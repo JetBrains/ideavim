@@ -23,10 +23,14 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.event.DocumentAdapter;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.EditorFactoryAdapter;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
+import com.intellij.openapi.fileEditor.FileDocumentManagerAdapter;
+import com.intellij.openapi.fileEditor.VetoDocumentSavingException;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -51,6 +55,7 @@ public class UndoManager
         documents = new HashMap();
 
         EditorFactory.getInstance().addEditorFactoryListener(new UndoEditorCloseListener());
+        FileDocumentManager.getInstance().addFileDocumentManagerListener(new FileDocumentListener());
     }
 
     public boolean inCommand(Editor editor)
@@ -180,6 +185,15 @@ public class UndoManager
         public void editorReleased(EditorFactoryEvent event)
         {
             UndoManager.getInstance().removeEditorUndoList(event.getEditor());
+        }
+    }
+
+    private class FileDocumentListener extends FileDocumentManagerAdapter
+    {
+        public void beforeDocumentSaving(Document document) throws VetoDocumentSavingException
+        {
+            EditorUndoList list = (EditorUndoList)UndoManager.getInstance().getEditors().get(document);
+            list.documentSaved();
         }
     }
 

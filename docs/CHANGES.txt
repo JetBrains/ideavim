@@ -5,7 +5,8 @@ History of changes for @NAME@
 New Features
 - Highlighting lines of code by clicking and/or dragging in the line number area
   now leaves you in visual line mode.
-- Undoing all changes in a file now correctly marks the file as unchanged.
+- Undoing all changes in a file now correctly marks the file as unchanged if it
+  hasn't been saved in the meantime.
 - All the :write commands (:w :wn :wN :wq) save just the one file now. To save
   all files use the :wall command.
 - Enhanced the :e command. Support for :e# and :e <filename> have been added.

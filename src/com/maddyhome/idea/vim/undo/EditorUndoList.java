@@ -23,14 +23,10 @@ import com.intellij.openapi.actionSystem.DataConstants;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vcs.AbstractVcsHelper;
-import com.intellij.openapi.vcs.FileStatusManager;
-import com.intellij.openapi.vfs.VirtualFile;
+import com.maddyhome.idea.vim.helper.DocumentManager;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.Options;
-import com.maddyhome.idea.vim.helper.DocumentManager;
 import java.util.ArrayList;
 
 /**
@@ -43,6 +39,14 @@ public class EditorUndoList
         //this.editor = editor;
 
         beginCommand(editor);
+    }
+
+    /**
+     * A document is restorable only if it hasn't been saved since changes were made.
+     */
+    public void documentSaved()
+    {
+        restorable = pointer == 0;
     }
 
     public boolean inCommand()
@@ -150,7 +154,7 @@ public class EditorUndoList
             cmd.undo(editor, context);
             inUndo = false;
 
-            if (pointer == 0)
+            if (pointer == 0 && restorable)
             {
                 Project p = (Project)context.getData(DataConstants.PROJECT);
                 DocumentManager.getInstance().reloadDocument(editor.getDocument(), p);
@@ -183,6 +187,7 @@ public class EditorUndoList
     private ArrayList undos = new ArrayList();
     private int pointer = 0;
     private boolean inUndo = false;
+    private boolean restorable = true;
 
     private static Logger logger = Logger.getInstance(EditorUndoList.class.getName());
 }
