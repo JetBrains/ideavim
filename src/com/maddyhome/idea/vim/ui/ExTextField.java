@@ -59,7 +59,7 @@ public class ExTextField extends JTextField
         this.context = context;
     }
 
-    Editor getEditor()
+    public Editor getEditor()
     {
         return editor;
     }

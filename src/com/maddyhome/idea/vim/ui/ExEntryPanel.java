@@ -180,6 +180,11 @@ public class ExEntryPanel extends JPanel
         return entry.getText();
     }
 
+    public ExTextField getEntry()
+    {
+        return entry;
+    }
+    
     /**
      * Turns off the ex entry field and puts the focus back to the original component
      * @param changeFocus true if focus should be put back, false if not

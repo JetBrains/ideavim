@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.ui;
  */
 
 import com.maddyhome.idea.vim.helper.SearchHelper;
+import com.maddyhome.idea.vim.group.CommandGroups;
 import com.intellij.openapi.diagnostic.Logger;
 
 import java.awt.event.ActionEvent;
@@ -165,6 +166,12 @@ public class ExEditorKit extends DefaultEditorKit
                         }
 
                         doc.remove(dot - delChars, delChars);
+                    }
+                    else
+                    {
+                        CommandGroups.getInstance().getProcess().cancelExEntry(
+                            ExEntryPanel.getInstance().getEntry().getEditor(),
+                            ExEntryPanel.getInstance().getEntry().getContext());
                     }
                 }
                 catch (BadLocationException bl)

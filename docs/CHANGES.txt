@@ -20,6 +20,10 @@ New Features
 - A new Vim.xml keymap needs to be installed or Ctrl-K needs to be removed
   from all source control menus.
 
+Bug Fixes
+- Fixed backspace in ex entry. Deleting the first character was closing the ex
+  entry window.
+
 0.7.2 from 0.7.1
 
 Bug Fixes
