@@ -548,6 +548,7 @@ public class Options
         addOption(new ToggleOption("more", "more", true));
         addOption(new NumberOption("scroll", "scr", 0));
         addOption(new BoundStringOption("selection", "sel", "inclusive", new String[] { "old", "inclusive", "exclusive" }));
+        addOption(new ToggleOption("showmode", "smd", false));
         addOption(new ToggleOption("smartcase", "scs", false));
         addOption(new NumberOption("undolevels", "ul", 1000, -1, Integer.MAX_VALUE));
         addOption(new ToggleOption("visualbell", "vb", false));

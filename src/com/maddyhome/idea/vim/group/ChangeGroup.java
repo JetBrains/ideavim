@@ -305,6 +305,8 @@ public class ChangeGroup extends AbstractActionGroup
         {
             lastInsert = state.getCommand();
             strokes.clear();
+            inInsert = true;
+            VimPlugin.showMode("INSERT");
             if (mode == CommandState.MODE_REPLACE)
             {
                 processInsert(editor, context);
@@ -385,6 +387,8 @@ public class ChangeGroup extends AbstractActionGroup
         CommandState.getInstance().reset();
         UndoManager.getInstance().endCommand(editor);
         UndoManager.getInstance().beginCommand(editor);
+        
+        VimPlugin.showMode("");
     }
 
     /**
@@ -416,6 +420,15 @@ public class ChangeGroup extends AbstractActionGroup
     {
         KeyHandler.executeAction("VimEditorToggleInsertState", context);
         CommandState.getInstance().toggleInsertOverwrite();
+        inInsert = !inInsert;
+        if (inInsert)
+        {
+            VimPlugin.showMode("INSERT");
+        }
+        else
+        {
+            VimPlugin.showMode("REPLACE");
+        }
     }
 
     /**
@@ -1307,6 +1320,7 @@ public class ChangeGroup extends AbstractActionGroup
     private ArrayList lastStrokes;
     private int insertStart;
     private Command lastInsert;
+    private boolean inInsert;
 
     private static Logger logger = Logger.getInstance(ChangeGroup.class.getName());
 }

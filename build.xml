@@ -23,6 +23,7 @@
       idea.home - $APPLICATION_HOME_DIR$
     -->
     <property name="src" value="src" />
+    <property name="resources" value="resources" />
     <property name="classes" value="classes" />
     <property name="javadoc" value="docs/javadoc" />
     <property name="install" value="install" />
@@ -59,6 +60,9 @@
         <copy file="plugin.xml" todir="${classes}/META-INF"/>
         <copy todir="${classes}">
             <fileset dir="${src}" excludes="**/*.java"/>
+        </copy>
+        <copy todir="${classes}">
+            <fileset dir="${resources}"/>
         </copy>
         <jar basedir="${classes}" jarfile="${install}/${project}.jar" compress="yes"/>
     </target>

@@ -1074,6 +1074,8 @@ public class MotionGroup extends AbstractActionGroup
         visualStart = editor.getSelectionModel().getSelectionStart();
         visualEnd = editor.getSelectionModel().getSelectionEnd();
 
+        updateVisualMessage();
+
         CommandGroups.getInstance().getMark().setMark(editor, context, '<', visualStart);
         CommandGroups.getInstance().getMark().setMark(editor, context, '>', visualEnd);
     }
@@ -1119,7 +1121,31 @@ public class MotionGroup extends AbstractActionGroup
             updateSelection(editor, context, visualEnd);
         }
 
+        updateVisualMessage();
+
         return true;
+    }
+
+    private void updateVisualMessage()
+    {
+        String msg;
+        if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
+        {
+            if ((CommandState.getInstance().getVisualType() & Command.FLAG_MOT_LINEWISE) != 0)
+            {
+                msg = "VISUAL LINES";
+            }
+            else
+            {
+                msg = "VISUAL";
+            }
+        }
+        else
+        {
+            msg = "";
+        }
+
+        VimPlugin.showMode(msg);
     }
 
     private TextRange calculateVisualRange(Editor editor, DataContext context, VisualChange range, int count)
@@ -1165,6 +1191,8 @@ public class MotionGroup extends AbstractActionGroup
         {
             CommandState.getInstance().reset();
         }
+
+        VimPlugin.showMode("");
     }
 
     public void resetVisual(Editor editor)
@@ -1273,6 +1301,8 @@ public class MotionGroup extends AbstractActionGroup
     {
         CommandState.getInstance().reset();
         editor.getSelectionModel().removeSelection();
+
+        VimPlugin.showMode("");
     }
 
     public static class MotionEditorChange implements FileEditorManagerListener

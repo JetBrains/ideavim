@@ -1,6 +1,16 @@
 History of changes for @NAME@
 
-0.3.1 to @VERSION@
+0.3.2 to @VERSION@
+
+New Features
+- A VIM tool window has been added. This is used to show the current mode (if
+  :set showmode is set) and any messages normally shown on the last line in
+  VIM.
+
+New :set Options
+- showmode is now supported.
+
+0.3.1 to 0.3.2
 
 New Commands
 - Added support for {visual}!{filter}, !{motion}{filter}, and !!{filter}.
