@@ -55,13 +55,13 @@
         <action id="VimMotionCamelRight" class="com.maddyhome.idea.vim.action.motion.text.MotionCamelRightAction" text="Camel Word Right"/>
         <action id="VimMotionNthCharacter" class="com.maddyhome.idea.vim.action.motion.text.MotionNthCharacterAction" text="Nth Character"/>
         <action id="VimMotionWordEndLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionWordEndLeftAction" text="Word End Left"/>
-        <action id="VimMotionWORDEndLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionWORDEndLeftAction" text="WORD End Left"/>
+        <action id="VimMotionBigWordEndLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionBigWordEndLeftAction" text="BigWord End Left"/>
         <action id="VimMotionWordEndRight" class="com.maddyhome.idea.vim.action.motion.text.MotionWordEndRightAction" text="Word End Right"/>
-        <action id="VimMotionWORDEndRight" class="com.maddyhome.idea.vim.action.motion.text.MotionWORDEndRightAction" text="WORD End Right"/>
+        <action id="VimMotionBigWordEndRight" class="com.maddyhome.idea.vim.action.motion.text.MotionBigWordEndRightAction" text="BigWord End Right"/>
         <action id="VimMotionWordLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionWordLeftAction" text="Word Left"/>
-        <action id="VimMotionWORDLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionWORDLeftAction" text="WORD Left"/>
+        <action id="VimMotionBigWordLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionBigWordLeftAction" text="BigWord Left"/>
         <action id="VimMotionWordRight" class="com.maddyhome.idea.vim.action.motion.text.MotionWordRightAction" text="Word Right"/>
-        <action id="VimMotionWORDRight" class="com.maddyhome.idea.vim.action.motion.text.MotionWORDRightAction" text="WORD Right"/>
+        <action id="VimMotionBigWordRight" class="com.maddyhome.idea.vim.action.motion.text.MotionBigWordRightAction" text="BigWord Right"/>
         <!-- Marks -->
         <action id="VimMotionMark" class="com.maddyhome.idea.vim.action.motion.mark.MotionMarkAction" text="Mark"/>
         <action id="VimMotionGotoFileMark" class="com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction" text="Goto Mark"/>

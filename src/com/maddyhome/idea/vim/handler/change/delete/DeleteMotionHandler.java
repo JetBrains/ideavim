@@ -31,6 +31,6 @@ public class DeleteMotionHandler extends ChangeEditorActionHandler
 {
     public boolean execute(Editor editor, DataContext context, int count, int rawCount, Argument argument)
     {
-        return CommandGroups.getInstance().getChange().deleteMotion(editor, context, count, rawCount, argument);
+        return CommandGroups.getInstance().getChange().deleteMotion(editor, context, count, rawCount, argument, false);
     }
 }

@@ -584,15 +584,15 @@ public class RegisterActions
             new Shortcut('w'),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_MASK))
         });
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionWORDEndLeft", Command.MOTION, Command.FLAG_MOT_INCLUSIVE,
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionBigWordEndLeft", Command.MOTION, Command.FLAG_MOT_INCLUSIVE,
             new Shortcut("gE"));
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionWORDEndRight", Command.MOTION, Command.FLAG_MOT_INCLUSIVE,
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionBigWordEndRight", Command.MOTION, Command.FLAG_MOT_INCLUSIVE,
             new Shortcut('E'));
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionWORDLeft", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionBigWordLeft", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut[] {
             new Shortcut('B'),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_MASK))
         });
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionWORDRight", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionBigWordRight", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut[] {
             new Shortcut('W'),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_MASK))
         });

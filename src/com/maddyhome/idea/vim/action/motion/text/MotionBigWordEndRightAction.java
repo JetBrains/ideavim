@@ -20,14 +20,14 @@ package com.maddyhome.idea.vim.action.motion.text;
 */
 
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
-import com.maddyhome.idea.vim.handler.motion.text.MotionWORDRightHandler;
+import com.maddyhome.idea.vim.handler.motion.text.MotionBigWordEndRightHandler;
 
 /**
  */
-public class MotionWORDRightAction extends MotionEditorAction
+public class MotionBigWordEndRightAction extends MotionEditorAction
 {
-    public MotionWORDRightAction()
+    public MotionBigWordEndRightAction()
     {
-        super(new MotionWORDRightHandler());
+        super(new MotionBigWordEndRightHandler());
     }
 }

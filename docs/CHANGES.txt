@@ -25,6 +25,7 @@ Bug Fixes
 - The commands c% and d% where not removing the closing match as expected.
 - The d{motion} command now becomes linewise when the motion covers more than
   one line and the is just whitespace before the start and after the end.
+- Renamed some source files to avoid problems on case insensitive platforms.
 
 0.3.0 to 0.3.1
 

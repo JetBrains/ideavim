@@ -27,10 +27,10 @@ import com.maddyhome.idea.vim.handler.motion.MotionEditorActionHandler;
 
 /**
  */
-public class MotionWORDEndLeftHandler extends MotionEditorActionHandler
+public class MotionBigWordRightHandler extends MotionEditorActionHandler
 {
     public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument)
     {
-        return CommandGroups.getInstance().getMotion().moveCaretToNextWordEnd(editor, -count, true);
+        return CommandGroups.getInstance().getMotion().moveCaretToNextWord(editor, count, true);
     }
 }

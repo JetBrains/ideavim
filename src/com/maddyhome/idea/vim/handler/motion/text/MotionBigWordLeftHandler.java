@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.handler.motion.MotionEditorActionHandler;
 
 /**
  */
-public class MotionWORDLeftHandler extends MotionEditorActionHandler
+public class MotionBigWordLeftHandler extends MotionEditorActionHandler
 {
     public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument)
     {

@@ -54,6 +54,7 @@ import javax.swing.KeyStroke;
 
 /**
  * Provides all the insert/replace related functionality
+ * TODO - change cursor for the different modes
  */
 public class ChangeGroup extends AbstractActionGroup
 {
