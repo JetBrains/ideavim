@@ -261,11 +261,6 @@ public class MotionGroup extends AbstractActionGroup
         return Math.max(0, Math.min(count, EditorHelper.getFileSize(editor) - 1));
     }
 
-    private void saveJumpLocation(Editor editor, DataContext context)
-    {
-        CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
-    }
-
     public int moveCaretToMarkLine(Editor editor, DataContext context, char ch)
     {
         Mark mark = CommandGroups.getInstance().getMark().getMark(editor, ch);
@@ -932,7 +927,7 @@ public class MotionGroup extends AbstractActionGroup
 
     public static void moveCaret(Editor editor, DataContext context, int offset)
     {
-        if (offset >= 0 && offset < editor.getDocument().getTextLength())
+        if (offset >= 0 && offset <= editor.getDocument().getTextLength())
         {
             editor.getCaretModel().moveToOffset(offset);
             EditorData.setLastColumn(editor, editor.getCaretModel().getVisualPosition().column);
@@ -1123,7 +1118,6 @@ public class MotionGroup extends AbstractActionGroup
 
     public boolean swapVisualEnds(Editor editor, DataContext context)
     {
-        int offset = editor.getCaretModel().getOffset();
         int t = visualEnd;
         visualEnd = visualStart;
         visualStart = t;
