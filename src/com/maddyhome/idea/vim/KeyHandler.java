@@ -143,7 +143,17 @@ public class KeyHandler
         else if (currentArg == Argument.CHARACTER)
         {
             // We are expecting a character argument - is this a regular character the user typed?
-            // FIX - This doesn't handle r<Enter>, for example
+            // Some special keys can be handled as character arguments - let's check for them here.
+            if (chKey == 0)
+            {
+                switch (key.getKeyCode())
+                {
+                    case KeyEvent.VK_ENTER:
+                        chKey = '\n';
+                        break;
+                }
+            }
+
             if (chKey != 0)
             {
                 // Create the character argument, add it to the current command, and signal we are ready to process
