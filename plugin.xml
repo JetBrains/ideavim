@@ -1,19 +1,20 @@
 <idea-plugin url="http://sourceforge.net/projects/ideavim/">
     <name>@NAME@</name>
     <description>VIM Emulator. This plugin provides key mappings in IDEA to emulate vi/vim/gvim. Please see the README file for key mapping installation. Required for a first time install.</description>
-    <version>@VERSION@</version>
+    <version>@VERSION@-@IDEA-VERSION@</version>
     <vendor email="rick@maddyhome.com">Rick Maddy</vendor>
     <change-notes>
 <![CDATA[
 New Features<br>
 <br>
 Bug Fixes<br>
+- Updated to show up in the plugin list for Pallada.
 - Fixed NullPointerException when using the :qall, :q, or :wq commands.<br>
 - Fixed the :edit, :next, :previous, :argument, :first, and :last commands.
 These were broken by the focus fix in 0.7.2.<br>
 ]]>
     </change-notes>
-    <idea-version min="4.0" max="4.5"/>
+    <idea-version since-build="1162"/>
 
     <application-components>
         <component>

@@ -30,12 +30,12 @@
     <property name="install" value="install" />
     <property name="dist" value="dist" />
     <!-- Update to your IntelliJ installtion -->
-    <property name="idea.home" value="/opt/idea-2151" />
+    <property name="idea.home" value="/opt/idea-2155" />
 
     <property name="project" value="IdeaVIM" />
     <!-- Update this prior to building a new distribution -->
     <property name="idea-version" value="4.5" />
-    <property name="version" value="0.8.1" />
+    <property name="version" value="0.8.2" />
 
     <path id="build.classpath">
         <pathelement path="${idea.home}/lib/idea.jar" />
@@ -65,6 +65,7 @@
             <filterset>
                 <filter token="NAME" value="${project}" />
                 <filter token="VERSION" value="${version}" />
+                <filter token="IDEA-VERSION" value="${idea-version}" />
             </filterset>
         </copy>
         <copy todir="${classes}">
