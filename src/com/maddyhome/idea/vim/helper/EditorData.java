@@ -19,6 +19,7 @@ package com.maddyhome.idea.vim.helper;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditor;
@@ -26,9 +27,8 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.command.VisualRange;
 import com.maddyhome.idea.vim.group.MarkGroup;

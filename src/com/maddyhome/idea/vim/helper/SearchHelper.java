@@ -19,9 +19,9 @@ package com.maddyhome.idea.vim.helper;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionChangeEvent;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
