@@ -79,7 +79,7 @@ public class ExEntryHandler extends AbstractEditorActionHandler
                     {
                         logger.debug("processing command");
                         CommandEntryPanel.getInstance().deactivate(true);
-                        CommandParser.getInstance().processCommand(editor, context, e.getActionCommand());
+                        CommandParser.getInstance().processCommand(editor, context, e.getActionCommand(), 1);
                         if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
                         {
                             CommandGroups.getInstance().getMotion().resetVisual(editor);
