@@ -295,6 +295,7 @@ public class CommandParser
                         }
                         else if (ch == '+' || ch == '-')
                         {
+                            location.append('0');
                             state = STATE_RANGE_OFFSET;
                         }
                         else if (ch == '\\')

@@ -52,12 +52,16 @@ public class GotoLineHandler extends CommandHandler
     {
         int count = cmd.getLine(editor, context);
 
-        if (count > 0)
+        if (count >= 0)
         {
             MotionGroup.moveCaret(editor, context,
                 CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor, count));
 
             return true;
+        }
+        else
+        {
+            MotionGroup.moveCaret(editor, context, 0);
         }
 
         return false;

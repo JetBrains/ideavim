@@ -28,8 +28,8 @@ import com.maddyhome.idea.vim.helper.EditorHelper;
  */
 public class LineNumberRange extends AbstractRange
 {
-    public static final int CURRENT_LINE = -3;
-    public static final int LAST_LINE = -4;
+    public static final int CURRENT_LINE = -99999999;
+    public static final int LAST_LINE =    -99999998;
 
     /**
      * Create a range for the current line

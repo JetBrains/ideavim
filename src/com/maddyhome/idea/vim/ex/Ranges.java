@@ -59,7 +59,7 @@ public class Ranges
      */
     public int size()
     {
-        return count;
+        return ranges.size();
     }
 
     /**
