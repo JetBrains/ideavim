@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.ex.handler.RegistersHandler;
 import com.maddyhome.idea.vim.ex.handler.SelectFileHandler;
 import com.maddyhome.idea.vim.ex.handler.SelectFirstFileHandler;
 import com.maddyhome.idea.vim.ex.handler.SelectLastFileHandler;
+import com.maddyhome.idea.vim.ex.handler.SetHandler;
 import com.maddyhome.idea.vim.ex.handler.ShiftLeftHandler;
 import com.maddyhome.idea.vim.ex.handler.ShiftRightHandler;
 import com.maddyhome.idea.vim.ex.handler.SubstituteHandler;
@@ -95,6 +96,7 @@ public class CommandParser
         new SelectFileHandler();
         new SelectFirstFileHandler();
         new SelectLastFileHandler();
+        new SetHandler();
         new ShiftLeftHandler();
         new ShiftRightHandler();
         new SubstituteHandler();
