@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.helper;
  */
 
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.TextEditor;
@@ -155,20 +156,25 @@ public class EditorData
             for (int p = 0; p < projs.length; p++)
             {
                 FileEditorManager fMgr = FileEditorManager.getInstance(projs[p]);
+                /*
                 VirtualFile[] files = fMgr.getOpenFiles();
                 for (int i = 0; i < files.length; i++)
                 {
                     FileEditor[] editors = fMgr.getEditors(files[i]);
+                    */
+                    FileEditor[] editors = fMgr.getAllEditors();
                     for (int e = 0; e < editors.length; e++)
                     {
-                        if (editors[0] instanceof TextEditor && ((TextEditor)editors[0]).getEditor().equals(editor))
+                        if (editors[e] instanceof TextEditor && ((TextEditor)editors[e]).getEditor().equals(editor))
                         {
                             proj = projs[p];
                             editor.putUserData(key, proj);
                             break;
                         }
                     }
+                /*
                 }
+                */
             }
         }
 
@@ -182,6 +188,7 @@ public class EditorData
      */
     public static VirtualFile getVirtualFile(Editor editor)
     {
+        /*
         Key key = new Key(FILE);
         VirtualFile file = (VirtualFile)editor.getUserData(key);
         if (file == null)
@@ -208,6 +215,9 @@ public class EditorData
         }
 
         return file;
+        */
+
+        return FileDocumentManager.getInstance().getFile(editor.getDocument());
     }
 
     /**
@@ -217,7 +227,6 @@ public class EditorData
 
     private static final String LAST_COLUMN = "lastColumn";
     private static final String PROJECT = "project";
-    private static final String FILE = "virtualFile";
     private static final String VISUAL = "lastVisual";
     private static final String VISUAL_OP = "lastVisualOp";
 }
