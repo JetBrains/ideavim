@@ -1116,6 +1116,7 @@ public class MotionGroup extends AbstractActionGroup
 
     public void resetVisual(Editor editor)
     {
+        logger.debug("resetVisual");
         EditorData.setLastVisualRange(editor, new VisualRange(visualStart,
             visualEnd, CommandState.getInstance().getVisualType()));
 
