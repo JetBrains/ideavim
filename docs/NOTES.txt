@@ -3,5 +3,5 @@
 VIM Emulator plugin for IntelliJ IDEA. See the enclosed README file in the
 binary distribution for installation instructions. See docs/vim/index.txt for
 a complete list of supported VIM commands. This release has been tested with
-IDEA Aurora. (builds #1050 - 1156).
+IDEA 4.0 to 4.0.3. (builds #1162 - 1182).
 

@@ -1,6 +1,6 @@
 History of changes for @NAME@ for IDEA @IDEA-VERSION@
 
-0.7.1 to @VERSION@
+@VERSION@ from 0.7.1
 
 Bug Fixes
 - Fixed c<motion and d<motion> exception if the motion was invalid.
@@ -18,7 +18,7 @@ Bug Fixes
 - A space is now properly allowed between the range and the command in a :
   command such as :1,2 co 4
 
-0.7.0 to 0.7.1
+0.7.1 from 0.7.0
 
 Bug Fixes
 - Opening a non-text file resulted in some exceptions. This could happen when
@@ -31,7 +31,7 @@ Bug Fixes
 - Using the C command on an empty file caused an error.
 - Changing the last word on the last line leaves cursor correctly.
 
-0.6.5 to 0.7.0
+0.7.0 from 0.6.5
 
 New Features
 - Highlighting lines of code by clicking and/or dragging in the line number area
@@ -75,11 +75,11 @@ Bug Fixes
 - dw, dW, and d[w now act like d$ if deleting the last word of a line.
 - cW now properly behaves like cE.
 
-0.6.4 to 0.6.5
+0.6.5 from 0.6.4
 
 Support for Aurora build #1050 and higher.
 
-0.6.3 to 0.6.4
+0.6.4 from 0.6.3
 
 Support for Aurora build #1035 and higher.
 
@@ -97,16 +97,16 @@ Clean-up
 - Removed use of newly deprecated methods in Open API.
 - Some basic code cleanup.
 
-0.6.2 to 0.6.3
+0.6.3 from 0.6.2
 
 Support for Aurora build #992 and higher.
 
-0.6.1 to 0.6.2
+0.6.2 from 0.6.1
 
 Repackaged to install as a zip directory instead of a jar file. This provides
 better support for the new plugins repository.
 
-0.6.0 to 0.6.1
+0.6.1 from 0.6.0
 
 Support for Aurora build #963.
 
@@ -117,7 +117,7 @@ Changed Features
 Bug Unfixes
 - Removed, again, support for :w related ex commands
 
-0.4.1 to 0.6.0
+0.6.0 from 0.4.1
 
 Support for Aurora build #939. It may work with slightly older versions too.
 This version will not work with IDEA 3.x. For IDEA 3.x you must use @NAME@
@@ -126,7 +126,7 @@ versions prior to 0.6.0.
 Bug Fixes
 - Put back file saving for the :w related ex commands
 
-0.4.0 to 0.4.1
+0.4.1 from 0.4.0
 
 Bug Fixes
 - Fixed vim.xml for Windows. This file was getting deleted by Idea on Windows
@@ -138,7 +138,7 @@ Temporary Work-arounds
 - Disabled the saving of files when using any of the :w related commands until
   a fix can be found for the dead-lock bug. ZZ and ZQ still save files.
 
-0.3.2 to 0.4.0
+0.4.0 from 0.3.2
 
 New Features
 - A VIM tool window has been added. This is used to show the current mode (if
@@ -173,7 +173,7 @@ Bug Fixes
   real tab characters. Tabs are now properly handled.
 - gd and gD weren't working in read-only files.
 
-0.3.1 to 0.3.2
+0.3.2 from 0.3.1
 
 New Commands
 - Added support for {visual}!{filter}, !{motion}{filter}, and !!{filter}.
@@ -214,7 +214,7 @@ Bug Fixes
 - Issuing a p command when on the last line of a file pasted the line before
   the last line instead of after the last line.
 
-0.3.0 to 0.3.1
+0.3.1 from 0.3.0
 
 New Commands
 - Added support for [w, ]w, [b, and ]b. These move the cursor forward to start
@@ -247,7 +247,7 @@ Bug Fixes
 - Backslashes (\) in the replace text of a :substitute command was not being
   handled correctly in all cases.
 
-0.2.0 to 0.3.0
+0.3.0 from 0.2.0
 
 Redone Commands
 - / and ? and all their variants are now supported properly, including offsets.
@@ -278,7 +278,7 @@ Supported Set Options
 - visualbell - controls whether the plugin beeps or not.
 - wrapscan - Determines is searches wrap around the start or end of the file.
 
-0.1.1 to 0.2.0
+0.2.0 from 0.1.1
 
 New Commands
 - Added support for Ctrl-U while in insert mode
@@ -306,7 +306,7 @@ Bug Fixes
 Keymappings - Install new plugin.xml or manually add keymapping
 - F1
 
-0.1.0 to 0.1.1
+0.1.1 from 0.1.0
 - Fixed text of README file (NAME and VERSION weren't properly substituted)
 - Fixed issue with pressing Enter when entering an Ex command (no more beep or
   IDEA error message)

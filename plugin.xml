@@ -6,6 +6,20 @@
     <change-notes>
 <![CDATA[
 Bug Fixes<br>
+- Fixed c<motion and d<motion> exception if the motion was invalid.<br>
+- Fixed focus problem with : and / and ? commands.<br>
+- Fixed word motion on strings such as 1/2/3.<br>
+- Fixed <count><word motion> which didn't always match doing <count>
+independent <word motion> commands.<br>
+- Fixed <count>cw on strings such as 1/2/3.<br>
+- Fixed <count>dw which could delete <count> lines instead.<br>
+- The results of the :registers, :marks, and :set commands are now displayed
+properly. This "more" window hadn't been working for a while.<br>
+- Fixed cursor position when issuing the O command on the first line.<br>
+- The confirmation dialog used with the :s//c command now has a default button
+and mnemonics for all buttons.<br>
+- A space is now properly allowed between the range and the command in a :
+command such as :1,2 co 4<br>
 ]]>
     </change-notes>
     <idea-version min="4.0" max="4.5"/>

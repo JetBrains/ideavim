@@ -80,16 +80,11 @@ You may obtain the plugin by visiting the files page on
 
 <h3>Versions</h3>
 
-The VIM plugin has been developed and tested with IntelliJ IDEA 3.0.2 (#695), 3.0.3 (#698), and 3.0.4 (#701).
-It is not known at this time if older or newer versions will work correctly.
+Version 0.4.x was used with IDEA 3.x.
 <br>
-Version 0.6.2 of the plugin now works with Aurora build #963 and higher.
+Version 0.6.x was used with Aurora.
 <br>
-Version 0.6.3 of the plugin now works with Aurora build #992 and higher.
-<br>
-Version 0.6.4 of the plugin now works with Aurora build #1035 and higher.
-<br>
-Version 0.6.5 of the plugin now works with Aurora build #1050 and higher.
+Version 0.7.x is used with IDEA 4.x
 
 <hr>
 
