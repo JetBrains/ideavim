@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.group;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2004 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -534,6 +534,41 @@ public class ChangeGroup extends AbstractActionGroup
     public boolean processKey(Editor editor, DataContext context, KeyStroke key)
     {
         logger.debug("processKey(" + key + ")");
+
+        switch (digraphState)
+        {
+            case 0:
+                if (key.getKeyCode() == KeyEvent.VK_K && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0)
+                {
+                    digraphState = 1;
+                    return true;
+                }
+                break;
+            case 1:
+                if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED)
+                {
+                    digraphChar = key.getKeyChar();
+                    digraphState = 2;
+
+                    return true;
+                }
+                else
+                {
+                    digraphState = 0;
+                    return false;
+                }
+            case 2:
+                if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED)
+                {
+                    char ch = CommandGroups.getInstance().getDigraph().getDigraph(digraphChar, key.getKeyChar());
+                    if (ch != key.getKeyChar())
+                    {
+                        key = KeyStroke.getKeyStroke(ch);
+                    }
+                }
+                digraphState = 0;
+                break;
+        }
 
         if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED)
         {
@@ -1434,6 +1469,8 @@ public class ChangeGroup extends AbstractActionGroup
     private int insertStart;
     private Command lastInsert;
     private boolean inInsert;
+    private int digraphState = 0;
+    private char digraphChar;
 
     private static Logger logger = Logger.getInstance(ChangeGroup.class.getName());
 }

@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.key;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2004 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -224,8 +224,8 @@ public class RegisterActions
             new Shortcut('c'),
             new Shortcut('s')
         });
-        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimChangeVisualCharacter", Command.CHANGE,
-            new Shortcut('r'), Argument.CHARACTER);
+        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimChangeVisualCharacter", Command.CHANGE, Command.FLAG_ALLOW_DIGRAPH,
+            new Shortcut('r'), Argument.DIGRAPH);
         parser.registerAction(KeyParser.MAPPING_VISUAL, "VimChangeVisualLines", Command.CHANGE, Command.FLAG_MOT_LINEWISE | Command.FLAG_MULTIKEY_UNDO, new Shortcut[] {
             new Shortcut('C'),
             new Shortcut('R'),
@@ -308,8 +308,8 @@ public class RegisterActions
             new Shortcut("g~"), Argument.MOTION);
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeCaseUpperMotion", Command.CHANGE, Command.FLAG_OP_PEND,
             new Shortcut("gU"), Argument.MOTION);
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeCharacter", Command.CHANGE,
-            new Shortcut('r'), Argument.CHARACTER);
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeCharacter", Command.CHANGE, Command.FLAG_ALLOW_DIGRAPH,
+            new Shortcut('r'), Argument.DIGRAPH);
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeCharacters", Command.CHANGE, Command.FLAG_NO_REPEAT | Command.FLAG_MULTIKEY_UNDO,
             new Shortcut('s'));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeEndOfLine", Command.CHANGE, Command.FLAG_MULTIKEY_UNDO,
@@ -507,10 +507,10 @@ public class RegisterActions
             new Shortcut('h'),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0))
         });
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLeftMatchChar", Command.MOTION, Command.FLAG_MOT_INCLUSIVE,
-            new Shortcut('F'), Argument.CHARACTER);
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLeftTillMatchChar", Command.MOTION, Command.FLAG_MOT_INCLUSIVE,
-            new Shortcut('T'), Argument.CHARACTER);
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLeftMatchChar", Command.MOTION, Command.FLAG_MOT_INCLUSIVE | Command.FLAG_ALLOW_DIGRAPH,
+            new Shortcut('F'), Argument.DIGRAPH);
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLeftTillMatchChar", Command.MOTION, Command.FLAG_MOT_INCLUSIVE | Command.FLAG_ALLOW_DIGRAPH,
+            new Shortcut('T'), Argument.DIGRAPH);
         parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLeftWrap", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK))
@@ -528,10 +528,10 @@ public class RegisterActions
             new Shortcut('l'),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0))
         });
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionRightMatchChar", Command.MOTION, Command.FLAG_MOT_INCLUSIVE,
-            new Shortcut('f'), Argument.CHARACTER);
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionRightTillMatchChar", Command.MOTION, Command.FLAG_MOT_INCLUSIVE,
-            new Shortcut('t'), Argument.CHARACTER);
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionRightMatchChar", Command.MOTION, Command.FLAG_MOT_INCLUSIVE | Command.FLAG_ALLOW_DIGRAPH,
+            new Shortcut('f'), Argument.DIGRAPH);
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionRightTillMatchChar", Command.MOTION, Command.FLAG_MOT_INCLUSIVE | Command.FLAG_ALLOW_DIGRAPH,
+            new Shortcut('t'), Argument.DIGRAPH);
         parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionRightWrap", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE,
             new Shortcut(' '));
         parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionScrollFirstScreenLine", Command.OTHER_READONLY, new Shortcut[] {

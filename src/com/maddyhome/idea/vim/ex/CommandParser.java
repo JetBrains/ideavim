@@ -1,3 +1,6 @@
+
+package com.maddyhome.idea.vim.ex;
+
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
  * Copyright (C) 2003-2004 Rick Maddy
@@ -16,7 +19,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.maddyhome.idea.vim.ex;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
@@ -64,6 +66,7 @@ import com.maddyhome.idea.vim.ex.handler.WriteNextFileHandler;
 import com.maddyhome.idea.vim.ex.handler.WritePreviousFileHandler;
 import com.maddyhome.idea.vim.ex.handler.WriteQuitHandler;
 import com.maddyhome.idea.vim.ex.handler.YankLinesHandler;
+import com.maddyhome.idea.vim.ex.handler.DigraphHandler;
 import com.maddyhome.idea.vim.ex.range.AbstractRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.MessageHelper;
@@ -108,6 +111,7 @@ public class CommandParser
         new CmdFilterHandler();
         new CopyTextHandler();
         new DeleteLinesHandler();
+        new DigraphHandler();
         new DumpLineHandler();
         new EditFileHandler();
         new ExitHandler();

@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.command;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2004 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -58,6 +58,8 @@ public class Command
     public static final int FLAG_EXPECT_MORE = 1 << 26;
     /** This flag indicates the command's argument isn't used while recording */
     public static final int FLAG_NO_ARG_RECORDING = 1 << 27;
+    /** Indicate that the character argument may come from a digraph */
+    public static final int FLAG_ALLOW_DIGRAPH = 1 << 28;
 
     /** Represents commands that actually move the cursor and can be arguments to operators */
     public static final int MOTION = 1;

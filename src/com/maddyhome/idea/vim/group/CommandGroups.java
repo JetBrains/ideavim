@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.group;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2004 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -56,6 +56,7 @@ public class CommandGroups
         search = new SearchGroup();
         process = new ProcessGroup();
         macro = new MacroGroup();
+        digraph = new DigraphGroup();
     }
 
     /**
@@ -139,6 +140,11 @@ public class CommandGroups
         return macro;
     }
 
+    public DigraphGroup getDigraph()
+    {
+        return digraph;
+    }
+
     /**
      * Tells each group to save its data.
      * @param element The plugin's root element
@@ -154,6 +160,7 @@ public class CommandGroups
         search.saveData(element);
         process.saveData(element);
         macro.saveData(element);
+        digraph.saveData(element);
     }
 
     /**
@@ -172,6 +179,7 @@ public class CommandGroups
         search.readData(element);
         process.readData(element);
         macro.readData(element);
+        digraph.readData(element);
     }
 
     private static CommandGroups instance;
@@ -184,6 +192,7 @@ public class CommandGroups
     private SearchGroup search;
     private ProcessGroup process;
     private MacroGroup macro;
+    private DigraphGroup digraph;
 
     private static Logger logger = Logger.getInstance(CommandGroups.class.getName());
 }

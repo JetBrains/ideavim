@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2004 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -123,7 +123,7 @@ public class KeyHandler
         // check if a number can be entered at this point, and if so, did the user send us a digit.
         else if ((CommandState.getInstance().getMode() == CommandState.MODE_COMMAND ||
             CommandState.getInstance().getMode() == CommandState.MODE_VISUAL) &&
-            mode == STATE_NEW_COMMAND && currentArg != Argument.CHARACTER && Character.isDigit(chKey) &&
+            mode == STATE_NEW_COMMAND && currentArg != Argument.CHARACTER && currentArg != Argument.DIGRAPH && Character.isDigit(chKey) &&
             (count != 0 || chKey != '0'))
         {
             // Update the count
@@ -132,7 +132,7 @@ public class KeyHandler
         // Pressing delete while entering a count "removes" the last digit entered
         else if ((CommandState.getInstance().getMode() == CommandState.MODE_COMMAND ||
             CommandState.getInstance().getMode() == CommandState.MODE_VISUAL) &&
-            mode == STATE_NEW_COMMAND && currentArg != Argument.CHARACTER &&
+            mode == STATE_NEW_COMMAND && currentArg != Argument.CHARACTER && currentArg != Argument.DIGRAPH &&
             key.getKeyCode() == KeyEvent.VK_DELETE && count != 0)
         {
             // "Remove" the last digit sent to us
@@ -167,6 +167,65 @@ public class KeyHandler
             {
                 // Oops - this isn't a valid character argument
                 mode = STATE_ERROR;
+            }
+        }
+        else if (currentArg == Argument.DIGRAPH)
+        {
+            logger.debug("currentArg == DIGRAPH(" + digraphState + ")");
+            switch (digraphState)
+            {
+                case 0:
+                    // We should have a Ctrl-K if this is a true digraph or a regular character
+                    if (key.getKeyCode() == KeyEvent.VK_K && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0)
+                    {
+                        // we have a Ctrl-K - start of a digraph
+                        digraphState = 1;
+                        logger.debug("we have Ctrl-K");
+                    }
+                    else
+                    {
+                        // We have a regular character
+                        currentArg = Argument.CHARACTER;
+                        handleKey(editor, key, context);
+                    }
+                    break;
+                case 1:
+                    logger.debug("first key: " + chKey);
+                    if (chKey != 0)
+                    {
+                        Argument arg = new Argument(chKey);
+                        Command cmd = (Command)currentCmd.peek();
+                        cmd.setArgument(arg);
+                        digraphState = 2;
+                    }
+                    else
+                    {
+                        Argument arg = new Argument((char)11);
+                        Command cmd = (Command)currentCmd.peek();
+                        cmd.setArgument(arg);
+                        mode = STATE_READY;
+                    }
+                    break;
+                case 2:
+                    logger.debug("second key: " + chKey);
+                    if (chKey != 0)
+                    {
+                        char char1 = ((Command)currentCmd.peek()).getArgument().getCharacter();
+                        char digraph = CommandGroups.getInstance().getDigraph().getDigraph(char1, chKey);
+
+                        Argument arg = new Argument(digraph);
+                        Command cmd = (Command)currentCmd.peek();
+                        cmd.setArgument(arg);
+                        mode = STATE_READY;
+                    }
+                    else
+                    {
+                        Argument arg = new Argument((char)11);
+                        Command cmd = (Command)currentCmd.peek();
+                        cmd.setArgument(arg);
+                        mode = STATE_READY;
+                    }
+                    break;
             }
         }
         // If we are this far - sheesh, then the user must be entering a command or a non-single-character argument
@@ -254,6 +313,9 @@ public class KeyHandler
                 // What argType of argument does this command expect?
                 switch (arg.getArgType())
                 {
+                    case Argument.DIGRAPH:
+                        digraphState = 0;
+                        // No break - fall through
                     case Argument.CHARACTER:
                     case Argument.MOTION:
                         mode = STATE_NEW_COMMAND;
@@ -438,6 +500,7 @@ public class KeyHandler
         mode = STATE_NEW_COMMAND;
         currentCmd.clear();
         currentArg = Argument.NONE;
+        digraphState = 0;
         logger.debug("reset");
     }
 
@@ -516,6 +579,7 @@ public class KeyHandler
     private Stack currentCmd = new Stack();
     private int currentArg;
     private TypedActionHandler origHandler;
+    private int digraphState;
 
     private static KeyHandler instance;
 

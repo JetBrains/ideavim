@@ -6,7 +6,7 @@ Bugs to fix:
 
 Requested Functionality to add:
 
-- Compose support for i18n
+- Compose support for i18n (Ctrl-K {char} {char}, :digraph)
 - Highlight all searches (:set hls, :set nohls, :nohls)
 - More fold region support
 - Window support (need access to splitter)
