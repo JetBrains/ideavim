@@ -372,6 +372,7 @@ public class ChangeGroup extends AbstractActionGroup
         CommandGroups.getInstance().getMark().setMark(editor, context, ']', editor.getCaretModel().getOffset());
         CommandState.getInstance().reset();
         UndoManager.getInstance().endCommand(editor);
+        UndoManager.getInstance().beginCommand(editor);
     }
 
     /**
@@ -644,7 +645,7 @@ public class ChangeGroup extends AbstractActionGroup
      */
     public boolean deleteMotion(Editor editor, DataContext context, int count, int rawCount, Argument argument)
     {
-        TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, false);
+        TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true, false);
         if (range == null && EditorHelper.getFileSize(editor) == 0)
         {
             return true;
@@ -925,7 +926,7 @@ public class ChangeGroup extends AbstractActionGroup
      */
     public boolean changeCaseMotion(Editor editor, DataContext context, int count, int rawCount, char type, Argument argument)
     {
-        TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, false);
+        TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true, false);
 
         return changeCaseRange(editor, context, range, type);
     }
@@ -1020,7 +1021,7 @@ public class ChangeGroup extends AbstractActionGroup
 
     public void indentMotion(Editor editor, DataContext context, int count, int rawCount, Argument argument, int dir)
     {
-        TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, false);
+        TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, false, false);
 
         indentRange(editor, context, range, 1, dir);
     }

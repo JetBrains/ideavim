@@ -41,12 +41,22 @@ public class EditorKeyHandler extends EditorActionHandler
     {
         if (editor == null || !VimPlugin.isEnabled())
         {
-            origHandler.execute(editor, context);
+            original(editor, context);
         }
         else
         {
-            KeyHandler.getInstance().handleKey(editor, stroke, context);
+            handle(editor, context);
         }
+    }
+
+    protected void original(Editor editor, DataContext context)
+    {
+        origHandler.execute(editor, context);
+    }
+
+    protected void handle(Editor editor, DataContext context)
+    {
+        KeyHandler.getInstance().handleKey(editor, stroke, context);
     }
 
     protected EditorActionHandler origHandler;

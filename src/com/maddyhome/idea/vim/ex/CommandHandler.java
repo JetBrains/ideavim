@@ -214,6 +214,7 @@ public abstract class CommandHandler
                     boolean res = true;
                     try
                     {
+                        UndoManager.getInstance().endCommand(editor);
                         UndoManager.getInstance().beginCommand(editor);
                         for (int i = 0; i < count && res; i++)
                         {
@@ -236,6 +237,7 @@ public abstract class CommandHandler
                         {
                             UndoManager.getInstance().abortCommand(editor);
                         }
+                        UndoManager.getInstance().beginCommand(editor);
                     }
                 }
             });

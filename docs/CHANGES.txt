@@ -1,6 +1,22 @@
 History of changes for @NAME@
 
-0.3.0 to @VERSION@
+0.3.1 to @VERSION@
+
+New Commands
+- Added support for {visual}!{filter}, !{motion}{filter}, and !!{filter}.
+
+Bug Fixes
+- Now properly handle :0, :1, and :<negative> commands
+- More problems with Visual mode - none of the visual change commands left
+  you in insert mode after deleting the text and undo wouldn't put the text
+  back.
+- Fixed the handling of undo/redo with regard to text added to a file while not
+  in insert mode. This can happen with the use of the Generate... menu for
+  adding constructors, getters, etc. This also can happen when IDEA adds an
+  import statement automatically. This also allows you to undo import
+  optimizations!
+
+0.3.0 to 0.3.1
 
 New Commands
 - Added support for [w, ]w, [b, and ]b. These move the cursor forward to start

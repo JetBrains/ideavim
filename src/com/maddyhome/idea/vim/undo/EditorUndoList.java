@@ -31,9 +31,25 @@ import java.util.ArrayList;
  */
 public class EditorUndoList
 {
-    public void beginCommand(Editor editor)
+    public EditorUndoList(Editor editor)
+    {
+        this.editor = editor;
+
+        beginCommand();
+    }
+
+    public boolean inCommand()
+    {
+        return currentCommand != null;
+    }
+
+    public void beginCommand()
     {
         logger.info("beginCommand");
+        if (inCommand())
+        {
+            endCommand();
+        }
         currentCommand = new UndoCommand(editor);
     }
 
@@ -43,53 +59,55 @@ public class EditorUndoList
         currentCommand = null;
     }
 
-    public void endCommand(Editor editor)
+    public void endCommand()
     {
-        if (currentCommand == null)
+        if (currentCommand != null && currentCommand.size() > 0)
         {
-            return;
-        }
-        else if (currentCommand.size() == 0)
-        {
-            currentCommand = null;
-            return;
-        }
-
-        logger.info("endCommand");
-        int max = getMaxUndos();
-        if (max == 0)
-        {
-            undos.clear();
-            undos.add(currentCommand);
-        }
-        else
-        {
-            while (pointer < undos.size())
+            logger.info("endCommand");
+            int max = getMaxUndos();
+            if (max == 0)
             {
-                undos.remove(pointer);
+                undos.clear();
+                undos.add(currentCommand);
+            }
+            else
+            {
+                while (pointer < undos.size())
+                {
+                    undos.remove(pointer);
+                }
+
+                undos.add(currentCommand);
+
+                if (undos.size() > max)
+                {
+                    undos.remove(0);
+                }
             }
 
-            undos.add(currentCommand);
+            currentCommand.complete();
 
-            if (undos.size() > max)
-            {
-                undos.remove(0);
-            }
+            pointer = undos.size();
         }
 
-        currentCommand.complete(editor);
         currentCommand = null;
-
-        pointer = undos.size();
     }
 
     public void addChange(DocumentChange change)
     {
-        if (currentCommand != null)
+        if (!inUndo && currentCommand != null)
         {
             logger.info("addChange");
             currentCommand.addChange(change);
         }
+        /*
+        else if (!inUndo)
+        {
+            beginCommand(editor);
+            currentCommand.addChange(change);
+            endCommand(editor);
+        }
+        */
     }
 
     public boolean redo(Editor editor, DataContext context)
@@ -99,7 +117,9 @@ public class EditorUndoList
             UndoCommand cmd = (UndoCommand)undos.get(pointer);
             logger.debug("redo command " + pointer);
             pointer++;
+            inUndo = true;
             cmd.redo(editor, context);
+            inUndo = false;
 
             return true;
         }
@@ -119,7 +139,9 @@ public class EditorUndoList
             pointer--;
             UndoCommand cmd = (UndoCommand)undos.get(pointer);
             logger.debug("undo command " + pointer);
+            inUndo = true;
             cmd.undo(editor, context);
+            inUndo = false;
 
             return true;
         }
@@ -143,9 +165,11 @@ public class EditorUndoList
         return res.toString();
     }
 
+    private Editor editor;
     private UndoCommand currentCommand;
     private ArrayList undos = new ArrayList();
     private int pointer = 0;
+    private boolean inUndo = false;
 
     private static Logger logger = Logger.getInstance(EditorUndoList.class.getName());
 }

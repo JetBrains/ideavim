@@ -32,6 +32,7 @@ public abstract class ChangeEditorActionHandler extends AbstractEditorActionHand
 {
     protected final boolean execute(Editor editor, DataContext context, Command cmd)
     {
+        UndoManager.getInstance().endCommand(editor);
         UndoManager.getInstance().beginCommand(editor);
         boolean worked = execute(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
         if (worked)
@@ -39,12 +40,14 @@ public abstract class ChangeEditorActionHandler extends AbstractEditorActionHand
             if ((cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) == 0)
             {
                 UndoManager.getInstance().endCommand(editor);
+                UndoManager.getInstance().beginCommand(editor);
             }
             CommandState.getInstance().saveLastChangeCommand(cmd);
         }
         else
         {
             UndoManager.getInstance().abortCommand(editor);
+            UndoManager.getInstance().beginCommand(editor);
         }
 
         return worked;

@@ -31,7 +31,6 @@ import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import java.util.HashMap;
 
 /**
- * TODO - support undolevels option
  */
 public class UndoManager
 {
@@ -53,10 +52,17 @@ public class UndoManager
         EditorFactory.getInstance().addEditorFactoryListener(new UndoEditorCloseListener());
     }
 
+    public boolean inCommand(Editor editor)
+    {
+        EditorUndoList list = getEditorUndoList(editor);
+
+        return list.inCommand();
+    }
+
     public void beginCommand(Editor editor)
     {
         EditorUndoList list = getEditorUndoList(editor);
-        list.beginCommand(editor);
+        list.beginCommand();
     }
 
     public void abortCommand(Editor editor)
@@ -68,7 +74,7 @@ public class UndoManager
     public void endCommand(Editor editor)
     {
         EditorUndoList list = getEditorUndoList(editor);
-        list.endCommand(editor);
+        list.endCommand();
         logger.debug("endCommand: list=" + list);
     }
 
@@ -106,7 +112,7 @@ public class UndoManager
 
     private EditorUndoList addEditorUndoList(Editor editor)
     {
-        EditorUndoList res = new EditorUndoList();
+        EditorUndoList res = new EditorUndoList(editor);
         editors.put(editor.getDocument(), res);
 
         return res;

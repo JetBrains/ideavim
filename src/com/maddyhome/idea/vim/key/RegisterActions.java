@@ -57,6 +57,13 @@ public class RegisterActions
         KeyParser.setupActionHandler("EditorToggleInsertState", "VimEditorToggleInsertState", KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0));
         KeyParser.setupActionHandler("EditorUp", "VimEditorUp", KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0));
 
+        // All the Alt keys
+        KeyParser.setupActionHandler("GenerateConstructor");
+        KeyParser.setupActionHandler("GenerateGetter");
+        KeyParser.setupActionHandler("GenerateSetter");
+        KeyParser.setupActionHandler("GenerateGetterAndSetter");
+        KeyParser.setupActionHandler("GenerateEquals");
+
         // All the Ctrl keys
         KeyParser.setupActionHandler("EditorDeleteToWordEnd", null, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, KeyEvent.CTRL_MASK));
         KeyParser.setupActionHandler("EditorDeleteToWordStart", null, KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, KeyEvent.CTRL_MASK));
@@ -213,6 +220,7 @@ public class RegisterActions
             new Shortcut('D'),
             new Shortcut('X')
         });
+        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimFilterVisualLines", Command.CHANGE, new Shortcut('!'));
         parser.registerAction(KeyParser.MAPPING_VISUAL, "VimShiftLeftVisual", Command.CHANGE, new Shortcut('<'));
         parser.registerAction(KeyParser.MAPPING_VISUAL, "VimShiftRightVisual", Command.CHANGE, new Shortcut('>'));
         parser.registerAction(KeyParser.MAPPING_VISUAL, "VimVisualExitMode", Command.OTHER_READONLY, new Shortcut[] {
@@ -267,6 +275,8 @@ public class RegisterActions
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimDeleteJoinLinesSpaces", Command.DELETE, new Shortcut('J'));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimDeleteLine", Command.DELETE, new Shortcut("dd"));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimDeleteMotion", Command.DELETE, Command.FLAG_OP_PEND, new Shortcut('d'), Argument.MOTION);
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimFilterCountLines", Command.CHANGE, new Shortcut("!!"));
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimFilterMotion", Command.CHANGE, Command.FLAG_OP_PEND, new Shortcut('!'), Argument.MOTION);
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimInsertAfterCursor", Command.INSERT, Command.FLAG_MULTIKEY_UNDO, new Shortcut('a'));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimInsertAfterLineEnd", Command.INSERT, Command.FLAG_MULTIKEY_UNDO, new Shortcut('A'));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimInsertAtPreviousInsert", Command.INSERT, Command.FLAG_MULTIKEY_UNDO, new Shortcut("gi"));

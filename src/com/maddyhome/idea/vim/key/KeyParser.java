@@ -26,6 +26,7 @@ import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.handler.key.EditorKeyHandler;
+import com.maddyhome.idea.vim.action.TxActionWrapper;
 import java.util.HashMap;
 import javax.swing.KeyStroke;
 
@@ -79,17 +80,32 @@ public class KeyParser
         return instance;
     }
 
+    public static void setupActionHandler(String ideaActName)
+    {
+        ActionManager amgr = ActionManager.getInstance();
+        AnAction action = amgr.getAction(ideaActName);
+
+        amgr.unregisterAction(ideaActName);
+        TxActionWrapper taw = new TxActionWrapper(action);
+        amgr.registerAction(ideaActName, taw);
+    }
+
     public static void setupActionHandler(String ideaActName, String vimActName, KeyStroke stroke)
     {
         ActionManager amgr = ActionManager.getInstance();
-        EditorAction iaction = (EditorAction)amgr.getAction(ideaActName);
-        EditorActionHandler handler = iaction.getHandler();
-        if (vimActName != null)
+        AnAction action = amgr.getAction(ideaActName);
+        if (action instanceof EditorAction)
         {
-            EditorAction vaction = (EditorAction)amgr.getAction(vimActName);
-            vaction.setupHandler(handler);
+            EditorAction iaction = (EditorAction)action;
+            EditorActionHandler handler = iaction.getHandler();
+            if (vimActName != null)
+            {
+                EditorAction vaction = (EditorAction)amgr.getAction(vimActName);
+                vaction.setupHandler(handler);
+            }
+
+            iaction.setupHandler(new EditorKeyHandler(handler, stroke));
         }
-        iaction.setupHandler(new EditorKeyHandler(handler, stroke));
     }
 
     /**

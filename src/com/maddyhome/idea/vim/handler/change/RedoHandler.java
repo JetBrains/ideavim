@@ -32,6 +32,10 @@ public class RedoHandler extends AbstractEditorActionHandler
 {
     protected boolean execute(Editor editor, DataContext context, Command cmd)
     {
-        return UndoManager.getInstance().redo(editor, context);
+        UndoManager.getInstance().endCommand(editor);
+        boolean res =  UndoManager.getInstance().redo(editor, context);
+        UndoManager.getInstance().beginCommand(editor);
+
+        return res;
     }
 }

@@ -58,6 +58,7 @@ public class RepeatChangeHandler extends AbstractEditorActionHandler
             {
                 KeyHandler.executeAction(cmd.getAction(), context);
                 UndoManager.getInstance().endCommand(editor);
+                UndoManager.getInstance().beginCommand(editor);
             }
             catch (Exception e)
             {

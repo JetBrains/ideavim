@@ -30,16 +30,22 @@ public class UndoCommand
 {
     public UndoCommand(Editor editor)
     {
+        this.editor = editor;
         startOffset = editor.getCaretModel().getOffset();
     }
 
-    public void complete(Editor editor)
+    public void complete()
     {
         endOffset = editor.getCaretModel().getOffset();
     }
 
     public void addChange(DocumentChange change)
     {
+        if (changes.size() == 0)
+        {
+            startOffset = editor.getCaretModel().getOffset();
+        }
+
         changes.add(change);
     }
 
@@ -82,6 +88,7 @@ public class UndoCommand
         return changes.size();
     }
 
+    private Editor editor;
     private int startOffset;
     private int endOffset;
     private ArrayList changes = new ArrayList();
