@@ -24,11 +24,12 @@ package com.maddyhome.idea.vim.command;
  */
 public class VisualRange
 {
-    public VisualRange(int start, int end, int type)
+    public VisualRange(int start, int end, int type, int offset)
     {
         this.start = start;
         this.end = end;
         this.type = type;
+        this.offset = offset;
     }
 
     public int getStart()
@@ -46,7 +47,26 @@ public class VisualRange
         return type;
     }
 
+    public int getOffset()
+    {
+        return offset;
+    }
+
+    public String toString()
+    {
+        StringBuffer res = new StringBuffer();
+        res.append("VisualRange[");
+        res.append("start=").append(start);
+        res.append(", end=").append(end);
+        res.append(", type=").append(type);
+        res.append(", offset=").append(offset);
+        res.append("]");
+
+        return res.toString();
+    }
+
     int start;
     int end;
     int type;
+    int offset;
 }
