@@ -284,7 +284,7 @@ public class CommandParser
                         {
                             command.append(ch);
                             reprocess = false;
-                            if (!Character.isLetter(ch))
+                            if (!Character.isLetter(ch) && "<>".indexOf(ch) == 0)
                             {
                                 state = STATE_CMD_ARG;
                             }
