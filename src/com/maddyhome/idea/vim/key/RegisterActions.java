@@ -99,14 +99,14 @@ public class RegisterActions
         KeyParser parser = KeyParser.getInstance();
 
         // ******************* Insert Mode Actions **********************
-        parser.registerAction(KeyParser.MAPPING_INSERT, "ClassNameCompletion", Command.INSERT,
+        parser.registerAction(KeyParser.MAPPING_INSERT, "ClassNameCompletion", Command.INSERT, Command.FLAG_SAVE_CHANGES,
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_MASK | KeyEvent.ALT_MASK)));
-        parser.registerAction(KeyParser.MAPPING_INSERT, "CodeCompletion", Command.INSERT, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_INSERT, "CodeCompletion", Command.INSERT, Command.FLAG_SAVE_CHANGES, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_MASK))
         });
-        parser.registerAction(KeyParser.MAPPING_INSERT, "InsertLiveTemplate", Command.INSERT,
+        parser.registerAction(KeyParser.MAPPING_INSERT, "InsertLiveTemplate", Command.INSERT, Command.FLAG_SAVE_CHANGES,
             new Shortcut(KeyStroke.getKeyStroke(']', KeyEvent.CTRL_MASK)));
         parser.registerAction(KeyParser.MAPPING_INSERT, "VimEditorBackSpace", Command.INSERT, Command.FLAG_SAVE_STROKE | Command.FLAG_IS_BACKSPACE, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK)),

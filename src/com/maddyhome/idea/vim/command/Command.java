@@ -49,6 +49,7 @@ public class Command
     public static final int FLAG_SAVE_STROKE = 1 << 10;
     /** This is a backspace command */
     public static final int FLAG_IS_BACKSPACE = 1 << 11;
+    public static final int FLAG_SAVE_CHANGES = 1 << 12;
 
     /** Search Flags */
     public static final int FLAG_SEARCH_FWD = 1 << 16;

@@ -51,10 +51,10 @@ import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.command.VisualRange;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.helper.ApiHelper;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
-import com.maddyhome.idea.vim.helper.ApiHelper;
 import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.NumberOption;
@@ -1193,6 +1193,12 @@ public class MotionGroup extends AbstractActionGroup
 
         visualStart = editor.getSelectionModel().getSelectionStart();
         visualEnd = editor.getSelectionModel().getSelectionEnd();
+        if (visualEnd < visualStart)
+        {
+            int t = visualEnd;
+            visualEnd = visualStart;
+            visualStart = t;
+        }
         if (CommandState.getInstance().getSubMode() == Command.FLAG_MOT_CHARACTERWISE)
         {
             BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
