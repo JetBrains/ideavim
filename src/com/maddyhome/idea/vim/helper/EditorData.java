@@ -21,17 +21,15 @@ package com.maddyhome.idea.vim.helper;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.command.VisualRange;
-import com.maddyhome.idea.vim.group.MarkGroup;
 import com.maddyhome.idea.vim.undo.UndoManager;
 
 /**
@@ -46,12 +44,7 @@ public class EditorData
      */
     public static void initializeEditor(Editor editor)
     {
-        // Add a document listener so we can update the position of the editor specific marks each time the
-        // contents change
-        if (!editor.isViewer())
-        {
-            editor.getDocument().addDocumentListener(new MarkGroup.MarkUpdater(editor));
-        }
+        logger.debug("editor created: " + editor);
         UndoManager.getInstance().editorOpened(editor);
     }
 
@@ -61,6 +54,7 @@ public class EditorData
      */
     public static void uninitializeEditor(Editor editor)
     {
+        logger.debug("editor closed: " + editor);
         UndoManager.getInstance().editorClosed(editor);
     }
 
@@ -101,7 +95,7 @@ public class EditorData
      */
     public static VisualRange getLastVisualRange(Editor editor)
     {
-        VisualRange res = (VisualRange)editor.getUserData(VISUAL);
+        VisualRange res = (VisualRange)editor.getDocument().getUserData(VISUAL);
         return res;
     }
 
@@ -112,7 +106,7 @@ public class EditorData
      */
     public static void setLastVisualRange(Editor editor, VisualRange range)
     {
-        editor.putUserData(VISUAL, range);
+        editor.getDocument().putUserData(VISUAL, range);
     }
 
     /**
@@ -122,7 +116,7 @@ public class EditorData
      */
     public static VisualChange getLastVisualOperatorRange(Editor editor)
     {
-        VisualChange res = (VisualChange)editor.getUserData(VISUAL_OP);
+        VisualChange res = (VisualChange)editor.getDocument().getUserData(VISUAL_OP);
         return res;
     }
 
@@ -133,7 +127,7 @@ public class EditorData
      */
     public static void setLastVisualOperatorRange(Editor editor, VisualChange range)
     {
-        editor.putUserData(VISUAL_OP, range);
+        editor.getDocument().putUserData(VISUAL_OP, range);
     }
 
     /**
@@ -151,30 +145,34 @@ public class EditorData
             Project[] projs = ProjectManager.getInstance().getOpenProjects();
             for (int p = 0; p < projs.length; p++)
             {
-                FileEditorManager fMgr = FileEditorManager.getInstance(projs[p]);
-                /*
-                VirtualFile[] files = fMgr.getOpenFiles();
-                for (int i = 0; i < files.length; i++)
+                Editor[] editors = EditorFactory.getInstance().getEditors(editor.getDocument(), projs[p]);
+                for (int e = 0; e < editors.length; e++)
                 {
-                    FileEditor[] editors = fMgr.getEditors(files[i]);
-                    */
-                    FileEditor[] editors = fMgr.getAllEditors();
-                    for (int e = 0; e < editors.length; e++)
+                    if (editors[e].equals(editor))
                     {
-                        if (editors[e] instanceof TextEditor && ((TextEditor)editors[e]).getEditor().equals(editor))
-                        {
-                            proj = projs[p];
-                            editor.putUserData(PROJECT, proj);
-                            break;
-                        }
+                        editor.putUserData(PROJECT, projs[p]);
+                        break;
                     }
-                /*
                 }
-                */
             }
         }
 
         return proj;
+    }
+
+    public static Project getProject(FileEditorManager mgr)
+    {
+        Project[] projs = ProjectManager.getInstance().getOpenProjects();
+        for (int p = 0; p < projs.length; p++)
+        {
+            FileEditorManager fem = FileEditorManager.getInstance(projs[p]);
+            if (fem.equals(mgr))
+            {
+                return projs[p];
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -184,35 +182,6 @@ public class EditorData
      */
     public static VirtualFile getVirtualFile(Editor editor)
     {
-        /*
-        Key key = new Key(FILE);
-        VirtualFile file = (VirtualFile)editor.getUserData(key);
-        if (file == null)
-        {
-            Project[] projs = ProjectManager.getInstance().getOpenProjects();
-            for (int p = 0; p < projs.length; p++)
-            {
-                FileEditorManager fMgr = FileEditorManager.getInstance(projs[p]);
-                VirtualFile[] files = fMgr.getOpenFiles();
-                for (int i = 0; i < files.length; i++)
-                {
-                    FileEditor[] editors = fMgr.getEditors(files[i]);
-                    for (int e = 0; e < editors.length; e++)
-                    {
-                        if (editors[0] instanceof TextEditor && ((TextEditor)editors[0]).getEditor().equals(editor))
-                        {
-                            file = files[i];
-                            editor.putUserData(key, file);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        return file;
-        */
-
         return FileDocumentManager.getInstance().getFile(editor.getDocument());
     }
 
