@@ -5,46 +5,47 @@
     <vendor url="http://sourceforge.net/projects/ideavim/" email="rick@maddyhome.com">Rick Maddy</vendor>
     <change-notes>
 <![CDATA[
+New Features<br>
 - Highlighting lines of code by clicking and/or dragging in the line number area
-  now leaves you in visual line mode.
+  now leaves you in visual line mode.<br>
 - Undoing all changes in a file now correctly marks the file as unchanged if it
-  hasn't been saved in the meantime.
+  hasn't been saved in the meantime.<br>
 - All the :write commands (:w :wn :wN :wq) save just the one file now. To save
-  all files use the :wall command.
+  all files use the :wall command.<br>
 - Enhanced the :e command. Support for :e# and :e <filename> have been added.
   :e# selects the previous tab. :e <filename> will search the entire project
   and open the first matching file. Relative paths are supported too. :e with
-  no argument will still bring up the File Open dialog.
-- Added support for the gP and gp commands.
-- Added support for the z+ and z^ commands.
+  no argument will still bring up the File Open dialog.<br>
+- Added support for the gP and gp commands.<br>
+- Added support for the z+ and z^ commands.<br>
 - Added :class command to bring up "Go To Class" dialog. If followed by a
-  classname, open the corresponding Java file. Not in VIM.
-- Added :symbol command to bring up "Go To Symbol" dialog. Not in VIM.
+  classname, open the corresponding Java file. Not in VIM.<br>
+- Added :symbol command to bring up "Go To Symbol" dialog. Not in VIM.<br>
 - Editors use block cursor for command mode and a vertical bar for
-  insert/replace mode.
-- Better support for split view editing.
-- Text selection is reflected in all editors of a file.
-
-Bug Fixes
+  insert/replace mode.<br>
+- Better support for split view editing.<br>
+- Text selection is reflected in all editors of a file.<br>
+<br>
+Bug Fixes<br>
 - Under certain conditions, highlighting text left you in multiple layers of
-  visual mode. This is now fixed.
-- The gv command resulted in too much text being selected in many cases.
-- The gv command now properly restores the cursor position.
-- Fixed exception caused by using the :undo and :redo commands.
+  visual mode. This is now fixed.<br>
+- The gv command resulted in too much text being selected in many cases.<br>
+- The gv command now properly restores the cursor position.<br>
+- Fixed exception caused by using the :undo and :redo commands.<br>
 - Re-enabled all the :write related commands. Hopefully the deadlock has been
-  solved.
-- Fixed error referencing unknown class FileCloseAction.
-- Fixed several exceptions related to edit fields in dialog boxes.
-- Fixed some exceptions related to the undo manager.
-- Status was not always show proper mode.
-- r<Enter> now works as expected.
-- Toggling between insert and replace mode wasn't working properly.
-- The cursor wasn't always restored correctly after an undo.
+  solved.<br>
+- Fixed error referencing unknown class FileCloseAction.<br>
+- Fixed several exceptions related to edit fields in dialog boxes.<br>
+- Fixed some exceptions related to the undo manager.<br>
+- Status was not always show proper mode.<br>
+- r<Enter> now works as expected.<br>
+- Toggling between insert and replace mode wasn't working properly.<br>
+- The cursor wasn't always restored correctly after an undo.<br>
 - Yanking the last line and then putting it elsewhere sometimes resulted in the
-  old and new line not having a newline between them.
-- Repeating of o and O commands, including with count, works properly now.
-- dw, dW, and d[w now act like d$ if deleting the last word of a line.
-- cW now properly behaves like cE.
+  old and new line not having a newline between them.<br>
+- Repeating of o and O commands, including with count, works properly now.<br>
+- dw, dW, and d[w now act like d$ if deleting the last word of a line.<br>
+- cW now properly behaves like cE.<br>
 ]]>
     </change-notes>
     <idea-version min="4.0" max="4.5"/>
