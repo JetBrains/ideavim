@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
+import com.maddyhome.idea.vim.group.CommandGroups;
 import javax.swing.SwingUtilities;
 
 /**
@@ -39,6 +40,12 @@ public class FindFileHandler extends CommandHandler
 
     public boolean execute(Editor editor, final DataContext context, ExCommand cmd) throws ExException
     {
+        String arg = cmd.getArgument();
+        if (arg != null && arg.length() > 0)
+        {
+            return CommandGroups.getInstance().getFile().openFile(arg, context);
+        }
+
         SwingUtilities.invokeLater(new Runnable() {
             public void run()
             {
