@@ -27,13 +27,14 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.undo.UndoManager;
 import com.maddyhome.idea.vim.key.KeyParser;
+import javax.swing.SwingUtilities;
 
 /**
  *
  */
 public abstract class VisualOperatorActionHandler extends AbstractEditorActionHandler
 {
-    protected final boolean execute(Editor editor, DataContext context, Command cmd)
+    protected final boolean execute(final Editor editor, DataContext context, Command cmd)
     {
         if (!Command.isReadOnlyType(cmd.getType()))
         {
@@ -44,7 +45,13 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
         CommandState.getInstance().setMode(CommandState.MODE_COMMAND);
         CommandState.getInstance().setMappingMode(KeyParser.MAPPING_NORMAL);
         boolean res = execute(editor, context, cmd, range);
-        CommandGroups.getInstance().getMotion().resetVisual(editor);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run()
+            {
+                CommandGroups.getInstance().getMotion().resetVisual(editor);
+            }
+
+        });
 
         if (res)
         {
