@@ -23,20 +23,28 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
 import com.maddyhome.idea.vim.ex.range.AbstractRange;
-import com.maddyhome.idea.vim.ex.range.LineNumberRange;
+import com.maddyhome.idea.vim.group.CommandGroups;
+import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import java.util.ArrayList;
 
 /**
- *
+ * Handles the set of range values entered as part of an Ex command.
  */
 public class Ranges
 {
+    /**
+     * Create the empty range list
+     */
     public Ranges()
     {
         ranges = new ArrayList();
     }
 
+    /**
+     * Adds a range to the list
+     * @param range The list of ranges to append to the current list
+     */
     public void addRange(Range[] range)
     {
         for (int i = 0; i < range.length; i++)
@@ -45,39 +53,49 @@ public class Ranges
         }
     }
 
+    /**
+     * Gets the number of ranges in the list
+     * @return The range count
+     */
     public int size()
     {
-        return ranges.size();
+        return count;
     }
 
+    /**
+     * Gets the line of the last range specified in the range list
+     * @param editor The editor to get the line for
+     * @param context The data context
+     * @return The line number represented by the range
+     */
     public int getLine(Editor editor, DataContext context)
     {
-        if (size() > 0)
-        {
-            Range last = (Range)ranges.get(size() - 1);
+        processRange(editor, context);
 
-            return last.getLine(editor, context);
-        }
-        else
-        {
-            return (new LineNumberRange(0, false)).getLine(editor, context);
-        }
+        return endLine;
     }
 
+    /**
+     * Gets the start line number the range represents
+     * @param editor The editor to get the line number for
+     * @param context The data context
+     * @return The starting line number
+     */
     public int getFirstLine(Editor editor, DataContext context)
     {
-        if (size() > 0)
-        {
-            Range first = (Range)ranges.get(0);
+        processRange(editor, context);
 
-            return first.getLine(editor, context);
-        }
-        else
-        {
-            return (new LineNumberRange(0, false)).getLine(editor, context);
-        }
+        return startLine;
     }
 
+    /**
+     * Gets the count for an Ex command. This is either an explicit count enter at the end of the command or the
+     * end of the specified range.
+     * @param editor The editor to get the count for
+     * @param context The data context
+     * @param count The count given at the end of the command or -1 if no such count (use end line)
+     * @return count if count != -1, else return end line of range
+     */
     public int getCount(Editor editor, DataContext context, int count)
     {
         if (count == -1)
@@ -90,45 +108,42 @@ public class Ranges
         }
     }
 
+    /**
+     * Gets the line range represented by this range. If a count is given, the range is the range end line through
+     * count-1 lines. If no count is given (-1), the range is the range given by the user.
+     * @param editor The editor to get the range for
+     * @param context The data context
+     * @param count The count given at the end of the command or -1 if no such count
+     * @return The line range
+     */
     public LineRange getLineRange(Editor editor, DataContext context, int count)
     {
-        Range end = null;
-        Range start = null;
+        processRange(editor, context);
+        int end = -1;
+        int start = -1;
         if (count == -1)
         {
-            if (size() >= 2)
-            {
-                end = (Range)ranges.get(size() - 1);
-                start = (Range)ranges.get(size() - 2);
-            }
-            else if (size() == 1)
-            {
-                end = (Range)ranges.get(size() - 1);
-                start = end;
-            }
-            else
-            {
-                end = new LineNumberRange(0, false);
-                start = end;
-            }
+            end = endLine;
+            start = startLine;
         }
         else
         {
-            if (size() >= 1)
-            {
-                start = (Range)ranges.get(size() - 1);
-            }
-            else
-            {
-                start = new LineNumberRange(0, false);
-            }
-
-            end = new LineNumberRange(start.getLine(editor, context), count - 1, false);
+            start = endLine;
+            end = start + count - 1;
         }
 
-        return new LineRange(start.getLine(editor, context), end.getLine(editor, context));
+        return new LineRange(start, end);
     }
 
+    /**
+     * Gets the text range represented by this range. If a count is given, the range is the range end line through
+     * count-1 lines. If no count is given (-1), the range is the range given by the user. The text range is based
+     * on the line range but this is character based from the start of the first line to the end of the last line.
+     * @param editor The editor to get the range for
+     * @param context The data context
+     * @param count The count given at the end of the command or -1 if no such count
+     * @return The text range
+     */
     public TextRange getTextRange(Editor editor, DataContext context, int count)
     {
         LineRange lr = getLineRange(editor, context, count);
@@ -138,6 +153,12 @@ public class Ranges
         return new TextRange(start, Math.min(end, EditorHelper.getFileSize(editor)));
     }
 
+    /**
+     * Helper method to get the text range for the current cursor line
+     * @param editor The editor to get the range for
+     * @param context The data context
+     * @return The range of the current line
+     */
     public static TextRange getCurrentLineRange(Editor editor, DataContext context)
     {
         Ranges ranges = new Ranges();
@@ -145,12 +166,57 @@ public class Ranges
         return ranges.getTextRange(editor, context, -1);
     }
 
+    /**
+     * Helper method to get the text range for the current file
+     * @param editor The editor to get the range for
+     * @param context The data context
+     * @return The range of the current file
+     */
     public static TextRange getFileTextRange(Editor editor, DataContext context)
     {
         Ranges ranges = new Ranges();
         ranges.addRange(AbstractRange.createRange("%", 0, false));
 
         return ranges.getTextRange(editor, context, -1);
+    }
+
+    /**
+     * Processes the list of ranges and calculates the start and end lines of the range
+     * @param editor The editor to get the lines for
+     * @param context The data context
+     */
+    private void processRange(Editor editor, DataContext context)
+    {
+        // Already done
+        if (done) return;
+
+        // Start with the range being the current line
+        startLine = editor.getCaretModel().getLogicalPosition().line;
+        endLine = startLine;
+        boolean lastZero = false;
+        // Now process each range, moving the cursor if appropriate
+        for (int i = 0; i < ranges.size(); i++)
+        {
+            startLine = endLine;
+            Range range = (Range)ranges.get(i);
+            endLine = range.getLine(editor, context, lastZero);
+            if (range.isMove())
+            {
+                MotionGroup.moveCaret(editor, context,
+                    CommandGroups.getInstance().getMotion().moveCaretToLine(editor, context, endLine));
+            }
+            // Did that last range represent the start of the file?
+            lastZero = (endLine < 0);
+            count++;
+        }
+
+        // If only one range given, make the start and end the same
+        if (count == 1)
+        {
+            startLine = endLine;
+        }
+
+        done = true;
     }
 
     public String toString()
@@ -162,5 +228,9 @@ public class Ranges
         return res.toString();
     }
 
+    private int startLine = 0;
+    private int endLine = 0;
+    private int count = 0;
+    private boolean done = false;
     private ArrayList ranges;
 }
