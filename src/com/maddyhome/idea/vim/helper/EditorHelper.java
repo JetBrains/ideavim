@@ -26,6 +26,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.nio.CharBuffer;
 
 /**
  * This is a set of helper methods for working with editors. All line and column values are zero based.
@@ -230,7 +231,7 @@ public class EditorHelper
      * @param lline The logical line to get the end offset for.
      * @return 0 if line is &lt 0, file size of line is bigger than file, else the end offset for the line
      */
-    public static int getLineEndOffset(Editor editor, int lline)
+    public static int getLineEndOffset(Editor editor, int lline, boolean incEnd)
     {
         if (lline < 0)
         {
@@ -242,7 +243,7 @@ public class EditorHelper
         }
         else
         {
-            return editor.getDocument().getLineEndOffset(lline);
+            return editor.getDocument().getLineEndOffset(lline) - (incEnd ? 0 : 1);
         }
     }
 
@@ -321,7 +322,7 @@ public class EditorHelper
         }
 
         int min = getLineStartOffset(editor, lline);
-        int max = getLineEndOffset(editor, lline) - (allowEnd ? 0 : 1);
+        int max = getLineEndOffset(editor, lline, allowEnd);;
         offset = Math.max(Math.min(offset, max), min);
 
         return offset;
@@ -409,6 +410,11 @@ public class EditorHelper
      */
     public static String getLineText(Editor editor, int lline)
     {
-        return getText(editor, getLineStartOffset(editor, lline), getLineEndOffset(editor, lline));
+        return getText(editor, getLineStartOffset(editor, lline), getLineEndOffset(editor, lline, true));
+    }
+
+    public static CharBuffer getLineBuffer(Editor editor, int lline)
+    {
+        return CharBuffer.wrap(editor.getDocument().getChars(), getLineStartOffset(editor, lline), getLineLength(editor, lline));
     }
 }

@@ -122,7 +122,7 @@ public class ChangeGroup extends AbstractActionGroup
      */
     public void insertAfterCursor(Editor editor, DataContext context)
     {
-        MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretHorizontalAppend(editor));
+        MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, 1, true));
         initInsert(editor, context, CommandState.MODE_INSERT);
     }
 
@@ -133,7 +133,7 @@ public class ChangeGroup extends AbstractActionGroup
      */
     public void insertAfterLineEnd(Editor editor, DataContext context)
     {
-        MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineEndAppend(editor));
+        MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, true));
         initInsert(editor, context, CommandState.MODE_INSERT);
     }
 
@@ -157,7 +157,7 @@ public class ChangeGroup extends AbstractActionGroup
      */
     public void insertNewLineBelow(Editor editor, DataContext context)
     {
-        MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineEndAppend(editor));
+        MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, true));
         initInsert(editor, context, CommandState.MODE_INSERT);
         KeyHandler.executeAction("VimEditorEnter", context);
     }
@@ -312,7 +312,7 @@ public class ChangeGroup extends AbstractActionGroup
     {
         repeatInsertText(editor, context, count);
 
-        MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, -1));
+        MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, -1, false));
     }
 
     /**
@@ -484,7 +484,7 @@ public class ChangeGroup extends AbstractActionGroup
      */
     public boolean deleteCharacter(Editor editor, DataContext context, int count)
     {
-        int offset = CommandGroups.getInstance().getMotion().moveCaretHorizontalAppend(editor, count);
+        int offset = CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, count, true);
         if (offset != -1)
         {
             boolean res = deleteText(editor, context, editor.getCaretModel().getOffset(), offset, Command.FLAG_MOT_INCLUSIVE);
@@ -511,8 +511,8 @@ public class ChangeGroup extends AbstractActionGroup
     public boolean deleteLine(Editor editor, DataContext context, int count)
     {
         int start = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor);
-        int offset = Math.min(CommandGroups.getInstance().getMotion().moveCaretToLineEndAppendOffset(editor,
-            count - 1) + 1, EditorHelper.getFileSize(editor));
+        int offset = Math.min(CommandGroups.getInstance().getMotion().moveCaretToLineEndOffset(editor,
+            count - 1, true) + 1, EditorHelper.getFileSize(editor));
         if (offset != -1)
         {
             boolean res = deleteText(editor, context, start, offset, Command.FLAG_MOT_LINEWISE);
@@ -538,11 +538,11 @@ public class ChangeGroup extends AbstractActionGroup
      */
     public boolean deleteEndOfLine(Editor editor, DataContext context, int count)
     {
-        int offset = CommandGroups.getInstance().getMotion().moveCaretToLineEndOffset(editor, count - 1) + 1;
+        int offset = CommandGroups.getInstance().getMotion().moveCaretToLineEndOffset(editor, count - 1, true);
         if (offset != -1)
         {
             boolean res = deleteText(editor, context, editor.getCaretModel().getOffset(), offset, Command.FLAG_MOT_INCLUSIVE);
-            int pos = CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, -1);
+            int pos = CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, -1, false);
             if (pos != -1)
             {
                 MotionGroup.moveCaret(editor, context, pos);
@@ -608,10 +608,10 @@ public class ChangeGroup extends AbstractActionGroup
     private boolean deleteJoinNLines(Editor editor, DataContext context, int startLine, int count, boolean spaces)
     {
         // start my moving the cursor to the very end of the first line
-        MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineEndAppend(editor, startLine));
+        MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, startLine, true));
         for (int i = 1; i < count; i++)
         {
-            int start = CommandGroups.getInstance().getMotion().moveCaretToLineEndAppend(editor);
+            int start = CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, true);
             MotionGroup.moveCaret(editor, context, start);
             int offset;
             if (spaces)
@@ -626,7 +626,7 @@ public class ChangeGroup extends AbstractActionGroup
             if (spaces)
             {
                 insertText(editor, context, start, " ");
-                MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, -1));
+                MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, -1, false));
             }
         }
 
@@ -753,6 +753,7 @@ public class ChangeGroup extends AbstractActionGroup
      */
     public boolean changeCharacters(Editor editor, DataContext context, int count)
     {
+        // FIX - undo fails miserably for this
         boolean res = deleteCharacter(editor, context, count);
         if (res)
         {
@@ -887,7 +888,7 @@ public class ChangeGroup extends AbstractActionGroup
      */
     public boolean changeCaseToggleCharacter(Editor editor, DataContext context, int count)
     {
-        int offset = CommandGroups.getInstance().getMotion().moveCaretHorizontalAppend(editor, count);
+        int offset = CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, count, true);
         if (offset == -1)
         {
             return false;
@@ -998,7 +999,7 @@ public class ChangeGroup extends AbstractActionGroup
         }
 
         int start = editor.getCaretModel().getOffset();
-        int end = CommandGroups.getInstance().getMotion().moveCaretToLineEndOffset(editor, lines - 1);
+        int end = CommandGroups.getInstance().getMotion().moveCaretToLineEndOffset(editor, lines - 1, false);
 
         indentRange(editor, context, new TextRange(start, end), cnt, dir);
     }

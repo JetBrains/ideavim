@@ -31,6 +31,6 @@ public class MotionLeftHandler extends MotionEditorActionHandler
 {
     public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument)
     {
-        return CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, -count);
+        return CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, -count, false);
     }
 }

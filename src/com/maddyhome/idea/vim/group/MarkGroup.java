@@ -424,7 +424,7 @@ public class MarkGroup extends AbstractActionGroup
                 else if (delStart.line <= mark.getLogicalLine() && delEnd.line >= mark.getLogicalLine())
                 {
                     int markLineStartOff = EditorHelper.getLineStartOffset(editor, mark.getLogicalLine());
-                    int markLineEndOff = EditorHelper.getLineEndOffset(editor, mark.getLogicalLine());
+                    int markLineEndOff = EditorHelper.getLineEndOffset(editor, mark.getLogicalLine(), true);
                     // If the marked line is completely within the deleted text, remove the mark
                     if (delStartOff <= markLineStartOff && delEndOff >= markLineEndOff)
                     {

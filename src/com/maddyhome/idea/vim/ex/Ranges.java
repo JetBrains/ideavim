@@ -133,7 +133,7 @@ public class Ranges
     {
         LineRange lr = getLineRange(editor, context, count);
         int start = EditorHelper.getLineStartOffset(editor, lr.getStartLine());
-        int end = EditorHelper.getLineEndOffset(editor, lr.getEndLine()) + 1;
+        int end = EditorHelper.getLineEndOffset(editor, lr.getEndLine(), true) + 1;
 
         return new TextRange(start, Math.min(end, EditorHelper.getFileSize(editor)));
     }

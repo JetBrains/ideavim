@@ -26,7 +26,6 @@
         <action id="VimMotionFirstColumn" class="com.maddyhome.idea.vim.action.motion.leftright.MotionFirstColumnAction" text="Start of Line"/>
         <action id="VimMotionFirstNonSpace" class="com.maddyhome.idea.vim.action.motion.leftright.MotionFirstNonSpaceAction" text="First Character of Line"/>
         <action id="VimMotionLastColumn" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnAction" text="End of Line"/>
-        <action id="VimMotionLastColumnAppend" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnAppendAction" text="End of Line"/>
         <action id="VimMotionLastMatchChar" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLastMatchCharAction" text="Repeat Last Character Match"/>
         <action id="VimMotionLastMatchCharReverse" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLastMatchCharReverseAction" text="Repeat Last Character Match in Reverse"/>
         <action id="VimMotionLastNonSpace" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLastNonSpaceAction" text="Last Character of Line"/>
@@ -36,7 +35,6 @@
         <action id="VimMotionLeftTillMatchChar" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftTillMatchCharAction" text="Move Left till Character"/>
         <action id="VimMotionMiddleColumn" class="com.maddyhome.idea.vim.action.motion.leftright.MotionMiddleColumnAction" text="Middle of Screen"/>
         <action id="VimMotionRight" class="com.maddyhome.idea.vim.action.motion.leftright.MotionRightAction" text="Right"/>
-        <action id="VimMotionRightAppend" class="com.maddyhome.idea.vim.action.motion.leftright.MotionRightAppendAction" text="Right"/>
         <action id="VimMotionRightWrap" class="com.maddyhome.idea.vim.action.motion.leftright.MotionRightWrapAction" text="Right"/>
         <action id="VimMotionRightMatchChar" class="com.maddyhome.idea.vim.action.motion.leftright.MotionRightMatchCharAction" text="Move Right to Character"/>
         <action id="VimMotionRightTillMatchChar" class="com.maddyhome.idea.vim.action.motion.leftright.MotionRightTillMatchCharAction" text="Move Right till Character"/>
@@ -47,7 +45,6 @@
         <action id="VimMotionGotoLineFirst" class="com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineFirstAction" text="Goto Line"/>
         <action id="VimMotionGotoLineLast" class="com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastAction" text="Goto Line"/>
         <action id="VimMotionGotoLineLastEnd" class="com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastEndAction" text="Goto Line End"/>
-        <action id="VimMotionGotoLineLastEndAppend" class="com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastEndAppendAction" text="Goto Line End"/>
         <action id="VimMotionPercentOrMatch" class="com.maddyhome.idea.vim.action.motion.updown.MotionPercentOrMatchAction" text="Percent Down or Match"/>
         <action id="VimMotionUp" class="com.maddyhome.idea.vim.action.motion.updown.MotionUpAction" text="Up"/>
         <action id="VimMotionUpFirstNonSpace" class="com.maddyhome.idea.vim.action.motion.updown.MotionUpFirstNonSpaceAction" text="Up to First non-Space"/>
@@ -167,7 +164,9 @@
         <action id="VimFileClose" class="com.maddyhome.idea.vim.action.file.FileCloseAction" text="Close Editor"/>
 
         <!-- Search -->
-        <action id="VimSearchEntry" class="com.maddyhome.idea.vim.action.search.SearchEntryAction" text="Search"/>
+        <action id="VimSearchEntry" class="com.maddyhome.idea.vim.action.motion.search.SearchEntryAction" text="Search"/>
+        <action id="VimSearchAgainNext" class="com.maddyhome.idea.vim.action.motion.search.SearchAgainNextAction" text="Search Again"/>
+        <action id="VimSearchAgainPrevious" class="com.maddyhome.idea.vim.action.motion.search.SearchAgainPreviousAction" text="Search Again"/>
 
         <!-- Other -->
         <action id="VimLastSearchReplace" class="com.maddyhome.idea.vim.action.change.change.ChangeLastSearchReplaceAction" text="Repeat Last :s"/>

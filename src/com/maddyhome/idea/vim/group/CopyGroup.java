@@ -26,8 +26,8 @@ import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.util.TextRange;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 
@@ -69,8 +69,8 @@ public class CopyGroup extends AbstractActionGroup
     public boolean yankLine(Editor editor, DataContext context, int count)
     {
         int start = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor);
-        int offset = Math.min(CommandGroups.getInstance().getMotion().moveCaretToLineEndAppendOffset(
-            editor, count - 1) + 1, EditorHelper.getFileSize(editor));
+        int offset = Math.min(CommandGroups.getInstance().getMotion().moveCaretToLineEndOffset(
+            editor, count - 1, true) + 1, EditorHelper.getFileSize(editor));
         if (offset != -1)
         {
             return yankRange(editor, context, new TextRange(start, offset), Command.FLAG_MOT_LINEWISE);

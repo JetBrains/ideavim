@@ -145,13 +145,13 @@ public class RegisterActions
         parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertSingleCommand", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK)));
         parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionFirstColumn", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0)));
         parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionGotoLineFirst", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, KeyEvent.CTRL_MASK)));
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionGotoLineLastEndAppend", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, KeyEvent.CTRL_MASK)));
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionLastColumnAppend", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, 0)));
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionGotoLineLastEnd", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, KeyEvent.CTRL_MASK)));
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionLastColumn", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, 0)));
         parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionLeft", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0))
         });
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionRightAppend", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionRight", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0))
         });
@@ -476,10 +476,10 @@ public class RegisterActions
         // TODO - finds should update visual mode selection
         // TODO - add #
         // TODO - add *
-        parser.registerAction(KeyParser.MAPPING_NVO, "Find", Command.OTHER_READONLY, Command.FLAG_SEARCH_FWD, new Shortcut('/'));
-        parser.registerAction(KeyParser.MAPPING_NVO, "Find", Command.OTHER_READONLY, Command.FLAG_SEARCH_REV, new Shortcut('?'));
-        parser.registerAction(KeyParser.MAPPING_NVO, "FindNext", Command.OTHER_READONLY, new Shortcut('n'));
-        parser.registerAction(KeyParser.MAPPING_NVO, "FindPrevious", Command.OTHER_READONLY, new Shortcut('N'));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimSearchEntry", Command.OTHER_READONLY, Command.FLAG_SEARCH_FWD, new Shortcut('/'));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimSearchEntry", Command.OTHER_READONLY, Command.FLAG_SEARCH_REV, new Shortcut('?'));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimSearchAgainNext", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut('n'));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimSearchAgainPrevious", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut('N'));
         parser.registerAction(KeyParser.MAPPING_NVO, "VimExEntry", Command.OTHER_READONLY, new Shortcut(':'));
 
         // ********************** Various Mode Actions ************************

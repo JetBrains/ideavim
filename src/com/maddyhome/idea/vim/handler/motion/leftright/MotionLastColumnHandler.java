@@ -23,9 +23,12 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.motion.MotionEditorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorData;
+import com.maddyhome.idea.vim.option.BoundStringOption;
+import com.maddyhome.idea.vim.option.Options;
 
 /**
  */
@@ -33,7 +36,23 @@ public class MotionLastColumnHandler extends MotionEditorActionHandler
 {
     public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument)
     {
-        return CommandGroups.getInstance().getMotion().moveCaretToLineEndOffset(editor, count - 1);
+        boolean allow = false;
+        if (CommandState.getInstance().getMode() == CommandState.MODE_INSERT ||
+            CommandState.getInstance().getMode() == CommandState.MODE_REPLACE)
+        {
+            allow = true;
+        }
+        else if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
+        {
+            BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
+            if (!opt.getValue().equals("old"))
+            {
+                allow = true;
+            }
+
+        }
+
+        return CommandGroups.getInstance().getMotion().moveCaretToLineEndOffset(editor, count - 1, allow);
     }
 
     protected void postMove(Editor editor, DataContext context, Command cmd)
