@@ -3,14 +3,20 @@ package com.maddyhome.idea.vim.group;
 import com.intellij.openapi.actionSystem.DataConstants;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.KeyHandler;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.EditorData;
+import java.util.HashMap;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
@@ -38,6 +44,57 @@ public class FileGroup extends AbstractActionGroup
 {
     public FileGroup()
     {
+    }
+
+    public boolean openFile(String filename, DataContext context)
+    {
+        Project proj = (Project)context.getData(DataConstants.PROJECT);
+        ProjectRootManager prm = ProjectRootManager.getInstance(proj);
+        VirtualFile[] roots = prm.getContentRoots();
+        for (int i = 0; i < roots.length; i++)
+        {
+            logger.debug("root[" + i + "] = " + roots[i].getPath());
+            VirtualFile vf = findFile(roots[i], filename);
+            if (vf != null)
+            {
+                FileEditorManager fem = FileEditorManager.getInstance(proj);
+                fem.openTextEditor(new OpenFileDescriptor(vf), true);
+
+                return true;
+            }
+        }
+
+        VimPlugin.showMessage("Unable to find " + filename);
+
+        return false;
+    }
+
+    private VirtualFile findFile(VirtualFile root, String filename)
+    {
+        VirtualFile res = root.findFileByRelativePath(filename);
+        if (res != null)
+        {
+            return res;
+        }
+
+        VirtualFile[] children = root.getChildren();
+        for (int i = 0; i < children.length; i++)
+        {
+            if (children[i].isDirectory())
+            {
+                res = findFile(children[i], filename);
+                if (res != null)
+                {
+                    return res;
+                }
+            }
+            else if (children[i].getName().equals(filename))
+            {
+                return children[i];
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -78,14 +135,22 @@ public class FileGroup extends AbstractActionGroup
     }
 
     /**
+     * Saves specific file in the project
+     * @param context The data context
+     */
+    public void saveFile(Editor editor, DataContext context)
+    {
+        // TODO - this needs to be fixed
+        FileDocumentManager.getInstance().saveDocument(editor.getDocument());
+    }
+
+    /**
      * Saves all files in the project
      * @param context The data context
      */
     public void saveFiles(DataContext context)
     {
         // TODO - this needs to be fixed
-        Project proj = (Project)context.getData(DataConstants.PROJECT);
-        proj.save();
         FileDocumentManager.getInstance().saveAllDocuments();
     }
 
@@ -146,4 +211,42 @@ public class FileGroup extends AbstractActionGroup
             }
         }
     }
+
+    /**
+     * Selects previous editor tab
+     */
+    public void selectPreviousTab(DataContext context)
+    {
+        Project proj = (Project)context.getData(DataConstants.PROJECT);
+        FileEditorManager fem = FileEditorManager.getInstance(proj);
+        VirtualFile vf = (VirtualFile)lastSelections.get(fem);
+        if (vf != null)
+        {
+            fem.openTextEditor(new OpenFileDescriptor(vf), true);
+        }
+        else
+        {
+            VimPlugin.indicateError();
+        }
+    }
+
+    /**
+     * This class listens for editor tab changes so any insert/replace modes that need to be reset can be
+     */
+    public static class SelectionCheck extends FileEditorManagerAdapter
+    {
+        /**
+         * The user has changed the editor they are working with - exit insert/replace mode, and complete any
+         * appropriate repeat.
+         * @param event
+         */
+        public void selectionChanged(FileEditorManagerEvent event)
+        {
+            lastSelections.put(event.getManager(), event.getOldFile());
+        }
+    }
+
+    private static HashMap lastSelections = new HashMap();
+
+    private static Logger logger = Logger.getInstance(FileGroup.class.getName());
 }
