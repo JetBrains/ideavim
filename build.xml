@@ -30,12 +30,12 @@
     <property name="install" value="install" />
     <property name="dist" value="dist" />
     <!-- Update to your IntelliJ installtion -->
-    <property name="idea.home" value="/opt/idea-2155" />
+    <property name="idea.home" value="/opt/idea-4.5.1" />
 
     <property name="project" value="IdeaVIM" />
     <!-- Update this prior to building a new distribution -->
     <property name="idea-version" value="4.5" />
-    <property name="version" value="0.8.2" />
+    <property name="version" value="0.8.3" />
 
     <path id="build.classpath">
         <pathelement path="${idea.home}/lib/idea.jar" />
@@ -79,8 +79,8 @@
     </target>
 
     <target name="deploy" depends="build" description="Copies plugin to IntelliJ plugin directory" >
-        <mkdir dir="${idea.home}/plugins/IdeaVIM/lib"/>
-        <copy file="${build}/${project}.jar" todir="${idea.home}/plugins/IdeaVIM/lib" />
+        <mkdir dir="${user.home}/.IntelliJIdea/config/plugins/IdeaVIM/lib"/>
+        <copy file="${build}/${project}.jar" todir="${user.home}/.IntelliJIdea/config/plugins/IdeaVIM/lib" />
     </target>
 
     <target name="dist" depends="dist-src, dist-bin" description="Creates the src and bin distribution files" />

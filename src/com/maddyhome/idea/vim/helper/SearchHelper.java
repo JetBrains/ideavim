@@ -350,11 +350,11 @@ public class SearchHelper
 
         if (found)
         {
-            if (pos <= 0)
+            if (res < 0) //(pos <= 0)
             {
                 res = 0;
             }
-            else if (pos >= size)
+            else if (res >= size) //(pos >= size)
             {
                 res = size - 1;
             }
@@ -413,7 +413,16 @@ public class SearchHelper
             return null;
         }
 
-        int end = findNextWordEnd(chars, start, stop, 1, false, false, false) + 1;
+        int end = start;
+        // Special case 1 character words because 'findNextWordEnd' returns one to many chars
+        if (start < stop && CharacterHelper.charType(chars[start + 1], false) != CharacterHelper.TYPE_CHAR)
+        {
+            end = start + 1;
+        }
+        else
+        {
+            end = findNextWordEnd(chars, start, stop, 1, false, false, false) + 1;
+        }
 
         return new TextRange(start, end);
     }
@@ -663,11 +672,11 @@ public class SearchHelper
 
         if (found)
         {
-            if (pos <= 0)
+            if (res < 0) //(pos <= 0)
             {
                 res = 0;
             }
-            else if (pos >= size)
+            else if (res >= size) //(pos >= size)
             {
                 res = size - 1;
             }
