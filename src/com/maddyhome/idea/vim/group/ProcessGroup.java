@@ -19,7 +19,6 @@ package com.maddyhome.idea.vim.group;
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-import com.intellij.openapi.actionSystem.DataConstants;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
@@ -29,9 +28,9 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.ui.CommandEntryPanel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import com.maddyhome.idea.vim.key.KeyParser;
+import com.maddyhome.idea.vim.ui.ExEntryPanel;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.CharArrayReader;
@@ -41,6 +40,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 /**
@@ -57,22 +57,114 @@ public class ProcessGroup extends AbstractActionGroup
         return lastCommand;
     }
 
+    public void startSearchCommand(Editor editor, DataContext context, Command cmd)
+    {
+        String initText = "";
+        int flags = cmd.getFlags();
+        String label = "";
+        if ((flags & Command.FLAG_SEARCH_FWD) != 0)
+        {
+            label = "/";
+        }
+        else if ((flags & Command.FLAG_SEARCH_REV) != 0)
+        {
+            label = "?";
+        }
+
+        CommandState.getInstance().pushState(CommandState.MODE_EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
+        ExEntryPanel panel = ExEntryPanel.getInstance();
+        panel.activate(editor, context, label, initText, cmd.getCount());
+    }
+
     public void startExCommand(Editor editor, DataContext context, Command cmd)
     {
         String initText = getRange(cmd);
-        CommandEntryPanel panel = CommandEntryPanel.getInstance();
-        panel.addActionListener(new ExEntryListener(editor, context));
+        CommandState.getInstance().pushState(CommandState.MODE_EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
+        ExEntryPanel panel = ExEntryPanel.getInstance();
+        panel.activate(editor, context, ":", initText, 1);
+    }
 
-        panel.activate(((Editor)context.getData(DataConstants.EDITOR)).getContentComponent(), ":", initText);
+    public boolean processExKey(Editor editor, DataContext context, KeyStroke stroke, boolean charOnly)
+    {
+        if (!charOnly || stroke.getKeyChar() != KeyEvent.CHAR_UNDEFINED)
+        {
+            ExEntryPanel panel = ExEntryPanel.getInstance();
+            panel.handleKey(stroke);
+
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public boolean processExEntry(final Editor editor, final DataContext context)
+    {
+        // FIX - :find command - if escaped - focus not on editor
+        final ExEntryPanel panel = ExEntryPanel.getInstance();
+        panel.deactivate(true);
+        //editor.getContentComponent().requestFocus();
+        boolean res = true;
+        try
+        {
+            CommandState.getInstance().popState();
+            logger.debug("processing command");
+            final String text = panel.getText();
+            logger.debug("swing=" + SwingUtilities.isEventDispatchThread());
+            if (panel.getLabel().equals(":"))
+            {
+                CommandParser.getInstance().processCommand(editor, context, text, 1);
+                if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
+                {
+                    CommandGroups.getInstance().getMotion().exitVisual(editor);
+                }
+            }
+            else
+            {
+                int pos = CommandGroups.getInstance().getSearch().search(editor, context, text, panel.getCount(),
+                    panel.getLabel().equals("/") ? Command.FLAG_SEARCH_FWD : Command.FLAG_SEARCH_REV, true);
+                if (pos == -1)
+                {
+                    res = false;
+                }
+            }
+        }
+        catch (ExException ex)
+        {
+            VimPlugin.showMessage(ex.getMessage());
+            ProcessGroup.logger.info(ex.getMessage());
+            VimPlugin.indicateError();
+            res = false;
+        }
+        catch (Exception bad)
+        {
+            ProcessGroup.logger.error(bad);
+            VimPlugin.indicateError();
+            res = false;
+        }
+        finally
+        {
+            return res;
+        }
+    }
+
+    public boolean cancelExEntry(Editor editor, DataContext context)
+    {
+        CommandState.getInstance().popState();
+        ExEntryPanel panel = ExEntryPanel.getInstance();
+        panel.deactivate(false);
+        editor.getContentComponent().requestFocus();
+
+        return true;
     }
 
     public void startFilterCommand(Editor editor, DataContext context, Command cmd)
     {
         String initText = getRange(cmd) + "!";
-        CommandEntryPanel panel = CommandEntryPanel.getInstance();
-        panel.addActionListener(new ExEntryListener(editor, context));
-
-        panel.activate(((Editor)context.getData(DataConstants.EDITOR)).getContentComponent(), ":", initText);
+        CommandState.getInstance().pushState(CommandState.MODE_EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
+        ExEntryPanel panel = ExEntryPanel.getInstance();
+        panel.activate(editor, context, ":", initText, 1);
     }
 
     private String getRange(Command cmd)
@@ -136,54 +228,6 @@ public class ProcessGroup extends AbstractActionGroup
             logger.debug("buf="+buf);
             to.write(buf, 0, cnt);
         }
-    }
-
-    private static class ExEntryListener implements ActionListener
-    {
-        public ExEntryListener(Editor editor, DataContext context)
-        {
-            this.editor = editor;
-            this.context = context;
-        }
-
-        public void actionPerformed(final ActionEvent e)
-        {
-            CommandEntryPanel.getInstance().removeActionListener(this);
-
-            SwingUtilities.invokeLater(new Runnable()
-            {
-                public void run()
-                {
-                    try
-                    {
-                        ProcessGroup.logger.debug("processing command");
-                        CommandEntryPanel.getInstance().deactivate(true);
-                        CommandParser.getInstance().processCommand(editor, context, e.getActionCommand(), 1);
-                        if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
-                        {
-                            CommandGroups.getInstance().getMotion().exitVisual(editor);
-                        }
-                    }
-                    catch (ExException ex)
-                    {
-                        VimPlugin.showMessage(ex.getMessage());
-                        ProcessGroup.logger.info(ex.getMessage());
-                        VimPlugin.indicateError();
-                    }
-                    catch (Exception bad)
-                    {
-                        ProcessGroup.logger.error(bad);
-                        VimPlugin.indicateError();
-                    }
-                    finally
-                    {
-                    }
-                }
-            });
-        }
-
-        private Editor editor;
-        private DataContext context;
     }
 
     private String lastCommand;
