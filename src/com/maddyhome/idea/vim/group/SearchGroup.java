@@ -23,10 +23,11 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
-import com.maddyhome.idea.vim.helper.EditorHelper;
 import java.nio.CharBuffer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JOptionPane;
+import javax.swing.JButton;
 
 /**
  *
@@ -100,6 +101,7 @@ public class SearchGroup extends AbstractActionGroup
         int lastMatch = -1;
         boolean found = true;
         int lastLine = -1;
+        boolean checkConfirm = true;
         while (found)
         {
             char[] chars = editor.getDocument().getChars();
@@ -120,9 +122,42 @@ public class SearchGroup extends AbstractActionGroup
                 int line = editor.offsetToLogicalPosition(start + spos).line;
                 if ((flags & GLOBAL) != 0 || line != lastLine)
                 {
-                    lastLine = line;
-                    editor.getDocument().replaceString(start + spos, start + epos, match);
-                    lastMatch = start + spos;
+                    boolean doReplace = true;
+                    if ((flags & CONFIRM) != 0 && checkConfirm)
+                    {
+                        editor.getSelectionModel().setSelection(start + spos, start + epos);
+                        int choice = JOptionPane.showOptionDialog(null, "Replace with " + match + " ?", "Confirm Replace",
+                            JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, getConfirmButtons(), null);
+                        editor.getSelectionModel().removeSelection();
+                        switch (choice)
+                        {
+                            case 0: // Yes
+                                doReplace = true;
+                                break;
+                            case 1: // No
+                                doReplace = false;
+                                break;
+                            case 2: // All
+                                checkConfirm = false;
+                                break;
+                            case JOptionPane.CLOSED_OPTION:
+                            case 3: // Quit
+                                found = false;
+                                doReplace = false;
+                                break;
+                            case 4: // Last
+                                found = false;
+                                doReplace = true;
+                                break;
+                        }
+                    }
+
+                    if (doReplace)
+                    {
+                        lastLine = line;
+                        editor.getDocument().replaceString(start + spos, start + epos, match);
+                        lastMatch = start + spos;
+                    }
                 }
 
                 int diff = match.length() - (epos - spos);
@@ -178,10 +213,37 @@ public class SearchGroup extends AbstractActionGroup
         return res;
     }
 
+    private Object[] getConfirmButtons()
+    {
+        if (confirmBtns == null)
+        {
+            // TODO - need buttons with mnemonics
+            /*
+            confirmBtns = new JButton[] {
+                new JButton("Yes"),
+                new JButton("No"),
+                new JButton("All"),
+                new JButton("Quit"),
+                new JButton("Last")
+            };
+
+            confirmBtns[0].setMnemonic('Y');
+            confirmBtns[1].setMnemonic('N');
+            confirmBtns[2].setMnemonic('A');
+            confirmBtns[3].setMnemonic('Q');
+            confirmBtns[4].setMnemonic('L');
+            */
+            confirmBtns = new String[] { "Yes", "No", "All", "Quit", "Last" };
+        }
+
+        return confirmBtns;
+    }
+
     private Pattern lastSearch;
     private Pattern lastPattern;
     private String lastReplace;
     private int lastFlags;
+    private Object[] confirmBtns;
 
     private static Logger logger = Logger.getInstance(SearchGroup.class.getName());
 }
