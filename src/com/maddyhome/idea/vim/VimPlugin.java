@@ -244,10 +244,7 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
 
     public static void showMode(String msg)
     {
-        if (msg.length() == 0 || Options.getInstance().isSet("showmode"))
-        {
-            showMessage(msg);
-        }
+        showMessage(msg);
     }
 
     public static void showMessage(String msg)
