@@ -1,4 +1,4 @@
-*index.txt*     For @NAME@ version @VERSION@.  Last change: 2003 May 13.
+*index.txt*     For @NAME@ version @VERSION@.  Last change: 2003 May 14.
 
 
                   @NAME@ REFERENCE MANUAL    by Rick Maddy

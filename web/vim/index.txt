@@ -1,4 +1,4 @@
-*index.txt*     For IdeaVIM version 0.3.2.  Last change: 2003 May 8
+*index.txt*     For IdeaVIM version 0.4.0.  Last change: 2003 May 14 
 
 
                   IdeaVIM REFERENCE MANUAL    by Rick Maddy
