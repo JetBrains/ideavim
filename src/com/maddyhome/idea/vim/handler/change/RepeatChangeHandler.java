@@ -22,6 +22,7 @@ package com.maddyhome.idea.vim.handler.change;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
+import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.Argument;
@@ -54,8 +55,7 @@ public class RepeatChangeHandler extends AbstractEditorActionHandler
             }
             Command save = state.getCommand();
             state.setCommand(cmd);
-            int mode = state.getMode();
-            state.setMode(CommandState.MODE_REPEAT);
+            state.pushState(CommandState.MODE_REPEAT, 0, KeyParser.MAPPING_NORMAL);
             char reg = CommandGroups.getInstance().getRegister().getCurrentRegister();
             CommandGroups.getInstance().getRegister().selectRegister(state.getLastChangeRegister());
             try
@@ -68,7 +68,7 @@ public class RepeatChangeHandler extends AbstractEditorActionHandler
             {
                 // oops
             }
-            state.setMode(mode);
+            state.popState();
             state.setCommand(save);
             state.saveLastChangeCommand(cmd);
             CommandGroups.getInstance().getRegister().selectRegister(reg);
