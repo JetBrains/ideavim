@@ -35,6 +35,8 @@ Bug Fixes
   error.
 - Repeating an R command resulted in the text being inserted instead of
   overwriting old text. This now works properly.
+- Issuing a p command when on the last line of a file pasted the line before
+  the last line instead of after the last line.
 
 0.3.0 to 0.3.1
 

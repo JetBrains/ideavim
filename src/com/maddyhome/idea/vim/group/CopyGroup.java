@@ -148,7 +148,13 @@ public class CopyGroup extends AbstractActionGroup
             // If a linewise paste, the text is inserted after the current line.
             if ((reg.getType() & Command.FLAG_MOT_LINEWISE) != 0)
             {
-                pos = CommandGroups.getInstance().getMotion().moveCaretToLineStartOffset(editor, 1);
+                pos = Math.min(editor.getDocument().getTextLength(),
+                    CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, true) + 1);
+                if (pos > 0 && pos == editor.getDocument().getTextLength() &&
+                    editor.getDocument().getChars()[pos - 1] != '\n')
+                {
+                    editor.getDocument().insertString(pos, "\n");
+                }
             }
             else
             {
