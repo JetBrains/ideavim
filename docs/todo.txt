@@ -5,4 +5,6 @@ Bugs to fix:
 
 Requested Functionality to add:
 
-- Support for :e# command
+- More fold region support
+- Window support (need access to splitter)
+- Text objects (visual and operator modes)
