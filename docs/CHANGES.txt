@@ -6,6 +6,8 @@ Bug Fixes
   minor issues such as not being able to clear highlighted text using the
   Ctrl-Shift-F7, for example.
 - :quit command now works in all forms (e.g. :q, :qu, :qui, :quit).
+- Performing a change command while in visual mode now properly terminates
+  visual mode.
 
 0.8.3 from 0.8.2
 Bug Fixes

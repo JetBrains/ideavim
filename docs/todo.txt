@@ -1,7 +1,6 @@
 Bugs to fix:
 
 x Using column selection causes exception.
-- change commands in visual mode leaves you in visual mode - shouldn't
 - Split text when typing fast after o command.
 - Show message after shifting lines with :< or :>
 - Replace mode - fix cursor. Can't figure out how to keep block cursor.

@@ -47,6 +47,8 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
         }
         TextRange range = CommandGroups.getInstance().getMotion().getVisualRange(editor);
         VisualChange change = CommandGroups.getInstance().getMotion().getVisualOperatorRange(editor, cmd.getFlags());
+        CommandGroups.getInstance().getMotion().exitVisual(editor);
+        
         boolean res = execute(editor, context, cmd, range);
 
         if (res)
@@ -67,8 +69,6 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
                 UndoManager.getInstance().beginCommand(editor);
             }
         }
-
-        CommandGroups.getInstance().getMotion().exitVisual(editor);
 
         return res;
     }
