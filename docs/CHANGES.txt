@@ -32,7 +32,7 @@ Bug Fixes
 - Visual mode is now exited after issuing the = or gq command.
 - The commands c% and d% where not removing the closing match as expected.
 - The d{motion} command now becomes linewise when the motion covers more than
-  one line and the is just whitespace before the start and after the end.
+  one line and there is just whitespace before the start and after the end.
 - Renamed some source files to avoid problems on case insensitive platforms.
 - Entering a count for the . (repeat) command sometimes results in an internal
   error.
