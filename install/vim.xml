@@ -19,6 +19,7 @@
   <action id="ClassNameCompletion" />
   <action id="CodeCompletion" />
   <action id="CommanderSwapPanels" />
+  <action id="ContextHelp" />
   <action id="EditorBackSpace">
     <keyboard-shortcut id="EditorBackSpace" first-keystroke="BACK_SPACE" />
   </action>
@@ -153,6 +154,7 @@
     <keyboard-shortcut id="VimKeyHandler" first-keystroke="control X" />
     <keyboard-shortcut id="VimKeyHandler" first-keystroke="control Y" />
     <keyboard-shortcut id="VimKeyHandler" first-keystroke="control Z" />
+    <keyboard-shortcut id="VimKeyHandler" first-keystroke="F1" />
     <keyboard-shortcut id="VimKeyHandler" first-keystroke="KP_DOWN" />
     <keyboard-shortcut id="VimKeyHandler" first-keystroke="KP_LEFT" />
     <keyboard-shortcut id="VimKeyHandler" first-keystroke="KP_RIGHT" />
