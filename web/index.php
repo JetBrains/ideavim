@@ -84,7 +84,9 @@ Version 0.4.x was used with IDEA 3.x.
 <br>
 Version 0.6.x was used with Aurora.
 <br>
-Version 0.7.x is used with IDEA 4.x
+Version 0.7.x is used with IDEA 4.0.x
+<br>
+Version 0.8.x is used with Pallada/IDEA 4.5.x
 
 <hr>
 

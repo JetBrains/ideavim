@@ -1,6 +1,13 @@
 History of changes for @NAME@ for IDEA @IDEA-VERSION@
 
-@VERSION@ from 0.7.2
+@VERSION@ from 0.7.3
+New Features
+- Support for Pallada (IDEA 4.5)
+- Support for the hlsearch option and the :nohlsearch command. Now when a
+  search is done, all matching text is highlighted. The highlight attributes
+  are based on the "General|Search result" color setting.
+
+0.7.3 from 0.7.2
 
 New Features
 - Added support for digraphs. Currently you can use Ctrl-k {char1}{char2} to

@@ -181,6 +181,21 @@ is entered.  When an option is "reset", ":set nooption" is used.
                 :s///g            subst. one      subst. all
                 :s///gg           subst. all      subst. one
 
+                                 *'hlsearch'* *'hls'* *'nohlsearch'* *'nohls'*
+'hlsearch' 'hls'        boolean (default off)
+                        global
+        When there is a previous search pattern, highlight all its matches.
+        Note that only the matching text is highlighted, any offsets
+        are not applied.
+        When you get bored looking at the highlighted matches, you can turn it
+        off with |:nohlsearch|.  As soon as you use a search command, the
+        highlighting comes back.
+        When the search pattern can match an end-of-line, Vim will try to
+        highlight all of the matched text.  However, this depends on where the
+        search starts.  This will be the first line in the window or the first
+        line below a closed fold.  A match in a previous line which is not
+        drawn may not continue in an newly drawn line.
+
                         *'ignorecase'* *'ic'* *'noignorecase'* *'noic'*
 'ignorecase' 'ic'       boolean (default off)
                         global

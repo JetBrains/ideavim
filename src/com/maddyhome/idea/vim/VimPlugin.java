@@ -43,6 +43,7 @@ import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.FileGroup;
 import com.maddyhome.idea.vim.group.MarkGroup;
 import com.maddyhome.idea.vim.group.MotionGroup;
+import com.maddyhome.idea.vim.group.SearchGroup;
 import com.maddyhome.idea.vim.helper.DocumentManager;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.key.RegisterActions;
@@ -139,6 +140,7 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
                 FileEditorManager.getInstance(project).addFileEditorManagerListener(new MotionGroup.MotionEditorChange());
                 FileEditorManager.getInstance(project).addFileEditorManagerListener(new MorePanel.MoreEditorChangeListener());
                 FileEditorManager.getInstance(project).addFileEditorManagerListener(new FileGroup.SelectionCheck());
+                FileEditorManager.getInstance(project).addFileEditorManagerListener(new SearchGroup.SelectionCheck());
 
                 DocumentManager.getInstance().openProject(project);
 

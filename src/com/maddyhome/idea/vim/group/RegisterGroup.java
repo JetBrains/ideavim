@@ -345,7 +345,7 @@ public class RegisterGroup extends AbstractActionGroup
             if (register.isText())
             {
                 Element text = new Element("text");
-                CDATA data = new CDATA(register.getText());
+                CDATA data = new CDATA(CDATA.normalizeString(register.getText()));
                 text.addContent(data);
                 reg.addContent(text);
             }
@@ -389,7 +389,7 @@ public class RegisterGroup extends AbstractActionGroup
                 if (reg.getChild("text") != null)
                 {
                     register = new Register(key.charValue(), Integer.parseInt(reg.getAttributeValue("type")),
-                        reg.getChildText("text"));
+                        reg.getChild("text").getTextNormalize());
                 }
                 else
                 {

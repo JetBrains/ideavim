@@ -67,6 +67,7 @@ import com.maddyhome.idea.vim.ex.handler.WritePreviousFileHandler;
 import com.maddyhome.idea.vim.ex.handler.WriteQuitHandler;
 import com.maddyhome.idea.vim.ex.handler.YankLinesHandler;
 import com.maddyhome.idea.vim.ex.handler.DigraphHandler;
+import com.maddyhome.idea.vim.ex.handler.NoHLSearchHandler;
 import com.maddyhome.idea.vim.ex.range.AbstractRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.MessageHelper;
@@ -126,6 +127,7 @@ public class CommandParser
         new MarksHandler();
         new MoveTextHandler();
         new NextFileHandler();
+        new NoHLSearchHandler();
         new OnlyHandler();
         new PreviousFileHandler();
         new PromptFindHandler();

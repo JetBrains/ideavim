@@ -6,29 +6,13 @@
     <change-notes>
 <![CDATA[
 New Features<br>
-- Added support for digraphs. Currently you can use Ctrl-k {char1}{char2} to
-  enter a special character. This works while in Insert/Replace mode, as an
-  argument to the r, F, T, f, and t commands, or while entering an ex command.
-  The :digraphs command has been added to display the currently supported
-  digraphs. Certain special cases of the Ctrl-K {char1}{char2} sequence are not
-  supported. This supports all two character digraphs as listed in RFC1345.
-  This amounts to 1,338 digraphs! Ensure the file encoding can handle the
-  characters you enter.<br>
-- Added support for the 'digraph' option. If set, digraphs may be entered using
-  {char1} [BackSpace] {char2}. This works in Insert/Replace mode or while
-  entering an ex command.<br>
-- Added support for Ctrl-v {digits}. This works while in Insert/Replace mode,
-  as an argument to the r, F, T, f, and t commands, or while entering an ex
-  command.<br>
-- A new Vim.xml keymap needs to be installed or Ctrl-K needs to be removed
-  from all source control menus.<br>
-<br>
-Bug Fixes<br>
-- Fixed backspace in ex entry. Deleting the first character was closing the ex
-  entry window.<br>
+- Support for Pallada (IDEA 4.5)<br>
+- Support for the hlsearch option and the :nohlsearch command. Now when a
+search is done, all matching text is highlighted. The highlight attributes
+are based on the "General|Search result" color setting.<br>
 ]]>
     </change-notes>
-    <idea-version min="4.0" max="4.5"/>
+    <idea-version min="4.5" max="4.5"/>
 
     <application-components>
         <component>

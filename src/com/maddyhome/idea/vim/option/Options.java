@@ -545,7 +545,7 @@ public class Options
     {
         addOption(new ToggleOption("digraph", "dg", false));
         addOption(new ToggleOption("gdefault", "gd", false));
-        //addOption(new ToggleOption("hlsearch", "hls", false));
+        addOption(new ToggleOption("hlsearch", "hls", false));
         addOption(new ToggleOption("ignorecase", "ic", false));
         //addOption(new ToggleOption("incsearch", "is", false));
         addOption(new ListOption("matchpairs", "mps", new String[] { "(:)", "{:}", "[:]" }, ".:."));

@@ -31,6 +31,8 @@ import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.command.VisualRange;
 import com.maddyhome.idea.vim.undo.UndoManager;
 
+import java.util.Collection;
+
 /**
  * This class is used to manipulate editor specific data. Each editor has a user defined map associated with it.
  * These methods provide convenient methods for working with that Vim Plugin specific data.
@@ -85,6 +87,26 @@ public class EditorData
         editor.putUserData(LAST_COLUMN, new Integer(col));
         int t = getLastColumn(editor);
         logger.debug("setLastColumn(" + col + ") is now " + t);
+    }
+
+    public static String getLastSearch(Editor editor)
+    {
+        return (String)editor.getUserData(LAST_SEARCH);
+    }
+
+    public static void setLastSearch(Editor editor, String search)
+    {
+        editor.putUserData(LAST_SEARCH, search);
+    }
+
+    public static Collection getLastHighlights(Editor editor)
+    {
+        return (Collection)editor.getUserData(LAST_HIGHLIGHTS);
+    }
+
+    public static void setLastHighlights(Editor editor, Collection highlights)
+    {
+        editor.putUserData(LAST_HIGHLIGHTS, highlights);
     }
 
     /**
@@ -194,6 +216,8 @@ public class EditorData
     private static final Key PROJECT = new Key("project");
     private static final Key VISUAL = new Key("lastVisual");
     private static final Key VISUAL_OP = new Key("lastVisualOp");
+    private static final Key LAST_SEARCH = new Key("lastSearch");
+    private static final Key LAST_HIGHLIGHTS = new Key("lastHighlights");
 
     private static Logger logger = Logger.getInstance(EditorData.class.getName());
 }

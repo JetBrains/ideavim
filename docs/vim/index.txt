@@ -765,6 +765,7 @@ The commands are sorted on the non-optional part of their name.
 |:mark|         :ma[rk]         set a mark
 |:marks|        :marks          list all marks
 |:next|         :n[ext]         go to next file in the argument list
+|:nohlsearch|   :noh[lsearch]   suspend 'hlsearch' highlighting
 |:only|         :on[ly]         close all editors except current one
 |:previous|     :prev[ious]     go to previous file in argument list
 |:promptfind|   :pro[mptfind]   Search dialog
@@ -1291,7 +1292,6 @@ tag             command       note action in Visual mode        ~
 |:mkvimrc|      :mkv[imrc]      write current mappings and settings to a file
 |:mkview|       :mkvie[w]       write view of current window to a file
 |:new|          :new            create a new empty window
-|:nohlsearch|   :noh[lsearch]   suspend 'hlsearch' highlighting
 |:noreabbrev|   :norea[bbrev]   enter an abbreviation that will not be
                                 remapped
 |:noremenu|     :noreme[nu]     enter a menu that will not be remapped

@@ -23,36 +23,48 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.colors.EditorColors;
+import com.intellij.openapi.editor.event.DocumentAdapter;
+import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.markup.HighlighterLayer;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
+import com.intellij.openapi.fileEditor.TextEditor;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.ex.LineRange;
+import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
+import com.maddyhome.idea.vim.option.OptionChangeEvent;
+import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.regexp.CharHelper;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
+import org.jdom.CDATA;
+import org.jdom.Element;
 
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -73,6 +85,14 @@ public class SearchGroup extends AbstractActionGroup
 
     public SearchGroup()
     {
+        Options.getInstance().getOption("hlsearch").addOptionChangeListener(new OptionChangeListener()
+        {
+            public void valueChange(OptionChangeEvent event)
+            {
+                showSearchHighlight = Options.getInstance().isSet("hlsearch");
+                updateHighlight();
+            }
+        });
     }
 
     public String getLastSearch()
@@ -327,7 +347,7 @@ public class SearchGroup extends AbstractActionGroup
 
         lastReplace = sub.toString();
 
-        highlightSearch(false);
+        searchHighlight(false);
 
         logger.debug("search range=[" + start + "," + end + "]");
         logger.debug("pattern="+pattern + ", replace="+sub);
@@ -619,7 +639,7 @@ public class SearchGroup extends AbstractActionGroup
         logger.debug("lastOffset=" + lastOffset);
         logger.debug("lastDir=" + lastDir);
 
-        highlightSearch(false);
+        searchHighlight(false);
 
         int res = findItOffset(editor, context, startOffset, count, lastDir, false);
 
@@ -652,7 +672,7 @@ public class SearchGroup extends AbstractActionGroup
         lastOffset = "";
         lastDir = dir;
 
-        highlightSearch(true);
+        searchHighlight(true);
 
         int res = findItOffset(editor, context, editor.getCaretModel().getOffset(), count, lastDir, true);
 
@@ -661,12 +681,26 @@ public class SearchGroup extends AbstractActionGroup
 
     public int searchNext(Editor editor, DataContext context, int count)
     {
+        searchHighlight(false);
         return findItOffset(editor, context, editor.getCaretModel().getOffset(), count, lastDir, false);
     }
 
     public int searchPrevious(Editor editor, DataContext context, int count)
     {
+        searchHighlight(false);
         return findItOffset(editor, context, editor.getCaretModel().getOffset(), count, -lastDir, false);
+    }
+
+    public void updateHighlight()
+    {
+        highlightSearch(false);
+    }
+
+    private void searchHighlight(boolean noSmartCase)
+    {
+        showSearchHighlight = Options.getInstance().isSet("hlsearch");
+
+        highlightSearch(noSmartCase);
     }
 
     private void highlightSearch(boolean noSmartCase)
@@ -675,18 +709,87 @@ public class SearchGroup extends AbstractActionGroup
         for (int i = 0; i < projects.length; i++)
         {
             Editor editor = FileEditorManager.getInstance(projects[i]).getSelectedTextEditor();
-            TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES);
-
-            TextRange range = null;
-            int pos = 0;
-            while ((range = findIt(editor, null, pos, 1, 1, noSmartCase, false, true, true)) != null)
+            String els = EditorData.getLastSearch(editor);
+            if (!showSearchHighlight)
             {
-                RangeHighlighter rh = highlightMatch(editor, range.getStartOffset(), range.getEndOffset());
-                rh.setErrorStripeMarkColor(color.getBackgroundColor());
-                rh.setErrorStripeTooltip(lastPattern);
-                pos = range.getEndOffset();
+                removeSearchHighlight(editor);
+
+                return;
             }
+            else if (lastSearch != null && lastSearch.equals(els))
+            {
+                return;
+            }
+            else if (lastSearch == null)
+            {
+                return;
+            }
+
+            removeSearchHighlight(editor);
+
+            highlightSearchLines(editor, noSmartCase, 0, -1);
+
+            EditorData.setLastSearch(editor, lastSearch);
         }
+    }
+
+    private void highlightSearchLines(Editor editor, boolean noSmartCase, int startLine, int endLine)
+    {
+        TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
+        ArrayList hls = (ArrayList)EditorData.getLastHighlights(editor);
+        if (hls == null)
+        {
+            hls = new ArrayList();
+            EditorData.setLastHighlights(editor, hls);
+        }
+
+            int line1 = startLine;
+            int line2 = endLine == -1 ? EditorHelper.getLineCount(editor) : endLine;
+
+            RegExp sp;
+            RegExp.regmmatch_T regmatch = new RegExp.regmmatch_T();
+            sp = new RegExp();
+            regmatch.regprog = sp.vim_regcomp(lastSearch, 1);
+            if (regmatch.regprog == null)
+            {
+                return;
+            }
+
+            regmatch.rmm_ic = shouldIgnoreCase(lastSearch, noSmartCase);
+            
+            boolean found = true;
+            int searchcol = 0;
+            for (int lnum = line1; lnum <= line2;)
+            {
+                CharacterPosition newpos = null;
+                int nmatch = sp.vim_regexec_multi(regmatch, editor, lnum, searchcol);
+                found = nmatch > 0;
+                if (found)
+                {
+                    CharacterPosition startpos = new CharacterPosition(lnum + regmatch.startpos[0].lnum,
+                        regmatch.startpos[0].col);
+                    CharacterPosition endpos = new CharacterPosition(lnum + regmatch.endpos[0].lnum,
+                        regmatch.endpos[0].col);
+                    int startoff = EditorHelper.characterPositionToOffset(editor, startpos);
+                    int endoff = EditorHelper.characterPositionToOffset(editor, endpos);
+
+                    RangeHighlighter rh = highlightMatch(editor, startoff, endoff);
+                    rh.setErrorStripeMarkColor(color.getBackgroundColor());
+                    rh.setErrorStripeTooltip(lastSearch);
+                    hls.add(rh);
+
+                    lnum += nmatch - 1;
+                    if (newpos != null)
+                        searchcol = newpos.column;
+                    else
+                        searchcol = endpos.column;
+                }
+                else
+                {
+                    lnum++;
+                    searchcol = 0;
+                }
+            }
     }
 
     private int findItOffset(Editor editor, DataContext context, int startOffset, int count, int dir,
@@ -1108,9 +1211,136 @@ public class SearchGroup extends AbstractActionGroup
 
     private RangeHighlighter highlightMatch(Editor editor, int start, int end)
     {
-        TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES);
+        TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
         return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.SELECTION + 1,
             color, HighlighterTargetArea.EXACT_RANGE);
+    }
+
+    public void clearSearchHighlight(Editor editor, DataContext context)
+    {
+        showSearchHighlight = false;
+        updateHighlight();
+    }
+
+    private void removeSearchHighlight(Editor editor)
+    {
+        Collection ehl = EditorData.getLastHighlights(editor);
+        if (ehl == null)
+        {
+            return;
+        }
+
+        Iterator iter = ehl.iterator();
+        while (iter.hasNext())
+        {
+            RangeHighlighter rh = (RangeHighlighter)iter.next();
+            editor.getMarkupModel().removeHighlighter(rh);
+        }
+
+        ehl.clear();
+
+        EditorData.setLastHighlights(editor, null);
+        EditorData.setLastSearch(editor, null);
+    }
+
+    /**
+     * Allows the group to save its state and any configuration. This does nothing.
+     *
+     * @param element The plugin's root XML element that this group can add a child to
+     */
+    public void saveData(Element element)
+    {
+        logger.debug("saveData");
+        Element search = new Element("search");
+        if (lastSearch != null)
+        {
+            Element text = new Element("last-search");
+            CDATA data = new CDATA(CDATA.normalizeString(lastSearch));
+            text.addContent(data);
+            search.addContent(text);
+        }
+        if (lastOffset != null)
+        {
+            Element text = new Element("last-offset");
+            CDATA data = new CDATA(CDATA.normalizeString(lastOffset));
+            text.addContent(data);
+            search.addContent(text);
+        }
+        if (lastPattern != null)
+        {
+            Element text = new Element("last-pattern");
+            CDATA data = new CDATA(CDATA.normalizeString(lastPattern));
+            text.addContent(data);
+            search.addContent(text);
+        }
+        if (lastReplace != null)
+        {
+            Element text = new Element("last-replace");
+            CDATA data = new CDATA(CDATA.normalizeString(lastReplace));
+            text.addContent(data);
+            search.addContent(text);
+        }
+        if (lastSubstitute != null)
+        {
+            Element text = new Element("last-substitute");
+            CDATA data = new CDATA(CDATA.normalizeString(lastSubstitute));
+            text.addContent(data);
+            search.addContent(text);
+        }
+        Element text = new Element("last-dir");
+        text.addContent(Integer.toString(lastDir));
+        search.addContent(text);
+
+        text = new Element("show-last");
+        text.addContent(Boolean.toString(showSearchHighlight));
+        logger.debug("text=" + text);
+        search.addContent(text);
+
+        element.addContent(search);
+    }
+
+    /**
+     * Allows the group to restore its state and any configuration. This does nothing.
+     *
+     * @param element The plugin's root XML element that this group can add a child to
+     */
+    public void readData(Element element)
+    {
+        logger.debug("readData");
+        Element search = element.getChild("search");
+        if (search == null)
+        {
+            return;
+        }
+
+        if (search.getChild("last-search") != null);
+        {
+            lastSearch = search.getChildTextNormalize("last-search");
+        }
+        if (search.getChild("last-offset") != null);
+        {
+            lastOffset = search.getChildTextNormalize("last-offset");
+        }
+        if (search.getChild("last-pattern") != null);
+        {
+            lastPattern = search.getChildTextNormalize("last-pattern");
+        }
+        if (search.getChild("last-replace") != null);
+        {
+            lastReplace = search.getChildTextNormalize("last-replace");
+        }
+        if (search.getChild("last-substitute") != null);
+        {
+            lastSubstitute = search.getChildTextNormalize("last-substitute");
+        }
+
+        Element dir = search.getChild("last-dir");
+        lastDir = Integer.parseInt(dir.getText());
+
+        Element show = search.getChild("show-last");
+        logger.debug("show=" + show + "(" + show.getText() + ")");
+        showSearchHighlight = Boolean.valueOf(show.getText()).booleanValue();
+        logger.debug("showSearchHighlight=" + showSearchHighlight);
     }
 
     private class ButtonActionListener implements ActionListener
@@ -1135,15 +1365,69 @@ public class SearchGroup extends AbstractActionGroup
     {
         public void fileOpened(FileEditorManager fileEditorManager, VirtualFile virtualFile)
         {
+            FileDocumentManager.getInstance().getDocument(virtualFile).addDocumentListener(listener);
         }
 
         public void fileClosed(FileEditorManager fileEditorManager, VirtualFile virtualFile)
         {
+            FileDocumentManager.getInstance().getDocument(virtualFile).removeDocumentListener(listener);
         }
 
         public void selectionChanged(FileEditorManagerEvent event)
         {
+            CommandGroups.getInstance().getSearch().updateHighlight();
         }
+
+        private class DocumentSearchListener extends DocumentAdapter
+        {
+            public void documentChanged(DocumentEvent event)
+            {
+                Project[] projs = ProjectManager.getInstance().getOpenProjects();
+                VirtualFile vf = FileDocumentManager.getInstance().getFile(event.getDocument());
+                for (int i = 0; i < projs.length; i++)
+                {
+                    FileEditorManager fem = FileEditorManager.getInstance(projs[i]);
+                    FileEditor[] fes = fem.getEditors(vf);
+                    for (int j = 0; j < fes.length; j++)
+                    {
+                        if (fes[j] instanceof TextEditor)
+                        {
+                            Editor editor = ((TextEditor)fes[j]).getEditor();
+                            Collection hls = EditorData.getLastHighlights(editor);
+                            if (hls == null)
+                            {
+                                continue;
+                            }
+
+                            int soff = event.getOffset();
+                            int eoff = soff + event.getNewLength();
+
+                            logger.debug("hls=" + hls);
+                            logger.debug("event=" + event);
+                            Iterator iter = hls.iterator();
+                            while (iter.hasNext())
+                            {
+                                RangeHighlighter rh = (RangeHighlighter)iter.next();
+                                if (!rh.isValid() || (eoff >= rh.getStartOffset() && soff <= rh.getEndOffset()))
+                                {
+                                    iter.remove();
+                                    editor.getMarkupModel().removeHighlighter(rh);
+                                }
+                            }
+
+                            int sl = editor.offsetToLogicalPosition(soff).line;
+                            int el = editor.offsetToLogicalPosition(eoff).line;
+                            logger.debug("sl=" + sl + ", el=" + el);
+                            CommandGroups.getInstance().getSearch().highlightSearchLines(editor, false, sl, el);
+                            hls = EditorData.getLastHighlights(editor);
+                            logger.debug("hls=" + hls);
+                        }
+                    }
+                }
+            }
+        }
+
+        private DocumentSearchListener listener = new DocumentSearchListener();
     }
 
     private String lastSearch;
@@ -1154,6 +1438,7 @@ public class SearchGroup extends AbstractActionGroup
     private int lastDir;
     private JButton[] confirmBtns;
     private JOptionPane confirmDlg = null;
+    private boolean showSearchHighlight = Options.getInstance().isSet("hlsearch");
 
     private boolean do_all = false; /* do multiple substitutions per line */
     private boolean do_ask = false; /* ask for confirmation */
