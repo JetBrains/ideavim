@@ -36,9 +36,8 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMExternalizable;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.openapi.wm.ToolWindowAnchor;
-import com.intellij.openapi.wm.ToolWindowType;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.group.ChangeGroup;
 import com.maddyhome.idea.vim.group.CommandGroups;
@@ -48,13 +47,12 @@ import com.maddyhome.idea.vim.key.RegisterActions;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.MorePanel;
 import com.maddyhome.idea.vim.ui.VimToolWindow;
-import com.maddyhome.idea.vim.command.CommandState;
 import java.awt.Toolkit;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.net.URL;
-import org.jdom.Element;
 import javax.swing.ImageIcon;
+import org.jdom.Element;
 
 /**
  * This plugin attempts to emulate the keybinding and general functionality of Vim and gVim. See the supplied
@@ -159,6 +157,7 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
         ImageIcon icon = new ImageIcon(url);
         win.setIcon(icon);
 
+        /*
         win.setType(ToolWindowType.DOCKED, null);
         if (isEnabled())
         {
@@ -170,6 +169,7 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
             win.setAutoHide(true);
             win.hide(null);
         }
+        */
     }
 
     /**
@@ -246,14 +246,7 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
     {
         if (msg.length() == 0 || Options.getInstance().isSet("showmode"))
         {
-            if (CommandState.getInstance().isRecording())
-            {
-                showMessage(msg + (msg.length() > 0 ? " - " : "") + "recording");
-            }
-            else
-            {
-                showMessage(msg);
-            }
+            showMessage(msg);
         }
     }
 
