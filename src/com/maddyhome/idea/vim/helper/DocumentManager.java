@@ -29,7 +29,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.AbstractVcsHelper;
 import com.intellij.openapi.vcs.FileStatusManager;
 import com.intellij.openapi.vfs.VirtualFile;
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 
 public class DocumentManager
 {
@@ -45,6 +46,7 @@ public class DocumentManager
 
     public void closeProject(Project project)
     {
+        FileEditorManager.getInstance(project).removeFileEditorManagerListener(listener);
     }
 
     public void addDocumentListener(DocumentListener listener)
@@ -70,17 +72,19 @@ public class DocumentManager
 
     private void addListeners(Document doc)
     {
-        for (int i = 0; i < docListeners.size(); i++)
+        Iterator iter = docListeners.iterator();
+        while (iter.hasNext())
         {
-            doc.addDocumentListener((DocumentListener)docListeners.get(i));
+            doc.addDocumentListener((DocumentListener)iter.next());
         }
     }
 
     private void removeListeners(Document doc)
     {
-        for (int i = 0; i < docListeners.size(); i++)
+        Iterator iter = docListeners.iterator();
+        while (iter.hasNext())
         {
-            doc.removeDocumentListener((DocumentListener)docListeners.get(i));
+            doc.removeDocumentListener((DocumentListener)iter.next());
         }
     }
 
@@ -110,7 +114,7 @@ public class DocumentManager
     }
 
     private FileEditorListener listener = new FileEditorListener();
-    private ArrayList docListeners = new ArrayList();
+    private HashSet docListeners = new HashSet();
 
     private static DocumentManager instance = new DocumentManager();
     private static Logger logger = Logger.getInstance(DocumentManager.class.getName());
