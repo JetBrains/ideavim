@@ -93,13 +93,19 @@ public class DocumentManager
         public void fileOpened(FileEditorManager fileEditorManager, VirtualFile virtualFile)
         {
             Document doc = FileDocumentManager.getInstance().getDocument(virtualFile);
-            addListeners(doc);
+            if (doc != null)
+            {
+                addListeners(doc);
+            }
         }
 
         public void fileClosed(FileEditorManager fileEditorManager, VirtualFile virtualFile)
         {
             Document doc = FileDocumentManager.getInstance().getDocument(virtualFile);
-            removeListeners(doc);
+            if (doc != null)
+            {
+                removeListeners(doc);
+            }
         }
     }
 
