@@ -190,6 +190,14 @@
 
         <!-- Macro -->
         <action id="VimToggleRecording" class="com.maddyhome.idea.vim.action.macro.ToggleRecordingAction" text="Record Keystrokes"/>
+        <action id="VimPlaybackRegister" class="com.maddyhome.idea.vim.action.macro.PlaybackRegisterAction" text="Playback Register"/>
+        <action id="VimPlaybackLastRegister" class="com.maddyhome.idea.vim.action.macro.PlaybackLastRegisterAction" text="Playback Last Register"/>
+
+        <!-- Command Line -->
+        <action id="VimExBackspace" class="com.maddyhome.idea.vim.action.ex.BackspaceAction" text="Backspace"/>
+        <action id="VimProcessExEntry" class="com.maddyhome.idea.vim.action.ex.ProcessExEntryAction" text="Process Ex Entry"/>
+        <action id="VimProcessExKey" class="com.maddyhome.idea.vim.action.ex.ProcessExKeyAction" text="Process Ex Key"/>
+        <action id="VimCancelExEntry" class="com.maddyhome.idea.vim.action.ex.CancelExEntryAction" text="Cancel Ex Entry"/>
 
         <!-- Other -->
         <action id="VimLastSearchReplace" class="com.maddyhome.idea.vim.action.change.change.ChangeLastSearchReplaceAction" text="Repeat Last :s"/>
