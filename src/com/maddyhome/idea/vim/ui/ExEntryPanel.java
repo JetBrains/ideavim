@@ -194,8 +194,13 @@ public class ExEntryPanel extends JPanel
         if (changeFocus)
         {
             logger.debug("parent.requestFocus()");
-            //parent.requestFocus();
-            last.requestFocus();
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run()
+                {
+                    //parent.requestFocus();
+                    last.requestFocus();
+                }
+            });
         }
         parent = null;
     }

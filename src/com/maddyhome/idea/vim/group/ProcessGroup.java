@@ -143,16 +143,27 @@ public class ProcessGroup extends AbstractActionGroup
         }
         finally
         {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run()
+                {
+                    editor.getContentComponent().requestFocus();
+                }
+            });
             return res;
         }
     }
 
-    public boolean cancelExEntry(Editor editor, DataContext context)
+    public boolean cancelExEntry(final Editor editor, DataContext context)
     {
         CommandState.getInstance().popState();
         ExEntryPanel panel = ExEntryPanel.getInstance();
         panel.deactivate(false);
-        editor.getContentComponent().requestFocus();
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run()
+            {
+                editor.getContentComponent().requestFocus();
+            }
+        });
 
         return true;
     }
