@@ -21,8 +21,6 @@ package com.maddyhome.idea.vim.key;
 
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.group.ChangeGroup;
-import com.maddyhome.idea.vim.group.MotionGroup;
 import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 
@@ -99,29 +97,29 @@ public class RegisterActions
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_MASK))
         });
         parser.registerAction(KeyParser.MAPPING_INSERT, "InsertLiveTemplate", Command.INSERT, new Shortcut(KeyStroke.getKeyStroke(']', KeyEvent.CTRL_MASK)));
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimEditorBackSpace", Command.INSERT, ChangeGroup.SAVE_STROKE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimEditorBackSpace", Command.INSERT, Command.FLAG_SAVE_STROKE, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0))
         });
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimEditorDelete", Command.INSERT, ChangeGroup.SAVE_STROKE, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)));
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimEditorDown", Command.INSERT, ChangeGroup.CLEAR_STROKES, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimEditorDelete", Command.INSERT, Command.FLAG_SAVE_STROKE, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)));
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimEditorDown", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0))
         });
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimEditorTab", Command.INSERT, ChangeGroup.SAVE_STROKE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimEditorTab", Command.INSERT, Command.FLAG_SAVE_STROKE, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0))
         });
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimEditorUp", Command.INSERT, ChangeGroup.CLEAR_STROKES, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimEditorUp", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0))
         });
         parser.registerAction(KeyParser.MAPPING_INSERT, "SmartTypeCompletion", Command.INSERT, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK)));
         parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertCharacterAboveCursor", Command.INSERT, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_MASK)));
         parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertCharacterBelowCursor", Command.INSERT, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_MASK)));
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertDeleteInsertedText", Command.INSERT, ChangeGroup.CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.CTRL_MASK)));
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertDeletePreviousWord", Command.INSERT, ChangeGroup.CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK)));
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertEnter", Command.INSERT, ChangeGroup.SAVE_STROKE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertDeleteInsertedText", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.CTRL_MASK)));
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertDeletePreviousWord", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK)));
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertEnter", Command.INSERT, Command.FLAG_SAVE_STROKE, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_J, KeyEvent.CTRL_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.CTRL_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0))
@@ -143,48 +141,48 @@ public class RegisterActions
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_AT, KeyEvent.CTRL_MASK))
         });
         parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertRegister", Command.INSERT, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_MASK)), Argument.CHARACTER);
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertReplaceToggle", Command.INSERT, ChangeGroup.SAVE_STROKE, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0)));
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertSingleCommand", Command.INSERT, ChangeGroup.CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK)));
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionFirstColumn", Command.INSERT, ChangeGroup.CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0)));
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionGotoLineFirst", Command.INSERT, ChangeGroup.CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, KeyEvent.CTRL_MASK)));
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionGotoLineLastEndAppend", Command.INSERT, ChangeGroup.CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, KeyEvent.CTRL_MASK)));
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionLastColumnAppend", Command.INSERT, ChangeGroup.CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, 0)));
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionLeft", Command.INSERT, ChangeGroup.CLEAR_STROKES, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertReplaceToggle", Command.INSERT, Command.FLAG_SAVE_STROKE, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0)));
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertSingleCommand", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK)));
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionFirstColumn", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0)));
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionGotoLineFirst", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, KeyEvent.CTRL_MASK)));
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionGotoLineLastEndAppend", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, KeyEvent.CTRL_MASK)));
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionLastColumnAppend", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, 0)));
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionLeft", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0))
         });
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionRightAppend", Command.INSERT, ChangeGroup.CLEAR_STROKES, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionRightAppend", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0))
         });
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionScrollPageUp", Command.INSERT, ChangeGroup.CLEAR_STROKES, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionScrollPageUp", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.CTRL_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, KeyEvent.CTRL_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, KeyEvent.SHIFT_MASK))
         });
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionScrollPageDown", Command.INSERT, ChangeGroup.CLEAR_STROKES, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionScrollPageDown", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.CTRL_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, KeyEvent.CTRL_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.SHIFT_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, KeyEvent.SHIFT_MASK))
         });
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionWordLeft", Command.INSERT, ChangeGroup.CLEAR_STROKES, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionWordLeft", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, KeyEvent.CTRL_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, KeyEvent.SHIFT_MASK))
         });
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionWordRight", Command.INSERT, ChangeGroup.CLEAR_STROKES, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionWordRight", Command.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, KeyEvent.CTRL_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, KeyEvent.SHIFT_MASK))
         });
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimShiftLeftLines", Command.INSERT, ChangeGroup.SAVE_STROKE, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.CTRL_MASK)));
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimShiftRightLines", Command.INSERT, ChangeGroup.SAVE_STROKE, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.CTRL_MASK)));
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimShiftLeftLines", Command.INSERT, Command.FLAG_SAVE_STROKE, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.CTRL_MASK)));
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimShiftRightLines", Command.INSERT, Command.FLAG_SAVE_STROKE, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.CTRL_MASK)));
 
         // ************************* Visual Mode Actions **********************
         parser.registerAction(KeyParser.MAPPING_VISUAL, "AutoIndentLines", Command.CHANGE, new Shortcut('='));
@@ -192,12 +190,12 @@ public class RegisterActions
         parser.registerAction(KeyParser.MAPPING_VISUAL, "VimChangeCaseLowerVisual", Command.CHANGE, new Shortcut('u'));
         parser.registerAction(KeyParser.MAPPING_VISUAL, "VimChangeCaseToggleVisual", Command.CHANGE, new Shortcut('~'));
         parser.registerAction(KeyParser.MAPPING_VISUAL, "VimChangeCaseUpperVisual", Command.CHANGE, new Shortcut('U'));
-        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimChangeVisual", Command.CHANGE, KeyParser.FLAG_MULTIKEY_UNDO, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimChangeVisual", Command.CHANGE, Command.FLAG_MULTIKEY_UNDO, new Shortcut[] {
             new Shortcut('c'),
             new Shortcut('s')
         });
         parser.registerAction(KeyParser.MAPPING_VISUAL, "VimChangeVisualCharacter", Command.CHANGE, new Shortcut('r'), Argument.CHARACTER);
-        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimChangeVisualLines", Command.CHANGE, KeyParser.FLAG_MULTIKEY_UNDO, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimChangeVisualLines", Command.CHANGE, Command.FLAG_MULTIKEY_UNDO, new Shortcut[] {
             new Shortcut('C'),
             new Shortcut('R'),
             new Shortcut('S')
@@ -245,22 +243,22 @@ public class RegisterActions
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimCopyPutTextAfterCursor", Command.PASTE, new Shortcut('p'));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimCopyYankLine", Command.COPY, new Shortcut('Y'));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimCopyYankLine", Command.COPY, new Shortcut("yy"));
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimCopyYankMotion", Command.COPY, KeyParser.FLAG_OP_PEND, new Shortcut('y'), Argument.MOTION);
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimCopyYankMotion", Command.COPY, Command.FLAG_OP_PEND, new Shortcut('y'), Argument.MOTION);
 
         // Insert/Replace/Change Actions
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeCaseLowerMotion", Command.CHANGE, KeyParser.FLAG_OP_PEND, new Shortcut("gu"), Argument.MOTION);
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeCaseLowerMotion", Command.CHANGE, Command.FLAG_OP_PEND, new Shortcut("gu"), Argument.MOTION);
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeCaseToggleCharacter", Command.CHANGE, new Shortcut('~'));
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeCaseToggleMotion", Command.CHANGE, KeyParser.FLAG_OP_PEND, new Shortcut("g~"), Argument.MOTION);
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeCaseUpperMotion", Command.CHANGE, KeyParser.FLAG_OP_PEND, new Shortcut("gU"), Argument.MOTION);
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeCaseToggleMotion", Command.CHANGE, Command.FLAG_OP_PEND, new Shortcut("g~"), Argument.MOTION);
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeCaseUpperMotion", Command.CHANGE, Command.FLAG_OP_PEND, new Shortcut("gU"), Argument.MOTION);
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeCharacter", Command.CHANGE, new Shortcut('r'), Argument.CHARACTER);
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeCharacters", Command.CHANGE, ChangeGroup.NO_REPEAT | KeyParser.FLAG_MULTIKEY_UNDO, new Shortcut('s'));
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeEndOfLine", Command.CHANGE, KeyParser.FLAG_MULTIKEY_UNDO, new Shortcut('C'));
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeLine", Command.CHANGE, KeyParser.FLAG_MULTIKEY_UNDO, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeCharacters", Command.CHANGE, Command.FLAG_NO_REPEAT | Command.FLAG_MULTIKEY_UNDO, new Shortcut('s'));
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeEndOfLine", Command.CHANGE, Command.FLAG_MULTIKEY_UNDO, new Shortcut('C'));
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeLine", Command.CHANGE, Command.FLAG_MULTIKEY_UNDO, new Shortcut[] {
             new Shortcut("cc"),
             new Shortcut('S')
         });
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeMotion", Command.CHANGE, KeyParser.FLAG_OP_PEND | KeyParser.FLAG_MULTIKEY_UNDO, new Shortcut('c'), Argument.MOTION);
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeReplace", Command.CHANGE, KeyParser.FLAG_MULTIKEY_UNDO, new Shortcut('R'));
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeMotion", Command.CHANGE, Command.FLAG_OP_PEND | Command.FLAG_MULTIKEY_UNDO, new Shortcut('c'), Argument.MOTION);
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimChangeReplace", Command.CHANGE, Command.FLAG_MULTIKEY_UNDO, new Shortcut('R'));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimDeleteCharacter", Command.DELETE, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimDeleteCharacterLeft", Command.DELETE, new Shortcut('X'));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimDeleteCharacterRight", Command.DELETE, new Shortcut('x'));
@@ -268,21 +266,21 @@ public class RegisterActions
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimDeleteJoinLines", Command.DELETE, new Shortcut("gJ"));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimDeleteJoinLinesSpaces", Command.DELETE, new Shortcut('J'));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimDeleteLine", Command.DELETE, new Shortcut("dd"));
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimDeleteMotion", Command.DELETE, KeyParser.FLAG_OP_PEND, new Shortcut('d'), Argument.MOTION);
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimInsertAfterCursor", Command.INSERT, KeyParser.FLAG_MULTIKEY_UNDO, new Shortcut('a'));
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimInsertAfterLineEnd", Command.INSERT, KeyParser.FLAG_MULTIKEY_UNDO, new Shortcut('A'));
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimInsertAtPreviousInsert", Command.INSERT, KeyParser.FLAG_MULTIKEY_UNDO, new Shortcut("gi"));
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimInsertBeforeCursor", Command.INSERT, KeyParser.FLAG_MULTIKEY_UNDO, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimDeleteMotion", Command.DELETE, Command.FLAG_OP_PEND, new Shortcut('d'), Argument.MOTION);
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimInsertAfterCursor", Command.INSERT, Command.FLAG_MULTIKEY_UNDO, new Shortcut('a'));
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimInsertAfterLineEnd", Command.INSERT, Command.FLAG_MULTIKEY_UNDO, new Shortcut('A'));
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimInsertAtPreviousInsert", Command.INSERT, Command.FLAG_MULTIKEY_UNDO, new Shortcut("gi"));
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimInsertBeforeCursor", Command.INSERT, Command.FLAG_MULTIKEY_UNDO, new Shortcut[] {
             new Shortcut('i'),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0))
         });
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimInsertBeforeFirstNonBlank", Command.INSERT, KeyParser.FLAG_MULTIKEY_UNDO, new Shortcut('I'));
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimInsertLineStart", Command.INSERT, KeyParser.FLAG_MULTIKEY_UNDO, new Shortcut("gI"));
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimInsertNewLineAbove", Command.INSERT, KeyParser.FLAG_MULTIKEY_UNDO, new Shortcut('O'));
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimInsertNewLineBelow", Command.INSERT, KeyParser.FLAG_MULTIKEY_UNDO, new Shortcut('o'));
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimInsertBeforeFirstNonBlank", Command.INSERT, Command.FLAG_MULTIKEY_UNDO, new Shortcut('I'));
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimInsertLineStart", Command.INSERT, Command.FLAG_MULTIKEY_UNDO, new Shortcut("gI"));
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimInsertNewLineAbove", Command.INSERT, Command.FLAG_MULTIKEY_UNDO, new Shortcut('O'));
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimInsertNewLineBelow", Command.INSERT, Command.FLAG_MULTIKEY_UNDO, new Shortcut('o'));
         // Motion Actions
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimMotionGotoMark", Command.MOTION, MotionGroup.EXCLUSIVE, new Shortcut('`'), Argument.CHARACTER);
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimMotionGotoMarkLine", Command.MOTION, MotionGroup.LINEWISE, new Shortcut('\''), Argument.CHARACTER);
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimMotionGotoMark", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut('`'), Argument.CHARACTER);
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimMotionGotoMarkLine", Command.MOTION, Command.FLAG_MOT_LINEWISE, new Shortcut('\''), Argument.CHARACTER);
         // Misc Actions
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimLastSearchReplace", Command.OTHER_WRITABLE, new Shortcut('&'));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimLastGlobalSearchReplace", Command.OTHER_WRITABLE, new Shortcut("g&"));
@@ -326,7 +324,7 @@ public class RegisterActions
         // TODO - support for :map macros
 
         // ************************* Normal, Operator Pending, Visual Mode Actions *************************
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimCopySelectRegister", Command.SELECT_REGISTER, KeyParser.FLAG_EXPECT_MORE, new Shortcut('"'), Argument.CHARACTER);
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimCopySelectRegister", Command.SELECT_REGISTER, Command.FLAG_EXPECT_MORE, new Shortcut('"'), Argument.CHARACTER);
 
         // Motion Actions
         // TODO - add ['
@@ -344,44 +342,44 @@ public class RegisterActions
         // TODO - add zl, z<right>
         // TODO - add zs
 
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionColumn", Command.MOTION, MotionGroup.EXCLUSIVE, new Shortcut('|'));
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionDown", Command.MOTION, MotionGroup.LINEWISE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionColumn", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut('|'));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionDown", Command.MOTION, Command.FLAG_MOT_LINEWISE, new Shortcut[] {
             new Shortcut('j'),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_J, KeyEvent.CTRL_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK)),
         });
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionDown", Command.MOTION, MotionGroup.EXCLUSIVE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionDown", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut[] {
             new Shortcut("gj"),
             new Shortcut(new KeyStroke[] { KeyStroke.getKeyStroke('g'), KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0) })
         });
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionDownFirstNonSpace", Command.MOTION, MotionGroup.LINEWISE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionDownFirstNonSpace", Command.MOTION, Command.FLAG_MOT_LINEWISE, new Shortcut[] {
             new Shortcut('+'),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.CTRL_MASK))
         });
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionDownLess1FirstNonSpace", Command.MOTION, MotionGroup.LINEWISE, new Shortcut('_'));
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionFirstColumn", Command.MOTION, MotionGroup.EXCLUSIVE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionDownLess1FirstNonSpace", Command.MOTION, Command.FLAG_MOT_LINEWISE, new Shortcut('_'));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionFirstColumn", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut[] {
             new Shortcut('0'),
             new Shortcut("g0"),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0)),
             new Shortcut(new KeyStroke[] { KeyStroke.getKeyStroke('g'), KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0) })
         });
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionFirstNonSpace", Command.MOTION, MotionGroup.EXCLUSIVE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionFirstNonSpace", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut[] {
             new Shortcut('^'),
             new Shortcut("g^")
         });
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionFirstScreenLine", Command.MOTION, MotionGroup.LINEWISE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionFirstScreenLine", Command.MOTION, Command.FLAG_MOT_LINEWISE, new Shortcut[] {
             new Shortcut('H'),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, KeyEvent.CTRL_MASK))
         });
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionGotoLineFirst", Command.MOTION, MotionGroup.LINEWISE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionGotoLineFirst", Command.MOTION, Command.FLAG_MOT_LINEWISE, new Shortcut[] {
             new Shortcut("gg"),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, KeyEvent.CTRL_MASK))
         });
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionGotoLineLast", Command.MOTION, MotionGroup.LINEWISE, new Shortcut('G'));
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionGotoLineLastEnd", Command.MOTION, MotionGroup.LINEWISE, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, KeyEvent.CTRL_MASK)));
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLastColumn", Command.MOTION, MotionGroup.INCLUSIVE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionGotoLineLast", Command.MOTION, Command.FLAG_MOT_LINEWISE, new Shortcut('G'));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionGotoLineLastEnd", Command.MOTION, Command.FLAG_MOT_LINEWISE, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, KeyEvent.CTRL_MASK)));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLastColumn", Command.MOTION, Command.FLAG_MOT_INCLUSIVE, new Shortcut[] {
             new Shortcut('$'),
             new Shortcut("g$"),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, 0)),
@@ -389,32 +387,31 @@ public class RegisterActions
         });
         parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLastMatchChar", Command.MOTION, new Shortcut(';'));
         parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLastMatchCharReverse", Command.MOTION, new Shortcut(','));
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLastNonSpace", Command.MOTION, MotionGroup.INCLUSIVE, new Shortcut("g_"));
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLastScreenLine", Command.MOTION, MotionGroup.LINEWISE, new Shortcut('L'));
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLastScreenLineEnd", Command.MOTION, MotionGroup.LINEWISE, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, KeyEvent.CTRL_MASK)));
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLeft", Command.MOTION, MotionGroup.EXCLUSIVE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLastNonSpace", Command.MOTION, Command.FLAG_MOT_INCLUSIVE, new Shortcut("g_"));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLastScreenLine", Command.MOTION, Command.FLAG_MOT_LINEWISE, new Shortcut('L'));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLastScreenLineEnd", Command.MOTION, Command.FLAG_MOT_LINEWISE, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, KeyEvent.CTRL_MASK)));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLeft", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut[] {
             new Shortcut('h'),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0))
         });
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLeftMatchChar", Command.MOTION, MotionGroup.INCLUSIVE, new Shortcut('F'), Argument.CHARACTER);
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLeftTillMatchChar", Command.MOTION, MotionGroup.INCLUSIVE, new Shortcut('T'), Argument.CHARACTER);
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLeftWrap", Command.MOTION, MotionGroup.EXCLUSIVE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLeftMatchChar", Command.MOTION, Command.FLAG_MOT_INCLUSIVE, new Shortcut('F'), Argument.CHARACTER);
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLeftTillMatchChar", Command.MOTION, Command.FLAG_MOT_INCLUSIVE, new Shortcut('T'), Argument.CHARACTER);
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLeftWrap", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK))
         });
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionMark", Command.OTHER_READONLY, new Shortcut('m'), Argument.CHARACTER);
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionMiddleColumn", Command.MOTION, MotionGroup.INCLUSIVE, new Shortcut("gm"));
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionMiddleScreenLine", Command.MOTION, MotionGroup.LINEWISE, new Shortcut('M'));
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionNthCharacter", Command.MOTION, MotionGroup.EXCLUSIVE, new Shortcut("go"));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionMiddleColumn", Command.MOTION, Command.FLAG_MOT_INCLUSIVE, new Shortcut("gm"));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionMiddleScreenLine", Command.MOTION, Command.FLAG_MOT_LINEWISE, new Shortcut('M'));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionNthCharacter", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut("go"));
         // This represents two commands and one is linewise and the other is exclusive - the handler will fix it
         parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionPercentOrMatch", Command.MOTION, new Shortcut('%'));
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionRight", Command.MOTION, MotionGroup.EXCLUSIVE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionRight", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut[] {
             new Shortcut('l'),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0))
         });
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionRightMatchChar", Command.MOTION, MotionGroup.INCLUSIVE, new Shortcut('f'), Argument.CHARACTER);
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionRightTillMatchChar", Command.MOTION, MotionGroup.INCLUSIVE, new Shortcut('t'), Argument.CHARACTER);
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionRightWrap", Command.MOTION, MotionGroup.EXCLUSIVE, new Shortcut(' '));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionRightMatchChar", Command.MOTION, Command.FLAG_MOT_INCLUSIVE, new Shortcut('f'), Argument.CHARACTER);
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionRightTillMatchChar", Command.MOTION, Command.FLAG_MOT_INCLUSIVE, new Shortcut('t'), Argument.CHARACTER);
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionRightWrap", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut(' '));
         parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionScrollFirstScreenLine", Command.OTHER_READONLY, new Shortcut[] {
             new Shortcut("zt"),
             // FIX - z<Enter> should move cursor to first non-blank on line
@@ -444,61 +441,62 @@ public class RegisterActions
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_MASK))
         });
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionUp", Command.MOTION, MotionGroup.LINEWISE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionUp", Command.MOTION, Command.FLAG_MOT_LINEWISE, new Shortcut[] {
             new Shortcut('k'),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)),
         });
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionUp", Command.MOTION, MotionGroup.EXCLUSIVE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionUp", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut[] {
             new Shortcut("gk"),
             new Shortcut(new KeyStroke[] { KeyStroke.getKeyStroke('g'), KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0) })
         });
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionUpFirstNonSpace", Command.MOTION, MotionGroup.LINEWISE, new Shortcut('-'));
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionWordEndLeft", Command.MOTION, MotionGroup.INCLUSIVE, new Shortcut("ge"));
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionWordEndRight", Command.MOTION, MotionGroup.INCLUSIVE, new Shortcut('e'));
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionWordLeft", Command.MOTION, MotionGroup.EXCLUSIVE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionUpFirstNonSpace", Command.MOTION, Command.FLAG_MOT_LINEWISE, new Shortcut('-'));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionWordEndLeft", Command.MOTION, Command.FLAG_MOT_INCLUSIVE, new Shortcut("ge"));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionWordEndRight", Command.MOTION, Command.FLAG_MOT_INCLUSIVE, new Shortcut('e'));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionWordLeft", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut[] {
             new Shortcut('b'),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_MASK))
         });
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionWordRight", Command.MOTION, MotionGroup.EXCLUSIVE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionWordRight", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut[] {
             new Shortcut('w'),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_MASK))
         });
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionWORDEndLeft", Command.MOTION, MotionGroup.INCLUSIVE, new Shortcut("gE"));
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionWORDEndRight", Command.MOTION, MotionGroup.INCLUSIVE, new Shortcut('E'));
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionWORDLeft", Command.MOTION, MotionGroup.EXCLUSIVE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionWORDEndLeft", Command.MOTION, Command.FLAG_MOT_INCLUSIVE, new Shortcut("gE"));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionWORDEndRight", Command.MOTION, Command.FLAG_MOT_INCLUSIVE, new Shortcut('E'));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionWORDLeft", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut[] {
             new Shortcut('B'),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_MASK))
         });
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionWORDRight", Command.MOTION, MotionGroup.EXCLUSIVE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionWORDRight", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut[] {
             new Shortcut('W'),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_MASK))
         });
 
         // Misc Actions
-        // TODO - add zC
-        // TODO - add zO
-        parser.registerAction(KeyParser.MAPPING_NVO, "CollapseAllRegions", Command.OTHER_READONLY, new Shortcut("zM"));
-        parser.registerAction(KeyParser.MAPPING_NVO, "CollapseRegion", Command.OTHER_READONLY, new Shortcut("zc"));
-        parser.registerAction(KeyParser.MAPPING_NVO, "ExpandAllRegions", Command.OTHER_READONLY, new Shortcut("zR"));
-        parser.registerAction(KeyParser.MAPPING_NVO, "ExpandRegion", Command.OTHER_READONLY, new Shortcut("zo"));
         // TODO - finds should update visual mode selection
         // TODO - add #
         // TODO - add *
-        parser.registerAction(KeyParser.MAPPING_NVO, "Find", Command.OTHER_READONLY, new Shortcut('/'));
-        parser.registerAction(KeyParser.MAPPING_NVO, "Find", Command.OTHER_READONLY, new Shortcut('?'));
+        parser.registerAction(KeyParser.MAPPING_NVO, "Find", Command.OTHER_READONLY, Command.FLAG_SEARCH_FWD, new Shortcut('/'));
+        parser.registerAction(KeyParser.MAPPING_NVO, "Find", Command.OTHER_READONLY, Command.FLAG_SEARCH_REV, new Shortcut('?'));
         parser.registerAction(KeyParser.MAPPING_NVO, "FindNext", Command.OTHER_READONLY, new Shortcut('n'));
         parser.registerAction(KeyParser.MAPPING_NVO, "FindPrevious", Command.OTHER_READONLY, new Shortcut('N'));
-        // FIX - make custom actions so can save jump
-        parser.registerAction(KeyParser.MAPPING_NVO, "GotoDeclaration", Command.OTHER_READONLY, new Shortcut[] {
-            new Shortcut("gD"),
-            new Shortcut("gd")
-        });
         parser.registerAction(KeyParser.MAPPING_NVO, "VimExEntry", Command.OTHER_READONLY, new Shortcut(':'));
 
         // ********************** Various Mode Actions ************************
-        parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimVisualToggleCharacterMode", Command.OTHER_READONLY, MotionGroup.CHARACTERWISE, new Shortcut('v'));
-        parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimVisualToggleLineMode", Command.OTHER_READONLY, MotionGroup.LINEWISE, new Shortcut('V'));
+        parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimVisualToggleCharacterMode", Command.OTHER_READONLY, Command.FLAG_MOT_CHARACTERWISE, new Shortcut('v'));
+        parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimVisualToggleLineMode", Command.OTHER_READONLY, Command.FLAG_MOT_LINEWISE, new Shortcut('V'));
+        parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimMotionMark", Command.OTHER_READONLY, new Shortcut('m'), Argument.CHARACTER);
+        // FIX - make custom actions so can save jump
+        parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "GotoDeclaration", Command.OTHER_READONLY, new Shortcut[] {
+            new Shortcut("gD"),
+            new Shortcut("gd")
+        });
+        // TODO - add zC
+        // TODO - add zO
+        parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "CollapseAllRegions", Command.OTHER_READONLY, new Shortcut("zM"));
+        parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "CollapseRegion", Command.OTHER_READONLY, new Shortcut("zc"));
+        parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "ExpandAllRegions", Command.OTHER_READONLY, new Shortcut("zR"));
+        parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "ExpandRegion", Command.OTHER_READONLY, new Shortcut("zo"));
 
         // Text Object Actions for Visual and Operator Pending Modes
         // TODO - aW
@@ -509,8 +507,8 @@ public class RegisterActions
         // TODO - i[
         // TODO - i]
         // TODO - iw
-        parser.registerAction(KeyParser.MAPPING_VISUAL | KeyParser.MAPPING_OP_PEND, "VimMotionGotoFileMark", Command.MOTION, MotionGroup.EXCLUSIVE, new Shortcut('`'), Argument.CHARACTER);
-        parser.registerAction(KeyParser.MAPPING_VISUAL | KeyParser.MAPPING_OP_PEND, "VimMotionGotoFileMarkLine", Command.MOTION, MotionGroup.LINEWISE, new Shortcut('\''), Argument.CHARACTER);
+        parser.registerAction(KeyParser.MAPPING_VISUAL | KeyParser.MAPPING_OP_PEND, "VimMotionGotoFileMark", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut('`'), Argument.CHARACTER);
+        parser.registerAction(KeyParser.MAPPING_VISUAL | KeyParser.MAPPING_OP_PEND, "VimMotionGotoFileMarkLine", Command.MOTION, Command.FLAG_MOT_LINEWISE, new Shortcut('\''), Argument.CHARACTER);
 
         parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_OP_PEND, "VimResetMode", Command.RESET, new Shortcut(new KeyStroke[] {
             KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SLASH, KeyEvent.CTRL_MASK),
