@@ -4,12 +4,7 @@
     <version>@VERSION@</version>
     <vendor url="http://sourceforge.net/projects/ideavim/" email="rick@maddyhome.com">Rick Maddy</vendor>
     <change-notes>
-        - Added support for { and } commands.
-        - Fixed cursor movement problem introduced in version 0.6.3.
-        - Fixed issues with visual ranges introduced in version 0.6.3.
-        - Fixed bug with cursor placement when clicking on a blank line.
-        - Triple clicking text now properly puts the user in Visual Line mode.
-        - Updated to support Aurora build 1035 and higher.
+        - Updated to support Aurora build 1050 and higher.
     </change-notes>
     <idea-version min="4.0" max="4.5"/>
 

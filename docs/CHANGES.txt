@@ -1,6 +1,10 @@
 History of changes for @NAME@
 
-0.6.3 to @VERSION@
+0.6.4 to @VERSION@
+
+Support for Aurora build #1050 and higher.
+
+0.6.3 to 0.6.4
 
 Support for Aurora build #1035 and higher.
 
