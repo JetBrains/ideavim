@@ -1,4 +1,4 @@
-*index.txt*     For @NAME@ version @VERSION@.  Last change: 2003 Apr 14
+*index.txt*     For @NAME@ version @VERSION@.  Last change: 2003 May 4
 
 
                   @NAME@ REFERENCE MANUAL    by Rick Maddy
@@ -749,6 +749,7 @@ The commands are sorted on the non-optional part of their name.
 |:quit|         :q[uit]         quit current window (when one window quit Vim)
 |:registers|    :reg[isters]    display the contents of registers
 |:rewind|       :rew[ind]       go to the first file in the argument list
+|:set|          :se[t]          show or set options
 |:substitute|   :s[ubstitute]   find and replace text
 |:t|            :t              same as ":copy"
 |:write|        :w[rite]        write to a file
@@ -818,7 +819,6 @@ TODO:
 |:redo|         :red[o]         redo one undone change
 |:resize|       :res[ize]       change current window height
 |:right|        :ri[ght]        right align text
-|:set|          :se[t]          show or set options
 |:split|        :sp[lit]        split current window
 |:undo|         :u[ndo]         undo last change(s)
 |:unabbreviate| :una[bbreviate] remove abbreviation

@@ -25,8 +25,8 @@ took it upon myself to write one. This project is the result of my desire to kee
 <p>
 The goal of this plugin is to support as much VIM functionality as makes sense within the scope of IDEA. The plugin
 was actually written in IDEA using the VIM plugin once there was enough basic editing support. For the curious, the
-plugin is being written without any reference to the VIM source code. I'm basically using the excellent VIM
-documentation and VIM itself as a reference to verify correct behavior.
+plugin is being written without any reference to the VIM source code (except for the regular expression handling).
+I'm basically using the excellent VIM documentation and VIM itself as a reference to verify correct behavior.
 </p>
 <p>
 This plugin is meant for developers that already know, and probably love, vi/VIM. I make no attempt to teach users
@@ -61,9 +61,9 @@ You may obtain the plugin by visiting the files page on
 
 <h3>Versions</h3>
 
-The VIM plugin has been developed and tested with IntelliJ IDEA 3.0.2 (#695) and 3.0.3 (#698).
-It is not known at this time if older or newer versions will work correctly. Minimal testing was done with
-build #811 and it appeared to work just fine.
+The VIM plugin has been developed and tested with IntelliJ IDEA 3.0.2 (#695), 3.0.3 (#698), and 3.0.4 (#701).
+It is not known at this time if older or newer versions will work correctly. Minimal testing was done with beta
+versions of Aurora (#811) and it appeared to work just fine.
 
 <hr>
 

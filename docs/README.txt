@@ -133,6 +133,8 @@ Registers
 VIM undo/redo
 Visual mode commands
 Some Ex commands
+Some :set options
+Full VIM regular expressions for search and search/replace
 
 Not Supported (yet)
 Keymaps
@@ -143,9 +145,6 @@ macros
 Window commands
 Command line history
 Search history
-Search and Search/Replace still use the standard IDEA dialogs. This will be the
-case until either the JDK regexp library supported backward searches or the
-IDEA openapi provides access to their builtin search and replace.
 
 Please see the file 'index.txt' for a complete list of supported, soon-to-be
 supported, and never-to-be supported commands.
