@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.helper;
  */
 
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
@@ -178,7 +179,8 @@ public class EditorData
                 VirtualFile[] files = fMgr.getOpenFiles();
                 for (int i = 0; i < files.length; i++)
                 {
-                    if (fMgr.fileToDocument(files[i]).equals(editor.getDocument()))
+                    Document doc = fMgr.fileToDocument(files[i]);
+                    if (doc != null && doc.equals(editor.getDocument()))
                     {
                         file = files[i];
                         editor.putUserData(FILE, file);
