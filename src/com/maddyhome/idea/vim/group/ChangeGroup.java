@@ -32,8 +32,8 @@ import com.intellij.openapi.editor.event.EditorFactoryAdapter;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.editor.event.EditorMouseAdapter;
 import com.intellij.openapi.editor.event.EditorMouseEvent;
+import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
-import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.maddyhome.idea.vim.KeyHandler;
@@ -1246,14 +1246,14 @@ public class ChangeGroup extends AbstractActionGroup
     /**
      * This class listens for editor tab changes so any insert/replace modes that need to be reset can be
      */
-    public static class InsertCheck implements FileEditorManagerListener
+    public static class InsertCheck extends FileEditorManagerAdapter
     {
         /**
          * The user has changed the editor they are working with - exit insert/replace mode, and complete any
          * appropriate repeat.
-         * @param event The file selection event
+         * @param event
          */
-        public void selectedFileChanged(FileEditorManagerEvent event)
+        public void selectionChanged(FileEditorManagerEvent event)
         {
             if (!VimPlugin.isEnabled()) return;
 

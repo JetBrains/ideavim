@@ -1,6 +1,15 @@
 History of changes for @NAME@
 
-0.4.0 to @VERSION@
+0.4.1 to @VERSION@
+
+Support for Aurora build #939. It may work with slightly older versions too.
+This version will not work with IDEA 3.x. For IDEA 3.x you must use @NAME@
+versions prior to 0.6.0.
+
+Bug Fixes
+- Put back file saving for the :w related ex commands
+
+0.4.0 to 0.4.1
 
 Bug Fixes
 - Fixed vim.xml for Windows. This file was getting deleted by Idea on Windows

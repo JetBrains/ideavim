@@ -33,8 +33,8 @@ import com.intellij.openapi.editor.event.EditorMouseEventArea;
 import com.intellij.openapi.editor.event.EditorMouseListener;
 import com.intellij.openapi.editor.event.EditorMouseMotionListener;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
-import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
@@ -352,7 +352,8 @@ public class MotionGroup extends AbstractActionGroup
     {
         Project proj = EditorData.getProject(editor);
         FileEditorManager fMgr = FileEditorManager.getInstance(proj);
-        return fMgr.openFile(new OpenFileDescriptor(file), ScrollType.RELATIVE, true);
+        //return fMgr.openFile(new OpenFileDescriptor(file), ScrollType.RELATIVE, true);
+        return fMgr.openTextEditor(new OpenFileDescriptor(file), true);
     }
 
     public int moveCaretToMatchingPair(Editor editor, DataContext context)
@@ -1262,9 +1263,9 @@ public class MotionGroup extends AbstractActionGroup
         exitVisual(editor);
     }
 
-    public static class MotionEditorChange implements FileEditorManagerListener
+    public static class MotionEditorChange extends FileEditorManagerAdapter
     {
-        public void selectedFileChanged(FileEditorManagerEvent event)
+        public void selectionChanged(FileEditorManagerEvent event)
         {
             if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
             {

@@ -4,12 +4,12 @@ import com.intellij.openapi.actionSystem.DataConstants;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.KeyHandler;
+import com.maddyhome.idea.vim.helper.EditorData;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
@@ -47,7 +47,8 @@ public class FileGroup extends AbstractActionGroup
     {
         Project proj = (Project)context.getData(DataConstants.PROJECT);
         FileEditorManager fem = FileEditorManager.getInstance(proj);
-        fem.closeFile(fem.getSelectedFile());
+        //fem.closeFile(fem.getSelectedFile());
+        fem.closeFile(EditorData.getVirtualFile(fem.getSelectedTextEditor()));
 
         /*
         if (fem.getOpenFiles().length == 0)
@@ -116,7 +117,8 @@ public class FileGroup extends AbstractActionGroup
             return false;
         }
 
-        fem.openFile(new OpenFileDescriptor(editors[count]), ScrollType.RELATIVE, true);
+        //fem.openFile(new OpenFileDescriptor(editors[count]), ScrollType.RELATIVE, true);
+        fem.openTextEditor(new OpenFileDescriptor(editors[count]), true);
 
         return true;
     }
@@ -131,14 +133,15 @@ public class FileGroup extends AbstractActionGroup
         Project proj = (Project)context.getData(DataConstants.PROJECT);
         FileEditorManager fem = FileEditorManager.getInstance(proj);
         VirtualFile[] editors = fem.getOpenFiles();
-        VirtualFile current = fem.getSelectedFile();
+        VirtualFile current = fem.getSelectedFiles()[0];
         for (int i = 0; i < editors.length; i++)
         {
             if (editors[i].equals(current))
             {
                 int pos = (i + (count % editors.length) + editors.length) % editors.length;
 
-                fem.openFile(new OpenFileDescriptor(editors[pos]), ScrollType.RELATIVE, true);
+                //fem.openFile(new OpenFileDescriptor(editors[pos]), ScrollType.RELATIVE, true);
+                fem.openTextEditor(new OpenFileDescriptor(editors[pos]), true);
             }
         }
     }

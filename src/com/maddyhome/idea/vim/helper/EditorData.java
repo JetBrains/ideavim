@@ -20,8 +20,9 @@ package com.maddyhome.idea.vim.helper;
  */
 
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -149,11 +150,15 @@ public class EditorData
                 VirtualFile[] files = fMgr.getOpenFiles();
                 for (int i = 0; i < files.length; i++)
                 {
-                    if (fMgr.fileToDocument(files[i]).equals(editor.getDocument()))
+                    FileEditor[] editors = fMgr.getEditors(files[i]);
+                    for (int e = 0; e < editors.length; e++)
                     {
-                        proj = projs[p];
-                        editor.putUserData(PROJECT, proj);
-                        break;
+                        if (editors[0] instanceof TextEditor && ((TextEditor)editors[0]).getEditor().equals(editor))
+                        {
+                            proj = projs[p];
+                            editor.putUserData(PROJECT, proj);
+                            break;
+                        }
                     }
                 }
             }
@@ -179,12 +184,15 @@ public class EditorData
                 VirtualFile[] files = fMgr.getOpenFiles();
                 for (int i = 0; i < files.length; i++)
                 {
-                    Document doc = fMgr.fileToDocument(files[i]);
-                    if (doc != null && doc.equals(editor.getDocument()))
+                    FileEditor[] editors = fMgr.getEditors(files[i]);
+                    for (int e = 0; e < editors.length; e++)
                     {
-                        file = files[i];
-                        editor.putUserData(FILE, file);
-                        break;
+                        if (editors[0] instanceof TextEditor && ((TextEditor)editors[0]).getEditor().equals(editor))
+                        {
+                            file = files[i];
+                            editor.putUserData(FILE, file);
+                            break;
+                        }
                     }
                 }
             }

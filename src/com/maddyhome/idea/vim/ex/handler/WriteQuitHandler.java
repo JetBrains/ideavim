@@ -42,7 +42,7 @@ public class WriteQuitHandler extends CommandHandler
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd)
     {
-        //CommandGroups.getInstance().getFile().saveFiles(context);
+        CommandGroups.getInstance().getFile().saveFiles(context);
         CommandGroups.getInstance().getFile().closeFile(editor, context);
 
         return true;

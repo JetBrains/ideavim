@@ -21,8 +21,8 @@ package com.maddyhome.idea.vim.ui;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
-import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.maddyhome.idea.vim.option.Options;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -371,9 +371,9 @@ public class MorePanel extends JPanel
         private MorePanel parent;
     }
 
-    public static class MoreEditorChangeListener implements FileEditorManagerListener
+    public static class MoreEditorChangeListener extends FileEditorManagerAdapter
     {
-        public void selectedFileChanged(FileEditorManagerEvent event)
+        public void selectionChanged(FileEditorManagerEvent event)
         {
             if (currentPanel != null)
             {

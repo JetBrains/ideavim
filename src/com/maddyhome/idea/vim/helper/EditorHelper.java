@@ -22,7 +22,9 @@ package com.maddyhome.idea.vim.helper;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.VisualPosition;
+import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import java.awt.Point;
@@ -345,13 +347,10 @@ public class EditorHelper
      */
     public static Editor getEditor(FileEditorManager manager, VirtualFile file)
     {
-        Editor[] editors = manager.getAllEditors();
-        for (int i = 0; i < editors.length; i++)
+        FileEditor[] editors = manager.getEditors(file);
+        if (editors.length > 0 && editors[0] instanceof TextEditor)
         {
-            if (manager.fileToDocument(file).equals(editors[i].getDocument()))
-            {
-                return editors[i];
-            }
+            return ((TextEditor)editors[0]).getEditor();
         }
 
         return null;

@@ -141,6 +141,7 @@ public class KeyHandler
         else if (currentArg == Argument.CHARACTER)
         {
             // We are expecting a character argument - is this a regular character the user typed?
+            // FIX - This doesn't handle r<Enter>, for example
             if (chKey != 0)
             {
                 // Create the character argument, add it to the current command, and signal we are ready to process

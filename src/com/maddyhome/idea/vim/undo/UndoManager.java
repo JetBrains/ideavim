@@ -100,16 +100,27 @@ public class UndoManager
         if (!editor.isViewer())
         {
             // Paranoid - make sure there is only one listener of our on this editor
-            editor.getDocument().removeDocumentListener(listener);
-            editor.getDocument().addDocumentListener(listener);
-            addEditorUndoList(editor);
+            // editor.getDocument().removeDocumentListener(listener);
+            if (!editors.containsKey(editor.getDocument()))
+            {
+                editor.getDocument().addDocumentListener(listener);
+                addEditorUndoList(editor);
+            }
         }
     }
 
     public void editorClosed(Editor editor)
     {
         logger.info("editorClosed");
-        editors.remove(editor);
+        //editors.remove(editor);
+        if (!editor.isViewer())
+        {
+            if (editors.containsKey(editor.getDocument()))
+            {
+                editor.getDocument().removeDocumentListener(listener);
+                removeEditorUndoList(editor);
+            }
+        }
     }
 
     private EditorUndoList addEditorUndoList(Editor editor)
