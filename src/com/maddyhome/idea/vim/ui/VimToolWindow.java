@@ -47,8 +47,6 @@ public class VimToolWindow extends JPanel
         setLayout(new BorderLayout());
         ExEntryPanel panel = ExEntryPanel.getInstance();
         add(BorderLayout.NORTH, panel);
-
-        setSize(0,0);
     }
 
     private static VimToolWindow instance;

@@ -111,6 +111,33 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
         logger.debug("done");
     }
 
+    public static void showToolWindow(Project proj)
+    {
+        ToolWindow win = (ToolWindow)toolWindows.get(proj);
+        if (win != null)
+        {
+            win.setType(ToolWindowType.DOCKED, null);
+            if (isEnabled())
+            {
+                win.setAutoHide(false);
+                win.show(null);
+            }
+        }
+    }
+
+    public static void hideToolWindow(Project proj)
+    {
+        ToolWindow win = (ToolWindow)toolWindows.get(proj);
+        if (win != null)
+        {
+            if (isEnabled())
+            {
+                win.setAutoHide(false);
+                win.hide(null);
+            }
+        }
+    }
+
     /**
      * This sets up some listeners so we can handle various events that occur
      */
@@ -175,7 +202,7 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
         if (isEnabled())
         {
             win.setAutoHide(false);
-            win.show(null);
+            //win.show(null);
         }
         else
         {
@@ -314,7 +341,7 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
     private VimTypedActionHandler vimHandler;
     private RegisterActions actions;
     private static HashMap toolWindows = new HashMap();
-    private MarkGroup.MarkUpdater markUpdater = new MarkGroup.MarkUpdater();
+    //private MarkGroup.MarkUpdater markUpdater = new MarkGroup.MarkUpdater();
 
     private static boolean enabled = true;
     private static Logger logger = Logger.getInstance(VimPlugin.class.getName());

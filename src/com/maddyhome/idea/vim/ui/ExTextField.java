@@ -63,6 +63,11 @@ public class ExTextField extends JTextField
         return editor;
     }
 
+    public DataContext getContext()
+    {
+        return context;
+    }
+
     public Action[] getActions()
     {
         return TextAction.augmentList(super.getActions(), ExEditorKit.getInstance().getActions());
