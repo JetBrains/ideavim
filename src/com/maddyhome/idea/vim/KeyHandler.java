@@ -99,21 +99,23 @@ public class KeyHandler
      */
     public void handleKey(Editor editor, KeyStroke key, DataContext context)
     {
+        boolean isRecording = CommandState.getInstance().isRecording();
+        boolean shouldRecord = true;
         // If this is a "regular" character keystroke, get the character
         char chKey = key.getKeyChar() == KeyEvent.CHAR_UNDEFINED ? 0 : key.getKeyChar();
 
-        if (CommandState.getInstance().getMode() == CommandState.MODE_COMMAND &&
+        if ((CommandState.getInstance().getMode() == CommandState.MODE_COMMAND || mode == STATE_COMMAND) &&
             (key.getKeyCode() == KeyEvent.VK_ESCAPE ||
             (key.getKeyCode() == KeyEvent.VK_C && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0) ||
             (key.getKeyCode() == '[' && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0)))
         {
-            if (count == 0 && currentArg == Argument.NONE && currentCmd.size() == 0 &&
+            if (mode != STATE_COMMAND && count == 0 && currentArg == Argument.NONE && currentCmd.size() == 0 &&
                 CommandGroups.getInstance().getRegister().getCurrentRegister() == RegisterGroup.REGISTER_DEFAULT)
             {
                VimPlugin.indicateError();
             }
 
-            fullReset();
+            reset();
         }
         // At this point the user must be typing in a command. Most commands can be preceeded by a number. Let's
         // check if a number can be entered at this point, and if so, did the user send us a digit.
@@ -194,12 +196,14 @@ public class KeyHandler
                     {
                         // Create the motion command and add it to the stack
                         Command cmd = new Command(count, cmdNode.getAction(), cmdNode.getCmdType(), cmdNode.getFlags());
+                        cmd.setKeys(keys);
                         currentCmd.push(cmd);
                     }
                     else if (cmdNode.getCmdType() == Command.RESET)
                     {
                         currentCmd.clear();
                         Command cmd = new Command(1, cmdNode.getAction(), cmdNode.getCmdType(), cmdNode.getFlags());
+                        cmd.setKeys(keys);
                         currentCmd.push(cmd);
                     }
                     else
@@ -213,6 +217,7 @@ public class KeyHandler
                 {
                     // Create the command and add it to the stack
                     Command cmd = new Command(count, cmdNode.getAction(), cmdNode.getCmdType(), cmdNode.getFlags());
+                    cmd.setKeys(keys);
                     currentCmd.push(cmd);
 
                     // This is a sanity check that the command has a valid action. This should only fail if the
@@ -231,6 +236,7 @@ public class KeyHandler
                 // Create a new command based on what the user has typed so far, excluding this keystroke.
                 ArgumentNode arg = (ArgumentNode)node;
                 Command cmd = new Command(count, arg.getAction(), arg.getCmdType(), arg.getFlags());
+                cmd.setKeys(keys);
                 currentCmd.push(cmd);
                 // What argType of argument does this command expect?
                 switch (arg.getArgType())
@@ -243,7 +249,10 @@ public class KeyHandler
                         // commands
                         if ((arg.getFlags() & Command.FLAG_OP_PEND) != 0)
                         {
-                            CommandState.getInstance().setMappingMode(KeyParser.MAPPING_OP_PEND);
+                            //CommandState.getInstance().setMappingMode(KeyParser.MAPPING_OP_PEND);
+                            CommandState state = CommandState.getInstance();
+                            CommandState.getInstance().pushState(state.getMode(), state.getSubMode(),
+                                KeyParser.MAPPING_OP_PEND);
                         }
                         break;
                     default:
@@ -257,7 +266,9 @@ public class KeyHandler
                 if (currentArg != Argument.NONE)
                 {
                     partialReset();
+                    boolean saveRecording = isRecording;
                     handleKey(editor, key, context);
+                    isRecording = saveRecording;
                 }
             }
             else
@@ -266,13 +277,24 @@ public class KeyHandler
                 if (CommandState.getInstance().getMode() == CommandState.MODE_INSERT ||
                     CommandState.getInstance().getMode() == CommandState.MODE_REPLACE)
                 {
-                    CommandGroups.getInstance().getChange().processKey(editor, context, key);
+                    if (!CommandGroups.getInstance().getChange().processKey(editor, context, key))
+                    {
+                        shouldRecord = false;
+                    }
+                }
+                else if (CommandState.getInstance().getMappingMode() == KeyParser.MAPPING_CMD_LINE)
+                {
+                    if (!CommandGroups.getInstance().getProcess().processExKey(editor, context, key, true))
+                    {
+                        shouldRecord = false;
+                    }
                 }
                 // If we get here then the user has entered an unrecognized series of keystrokes
                 else
                 {
                     mode = STATE_ERROR;
                 }
+                partialReset();
             }
         }
 
@@ -307,7 +329,8 @@ public class KeyHandler
             // If we were in "operator pending" mode, reset back to normal mode.
             if (CommandState.getInstance().getMappingMode() == KeyParser.MAPPING_OP_PEND)
             {
-                CommandState.getInstance().setMappingMode(KeyParser.MAPPING_NORMAL);
+                //CommandState.getInstance().setMappingMode(KeyParser.MAPPING_NORMAL);
+                CommandState.getInstance().popState();
             }
 
             // Save off the command we are about to execute
@@ -337,7 +360,7 @@ public class KeyHandler
             VimPlugin.indicateError();
             fullReset();
         }
-        else if (CommandState.getInstance().isRecording())
+        else if (isRecording && shouldRecord)
         {
             CommandGroups.getInstance().getRegister().addKeyStroke(key);
         }
@@ -410,7 +433,7 @@ public class KeyHandler
      */
     public void fullReset()
     {
-        CommandState.getInstance().setMappingMode(KeyParser.MAPPING_NORMAL);
+        CommandState.getInstance().reset();
         reset();
         CommandGroups.getInstance().getRegister().resetRegister();
     }
@@ -430,6 +453,8 @@ public class KeyHandler
 
         public void run()
         {
+            boolean wasRecording = CommandState.getInstance().isRecording();
+
             executeAction(cmd.getAction(), context);
             if (CommandState.getInstance().getMode() == CommandState.MODE_INSERT ||
                 CommandState.getInstance().getMode() == CommandState.MODE_REPLACE)
@@ -446,21 +471,19 @@ public class KeyHandler
                 CommandGroups.getInstance().getRegister().resetRegister();
             }
 
-            KeyHandler.getInstance().reset();
-
             // If, at this point, we are not in insert, replace, or visual modes, we need to restore the previous
             // mode we were in. This handles commands in those modes that temporarily allow us to execute normal
             // mode commands. An exception is if this command should leave us in the temporary mode such as
             // "select register"
-            if ((CommandState.getInstance().getMode() != CommandState.MODE_INSERT &&
-                CommandState.getInstance().getMode() != CommandState.MODE_REPLACE &&
-                CommandState.getInstance().getMode() != CommandState.MODE_VISUAL) &&
+            if (CommandState.getInstance().getSubMode() == CommandState.SUBMODE_SINGLE_COMMAND &&
                 (cmd.getFlags() & Command.FLAG_EXPECT_MORE) == 0)
             {
-                CommandState.getInstance().restoreMode();
+                CommandState.getInstance().popState();
             }
 
-            if (CommandState.getInstance().isRecording())
+            KeyHandler.getInstance().reset();
+
+            if (wasRecording && CommandState.getInstance().isRecording())
             {
                 CommandGroups.getInstance().getRegister().addKeyStroke(key);
             }
