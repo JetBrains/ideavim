@@ -46,6 +46,7 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.VisualRange;
+import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
@@ -1087,7 +1088,7 @@ public class MotionGroup extends AbstractActionGroup
             int end;
             if (rawCount > 0)
             {
-                VisualRange range = EditorData.getLastVisualOperatorRange(editor);
+                VisualChange range = EditorData.getLastVisualOperatorRange(editor);
                 if (range == null)
                 {
                     return false;
@@ -1121,34 +1122,20 @@ public class MotionGroup extends AbstractActionGroup
         return true;
     }
 
-    private TextRange calculateVisualRange(Editor editor, DataContext context, VisualRange range, int count)
+    private TextRange calculateVisualRange(Editor editor, DataContext context, VisualChange range, int count)
     {
-        int start = range.getStart();
-        int end = range.getEnd();
-        if (start > end)
-        {
-            int t = start;
-            start = end;
-            end = t;
-        }
-
-        start = EditorHelper.normalizeOffset(editor, start, false);
-        end = EditorHelper.normalizeOffset(editor, end, false);
-        LogicalPosition sp = editor.offsetToLogicalPosition(start);
-        LogicalPosition ep = editor.offsetToLogicalPosition(end);
-        int lines = ep.line - sp.line + 1;
-        int chars = 0;
+        int lines = range.getLines();
+        int chars = range.getColumns();
         if (range.getType() == Command.FLAG_MOT_LINEWISE || lines > 1)
         {
             lines *= count;
         }
         else
         {
-            chars = ep.column - sp.column + 1;
             chars *= count;
         }
-        start = editor.getSelectionModel().getSelectionStart();
-        sp = editor.offsetToLogicalPosition(start);
+        int start = editor.getSelectionModel().getSelectionStart();
+        LogicalPosition sp = editor.offsetToLogicalPosition(start);
         int endLine = sp.line + lines - 1;
         TextRange res;
         if (range.getType() == Command.FLAG_MOT_LINEWISE)
@@ -1160,7 +1147,7 @@ public class MotionGroup extends AbstractActionGroup
             if (lines > 1)
             {
                 res = new TextRange(start, moveCaretToLineStart(editor, endLine) +
-                    Math.min(EditorHelper.getLineLength(editor, endLine), ep.column));
+                    Math.min(EditorHelper.getLineLength(editor, endLine), chars));
             }
             else
             {
@@ -1191,10 +1178,44 @@ public class MotionGroup extends AbstractActionGroup
         CommandState.getInstance().setVisualType(0);
     }
 
-    public void saveVisualOperatorRange(Editor editor)
+    public VisualChange getVisualOperatorRange(Editor editor, int cmdFlags)
     {
-        EditorData.setLastVisualOperatorRange(editor, new VisualRange(visualStart,
-            visualEnd, CommandState.getInstance().getVisualType()));
+        int start = visualStart;
+        int end = visualEnd;
+        if (start > end)
+        {
+            int t = start;
+            start = end;
+            end = t;
+        }
+
+        start = EditorHelper.normalizeOffset(editor, start, false);
+        end = EditorHelper.normalizeOffset(editor, end, false);
+        LogicalPosition sp = editor.offsetToLogicalPosition(start);
+        LogicalPosition ep = editor.offsetToLogicalPosition(end);
+        int lines = ep.line - sp.line + 1;
+        int chars = 0;
+        int type;
+        if (CommandState.getInstance().getVisualType() == Command.FLAG_MOT_LINEWISE ||
+            (cmdFlags & Command.FLAG_MOT_LINEWISE) != 0)
+        {
+            chars = ep.column;
+            type = Command.FLAG_MOT_LINEWISE;
+        }
+        else
+        {
+            type = Command.FLAG_MOT_CHARACTERWISE;
+            if (lines > 1)
+            {
+                chars = ep.column;
+            }
+            else
+            {
+                chars = ep.column - sp.column + 1;
+            }
+        }
+
+        return new VisualChange(lines, chars, type);
     }
 
     public TextRange getVisualRange(Editor editor)

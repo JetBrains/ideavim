@@ -8,6 +8,7 @@ New Commands
 New Features
 - Entering a count before the v or V command to start Visual mode is now
   supported.
+- Repeating Visual commands is now supported.
 
 Bug Fixes
 - Now properly handle :0, :1, and :<negative> commands
@@ -30,6 +31,8 @@ Bug Fixes
 - The d{motion} command now becomes linewise when the motion covers more than
   one line and the is just whitespace before the start and after the end.
 - Renamed some source files to avoid problems on case insensitive platforms.
+- Entering a count for the . (repeat) command sometimes results in an internal
+  error.
 
 0.3.0 to 0.3.1
 

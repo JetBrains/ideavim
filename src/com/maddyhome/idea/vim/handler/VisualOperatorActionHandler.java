@@ -24,9 +24,11 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.undo.UndoManager;
 import com.maddyhome.idea.vim.key.KeyParser;
+import com.maddyhome.idea.vim.helper.EditorData;
 import javax.swing.SwingUtilities;
 
 /**
@@ -41,21 +43,25 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
             UndoManager.getInstance().endCommand(editor);
             UndoManager.getInstance().beginCommand(editor);
         }
+        if (CommandState.getInstance().getMode() == CommandState.MODE_REPEAT)
+        {
+            CommandGroups.getInstance().getMotion().toggleVisual(editor, context, 1, 1, 0);
+        }
         TextRange range = CommandGroups.getInstance().getMotion().getVisualRange(editor);
+        VisualChange change = CommandGroups.getInstance().getMotion().getVisualOperatorRange(editor, cmd.getFlags());
         CommandState.getInstance().setMode(CommandState.MODE_COMMAND);
         CommandState.getInstance().setMappingMode(KeyParser.MAPPING_NORMAL);
         boolean res = execute(editor, context, cmd, range);
 
         if (res)
         {
-            CommandGroups.getInstance().getMotion().saveVisualOperatorRange(editor);
+            EditorData.setLastVisualOperatorRange(editor, change);
             if ((cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) == 0 && !Command.isReadOnlyType(cmd.getType()))
             {
                 UndoManager.getInstance().endCommand(editor);
                 UndoManager.getInstance().beginCommand(editor);
             }
-            // TODO support redo of visual mode changes
-            //CommandState.getInstance().saveLastChangeCommand(cmd);
+            CommandState.getInstance().saveLastChangeCommand(cmd);
         }
         else
         {

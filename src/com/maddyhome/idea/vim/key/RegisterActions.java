@@ -210,9 +210,9 @@ public class RegisterActions
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.CTRL_MASK)));
 
         // ************************* Visual Mode Actions **********************
-        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimAutoIndentVisual", Command.CHANGE,
+        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimAutoIndentVisual", Command.CHANGE, Command.FLAG_MOT_LINEWISE,
             new Shortcut('='));
-        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimReformatVisual", Command.CHANGE,
+        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimReformatVisual", Command.CHANGE, Command.FLAG_MOT_LINEWISE,
             new Shortcut("gq"));
         parser.registerAction(KeyParser.MAPPING_VISUAL, "VimChangeCaseLowerVisual", Command.CHANGE,
             new Shortcut('u'));
@@ -226,14 +226,14 @@ public class RegisterActions
         });
         parser.registerAction(KeyParser.MAPPING_VISUAL, "VimChangeVisualCharacter", Command.CHANGE,
             new Shortcut('r'), Argument.CHARACTER);
-        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimChangeVisualLines", Command.CHANGE, Command.FLAG_MULTIKEY_UNDO, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimChangeVisualLines", Command.CHANGE, Command.FLAG_MOT_LINEWISE | Command.FLAG_MULTIKEY_UNDO, new Shortcut[] {
             new Shortcut('C'),
             new Shortcut('R'),
             new Shortcut('S')
         });
         parser.registerAction(KeyParser.MAPPING_VISUAL, "VimCopyYankVisual", Command.COPY,
             new Shortcut('y'));
-        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimCopyYankVisualLines", Command.COPY,
+        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimCopyYankVisualLines", Command.COPY, Command.FLAG_MOT_LINEWISE,
             new Shortcut('Y'));
         parser.registerAction(KeyParser.MAPPING_VISUAL, "VimDeleteJoinVisualLines", Command.DELETE,
             new Shortcut("gJ"));
@@ -244,11 +244,11 @@ public class RegisterActions
             new Shortcut('x'),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0))
         });
-        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimDeleteVisualLines", Command.DELETE, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimDeleteVisualLines", Command.DELETE, Command.FLAG_MOT_LINEWISE, new Shortcut[] {
             new Shortcut('D'),
             new Shortcut('X')
         });
-        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimFilterVisualLines", Command.CHANGE,
+        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimFilterVisualLines", Command.CHANGE, Command.FLAG_MOT_LINEWISE,
             new Shortcut('!'));
         parser.registerAction(KeyParser.MAPPING_VISUAL, "VimShiftLeftVisual", Command.CHANGE,
             new Shortcut('<'));

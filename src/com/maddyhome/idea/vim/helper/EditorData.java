@@ -25,6 +25,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.command.VisualRange;
+import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.group.MarkGroup;
 import com.maddyhome.idea.vim.undo.UndoManager;
 
@@ -112,9 +113,9 @@ public class EditorData
      * @param editor The editor to get the range for
      * @return The last visual range, null if no previous range
      */
-    public static VisualRange getLastVisualOperatorRange(Editor editor)
+    public static VisualChange getLastVisualOperatorRange(Editor editor)
     {
-        VisualRange res = (VisualRange)editor.getUserData(VISUAL_OP);
+        VisualChange res = (VisualChange)editor.getUserData(VISUAL_OP);
         return res;
     }
 
@@ -123,7 +124,7 @@ public class EditorData
      * @param editor The editor to set the range for
      * @param range The visual range
      */
-    public static void setLastVisualOperatorRange(Editor editor, VisualRange range)
+    public static void setLastVisualOperatorRange(Editor editor, VisualChange range)
     {
         editor.putUserData(VISUAL_OP, range);
     }

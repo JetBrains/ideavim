@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
 import com.maddyhome.idea.vim.undo.UndoManager;
@@ -42,10 +43,14 @@ public class RepeatChangeHandler extends AbstractEditorActionHandler
             if (command.getRawCount() > 0)
             {
                 cmd.setCount(command.getCount());
-                Command mot = cmd.getArgument().getMotion();
-                if (mot != null)
+                Argument arg = cmd.getArgument();
+                if (arg != null)
                 {
-                    mot.setCount(0);
+                    Command mot = arg.getMotion();
+                    if (mot != null)
+                    {
+                        mot.setCount(0);
+                    }
                 }
             }
             Command save = state.getCommand();
