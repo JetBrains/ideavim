@@ -605,6 +605,10 @@ public class RegisterActions
             new Shortcut('W'),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_MASK))
         });
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionParagraphPrevious", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE,
+            new Shortcut('{'));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionParagraphNext", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE,
+            new Shortcut('}'));
 
         // Misc Actions
         parser.registerAction(KeyParser.MAPPING_NVO, "VimSearchEntry", Command.OTHER_READONLY, Command.FLAG_SEARCH_FWD | Command.FLAG_SAVE_JUMP,
