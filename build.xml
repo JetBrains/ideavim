@@ -34,7 +34,7 @@
 
     <property name="project" value="IdeaVIM" />
     <!-- Update this prior to building a new distribution -->
-    <property name="idea-version" value="4.5" />
+    <property name="idea-version" value="4.x" />
     <property name="version" value="0.8.3" />
 
     <path id="build.classpath">
