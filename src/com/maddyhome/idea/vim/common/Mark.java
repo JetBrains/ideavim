@@ -19,7 +19,6 @@ package com.maddyhome.idea.vim.common;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import java.util.Comparator;
@@ -97,11 +96,6 @@ public class Mark
     public int getLogicalLine()
     {
         return line;
-    }
-
-    public int getOffset(Editor editor)
-    {
-        return 0;
     }
 
     /**
