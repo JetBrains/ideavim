@@ -73,6 +73,12 @@ public class SearchGroup extends AbstractActionGroup
         return lastPattern;
     }
 
+    private void setLastPattern(Editor editor, DataContext context, String lastPattern)
+    {
+        this.lastPattern = lastPattern;
+        CommandGroups.getInstance().getRegister().storeTextInternal(editor, context, -1, -1, lastPattern, Command.FLAG_MOT_CHARACTERWISE, '/', false, false);
+    }
+
     public boolean searchAndReplace(Editor editor, DataContext context, LineRange range, String excmd, String exarg)
     {
         boolean res = true;
@@ -256,7 +262,7 @@ public class SearchGroup extends AbstractActionGroup
         }
 
         lastSubstitute = pattern;
-        lastPattern = pattern;
+        setLastPattern(editor, context, pattern);
 
         int start = editor.logicalPositionToOffset(new LogicalPosition(line1, 0));
         int end = editor.logicalPositionToOffset(new LogicalPosition(line2, EditorHelper.getLineLength(editor, line2)));
@@ -418,6 +424,10 @@ public class SearchGroup extends AbstractActionGroup
                 CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor,
                 editor.offsetToLogicalPosition(lastMatch).line));
         }
+        else
+        {
+            MessageHelper.EMSG(Msg.e_patnotf2, pattern);
+        }
 
         return res;
     }
@@ -562,7 +572,7 @@ public class SearchGroup extends AbstractActionGroup
         }
 
         lastSearch = pattern;
-        lastPattern = pattern;
+        setLastPattern(editor, context, pattern);
         lastOffset = offset;
         lastDir = dir;
 
@@ -597,6 +607,7 @@ public class SearchGroup extends AbstractActionGroup
         MotionGroup.moveCaret(editor, context, range.getStartOffset());
 
         lastSearch = pattern.toString();
+        setLastPattern(editor, context, lastSearch);
         lastOffset = "";
         lastDir = dir;
 
