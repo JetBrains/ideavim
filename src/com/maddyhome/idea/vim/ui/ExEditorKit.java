@@ -19,7 +19,6 @@ package com.maddyhome.idea.vim.ui;
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import java.awt.event.ActionEvent;
 import javax.swing.Action;
@@ -80,8 +79,6 @@ public class ExEditorKit extends DefaultEditorKit
         return new ExDocument();
     }
 
-    public static final String CompleteEdit = "complete-edit";
-    public static final String AbortEdit = "abort-edit";
     public static final String DeletePreviousChar = "delete-prev-char";
     public static final String DeletePreviousWord = "delete-prev-word";
     public static final String DeleteToCursor = "delete-to-cursor";
@@ -96,50 +93,11 @@ public class ExEditorKit extends DefaultEditorKit
 
     //TODO - add rest of actions
     protected Action[] exActions = new Action[] {
-        new CompleteEditAction(),
-        new AbortEditAction(),
         new DeletePreviousCharAction(),
         new DeletePreviousWordAction(),
         new DeleteToCursorAction(),
         new ToggleInsertReplaceAction()
     };
-
-    public static class CompleteEditAction extends TextAction
-    {
-        public CompleteEditAction()
-        {
-            super(CompleteEdit);
-        }
-
-        /**
-         * Invoked when an action occurs.
-         */
-        public void actionPerformed(ActionEvent e)
-        {
-            logger.info("actionPeformed");
-            JTextField target = (JTextField)getTextComponent(e);
-            target.postActionEvent();
-        }
-    }
-
-    public static class AbortEditAction extends TextAction
-    {
-        public AbortEditAction()
-        {
-            super(AbortEdit);
-        }
-
-        /**
-         * Invoked when an action occurs.
-         */
-        public void actionPerformed(ActionEvent e)
-        {
-            logger.info("actionPeformed");
-            JTextField target = (JTextField)getTextComponent(e);
-            target.setText("");
-            target.postActionEvent();
-        }
-    }
 
     // TODO - how do I get the argument (register name)?
     public static class InsertRegisterAction extends TextAction
@@ -298,6 +256,4 @@ public class ExEditorKit extends DefaultEditorKit
     }
 
     private static ExEditorKit instance;
-
-    private static Logger logger = Logger.getInstance(ExEditorKit.class.getName());
 }

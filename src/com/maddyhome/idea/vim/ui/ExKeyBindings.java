@@ -43,12 +43,6 @@ public class ExKeyBindings
     // Ctrl-U - remove all chars to cursor
     // Ctrl-\ Ctrl-N - abort
     static final KeyBinding[] bindings = new KeyBinding[] {
-        new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), ExEditorKit.CompleteEdit),
-        new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_J, KeyEvent.CTRL_MASK), ExEditorKit.CompleteEdit),
-        new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.CTRL_MASK), ExEditorKit.CompleteEdit),
-        new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), ExEditorKit.AbortEdit),
-        new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_MASK), ExEditorKit.AbortEdit),
-        new KeyBinding(KeyStroke.getKeyStroke('[', KeyEvent.CTRL_MASK), ExEditorKit.AbortEdit),
         new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0), ExEditorKit.ToggleInsertReplace),
         new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_MASK), ExEditorKit.beginLineAction),
         new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0), ExEditorKit.beginLineAction),
