@@ -19,12 +19,13 @@ package com.maddyhome.idea.vim.helper;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.VisualPosition;
-import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import java.awt.Point;
@@ -98,7 +99,14 @@ public class EditorHelper
      */
     public static int getLineLength(Editor editor, int lline)
     {
-        return Math.max(0, editor.offsetToLogicalPosition(editor.getDocument().getLineEndOffset(lline)).column);
+        if (getLineCount(editor) == 0)
+        {
+            return 0;
+        }
+        else
+        {
+            return Math.max(0, editor.offsetToLogicalPosition(editor.getDocument().getLineEndOffset(lline)).column);
+        }
     }
 
     /**
@@ -351,11 +359,12 @@ public class EditorHelper
         {
             return null;
         }
-        
-        FileEditor[] editors = manager.getEditors(file);
-        if (editors.length > 0 && editors[0] instanceof TextEditor)
+
+        Document doc = FileDocumentManager.getInstance().getDocument(file);
+        Editor[] editors = EditorFactory.getInstance().getEditors(doc, EditorData.getProject(manager));
+        if (editors != null && editors.length > 0)
         {
-            return ((TextEditor)editors[0]).getEditor();
+            return editors[0];
         }
 
         return null;
