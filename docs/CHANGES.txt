@@ -9,6 +9,20 @@ New Commands
   These are NOT in VIM but are very useful when working with mixed case method
   and variable names. Like their normal w, e, b, and ge counterparts, these may
   be used as operators for the c and d commands.
+- :qall, :quitall, :wqall, and :xall closes the current project or exits IDEA
+  if only one project is open.
+- :wall - same as :write - save all files.
+- :xit and :exit - sames :wq - save files and close current editor.
+- :close and :hide - same as :quit - close current editor.
+- :only - Close all editors except the current editor.
+- :display - same as :registers - display register contents.
+- :undo - same as u - undo last change.
+- :redo - same as Ctrl-R - redo last undone change.
+- :wnext - save files and move to next editor.
+- :wNext and :wprevious - save files and move to previous editor.
+
+Changed Commands
+- ZZ, ZQ, :q and :wq will not exit IDEA anymore
 
 Bug Fixes
 - Visual mode became unusable without doing a Ctrl-\ Ctrl-n command after each

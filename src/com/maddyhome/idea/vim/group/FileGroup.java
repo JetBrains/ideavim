@@ -9,6 +9,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.maddyhome.idea.vim.KeyHandler;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
@@ -40,7 +41,7 @@ public class FileGroup extends AbstractActionGroup
 
     /**
      * Close the current editor
-     * @param context
+     * @param context The data context
      */
     public void closeFile(Editor editor, DataContext context)
     {
@@ -48,21 +49,37 @@ public class FileGroup extends AbstractActionGroup
         FileEditorManager fem = FileEditorManager.getInstance(proj);
         fem.closeFile(fem.getSelectedFile());
 
+        /*
         if (fem.getOpenFiles().length == 0)
         {
             exitIdea();
         }
+        */
+    }
+
+    /**
+     * Close all editors except for the current editor
+     * @param context The data context
+     */
+    public void closeAllButCurrent(DataContext context)
+    {
+        KeyHandler.executeAction("CloseAllEditorsButCurrent", context);
     }
 
     /**
      * Saves all files in the project
-     * @param context
+     * @param context The data context
      */
     public void saveFiles(DataContext context)
     {
         Project proj = (Project)context.getData(DataConstants.PROJECT);
         proj.saveAllDocuments();
         proj.save();
+    }
+
+    public void closeProject(DataContext context)
+    {
+        KeyHandler.executeAction("CloseProject", context);
     }
 
     public void exitIdea()

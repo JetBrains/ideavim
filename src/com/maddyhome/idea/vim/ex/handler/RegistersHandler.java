@@ -40,6 +40,7 @@ public class RegistersHandler extends CommandHandler
     public RegistersHandler()
     {
         super(new CommandName[] {
+            new CommandName("di", "splay"),
             new CommandName("reg", "isters")
         }, ARGUMENT_OPTIONAL);
     }

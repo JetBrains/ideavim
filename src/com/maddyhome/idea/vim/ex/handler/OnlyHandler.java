@@ -29,19 +29,18 @@ import com.maddyhome.idea.vim.group.CommandGroups;
 /**
  *
  */
-public class WriteHandler extends CommandHandler
+public class OnlyHandler extends CommandHandler
 {
-    public WriteHandler()
+    public OnlyHandler()
     {
         super(new CommandName[] {
-            new CommandName("w", "rite"),
-            new CommandName("wa", "ll")
-        }, RANGE_OPTIONAL | ARGUMENT_OPTIONAL);
+            new CommandName("on", "ly")
+        }, ARGUMENT_OPTIONAL);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd)
     {
-        CommandGroups.getInstance().getFile().saveFiles(context);
+        CommandGroups.getInstance().getFile().closeAllButCurrent(context);
 
         return true;
     }

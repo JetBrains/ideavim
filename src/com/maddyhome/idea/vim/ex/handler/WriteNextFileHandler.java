@@ -23,25 +23,24 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.group.CommandGroups;
 
 /**
  *
  */
-public class WriteHandler extends CommandHandler
+public class WriteNextFileHandler extends CommandHandler
 {
-    public WriteHandler()
+    public WriteNextFileHandler()
     {
-        super(new CommandName[] {
-            new CommandName("w", "rite"),
-            new CommandName("wa", "ll")
-        }, RANGE_OPTIONAL | ARGUMENT_OPTIONAL);
+        super("wn", "ext", RANGE_OPTIONAL | ARGUMENT_OPTIONAL | RANGE_IS_COUNT);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd)
     {
+        int count = cmd.getCount(editor, context, 1, true);
+       
         CommandGroups.getInstance().getFile().saveFiles(context);
+        CommandGroups.getInstance().getFile().selectNextFile(count, context);
 
         return true;
     }

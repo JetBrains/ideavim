@@ -471,13 +471,17 @@ The commands are sorted on the non-optional part of their name.
 |:Next|         :N[ext]         go to previous file in the argument list
 |:argument|     :argu[ment]     go to specific file in the argument list
 |:browse|       :bro[wse]       Opens the 'File Open...' dialog
+|:close|        :clo[se]        close current window
 |:copy|         :co[py]         copy lines
 |:delete|       :d[elete]       delete lines
+|:display|      :di[splay]      display registers
 |:edit|         :e[dit]         Opens the 'File Open...' dialog
+|:exit|         :exi[t]         same as ":xit"
 |:find|         :fin[d]         Opens the file search dialog
 |:first|        :fir[st]        go to the first file in the argument list
 |:goto|         :go[to]         go to character in the buffer
 |:help|         :h[elp]         open a help window
+|:hide|         :hid[e]         close current window
 |:join|         :j[oin]         join lines
 |:k|            :k              set a mark
 |:last|         :la[st]         go to the last file in the argument list
@@ -485,18 +489,33 @@ The commands are sorted on the non-optional part of their name.
 |:mark|         :ma[rk]         set a mark
 |:marks|        :marks          list all marks
 |:next|         :n[ext]         go to next file in the argument list
+|:only|         :on[ly]         close all editors except current one
 |:previous|     :prev[ious]     go to previous file in argument list
 |:promptfind|   :pro[mptfind]   Search dialog
 |:promptrepl|   :promptr[epl]   Search/Replace dialog
 |:put|          :pu[t]          insert contents of register in the text
 |:quit|         :q[uit]         quit current window (when one window quit Vim)
+|:qall|         :qa[ll]         close current project, exit IDEA if last
+|:quitall|      :quita[ll]      close current project, exit IDEA if last
+|:redo|         :red[o]         redo one undone change
 |:registers|    :reg[isters]    display the contents of registers
 |:rewind|       :rew[ind]       go to the first file in the argument list
 |:set|          :se[t]          show or set options
 |:substitute|   :s[ubstitute]   search and replace text
 |:t|            :t              same as ":copy"
+|:undo|         :u[ndo]         undo last change(s)
 |:write|        :w[rite]        write to a file
+|:wall|         :wa[ll]         Save all files
+|:wNext|        :wN[ext]        write to a file and go to previous file in
+                                argument list
+|:wnext|        :wn[ext]        write to a file and go to next file in
+                                argument list
+|:wprevious|    :wp[revious]    write to a file and go to previous file in
+                                argument list
 |:wq|           :wq             write to a file and quit window or Vim
+|:wqall|        :wqa[ll]        write to a file and quit window or Vim
+|:xit|          :x[it]          write if buffer changed and quit window or Vim
+|:xall|         :xa[ll]         close current project, exit IDEA if last
 |:yank|         :y[ank]         yank lines into a register
 |:~|            :~              repeat last ":substitute"
 

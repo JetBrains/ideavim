@@ -32,6 +32,12 @@ import com.maddyhome.idea.vim.ex.handler.SubstituteHandler;
 import com.maddyhome.idea.vim.ex.handler.WriteHandler;
 import com.maddyhome.idea.vim.ex.handler.WriteQuitHandler;
 import com.maddyhome.idea.vim.ex.handler.YankLinesHandler;
+import com.maddyhome.idea.vim.ex.handler.ExitHandler;
+import com.maddyhome.idea.vim.ex.handler.OnlyHandler;
+import com.maddyhome.idea.vim.ex.handler.RedoHandler;
+import com.maddyhome.idea.vim.ex.handler.UndoHandler;
+import com.maddyhome.idea.vim.ex.handler.WriteNextFileHandler;
+import com.maddyhome.idea.vim.ex.handler.WritePreviousFileHandler;
 import com.maddyhome.idea.vim.ex.range.AbstractRange;
 
 /*
@@ -89,6 +95,7 @@ public class CommandParser
         new CopyTextHandler();
         new DeleteLinesHandler();
         new EditFileHandler();
+        new ExitHandler();
         new FindFileHandler();
         new GotoCharacterHandler();
         //new GotoLineHandler(); - not needed here
@@ -98,11 +105,13 @@ public class CommandParser
         new MarksHandler();
         new MoveTextHandler();
         new NextFileHandler();
+        new OnlyHandler();
         new PreviousFileHandler();
         new PromptFindHandler();
         new PromptReplaceHandler();
         new PutLinesHandler();
         new QuitHandler();
+        new RedoHandler();
         new RegistersHandler();
         new SelectFileHandler();
         new SelectFirstFileHandler();
@@ -111,7 +120,10 @@ public class CommandParser
         new ShiftLeftHandler();
         new ShiftRightHandler();
         new SubstituteHandler();
+        new UndoHandler();
         new WriteHandler();
+        new WriteNextFileHandler();
+        new WritePreviousFileHandler();
         new WriteQuitHandler();
         new YankLinesHandler();
     }

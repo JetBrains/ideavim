@@ -29,19 +29,22 @@ import com.maddyhome.idea.vim.group.CommandGroups;
 /**
  *
  */
-public class WriteHandler extends CommandHandler
+public class WritePreviousFileHandler extends CommandHandler
 {
-    public WriteHandler()
+    public WritePreviousFileHandler()
     {
         super(new CommandName[] {
-            new CommandName("w", "rite"),
-            new CommandName("wa", "ll")
-        }, RANGE_OPTIONAL | ARGUMENT_OPTIONAL);
+            new CommandName("wN", "ext"),
+            new CommandName("wp", "revious")
+        }, RANGE_OPTIONAL | ARGUMENT_OPTIONAL | RANGE_IS_COUNT);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd)
     {
+        int count = cmd.getCount(editor, context, 1, true);
+       
         CommandGroups.getInstance().getFile().saveFiles(context);
+        CommandGroups.getInstance().getFile().selectNextFile(-count, context);
 
         return true;
     }

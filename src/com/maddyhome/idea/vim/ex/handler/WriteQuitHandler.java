@@ -23,6 +23,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
+import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.group.CommandGroups;
 
 /**
@@ -32,17 +33,17 @@ public class WriteQuitHandler extends CommandHandler
 {
     public WriteQuitHandler()
     {
-        super("wq", "", RANGE_OPTIONAL | ARGUMENT_OPTIONAL);
+        super(new CommandName[] {
+            new CommandName("wq", ""),
+            new CommandName("exi", "t"),
+            new CommandName("x", "it"),
+        } , RANGE_OPTIONAL | ARGUMENT_OPTIONAL);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd)
     {
         CommandGroups.getInstance().getFile().saveFiles(context);
         CommandGroups.getInstance().getFile().closeFile(editor, context);
-        if (cmd.getArgument().equals("!"))
-        {
-            CommandGroups.getInstance().getFile().exitIdea();
-        }
 
         return true;
     }

@@ -24,25 +24,22 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.CommandName;
-import com.maddyhome.idea.vim.group.CommandGroups;
+import com.maddyhome.idea.vim.undo.UndoManager;
 
 /**
  *
  */
-public class WriteHandler extends CommandHandler
+public class UndoHandler extends CommandHandler
 {
-    public WriteHandler()
+    public UndoHandler()
     {
         super(new CommandName[] {
-            new CommandName("w", "rite"),
-            new CommandName("wa", "ll")
-        }, RANGE_OPTIONAL | ARGUMENT_OPTIONAL);
+            new CommandName("u", "ndo")
+        }, RANGE_FORBIDDEN | ARGUMENT_FORBIDDEN);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd)
     {
-        CommandGroups.getInstance().getFile().saveFiles(context);
-
-        return true;
+        return UndoManager.getInstance().undo(editor, context);
     }
 }
