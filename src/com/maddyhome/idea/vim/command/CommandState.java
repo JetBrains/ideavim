@@ -62,6 +62,11 @@ public class CommandState
         return ourInstance;
     }
 
+    public static boolean inInsertMode()
+    {
+        return (getInstance().getMode() == MODE_INSERT || getInstance().getMode() == MODE_REPLACE);
+    }
+
     /**
      * Gets the currently executing command
      * @return The running command
@@ -202,6 +207,7 @@ public class CommandState
         {
             mode = MODE_INSERT;
         }
+        updateStatus();
     }
 
     /**
@@ -216,6 +222,7 @@ public class CommandState
         mappingMode = KeyParser.MAPPING_NORMAL;
         */
         modes.clear();
+        updateStatus();
     }
 
     /**
