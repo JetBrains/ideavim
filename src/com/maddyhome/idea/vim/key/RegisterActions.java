@@ -160,7 +160,7 @@ public class RegisterActions
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_MASK)), Argument.CHARACTER);
         parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertReplaceToggle", Command.INSERT, Command.FLAG_SAVE_STROKE,
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0)));
-        parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertSingleCommand", Command.INSERT, Command.FLAG_CLEAR_STROKES,
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertSingleCommand", Command.INSERT, Command.FLAG_CLEAR_STROKES | Command.FLAG_EXPECT_MORE,
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK)));
         parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionFirstColumn", Command.INSERT, Command.FLAG_CLEAR_STROKES,
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0)));
@@ -412,10 +412,10 @@ public class RegisterActions
         // TODO - CTRL-W commands: +, -, =, S, s, _, b, c, n, o, q, s, t, <up>, <down>
 
         // Macro Actions
-        // TODO - add @
-        // TODO - add @@
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimToggleRecording", Command.OTHER_READONLY, Command.FLAG_NO_ARG_RECORDING,
-            new Shortcut('q'), Argument.CHARACTER);
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimPlaybackLastRegister", Command.OTHER_WRITABLE,
+            new Shortcut("@@"));
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimPlaybackRegister", Command.OTHER_WRITABLE,
+            new Shortcut('@'), Argument.CHARACTER);
         // TODO - support for :map macros
 
         // ************************* Normal, Operator Pending, Visual Mode Actions *************************
@@ -626,6 +626,36 @@ public class RegisterActions
         parser.registerAction(KeyParser.MAPPING_NVO, "VimSearchWordBackward", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE | Command.FLAG_SAVE_JUMP,
             new Shortcut("g#"));
 
+        // ********************** Command Line Actions ************************
+        parser.registerAction(KeyParser.MAPPING_CMD_LINE, "VimProcessExEntry", Command.OTHER_READONLY, new Shortcut[] {
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)),
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_J, KeyEvent.CTRL_MASK)),
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.CTRL_MASK))
+        });
+        parser.registerAction(KeyParser.MAPPING_CMD_LINE, "VimCancelExEntry", Command.OTHER_READONLY, new Shortcut[] {
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)),
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_MASK)),
+            new Shortcut(KeyStroke.getKeyStroke('[', KeyEvent.CTRL_MASK))
+        });
+        parser.registerAction(KeyParser.MAPPING_CMD_LINE, "VimExBackspace", Command.OTHER_READONLY, new Shortcut[] {
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)),
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK))
+        });
+        parser.registerAction(KeyParser.MAPPING_CMD_LINE, "VimProcessExKey", Command.OTHER_READONLY, new Shortcut[] {
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0)),
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_MASK)),
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0)),
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_MASK)),
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, 0)),
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)),
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_MASK)),
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_MASK)),
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0)),
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_MASK)),
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_MASK)),
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0))
+        });
+
         // ********************** Various Mode Actions ************************
         parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimVisualToggleCharacterMode", Command.OTHER_READONLY, Command.FLAG_MOT_CHARACTERWISE,
             new Shortcut('v'));
@@ -633,6 +663,7 @@ public class RegisterActions
             new Shortcut('V'));
         parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimMotionMark", Command.OTHER_READONLY,
             new Shortcut('m'), Argument.CHARACTER);
+        // TODO - why don't these work on RO files?
         parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimGotoDeclaration", Command.OTHER_READONLY | Command.FLAG_SAVE_JUMP, new Shortcut[] {
             new Shortcut("gD"),
             new Shortcut("gd")
@@ -647,6 +678,8 @@ public class RegisterActions
             new Shortcut("zR"));
         parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "ExpandRegion", Command.OTHER_READONLY,
             new Shortcut("zo"));
+        parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimToggleRecording", Command.OTHER_READONLY, Command.FLAG_NO_ARG_RECORDING,
+            new Shortcut('q'), Argument.CHARACTER);
 
         // Text Object Actions for Visual and Operator Pending Modes
         // TODO - aW
