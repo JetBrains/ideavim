@@ -1,4 +1,4 @@
-*index.txt*     For @NAME@ version @VERSION@.  Last change: 2003 May 14.
+*index.txt*     For @NAME@ version @VERSION@.  Last change: 2003 Dec 28.
 
 
                   @NAME@ REFERENCE MANUAL    by Rick Maddy
@@ -183,6 +183,10 @@ tag             char          note action in Normal mode        ~
 |']|            ']              1  cursor to the first CHAR on the line of the
                                    end of last operated text or end of putted
                                    text
+|'{|            '{              1  cursor to the first CHAR on the line of the
+                                   start of the current paragraph
+|'}|            '}              1  cursor to the first CHAR on the line of the
+                                   end of the current paragraph
 |+|             +               1  cursor to the first CHAR N lines lower
 |,|             ,               1  repeat latest f, t, F or T in opposite
                                    direction N times
@@ -273,6 +277,8 @@ tag             char          note action in Normal mode        ~
 |`]|            `]              1  cursor to the end of last operated text or
                                    end of putted text
 |``|            ``              1  cursor to the position before latest jump
+|`{|            `{              1  cursor to the start of the current paragraph
+|`}|            `}              1  cursor to the end of the current paragraph
 |a|             a               2  append text after the cursor N times
 |b|             b               1  cursor N words backward
 |c|             ["x]c{motion}   2  delete Nmove text [into buffer x] and start
@@ -312,7 +318,9 @@ tag             char          note action in Normal mode        ~
 |y|             ["x]y{motion}      yank Nmove text [into buffer x]
 |yy|            ["x]yy             yank N lines [into buffer x]
 |z|             z{char}            commands starting with 'z', see below
+|{|             {               1  cursor N paragraphs backward
 |bar|           |               1  cursor to column N
+|}|             }               1  cursor N paragraphs forward
 |~|             ~               2  switch case of N characters
                                    under cursor and move the cursor N
                                    characters to the right
@@ -351,20 +359,12 @@ tag             char            action  ~
                                    start of the current sentence
 |')|            ')              1  cursor to the first CHAR on the line of the
                                    end of the current sentence
-|'{|            '{              1  cursor to the first CHAR on the line of the
-                                   start of the current paragraph
-|'}|            '}              1  cursor to the first CHAR on the line of the
-                                   end of the current paragraph
 |(|             (               1  cursor N sentences backward
 |)|             )               1  cursor N sentences forward
 |=|             ={motion}       2  filter Nmove lines through "indent"
 |U|             U               2  undo all latest changes on one line
 |`(|            `(              1  cursor to the start of the current sentence
 |`)|            `)              1  cursor to the end of the current sentence
-|`{|            `{              1  cursor to the start of the current paragraph
-|`}|            `}              1  cursor to the end of the current paragraph
-|{|             {               1  cursor N paragraphs backward
-|}|             }               1  cursor N paragraphs forward
 
 ==============================================================================
 2.1 Text objects                                                *objects*

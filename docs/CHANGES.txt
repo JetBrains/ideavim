@@ -1,6 +1,24 @@
 History of changes for @NAME@
 
-0.6.2 to @VERSION@
+0.6.3 to @VERSION@
+
+Support for Aurora build #1035 and higher.
+
+New Features
+- Added support for {, }, '{, '}, `{, and `} commands (previous and next
+  paragraph).
+
+Bug Fixes
+- Fixed cursor movement problem introduced in version 0.6.3.
+- Fixed issues with visual ranges introduced in version 0.6.3.
+- Fixed bug with cursor placement when clicking on a blank line.
+- Triple clicking text now properly puts the user in Visual Line mode.
+
+Clean-up
+- Removed use of newly deprecated methods in Open API.
+- Some basic code cleanup.
+
+0.6.2 to 0.6.3
 
 Support for Aurora build #992 and higher.
 

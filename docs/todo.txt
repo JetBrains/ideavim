@@ -1,10 +1,8 @@
 Bugs to fix:
 
-- Clicking mouse on blank line doesn't move cursor to first column.
 - Yanking/putting on last line of file not quite right.
 - Repeating (via .) the O command affects prior line of text.
 
 Requested Functionality to add:
 
-- Support for paragraph movement commands.
 - Support for :e# command

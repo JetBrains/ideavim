@@ -4,7 +4,12 @@
     <version>@VERSION@</version>
     <vendor url="http://sourceforge.net/projects/ideavim/" email="rick@maddyhome.com">Rick Maddy</vendor>
     <change-notes>
-        Updated to support Aurora build 992 and higher.
+        - Added support for { and } commands.
+        - Fixed cursor movement problem introduced in version 0.6.3.
+        - Fixed issues with visual ranges introduced in version 0.6.3.
+        - Fixed bug with cursor placement when clicking on a blank line.
+        - Triple clicking text now properly puts the user in Visual Line mode.
+        - Updated to support Aurora build 1035 and higher.
     </change-notes>
     <idea-version min="4.0" max="4.5"/>
 
@@ -65,6 +70,8 @@
         <action id="VimMotionBigWordLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionBigWordLeftAction" text="BigWord Left"/>
         <action id="VimMotionWordRight" class="com.maddyhome.idea.vim.action.motion.text.MotionWordRightAction" text="Word Right"/>
         <action id="VimMotionBigWordRight" class="com.maddyhome.idea.vim.action.motion.text.MotionBigWordRightAction" text="BigWord Right"/>
+        <action id="VimMotionParagraphNext" class="com.maddyhome.idea.vim.action.motion.text.MotionParagraphNextAction" text="Next Paragraph"/>
+        <action id="VimMotionParagraphPrevious" class="com.maddyhome.idea.vim.action.motion.text.MotionParagraphPreviousAction" text="Previous Paragraph"/>
         <!-- Marks -->
         <action id="VimMotionMark" class="com.maddyhome.idea.vim.action.motion.mark.MotionMarkAction" text="Mark"/>
         <action id="VimMotionGotoFileMark" class="com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction" text="Goto Mark"/>
