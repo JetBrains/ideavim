@@ -31,6 +31,6 @@ public class PutTextAfterCursorHandler extends ChangeEditorActionHandler
 {
     public boolean execute(Editor editor, DataContext context, int count, int rawCount, Argument argument)
     {
-        return CommandGroups.getInstance().getCopy().putTextAfterCursor(editor, context, count, true);
+        return CommandGroups.getInstance().getCopy().putTextAfterCursor(editor, context, count, true, false);
     }
 }

@@ -31,6 +31,6 @@ public class PutTextBeforeCursorNoIndentHandler extends ChangeEditorActionHandle
 {
     public boolean execute(Editor editor, DataContext context, int count, int rawCount, Argument argument)
     {
-        return CommandGroups.getInstance().getCopy().putTextBeforeCursor(editor, context, count, false);
+        return CommandGroups.getInstance().getCopy().putTextBeforeCursor(editor, context, count, false, false);
     }
 }
