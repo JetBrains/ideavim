@@ -817,13 +817,22 @@ public class ChangeGroup extends AbstractActionGroup
             return false;
         }
 
+        // Special case - if char is newline, only add one despite count
+        int num = count;
+        if (ch == '\n')
+        {
+            num = 1;
+        }
+
         StringBuffer repl = new StringBuffer(count);
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < num; i++)
         {
             repl.append(ch);
         }
 
         replaceText(editor, context, offset, offset + count, repl.toString());
+
+        //TODO - move cursor and indent line of new char was newline
 
         return true;
     }
