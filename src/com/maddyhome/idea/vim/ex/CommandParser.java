@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.ex.handler.DeleteLinesHandler;
 import com.maddyhome.idea.vim.ex.handler.DumpLineHandler;
 import com.maddyhome.idea.vim.ex.handler.EditFileHandler;
 import com.maddyhome.idea.vim.ex.handler.ExitHandler;
+import com.maddyhome.idea.vim.ex.handler.FindClassHandler;
 import com.maddyhome.idea.vim.ex.handler.FindFileHandler;
 import com.maddyhome.idea.vim.ex.handler.GotoCharacterHandler;
 import com.maddyhome.idea.vim.ex.handler.GotoLineHandler;
@@ -38,11 +39,13 @@ import com.maddyhome.idea.vim.ex.handler.ShiftLeftHandler;
 import com.maddyhome.idea.vim.ex.handler.ShiftRightHandler;
 import com.maddyhome.idea.vim.ex.handler.SubstituteHandler;
 import com.maddyhome.idea.vim.ex.handler.UndoHandler;
+import com.maddyhome.idea.vim.ex.handler.WriteAllHandler;
 import com.maddyhome.idea.vim.ex.handler.WriteHandler;
 import com.maddyhome.idea.vim.ex.handler.WriteNextFileHandler;
 import com.maddyhome.idea.vim.ex.handler.WritePreviousFileHandler;
 import com.maddyhome.idea.vim.ex.handler.WriteQuitHandler;
 import com.maddyhome.idea.vim.ex.handler.YankLinesHandler;
+import com.maddyhome.idea.vim.ex.handler.FindSymbolHandler;
 import com.maddyhome.idea.vim.ex.range.AbstractRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.MessageHelper;
@@ -105,7 +108,9 @@ public class CommandParser
         new DumpLineHandler();
         new EditFileHandler();
         new ExitHandler();
+        new FindClassHandler();
         new FindFileHandler();
+        new FindSymbolHandler();
         new GotoCharacterHandler();
         //new GotoLineHandler(); - not needed here
         new HelpHandler();
@@ -131,6 +136,7 @@ public class CommandParser
         new ShiftRightHandler();
         new SubstituteHandler();
         new UndoHandler();
+        new WriteAllHandler();
         new WriteHandler();
         new WriteNextFileHandler();
         new WritePreviousFileHandler();
@@ -208,6 +214,12 @@ public class CommandParser
         {
             MessageHelper.EMSG(Msg.NOT_EX_CMD, command);
             throw new InvalidCommandException(cmd);
+        }
+
+        if ((handler.getArgFlags() & CommandHandler.WRITABLE) > 0 && !editor.getDocument().isWritable())
+        {
+            VimPlugin.indicateError();
+            return;
         }
 
         // Run the command
