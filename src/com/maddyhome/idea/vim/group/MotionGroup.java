@@ -284,7 +284,7 @@ public class MotionGroup extends AbstractActionGroup
             }
             else
             {
-                saveJumpLocation(editor, context);
+                //saveJumpLocation(editor, context);
                 return moveCaretToLineStartSkipLeading(editor, line);
             }
         }
@@ -300,7 +300,7 @@ public class MotionGroup extends AbstractActionGroup
         if (mark != null)
         {
             int line = mark.getLogicalLine();
-            saveJumpLocation(editor, context);
+            //saveJumpLocation(editor, context);
             return moveCaretToLineStartSkipLeading(editor, line);
         }
         else
@@ -327,7 +327,7 @@ public class MotionGroup extends AbstractActionGroup
             }
             else
             {
-                saveJumpLocation(editor, context);
+                //saveJumpLocation(editor, context);
 
                 return editor.logicalPositionToOffset(lp);
             }
@@ -344,7 +344,7 @@ public class MotionGroup extends AbstractActionGroup
         if (mark != null)
         {
             LogicalPosition lp = new LogicalPosition(mark.getLogicalLine(), mark.getCol());
-            saveJumpLocation(editor, context);
+            //saveJumpLocation(editor, context);
 
             return editor.logicalPositionToOffset(lp);
         }
@@ -366,7 +366,7 @@ public class MotionGroup extends AbstractActionGroup
         int pos = SearchHelper.findMatchingPairOnCurrentLine(editor);
         if (pos >= 0)
         {
-            saveJumpLocation(editor, context);
+            //saveJumpLocation(editor, context);
 
             return pos;
         }
@@ -570,7 +570,7 @@ public class MotionGroup extends AbstractActionGroup
 
     private int moveCaretToScreenLine(Editor editor, DataContext context, int line)
     {
-        saveJumpLocation(editor, context);
+        //saveJumpLocation(editor, context);
         int height = EditorHelper.getScreenHeight(editor);
         if (line > height)
         {
@@ -881,32 +881,52 @@ public class MotionGroup extends AbstractActionGroup
         }
     }
 
+    public int moveCaretToLine(Editor editor, DataContext context, int lline)
+    {
+        int col = EditorData.getLastColumn(editor);
+        int line = lline;
+        if (lline < 0)
+        {
+            line = 0;
+            col = 0;
+        }
+        else if (lline >= EditorHelper.getLineCount(editor))
+        {
+            line = EditorHelper.normalizeLine(editor, EditorHelper.getLineCount(editor) - 1);
+            col = EditorHelper.getLineLength(editor, line);
+        }
+
+        LogicalPosition newPos = new LogicalPosition(line, EditorHelper.normalizeColumn(editor, line, col));
+
+        return editor.logicalPositionToOffset(newPos);
+    }
+
     public int moveCaretToLinePercent(Editor editor, DataContext context, int count)
     {
         if (count > 100) count = 100;
 
-        saveJumpLocation(editor, context);
+        //saveJumpLocation(editor, context);
         return moveCaretToLineStartSkipLeading(editor, EditorHelper.normalizeLine(
             editor, (EditorHelper.getLineCount(editor) * count + 99) / 100 - 1));
     }
 
     public int moveCaretGotoLineLast(Editor editor, DataContext context, int rawCount, int lline)
     {
-        saveJumpLocation(editor, context);
+        //saveJumpLocation(editor, context);
         return moveCaretToLineStartSkipLeading(editor, rawCount == 0 ?
             EditorHelper.normalizeLine(editor, EditorHelper.getLineCount(editor) - 1) : lline);
     }
 
     public int moveCaretGotoLineLastEnd(Editor editor, DataContext context, int rawCount, int lline, boolean pastEnd)
     {
-        saveJumpLocation(editor, context);
+        //saveJumpLocation(editor, context);
         return moveCaretToLineEnd(editor, rawCount == 0 ?
             EditorHelper.normalizeLine(editor, EditorHelper.getLineCount(editor) - 1) : lline, pastEnd);
     }
 
     public int moveCaretGotoLineFirst(Editor editor, DataContext context, int lline)
     {
-        saveJumpLocation(editor, context);
+        //saveJumpLocation(editor, context);
         return moveCaretToLineStartSkipLeading(editor, lline);
     }
 
