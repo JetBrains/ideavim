@@ -22,15 +22,26 @@ package com.maddyhome.idea.vim.option;
 import java.util.Iterator;
 
 /**
- *
+ * This represents a set of one character flags
  */
-public class FlagsOption extends BoundedListOption
+public class FlagsOption extends BoundListOption
 {
+    /**
+     * Create a flag based option
+     * @param name The name of the option
+     * @param abbrev The short name
+     * @param dflt The list of default flags
+     * @param values The list of possible flags
+     */
     FlagsOption(String name, String abbrev, String[] dflt, String[] values)
     {
         super(name, abbrev, dflt, values);
     }
 
+    /**
+     * Overrides parent so there are no commas in the value
+     * @return The list of flags
+     */
     public String getValue()
     {
         StringBuffer res = new StringBuffer();
