@@ -147,10 +147,18 @@ public class ChangeGroup extends AbstractActionGroup
      */
     public void insertNewLineAbove(Editor editor, DataContext context)
     {
-        MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor));
-        initInsert(editor, context, CommandState.MODE_INSERT);
-        KeyHandler.executeAction("VimEditorEnter", context);
-        MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
+        if (EditorHelper.getCurrentVisualLine(editor) == 0)
+        {
+            MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor));
+            initInsert(editor, context, CommandState.MODE_INSERT);
+            KeyHandler.executeAction("VimEditorEnter", context);
+            MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
+        }
+        else
+        {
+            MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
+            insertNewLineBelow(editor, context);
+        }
     }
 
     /**
