@@ -194,6 +194,7 @@ public class ChangeGroup extends AbstractActionGroup
         Register register = CommandGroups.getInstance().getRegister().getRegister(key);
         if (register != null)
         {
+            // TODO - update when registers store Character and AnAction
             String text = register.getText();
             for (int i = 0; i < text.length(); i++)
             {
@@ -349,7 +350,7 @@ public class ChangeGroup extends AbstractActionGroup
      */
     public void processEscape(Editor editor, DataContext context)
     {
-        // TODO - register '.' needs to get text of insert
+        // TODO - register '.' needs to get text of insert foo
         logger.debug("processing escape");
         int cnt = lastInsert.getCount();
         // Turn off overwrite mode if we were in replace mode

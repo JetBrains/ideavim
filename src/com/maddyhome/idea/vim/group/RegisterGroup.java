@@ -36,6 +36,7 @@ import org.jdom.Element;
 
 /**
  * This group works with command associated with copying and pasting text
+ * TODO - support registers with Character and AnAction
  */
 public class RegisterGroup extends AbstractActionGroup
 {

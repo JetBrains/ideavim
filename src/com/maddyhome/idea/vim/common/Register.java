@@ -22,7 +22,8 @@ import java.util.Comparator;
  */
 
 /**
- * Represents a register
+ * Represents a register.
+ * TODO - need to support mixed array of Character and AnAction.
  */
 public class Register
 {
