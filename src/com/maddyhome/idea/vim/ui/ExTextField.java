@@ -19,11 +19,16 @@ package com.maddyhome.idea.vim.ui;
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.KeyHandler;
 import java.awt.Font;
+import java.awt.event.KeyEvent;
+import java.util.Date;
 import javax.swing.Action;
 import javax.swing.InputMap;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.text.Document;
 import javax.swing.text.Keymap;
 import javax.swing.text.TextAction;
@@ -47,9 +52,30 @@ public class ExTextField extends JTextField
         setKeymap(map);
     }
 
+    void setEditor(Editor editor, DataContext context)
+    {
+        this.editor = editor;
+        this.context = context;
+    }
+
     public Action[] getActions()
     {
         return TextAction.augmentList(super.getActions(), ExEditorKit.getInstance().getActions());
+    }
+
+    public void handleKey(KeyStroke stroke)
+    {
+        KeyEvent event = new KeyEvent(this, stroke.getKeyChar() != KeyEvent.CHAR_UNDEFINED ? KeyEvent.KEY_TYPED :
+            (stroke.isOnKeyRelease() ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED),
+            (new Date()).getTime(), stroke.getModifiers(), stroke.getKeyCode(), stroke.getKeyChar());
+
+        super.processKeyEvent(event);
+    }
+
+    protected void processKeyEvent(KeyEvent e)
+    {
+        KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStrokeForEvent(e), context);
+        e.consume();
     }
 
     /**
@@ -65,6 +91,6 @@ public class ExTextField extends JTextField
     }
 
     // TODO - support block cursor for overwrite mode
-
-    private static Logger logger = Logger.getInstance(ExTextField.class.getName());
+    private Editor editor;
+    private DataContext context;
 }
