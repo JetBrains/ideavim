@@ -1205,14 +1205,14 @@ public class SearchGroup extends AbstractActionGroup
     private RangeHighlighter highlightConfirm(Editor editor, int start, int end)
     {
         TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SELECTION_FOREGROUND_COLOR);
-        return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.SELECTION + 2,
+        return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.ADDITIONAL_SYNTAX + 2,
             color, HighlighterTargetArea.EXACT_RANGE);
     }
 
     private RangeHighlighter highlightMatch(Editor editor, int start, int end)
     {
         TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
-        return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.SELECTION + 1,
+        return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.ADDITIONAL_SYNTAX + 1,
             color, HighlighterTargetArea.EXACT_RANGE);
     }
 

@@ -73,6 +73,11 @@ are based on the "General|Search result" color setting.<br>
         <action id="VimMotionBigWordRight" class="com.maddyhome.idea.vim.action.motion.text.MotionBigWordRightAction" text="BigWord Right"/>
         <action id="VimMotionParagraphNext" class="com.maddyhome.idea.vim.action.motion.text.MotionParagraphNextAction" text="Next Paragraph"/>
         <action id="VimMotionParagraphPrevious" class="com.maddyhome.idea.vim.action.motion.text.MotionParagraphPreviousAction" text="Previous Paragraph"/>
+        <!-- Text Objects -->
+        <action id="VimMotionTextOuterWord" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterWordAction" text="Select outer word"/>
+        <action id="VimMotionTextOuterBigWord" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBigWordAction" text="Select outer WORD"/>
+        <action id="VimMotionTextInnerWord" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerWordAction" text="Select inner word"/>
+        <action id="VimMotionTextInderBigWord" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerBigWordAction" text="Select inner WORD"/>
         <!-- Marks -->
         <action id="VimMotionMark" class="com.maddyhome.idea.vim.action.motion.mark.MotionMarkAction" text="Mark"/>
         <action id="VimMotionGotoFileMark" class="com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction" text="Goto Mark"/>

@@ -43,6 +43,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
+import com.maddyhome.idea.vim.action.motion.TextObjectAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -247,6 +248,25 @@ public class MotionGroup extends AbstractActionGroup
         return offset;
     }
 
+    public TextRange getWordRange(Editor editor, DataContext context, int count, boolean isOuter, boolean isBig)
+    {
+        int dir = 1;
+        boolean selection = false;
+        if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
+        {
+            if (visualEnd < visualStart)
+            {
+                dir = -1;
+            }
+            if (visualStart != visualEnd)
+            {
+                selection = true;
+            }
+        }
+
+        return SearchHelper.findWordUnderCursor(editor, count, dir, isOuter, isBig, selection);
+    }
+
     /**
      * This helper method calculates the complete range a motion will move over taking into account whether
      * the motion is FLAG_MOT_LINEWISE or FLAG_MOT_CHARACTERWISE (FLAG_MOT_INCLUSIVE or FLAG_MOT_EXCLUSIVE).
@@ -265,23 +285,47 @@ public class MotionGroup extends AbstractActionGroup
         // Normalize the counts between the command and the motion argument
         int cnt = cmd.getCount() * count;
         int raw = rawCount == 0 && cmd.getRawCount() == 0 ? 0 : cnt;
-        MotionEditorAction action = (MotionEditorAction)cmd.getAction();
-
-        // This is where we are now
-        int start = editor.getCaretModel().getOffset();
-
-        // Execute the motion (without moving the cursor) and get where we end
-        int end = action.getOffset(editor, context, cnt, raw, cmd.getArgument());
-
-        // Invalid motion
-        if (end == -1)
+        int start = 0;
+        int end = 0;
+        if (cmd.getAction() instanceof MotionEditorAction)
         {
-            return null;
+            MotionEditorAction action = (MotionEditorAction)cmd.getAction();
+
+            // This is where we are now
+            start = editor.getCaretModel().getOffset();
+
+            // Execute the motion (without moving the cursor) and get where we end
+            end = action.getOffset(editor, context, cnt, raw, cmd.getArgument());
+
+            // Invalid motion
+            if (end == -1)
+            {
+                return null;
+            }
+
+            if (moveCursor)
+            {
+                moveCaret(editor, context, end);
+            }
         }
-
-        if (moveCursor)
+        else if (cmd.getAction() instanceof TextObjectAction)
         {
-            moveCaret(editor, context, end);
+            TextObjectAction action = (TextObjectAction)cmd.getAction();
+
+            TextRange range = action.getRange(editor, context, cnt, raw, cmd.getArgument());
+
+            if (range == null)
+            {
+                return null;
+            }
+
+            start = range.getStartOffset();
+            end = range.getEndOffset();
+
+            if (moveCursor)
+            {
+                moveCaret(editor, context, start);
+            }
         }
 
         // If we are a linewise motion we need to normalize the start and stop then move the start to the beginning
@@ -1328,6 +1372,11 @@ public class MotionGroup extends AbstractActionGroup
         }
     }
 
+    public TextRange getRawVisualRange()
+    {
+        return new TextRange(visualStart, visualEnd);
+    }
+
     private void updateSelection(Editor editor, DataContext context, int offset)
     {
         logger.debug("updateSelection");
@@ -1345,8 +1394,11 @@ public class MotionGroup extends AbstractActionGroup
         if (CommandState.getInstance().getSubMode() == Command.FLAG_MOT_CHARACTERWISE)
         {
             BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
+            int lineend = EditorHelper.getLineEndForOffset(editor, end);
+            logger.debug("lineend=" + lineend);
+            logger.debug("end=" + end);
             int adj = 1;
-            if (opt.getValue().equals("exclusive"))
+            if (opt.getValue().equals("exclusive") || end == lineend)
             {
                 adj = 0;
             }
@@ -1402,6 +1454,11 @@ public class MotionGroup extends AbstractActionGroup
         moveCaret(editor, context, visualEnd);
 
         return true;
+    }
+
+    public void moveVisualStart(Editor editor, int startOffset)
+    {
+        visualStart = startOffset;
     }
 
     public void processEscape(Editor editor, DataContext context)

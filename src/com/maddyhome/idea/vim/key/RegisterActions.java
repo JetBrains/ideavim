@@ -704,18 +704,22 @@ public class RegisterActions
             new Shortcut('q'), Argument.CHARACTER);
 
         // Text Object Actions for Visual and Operator Pending Modes
-        // TODO - aW
         // TODO - a[
         // TODO - a]
-        // TODO - aw
-        // TODO - iW
         // TODO - i[
         // TODO - i]
-        // TODO - iw
         parser.registerAction(KeyParser.MAPPING_VISUAL | KeyParser.MAPPING_OP_PEND, "VimMotionGotoFileMark", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE | Command.FLAG_SAVE_JUMP,
             new Shortcut('`'), Argument.CHARACTER);
         parser.registerAction(KeyParser.MAPPING_VISUAL | KeyParser.MAPPING_OP_PEND, "VimMotionGotoFileMarkLine", Command.MOTION, Command.FLAG_MOT_LINEWISE | Command.FLAG_SAVE_JUMP,
             new Shortcut('\''), Argument.CHARACTER);
+        parser.registerAction(KeyParser.MAPPING_VISUAL | KeyParser.MAPPING_OP_PEND, "VimMotionTextOuterWord", Command.MOTION, Command.FLAG_MOT_CHARACTERWISE | Command.FLAG_MOT_INCLUSIVE,
+            new Shortcut("aw"));
+        parser.registerAction(KeyParser.MAPPING_VISUAL | KeyParser.MAPPING_OP_PEND, "VimMotionTextOuterBigWord", Command.MOTION, Command.FLAG_MOT_CHARACTERWISE | Command.FLAG_MOT_INCLUSIVE,
+            new Shortcut("aW"));
+        parser.registerAction(KeyParser.MAPPING_VISUAL | KeyParser.MAPPING_OP_PEND, "VimMotionTextInnerWord", Command.MOTION, Command.FLAG_MOT_CHARACTERWISE | Command.FLAG_MOT_INCLUSIVE,
+            new Shortcut("iw"));
+        parser.registerAction(KeyParser.MAPPING_VISUAL | KeyParser.MAPPING_OP_PEND, "VimMotionTextInnerBigWord", Command.MOTION, Command.FLAG_MOT_CHARACTERWISE | Command.FLAG_MOT_INCLUSIVE,
+            new Shortcut("iW"));
 
         parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_OP_PEND, "VimResetMode", Command.RESET, new Shortcut(new KeyStroke[] {
             KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SLASH, KeyEvent.CTRL_MASK),

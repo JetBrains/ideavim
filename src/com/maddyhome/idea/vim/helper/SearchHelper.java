@@ -414,6 +414,123 @@ public class SearchHelper
         return new TextRange(start, end);
     }
 
+    public static TextRange findWordUnderCursor(Editor editor, int count, int dir, boolean isOuter, boolean isBig, boolean hasSelection)
+    {
+        logger.debug("count=" + count);
+        logger.debug("dir=" + dir);
+        logger.debug("isOuter=" + isOuter);
+        logger.debug("isBig=" + isBig);
+        logger.debug("hasSelection=" + hasSelection);
+
+        char[] chars = editor.getDocument().getChars();
+        int min = EditorHelper.getLineStartOffset(editor, EditorHelper.getCurrentLogicalLine(editor));
+        int max = EditorHelper.getLineEndOffset(editor, EditorHelper.getCurrentLogicalLine(editor), true);
+
+        logger.debug("min=" + min);
+        logger.debug("max=" + max);
+
+        int pos = editor.getCaretModel().getOffset();
+        boolean startSpace = CharacterHelper.charType(chars[pos], isBig) == CharacterHelper.TYPE_SPACE;
+        // Find word start
+        boolean onWordStart = pos == min || startSpace ||
+            CharacterHelper.charType(chars[pos - 1], isBig) != CharacterHelper.charType(chars[pos], isBig);
+        int start = pos;
+
+        logger.debug("pos=" + pos);
+        logger.debug("onWordStart=" + onWordStart);
+
+        if (!onWordStart || (dir == -1 && isOuter))
+        {
+            if (dir == 1)
+            {
+                start = findNextWord(chars, pos, max, -1, isBig);
+            }
+            else
+            {
+                start = findNextWord(chars, pos, max, -count, isBig);
+            }
+        }
+
+        logger.debug("start=" + start);
+
+        // Find word end
+        boolean onWordEnd = pos == max || (startSpace && !isOuter) || (!startSpace &&
+            CharacterHelper.charType(chars[pos + 1], isBig) != CharacterHelper.charType(chars[pos], isBig));
+        if (onWordEnd && isOuter && dir == 1 && hasSelection)
+        {
+            onWordEnd = false;
+        }
+
+        logger.debug("onWordEnd=" + onWordEnd);
+
+        int end = pos;
+        if (!onWordEnd)
+        {
+            if (dir == 1)
+            {
+                end = findNextWordEnd(chars, pos, max, count, isBig, true);
+            }
+            else
+            {
+                end = findNextWordEnd(chars, pos, max, 1, isBig, true);
+            }
+        }
+
+        logger.debug("end=" + end);
+
+        boolean goBack = (startSpace && !hasSelection);
+        if (dir == 1 && isOuter)
+        {
+            int firstEnd = end;
+            if (count > 1)
+            {
+                firstEnd = findNextWordEnd(chars, pos, max, 1, isBig, true);
+            }
+            if (firstEnd < max)
+            {
+                if (CharacterHelper.charType(chars[firstEnd + 1], false) != CharacterHelper.TYPE_SPACE)
+                {
+                    goBack = true;
+                }
+            }
+        }
+        if (dir == -1 && isOuter && startSpace)
+        {
+            if (pos > min)
+            {
+                if (CharacterHelper.charType(chars[pos - 1], false) != CharacterHelper.TYPE_SPACE)
+                {
+                    goBack = true;
+                }
+            }
+        }
+
+        boolean goForward = (dir == 1 && isOuter && !startSpace) || (startSpace && !isOuter);
+
+        logger.debug("goBack=" + goBack);
+        logger.debug("goForward=" + goForward);
+
+        if (goForward)
+        {
+            while (end < max && CharacterHelper.charType(chars[end + 1], false) == CharacterHelper.TYPE_SPACE)
+            {
+                end++;
+            }
+        }
+        if (goBack)
+        {
+            while (start > min && CharacterHelper.charType(chars[start - 1], false) == CharacterHelper.TYPE_SPACE)
+            {
+                start--;
+            }
+        }
+
+        logger.debug("start=" + start);
+        logger.debug("end=" + end);
+        
+        return new TextRange(start, end);
+    }
+
     /**
      * This finds the offset to the end of the next/previous word/WORD.
      *
@@ -521,6 +638,10 @@ public class SearchHelper
             {
                 res = size - 1;
             }
+        }
+        else if (pos == size)
+        {
+            res = size - 1;
         }
 
         return res;
