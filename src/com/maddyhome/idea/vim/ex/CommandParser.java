@@ -38,9 +38,14 @@ import com.maddyhome.idea.vim.ex.handler.RedoHandler;
 import com.maddyhome.idea.vim.ex.handler.UndoHandler;
 import com.maddyhome.idea.vim.ex.handler.WriteNextFileHandler;
 import com.maddyhome.idea.vim.ex.handler.WritePreviousFileHandler;
+import com.maddyhome.idea.vim.ex.handler.RepeatHandler;
 import com.maddyhome.idea.vim.ex.range.AbstractRange;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
+import com.maddyhome.idea.vim.group.CommandGroups;
+import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.common.Register;
+import com.maddyhome.idea.vim.VimPlugin;
 
 /*
 * IdeaVim - A Vim emulator plugin for IntelliJ Idea
@@ -115,6 +120,7 @@ public class CommandParser
         new QuitHandler();
         new RedoHandler();
         new RegistersHandler();
+        new RepeatHandler();
         new SelectFileHandler();
         new SelectFirstFileHandler();
         new SelectLastFileHandler();
@@ -140,12 +146,13 @@ public class CommandParser
      */
     public boolean processLastCommand(Editor editor, DataContext context, int count) throws ExException
     {
-        if (lastCommand == null)
+        Register reg = CommandGroups.getInstance().getRegister().getRegister(':');
+        if (reg == null)
         {
             return false;
         }
 
-        processCommand(editor, context, lastCommand, count);
+        processCommand(editor, context, reg.getText(), count);
 
         return true;
     }
@@ -197,13 +204,17 @@ public class CommandParser
 
         if (handler == null)
         {
-            MessageHelper.EMSG(Msg.INT_BAD_CMD, command);
+            MessageHelper.EMSG(Msg.NOT_EX_CMD, command);
             throw new InvalidCommandException(cmd);
         }
 
         // Run the command
         handler.process(editor, context, new ExCommand(res.getRanges(), command, res.getArgument()), count);
-        lastCommand = cmd;
+        if ((handler.getArgFlags() & CommandHandler.DONT_SAVE_LAST) == 0)
+        {
+            CommandGroups.getInstance().getRegister().storeTextInternal(editor, context, -1, -1, cmd,
+                Command.FLAG_MOT_CHARACTERWISE, ':', false, false);
+        }
     }
 
     /**
@@ -559,7 +570,7 @@ public class CommandParser
             // Oops - bad command string
             if (state == STATE_ERROR)
             {
-                MessageHelper.EMSG(error);
+                VimPlugin.showMessage(error);
                 throw new InvalidCommandException(cmd);
             }
         }
@@ -623,7 +634,6 @@ public class CommandParser
     }
 
     private CommandNode root = new CommandNode();
-    private String lastCommand;
 
     private static CommandParser ourInstance;
 
