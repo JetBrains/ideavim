@@ -35,7 +35,7 @@
     <property name="project" value="IdeaVIM" />
     <!-- Update this prior to building a new distribution -->
     <property name="idea-version" value="4.x" />
-    <property name="version" value="0.7.0" />
+    <property name="version" value="0.7.1" />
 
     <path id="build.classpath">
         <pathelement path="${idea.home}/lib/idea.jar" />
@@ -77,8 +77,8 @@
     </target>
 
     <target name="deploy" depends="build" description="Copies plugin to IntelliJ plugin directory" >
-        <mkdir dir="${idea.home}/plugins/IdeaVIM-${version}/lib"/>
-        <copy file="${build}/${project}.jar" todir="${idea.home}/plugins/IdeaVIM-${version}/lib" />
+        <mkdir dir="${idea.home}/plugins/IdeaVIM/lib"/>
+        <copy file="${build}/${project}.jar" todir="${idea.home}/plugins/IdeaVIM/lib" />
     </target>
 
     <target name="dist" depends="dist-src, dist-bin" description="Creates the src and bin distribution files" />
@@ -123,9 +123,11 @@
                 <filter token="IDEA-VERSION" value="${idea-version}" />
             </filterset>
         </copy>
-        <mkdir dir="${dist}"/>
         <tar basedir="." destfile="${dist}/${project}-${version}-${idea-version}-bin.tar.gz" compression="gzip" includes="${project}-${version}-${idea-version}/**" />
-        <zip basedir="." zipfile="${dist}/${project}-${version}-${idea-version}.zip" compress="true" includes="${project}-${version}-${idea-version}/**" />
+        <move todir="${project}">
+            <fileset dir="${project}-${version}-${idea-version}"/>
+        </move>
+        <zip basedir="." zipfile="${dist}/${project}-${version}-${idea-version}.zip" compress="true" includes="${project}/**" />
     </target>
 
     <target name="dist-src" depends="clean" description="Creates the source tar file" >

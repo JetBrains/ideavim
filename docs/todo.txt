@@ -1,8 +1,7 @@
 Bugs to fix:
 
 - can't delete empty lines at end of file.
-- cw on last word of file removes last word but moves cursor to start of
-  previous line.
+- Show message after shifting lines with :< or :>
 - Replace mode - fix cursor. Can't figure out how to keep block cursor.
 
 Requested Functionality to add:
