@@ -1,4 +1,4 @@
-package com.maddyhome.idea.vim.handler.copy;
+package com.maddyhome.idea.vim.action.copy;
 
 /*
 * IdeaVim - A Vim emulator plugin for IntelliJ Idea
@@ -19,18 +19,15 @@ package com.maddyhome.idea.vim.handler.copy;
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.group.CommandGroups;
-import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
+import com.intellij.openapi.editor.actionSystem.EditorAction;
+import com.maddyhome.idea.vim.handler.copy.PutTextBeforeCursorNoIndentHandler;
 
 /**
  */
-public class PutTextAfterCursorHandler extends ChangeEditorActionHandler
+public class PutTextBeforeCursorNoIndentAction extends EditorAction
 {
-    public boolean execute(Editor editor, DataContext context, int count, int rawCount, Argument argument)
+    public PutTextBeforeCursorNoIndentAction()
     {
-        return CommandGroups.getInstance().getCopy().putTextAfterCursor(editor, context, count, true);
+        super(new PutTextBeforeCursorNoIndentHandler());
     }
 }

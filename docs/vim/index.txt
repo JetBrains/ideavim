@@ -448,6 +448,10 @@ tag             char          note action in Normal mode        ~
 |[w|            [w              1  cursor N camel words forward
 |]b|            ]b              1  cursor backward to the end of camel word N
 |]w|            ]w              1  cursor forward to the end of camel word N
+|[P|            [P              2  like "P", but don't autoindent text
+|[p|            [p              2  like "p", but don't autoindent text
+|]P|            ]P              2  same as "[P"
+|]p|            ]p              2  same as "[p"
 
 TODO:
 tag             char          note action in Normal mode        ~
@@ -458,11 +462,9 @@ tag             char          note action in Normal mode        ~
 |[star|         [*              1  same as "[/"
 |[`|            [`              1  cursor to previous lowercase mark
 |[/|            [/              1  cursor to N previous start of a C comment
-|[P|            [P              2  same as "[p"
 |[[|            [[              1  cursor N sections backward
 |[]|            []              1  cursor N SECTIONS backward
 |[c|            [c              1  cursor N times backwards to start of change
-|[p|            [p              2  like "P", but adjust indent to current line
 |[m|            [m              1  cursor N times back to start of member
                                    function
 |[z|            [z              1  move to start of open fold
@@ -473,11 +475,9 @@ tag             char          note action in Normal mode        ~
 |]star|         ]*              1  same as "]/"
 |]`|            ]`              1  cursor to next lowercase mark
 |]/|            ]/              1  cursor to N next end of a C comment
-|]P|            ]P              2  same as "[p"
 |][|            ][              1  cursor N SECTIONS forward
 |]]|            ]]              1  cursor N sections forward
 |]c|            ]c              1  cursor N times forward to start of change
-|]p|            ]p              2  like "p", but adjust indent to current line
 |]m|            ]m              1  cursor N times forward to end of member
                                    function
 |]z|            ]z              1  move to end of open fold

@@ -31,6 +31,6 @@ public class PutTextBeforeCursorHandler extends ChangeEditorActionHandler
 {
     public boolean execute(Editor editor, DataContext context, int count, int rawCount, Argument argument)
     {
-        return CommandGroups.getInstance().getCopy().putTextBeforeCursor(editor, context, count);
+        return CommandGroups.getInstance().getCopy().putTextBeforeCursor(editor, context, count, true);
     }
 }

@@ -4,6 +4,9 @@ History of changes for @NAME@
 
 New Commands
 - Added support for {visual}!{filter}, !{motion}{filter}, and !!{filter}.
+- Added support for [p, ]p, [P, ]P - put text but do not autoindent. Note -
+  This plugin's support for putting text with or without proper indenting is
+  reversed from VIM.
 
 New Features
 - Entering a count before the v or V command to start Visual mode is now

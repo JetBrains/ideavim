@@ -282,6 +282,14 @@ public class RegisterActions
             new Shortcut('P'));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimCopyPutTextAfterCursor", Command.PASTE,
             new Shortcut('p'));
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimCopyPutTextBeforeCursorNoIndent", Command.PASTE, new Shortcut[] {
+            new Shortcut("[P"),
+            new Shortcut("]P")
+        });
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimCopyPutTextAfterCursorNoIndent", Command.PASTE, new Shortcut[] {
+            new Shortcut("[p"),
+            new Shortcut("]p")
+        });
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimCopyYankLine", Command.COPY,
             new Shortcut('Y'));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimCopyYankLine", Command.COPY,

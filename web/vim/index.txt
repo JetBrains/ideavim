@@ -309,7 +309,10 @@ tag             char          note action in Normal mode        ~
 |[w|            [w              1  cursor N camel words forward
 |]b|            ]b              1  cursor backward to the end of camel word N
 |]w|            ]w              1  cursor forward to the end of camel word N
-
+|[P|            [P              2  like "P", but don't autoindent text
+|[p|            [p              2  like "p", but don't autoindent text
+|]P|            ]P              2  same as "[P"
+|]p|            ]p              2  same as "[p"
 
 ==============================================================================
 2.4 Commands starting with 'g'                                          *g*

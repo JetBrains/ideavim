@@ -165,6 +165,8 @@
         <!-- Copy -->
         <action id="VimCopyPutTextAfterCursor" class="com.maddyhome.idea.vim.action.copy.PutTextAfterCursorAction" text="Put Text"/>
         <action id="VimCopyPutTextBeforeCursor" class="com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorAction" text="Put Text"/>
+        <action id="VimCopyPutTextAfterCursorNoIndent" class="com.maddyhome.idea.vim.action.copy.PutTextAfterCursorNoIndentAction" text="Put Text"/>
+        <action id="VimCopyPutTextBeforeCursorNoIndent" class="com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction" text="Put Text"/>
         <action id="VimCopySelectRegister" class="com.maddyhome.idea.vim.action.copy.SelectRegisterAction" text="Select Register"/>
         <action id="VimCopyYankLine" class="com.maddyhome.idea.vim.action.copy.YankLineAction" text="Yank Line"/>
         <action id="VimCopyYankMotion" class="com.maddyhome.idea.vim.action.copy.YankMotionAction" text="Yank Motion"/>

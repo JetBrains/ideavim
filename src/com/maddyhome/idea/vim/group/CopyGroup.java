@@ -106,7 +106,7 @@ public class CopyGroup extends AbstractActionGroup
      * @param count The number of times to perform the paste
      * @return true if able to paste, false if not
      */
-    public boolean putTextBeforeCursor(Editor editor, DataContext context, int count)
+    public boolean putTextBeforeCursor(Editor editor, DataContext context, int count, boolean indent)
     {
         // What register are we getting the text from?
         Register reg = CommandGroups.getInstance().getRegister().getLastRegister();
@@ -124,7 +124,7 @@ public class CopyGroup extends AbstractActionGroup
             }
 
             // TODO - update when register stores Character and AnAction
-            putText(editor, context, pos, reg.getText(), reg.getType(), count);
+            putText(editor, context, pos, reg.getText(), reg.getType(), count, indent);
 
             return true;
         }
@@ -139,7 +139,7 @@ public class CopyGroup extends AbstractActionGroup
      * @param count The number of times to perform the paste
      * @return true if able to paste, false if not
      */
-    public boolean putTextAfterCursor(Editor editor, DataContext context, int count)
+    public boolean putTextAfterCursor(Editor editor, DataContext context, int count, boolean indent)
     {
         Register reg = CommandGroups.getInstance().getRegister().getLastRegister();
         if (reg != null)
@@ -162,7 +162,7 @@ public class CopyGroup extends AbstractActionGroup
             }
 
             // TODO - update when register stores Character and AnAction
-            putText(editor, context, pos, reg.getText(), reg.getType(), count);
+            putText(editor, context, pos, reg.getText(), reg.getType(), count, indent);
 
             return true;
         }
@@ -182,7 +182,13 @@ public class CopyGroup extends AbstractActionGroup
             if ((reg.getType() & Command.FLAG_MOT_LINEWISE) != 0)
             {
                 MotionGroup.moveCaret(editor, context, end);
-                pos = CommandGroups.getInstance().getMotion().moveCaretToLineStartOffset(editor, 1);
+                pos = Math.min(editor.getDocument().getTextLength(),
+                    CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, true) + 1);
+                if (pos > 0 && pos == editor.getDocument().getTextLength() &&
+                    editor.getDocument().getChars()[pos - 1] != '\n')
+                {
+                    editor.getDocument().insertString(pos, "\n");
+                }
             }
             else
             {
@@ -190,7 +196,7 @@ public class CopyGroup extends AbstractActionGroup
             }
 
             // TODO - update when register stores Character and AnAction
-            putText(editor, context, pos, reg.getText(), reg.getType(), count);
+            putText(editor, context, pos, reg.getText(), reg.getType(), count, true);
 
             MotionGroup.moveCaret(editor, context, start);
 
@@ -211,8 +217,10 @@ public class CopyGroup extends AbstractActionGroup
      * @param text The text to paste
      * @param type The type of paste (linewise or characterwise)
      * @param count The number of times to paste the text
+     * @param indent True if pasted lines should be autoindented, false if not
      */
-    public void putText(Editor editor, DataContext context, int offset, String text, int type, int count)
+    public void putText(Editor editor, DataContext context, int offset, String text, int type, int count,
+        boolean indent)
     {
         // TODO - What about auto imports?
         for (int i = 0; i < count; i++)
@@ -227,7 +235,7 @@ public class CopyGroup extends AbstractActionGroup
             adjust = -1;
         }
         LogicalPosition elp = editor.offsetToLogicalPosition(offset + count * text.length() + adjust);
-        for (int i = slp.line; i <= elp.line; i++)
+        for (int i = slp.line; indent && i <= elp.line; i++)
         {
             MotionGroup.moveCaret(editor, context, editor.logicalPositionToOffset(new LogicalPosition(i, 0)));
             KeyHandler.executeAction("AutoIndentLines", context);
