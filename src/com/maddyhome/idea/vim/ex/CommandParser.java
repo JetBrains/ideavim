@@ -281,6 +281,11 @@ public class CommandParser
                         {
                             state = STATE_COMMAND;
                         }
+                        else if (ch == ' ')
+                        {
+                            state = STATE_START;
+                            reprocess = false;
+                        }
                         else
                         {
                             state = STATE_RANGE;
@@ -482,9 +487,9 @@ public class CommandParser
                             reprocess = false;
                         }
                         // Start of command
-                        else if (Character.isLetter(ch) || "~<>@=#*&!".indexOf(ch) >= 0)
+                        else if (Character.isLetter(ch) || "~<>@=#*&!".indexOf(ch) >= 0 || ch == ' ')
                         {
-                            state = STATE_COMMAND;
+                            state = STATE_START;
                         }
                         // We have another range
                         else

@@ -15,6 +15,8 @@ Bug Fixes
 - Fixed cursor position when issuing the O command on the first line.
 - The confirmation dialog used with the :s//c command now has a default button
   and mnemonics for all buttons.
+- A space is now properly allowed between the range and the command in a :
+  command such as :1,2 co 4
 
 0.7.0 to 0.7.1
 
