@@ -45,7 +45,6 @@ import com.maddyhome.idea.vim.helper.CharacterHelper;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.key.KeyParser;
-import com.maddyhome.idea.vim.ui.CommandEntryPanel;
 import com.maddyhome.idea.vim.undo.UndoManager;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -189,6 +188,12 @@ public class ChangeGroup extends AbstractActionGroup
         }
     }
 
+    public void insertHelp(Editor editor, DataContext context)
+    {
+        processEscape(editor, context);
+        KeyHandler.executeAction("HelpTopics", context);
+    }
+
     public boolean insertRegister(Editor editor, DataContext context, char key)
     {
         Register register = CommandGroups.getInstance().getRegister().getRegister(key);
@@ -222,6 +227,25 @@ public class ChangeGroup extends AbstractActionGroup
         }
 
         return res;
+    }
+
+    public boolean insertDeleteInsertedText(Editor editor, DataContext context)
+    {
+        int deleteTo = insertStart;
+        int offset = editor.getCaretModel().getOffset();
+        if (offset == insertStart)
+        {
+            deleteTo = CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor);
+        }
+
+        if (deleteTo != -1)
+        {
+            deleteRange(editor, context, new TextRange(deleteTo, offset), MotionGroup.EXCLUSIVE);
+
+            return true;
+        }
+
+        return false;
     }
 
     public boolean insertDeletePreviousWord(Editor editor, DataContext context)
@@ -788,6 +812,9 @@ public class ChangeGroup extends AbstractActionGroup
     {
         // TODO: Hack - find better way to do this exceptional case - at least make constants out of these strings
 
+        // FIX - typing cw on a one char word results in two words being deleted because e moved to end of next
+        // word when on a one char word
+
         // Vim treats cw as ce and cW as cE if cursor is on a non-blank character
         String id = ActionManager.getInstance().getId(argument.getMotion().getAction());
         if (id.equals("VimMotionWordRight"))
@@ -945,10 +972,29 @@ public class ChangeGroup extends AbstractActionGroup
 
     public void indentLines(Editor editor, DataContext context, int lines, int dir)
     {
+        int cnt = 1;
+        if (CommandState.getInstance().getMode() == CommandState.MODE_INSERT ||
+            CommandState.getInstance().getMode() == CommandState.MODE_REPLACE)
+        {
+            if (strokes.size() > 0)
+            {
+                Object stroke = strokes.get(strokes.size() - 1);
+                if (stroke instanceof Character)
+                {
+                    Character key = (Character)stroke;
+                    if (key.charValue() == '0')
+                    {
+                        deleteCharacter(editor, context, -1);
+                        cnt = 99;
+                    }
+                }
+            }
+        }
+
         int start = editor.getCaretModel().getOffset();
         int end = CommandGroups.getInstance().getMotion().moveCaretToLineEndOffset(editor, lines - 1);
 
-        indentRange(editor, context, new TextRange(start, end), 1, dir);
+        indentRange(editor, context, new TextRange(start, end), cnt, dir);
     }
 
     public void indentMotion(Editor editor, DataContext context, int count, int rawCount, Argument argument, int dir)
@@ -1008,6 +1054,8 @@ public class ChangeGroup extends AbstractActionGroup
             }
         }
 
+        // FIX - Undo of indent actually does reverse outdent!
+        
         if (CommandState.getInstance().getMode() != CommandState.MODE_INSERT &&
             CommandState.getInstance().getMode() != CommandState.MODE_REPLACE)
         {
