@@ -1,4 +1,4 @@
-*index.txt*     For @NAME@ version @VERSION@.  Last change: 2003 May 6.
+*index.txt*     For @NAME@ version @VERSION@.  Last change: 2003 May 13.
 
 
                   @NAME@ REFERENCE MANUAL    by Rick Maddy
@@ -216,6 +216,9 @@ tag             char          note action in Normal mode        ~
 |>>|            >>              2  shift N lines one 'shiftwidth' rightwards
 |?|             ?{pattern}<CR>  1  search backward for the Nth previous
                                    occurrence of {pattern}
+|@|             @{a-z}          2  execute the contents of named buffer {a-z}
+                                   N times
+|@@|            @@              2  repeat the previous @{a-z} N times
 |A|             A               2  append text after the end of the line N times
 |B|             B               1  cursor N WORDS backward
 |C|             ["x]C           2  change from the cursor position to the end
@@ -355,9 +358,6 @@ tag             char            action  ~
 |(|             (               1  cursor N sentences backward
 |)|             )               1  cursor N sentences forward
 |=|             ={motion}       2  filter Nmove lines through "indent"
-|@|             @{a-z}          2  execute the contents of named buffer {a-z}
-                                   N times
-|@@|            @@              2  repeat the previous @{a-z} N times
 |U|             U               2  undo all latest changes on one line
 |`(|            `(              1  cursor to the start of the current sentence
 |`)|            `)              1  cursor to the end of the current sentence
@@ -738,6 +738,8 @@ The commands are sorted on the non-optional part of their name.
 |:<|            :<              shift lines one 'shiftwidth' left
 |:>|            :>              shift lines one 'shiftwidth' right
 |:&|            :&              repeat last ":substitute"
+|:@|            :@              execute contents of a register
+|:@@|           :@@             repeat the previous ":@"
 |:Next|         :N[ext]         go to previous file in the argument list
 |:argument|     :argu[ment]     go to specific file in the argument list
 |:browse|       :bro[wse]       use file selection dialog
@@ -795,8 +797,6 @@ TODO:
 
 |:#|            :#              same as ":number"
 |:star|         :*              execute contents of a register
-|:@|            :@              execute contents of a register
-|:@@|           :@@             repeat the previous ":@"
 |:center|       :ce[nter]       format lines at the center
 |:cmap|         :cm[ap]         like ":map" but for Command-line mode
 |:cmapclear|    :cmapc[lear]    clear all mappings for Command-line mode

@@ -12,10 +12,14 @@ New Features
   - Do not move the VIM tool window to the left or right - leave on the bottom
     or top.
 - Various error messages are now displayed in the new status bar.
+- Added support for : register
+- Added support for / register
 
 New Commands
 - Added support for q{register} command - macro recording.
 - Added support for @{register} and @@ commands - playback register contents.
+- Added support for :@{register}, :@@, and :@: - run register as command or
+  repeat last :@ command.
 
 New :set Options
 - showmode is now supported.
