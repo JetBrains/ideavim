@@ -36,7 +36,7 @@ public abstract class AbstractRange implements Range
         }
         else if (str.equals("%"))
         {
-            return new Range[] { new LineNumberRange(1, 0, move), new LineNumberRange(true, offset, move) };
+            return new Range[] { new LineNumberRange(0, 0, move), new LineNumberRange(true, offset, move) };
         }
         else if (str.equals("$"))
         {
