@@ -41,8 +41,9 @@ import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.key.RegisterActions;
-import org.jdom.Element;
+import com.maddyhome.idea.vim.ui.MorePanel;
 import java.awt.Toolkit;
+import org.jdom.Element;
 
 /**
  * This plugin attempts to emulate the keybinding and general functionality of Vim and gVim. See the supplied
@@ -123,6 +124,7 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
 
                 FileEditorManager.getInstance(project).addFileEditorManagerListener(new ChangeGroup.InsertCheck());
                 FileEditorManager.getInstance(project).addFileEditorManagerListener(new MotionGroup.MotionEditorChange());
+                FileEditorManager.getInstance(project).addFileEditorManagerListener(new MorePanel.MoreEditorChangeListener());
             }
         });
     }
