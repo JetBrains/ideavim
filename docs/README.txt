@@ -29,7 +29,7 @@ normally and then perform the following steps. These only need to be done the
 first time:
 
 1) Select the "Tools" menu. There should be a new menu option labeled
-   "VimPlugin Toggle". This should have a checkmark next to it. If not, please
+   "VIM Emulator". This should have a checkmark next to it. If not, please
    select this menu to check it. If this menu option is not available, you did
    not copy @NAME@.jar into the correct location.
 2) Select the "Options|Keymaps" menu. There should be a new keymap labeled "vim"
@@ -42,7 +42,7 @@ At this point you must use VIM keystrokes in all editors.
 
 Disabling the @NAME@ Plugin
 
-If you wish to disable the plugin, select the "Tools|VimPlugin Toggle" menu so
+If you wish to disable the plugin, select the "Tools|VIM Emulator" menu so
 it is unchecked. You must also select "Options|Keymaps" and make a keymap other
 than "vim" the active keymap. At this point IDEA will work with it's regular
 keyboard shortcuts.

@@ -1,16 +1,16 @@
 <idea-plugin url="http://sourceforge.net/projects/ideavim/">
     <name>@NAME@</name>
-    <description>VIM Emulator. Please see the README file for key mapping installation. Required for a first time install.</description>
+    <description>VIM Emulator. This plugin provides key mappings in IDEA to emulate vi/vim/gvim. Please see the README file for key mapping installation. Required for a first time install.</description>
     <version>@VERSION@</version>
     <vendor email="rick@maddyhome.com">Rick Maddy</vendor>
     <change-notes>
 <![CDATA[
 Bug Fixes<br>
-- Opening a non-text file resulted in some exceptions. This could happend when
+- Opening a non-text file resulted in some exceptions. This could happen when
   opening an image with the ImageViewer plugin.<br>
 - Better handling of trying to edit a VCS controlled read-only file.<br>
 - Properly handle multiple < or > in the :> and :< commands.<br>
-- Fix some exception and assertions when reopening a project.<br>
+- Fixed an exception and assertions when reopening a project.<br>
 - Fixed cursor position problem when issuing a c<motion> command that changed
   text up to the end of line.<br>
 - Using the C command on an empty file caused an error.<br>

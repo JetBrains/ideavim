@@ -3,11 +3,11 @@ History of changes for @NAME@ for IDEA @IDEA-VERSION@
 0.7.0 to @VERSION@
 
 Bug Fixes
-- Opening a non-text file resulted in some exceptions. This could happend when
+- Opening a non-text file resulted in some exceptions. This could happen when
   opening an image with the ImageViewer plugin.
 - Better handling of trying to edit a VCS controlled read-only file.
 - Properly handle multiple < or > in the :> and :< commands.
-- Fix some exception and assertions when reopening a project.
+- Fixed an exception and assertions when reopening a project.
 - Fixed cursor position problem when issuing a c<motion> command that changed
   text up to the end of line.
 - Using the C command on an empty file caused an error.
