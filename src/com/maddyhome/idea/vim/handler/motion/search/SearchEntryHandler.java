@@ -82,7 +82,12 @@ public class SearchEntryHandler extends AbstractEditorActionHandler
                     {
                         logger.debug("processing search");
                         CommandEntryPanel.getInstance().deactivate(true);
-                        CommandGroups.getInstance().getSearch().search(editor, context, e.getActionCommand(), count, flags);
+                        int res = CommandGroups.getInstance().getSearch().search(editor, context, e.getActionCommand(),
+                            count, flags, true);
+                        if (res == -1)
+                        {
+                            VimPlugin.indicateError();
+                        }
                     }
                     catch (Exception bad)
                     {

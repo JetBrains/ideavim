@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
 import com.maddyhome.idea.vim.undo.UndoManager;
 
 /**
+ * TODO - doesn't work for repeating last 'R' command
  */
 public class RepeatChangeHandler extends AbstractEditorActionHandler
 {

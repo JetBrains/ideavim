@@ -21,11 +21,11 @@ package com.maddyhome.idea.vim.handler.change.change;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.util.TextRange;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.ex.Ranges;
+import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
+import com.maddyhome.idea.vim.helper.EditorHelper;
 
 /**
  */
@@ -33,7 +33,8 @@ public class ChangeLastSearchReplaceHandler extends ChangeEditorActionHandler
 {
     public boolean execute(Editor editor, DataContext context, int count, int rawCount, Argument argument)
     {
-        TextRange range = Ranges.getCurrentLineRange(editor, context);
-        return CommandGroups.getInstance().getSearch().searchAndReplace(editor, context, range, "", "~", 0);
+        int line = EditorHelper.getCurrentLogicalLine(editor);
+        LineRange range = new LineRange(line, line);
+        return CommandGroups.getInstance().getSearch().searchAndReplace(editor, context, range, "s", "//~/");
     }
 }

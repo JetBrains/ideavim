@@ -1,4 +1,4 @@
-package com.maddyhome.idea.vim.handler.change.change;
+package com.maddyhome.idea.vim.regexp;
 
 /*
 * IdeaVim - A Vim emulator plugin for IntelliJ Idea
@@ -19,21 +19,15 @@ package com.maddyhome.idea.vim.handler.change.change;
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.ex.LineRange;
-import com.maddyhome.idea.vim.group.CommandGroups;
-import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
-import com.maddyhome.idea.vim.helper.EditorHelper;
-
 /**
+ *
  */
-public class ChangeLastGlobalSearchReplaceHandler extends ChangeEditorActionHandler
+public interface Ascii
 {
-    public boolean execute(Editor editor, DataContext context, int count, int rawCount, Argument argument)
-    {
-        LineRange range = new LineRange(0, EditorHelper.getLineCount(editor) - 1);
-        return CommandGroups.getInstance().getSearch().searchAndReplace(editor, context, range, "s", "//~/&");
-    }
+    char BS = 010;
+    char TAB = 011;
+    char NL = 012;
+    char CR = 015;
+    char ESC = 033;
+    char Ctrl_H = 8;
 }

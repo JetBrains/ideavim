@@ -82,7 +82,7 @@ public class SearchEntryHandler extends AbstractEditorActionHandler
                     {
                         logger.debug("processing search");
                         CommandEntryPanel.getInstance().deactivate(true);
-                        CommandGroups.getInstance().getSearch().search(editor, context, e.getActionCommand(), count, flags);
+                        CommandGroups.getInstance().getSearch().search(editor, context, e.getActionCommand(), count, flags, true);
                     }
                     catch (Exception bad)
                     {

@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.group.MotionGroup;
+import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
 
 /**
@@ -41,6 +42,10 @@ public abstract class MotionEditorActionHandler extends AbstractEditorActionHand
         }
         else if (offset >= 0)
         {
+            if ((cmd.getFlags() & Command.FLAG_SAVE_JUMP) != 0)
+            {
+                CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
+            }
             MotionGroup.moveCaret(editor, context, offset);
             postMove(editor, context, cmd);
 

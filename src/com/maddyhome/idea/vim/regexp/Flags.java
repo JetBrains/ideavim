@@ -1,4 +1,4 @@
-package com.maddyhome.idea.vim.ex.handler;
+package com.maddyhome.idea.vim.regexp;
 
 /*
 * IdeaVim - A Vim emulator plugin for IntelliJ Idea
@@ -19,32 +19,56 @@ package com.maddyhome.idea.vim.ex.handler;
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.ex.CommandHandler;
-import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.group.CommandGroups;
-
 /**
  *
  */
-public class QuitHandler extends CommandHandler
+public class Flags
 {
-    public QuitHandler()
+    public Flags()
     {
-        super("q", "uit", ARGUMENT_OPTIONAL);
+        flags = 0;
     }
 
-    public boolean execute(Editor editor, DataContext context, ExCommand cmd)
+    public Flags(int flags)
     {
-        // TODO - redo this properly
-        CommandGroups.getInstance().getFile().saveFiles(context);
-        CommandGroups.getInstance().getFile().closeFile(editor, context);
-        if (cmd.getArgument().equals("!"))
-        {
-            CommandGroups.getInstance().getFile().exitIdea();
-        }
-
-        return true;
+        this.flags = flags;
     }
+
+    public int get()
+    {
+        return flags;
+    }
+
+    public boolean isSet(int flag)
+    {
+        return ((this.flags & flag) != 0);
+    }
+
+    public boolean allSet(int flags)
+    {
+        return ((this.flags & flags) == flags);
+    }
+
+    public int init(int flags)
+    {
+        this.flags = flags;
+
+        return this.flags;
+    }
+
+    public int set(int flags)
+    {
+        this.flags |= flags;
+
+        return this.flags;
+    }
+
+    public int unset(int flags)
+    {
+        this.flags &= ~flags;
+
+        return this.flags;
+    }
+
+    private int flags;
 }

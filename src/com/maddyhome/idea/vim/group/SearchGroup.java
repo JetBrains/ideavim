@@ -24,20 +24,20 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.markup.HighlighterLayer;
-import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
+import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.util.TextRange;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.option.Options;
-import gnu.regexp.RE;
-import gnu.regexp.REException;
-import gnu.regexp.REMatch;
-import gnu.regexp.RESyntax;
-import java.nio.CharBuffer;
-import java.util.StringTokenizer;
+import com.maddyhome.idea.vim.regexp.CharHelper;
+import com.maddyhome.idea.vim.regexp.CharPointer;
+import com.maddyhome.idea.vim.regexp.CharacterClasses;
+import com.maddyhome.idea.vim.regexp.RegExp;
 import java.awt.Color;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
@@ -71,92 +71,285 @@ public class SearchGroup extends AbstractActionGroup
         return lastPattern;
     }
 
-    public boolean searchAndReplace(Editor editor, DataContext context, TextRange range, String pattern, String replace,
-        int flags)
+    public boolean searchAndReplace(Editor editor, DataContext context, LineRange range, String excmd, String exarg)
     {
         boolean res = true;
 
-        if ((flags & KEEP_FLAGS) != 0)
-        {
-            flags |= lastFlags;
-        }
-        lastFlags = flags;
+        CharPointer cmd = new CharPointer(new StringBuffer(exarg));
+        //sub_nsubs = 0;
+        //sub_nlines = 0;
 
-        int pflags = RE.REG_MULTILINE;
-        // If the user set the i flag or they didn't set the I flag but the ignorecase option is set, then ignore case
-        if ((flags & IGNORE_CASE) != 0 || ((flags & NO_IGNORE_CASE) == 0 && shouldIgnoreCase(pattern, false)))
-        {
-            pflags |= RE.REG_ICASE;
-        }
+        int which_pat;
+        if (excmd.equals("~"))
+            which_pat = RE_LAST;    /* use last used regexp */
+        else
+            which_pat = RE_SUBST;   /* use last substitute regexp */
 
-        RE sp;
-        if (pattern.length() == 0)
+        CharPointer pat = null;
+        CharPointer sub = null;
+        char delimiter;
+        /* new pattern and substitution */
+        if (excmd.charAt(0) == 's' && !cmd.isNul() && !Character.isWhitespace(cmd.charAt()) &&
+            "0123456789cegriIp|\"".indexOf(cmd.charAt()) == -1)
         {
-            if ((flags & REUSE) != 0)
+            /* don't accept alphanumeric for separator */
+            if (CharacterClasses.isAlpha(cmd.charAt()))
             {
-                pattern = lastSearch;
+                // EMSG(_("E146: Regular expressions can't be delimited by letters")); TODO
+                return false;
             }
-            else
+            /*
+            * undocumented vi feature:
+            *  "\/sub/" and "\?sub?" use last used search pattern (almost like
+            *  //sub/r).  "\&sub&" use last substitute pattern (like //sub/).
+            */
+            if (cmd.charAt() == '\\')
             {
-                pattern = lastPattern;
+                cmd.inc();
+                if ("/?&".indexOf(cmd.charAt()) == -1)
+                {
+                    // EMSG(_(e_backslash)); TODO
+                    return false;
+                }
+                if (cmd.charAt() != '&')
+                {
+                    which_pat = RE_SEARCH;      /* use last '/' pattern */
+                }
+                pat = new CharPointer("");             /* empty search pattern */
+                delimiter = cmd.charAt();             /* remember delimiter character */
+                cmd.inc();
+            }
+            else            /* find the end of the regexp */
+            {
+                which_pat = RE_LAST;            /* use last used regexp */
+                delimiter = cmd.charAt();             /* remember delimiter character */
+                cmd.inc();
+                pat = cmd.ref(0);                      /* remember start of search pat */
+                cmd = RegExp.skip_regexp(cmd, delimiter, true);
+                if (cmd.charAt() == delimiter)        /* end delimiter found */
+                {
+                    cmd.set('\u0000').inc(); /* replace it with a NUL */
+                }
+            }
+
+            /*
+            * Small incompatibility: vi sees '\n' as end of the command, but in
+            * Vim we want to use '\n' to find/substitute a NUL.
+            */
+            sub = cmd.ref(0);          /* remember the start of the substitution */
+
+            while (!cmd.isNul())
+            {
+                if (cmd.charAt() == delimiter)            /* end delimiter found */
+                {
+                    cmd.set('\u0000').inc(); /* replace it with a NUL */
+                    break;
+                }
+                if (cmd.charAt(0) == '\\' && cmd.charAt(1) != 0)  /* skip escaped characters */
+                {
+                    cmd.inc();
+                }
+                cmd.inc();
             }
         }
-
-        try
+        else        /* use previous pattern and substitution */
         {
-            sp = new RE(pattern, pflags, RESyntax.RE_SYNTAX_ED);
+            if (lastReplace == null)    /* there is no previous command */
+            {
+                // EMSG(_(e_nopresub)); TODO
+                return false;
+            }
+            pat = null;             /* search_regcomp() will use previous pattern */
+            sub = new CharPointer(lastReplace);
         }
-        catch (Exception e)
-        {
-            return false;
-        }
 
-        lastSearch = pattern;
-        lastPattern = pattern;
-
-        if (replace.equals("~"))
+        /*
+        * Find trailing options.  When '&' is used, keep old options.
+        */
+        if (cmd.charAt() == '&')
         {
-            replace = lastReplace;
+            cmd.inc();
         }
         else
         {
-            lastReplace = replace;
+            do_all = Options.getInstance().isSet("gdefault");
+            do_ask = false;
+            do_error = true;
+            do_print = false;
+            do_ic = 0;
+        }
+        while (!cmd.isNul())
+        {
+            /*
+            * Note that 'g' and 'c' are always inverted, also when p_ed is off.
+            * 'r' is never inverted.
+            */
+            if (cmd.charAt() == 'g')
+                do_all = !do_all;
+            else if (cmd.charAt() == 'c')
+                do_ask = !do_ask;
+            else if (cmd.charAt() == 'e')
+                do_error = !do_error;
+            else if (cmd.charAt() == 'r')       /* use last used regexp */
+                which_pat = RE_LAST;
+            else if (cmd.charAt() == 'p')
+                do_print = true;
+            else if (cmd.charAt() == 'i')       /* ignore case */
+                do_ic = 'i';
+            else if (cmd.charAt() == 'I')       /* don't ignore case */
+                do_ic = 'I';
+            else
+                break;
+            cmd.inc();
         }
 
-        int start = range.getStartOffset();
-        int end = range.getEndOffset();
+        int line1 = range.getStartLine();
+        int line2 = range.getEndLine();
+
+        /*
+        * check for a trailing count
+        */
+        cmd = CharHelper.skipwhite(cmd);
+        if (CharacterClasses.isDigit(cmd.charAt()))
+        {
+            int i = CharHelper.getdigits(cmd);
+            if (i <= 0 && do_error)
+            {
+                // EMSG(_(e_zerocount)); TODO
+                return false;
+            }
+            line1 = line2;
+            line2 = EditorHelper.normalizeLine(editor, line1 + i - 1);
+        }
+
+        /*
+        * check for trailing command or garbage
+        */
+        cmd = CharHelper.skipwhite(cmd);
+        if (!cmd.isNul() && cmd.charAt() != '"')        /* if not end-of-line or comment */
+        {
+            // EMSG(_(e_trailing)); TODO
+            return false;
+        }
+
+        String pattern = "";
+        if (pat == null || pat.isNul())
+        {
+            switch (which_pat)
+            {
+                case RE_LAST:
+                    pattern = lastPattern;
+                    break;
+                case RE_SEARCH:
+                    pattern = lastSearch;
+                    break;
+                case RE_SUBST:
+                    pattern = lastSubstitute;
+                    break;
+            }
+        }
+        else
+        {
+            pattern = pat.toString();
+        }
+
+        lastSubstitute = pattern;
+        lastPattern = pattern;
+
+        int start = editor.logicalPositionToOffset(new LogicalPosition(line1, 0));
+        int end = editor.logicalPositionToOffset(new LogicalPosition(line2, EditorHelper.getLineLength(editor, line2)));
+
+        RegExp sp;
+        RegExp.regmmatch_T regmatch = new RegExp.regmmatch_T();
+        sp = new RegExp();
+        regmatch.regprog = sp.vim_regcomp(pattern, 1);
+        if (regmatch.regprog == null)
+        {
+            if (do_error)
+            {
+                // EMSG(_(e_invcmd)); TODO
+            }
+            return false;
+        }
+
+        /* the 'i' or 'I' flag overrules 'ignorecase' and 'smartcase' */
+        if (do_ic == 'i')
+        {
+            regmatch.rmm_ic = true;
+        }
+        else if (do_ic == 'I')
+        {
+            regmatch.rmm_ic = false;
+        }
+
+        /*
+        * ~ in the substitute pattern is replaced with the old pattern.
+        * We do it here once to avoid it to be replaced over and over again.
+        * But don't do it when it starts with "\=", then it's an expression.
+        */
+        if (!(sub.charAt(0) == '\\' && sub.charAt(1) == '=') && lastReplace != null)
+        {
+            StringBuffer tmp = new StringBuffer(sub.toString());
+            int pos = 0;
+            while ((pos = tmp.indexOf("~", pos)) != -1)
+            {
+                if (pos == 0 || tmp.charAt(pos - 1) != '\\')
+                {
+                    tmp.replace(pos, pos + 1, lastReplace);
+                    pos += lastReplace.length();
+                }
+                pos++;
+            }
+            sub = new CharPointer(tmp);
+        }
+
+        lastReplace = sub.toString();
+
         logger.debug("search range=[" + start + "," + end + "]");
-        logger.debug("pattern="+pattern + ", replace="+replace);
-        int from = 0;
+        logger.debug("pattern="+pattern + ", replace="+sub);
         int lastMatch = -1;
         boolean found = true;
         int lastLine = -1;
-        boolean checkConfirm = true;
-        while (found)
+        int searchcol = 0;
+        boolean firstMatch = true;
+        boolean got_quit = false;
+        for (int lnum = line1; lnum <= line2 && !got_quit;)
         {
-            char[] chars = editor.getDocument().getChars();
-            CharBuffer buf = CharBuffer.wrap(chars, start, end - start);
-            logger.debug("buf=" + buf);
-            REMatch matcher = sp.getMatch(buf, from);
-            found = matcher != null;
+            LogicalPosition newpos = null;
+            int nmatch = sp.vim_regexec_multi(regmatch, editor, lnum, searchcol);
+            found = nmatch > 0;
             if (found)
             {
-                int spos = matcher.getStartIndex();
-                int epos = matcher.getEndIndex();
-                String match = matcher.substituteInto(replace);
-                logger.debug("found match[" + spos + "," + epos + "] - replace " + match);
+                if (firstMatch)
+                {
+                    CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
+                    firstMatch = false;
+                }
 
-                int line = editor.offsetToLogicalPosition(start + spos).line;
-                if ((flags & GLOBAL) != 0 || line != lastLine)
+                String match = sp.vim_regsub_multi(regmatch, lnum, sub, 1, true);
+                //logger.debug("found match[" + spos + "," + epos + "] - replace " + match);
+
+                int line = lnum + regmatch.startpos[0].lnum;
+                LogicalPosition startpos = new LogicalPosition(lnum + regmatch.startpos[0].lnum,
+                    regmatch.startpos[0].col);
+                LogicalPosition endpos = new LogicalPosition(lnum + regmatch.endpos[0].lnum,
+                    regmatch.endpos[0].col);
+                int startoff = editor.logicalPositionToOffset(startpos);
+                int endoff = editor.logicalPositionToOffset(endpos);
+                int newend = startoff + match.length();
+
+                if (do_all || line != lastLine)
                 {
                     boolean doReplace = true;
-                    if ((flags & CONFIRM) != 0 && checkConfirm)
+                    if (do_ask)
                     {
-                        editor.getSelectionModel().setSelection(start + spos, start + epos);
+                        //editor.getSelectionModel().setSelection(startoff, endoff);
+                        RangeHighlighter hl = highlightMatch(editor, startoff, endoff);
                         int choice = JOptionPane.showOptionDialog(null, "Replace with " + match + " ?",
                             "Confirm Replace", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
                             getConfirmButtons(), null);
-                        editor.getSelectionModel().removeSelection();
+                        //editor.getSelectionModel().removeSelection();
+                        editor.getMarkupModel().removeHighlighter(hl);
                         switch (choice)
                         {
                             case 0: // Yes
@@ -166,14 +359,17 @@ public class SearchGroup extends AbstractActionGroup
                                 doReplace = false;
                                 break;
                             case 2: // All
-                                checkConfirm = false;
+                                do_ask = false;
                                 break;
                             case JOptionPane.CLOSED_OPTION:
                             case 3: // Quit
                                 found = false;
                                 doReplace = false;
+                                got_quit = true;
                                 break;
                             case 4: // Last
+                                do_all = false;
+                                line2 = lnum;
                                 found = false;
                                 doReplace = true;
                                 break;
@@ -182,15 +378,35 @@ public class SearchGroup extends AbstractActionGroup
 
                     if (doReplace)
                     {
-                        lastLine = line;
-                        editor.getDocument().replaceString(start + spos, start + epos, match);
-                        lastMatch = start + spos;
+                        editor.getDocument().replaceString(startoff, endoff, match);
+                        lastMatch = startoff;
+                        newpos = editor.offsetToLogicalPosition(newend);
+
+                        int diff = newpos.line - endpos.line;
+                        line2 += diff;
                     }
                 }
 
-                int diff = match.length() - (epos - spos);
-                end += diff;
-                from = epos + diff;
+                lastLine = line;
+
+                lnum += nmatch - 1;
+                if (do_all)
+                {
+                    if (newpos != null)
+                        searchcol = newpos.column;
+                    else
+                        searchcol = endpos.column;
+                }
+                else
+                {
+                    searchcol = 0;
+                    lnum++;
+                }
+            }
+            else
+            {
+                lnum++;
+                searchcol = 0;
             }
         }
 
@@ -312,22 +528,23 @@ public class SearchGroup extends AbstractActionGroup
             type = '?';
         }
 
-        // TODO - broke - doesn't handle ranges and backslashes
         if (command.length() > 0)
         {
-            StringTokenizer tokenizer = new StringTokenizer(command, Character.toString(type));
             if (command.charAt(0) != type)
             {
-                pattern = tokenizer.nextToken();
+                CharPointer p = new CharPointer(command);
+                CharPointer end = RegExp.skip_regexp(p.ref(0), type, true);
+                pattern = p.substring(end.pointer() - p.pointer());
                 logger.debug("pattern=" + pattern);
-                if (!tokenizer.hasMoreTokens())
+                if (p.charAt() != type)
                 {
                     logger.debug("no offset");
                     offset = "";
                 }
                 else
                 {
-                    offset = tokenizer.nextToken("\n").substring(1);
+                    p.inc();
+                    offset = p.toString();
                     logger.debug("offset=" + offset);
                 }
             }
@@ -337,12 +554,13 @@ public class SearchGroup extends AbstractActionGroup
             }
             else
             {
-                offset = tokenizer.nextToken("\n").substring(1);
+                offset = command.substring(1);
                 logger.debug("offset=" + offset);
             }
         }
 
         lastSearch = pattern;
+        lastPattern = pattern;
         lastOffset = offset;
         lastDir = dir;
 
@@ -381,10 +599,6 @@ public class SearchGroup extends AbstractActionGroup
         lastDir = dir;
 
         int res = findItOffset(editor, context, editor.getCaretModel().getOffset(), count, lastDir, true);
-        if (res != -1)
-        {
-            MotionGroup.moveCaret(editor, context, res);
-        }
 
         return res;
     }
@@ -407,6 +621,8 @@ public class SearchGroup extends AbstractActionGroup
         {
             return -1;
         }
+
+        //highlightMatch(editor, range.getStartOffset(), range.getEndOffset());
 
         ParsePosition pp = new ParsePosition(0);
         int res = range.getStartOffset();
@@ -515,38 +731,66 @@ public class SearchGroup extends AbstractActionGroup
             return res;
         }
 
+        /*
         int pflags = RE.REG_MULTILINE;
         if (shouldIgnoreCase(lastSearch, noSmartCase))
         {
             pflags |= RE.REG_ICASE;
         }
-        RE sp;
-        try
-        {
-            sp = new RE(lastSearch, pflags, RESyntax.RE_SYNTAX_ED);
-        }
-        catch (REException e)
+        */
+        //RE sp;
+        RegExp sp;
+        RegExp.regmmatch_T regmatch = new RegExp.regmmatch_T();
+        regmatch.rmm_ic = shouldIgnoreCase(lastSearch, noSmartCase);
+        sp = new RegExp();
+        regmatch.regprog = sp.vim_regcomp(lastSearch, 1);
+        if (regmatch == null)
         {
             logger.debug("bad pattern: " + lastSearch);
             return res;
         }
 
+        /*
         int extra_col = 1;
         int startcol = -1;
         boolean found = false;
         boolean match_ok = true;
         LogicalPosition pos = editor.offsetToLogicalPosition(startOffset);
         LogicalPosition endpos = null;
-        REMatch match = null;
+        //REMatch match = null;
+        */
 
-        do	/* loop for count */
+        LogicalPosition lpos = editor.offsetToLogicalPosition(startOffset);
+        RegExp.lpos_T pos = new RegExp.lpos_T();
+        pos.lnum = lpos.line;
+        pos.col = lpos.column;
+
+        int    found;
+        int    lnum;           /* no init to shut up Apollo cc */
+        //RegExp.regmmatch_T regmatch;
+        CharPointer ptr = null;
+        int     matchcol;
+        int     startcol;
+        RegExp.lpos_T      endpos = new RegExp.lpos_T();
+        int         loop;
+        RegExp.lpos_T       start_pos;
+        boolean         at_first_line;
+        int         extra_col = 1;
+        boolean         match_ok;
+        long        nmatched;
+        //int         submatch = 0;
+        int    first_lnum;
+        boolean p_ws = Options.getInstance().isSet("wrapscan");
+
+        do  /* loop for count */
         {
-            LogicalPosition start_pos = pos;	/* remember start pos for detecting no match */
-            found = false;		/* default: not found */
-            boolean at_first_line = true;	/* default: start in first line */
-            if (pos.line == -1)	/* correct lnum for when starting in line 0 */
+            start_pos = new RegExp.lpos_T(pos);       /* remember start pos for detecting no match */
+            found = 0;              /* default: not found */
+            at_first_line = true;   /* default: start in first line */
+            if (pos.lnum == -1)     /* correct lnum for when starting in line 0 */
             {
-                pos = new LogicalPosition(0, 0);
+                pos.lnum = 0;
+                pos.col = 0;
                 at_first_line = false;  /* not in first line now */
             }
 
@@ -554,42 +798,33 @@ public class SearchGroup extends AbstractActionGroup
             * Start searching in current line, unless searching backwards and
             * we're in column 0.
             */
-            int lnum;
-            if (dir == -1 && start_pos.column == 0)
+            if (dir == -1 && start_pos.col == 0)
             {
-                lnum = pos.line - 1;
+                lnum = pos.lnum - 1;
                 at_first_line = false;
             }
             else
-                lnum = pos.line;
-
-            for (int loop = 0; loop <= 1; ++loop)   /* loop twice if 'wrapscan' set */
             {
-                for ( ; lnum >= 0 && lnum < EditorHelper.getLineCount(editor);
-                      lnum += dir, at_first_line = false)
+                lnum = pos.lnum;
+            }
+
+            for (loop = 0; loop <= 1; ++loop)   /* loop twice if 'wrapscan' set */
+            {
+                int lineCount = EditorHelper.getLineCount(editor);
+                for ( ; lnum >= 0 && lnum < lineCount; lnum += dir, at_first_line = false)
                 {
                     /*
                     * Look for a match somewhere in the line.
                     */
-                    int first_lnum = lnum;
-                    /*
-                    nmatched = vim_regexec_multi(&regmatch, win, buf,
-                        lnum, (colnr_T)0);
-                    */
-                    match = sp.getMatch(EditorHelper.getLineBuffer(editor, lnum), 0);
-                    int nmatched = match == null ? 0 : 1;
-                    /* Abort searching on an error (e.g., out of stack). */
-                    /*
-                    if (called_emsg)
-                        break;
-                    */
+                    first_lnum = lnum;
+                    nmatched = sp.vim_regexec_multi(regmatch, editor, lnum, 0);
                     if (nmatched > 0)
                     {
                         /* match may actually be in another line when using \zs */
-                        //lnum += regmatch.startpos[0].lnum;
-                        int ptr = EditorHelper.getLineStartOffset(editor, lnum); //ptr = ml_get_buf(buf, lnum, false);
-                        startcol = match.getStartIndex(); //regmatch.startpos[0].col;
-                        endpos = new LogicalPosition(lnum, match.getEndIndex()); //endpos = regmatch.endpos[0];
+                        lnum += regmatch.startpos[0].lnum;
+                        ptr = new CharPointer(EditorHelper.getLineBuffer(editor, lnum));
+                        startcol = regmatch.startpos[0].col;
+                        endpos = regmatch.endpos[0];
 
                         /*
                         * Forward search in the first line: match should be after
@@ -604,34 +839,38 @@ public class SearchGroup extends AbstractActionGroup
                             * one back afterwards, compare with that position,
                             * otherwise "/$" will get stuck on end of line.
                             */
-                            while (startcol < start_pos.column + extra_col)
+                            while ((startcol - (startcol == ptr.strlen() ? 1 : 0)) < (start_pos.col + extra_col))
                             {
-                                int matchcol = startcol;
-                                if (matchcol < EditorHelper.getLineLength(editor, lnum))//(ptr[matchcol] != NUL)
+                                if (nmatched > 1)
                                 {
-                                        ++matchcol;
+                                    /* end is in next line, thus no match in
+                                    * this line */
+                                    match_ok = false;
+                                    break;
                                 }
-                                if (matchcol == EditorHelper.getLineLength(editor, lnum))//ptr[matchcol] == NUL
+                                matchcol = endpos.col;
+                                /* for empty match: advance one char */
+                                if (matchcol == startcol && ptr.charAt(matchcol) != '\u0000')
+                                {
+                                    ++matchcol;
+                                }
+                                if (ptr.charAt(matchcol) == '\u0000' ||
+                                    (nmatched = sp.vim_regexec_multi(regmatch, editor, lnum, matchcol)) == 0)
                                 {
                                     match_ok = false;
                                     break;
                                 }
-                                match = sp.getMatch(EditorHelper.getLineBuffer(editor, lnum), matchcol);
-                                nmatched = match == null ? 0 : 1;
-                                if (nmatched == 0)
-                                {
-                                    match_ok = false;
-                                    break;
-                                }
-                                startcol = match.getStartIndex(); //regmatch.startpos[0].col;
-                                endpos = new LogicalPosition(lnum, match.getEndIndex()); //endpos = regmatch.endpos[0];
+                                startcol = regmatch.startpos[0].col;
+                                endpos = regmatch.endpos[0];
 
-                                    /* Need to get the line pointer again, a
-                                    * multi-line search may have made it invalid. */
-                                    //ptr = ml_get_buf(buf, lnum, false);
+                                /* Need to get the line pointer again, a
+                                 * multi-line search may have made it invalid. */
+                                ptr = new CharPointer(EditorHelper.getLineBuffer(editor, lnum));
                             }
                             if (!match_ok)
+                            {
                                 continue;
+                            }
                         }
                         if (dir == -1)
                         {
@@ -645,17 +884,18 @@ public class SearchGroup extends AbstractActionGroup
                             match_ok = false;
                             for (;;)
                             {
-                                if (!at_first_line || (match.getEndIndex() + extra_col <= start_pos.column))
+                                if (!at_first_line || (regmatch.startpos[0].col + extra_col <= start_pos.col))
                                 {
                                     /* Remember this position, we use it if it's
                                     * the last match in the line. */
                                     match_ok = true;
-                                    startcol = match.getStartIndex(); //regmatch.startpos[0].col;
-                                    endpos = new LogicalPosition(lnum, match.getEndIndex());
-                                    //endpos = regmatch.endpos[0];
+                                    startcol = regmatch.startpos[0].col;
+                                    endpos = regmatch.endpos[0];
                                 }
                                 else
+                                {
                                     break;
+                                }
 
                                 /*
                                 * We found a valid match, now check if there is
@@ -664,25 +904,25 @@ public class SearchGroup extends AbstractActionGroup
                                 * of the match, otherwise continue one position
                                 * forward.
                                 */
-                                int matchcol = startcol;
-                                if (matchcol < EditorHelper.getLineLength(editor, lnum))//(ptr[matchcol] != NUL)
-                                {
-                                    ++matchcol;
-                                }
-                                if (matchcol == EditorHelper.getLineLength(editor, lnum))//ptr[matchcol] == NUL
+                                if (nmatched > 1)
                                 {
                                     break;
                                 }
-                                match = sp.getMatch(EditorHelper.getLineBuffer(editor, lnum), matchcol);
-                                nmatched = match == null ? 0 : 1;
-                                if (nmatched == 0)
+                                matchcol = endpos.col;
+                                /* for empty match: advance one char */
+                                if (matchcol == startcol && ptr.charAt(matchcol) != '\u0000')
+                                {
+                                    ++matchcol;
+                                }
+                                if (ptr.charAt(matchcol) == '\u0000' ||
+                                    (nmatched = sp.vim_regexec_multi(regmatch, editor, lnum, matchcol)) == 0)
                                 {
                                     break;
                                 }
 
                                 /* Need to get the line pointer again, a
                                 * multi-line search may have made it invalid. */
-                                //ptr = ml_get_buf(buf, lnum, false);
+                                ptr = new CharPointer(EditorHelper.getLineBuffer(editor, lnum));
                             }
 
                             /*
@@ -690,36 +930,30 @@ public class SearchGroup extends AbstractActionGroup
                             * this match.
                             */
                             if (!match_ok)
+                            {
                                 continue;
+                            }
                         }
 
-                        pos = new LogicalPosition(lnum, startcol);
-                        found = true;
+                        pos.lnum = lnum;
+                        pos.col = startcol;
+                        endpos.lnum += first_lnum;
+                        found = 1;
 
                         /* Set variables used for 'incsearch' highlighting. */
                         //search_match_lines = endpos.lnum - (lnum - first_lnum);
                         //search_match_endcol = endpos.col;
                         break;
                     }
-                    //line_breakcheck();	/* stop if ctrl-C typed */
+                    //line_breakcheck();      /* stop if ctrl-C typed */
                     //if (got_int)
                     //    break;
 
-                    /* Cancel searching if a character was typed.  Used for
-                    * 'incsearch'.  Don't check too often, that would slowdown
-                    * searching too much. */
-                    /*
-                    if ((options & SEARCH_PEEK)
-                        && ((lnum - pos.lnum) & 0x3f) == 0
-                        && char_avail())
-                    {
-                        break_loop = true;
-                        break;
-                    }
-                    */
 
-                    if (loop == 1 && lnum == start_pos.line)
-                        break;	    /* if second loop, stop where started */
+                    if (loop != 0 && lnum == start_pos.lnum)
+                    {
+                        break;          /* if second loop, stop where started */
+                    }
                 }
                 at_first_line = false;
 
@@ -727,8 +961,10 @@ public class SearchGroup extends AbstractActionGroup
                 * stop the search if wrapscan isn't set, after an interrupt and
                 * after a match
                 */
-                if (found)
+                if (!p_ws || found != 0)
+                {
                     break;
+                }
 
                 /*
                 * If 'wrapscan' is set we continue at the other end of the file.
@@ -739,36 +975,23 @@ public class SearchGroup extends AbstractActionGroup
                 */
                 if (dir == -1)    /* start second loop at the other end */
                 {
-                    lnum = EditorHelper.getLineCount(editor) - 1;//buf.b_ml.ml_line_count;
-                    /*
-                    if (!shortmess(SHM_SEARCH) && (options & SEARCH_MSG))
-                        give_warning((char_u *)_(top_bot_msg), true);
-                    */
+                    lnum = lineCount - 1;
+                    //if (!shortmess(SHM_SEARCH) && (options & SEARCH_MSG))
+                    //    give_warning((char_u *)_(top_bot_msg), TRUE);
                 }
                 else
                 {
                     lnum = 0;
-                    /*
-                    if (!shortmess(SHM_SEARCH) && (options & SEARCH_MSG))
-                        give_warning((char_u *)_(bot_top_msg), true);
-                    */
-                }
-
-                if (!Options.getInstance().isSet("wrapscan"))
-                {
-                    break;
+                    //if (!shortmess(SHM_SEARCH) && (options & SEARCH_MSG))
+                    //    give_warning((char_u *)_(bot_top_msg), TRUE);
                 }
             }
-            /*
-            if (got_int || called_emsg || break_loop)
-                break;
-            */
+            //if (got_int || called_emsg || break_loop)
+            //    break;
         }
-        while (--count > 0 && found);   /* stop after count matches or no match */
+        while (--count > 0 && found != 0);   /* stop after count matches or no match */
 
-        //vim_free(regmatch.regprog);
-
-        if (!found)		    /* did not find it */
+        if (found == 0)             /* did not find it */
         {
             /*
             if (got_int)
@@ -783,30 +1006,36 @@ public class SearchGroup extends AbstractActionGroup
                     EMSG2(_("E385: search hit BOTTOM without match for: %s"), mr_pattern);
             }
             */
-            res = null; //return FAIL;
-        }
-        else
-        {
-            res = new TextRange(editor.logicalPositionToOffset(pos), editor.logicalPositionToOffset(endpos));
-            //highlightMatch(editor, res.getStartOffset(), res.getEndOffset());
+            return null;
         }
 
-        return res;
+        return new TextRange(editor.logicalPositionToOffset(new LogicalPosition(pos.lnum, pos.col)),
+            editor.logicalPositionToOffset(new LogicalPosition(endpos.lnum, endpos.col)));
     }
 
-    private void highlightMatch(Editor editor, int start, int end)
+    private RangeHighlighter highlightMatch(Editor editor, int start, int end)
     {
-        editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.SELECTION,
+        return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.SELECTION,
             new TextAttributes(Color.BLACK, Color.YELLOW, null, null, 0), HighlighterTargetArea.EXACT_RANGE);
     }
 
     private String lastSearch;
     private String lastPattern;
+    private String lastSubstitute;
     private String lastReplace;
     private String lastOffset;
     private int lastDir;
-    private int lastFlags;
     private Object[] confirmBtns;
+
+    private boolean do_all = false; /* do multiple substitutions per line */
+    private boolean do_ask = false; /* ask for confirmation */
+    private boolean do_error = true; /* if false, ignore errors */
+    private boolean do_print = false; /* print last line with subs. */
+    private char do_ic = 0; /* ignore case flag */
+
+    private static final int RE_LAST = 1;
+    private static final int RE_SEARCH = 2;
+    private static final int RE_SUBST = 3;
 
     private static Logger logger = Logger.getInstance(SearchGroup.class.getName());
 }

@@ -1,4 +1,4 @@
-package com.maddyhome.idea.vim.ex.handler;
+package com.maddyhome.idea.vim.regexp;
 
 /*
 * IdeaVim - A Vim emulator plugin for IntelliJ Idea
@@ -19,32 +19,32 @@ package com.maddyhome.idea.vim.ex.handler;
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.ex.CommandHandler;
-import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.group.CommandGroups;
-
 /**
  *
  */
-public class QuitHandler extends CommandHandler
+public class CharHelper
 {
-    public QuitHandler()
+    public static CharPointer skipwhite(CharPointer ptr)
     {
-        super("q", "uit", ARGUMENT_OPTIONAL);
-    }
-
-    public boolean execute(Editor editor, DataContext context, ExCommand cmd)
-    {
-        // TODO - redo this properly
-        CommandGroups.getInstance().getFile().saveFiles(context);
-        CommandGroups.getInstance().getFile().closeFile(editor, context);
-        if (cmd.getArgument().equals("!"))
+        while (CharacterClasses.isWhite(ptr.charAt()))
         {
-            CommandGroups.getInstance().getFile().exitIdea();
+            ptr.inc();
         }
 
-        return true;
+        return ptr;
     }
+
+    public static int getdigits(CharPointer ptr)
+    {
+        int res = 0;
+        while (CharacterClasses.isDigit(ptr.charAt()))
+        {
+            res = res * 10 + (ptr.charAt() - '0');
+            ptr.inc();
+        }
+
+        return res;
+    }
+
+    private CharHelper() {}
 }

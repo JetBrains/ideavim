@@ -6,6 +6,7 @@ Redone Commands
 - / and ? and all their variants are now supported properly, including offsets.
 - n and N are now supported properly
 - Ex command ranges now fully support searches
+- :substitute command now fully supports all Vim style search and replaces
 
 New Commands
 - Added support for :set. Only a small number of options are supported.
