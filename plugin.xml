@@ -79,11 +79,13 @@
         <action id="VimMotionLastScreenLineEnd" class="com.maddyhome.idea.vim.action.motion.screen.MotionLastScreenLineEndAction" text="Last Screen Line End"/>
         <action id="VimMotionMiddleScreenLine" class="com.maddyhome.idea.vim.action.motion.screen.MotionMiddleScreenLineAction" text="Middle Screen Line"/>
         <!-- Scroll -->
+        <action id="VimMotionScrollFirstScreenLinePageStart" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLinePageStartAction" text="Scroll Line to Top"/>
         <action id="VimMotionScrollFirstScreenLineStart" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLineStartAction" text="Scroll Line to Top"/>
         <action id="VimMotionScrollFirstScreenLine" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLineAction" text="Scroll Line to Top"/>
         <action id="VimMotionScrollHalfPageDown" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfPageDownAction" text="Scroll Half Page Down"/>
         <action id="VimMotionScrollHalfPageUp" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfPageUpAction" text="Scroll Half Page Up"/>
         <action id="VimMotionScrollLastScreenLine" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLineAction" text="Scroll Line to Bottom"/>
+        <action id="VimMotionScrollLastScreenLinePageStart" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLinePageStartAction" text="Scroll Line to Bottom"/>
         <action id="VimMotionScrollLastScreenLineStart" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLineStartAction" text="Scroll Line to Bottom"/>
         <action id="VimMotionScrollLineDown" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLineDownAction" text="Scroll Line Down"/>
         <action id="VimMotionScrollLineUp" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLineUpAction" text="Scroll Line Up"/>
@@ -172,6 +174,8 @@
         <action id="VimCopyPutTextBeforeCursor" class="com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorAction" text="Put Text"/>
         <action id="VimCopyPutTextAfterCursorNoIndent" class="com.maddyhome.idea.vim.action.copy.PutTextAfterCursorNoIndentAction" text="Put Text"/>
         <action id="VimCopyPutTextBeforeCursorNoIndent" class="com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction" text="Put Text"/>
+        <action id="VimCopyPutTextAfterCursorMoveCursor" class="com.maddyhome.idea.vim.action.copy.PutTextAfterCursorActionMoveCursor" text="Put Text"/>
+        <action id="VimCopyPutTextBeforeCursorMoveCursor" class="com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorActionMoveCursor" text="Put Text"/>
         <action id="VimCopySelectRegister" class="com.maddyhome.idea.vim.action.copy.SelectRegisterAction" text="Select Register"/>
         <action id="VimCopyYankLine" class="com.maddyhome.idea.vim.action.copy.YankLineAction" text="Yank Line"/>
         <action id="VimCopyYankMotion" class="com.maddyhome.idea.vim.action.copy.YankMotionAction" text="Yank Motion"/>
@@ -181,7 +185,6 @@
 
         <!-- File -->
         <action id="VimFileSaveClose" class="com.maddyhome.idea.vim.action.file.FileSaveCloseAction" text="Save and Close Editor"/>
-        <action id="VimFileClose" class="com.maddyhome.idea.vim.action.file.FileCloseAction" text="Close Editor"/>
 
         <!-- Search -->
         <action id="VimSearchEntry" class="com.maddyhome.idea.vim.action.motion.search.SearchEntryAction" text="Search"/>

@@ -1,4 +1,4 @@
-*index.txt*     For IdeaVIM version 0.4.0.  Last change: 2003 May 14 
+*index.txt*     For IdeaVIM version 0.6.6.  Last change: 2004 January 21 
 
 
                   IdeaVIM REFERENCE MANUAL    by Rick Maddy
@@ -135,6 +135,10 @@ tag             char          note action in Normal mode        ~
 |']|            ']              1  cursor to the first CHAR on the line of the
                                    end of last operated text or end of putted
                                    text
+|'{|            '{              1  cursor to the first CHAR on the line of the
+                                   start of the current paragraph
+|'}|            '}              1  cursor to the first CHAR on the line of the
+                                   end of the current paragraph
 |+|             +               1  cursor to the first CHAR N lines lower
 |,|             ,               1  repeat latest f, t, F or T in opposite
                                    direction N times
@@ -225,6 +229,8 @@ tag             char          note action in Normal mode        ~
 |`]|            `]              1  cursor to the end of last operated text or
                                    end of putted text
 |``|            ``              1  cursor to the position before latest jump
+|`{|            `{              1  cursor to the start of the current paragraph
+|`}|            `}              1  cursor to the end of the current paragraph
 |a|             a               2  append text after the cursor N times
 |b|             b               1  cursor N words backward
 |c|             ["x]c{motion}   2  delete Nmove text [into buffer x] and start
@@ -264,7 +270,9 @@ tag             char          note action in Normal mode        ~
 |y|             ["x]y{motion}      yank Nmove text [into buffer x]
 |yy|            ["x]yy             yank N lines [into buffer x]
 |z|             z{char}            commands starting with 'z', see below
+|{|             {               1  cursor N paragraphs backward
 |bar|           |               1  cursor to column N
+|}|             }               1  cursor N paragraphs forward
 |~|             ~               2  switch case of N characters
                                    under cursor and move the cursor N
                                    characters to the right
@@ -342,6 +350,8 @@ tag             char          note action in Normal mode        ~
                                    WORD
 |gI|            gI              2  like "I", but always start in column 1
 |gJ|            gJ              2  join lines without inserting space
+|gP|            ["x]gP          2  put the text [from register x] before the
+                                   cursor N times, leave the cursor after it
 |gU|            gU{motion}      2  make Nmove text uppercase
 |g^|            g^              1  when 'wrap' off go to leftmost non-white
                                    character of the current line that is on
@@ -360,6 +370,8 @@ tag             char          note action in Normal mode        ~
                                    lines up
 |gm|            gm              1  go to character at middle of the screenline
 |go|            go              1  cursor to character N in the buffer
+|gp|            ["x]gp          2  put the text [from register x] after the
+                                   cursor N times, leave the cursor after it
 |gu|            gu{motion}      2  make Nmove text lowercase
 |gv|            gv                 reselect the previous Visual area
 |g~|            g~{motion}      2  swap case for Nmove text
@@ -375,13 +387,19 @@ tag             char          note action in Normal mode        ~
 ------------------------------------------------------------------------------
 |z<CR>|         z<CR>              redraw, cursor line to top of window,
                                    cursor on first non-blank
+|z+|            z+                 cursor on line N (default line below
+                                   window), otherwise like "z<CR>"
+|z^|            z^                 cursor on line N (default line above
+                                   window), otherwise like "z-"
 |z-|            z-                 redraw, cursor line at bottom of window,
                                    cursor on first non-blank
 |z.|            z.                 redraw, cursor line to center of window,
                                    cursor on first non-blank
 |zb|            zb                 redraw, cursor line at bottom of window
 |zc|            zc                 close a fold
+|zM|            zM                 set 'foldlevel' to zero
 |zo|            zo                 open fold
+|zR|            zR                 set 'foldlevel' to the deepest fold
 |zt|            zt                 redraw, cursor line at top of window
 |zz|            zz                 redraw, cursor line at center of window
 
@@ -488,6 +506,7 @@ The commands are sorted on the non-optional part of their name.
 |:Next|         :N[ext]         go to previous file in the argument list
 |:argument|     :argu[ment]     go to specific file in the argument list
 |:browse|       :bro[wse]       Opens the 'File Open...' dialog
+|:class]        :cla[ss]        find class in project and edit it (not in VIM)
 |:close|        :clo[se]        close current window
 |:copy|         :co[py]         copy lines
 |:delete|       :d[elete]       delete lines
