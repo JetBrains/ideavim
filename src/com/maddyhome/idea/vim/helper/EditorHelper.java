@@ -300,7 +300,7 @@ public class EditorHelper
      */
     public static int normalizeColumn(Editor editor, int lline, int col)
     {
-        col = Math.min(Math.max(0, col), getLineLength(editor, lline) - 1);
+        col = Math.min(Math.max(0, getLineLength(editor, lline) - 1), col);
 
         return col;
     }
