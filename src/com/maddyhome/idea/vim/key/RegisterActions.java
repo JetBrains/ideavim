@@ -481,6 +481,10 @@ public class RegisterActions
         parser.registerAction(KeyParser.MAPPING_NVO, "VimSearchAgainNext", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut('n'));
         parser.registerAction(KeyParser.MAPPING_NVO, "VimSearchAgainPrevious", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut('N'));
         parser.registerAction(KeyParser.MAPPING_NVO, "VimExEntry", Command.OTHER_READONLY, new Shortcut(':'));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimSearchWholeWordForward", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut('*'));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimSearchWholeWordBackward", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut('#'));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimSearchWordForward", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut("g*"));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimSearchWordBackward", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut("g#"));
 
         // ********************** Various Mode Actions ************************
         parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimVisualToggleCharacterMode", Command.OTHER_READONLY, Command.FLAG_MOT_CHARACTERWISE, new Shortcut('v'));

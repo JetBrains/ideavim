@@ -10,8 +10,12 @@ New Commands
 - Added support for :set. Only a small number of options are supported.
 - Load .vimrc or _vimrc from user's home directory. Only set commands are
   honored.
+- Added support for *, #, g*, and g# - search for word under cursor.
 
 Supported Set Options
+- gdefault - Indicates of the global flag in on by default for the :substitute
+  command.
+- ignorecase - The default case sensitivity for searchs and substitutes.
 - matchpairs - Specify the character pairs used by the % command
 - more - Indicates whether 'more' is used or not for display windows
 - scroll - Specifies the number of lines scrolled by the Ctrl-D and Ctrl-U
@@ -19,9 +23,11 @@ Supported Set Options
 - selection - Specifies how the cursor can be moved at the ends of lines in
   Visual mode. It also controls whether the Visual mode selection is inclusive
   or exclusive.
+- smartcase - Overrides ignorecase if set and pattern has uppercase characters.
 - undolevels - Set to 0 for Vi style undo (1 level). Set to other number to
   specify how many levels of undo are supported per editor.
-- visualbell - controls whether the plugin beeps or not
+- visualbell - controls whether the plugin beeps or not.
+- wrapscan - Determines is searches wrap around the start or end of the file.
 
 0.1.1 to 0.2.0
 

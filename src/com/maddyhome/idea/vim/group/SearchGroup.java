@@ -23,15 +23,22 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
+import com.intellij.openapi.editor.markup.HighlighterLayer;
+import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.util.TextRange;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.StringHelper;
+import com.maddyhome.idea.vim.helper.SearchHelper;
+import com.maddyhome.idea.vim.option.Options;
 import gnu.regexp.RE;
 import gnu.regexp.REException;
 import gnu.regexp.REMatch;
 import gnu.regexp.RESyntax;
 import java.nio.CharBuffer;
 import java.util.StringTokenizer;
+import java.awt.Color;
 import javax.swing.JOptionPane;
 
 /**
@@ -63,9 +70,9 @@ public class SearchGroup extends AbstractActionGroup
         }
         lastFlags = flags;
 
-        // TODO - default case sensitivity
         int pflags = RE.REG_MULTILINE;
-        if ((flags & IGNORE_CASE) != 0)
+        // If the user set the i flag or they didn't set the I flag but the ignorecase option is set, then ignore case
+        if ((flags & IGNORE_CASE) != 0 || ((flags & NO_IGNORE_CASE) == 0 && shouldIgnoreCase(pattern)))
         {
             pflags |= RE.REG_ICASE;
         }
@@ -184,9 +191,24 @@ public class SearchGroup extends AbstractActionGroup
         return res;
     }
 
+    private boolean shouldIgnoreCase(String pattern)
+    {
+        boolean sc = Options.getInstance().isSet("smartcase");
+        boolean ic = Options.getInstance().isSet("ignorecase");
+        if (ic && !(sc && StringHelper.containsUpperCase(pattern)))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     public static int argsToFlags(String args)
     {
         int res = 0;
+        boolean global = Options.getInstance().isSet("gdefault");
         for (int i = 0; i < args.length(); i++)
         {
             switch (args.charAt(i))
@@ -201,7 +223,7 @@ public class SearchGroup extends AbstractActionGroup
                     res |= IGNORE_ERROR;
                     break;
                 case 'g':
-                    res |= GLOBAL;
+                    global = !global;
                     break;
                 case 'i':
                     res |= IGNORE_CASE;
@@ -216,6 +238,11 @@ public class SearchGroup extends AbstractActionGroup
                     res |= REUSE;
                     break;
             }
+        }
+
+        if (global)
+        {
+            res |= GLOBAL;
         }
 
         return res;
@@ -294,6 +321,39 @@ public class SearchGroup extends AbstractActionGroup
         return res;
     }
 
+    public int searchWord(Editor editor, DataContext context, int count, boolean whole, int dir)
+    {
+        TextRange range = SearchHelper.findWordUnderCursor(editor);
+        if (range == null)
+        {
+            return -1;
+        }
+
+        StringBuffer pattern = new StringBuffer();
+        if (whole)
+        {
+            pattern.append("\\<");
+        }
+        pattern.append(EditorHelper.getText(editor, range.getStartOffset(), range.getEndOffset()));
+        if (whole)
+        {
+            pattern.append("\\>");
+        }
+
+        MotionGroup.moveCaret(editor, context, range.getStartOffset());
+
+        lastSearch = pattern.toString();
+        lastDir = dir;
+
+        int res = findIt(editor, context, editor.getCaretModel().getOffset(), count, lastDir);
+        if (res != -1)
+        {
+            MotionGroup.moveCaret(editor, context, res);
+        }
+
+        return res;
+    }
+
     public int searchNext(Editor editor, DataContext context, int count)
     {
         return findIt(editor, context, editor.getCaretModel().getOffset(), count, lastDir);
@@ -313,8 +373,11 @@ public class SearchGroup extends AbstractActionGroup
             return res;
         }
 
-        int pflags = 0;
-        // TODO - check if ignore case
+        int pflags = RE.REG_MULTILINE;
+        if (shouldIgnoreCase(lastSearch))
+        {
+            pflags |= RE.REG_ICASE;
+        }
         RE sp;
         try
         {
@@ -331,6 +394,8 @@ public class SearchGroup extends AbstractActionGroup
         boolean found = false;
         boolean match_ok = true;
         LogicalPosition pos = editor.offsetToLogicalPosition(startOffset);
+        LogicalPosition endpos = null;
+        REMatch match = null;
 
         do	/* loop for count */
         {
@@ -369,7 +434,7 @@ public class SearchGroup extends AbstractActionGroup
                     nmatched = vim_regexec_multi(&regmatch, win, buf,
                         lnum, (colnr_T)0);
                     */
-                    REMatch match = sp.getMatch(EditorHelper.getLineBuffer(editor, lnum), 0);
+                    match = sp.getMatch(EditorHelper.getLineBuffer(editor, lnum), 0);
                     int nmatched = match == null ? 0 : 1;
                     /* Abort searching on an error (e.g., out of stack). */
                     /*
@@ -382,7 +447,7 @@ public class SearchGroup extends AbstractActionGroup
                         //lnum += regmatch.startpos[0].lnum;
                         int ptr = EditorHelper.getLineStartOffset(editor, lnum); //ptr = ml_get_buf(buf, lnum, false);
                         startcol = match.getStartIndex(); //regmatch.startpos[0].col;
-                        LogicalPosition endpos = new LogicalPosition(lnum, match.getEndIndex()); //endpos = regmatch.endpos[0];
+                        endpos = new LogicalPosition(lnum, match.getEndIndex()); //endpos = regmatch.endpos[0];
 
                         /*
                         * Forward search in the first line: match should be after
@@ -545,6 +610,11 @@ public class SearchGroup extends AbstractActionGroup
                         give_warning((char_u *)_(bot_top_msg), true);
                     */
                 }
+
+                if (!Options.getInstance().isSet("wrapscan"))
+                {
+                    break;
+                }
             }
             /*
             if (got_int || called_emsg || break_loop)
@@ -575,9 +645,16 @@ public class SearchGroup extends AbstractActionGroup
         else
         {
             res = editor.logicalPositionToOffset(pos);
+            //highlightMatch(editor, res, editor.logicalPositionToOffset(endpos));
         }
 
         return res;
+    }
+
+    private void highlightMatch(Editor editor, int start, int end)
+    {
+        editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.SELECTION,
+            new TextAttributes(Color.BLACK, Color.YELLOW, null, null, 0), HighlighterTargetArea.EXACT_RANGE);
     }
 
     private String lastSearch;

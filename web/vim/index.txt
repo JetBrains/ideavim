@@ -104,6 +104,8 @@ tag             char          note action in Normal mode        ~
                                    delete, yank or put (uppercase to append)
                                    ({.%#:} only work with put)
 |@:|            @:                 repeat the previous ":" command N times
+|#|             #               1  search backward for the Nth occurrence of
+                                   the ident under the cursor
 |$|             $               1  cursor to the end of Nth next line
 |%|             %               1  find the next (curly/square) bracket on
                                    this line and go to its match, or go to
@@ -111,6 +113,8 @@ tag             char          note action in Normal mode        ~
                                    preprocessor directive.
 |N%|            {count}%        1  go to N percentage in the file
 |&|             &               2  repeat last :s
+|star|          *               1  search forward for the Nth occurrence of
+                                   the ident under the cursor
 |'|             '{a-zA-Z0-9}    1  cursor to the first CHAR on the line with
                                    mark {a-zA-Z0-9}
 |''|            ''              1  cursor to the first CHAR of the line where
@@ -152,7 +156,9 @@ tag             char          note action in Normal mode        ~
 |<|             <{motion}       2  shift Nmove lines one 'shiftwidth'
                                    leftwards
 |<<|            <<              2  shift N lines one 'shiftwidth' leftwards
+|/<CR>|         /<CR>           1  search forward for {pattern} of last search
 |==|            ==              2  filter N lines through "indent" (one line)
+|?<CR>|         ?<CR>           1  search backward for {pattern} of last search
 |>|             >{motion}       2  shift Nmove lines one 'shiftwidth'
                                    rightwards
 |>>|            >>              2  shift N lines one 'shiftwidth' rightwards
@@ -301,11 +307,13 @@ tag             char          note action in Normal mode        ~
 
 tag             char          note action in Normal mode        ~
 ------------------------------------------------------------------------------
+|g#|            g#              1  like "#", but without using "\<" and "\>"
 |g$|            g$              1  when 'wrap' off go to rightmost character of
                                    the current line that is on the screen;
                                    when 'wrap' on go to the rightmost character
                                    of the current screen line
 |g&|            g&              2  repeat last ":s" on all lines
+|gstar|         g*              1  like "*", but without using "\<" and "\>"
 |g0|            g0              1  when 'wrap' off go to leftmost character of
                                    the current line that is on the screen;
                                    when 'wrap' on go to the leftmost character

@@ -52,5 +52,18 @@ public class StringHelper
         return res.toString();
     }
 
+    public static boolean containsUpperCase(String text)
+    {
+        for (int i = 0; i < text.length(); i++)
+        {
+            if (Character.isUpperCase(text.charAt(i)) && (i == 0 || text.charAt(i - 1) == '\\'))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private StringHelper() {}
 }

@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.helper;
  */
 
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.util.TextRange;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionChangeEvent;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
@@ -193,6 +194,56 @@ public class SearchHelper
         }
 
         return res;
+    }
+
+    /**
+     * Find the word under the cursor or the next word to the right of the cursor on the current line.
+     * @param editor The editor to find the word in
+     * @return The text range of the found word or null if there is no word under/after the cursor on the line
+     */
+    public static TextRange findWordUnderCursor(Editor editor)
+    {
+        char[] chars = editor.getDocument().getChars();
+        int stop = EditorHelper.getLineEndOffset(editor, EditorHelper.getCurrentLogicalLine(editor), true);
+
+        int pos = editor.getCaretModel().getOffset();
+        int start = pos;
+        int[] types = new int[] { CharacterHelper.TYPE_CHAR, CharacterHelper.TYPE_PUNC };
+        for (int i = 0; i < 2; i++)
+        {
+            start = pos;
+            int type = CharacterHelper.charType(chars[start], false);
+            if (type == types[i])
+            {
+                // Search back for start of word
+                while (start > 0 && CharacterHelper.charType(chars[start - 1], false) == types[i])
+                {
+                    start--;
+                }
+            }
+            else
+            {
+                // Search forward for start of word
+                while (start < stop && CharacterHelper.charType(chars[start], false) != types[i])
+                {
+                    start++;
+                }
+            }
+
+            if (start != stop)
+            {
+                break;
+            }
+        }
+
+        if (start == stop)
+        {
+            return null;
+        }
+
+        int end = findNextWordEnd(chars, start, stop, 1, false);
+
+        return new TextRange(start, end);
     }
 
     /**

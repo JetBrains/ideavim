@@ -44,6 +44,7 @@ import org.jdom.Element;
 
 /**
  * This class contains all the mark related functionality
+ * TODO - look into using RangeMarker for marks
  */
 public class MarkGroup extends AbstractActionGroup
 {

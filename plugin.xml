@@ -167,6 +167,10 @@
         <action id="VimSearchEntry" class="com.maddyhome.idea.vim.action.motion.search.SearchEntryAction" text="Search"/>
         <action id="VimSearchAgainNext" class="com.maddyhome.idea.vim.action.motion.search.SearchAgainNextAction" text="Search Again"/>
         <action id="VimSearchAgainPrevious" class="com.maddyhome.idea.vim.action.motion.search.SearchAgainPreviousAction" text="Search Again"/>
+        <action id="VimSearchWholeWordForward" class="com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction" text="Search Again"/>
+        <action id="VimSearchWholeWordBackward" class="com.maddyhome.idea.vim.action.motion.search.SearchWholeWordBackwardAction" text="Search Again"/>
+        <action id="VimSearchWordForward" class="com.maddyhome.idea.vim.action.motion.search.SearchWordForwardAction" text="Search Again"/>
+        <action id="VimSearchWordBackward" class="com.maddyhome.idea.vim.action.motion.search.SearchWordBackwardAction" text="Search Again"/>
 
         <!-- Other -->
         <action id="VimLastSearchReplace" class="com.maddyhome.idea.vim.action.change.change.ChangeLastSearchReplaceAction" text="Repeat Last :s"/>
