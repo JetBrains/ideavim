@@ -37,7 +37,7 @@ public class QuitHandler extends CommandHandler
             new CommandName("q", "uit"),
             new CommandName("clo", "se"),
             new CommandName("hid", "e")
-        }, ARGUMENT_OPTIONAL);
+        }, ARGUMENT_OPTIONAL | DONT_REOPEN);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd)

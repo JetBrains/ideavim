@@ -39,7 +39,7 @@ public class ExitHandler extends CommandHandler
             new CommandName("quita", "ll"),
             new CommandName("wqa", "ll"),
             new CommandName("xa", "ll")
-        }, 0);
+        }, DONT_REOPEN);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException

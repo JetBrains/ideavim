@@ -32,7 +32,7 @@ public class SelectFileHandler extends CommandHandler
 {
     public SelectFileHandler()
     {
-        super("argu", "ment", RANGE_OPTIONAL | ARGUMENT_OPTIONAL | RANGE_IS_COUNT);
+        super("argu", "ment", RANGE_OPTIONAL | ARGUMENT_OPTIONAL | RANGE_IS_COUNT | DONT_REOPEN);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd)

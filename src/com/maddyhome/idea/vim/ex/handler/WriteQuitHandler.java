@@ -37,7 +37,7 @@ public class WriteQuitHandler extends CommandHandler
             new CommandName("wq", ""),
             new CommandName("exi", "t"),
             new CommandName("x", "it"),
-        } , RANGE_OPTIONAL | ARGUMENT_OPTIONAL);
+        } , RANGE_OPTIONAL | ARGUMENT_OPTIONAL | DONT_REOPEN);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd)

@@ -32,7 +32,7 @@ public class NextFileHandler extends CommandHandler
 {
     public NextFileHandler()
     {
-        super("n", "ext", RANGE_OPTIONAL | ARGUMENT_OPTIONAL | RANGE_IS_COUNT);
+        super("n", "ext", RANGE_OPTIONAL | ARGUMENT_OPTIONAL | RANGE_IS_COUNT | DONT_REOPEN);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd)

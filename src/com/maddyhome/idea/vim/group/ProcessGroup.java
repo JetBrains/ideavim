@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExException;
+import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.key.KeyParser;
@@ -160,8 +161,11 @@ public class ProcessGroup extends AbstractActionGroup
                     //editor.getContentComponent().requestFocus();
                     // Reopening the file was the only way I could solve the focus problem introduced in IDEA at
                     // version 1050.
-                    FileEditorManager.getInstance((Project)context.getData(DataConstants.PROJECT)).openFile(
-                        EditorData.getVirtualFile(editor), true);
+                    if ((flg & CommandParser.RES_DONT_REOPEN) == 0)
+                    {
+                        FileEditorManager.getInstance((Project)context.getData(DataConstants.PROJECT)).openFile(
+                            EditorData.getVirtualFile(editor), true);
+                    }
 
                     // If the result of the ex command is to display the "more" panel, show it here.
                     if ((flg & CommandParser.RES_MORE_PANEL) != 0)

@@ -36,7 +36,7 @@ public class SelectFirstFileHandler extends CommandHandler
         super(new CommandName[] {
             new CommandName("fir", "st"),
             new CommandName("rew", "ind")
-        } , ARGUMENT_OPTIONAL);
+        } , ARGUMENT_OPTIONAL | DONT_REOPEN);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd)

@@ -36,7 +36,7 @@ public class PreviousFileHandler extends CommandHandler
         super(new CommandName[] {
             new CommandName("N", "ext"),
             new CommandName("prev", "ious")
-        }, RANGE_OPTIONAL | ARGUMENT_OPTIONAL | RANGE_IS_COUNT);
+        }, RANGE_OPTIONAL | ARGUMENT_OPTIONAL | RANGE_IS_COUNT | DONT_REOPEN);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd)

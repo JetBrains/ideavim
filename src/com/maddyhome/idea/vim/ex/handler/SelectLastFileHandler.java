@@ -32,7 +32,7 @@ public class SelectLastFileHandler extends CommandHandler
 {
     public SelectLastFileHandler()
     {
-        super("la", "st", ARGUMENT_OPTIONAL);
+        super("la", "st", ARGUMENT_OPTIONAL | DONT_REOPEN);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd)

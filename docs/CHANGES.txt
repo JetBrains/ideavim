@@ -1,6 +1,12 @@
 History of changes for @NAME@ for IDEA @IDEA-VERSION@
 
-@VERSION@ from 0.7.3
+@VERSION@ from 0.8.0
+Bug Fixes
+- Fixed NullPointerException when using the :qall, :q, or :wq commands.
+- Fixed the :edit, :next, :previous, :argument, :first, and :last commands.
+  These were broken by the focus fix in 0.7.2.
+
+0.8.0 from 0.7.3
 New Features
 - Support for Pallada (IDEA 4.5)
 - Support for the hlsearch option and the :nohlsearch command. Now when a

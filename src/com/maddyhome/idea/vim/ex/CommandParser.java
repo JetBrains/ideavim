@@ -84,6 +84,7 @@ public class CommandParser
     public static final int RES_ERROR = 1;
     public static final int RES_READONLY = 1;
     public static final int RES_MORE_PANEL = 2;
+    public static final int RES_DONT_REOPEN = 4;
 
     /**
      * There is only one parser.
@@ -248,6 +249,11 @@ public class CommandParser
         if ((handler.getArgFlags() & CommandHandler.KEEP_FOCUS) != 0)
         {
             result |= RES_MORE_PANEL;
+        }
+
+        if ((handler.getArgFlags() & CommandHandler.DONT_REOPEN) != 0)
+        {
+            result |= RES_DONT_REOPEN;
         }
 
         return result;

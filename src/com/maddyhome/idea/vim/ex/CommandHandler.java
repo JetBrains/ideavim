@@ -46,12 +46,13 @@ public abstract class CommandHandler
     public static final int RANGE_IS_COUNT = 64;
     /** Indicates that the editor should not get focus back after the command */
     public static final int KEEP_FOCUS = 128;
+    public static final int DONT_REOPEN = 256;
 
     /** Indicates that this is a command that modifies the editor */
-    public static final int WRITABLE = 256;
+    public static final int WRITABLE = 512;
     /** Indicates that this command does not modify the editor */
-    public static final int READ_ONLY = 512;
-    public static final int DONT_SAVE_LAST = 1024;
+    public static final int READ_ONLY = 1024;
+    public static final int DONT_SAVE_LAST = 2048;
 
     /**
      * Create the handler

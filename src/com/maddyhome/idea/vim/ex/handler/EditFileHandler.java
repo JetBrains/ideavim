@@ -38,7 +38,7 @@ public class EditFileHandler extends CommandHandler
         super(new CommandName[] {
             new CommandName("bro", "wse"),
             new CommandName("e", "dit")
-        }, RANGE_FORBIDDEN | ARGUMENT_OPTIONAL);
+        }, RANGE_FORBIDDEN | ARGUMENT_OPTIONAL | DONT_REOPEN);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException
