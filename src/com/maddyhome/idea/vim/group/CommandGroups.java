@@ -54,6 +54,7 @@ public class CommandGroups
         register = new RegisterGroup();
         file = new FileGroup();
         search = new SearchGroup();
+        process = new ProcessGroup();
     }
 
     /**
@@ -120,6 +121,15 @@ public class CommandGroups
     }
 
     /**
+     * Returns the process group
+     * @return The process group
+     */
+    public ProcessGroup getProcess()
+    {
+        return process;
+    }
+
+    /**
      * Tells each group to save its data.
      * @param element The plugin's root element
      */
@@ -132,6 +142,7 @@ public class CommandGroups
         register.saveData(element);
         file.saveData(element);
         search.saveData(element);
+        process.saveData(element);
     }
 
     /**
@@ -148,6 +159,7 @@ public class CommandGroups
         register.readData(element);
         file.readData(element);
         search.readData(element);
+        process.readData(element);
     }
 
     private static CommandGroups instance;
@@ -158,6 +170,7 @@ public class CommandGroups
     private RegisterGroup register;
     private FileGroup file;
     private SearchGroup search;
+    private ProcessGroup process;
 
     private static Logger logger = Logger.getInstance(CommandGroups.class.getName());
 }
