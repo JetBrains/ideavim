@@ -757,6 +757,24 @@ public class ChangeGroup extends AbstractActionGroup
             return true;
         }
 
+        // This is a kludge for dw, dW, and d[w. They are changed to d$ if we are
+        // deleting the last word on a line. Without this kludge we end up deleting the newline too.
+        String text = new String(editor.getDocument().getChars(), range.getStartOffset(),
+            range.getEndOffset() - range.getStartOffset());
+        if (text.indexOf('\n') >= 0)
+        {
+            String id = ActionManager.getInstance().getId(argument.getMotion().getAction());
+            logger.debug("action id=" + id);
+            if (id.equals("VimMotionWordRight") || id.equals("VimMotionBigWordRight") || id.equals("VimMotionCamelRight"))
+            {
+                logger.debug("kludge delete to d$");
+                argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionLastColumn"));
+                argument.getMotion().setFlags(Command.FLAG_MOT_INCLUSIVE);
+
+                range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true, false);
+            }
+        }
+
         // Delete motion commands that are not linewise become linewise if all the following are true:
         // 1) The range is across multiple lines
         // 2) There is only whitespace before the start of the range
@@ -803,6 +821,15 @@ public class ChangeGroup extends AbstractActionGroup
             {
                 MotionGroup.moveCaret(editor, context,
                     CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeadingOffset(editor, -1));
+            }
+            else if (res)
+            {
+                VisualPosition vp = editor.getCaretModel().getVisualPosition();
+                int col = EditorHelper.normalizeVisualColumn(editor, vp.line, vp.column, false);
+                if (col != vp.column)
+                {
+                    editor.getCaretModel().moveToVisualPosition(new VisualPosition(vp.line, col));
+                }
             }
 
             return res;
@@ -972,12 +999,12 @@ public class ChangeGroup extends AbstractActionGroup
                 argument.getMotion().setFlags(Command.FLAG_MOT_INCLUSIVE);
             }
         }
-        else if (id.equals("VimMotionWORDRight"))
+        else if (id.equals("VimMotionBigWordRight"))
         {
             if (EditorHelper.getFileSize(editor) > 0 &&
                 !Character.isWhitespace(editor.getDocument().getChars()[editor.getCaretModel().getOffset()]))
             {
-                argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionWORDEndRight"));
+                argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionBigWordEndRight"));
                 argument.getMotion().setFlags(Command.FLAG_MOT_INCLUSIVE);
             }
         }
