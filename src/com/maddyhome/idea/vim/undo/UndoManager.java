@@ -22,9 +22,12 @@ package com.maddyhome.idea.vim.undo;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.DocumentAdapter;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
+import com.intellij.openapi.editor.event.EditorFactoryAdapter;
+import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import java.util.HashMap;
 
 /**
@@ -46,6 +49,8 @@ public class UndoManager
     {
         listener = new DocumentChangeListener();
         editors = new HashMap();
+
+        EditorFactory.getInstance().addEditorFactoryListener(new UndoEditorCloseListener());
     }
 
     public void beginCommand(Editor editor)
@@ -107,6 +112,11 @@ public class UndoManager
         return res;
     }
 
+    private void removeEditorUndoList(Editor editor)
+    {
+        editors.remove(editor.getDocument());
+    }
+
     private EditorUndoList getEditorUndoList(Editor editor)
     {
         EditorUndoList res = (EditorUndoList)editors.get(editor.getDocument());
@@ -124,6 +134,14 @@ public class UndoManager
         {
             EditorUndoList list = (EditorUndoList)editors.get(event.getDocument());
             list.addChange(new DocumentChange(event.getOffset(), event.getOldFragment(), event.getNewFragment()));
+        }
+    }
+
+    public static class UndoEditorCloseListener extends EditorFactoryAdapter
+    {
+        public void editorReleased(EditorFactoryEvent event)
+        {
+            UndoManager.getInstance().removeEditorUndoList(event.getEditor());
         }
     }
 
