@@ -84,7 +84,7 @@ public class MotionGroup extends AbstractActionGroup
                 editor.addEditorMouseListener(handler);
                 editor.addEditorMouseMotionListener(handler);
 
-                //editor.getSelectionModel().addSelectionListener(new EditorSelectionHandler());
+                editor.getSelectionModel().addSelectionListener(selectionHandler);
             }
         });
     }
@@ -1365,8 +1365,29 @@ public class MotionGroup extends AbstractActionGroup
     {
         public void selectionChanged(SelectionEvent selectionEvent)
         {
-            logger.debug("selection changed: " + selectionEvent.getOldRange() + " to " + selectionEvent.getNewRange());
+            if (makingChanges) return;
+
+            makingChanges = true;
+
+            Editor editor = selectionEvent.getEditor();
+            TextRange range = selectionEvent.getNewRange();
+
+            Editor[] editors = EditorFactory.getInstance().getEditors(editor.getDocument());
+            for (int i = 0; i < editors.length; i++)
+            {
+                if (editors[i].equals(editor))
+                {
+                    continue;
+                }
+
+                editors[i].getSelectionModel().setSelection(range.getStartOffset(), range.getEndOffset());
+                editors[i].getCaretModel().moveToOffset(editor.getCaretModel().getOffset());
+            }
+
+            makingChanges = false;
         }
+
+        private boolean makingChanges = false;
     }
 
     private static class EditorMouseHandler implements EditorMouseListener, EditorMouseMotionListener
@@ -1447,6 +1468,7 @@ public class MotionGroup extends AbstractActionGroup
     private int visualStart;
     private int visualEnd;
     private int visualOffset;
+    private EditorSelectionHandler selectionHandler = new EditorSelectionHandler();
 
     private static Logger logger = Logger.getInstance(MotionGroup.class.getName());
 }

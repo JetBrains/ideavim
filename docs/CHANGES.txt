@@ -21,6 +21,7 @@ New Features
 - Editors use block cursor for command mode and a vertical bar for
   insert/replace mode.
 - Better support for split view editing.
+- Text selection is reflected in all editors of a file.
 
 Bug Fixes
 - Under certain conditions, highlighting text left you in multiple layers of
@@ -35,6 +36,7 @@ Bug Fixes
 - Fixed some exceptions related to the undo manager.
 - Status was not always show proper mode.
 - r<Enter> now works as expected.
+- Toggling between insert and replace mode wasn't working properly.
 
 0.6.4 to 0.6.5
 
