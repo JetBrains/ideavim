@@ -55,6 +55,7 @@ public class CommandGroups
         file = new FileGroup();
         search = new SearchGroup();
         process = new ProcessGroup();
+        macro = new MacroGroup();
     }
 
     /**
@@ -130,6 +131,15 @@ public class CommandGroups
     }
 
     /**
+     * Returns the macro group
+     * @return The macro group
+     */
+    public MacroGroup getMacro()
+    {
+        return macro;
+    }
+
+    /**
      * Tells each group to save its data.
      * @param element The plugin's root element
      */
@@ -143,6 +153,7 @@ public class CommandGroups
         file.saveData(element);
         search.saveData(element);
         process.saveData(element);
+        macro.saveData(element);
     }
 
     /**
@@ -160,6 +171,7 @@ public class CommandGroups
         file.readData(element);
         search.readData(element);
         process.readData(element);
+        macro.readData(element);
     }
 
     private static CommandGroups instance;
@@ -171,6 +183,7 @@ public class CommandGroups
     private FileGroup file;
     private SearchGroup search;
     private ProcessGroup process;
+    private MacroGroup macro;
 
     private static Logger logger = Logger.getInstance(CommandGroups.class.getName());
 }
