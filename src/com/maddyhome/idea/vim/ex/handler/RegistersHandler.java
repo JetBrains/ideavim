@@ -58,7 +58,7 @@ public class RegistersHandler extends CommandHandler
             text.append(reg.getName());
 
             text.append("   ");
-            text.append(StringHelper.escape(reg.getText().trim()));
+            text.append(StringHelper.escape(reg.getText()).trim());
             text.append("\n");
         }
 
