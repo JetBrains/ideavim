@@ -241,7 +241,7 @@ public class SearchHelper
             return null;
         }
 
-        int end = findNextWordEnd(chars, start, stop, 1, false);
+        int end = findNextWordEnd(chars, start, stop, 1, false) + 1;
 
         return new TextRange(start, end);
     }
