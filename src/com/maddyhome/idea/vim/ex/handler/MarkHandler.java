@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.CommandGroups;
+import com.maddyhome.idea.vim.helper.EditorHelper;
 
 /**
  *
@@ -44,7 +45,7 @@ public class MarkHandler extends CommandHandler
     {
         char mark = cmd.getArgument().charAt(0);
         int line = cmd.getLine(editor, context);
-        int offset = editor.getDocument().getLineStartOffset(line);
+        int offset = EditorHelper.getLineStartOffset(editor, line);
 
         return CommandGroups.getInstance().getMark().setMark(editor, context, mark, offset);
     }

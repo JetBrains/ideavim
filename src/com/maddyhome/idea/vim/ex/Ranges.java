@@ -132,8 +132,8 @@ public class Ranges
     public TextRange getTextRange(Editor editor, DataContext context, int count)
     {
         LineRange lr = getLineRange(editor, context, count);
-        int start = editor.getDocument().getLineStartOffset(lr.getStartLine());
-        int end = editor.getDocument().getLineEndOffset(lr.getEndLine()) + 1;
+        int start = EditorHelper.getLineStartOffset(editor, lr.getStartLine());
+        int end = EditorHelper.getLineEndOffset(editor, lr.getEndLine()) + 1;
 
         return new TextRange(start, Math.min(end, EditorHelper.getFileSize(editor)));
     }

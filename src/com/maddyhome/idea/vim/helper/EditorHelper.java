@@ -111,14 +111,15 @@ public class EditorHelper
     }
 
     /**
-     * Gets the number of visible lines in the editor. This will less then the actuall number of lines in the file
+     * Gets the number of visible lines in the editor. This will less then the actual number of lines in the file
      * if there are any collapsed folds.
      * @param editor The editor
      * @return The number of visible lines in the file
      */
     public static int getVisualLineCount(Editor editor)
     {
-        return logicalLineToVisualLine(editor, getLineCount(editor));
+        int count = getLineCount(editor);
+        return count == 0 ? 0 : logicalLineToVisualLine(editor, count - 1) + 1;
     }
 
     /**
@@ -202,6 +203,50 @@ public class EditorHelper
     }
 
     /**
+     * Returns the offset of the start of the requested line.
+     * @param editor The editor
+     * @param lline The logical line to get the start offset for.
+     * @return 0 if line is &lt 0, file size of line is bigger than file, else the start offset for the line
+     */
+    public static int getLineStartOffset(Editor editor, int lline)
+    {
+        if (lline < 0)
+        {
+            return 0;
+        }
+        else if (lline >= getLineCount(editor))
+        {
+            return getFileSize(editor);
+        }
+        else
+        {
+            return editor.getDocument().getLineStartOffset(lline);
+        }
+    }
+
+    /**
+     * Returns the offset of the end of the requested line.
+     * @param editor The editor
+     * @param lline The logical line to get the end offset for.
+     * @return 0 if line is &lt 0, file size of line is bigger than file, else the end offset for the line
+     */
+    public static int getLineEndOffset(Editor editor, int lline)
+    {
+        if (lline < 0)
+        {
+            return 0;
+        }
+        else if (lline >= getLineCount(editor))
+        {
+            return getFileSize(editor);
+        }
+        else
+        {
+            return editor.getDocument().getLineEndOffset(lline);
+        }
+    }
+
+    /**
      * Ensures that the supplied visual line is within the range 0 (incl) and the number of visual lines in the file
      * (excl).
      * @param editor The editor
@@ -224,7 +269,7 @@ public class EditorHelper
      */
     public static int normalizeLine(Editor editor, int lline)
     {
-        lline = Math.min(Math.max(0, lline), getLineCount(editor) - 1);
+        lline = Math.max(0, Math.min(lline, getLineCount(editor) - 1));
 
         return lline;
     }
@@ -270,13 +315,13 @@ public class EditorHelper
      */
     public static int normalizeOffset(Editor editor, int lline, int offset, boolean allowEnd)
     {
-        if (lline == 0 && getFileSize(editor) == 0)
+        if (getFileSize(editor) == 0)
         {
             return 0;
         }
 
-        int min = editor.getDocument().getLineStartOffset(lline);
-        int max = editor.getDocument().getLineEndOffset(lline) - (allowEnd ? 0 : 1);
+        int min = getLineStartOffset(editor, lline);
+        int max = getLineEndOffset(editor, lline) - (allowEnd ? 0 : 1);
         offset = Math.max(Math.min(offset, max), min);
 
         return offset;

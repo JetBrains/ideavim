@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.group.RegisterGroup;
+import com.maddyhome.idea.vim.helper.EditorHelper;
 
 /**
  *
@@ -60,7 +61,7 @@ public class PutLinesHandler extends CommandHandler
             CommandGroups.getInstance().getRegister().selectRegister(RegisterGroup.REGISTER_DEFAULT);
         }
 
-        MotionGroup.moveCaret(editor, context, editor.getDocument().getLineStartOffset(line));
+        MotionGroup.moveCaret(editor, context, EditorHelper.getLineStartOffset(editor, line));
         if (before)
         {
             return CommandGroups.getInstance().getCopy().putTextBeforeCursor(editor, context, 1);

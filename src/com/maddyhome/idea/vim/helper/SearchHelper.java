@@ -38,7 +38,7 @@ public class SearchHelper
     {
         int res = -1;
         int line = EditorHelper.getCurrentLogicalLine(editor);
-        int end = editor.getDocument().getLineEndOffset(line);
+        int end = EditorHelper.getLineEndOffset(editor, line);
         char[] chars = editor.getDocument().getChars();
         int pos = editor.getCaretModel().getOffset();
         int loc = -1;
@@ -142,6 +142,11 @@ public class SearchHelper
             pos = skipSpace(chars, pos, step, size);
         }
         int res = pos;
+        if (pos < 0 || pos >= size)
+        {
+            return pos;
+        }
+
         int type = CharacterHelper.charType(chars[pos], skipPunc);
         pos += step;
         while (pos >= 0 && pos < size && found < Math.abs(count))
@@ -212,6 +217,10 @@ public class SearchHelper
             pos = skipSpace(chars, pos, step, size);
         }
         int res = pos;
+        if (pos < 0 || pos >= size)
+        {
+            return pos;
+        }
         int type = CharacterHelper.charType(chars[pos], skipPunc);
         pos += step;
         while (pos >= 0 && pos < size && found < Math.abs(count))
@@ -288,13 +297,13 @@ public class SearchHelper
     public static int findNextCharacterOnLine(Editor editor, int count, char ch)
     {
         int line = EditorHelper.getCurrentLogicalLine(editor);
-        int start = editor.getDocument().getLineStartOffset(line);
-        int end = editor.getDocument().getLineEndOffset(line);
+        int start = EditorHelper.getLineStartOffset(editor, line);
+        int end = EditorHelper.getLineEndOffset(editor, line);
         char[] chars = editor.getDocument().getChars();
         int found = 0;
         int step = count >= 0 ? 1 : -1;
         int pos = editor.getCaretModel().getOffset() + step;
-        while (pos >= start && pos < end)
+        while (pos >= start && pos < end && pos >= 0 && pos < chars.length)
         {
             if (chars[pos] == ch)
             {

@@ -393,6 +393,12 @@ public class MotionGroup extends AbstractActionGroup
      */
     public int moveCaretToNextWordEnd(Editor editor, int count, boolean skipPunc)
     {
+        if ((editor.getCaretModel().getOffset() == 0 && count < 0) ||
+            (editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0))
+        {
+            return -1;
+        }
+
         int pos = SearchHelper.findNextWordEnd(editor, count, skipPunc);
         if (pos == -1)
         {
@@ -707,12 +713,17 @@ public class MotionGroup extends AbstractActionGroup
 
     public int moveCaretToLineStartSkipLeading(Editor editor, int lline)
     {
-        int start = editor.getDocument().getLineStartOffset(lline);
-        int end = editor.getDocument().getLineEndOffset(lline);
+        int start = EditorHelper.getLineStartOffset(editor, lline);
+        int end = EditorHelper.getLineEndOffset(editor, lline);
         char[] chars = editor.getDocument().getChars();
         int pos = end;
         for (int offset = start; offset < end; offset++)
         {
+            if (offset >= chars.length)
+            {
+                break;
+            }
+
             if (!Character.isWhitespace(chars[offset]))
             {
                 pos = offset;
@@ -731,12 +742,17 @@ public class MotionGroup extends AbstractActionGroup
 
     public int moveCaretToLineEndSkipLeading(Editor editor, int lline)
     {
-        int start = editor.getDocument().getLineStartOffset(lline);
-        int end = editor.getDocument().getLineEndOffset(lline);
+        int start = EditorHelper.getLineStartOffset(editor, lline);
+        int end = EditorHelper.getLineEndOffset(editor, lline);
         char[] chars = editor.getDocument().getChars();
         int pos = start;
         for (int offset = end; offset > start; offset--)
         {
+            if (offset >= chars.length)
+            {
+                break;
+            }
+
             if (!Character.isWhitespace(chars[offset]))
             {
                 pos = offset;
@@ -749,7 +765,7 @@ public class MotionGroup extends AbstractActionGroup
 
     public int moveCaretToLineEnd(Editor editor, int lline)
     {
-        int offset = EditorHelper.normalizeOffset(editor, lline, editor.getDocument().getLineEndOffset(lline) - 1,
+        int offset = EditorHelper.normalizeOffset(editor, lline, EditorHelper.getLineEndOffset(editor, lline) - 1,
             false);
 
         return offset;
@@ -757,7 +773,7 @@ public class MotionGroup extends AbstractActionGroup
 
     public int moveCaretToLineEndAppend(Editor editor, int lline)
     {
-        return editor.getDocument().getLineEndOffset(lline);
+        return EditorHelper.getLineEndOffset(editor, lline);
     }
 
     public int moveCaretToLineEndAppend(Editor editor)
@@ -768,7 +784,7 @@ public class MotionGroup extends AbstractActionGroup
     public int moveCaretToLineEndAppendOffset(Editor editor, int cntForward)
     {
         int line = EditorHelper.normalizeVisualLine(editor, EditorHelper.getCurrentVisualLine(editor) + cntForward);
-        return editor.getDocument().getLineEndOffset(EditorHelper.visualLineToLogicalLine(editor, line));
+        return EditorHelper.getLineEndOffset(editor, EditorHelper.visualLineToLogicalLine(editor, line));
     }
 
     public int moveCaretToLineEndOffset(Editor editor, int cntForward)
@@ -790,7 +806,7 @@ public class MotionGroup extends AbstractActionGroup
             return EditorHelper.getFileSize(editor);
         }
 
-        int start = editor.getDocument().getLineStartOffset(lline);
+        int start = EditorHelper.getLineStartOffset(editor, lline);
         return start;
     }
 
@@ -873,25 +889,28 @@ public class MotionGroup extends AbstractActionGroup
 
         saveJumpLocation(editor, context);
         return moveCaretToLineStartSkipLeading(editor, EditorHelper.normalizeLine(
-            editor, (EditorHelper.getLineCount(editor) * count + 99) / 100) - 1);
+            editor, (EditorHelper.getLineCount(editor) * count + 99) / 100 - 1));
     }
 
     public int moveCaretGotoLineLast(Editor editor, DataContext context, int rawCount, int lline)
     {
         saveJumpLocation(editor, context);
-        return moveCaretToLineStartSkipLeading(editor, rawCount == 0 ? EditorHelper.getLineCount(editor) - 1 : lline);
+        return moveCaretToLineStartSkipLeading(editor, rawCount == 0 ?
+            EditorHelper.normalizeLine(editor, EditorHelper.getLineCount(editor) - 1) : lline);
     }
 
     public int moveCaretGotoLineLastEnd(Editor editor, DataContext context, int rawCount, int lline)
     {
         saveJumpLocation(editor, context);
-        return moveCaretToLineEnd(editor, rawCount == 0 ? EditorHelper.getLineCount(editor) - 1 : lline);
+        return moveCaretToLineEnd(editor, rawCount == 0 ?
+            EditorHelper.normalizeLine(editor, EditorHelper.getLineCount(editor) - 1) : lline);
     }
 
     public int moveCaretGotoLineLastEndAppend(Editor editor, DataContext context, int rawCount, int lline)
     {
         saveJumpLocation(editor, context);
-        return moveCaretToLineEndAppend(editor, rawCount == 0 ? EditorHelper.getLineCount(editor) - 1 : lline);
+        return moveCaretToLineEndAppend(editor, rawCount == 0 ?
+            EditorHelper.normalizeLine(editor, EditorHelper.getLineCount(editor) - 1) : lline);
     }
 
     public int moveCaretGotoLineFirst(Editor editor, DataContext context, int lline)
@@ -902,7 +921,7 @@ public class MotionGroup extends AbstractActionGroup
 
     public static void moveCaret(Editor editor, DataContext context, int offset)
     {
-        if (offset >= 0)
+        if (offset >= 0 && offset < editor.getDocument().getTextLength())
         {
             editor.getCaretModel().moveToOffset(offset);
             EditorData.setLastColumn(editor, editor.getCaretModel().getVisualPosition().column);
@@ -973,8 +992,8 @@ public class MotionGroup extends AbstractActionGroup
             if (start != end)
             {
                 int line = editor.offsetToLogicalPosition(start).line;
-                int lstart = editor.getDocument().getLineStartOffset(line);
-                int lend = editor.getDocument().getLineEndOffset(line);
+                int lstart = EditorHelper.getLineStartOffset(editor, line);
+                int lend = EditorHelper.getLineEndOffset(editor, line);
                 logger.debug("start=" + start + ", end=" + end + ", lstart=" + lstart + ", lend=" + lend);
                 if (lstart == start && lend + 1 == end)
                 {

@@ -32,6 +32,7 @@ import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.helper.EditorData;
+import com.maddyhome.idea.vim.helper.EditorHelper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -410,8 +411,8 @@ public class MarkGroup extends AbstractActionGroup
                 // If the deleted text begins before the mark and ends after the mark then it may be shifted or deleted
                 else if (delStart.line <= mark.getLogicalLine() && delEnd.line >= mark.getLogicalLine())
                 {
-                    int markLineStartOff = editor.getDocument().getLineStartOffset(mark.getLogicalLine());
-                    int markLineEndOff = editor.getDocument().getLineEndOffset(mark.getLogicalLine());
+                    int markLineStartOff = EditorHelper.getLineStartOffset(editor, mark.getLogicalLine());
+                    int markLineEndOff = EditorHelper.getLineEndOffset(editor, mark.getLogicalLine());
                     // If the marked line is completely within the deleted text, remove the mark
                     if (delStartOff <= markLineStartOff && delEndOff >= markLineEndOff)
                     {

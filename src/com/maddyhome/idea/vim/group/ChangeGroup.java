@@ -650,6 +650,10 @@ public class ChangeGroup extends AbstractActionGroup
     public boolean deleteMotion(Editor editor, DataContext context, int count, int rawCount, Argument argument)
     {
         TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, false);
+        if (range == null && EditorHelper.getFileSize(editor) == 0)
+        {
+            return true;
+        }
 
         return deleteRange(editor, context, range, argument.getMotion().getFlags());
     }
@@ -737,7 +741,7 @@ public class ChangeGroup extends AbstractActionGroup
         char[] chars = editor.getDocument().getChars();
         for (int i = range.getStartOffset(); i < range.getEndOffset(); i++)
         {
-            if ('\n' != chars[i])
+            if (i < chars.length && '\n' != chars[i])
             {
                 replaceText(editor, context, i, i + 1, Character.toString(ch));
             }
@@ -819,7 +823,8 @@ public class ChangeGroup extends AbstractActionGroup
         String id = ActionManager.getInstance().getId(argument.getMotion().getAction());
         if (id.equals("VimMotionWordRight"))
         {
-            if (!Character.isWhitespace(editor.getDocument().getChars()[editor.getCaretModel().getOffset()]))
+            if (EditorHelper.getFileSize(editor) > 0 &&
+                !Character.isWhitespace(editor.getDocument().getChars()[editor.getCaretModel().getOffset()]))
             {
                 argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionWordEndRight"));
                 argument.getMotion().setFlags(MotionGroup.INCLUSIVE);
@@ -827,7 +832,8 @@ public class ChangeGroup extends AbstractActionGroup
         }
         else if (id.equals("VimMotionWORDRight"))
         {
-            if (!Character.isWhitespace(editor.getDocument().getChars()[editor.getCaretModel().getOffset()]))
+            if (EditorHelper.getFileSize(editor) > 0 &&
+                !Character.isWhitespace(editor.getDocument().getChars()[editor.getCaretModel().getOffset()]))
             {
                 argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionWORDEndRight"));
                 argument.getMotion().setFlags(MotionGroup.INCLUSIVE);
@@ -962,6 +968,11 @@ public class ChangeGroup extends AbstractActionGroup
         char[] chars = editor.getDocument().getChars();
         for (int i = start; i < end; i++)
         {
+            if (i >= chars.length)
+            {
+                break;
+            }
+
             char ch = CharacterHelper.changeCase(chars[i], type);
             if (ch != chars[i])
             {
@@ -1022,7 +1033,7 @@ public class ChangeGroup extends AbstractActionGroup
 
         for (int l = sline; l <= eline; l++)
         {
-            int soff = editor.getDocument().getLineStartOffset(l);
+            int soff = EditorHelper.getLineStartOffset(editor, l);
             int woff = CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor, l);
             int col = editor.offsetToVisualPosition(woff).column;
             int newCol = Math.max(0, col + dir * tabSize * count);
