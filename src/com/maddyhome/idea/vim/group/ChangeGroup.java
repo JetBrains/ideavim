@@ -165,6 +165,11 @@ public class ChangeGroup extends AbstractActionGroup
         KeyHandler.executeAction("VimEditorEnter", context);
     }
 
+    /**
+     * Begin insert at the location of the previous insert
+     * @param editor The editor to insert into
+     * @param context The data context
+     */
     public void insertAtPreviousInsert(Editor editor, DataContext context)
     {
         int offset = CommandGroups.getInstance().getMotion().moveCaretToFileMarkLine(editor, context, '^');
@@ -176,22 +181,39 @@ public class ChangeGroup extends AbstractActionGroup
         insertBeforeCursor(editor, context);
     }
 
+    /**
+     * Inserts the previously inserted text
+     * @param editor The editor to insert into
+     * @param context The data context
+     * @param exit true if insert mode should be exited after the insert, false should stay in insert mode
+     */
     public void insertPreviousInsert(Editor editor, DataContext context, boolean exit)
     {
         repeatInsertText(editor, context, 1);
-        //strokes.addAll(lastStrokes);
         if (exit)
         {
             processEscape(editor, context);
         }
     }
 
+    /**
+     * Exits insert mode and brings up the help system
+     * @param editor The editor to exit insert mode in
+     * @param context The data context
+     */
     public void insertHelp(Editor editor, DataContext context)
     {
         processEscape(editor, context);
         KeyHandler.executeAction("HelpTopics", context);
     }
 
+    /**
+     * Inserts the contents of the specified register
+     * @param editor The editor to insert the text into
+     * @param context The data context
+     * @param key The register name
+     * @return true if able to insert the register contents, false if not
+     */
     public boolean insertRegister(Editor editor, DataContext context, char key)
     {
         Register register = CommandGroups.getInstance().getRegister().getRegister(key);
@@ -209,6 +231,13 @@ public class ChangeGroup extends AbstractActionGroup
         return false;
     }
 
+    /**
+     * Inserts the character above/below the cursor at the cursor location
+     * @param editor The editor to insert into
+     * @param context The data context
+     * @param dir 1 for getting from line below cursor, -1 for getting from line aboe cursor
+     * @return true if able to get the character and insert it, false if not
+     */
     public boolean insertCharacterAroundCursor(Editor editor, DataContext context, int dir)
     {
         boolean res = false;
@@ -227,6 +256,13 @@ public class ChangeGroup extends AbstractActionGroup
         return res;
     }
 
+    /**
+     * If the cursor is currently after the start of the current insert this deletes all the newly inserted text.
+     * Otherwise it deletes all text from the cursor back to the first non-blank in the line.
+     * @param editor The editor to delete the text from
+     * @param context The data context
+     * @return true if able to delete the text, false if not
+     */
     public boolean insertDeleteInsertedText(Editor editor, DataContext context)
     {
         int deleteTo = insertStart;
@@ -246,6 +282,12 @@ public class ChangeGroup extends AbstractActionGroup
         return false;
     }
 
+    /**
+     * Deletes the text from the cursor to the start of the previous word
+     * @param editor The editor to delete the text from
+     * @param context The data context
+     * @return true if able to delete text, false if not
+     */
     public boolean insertDeletePreviousWord(Editor editor, DataContext context)
     {
         int deleteTo = insertStart;
@@ -258,7 +300,7 @@ public class ChangeGroup extends AbstractActionGroup
         if (deleteTo != -1)
         {
             deleteRange(editor, context, new TextRange(deleteTo, offset), Command.FLAG_MOT_EXCLUSIVE);
-            
+
             return true;
         }
 
@@ -305,13 +347,11 @@ public class ChangeGroup extends AbstractActionGroup
             lastInsert = state.getCommand();
             strokes.clear();
             inInsert = true;
-            VimPlugin.showMode("INSERT");
             if (mode == CommandState.MODE_REPLACE)
             {
                 processInsert(editor, context);
             }
-            state.setMode(mode);
-            state.setMappingMode(KeyParser.MAPPING_INSERT);
+            state.pushState(mode, 0, KeyParser.MAPPING_INSERT);
         }
     }
 
@@ -362,7 +402,6 @@ public class ChangeGroup extends AbstractActionGroup
      */
     public void processEscape(Editor editor, DataContext context)
     {
-        // TODO - register '.' needs to get text of insert
         logger.debug("processing escape");
         int cnt = lastInsert.getCount();
         // Turn off overwrite mode if we were in replace mode
@@ -379,15 +418,17 @@ public class ChangeGroup extends AbstractActionGroup
         // Save off current list of keystrokes
         lastStrokes = new ArrayList(strokes);
 
+        // TODO - support . register
+        //CommandGroups.getInstance().getRegister().storeKeys(lastStrokes, Command.FLAG_MOT_CHARACTERWISE, '.');
+
         // If the insert/replace command was preceded by a count, repeat again N - 1 times
         repeatInsert(editor, context, cnt - 1);
+
         CommandGroups.getInstance().getMark().setMark(editor, context, '^', editor.getCaretModel().getOffset());
         CommandGroups.getInstance().getMark().setMark(editor, context, ']', editor.getCaretModel().getOffset());
-        CommandState.getInstance().reset();
+        CommandState.getInstance().popState();
         UndoManager.getInstance().endCommand(editor);
         UndoManager.getInstance().beginCommand(editor);
-        
-        VimPlugin.showMode("");
     }
 
     /**
@@ -420,14 +461,6 @@ public class ChangeGroup extends AbstractActionGroup
         KeyHandler.executeAction("VimEditorToggleInsertState", context);
         CommandState.getInstance().toggleInsertOverwrite();
         inInsert = !inInsert;
-        if (inInsert)
-        {
-            VimPlugin.showMode("INSERT");
-        }
-        else
-        {
-            VimPlugin.showMode("REPLACE");
-        }
     }
 
     /**
@@ -438,7 +471,8 @@ public class ChangeGroup extends AbstractActionGroup
      */
     public void processSingleCommand(Editor editor, DataContext context)
     {
-        CommandState.getInstance().saveMode();
+        CommandState.getInstance().pushState(CommandState.MODE_COMMAND, CommandState.SUBMODE_SINGLE_COMMAND,
+            KeyParser.MAPPING_NORMAL);
         clearStrokes(editor);
     }
 
@@ -494,6 +528,10 @@ public class ChangeGroup extends AbstractActionGroup
         }
     }
 
+    /**
+     * Clears all the keystrokes from the current insert command
+     * @param editor
+     */
     private void clearStrokes(Editor editor)
     {
         strokes.clear();
@@ -1142,9 +1180,6 @@ public class ChangeGroup extends AbstractActionGroup
         CommandGroups.getInstance().getMark().setMark(editor, context, '.', start);
         //CommandGroups.getInstance().getMark().setMark(editor, context, '[', start);
         //CommandGroups.getInstance().getMark().setMark(editor, context, ']', start + str.length());
-
-        //CommandGroups.getInstance().getRegister().storeTextInternal(editor, context, start, start + str.length(), str, MotionGroup.FLAG_MOT_CHARACTERWISE, '.', false, false);
-        //runWriteCommand(new InsertText(editor, context, start, str));
     }
 
     /**
@@ -1176,7 +1211,6 @@ public class ChangeGroup extends AbstractActionGroup
             CommandGroups.getInstance().getMark().setMark(editor, context, '.', start);
             CommandGroups.getInstance().getMark().setMark(editor, context, '[', start);
             CommandGroups.getInstance().getMark().setMark(editor, context, ']', start);
-            //runWriteCommand(new DeleteText(editor, context, start, end));
 
             return true;
         }
@@ -1199,96 +1233,7 @@ public class ChangeGroup extends AbstractActionGroup
         CommandGroups.getInstance().getMark().setMark(editor, context, '[', start);
         CommandGroups.getInstance().getMark().setMark(editor, context, ']', start + str.length());
         CommandGroups.getInstance().getMark().setMark(editor, context, '.', start + str.length());
-        //runWriteCommand(new ReplaceText(editor, context, start, end, str));
     }
-
-    /*
-    public static void runWriteCommand(Runnable cmd)
-    {
-        CommandProcessor.getInstance().executeCommand(new WriteAction(cmd), "Foo", "Bar");
-    }
-
-    static class WriteAction implements Runnable
-    {
-        WriteAction(Runnable cmd)
-        {
-            this.cmd = cmd;
-        }
-
-        public void run()
-        {
-            ApplicationManager.getApplication().runWriteAction(cmd);
-        }
-
-        Runnable cmd;
-    }
-
-    static class InsertText implements Runnable
-    {
-        InsertText(Editor editor, DataContext context, int start, String str)
-        {
-            this.editor = editor;
-            this.context = context;
-            this.start = start;
-            this.str = str;
-        }
-
-        public void run()
-        {
-            editor.getDocument().insertString(start, str);
-            editor.getCaretModel().moveToOffset(start + str.length());
-        }
-
-        Editor editor;
-        DataContext context;
-        int start;
-        String str;
-    }
-
-    static class DeleteText implements Runnable
-    {
-        DeleteText(Editor editor, DataContext context, int start, int end)
-        {
-            this.editor = editor;
-            this.context = context;
-            this.start = start;
-            this.end = end;
-        }
-
-        public void run()
-        {
-            editor.getDocument().deleteString(start, end);
-        }
-
-        Editor editor;
-        DataContext context;
-        int start;
-        int end;
-    }
-
-    static class ReplaceText implements Runnable
-    {
-        ReplaceText(Editor editor, DataContext context, int start, int end, String str)
-        {
-            this.editor = editor;
-            this.context = context;
-            this.start = start;
-            this.end = end;
-            this.str = str;
-        }
-
-        public void run()
-        {
-            editor.getDocument().replaceString(start, end, str);
-        }
-
-        Editor editor;
-        DataContext context;
-        int start;
-        int end;
-        String str;
-    }
-    */
 
     /**
      * This class listens for editor tab changes so any insert/replace modes that need to be reset can be
@@ -1306,14 +1251,8 @@ public class ChangeGroup extends AbstractActionGroup
 
             logger.debug("selected file changed");
 
-            if (CommandState.getInstance().getMode() == CommandState.MODE_INSERT ||
-                CommandState.getInstance().getMode() == CommandState.MODE_REPLACE)
-            {
-                // NOTE - is there a way to get the DataContext at this point?
-                CommandGroups.getInstance().getChange().processEscape(EditorHelper.getEditor(event.getManager(), event.getOldFile()), null);
-            }
-            
-            VimPlugin.showMode("");
+            CommandState.getInstance().reset();
+            KeyHandler.getInstance().fullReset();
         }
     }
 
