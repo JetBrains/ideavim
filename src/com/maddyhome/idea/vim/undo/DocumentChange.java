@@ -1,6 +1,7 @@
 package com.maddyhome.idea.vim.undo;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 
 /*
@@ -77,6 +78,7 @@ public class DocumentChange
 
     public void undo(Editor editor, DataContext context)
     {
+        logger.debug("undo command = " + this);
         if (oldText.length() > 0)
         {
             if (newText.length() > 0)
@@ -116,4 +118,6 @@ public class DocumentChange
     private int offset;
     private String oldText;
     private String newText;
+
+    private static Logger logger = Logger.getInstance(DocumentChange.class.getName());
 }
