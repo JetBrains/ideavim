@@ -347,6 +347,11 @@ public class EditorHelper
      */
     public static Editor getEditor(FileEditorManager manager, VirtualFile file)
     {
+        if (file == null)
+        {
+            return null;
+        }
+        
         FileEditor[] editors = manager.getEditors(file);
         if (editors.length > 0 && editors[0] instanceof TextEditor)
         {
