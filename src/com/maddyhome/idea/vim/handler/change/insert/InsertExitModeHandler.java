@@ -33,6 +33,5 @@ public class InsertExitModeHandler extends EditorActionHandler
     public void execute(Editor editor, DataContext context)
     {
         CommandGroups.getInstance().getChange().processEscape(editor, context);
-        UndoManager.getInstance().endCommand(editor);
     }
 }
