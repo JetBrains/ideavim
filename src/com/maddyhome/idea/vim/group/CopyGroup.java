@@ -123,7 +123,6 @@ public class CopyGroup extends AbstractActionGroup
                 pos = editor.getCaretModel().getOffset();
             }
 
-            // TODO - update when register stores Character and AnAction
             putText(editor, context, pos, reg.getText(), reg.getType(), count, indent);
 
             return true;
@@ -161,7 +160,6 @@ public class CopyGroup extends AbstractActionGroup
                 pos = editor.getCaretModel().getOffset() + 1;
             }
 
-            // TODO - update when register stores Character and AnAction
             putText(editor, context, pos, reg.getText(), reg.getType(), count, indent);
 
             return true;
@@ -195,7 +193,6 @@ public class CopyGroup extends AbstractActionGroup
                 pos = end;
             }
 
-            // TODO - update when register stores Character and AnAction
             putText(editor, context, pos, reg.getText(), reg.getType(), count, true);
 
             MotionGroup.moveCaret(editor, context, start);

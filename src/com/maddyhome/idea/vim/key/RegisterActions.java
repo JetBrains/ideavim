@@ -414,7 +414,8 @@ public class RegisterActions
         // Macro Actions
         // TODO - add @
         // TODO - add @@
-        // TODO - add q
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimToggleRecording", Command.OTHER_READONLY, Command.FLAG_NO_ARG_RECORDING,
+            new Shortcut('q'), Argument.CHARACTER);
         // TODO - support for :map macros
 
         // ************************* Normal, Operator Pending, Visual Mode Actions *************************

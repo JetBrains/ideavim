@@ -188,6 +188,9 @@
         <action id="VimSearchWordBackward" class="com.maddyhome.idea.vim.action.motion.search.SearchWordBackwardAction" text="Search Again"/>
         <action id="VimGotoDeclaration" class="com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction" text="Goto Declaration"/>
 
+        <!-- Macro -->
+        <action id="VimToggleRecording" class="com.maddyhome.idea.vim.action.macro.ToggleRecordingAction" text="Record Keystrokes"/>
+
         <!-- Other -->
         <action id="VimLastSearchReplace" class="com.maddyhome.idea.vim.action.change.change.ChangeLastSearchReplaceAction" text="Repeat Last :s"/>
         <action id="VimLastGlobalSearchReplace" class="com.maddyhome.idea.vim.action.change.change.ChangeLastGlobalSearchReplaceAction" text="Repeat Last :s"/>

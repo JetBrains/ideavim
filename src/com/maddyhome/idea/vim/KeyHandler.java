@@ -171,6 +171,14 @@ public class KeyHandler
                 // Flag that we aren't allowing any more count digits
                 mode = STATE_COMMAND;
                 currentNode = (BranchNode)node;
+                if (CommandState.getInstance().isRecording())
+                {
+                    ArgumentNode arg = (ArgumentNode)((BranchNode)currentNode).getArgumentNode();
+                    if (arg != null && (arg.getFlags() & Command.FLAG_NO_ARG_RECORDING) != 0)
+                    {
+                        handleKey(editor, KeyStroke.getKeyStroke(' '), context);
+                    }
+                }
             }
             // If this is a command node the user has entered a valid key sequence of a know command
             else if (node instanceof CommandNode)
@@ -312,7 +320,7 @@ public class KeyHandler
             }
             else
             {
-                Runnable action = new ActionRunner(editor, context, cmd);
+                Runnable action = new ActionRunner(editor, context, cmd, key);
                 if (Command.isReadOnlyType(cmd.getType()))
                 {
                     RunnableHelper.runReadCommand(action);
@@ -328,6 +336,10 @@ public class KeyHandler
         {
             VimPlugin.indicateError();
             fullReset();
+        }
+        else if (CommandState.getInstance().isRecording())
+        {
+            CommandGroups.getInstance().getRegister().addKeyStroke(key);
         }
     }
 
@@ -408,11 +420,12 @@ public class KeyHandler
      */
     static class ActionRunner implements Runnable
     {
-        public ActionRunner(Editor editor, DataContext context, Command cmd)
+        public ActionRunner(Editor editor, DataContext context, Command cmd, KeyStroke key)
         {
             this.editor = editor;
             this.context = context;
             this.cmd = cmd;
+            this.key = key;
         }
 
         public void run()
@@ -446,11 +459,17 @@ public class KeyHandler
             {
                 CommandState.getInstance().restoreMode();
             }
+
+            if (CommandState.getInstance().isRecording())
+            {
+                CommandGroups.getInstance().getRegister().addKeyStroke(key);
+            }
         }
 
         private Editor editor;
         private DataContext context;
         private Command cmd;
+        private KeyStroke key;
     }
 
     private int count;

@@ -48,6 +48,7 @@ import com.maddyhome.idea.vim.key.RegisterActions;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.MorePanel;
 import com.maddyhome.idea.vim.ui.VimToolWindow;
+import com.maddyhome.idea.vim.command.CommandState;
 import java.awt.Toolkit;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -245,7 +246,14 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
     {
         if (msg.length() == 0 || Options.getInstance().isSet("showmode"))
         {
-            showMessage(msg);
+            if (CommandState.getInstance().isRecording())
+            {
+                showMessage(msg + (msg.length() > 0 ? " - " : "") + "recording");
+            }
+            else
+            {
+                showMessage(msg);
+            }
         }
     }
 

@@ -293,6 +293,9 @@ tag             char          note action in Normal mode        ~
                                    insert text, repeat N times
 |p|             ["x]p           2  put the text [from register x] after the
                                    cursor N times
+|q|             q{0-9a-zA-Z"}      record typed characters into named register
+                                   {0-9a-zA-Z"} (uppercase to append)
+|q|             q                  (while recording) stops recording
 |r|             r{char}         2  replace N chars with {char}
 |s|             ["x]s           2  (substitute) delete N characters [into
                                    buffer x] and start insert
@@ -360,9 +363,6 @@ tag             char            action  ~
 |`)|            `)              1  cursor to the end of the current sentence
 |`{|            `{              1  cursor to the start of the current paragraph
 |`}|            `}              1  cursor to the end of the current paragraph
-|q|             q{0-9a-zA-Z"}      record typed characters into named register
-                                   {0-9a-zA-Z"} (uppercase to append)
-|q|             q                  (while recording) stops recording
 |{|             {               1  cursor N paragraphs backward
 |}|             }               1  cursor N paragraphs forward
 

@@ -8,6 +8,9 @@ New Features
   VIM.
 - Various error messages are now displayed in the new status bar.
 
+New Commands
+- Added support for q{register} command - macro recording.
+
 New :set Options
 - showmode is now supported.
 

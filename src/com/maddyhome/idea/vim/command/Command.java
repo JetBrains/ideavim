@@ -55,6 +55,8 @@ public class Command
     public static final int FLAG_MULTIKEY_UNDO = 1 << 25;
     /** This command should be followed by another command */
     public static final int FLAG_EXPECT_MORE = 1 << 26;
+    /** This flag indicates the command's argument isn't used while recording */
+    public static final int FLAG_NO_ARG_RECORDING = 1 << 27;
 
     /** Represents commands that actually move the cursor and can be arguments to operators */
     public static final int MOTION = 1;

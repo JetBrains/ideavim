@@ -203,6 +203,16 @@ public class CommandState
         lastRegister = CommandGroups.getInstance().getRegister().getCurrentRegister();
     }
 
+    public boolean isRecording()
+    {
+        return isRecording;
+    }
+
+    public void setRecording(boolean val)
+    {
+        isRecording = val;
+    }
+    
     /**
      * Signleton, no public object creation
      */
@@ -219,6 +229,7 @@ public class CommandState
     private int mappingMode = KeyParser.MAPPING_NORMAL;
     private int oldMapping = KeyParser.MAPPING_NORMAL;
     private int visualType = 0;
+    private boolean isRecording = false;
 
     private static CommandState ourInstance;
 }

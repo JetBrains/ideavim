@@ -1,5 +1,11 @@
 package com.maddyhome.idea.vim.helper;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.awt.event.KeyEvent;
+import java.awt.Toolkit;
+import javax.swing.KeyStroke;
+
 /*
 * IdeaVim - A Vim emulator plugin for IntelliJ Idea
 * Copyright (C) 2003 Rick Maddy
@@ -50,6 +56,79 @@ public class StringHelper
         }
 
         return res.toString();
+    }
+
+    public static List stringToKeys(String str)
+    {
+        ArrayList res = new ArrayList();
+        for (int i = 0; i < str.length(); i++)
+        {
+            res.add(KeyStroke.getKeyStroke(str.charAt(i)));
+        }
+
+        return res;
+    }
+
+    public static String keysToString(List keys)
+    {
+        StringBuffer res = new StringBuffer();
+        for (int i = 0; i < keys.size(); i++)
+        {
+            KeyStroke key = (KeyStroke)keys.get(i);
+            if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED)
+            {
+                res.append(key.getKeyChar());
+            }
+            else
+            {
+                switch (key.getKeyCode())
+                {
+                    case KeyEvent.VK_TAB:
+                        res.append("\t");
+                        break;
+                    case KeyEvent.VK_ENTER:
+                        res.append("\n");
+                        break;
+                    case KeyEvent.VK_BACK_SPACE:
+                        res.append("\b");
+                        break;
+                    default:
+                        res.append('<');
+                        res.append(getModifiersText(key.getModifiers()));
+                        res.append(KeyEvent.getKeyText(key.getKeyCode()));
+                        res.append('>');
+                }
+            }
+        }
+
+        return res.toString();
+    }
+
+    public static String getModifiersText(int modifiers)
+    {
+        StringBuffer buf = new StringBuffer();
+        if ((modifiers & KeyEvent.META_MASK) != 0)
+        {
+            buf.append("M-");
+        }
+        if ((modifiers & KeyEvent.CTRL_MASK) != 0)
+        {
+            buf.append("C-");
+        }
+        if ((modifiers & KeyEvent.ALT_MASK) != 0)
+        {
+            buf.append("A-");
+        }
+        if ((modifiers & KeyEvent.SHIFT_MASK) != 0)
+        {
+            buf.append("S-");
+        }
+        if ((modifiers & KeyEvent.ALT_GRAPH_MASK) != 0)
+        {
+            buf.append("G-");
+        }
+
+        return buf.toString();
     }
 
     public static boolean containsUpperCase(String text)

@@ -1,6 +1,8 @@
 package com.maddyhome.idea.vim.common;
 
 import java.util.Comparator;
+import java.util.List;
+import com.maddyhome.idea.vim.helper.StringHelper;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
@@ -23,7 +25,6 @@ import java.util.Comparator;
 
 /**
  * Represents a register.
- * TODO - need to support mixed array of Character and AnAction.
  */
 public class Register
 {
@@ -32,20 +33,29 @@ public class Register
      * @param type The register type (linewise or characterwise)
      * @param text The text to store
      */
-    public Register(char key, int type, String text)
+    public Register(char name, int type, String text)
     {
-        this.key = key;
+        this.name = name;
         this.type = type;
         this.text = text;
+        this.keys = null;
+    }
+
+    public Register(char name, int type, List keys)
+    {
+        this.name = name;
+        this.type = type;
+        this.text = null;
+        this.keys = keys;
     }
 
     /**
-     * Gets the key the register is assigned to
-     * @return The register key
+     * Gets the name the register is assigned to
+     * @return The register name
      */
-    public char getKey()
+    public char getName()
     {
-        return key;
+        return name;
     }
 
     /**
@@ -63,7 +73,25 @@ public class Register
      */
     public String getText()
     {
+        if (text == null && keys != null)
+        {
+            return StringHelper.keysToString(keys);
+        }
         return text;
+    }
+
+    /**
+     * Get the sequence of keys in the register
+     * @return The register keys
+     */
+    public List getKeys()
+    {
+        if (keys == null && text != null)
+        {
+            return StringHelper.stringToKeys(text);
+        }
+
+        return keys;
     }
 
     /**
@@ -72,7 +100,44 @@ public class Register
      */
     public void addText(String text)
     {
-        this.text = this.text + text;
+        if (this.text != null)
+        {
+            this.text = this.text + text;
+        }
+        else if (this.keys != null)
+        {
+            addKeys(StringHelper.stringToKeys(text));
+        }
+        else
+        {
+            this.text = text;
+        }
+    }
+
+    public void addKeys(List keys)
+    {
+        if (this.keys != null)
+        {
+            this.keys.addAll(keys);
+        }
+        else if (this.text != null)
+        {
+            this.text = this.text + StringHelper.keysToString(keys);
+        }
+        else
+        {
+            this.keys = keys;
+        }
+    }
+
+    public boolean isText()
+    {
+        return text != null;
+    }
+
+    public boolean isKeys()
+    {
+        return keys != null;
     }
 
     public static class KeySorter implements Comparator
@@ -81,11 +146,11 @@ public class Register
         {
             Register a = (Register)o1;
             Register b = (Register)o2;
-            if (a.key < b.key)
+            if (a.name < b.name)
             {
                 return -1;
             }
-            else if (a.key > b.key)
+            else if (a.name > b.name)
             {
                 return 1;
             }
@@ -96,7 +161,8 @@ public class Register
         }
     }
 
-    private char key;
+    private char name;
     private int type;
     private String text;
+    private List keys;
 }

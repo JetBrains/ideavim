@@ -55,7 +55,7 @@ public class RegistersHandler extends CommandHandler
         {
             Register reg = (Register)iterator.next();
             text.append("\"");
-            text.append(reg.getKey());
+            text.append(reg.getName());
 
             text.append("   ");
             text.append(StringHelper.escape(reg.getText().trim()));

@@ -56,6 +56,11 @@ public class BranchNode extends ParentNode
         return res;
     }
 
+    public Node getArgumentNode()
+    {
+        return (Node)children.get(ARGUMENT);
+    }
+
     /**
      * The key this node is associated with
      * @return The node's keystroke

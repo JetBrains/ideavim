@@ -23,20 +23,23 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.ui.ClipboardHandler;
+import com.maddyhome.idea.vim.VimPlugin;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.awt.event.KeyEvent;
 import org.jdom.CDATA;
 import org.jdom.Element;
+import javax.swing.KeyStroke;
 
 /**
  * This group works with command associated with copying and pasting text
- * TODO - support registers with Character and AnAction
  */
 public class RegisterGroup extends AbstractActionGroup
 {
@@ -243,6 +246,56 @@ public class RegisterGroup extends AbstractActionGroup
         return res;
     }
 
+    public boolean startRecording(char register)
+    {
+        if (RECORDABLE_REGISTER.indexOf(register) != -1)
+        {
+            CommandState.getInstance().setRecording(true);
+            VimPlugin.showMessage("Recording");
+            recordRegister = register;
+            recordList = new ArrayList();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public void addKeyStroke(KeyStroke key)
+    {
+        if (recordRegister != 0)
+        {
+            recordList.add(key);
+        }
+    }
+
+    public void finishRecording()
+    {
+        if (recordRegister != 0)
+        {
+            Register reg = null;
+            if (Character.isUpperCase(recordRegister))
+            {
+                reg = getRegister(recordRegister);
+            }
+
+            if (reg == null)
+            {
+                reg = new Register(Character.toLowerCase(recordRegister), Command.FLAG_MOT_CHARACTERWISE, recordList);
+                registers.put(new Character(Character.toLowerCase(recordRegister)), reg);
+            }
+            else
+            {
+                reg.addKeys(recordList);
+            }
+            CommandState.getInstance().setRecording(false);
+            VimPlugin.showMessage("");
+        }
+
+        recordRegister = 0;
+    }
+
     /**
      * Save all the registers
      * @param element The plugin's root XML element that this group can add a child to
@@ -258,10 +311,28 @@ public class RegisterGroup extends AbstractActionGroup
             Element reg = new Element("register");
             reg.setAttribute("name", String.valueOf(key));
             reg.setAttribute("type", Integer.toString(register.getType()));
-            Element text = new Element("text");
-            CDATA data = new CDATA(register.getText());
-            text.addContent(data);
-            reg.addContent(text);
+            if (register.isText())
+            {
+                Element text = new Element("text");
+                CDATA data = new CDATA(register.getText());
+                text.addContent(data);
+                reg.addContent(text);
+            }
+            else
+            {
+                Element keys = new Element("keys");
+                List list = register.getKeys();
+                for (int i = 0; i < list.size(); i++)
+                {
+                    KeyStroke stroke = (KeyStroke)list.get(i);
+                    Element k = new Element("key");
+                    k.setAttribute("char", Integer.toString(stroke.getKeyChar()));
+                    k.setAttribute("code", Integer.toString(stroke.getKeyCode()));
+                    k.setAttribute("mods", Integer.toString(stroke.getModifiers()));
+                    keys.addContent(k);
+                }
+                reg.addContent(keys);
+            }
             regs.addContent(reg);
         }
 
@@ -283,8 +354,34 @@ public class RegisterGroup extends AbstractActionGroup
             {
                 Element reg = (Element)list.get(i);
                 Character key = new Character(reg.getAttributeValue("name").charAt(0));
-                Register register = new Register(key.charValue(), Integer.parseInt(reg.getAttributeValue("type")),
-                    reg.getChildText("text"));
+                Register register = null;
+                if (reg.getChild("text") != null)
+                {
+                    register = new Register(key.charValue(), Integer.parseInt(reg.getAttributeValue("type")),
+                        reg.getChildText("text"));
+                }
+                else
+                {
+                    Element keys = reg.getChild("keys");
+                    List klist = keys.getChildren("key");
+                    List strokes = new ArrayList();
+                    for (int j = 0; j < klist.size(); j++)
+                    {
+                        Element kelem = (Element)klist.get(j);
+                        int code = Integer.parseInt(kelem.getAttributeValue("code"));
+                        int mods = Integer.parseInt(kelem.getAttributeValue("mods"));
+                        char ch = (char)Integer.parseInt(kelem.getAttributeValue("char"));
+                        if (ch == KeyEvent.CHAR_UNDEFINED)
+                        {
+                            strokes.add(KeyStroke.getKeyStroke(code, mods));
+                        }
+                        else
+                        {
+                            strokes.add(KeyStroke.getKeyStroke(new Character(ch), mods));
+                        }
+                    }
+                    register = new Register(key.charValue(), Integer.parseInt(reg.getAttributeValue("type")), strokes);
+                }
                 registers.put(key, register);
             }
         }
@@ -292,9 +389,12 @@ public class RegisterGroup extends AbstractActionGroup
 
     private char lastRegister = REGISTER_DEFAULT;
     private HashMap registers = new HashMap();
+    private char recordRegister = 0;
+    private List recordList = null;
 
     private static final String WRITABLE_REGISTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-*+_/\"";
     private static final String READONLY_REGISTERS = ":.%#=/";
+    private static final String RECORDABLE_REGISTER = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final String VALID_REGISTERS = WRITABLE_REGISTERS + READONLY_REGISTERS;
 
     private static Logger logger = Logger.getInstance(RegisterGroup.class.getName());
