@@ -1,5 +1,27 @@
 History of changes for @NAME@
 
+0.1.1 to @VERSION@
+
+New Commands
+- Added support for Ctrl-U while in insert mode
+- Added support for 0 Ctrl-D to remove all indent in current line
+- Added support for F1 while in insert - exit insert and bring up help topics
+- Added support for F1 while in normal mode - bring up help topics
+- Added support for :promptfind - Brings up Search Dialog
+- Added support for :promptrepl - Brings up Search/Replace Dialog
+- Added real support for :substitute - search and replace
+- Added support for :& - search and replace
+- Added support for :~ - search and replace
+- Added support for @: - repeat last Ex command
+
+Bug Fixes
+- Using the '%' range in Ex commands ignored the first line
+- Selecting a register for a command after using Ctrl-O in insert mode sent
+  the user back to insert mode before they could enter the command.
+
+Keymappings
+- F1
+
 0.1.0 to 0.1.1
 - Fixed text of README file (NAME and VERSION weren't properly substituted)
 - Fixed issue with pressing Enter when entering an Ex command (no more beep or
