@@ -1,32 +1,39 @@
 package com.maddyhome.idea.vim.group;
 
 /*
-* IdeaVim - A Vim emulator plugin for IntelliJ Idea
-* Copyright (C) 2003 Rick Maddy
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
+ * IdeaVim - A Vim emulator plugin for IntelliJ Idea
+ * Copyright (C) 2003-2004 Rick Maddy
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.editor.markup.HighlighterLayer;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
+import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.ex.LineRange;
@@ -320,6 +327,8 @@ public class SearchGroup extends AbstractActionGroup
 
         lastReplace = sub.toString();
 
+        highlightSearch(false);
+
         logger.debug("search range=[" + start + "," + end + "]");
         logger.debug("pattern="+pattern + ", replace="+sub);
         int lastMatch = -1;
@@ -359,7 +368,7 @@ public class SearchGroup extends AbstractActionGroup
                     if (do_ask)
                     {
                         //editor.getSelectionModel().setSelection(startoff, endoff);
-                        RangeHighlighter hl = highlightMatch(editor, startoff, endoff);
+                        RangeHighlighter hl = highlightConfirm(editor, startoff, endoff);
                         int choice = getConfirmChoice(match);
                         //editor.getSelectionModel().removeSelection();
                         editor.getMarkupModel().removeHighlighter(hl);
@@ -610,6 +619,8 @@ public class SearchGroup extends AbstractActionGroup
         logger.debug("lastOffset=" + lastOffset);
         logger.debug("lastDir=" + lastDir);
 
+        highlightSearch(false);
+
         int res = findItOffset(editor, context, startOffset, count, lastDir, false);
 
         return res;
@@ -641,6 +652,8 @@ public class SearchGroup extends AbstractActionGroup
         lastOffset = "";
         lastDir = dir;
 
+        highlightSearch(true);
+
         int res = findItOffset(editor, context, editor.getCaretModel().getOffset(), count, lastDir, true);
 
         return res;
@@ -656,10 +669,31 @@ public class SearchGroup extends AbstractActionGroup
         return findItOffset(editor, context, editor.getCaretModel().getOffset(), count, -lastDir, false);
     }
 
+    private void highlightSearch(boolean noSmartCase)
+    {
+        Project[] projects = ProjectManager.getInstance().getOpenProjects();
+        for (int i = 0; i < projects.length; i++)
+        {
+            Editor editor = FileEditorManager.getInstance(projects[i]).getSelectedTextEditor();
+            TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES);
+
+            TextRange range = null;
+            int pos = 0;
+            while ((range = findIt(editor, null, pos, 1, 1, noSmartCase, false, true, true)) != null)
+            {
+                RangeHighlighter rh = highlightMatch(editor, range.getStartOffset(), range.getEndOffset());
+                rh.setErrorStripeMarkColor(color.getBackgroundColor());
+                rh.setErrorStripeTooltip(lastPattern);
+                pos = range.getEndOffset();
+            }
+        }
+    }
+
     private int findItOffset(Editor editor, DataContext context, int startOffset, int count, int dir,
         boolean noSmartCase)
     {
-        TextRange range = findIt(editor, context, startOffset, count, dir, noSmartCase);
+        boolean wrap = Options.getInstance().isSet("wrapscan");
+        TextRange range = findIt(editor, context, startOffset, count, dir, noSmartCase, wrap, true, true);
         if (range == null)
         {
             return -1;
@@ -765,7 +799,7 @@ public class SearchGroup extends AbstractActionGroup
     }
 
     private TextRange findIt(Editor editor, DataContext context, int startOffset, int count, int dir,
-        boolean noSmartCase)
+        boolean noSmartCase, boolean wrap, boolean showMessages, boolean wholeFile)
     {
         TextRange res = null;
 
@@ -823,7 +857,11 @@ public class SearchGroup extends AbstractActionGroup
         long        nmatched;
         //int         submatch = 0;
         int    first_lnum;
-        boolean p_ws = Options.getInstance().isSet("wrapscan");
+        boolean p_ws = wrap;
+
+        int lineCount = EditorHelper.getLineCount(editor);
+        int startLine = 0;
+        int endLine = lineCount;
 
         do  /* loop for count */
         {
@@ -853,8 +891,12 @@ public class SearchGroup extends AbstractActionGroup
 
             for (loop = 0; loop <= 1; ++loop)   /* loop twice if 'wrapscan' set */
             {
-                int lineCount = EditorHelper.getLineCount(editor);
-                for ( ; lnum >= 0 && lnum < lineCount; lnum += dir, at_first_line = false)
+                if (!wholeFile)
+                {
+                    startLine = lnum;
+                    endLine = lnum + 1;
+                }
+                for ( ; lnum >= startLine && lnum < endLine; lnum += dir, at_first_line = false)
                 {
                     /*
                     * Look for a match somewhere in the line.
@@ -1037,6 +1079,7 @@ public class SearchGroup extends AbstractActionGroup
         if (found == 0)             /* did not find it */
         {
             //if ((options & SEARCH_MSG) == SEARCH_MSG)
+            if (showMessages)
             {
                 if (p_ws)
                     MessageHelper.EMSG(Msg.e_patnotf2, lastSearch);
@@ -1056,10 +1099,18 @@ public class SearchGroup extends AbstractActionGroup
             EditorHelper.characterPositionToOffset(editor, new CharacterPosition(endpos.lnum, endpos.col)));
     }
 
+    private RangeHighlighter highlightConfirm(Editor editor, int start, int end)
+    {
+        TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SELECTION_FOREGROUND_COLOR);
+        return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.SELECTION + 2,
+            color, HighlighterTargetArea.EXACT_RANGE);
+    }
+
     private RangeHighlighter highlightMatch(Editor editor, int start, int end)
     {
-        return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.SELECTION,
-            new TextAttributes(Color.BLACK, Color.YELLOW, null, null, 0), HighlighterTargetArea.EXACT_RANGE);
+        TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES);
+        return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.SELECTION + 1,
+            color, HighlighterTargetArea.EXACT_RANGE);
     }
 
     private class ButtonActionListener implements ActionListener
@@ -1078,6 +1129,21 @@ public class SearchGroup extends AbstractActionGroup
         }
 
         private int index;
+    }
+
+    public static class SelectionCheck implements FileEditorManagerListener
+    {
+        public void fileOpened(FileEditorManager fileEditorManager, VirtualFile virtualFile)
+        {
+        }
+
+        public void fileClosed(FileEditorManager fileEditorManager, VirtualFile virtualFile)
+        {
+        }
+
+        public void selectionChanged(FileEditorManagerEvent event)
+        {
+        }
     }
 
     private String lastSearch;

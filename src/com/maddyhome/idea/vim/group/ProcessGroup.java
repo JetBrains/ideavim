@@ -175,9 +175,9 @@ public class ProcessGroup extends AbstractActionGroup
                     }
                 }
             });
-
-            return res;
         }
+        
+        return res;
     }
 
     public boolean cancelExEntry(final Editor editor, final DataContext context)
