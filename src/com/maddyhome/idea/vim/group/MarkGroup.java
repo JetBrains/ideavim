@@ -201,6 +201,18 @@ public class MarkGroup extends AbstractActionGroup
         return true;
     }
 
+    public List getMarks(Editor editor)
+    {
+        ArrayList res = new ArrayList();
+
+        res.addAll(getFileMarks(editor).values());
+        res.addAll(globalMarks.values());
+
+        Collections.sort(res, new Mark.KeySorter());
+
+        return res;
+    }
+
     /**
      * Gets the map of marks for the specified file
      * @param editor The editor to get the marks for
