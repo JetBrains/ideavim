@@ -32,7 +32,7 @@ public class FileSaveCloseHandler extends AbstractEditorActionHandler
 {
     protected boolean execute(Editor editor, DataContext context, Command cmd)
     {
-        CommandGroups.getInstance().getFile().saveFiles(context);
+        CommandGroups.getInstance().getFile().saveFile(editor, context);
         CommandGroups.getInstance().getFile().closeFile(editor, context);
 
         return true;
