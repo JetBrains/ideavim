@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.ex.handler.UndoHandler;
 import com.maddyhome.idea.vim.ex.handler.WriteNextFileHandler;
 import com.maddyhome.idea.vim.ex.handler.WritePreviousFileHandler;
 import com.maddyhome.idea.vim.ex.handler.RepeatHandler;
+import com.maddyhome.idea.vim.ex.handler.DumpLineHandler;
 import com.maddyhome.idea.vim.ex.range.AbstractRange;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
@@ -101,6 +102,7 @@ public class CommandParser
         new CmdFilterHandler();
         new CopyTextHandler();
         new DeleteLinesHandler();
+        new DumpLineHandler();
         new EditFileHandler();
         new ExitHandler();
         new FindFileHandler();
