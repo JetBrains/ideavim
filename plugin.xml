@@ -74,13 +74,16 @@
         <action id="VimMotionLastScreenLineEnd" class="com.maddyhome.idea.vim.action.motion.screen.MotionLastScreenLineEndAction" text="Last Screen Line End"/>
         <action id="VimMotionMiddleScreenLine" class="com.maddyhome.idea.vim.action.motion.screen.MotionMiddleScreenLineAction" text="Middle Screen Line"/>
         <!-- Scroll -->
+        <action id="VimMotionScrollFirstScreenLineStart" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLineStartAction" text="Scroll Line to Top"/>
         <action id="VimMotionScrollFirstScreenLine" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLineAction" text="Scroll Line to Top"/>
         <action id="VimMotionScrollHalfPageDown" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfPageDownAction" text="Scroll Half Page Down"/>
         <action id="VimMotionScrollHalfPageUp" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfPageUpAction" text="Scroll Half Page Up"/>
         <action id="VimMotionScrollLastScreenLine" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLineAction" text="Scroll Line to Bottom"/>
+        <action id="VimMotionScrollLastScreenLineStart" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLineStartAction" text="Scroll Line to Bottom"/>
         <action id="VimMotionScrollLineDown" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLineDownAction" text="Scroll Line Down"/>
         <action id="VimMotionScrollLineUp" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLineUpAction" text="Scroll Line Up"/>
         <action id="VimMotionScrollMiddleScreenLine" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollMiddleScreenLineAction" text="Scroll Line to Middle"/>
+        <action id="VimMotionScrollMiddleScreenLineStart" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollMiddleScreenLineStartAction" text="Scroll Line to Middle"/>
         <action id="VimMotionScrollPageDown" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownAction" text="Scroll Page Down"/>
         <action id="VimMotionScrollPageUp" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpAction" text="Scroll Page Up"/>
         <!-- Visual -->

@@ -20,6 +20,7 @@ Bug Fixes
   word too.
 - gd and gD now properly save the jump location before moving to the
   declaration.
+- z<Enter>, z-, and z. now move the cursor to the start of the line.
 
 0.3.0 to 0.3.1
 
