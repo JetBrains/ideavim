@@ -310,7 +310,7 @@ public class ChangeGroup extends AbstractActionGroup
 
         if (deleteTo != -1)
         {
-            deleteRange(editor, context, new TextRange(deleteTo, offset), Command.FLAG_MOT_EXCLUSIVE);
+            deleteRange(editor, context, new TextRange(deleteTo, offset), Command.FLAG_MOT_EXCLUSIVE, false);
 
             return true;
         }
@@ -335,7 +335,7 @@ public class ChangeGroup extends AbstractActionGroup
 
         if (deleteTo != -1)
         {
-            deleteRange(editor, context, new TextRange(deleteTo, offset), Command.FLAG_MOT_EXCLUSIVE);
+            deleteRange(editor, context, new TextRange(deleteTo, offset), Command.FLAG_MOT_EXCLUSIVE, false);
 
             return true;
         }
@@ -796,7 +796,7 @@ public class ChangeGroup extends AbstractActionGroup
                 }
             }
         }
-        return deleteRange(editor, context, range, argument.getMotion().getFlags());
+        return deleteRange(editor, context, range, argument.getMotion().getFlags(), isChange);
     }
 
     /**
@@ -805,9 +805,10 @@ public class ChangeGroup extends AbstractActionGroup
      * @param context The data context
      * @param range The range to delete
      * @param type The type of deletion (FLAG_MOT_LINEWISE, FLAG_MOT_EXCLUSIVE, or FLAG_MOT_INCLUSIVE)
+     * @param isChange
      * @return true if able to delete the text, false if not
      */
-    public boolean deleteRange(Editor editor, DataContext context, TextRange range, int type)
+    public boolean deleteRange(Editor editor, DataContext context, TextRange range, int type, boolean isChange)
     {
         if (range == null)
         {
@@ -817,12 +818,12 @@ public class ChangeGroup extends AbstractActionGroup
         {
             boolean res = deleteText(editor, context, range.getStartOffset(), range.getEndOffset(), type);
             if (res && editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) &&
-                editor.getCaretModel().getOffset() != 0)
+                editor.getCaretModel().getOffset() != 0 && !isChange)
             {
                 MotionGroup.moveCaret(editor, context,
                     CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeadingOffset(editor, -1));
             }
-            else if (res)
+            else if (res && !isChange)
             {
                 VisualPosition vp = editor.getCaretModel().getVisualPosition();
                 int col = EditorHelper.normalizeVisualColumn(editor, vp.line, vp.column, false);
@@ -1038,7 +1039,7 @@ public class ChangeGroup extends AbstractActionGroup
     public boolean changeRange(Editor editor, DataContext context, TextRange range, int type)
     {
         boolean after = range.getEndOffset() >= EditorHelper.getFileSize(editor);
-        boolean res = deleteRange(editor, context, range, type);
+        boolean res = deleteRange(editor, context, range, type, true);
         if (res)
         {
             if (type == Command.FLAG_MOT_LINEWISE)
@@ -1200,6 +1201,7 @@ public class ChangeGroup extends AbstractActionGroup
 
     public void indentRange(Editor editor, DataContext context, TextRange range, int count, int dir)
     {
+        logger.debug("count=" + count);
         if (range == null) return;
 
         Project proj = (Project)context.getData(DataConstants.PROJECT);
