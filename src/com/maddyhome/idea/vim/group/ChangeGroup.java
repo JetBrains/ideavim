@@ -55,11 +55,6 @@ import javax.swing.KeyStroke;
  */
 public class ChangeGroup extends AbstractActionGroup
 {
-    /** Special command flag that indicates it is not to be repeated */
-    public static final int NO_REPEAT = 1;
-    public static final int CLEAR_STROKES = 2;
-    public static final int SAVE_STROKE = 4;
-
     /**
      * Creates the group
      */
@@ -240,7 +235,7 @@ public class ChangeGroup extends AbstractActionGroup
 
         if (deleteTo != -1)
         {
-            deleteRange(editor, context, new TextRange(deleteTo, offset), MotionGroup.EXCLUSIVE);
+            deleteRange(editor, context, new TextRange(deleteTo, offset), Command.FLAG_MOT_EXCLUSIVE);
 
             return true;
         }
@@ -259,7 +254,7 @@ public class ChangeGroup extends AbstractActionGroup
 
         if (deleteTo != -1)
         {
-            deleteRange(editor, context, new TextRange(deleteTo, offset), MotionGroup.EXCLUSIVE);
+            deleteRange(editor, context, new TextRange(deleteTo, offset), Command.FLAG_MOT_EXCLUSIVE);
             
             return true;
         }
@@ -284,7 +279,7 @@ public class ChangeGroup extends AbstractActionGroup
         if (state.getMode() == CommandState.MODE_REPEAT)
         {
             // If this command doesn't allow repeating, set the count to 1
-            if ((state.getCommand().getFlags() & NO_REPEAT) != 0)
+            if ((state.getCommand().getFlags() & Command.FLAG_NO_REPEAT) != 0)
             {
                 repeatInsert(editor, context, 1);
             }
@@ -363,7 +358,7 @@ public class ChangeGroup extends AbstractActionGroup
             KeyHandler.executeAction("VimInsertReplaceToggle", context);
         }
         // If this command doesn't allow repeats, set count to 1
-        if ((lastInsert.getFlags() & NO_REPEAT) != 0)
+        if ((lastInsert.getFlags() & Command.FLAG_NO_REPEAT) != 0)
         {
             cnt = 1;
         }
@@ -457,13 +452,13 @@ public class ChangeGroup extends AbstractActionGroup
      */
     public boolean processCommand(Editor editor, DataContext context, Command cmd)
     {
-        if ((cmd.getFlags() & SAVE_STROKE) != 0)
+        if ((cmd.getFlags() & Command.FLAG_SAVE_STROKE) != 0)
         {
             strokes.add(cmd.getAction());
 
             return true;
         }
-        else if ((cmd.getFlags() & CLEAR_STROKES) != 0)
+        else if ((cmd.getFlags() & Command.FLAG_CLEAR_STROKES) != 0)
         {
             clearStrokes(editor);
             return false;
@@ -492,7 +487,7 @@ public class ChangeGroup extends AbstractActionGroup
         int offset = CommandGroups.getInstance().getMotion().moveCaretHorizontalAppend(editor, count);
         if (offset != -1)
         {
-            boolean res = deleteText(editor, context, editor.getCaretModel().getOffset(), offset, MotionGroup.INCLUSIVE);
+            boolean res = deleteText(editor, context, editor.getCaretModel().getOffset(), offset, Command.FLAG_MOT_INCLUSIVE);
             int pos = editor.getCaretModel().getOffset();
             int norm = EditorHelper.normalizeOffset(editor, EditorHelper.getCurrentLogicalLine(editor), pos, false);
             if (norm != pos)
@@ -520,7 +515,7 @@ public class ChangeGroup extends AbstractActionGroup
             count - 1) + 1, EditorHelper.getFileSize(editor));
         if (offset != -1)
         {
-            boolean res = deleteText(editor, context, start, offset, MotionGroup.LINEWISE);
+            boolean res = deleteText(editor, context, start, offset, Command.FLAG_MOT_LINEWISE);
             if (res && editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) &&
                 editor.getCaretModel().getOffset() != 0)
             {
@@ -546,7 +541,7 @@ public class ChangeGroup extends AbstractActionGroup
         int offset = CommandGroups.getInstance().getMotion().moveCaretToLineEndOffset(editor, count - 1) + 1;
         if (offset != -1)
         {
-            boolean res = deleteText(editor, context, editor.getCaretModel().getOffset(), offset, MotionGroup.INCLUSIVE);
+            boolean res = deleteText(editor, context, editor.getCaretModel().getOffset(), offset, Command.FLAG_MOT_INCLUSIVE);
             int pos = CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, -1);
             if (pos != -1)
             {
@@ -627,7 +622,7 @@ public class ChangeGroup extends AbstractActionGroup
             {
                 offset = CommandGroups.getInstance().getMotion().moveCaretToLineStartOffset(editor, 1);
             }
-            deleteText(editor, context, editor.getCaretModel().getOffset(), offset, MotionGroup.INCLUSIVE);
+            deleteText(editor, context, editor.getCaretModel().getOffset(), offset, Command.FLAG_MOT_INCLUSIVE);
             if (spaces)
             {
                 insertText(editor, context, start, " ");
@@ -663,7 +658,7 @@ public class ChangeGroup extends AbstractActionGroup
      * @param editor The editor to delete the text from
      * @param context The data context
      * @param range The range to delete
-     * @param type The type of deletion (LINEWISE, EXCLUSIVE, or INCLUSIVE)
+     * @param type The type of deletion (FLAG_MOT_LINEWISE, FLAG_MOT_EXCLUSIVE, or FLAG_MOT_INCLUSIVE)
      * @return true if able to delete the text, false if not
      */
     public boolean deleteRange(Editor editor, DataContext context, TextRange range, int type)
@@ -827,7 +822,7 @@ public class ChangeGroup extends AbstractActionGroup
                 !Character.isWhitespace(editor.getDocument().getChars()[editor.getCaretModel().getOffset()]))
             {
                 argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionWordEndRight"));
-                argument.getMotion().setFlags(MotionGroup.INCLUSIVE);
+                argument.getMotion().setFlags(Command.FLAG_MOT_INCLUSIVE);
             }
         }
         else if (id.equals("VimMotionWORDRight"))
@@ -836,7 +831,7 @@ public class ChangeGroup extends AbstractActionGroup
                 !Character.isWhitespace(editor.getDocument().getChars()[editor.getCaretModel().getOffset()]))
             {
                 argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionWORDEndRight"));
-                argument.getMotion().setFlags(MotionGroup.INCLUSIVE);
+                argument.getMotion().setFlags(Command.FLAG_MOT_INCLUSIVE);
             }
         }
 
@@ -854,7 +849,7 @@ public class ChangeGroup extends AbstractActionGroup
      * @param editor The editor to change
      * @param context The data context
      * @param range The range to change
-     * @param type The type of the range (LINEWISE, CHARACTERWISE)
+     * @param type The type of the range (FLAG_MOT_LINEWISE, FLAG_MOT_CHARACTERWISE)
      * @return true if able to delete the range, false if not
      */
     public boolean changeRange(Editor editor, DataContext context, TextRange range, int type)
@@ -863,7 +858,7 @@ public class ChangeGroup extends AbstractActionGroup
         boolean res = deleteRange(editor, context, range, type);
         if (res)
         {
-            if (type == MotionGroup.LINEWISE)
+            if (type == Command.FLAG_MOT_LINEWISE)
             {
                 if (after)
                 {
@@ -1093,7 +1088,7 @@ public class ChangeGroup extends AbstractActionGroup
         //CommandGroups.getInstance().getMark().setMark(editor, context, '[', start);
         //CommandGroups.getInstance().getMark().setMark(editor, context, ']', start + str.length());
 
-        //CommandGroups.getInstance().getRegister().storeTextInternal(editor, context, start, start + str.length(), str, MotionGroup.CHARACTERWISE, '.', false, false);
+        //CommandGroups.getInstance().getRegister().storeTextInternal(editor, context, start, start + str.length(), str, MotionGroup.FLAG_MOT_CHARACTERWISE, '.', false, false);
         //runWriteCommand(new InsertText(editor, context, start, str));
     }
 
@@ -1104,7 +1099,7 @@ public class ChangeGroup extends AbstractActionGroup
      * @param context The data context
      * @param start The start offset to delete
      * @param end The end offset to delete
-     * @param type The type of deletion (LINEWISE, CHARACTERWISE)
+     * @param type The type of deletion (FLAG_MOT_LINEWISE, FLAG_MOT_CHARACTERWISE)
      * @return true if able to delete the text, false if not
      */
     private boolean deleteText(Editor editor, DataContext context, int start, int end, int type)

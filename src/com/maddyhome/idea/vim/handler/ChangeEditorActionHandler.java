@@ -37,7 +37,7 @@ public abstract class ChangeEditorActionHandler extends AbstractEditorActionHand
         boolean worked = execute(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
         if (worked)
         {
-            if ((cmd.getFlags() & KeyParser.FLAG_MULTIKEY_UNDO) == 0)
+            if ((cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) == 0)
             {
                 UndoManager.getInstance().endCommand(editor);
             }

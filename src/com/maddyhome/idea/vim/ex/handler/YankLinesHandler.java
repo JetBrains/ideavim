@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.group.RegisterGroup;
+import com.maddyhome.idea.vim.command.Command;
 
 /**
  *
@@ -54,6 +55,6 @@ public class YankLinesHandler extends CommandHandler
 
         TextRange range = cmd.getTextRange(editor, context, true);
 
-        return CommandGroups.getInstance().getCopy().yankRange(editor, context, range, MotionGroup.LINEWISE);
+        return CommandGroups.getInstance().getCopy().yankRange(editor, context, range, Command.FLAG_MOT_LINEWISE);
     }
 }

@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.group.RegisterGroup;
+import com.maddyhome.idea.vim.command.Command;
 
 /**
  *
@@ -54,6 +55,6 @@ public class DeleteLinesHandler extends CommandHandler
 
         TextRange range = cmd.getTextRange(editor, context, true);
 
-        return CommandGroups.getInstance().getChange().deleteRange(editor, context, range, MotionGroup.LINEWISE);
+        return CommandGroups.getInstance().getChange().deleteRange(editor, context, range, Command.FLAG_MOT_LINEWISE);
     }
 }

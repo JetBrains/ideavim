@@ -34,6 +34,6 @@ public class YankVisualHandler extends VisualOperatorActionHandler
 {
     protected boolean execute(Editor editor, DataContext context, Command cmd, TextRange range)
     {
-        return CommandGroups.getInstance().getCopy().yankRange(editor, context, range, MotionGroup.INCLUSIVE);
+        return CommandGroups.getInstance().getCopy().yankRange(editor, context, range, Command.FLAG_MOT_INCLUSIVE);
     }
 }

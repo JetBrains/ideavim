@@ -33,6 +33,6 @@ public class VisualToggleCharacterModeHandler extends AbstractEditorActionHandle
 {
     protected boolean execute(Editor editor, DataContext context, Command cmd)
     {
-        return CommandGroups.getInstance().getMotion().toggleVisual(editor, context, MotionGroup.CHARACTERWISE);
+        return CommandGroups.getInstance().getMotion().toggleVisual(editor, context, Command.FLAG_MOT_CHARACTERWISE);
     }
 }

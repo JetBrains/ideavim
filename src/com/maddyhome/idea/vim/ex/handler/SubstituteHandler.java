@@ -76,22 +76,25 @@ public class SubstituteHandler extends CommandHandler
             // We have a pattern and maybe flags and a count
             else
             {
-                if (arg.length() < 3)
-                {
-                    throw new InvalidArgumentException();
-                }
                 StringTokenizer tokenizer = new StringTokenizer(arg.substring(1), Character.toString(arg.charAt(0)));
-                if (tokenizer.countTokens() < 2)
-                {
-                    throw new InvalidArgumentException();
-                }
-
-                pattern = tokenizer.nextToken();
-                replace = tokenizer.nextToken();
                 try
                 {
-                    args = tokenizer.nextToken(" " + arg.charAt(0));
-                    count = tokenizer.nextToken(" ");
+                    if (tokenizer.hasMoreTokens())
+                    {
+                        pattern = tokenizer.nextToken();
+                    }
+                    if (tokenizer.hasMoreTokens())
+                    {
+                        replace = tokenizer.nextToken();
+                    }
+                    if (tokenizer.hasMoreTokens())
+                    {
+                        args = tokenizer.nextToken(" " + arg.charAt(0));
+                    }
+                    if (tokenizer.hasMoreTokens())
+                    {
+                        count = tokenizer.nextToken(" ");
+                    }
                 }
                 catch (NoSuchElementException e)
                 {

@@ -25,6 +25,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.ui.ClipboardHandler;
+import com.maddyhome.idea.vim.command.Command;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -169,7 +170,7 @@ public class RegisterGroup extends AbstractActionGroup
             registers.put(new Character('1'), new Register('1', type, text));
 
             // Deletes small than one line also go the the - register
-            if (type == MotionGroup.CHARACTERWISE)
+            if (type == Command.FLAG_MOT_CHARACTERWISE)
             {
                 if (editor.offsetToLogicalPosition(start).line == editor.offsetToLogicalPosition(end).line)
                 {
@@ -213,7 +214,7 @@ public class RegisterGroup extends AbstractActionGroup
             String text = ClipboardHandler.getClipboardText();
             if (text != null)
             {
-                reg = new Register(r, MotionGroup.CHARACTERWISE, text);
+                reg = new Register(r, Command.FLAG_MOT_CHARACTERWISE, text);
             }
         }
         else

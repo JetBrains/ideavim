@@ -65,11 +65,6 @@ public class MotionGroup extends AbstractActionGroup
     public static final int LAST_T = 3;
     public static final int LAST_t = 4;
 
-    public static final int LINEWISE = 1;
-    public static final int CHARACTERWISE = 2;
-    public static final int INCLUSIVE = 4;
-    public static final int EXCLUSIVE = 8;
-
     /**
      * Create the group
      */
@@ -99,7 +94,7 @@ public class MotionGroup extends AbstractActionGroup
         // We want to move the mouse back one character to be consistence with how regular motion highlights text.
         // Don't move the cursor if the user ended up selecting no characters.
         // Once the cursor is set, save the current column.
-        setVisualMode(editor, null, CHARACTERWISE);
+        setVisualMode(editor, null, Command.FLAG_MOT_CHARACTERWISE);
         int offset = editor.getCaretModel().getOffset();
         int start = editor.getSelectionModel().getSelectionStart();
         if (offset > start)
@@ -117,9 +112,9 @@ public class MotionGroup extends AbstractActionGroup
     private void processMouseClick(Editor editor, MouseEvent event)
     {
         // FIX - all this works except 3 click/triple click. Because we move the cursor after a two/double click,
-        // we can't get the three/triple click so there is no easy way to enter LINEWISE visual mode using the mouse.
-        // If we don't move the mouse after the two/double click, then we can get LINEWISE visual mode but then
-        // CHARACTERWISE mode is wrong because the cursor is in the wrong place and the first cursor move after
+        // we can't get the three/triple click so there is no easy way to enter FLAG_MOT_LINEWISE visual mode using the mouse.
+        // If we don't move the mouse after the two/double click, then we can get FLAG_MOT_LINEWISE visual mode but then
+        // FLAG_MOT_CHARACTERWISE mode is wrong because the cursor is in the wrong place and the first cursor move after
         // results in unexpected highlight behaviour.
         int visualMode = 0;
         switch (event.getClickCount() % 3)
@@ -128,10 +123,10 @@ public class MotionGroup extends AbstractActionGroup
                 visualMode = 0;
                 break;
             case 2: // Double click
-                visualMode = CHARACTERWISE;
+                visualMode = Command.FLAG_MOT_CHARACTERWISE;
                 break;
             case 0: // Triple click
-                visualMode = LINEWISE;
+                visualMode = Command.FLAG_MOT_LINEWISE;
                 break;
         }
 
@@ -149,10 +144,10 @@ public class MotionGroup extends AbstractActionGroup
                     editor.getCaretModel().moveToOffset(clean);
                 }
                 break;
-            case CHARACTERWISE:
+            case Command.FLAG_MOT_CHARACTERWISE:
                 editor.getCaretModel().moveToOffset(visualEnd - 1);
                 break;
-            case LINEWISE:
+            case Command.FLAG_MOT_LINEWISE:
                 editor.getCaretModel().moveToLogicalPosition(editor.xyToLogicalPosition(event.getPoint()));
                 break;
         }
@@ -181,7 +176,7 @@ public class MotionGroup extends AbstractActionGroup
 
     /**
      * This helper method calculates the complete range a motion will move over taking into account whether
-     * the motion is LINEWISE or CHARACTERWISE (INCLUSIVE or EXCLUSIVE).
+     * the motion is FLAG_MOT_LINEWISE or FLAG_MOT_CHARACTERWISE (FLAG_MOT_INCLUSIVE or FLAG_MOT_EXCLUSIVE).
      * @param editor The editor the motion takes place in
      * @param context The data context
      * @param count The count applied to the motion
@@ -219,7 +214,7 @@ public class MotionGroup extends AbstractActionGroup
         // If we are a linewise motion we need to normalize the start and stop then move the start to the beginning
         // of the line and move the end to the end of the line.
         int flags = cmd.getFlags();
-        if ((flags & MotionGroup.LINEWISE) != 0)
+        if ((flags & Command.FLAG_MOT_LINEWISE) != 0)
         {
             if (start > end)
             {
@@ -232,7 +227,7 @@ public class MotionGroup extends AbstractActionGroup
             end = Math.min(EditorHelper.getLineEndForOffset(editor, end) + 1, EditorHelper.getFileSize(editor));
         }
         // If characterwise and inclusive, add the last character to the range
-        else if ((flags & MotionGroup.INCLUSIVE) != 0)
+        else if ((flags & Command.FLAG_MOT_INCLUSIVE) != 0)
         {
             end = end + (start <= end ? 1 : -1);
         }
@@ -999,11 +994,11 @@ public class MotionGroup extends AbstractActionGroup
                 logger.debug("start=" + start + ", end=" + end + ", lstart=" + lstart + ", lend=" + lend);
                 if (lstart == start && lend + 1 == end)
                 {
-                    mode = LINEWISE;
+                    mode = Command.FLAG_MOT_LINEWISE;
                 }
                 else
                 {
-                    mode = CHARACTERWISE;
+                    mode = Command.FLAG_MOT_CHARACTERWISE;
                 }
             }
         }
@@ -1090,7 +1085,7 @@ public class MotionGroup extends AbstractActionGroup
             end = t;
         }
 
-        if (CommandState.getInstance().getVisualType() == CHARACTERWISE)
+        if (CommandState.getInstance().getVisualType() == Command.FLAG_MOT_CHARACTERWISE)
         {
             end = Math.min(EditorHelper.getFileSize(editor), end + 1);
             editor.getSelectionModel().setSelection(start, end);

@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
+import com.maddyhome.idea.vim.command.Command;
 
 /**
  *
@@ -33,7 +34,7 @@ public class GotoCharacterHandler extends CommandHandler
 {
     public GotoCharacterHandler()
     {
-        super("go", "to", RANGE_OPTIONAL | ARGUMENT_OPTIONAL);
+        super("go", "to", RANGE_OPTIONAL | ARGUMENT_OPTIONAL, Command.FLAG_MOT_EXCLUSIVE);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd)

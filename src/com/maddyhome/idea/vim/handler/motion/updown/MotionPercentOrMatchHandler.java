@@ -47,11 +47,11 @@ public class MotionPercentOrMatchHandler extends MotionEditorActionHandler
     {
         if (cmd.getRawCount() == 0)
         {
-            cmd.setFlags(MotionGroup.INCLUSIVE);
+            cmd.setFlags(Command.FLAG_MOT_INCLUSIVE);
         }
         else
         {
-            cmd.setFlags(MotionGroup.LINEWISE);
+            cmd.setFlags(Command.FLAG_MOT_LINEWISE);
         }
     }
 }

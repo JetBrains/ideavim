@@ -50,11 +50,6 @@ import javax.swing.KeyStroke;
  */
 public class KeyParser
 {
-    /** Special flag used for any mappings involving operators */
-    public static final int FLAG_OP_PEND = 256;
-    public static final int FLAG_MULTIKEY_UNDO = 512;
-    public static final int FLAG_EXPECT_MORE = 1024;
-
     /** Indicates this key mapping applies to Normal mode */
     public static final int MAPPING_NORMAL = 1;
     /** Indicates this key mapping applies to Visual mode */

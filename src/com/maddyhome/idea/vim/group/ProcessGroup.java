@@ -91,6 +91,7 @@ public class ProcessGroup extends AbstractActionGroup
         int cnt;
         while ((cnt = from.read(buf)) != -1)
         {
+            logger.debug("buf="+buf);
             to.write(buf, 0, cnt);
         }
     }

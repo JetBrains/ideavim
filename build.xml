@@ -1,4 +1,4 @@
-<project name="IdeaVim" default="build" basedir=".">
+<project name="IdeaVim" default="deploy" basedir=".">
     <!--
     * IdeaVim - A Vim emulator plugin for IntelliJ Idea
     * Copyright (C) 2003 Rick Maddy
@@ -32,7 +32,7 @@
 
     <property name="project" value="IdeaVIM" />
     <!-- Update this prior to building a new distribution -->
-    <property name="version" value="0.1.1" />
+    <property name="version" value="0.2.0" />
 
     <path id="build.classpath">
         <pathelement path="${idea.home}/lib/openapi.jar" />
@@ -40,14 +40,17 @@
         <pathelement path="${classes}"/>
     </path>
 
-    <target name="clean" description="Removes all generated files" >
+    <target name="clean.build">
         <delete dir="${classes}"/>
-        <delete dir="${javadoc}"/>
-        <delete dir="${project}"/>
-        <delete file="${install}/${project}.jar" />
+        <delete file="${install}/${project}.jar"/>
     </target>
 
-    <target name="build" description="Compiles all source code and created plugin jar file" >
+    <target name="clean" depends="clean.build" description="Removes all generated files" >
+        <delete dir="${javadoc}"/>
+        <delete dir="${project}"/>
+    </target>
+
+    <target name="build" depends="clean.build" description="Compiles all source code and created plugin jar file" >
         <mkdir dir="${classes}"/>
         <javac destdir="${classes}" debug="on" classpathref="build.classpath" >
             <src path="${src}"/>
@@ -55,7 +58,7 @@
         <mkdir dir="${classes}/META-INF"/>
         <copy file="plugin.xml" todir="${classes}/META-INF"/>
         <copy todir="${classes}">
-            <fileset dir="${classes}" excludes="**/*.java"/>
+            <fileset dir="${src}" excludes="**/*.java"/>
         </copy>
         <jar basedir="${classes}" jarfile="${install}/${project}.jar" compress="yes"/>
     </target>

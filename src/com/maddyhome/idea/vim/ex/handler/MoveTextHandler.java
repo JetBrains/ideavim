@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.ex.ParseResult;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.command.Command;
 
 /**
  *
@@ -66,7 +67,7 @@ public class MoveTextHandler extends CommandHandler
         editor.getDocument().deleteString(range.getStartOffset(), range.getEndOffset());
 
         int offset = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor, line + 1);
-        CommandGroups.getInstance().getCopy().putText(editor, context, offset, text, MotionGroup.LINEWISE, 1);
+        CommandGroups.getInstance().getCopy().putText(editor, context, offset, text, Command.FLAG_MOT_LINEWISE, 1);
 
         return true;
     }

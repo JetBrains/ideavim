@@ -27,6 +27,7 @@ import com.intellij.openapi.util.TextRange;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 
@@ -72,7 +73,7 @@ public class CopyGroup extends AbstractActionGroup
             editor, count - 1) + 1, EditorHelper.getFileSize(editor));
         if (offset != -1)
         {
-            return yankRange(editor, context, new TextRange(start, offset), MotionGroup.LINEWISE);
+            return yankRange(editor, context, new TextRange(start, offset), Command.FLAG_MOT_LINEWISE);
         }
 
         return false;
@@ -113,7 +114,7 @@ public class CopyGroup extends AbstractActionGroup
         {
             int pos = 0;
             // If a linewise put the text is inserted before the current line.
-            if ((reg.getType() & MotionGroup.LINEWISE) != 0)
+            if ((reg.getType() & Command.FLAG_MOT_LINEWISE) != 0)
             {
                 pos = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor);
             }
@@ -144,7 +145,7 @@ public class CopyGroup extends AbstractActionGroup
         {
             int pos = 0;
             // If a linewise paste, the text is inserted after the current line.
-            if ((reg.getType() & MotionGroup.LINEWISE) != 0)
+            if ((reg.getType() & Command.FLAG_MOT_LINEWISE) != 0)
             {
                 pos = CommandGroups.getInstance().getMotion().moveCaretToLineStartOffset(editor, 1);
             }
@@ -170,7 +171,7 @@ public class CopyGroup extends AbstractActionGroup
             int end = editor.getSelectionModel().getSelectionEnd();
             int pos = 0;
             // If a linewise paste, the text is inserted after the current line.
-            if ((reg.getType() & MotionGroup.LINEWISE) != 0)
+            if ((reg.getType() & Command.FLAG_MOT_LINEWISE) != 0)
             {
                 MotionGroup.moveCaret(editor, context, end);
                 pos = CommandGroups.getInstance().getMotion().moveCaretToLineStartOffset(editor, 1);
@@ -212,7 +213,7 @@ public class CopyGroup extends AbstractActionGroup
 
         LogicalPosition slp = editor.offsetToLogicalPosition(offset);
         int adjust = 0;
-        if ((type & MotionGroup.LINEWISE) != 0)
+        if ((type & Command.FLAG_MOT_LINEWISE) != 0)
         {
             adjust = -1;
         }
@@ -224,7 +225,7 @@ public class CopyGroup extends AbstractActionGroup
         }
 
         // Adjust the cursor position after the paste
-        if ((type & MotionGroup.LINEWISE) != 0)
+        if ((type & Command.FLAG_MOT_LINEWISE) != 0)
         {
             MotionGroup.moveCaret(editor, context, offset);
             MotionGroup.moveCaret(editor, context,

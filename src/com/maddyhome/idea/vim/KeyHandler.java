@@ -233,7 +233,7 @@ public class KeyHandler
                         currentArg = arg.getArgType();
                         // Is the current command an operator? If so set the state to only accept "operator pending"
                         // commands
-                        if ((arg.getFlags() & KeyParser.FLAG_OP_PEND) != 0)
+                        if ((arg.getFlags() & Command.FLAG_OP_PEND) != 0)
                         {
                             CommandState.getInstance().setMappingMode(KeyParser.MAPPING_OP_PEND);
                         }
@@ -442,7 +442,7 @@ public class KeyHandler
             if ((CommandState.getInstance().getMode() != CommandState.MODE_INSERT &&
                 CommandState.getInstance().getMode() != CommandState.MODE_REPLACE &&
                 CommandState.getInstance().getMode() != CommandState.MODE_VISUAL) &&
-                (cmd.getFlags() & KeyParser.FLAG_EXPECT_MORE) == 0)
+                (cmd.getFlags() & Command.FLAG_EXPECT_MORE) == 0)
             {
                 CommandState.getInstance().restoreMode();
             }

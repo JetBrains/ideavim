@@ -46,7 +46,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
 
         if (res)
         {
-            if ((cmd.getFlags() & KeyParser.FLAG_MULTIKEY_UNDO) == 0 && !Command.isReadOnlyType(cmd.getType()))
+            if ((cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) == 0 && !Command.isReadOnlyType(cmd.getType()))
             {
                 UndoManager.getInstance().endCommand(editor);
             }

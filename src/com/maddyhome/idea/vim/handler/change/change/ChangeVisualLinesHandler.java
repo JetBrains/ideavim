@@ -38,6 +38,6 @@ public class ChangeVisualLinesHandler extends VisualOperatorActionHandler
         range = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
             EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
 
-        return CommandGroups.getInstance().getChange().changeRange(editor, context, range, MotionGroup.LINEWISE);
+        return CommandGroups.getInstance().getChange().changeRange(editor, context, range, Command.FLAG_MOT_LINEWISE);
     }
 }

@@ -60,17 +60,25 @@ public class ExEntryHandler extends AbstractEditorActionHandler
             }
         }
 
-        listener.setState(editor, context);
+        CommandEntryPanel.getInstance().addActionListener(new ExEntryListener(editor, context));
 
         panel.activate(((Editor)context.getData(DataConstants.EDITOR)).getContentComponent(), ":", initText);
 
         return true;
     }
 
-    static class ExEntryListener implements ActionListener
+    private static class ExEntryListener implements ActionListener
     {
+        public ExEntryListener(Editor editor, DataContext context)
+        {
+            this.editor = editor;
+            this.context = context;
+        }
+
         public void actionPerformed(final ActionEvent e)
         {
+            CommandEntryPanel.getInstance().removeActionListener(this);
+
             SwingUtilities.invokeLater(new Runnable()
             {
                 public void run()
@@ -103,20 +111,8 @@ public class ExEntryHandler extends AbstractEditorActionHandler
             });
         }
 
-        public void setState(Editor editor, DataContext context)
-        {
-            this.editor = editor;
-            this.context = context;
-        }
-
         private Editor editor;
         private DataContext context;
-    }
-
-    private static ExEntryListener listener = new ExEntryListener();
-
-    static {
-        CommandEntryPanel.getInstance().addActionListener(listener);
     }
 
     private static Logger logger = Logger.getInstance(ExEntryHandler.class.getName());
