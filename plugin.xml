@@ -166,6 +166,9 @@
         <action id="VimFileSaveClose" class="com.maddyhome.idea.vim.action.file.FileSaveCloseAction" text="Save and Close Editor"/>
         <action id="VimFileClose" class="com.maddyhome.idea.vim.action.file.FileCloseAction" text="Close Editor"/>
 
+        <!-- Search -->
+        <action id="VimSearchEntry" class="com.maddyhome.idea.vim.action.search.SearchEntryAction" text="Search"/>
+
         <!-- Other -->
         <action id="VimLastSearchReplace" class="com.maddyhome.idea.vim.action.change.change.ChangeLastSearchReplaceAction" text="Repeat Last :s"/>
         <action id="VimLastGlobalSearchReplace" class="com.maddyhome.idea.vim.action.change.change.ChangeLastGlobalSearchReplaceAction" text="Repeat Last :s"/>
