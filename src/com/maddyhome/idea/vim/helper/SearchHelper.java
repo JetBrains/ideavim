@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.helper;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionChangeEvent;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
@@ -520,6 +521,61 @@ public class SearchHelper
         }
     }
 
+    public static int findNextParagraph(Editor editor, int count)
+    {
+        int offset = editor.getCaretModel().getOffset();
+        char[] chars = editor.getDocument().getChars();
+        int found = 0;
+        int step = count >= 0 ? 1 : -1;
+        int pos = offset;
+        int res = offset;
+        int cnt = 0;
+        pos = skipNewlines(chars, pos, step);
+        while (pos >= 0 && pos < chars.length && found < Math.abs(count))
+        {
+            if (chars[pos] == '\n')
+            {
+                cnt++;
+                if (cnt == 2)
+                {
+                    found++;
+                    res = pos + (step == -1 ? 1 : 0);
+                    pos = skipNewlines(chars, pos, step) - step;
+                }
+            }
+            else
+            {
+                cnt = 0;
+            }
+
+            pos += step;
+        }
+
+        if (found < Math.abs(count))
+        {
+            if (pos <= 0)
+            {
+                res = 0;
+            }
+            else if (pos >= chars.length)
+            {
+                res = chars.length - 1;
+            }
+        }
+
+        return res;
+    }
+
+    private static int skipNewlines(char[] chars, int offset, int step)
+    {
+        while (offset >= 0 && offset < chars.length && chars[offset] == '\n')
+        {
+            offset += step;
+        }
+
+        return offset;
+    }
+
     private static String getPairChars()
     {
         if (pairsChars == null)
@@ -555,4 +611,6 @@ public class SearchHelper
     }
 
     private static String pairsChars = null;
+
+    private static Logger logger = Logger.getInstance(SearchHelper.class.getName());
 }

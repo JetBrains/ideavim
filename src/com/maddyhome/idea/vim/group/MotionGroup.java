@@ -116,11 +116,6 @@ public class MotionGroup extends AbstractActionGroup
      */
     private void processMouseClick(Editor editor, MouseEvent event)
     {
-        // FIX - all this works except 3 click/triple click. Because we move the cursor after a two/double click,
-        // we can't get the three/triple click so there is no easy way to enter FLAG_MOT_LINEWISE visual mode using the mouse.
-        // If we don't move the mouse after the two/double click, then we can get FLAG_MOT_LINEWISE visual mode but then
-        // FLAG_MOT_CHARACTERWISE mode is wrong because the cursor is in the wrong place and the first cursor move after
-        // results in unexpected highlight behaviour.
         int visualMode = 0;
         switch (event.getClickCount() % 3)
         {
@@ -132,6 +127,11 @@ public class MotionGroup extends AbstractActionGroup
                 break;
             case 0: // Triple click
                 visualMode = Command.FLAG_MOT_LINEWISE;
+                // Pop state of being in Visual Char mode
+                if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
+                {
+                    CommandState.getInstance().popState();
+                }
                 break;
         }
 
@@ -140,13 +140,13 @@ public class MotionGroup extends AbstractActionGroup
         switch (CommandState.getInstance().getSubMode())
         {
             case 0:
-                int offset = editor.getCaretModel().getOffset();
-                int clean = EditorHelper.normalizeOffset(editor, offset,
+                VisualPosition vp = editor.getCaretModel().getVisualPosition();
+                int col = EditorHelper.normalizeVisualColumn(editor, vp.line, vp.column,
                     CommandState.getInstance().getMode() == CommandState.MODE_INSERT ||
                     CommandState.getInstance().getMode() == CommandState.MODE_REPLACE);
-                if (offset != clean)
+                if (col != vp.column)
                 {
-                    editor.getCaretModel().moveToOffset(clean);
+                    editor.getCaretModel().moveToVisualPosition(new VisualPosition(vp.line, col));
                 }
                 break;
             case Command.FLAG_MOT_CHARACTERWISE:
@@ -459,6 +459,24 @@ public class MotionGroup extends AbstractActionGroup
         else
         {
             return pos;
+        }
+    }
+
+    /**
+     * This moves the caret to the start of the next/previous paragraph.
+     * @param count The number of paragraphs to skip
+     * @param editor The editor to move in
+     */
+    public int moveCaretToNextParagraph(Editor editor, int count)
+    {
+        if ((editor.getCaretModel().getOffset() == 0 && count < 0) ||
+            (editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0))
+        {
+            return -1;
+        }
+        else
+        {
+            return EditorHelper.normalizeOffset(editor, SearchHelper.findNextParagraph(editor, count), false);
         }
     }
 
@@ -910,7 +928,9 @@ public class MotionGroup extends AbstractActionGroup
         {
             int col = EditorData.getLastColumn(editor);
             int line = EditorHelper.normalizeVisualLine(editor, pos.line + count);
-            VisualPosition newPos = new VisualPosition(line, EditorHelper.normalizeVisualColumn(editor, line, col));
+            VisualPosition newPos = new VisualPosition(line, EditorHelper.normalizeVisualColumn(editor, line, col,
+                CommandState.getInstance().getMode() == CommandState.MODE_INSERT ||
+                CommandState.getInstance().getMode() == CommandState.MODE_REPLACE));
 
             return EditorHelper.visualPostionToOffset(editor, newPos);
         }
