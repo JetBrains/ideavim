@@ -59,11 +59,20 @@ public class CommandEntryPanel extends JPanel
 
     private CommandEntryPanel()
     {
+        setBorder(BorderFactory.createEtchedBorder());
+        
         Font font = new Font("Monospaced", Font.PLAIN, 12);
-        this.label = new JLabel(" ");
-        this.label.setFont(font);
-        this.entry = new ExTextField();
-        this.entry.setFont(font);
+        label = new JLabel(" ");
+        label.setFont(font);
+        entry = new ExTextField();
+        entry.setFont(font);
+        entry.setBorder(null);
+
+        setForeground(entry.getForeground());
+        setBackground(entry.getBackground());
+
+        label.setForeground(entry.getForeground());
+        label.setBackground(entry.getBackground());
 
         GridBagLayout layout = new GridBagLayout();
         GridBagConstraints gbc = new GridBagConstraints();
