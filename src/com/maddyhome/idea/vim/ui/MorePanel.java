@@ -23,6 +23,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
+import com.maddyhome.idea.vim.option.Options;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -95,7 +96,11 @@ public class MorePanel extends JPanel
      */
     public int getDisplayWidth()
     {
-        int width = text.getSize().width;
+        Container scroll = SwingUtilities.getAncestorOfClass(JScrollPane.class, parent);
+        int width = scroll.getSize().width;
+        
+        //int width = text.getSize().width;
+        logger.debug("width=" + width);
         int charWidth = text.getFontMetrics(text.getFont()).charWidth('M');
 
         return width / charWidth;
@@ -213,7 +218,15 @@ public class MorePanel extends JPanel
         setBounds(bounds);
 
         scrollPane.getVerticalScrollBar().setValue(0);
-        scrollOffset(0);
+        if (!Options.getInstance().isSet("more"))
+        {
+            // FIX
+            scrollOffset(100000);
+        }
+        else
+        {
+            scrollOffset(0);
+        }
     }
 
     private void scrollLine()
