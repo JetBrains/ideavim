@@ -10,6 +10,7 @@ Bug Fixes
 - Fixed b and e commands when trying to move to first or last word of file and
   the first or last character of the file was punctuation.
 - Fixed NullPointerException appearing in system log when viewing a .form file.
+- Fixed extraneous characters getting added to a register during recording.
 
 0.8.2 from 0.8.1
 - Fixed typo in plugin.xml for new 'since-build'

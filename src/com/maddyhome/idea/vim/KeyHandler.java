@@ -316,6 +316,7 @@ public class KeyHandler
                     boolean saveRecording = isRecording;
                     handleKey(editor, key, context);
                     isRecording = saveRecording;
+                    shouldRecord = false; // Prevent this from getting recorded twice
                 }
             }
             else
