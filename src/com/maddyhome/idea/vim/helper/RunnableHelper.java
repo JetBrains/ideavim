@@ -21,20 +21,21 @@ package com.maddyhome.idea.vim.helper;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
+import com.intellij.openapi.project.Project;
 
 /**
  * This provides some helper methods to run code as a command and an application write action
  */
 public class RunnableHelper
 {
-    public static void runReadCommand(Runnable cmd)
+    public static void runReadCommand(Project project, Runnable cmd)
     {
-        CommandProcessor.getInstance().executeCommand(new ReadAction(cmd), "Foo", "Bar");
+        CommandProcessor.getInstance().executeCommand(project, new ReadAction(cmd), "Foo", "Bar");
     }
 
-    public static void runWriteCommand(Runnable cmd)
+    public static void runWriteCommand(Project project, Runnable cmd)
     {
-        CommandProcessor.getInstance().executeCommand(new WriteAction(cmd), "Foo", "Bar");
+        CommandProcessor.getInstance().executeCommand(project, new WriteAction(cmd), "Foo", "Bar");
     }
 
     static class ReadAction implements Runnable
