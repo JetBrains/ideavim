@@ -15,6 +15,9 @@ Bug Fixes
   adding constructors, getters, etc. This also can happen when IDEA adds an
   import statement automatically. This also allows you to undo import
   optimizations!
+- Doing a cw or cW when the cursor is already on the end of a word/WORD now
+  correctly deletes only the last character of the word/WORD and not the next
+  word too.
 
 0.3.0 to 0.3.1
 

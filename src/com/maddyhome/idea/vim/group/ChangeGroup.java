@@ -754,7 +754,6 @@ public class ChangeGroup extends AbstractActionGroup
      */
     public boolean changeCharacters(Editor editor, DataContext context, int count)
     {
-        // FIX - undo fails miserably for this
         boolean res = deleteCharacter(editor, context, count);
         if (res)
         {
@@ -812,9 +811,6 @@ public class ChangeGroup extends AbstractActionGroup
     public boolean changeMotion(Editor editor, DataContext context, int count, int rawCount, Argument argument)
     {
         // TODO: Hack - find better way to do this exceptional case - at least make constants out of these strings
-
-        // FIX - typing cw on a one char word results in two words being deleted because e moved to end of next
-        // word when on a one char word
 
         // Vim treats cw as ce and cW as cE if cursor is on a non-blank character
         String id = ActionManager.getInstance().getId(argument.getMotion().getAction());
@@ -1076,8 +1072,6 @@ public class ChangeGroup extends AbstractActionGroup
             }
         }
 
-        // FIX - Undo of indent actually does reverse outdent!
-        
         if (CommandState.getInstance().getMode() != CommandState.MODE_INSERT &&
             CommandState.getInstance().getMode() != CommandState.MODE_REPLACE)
         {

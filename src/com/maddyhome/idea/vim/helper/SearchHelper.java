@@ -349,7 +349,7 @@ public class SearchHelper
             return null;
         }
 
-        int end = findNextWordEnd(chars, start, stop, 1, false) + 1;
+        int end = findNextWordEnd(chars, start, stop, 1, false, false) + 1;
 
         return new TextRange(start, end);
     }
@@ -361,23 +361,26 @@ public class SearchHelper
      * @param skipPunc If true then find WORD, if false then find word
      * @return The offset of match
      */
-    public static int findNextWordEnd(Editor editor, int count, boolean skipPunc)
+    public static int findNextWordEnd(Editor editor, int count, boolean skipPunc, boolean stayEnd)
     {
         char[] chars = editor.getDocument().getChars();
         int pos = editor.getCaretModel().getOffset();
         int size = EditorHelper.getFileSize(editor);
 
-        return findNextWordEnd(chars, pos, size, count, skipPunc);
+        return findNextWordEnd(chars, pos, size, count, skipPunc, stayEnd);
     }
 
-    public static int findNextWordEnd(char[] chars, int pos, int size, int count, boolean skipPunc)
+    public static int findNextWordEnd(char[] chars, int pos, int size, int count, boolean skipPunc, boolean stayEnd)
     {
         int found = 0;
         int step = count >= 0 ? 1 : -1;
         // For forward searches, skip any current whitespace so we start at the end of a word
         if (count > 0)
         {
-            pos += step;
+            if (!stayEnd)
+            {
+                pos += step;
+            }
             pos = skipSpace(chars, pos, step, size);
         }
         int res = pos;
