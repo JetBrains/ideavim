@@ -45,16 +45,10 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
         CommandState.getInstance().setMode(CommandState.MODE_COMMAND);
         CommandState.getInstance().setMappingMode(KeyParser.MAPPING_NORMAL);
         boolean res = execute(editor, context, cmd, range);
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run()
-            {
-                CommandGroups.getInstance().getMotion().resetVisual(editor);
-            }
-
-        });
 
         if (res)
         {
+            CommandGroups.getInstance().getMotion().saveVisualOperatorRange(editor);
             if ((cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) == 0 && !Command.isReadOnlyType(cmd.getType()))
             {
                 UndoManager.getInstance().endCommand(editor);
@@ -71,6 +65,14 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
                 UndoManager.getInstance().beginCommand(editor);
             }
         }
+
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run()
+            {
+                CommandGroups.getInstance().getMotion().resetVisual(editor);
+            }
+
+        });
 
         return res;
     }

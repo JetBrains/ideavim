@@ -73,8 +73,6 @@ public class MotionGroup extends AbstractActionGroup
      */
     public MotionGroup()
     {
-        // TODO - need to listen to document selection changes to turn off visual mode after an IDEA command is
-        // run on the selection.
         EditorFactory.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
             public void editorCreated(EditorFactoryEvent event)
             {
@@ -1079,18 +1077,36 @@ public class MotionGroup extends AbstractActionGroup
         CommandGroups.getInstance().getMark().setMark(editor, context, '>', visualEnd);
     }
 
-    public boolean toggleVisual(Editor editor, DataContext context, int mode)
+    public boolean toggleVisual(Editor editor, DataContext context, int count, int rawCount, int mode)
     {
-        // TODO - support count before v and V commands
         // TODO - support pending insert mode
         int currentMode = CommandState.getInstance().getVisualType();
         if (currentMode == 0)
         {
+            int start;
+            int end;
+            if (rawCount > 0)
+            {
+                VisualRange range = EditorData.getLastVisualOperatorRange(editor);
+                if (range == null)
+                {
+                    return false;
+                }
+                mode = range.getType();
+                TextRange trange = calculateVisualRange(editor, context, range, count);
+                start = trange.getStartOffset();
+                end = trange.getEndOffset();
+            }
+            else
+            {
+                start = end = editor.getSelectionModel().getSelectionStart();
+            }
             CommandState.getInstance().setMode(CommandState.MODE_VISUAL);
             CommandState.getInstance().setVisualType(mode);
             CommandState.getInstance().setMappingMode(KeyParser.MAPPING_VISUAL);
-            visualStart = editor.getSelectionModel().getSelectionStart();
-            updateSelection(editor, context, visualStart);
+            visualStart = start;
+            updateSelection(editor, context, end);
+            MotionGroup.moveCaret(editor, context, visualEnd);
         }
         else if (mode == currentMode)
         {
@@ -1103,6 +1119,56 @@ public class MotionGroup extends AbstractActionGroup
         }
 
         return true;
+    }
+
+    private TextRange calculateVisualRange(Editor editor, DataContext context, VisualRange range, int count)
+    {
+        int start = range.getStart();
+        int end = range.getEnd();
+        if (start > end)
+        {
+            int t = start;
+            start = end;
+            end = t;
+        }
+
+        start = EditorHelper.normalizeOffset(editor, start, false);
+        end = EditorHelper.normalizeOffset(editor, end, false);
+        LogicalPosition sp = editor.offsetToLogicalPosition(start);
+        LogicalPosition ep = editor.offsetToLogicalPosition(end);
+        int lines = ep.line - sp.line + 1;
+        int chars = 0;
+        if (range.getType() == Command.FLAG_MOT_LINEWISE || lines > 1)
+        {
+            lines *= count;
+        }
+        else
+        {
+            chars = ep.column - sp.column + 1;
+            chars *= count;
+        }
+        start = editor.getSelectionModel().getSelectionStart();
+        sp = editor.offsetToLogicalPosition(start);
+        int endLine = sp.line + lines - 1;
+        TextRange res;
+        if (range.getType() == Command.FLAG_MOT_LINEWISE)
+        {
+            res = new TextRange(start, moveCaretToLine(editor, context, endLine));
+        }
+        else
+        {
+            if (lines > 1)
+            {
+                res = new TextRange(start, moveCaretToLineStart(editor, endLine) +
+                    Math.min(EditorHelper.getLineLength(editor, endLine), ep.column));
+            }
+            else
+            {
+                res = new TextRange(start, EditorHelper.normalizeOffset(editor, sp.line, start + chars - 1, false));
+            }
+        }
+
+        return res;
     }
 
     public void exitVisual(Editor editor)
@@ -1123,6 +1189,12 @@ public class MotionGroup extends AbstractActionGroup
         editor.getSelectionModel().removeSelection();
 
         CommandState.getInstance().setVisualType(0);
+    }
+
+    public void saveVisualOperatorRange(Editor editor)
+    {
+        EditorData.setLastVisualOperatorRange(editor, new VisualRange(visualStart,
+            visualEnd, CommandState.getInstance().getVisualType()));
     }
 
     public TextRange getVisualRange(Editor editor)

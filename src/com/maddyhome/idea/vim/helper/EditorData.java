@@ -108,6 +108,27 @@ public class EditorData
     }
 
     /**
+     * Gets the previous visual operator range for the editor.
+     * @param editor The editor to get the range for
+     * @return The last visual range, null if no previous range
+     */
+    public static VisualRange getLastVisualOperatorRange(Editor editor)
+    {
+        VisualRange res = (VisualRange)editor.getUserData(VISUAL_OP);
+        return res;
+    }
+
+    /**
+     * Sets the previous visual operator range for the editor.
+     * @param editor The editor to set the range for
+     * @param range The visual range
+     */
+    public static void setLastVisualOperatorRange(Editor editor, VisualRange range)
+    {
+        editor.putUserData(VISUAL_OP, range);
+    }
+
+    /**
      * Gets the project associated with the editor.
      * @param editor The editor to get the project for
      * @return The editor's project
@@ -178,4 +199,5 @@ public class EditorData
     private static final String PROJECT = "project";
     private static final String FILE = "virtualFile";
     private static final String VISUAL = "lastVisual";
+    private static final String VISUAL_OP = "lastVisualOp";
 }

@@ -5,6 +5,10 @@ History of changes for @NAME@
 New Commands
 - Added support for {visual}!{filter}, !{motion}{filter}, and !!{filter}.
 
+New Features
+- Entering a count before the v or V command to start Visual mode is now
+  supported.
+
 Bug Fixes
 - Now properly handle :0, :1, and :<negative> commands
 - More problems with Visual mode - none of the visual change commands left
