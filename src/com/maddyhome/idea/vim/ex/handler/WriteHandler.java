@@ -41,7 +41,7 @@ public class WriteHandler extends CommandHandler
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd)
     {
-        CommandGroups.getInstance().getFile().saveFiles(context);
+        //CommandGroups.getInstance().getFile().saveFiles(context);
 
         return true;
     }

@@ -81,6 +81,7 @@ public class FileGroup extends AbstractActionGroup
      */
     public void saveFiles(DataContext context)
     {
+        // TODO - this needs to be fixed
         Project proj = (Project)context.getData(DataConstants.PROJECT);
         proj.saveAllDocuments();
         proj.save();
