@@ -72,7 +72,8 @@ public abstract class CommandHandler
         return flags;
     }
 
-    public void process(final Editor editor, final DataContext context, final ExCommand cmd) throws ExException
+    public void process(final Editor editor, final DataContext context, final ExCommand cmd, final int count) throws
+        ExException
     {
         if ((flags & RANGE_FORBIDDEN) != 0 && cmd.getRanges().size() != 0)
         {
@@ -89,16 +90,20 @@ public abstract class CommandHandler
             RunnableHelper.runWriteCommand(new Runnable() {
                 public void run()
                 {
-                    boolean res = false;
+                    boolean res = true;
                     try
                     {
                         UndoManager.getInstance().beginCommand(editor);
-                        res = execute(editor, context, cmd);
+                        for (int i = 0; i < count && res; i++)
+                        {
+                            res = execute(editor, context, cmd);
+                        }
                     }
                     catch (ExException e)
                     {
                         // TODO - handle this
                         VimPlugin.indicateError();
+                        res = false;
                     }
                     finally
                     {
@@ -121,7 +126,10 @@ public abstract class CommandHandler
                 {
                     try
                     {
-                        execute(editor, context, cmd);
+                        for (int i = 0; i < count; i++)
+                        {
+                            execute(editor, context, cmd);
+                        }
                     }
                     catch (ExException e)
                     {
