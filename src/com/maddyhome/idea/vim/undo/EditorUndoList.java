@@ -30,6 +30,7 @@ import com.intellij.openapi.vcs.FileStatusManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.helper.DocumentManager;
 import java.util.ArrayList;
 
 /**
@@ -39,9 +40,9 @@ public class EditorUndoList
 {
     public EditorUndoList(Editor editor)
     {
-        this.editor = editor;
+        //this.editor = editor;
 
-        beginCommand();
+        beginCommand(editor);
     }
 
     public boolean inCommand()
@@ -49,7 +50,7 @@ public class EditorUndoList
         return currentCommand != null;
     }
 
-    public void beginCommand()
+    public void beginCommand(Editor editor)
     {
         logger.info("beginCommand");
         if (inCommand())
@@ -151,14 +152,8 @@ public class EditorUndoList
 
             if (pointer == 0)
             {
-                logger.debug("marking as up-to-date");
                 Project p = (Project)context.getData(DataConstants.PROJECT);
-                VirtualFile vf = (VirtualFile)context.getData(DataConstants.VIRTUAL_FILE);
-                logger.debug("project=" + p.getName() + ":" + p.getProjectFile());
-                logger.debug("file=" + vf);
-                FileDocumentManager.getInstance().reloadFromDisk(editor.getDocument());
-                AbstractVcsHelper.getInstance(p).markFileAsUpToDate(vf);
-                FileStatusManager.getInstance(p).fileStatusChanged(vf);
+                DocumentManager.getInstance().reloadDocument(editor.getDocument(), p);
             }
 
             return true;
@@ -183,7 +178,7 @@ public class EditorUndoList
         return res.toString();
     }
 
-    private Editor editor;
+    //private Editor editor;
     private UndoCommand currentCommand;
     private ArrayList undos = new ArrayList();
     private int pointer = 0;
