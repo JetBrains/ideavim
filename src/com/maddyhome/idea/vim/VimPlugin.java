@@ -42,11 +42,14 @@ import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.group.ChangeGroup;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.FileGroup;
+import com.maddyhome.idea.vim.group.MarkGroup;
 import com.maddyhome.idea.vim.group.MotionGroup;
+import com.maddyhome.idea.vim.helper.DocumentManager;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.key.RegisterActions;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.MorePanel;
+import com.maddyhome.idea.vim.undo.UndoManager;
 import java.awt.Toolkit;
 import java.net.URL;
 import javax.swing.ImageIcon;
@@ -108,6 +111,9 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
      */
     private void setupListeners()
     {
+        DocumentManager.getInstance().addDocumentListener(new MarkGroup.MarkUpdater());
+        DocumentManager.getInstance().addDocumentListener(new UndoManager.DocumentChangeListener());
+
         EditorFactory.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
             public void editorCreated(EditorFactoryEvent event)
             {
@@ -134,6 +140,8 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
                 FileEditorManager.getInstance(project).addFileEditorManagerListener(new MorePanel.MoreEditorChangeListener());
                 FileEditorManager.getInstance(project).addFileEditorManagerListener(new FileGroup.SelectionCheck());
 
+                DocumentManager.getInstance().openProject(project);
+
                 /*
                 ToolWindowManager mgr = ToolWindowManager.getInstance(project);
                 ToolWindow win = mgr.registerToolWindow("VIM", VimToolWindow.getInstance(), ToolWindowAnchor.BOTTOM);
@@ -144,6 +152,8 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
 
             public void projectClosed(Project project)
             {
+                DocumentManager.getInstance().closeProject(project);
+
                 /*
                 toolWindows.remove(project);
                 ToolWindowManager mgr = ToolWindowManager.getInstance(project);
@@ -305,6 +315,7 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
     private VimTypedActionHandler vimHandler;
     private RegisterActions actions;
     //private static HashMap toolWindows = new HashMap();
+    private MarkGroup.MarkUpdater markUpdater = new MarkGroup.MarkUpdater();
 
     private static boolean enabled = true;
     private static Logger logger = Logger.getInstance(VimPlugin.class.getName());
