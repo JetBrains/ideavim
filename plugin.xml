@@ -98,9 +98,11 @@
         <action id="VimInsertBeforeFirstNonBlank" class="com.maddyhome.idea.vim.action.change.insert.InsertBeforeFirstNonBlankAction" text="Insert Before First non-Blank"/>
         <action id="VimInsertCharacterAboveCursor" class="com.maddyhome.idea.vim.action.change.insert.InsertCharacterAboveCursorAction" text="Insert Character Above Cursor"/>
         <action id="VimInsertCharacterBelowCursor" class="com.maddyhome.idea.vim.action.change.insert.InsertCharacterBelowCursorAction" text="Insert Character Below Cursor"/>
+        <action id="VimInsertDeleteInsertedText" class="com.maddyhome.idea.vim.action.change.insert.InsertDeleteInsertedTextAction" text="Delete Inserted Text"/>
         <action id="VimInsertDeletePreviousWord" class="com.maddyhome.idea.vim.action.change.insert.InsertDeletePreviousWordAction" text="Delete Previous Word"/>
         <action id="VimInsertEnter" class="com.maddyhome.idea.vim.action.change.insert.InsertEnterAction" text="Enter"/>
         <action id="VimInsertExitMode" class="com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction" text="Exit Insert Mode"/>
+        <action id="VimInsertHelp" class="com.maddyhome.idea.vim.action.change.insert.InsertHelpAction" text="Help"/>
         <action id="VimInsertLineStart" class="com.maddyhome.idea.vim.action.change.insert.InsertLineStartAction" text="Insert at Line Start"/>
         <action id="VimInsertNewLineAbove" class="com.maddyhome.idea.vim.action.change.insert.InsertNewLineAboveAction" text="Insert New Line Above"/>
         <action id="VimInsertNewLineBelow" class="com.maddyhome.idea.vim.action.change.insert.InsertNewLineBelowAction" text="Insert New Line Below"/>
@@ -165,7 +167,10 @@
         <action id="VimFileClose" class="com.maddyhome.idea.vim.action.file.FileCloseAction" text="Close Editor"/>
 
         <!-- Other -->
+        <action id="VimLastSearchReplace" class="com.maddyhome.idea.vim.action.change.change.ChangeLastSearchReplaceAction" text="Repeat Last :s"/>
+        <action id="VimLastGlobalSearchReplace" class="com.maddyhome.idea.vim.action.change.change.ChangeLastGlobalSearchReplaceAction" text="Repeat Last :s"/>
         <action id="VimRepeatChange" class="com.maddyhome.idea.vim.action.change.RepeatChangeAction" text="Repeat Change"/>
+        <action id="VimRepeatExCommand" class="com.maddyhome.idea.vim.action.change.RepeatExCommandAction" text="Repeat Ex Command"/>
         <action id="VimExEntry" class="com.maddyhome.idea.vim.action.ExEntryAction" text="Enter Ex Command"/>
         <action id="VimResetMode" class="com.maddyhome.idea.vim.action.ResetModeAction" text="Reset Mode"/>
         <action id="VimRedo" class="com.maddyhome.idea.vim.action.change.RedoAction" text="Redo"/>
