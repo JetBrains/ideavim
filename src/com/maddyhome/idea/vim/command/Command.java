@@ -79,7 +79,7 @@ public class Command
     public static final int OTHER_WRITABLE = 10;
     public static final int OTHER_READ_WRITE = 11;
 
-    public static boolean isReadType(int type)
+    public boolean isReadType()
     {
         boolean res = false;
         switch (type)
@@ -95,7 +95,7 @@ public class Command
         return res;
     }
 
-    public static boolean isWriteType(int type)
+    public boolean isWriteType()
     {
         boolean res = false;
         switch (type)
