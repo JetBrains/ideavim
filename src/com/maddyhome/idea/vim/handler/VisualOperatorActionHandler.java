@@ -36,7 +36,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
 {
     protected final boolean execute(final Editor editor, DataContext context, Command cmd)
     {
-        if (!Command.isReadOnlyType(cmd.getType()))
+        if (!Command.isReadType(cmd.getType()))
         {
             UndoManager.getInstance().endCommand(editor);
             UndoManager.getInstance().beginCommand(editor);
@@ -52,7 +52,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
         if (res)
         {
             EditorData.setLastVisualOperatorRange(editor, change);
-            if ((cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) == 0 && !Command.isReadOnlyType(cmd.getType()))
+            if ((cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) == 0 && !Command.isReadType(cmd.getType()))
             {
                 UndoManager.getInstance().endCommand(editor);
                 UndoManager.getInstance().beginCommand(editor);
@@ -61,7 +61,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
         }
         else
         {
-            if (!Command.isReadOnlyType(cmd.getType()))
+            if (!Command.isReadType(cmd.getType()))
             {
                 UndoManager.getInstance().abortCommand(editor);
                 UndoManager.getInstance().beginCommand(editor);
