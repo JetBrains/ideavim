@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
+import com.maddyhome.idea.vim.group.CommandGroups;
 
 /**
  *
@@ -42,6 +43,21 @@ public class EditFileHandler extends CommandHandler
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException
     {
+        String arg = cmd.getArgument();
+        if (arg != null)
+        {
+            if (arg.equals("#"))
+            {
+                CommandGroups.getInstance().getFile().selectPreviousTab(context);
+
+                return true;
+            }
+            else if (arg.length() > 0)
+            {
+                return CommandGroups.getInstance().getFile().openFile(arg, context);
+            }
+        }
+
         KeyHandler.executeAction("OpenFile", context);
 
         return true;
