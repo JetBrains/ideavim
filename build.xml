@@ -113,7 +113,7 @@
 
     <target name="dist-src" depends="clean" description="Creates the source tar file" >
         <mkdir dir="dist" />
-        <tar basedir="." destfile="${dist}/${project}-src-${version}.tar.gz" excludes="*.iws,dist/**,scratch/**" compression="gzip"/>
+        <tar basedir="." destfile="${dist}/${project}-src-${version}.tar.gz" excludes="*.iws,dist/**,scratch/**,web/docs/**" compression="gzip"/>
     </target>
 
     <target name="javadoc" depends="build" description="Generates Javadoc for all source code" >

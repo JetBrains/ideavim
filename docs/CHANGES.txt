@@ -9,6 +9,7 @@ New Features
   - Show the VIM tool window.
   - Make the VIM tool window docked.
   - Turn off auto-hide for the VIM tool window.
+  - Shrink the tool window so just the window title is visible.
   - Do not move the VIM tool window to the left or right - leave on the bottom
     or top.
 - Various error messages are now displayed in the new status bar.
@@ -28,6 +29,11 @@ Bug Fixes
 - Hitting escape while entering a search string resulted in a search for the
   previous search string instead of doing nothing.
 - The :registers command didn't display trailing newlines in a register
+- Fixed focus problem if user hits escape in the find dialog after entering
+  the :find command.
+- All the search and substitute commands acted strangely if the text contained
+  real tab characters. Tabs are now properly handled.
+- gd and gD weren't working in read-only files.
 
 0.3.1 to 0.3.2
 
