@@ -33,7 +33,7 @@
 
     <property name="project" value="IdeaVIM" />
     <!-- Update this prior to building a new distribution -->
-    <property name="version" value="0.4.0" />
+    <property name="version" value="0.4.1" />
 
     <path id="build.classpath">
         <pathelement path="${idea.home}/lib/openapi.jar" />

@@ -5,6 +5,12 @@ History of changes for @NAME@
 Bug Fixes
 - Fixed vim.xml for Windows. This file was getting deleted by Idea on Windows
   due to a mismatch in the case of the name.
+- The O command now properly indents the new line.
+- Fixed Null Pointer Exception when editing file templates.
+
+Temporary Work-arounds
+- Disabled the saving of files when using any of the :w related commands until
+  a fix can be found for the dead-lock bug. ZZ and ZQ still save files.
 
 0.3.2 to 0.4.0
 
