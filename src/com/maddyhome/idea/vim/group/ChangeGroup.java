@@ -24,6 +24,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DataConstants;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.LogicalPosition;
@@ -32,10 +33,13 @@ import com.intellij.openapi.editor.event.EditorFactoryAdapter;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.editor.event.EditorMouseAdapter;
 import com.intellij.openapi.editor.event.EditorMouseEvent;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
@@ -81,8 +85,9 @@ public class ChangeGroup extends AbstractActionGroup
                         }
                     }
                 });
-            }
 
+                editor.getSettings().setBlockCursor(!CommandState.inInsertMode());
+            }
        });
     }
 
@@ -360,6 +365,8 @@ public class ChangeGroup extends AbstractActionGroup
                 processInsert(editor, context);
             }
             state.pushState(mode, 0, KeyParser.MAPPING_INSERT);
+
+            resetCursor(editor, true);
         }
     }
 
@@ -435,6 +442,12 @@ public class ChangeGroup extends AbstractActionGroup
         CommandGroups.getInstance().getMark().setMark(editor, context, '^', editor.getCaretModel().getOffset());
         CommandGroups.getInstance().getMark().setMark(editor, context, ']', editor.getCaretModel().getOffset());
         CommandState.getInstance().popState();
+
+        if (!CommandState.inInsertMode())
+        {
+            resetCursor(editor, false);
+        }
+
         UndoManager.getInstance().endCommand(editor);
         UndoManager.getInstance().beginCommand(editor);
     }
@@ -1243,11 +1256,47 @@ public class ChangeGroup extends AbstractActionGroup
         CommandGroups.getInstance().getMark().setMark(editor, context, '.', start + str.length());
     }
 
+    private static void resetCursor(Editor editor, boolean insert)
+    {
+        Document doc = editor.getDocument();
+        VirtualFile vf = FileDocumentManager.getInstance().getFile(doc);
+        if (vf != null)
+        {
+            resetCursor(vf, EditorData.getProject(editor), insert);
+        }
+        else
+        {
+            editor.getSettings().setBlockCursor(!insert);
+        }
+    }
+
+    private static void resetCursor(VirtualFile virtualFile, Project proj, boolean insert)
+    {
+        logger.debug("resetCursor");
+        Document doc = FileDocumentManager.getInstance().getDocument(virtualFile);
+        Editor[] editors = EditorFactory.getInstance().getEditors(doc, proj);
+        logger.debug("There are " + editors.length + " editors for virtual file " + virtualFile.getName());
+        for (int i = 0; i < editors.length; i++)
+        {
+            editors[i].getSettings().setBlockCursor(!insert);
+        }
+    }
+
     /**
      * This class listens for editor tab changes so any insert/replace modes that need to be reset can be
      */
     public static class InsertCheck extends FileEditorManagerAdapter
     {
+        /**
+         * Ensure that all open editors get a block cursor for command mode.
+         * @param fileEditorManager
+         * @param virtualFile
+         */
+        public void fileOpened(FileEditorManager fileEditorManager, VirtualFile virtualFile)
+        {
+            resetCursor(virtualFile, EditorData.getProject(fileEditorManager), false);
+        }
+
         /**
          * The user has changed the editor they are working with - exit insert/replace mode, and complete any
          * appropriate repeat.
@@ -1261,7 +1310,14 @@ public class ChangeGroup extends AbstractActionGroup
 
             CommandState.getInstance().reset();
             KeyHandler.getInstance().fullReset();
+
+            VirtualFile virtualFile = event.getOldFile();
+            if (virtualFile != null)
+            {
+                resetCursor(virtualFile, EditorData.getProject(event.getManager()), false);
+            }
         }
+
     }
 
     private ArrayList strokes = new ArrayList();
