@@ -282,6 +282,10 @@ public class ChangeGroup extends AbstractActionGroup
         // If we are repeating the last insert/replace
         if (state.getMode() == CommandState.MODE_REPEAT)
         {
+            if (mode == CommandState.MODE_REPLACE)
+            {
+                processInsert(editor, context);
+            }
             // If this command doesn't allow repeating, set the count to 1
             if ((state.getCommand().getFlags() & Command.FLAG_NO_REPEAT) != 0)
             {
@@ -290,6 +294,10 @@ public class ChangeGroup extends AbstractActionGroup
             else
             {
                 repeatInsert(editor, context, state.getCommand().getCount());
+            }
+            if (mode == CommandState.MODE_REPLACE)
+            {
+                processInsert(editor, context);
             }
         }
         // Here we begin insert/replace mode
