@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.helper;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2004 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -278,15 +278,35 @@ public class SearchHelper
 
     public static int findNextWord(char[] chars, int pos, int size, int count, boolean skipPunc)
     {
-        int found = 0;
         int step = count >= 0 ? 1 : -1;
-        // For back searches, skip any current whitespace so we start at the end of a word
-        if (count < 0 && pos > 0)
+        count = Math.abs(count);
+
+        int res = pos;
+        for (int i = 0; i < count; i++)
         {
-            if (CharacterHelper.charType(chars[pos + step], false) == CharacterHelper.TYPE_SPACE)
+            res = findNextWordOne(chars, res, size, step, skipPunc);
+            if (res == pos || res == 0 || res == size - 1)
+            {
+                break;
+            }
+        }
+
+        return res;
+    }
+
+    private static int findNextWordOne(char[] chars, int pos, int size, int step, boolean skipPunc)
+    {
+        boolean found = false;
+        // For back searches, skip any current whitespace so we start at the end of a word
+        if (step < 0 && pos > 0)
+        {
+            if (CharacterHelper.charType(chars[pos - 1], skipPunc) == CharacterHelper.TYPE_SPACE)
+            {
+                pos = skipSpace(chars, pos - 1, step, size) + 1;
+            }
+            if (CharacterHelper.charType(chars[pos], skipPunc) != CharacterHelper.charType(chars[pos - 1], skipPunc))
             {
                 pos += step;
-                pos = skipSpace(chars, pos, step, size);
             }
         }
         int res = pos;
@@ -296,18 +316,23 @@ public class SearchHelper
         }
 
         int type = CharacterHelper.charType(chars[pos], skipPunc);
+        if (type == CharacterHelper.TYPE_SPACE && step < 0 && pos > 0)
+        {
+            type = CharacterHelper.charType(chars[pos - 1], skipPunc);
+        }
+        
         pos += step;
-        while (pos >= 0 && pos < size && found < Math.abs(count))
+        while (pos >= 0 && pos < size && !found)
         {
             int newType = CharacterHelper.charType(chars[pos], skipPunc);
             if (newType != type)
             {
-                if (newType == CharacterHelper.TYPE_SPACE && count >= 0)
+                if (newType == CharacterHelper.TYPE_SPACE && step >= 0)
                 {
                     pos = skipSpace(chars, pos, step, size);
                     res = pos;
                 }
-                else if (count < 0)
+                else if (step < 0)
                 {
                     res = pos + 1;
                 }
@@ -317,13 +342,13 @@ public class SearchHelper
                 }
 
                 type = CharacterHelper.charType(chars[res], skipPunc);
-                found++;
+                found = true;
             }
 
             pos += step;
         }
 
-        if (found < Math.abs(count))
+        if (found)
         {
             if (pos <= 0)
             {
@@ -408,11 +433,29 @@ public class SearchHelper
 
     public static int findNextWordEnd(char[] chars, int pos, int size, int count, boolean skipPunc, boolean stayEnd)
     {
-        int found = 0;
         int step = count >= 0 ? 1 : -1;
-        // For forward searches, skip any current whitespace so we start at the start of a word
-        if (count > 0 && pos < size - 1)
+        count = Math.abs(count);
+
+        int res = pos;
+        for (int i = 0; i < count; i++)
         {
+            res = findNextWordEndOne(chars, res, size, step, skipPunc, stayEnd);
+            if (res == pos || res == 0 || res == size - 1)
+            {
+                break;
+            }
+        }
+
+        return res;
+    }
+
+    private static int findNextWordEndOne(char[] chars, int pos, int size, int step, boolean skipPunc, boolean stayEnd)
+    {
+        boolean found = false;
+        // For forward searches, skip any current whitespace so we start at the start of a word
+        if (step > 0 && pos < size - 1)
+        {
+            /*
             if (CharacterHelper.charType(chars[pos + step], false) == CharacterHelper.TYPE_SPACE)
             {
                 if (!stayEnd)
@@ -421,6 +464,15 @@ public class SearchHelper
                 }
                 pos = skipSpace(chars, pos, step, size);
             }
+            */
+            if (CharacterHelper.charType(chars[pos + 1], skipPunc) == CharacterHelper.TYPE_SPACE)
+            {
+                pos = skipSpace(chars, pos + 1, step, size) - 1;
+            }
+            if (CharacterHelper.charType(chars[pos], skipPunc) != CharacterHelper.charType(chars[pos + 1], skipPunc))
+            {
+                pos += step;
+            }
         }
         int res = pos;
         if (pos < 0 || pos >= size)
@@ -428,17 +480,22 @@ public class SearchHelper
             return pos;
         }
         int type = CharacterHelper.charType(chars[pos], skipPunc);
+        if (type == CharacterHelper.TYPE_SPACE && step >= 0 && pos < size - 1)
+        {
+            type = CharacterHelper.charType(chars[pos + 1], skipPunc);
+        }
+
         pos += step;
-        while (pos >= 0 && pos < size && found < Math.abs(count))
+        while (pos >= 0 && pos < size && !found)
         {
             int newType = CharacterHelper.charType(chars[pos], skipPunc);
             if (newType != type)
             {
-                if (count >= 0)
+                if (step >= 0)
                 {
                     res = pos - 1;
                 }
-                else if (newType == CharacterHelper.TYPE_SPACE && count < 0)
+                else if (newType == CharacterHelper.TYPE_SPACE && step < 0)
                 {
                     pos = skipSpace(chars, pos, step, size);
                     res = pos;
@@ -448,14 +505,13 @@ public class SearchHelper
                     res = pos;
                 }
 
-                type = CharacterHelper.charType(chars[res], skipPunc);
-                found++;
+                found = true;
             }
 
             pos += step;
         }
 
-        if (found < Math.abs(count))
+        if (found)
         {
             if (pos <= 0)
             {

@@ -991,11 +991,14 @@ public class ChangeGroup extends AbstractActionGroup
 
         // Vim treats cw as ce and cW as cE if cursor is on a non-blank character
         String id = ActionManager.getInstance().getId(argument.getMotion().getAction());
+        boolean kludge = false;
+        boolean skipPunc = false;
         if (id.equals("VimMotionWordRight"))
         {
             if (EditorHelper.getFileSize(editor) > 0 &&
                 !Character.isWhitespace(editor.getDocument().getChars()[editor.getCaretModel().getOffset()]))
             {
+                kludge = true;
                 argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionWordEndRight"));
                 argument.getMotion().setFlags(Command.FLAG_MOT_INCLUSIVE);
             }
@@ -1005,6 +1008,8 @@ public class ChangeGroup extends AbstractActionGroup
             if (EditorHelper.getFileSize(editor) > 0 &&
                 !Character.isWhitespace(editor.getDocument().getChars()[editor.getCaretModel().getOffset()]))
             {
+                kludge = true;
+                skipPunc = true;
                 argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionBigWordEndRight"));
                 argument.getMotion().setFlags(Command.FLAG_MOT_INCLUSIVE);
             }
@@ -1014,8 +1019,39 @@ public class ChangeGroup extends AbstractActionGroup
             if (EditorHelper.getFileSize(editor) > 0 &&
                 !Character.isWhitespace(editor.getDocument().getChars()[editor.getCaretModel().getOffset()]))
             {
+                kludge = true;
                 argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionCamelEndRight"));
                 argument.getMotion().setFlags(Command.FLAG_MOT_INCLUSIVE);
+            }
+        }
+
+        if (kludge)
+        {
+            int pos = editor.getCaretModel().getOffset();
+            int size = EditorHelper.getFileSize(editor);
+            int cnt = count * argument.getMotion().getCount();
+            int pos1 = SearchHelper.findNextWordEnd(editor.getDocument().getChars(), pos, size, cnt, skipPunc, false);
+            int pos2 = SearchHelper.findNextWordEnd(editor.getDocument().getChars(), pos1, size, -cnt, skipPunc, false);
+            logger.debug("pos=" + pos);
+            logger.debug("pos1=" + pos1);
+            logger.debug("pos2=" + pos2);
+            logger.debug("count=" + count);
+            logger.debug("arg.count=" + argument.getMotion().getCount());
+            if (pos2 == pos)
+            {
+                if (count > 1)
+                {
+                    count--;
+                    rawCount--;
+                }
+                else if (argument.getMotion().getCount() > 1)
+                {
+                    argument.getMotion().setCount(argument.getMotion().getCount() - 1);
+                }
+                else
+                {
+                    argument.getMotion().setFlags(Command.FLAG_MOT_EXCLUSIVE);
+                }
             }
         }
 

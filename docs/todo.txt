@@ -1,8 +1,6 @@
 Bugs to fix:
 
-- b when on start of punctuation.
 - :<range><command> can't have a space before the command.
-- <count>e and <count>b on 1/2/3 doesn't work right.
 - 5dw on /1/2/3 deletes way too much.
 - can't delete empty lines at end of file.
 - Show message after shifting lines with :< or :>
