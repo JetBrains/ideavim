@@ -720,6 +720,8 @@ This is a brief but complete listing of all the ":" commands, without
 mentioning any arguments.  The optional part of the command name is inside [].
 The commands are sorted on the non-optional part of their name.
 
+|:!|            :!              filter lines or execute an external command
+|:!!|           :!!             repeat last ":!" command
 |:<|            :<              shift lines one 'shiftwidth' left
 |:>|            :>              shift lines one 'shiftwidth' right
 |:&|            :&              repeat last ":substitute"
@@ -738,12 +740,14 @@ The commands are sorted on the non-optional part of their name.
 |:last|         :la[st]         go to the last file in the argument list
 |:move|         :m[ove]         move lines
 |:mark|         :ma[rk]         set a mark
+|:marks|        :marks          list all marks
 |:next|         :n[ext]         go to next file in the argument list
 |:previous|     :prev[ious]     go to previous file in argument list
 |:promptfind|   :pro[mptfind]   Search dialog
 |:promptrepl|   :promptr[epl]   Search/Replace dialog
 |:put|          :pu[t]          insert contents of register in the text
 |:quit|         :q[uit]         quit current window (when one window quit Vim)
+|:registers|    :reg[isters]    display the contents of registers
 |:rewind|       :rew[ind]       go to the first file in the argument list
 |:substitute|   :s[ubstitute]   find and replace text
 |:t|            :t              same as ":copy"
@@ -756,8 +760,6 @@ TODO:
 ==============================================================================
 5. EX commands                                  *ex-cmd-index* *:index*
 
-|:!|            :!              filter lines or execute an external command
-|:!!|           :!!             repeat last ":!" command
 |:#|            :#              same as ":number"
 |:star|         :*              execute contents of a register
 |:@|            :@              execute contents of a register
@@ -793,7 +795,6 @@ TODO:
 |:left|         :le[ft]         left align lines
 |:map|          :map            show or enter a mapping
 |:mapclear|     :mapc[lear]     clear all mappings for Normal and Visual mode
-|:marks|        :marks          list all marks
 |:mode|         :mod[e]         show or change the screen mode
 |:nmap|         :nm[ap]         like ":map" but for Normal mode
 |:nmapclear|    :nmapc[lear]    clear all mappings for Normal mode
@@ -815,7 +816,6 @@ TODO:
 |:qall|         :qa[ll]         quit Vim
 |:read|         :r[ead]         read file into the text
 |:redo|         :red[o]         redo one undone change
-|:registers|    :reg[isters]    display the contents of registers
 |:resize|       :res[ize]       change current window height
 |:right|        :ri[ght]        right align text
 |:set|          :se[t]          show or set options
