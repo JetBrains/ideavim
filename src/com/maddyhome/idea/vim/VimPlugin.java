@@ -1,8 +1,6 @@
-package com.maddyhome.idea.vim;
-
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2004 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,6 +16,7 @@ package com.maddyhome.idea.vim;
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+package com.maddyhome.idea.vim;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
@@ -38,9 +37,6 @@ import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.WindowManager;
-import com.intellij.openapi.wm.ToolWindowType;
-import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.group.ChangeGroup;
 import com.maddyhome.idea.vim.group.CommandGroups;
@@ -52,13 +48,12 @@ import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.key.RegisterActions;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.MorePanel;
-import com.maddyhome.idea.vim.ui.VimToolWindow;
 import com.maddyhome.idea.vim.undo.UndoManager;
+import org.jdom.Element;
+
 import java.awt.Toolkit;
 import java.net.URL;
-import java.util.HashMap;
 import javax.swing.ImageIcon;
-import org.jdom.Element;
 
 /**
  * This plugin attempts to emulate the keybinding and general functionality of Vim and gVim. See the supplied
@@ -111,44 +106,6 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
         logger.debug("done");
     }
 
-    public static void showToolWindow(Project proj)
-    {
-        ToolWindow win = (ToolWindow)toolWindows.get(proj);
-        if (win != null)
-        {
-            win.setType(ToolWindowType.DOCKED, null);
-            if (isEnabled())
-            {
-                showing.put(proj, new Boolean(win.isVisible()));
-                win.setAutoHide(false);
-                win.show(null);
-                win.activate(null);
-            }
-        }
-    }
-
-    public static void hideToolWindow(Project proj)
-    {
-        ToolWindow win = (ToolWindow)toolWindows.get(proj);
-        if (win != null)
-        {
-            if (isEnabled())
-            {
-                win.setAutoHide(false);
-                boolean hide = false;
-                Boolean wasVisible = (Boolean)showing.get(proj);
-                if (wasVisible != null)
-                {
-                    hide = !wasVisible.booleanValue();
-                }
-                if (hide)
-                {
-                    win.hide(null);
-                }
-            }
-        }
-    }
-
     /**
      * This sets up some listeners so we can handle various events that occur
      */
@@ -185,19 +142,23 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
 
                 DocumentManager.getInstance().openProject(project);
 
+                /*
                 ToolWindowManager mgr = ToolWindowManager.getInstance(project);
                 ToolWindow win = mgr.registerToolWindow("VIM", VimToolWindow.getInstance(), ToolWindowAnchor.BOTTOM);
                 setupToolWindow(win);
                 toolWindows.put(project, win);
+                */
             }
 
             public void projectClosed(Project project)
             {
                 DocumentManager.getInstance().closeProject(project);
 
+                /*
                 toolWindows.remove(project);
                 ToolWindowManager mgr = ToolWindowManager.getInstance(project);
                 mgr.unregisterToolWindow("VIM");
+                */
             }
         });
     }
@@ -209,17 +170,19 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
         ImageIcon icon = new ImageIcon(url);
         win.setIcon(icon);
 
+        /*
         win.setType(ToolWindowType.DOCKED, null);
         if (isEnabled())
         {
             win.setAutoHide(false);
-            //win.show(null);
+            win.show(null);
         }
         else
         {
             win.setAutoHide(true);
             win.hide(null);
         }
+        */
     }
 
     /**
@@ -351,9 +314,8 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
 
     private VimTypedActionHandler vimHandler;
     private RegisterActions actions;
-    private static HashMap toolWindows = new HashMap();
-    private static HashMap showing = new HashMap();
-    //private MarkGroup.MarkUpdater markUpdater = new MarkGroup.MarkUpdater();
+    //private static HashMap toolWindows = new HashMap();
+    private MarkGroup.MarkUpdater markUpdater = new MarkGroup.MarkUpdater();
 
     private static boolean enabled = true;
     private static Logger logger = Logger.getInstance(VimPlugin.class.getName());

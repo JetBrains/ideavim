@@ -4,8 +4,7 @@ History of changes for @NAME@ for IDEA @IDEA-VERSION@
 
 Bug Fixes
 - Fixed c<motion and d<motion> exception if the motion was invalid.
-- The use of : and / commands now uses a different type of window for text
-  entry. This fixes the focus problem that has existed since Idea 4.0.
+- Fixed focus problem with : and / and ? commands.
 - Fixed word motion on strings such as 1/2/3.
 - Fixed <count><word motion> which didn't always match doing <count>
   independent <word motion> commands.

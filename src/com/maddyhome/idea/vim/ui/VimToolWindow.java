@@ -1,8 +1,6 @@
-package com.maddyhome.idea.vim.ui;
-
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2004 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,9 +16,8 @@ package com.maddyhome.idea.vim.ui;
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+package com.maddyhome.idea.vim.ui;
 
-import java.awt.GridLayout;
-import java.awt.BorderLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -43,10 +40,9 @@ public class VimToolWindow extends JPanel
      */
     private VimToolWindow()
     {
-        //add(new JLabel("Resize so just the window title is visible"));
-        setLayout(new BorderLayout());
-        ExEntryPanel panel = ExEntryPanel.getInstance();
-        add(BorderLayout.NORTH, panel);
+        add(new JLabel("Resize so just the window title is visible"));
+
+        setSize(0,0);
     }
 
     private static VimToolWindow instance;

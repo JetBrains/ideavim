@@ -20,10 +20,14 @@ package com.maddyhome.idea.vim.group;
 */
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.DataConstants;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
@@ -102,7 +106,7 @@ public class ProcessGroup extends AbstractActionGroup
     public boolean processExEntry(final Editor editor, final DataContext context)
     {
         final ExEntryPanel panel = ExEntryPanel.getInstance();
-        panel.deactivate(true);
+        panel.deactivate(false);
         boolean res = true;
         try
         {
@@ -143,32 +147,31 @@ public class ProcessGroup extends AbstractActionGroup
         }
         finally
         {
-            /*
             SwingUtilities.invokeLater(new Runnable() {
                 public void run()
                 {
-                    editor.getContentComponent().requestFocus();
+                    //editor.getContentComponent().requestFocus();
+                    FileEditorManager.getInstance((Project)context.getData(DataConstants.PROJECT)).openFile(
+                        EditorData.getVirtualFile(editor), true);
                 }
             });
-            */
             return res;
         }
     }
 
-    public boolean cancelExEntry(final Editor editor, DataContext context)
+    public boolean cancelExEntry(final Editor editor, final DataContext context)
     {
         CommandState.getInstance().popState();
         ExEntryPanel panel = ExEntryPanel.getInstance();
-        panel.clear();
-        panel.deactivate(true);
-        /*
+        panel.deactivate(false);
         SwingUtilities.invokeLater(new Runnable() {
             public void run()
             {
-                editor.getContentComponent().requestFocus();
+                //editor.getContentComponent().requestFocus();
+                FileEditorManager.getInstance((Project)context.getData(DataConstants.PROJECT)).openFile(
+                    EditorData.getVirtualFile(editor), true);
             }
         });
-        */
 
         return true;
     }

@@ -19,25 +19,27 @@ package com.maddyhome.idea.vim.ui;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import com.intellij.openapi.actionSystem.DataConstants;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.helper.EditorData;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.KeyboardFocusManager;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
@@ -68,7 +70,6 @@ public class ExEntryPanel extends JPanel
         entry = new ExTextField();
         entry.setFont(font);
         entry.setBorder(null);
-        entry.setEnabled(false);
 
         setForeground(entry.getForeground());
         setBackground(entry.getBackground());
@@ -90,7 +91,6 @@ public class ExEntryPanel extends JPanel
         add(entry);
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
-        /*
         newGlass = new CommandEntryGlass();
         newGlass.add(this);
         newGlass.addComponentListener(new ComponentAdapter() {
@@ -99,7 +99,6 @@ public class ExEntryPanel extends JPanel
                 positionPanel();
             }
         });
-        */
     }
 
     /**
@@ -112,30 +111,22 @@ public class ExEntryPanel extends JPanel
      */
     public void activate(Editor editor, DataContext context, String label, String initText, int count)
     {
-        last = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+        //last = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
         entry.setEditor(editor, context);
-        //JComponent comp = editor.getContentComponent();
+        JComponent comp = editor.getContentComponent();
         this.label.setText(label);
         this.count = count;
         entry.setDocument(entry.createDefaultModel());
         entry.setText(initText);
-        entry.setEnabled(true);
-        //parent = comp;
-        //root = SwingUtilities.getRootPane(parent);
-        //oldGlass = root.getGlassPane();
-        //root.setGlassPane(newGlass);
+        parent = comp;
+        root = SwingUtilities.getRootPane(parent);
+        oldGlass = root.getGlassPane();
+        root.setGlassPane(newGlass);
 
-        //positionPanel();
+        positionPanel();
 
-        //newGlass.setVisible(true);
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run()
-            {
-                VimPlugin.showToolWindow((Project)entry.getContext().getData(DataConstants.PROJECT));
-                entry.requestFocus();
-            }
-        });
-
+        newGlass.setVisible(true);
+        entry.requestFocus();
         active = true;
     }
 
@@ -166,7 +157,6 @@ public class ExEntryPanel extends JPanel
         entry.handleKey(stroke);
     }
 
-    /*
     private void positionPanel()
     {
         if (parent == null) return;
@@ -181,7 +171,6 @@ public class ExEntryPanel extends JPanel
         setBounds(bounds);
         repaint();
     }
-    */
 
     /**
      * Gets the text entered by the user. This includes any initial text but does not include the label
@@ -190,11 +179,6 @@ public class ExEntryPanel extends JPanel
     public String getText()
     {
         return entry.getText();
-    }
-
-    public void clear()
-    {
-        entry.setText("");
     }
 
     /**
@@ -206,27 +190,22 @@ public class ExEntryPanel extends JPanel
         logger.info("deactivate");
         if (!active) return;
         active = false;
-        entry.setEnabled(false);
-        //newGlass.setVisible(false);
-        //root.setGlassPane(oldGlass);
+        newGlass.setVisible(false);
+        root.setGlassPane(oldGlass);
+        /*
         if (changeFocus)
         {
             logger.debug("parent.requestFocus()");
             SwingUtilities.invokeLater(new Runnable() {
                 public void run()
                 {
-                    VimPlugin.hideToolWindow((Project)entry.getContext().getData(DataConstants.PROJECT));
-
                     //parent.requestFocus();
-                    //last.requestFocus();
-                    //entry.getEditor().getComponent().requestFocus();
-                    FileEditorManager.getInstance((Project)entry.getContext().getData(DataConstants.PROJECT)).openFile(
-                        EditorData.getVirtualFile(entry.getEditor()), true);
+                    last.requestFocus();
                 }
             });
         }
-
-        //parent = null;
+        */
+        parent = null;
     }
 
     /**
@@ -247,14 +226,14 @@ public class ExEntryPanel extends JPanel
         }
     }
 
-    //private JComponent parent;
+    private JComponent parent;
     private JLabel label;
     private ExTextField entry;
-    //private JPanel newGlass;
-    //private Component oldGlass;
-    //private JRootPane root;
+    private JPanel newGlass;
+    private Component oldGlass;
+    private JRootPane root;
     private int count;
-    private Component last;
+    //private Component last;
 
     private boolean active;
 
