@@ -1,4 +1,4 @@
-*options.txt*   For @NAME@ version @VERSION@.  Last change: 2004 May 28.
+*options.txt*   For @NAME@ version @VERSION@.  Last change: 2004 June 29.
                        For IDEA version @IDEA-VERSION@
 
                   @NAME@ REFERENCE MANUAL    by Rick Maddy
