@@ -28,15 +28,26 @@ import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 
 /**
- *
+ * This handles Ex commands that just specify a range which translates to moving the cursor to the line given by the
+ * range.
  */
 public class GotoLineHandler extends CommandHandler
 {
+    /**
+     * Create the handler
+     */
     public GotoLineHandler()
     {
-        super(null, "", RANGE_REQUIRED | ARGUMENT_OPTIONAL, Command.FLAG_MOT_EXCLUSIVE);
+        super(RANGE_REQUIRED | ARGUMENT_OPTIONAL, Command.FLAG_MOT_EXCLUSIVE);
     }
 
+    /**
+     * Moves the cursor to the line entered by the user
+     * @param editor The editor to perform the action in.
+     * @param context The data context
+     * @param cmd The complete Ex command including range, command, and arguments
+     * @return True if able to perform the command, false if not
+     */
     public boolean execute(Editor editor, DataContext context, ExCommand cmd)
     {
         int count = cmd.getLine(editor, context);
@@ -44,7 +55,7 @@ public class GotoLineHandler extends CommandHandler
         if (count > 0)
         {
             MotionGroup.moveCaret(editor, context,
-                CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor, count - 1));
+                CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor, count));
 
             return true;
         }
