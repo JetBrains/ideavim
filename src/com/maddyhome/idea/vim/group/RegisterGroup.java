@@ -25,6 +25,8 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.ui.ClipboardHandler;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -131,7 +133,7 @@ public class RegisterGroup extends AbstractActionGroup
             // Set the text if the lowercase register didn't exist yet
             else
             {
-                registers.put(new Character(lreg), new Register(type, text));
+                registers.put(new Character(lreg), new Register(lreg, type, text));
                 logger.debug("register '" + register + "' contains: \"" + text + "\"");
             }
         }
@@ -142,14 +144,14 @@ public class RegisterGroup extends AbstractActionGroup
         // Put the text in the specified register
         else
         {
-            registers.put(new Character(register), new Register(type, text));
+            registers.put(new Character(register), new Register(register, type, text));
             logger.debug("register '" + register + "' contains: \"" + text + "\"");
         }
 
         // Also add it to the default register if the default wasn't specified
         if (register != REGISTER_DEFAULT)
         {
-            registers.put(new Character(REGISTER_DEFAULT), new Register(type, text));
+            registers.put(new Character(REGISTER_DEFAULT), new Register(REGISTER_DEFAULT, type, text));
             logger.debug("register '" + register + "' contains: \"" + text + "\"");
         }
 
@@ -164,21 +166,21 @@ public class RegisterGroup extends AbstractActionGroup
                     registers.put(new Character((char)(d + 1)), t);
                 }
             }
-            registers.put(new Character('1'), new Register(type, text));
+            registers.put(new Character('1'), new Register('1', type, text));
 
             // Deletes small than one line also go the the - register
             if (type == MotionGroup.CHARACTERWISE)
             {
                 if (editor.offsetToLogicalPosition(start).line == editor.offsetToLogicalPosition(end).line)
                 {
-                    registers.put(new Character('-'), new Register(type, text));
+                    registers.put(new Character('-'), new Register('-', type, text));
                 }
             }
         }
         // Yanks also go to register 0 if the default register was used
         else if (register == REGISTER_DEFAULT)
         {
-            registers.put(new Character('0'), new Register(type, text));
+            registers.put(new Character('0'), new Register('0', type, text));
             logger.debug("register '" + register + "' contains: \"" + text + "\"");
         }
 
@@ -211,7 +213,7 @@ public class RegisterGroup extends AbstractActionGroup
             String text = ClipboardHandler.getClipboardText();
             if (text != null)
             {
-                reg = new Register(MotionGroup.CHARACTERWISE, text);
+                reg = new Register(r, MotionGroup.CHARACTERWISE, text);
             }
         }
         else
@@ -229,6 +231,14 @@ public class RegisterGroup extends AbstractActionGroup
     public char getCurrentRegister()
     {
         return lastRegister;
+    }
+
+    public List getRegisters()
+    {
+        ArrayList res = new ArrayList(registers.values());
+        Collections.sort(res, new Register.KeySorter());
+
+        return res;
     }
 
     /**
@@ -270,8 +280,9 @@ public class RegisterGroup extends AbstractActionGroup
             for (int i = 0; i < list.size(); i++)
             {
                 Element reg = (Element)list.get(i);
-                Register register = new Register(Integer.parseInt(reg.getAttributeValue("type")), reg.getChildText("text"));
                 Character key = new Character(reg.getAttributeValue("name").charAt(0));
+                Register register = new Register(key.charValue(), Integer.parseInt(reg.getAttributeValue("type")),
+                    reg.getChildText("text"));
                 registers.put(key, register);
             }
         }
