@@ -302,8 +302,8 @@ public class RegisterActions
 
         // Shift Actions
         // TODO - add =
-        // TODO - == will ignore count any only autoindent 1 lines
-        parser.registerAction(KeyParser.MAPPING_NORMAL, "AutoIndentLines", Command.CHANGE, new Shortcut("=="));
+        // TODO - == will ignore count and only autoindent 1 lines
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimAutoIndentLines", Command.CHANGE, new Shortcut("=="));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimShiftLeftLines", Command.CHANGE, new Shortcut("<<"));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimShiftLeftMotion", Command.CHANGE, new Shortcut('<'), Argument.MOTION);
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimShiftRightLines", Command.CHANGE, new Shortcut(">>"));
