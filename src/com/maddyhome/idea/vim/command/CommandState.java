@@ -22,6 +22,8 @@ package com.maddyhome.idea.vim.command;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.key.KeyParser;
+import com.maddyhome.idea.vim.VimPlugin;
+import java.util.Stack;
 
 /**
  * This singleton maintains various state information about commands being run
@@ -38,6 +40,12 @@ public class CommandState
     public static final int MODE_REPEAT = 4;
     /** Indicates a runtime state of being in visual mode */
     public static final int MODE_VISUAL = 5;
+    /** Indicates a runtime state of entering an Ex command */
+    public static final int MODE_EX_ENTRY = 6;
+
+    public static final int SUBMODE_SINGLE_COMMAND = 1;
+    public static final int SUBMODE_INSERT = 1;
+    public static final int SUBMODE_REPLACE = 1;
 
     /**
      * Gets the command state singleton
@@ -68,7 +76,19 @@ public class CommandState
      */
     public void setCommand(Command cmd)
     {
-        command = cmd;
+            command = cmd;
+    }
+
+    public void pushState(int mode, int submode, int mapping)
+    {
+        modes.push(new State(mode, submode, mapping));
+        updateStatus();
+    }
+
+    public void popState()
+    {
+        modes.pop();
+        updateStatus();
     }
 
     /**
@@ -77,35 +97,90 @@ public class CommandState
      */
     public int getMode()
     {
-        return mode;
+        //return mode;
+        return currentState().getMode();
     }
 
-    /**
-     * Sets the runtime mode
-     * @param mode The new mode
-     */
-    public void setMode(int mode)
+    public int getSubMode()
     {
-        this.mode = mode;
+        return currentState().getSubmode();
     }
 
-    /**
-     * Gets the current visual mode type
-     * @return The visual mode type
-     */
-    public int getVisualType()
+    public void setSubMode(int submode)
     {
-        return visualType;
+        currentState().setSubmode(submode);
+        updateStatus();
     }
 
-    /**
-     * Sets the visual mode type. {@link com.maddyhome.idea.vim.command.Command#FLAG_MOT_CHARACTERWISE} and
-     * {@link com.maddyhome.idea.vim.command.Command#FLAG_MOT_LINEWISE}
-     * @param visualType The new visual mode type
-     */
-    public void setVisualType(int visualType)
+    private void updateStatus()
     {
-        this.visualType = visualType;
+        StringBuffer msg = new StringBuffer(getStatusString(modes.size() - 1));
+
+        if (isRecording())
+        {
+            if (msg.length() > 0)
+            {
+                msg.append(" - ");
+            }
+            msg.append("recording");
+        }
+
+        VimPlugin.showMode(msg.toString());
+    }
+
+    private String getStatusString(int pos)
+    {
+        State state = null;
+        if (pos >= 0 && pos < modes.size())
+        {
+            state = (State)modes.get(pos);
+        }
+        else if (pos < 0)
+        {
+            state = defaultState;
+        }
+        else
+        {
+            return "";
+        }
+
+        StringBuffer msg = new StringBuffer();
+        switch (state.getMode())
+        {
+            case MODE_COMMAND:
+                if (state.getSubmode() == SUBMODE_SINGLE_COMMAND)
+                {
+                    msg.append('(').append(getStatusString(pos - 1).toLowerCase()).append(')');
+                }
+                break;
+            case MODE_INSERT:
+                msg.append("INSERT");
+                break;
+            case MODE_REPLACE:
+                msg.append("REPLACE");
+                break;
+            case MODE_VISUAL:
+                if (pos > 0)
+                {
+                    State tmp = (State)modes.get(pos - 1);
+                    if (tmp.getMode() == MODE_COMMAND && tmp.getSubmode() == SUBMODE_SINGLE_COMMAND)
+                    {
+                        msg.append(getStatusString(pos - 1));
+                        msg.append(" - ");
+                    }
+                }
+                switch (state.getSubmode())
+                {
+                    case Command.FLAG_MOT_LINEWISE:
+                        msg.append("VISUAL LINE");
+                        break;
+                    default:
+                        msg.append("VISUAL");
+                }
+                break;
+        }
+
+        return msg.toString();
     }
 
     /**
@@ -125,36 +200,17 @@ public class CommandState
     }
 
     /**
-     * Save the current mode state. This saves the mode and mapping mode and then resets them to initial values
-     */
-    public void saveMode()
-    {
-        oldMode = mode;
-        oldMapping = mappingMode;
-        mode = MODE_COMMAND;
-        mappingMode = KeyParser.MAPPING_NORMAL;
-    }
-
-    /**
-     * Restores the previously saves mode and mapping mode.
-     */
-    public void restoreMode()
-    {
-        mode = oldMode;
-        mappingMode = oldMapping;
-        oldMode = MODE_COMMAND;
-        oldMapping = KeyParser.MAPPING_NORMAL;
-    }
-
-    /**
      * Resets the command, mode, visual mode, and mapping mode to initial values.
      */
     public void reset()
     {
         command = null;
+        /*
         mode = MODE_COMMAND;
         visualType = 0;
         mappingMode = KeyParser.MAPPING_NORMAL;
+        */
+        modes.clear();
     }
 
     /**
@@ -163,16 +219,8 @@ public class CommandState
      */
     public int getMappingMode()
     {
-        return mappingMode;
-    }
-
-    /**
-     * Sets the key mapping mode. See the MAPPING constants in KeyParser.
-     * @param mappingMode The new mapping mode.
-     */
-    public void setMappingMode(int mappingMode)
-    {
-        this.mappingMode = mappingMode;
+        //return mappingMode;
+        return currentState().getMapping();
     }
 
     /**
@@ -211,24 +259,83 @@ public class CommandState
     public void setRecording(boolean val)
     {
         isRecording = val;
+        updateStatus();
     }
-    
+
+    private State currentState()
+    {
+        if (modes.size() > 0)
+        {
+            return (State)modes.peek();
+        }
+        else
+        {
+            return defaultState;
+        }
+    }
+
     /**
      * Signleton, no public object creation
      */
     private CommandState()
     {
-        reset();
+        modes.push(new State(MODE_COMMAND, 0, KeyParser.MAPPING_NORMAL));
     }
 
+    private class State
+    {
+        public State(int mode, int submode, int mapping)
+        {
+            this.mode = mode;
+            this.submode = submode;
+            this.mapping = mapping;
+        }
+
+        public int getMode()
+        {
+            return mode;
+        }
+
+        public int getSubmode()
+        {
+            return submode;
+        }
+
+        public void setSubmode(int submode)
+        {
+            this.submode = submode;
+        }
+
+        public int getMapping()
+        {
+            return mapping;
+        }
+
+        public String toString()
+        {
+            StringBuffer res = new StringBuffer();
+            res.append("State[mode=");
+            res.append(mode);
+            res.append(", submode=");
+            res.append(submode);
+            res.append(", mapping=");
+            res.append(mapping);
+            res.append("]");
+
+            return res.toString();
+        }
+
+        private int mode;
+        private int submode;
+        private int mapping;
+    }
+
+    private Stack modes = new Stack();
+    private State defaultState = new State(MODE_COMMAND, 0, KeyParser.MAPPING_NORMAL);
     private Command command;
     private int mode;
     private Command lastChange;
     private char lastRegister = RegisterGroup.REGISTER_DEFAULT;
-    private int oldMode = MODE_COMMAND;
-    private int mappingMode = KeyParser.MAPPING_NORMAL;
-    private int oldMapping = KeyParser.MAPPING_NORMAL;
-    private int visualType = 0;
     private boolean isRecording = false;
 
     private static CommandState ourInstance;
