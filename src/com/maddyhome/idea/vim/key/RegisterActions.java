@@ -210,9 +210,9 @@ public class RegisterActions
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.CTRL_MASK)));
 
         // ************************* Visual Mode Actions **********************
-        parser.registerAction(KeyParser.MAPPING_VISUAL, "AutoIndentLines", Command.CHANGE,
+        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimAutoIndentVisual", Command.CHANGE,
             new Shortcut('='));
-        parser.registerAction(KeyParser.MAPPING_VISUAL, "ReformatCode", Command.CHANGE,
+        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimReformatVisual", Command.CHANGE,
             new Shortcut("gq"));
         parser.registerAction(KeyParser.MAPPING_VISUAL, "VimChangeCaseLowerVisual", Command.CHANGE,
             new Shortcut('u'));
@@ -512,7 +512,7 @@ public class RegisterActions
             new Shortcut('M'));
         parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionNthCharacter", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE | Command.FLAG_SAVE_JUMP,
             new Shortcut("go"));
-        // This represents two commands and one is linewise and the other is exclusive - the handler will fix it
+        // This represents two commands and one is linewise and the other is inclusive - the handler will fix it
         parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionPercentOrMatch", Command.MOTION, Command.FLAG_SAVE_JUMP,
             new Shortcut('%'));
         parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionRight", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut[] {
