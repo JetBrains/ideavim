@@ -326,7 +326,7 @@ public class SearchGroup extends AbstractActionGroup
                     firstMatch = false;
                 }
 
-                String match = sp.vim_regsub_multi(regmatch, lnum, sub, 1, true);
+                String match = sp.vim_regsub_multi(regmatch, lnum, sub, 1, false);
                 //logger.debug("found match[" + spos + "," + epos + "] - replace " + match);
 
                 int line = lnum + regmatch.startpos[0].lnum;
