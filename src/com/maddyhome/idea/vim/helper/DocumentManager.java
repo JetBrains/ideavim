@@ -49,6 +49,8 @@ public class DocumentManager
     {
         logger.debug("closing project");
 
+        // This bit of code is here because FileEditorManager.fileClosed is not getting called
+        // for each open file when a project is closed. See IDEA bug 29727.
         VirtualFile[] files = FileEditorManager.getInstance(project).getOpenFiles();
         logger.debug("there are " + files.length + " open files");
         for (int i = 0; i < files.length; i++)
