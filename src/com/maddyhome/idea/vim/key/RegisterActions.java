@@ -664,7 +664,7 @@ public class RegisterActions
         parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimMotionMark", Command.OTHER_READONLY,
             new Shortcut('m'), Argument.CHARACTER);
         // TODO - why don't these work on RO files?
-        parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimGotoDeclaration", Command.OTHER_READONLY | Command.FLAG_SAVE_JUMP, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimGotoDeclaration", Command.OTHER_READONLY, Command.FLAG_SAVE_JUMP, new Shortcut[] {
             new Shortcut("gD"),
             new Shortcut("gd")
         });
