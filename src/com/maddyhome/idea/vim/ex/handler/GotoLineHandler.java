@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
+import com.maddyhome.idea.vim.helper.EditorHelper;
 
 /**
  * This handles Ex commands that just specify a range which translates to moving the cursor to the line given by the
@@ -52,6 +53,12 @@ public class GotoLineHandler extends CommandHandler
     {
         int count = cmd.getLine(editor, context);
 
+        int max = EditorHelper.getLineCount(editor);
+        if (count >= max)
+        {
+            count = max - 1;
+        }
+        
         if (count >= 0)
         {
             MotionGroup.moveCaret(editor, context,
