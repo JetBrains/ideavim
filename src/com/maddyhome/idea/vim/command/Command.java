@@ -32,6 +32,8 @@ public class Command
     public static final int FLAG_MOT_CHARACTERWISE = 1 << 2;
     public static final int FLAG_MOT_INCLUSIVE = 1 << 3;
     public static final int FLAG_MOT_EXCLUSIVE = 1 << 4;
+    /** Indicates that the cursor position should be saved prior to this motion command */
+    public static final int FLAG_SAVE_JUMP = 1 << 5;
 
     /** Special command flag that indicates it is not to be repeated */
     public static final int FLAG_NO_REPEAT = 1 << 8;
