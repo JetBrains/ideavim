@@ -4,7 +4,48 @@
     <version>@VERSION@</version>
     <vendor url="http://sourceforge.net/projects/ideavim/" email="rick@maddyhome.com">Rick Maddy</vendor>
     <change-notes>
-        - Updated to support Aurora build 1050 and higher.
+<![CDATA[
+- Highlighting lines of code by clicking and/or dragging in the line number area
+  now leaves you in visual line mode.
+- Undoing all changes in a file now correctly marks the file as unchanged if it
+  hasn't been saved in the meantime.
+- All the :write commands (:w :wn :wN :wq) save just the one file now. To save
+  all files use the :wall command.
+- Enhanced the :e command. Support for :e# and :e <filename> have been added.
+  :e# selects the previous tab. :e <filename> will search the entire project
+  and open the first matching file. Relative paths are supported too. :e with
+  no argument will still bring up the File Open dialog.
+- Added support for the gP and gp commands.
+- Added support for the z+ and z^ commands.
+- Added :class command to bring up "Go To Class" dialog. If followed by a
+  classname, open the corresponding Java file. Not in VIM.
+- Added :symbol command to bring up "Go To Symbol" dialog. Not in VIM.
+- Editors use block cursor for command mode and a vertical bar for
+  insert/replace mode.
+- Better support for split view editing.
+- Text selection is reflected in all editors of a file.
+
+Bug Fixes
+- Under certain conditions, highlighting text left you in multiple layers of
+  visual mode. This is now fixed.
+- The gv command resulted in too much text being selected in many cases.
+- The gv command now properly restores the cursor position.
+- Fixed exception caused by using the :undo and :redo commands.
+- Re-enabled all the :write related commands. Hopefully the deadlock has been
+  solved.
+- Fixed error referencing unknown class FileCloseAction.
+- Fixed several exceptions related to edit fields in dialog boxes.
+- Fixed some exceptions related to the undo manager.
+- Status was not always show proper mode.
+- r<Enter> now works as expected.
+- Toggling between insert and replace mode wasn't working properly.
+- The cursor wasn't always restored correctly after an undo.
+- Yanking the last line and then putting it elsewhere sometimes resulted in the
+  old and new line not having a newline between them.
+- Repeating of o and O commands, including with count, works properly now.
+- dw, dW, and d[w now act like d$ if deleting the last word of a line.
+- cW now properly behaves like cE.
+]]>
     </change-notes>
     <idea-version min="4.0" max="4.5"/>
 
