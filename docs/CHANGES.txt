@@ -13,6 +13,8 @@ Bug Fixes
 - The results of the :registers, :marks, and :set commands are now displayed
   properly. This "more" window hadn't been working for a while.
 - Fixed cursor position when issuing the O command on the first line.
+- The confirmation dialog used with the :s//c command now has a default button
+  and mnemonics for all buttons.
 
 0.7.0 to 0.7.1
 

@@ -40,9 +40,14 @@ import com.maddyhome.idea.vim.regexp.CharHelper;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
+
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
+import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 /**
@@ -355,9 +360,7 @@ public class SearchGroup extends AbstractActionGroup
                     {
                         //editor.getSelectionModel().setSelection(startoff, endoff);
                         RangeHighlighter hl = highlightMatch(editor, startoff, endoff);
-                        int choice = JOptionPane.showOptionDialog(null, "Replace with " + match + " ?",
-                            "Confirm Replace", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-                            getConfirmButtons(), null);
+                        int choice = getConfirmChoice(match);
                         //editor.getSelectionModel().removeSelection();
                         editor.getMarkupModel().removeHighlighter(hl);
                         switch (choice)
@@ -434,6 +437,29 @@ public class SearchGroup extends AbstractActionGroup
         return res;
     }
 
+    private int getConfirmChoice(String match)
+    {
+        Object[] btns = getConfirmButtons();
+        confirmDlg = new JOptionPane("Replace with " + match + " ?", JOptionPane.QUESTION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, btns, btns[0]);
+        JDialog dlg = confirmDlg.createDialog(null, "Confirm Replace");
+        dlg.show();
+        Object res = confirmDlg.getValue();
+        confirmDlg = null;
+        if (res == null)
+        {
+            return JOptionPane.CLOSED_OPTION;
+        }
+        for (int i = 0; i < btns.length; i++)
+        {
+            if (btns[i].equals(res))
+            {
+                return i;
+            }
+        }
+
+        return JOptionPane.CLOSED_OPTION;
+    }
+
     private boolean shouldIgnoreCase(String pattern, boolean noSmartCase)
     {
         boolean sc = noSmartCase ? false : Options.getInstance().isSet("smartcase");
@@ -495,8 +521,6 @@ public class SearchGroup extends AbstractActionGroup
     {
         if (confirmBtns == null)
         {
-            // TODO - need buttons with mnemonics
-            /*
             confirmBtns = new JButton[] {
                 new JButton("Yes"),
                 new JButton("No"),
@@ -510,8 +534,12 @@ public class SearchGroup extends AbstractActionGroup
             confirmBtns[2].setMnemonic('A');
             confirmBtns[3].setMnemonic('Q');
             confirmBtns[4].setMnemonic('L');
-            */
-            confirmBtns = new String[] { "Yes", "No", "All", "Quit", "Last" };
+
+            for (int i = 0; i < confirmBtns.length; i++)
+            {
+                confirmBtns[i].addActionListener(new ButtonActionListener(i));
+            }
+            //confirmBtns = new String[] { "Yes", "No", "All", "Quit", "Last" };
         }
 
         return confirmBtns;
@@ -1034,13 +1062,32 @@ public class SearchGroup extends AbstractActionGroup
             new TextAttributes(Color.BLACK, Color.YELLOW, null, null, 0), HighlighterTargetArea.EXACT_RANGE);
     }
 
+    private class ButtonActionListener implements ActionListener
+    {
+        public ButtonActionListener(int i)
+        {
+            index = i;
+        }
+
+        public void actionPerformed(ActionEvent event)
+        {
+            if (confirmDlg != null)
+            {
+                confirmDlg.setValue(confirmBtns[index]);
+            }
+        }
+
+        private int index;
+    }
+
     private String lastSearch;
     private String lastPattern;
     private String lastSubstitute;
     private String lastReplace;
     private String lastOffset;
     private int lastDir;
-    private Object[] confirmBtns;
+    private JButton[] confirmBtns;
+    private JOptionPane confirmDlg = null;
 
     private boolean do_all = false; /* do multiple substitutions per line */
     private boolean do_ask = false; /* ask for confirmation */
