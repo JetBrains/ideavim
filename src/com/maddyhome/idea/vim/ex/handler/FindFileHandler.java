@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -36,9 +37,14 @@ public class FindFileHandler extends CommandHandler
         super("fin", "d", RANGE_FORBIDDEN | ARGUMENT_OPTIONAL);
     }
 
-    public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException
+    public boolean execute(Editor editor, final DataContext context, ExCommand cmd) throws ExException
     {
-        KeyHandler.executeAction("GotoFile", context);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run()
+            {
+                KeyHandler.executeAction("GotoFile", context);
+            }
+        });
 
         return true;
     }
