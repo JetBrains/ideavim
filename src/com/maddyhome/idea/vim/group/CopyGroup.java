@@ -54,7 +54,7 @@ public class CopyGroup extends AbstractActionGroup
      */
     public boolean yankMotion(Editor editor, DataContext context, int count, int rawCount, Argument argument)
     {
-        TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true);
+        TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true, true);
 
         return yankRange(editor, context, range, argument.getMotion().getFlags());
     }
