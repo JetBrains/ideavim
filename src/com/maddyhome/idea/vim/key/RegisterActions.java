@@ -119,6 +119,7 @@ public class RegisterActions
         parser.registerAction(KeyParser.MAPPING_INSERT, "SmartTypeCompletion", Command.INSERT, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK)));
         parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertCharacterAboveCursor", Command.INSERT, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_MASK)));
         parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertCharacterBelowCursor", Command.INSERT, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_MASK)));
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertDeleteInsertedText", Command.INSERT, ChangeGroup.CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.CTRL_MASK)));
         parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertDeletePreviousWord", Command.INSERT, ChangeGroup.CLEAR_STROKES, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK)));
         parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertEnter", Command.INSERT, ChangeGroup.SAVE_STROKE, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_J, KeyEvent.CTRL_MASK)),
@@ -130,6 +131,10 @@ public class RegisterActions
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)),
             new Shortcut(new KeyStroke[] { KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SLASH, KeyEvent.CTRL_MASK), KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK)})
+        });
+        parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertHelp", Command.INSERT, new Shortcut[] {
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0)),
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_HELP, 0))
         });
         parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertPreviousInsert", Command.INSERT, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_MASK)));
         parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertPreviousInsertExit", Command.INSERT, new Shortcut[] {
@@ -232,6 +237,10 @@ public class RegisterActions
         // Copy/Paste Actions
         // TODO - add gP
         // TODO - add gp
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "HelpTopics", Command.OTHER_READONLY, new Shortcut[] {
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0)),
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_HELP, 0))
+        });
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimCopyPutTextBeforeCursor", Command.PASTE, new Shortcut('P'));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimCopyPutTextAfterCursor", Command.PASTE, new Shortcut('p'));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimCopyYankLine", Command.COPY, new Shortcut('Y'));
@@ -275,9 +284,17 @@ public class RegisterActions
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimMotionGotoMark", Command.MOTION, MotionGroup.EXCLUSIVE, new Shortcut('`'), Argument.CHARACTER);
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimMotionGotoMarkLine", Command.MOTION, MotionGroup.LINEWISE, new Shortcut('\''), Argument.CHARACTER);
         // Misc Actions
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimLastSearchReplace", Command.OTHER_WRITABLE, new Shortcut('&'));
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimLastGlobalSearchReplace", Command.OTHER_WRITABLE, new Shortcut("g&"));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimVisualSelectPrevious", Command.OTHER_READONLY, new Shortcut("gv"));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimRepeatChange", Command.OTHER_WRITABLE, new Shortcut('.'));
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimRepeatExCommand", Command.OTHER_WRITABLE, new Shortcut("@:"));
         parser.registerAction(KeyParser.MAPPING_NORMAL, "QuickJavaDoc", Command.OTHER_READONLY, new Shortcut('K'));
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimRedo", Command.OTHER_WRITABLE, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_MASK)));
+        parser.registerAction(KeyParser.MAPPING_NORMAL, "VimUndo", Command.OTHER_WRITABLE, new Shortcut[] {
+            new Shortcut('u'),
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_UNDO, 0))
+        });
 
         // File Actions
         parser.registerAction(KeyParser.MAPPING_NORMAL, "VimFileSaveClose", Command.OTHER_WRITABLE, new Shortcut[] {
@@ -309,7 +326,7 @@ public class RegisterActions
         // TODO - support for :map macros
 
         // ************************* Normal, Operator Pending, Visual Mode Actions *************************
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimCopySelectRegister", Command.SELECT_REGISTER, new Shortcut('"'), Argument.CHARACTER);
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimCopySelectRegister", Command.SELECT_REGISTER, KeyParser.FLAG_EXPECT_MORE, new Shortcut('"'), Argument.CHARACTER);
 
         // Motion Actions
         // TODO - add ['
@@ -461,8 +478,6 @@ public class RegisterActions
         // Misc Actions
         // TODO - add zC
         // TODO - add zO
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimRedo", Command.OTHER_WRITABLE, new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_MASK)));
-        parser.registerAction(KeyParser.MAPPING_NVO, "VimUndo", Command.OTHER_WRITABLE, new Shortcut('u'));
         parser.registerAction(KeyParser.MAPPING_NVO, "CollapseAllRegions", Command.OTHER_READONLY, new Shortcut("zM"));
         parser.registerAction(KeyParser.MAPPING_NVO, "CollapseRegion", Command.OTHER_READONLY, new Shortcut("zc"));
         parser.registerAction(KeyParser.MAPPING_NVO, "ExpandAllRegions", Command.OTHER_READONLY, new Shortcut("zR"));
@@ -474,6 +489,7 @@ public class RegisterActions
         parser.registerAction(KeyParser.MAPPING_NVO, "Find", Command.OTHER_READONLY, new Shortcut('?'));
         parser.registerAction(KeyParser.MAPPING_NVO, "FindNext", Command.OTHER_READONLY, new Shortcut('n'));
         parser.registerAction(KeyParser.MAPPING_NVO, "FindPrevious", Command.OTHER_READONLY, new Shortcut('N'));
+        // FIX - make custom actions so can save jump
         parser.registerAction(KeyParser.MAPPING_NVO, "GotoDeclaration", Command.OTHER_READONLY, new Shortcut[] {
             new Shortcut("gD"),
             new Shortcut("gd")
