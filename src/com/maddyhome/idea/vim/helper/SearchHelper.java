@@ -32,6 +32,33 @@ import java.util.List;
  */
 public class SearchHelper
 {
+    public static boolean anyNonWhitespace(Editor editor, int offset, int dir)
+    {
+        int start;
+        int end;
+        if (dir > 0)
+        {
+            start = offset + 1;
+            end = EditorHelper.getLineEndForOffset(editor, offset);
+        }
+        else
+        {
+            start = EditorHelper.getLineStartForOffset(editor, offset);
+            end = offset - 1;
+        }
+
+        char[] chars = editor.getDocument().getChars();
+        for (int i = start; i <= end; i++)
+        {
+            if (!Character.isWhitespace(chars[i]))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * This looks on the current line, starting at the cursor postion for one of {, }, (, ), [, or ].
      * It then searches forward or backward, as appropriate for the associated match pair. String in double quotes

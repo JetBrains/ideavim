@@ -27,6 +27,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.VisualPosition;
+import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.event.EditorFactoryAdapter;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.editor.event.EditorMouseAdapter;
@@ -44,6 +45,7 @@ import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.undo.UndoManager;
 import java.awt.event.KeyEvent;
@@ -644,7 +646,7 @@ public class ChangeGroup extends AbstractActionGroup
      * @param argument The motion command
      * @return true if able to delete the text, false if not
      */
-    public boolean deleteMotion(Editor editor, DataContext context, int count, int rawCount, Argument argument)
+    public boolean deleteMotion(Editor editor, DataContext context, int count, int rawCount, Argument argument, boolean isChange)
     {
         TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true, false);
         if (range == null && EditorHelper.getFileSize(editor) == 0)
@@ -652,6 +654,27 @@ public class ChangeGroup extends AbstractActionGroup
             return true;
         }
 
+        // Delete motion commands that are not linewise become linewise if all the following are true:
+        // 1) The range is across multiple lines
+        // 2) There is only whitespace before the start of the range
+        // 3) There is only whitespace after the end of the range
+        if (!isChange && (argument.getMotion().getFlags() & Command.FLAG_MOT_LINEWISE) == 0)
+        {
+            LogicalPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
+            LogicalPosition end = editor.offsetToLogicalPosition(range.getEndOffset());
+            if (start.line != end.line)
+            {
+                if (!SearchHelper.anyNonWhitespace(editor, range.getStartOffset(), -1) &&
+                    !SearchHelper.anyNonWhitespace(editor, range.getEndOffset(), 1))
+                {
+                    int flags = argument.getMotion().getFlags();
+                    flags &= ~Command.FLAG_MOT_EXCLUSIVE;
+                    flags &= ~Command.FLAG_MOT_INCLUSIVE;
+                    flags |= Command.FLAG_MOT_LINEWISE;
+                    argument.getMotion().setFlags(flags);
+                }
+            }
+        }
         return deleteRange(editor, context, range, argument.getMotion().getFlags());
     }
 
@@ -843,7 +866,7 @@ public class ChangeGroup extends AbstractActionGroup
             }
         }
 
-        boolean res = deleteMotion(editor, context, count, rawCount, argument);
+        boolean res = deleteMotion(editor, context, count, rawCount, argument, true);
         if (res)
         {
             insertBeforeCursor(editor, context);
