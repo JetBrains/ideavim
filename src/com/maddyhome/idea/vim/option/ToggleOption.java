@@ -20,10 +20,16 @@ package com.maddyhome.idea.vim.option;
 */
 
 /**
- *
+ * Represents a boolean option
  */
 public class ToggleOption extends Option
 {
+    /**
+     * Creates the option
+     * @param name The option's name
+     * @param abbrev The short name
+     * @param dflt The default value
+     */
     ToggleOption(String name, String abbrev, boolean dflt)
     {
         super(name, abbrev);
@@ -32,26 +38,57 @@ public class ToggleOption extends Option
         this.value = dflt;
     }
 
+    /**
+     * The option's value
+     * @return The value
+     */
     public boolean getValue()
     {
         return value;
     }
 
+    /**
+     * Sets the on (true)
+     */
     public void set()
     {
-        value = true;
+        update(true);
     }
 
+    /**
+     * Resets the option (false)
+     */
     public void reset()
     {
-        value = false;
+        update(false);
     }
 
+    /**
+     * Toggles the option's value (false to true, true to false)
+     */
     public void toggle()
     {
-        value = !value;
+        update(!value);
     }
 
+    /**
+     * Helper to set the value only it is changing and notify listeners
+     * @param val The new value
+     */
+    private void update(boolean val)
+    {
+        boolean old = value;
+        value = val;
+        if (val != old)
+        {
+            fireOptionChangeEvent();
+        }
+    }
+
+    /**
+     * The display value of the option [no]{name}
+     * @return The option's display value
+     */
     public String toString()
     {
         StringBuffer res = new StringBuffer();
@@ -69,11 +106,18 @@ public class ToggleOption extends Option
         return res.toString();
     }
 
+    /**
+     * Checks to see if the option's current value equals the default value
+     * @return True if equal to default, false if not.
+     */
     public boolean isDefault()
     {
         return value == dflt;
     }
 
+    /**
+     * Sets the option to its default value.
+     */
     public void resetDefault()
     {
         value = dflt;
