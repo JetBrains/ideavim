@@ -25,7 +25,6 @@ import com.intellij.openapi.util.TextRange;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.CommandGroups;
-import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.undo.UndoManager;
 
 /**
