@@ -41,7 +41,8 @@ using IDEA in VIM Emulation mode:
 
 <ol>
 <li>Copy <code>IdeaVIM.jar</code> to the plugins directory. This is at <code>&lt;IDEA_HOME&gt;/plugins</code> where
-    <code>IDEA_HOME</code> is IDEA installation directory.</li>
+    <code>IDEA_HOME</code> is IDEA installation directory. Newer versions of the Aurora builds should use the
+    plugin manager to download the latest version of the plugin.</li>
 <li>Copy <code>vim.xml</code> to <code>&lt;HOME&gt;/.IntelliJIdea/config/keymaps</code> where <code>HOME</code>
     if your home directory on Unix or <code>C:\Documents&nbsp;and&nbsp;Settings\&lt;user&gt;</code> on Windows.
     Create the <code>keymaps</code> directory if it does not exist.</li>
@@ -63,8 +64,10 @@ You may obtain the plugin by visiting the files page on
 
 The VIM plugin has been developed and tested with IntelliJ IDEA 3.0.2 (#695), 3.0.3 (#698), and 3.0.4 (#701).
 It is not known at this time if older or newer versions will work correctly.
-
-Version 0.6.2 of the plugin now works with Aurora build #963.
+<br>
+Version 0.6.2 of the plugin now works with Aurora build #963 and higher.
+<br>
+Version 0.6.3 of the plugin now works with Aurora build #992 and higher.
 
 <hr>
 

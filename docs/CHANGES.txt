@@ -1,6 +1,10 @@
 History of changes for @NAME@
 
-0.6.1 to @VERSION@
+0.6.2 to @VERSION@
+
+Support for Aurora build #992 and higher.
+
+0.6.1 to 0.6.2
 
 Repackaged to install as a zip directory instead of a jar file. This provides
 better support for the new plugins repository.

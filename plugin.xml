@@ -2,8 +2,10 @@
     <name>@NAME@</name>
     <description>VIM Emulator. Please see the README file for key mapping installation. Required for a first time install.</description>
     <version>@VERSION@</version>
-    <vendor url="http://sourceforge.net/projects/ideavim/">Rick Maddy</vendor>
-    <change-notes></change-notes>
+    <vendor url="http://sourceforge.net/projects/ideavim/" email="rick@maddyhome.com">Rick Maddy</vendor>
+    <change-notes>
+        Updated to support Aurora build 992 and higher.
+    </change-notes>
     <idea-version min="4.0" max="4.5"/>
 
     <application-components>

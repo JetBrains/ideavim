@@ -17,7 +17,7 @@ the keymaps directory if it doesn't exist.
 
 Windows
 
-Copy @NAME@.jar to %IDEA_HOME%/plugins where IDEA_HOME is where IntelliJ IDEA
+Copy @NAME@.jar to %IDEA_HOME%\plugins where IDEA_HOME is where IntelliJ IDEA
 has been installed.
 
 Copy vim.xml to C:\Documents and Settings\<user>\.IntelliJIdea\config\keymaps
