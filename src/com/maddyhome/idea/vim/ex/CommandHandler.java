@@ -19,8 +19,10 @@ package com.maddyhome.idea.vim.ex;
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
+import com.intellij.openapi.actionSystem.DataConstants;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
@@ -213,7 +215,7 @@ public abstract class CommandHandler
 
         if ((argFlags & WRITABLE) != 0)
         {
-            RunnableHelper.runWriteCommand(new Runnable() {
+            RunnableHelper.runWriteCommand((Project)context.getData(DataConstants.PROJECT), new Runnable() {
                 public void run()
                 {
                     boolean res = true;
@@ -249,7 +251,7 @@ public abstract class CommandHandler
         }
         else
         {
-            RunnableHelper.runReadCommand(new Runnable() {
+            RunnableHelper.runReadCommand((Project)context.getData(DataConstants.PROJECT), new Runnable() {
                 public void run()
                 {
                     boolean res = true;
