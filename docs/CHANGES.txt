@@ -4,7 +4,8 @@ History of changes for @NAME@ for IDEA @IDEA-VERSION@
 Bug Fixes
 - After a fresh install it is possible to get a NPE when loading the first
   project. Now fixed.
-  
+- Fixed :class and :find. These were also broken by the focus fix in 0.7.2.
+
 0.8.2 from 0.8.1
 - Fixed typo in plugin.xml for new 'since-build'
 
