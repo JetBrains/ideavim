@@ -27,6 +27,7 @@ import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.Key;
 import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.command.VisualRange;
@@ -70,8 +71,7 @@ public class EditorData
      */
     public static int getLastColumn(Editor editor)
     {
-        Key key = new Key(LAST_COLUMN);
-        Integer col = (Integer)editor.getUserData(key);
+        Integer col = (Integer)editor.getUserData(LAST_COLUMN);
         if (col == null)
         {
             return EditorHelper.getCurrentVisualColumn(editor);
@@ -89,8 +89,9 @@ public class EditorData
      */
     public static void setLastColumn(Editor editor, int col)
     {
-        Key key = new Key(LAST_COLUMN);
-        editor.putUserData(key, new Integer(col));
+        editor.putUserData(LAST_COLUMN, new Integer(col));
+        int t = getLastColumn(editor);
+        logger.debug("setLastColumn(" + col + ") is now " + t);
     }
 
     /**
@@ -100,8 +101,7 @@ public class EditorData
      */
     public static VisualRange getLastVisualRange(Editor editor)
     {
-        Key key = new Key(VISUAL);
-        VisualRange res = (VisualRange)editor.getUserData(key);
+        VisualRange res = (VisualRange)editor.getUserData(VISUAL);
         return res;
     }
 
@@ -112,8 +112,7 @@ public class EditorData
      */
     public static void setLastVisualRange(Editor editor, VisualRange range)
     {
-        Key key = new Key(VISUAL);
-        editor.putUserData(key, range);
+        editor.putUserData(VISUAL, range);
     }
 
     /**
@@ -123,8 +122,7 @@ public class EditorData
      */
     public static VisualChange getLastVisualOperatorRange(Editor editor)
     {
-        Key key = new Key(VISUAL_OP);
-        VisualChange res = (VisualChange)editor.getUserData(key);
+        VisualChange res = (VisualChange)editor.getUserData(VISUAL_OP);
         return res;
     }
 
@@ -135,8 +133,7 @@ public class EditorData
      */
     public static void setLastVisualOperatorRange(Editor editor, VisualChange range)
     {
-        Key key = new Key(VISUAL_OP);
-        editor.putUserData(key, range);
+        editor.putUserData(VISUAL_OP, range);
     }
 
     /**
@@ -146,8 +143,7 @@ public class EditorData
      */
     public static Project getProject(Editor editor)
     {
-        Key key = new Key(PROJECT);
-        Project proj = (Project)editor.getUserData(key);
+        Project proj = (Project)editor.getUserData(PROJECT);
         if (proj == null)
         {
             // If we don't have the project already we need to scan all open projects and check all their
@@ -168,7 +164,7 @@ public class EditorData
                         if (editors[e] instanceof TextEditor && ((TextEditor)editors[e]).getEditor().equals(editor))
                         {
                             proj = projs[p];
-                            editor.putUserData(key, proj);
+                            editor.putUserData(PROJECT, proj);
                             break;
                         }
                     }
@@ -225,8 +221,10 @@ public class EditorData
      */
     private EditorData() {}
 
-    private static final String LAST_COLUMN = "lastColumn";
-    private static final String PROJECT = "project";
-    private static final String VISUAL = "lastVisual";
-    private static final String VISUAL_OP = "lastVisualOp";
+    private static final Key LAST_COLUMN = new Key("lastColumn");
+    private static final Key PROJECT = new Key("project");
+    private static final Key VISUAL = new Key("lastVisual");
+    private static final Key VISUAL_OP = new Key("lastVisualOp");
+
+    private static Logger logger = Logger.getInstance(EditorData.class.getName());
 }
