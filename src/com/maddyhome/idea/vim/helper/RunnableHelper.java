@@ -27,9 +27,29 @@ import com.intellij.openapi.command.CommandProcessor;
  */
 public class RunnableHelper
 {
-    public static void runCommand(Runnable cmd)
+    public static void runReadCommand(Runnable cmd)
+    {
+        CommandProcessor.getInstance().executeCommand(new ReadAction(cmd), "Foo", "Bar");
+    }
+
+    public static void runWriteCommand(Runnable cmd)
     {
         CommandProcessor.getInstance().executeCommand(new WriteAction(cmd), "Foo", "Bar");
+    }
+
+    static class ReadAction implements Runnable
+    {
+        ReadAction(Runnable cmd)
+        {
+            this.cmd = cmd;
+        }
+
+        public void run()
+        {
+            ApplicationManager.getApplication().runReadAction(cmd);
+        }
+
+        Runnable cmd;
     }
 
     static class WriteAction implements Runnable

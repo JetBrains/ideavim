@@ -42,6 +42,7 @@ import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.key.RegisterActions;
 import org.jdom.Element;
+import java.awt.Toolkit;
 
 /**
  * This plugin attempts to emulate the keybinding and general functionality of Vim and gVim. See the supplied
@@ -183,6 +184,14 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
     public static boolean isEnabled()
     {
         return enabled;
+    }
+
+    /**
+     * Inidicate to the user that an error has occurred. Just beep.
+     */
+    public static void indicateError()
+    {
+        Toolkit.getDefaultToolkit().beep();
     }
 
     /**

@@ -66,7 +66,7 @@ public class ExEditorKit extends DefaultEditorKit
      */
     public Action[] getActions()
     {
-        return TextAction.augmentList(super.getActions(), this.defaultActions);
+        return TextAction.augmentList(super.getActions(), this.exActions);
     }
 
     /**
@@ -82,6 +82,7 @@ public class ExEditorKit extends DefaultEditorKit
 
     public static final String CompleteEdit = "complete-edit";
     public static final String AbortEdit = "abort-edit";
+    public static final String DeletePreviousChar = "delete-prev-char";
     public static final String DeletePreviousWord = "delete-prev-word";
     public static final String DeleteToCursor = "delete-to-cursor";
     public static final String ToggleInsertReplace = "toggle-insert";
@@ -94,9 +95,10 @@ public class ExEditorKit extends DefaultEditorKit
     public static final String HistoryOldFilter = "history-old-filter";
 
     //TODO - add rest of actions
-    protected Action[] defaultActions = new Action[] {
+    protected Action[] exActions = new Action[] {
         new CompleteEditAction(),
         new AbortEditAction(),
+        new DeletePreviousCharAction(),
         new DeletePreviousWordAction(),
         new DeleteToCursorAction(),
         new ToggleInsertReplaceAction()
@@ -158,6 +160,65 @@ public class ExEditorKit extends DefaultEditorKit
             }
         }
 
+    }
+
+    public static class DeletePreviousCharAction extends TextAction
+    {
+        public DeletePreviousCharAction()
+        {
+            super(DeletePreviousChar);
+        }
+
+        /**
+         * Invoked when an action occurs.
+         */
+        public void actionPerformed(ActionEvent e)
+        {
+            JTextField target = (JTextField)getTextComponent(e);
+            if ((target != null) && (target.isEditable()))
+            {
+                try
+                {
+                    Document doc = target.getDocument();
+                    Caret caret = target.getCaret();
+                    int dot = caret.getDot();
+                    int mark = caret.getMark();
+                    if (dot != mark)
+                    {
+                        doc.remove(Math.min(dot, mark), Math.abs(dot - mark));
+                    }
+                    else if (dot > 0)
+                    {
+                        int delChars = 1;
+
+                        if (dot > 1)
+                        {
+                            String dotChars = doc.getText(dot - 2, 2);
+                            char c0 = dotChars.charAt(0);
+                            char c1 = dotChars.charAt(1);
+
+                            if (c0 >= '\uD800' && c0 <= '\uDBFF' &&
+                                c1 >= '\uDC00' && c1 <= '\uDFFF')
+                            {
+                                delChars = 2;
+                            }
+                        }
+
+                        doc.remove(dot - delChars, delChars);
+                    }
+                    else
+                    {
+                        if (doc.getLength() == 0)
+                        {
+                            target.postActionEvent();
+                        }
+                    }
+                }
+                catch (BadLocationException bl)
+                {
+                }
+            }
+        }
     }
 
     public static class DeletePreviousWordAction extends TextAction

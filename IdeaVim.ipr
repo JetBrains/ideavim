@@ -81,6 +81,9 @@
         <filter targetName="clean" isVisible="true" />
         <filter targetName="build" isVisible="true" />
         <filter targetName="deploy" isVisible="true" />
+        <filter targetName="dist" isVisible="true" />
+        <filter targetName="dist-bin" isVisible="true" />
+        <filter targetName="dist-src" isVisible="true" />
         <filter targetName="javadoc" isVisible="false" />
       </targetFilters>
     </buildFile>
@@ -128,6 +131,5 @@
     <option name="OPEN_IN_BROWSER" value="false" />
     <option name="OUTPUT_DIRECTORY" />
   </component>
-  <component name="WebReferencesManager" />
 </project>
 

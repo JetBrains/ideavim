@@ -23,6 +23,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import java.awt.Font;
 import javax.swing.Action;
 import javax.swing.JTextField;
+import javax.swing.InputMap;
 import javax.swing.text.Document;
 import javax.swing.text.Keymap;
 import javax.swing.text.TextAction;
@@ -39,8 +40,11 @@ public class ExTextField extends JTextField
         Font font = new Font("Monospaced", Font.PLAIN, 12);
         setFont(font);
 
-        Keymap map = addKeymap("ex", getKeymap());
+        setInputMap(WHEN_FOCUSED, new InputMap());
+        Keymap map = addKeymap("ex", null);
         loadKeymap(map, ExKeyBindings.getBindings(), getActions());
+        map.setDefaultAction(new ExEditorKit.DefaultKeyTypedAction());
+        setKeymap(map);
     }
 
     public Action[] getActions()

@@ -29,8 +29,10 @@ import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.ui.CommandEntryPanel;
+import com.maddyhome.idea.vim.VimPlugin;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -39,7 +41,6 @@ public class ExEntryHandler extends AbstractEditorActionHandler
 {
     protected boolean execute(Editor editor, DataContext context, Command cmd)
     {
-        // TODO - deal with any preceeding count or if currently in visual mode
         CommandEntryPanel panel = CommandEntryPanel.getInstance();
 
         String initText = "";
@@ -68,28 +69,38 @@ public class ExEntryHandler extends AbstractEditorActionHandler
 
     static class ExEntryListener implements ActionListener
     {
-        public void actionPerformed(ActionEvent e)
+        public void actionPerformed(final ActionEvent e)
         {
-            try
+            SwingUtilities.invokeLater(new Runnable()
             {
-                logger.debug("processing command");
-                CommandEntryPanel.getInstance().deactivate();
-                CommandParser.getInstance().processCommand(editor, context, e.getActionCommand());
-                if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
+                public void run()
                 {
-                    CommandGroups.getInstance().getMotion().resetVisual(editor);
+                    try
+                    {
+                        logger.debug("processing command");
+                        CommandEntryPanel.getInstance().deactivate(true);
+                        CommandParser.getInstance().processCommand(editor, context, e.getActionCommand());
+                        if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
+                        {
+                            CommandGroups.getInstance().getMotion().resetVisual(editor);
+                        }
+                    }
+                    catch (ExException ex)
+                    {
+                        // TODO - display error
+                        logger.info(ex.getMessage());
+                        VimPlugin.indicateError();
+                    }
+                    catch (Exception bad)
+                    {
+                        logger.error(bad);
+                        VimPlugin.indicateError();
+                    }
+                    finally
+                    {
+                    }
                 }
-            }
-            catch (ExException ex)
-            {
-                // TODO - display error
-                logger.info(ex.getMessage());
-            }
-            catch (Exception bad)
-            {
-                logger.error(bad);
-            }
-            //CommandGroups.getInstance().getEx().processExCommand(editor, context, e.getActionCommand());
+            });
         }
 
         public void setState(Editor editor, DataContext context)

@@ -1,0 +1,8 @@
+History of changes for @NAME@
+
+0.1.0 to 0.1.1
+- Fixed text of README file (NAME and VERSION weren't properly substituted)
+- Fixed issue with pressing Enter when entering an Ex command (no more beep or
+  IDEA error message)
+- Fixed issue with pressing Backspace in the Ex command entry window when there
+  are no characters. The beep is gone and the command entry is properly exited.

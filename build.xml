@@ -32,7 +32,7 @@
 
     <property name="project" value="IdeaVIM" />
     <!-- Update this prior to building a new distribution -->
-    <property name="version" value="0.1.0" />
+    <property name="version" value="0.1.1" />
 
     <path id="build.classpath">
         <pathelement path="${idea.home}/lib/openapi.jar" />
@@ -65,7 +65,10 @@
         <copy file="${install}/${project}.jar" todir="${idea.home}/plugins/" />
     </target>
 
-    <target name="dist" depends="clean, build" description="Creates a tar file containing the plugin distribution" >
+    <target name="dist" depends="dist-src, dist-bin" description="Creates the src and bin distribution files" />
+
+    <target name="dist-bin" depends="clean, build" description="Creates a tar file containing the plugin distribution" >
+        <mkdir dir="dist" />
         <delete dir="${project}" />
         <mkdir dir="${project}"/>
         <copy todir="${project}">
@@ -77,11 +80,33 @@
                 <filter token="NAME" value="${project}" />
                 <filter token="VERSION" value="${version}" />
             </filterset>
-            <fileset dir="docs" includes="*,vim/*.txt" excludes="javadoc" />
+            <fileset dir="docs" includes="vim/*.txt" excludes="javadoc" />
         </copy>
-        <copy file="docs/README.txt" tofile="${project}/README" />
+        <copy file="docs/README.txt" tofile="${project}/README" >
+            <filterset>
+                <filter token="NAME" value="${project}" />
+                <filter token="VERSION" value="${version}" />
+            </filterset>
+        </copy>
+        <copy file="docs/CHANGES.txt" tofile="${project}/CHANGES" >
+            <filterset>
+                <filter token="NAME" value="${project}" />
+                <filter token="VERSION" value="${version}" />
+            </filterset>
+        </copy>
+        <copy file="docs/NOTES.txt" tofile="${project}/NOTES" >
+            <filterset>
+                <filter token="NAME" value="${project}" />
+                <filter token="VERSION" value="${version}" />
+            </filterset>
+        </copy>
         <mkdir dir="${dist}"/>
         <tar basedir="." destfile="${dist}/${project}-${version}.tar.gz" compression="gzip" includes="${project}/**" />
+    </target>
+
+    <target name="dist-src" depends="clean" description="Creates the source tar file" >
+        <mkdir dir="dist" />
+        <tar basedir="." destfile="${dist}/${project}-src-${version}.tar.gz" excludes="dist/**" compression="gzip"/>
     </target>
 
     <target name="javadoc" depends="build" description="Generates Javadoc for all source code" >

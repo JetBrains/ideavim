@@ -23,6 +23,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.undo.UndoManager;
+import com.maddyhome.idea.vim.VimPlugin;
 
 /**
  *
@@ -85,7 +86,7 @@ public abstract class CommandHandler
 
         if ((getFlags() & WRITABLE) != 0)
         {
-            RunnableHelper.runCommand(new Runnable() {
+            RunnableHelper.runWriteCommand(new Runnable() {
                 public void run()
                 {
                     boolean res = false;
@@ -97,6 +98,7 @@ public abstract class CommandHandler
                     catch (ExException e)
                     {
                         // TODO - handle this
+                        VimPlugin.indicateError();
                     }
                     finally
                     {
@@ -114,7 +116,20 @@ public abstract class CommandHandler
         }
         else
         {
-            execute(editor, context, cmd);
+            RunnableHelper.runReadCommand(new Runnable() {
+                public void run()
+                {
+                    try
+                    {
+                        execute(editor, context, cmd);
+                    }
+                    catch (ExException e)
+                    {
+                        // TODO - handle this
+                        VimPlugin.indicateError();
+                    }
+                }
+            });
         }
     }
 

@@ -1035,7 +1035,7 @@ public class ChangeGroup extends AbstractActionGroup
         //CommandGroups.getInstance().getMark().setMark(editor, context, ']', start + str.length());
 
         //CommandGroups.getInstance().getRegister().storeTextInternal(editor, context, start, start + str.length(), str, MotionGroup.CHARACTERWISE, '.', false, false);
-        //runCommand(new InsertText(editor, context, start, str));
+        //runWriteCommand(new InsertText(editor, context, start, str));
     }
 
     /**
@@ -1067,7 +1067,7 @@ public class ChangeGroup extends AbstractActionGroup
             CommandGroups.getInstance().getMark().setMark(editor, context, '.', start);
             CommandGroups.getInstance().getMark().setMark(editor, context, '[', start);
             CommandGroups.getInstance().getMark().setMark(editor, context, ']', start);
-            //runCommand(new DeleteText(editor, context, start, end));
+            //runWriteCommand(new DeleteText(editor, context, start, end));
 
             return true;
         }
@@ -1090,11 +1090,11 @@ public class ChangeGroup extends AbstractActionGroup
         CommandGroups.getInstance().getMark().setMark(editor, context, '[', start);
         CommandGroups.getInstance().getMark().setMark(editor, context, ']', start + str.length());
         CommandGroups.getInstance().getMark().setMark(editor, context, '.', start + str.length());
-        //runCommand(new ReplaceText(editor, context, start, end, str));
+        //runWriteCommand(new ReplaceText(editor, context, start, end, str));
     }
 
     /*
-    public static void runCommand(Runnable cmd)
+    public static void runWriteCommand(Runnable cmd)
     {
         CommandProcessor.getInstance().executeCommand(new WriteAction(cmd), "Foo", "Bar");
     }
@@ -1202,11 +1202,6 @@ public class ChangeGroup extends AbstractActionGroup
             {
                 // NOTE - is there a way to get the DataContext at this point?
                 CommandGroups.getInstance().getChange().processEscape(EditorHelper.getEditor(event.getManager(), event.getOldFile()), null);
-            }
-
-            if (CommandEntryPanel.getInstance().isActive())
-            {
-                CommandEntryPanel.getInstance().deactivate();
             }
         }
     }

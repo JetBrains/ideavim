@@ -28,7 +28,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -95,19 +94,13 @@ public class CommandEntryPanel extends JPanel
             {
                 if (isActive())
                 {
-                    deactivate();
+                    deactivate(false);
                 }
             }
         });
 
-        addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e)
-            {
-                //deactivate();
-            }
-        });
-
         // TODO - move these keys to the ExEditorKit
+        /*
         entry.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e)
             {
@@ -120,15 +113,9 @@ public class CommandEntryPanel extends JPanel
                         entry.postActionEvent();
                     }
                 }
-                /*
-                else if (e.getKeyCode() == KeyEvent.VK_ENTER)
-                {
-                    e.consume();
-                    entry.postActionEvent();
-                }
-                */
             }
         });
+        */
     }
 
     public void activate(JComponent comp, String label, String initText)
@@ -163,13 +150,17 @@ public class CommandEntryPanel extends JPanel
         repaint();
     }
 
-    public void deactivate()
+    public void deactivate(boolean changeFocus)
     {
         logger.info("deactivate");
+        if (!active) return;
         active = false;
         newGlass.setVisible(false);
         root.setGlassPane(oldGlass);
-        parent.requestFocus();
+        if (changeFocus)
+        {
+            parent.requestFocus();
+        }
         parent = null;
     }
 

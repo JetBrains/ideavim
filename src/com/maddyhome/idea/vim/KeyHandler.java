@@ -37,7 +37,6 @@ import com.maddyhome.idea.vim.key.CommandNode;
 import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.key.Node;
 import com.maddyhome.idea.vim.key.ParentNode;
-import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Stack;
@@ -110,7 +109,7 @@ public class KeyHandler
             if (count == 0 && currentArg == Argument.NONE && currentCmd.size() == 0 &&
                 CommandGroups.getInstance().getRegister().getCurrentRegister() == RegisterGroup.REGISTER_DEFAULT)
             {
-               indicateError();
+               VimPlugin.indicateError();
             }
 
             fullReset();
@@ -307,7 +306,7 @@ public class KeyHandler
 
             if (!editor.getDocument().isWritable() && !Command.isReadOnlyType(cmd.getType()))
             {
-                indicateError();
+                VimPlugin.indicateError();
             }
             else
             {
@@ -343,7 +342,7 @@ public class KeyHandler
         // We had some sort of error so reset the handler and let the user know (beep)
         else if (mode == STATE_ERROR)
         {
-            indicateError();
+            VimPlugin.indicateError();
             fullReset();
         }
     }
@@ -383,14 +382,6 @@ public class KeyHandler
         // Is the template presentation sufficient?
         // What are the modifiers? Is zero OK?
         action.actionPerformed(new AnActionEvent(null, context, "", action.getTemplatePresentation(), 0));
-    }
-
-    /**
-     * Inidicate to the user that an error has occurred. Just beep.
-     */
-    public static void indicateError()
-    {
-        Toolkit.getDefaultToolkit().beep();
     }
 
     /**
