@@ -626,7 +626,9 @@ public class ChangeGroup extends AbstractActionGroup
     {
         int start = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor);
         int offset = Math.min(CommandGroups.getInstance().getMotion().moveCaretToLineEndOffset(editor,
-            count - 1, true) + 1, EditorHelper.getFileSize(editor));
+            count - 1, true) + 1, EditorHelper.getFileSize(editor, true));
+        logger.debug("start="+start);
+        logger.debug("offset="+offset);
         if (offset != -1)
         {
             boolean res = deleteText(editor, context, start, offset, Command.FLAG_MOT_LINEWISE);
@@ -1363,8 +1365,12 @@ public class ChangeGroup extends AbstractActionGroup
             end = t;
         }
 
-        start = Math.max(0, Math.min(start, EditorHelper.getFileSize(editor)));
-        end = Math.max(0, Math.min(end, EditorHelper.getFileSize(editor)));
+        logger.debug("start="+start);
+        logger.debug("end="+end);
+        start = Math.max(0, Math.min(start, EditorHelper.getFileSize(editor, true)));
+        end = Math.max(0, Math.min(end, EditorHelper.getFileSize(editor, true)));
+        logger.debug("start="+start);
+        logger.debug("end="+end);
 
         if (CommandGroups.getInstance().getRegister().storeText(editor, context, start, end, type, true, false))
         {

@@ -1,7 +1,6 @@
 Bugs to fix:
 
 - Split text when typing fast after o command.
-- can't delete empty lines at end of file.
 - Show message after shifting lines with :< or :>
 - Replace mode - fix cursor. Can't figure out how to keep block cursor.
 

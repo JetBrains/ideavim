@@ -17,6 +17,7 @@ the first or last character of the file was punctuation.<br>
 - Fixed extraneous characters getting added to a register during recording.<br>
 - Use file type's indent size instead of tab size for indenting text.<br>
 - Restore caret if plugin is disabled.<br>
+- Fixed ability to delete blank line at end of files.<br>
 ]]>
     </change-notes>
     <idea-version since-build="1162"/>

@@ -158,8 +158,19 @@ public class EditorHelper
      */
     public static int getFileSize(Editor editor)
     {
-        int len = editor.getDocument().getTextLength();
-        if (len >= 1 && editor.getDocument().getChars()[len - 1] == '\n')
+        return getFileSize(editor, false);
+    }
+
+    /**
+     * Gets the actual number of characters in the file
+     * @param editor The editor
+     * @return The file's character count
+     */
+    public static int getFileSize(Editor editor, boolean incEnd)
+    {
+        Document doc = editor.getDocument();
+        int len = doc.getTextLength();
+        if (!incEnd && len >= 1 && doc.getChars()[len - 1] == '\n')
         {
             len--;
         }
@@ -251,7 +262,7 @@ public class EditorHelper
         }
         else if (lline >= getLineCount(editor))
         {
-            return getFileSize(editor);
+            return getFileSize(editor, incEnd);
         }
         else
         {
@@ -328,7 +339,7 @@ public class EditorHelper
      */
     public static int normalizeOffset(Editor editor, int lline, int offset, boolean allowEnd)
     {
-        if (getFileSize(editor) == 0)
+        if (getFileSize(editor, allowEnd) == 0)
         {
             return 0;
         }

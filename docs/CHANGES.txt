@@ -13,6 +13,7 @@ Bug Fixes
 - Fixed extraneous characters getting added to a register during recording.
 - Use file type's indent size instead of tab size for indenting text.
 - Restore caret if plugin is disabled.
+- Fixed ability to delete blank line at end of files.
 
 0.8.2 from 0.8.1
 - Fixed typo in plugin.xml for new 'since-build'
