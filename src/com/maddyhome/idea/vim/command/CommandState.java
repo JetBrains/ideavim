@@ -99,8 +99,8 @@ public class CommandState
     }
 
     /**
-     * Sets the visual mode type. {@link com.maddyhome.idea.vim.group.MotionGroup#CHARACTERWISE} and
-     * {@link com.maddyhome.idea.vim.group.MotionGroup#LINEWISE}
+     * Sets the visual mode type. {@link com.maddyhome.idea.vim.command.Command#FLAG_MOT_CHARACTERWISE} and
+     * {@link com.maddyhome.idea.vim.command.Command#FLAG_MOT_LINEWISE}
      * @param visualType The new visual mode type
      */
     public void setVisualType(int visualType)

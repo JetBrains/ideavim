@@ -10,6 +10,11 @@ New Commands
   and variable names. Like their normal w, e, b, and ge counterparts, these may
   be used as operators for the c and d commands.
 
+Bug Fixes
+- Visual mode became unusable without doing a Ctrl-\ Ctrl-n command after each
+  visual mode command. This unstable mode also caused undo to work improperly
+  resulting in garbled text.
+
 0.2.0 to 0.3.0
 
 Redone Commands

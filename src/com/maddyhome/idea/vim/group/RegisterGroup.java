@@ -182,7 +182,7 @@ public class RegisterGroup extends AbstractActionGroup
         else if (register == REGISTER_DEFAULT)
         {
             registers.put(new Character('0'), new Register('0', type, text));
-            logger.debug("register '" + register + "' contains: \"" + text + "\"");
+            logger.debug("register '" + '0' + "' contains: \"" + text + "\"");
         }
 
         CommandGroups.getInstance().getMark().setMark(editor, context, '[', start);

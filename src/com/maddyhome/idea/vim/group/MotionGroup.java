@@ -1105,10 +1105,10 @@ public class MotionGroup extends AbstractActionGroup
         EditorData.setLastVisualRange(editor, new VisualRange(visualStart,
             visualEnd, CommandState.getInstance().getVisualType()));
 
-        if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
-        {
+        //if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
+        //{
             CommandState.getInstance().reset();
-        }
+        //}
         editor.getSelectionModel().removeSelection();
     }
 
