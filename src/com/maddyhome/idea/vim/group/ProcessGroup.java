@@ -101,10 +101,8 @@ public class ProcessGroup extends AbstractActionGroup
 
     public boolean processExEntry(final Editor editor, final DataContext context)
     {
-        // FIX - :find command - if escaped - focus not on editor
         final ExEntryPanel panel = ExEntryPanel.getInstance();
         panel.deactivate(true);
-        //editor.getContentComponent().requestFocus();
         boolean res = true;
         try
         {
