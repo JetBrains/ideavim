@@ -41,11 +41,21 @@ public class DocumentManager
 
     public void openProject(Project project)
     {
+        logger.debug("opening project");
         FileEditorManager.getInstance(project).addFileEditorManagerListener(listener);
     }
 
     public void closeProject(Project project)
     {
+        logger.debug("closing project");
+
+        VirtualFile[] files = FileEditorManager.getInstance(project).getOpenFiles();
+        logger.debug("there are " + files.length + " open files");
+        for (int i = 0; i < files.length; i++)
+        {
+            removeListeners(FileDocumentManager.getInstance().getDocument(files[i]));
+        }
+
         FileEditorManager.getInstance(project).removeFileEditorManagerListener(listener);
     }
 
@@ -96,6 +106,7 @@ public class DocumentManager
     {
         public void fileOpened(FileEditorManager fileEditorManager, VirtualFile virtualFile)
         {
+            logger.debug("opened vf=" + virtualFile.getPresentableName());
             Document doc = FileDocumentManager.getInstance().getDocument(virtualFile);
             if (doc != null)
             {
@@ -105,6 +116,7 @@ public class DocumentManager
 
         public void fileClosed(FileEditorManager fileEditorManager, VirtualFile virtualFile)
         {
+            logger.debug("closed vf=" + virtualFile.getName());
             Document doc = FileDocumentManager.getInstance().getDocument(virtualFile);
             if (doc != null)
             {

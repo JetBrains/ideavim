@@ -10,7 +10,7 @@ Bug Fixes<br>
   opening an image with the ImageViewer plugin.<br>
 - Better handling of trying to edit a VCS controlled read-only file.<br>
 - Properly handle multiple < or > in the :> and :< commands.<br>
-- Fix some exception and assertions when opening multiple projects.<br>
+- Fix some exception and assertions when reopening a project.<br>
 - Fixed cursor position problem when issuing a c<motion> command that changed
   text up to the end of line.<br>
 - Using the C command on an empty file caused an error.<br>
