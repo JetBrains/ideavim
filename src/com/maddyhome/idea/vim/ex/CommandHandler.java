@@ -41,15 +41,26 @@ public abstract class CommandHandler
 
     public CommandHandler(CommandName[] names, int flags)
     {
+        this(names, flags, 0);
+    }
+
+    public CommandHandler(CommandName[] names, int argFlags, int optFlags)
+    {
         this.names = names;
-        this.flags = flags;
+        this.argFlags = argFlags;
+        this.optFlags = optFlags;
 
         CommandParser.getInstance().addHandler(this);
     }
 
-    public CommandHandler(String text, String optional, int flags)
+    public CommandHandler(String text, String optional, int argFlags)
     {
-        this(new CommandName[] { new CommandName(text, optional) }, flags);
+        this(text, optional, argFlags, 0);
+    }
+
+    public CommandHandler(String text, String optional, int argFlags, int optFlags)
+    {
+        this(new CommandName[] { new CommandName(text, optional) }, argFlags, optFlags);
     }
 
     public String getRequired()
@@ -67,25 +78,30 @@ public abstract class CommandHandler
         return names;
     }
 
-    public int getFlags()
+    public int getArgFlags()
     {
-        return flags;
+        return argFlags;
+    }
+
+    public int getOptFlags()
+    {
+        return optFlags;
     }
 
     public void process(final Editor editor, final DataContext context, final ExCommand cmd, final int count) throws
         ExException
     {
-        if ((flags & RANGE_FORBIDDEN) != 0 && cmd.getRanges().size() != 0)
+        if ((argFlags & RANGE_FORBIDDEN) != 0 && cmd.getRanges().size() != 0)
         {
             throw new NoRangeAllowedException();
         }
 
-        if ((flags & ARGUMENT_REQUIRED) != 0 && cmd.getArgument().length() == 0)
+        if ((argFlags & ARGUMENT_REQUIRED) != 0 && cmd.getArgument().length() == 0)
         {
             throw new MissingArgumentException();
         }
 
-        if ((getFlags() & WRITABLE) != 0)
+        if ((argFlags & WRITABLE) != 0)
         {
             RunnableHelper.runWriteCommand(new Runnable() {
                 public void run()
@@ -144,5 +160,6 @@ public abstract class CommandHandler
     public abstract boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException;
 
     protected CommandName[] names;
-    protected int flags;
+    protected int argFlags;
+    protected int optFlags;
 }
