@@ -199,15 +199,23 @@ public class CommandState
      */
     public void toggleInsertOverwrite()
     {
-        if (mode == MODE_INSERT)
+        int oldmode = getMode();
+        int newmode = oldmode;
+        if (oldmode == MODE_INSERT)
         {
-            mode = MODE_REPLACE;
+            newmode = MODE_REPLACE;
         }
-        else if (mode == MODE_REPLACE)
+        else if (oldmode == MODE_REPLACE)
         {
-            mode = MODE_INSERT;
+            newmode = MODE_INSERT;
         }
-        updateStatus();
+
+        if (oldmode != newmode)
+        {
+            State state = currentState();
+            popState();
+            pushState(newmode, state.getSubmode(), state.getMapping());
+        }
     }
 
     /**
@@ -345,7 +353,6 @@ public class CommandState
     private Stack modes = new Stack();
     private State defaultState = new State(MODE_COMMAND, 0, KeyParser.MAPPING_NORMAL);
     private Command command;
-    private int mode;
     private Command lastChange;
     private char lastRegister = RegisterGroup.REGISTER_DEFAULT;
     private boolean isRecording = false;
