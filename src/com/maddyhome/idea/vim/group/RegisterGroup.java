@@ -26,17 +26,17 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.ui.ClipboardHandler;
-import com.maddyhome.idea.vim.VimPlugin;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.awt.event.KeyEvent;
+import javax.swing.KeyStroke;
 import org.jdom.CDATA;
 import org.jdom.Element;
-import javax.swing.KeyStroke;
 
 /**
  * This group works with command associated with copying and pasting text
@@ -110,6 +110,11 @@ public class RegisterGroup extends AbstractActionGroup
         }
 
         return false;
+    }
+
+    public void storeKeys(List strokes, int type, char register)
+    {
+        registers.put(new Character(register), new Register(register, type, strokes));
     }
 
     public boolean storeTextInternal(Editor editor, DataContext context, int start, int end, String text, int type, char register, boolean isDelete, boolean isYank)
@@ -204,6 +209,18 @@ public class RegisterGroup extends AbstractActionGroup
         return getRegister(lastRegister);
     }
 
+    public Register getPlaybackRegister(char r)
+    {
+        if (PLAYBACK_REGISTER.indexOf(r) != 0)
+        {
+            return getRegister(r);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public Register getRegister(char r)
     {
         // Uppercase registers actually get the lowercase register
@@ -251,7 +268,6 @@ public class RegisterGroup extends AbstractActionGroup
         if (RECORDABLE_REGISTER.indexOf(register) != -1)
         {
             CommandState.getInstance().setRecording(true);
-            VimPlugin.showMessage("Recording");
             recordRegister = register;
             recordList = new ArrayList();
             return true;
@@ -267,6 +283,14 @@ public class RegisterGroup extends AbstractActionGroup
         if (recordRegister != 0)
         {
             recordList.add(key);
+        }
+    }
+
+    public void addText(String text)
+    {
+        if (recordRegister != 0)
+        {
+            recordList.addAll(StringHelper.stringToKeys(text));
         }
     }
 
@@ -290,7 +314,6 @@ public class RegisterGroup extends AbstractActionGroup
                 reg.addKeys(recordList);
             }
             CommandState.getInstance().setRecording(false);
-            VimPlugin.showMessage("");
         }
 
         recordRegister = 0;
@@ -395,6 +418,7 @@ public class RegisterGroup extends AbstractActionGroup
     private static final String WRITABLE_REGISTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-*+_/\"";
     private static final String READONLY_REGISTERS = ":.%#=/";
     private static final String RECORDABLE_REGISTER = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final String PLAYBACK_REGISTER = RECORDABLE_REGISTER + "\".*+";
     private static final String VALID_REGISTERS = WRITABLE_REGISTERS + READONLY_REGISTERS;
 
     private static Logger logger = Logger.getInstance(RegisterGroup.class.getName());
