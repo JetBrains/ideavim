@@ -25,7 +25,7 @@ Bug Fixes
 - Many commands caused exceptions if the current file is empty.
 - Let mouse clicks move cursor to end-of-line while in Insert or Replace mode.
 
-Keymappings
+Keymappings - Install new plugin.xml or manually add keymapping
 - F1
 
 0.1.0 to 0.1.1
