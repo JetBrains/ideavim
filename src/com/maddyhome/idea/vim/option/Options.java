@@ -544,9 +544,9 @@ public class Options
     private void createDefaultOptions()
     {
         addOption(new ToggleOption("gdefault", "gd", false));
-        addOption(new ToggleOption("hlsearch", "hls", false));
+        //addOption(new ToggleOption("hlsearch", "hls", false));
         addOption(new ToggleOption("ignorecase", "ic", false));
-        addOption(new ToggleOption("incsearch", "is", false));
+        //addOption(new ToggleOption("incsearch", "is", false));
         addOption(new ListOption("matchpairs", "mps", new String[] { "(:)", "{:}", "[:]" }, ".:."));
         addOption(new ToggleOption("more", "more", true));
         addOption(new NumberOption("scroll", "scr", 0));
