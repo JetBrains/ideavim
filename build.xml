@@ -1,0 +1,92 @@
+<project name="IdeaVim" default="build" basedir=".">
+    <!--
+    * IdeaVim - A Vim emulator plugin for IntelliJ Idea
+    * Copyright (C) 2003 Rick Maddy
+    *
+    * This program is free software; you can redistribute it and/or
+    * modify it under the terms of the GNU General Public License
+    * as published by the Free Software Foundation; either version 2
+    * of the License, or (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * You should have received a copy of the GNU General Public License
+    * along with this program; if not, write to the Free Software
+    * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+    -->
+
+    <!--
+    External Properties (set in IntelliJ project):
+      idea.home - $APPLICATION_HOME_DIR$
+    -->
+    <property name="src" value="src" />
+    <property name="classes" value="classes" />
+    <property name="javadoc" value="docs/javadoc" />
+    <property name="install" value="install" />
+    <property name="dist" value="dist" />
+    <!-- Update to your IntelliJ installtion -->
+    <property name="idea.home" value="/opt/IntelliJ" />
+
+    <property name="project" value="IdeaVIM" />
+    <!-- Update this prior to building a new distribution -->
+    <property name="version" value="0.1.0" />
+
+    <path id="build.classpath">
+        <pathelement path="${idea.home}/lib/openapi.jar" />
+        <pathelement path="${idea.home}/lib/jdom.jar" />
+        <pathelement path="${classes}"/>
+    </path>
+
+    <target name="clean" description="Removes all generated files" >
+        <delete dir="${classes}"/>
+        <delete dir="${javadoc}"/>
+        <delete dir="${project}"/>
+        <delete file="${install}/${project}.jar" />
+    </target>
+
+    <target name="build" description="Compiles all source code and created plugin jar file" >
+        <mkdir dir="${classes}"/>
+        <javac destdir="${classes}" debug="on" classpathref="build.classpath" >
+            <src path="${src}"/>
+        </javac>
+        <mkdir dir="${classes}/META-INF"/>
+        <copy file="plugin.xml" todir="${classes}/META-INF"/>
+        <copy todir="${classes}">
+            <fileset dir="${classes}" excludes="**/*.java"/>
+        </copy>
+        <jar basedir="${classes}" jarfile="${install}/${project}.jar" compress="yes"/>
+    </target>
+
+    <target name="deploy" depends="build" description="Copies plugin to IntelliJ plugin directory" >
+        <mkdir dir="${idea.home}/plugins"/>
+        <copy file="${install}/${project}.jar" todir="${idea.home}/plugins/" />
+    </target>
+
+    <target name="dist" depends="clean, build" description="Creates a tar file containing the plugin distribution" >
+        <delete dir="${project}" />
+        <mkdir dir="${project}"/>
+        <copy todir="${project}">
+            <fileset dir="." includes="license/**"/>
+            <fileset dir="${install}" includes="**"/>
+        </copy>
+        <copy todir="${project}/docs">
+            <filterset>
+                <filter token="NAME" value="${project}" />
+                <filter token="VERSION" value="${version}" />
+            </filterset>
+            <fileset dir="docs" includes="*,vim/*.txt" excludes="javadoc" />
+        </copy>
+        <copy file="docs/README.txt" tofile="${project}/README" />
+        <mkdir dir="${dist}"/>
+        <tar basedir="." destfile="${dist}/${project}-${version}.tar.gz" compression="gzip" includes="${project}/**" />
+    </target>
+
+    <target name="javadoc" depends="build" description="Generates Javadoc for all source code" >
+        <delete dir="${javadoc}"/>
+        <mkdir dir="${javadoc}" />
+        <javadoc classpathref="build.classpath" access="protected" destdir="${javadoc}" packagenames="com.*" sourcepath="src" use="true" />
+    </target>
+</project>

@@ -1,0 +1,47 @@
+*help.txt*      For @NAME@ version @VERSION@.  Last change: 2003 Apr 14
+
+                        @NAME@ - main help file
+
+VIM stands for Vi IMproved.  @NAME@ was made by Rick Maddy, but only
+through the help of many others.  See |credits|.
+------------------------------------------------------------------------------
+                                                *doc-file-list* *Q_ct*
+BASIC:
+|quickref|      Overview of the most common commands you will use
+|copying|       About copyrights
+|www|           IdeaVim on the World Wide Web
+|bugs|          Where to send bug reports
+
+REFERENCE MANUAL: These files explain every detail of Vim.
+
+General subjects ~
+|intro.txt|     general introduction to Vim; notation used in help files
+|help.txt|      overview and quick reference (this file)
+|index.txt|     alphabetical index of all commands
+|help-tags|     all the tags you can jump to (index of tags)
+|todo.txt|      known problems and desired extensions
+
+Basic editing ~
+|editing.txt|   editing and writing files
+|motion.txt|    commands for moving around
+|scroll.txt|    scrolling the text in the window
+|insert.txt|    Insert and Replace mode
+|change.txt|    deleting and replacing text
+|indent.txt|    automatic indenting for C and other languages
+|undo.txt|      Undo and Redo
+|repeat.txt|    repeating commands, Vim scripts and debugging
+|visual.txt|    using the Visual mode (selecting a text area)
+|various.txt|   various remaining commands
+
+Advanced editing ~
+|cmdline.txt|   Command-line editing
+|options.txt|   description of all options
+|pattern.txt|   regexp patterns and search commands
+|map.txt|       key mapping and abbreviations
+|windows.txt|   commands for using multiple windows and buffers
+|autocmd.txt|   automatically executing commands on an event
+|filetype.txt|  settings done specifically for a type of file
+|fold.txt|      hide (fold) ranges of lines
+
+Special issues ~
+|digraph.txt|   list of available digraphs
