@@ -19,6 +19,8 @@ package com.maddyhome.idea.vim.ui;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import java.awt.GridLayout;
+import java.awt.BorderLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -41,7 +43,10 @@ public class VimToolWindow extends JPanel
      */
     private VimToolWindow()
     {
-        add(new JLabel("Resize so just the window title is visible"));
+        //add(new JLabel("Resize so just the window title is visible"));
+        setLayout(new BorderLayout());
+        ExEntryPanel panel = ExEntryPanel.getInstance();
+        add(BorderLayout.NORTH, panel);
 
         setSize(0,0);
     }

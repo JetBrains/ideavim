@@ -38,6 +38,9 @@ import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.WindowManager;
+import com.intellij.openapi.wm.ToolWindowType;
+import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.group.ChangeGroup;
 import com.maddyhome.idea.vim.group.CommandGroups;
@@ -49,9 +52,11 @@ import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.key.RegisterActions;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.MorePanel;
+import com.maddyhome.idea.vim.ui.VimToolWindow;
 import com.maddyhome.idea.vim.undo.UndoManager;
 import java.awt.Toolkit;
 import java.net.URL;
+import java.util.HashMap;
 import javax.swing.ImageIcon;
 import org.jdom.Element;
 
@@ -142,23 +147,19 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
 
                 DocumentManager.getInstance().openProject(project);
 
-                /*
                 ToolWindowManager mgr = ToolWindowManager.getInstance(project);
                 ToolWindow win = mgr.registerToolWindow("VIM", VimToolWindow.getInstance(), ToolWindowAnchor.BOTTOM);
                 setupToolWindow(win);
                 toolWindows.put(project, win);
-                */
             }
 
             public void projectClosed(Project project)
             {
                 DocumentManager.getInstance().closeProject(project);
 
-                /*
                 toolWindows.remove(project);
                 ToolWindowManager mgr = ToolWindowManager.getInstance(project);
                 mgr.unregisterToolWindow("VIM");
-                */
             }
         });
     }
@@ -170,7 +171,6 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
         ImageIcon icon = new ImageIcon(url);
         win.setIcon(icon);
 
-        /*
         win.setType(ToolWindowType.DOCKED, null);
         if (isEnabled())
         {
@@ -182,7 +182,6 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
             win.setAutoHide(true);
             win.hide(null);
         }
-        */
     }
 
     /**
@@ -314,7 +313,7 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
 
     private VimTypedActionHandler vimHandler;
     private RegisterActions actions;
-    //private static HashMap toolWindows = new HashMap();
+    private static HashMap toolWindows = new HashMap();
     private MarkGroup.MarkUpdater markUpdater = new MarkGroup.MarkUpdater();
 
     private static boolean enabled = true;

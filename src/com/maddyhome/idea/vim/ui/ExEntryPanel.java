@@ -112,19 +112,19 @@ public class ExEntryPanel extends JPanel
     {
         last = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
         entry.setEditor(editor, context);
-        JComponent comp = editor.getContentComponent();
+        //JComponent comp = editor.getContentComponent();
         this.label.setText(label);
         this.count = count;
         entry.setDocument(entry.createDefaultModel());
         entry.setText(initText);
-        parent = comp;
-        root = SwingUtilities.getRootPane(parent);
-        oldGlass = root.getGlassPane();
-        root.setGlassPane(newGlass);
+        //parent = comp;
+        //root = SwingUtilities.getRootPane(parent);
+        //oldGlass = root.getGlassPane();
+        //root.setGlassPane(newGlass);
 
-        positionPanel();
+        //positionPanel();
 
-        newGlass.setVisible(true);
+        //newGlass.setVisible(true);
         entry.requestFocus();
         active = true;
     }
@@ -180,6 +180,11 @@ public class ExEntryPanel extends JPanel
         return entry.getText();
     }
 
+    public void clear()
+    {
+        entry.setText("");
+    }
+
     /**
      * Turns off the ex entry field and puts the focus back to the original component
      * @param changeFocus true if focus should be put back, false if not
@@ -189,8 +194,8 @@ public class ExEntryPanel extends JPanel
         logger.info("deactivate");
         if (!active) return;
         active = false;
-        newGlass.setVisible(false);
-        root.setGlassPane(oldGlass);
+        //newGlass.setVisible(false);
+        //root.setGlassPane(oldGlass);
         if (changeFocus)
         {
             logger.debug("parent.requestFocus()");
@@ -199,6 +204,7 @@ public class ExEntryPanel extends JPanel
                 {
                     //parent.requestFocus();
                     last.requestFocus();
+                    //entry.getEditor().getComponent().requestFocus();
                 }
             });
         }

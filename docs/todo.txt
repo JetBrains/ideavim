@@ -1,5 +1,8 @@
 Bugs to fix:
 
+- :<range><command> can't have a space before the command.
+- <count>e and <count>b on 1/2/3 doesn't work right.
+- 5dw on /1/2/3 deletes way too much.
 - Fix focus problem with Ex window goes away.
 - can't delete empty lines at end of file.
 - Show message after shifting lines with :< or :>
@@ -7,6 +10,7 @@ Bugs to fix:
 
 Requested Functionality to add:
 
+- Compose support for i18n
 - More fold region support
 - Window support (need access to splitter)
 - Text objects (visual and operator modes)

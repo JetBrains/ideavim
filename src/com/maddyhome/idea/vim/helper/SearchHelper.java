@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionChangeEvent;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.Options;
+
 import java.util.List;
 
 /**
@@ -61,12 +62,13 @@ public class SearchHelper
     }
 
     /**
-     * This looks on the current line, starting at the cursor postion for one of {, }, (, ), [, or ].
-     * It then searches forward or backward, as appropriate for the associated match pair. String in double quotes
-     * are skipped over. Single characters in single quotes are skipped too.
+     * This looks on the current line, starting at the cursor postion for one of {, }, (, ), [, or ]. It then searches
+     * forward or backward, as appropriate for the associated match pair. String in double quotes are skipped over.
+     * Single characters in single quotes are skipped too.
+     *
      * @param editor The editor to search in
-     * @return The offset within the editor of the found character or -1 if no match was found or none of the
-     *         characters were found on the remainder of the current line.
+     * @return The offset within the editor of the found character or -1 if no match was found or none of the characters
+     *         were found on the remainder of the current line.
      */
     public static int findMatchingPairOnCurrentLine(Editor editor)
     {
@@ -259,6 +261,7 @@ public class SearchHelper
 
     /**
      * This finds the offset to the start of the next/previous word/WORD.
+     *
      * @param editor The editor to find the words in
      * @param count The number of words to skip. Negative for backward searches
      * @param skipPunc If true then find WORD, if false then find word
@@ -278,10 +281,13 @@ public class SearchHelper
         int found = 0;
         int step = count >= 0 ? 1 : -1;
         // For back searches, skip any current whitespace so we start at the end of a word
-        if (count < 0)
+        if (count < 0 && pos > 0)
         {
-            pos += step;
-            pos = skipSpace(chars, pos, step, size);
+            if (CharacterHelper.charType(chars[pos + step], false) == CharacterHelper.TYPE_SPACE)
+            {
+                pos += step;
+                pos = skipSpace(chars, pos, step, size);
+            }
         }
         int res = pos;
         if (pos < 0 || pos >= size)
@@ -334,6 +340,7 @@ public class SearchHelper
 
     /**
      * Find the word under the cursor or the next word to the right of the cursor on the current line.
+     *
      * @param editor The editor to find the word in
      * @return The text range of the found word or null if there is no word under/after the cursor on the line
      */
@@ -344,7 +351,7 @@ public class SearchHelper
 
         int pos = editor.getCaretModel().getOffset();
         int start = pos;
-        int[] types = new int[] { CharacterHelper.TYPE_CHAR, CharacterHelper.TYPE_PUNC };
+        int[] types = new int[]{CharacterHelper.TYPE_CHAR, CharacterHelper.TYPE_PUNC};
         for (int i = 0; i < 2; i++)
         {
             start = pos;
@@ -384,6 +391,7 @@ public class SearchHelper
 
     /**
      * This finds the offset to the end of the next/previous word/WORD.
+     *
      * @param editor The editor to search in
      * @param count The number of words to skip. Negative for backward searches
      * @param skipPunc If true then find WORD, if false then find word
@@ -402,14 +410,17 @@ public class SearchHelper
     {
         int found = 0;
         int step = count >= 0 ? 1 : -1;
-        // For forward searches, skip any current whitespace so we start at the end of a word
-        if (count > 0)
+        // For forward searches, skip any current whitespace so we start at the start of a word
+        if (count > 0 && pos < size - 1)
         {
-            if (!stayEnd)
+            if (CharacterHelper.charType(chars[pos + step], false) == CharacterHelper.TYPE_SPACE)
             {
-                pos += step;
+                if (!stayEnd)
+                {
+                    pos += step;
+                }
+                pos = skipSpace(chars, pos, step, size);
             }
-            pos = skipSpace(chars, pos, step, size);
         }
         int res = pos;
         if (pos < 0 || pos >= size)
@@ -461,6 +472,7 @@ public class SearchHelper
 
     /**
      * This skips whitespace starting with the supplied position.
+     *
      * @param chars The text as a character array
      * @param offset The starting position
      * @param step The direction to move
@@ -484,6 +496,7 @@ public class SearchHelper
 
     /**
      * This locates the position with the document of the count'th occurence of ch on the current line
+     *
      * @param editor The editor to search in
      * @param count The number of occurences of ch to locate. Negative for backward searches
      * @param ch The character on the line to find
@@ -583,7 +596,8 @@ public class SearchHelper
             ListOption lo = (ListOption)Options.getInstance().getOption("matchpairs");
             pairsChars = parseOption(lo);
 
-            lo.addOptionChangeListener(new OptionChangeListener() {
+            lo.addOptionChangeListener(new OptionChangeListener()
+            {
                 public void valueChange(OptionChangeEvent event)
                 {
                     pairsChars = parseOption((ListOption)event.getOption());
