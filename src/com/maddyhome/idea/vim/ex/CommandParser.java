@@ -25,6 +25,9 @@ import com.maddyhome.idea.vim.ex.handler.SubstituteHandler;
 import com.maddyhome.idea.vim.ex.handler.WriteHandler;
 import com.maddyhome.idea.vim.ex.handler.WriteQuitHandler;
 import com.maddyhome.idea.vim.ex.handler.YankLinesHandler;
+import com.maddyhome.idea.vim.ex.handler.GotoLineHandler;
+import com.maddyhome.idea.vim.ex.handler.PromptFindHandler;
+import com.maddyhome.idea.vim.ex.handler.PromptReplaceHandler;
 import com.maddyhome.idea.vim.ex.range.AbstractRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
@@ -74,12 +77,15 @@ public class CommandParser
         new EditFileHandler();
         new FindFileHandler();
         new GotoCharacterHandler();
+        //new GotoLineHandler(); - not needed here
         new HelpHandler();
         new JoinLinesHandler();
         new MarkHandler();
         new MoveTextHandler();
         new NextFileHandler();
         new PreviousFileHandler();
+        new PromptFindHandler();
+        new PromptReplaceHandler();
         new PutLinesHandler();
         new QuitHandler();
         new SelectFileHandler();
@@ -93,7 +99,19 @@ public class CommandParser
         new YankLinesHandler();
     }
 
-    public void processCommand(Editor editor, DataContext context, String cmd) throws ExException
+    public boolean processLastCommand(Editor editor, DataContext context, int count) throws ExException
+    {
+        if (lastCommand == null)
+        {
+            return false;
+        }
+
+        processCommand(editor, context, lastCommand, count);
+
+        return true;
+    }
+
+    public void processCommand(Editor editor, DataContext context, String cmd, int count) throws ExException
     {
         if (cmd.length() == 0)
         {
@@ -103,32 +121,33 @@ public class CommandParser
         ParseResult res = parse(cmd);
         String command = res.getCommand();
 
+        CommandHandler handler = null;
         if (command.length() == 0)
         {
-            MotionGroup.moveCaret(editor, context,
-                CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor,
-                res.getRanges().getLine(editor, context)));
-
-            return;
+            handler = new GotoLineHandler();
         }
-
-        CommandNode node = root;
-        for (int i = 0; i < command.length(); i++)
+        else
         {
-            node = node.getChild(command.charAt(i));
-            if (node == null)
+            CommandNode node = root;
+            for (int i = 0; i < command.length(); i++)
             {
-                throw new InvalidCommandException(cmd);
+                node = node.getChild(command.charAt(i));
+                if (node == null)
+                {
+                    throw new InvalidCommandException(cmd);
+                }
             }
+
+            handler = node.getCommandHandler();
         }
 
-        CommandHandler handler = node.getCommandHandler();
         if (handler == null)
         {
             throw new InvalidCommandException(cmd);
         }
 
-        handler.process(editor, context, new ExCommand(res.getRanges(), command, res.getArgument()));
+        handler.process(editor, context, new ExCommand(res.getRanges(), command, res.getArgument()), count);
+        lastCommand = cmd;
     }
 
     public ParseResult parse(String cmd) throws ExException
@@ -412,6 +431,7 @@ public class CommandParser
     }
 
     private CommandNode root = new CommandNode();
+    private String lastCommand;
 
     private static CommandParser ourInstance;
 
