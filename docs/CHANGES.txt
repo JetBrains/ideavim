@@ -1,6 +1,12 @@
 History of changes for @NAME@ for IDEA @IDEA-VERSION@
 
-0.6.5 to @VERSION@
+0.7.0 to @VERSION@
+
+Bug Fixes
+- Opening a non-text file resulted in some exceptions. This could happend when
+  opening an image with the ImageViewer plugin.
+
+0.6.5 to 0.7.0
 
 New Features
 - Highlighting lines of code by clicking and/or dragging in the line number area
