@@ -1,23 +1,22 @@
-package com.maddyhome.idea.vim.ex;
-
 /*
-* IdeaVim - A Vim emulator plugin for IntelliJ Idea
-* Copyright (C) 2003 Rick Maddy
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
+ * IdeaVim - A Vim emulator plugin for IntelliJ Idea
+ * Copyright (C) 2003-2004 Rick Maddy
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+package com.maddyhome.idea.vim.ex;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
@@ -45,6 +44,8 @@ public abstract class CommandHandler
     public static final int ARGUMENT_FORBIDDEN = 32;
     /** Indicates that the command takes a count, not a range - effects default */
     public static final int RANGE_IS_COUNT = 64;
+    /** Indicates that the editor should not get focus back after the command */
+    public static final int KEEP_FOCUS = 128;
 
     /** Indicates that this is a command that modifies the editor */
     public static final int WRITABLE = 256;

@@ -1,23 +1,22 @@
-package com.maddyhome.idea.vim.group;
-
 /*
-* IdeaVim - A Vim emulator plugin for IntelliJ Idea
-* Copyright (C) 2003 Rick Maddy
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
+ * IdeaVim - A Vim emulator plugin for IntelliJ Idea
+ * Copyright (C) 2003-2004 Rick Maddy
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.DataConstants;
@@ -28,12 +27,15 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.EditorData;
+import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
+import com.maddyhome.idea.vim.ui.MorePanel;
+
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -105,9 +107,10 @@ public class ProcessGroup extends AbstractActionGroup
 
     public boolean processExEntry(final Editor editor, final DataContext context)
     {
-        final ExEntryPanel panel = ExEntryPanel.getInstance();
+        ExEntryPanel panel = ExEntryPanel.getInstance();
         panel.deactivate(false);
         boolean res = true;
+        int flags = 0;
         try
         {
             CommandState.getInstance().popState();
@@ -116,7 +119,8 @@ public class ProcessGroup extends AbstractActionGroup
             logger.debug("swing=" + SwingUtilities.isEventDispatchThread());
             if (panel.getLabel().equals(":"))
             {
-                CommandParser.getInstance().processCommand(editor, context, text, 1);
+                flags = CommandParser.getInstance().processCommand(editor, context, text, 1);
+                logger.debug("flags=" + flags);
                 if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
                 {
                     CommandGroups.getInstance().getMotion().exitVisual(editor);
@@ -147,14 +151,29 @@ public class ProcessGroup extends AbstractActionGroup
         }
         finally
         {
+            final int flg = flags;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run()
                 {
                     //editor.getContentComponent().requestFocus();
+                    // Reopening the file was the only way I could solve the focus problem introduced in IDEA at
+                    // version 1050.
                     FileEditorManager.getInstance((Project)context.getData(DataConstants.PROJECT)).openFile(
                         EditorData.getVirtualFile(editor), true);
+
+                    // If the result of the ex command is to display the "more" panel, show it here.
+                    if ((flg & CommandParser.RES_MORE_PANEL) != 0)
+                    {
+                        RunnableHelper.runReadCommand((Project)context.getData(DataConstants.PROJECT), new Runnable() {
+                            public void run()
+                            {
+                                MorePanel.getInstance(editor).setVisible(true);
+                            }
+                        });
+                    }
                 }
             });
+
             return res;
         }
     }

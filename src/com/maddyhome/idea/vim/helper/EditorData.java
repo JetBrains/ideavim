@@ -1,8 +1,6 @@
-package com.maddyhome.idea.vim.helper;
-
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2004 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,6 +16,7 @@ package com.maddyhome.idea.vim.helper;
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+package com.maddyhome.idea.vim.helper;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
@@ -151,6 +150,7 @@ public class EditorData
                     if (editors[e].equals(editor))
                     {
                         editor.putUserData(PROJECT, projs[p]);
+                        proj = projs[p];
                         break;
                     }
                 }

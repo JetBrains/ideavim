@@ -1,3 +1,21 @@
+/*
+ * IdeaVim - A Vim emulator plugin for IntelliJ Idea
+ * Copyright (C) 2003-2004 Rick Maddy
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 package com.maddyhome.idea.vim.ex;
 
 import com.intellij.openapi.actionSystem.DataContext;
@@ -51,32 +69,17 @@ import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
 
-/*
-* IdeaVim - A Vim emulator plugin for IntelliJ Idea
-* Copyright (C) 2003 Rick Maddy
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
-
-
 /**
  * Maintains a tree of Ex commands based on the required and optional parts of the command names. Parses and
  * executes Ex commands entered by the user.
  */
 public class CommandParser
 {
+    public static final int RES_EMPTY = 1;
+    public static final int RES_ERROR = 1;
+    public static final int RES_READONLY = 1;
+    public static final int RES_MORE_PANEL = 2;
+
     /**
      * There is only one parser.
      * @return The singleton instance
@@ -171,14 +174,16 @@ public class CommandParser
      * @param context The data context
      * @param cmd The text entered by the user
      * @param count The count entered before the colon
+     * @return A bitwise collection of flags, if any, from the result of running the command.
      * @throws ExException if any part of the command is invalid or unknown
      */
-    public void processCommand(Editor editor, DataContext context, String cmd, int count) throws ExException
+    public int processCommand(Editor editor, DataContext context, String cmd, int count) throws ExException
     {
         // Nothing entered
+        int result = 0;
         if (cmd.length() == 0)
         {
-            return;
+            return result | RES_EMPTY;
         }
 
         // Parse the command
@@ -219,7 +224,7 @@ public class CommandParser
         if ((handler.getArgFlags() & CommandHandler.WRITABLE) > 0 && !editor.getDocument().isWritable())
         {
             VimPlugin.indicateError();
-            return;
+            return result | RES_READONLY;
         }
 
         // Run the command
@@ -229,6 +234,13 @@ public class CommandParser
             CommandGroups.getInstance().getRegister().storeTextInternal(editor, context, -1, -1, cmd,
                 Command.FLAG_MOT_CHARACTERWISE, ':', false, false);
         }
+
+        if ((handler.getArgFlags() & CommandHandler.KEEP_FOCUS) != 0)
+        {
+            result |= RES_MORE_PANEL;
+        }
+
+        return result;
     }
 
     /**

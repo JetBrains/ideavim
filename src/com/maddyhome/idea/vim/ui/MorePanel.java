@@ -1,29 +1,31 @@
-package com.maddyhome.idea.vim.ui;
-
 /*
-* IdeaVim - A Vim emulator plugin for IntelliJ Idea
-* Copyright (C) 2003 Rick Maddy
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
+ * IdeaVim - A Vim emulator plugin for IntelliJ Idea
+ * Copyright (C) 2003-2004 Rick Maddy
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+package com.maddyhome.idea.vim.ui;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
+import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.option.Options;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -48,14 +50,32 @@ import javax.swing.SwingUtilities;
  */
 public class MorePanel extends JPanel
 {
+    public static MorePanel getInstance(Editor editor)
+    {
+        if (instance == null)
+        {
+            instance = new MorePanel();
+        }
+
+        instance.setEditor(editor);
+        
+        return instance;
+    }
+
     /**
-     * Creates the panel
      * @param editor The editor that this more panel will be displayed over
      */
-    public MorePanel(Editor editor)
+    public void setEditor(Editor editor)
     {
+        this.editor = editor;
         this.parent = editor.getContentComponent();
+    }
 
+    /**
+     * Creates the panel
+     */
+    private MorePanel()
+    {
         // Create a text editor for the text and a label for the prompt
         BorderLayout layout = new BorderLayout(0, 0);
         setLayout(layout);
@@ -157,20 +177,22 @@ public class MorePanel extends JPanel
             JPanel glass = (JPanel)SwingUtilities.getRootPane(parent).getGlassPane();
             glass.setLayout(null);
             glass.add(this);
-            positionPanel();
             glass.addComponentListener(resizeListener);
             glass.setVisible(true);
+            positionPanel();
         }
 
         super.setVisible(aFlag);
 
         if (aFlag)
         {
-            requestFocus();
-
             SwingUtilities.invokeLater(new Runnable() {
                 public void run()
                 {
+                    requestFocus();
+                    text.requestFocus();
+
+                    focusListener.reset();
                     parent.addFocusListener(focusListener);
                 }
             });
@@ -290,8 +312,11 @@ public class MorePanel extends JPanel
             public void run()
             {
                 setVisible(false);
-                removeKeyListener(moreKeyListener);
+                //removeKeyListener(moreKeyListener);
                 parent.removeFocusListener(focusListener);
+
+                FileEditorManager.getInstance(EditorData.getProject(editor)).openFile(
+                    EditorData.getVirtualFile(editor), true);
             }
         });
     }
@@ -363,12 +388,28 @@ public class MorePanel extends JPanel
             this.parent = parent;
         }
 
+        public void reset()
+        {
+            cnt = 0;
+        }
+
         public void focusGained(FocusEvent e)
         {
-            parent.close();
+            cnt++;
+            if (cnt > 1)
+            {
+                parent.close();
+                logger.debug("cnt="+cnt);
+            }
+            else
+            {
+                // This is a kludge to solve a focus problem I was unable to solve an other way.
+                parent.requestFocus();
+            }
         }
 
         private MorePanel parent;
+        private int cnt;
     }
 
     public static class MoreEditorChangeListener extends FileEditorManagerAdapter
@@ -401,6 +442,7 @@ public class MorePanel extends JPanel
         private MorePanel parent;
     }
 
+    private Editor editor;
     private Component parent;
     private JLabel label = new JLabel("more");
     private JTextArea text = new JTextArea();
@@ -415,4 +457,5 @@ public class MorePanel extends JPanel
     private static MorePanel currentPanel;
 
     private static Logger logger = Logger.getInstance(MorePanel.class.getName());
+    private static MorePanel instance;
 }
