@@ -23,6 +23,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
 import com.maddyhome.idea.vim.ex.range.LineNumberRange;
+import com.maddyhome.idea.vim.ex.range.AbstractRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import java.util.ArrayList;
 
@@ -135,6 +136,21 @@ public class Ranges
         int end = editor.getDocument().getLineEndOffset(lr.getEndLine()) + 1;
 
         return new TextRange(start, Math.min(end, EditorHelper.getFileSize(editor)));
+    }
+
+    public static TextRange getCurrentLineRange(Editor editor, DataContext context)
+    {
+        Ranges ranges = new Ranges();
+
+        return ranges.getTextRange(editor, context, -1);
+    }
+
+    public static TextRange getFileTextRange(Editor editor, DataContext context)
+    {
+        Ranges ranges = new Ranges();
+        ranges.addRange(AbstractRange.createRange("%", 0, false));
+
+        return ranges.getTextRange(editor, context, -1);
     }
 
     public String toString()
