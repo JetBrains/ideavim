@@ -1313,6 +1313,8 @@ public class ChangeGroup extends AbstractActionGroup
                 // NOTE - is there a way to get the DataContext at this point?
                 CommandGroups.getInstance().getChange().processEscape(EditorHelper.getEditor(event.getManager(), event.getOldFile()), null);
             }
+            
+            VimPlugin.showMode("");
         }
     }
 

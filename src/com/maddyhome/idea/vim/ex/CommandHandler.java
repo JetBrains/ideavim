@@ -23,6 +23,8 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
+import com.maddyhome.idea.vim.helper.MessageHelper;
+import com.maddyhome.idea.vim.helper.Msg;
 import com.maddyhome.idea.vim.undo.UndoManager;
 
 /**
@@ -192,12 +194,14 @@ public abstract class CommandHandler
         // No range allowed
         if ((argFlags & RANGE_FORBIDDEN) != 0 && cmd.getRanges().size() != 0)
         {
+            MessageHelper.EMSG(Msg.e_norange);
             throw new NoRangeAllowedException();
         }
 
         // Argument required
         if ((argFlags & ARGUMENT_REQUIRED) != 0 && cmd.getArgument().length() == 0)
         {
+            MessageHelper.EMSG(Msg.e_argreq);
             throw new MissingArgumentException();
         }
 
@@ -223,7 +227,7 @@ public abstract class CommandHandler
                     }
                     catch (ExException e)
                     {
-                        // TODO - handle this
+                        MessageHelper.EMSG(e.getMessage());
                         VimPlugin.indicateError();
                         res = false;
                     }
@@ -256,7 +260,7 @@ public abstract class CommandHandler
                     }
                     catch (ExException e)
                     {
-                        // TODO - handle this
+                        MessageHelper.EMSG(e.getMessage());
                         VimPlugin.indicateError();
                     }
                 }

@@ -28,6 +28,8 @@ import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.Ranges;
 import com.maddyhome.idea.vim.group.CommandGroups;
+import com.maddyhome.idea.vim.helper.MessageHelper;
+import com.maddyhome.idea.vim.helper.Msg;
 
 /**
  *
@@ -65,6 +67,7 @@ public class CmdFilterHandler extends CommandHandler
                 String last = CommandGroups.getInstance().getProcess().getLastCommand();
                 if (last == null || last.length() == 0)
                 {
+                    MessageHelper.EMSG(Msg.e_noprev);
                     return false;
                 }
 

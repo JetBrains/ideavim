@@ -33,6 +33,8 @@ import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
+import com.maddyhome.idea.vim.helper.MessageHelper;
+import com.maddyhome.idea.vim.helper.Msg;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.regexp.CharHelper;
 import com.maddyhome.idea.vim.regexp.CharPointer;
@@ -95,7 +97,7 @@ public class SearchGroup extends AbstractActionGroup
             /* don't accept alphanumeric for separator */
             if (CharacterClasses.isAlpha(cmd.charAt()))
             {
-                // EMSG(_("E146: Regular expressions can't be delimited by letters")); TODO
+                MessageHelper.EMSG(Msg.E146);
                 return false;
             }
             /*
@@ -108,7 +110,7 @@ public class SearchGroup extends AbstractActionGroup
                 cmd.inc();
                 if ("/?&".indexOf(cmd.charAt()) == -1)
                 {
-                    // EMSG(_(e_backslash)); TODO
+                    MessageHelper.EMSG(Msg.e_backslash);
                     return false;
                 }
                 if (cmd.charAt() != '&')
@@ -156,7 +158,7 @@ public class SearchGroup extends AbstractActionGroup
         {
             if (lastReplace == null)    /* there is no previous command */
             {
-                // EMSG(_(e_nopresub)); TODO
+                MessageHelper.EMSG(Msg.e_nopresub);
                 return false;
             }
             pat = null;             /* search_regcomp() will use previous pattern */
@@ -215,7 +217,7 @@ public class SearchGroup extends AbstractActionGroup
             int i = CharHelper.getdigits(cmd);
             if (i <= 0 && do_error)
             {
-                // EMSG(_(e_zerocount)); TODO
+                MessageHelper.EMSG(Msg.e_zerocount);
                 return false;
             }
             line1 = line2;
@@ -228,7 +230,7 @@ public class SearchGroup extends AbstractActionGroup
         cmd = CharHelper.skipwhite(cmd);
         if (!cmd.isNul() && cmd.charAt() != '"')        /* if not end-of-line or comment */
         {
-            // EMSG(_(e_trailing)); TODO
+            MessageHelper.EMSG(Msg.e_trailing);
             return false;
         }
 
@@ -267,7 +269,7 @@ public class SearchGroup extends AbstractActionGroup
         {
             if (do_error)
             {
-                // EMSG(_(e_invcmd)); TODO
+                MessageHelper.EMSG(Msg.e_invcmd);
             }
             return false;
         }
@@ -993,19 +995,15 @@ public class SearchGroup extends AbstractActionGroup
 
         if (found == 0)             /* did not find it */
         {
-            /*
-            if (got_int)
-                EMSG(_(e_interr));
-            else if ((options & SEARCH_MSG) == SEARCH_MSG)
+            //if ((options & SEARCH_MSG) == SEARCH_MSG)
             {
                 if (p_ws)
-                    EMSG2(_(e_patnotf2), mr_pattern);
-                else if (lnum == 0)
-                    EMSG2(_("E384: search hit TOP without match for: %s"), mr_pattern);
+                    MessageHelper.EMSG(Msg.e_patnotf2, lastSearch);
+                else if (lnum <= 0)
+                    MessageHelper.EMSG(Msg.E384, lastSearch);
                 else
-                    EMSG2(_("E385: search hit BOTTOM without match for: %s"), mr_pattern);
+                    MessageHelper.EMSG(Msg.E385, lastSearch);
             }
-            */
             return null;
         }
 

@@ -1314,6 +1314,8 @@ public class MotionGroup extends AbstractActionGroup
                 CommandState.getInstance().reset();
                 EditorHelper.getEditor(event.getManager(), event.getOldFile()).getSelectionModel().removeSelection();
             }
+
+            VimPlugin.showMode("");
         }
     }
 

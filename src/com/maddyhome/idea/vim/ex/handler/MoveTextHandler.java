@@ -32,6 +32,8 @@ import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.ex.ParseResult;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.MessageHelper;
+import com.maddyhome.idea.vim.helper.Msg;
 
 /**
  *
@@ -58,7 +60,7 @@ public class MoveTextHandler extends CommandHandler
         }
         else if (line >= lr.getStartLine())
         {
-            throw new InvalidRangeException();
+            throw new InvalidRangeException(MessageHelper.getMsg(Msg.e_backrange));
         }
 
         String text = EditorHelper.getText(editor, range.getStartOffset(), range.getEndOffset());

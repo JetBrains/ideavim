@@ -27,6 +27,8 @@ import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.MessageHelper;
+import com.maddyhome.idea.vim.helper.Msg;
 
 /**
  *
@@ -47,6 +49,14 @@ public class MarkHandler extends CommandHandler
         int line = cmd.getLine(editor, context);
         int offset = EditorHelper.getLineStartOffset(editor, line);
 
-        return CommandGroups.getInstance().getMark().setMark(editor, context, mark, offset);
+        if (Character.isLetter(mark) || "'`".indexOf(mark) != -1)
+        {
+            return CommandGroups.getInstance().getMark().setMark(editor, context, mark, offset);
+        }
+        else
+        {
+            MessageHelper.EMSG(Msg.E191);
+            return false;
+        }
     }
 }

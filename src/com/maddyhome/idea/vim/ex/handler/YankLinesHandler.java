@@ -50,7 +50,10 @@ public class YankLinesHandler extends CommandHandler
             cmd.setArgument(arg.toString());
         }
 
-        CommandGroups.getInstance().getRegister().selectRegister(register);
+        if (!CommandGroups.getInstance().getRegister().selectRegister(register))
+        {
+            return false;
+        }
 
         TextRange range = cmd.getTextRange(editor, context, true);
 

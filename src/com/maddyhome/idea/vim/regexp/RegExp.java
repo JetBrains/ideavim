@@ -23,6 +23,8 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.MessageHelper;
+import com.maddyhome.idea.vim.helper.Msg;
 
 /*
  * NOTICE:
@@ -411,6 +413,21 @@ public class RegExp
 
     //EMSG_M_RET_null("E369: invalid item in %s%%[]", reg_magic == MAGIC_ALL)
 
+    private void EMSG_RET_null(String key)
+    {
+        MessageHelper.EMSG(key);
+    }
+
+    private void EMSG_M_RET_null(String key, boolean isMagic)
+    {
+        MessageHelper.EMSG(key, isMagic ? "" : "\\");
+    }
+
+    private void EMSG_ONE_RET_null()
+    {
+        EMSG_M_RET_null(Msg.E369, reg_magic == MAGIC_ALL);
+    }
+
     /*
      * Return NOT_MULTI if c is not a "multi" operator.
      * Return MULTI_ONE if c is a single "multi" operator.
@@ -601,7 +618,7 @@ public class RegExp
 
         if (expr == null)
         {
-            // EMSG_RET_null(e_null); TODO
+            MessageHelper.EMSG(Msg.e_null);
             return null;
         }
 
@@ -752,7 +769,7 @@ public class RegExp
             /* Make a ZOPEN node. */
             if (regnzpar >= NSUBEXP)
             {
-                // EMSG_RET_null("E50: Too many \\z("); TODO
+                MessageHelper.EMSG(Msg.E50);
                 return null;
             }
             parno = regnzpar;
@@ -764,7 +781,7 @@ public class RegExp
             /* Make a MOPEN node. */
             if (regnpar >= NSUBEXP)
             {
-                // EMSG_M_RET_null("E51: Too many %s(", reg_magic == MAGIC_ALL); TODO
+                EMSG_M_RET_null(Msg.E51, reg_magic == MAGIC_ALL);
                 return null;
             }
             parno = regnpar;
@@ -835,17 +852,17 @@ public class RegExp
         {
             if (paren == REG_ZPAREN)
             {
-                // EMSG_RET_null("E52: Unmatched \\z(") TODO
+                MessageHelper.EMSG(Msg.E52);
                 return null;
             }
             else if (paren == REG_NPAREN)
             {
-                // EMSG_M_RET_null("E53: Unmatched %s%%(", reg_magic == MAGIC_ALL) TODO
+                EMSG_M_RET_null(Msg.E53, reg_magic == MAGIC_ALL);
                 return null;
             }
             else
             {
-                // EMSG_M_RET_null("E54: Unmatched %s(", reg_magic == MAGIC_ALL) TODO
+                EMSG_M_RET_null(Msg.E54, reg_magic == MAGIC_ALL);
                 return null;
             }
         }
@@ -853,12 +870,12 @@ public class RegExp
         {
             if (curchr == Magic.LPAREN)
             {
-                // EMSG_M_RET_null("E55: Unmatched %s)", reg_magic == MAGIC_ALL) TODO
+                EMSG_M_RET_null(Msg.E55, reg_magic == MAGIC_ALL);
                 return null;
             }
             else
             {
-                // EMSG_RET_null(e_trailing)   /* "Can't happen". */ TODO
+                MessageHelper.EMSG(Msg.e_trailing);   /* "Can't happen". */
                 return null;
             }
             /* NOTREACHED */
@@ -1037,12 +1054,12 @@ public class RegExp
         {
             if (op == Magic.STAR)
             {
-                // EMSG_M_RET_null("E56: %s* operand could be empty", reg_magic >= MAGIC_ON); TODO
+                EMSG_M_RET_null(Msg.E56, reg_magic >= MAGIC_ON);
                 return null;
             }
             if (op == Magic.PLUS)
             {
-                // EMSG_M_RET_null("E57: %s+ operand could be empty", reg_magic == MAGIC_ALL); TODO
+                EMSG_M_RET_null(Msg.E57, reg_magic == MAGIC_ALL);
                 return null;
             }
             /* "\{}" is checked below, it's allowed when there is an upper limit */
@@ -1113,7 +1130,7 @@ public class RegExp
                     }
                     if (lop == END)
                     {
-                        // EMSG_M_RET_null("E59: invalid character after %s@", reg_magic == MAGIC_ALL); - TODO
+                        EMSG_M_RET_null(Msg.E59, reg_magic == MAGIC_ALL);
                         return null;
                     }
                     /* Look behind must match with behind_pos. */
@@ -1146,7 +1163,7 @@ public class RegExp
                 int minval = limits.minvalue;
                 if (!(flags.isSet(HASWIDTH)) && (maxval > minval ? maxval >= MAX_LIMIT : minval >= MAX_LIMIT))
                 {
-                    // EMSG_M_RET_null("E58: %s{ operand could be empty", reg_magic == MAGIC_ALL); - TODO
+                    EMSG_M_RET_null(Msg.E58, reg_magic == MAGIC_ALL);
                     return null;
                 }
                 if (flags.isSet(SIMPLE))
@@ -1158,7 +1175,7 @@ public class RegExp
                 {
                     if (num_complex_braces >= 10)
                     {
-                        // EMSG_M_RET_null("E60: Too many complex %s{...}s", reg_magic == MAGIC_ALL); - TODO
+                        EMSG_M_RET_null(Msg.E60, reg_magic == MAGIC_ALL);
                         return null;
                     }
                     reginsert(BRACE_COMPLEX + num_complex_braces, ret.ref(0));
@@ -1178,13 +1195,13 @@ public class RegExp
             /* Can't have a multi follow a multi. */
             if (peekchr() == Magic.STAR)
             {
-                //sprintf((char *)IObuff, _("E61: Nested %s*"), reg_magic >= MAGIC_ON ? "" : "\\"); - TODO
+                MessageHelper.EMSG(Msg.E61, reg_magic >= MAGIC_ON ? "" : "\\");
             }
             else
             {
-                //sprintf((char *)IObuff, _("E62: Nested %s%c"), reg_magic == MAGIC_ALL ? "" : "\\", no_Magic(peekchr())); - TODO
+                MessageHelper.EMSG(Msg.E62, reg_magic >= MAGIC_ON ? "" : "\\",
+                    Character.toString((char)Magic.no_Magic(peekchr())));
             }
-            // EMSG_RET_null(IObuff); - TODO
             return null;
         }
 
@@ -1300,7 +1317,7 @@ public class RegExp
                 int i = classchars.indexOf(Magic.no_Magic(c));
                 if (i == -1)
                 {
-                    // EMSG_RET_null("E63: invalid use of \\_"); TODO
+                    MessageHelper.EMSG(Msg.E63);
                     return null;
                 }
                 ret = regnode(classcodes[i] + extra);
@@ -1315,7 +1332,7 @@ public class RegExp
             case Magic.LPAREN:
                 if (one_exactly)
                 {
-                    //EMSG_ONE_RET_null; - TODO
+                    EMSG_ONE_RET_null();
                     return null;
                 }
                 ret = reg(REG_PAREN, flags);
@@ -1330,7 +1347,7 @@ public class RegExp
             case Magic.PIPE:
             case Magic.AMP:
             case Magic.RPAREN:
-                //EMSG_RET_null(e_internal);          /* Supposed to be caught earlier. */ TODO
+                EMSG_RET_null(Msg.e_internal);          /* Supposed to be caught earlier. */
                 return null;
                 /* NOTREACHED */
 
@@ -1341,12 +1358,8 @@ public class RegExp
             case Magic.LCURLY:
             case Magic.STAR:
                 c = Magic.no_Magic(c);
-                /* TODO
-                sprintf((char *)IObuff, _("E64: %s%c follows nothing"),
-                    (c == '*' ? reg_magic >= MAGIC_ON : reg_magic == MAGIC_ALL)
-                    ? "" : "\\", c);
-                EMSG_RET_null(IObuff);
-                */
+                MessageHelper.EMSG(Msg.E64, (c == '*' ? reg_magic >= MAGIC_ON : reg_magic == MAGIC_ALL) ? "" : "\\",
+                    Character.toString((char)c));
                 return null;
                 /* NOTREACHED */
 
@@ -1374,7 +1387,7 @@ public class RegExp
                 }
                 else
                 {
-                    // EMSG_RET_null(e_nopresub); - TODO
+                    MessageHelper.EMSG(Msg.e_nopresub);
                     return null;
                 }
                 break;
@@ -1412,7 +1425,7 @@ public class RegExp
                         }
                         if (p.isNul())
                         {
-                            //EMSG_RET_null("E65: Illegal back reference"); - TODO
+                            EMSG_RET_null(Msg.E65);
                             return null;
                         }
                     }
@@ -1427,12 +1440,12 @@ public class RegExp
                         case '(':
                             if (reg_do_extmatch != REX_SET)
                             {
-                                // EMSG_RET_null("E66: \\z( not allowed here"); - TODO
+                                MessageHelper.EMSG(Msg.E66);
                                 return null;
                             }
                             if (one_exactly)
                             {
-                                // EMSG_ONE_RET_null; - TODO
+                                EMSG_ONE_RET_null();
                                 return null;
                             }
                             ret = reg(REG_ZPAREN, flags);
@@ -1455,7 +1468,7 @@ public class RegExp
                         case '9':
                             if (reg_do_extmatch != REX_USE)
                             {
-                                // EMSG_RET_null("E67: \\z1 et al. not allowed here"); - TODO
+                                MessageHelper.EMSG(Msg.E67);
                                 return null;
                             }
                             ret = regnode(ZREF + c - '0');
@@ -1471,7 +1484,7 @@ public class RegExp
                             break;
 
                         default:
-                            // EMSG_RET_null("E68: Invalid character after \\z"); - TODO
+                            MessageHelper.EMSG(Msg.E68);
                             return null;
                     }
                 }
@@ -1486,7 +1499,7 @@ public class RegExp
                         case '(':
                             if (one_exactly)
                             {
-                                // EMSG_ONE_RET_null; - TODO
+                                EMSG_ONE_RET_null();
                                 return null;
                             }
                             ret = reg(REG_NPAREN, flags);
@@ -1516,7 +1529,7 @@ public class RegExp
                         case '[':
                             if (one_exactly)      /* doesn't nest */
                             {
-                                // EMSG_ONE_RET_null; - TODO
+                                EMSG_ONE_RET_null();
                                 return null;
                             }
                             else
@@ -1530,7 +1543,7 @@ public class RegExp
                                 {
                                     if (c == '\u0000')
                                     {
-                                        // EMSG_M_RET_null("E69: Missing ] after %s%%[", reg_magic == MAGIC_ALL); -TODO
+                                        EMSG_M_RET_null(Msg.E69, reg_magic == MAGIC_ALL);
                                         return null;
                                     }
                                     br = regnode(BRANCH);
@@ -1554,7 +1567,7 @@ public class RegExp
                                 }
                                 if (ret == null)
                                 {
-                                    // EMSG_M_RET_null("E70: Empty %s%%[]", reg_magic == MAGIC_ALL); - TODO
+                                    EMSG_M_RET_null(Msg.E70, reg_magic == MAGIC_ALL);
                                     return null;
                                 }
                                 lastbranch = regnode(BRANCH);
@@ -1618,7 +1631,7 @@ public class RegExp
                                 }
                             }
 
-                            // EMSG_M_RET_null("E71: Invalid character after %s%%", reg_magic == MAGIC_ALL); - TODO
+                            EMSG_M_RET_null(Msg.E71, reg_magic == MAGIC_ALL);
                             return null;
                     }
                 }
@@ -1686,7 +1699,7 @@ public class RegExp
                             regparse.inc();
                             if (startc > endc)
                             {
-                                // EMSG_RET_null(e_invrange); - TODO
+                                MessageHelper.EMSG(Msg.e_invrange);
                                 return null;
                             }
                             while (++startc <= endc)
@@ -1869,7 +1882,7 @@ public class RegExp
                 prevchr_len = 1;        /* last char was the ']' */
                 if (regparse.charAt() != ']')
                 {
-                    // EMSG_RET_null(e_toomsbra);  /* Cannot happen? */ - TODO
+                    MessageHelper.EMSG(Msg.e_toomsbra);  /* Cannot happen? */
                     return null;
                 }
                 skipchr();          /* let's be friends with the lexer again */
@@ -2314,11 +2327,7 @@ public class RegExp
         }
         if (regparse.charAt() != '}' || (maxval == 0 && minval == 0))
         {
-            /* TODO
-            sprintf((char *)IObuff, _("Syntax error in %s{...}"),
-                reg_magic == MAGIC_ALL ? "" : "\\");
-            EMSG_RET_FAIL(IObuff);
-            */
+            MessageHelper.EMSG(Msg.synerror, reg_magic == MAGIC_ALL ? "" : "\\");
             return null;
         }
 
@@ -2466,7 +2475,7 @@ public class RegExp
         /* Be paranoid... */
         if (prog == null || line == null)
         {
-            // EMSG(_(e_null)); - TODO
+            MessageHelper.EMSG(Msg.e_null);
             return retval;
         }
 
@@ -2565,7 +2574,7 @@ public class RegExp
 
         if (out_of_stack)
         {
-            // EMSG(_("E363: pattern caused out-of-stack error")); - TODO
+            MessageHelper.EMSG(Msg.E363);
         }
 
             /* Didn't find a match. */
@@ -3355,7 +3364,7 @@ public class RegExp
                             }
                             else
                             {
-                                //EMSG(_(e_internal));            /* Shouldn't happen */ TODO
+                                MessageHelper.EMSG(Msg.e_internal);            /* Shouldn't happen */
                                 return false;
                             }
                         }
@@ -3707,7 +3716,7 @@ public class RegExp
                         return true;        /* Success! */
 
                     default:
-                        // EMSG(_(e_re_corr)); - TODO
+                        MessageHelper.EMSG(Msg.e_re_corr);
                         return false;
                 }
             }
@@ -3719,7 +3728,7 @@ public class RegExp
          * We get here only if there's trouble -- normally "case END" is the
          * terminating point.
          */
-        // EMSG(_(e_re_corr)); TODO
+        MessageHelper.EMSG(Msg.e_re_corr);
         return false;
     }
 
@@ -4045,7 +4054,7 @@ public class RegExp
                 break;
 
             default:                  /* Oh dear.  Called inappropriately. */
-                // EMSG(_(e_re_corr)); TODO
+                MessageHelper.EMSG(Msg.e_re_corr);
                 break;
         }
 
@@ -4114,7 +4123,7 @@ public class RegExp
     {
         if ((reg_match == null ? reg_mmatch.regprog.program : reg_match.regprog.program).charAt(0) != REGMAGIC)
         {
-            // EMSG(_(e_re_corr)); TODO
+            MessageHelper.EMSG(Msg.e_re_corr);
             return true;
         }
         return false;
@@ -4494,7 +4503,7 @@ public class RegExp
         /* Be paranoid... */
         if (source == null)
         {
-            // EMSG(_(e_null)); TODO
+            MessageHelper.EMSG(Msg.e_null);
             return null;
         }
         if (prog_magic_wrong())
@@ -4658,7 +4667,7 @@ public class RegExp
                             }
                             else if (s.isNul()) /* we hit '\u0000'. */
                             {
-                                // EMSG(_(e_re_damg)); TODO
+                                MessageHelper.EMSG(Msg.e_re_damg);
 
                                 return dst.toString();
                             }

@@ -6,6 +6,7 @@ New Features
 - A VIM tool window has been added. This is used to show the current mode (if
   :set showmode is set) and any messages normally shown on the last line in
   VIM.
+- Various error messages are now displayed in the new status bar.
 
 New :set Options
 - showmode is now supported.

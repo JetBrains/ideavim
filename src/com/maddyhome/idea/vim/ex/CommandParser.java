@@ -39,6 +39,8 @@ import com.maddyhome.idea.vim.ex.handler.UndoHandler;
 import com.maddyhome.idea.vim.ex.handler.WriteNextFileHandler;
 import com.maddyhome.idea.vim.ex.handler.WritePreviousFileHandler;
 import com.maddyhome.idea.vim.ex.range.AbstractRange;
+import com.maddyhome.idea.vim.helper.MessageHelper;
+import com.maddyhome.idea.vim.helper.Msg;
 
 /*
 * IdeaVim - A Vim emulator plugin for IntelliJ Idea
@@ -183,6 +185,7 @@ public class CommandParser
                 node = node.getChild(command.charAt(i));
                 if (node == null)
                 {
+                    MessageHelper.EMSG(Msg.NOT_EX_CMD, command);
                     // No such command
                     throw new InvalidCommandException(cmd);
                 }
@@ -194,6 +197,7 @@ public class CommandParser
 
         if (handler == null)
         {
+            MessageHelper.EMSG(Msg.INT_BAD_CMD, command);
             throw new InvalidCommandException(cmd);
         }
 
@@ -224,6 +228,7 @@ public class CommandParser
         char patternType = 0; // ? or /
         int backCount = 0; // Number of backslashes in a row in a pattern
         boolean inBrackets = false; // If inside [ ] range in a pattern
+        String error = "";
 
         // Loop through each character. Treat the end of the string as a newline character
         for (int i = 0; i <= cmd.length(); i++)
@@ -315,6 +320,7 @@ public class CommandParser
                         }
                         else
                         {
+                            error = MessageHelper.getMsg(Msg.e_badrange, Character.toString(ch));
                             state = STATE_ERROR;
                             reprocess = false;
                         }
@@ -328,6 +334,7 @@ public class CommandParser
                         }
                         else
                         {
+                            error = MessageHelper.getMsg(Msg.e_backslash);
                             state = STATE_ERROR;
                             reprocess = false;
                         }
@@ -552,6 +559,7 @@ public class CommandParser
             // Oops - bad command string
             if (state == STATE_ERROR)
             {
+                MessageHelper.EMSG(error);
                 throw new InvalidCommandException(cmd);
             }
         }

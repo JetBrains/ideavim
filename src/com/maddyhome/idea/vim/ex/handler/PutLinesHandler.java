@@ -54,7 +54,10 @@ public class PutLinesHandler extends CommandHandler
         }
         if (arg.length() > 0)
         {
-            CommandGroups.getInstance().getRegister().selectRegister(arg.charAt(0));
+            if (!CommandGroups.getInstance().getRegister().selectRegister(arg.charAt(0)))
+            {
+                return false;
+            }
         }
         else
         {
