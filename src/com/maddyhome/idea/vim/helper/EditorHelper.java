@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.VisualPosition;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.maddyhome.idea.vim.common.CharacterPosition;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.nio.CharBuffer;
@@ -131,7 +132,8 @@ public class EditorHelper
     public static int getLineCount(Editor editor)
     {
         int len = editor.getDocument().getLineCount();
-        if (editor.getDocument().getTextLength() > 0 && editor.getDocument().getChars()[editor.getDocument().getTextLength() - 1] == '\n')
+        if (editor.getDocument().getTextLength() > 0 &&
+            editor.getDocument().getChars()[editor.getDocument().getTextLength() - 1] == '\n')
         {
             len--;
         }
@@ -402,6 +404,11 @@ public class EditorHelper
         return editor.getDocument().getLineEndOffset(pos.line);
     }
 
+    public static int getLineCharCount(Editor editor, int lline)
+    {
+        return getLineEndOffset(editor, lline, true) - getLineStartOffset(editor, lline);
+    }
+
     /**
      * Returns the text of the requested logical line
      * @param editor The editor
@@ -413,8 +420,22 @@ public class EditorHelper
         return getText(editor, getLineStartOffset(editor, lline), getLineEndOffset(editor, lline, true));
     }
 
+    public static CharacterPosition offsetToCharacterPosition(Editor editor, int offset)
+    {
+        int line = editor.getDocument().getLineNumber(offset);
+        int col = offset - editor.getDocument().getLineStartOffset(line);
+
+        return new CharacterPosition(line, col);
+    }
+
+    public static int characterPositionToOffset(Editor editor, CharacterPosition pos)
+    {
+        return editor.getDocument().getLineStartOffset(pos.line) + pos.column;
+    }
+
     public static CharBuffer getLineBuffer(Editor editor, int lline)
     {
-        return CharBuffer.wrap(editor.getDocument().getChars(), getLineStartOffset(editor, lline), getLineLength(editor, lline));
+        return CharBuffer.wrap(editor.getDocument().getChars(), getLineStartOffset(editor, lline),
+            getLineCharCount(editor, lline));
     }
 }

@@ -40,6 +40,7 @@ import com.maddyhome.idea.vim.regexp.CharHelper;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
+import com.maddyhome.idea.vim.common.CharacterPosition;
 import java.awt.Color;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
@@ -264,8 +265,10 @@ public class SearchGroup extends AbstractActionGroup
         lastSubstitute = pattern;
         setLastPattern(editor, context, pattern);
 
-        int start = editor.logicalPositionToOffset(new LogicalPosition(line1, 0));
-        int end = editor.logicalPositionToOffset(new LogicalPosition(line2, EditorHelper.getLineLength(editor, line2)));
+        //int start = editor.logicalPositionToOffset(new LogicalPosition(line1, 0));
+        //int end = editor.logicalPositionToOffset(new LogicalPosition(line2, EditorHelper.getLineLength(editor, line2)));
+        int start = editor.getDocument().getLineStartOffset(line1);
+        int end = editor.getDocument().getLineEndOffset(line2);
 
         RegExp sp;
         RegExp.regmmatch_T regmatch = new RegExp.regmmatch_T();
@@ -323,7 +326,7 @@ public class SearchGroup extends AbstractActionGroup
         boolean got_quit = false;
         for (int lnum = line1; lnum <= line2 && !got_quit;)
         {
-            LogicalPosition newpos = null;
+            CharacterPosition newpos = null;
             int nmatch = sp.vim_regexec_multi(regmatch, editor, lnum, searchcol);
             found = nmatch > 0;
             if (found)
@@ -338,12 +341,12 @@ public class SearchGroup extends AbstractActionGroup
                 //logger.debug("found match[" + spos + "," + epos + "] - replace " + match);
 
                 int line = lnum + regmatch.startpos[0].lnum;
-                LogicalPosition startpos = new LogicalPosition(lnum + regmatch.startpos[0].lnum,
+                CharacterPosition startpos = new CharacterPosition(lnum + regmatch.startpos[0].lnum,
                     regmatch.startpos[0].col);
-                LogicalPosition endpos = new LogicalPosition(lnum + regmatch.endpos[0].lnum,
+                CharacterPosition endpos = new CharacterPosition(lnum + regmatch.endpos[0].lnum,
                     regmatch.endpos[0].col);
-                int startoff = editor.logicalPositionToOffset(startpos);
-                int endoff = editor.logicalPositionToOffset(endpos);
+                int startoff = EditorHelper.characterPositionToOffset(editor, startpos);
+                int endoff = EditorHelper.characterPositionToOffset(editor, endpos);
                 int newend = startoff + match.length();
 
                 if (do_all || line != lastLine)
@@ -388,7 +391,7 @@ public class SearchGroup extends AbstractActionGroup
                     {
                         editor.getDocument().replaceString(startoff, endoff, match);
                         lastMatch = startoff;
-                        newpos = editor.offsetToLogicalPosition(newend);
+                        newpos = EditorHelper.offsetToCharacterPosition(editor, newend);
 
                         int diff = newpos.line - endpos.line;
                         line2 += diff;
@@ -773,7 +776,7 @@ public class SearchGroup extends AbstractActionGroup
         //REMatch match = null;
         */
 
-        LogicalPosition lpos = editor.offsetToLogicalPosition(startOffset);
+        CharacterPosition lpos = EditorHelper.offsetToCharacterPosition(editor, startOffset);
         RegExp.lpos_T pos = new RegExp.lpos_T();
         pos.lnum = lpos.line;
         pos.col = lpos.column;
@@ -1018,8 +1021,12 @@ public class SearchGroup extends AbstractActionGroup
             return null;
         }
 
-        return new TextRange(editor.logicalPositionToOffset(new LogicalPosition(pos.lnum, pos.col)),
-            editor.logicalPositionToOffset(new LogicalPosition(endpos.lnum, endpos.col)));
+        //return new TextRange(editor.logicalPositionToOffset(new LogicalPosition(pos.lnum, pos.col)),
+        //    editor.logicalPositionToOffset(new LogicalPosition(endpos.lnum, endpos.col)));
+        //return new TextRange(editor.logicalPositionToOffset(new LogicalPosition(pos.lnum, 0)) + pos.col,
+        //    editor.logicalPositionToOffset(new LogicalPosition(endpos.lnum, 0)) + endpos.col);
+        return new TextRange(EditorHelper.characterPositionToOffset(editor, new CharacterPosition(pos.lnum,  pos.col)),
+            EditorHelper.characterPositionToOffset(editor, new CharacterPosition(endpos.lnum, endpos.col)));
     }
 
     private RangeHighlighter highlightMatch(Editor editor, int start, int end)
