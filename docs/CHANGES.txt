@@ -1,6 +1,12 @@
 History of changes for @NAME@
 
-0.3.2 to @VERSION@
+0.4.0 to @VERSION@
+
+Bug Fixes
+- Fixed vim.xml for Windows. This file was getting deleted by Idea on Windows
+  due to a mismatch in the case of the name.
+
+0.3.2 to 0.4.0
 
 New Features
 - A VIM tool window has been added. This is used to show the current mode (if
