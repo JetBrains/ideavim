@@ -36,6 +36,8 @@ Within the pages of this website however, you will find a reference of all worki
 
 <h3>Installation</h3>
 
+<h4>Idea 3.x</h4>
+
 Once you have downloaded the binary release or built it from source, you have three simple steps to perform to begin
 using IDEA in VIM Emulation mode:
 
@@ -44,8 +46,24 @@ using IDEA in VIM Emulation mode:
     <code>IDEA_HOME</code> is IDEA installation directory. Newer versions of the Aurora builds should use the
     plugin manager to download the latest version of the plugin.</li>
 <li>Copy <code>vim.xml</code> to <code>&lt;HOME&gt;/.IntelliJIdea/config/keymaps</code> where <code>HOME</code>
-    if your home directory on Unix or <code>C:\Documents&nbsp;and&nbsp;Settings\&lt;user&gt;</code> on Windows.
+    is your home directory on Unix or <code>C:\Documents&nbsp;and&nbsp;Settings\&lt;user&gt;</code> on Windows.
     Create the <code>keymaps</code> directory if it does not exist.</li>
+<li>Restart IDEA and then select the <code>Options|Keymaps</code> menu. Select the <code>vim</code> keymap and make
+    it the active keymap by pressing the <code>Set Active</code> button.</li>
+</ol>
+
+<h4>Idea Aurora and 4.x</h4>
+
+<ol>
+<li>Use the plugin manager built into Idea to download and install the IdeaVIM
+plugin. This should be found under the Editor section.</li>
+<li>If this is the first time you have ever installed this plugin you must
+install the special VIM key mapping. Copy
+<code>&lt;IDEA_HOME&gt;/plugins/IdeaVIM/vim.xml</code> to
+<code>&lt;HOME&gt;/.IntelliJIdea/config/keymaps</code> where <code>HOME</code>
+is your home directory.
+Create the <code>keymaps</code> directory if it does not exist.
+</li>
 <li>Restart IDEA and then select the <code>Options|Keymaps</code> menu. Select the <code>vim</code> keymap and make
     it the active keymap by pressing the <code>Set Active</code> button.</li>
 </ol>
@@ -68,6 +86,10 @@ It is not known at this time if older or newer versions will work correctly.
 Version 0.6.2 of the plugin now works with Aurora build #963 and higher.
 <br>
 Version 0.6.3 of the plugin now works with Aurora build #992 and higher.
+<br>
+Version 0.6.4 of the plugin now works with Aurora build #1035 and higher.
+<br>
+Version 0.6.5 of the plugin now works with Aurora build #1050 and higher.
 
 <hr>
 
