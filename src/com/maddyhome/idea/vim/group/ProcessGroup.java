@@ -97,7 +97,7 @@ public class ProcessGroup extends AbstractActionGroup
         return initText;
     }
 
-    public boolean executeFilter(Editor editor, DataContext context, TextRange range, String command)
+    public boolean executeFilter(Editor editor, DataContext context, TextRange range, String command) throws IOException
     {
         logger.debug("command=" + command);
         char[] chars = editor.getDocument().getChars();
@@ -105,34 +105,26 @@ public class ProcessGroup extends AbstractActionGroup
             range.getEndOffset() - range.getStartOffset());
         StringWriter sw = new StringWriter();
 
-        try
-        {
-            logger.debug("about to create filter");
-            Process filter = Runtime.getRuntime().exec(command);
-            logger.debug("filter created");
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(filter.getOutputStream()));
-            logger.debug("sending text");
-            copy(car, writer);
-            writer.close();
-            logger.debug("sent");
+        logger.debug("about to create filter");
+        Process filter = Runtime.getRuntime().exec(command);
+        logger.debug("filter created");
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(filter.getOutputStream()));
+        logger.debug("sending text");
+        copy(car, writer);
+        writer.close();
+        logger.debug("sent");
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(filter.getInputStream()));
-            logger.debug("getting result");
-            copy(reader, sw);
-            sw.close();
-            logger.debug("received");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(filter.getInputStream()));
+        logger.debug("getting result");
+        copy(reader, sw);
+        sw.close();
+        logger.debug("received");
 
-            editor.getDocument().replaceString(range.getStartOffset(), range.getEndOffset(), sw.toString());
+        editor.getDocument().replaceString(range.getStartOffset(), range.getEndOffset(), sw.toString());
 
-            lastCommand = command;
-            
-            return true;
-        }
-        catch (IOException e)
-        {
-            // TODO
-            return false;
-        }
+        lastCommand = command;
+
+        return true;
     }
 
     private void copy(Reader from, Writer to) throws IOException
@@ -174,7 +166,7 @@ public class ProcessGroup extends AbstractActionGroup
                     }
                     catch (ExException ex)
                     {
-                        // TODO - display error
+                        VimPlugin.showMessage(ex.getMessage());
                         ProcessGroup.logger.info(ex.getMessage());
                         VimPlugin.indicateError();
                     }

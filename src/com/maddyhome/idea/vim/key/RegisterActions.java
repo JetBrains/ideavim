@@ -606,9 +606,6 @@ public class RegisterActions
         });
 
         // Misc Actions
-        // TODO - finds should update visual mode selection
-        // TODO - add #
-        // TODO - add *
         parser.registerAction(KeyParser.MAPPING_NVO, "VimSearchEntry", Command.OTHER_READONLY, Command.FLAG_SEARCH_FWD | Command.FLAG_SAVE_JUMP,
             new Shortcut('/'));
         parser.registerAction(KeyParser.MAPPING_NVO, "VimSearchEntry", Command.OTHER_READONLY, Command.FLAG_SEARCH_REV | Command.FLAG_SAVE_JUMP,

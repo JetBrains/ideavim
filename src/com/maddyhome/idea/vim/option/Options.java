@@ -22,6 +22,8 @@ package com.maddyhome.idea.vim.option;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.helper.Msg;
+import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.ui.MorePanel;
 import java.io.BufferedReader;
 import java.io.File;
@@ -160,13 +162,14 @@ public class Options
         }
 
         // We now have 1 or more option operators separator by spaces
-        int error = 0;
+        String error = null;
+        String token = null;
         String option = "";
         StringTokenizer tokenizer = new StringTokenizer(args);
         ArrayList toShow = new ArrayList();
         while (tokenizer.hasMoreTokens())
         {
-            String token = tokenizer.nextToken();
+            token = tokenizer.nextToken();
             // See if a space has been backslashed, if no get the rest of the text
             while (token.endsWith("\\"))
             {
@@ -188,7 +191,7 @@ public class Options
                 }
                 else
                 {
-                    error = UNKNOWN_OPTION;
+                    error = Msg.unkopt;
                 }
             }
             // Reset a boolean option
@@ -204,12 +207,12 @@ public class Options
                     }
                     else
                     {
-                        error = INVALID_ARGUMENT;
+                        error = Msg.e_invarg;
                     }
                 }
                 else
                 {
-                    error = UNKNOWN_OPTION;
+                    error = Msg.unkopt;
                 }
             }
             // Toggle a boolean option
@@ -225,12 +228,12 @@ public class Options
                     }
                     else
                     {
-                        error = INVALID_ARGUMENT;
+                        error = Msg.e_invarg;
                     }
                 }
                 else
                 {
-                    error = UNKNOWN_OPTION;
+                    error = Msg.unkopt;
                 }
             }
             // Toggle a boolean option
@@ -246,12 +249,12 @@ public class Options
                     }
                     else
                     {
-                        error = INVALID_ARGUMENT;
+                        error = Msg.e_invarg;
                     }
                 }
                 else
                 {
-                    error = UNKNOWN_OPTION;
+                    error = Msg.unkopt;
                 }
             }
             // Reset option to default
@@ -265,7 +268,7 @@ public class Options
                 }
                 else
                 {
-                    error = UNKNOWN_OPTION;
+                    error = Msg.unkopt;
                 }
             }
             // This must be one of =, :, +=, -=, or ^=
@@ -296,7 +299,7 @@ public class Options
                     }
                     else
                     {
-                        error = UNKNOWN_OPTION;
+                        error = Msg.unkopt;
                     }
                 }
                 // We have an operator
@@ -340,28 +343,28 @@ public class Options
                                 }
                                 if (!res)
                                 {
-                                    error = INVALID_ARGUMENT;
+                                    error = Msg.e_invarg;
                                 }
                             }
                             // boolean option - no good
                             else
                             {
-                                error = INVALID_ARGUMENT;
+                                error = Msg.e_invarg;
                             }
                         }
                         else
                         {
-                            error = UNKNOWN_OPTION;
+                            error = Msg.unkopt;
                         }
                     }
                     else
                     {
-                        error = UNKNOWN_OPTION;
+                        error = Msg.unkopt;
                     }
                 }
             }
 
-            if (failOnBad && error != 0)
+            if (failOnBad && error != null)
             {
                 break;
             }
@@ -373,13 +376,13 @@ public class Options
             showOptions(editor, toShow, false);
         }
 
-        // TODO - display message in status bar
-        if (editor != null && error != 0)
+        if (editor != null && error != null)
         {
+            VimPlugin.showMessage(MessageHelper.getMsg(error, token));
             VimPlugin.indicateError();
         }
 
-        return error == 0;
+        return error == null;
     }
 
     /**
@@ -565,9 +568,6 @@ public class Options
     private HashMap abbrevs = new HashMap();
 
     private static Options ourInstance;
-
-    private static final int UNKNOWN_OPTION = 1;
-    private static final int INVALID_ARGUMENT = 2;
 
     private static Logger logger = Logger.getInstance(Options.class.getName());
 }

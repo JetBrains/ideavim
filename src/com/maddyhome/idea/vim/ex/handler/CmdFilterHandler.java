@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.ex.Ranges;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
+import java.io.IOException;
 
 /**
  *
@@ -80,7 +81,14 @@ public class CmdFilterHandler extends CommandHandler
                 return false;
             }
 
-            return CommandGroups.getInstance().getProcess().executeFilter(editor, context, range, command);
+            try
+            {
+                return CommandGroups.getInstance().getProcess().executeFilter(editor, context, range, command);
+            }
+            catch (IOException e)
+            {
+                throw new ExException(e.getMessage());
+            }
         }
     }
 

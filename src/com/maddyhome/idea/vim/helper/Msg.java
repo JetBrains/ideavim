@@ -53,4 +53,6 @@ public interface Msg
     String E384 = "E384";
     String E385 = "E385";
     String e_patnotf2 = "e_patnotf2";
+    String unkopt = "unkopt";
+    String e_invarg = "e_invarg";
 }
