@@ -19,9 +19,15 @@ package com.maddyhome.idea.vim.undo;
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
+import com.intellij.openapi.actionSystem.DataConstants;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vcs.AbstractVcsHelper;
+import com.intellij.openapi.vcs.FileStatusManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.Options;
 import java.util.ArrayList;
@@ -142,6 +148,18 @@ public class EditorUndoList
             inUndo = true;
             cmd.undo(editor, context);
             inUndo = false;
+
+            if (pointer == 0)
+            {
+                logger.debug("marking as up-to-date");
+                Project p = (Project)context.getData(DataConstants.PROJECT);
+                VirtualFile vf = (VirtualFile)context.getData(DataConstants.VIRTUAL_FILE);
+                logger.debug("project=" + p.getName() + ":" + p.getProjectFile());
+                logger.debug("file=" + vf);
+                FileDocumentManager.getInstance().reloadFromDisk(editor.getDocument());
+                AbstractVcsHelper.getInstance(p).markFileAsUpToDate(vf);
+                FileStatusManager.getInstance(p).fileStatusChanged(vf);
+            }
 
             return true;
         }
