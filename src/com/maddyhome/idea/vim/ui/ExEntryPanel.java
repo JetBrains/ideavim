@@ -24,7 +24,10 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.EditorData;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -65,6 +68,7 @@ public class ExEntryPanel extends JPanel
         entry = new ExTextField();
         entry.setFont(font);
         entry.setBorder(null);
+        entry.setEnabled(false);
 
         setForeground(entry.getForeground());
         setBackground(entry.getBackground());
@@ -115,6 +119,7 @@ public class ExEntryPanel extends JPanel
         this.count = count;
         entry.setDocument(entry.createDefaultModel());
         entry.setText(initText);
+        entry.setEnabled(true);
         //parent = comp;
         //root = SwingUtilities.getRootPane(parent);
         //oldGlass = root.getGlassPane();
@@ -201,6 +206,7 @@ public class ExEntryPanel extends JPanel
         logger.info("deactivate");
         if (!active) return;
         active = false;
+        entry.setEnabled(false);
         //newGlass.setVisible(false);
         //root.setGlassPane(oldGlass);
         if (changeFocus)
@@ -212,8 +218,10 @@ public class ExEntryPanel extends JPanel
                     VimPlugin.hideToolWindow((Project)entry.getContext().getData(DataConstants.PROJECT));
 
                     //parent.requestFocus();
-                    last.requestFocus();
+                    //last.requestFocus();
                     //entry.getEditor().getComponent().requestFocus();
+                    FileEditorManager.getInstance((Project)entry.getContext().getData(DataConstants.PROJECT)).openFile(
+                        EditorData.getVirtualFile(entry.getEditor()), true);
                 }
             });
         }

@@ -122,6 +122,7 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
                 showing.put(proj, new Boolean(win.isVisible()));
                 win.setAutoHide(false);
                 win.show(null);
+                win.activate(null);
             }
         }
     }
