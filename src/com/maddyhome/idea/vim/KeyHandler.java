@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.key.CommandNode;
 import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.key.Node;
 import com.maddyhome.idea.vim.key.ParentNode;
+import com.maddyhome.idea.vim.helper.RunnableHelper;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Stack;
@@ -307,36 +308,19 @@ public class KeyHandler
             if (!editor.getDocument().isWritable() && !Command.isReadOnlyType(cmd.getType()))
             {
                 VimPlugin.indicateError();
+                reset();
             }
             else
             {
-                executeAction(cmd.getAction(), context);
-                if (CommandState.getInstance().getMode() == CommandState.MODE_INSERT ||
-                    CommandState.getInstance().getMode() == CommandState.MODE_REPLACE)
+                Runnable action = new ActionRunner(editor, context, cmd);
+                if (Command.isReadOnlyType(cmd.getType()))
                 {
-                    CommandGroups.getInstance().getChange().processCommand(editor, context, cmd);
+                    RunnableHelper.runReadCommand(action);
                 }
-            }
-
-            // Now that the command has been executed let's clean up a few things.
-
-            // By default the "empty" register is used by all commands so we want to reset whatever the last register
-            // selected by the user was to the empty register - unless we just executed the "select register" command.
-            if (cmd.getType() != Command.SELECT_REGISTER)
-            {
-                CommandGroups.getInstance().getRegister().resetRegister();
-            }
-
-            reset();
-
-            // If, at this point, we are not in insert, replace, or visual modes, we need to restore the previous
-            // mode we were in. This handles commands in those modes that temporarily allow us to execute normal
-            // mode commands.
-            if (CommandState.getInstance().getMode() != CommandState.MODE_INSERT &&
-                CommandState.getInstance().getMode() != CommandState.MODE_REPLACE &&
-                CommandState.getInstance().getMode() != CommandState.MODE_VISUAL)
-            {
-                CommandState.getInstance().restoreMode();
+                else
+                {
+                    RunnableHelper.runWriteCommand(action);
+                }
             }
         }
         // We had some sort of error so reset the handler and let the user know (beep)
@@ -424,19 +408,49 @@ public class KeyHandler
      */
     static class ActionRunner implements Runnable
     {
-        public ActionRunner(AnAction action, DataContext context)
+        public ActionRunner(Editor editor, DataContext context, Command cmd)
         {
-            this.action = action;
+            this.editor = editor;
             this.context = context;
+            this.cmd = cmd;
         }
 
         public void run()
         {
-            action.actionPerformed(new AnActionEvent(null, context, "", action.getTemplatePresentation(), 0));
+            executeAction(cmd.getAction(), context);
+            if (CommandState.getInstance().getMode() == CommandState.MODE_INSERT ||
+                CommandState.getInstance().getMode() == CommandState.MODE_REPLACE)
+            {
+                CommandGroups.getInstance().getChange().processCommand(editor, context, cmd);
+            }
+
+            // Now that the command has been executed let's clean up a few things.
+
+            // By default the "empty" register is used by all commands so we want to reset whatever the last register
+            // selected by the user was to the empty register - unless we just executed the "select register" command.
+            if (cmd.getType() != Command.SELECT_REGISTER)
+            {
+                CommandGroups.getInstance().getRegister().resetRegister();
+            }
+
+            KeyHandler.getInstance().reset();
+
+            // If, at this point, we are not in insert, replace, or visual modes, we need to restore the previous
+            // mode we were in. This handles commands in those modes that temporarily allow us to execute normal
+            // mode commands. An exception is if this command should leave us in the temporary mode such as
+            // "select register"
+            if ((CommandState.getInstance().getMode() != CommandState.MODE_INSERT &&
+                CommandState.getInstance().getMode() != CommandState.MODE_REPLACE &&
+                CommandState.getInstance().getMode() != CommandState.MODE_VISUAL) &&
+                (cmd.getFlags() & KeyParser.FLAG_EXPECT_MORE) == 0)
+            {
+                CommandState.getInstance().restoreMode();
+            }
         }
 
-        private AnAction action;
+        private Editor editor;
         private DataContext context;
+        private Command cmd;
     }
 
     private int count;
