@@ -46,6 +46,18 @@ public class VisualChange
         return type;
     }
 
+    public String toString()
+    {
+        StringBuffer res = new StringBuffer();
+        res.append("VisualChange[");
+        res.append("lines=").append(lines);
+        res.append(", columns=").append(columns);
+        res.append(", type=").append(type);
+        res.append("]");
+
+        return res.toString();
+    }
+
     int lines;
     int columns;
     int type;
