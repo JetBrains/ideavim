@@ -1,7 +1,6 @@
 Bugs to fix:
 
 - Replace mode - fix cursor. Can't figure out how to keep block cursor.
-- Yanking/putting on last line of file not quite right.
 - Repeating (via .) the O command affects prior line of text.
 
 Requested Functionality to add:

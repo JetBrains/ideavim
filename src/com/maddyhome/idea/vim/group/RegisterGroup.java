@@ -130,6 +130,11 @@ public class RegisterGroup extends AbstractActionGroup
             end = t;
         }
 
+        if (type == Command.FLAG_MOT_LINEWISE && text.length() > 0 && text.charAt(text.length() - 1) != '\n')
+        {
+            text = text + '\n';
+        }
+
         // If this is an uppercase register, we need to append the text to the corresponding lowercase register
         if (Character.isUpperCase(register))
         {
