@@ -193,7 +193,10 @@ public class UndoManager
         public void beforeDocumentSaving(Document document) throws VetoDocumentSavingException
         {
             EditorUndoList list = (EditorUndoList)UndoManager.getInstance().getEditors().get(document);
-            list.documentSaved();
+            if (list != null)
+            {
+                list.documentSaved();
+            }
         }
     }
 
