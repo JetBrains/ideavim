@@ -18,6 +18,8 @@ Bug Fixes
 - Doing a cw or cW when the cursor is already on the end of a word/WORD now
   correctly deletes only the last character of the word/WORD and not the next
   word too.
+- gd and gD now properly save the jump location before moving to the
+  declaration.
 
 0.3.0 to 0.3.1
 

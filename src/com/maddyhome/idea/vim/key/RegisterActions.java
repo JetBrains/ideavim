@@ -505,7 +505,7 @@ public class RegisterActions
         parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimVisualToggleLineMode", Command.OTHER_READONLY, Command.FLAG_MOT_LINEWISE, new Shortcut('V'));
         parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimMotionMark", Command.OTHER_READONLY, new Shortcut('m'), Argument.CHARACTER);
         // FIX - make custom actions so can save jump
-        parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "GotoDeclaration", Command.OTHER_READONLY | Command.FLAG_SAVE_JUMP, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimGotoDeclaration", Command.OTHER_READONLY | Command.FLAG_SAVE_JUMP, new Shortcut[] {
             new Shortcut("gD"),
             new Shortcut("gd")
         });
