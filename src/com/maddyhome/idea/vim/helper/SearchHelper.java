@@ -20,6 +20,11 @@ package com.maddyhome.idea.vim.helper;
  */
 
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.option.ListOption;
+import com.maddyhome.idea.vim.option.OptionChangeEvent;
+import com.maddyhome.idea.vim.option.OptionChangeListener;
+import com.maddyhome.idea.vim.option.Options;
+import java.util.List;
 
 /**
  * Helper methods for searching text
@@ -38,14 +43,14 @@ public class SearchHelper
     {
         int res = -1;
         int line = EditorHelper.getCurrentLogicalLine(editor);
-        int end = EditorHelper.getLineEndOffset(editor, line);
+        int end = EditorHelper.getLineEndOffset(editor, line, true);
         char[] chars = editor.getDocument().getChars();
         int pos = editor.getCaretModel().getOffset();
         int loc = -1;
         // Search the remainder of the current line for one of the candicate characters
         while (pos < end)
         {
-            loc = pairsChars.indexOf(chars[pos]);
+            loc = getPairChars().indexOf(chars[pos]);
             if (loc >= 0)
             {
                 break;
@@ -60,8 +65,8 @@ public class SearchHelper
             // What direction should we go now (-1 is backward, 1 is forward)
             int dir = loc % 2 == 0 ? 1 : -1;
             // Which character did we find and which should we now search for
-            char found = pairsChars.charAt(loc);
-            char match = pairsChars.charAt(loc + dir);
+            char found = getPairChars().charAt(loc);
+            char match = getPairChars().charAt(loc + dir);
             boolean inString = false;
             int stack = 0;
             pos += dir;
@@ -298,7 +303,7 @@ public class SearchHelper
     {
         int line = EditorHelper.getCurrentLogicalLine(editor);
         int start = EditorHelper.getLineStartOffset(editor, line);
-        int end = EditorHelper.getLineEndOffset(editor, line);
+        int end = EditorHelper.getLineEndOffset(editor, line, true);
         char[] chars = editor.getDocument().getChars();
         int found = 0;
         int step = count >= 0 ? 1 : -1;
@@ -326,5 +331,39 @@ public class SearchHelper
         }
     }
 
-    private static final String pairsChars = "{}[]()";
+    private static String getPairChars()
+    {
+        if (pairsChars == null)
+        {
+            ListOption lo = (ListOption)Options.getInstance().getOption("matchpairs");
+            pairsChars = parseOption(lo);
+
+            lo.addOptionChangeListener(new OptionChangeListener() {
+                public void valueChange(OptionChangeEvent event)
+                {
+                    pairsChars = parseOption((ListOption)event.getOption());
+                }
+            });
+        }
+
+        return pairsChars;
+    }
+
+    private static String parseOption(ListOption option)
+    {
+        List vals = option.values();
+        StringBuffer res = new StringBuffer();
+        for (int i = 0; i < vals.size(); i++)
+        {
+            String s = (String)vals.get(i);
+            if (s.length() == 3)
+            {
+                res.append(s.charAt(0)).append(s.charAt(2));
+            }
+        }
+
+        return res.toString();
+    }
+
+    private static String pairsChars = null;
 }
