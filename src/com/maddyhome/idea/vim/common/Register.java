@@ -1,8 +1,8 @@
 package com.maddyhome.idea.vim.common;
 
+import com.maddyhome.idea.vim.helper.StringHelper;
 import java.util.Comparator;
 import java.util.List;
-import com.maddyhome.idea.vim.helper.StringHelper;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea

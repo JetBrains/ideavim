@@ -1,9 +1,8 @@
 package com.maddyhome.idea.vim.helper;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.awt.event.KeyEvent;
-import java.awt.Toolkit;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.KeyStroke;
 
 /*

@@ -19,10 +19,10 @@ package com.maddyhome.idea.vim.command;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.key.KeyParser;
-import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.option.Options;
 import java.util.Stack;
 

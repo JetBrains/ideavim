@@ -24,8 +24,8 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.maddyhome.idea.vim.command.VisualRange;
 import com.maddyhome.idea.vim.command.VisualChange;
+import com.maddyhome.idea.vim.command.VisualRange;
 import com.maddyhome.idea.vim.group.MarkGroup;
 import com.maddyhome.idea.vim.undo.UndoManager;
 

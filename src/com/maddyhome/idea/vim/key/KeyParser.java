@@ -24,9 +24,9 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
+import com.maddyhome.idea.vim.action.TxActionWrapper;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.handler.key.EditorKeyHandler;
-import com.maddyhome.idea.vim.action.TxActionWrapper;
 import java.util.HashMap;
 import javax.swing.KeyStroke;
 

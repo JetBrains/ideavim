@@ -19,9 +19,9 @@ package com.maddyhome.idea.vim.helper;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import java.util.ResourceBundle;
-import java.text.MessageFormat;
 import com.maddyhome.idea.vim.VimPlugin;
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
 
 /**
  *
