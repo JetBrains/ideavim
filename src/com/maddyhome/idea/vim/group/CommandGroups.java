@@ -53,6 +53,7 @@ public class CommandGroups
         mark = new MarkGroup();
         register = new RegisterGroup();
         file = new FileGroup();
+        search = new SearchGroup();
     }
 
     /**
@@ -110,6 +111,15 @@ public class CommandGroups
     }
 
     /**
+     * Returns the search group
+     * @return The search group
+     */
+    public SearchGroup getSearch()
+    {
+        return search;
+    }
+
+    /**
      * Tells each group to save its data.
      * @param element The plugin's root element
      */
@@ -121,6 +131,7 @@ public class CommandGroups
         mark.saveData(element);
         register.saveData(element);
         file.saveData(element);
+        search.saveData(element);
     }
 
     /**
@@ -136,6 +147,7 @@ public class CommandGroups
         mark.readData(element);
         register.readData(element);
         file.readData(element);
+        search.readData(element);
     }
 
     private static CommandGroups instance;
@@ -145,6 +157,7 @@ public class CommandGroups
     private MarkGroup mark;
     private RegisterGroup register;
     private FileGroup file;
+    private SearchGroup search;
 
     private static Logger logger = Logger.getInstance(CommandGroups.class.getName());
 }
