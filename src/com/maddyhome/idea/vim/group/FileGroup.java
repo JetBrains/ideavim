@@ -6,6 +6,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.KeyHandler;
@@ -84,8 +85,8 @@ public class FileGroup extends AbstractActionGroup
     {
         // TODO - this needs to be fixed
         Project proj = (Project)context.getData(DataConstants.PROJECT);
-        proj.saveAllDocuments();
         proj.save();
+        FileDocumentManager.getInstance().saveAllDocuments();
     }
 
     public void closeProject(DataContext context)

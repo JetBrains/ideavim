@@ -35,9 +35,9 @@ import com.intellij.openapi.project.ProjectManagerAdapter;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMExternalizable;
 import com.intellij.openapi.util.WriteExternalException;
+import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowAnchor;
-import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.openapi.wm.WindowManager;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.group.ChangeGroup;
 import com.maddyhome.idea.vim.group.CommandGroups;
@@ -46,11 +46,8 @@ import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.key.RegisterActions;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.MorePanel;
-import com.maddyhome.idea.vim.ui.VimToolWindow;
 import java.awt.Toolkit;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
 import javax.swing.ImageIcon;
 import org.jdom.Element;
 
@@ -135,17 +132,21 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
                 FileEditorManager.getInstance(project).addFileEditorManagerListener(new MotionGroup.MotionEditorChange());
                 FileEditorManager.getInstance(project).addFileEditorManagerListener(new MorePanel.MoreEditorChangeListener());
 
+                /*
                 ToolWindowManager mgr = ToolWindowManager.getInstance(project);
                 ToolWindow win = mgr.registerToolWindow("VIM", VimToolWindow.getInstance(), ToolWindowAnchor.BOTTOM);
                 setupToolWindow(win);
                 toolWindows.put(project, win);
+                */
             }
 
             public void projectClosed(Project project)
             {
+                /*
                 toolWindows.remove(project);
                 ToolWindowManager mgr = ToolWindowManager.getInstance(project);
                 mgr.unregisterToolWindow("VIM");
+                */
             }
         });
     }
@@ -249,10 +250,26 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
 
     public static void showMessage(String msg)
     {
+        /*
         for (Iterator iterator = toolWindows.values().iterator(); iterator.hasNext();)
         {
             ToolWindow window = (ToolWindow)iterator.next();
             window.setTitle(msg);
+        }
+        */
+        ProjectManager pm = ProjectManager.getInstance();
+        Project[] projs = pm.getOpenProjects();
+        for (int i = 0; i < projs.length; i++)
+        {
+            StatusBar bar = WindowManager.getInstance().getStatusBar(projs[i]);
+            if (msg == null || msg.length() == 0)
+            {
+                bar.setInfo("");
+            }
+            else
+            {
+                bar.setInfo("VIM - " + msg);
+            }
         }
     }
 
@@ -285,7 +302,7 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
 
     private VimTypedActionHandler vimHandler;
     private RegisterActions actions;
-    private static HashMap toolWindows = new HashMap();
+    //private static HashMap toolWindows = new HashMap();
 
     private static boolean enabled = true;
     private static Logger logger = Logger.getInstance(VimPlugin.class.getName());

@@ -26,14 +26,15 @@
     <property name="resources" value="resources" />
     <property name="classes" value="classes" />
     <property name="javadoc" value="docs/javadoc" />
+    <property name="build" value="build" />
     <property name="install" value="install" />
     <property name="dist" value="dist" />
     <!-- Update to your IntelliJ installtion -->
-    <property name="idea.home" value="/opt/idea-939" />
+    <property name="idea.home" value="/opt/idea-963" />
 
     <property name="project" value="IdeaVIM" />
     <!-- Update this prior to building a new distribution -->
-    <property name="version" value="0.6.0" />
+    <property name="version" value="0.6.2" />
 
     <path id="build.classpath">
         <pathelement path="${idea.home}/lib/openapi.jar" />
@@ -43,7 +44,7 @@
 
     <target name="clean.build">
         <delete dir="${classes}"/>
-        <delete file="${install}/${project}.jar"/>
+        <delete dir="${build}"/>
     </target>
 
     <target name="clean" depends="clean.build" description="Removes all generated files" >
@@ -57,63 +58,73 @@
             <src path="${src}"/>
         </javac>
         <mkdir dir="${classes}/META-INF"/>
-        <copy file="plugin.xml" todir="${classes}/META-INF"/>
+        <copy file="plugin.xml" todir="${classes}/META-INF">
+            <filterset>
+                <filter token="NAME" value="${project}" />
+                <filter token="VERSION" value="${version}" />
+            </filterset>
+        </copy>
         <copy todir="${classes}">
             <fileset dir="${src}" excludes="**/*.java"/>
         </copy>
         <copy todir="${classes}">
             <fileset dir="${resources}"/>
         </copy>
-        <jar basedir="${classes}" jarfile="${install}/${project}.jar" compress="yes"/>
+        <mkdir dir="${build}"/>
+        <jar basedir="${classes}" jarfile="${build}/${project}.jar" compress="yes"/>
     </target>
 
     <target name="deploy" depends="build" description="Copies plugin to IntelliJ plugin directory" >
         <mkdir dir="${idea.home}/plugins"/>
-        <copy file="${install}/${project}.jar" todir="${idea.home}/plugins/" />
+        <copy file="${build}/${project}.jar" todir="${idea.home}/plugins/" />
     </target>
 
     <target name="dist" depends="dist-src, dist-bin" description="Creates the src and bin distribution files" />
 
     <target name="dist-bin" depends="clean, build" description="Creates a tar file containing the plugin distribution" >
         <mkdir dir="dist" />
-        <delete dir="${project}" />
-        <mkdir dir="${project}"/>
-        <copy todir="${project}">
+        <delete dir="${project}-${version}" />
+        <mkdir dir="${project}-${version}"/>
+        <copy todir="${project}-${version}">
             <fileset dir="." includes="license/**"/>
             <fileset dir="${install}" includes="**"/>
         </copy>
-        <copy todir="${project}/docs">
+        <copy todir="${project}-${version}/lib">
+            <fileset dir="${build}" includes="*.jar"/>
+        </copy>
+        <copy todir="${project}-${version}/docs">
             <filterset>
                 <filter token="NAME" value="${project}" />
                 <filter token="VERSION" value="${version}" />
             </filterset>
             <fileset dir="docs" includes="vim/*.txt" excludes="javadoc" />
         </copy>
-        <copy file="docs/README.txt" tofile="${project}/README" >
+        <copy file="docs/README.txt" tofile="${project}-${version}/README" >
             <filterset>
                 <filter token="NAME" value="${project}" />
                 <filter token="VERSION" value="${version}" />
             </filterset>
         </copy>
-        <copy file="docs/CHANGES.txt" tofile="${project}/CHANGES" >
+        <copy file="docs/CHANGES.txt" tofile="${project}-${version}/CHANGES" >
             <filterset>
                 <filter token="NAME" value="${project}" />
                 <filter token="VERSION" value="${version}" />
             </filterset>
         </copy>
-        <copy file="docs/NOTES.txt" tofile="${project}/NOTES" >
+        <copy file="docs/NOTES.txt" tofile="${project}-${version}/NOTES" >
             <filterset>
                 <filter token="NAME" value="${project}" />
                 <filter token="VERSION" value="${version}" />
             </filterset>
         </copy>
         <mkdir dir="${dist}"/>
-        <tar basedir="." destfile="${dist}/${project}-${version}.tar.gz" compression="gzip" includes="${project}/**" />
+        <tar basedir="." destfile="${dist}/${project}-${version}-bin.tar.gz" compression="gzip" includes="${project}-${version}/**" />
+        <zip basedir="." zipfile="${dist}/${project}-${version}.zip" compress="true" includes="${project}-${version}/**" />
     </target>
 
     <target name="dist-src" depends="clean" description="Creates the source tar file" >
         <mkdir dir="dist" />
-        <tar basedir="." destfile="${dist}/${project}-src-${version}.tar.gz" excludes="*.iws,dist/**,scratch/**,web/docs/**" compression="gzip"/>
+        <tar basedir="." destfile="${dist}/${project}-${version}-src.tar.gz" excludes="*.iws,dist/**,scratch/**,web/docs/**" compression="gzip"/>
     </target>
 
     <target name="javadoc" depends="build" description="Generates Javadoc for all source code" >

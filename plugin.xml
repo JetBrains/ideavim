@@ -1,9 +1,10 @@
 <idea-plugin>
     <name>@NAME@</name>
-    <description>VIM Emulator</description>
+    <description>VIM Emulator. Please see the README file for key mapping installation. Required for a first time install.</description>
     <version>@VERSION@</version>
-    <vendor>Rick Maddy</vendor>
-    <idea-version min="3.0" max="3.1"/>
+    <vendor url="http://sourceforge.net/projects/ideavim/">Rick Maddy</vendor>
+    <change-notes></change-notes>
+    <idea-version min="4.0" max="4.5"/>
 
     <application-components>
         <component>
