@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.group;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2004 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -43,6 +43,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
@@ -127,6 +128,11 @@ public class MotionGroup extends AbstractActionGroup
      */
     private void processMouseClick(Editor editor, MouseEvent event)
     {
+        if (ExEntryPanel.getInstance().isActive())
+        {
+            ExEntryPanel.getInstance().deactivate(false);
+        }
+
         int visualMode = 0;
         switch (event.getClickCount() % 3)
         {
@@ -1360,6 +1366,11 @@ public class MotionGroup extends AbstractActionGroup
     {
         public void selectionChanged(FileEditorManagerEvent event)
         {
+            if (ExEntryPanel.getInstance().isActive())
+            {
+                ExEntryPanel.getInstance().deactivate(false);
+            }
+            
             if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
             {
                 CommandGroups.getInstance().getMotion().exitVisual(

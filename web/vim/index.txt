@@ -1,4 +1,4 @@
-*index.txt*     For IdeaVIM version 0.6.6.  Last change: 2004 January 21 
+*index.txt*     For IdeaVIM version 0.7.3.  Last change: 2004 May 28 
 
 
                   IdeaVIM REFERENCE MANUAL    by Rick Maddy
@@ -27,6 +27,8 @@ tag             char            action  ~
 |i_CTRL-J|      CTRL-J          same as <CR>
 |i_CTRL-K|      CTRL-K {char1} {char2}
                                 enter digraph
+|i_digraph|     {char1}<BS>{char2}
+                                enter digraph (only when 'digraph' option set)
 |i_<CR>|        <CR>            begin new line
 |i_CTRL-M|      CTRL-M          same as <CR>
 |i_CTRL-N|      CTRL-N          find next match for keyword in front of the
@@ -470,12 +472,16 @@ Normal characters are inserted at the current cursor position.
 |c_CTRL-H|      CTRL-H          same as <BS>
 |c_<NL>|        <NL>            same as <CR>
 |c_CTRL-J|      CTRL-J          same as <CR>
+|c_CTRL-K|      CTRL-K {char1} {char2}
+                                enter digraph
 |c_<CR>|        <CR>            execute entered command
 |c_<CR>|        CTRL-M          same as <CR>
 |c_CTRL-R|      CTRL-R {0-9a-z"%#*:= CTRL-F CTRL-P CTRL-W CTRL-A}
                                 insert the contents of a register or object
                                 under the cursor as if typed
 |c_CTRL-U|      CTRL-U          remove all characters up to cursor
+|c_CTRL-V|      CTRL-V          insert next non-digit literally, insert three
+                                digit decimal number as a single byte.
 |c_CTRL-W|      CTRL-W          delete the word in front of the cursor
 |c_<Esc>|       <Esc>           abandon command-line without executing it
 |c_<Esc>|       CTRL-[          same as <Esc>

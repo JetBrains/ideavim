@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.ui;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.KeyHandler;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
@@ -84,8 +85,36 @@ public class ExTextField extends JTextField
 
     protected void processKeyEvent(KeyEvent e)
     {
-        KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStrokeForEvent(e), context);
-        e.consume();
+        logger.debug("key="+e);
+        boolean keep = false;
+        switch (e.getID())
+        {
+            case KeyEvent.KEY_TYPED:
+                keep = true;
+                break;
+            case KeyEvent.KEY_PRESSED:
+                if (e.getKeyChar() == KeyEvent.VK_UNDEFINED)
+                {
+                    keep = true;
+                }
+                break;
+            case KeyEvent.KEY_RELEASED:
+                if (e.getKeyChar() != KeyEvent.VK_UNDEFINED && e.getModifiers() != 0)
+                {
+                    keep = true;
+                }
+                break;
+        }
+        if (keep)
+        {
+            KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStrokeForEvent(e), context);
+            e.consume();
+        }
+        else
+        {
+            super.processKeyEvent(e);
+        }
+
     }
 
     /**
@@ -103,4 +132,6 @@ public class ExTextField extends JTextField
     // TODO - support block cursor for overwrite mode
     private Editor editor;
     private DataContext context;
+
+    private static final Logger logger = Logger.getInstance(ExTextField.class.getName());
 }

@@ -1,3 +1,5 @@
+package com.maddyhome.idea.vim.option;
+
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
  * Copyright (C) 2003-2004 Rick Maddy
@@ -16,7 +18,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.maddyhome.idea.vim.option;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
@@ -542,6 +543,7 @@ public class Options
      */
     private void createDefaultOptions()
     {
+        addOption(new ToggleOption("digraph", "dg", false));
         addOption(new ToggleOption("gdefault", "gd", false));
         //addOption(new ToggleOption("hlsearch", "hls", false));
         addOption(new ToggleOption("ignorecase", "ic", false));

@@ -1,4 +1,4 @@
-*index.txt*     For @NAME@ version @VERSION@.  Last change: 2004 Jan 21.
+*index.txt*     For @NAME@ version @VERSION@.  Last change: 2004 May 28.
                        For IDEA version @IDEA-VERSION@
 
                   @NAME@ REFERENCE MANUAL    by Rick Maddy
@@ -48,6 +48,8 @@ tag             char            action  ~
 |i_CTRL-J|      CTRL-J          same as <CR>
 |i_CTRL-K|      CTRL-K {char1} {char2}
                                 enter digraph
+|i_digraph|     {char1}<BS>{char2}
+                                enter digraph (only when 'digraph' option set)
 |i_<CR>|        <CR>            begin new line
 |i_CTRL-M|      CTRL-M          same as <CR>
 |i_CTRL-N|      CTRL-N          find next match for keyword in front of the
@@ -102,8 +104,6 @@ tag             char            action  ~
 |i_CTRL-G_k|    CTRL-G CTRL-K   line up, to column where inserting started
 |i_CTRL-G_k|    CTRL-G k        line up, to column where inserting started
 |i_CTRL-G_k|    CTRL-G <Up>     line up, to column where inserting started
-|i_digraph|     {char1}<BS>{char2}
-                                enter digraph (only when 'digraph' option set)
 |i_CTRL-R_CTRL-R| CTRL-R CTRL-R {0-9a-z"%#*:=}
 insert the contents of a register literally
 |i_CTRL-R_CTRL-O| CTRL-R CTRL-O {0-9a-z"%#*:=}
@@ -685,12 +685,16 @@ Normal characters are inserted at the current cursor position.
 |c_CTRL-H|      CTRL-H          same as <BS>
 |c_<NL>|        <NL>            same as <CR>
 |c_CTRL-J|      CTRL-J          same as <CR>
+|c_CTRL-K|      CTRL-K {char1} {char2}
+                                enter digraph
 |c_<CR>|        <CR>            execute entered command
 |c_<CR>|        CTRL-M          same as <CR>
 |c_CTRL-R|      CTRL-R {0-9a-z"%#*:= CTRL-F CTRL-P CTRL-W CTRL-A}
                                 insert the contents of a register or object
                                 under the cursor as if typed
 |c_CTRL-U|      CTRL-U          remove all characters up to cursor
+|c_CTRL-V|      CTRL-V          insert next non-digit literally, insert three
+                                digit decimal number as a single byte.
 |c_CTRL-W|      CTRL-W          delete the word in front of the cursor
 |c_<Esc>|       <Esc>           abandon command-line without executing it
 |c_<Esc>|       CTRL-[          same as <Esc>
@@ -712,13 +716,9 @@ TODO:
 
 |c_digraph|     {char1} <BS> {char2}
                                 enter digraph when 'digraph' is on
-|c_CTRL-K|      CTRL-K {char1} {char2}
-                                enter digraph
 |c_CTRL-R_CTRL-R| CTRL-R CTRL-R {0-9a-z"%#*:= CTRL-F CTRL-P CTRL-W CTRL-A}
                                 insert the contents of a register or object
                                 under the cursor literally
-|c_CTRL-V|      CTRL-V          insert next non-digit literally, insert three
-                                digit decimal number as a single byte.
 |c_<Up>|        <Up>            recall previous command-line from history that
                                 matches pattern in front of the cursor
 |c_<S-Up>|      <S-Up>          recall previous command-line from history

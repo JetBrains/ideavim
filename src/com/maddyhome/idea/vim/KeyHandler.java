@@ -41,6 +41,8 @@ import com.maddyhome.idea.vim.key.CommandNode;
 import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.key.Node;
 import com.maddyhome.idea.vim.key.ParentNode;
+import com.maddyhome.idea.vim.option.Options;
+
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Stack;
@@ -170,26 +172,6 @@ public class KeyHandler
                 mode = STATE_ERROR;
             }
         }
-        /*
-        else if (currentArg == Argument.DIGRAPH)
-        {
-            //logger.debug("currentArg == DIGRAPH(" + digraphState + ")");
-            int res = digraph.processKey(key, editor, context);
-            switch (res)
-            {
-                case DigraphSequence.RES_OK:
-                    break;
-                case DigraphSequence.RES_BAD:
-                    mode = STATE_READY;
-                    digraph = null;
-                    break;
-                case DigraphSequence.RES_DONE:
-                    currentArg = Argument.CHARACTER;
-                    digraph = null;
-                    break;
-            }
-        }
-        */
         // If we are this far - sheesh, then the user must be entering a command or a non-single-character argument
         // to an entered command. Let's figure out which it is
         else
@@ -337,31 +319,21 @@ public class KeyHandler
             }
             else
             {
+                logger.debug("checking for digraph");
+                logger.debug("lastWasBS=" + lastWasBS);
+                logger.debug("lastChar=" + lastChar);
+                if (lastWasBS && lastChar != 0 && Options.getInstance().isSet("digraph"))
+                {
+                    char dig = CommandGroups.getInstance().getDigraph().getDigraph(lastChar, key.getKeyChar());
+                    logger.debug("dig=" + dig);
+                    key = KeyStroke.getKeyStroke(dig);
+                }
+
                 // If we are in insert/replace mode send this key in for processing
                 if (CommandState.getInstance().getMode() == CommandState.MODE_INSERT ||
                     CommandState.getInstance().getMode() == CommandState.MODE_REPLACE)
                 {
-                    /*
-                    if (digraph == null && DigraphSequence.isDigraphStart(key))
-                    {
-                        digraph = new DigraphSequence();
-                    }
-                    if (digraph != null)
-                    {
-                        int res = digraph.processKey(key, editor, context);
-                        switch (res)
-                        {
-                            case DigraphSequence.RES_OK:
-                                break;
-                            case DigraphSequence.RES_BAD:
-                                digraph = null;
-                                break;
-                            case DigraphSequence.RES_DONE:
-                                digraph = null;
-                                break;
-                        }
-                    }
-                    else */ if (!CommandGroups.getInstance().getChange().processKey(editor, context, key))
+                    if (!CommandGroups.getInstance().getChange().processKey(editor, context, key))
                     {
                         shouldRecord = false;
                     }
@@ -378,6 +350,8 @@ public class KeyHandler
                 {
                     mode = STATE_ERROR;
                 }
+                
+                lastChar = key.getKeyChar();
                 partialReset();
             }
         }
@@ -419,6 +393,9 @@ public class KeyHandler
 
             // Save off the command we are about to execute
             CommandState.getInstance().setCommand(cmd);
+
+            lastWasBS = ((cmd.getFlags() & Command.FLAG_IS_BACKSPACE) != 0);
+            logger.debug("lastWasBS=" + lastWasBS);
 
             if (!editor.getDocument().isWritable() && !cmd.isReadType())
             {
@@ -509,7 +486,6 @@ public class KeyHandler
         mode = STATE_NEW_COMMAND;
         currentCmd.clear();
         currentArg = Argument.NONE;
-        //digraphState = 0;
         digraph = null;
         logger.debug("reset");
     }
@@ -522,6 +498,8 @@ public class KeyHandler
     {
         CommandState.getInstance().reset();
         reset();
+        lastChar = 0;
+        lastWasBS = false;
         CommandGroups.getInstance().getRegister().resetRegister();
     }
 
@@ -589,8 +567,9 @@ public class KeyHandler
     private Stack currentCmd = new Stack();
     private int currentArg;
     private TypedActionHandler origHandler;
-    //private int digraphState;
     private DigraphSequence digraph = null;
+    private char lastChar;
+    private boolean lastWasBS;
 
     private static KeyHandler instance;
 

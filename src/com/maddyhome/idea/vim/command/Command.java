@@ -45,6 +45,8 @@ public class Command
     public static final int FLAG_CLEAR_STROKES = 1 << 9;
     /** This keystroke should be saved as part of the current insert */
     public static final int FLAG_SAVE_STROKE = 1 << 10;
+    /** This is a backspace command */
+    public static final int FLAG_IS_BACKSPACE = 1 << 11;
 
     /** Search Flags */
     public static final int FLAG_SEARCH_FWD = 1 << 16;

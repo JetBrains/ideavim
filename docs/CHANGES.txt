@@ -1,17 +1,24 @@
 History of changes for @NAME@ for IDEA @IDEA-VERSION@
 
-@VERSION@ from 0.7.1
+@VERSION@ from 0.7.2
 
 New Features
 - Added support for digraphs. Currently you can use Ctrl-k {char1}{char2} to
-  enter a special character. This works while in Insert/Replace mode, or as an
-  argument to the r, F, T, f, and t commands. The :digraphs command has been
-  added to display the currently supported digraphs. Certain special cases of
-  the Ctrl-K {char1}{char2} sequence are not supported. This supports all two
-  character digraphs as listed in RFC1345. This amounts to 1,338 digraphs!
-  Ensure the file encoding can handle the characters you enter.
-- Added support for Ctrl-v {digits}. This works while in Insert/Replace mode, or
-  as an argument to the r, F, T, f, and t commands.
+  enter a special character. This works while in Insert/Replace mode, as an
+  argument to the r, F, T, f, and t commands, or while entering an ex command.
+  The :digraphs command has been added to display the currently supported
+  digraphs. Certain special cases of the Ctrl-K {char1}{char2} sequence are not
+  supported. This supports all two character digraphs as listed in RFC1345.
+  This amounts to 1,338 digraphs! Ensure the file encoding can handle the
+  characters you enter.
+- Added support for the 'digraph' option. If set, digraphs may be entered using
+  {char1} [BackSpace] {char2}. This works in Insert/Replace mode or while
+  entering an ex command.
+- Added support for Ctrl-v {digits}. This works while in Insert/Replace mode,
+  as an argument to the r, F, T, f, and t commands, or while entering an ex
+  command.
+- A new Vim.xml keymap needs to be installed or Ctrl-K needs to be removed
+  from all source control menus.
 
 0.7.2 from 0.7.1
 
