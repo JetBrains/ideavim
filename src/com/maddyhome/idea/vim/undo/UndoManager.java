@@ -25,10 +25,10 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.event.DocumentAdapter;
 import com.intellij.openapi.editor.event.DocumentEvent;
-import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.event.EditorFactoryAdapter;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  */
@@ -46,8 +46,9 @@ public class UndoManager
 
     public UndoManager()
     {
-        listener = new DocumentChangeListener();
+        //listener = new DocumentChangeListener();
         editors = new HashMap();
+        documents = new HashMap();
 
         EditorFactory.getInstance().addEditorFactoryListener(new UndoEditorCloseListener());
     }
@@ -62,7 +63,7 @@ public class UndoManager
     public void beginCommand(Editor editor)
     {
         EditorUndoList list = getEditorUndoList(editor);
-        list.beginCommand();
+        list.beginCommand(editor);
     }
 
     public void abortCommand(Editor editor)
@@ -99,41 +100,59 @@ public class UndoManager
         logger.info("editorOpened");
         if (!editor.isViewer())
         {
-            // Paranoid - make sure there is only one listener of our on this editor
-            // editor.getDocument().removeDocumentListener(listener);
-            if (!editors.containsKey(editor.getDocument()))
-            {
-                editor.getDocument().addDocumentListener(listener);
-                addEditorUndoList(editor);
-            }
+            addEditorUndoList(editor);
         }
     }
 
     public void editorClosed(Editor editor)
     {
         logger.info("editorClosed");
-        //editors.remove(editor);
         if (!editor.isViewer())
         {
-            if (editors.containsKey(editor.getDocument()))
-            {
-                editor.getDocument().removeDocumentListener(listener);
-                removeEditorUndoList(editor);
-            }
+            removeEditorUndoList(editor);
         }
+    }
+
+    public HashMap getEditors()
+    {
+        return editors;
     }
 
     private EditorUndoList addEditorUndoList(Editor editor)
     {
-        EditorUndoList res = new EditorUndoList(editor);
-        editors.put(editor.getDocument(), res);
+        EditorUndoList res = null;
+        HashSet tors = (HashSet)documents.get(editor.getDocument());
+        if (tors == null)
+        {
+            tors = new HashSet();
+            documents.put(editor.getDocument(), tors);
+
+            res = new EditorUndoList(editor);
+            editors.put(editor.getDocument(), res);
+        }
+        else
+        {
+            res = (EditorUndoList)editors.get(editor.getDocument());
+        }
+
+        tors.add(editor);
 
         return res;
     }
 
     private void removeEditorUndoList(Editor editor)
     {
-        editors.remove(editor.getDocument());
+        HashSet tors = (HashSet)documents.get(editor.getDocument());
+        if (tors != null)
+        {
+            tors.remove(editor);
+
+            if (tors.isEmpty())
+            {
+                documents.remove(editor.getDocument());
+                editors.remove(editor.getDocument());
+            }
+        }
     }
 
     private EditorUndoList getEditorUndoList(Editor editor)
@@ -147,11 +166,11 @@ public class UndoManager
         return res;
     }
 
-    private class DocumentChangeListener extends DocumentAdapter
+    public static class DocumentChangeListener extends DocumentAdapter
     {
         public void documentChanged(DocumentEvent event)
         {
-            EditorUndoList list = (EditorUndoList)editors.get(event.getDocument());
+            EditorUndoList list = (EditorUndoList)UndoManager.getInstance().getEditors().get(event.getDocument());
             list.addChange(new DocumentChange(event.getOffset(), event.getOldFragment(), event.getNewFragment()));
         }
     }
@@ -164,8 +183,9 @@ public class UndoManager
         }
     }
 
-    private DocumentListener listener;
+    //private DocumentListener listener;
     private HashMap editors;
+    private HashMap documents;
 
     private static UndoManager instance;
     private static Logger logger = Logger.getInstance(UndoManager.class.getName());
