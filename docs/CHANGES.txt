@@ -5,14 +5,25 @@ History of changes for @NAME@
 New Features
 - A VIM tool window has been added. This is used to show the current mode (if
   :set showmode is set) and any messages normally shown on the last line in
-  VIM.
+  VIM. To make this useful you should do the following:
+  - Show the VIM tool window.
+  - Make the VIM tool window docked.
+  - Turn off auto-hide for the VIM tool window.
+  - Do not move the VIM tool window to the left or right - leave on the bottom
+    or top.
 - Various error messages are now displayed in the new status bar.
 
 New Commands
 - Added support for q{register} command - macro recording.
+- Added support for @{register} and @@ commands - playback register contents.
 
 New :set Options
 - showmode is now supported.
+
+Bug Fixes
+- Hitting escape while entering a search string resulted in a search for the
+  previous search string instead of doing nothing.
+- The :registers command didn't display trailing newlines in a register
 
 0.3.1 to 0.3.2
 
