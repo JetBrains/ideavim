@@ -19,18 +19,11 @@ package com.maddyhome.idea.vim.handler.motion.search;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import com.intellij.openapi.actionSystem.DataConstants;
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
-import com.maddyhome.idea.vim.ui.CommandEntryPanel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.SwingUtilities;
 
 /**
  *
@@ -39,73 +32,8 @@ public class SearchEntryHandler extends AbstractEditorActionHandler
 {
     protected boolean execute(Editor editor, DataContext context, Command cmd)
     {
-        CommandEntryPanel panel = CommandEntryPanel.getInstance();
-
-        String initText = "";
-        int flags = cmd.getFlags();
-        String label = "";
-        if ((flags & Command.FLAG_SEARCH_FWD) != 0)
-        {
-            label = "/";
-        }
-        else if ((flags & Command.FLAG_SEARCH_REV) != 0)
-        {
-            label = "?";
-        }
-
-        CommandEntryPanel.getInstance().addActionListener(new ExEntryListener(editor, context, cmd.getCount(), flags));
-
-        panel.activate(((Editor)context.getData(DataConstants.EDITOR)).getContentComponent(), label, initText);
+        CommandGroups.getInstance().getProcess().startSearchCommand(editor, context, cmd);
 
         return true;
     }
-
-    private static class ExEntryListener implements ActionListener
-    {
-        public ExEntryListener(Editor editor, DataContext context, int count, int flags)
-        {
-            this.editor = editor;
-            this.context = context;
-            this.count = count;
-            this.flags = flags;
-        }
-
-        public void actionPerformed(final ActionEvent e)
-        {
-            CommandEntryPanel.getInstance().removeActionListener(this);
-
-            SwingUtilities.invokeLater(new Runnable()
-            {
-                public void run()
-                {
-                    try
-                    {
-                        logger.debug("processing search");
-                        CommandEntryPanel.getInstance().deactivate(true);
-                        int res = CommandGroups.getInstance().getSearch().search(editor, context, e.getActionCommand(),
-                            count, flags, true);
-                        if (res == -1)
-                        {
-                            VimPlugin.indicateError();
-                        }
-                    }
-                    catch (Exception bad)
-                    {
-                        logger.error(bad);
-                        VimPlugin.indicateError();
-                    }
-                    finally
-                    {
-                    }
-                }
-            });
-        }
-
-        private int count;
-        private int flags;
-        private Editor editor;
-        private DataContext context;
-    }
-
-    private static Logger logger = Logger.getInstance(SearchEntryHandler.class.getName());
 }
