@@ -23,9 +23,10 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
+import gnu.regexp.RE;
+import gnu.regexp.REMatch;
+import gnu.regexp.RESyntax;
 import java.nio.CharBuffer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 
 /**
@@ -58,30 +59,36 @@ public class SearchGroup extends AbstractActionGroup
         lastFlags = flags;
 
         // TODO - default case sensitivity
-        int pflags = Pattern.MULTILINE;
+        int pflags = RE.REG_MULTILINE;
         if ((flags & IGNORE_CASE) != 0)
         {
-            pflags |= Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
+            pflags |= RE.REG_ICASE;
         }
 
-        Pattern sp;
+        RE sp;
         if (pattern.length() == 0)
         {
             if ((flags & REUSE) != 0)
             {
-                sp = lastSearch;
+                pattern = lastSearch;
             }
             else
             {
-                sp = lastPattern;
+                pattern = lastPattern;
             }
         }
-        else
+
+        try
         {
-            sp = Pattern.compile(pattern, pflags);
+            sp = new RE(pattern, pflags, RESyntax.RE_SYNTAX_ED);
         }
-        lastSearch = sp;
-        lastPattern = sp;
+        catch (Exception e)
+        {
+            return false;
+        }
+
+        lastSearch = pattern;
+        lastPattern = pattern;
 
         if (replace.equals("~"))
         {
@@ -106,16 +113,13 @@ public class SearchGroup extends AbstractActionGroup
             char[] chars = editor.getDocument().getChars();
             CharBuffer buf = CharBuffer.wrap(chars, start, end - start);
             logger.debug("buf=" + buf);
-            Matcher matcher = sp.matcher(buf);
-            found = matcher.find(from);
+            REMatch matcher = sp.getMatch(buf, from);
+            found = matcher != null;
             if (found)
             {
-                int spos = matcher.start();
-                int epos = matcher.end();
-                StringBuffer sb = new StringBuffer();
-                matcher.appendReplacement(sb, replace);
-                logger.debug("sb=" + sb);
-                String match = sb.substring(spos);
+                int spos = matcher.getStartIndex();
+                int epos = matcher.getEndIndex();
+                String match = matcher.substituteInto(replace);
                 logger.debug("found match[" + spos + "," + epos + "] - replace " + match);
 
                 int line = editor.offsetToLogicalPosition(start + spos).line;
@@ -238,8 +242,15 @@ public class SearchGroup extends AbstractActionGroup
         return confirmBtns;
     }
 
-    private Pattern lastSearch;
-    private Pattern lastPattern;
+    public int search(Editor editor, DataContext context, String command, int count, int flags)
+    {
+        int res = -1;
+
+        return res;
+    }
+
+    private String lastSearch;
+    private String lastPattern;
     private String lastReplace;
     private int lastFlags;
     private Object[] confirmBtns;
