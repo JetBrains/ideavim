@@ -1,7 +1,7 @@
-*quickref.txt*  For Vim version 6.1.  Last change: 2001 Sep 10
+*quickref.txt*  For @NAME@ version @VERSION@.  Last change: 2003 Apr 25
 
 
-                  VIM REFERENCE MANUAL    by Bram Moolenaar
+                  @NAME@ REFERENCE MANUAL    by Rick Maddy
 
                             Quick reference guide
 
@@ -84,6 +84,7 @@ N is used to indicate an optional count that can be given before the command.
 |ge|    N  ge           backward to the end of the Nth word
 |gE|    N  gE           backward to the end of the Nth blank-separated |WORD|
 
+TODO:
 |)|     N  )            N sentences forward
 |(|     N  (            N sentences backward
 |}|     N  }            N paragraphs forward
@@ -115,6 +116,8 @@ N is used to indicate an optional count that can be given before the command.
 |?<CR>| N  ?<CR>        repeat last search, in the backward direction
 |n|     N  n            repeat last search
 |N|     N  N            repeat last search, in opposite direction
+
+TODO:
 |star|  N  *            search forward for the identifier under the cursor
 |#|     N  #            search backward for the identifier under the cursor
 |gstar| N  g*           like "*", but also find partial matches
@@ -184,6 +187,8 @@ N is used to indicate an optional count that can be given before the command.
 |'|        '{a-zA-Z0-9[]'"<>.}
                         same as `, but on the first non-blank in the line
 |:marks|  :marks        print the active marks
+
+TODO
 |CTRL-O|  N  CTRL-O     go to Nth older position in jump list
 |CTRL-I|  N  CTRL-I     go to Nth newer position in jump list
 |:ju|     :ju[mps]      print the jump list
@@ -202,31 +207,6 @@ N is used to indicate an optional count that can be given before the command.
 |go|    N  go                   go to Nth byte in the buffer
 |:go|   :[range]go[to] [off]    go to [off] byte in the buffer
 ------------------------------------------------------------------------------
-*Q_ta*          Using tags
-
-|:ta|      :ta[g][!] {tag}      Jump to tag {tag}
-|:ta|      :[count]ta[g][!]     Jump to [count]'th newer tag in tag list
-|CTRL-]|      CTRL-]            Jump to the tag under cursor, unless changes
-                                   have been made
-|:ts|      :ts[elect][!] [tag]  List matching tags and select one to jump to
-|:tjump|   :tj[ump][!] [tag]    Jump to tag [tag] or select from list when
-                                   there are multiple matches
-
-|:tags|    :tags                Print tag list
-|CTRL-T|   N  CTRL-T            Jump back from Nth older tag in tag list
-|:po|      :[count]po[p][!]     Jump back from [count]'th older tag in tag list
-|:tnext|   :[count]tn[ext][!]   Jump to [count]'th next matching tag
-|:tp|      :[count]tp[revious][!] Jump to [count]'th previous matching tag
-|:tr|      :[count]tr[ewind][!] Jump to [count]'th matching tag
-|:tl|      :tl[ast][!]          Jump to last matching tag
-
-|:ptag|    :pt[ag] {tag}        open a preview window to show tag {tag}
-|CTRL-W_}|     CTRL-W }         like CTRL-] but show tag in preview window
-|:pts|     :pts[elect]          like ":tselect" but show tag in preview window
-|:ptjump|  :ptj[ump]            like ":tjump" but show tag in preview window
-|:pclose|  :pc[lose]            close tag preview window
-|CTRL-W_z|     CTRL-W z         close tag preview window
-------------------------------------------------------------------------------
 *Q_sc*          Scrolling
 
 |CTRL-E|        N  CTRL-E       window N lines downwards (default: 1)
@@ -239,6 +219,7 @@ N is used to indicate an optional count that can be given before the command.
 |z.|               z.    or zz  redraw, current line at center of window
 |z-|               z-    or zb  redraw, current line at bottom of window
 
+TODO:
 These only work when 'wrap' is off:
 |zh|            N  zh           scroll screen N characters to the right
 |zl|            N  zl           scroll screen N characters to the left
@@ -254,11 +235,6 @@ These only work when 'wrap' is off:
 |gI|    N  gI   insert text in column 1 (N times)
 |o|     N  o    open a new line below the current line, append text (N times)
 |O|     N  O    open a new line above the current line, append text (N times)
-|:startinsert|  :star[tinsert][!]  start Insert mode, append when [!] used
-
-in Visual block mode:
-|v_b_I|    I    insert the same text in front of all the selected lines
-|v_b_A|    A    append the same text after all the selected lines
 ------------------------------------------------------------------------------
 *Q_ai*          Insert mode keys
 
@@ -278,8 +254,6 @@ moving around:
 ------------------------------------------------------------------------------
 *Q_ss*          Special keys in Insert mode
 
-|i_CTRL-V|      CTRL-V {char}..   insert character literally, or enter decimal
-                                     byte value
 |i_<NL>|        <NL> or <CR> or CTRL-M or CTRL-J
                                   begin new line
 |i_CTRL-E|      CTRL-E            insert the character from below the cursor
@@ -294,8 +268,6 @@ moving around:
                                      cursor
 |i_CTRL-P|      CTRL-P            insert previous match of identifier before
                                      the cursor
-|i_CTRL-X|      CTRL-X ...        complete the word before the cursor in
-                                     various ways
 
 |i_<BS>|        <BS> or CTRL-H    delete the character before the cursor
 |i_<Del>|       <Del>             delete the character under the cursor
@@ -307,11 +279,18 @@ moving around:
 |i_CTRL-D|      CTRL-D            delete one shiftwidth of indent in front of
                                      the current line
 |i_0_CTRL-D|    0 CTRL-D          delete all indent in the current line
+
+TODO:
 |i_^_CTRL-D|    ^ CTRL-D          delete all indent in the current line,
                                      restore indent in next line
+|i_CTRL-V|      CTRL-V {char}..   insert character literally, or enter decimal
+byte value
+|i_CTRL-X|      CTRL-X ...        complete the word before the cursor in
+various ways
 ------------------------------------------------------------------------------
 *Q_di*          Digraphs
 
+TODO:
 |:dig|     :dig[raphs]          show current list of digraphs
 |:dig|     :dig[raphs] {char1}{char2} {number} ...
                                 add digraph(s) to the list
@@ -324,6 +303,7 @@ In Insert or Command-line mode:
 ------------------------------------------------------------------------------
 *Q_si*          Special inserts
 
+TODO:
 |:r|       :r [file]       insert the contents of [file] below the cursor
 |:r!|      :r! {command}   insert the standard output of {command} below the
                               cursor
@@ -354,6 +334,8 @@ In Insert or Command-line mode:
 |Y|       N  Y          yank N lines into a register
 |p|       N  p          put a register after the cursor position (N times)
 |P|       N  P          put a register before the cursor position (N times)
+
+TODO:
 |]p|      N  ]p         like p, but adjust indent to current line
 |[p|      N  [p         like P, but adjust indent to current line
 |gp|      N  gp         like p, but leave cursor after the new text
@@ -362,10 +344,7 @@ In Insert or Command-line mode:
 *Q_ch*          Changing text
 
 |r|       N  r{char}    replace N characters with {char}
-|gr|      N  gr{char}   replace N characters without affecting layout
 |R|       N  R          enter Replace mode (repeat the entered text N times)
-|gR|      N  gR         enter virtual Replace mode: Like Replace mode but
-                           without affecting layout
 |v_b_r|   {visual}r{char}
                         in Visual block mode: Replace each char of the
                            selected text with {char}
@@ -392,12 +371,6 @@ In Insert or Command-line mode:
                            lowercase
 |gU|         gU{motion} make the text that is moved over with {motion}
                            uppercase
-|v_g?|       {visual}g? perform rot13 encoding on highlighted text
-|g?|         g?{motion} perform rot13 encoding on the text that is moved over
-                           with {motion}
-
-|CTRL-A|  N  CTRL-A     add N to the number at or after the cursor
-|CTRL-X|  N  CTRL-X     subtract N from the number at or after the cursor
 
 |<|       N  <{motion}  move the lines that are moved over with {motion} one
                            shiftwidth left
@@ -407,25 +380,26 @@ In Insert or Command-line mode:
 |>>|      N  >>         move N lines one shiftwidth right
 |gq|      N  gq{motion} format the lines that are moved over with {motion} to
                            'textwidth' length
+
+TODO:
+|gr|      N  gr{char}   replace N characters without affecting layout
+|gR|      N  gR         enter virtual Replace mode: Like Replace mode but
+                        without affecting layout
+|CTRL-A|  N  CTRL-A     add N to the number at or after the cursor
+|CTRL-X|  N  CTRL-X     subtract N from the number at or after the cursor
 |:ce|     :[range]ce[nter] [width]
-                        center the lines in [range]
+center the lines in [range]
 |:le|     :[range]le[ft] [indent]
-                        left-align the lines in [range] (with [indent])
+left-align the lines in [range] (with [indent])
 |:ri|     :[range]ri[ght] [width]
-                        right-align the lines in [range]
+right-align the lines in [range]
 ------------------------------------------------------------------------------
 *Q_co*          Complex changes
 
-|!|        N  !{motion}{command}<CR>
-                        filter the lines that are moved over through {command}
-|!!|       N  !!{command}<CR>
-                        filter N lines through {command}
 |v_!|         {visual}!{command}<CR>
                         filter the highlighted lines through {command}
 |:range!|  :[range]! {command}<CR>
                         filter [range] lines through {command}
-|=|        N  ={motion}
-                        filter the lines that are moved over through 'equalprg'
 |==|       N  ==        filter N lines through 'equalprg'
 |v_=|         {visual}=
                         filter the highlighted lines through 'equalprg'
@@ -436,9 +410,15 @@ In Insert or Command-line mode:
 |:s|       :[range]s[ubstitute] [g][c]
                         repeat previous ":s" with new range and options
 |&|           &         Repeat previous ":s" on current line without options
-|:ret|     :[range]ret[ab][!] [tabstop]
-                        set 'tabstop' to new value and adjust white space
-                           accordingly
+
+TODO:
+|!|        N  !{motion}{command}<CR>
+filter the lines that are moved over through {command}
+|!!|       N  !!{command}<CR>
+filter N lines through {command}
+|=|        N  ={motion}
+filter the lines that are moved over through 'equalprg'
+
 ------------------------------------------------------------------------------
 *Q_vi*          Visual mode
 
@@ -446,15 +426,14 @@ In Insert or Command-line mode:
 
 |v|        v            start highlighting characters  }  move cursor and use
 |V|        V            start highlighting linewise    }  operator to affect
-|CTRL-V|   CTRL-V       start highlighting blockwise   }  highlighted text
 |v_o|      o            exchange cursor position with start of highlighting
 |gv|       gv           start highlighting on previous visual area
 |v_v|      v            highlight characters or stop highlighting
 |v_V|      V            highlight linewise or stop highlighting
-|v_CTRL-V| CTRL-V       highlight blockwise or stop highlighting
 ------------------------------------------------------------------------------
 *Q_to*          Text objects (only in Visual mode or after an operator)
 
+TODO:
 |v_aw|  N  aw           Select "a word"
 |v_iw|  N  iw           Select "inner word"
 |v_aW|  N  aW           Select "a |WORD|"
@@ -471,6 +450,8 @@ In Insert or Command-line mode:
 *Q_re*          Repeating commands
 
 |.|        N  .         repeat last change (with count replaced with N)
+
+TODO:
 |q|           q{a-z}    record typed characters into register {a-z}
 |q|           q{A-Z}    record typed characters, appended to register {a-z}
 |q|           q         stop recording
@@ -485,16 +466,10 @@ In Insert or Command-line mode:
 |:g|       :[range]g[lobal]!/{pattern}/[cmd]
                         Execute Ex command [cmd] (default: ":p") on the lines
                            within [range] where {pattern} does NOT match.
-|:so|      :so[urce] {file}
-                        Read Ex commands from {file}.
-|:so|      :so[urce]! {file}
-                        Read Vim commands from {file}.
-|:sl|      :sl[eep] [sec]
-                        don't do anything for [sec] seconds
-|gs|       N  gs        Goto Sleep for N seconds
 ------------------------------------------------------------------------------
 *Q_km*          Key mapping
 
+TODO:
 |:map|       :ma[p] {lhs} {rhs}   Map {lhs} to {rhs} in Normal and Visual
                                      mode.
 |:map!|      :ma[p]! {lhs} {rhs}  Map {lhs} to {rhs} in Insert and Command-line
@@ -541,25 +516,10 @@ In Insert or Command-line mode:
                                      windows, etc. too, to be able to continue
                                      this session later.
 ------------------------------------------------------------------------------
-*Q_ab*          Abbreviations
-
-|:abbreviate|   :ab[breviate] {lhs} {rhs}  add abbreviation for {lhs} to {rhs}
-|:abbreviate|   :ab[breviate] {lhs}        show abbr's that start with {lhs}
-|:abbreviate|   :ab[breviate]              show all abbreviations
-|:unabbreviate| :una[bbreviate] {lhs}      remove abbreviation for {lhs}
-|:noreabbrev|   :norea[bbrev] [lhs] [rhs]  like ":ab", but don't remap [rhs]
-|:iabbrev|      :iab/:iunab/:inoreab       like ":ab", but only for Insert mode
-|:cabbrev|      :cab/:cunab/:cnoreab       like ":ab", but only for
-                                                Command-line mode
-|:abclear|      :abc[lear]                 remove all abbreviations
-|:cabclear|     :cabc[lear]                remove all abbr's for Cmdline mode
-|:iabclear|     :iabc[lear]                remove all abbr's for Insert mode
-------------------------------------------------------------------------------
 *Q_op*          Options
 
 |:set|          :se[t]                    Show all modified options.
 |:set|          :se[t] all                Show all non-termcap options.
-|:set|          :se[t] termcap            Show all termcap options.
 |:set|          :se[t] {option}           Set boolean option (switch it on),
                                           show string or number option.
 |:set|          :se[t] no{option}         Reset boolean option (switch it off).
@@ -571,18 +531,6 @@ In Insert or Command-line mode:
                                           subtract {value} from number option
 |:set|          :se[t] {option}?          Show value of {option}.
 |:set|          :se[t] {option}&          Reset {option} to its default value.
-
-|:setlocal|     :setl[ocal]               like ":set" but set the local value
-                                          for options that have one
-|:setglobal|    :setg[lobal]              like ":set" but set the global value
-                                          of a local option
-
-|:fix|          :fix[del]                 Set value of 't_kD' according to
-                                          value of 't_kb'.
-|:options|      :opt[ions]                Open a new window to view and set
-                                          options, grouped by functionality,
-                                          a one line explanation and links to
-                                          the help.
 
 Short explanation of each option:               *option-list*
 |'aleph'|         |'al'|     ASCII code of the letter Aleph (Hebrew)
@@ -880,54 +828,28 @@ Short explanation of each option:               *option-list*
 
 |u|       N  u          undo last N changes
 |CTRL-R|  N  CTRL-R     redo last N undone changes
+
+TODO:
 |U|          U          restore last changed line
 ------------------------------------------------------------------------------
 *Q_et*          External commands
 
-|:shell|        :sh[ell]        start a shell
-|:!|            :!{command}     execute {command} with a shell
 |K|                K            lookup keyword under the cursor with
                                    'keywordprg' program (default: "man")
-------------------------------------------------------------------------------
-*Q_qf*          Quickfix commands
 
-|:cc|           :cc [nr]        display error [nr] (default is the same again)
-|:cnext|        :cn             display the next error
-|:cprevious|    :cp             display the previous error
-|:clist|        :cl             list all errors
-|:cfile|        :cf             read errors from the file 'errorfile'
-|:cquit|        :cq             quit without writing and return error code (to
-                                   the compiler)
-|:make|         :make [args]    start make, read errors, and jump to first
-                                   error
-|:grep|         :gr[ep] [args]  execute 'grepprg' to find matches and jump to
-                                   the first one.
+TODO:
+|:!|            :!{command}     execute {command} with a shell
 ------------------------------------------------------------------------------
 *Q_vc*          Various commands
 
-|CTRL-L|           CTRL-L       Clear and redraw the screen.
-|CTRL-G|           CTRL-G       show current file name (with path) and cursor
-                                   position
-|ga|               ga           show ascii value of character under cursor in
-                                   decimal, hex, and octal
-|g_CTRL-G|         g CTRL-G     show cursor column, line, and character
-                                   position
+|<Del>|            <Del>        while entering a count: delete last character
+|:browse|       :browse {command}       open/read/write file, using a
+                                file selection dialog
+
+TODO:
 |CTRL-C|           CTRL-C       during searches: Interrupt the search
 |dos-CTRL-Break|   CTRL-Break   MS-DOS: during searches: Interrupt the search
-|<Del>|            <Del>        while entering a count: delete last character
 |:version|      :ve[rsion]      show version information
-|:mode|         :mode N         MS-DOS: set screen mode to N (number, C80,
-                                   C4350, etc.)
-|:normal|       :norm[al][!] {commands}
-                                Execute Normal mode commands.
-|Q|             Q               switch to "Ex" mode
-
-|:redir|        :redir >{file}          redirect messages to {file}
-|:silent|       :silent[!] {command}    execute {command} silently
-|:confirm|      :confirm {command}      quit, write, etc., asking about
-                                        unsaved changes or read-only files.
-|:browse|       :browse {command}       open/read/write file, using a
-                                        file selection dialog
 ------------------------------------------------------------------------------
 *Q_ce*          Command-line editing
 
@@ -1098,84 +1020,6 @@ Context-sensitive completion on the command-line:
                                    is set and [!] not given write the buffer.
 |CTRL-Z|     CTRL-Z             Same as ":stop"
 ------------------------------------------------------------------------------
-*Q_st*          Starting VIM
-
-|-vim|     vim [options]                start editing with an empty buffer
-|-file|    vim [options] {file} ..      start editing one or more files
-|--|       vim [options] -              read file from stdin
-|-tag|     vim [options] -t {tag}       edit the file associated with {tag}
-|-qf|      vim [options] -q [fname]     start editing in QuickFix mode,
-                                           display the first error
-
-        Vim arguments:
-
-|-gui|  -g                  start GUI (also allows other options)
-
-|-+|    +[num]              put the cursor at line [num] (default: last line)
-|-+c|   +{command}          execute {command} after loading the file
-|-+/|   +/{pat} {file} ..   put the cursor at the first occurrence of {pat}
-|-v|    -v                  Vi mode, start ex in Normal mode
-|-e|    -e                  Ex mode, start vim in Ex mode
-|-R|    -R                  Read-only mode, implies -n
-|-m|    -m                  modifications not allowed (resets 'write' option)
-|-b|    -b                  binary mode
-|-l|    -l                  lisp mode
-|-F|    -F                  Farsi mode ('fkmap' and 'rightleft' are set)
-|-H|    -H                  Hebrew mode ('hkmap' and 'rightleft' are set)
-|-V|    -V                  Verbose, give informative messages
-|-C|    -C                  Compatible, set the 'compatible' option
-|-N|    -N                  Nocompatible, reset the 'compatible' option
-|-r|    -r                  give list of swap files
-|-r|    -r {file} ..        recover aborted edit session
-|-n|    -n                  do not create a swap file
-|-o|    -o [num]            open [num] windows (default: one for each file)
-|-f|    -f                  GUI: foreground process, don't fork
-                            Amiga: do not restart VIM to open a window (for
-                                e.g., mail)
-|-s|    -s {scriptin}       first read commands from the file {scriptin}
-|-w|    -w {scriptout}      write typed chars to file {scriptout} (append)
-|-W|    -W {scriptout}      write typed chars to file {scriptout} (overwrite)
-|-T|    -T {terminal}       set terminal name
-|-d|    -d {device}         Amiga: open {device} to be used as a console
-|-u|    -u {vimrc}          read inits from {vimrc} instead of other inits
-|-U|    -U {gvimrc}         idem, for when starting the GUI
-|-i|    -i {viminfo}        read info from {viminfo} instead of other files
-|---|   --                  end of options, other arguments are file names
-|--help|    --help          show list of arguments and exit
-|--version| --version       show version info and exit
-|--|    -                   Read file from stdin.
-------------------------------------------------------------------------------
-*Q_ac*          Automatic Commands
-
-|viminfo-file|  Read registers, marks, history at startup, save when exiting.
-
-|:rviminfo|     :rv[iminfo] [file]      Read info from viminfo file [file]
-|:rviminfo|     :rv[iminfo]! [file]     idem, overwrite existing info
-|:wviminfo|     :wv[iminfo] [file]      Add info to viminfo file [file]
-|:wviminfo|     :wv[iminfo]! [file]     Write info to viminfo file [file]
-
-|modeline|      Automatic option setting when editing a file
-
-|modeline|      vim:{set-arg}: ..       In the first and last lines of the
-                                        file (see 'ml' option), {set-arg} is
-                                        given as an argument to ":set"
-
-|autocommand|   Automatic execution of commands on certain events.
-
-|:autocmd|      :au                     List all autocommands
-|:autocmd|      :au {event}             List all autocommands for {event}
-|:autocmd|      :au {event} {pat}       List all autocommands for {event} with
-                                        {pat}
-|:autocmd|      :au {event} {pat} {cmd} Enter new autocommands for {event}
-                                        with {pat}
-|:autocmd|      :au!                    Remove all autocommands
-|:autocmd|      :au! {event}            Remove all autocommands for {event}
-|:autocmd|      :au! * {pat}            Remove all autocommands for {pat}
-|:autocmd|      :au! {event} {pat}      Remove all autocommands for {event}
-                                        with {pat}
-|:autocmd|      :au! {event} {pat} {cmd}  Remove all autocommands for {event}
-                                        with {pat} and enter new one
-------------------------------------------------------------------------------
 *Q_wi*          Multi-window commands
 
 |CTRL-W_s|      CTRL-W s  or  :split    Split window into two parts
@@ -1212,69 +1056,6 @@ Context-sensitive completion on the command-line:
 |CTRL-W__|      CTRL-W _                Set current window height (default:
                                            very high)
 ------------------------------------------------------------------------------
-*Q_bu*          Buffer list commands
-
-|:buffers|      :buffers  or  :files    list all known buffer and file names
-
-|:ball|         :ball     or  :sball    edit all args/buffers
-|:unhide|       :unhide   or  :sunhide  edit all loaded buffers
-
-|:badd|         :badd {fname}           add file name {fname} to the list
-|:bunload|      :bunload[!] [N]         unload buffer [N] from memory
-|:bdelete|      :bdelete[!] [N]         unload buffer [N] and delete it from
-                                           the buffer list
-
-              in current window   in new window ~
-|:buffer|     :[N]buffer [N]      :[N]sbuffer [N]     to arg/buf N
-|:bnext|      :[N]bnext [N]       :[N]sbnext [N]      to Nth next arg/buf
-|:bNext|      :[N]bNext [N]       :[N]sbNext [N]      to Nth previous arg/buf
-|:bprevious|  :[N]bprevious [N]   :[N]sbprevious [N]  to Nth previous arg/buf
-|:bfirst|     :bfirst             :sbfirst            to first arg/buf
-|:blast|      :blast              :sblast             to last arg/buf
-|:bmodified|  :[N]bmod [N]        :[N]sbmod [N]       to Nth modified buf
-------------------------------------------------------------------------------
-*Q_sy*          Syntax Highlighting
-
-|:syn-on|       :syntax on              start using syntax highlighting
-|:syn-off|      :syntax off             stop using syntax highlighting
-
-|:syn-keyword|  :syntax keyword {group-name} {keyword} ..
-                                        add a syntax keyword item
-|:syn-match|    :syntax match {group-name} {pattern} ...
-                                        add syntax match item
-|:syn-region|   :syntax region {group-name} {pattern} ...
-                                        add syntax region item
-|:syn-sync|     :syntax sync [ccomment | lines {N} | ...]
-                                        tell syntax how to sync
-|:syntax|       :syntax [list]          list current syntax items
-|:syn-clear|    :syntax clear           clear all syntax info
-
-|:highlight|    :highlight clear        clear all highlight info
-|:highlight|    :highlight {group-name} {key}={arg} ..
-                                        set highlighting for {group-name}
-
-|:filetype|     :filetype on            switch on file type detection, without
-                                        syntax highlighting
-|:filetype|     :filetype plugin indent on
-                                        switch on file type detection, with
-                                        automatic indenting and settings
-------------------------------------------------------------------------------
-*Q_gu*          GUI commands
-
-|:gui|          :gui                    UNIX: start the GUI
-|:gui|          :gui {fname} ..         idem, and edit {fname} ..
-
-|:menu|         :menu                   list all menus
-|:menu|         :menu {mpath}           list menus starting with {mpath}
-|:menu|         :menu {mpath} {rhs}     add menu {mpath}, giving {lhs}
-|:menu|         :menu {pri} {mpath} {rhs}
-                                        idem, with priorities {pri}
-|:menu|         :menu ToolBar.{name} {rhs}
-                                        add toolbar item, giving {lhs}
-|:tmenu|        :tmenu {mpath} {text}   add tooltip to menu {mpath}
-|:unmenu|       :unmenu {mpath}         remove menu {mpath}
-
-------------------------------------------------------------------------------
 *Q_fo*          Folding
 
 |'foldmethod'|  set foldmethod=manual   manual folding
@@ -1302,4 +1083,3 @@ Context-sensitive completion on the command-line:
 |zN|            zN                      fold normal set 'foldenable'
 |zi|            zi                      invert 'foldenable'
 
- vim:tw=78:ts=8:ft=help:norl:
