@@ -141,7 +141,9 @@ public class MotionGroup extends AbstractActionGroup
         {
             case 0:
                 int offset = editor.getCaretModel().getOffset();
-                int clean = EditorHelper.normalizeOffset(editor, offset, false);
+                int clean = EditorHelper.normalizeOffset(editor, offset,
+                    CommandState.getInstance().getMode() == CommandState.MODE_INSERT ||
+                    CommandState.getInstance().getMode() == CommandState.MODE_REPLACE);
                 if (offset != clean)
                 {
                     editor.getCaretModel().moveToOffset(clean);
