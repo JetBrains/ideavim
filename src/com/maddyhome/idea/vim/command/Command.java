@@ -23,6 +23,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
+import java.util.List;
 
 /**
  * This represents a single Vim command to be executed. It may optionally include an argument if appropriate for
@@ -222,9 +223,20 @@ public class Command
         this.argument = argument;
     }
 
+    public List getKeys()
+    {
+        return keys;
+    }
+
+    public void setKeys(List keys)
+    {
+        this.keys = keys;
+    }
+
     private int count;
     private AnAction action;
     private int type;
     private int flags;
     private Argument argument;
+    private List keys;
 }
