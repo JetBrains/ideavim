@@ -1,6 +1,29 @@
 History of changes for @NAME@
 
-0.1.1 to @VERSION@
+0.2.0 to @VERSION@
+
+Redone Commands
+- / and ? and all their variants are now supported properly
+- n and N are now supported properly
+
+New Commands
+- Added support for :set. Only a small number of options are supported.
+- Load .vimrc or _vimrc from user's home directory. Only set commands are
+  honored.
+
+Supported Set Options
+- matchpairs - Specify the character pairs used by the % command
+- more - Indicates whether 'more' is used or not for display windows
+- scroll - Specifies the number of lines scrolled by the Ctrl-D and Ctrl-U
+  commands. Set to zero for half page.
+- selection - Specifies how the cursor can be moved at the ends of lines in
+  Visual mode. It also controls whether the Visual mode selection is inclusive
+  or exclusive.
+- undolevels - Set to 0 for Vi style undo (1 level). Set to other number to
+  specify how many levels of undo are supported per editor.
+- visualbell - controls whether the plugin beeps or not
+
+0.1.1 to 0.2.0
 
 New Commands
 - Added support for Ctrl-U while in insert mode
