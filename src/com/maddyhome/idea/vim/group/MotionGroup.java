@@ -898,7 +898,7 @@ public class MotionGroup extends AbstractActionGroup
     {
         int line = EditorHelper.normalizeVisualLine(editor, EditorHelper.getCurrentVisualLine(editor) + cntForward);
 
-        if (line <= 0)
+        if (line < 0)
         {
             return 0;
         }
