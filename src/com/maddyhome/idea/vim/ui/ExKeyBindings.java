@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.ui;
 
 import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
-import javax.swing.JTextField;
 import javax.swing.text.JTextComponent.KeyBinding;
 
 /**

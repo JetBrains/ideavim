@@ -23,10 +23,10 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
 import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.ex.Ranges;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.SearchGroup;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
-import com.maddyhome.idea.vim.ex.Ranges;
 
 /**
  */

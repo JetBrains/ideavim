@@ -19,19 +19,19 @@ package com.maddyhome.idea.vim.group;
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.diagnostic.Logger;
-import java.io.CharArrayReader;
-import java.io.StringWriter;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.util.TextRange;
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.BufferedWriter;
+import java.io.CharArrayReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 
 /**
  *

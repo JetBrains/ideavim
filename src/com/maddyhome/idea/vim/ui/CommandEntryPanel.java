@@ -33,8 +33,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -45,6 +43,7 @@ import javax.swing.SwingUtilities;
 
 /**
  * TODO - support complete set of command line editing keys
+ * TODO - redo focus change support to work like MorePanel
  */
 public class CommandEntryPanel extends JPanel
 {
@@ -98,24 +97,6 @@ public class CommandEntryPanel extends JPanel
                 }
             }
         });
-
-        // TODO - move these keys to the ExEditorKit
-        /*
-        entry.addKeyListener(new KeyAdapter() {
-            public void keyPressed(KeyEvent e)
-            {
-                if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
-                {
-                    if (entry.getDocument().getLength() == 0)
-                    {
-                        e.consume();
-                        entry.setText("");
-                        entry.postActionEvent();
-                    }
-                }
-            }
-        });
-        */
     }
 
     public void activate(JComponent comp, String label, String initText)

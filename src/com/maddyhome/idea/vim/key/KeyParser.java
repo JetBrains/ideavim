@@ -42,7 +42,7 @@ import javax.swing.KeyStroke;
  * <li>Insert - The mode where you actually enter text into the editor</li>
  * <li>Operator Pending - This mode is entered after an operator has been entered. Arguments then follow</li>
  * <li>Command Line - The mode for entering ex commands</li>
- * </ul>A
+ * </ul>
  * Several convenience methods are provided for building the key mapping trees. The mappings supplied to all the
  * <code>registerAction</code> methods are combinations of the five mapping constants. The action names supplied
  * must be valid action ids registered with Idea. These can be built in actions supplied with Idea or custom actions
