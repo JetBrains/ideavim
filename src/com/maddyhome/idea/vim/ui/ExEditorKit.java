@@ -19,9 +19,9 @@ package com.maddyhome.idea.vim.ui;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import com.maddyhome.idea.vim.helper.SearchHelper;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.intellij.openapi.diagnostic.Logger;
+import com.maddyhome.idea.vim.group.CommandGroups;
+import com.maddyhome.idea.vim.helper.SearchHelper;
 
 import java.awt.event.ActionEvent;
 import javax.swing.Action;

@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.command;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2004 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,6 +24,8 @@ import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.option.Options;
+import com.intellij.openapi.diagnostic.Logger;
+
 import java.util.Stack;
 
 /**
@@ -87,14 +89,18 @@ public class CommandState
 
     public void pushState(int mode, int submode, int mapping)
     {
+        logger.debug("pushState");
         modes.push(new State(mode, submode, mapping));
         updateStatus();
+        logger.debug("state=" + this);
     }
 
     public void popState()
     {
+        logger.debug("popState");
         modes.pop();
         updateStatus();
+        logger.debug("state=" + this);
     }
 
     /**
@@ -103,6 +109,7 @@ public class CommandState
      */
     public int getMode()
     {
+        logger.debug("getMode=" + currentState().getMode());
         //return mode;
         return currentState().getMode();
     }
@@ -240,6 +247,7 @@ public class CommandState
     public int getMappingMode()
     {
         //return mappingMode;
+        logger.debug("getMappingMode=" + currentState().getMapping());
         return currentState().getMapping();
     }
 
@@ -292,6 +300,20 @@ public class CommandState
         {
             return defaultState;
         }
+    }
+
+    public String toString()
+    {
+        final StringBuffer buf = new StringBuffer();
+        buf.append("CommandState");
+        buf.append("{modes=").append(modes);
+        buf.append(",defaultState=").append(defaultState);
+        buf.append(",command=").append(command);
+        buf.append(",lastChange=").append(lastChange);
+        buf.append(",lastRegister=").append(lastRegister);
+        buf.append(",isRecording=").append(isRecording);
+        buf.append('}');
+        return buf.toString();
     }
 
     /**
@@ -358,5 +380,7 @@ public class CommandState
     private boolean isRecording = false;
 
     private static CommandState ourInstance;
+
+    private static Logger logger = Logger.getInstance(CommandState.class.getName());
 }
 

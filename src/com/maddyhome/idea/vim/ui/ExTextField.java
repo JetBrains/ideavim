@@ -76,6 +76,7 @@ public class ExTextField extends JTextField
 
     public void handleKey(KeyStroke stroke)
     {
+        logger.debug("stroke="+stroke);
         KeyEvent event = new KeyEvent(this, stroke.getKeyChar() != KeyEvent.CHAR_UNDEFINED ? KeyEvent.KEY_TYPED :
             (stroke.isOnKeyRelease() ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED),
             (new Date()).getTime(), stroke.getModifiers(), stroke.getKeyCode(), stroke.getKeyChar());

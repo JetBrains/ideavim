@@ -1,3 +1,5 @@
+package com.maddyhome.idea.vim.group;
+
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
  * Copyright (C) 2003-2004 Rick Maddy
@@ -16,7 +18,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.DataConstants;
@@ -26,6 +27,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.command.Command;
@@ -92,7 +94,7 @@ public class ProcessGroup extends AbstractActionGroup
 
     public boolean processExKey(Editor editor, DataContext context, KeyStroke stroke, boolean charOnly)
     {
-        if (!charOnly || stroke.getKeyChar() != KeyEvent.CHAR_UNDEFINED)
+        if (!charOnly || stroke.getKeyChar() != KeyEvent.CHAR_UNDEFINED && ExEntryPanel.getInstance().isActive())
         {
             ExEntryPanel panel = ExEntryPanel.getInstance();
             panel.handleKey(stroke);
@@ -181,6 +183,7 @@ public class ProcessGroup extends AbstractActionGroup
     public boolean cancelExEntry(final Editor editor, final DataContext context)
     {
         CommandState.getInstance().popState();
+        KeyHandler.getInstance().reset();
         ExEntryPanel panel = ExEntryPanel.getInstance();
         panel.deactivate(false);
         SwingUtilities.invokeLater(new Runnable() {
