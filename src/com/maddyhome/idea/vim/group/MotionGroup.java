@@ -45,8 +45,8 @@ import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.command.VisualRange;
 import com.maddyhome.idea.vim.command.VisualChange;
+import com.maddyhome.idea.vim.command.VisualRange;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
@@ -88,9 +88,8 @@ public class MotionGroup extends AbstractActionGroup
     /**
      * Handles mouse drags by properly setting up visual mode based on the new selection
      * @param editor The editor the mouse drag occured in
-     * @param event The mouse event
      */
-    private void processMouseDrag(Editor editor, MouseEvent event)
+    private void processMouseDrag(Editor editor)
     {
         // Mouse drags can only result in CHARWISE selection
         // We want to move the mouse back one character to be consistence with how regular motion highlights text.
@@ -138,7 +137,7 @@ public class MotionGroup extends AbstractActionGroup
 
         setVisualMode(editor, null, visualMode);
 
-        switch (CommandState.getInstance().getVisualType())
+        switch (CommandState.getInstance().getSubMode())
         {
             case 0:
                 int offset = editor.getCaretModel().getOffset();
@@ -582,17 +581,17 @@ public class MotionGroup extends AbstractActionGroup
 
     public int moveCaretToFirstScreenLine(Editor editor, DataContext context, int count)
     {
-        return moveCaretToScreenLine(editor, context, count);
+        return moveCaretToScreenLine(editor, count);
     }
 
     public int moveCaretToLastScreenLine(Editor editor, DataContext context, int count)
     {
-        return moveCaretToScreenLine(editor, context, EditorHelper.getScreenHeight(editor) - count);
+        return moveCaretToScreenLine(editor, EditorHelper.getScreenHeight(editor) - count);
     }
 
     public int moveCaretToLastScreenLineEnd(Editor editor, DataContext context, int count)
     {
-        int offset = moveCaretToScreenLine(editor, context, EditorHelper.getScreenHeight(editor) - count);
+        int offset = moveCaretToScreenLine(editor, EditorHelper.getScreenHeight(editor) - count);
         LogicalPosition lline = editor.offsetToLogicalPosition(offset);
 
         return moveCaretToLineEnd(editor, lline.line, false);
@@ -600,10 +599,10 @@ public class MotionGroup extends AbstractActionGroup
 
     public int moveCaretToMiddleScreenLine(Editor editor, DataContext context)
     {
-        return moveCaretToScreenLine(editor, context, EditorHelper.getScreenHeight(editor) / 2);
+        return moveCaretToScreenLine(editor, EditorHelper.getScreenHeight(editor) / 2);
     }
 
-    private int moveCaretToScreenLine(Editor editor, DataContext context, int line)
+    private int moveCaretToScreenLine(Editor editor, int line)
     {
         //saveJumpLocation(editor, context);
         int height = EditorHelper.getScreenHeight(editor);
@@ -940,28 +939,24 @@ public class MotionGroup extends AbstractActionGroup
     {
         if (count > 100) count = 100;
 
-        //saveJumpLocation(editor, context);
         return moveCaretToLineStartSkipLeading(editor, EditorHelper.normalizeLine(
             editor, (EditorHelper.getLineCount(editor) * count + 99) / 100 - 1));
     }
 
     public int moveCaretGotoLineLast(Editor editor, DataContext context, int rawCount, int lline)
     {
-        //saveJumpLocation(editor, context);
         return moveCaretToLineStartSkipLeading(editor, rawCount == 0 ?
             EditorHelper.normalizeLine(editor, EditorHelper.getLineCount(editor) - 1) : lline);
     }
 
     public int moveCaretGotoLineLastEnd(Editor editor, DataContext context, int rawCount, int lline, boolean pastEnd)
     {
-        //saveJumpLocation(editor, context);
         return moveCaretToLineEnd(editor, rawCount == 0 ?
             EditorHelper.normalizeLine(editor, EditorHelper.getLineCount(editor) - 1) : lline, pastEnd);
     }
 
     public int moveCaretGotoLineFirst(Editor editor, DataContext context, int lline)
     {
-        //saveJumpLocation(editor, context);
         return moveCaretToLineStartSkipLeading(editor, lline);
     }
 
@@ -992,9 +987,7 @@ public class MotionGroup extends AbstractActionGroup
             return false;
         }
 
-        CommandState.getInstance().setMode(CommandState.MODE_VISUAL);
-        CommandState.getInstance().setVisualType(vr.getType());
-        CommandState.getInstance().setMappingMode(KeyParser.MAPPING_VISUAL);
+        CommandState.getInstance().pushState(CommandState.MODE_VISUAL, vr.getType(), KeyParser.MAPPING_VISUAL);
 
         visualStart = vr.getStart();
         visualEnd = vr.getEnd();
@@ -1015,11 +1008,11 @@ public class MotionGroup extends AbstractActionGroup
         }
 
         EditorData.setLastVisualRange(editor, new VisualRange(visualStart, visualEnd,
-            CommandState.getInstance().getVisualType()));
+            CommandState.getInstance().getSubMode()));
 
         visualStart = vr.getStart();
         visualEnd = vr.getEnd();
-        CommandState.getInstance().setVisualType(vr.getType());
+        CommandState.getInstance().setSubMode(vr.getType());
 
         updateSelection(editor, context, vr.getEnd());
 
@@ -1030,7 +1023,7 @@ public class MotionGroup extends AbstractActionGroup
 
     public void setVisualMode(Editor editor, DataContext context, int mode)
     {
-        int oldMode = CommandState.getInstance().getVisualType();
+        int oldMode = CommandState.getInstance().getSubMode();
         if (mode == 0)
         {
             int start = editor.getSelectionModel().getSelectionStart();
@@ -1058,15 +1051,13 @@ public class MotionGroup extends AbstractActionGroup
             return;
         }
 
-        CommandState.getInstance().setVisualType(mode);
         if (mode == 0)
         {
             exitVisual(editor);
         }
         else
         {
-            CommandState.getInstance().setMode(CommandState.MODE_VISUAL);
-            CommandState.getInstance().setMappingMode(KeyParser.MAPPING_VISUAL);
+            CommandState.getInstance().pushState(CommandState.MODE_VISUAL, mode, KeyParser.MAPPING_VISUAL);
         }
 
         KeyHandler.getInstance().reset();
@@ -1074,17 +1065,14 @@ public class MotionGroup extends AbstractActionGroup
         visualStart = editor.getSelectionModel().getSelectionStart();
         visualEnd = editor.getSelectionModel().getSelectionEnd();
 
-        updateVisualMessage();
-
         CommandGroups.getInstance().getMark().setMark(editor, context, '<', visualStart);
         CommandGroups.getInstance().getMark().setMark(editor, context, '>', visualEnd);
     }
 
     public boolean toggleVisual(Editor editor, DataContext context, int count, int rawCount, int mode)
     {
-        // TODO - support pending insert mode
-        int currentMode = CommandState.getInstance().getVisualType();
-        if (currentMode == 0)
+        int currentMode = CommandState.getInstance().getSubMode();
+        if (CommandState.getInstance().getMode() != CommandState.MODE_VISUAL)
         {
             int start;
             int end;
@@ -1104,9 +1092,7 @@ public class MotionGroup extends AbstractActionGroup
             {
                 start = end = editor.getSelectionModel().getSelectionStart();
             }
-            CommandState.getInstance().setMode(CommandState.MODE_VISUAL);
-            CommandState.getInstance().setVisualType(mode);
-            CommandState.getInstance().setMappingMode(KeyParser.MAPPING_VISUAL);
+            CommandState.getInstance().pushState(CommandState.MODE_VISUAL, mode, KeyParser.MAPPING_VISUAL);
             visualStart = start;
             updateSelection(editor, context, end);
             MotionGroup.moveCaret(editor, context, visualEnd);
@@ -1117,35 +1103,11 @@ public class MotionGroup extends AbstractActionGroup
         }
         else
         {
-            CommandState.getInstance().setVisualType(mode);
+            CommandState.getInstance().setSubMode(mode);
             updateSelection(editor, context, visualEnd);
         }
 
-        updateVisualMessage();
-
         return true;
-    }
-
-    private void updateVisualMessage()
-    {
-        String msg;
-        if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
-        {
-            if ((CommandState.getInstance().getVisualType() & Command.FLAG_MOT_LINEWISE) != 0)
-            {
-                msg = "VISUAL LINES";
-            }
-            else
-            {
-                msg = "VISUAL";
-            }
-        }
-        else
-        {
-            msg = "";
-        }
-
-        VimPlugin.showMode(msg);
     }
 
     private TextRange calculateVisualRange(Editor editor, DataContext context, VisualChange range, int count)
@@ -1189,21 +1151,19 @@ public class MotionGroup extends AbstractActionGroup
         resetVisual(editor);
         if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
         {
-            CommandState.getInstance().reset();
+            CommandState.getInstance().popState();
         }
-
-        VimPlugin.showMode("");
     }
 
     public void resetVisual(Editor editor)
     {
         logger.debug("resetVisual");
         EditorData.setLastVisualRange(editor, new VisualRange(visualStart,
-            visualEnd, CommandState.getInstance().getVisualType()));
+            visualEnd, CommandState.getInstance().getSubMode()));
 
         editor.getSelectionModel().removeSelection();
 
-        CommandState.getInstance().setVisualType(0);
+        CommandState.getInstance().setSubMode(0);
     }
 
     public VisualChange getVisualOperatorRange(Editor editor, int cmdFlags)
@@ -1224,7 +1184,7 @@ public class MotionGroup extends AbstractActionGroup
         int lines = ep.line - sp.line + 1;
         int chars = 0;
         int type;
-        if (CommandState.getInstance().getVisualType() == Command.FLAG_MOT_LINEWISE ||
+        if (CommandState.getInstance().getSubMode() == Command.FLAG_MOT_LINEWISE ||
             (cmdFlags & Command.FLAG_MOT_LINEWISE) != 0)
         {
             chars = ep.column;
@@ -1264,7 +1224,7 @@ public class MotionGroup extends AbstractActionGroup
             end = t;
         }
 
-        if (CommandState.getInstance().getVisualType() == Command.FLAG_MOT_CHARACTERWISE)
+        if (CommandState.getInstance().getSubMode() == Command.FLAG_MOT_CHARACTERWISE)
         {
             BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
             int adj = 1;
@@ -1299,10 +1259,7 @@ public class MotionGroup extends AbstractActionGroup
 
     public void processEscape(Editor editor, DataContext context)
     {
-        CommandState.getInstance().reset();
-        editor.getSelectionModel().removeSelection();
-
-        VimPlugin.showMode("");
+        exitVisual(editor);
     }
 
     public static class MotionEditorChange implements FileEditorManagerListener
@@ -1311,11 +1268,9 @@ public class MotionGroup extends AbstractActionGroup
         {
             if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
             {
-                CommandState.getInstance().reset();
-                EditorHelper.getEditor(event.getManager(), event.getOldFile()).getSelectionModel().removeSelection();
+                CommandGroups.getInstance().getMotion().exitVisual(
+                    EditorHelper.getEditor(event.getManager(), event.getOldFile()));
             }
-
-            VimPlugin.showMode("");
         }
     }
 
@@ -1360,7 +1315,7 @@ public class MotionGroup extends AbstractActionGroup
             {
                 if (event.getEditor().equals(dragEditor))
                 {
-                    CommandGroups.getInstance().getMotion().processMouseDrag(event.getEditor(), event.getMouseEvent());
+                    CommandGroups.getInstance().getMotion().processMouseDrag(event.getEditor());
                     event.consume();
                 }
 
