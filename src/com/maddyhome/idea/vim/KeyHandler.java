@@ -28,13 +28,16 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.application.ApplicationManager;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.RegisterGroup;
+import com.maddyhome.idea.vim.group.ChangeGroup;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
+import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.key.ArgumentNode;
 import com.maddyhome.idea.vim.key.BranchNode;
 import com.maddyhome.idea.vim.key.CommandNode;
@@ -47,6 +50,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Stack;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 /**
  * This handlers every keystroke that the user can argType except those that are still valid hotkeys for various
@@ -117,7 +121,12 @@ public class KeyHandler
             if (mode != STATE_COMMAND && count == 0 && currentArg == Argument.NONE && currentCmd.size() == 0 &&
                 CommandGroups.getInstance().getRegister().getCurrentRegister() == RegisterGroup.REGISTER_DEFAULT)
             {
-               VimPlugin.indicateError();
+                if (key.getKeyCode() == KeyEvent.VK_ESCAPE)
+                {
+                    KeyHandler.executeAction("VimEditorEscape", context);
+                    //getOriginalHandler().execute(editor, key.getKeyChar(), context);
+                }
+                VimPlugin.indicateError();
             }
 
             reset();
@@ -331,6 +340,14 @@ public class KeyHandler
                     key = KeyStroke.getKeyStroke(dig);
                 }
 
+                /* TODO - text change
+                if (textChangeListener != null)
+                {
+                    textChangeListener.complete();
+                    textChangeListener = null;
+                }
+                */
+
                 // If we are in insert/replace mode send this key in for processing
                 if (CommandState.getInstance().getMode() == CommandState.MODE_INSERT ||
                     CommandState.getInstance().getMode() == CommandState.MODE_REPLACE)
@@ -352,7 +369,7 @@ public class KeyHandler
                 {
                     mode = STATE_ERROR;
                 }
-                
+
                 lastChar = key.getKeyChar();
                 partialReset();
             }
@@ -506,7 +523,7 @@ public class KeyHandler
     }
 
     /**
-     * This was used as an experiment to execute actions as a runnable.
+     * Used to run commands
      */
     static class ActionRunner implements Runnable
     {
@@ -522,12 +539,50 @@ public class KeyHandler
         {
             boolean wasRecording = CommandState.getInstance().isRecording();
 
+            /* TODO - text change
+            if (textChangeListener != null)
+            {
+                textChangeListener.complete();
+            }
+
+            textChangeListener = ((cmd.getFlags() & Command.FLAG_SAVE_CHANGES) != 0) ?
+                new ChangeGroup.TextChangeListener(editor, context) : null;
+            if (textChangeListener != null)
+            {
+                logger.debug("save changes");
+                editor.getDocument().addDocumentListener(textChangeListener);
+            }
+            */
+
             executeAction(cmd.getAction(), context);
             if (CommandState.getInstance().getMode() == CommandState.MODE_INSERT ||
                 CommandState.getInstance().getMode() == CommandState.MODE_REPLACE)
             {
                 CommandGroups.getInstance().getChange().processCommand(editor, context, cmd);
             }
+
+            /*
+            if (listener != null)
+            {
+                logger.debug("complete");
+                ApplicationManager.getApplication().invokeLater(new Runnable() {
+                    public void run()
+                    {
+                        ApplicationManager.getApplication().invokeLater(
+                            new Runnable()
+                            {
+                                public void run()
+                                {
+                                    // TODO - I can't get this to run late enough - it's getting removed before any
+                                    // change events.
+                                    editor.getDocument().removeDocumentListener(listener);
+                                    listener.complete();
+                                }
+                            });
+                    }
+                });
+            }
+            */
 
             // Now that the command has been executed let's clean up a few things.
 
@@ -572,6 +627,7 @@ public class KeyHandler
     private DigraphSequence digraph = null;
     private char lastChar;
     private boolean lastWasBS;
+    private static ChangeGroup.TextChangeListener textChangeListener = null;
 
     private static KeyHandler instance;
 
