@@ -22,6 +22,7 @@ package com.maddyhome.idea.vim.group;
 import com.intellij.openapi.actionSystem.DataConstants;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.LogicalPosition;
@@ -29,6 +30,7 @@ import com.intellij.openapi.editor.event.DocumentAdapter;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.EditorFactoryAdapter;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.helper.EditorData;
@@ -97,7 +99,7 @@ public class MarkGroup extends AbstractActionGroup
         // If this is a file mark, get the mark from this file
         else if (FILE_MARKS.indexOf(ch) >= 0)
         {
-            HashMap fmarks = getFileMarks(editor);
+            HashMap fmarks = getFileMarks(editor.getDocument());
             mark = (Mark)fmarks.get(new Character(ch));
             if (mark != null && mark.isClear())
             {
@@ -129,7 +131,7 @@ public class MarkGroup extends AbstractActionGroup
     {
         Mark mark = null;
         if (ch == '`') ch = '\'';
-        HashMap fmarks = getFileMarks(editor);
+        HashMap fmarks = getFileMarks(editor.getDocument());
         mark = (Mark)fmarks.get(new Character(ch));
         if (mark != null && mark.isClear())
         {
@@ -191,13 +193,13 @@ public class MarkGroup extends AbstractActionGroup
         // File specific marks get added to the file
         if (FILE_MARKS.indexOf(ch) >= 0)
         {
-            HashMap fmarks = getFileMarks(editor);
+            HashMap fmarks = getFileMarks(editor.getDocument());
             fmarks.put(new Character(ch), mark);
         }
         // Global marks get set to both the file and the global list of marks
         else if (GLOBAL_MARKS.indexOf(ch) >= 0)
         {
-            HashMap fmarks = getFileMarks(editor);
+            HashMap fmarks = getFileMarks(editor.getDocument());
             fmarks.put(new Character(ch), mark);
             Mark oldMark = (Mark)globalMarks.put(new Character(ch), mark);
             if (oldMark != null)
@@ -213,7 +215,7 @@ public class MarkGroup extends AbstractActionGroup
     {
         ArrayList res = new ArrayList();
 
-        res.addAll(getFileMarks(editor).values());
+        res.addAll(getFileMarks(editor.getDocument()).values());
         res.addAll(globalMarks.values());
 
         Collections.sort(res, new Mark.KeySorter());
@@ -223,13 +225,13 @@ public class MarkGroup extends AbstractActionGroup
 
     /**
      * Gets the map of marks for the specified file
-     * @param editor The editor to get the marks for
+     * @param doc The editor to get the marks for
      * @return The map of marks. The keys are <code>Character</code>s of the mark names, the values are
      * <code>Mark</code>s.
      */
-    private FileMarks getFileMarks(Editor editor)
+    private FileMarks getFileMarks(Document doc)
     {
-        VirtualFile vf = EditorData.getVirtualFile(editor);
+        VirtualFile vf = FileDocumentManager.getInstance().getFile(doc);
         if (vf == null)
         {
             return null;
@@ -514,11 +516,9 @@ public class MarkGroup extends AbstractActionGroup
     {
         /**
          * Creates the listener for the supplied editor
-         * @param editor The editor to listen to
          */
-        public MarkUpdater(Editor editor)
+        public MarkUpdater()
         {
-            this.editor = editor;
         }
 
         /**
@@ -531,7 +531,8 @@ public class MarkGroup extends AbstractActionGroup
             logger.debug("MarkUpdater before, event = " + event);
             if (event.getOldLength() == 0) return;
 
-            updateMarkFromDelete(editor, CommandGroups.getInstance().getMark().getFileMarks(editor), event.getOffset(), event.getOldLength());
+            Document doc = event.getDocument();
+            updateMarkFromDelete(getAnEditor(doc), CommandGroups.getInstance().getMark().getFileMarks(doc), event.getOffset(), event.getOldLength());
         }
 
         /**
@@ -544,10 +545,16 @@ public class MarkGroup extends AbstractActionGroup
             logger.debug("MarkUpdater after, event = " + event);
             if (event.getNewLength() == 0 || (event.getNewLength() == 1 && !event.getNewFragment().equals("\n"))) return;
 
-            updateMarkFromInsert(editor, CommandGroups.getInstance().getMark().getFileMarks(editor), event.getOffset(), event.getNewLength());
+            Document doc = event.getDocument();
+            updateMarkFromInsert(getAnEditor(doc), CommandGroups.getInstance().getMark().getFileMarks(doc), event.getOffset(), event.getNewLength());
         }
 
-        private Editor editor;
+        private Editor getAnEditor(Document doc)
+        {
+            Editor[] editors = EditorFactory.getInstance().getEditors(doc);
+
+            return editors[0];
+        }
     }
 
     private HashMap fileMarks = new HashMap();
