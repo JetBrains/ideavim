@@ -1,4 +1,4 @@
-*index.txt*     For IdeaVIM version 0.7.3.  Last change: 2004 May 28 
+*index.txt*     For IdeaVIM version 0.8.0.  Last change: 2004 June 28 
 
 
                   IdeaVIM REFERENCE MANUAL    by Rick Maddy
@@ -313,6 +313,10 @@ These can be used after an operator or in Visual mode to select an object.
 
 tag             command            action in Normal mode        ~
 ------------------------------------------------------------------------------
+|v_aW|          aW                 "a WORD" (with white space)
+|v_aw|          aw                 "a word" (with white space)
+|v_iW|          iW                 "inner WORD"
+|v_iw|          iw                 "inner word"
 
 ==============================================================================
 2.2 Window commands                                             *CTRL-W*
@@ -442,6 +446,8 @@ tag             command       note action in Visual mode        ~
                                    mode
 |v_X|           X               2  delete the highlighted lines
 |v_Y|           Y                  yank the highlighted lines
+|v_aW|          aW                 extend highlighted area with "a WORD"
+|v_aw|          aw                 extend highlighted area with "a word"
 |v_c|           c               2  delete highlighted area and start insert
 |v_d|           d               2  delete highlighted area
 |v_gJ|          gJ              2  join the highlighted lines without
@@ -449,6 +455,8 @@ tag             command       note action in Visual mode        ~
 |v_gq|          gq              2  format the highlighted lines
 |v_gv|          gv                 exchange current and previous highlighted
                                    area
+|v_iW|          iW                 extend highlighted area with "inner WORD"
+|v_iw|          iw                 extend highlighted area with "inner word"
 |v_o|           o                  move cursor to other corner of area
 |v_r|           r               2  delete highlighted area and start insert
 |v_s|           s               2  delete highlighted area and start insert

@@ -1,4 +1,4 @@
-*index.txt*     For @NAME@ version @VERSION@.  Last change: 2004 May 28.
+*index.txt*     For @NAME@ version @VERSION@.  Last change: 2004 June 28.
                        For IDEA version @IDEA-VERSION@
 
                   @NAME@ REFERENCE MANUAL    by Rick Maddy
@@ -371,6 +371,13 @@ tag             char            action  ~
 
 These can be used after an operator or in Visual mode to select an object.
 
+tag             command            action in Normal mode        ~
+------------------------------------------------------------------------------
+|v_aW|          aW                 "a WORD" (with white space)
+|v_aw|          aw                 "a word" (with white space)
+|v_iW|          iW                 "inner WORD"
+|v_iw|          iw                 "inner word"
+
 TODO:
 tag             command            action in Normal mode        ~
 ------------------------------------------------------------------------------
@@ -379,13 +386,11 @@ tag             command            action in Normal mode        ~
 |v_a<|          a<                 "a <>" from '<' to the matching '>'
 |v_a>|          a>                 same as a<
 |v_aB|          aB                 "a Block" from "[{" to "]}" (with brackets)
-|v_aW|          aW                 "a WORD" (with white space)
 |v_a[|          a[                 "a []" from '[' to the matching ']'
 |v_a]|          a]                 same as a[
 |v_ab|          ab                 "a block" from "[(" to "])" (with braces)
 |v_ap|          ap                 "a paragraph" (with white space)
 |v_as|          as                 "a sentence" (with white space)
-|v_aw|          aw                 "a word" (with white space)
 |v_a{|          a{                 same as aB
 |v_a}|          a}                 same as aB
 |v_i(|          i(                 same as ib
@@ -393,13 +398,11 @@ tag             command            action in Normal mode        ~
 |v_i<|          i<                 "inner <>" from '<' to the matching '>'
 |v_i>|          i>                 same as i<
 |v_iB|          iB                 "inner Block" from "[{" and "]}"
-|v_iW|          iW                 "inner WORD"
 |v_i[|          i[                 "inner []" from '[' to the matching ']'
 |v_i]|          i]                 same as i[
 |v_ib|          ib                 "inner block" from "[(" to "])"
 |v_ip|          ip                 "inner paragraph"
 |v_is|          is                 "inner sentence"
-|v_iw|          iw                 "inner word"
 |v_i{|          i{                 same as iB
 |v_i}|          i}                 same as iB
 
@@ -621,6 +624,8 @@ tag             command       note action in Visual mode        ~
                                    mode
 |v_X|           X               2  delete the highlighted lines
 |v_Y|           Y                  yank the highlighted lines
+|v_aW|          aW                 extend highlighted area with "a WORD"
+|v_aw|          aw                 extend highlighted area with "a word"
 |v_c|           c               2  delete highlighted area and start insert
 |v_d|           d               2  delete highlighted area
 |v_gJ|          gJ              2  join the highlighted lines without
@@ -628,6 +633,8 @@ tag             command       note action in Visual mode        ~
 |v_gq|          gq              2  format the highlighted lines
 |v_gv|          gv                 exchange current and previous highlighted
                                    area
+|v_iW|          iW                 extend highlighted area with "inner WORD"
+|v_iw|          iw                 extend highlighted area with "inner word"
 |v_o|           o                  move cursor to other corner of area
 |v_r|           r               2  delete highlighted area and start insert
 |v_s|           s               2  delete highlighted area and start insert
@@ -648,13 +655,11 @@ tag             command       note action in Visual mode        ~
 |v_a<|          a<                 extend highlighted area with a <> block
 |v_a>|          a>                 same as a<
 |v_aB|          aB                 extend highlighted area with a {} block
-|v_aW|          aW                 extend highlighted area with "a WORD"
 |v_a[|          a[                 extend highlighted area with a [] block
 |v_a]|          a]                 same as a[
 |v_ab|          ab                 extend highlighted area with a () block
 |v_ap|          ap                 extend highlighted area with a paragraph
 |v_as|          as                 extend highlighted area with a sentence
-|v_aw|          aw                 extend highlighted area with "a word"
 |v_a{|          a{                 same as aB
 |v_a}|          a}                 same as aB
 |v_i(|          i(                 same as ib
@@ -662,13 +667,11 @@ tag             command       note action in Visual mode        ~
 |v_i<|          i<                 extend highlighted area with inner <> block
 |v_i>|          i>                 same as i<
 |v_iB|          iB                 extend highlighted area with inner {} block
-|v_iW|          iW                 extend highlighted area with "inner WORD"
 |v_i[|          i[                 extend highlighted area with inner [] block
 |v_i]|          i]                 same as i[
 |v_ib|          ib                 extend highlighted area with inner () block
 |v_ip|          ip                 extend highlighted area with inner paragraph
 |v_is|          is                 extend highlighted area with inner sentence
-|v_iw|          iw                 extend highlighted area with "inner word"
 |v_i{|          i{                 same as iB
 |v_i}|          i}                 same as iB
 

@@ -52,7 +52,7 @@ using IDEA in VIM Emulation mode:
     it the active keymap by pressing the <code>Set Active</code> button.</li>
 </ol>
 
-<h4>Idea Aurora and 4.x</h4>
+<h4>Idea Aurora/4.0.x and Pallada/4.5.x</h4>
 
 <ol>
 <li>Use the plugin manager built into Idea to download and install the IdeaVIM

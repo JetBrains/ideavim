@@ -10,6 +10,12 @@ New Features<br>
 - Support for the hlsearch option and the :nohlsearch command. Now when a
 search is done, all matching text is highlighted. The highlight attributes
 are based on the "General|Search result" color setting.<br>
+- Support for aw, aW, iw, and iW while in visual mode or as arguments to the
+y, gu, gU, g~, c, d, and ! commands.<br>
+<br>
+Bug Fixes<br>
+- e and E while on the last word of a file didn't work.<br>
+- b and B while on the first word of a file didn't work.<br>
 ]]>
     </change-notes>
     <idea-version min="4.5" max="4.5"/>
@@ -77,7 +83,7 @@ are based on the "General|Search result" color setting.<br>
         <action id="VimMotionTextOuterWord" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterWordAction" text="Select outer word"/>
         <action id="VimMotionTextOuterBigWord" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBigWordAction" text="Select outer WORD"/>
         <action id="VimMotionTextInnerWord" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerWordAction" text="Select inner word"/>
-        <action id="VimMotionTextInderBigWord" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerBigWordAction" text="Select inner WORD"/>
+        <action id="VimMotionTextInnerBigWord" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerBigWordAction" text="Select inner WORD"/>
         <!-- Marks -->
         <action id="VimMotionMark" class="com.maddyhome.idea.vim.action.motion.mark.MotionMarkAction" text="Mark"/>
         <action id="VimMotionGotoFileMark" class="com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction" text="Goto Mark"/>

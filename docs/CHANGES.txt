@@ -6,9 +6,12 @@ New Features
 - Support for the hlsearch option and the :nohlsearch command. Now when a
   search is done, all matching text is highlighted. The highlight attributes
   are based on the "General|Search result" color setting.
+- Support for aw, aW, iw, and iW while in visual mode or as arguments to the
+  y, gu, gU, g~, c, d, and ! commands.
   
 Bug Fixes
 - e and E while on the last word of a file didn't work.
+- b and B while on the first word of a file didn't work.
 
 0.7.3 from 0.7.2
 

@@ -1043,8 +1043,8 @@ public class ChangeGroup extends AbstractActionGroup
             int pos = editor.getCaretModel().getOffset();
             int size = EditorHelper.getFileSize(editor);
             int cnt = count * argument.getMotion().getCount();
-            int pos1 = SearchHelper.findNextWordEnd(editor.getDocument().getChars(), pos, size, cnt, skipPunc, false);
-            int pos2 = SearchHelper.findNextWordEnd(editor.getDocument().getChars(), pos1, size, -cnt, skipPunc, false);
+            int pos1 = SearchHelper.findNextWordEnd(editor.getDocument().getChars(), pos, size, cnt, skipPunc, false, false);
+            int pos2 = SearchHelper.findNextWordEnd(editor.getDocument().getChars(), pos1, size, -cnt, skipPunc, false, false);
             logger.debug("pos=" + pos);
             logger.debug("pos1=" + pos1);
             logger.debug("pos2=" + pos2);

@@ -199,7 +199,7 @@ public class ExEditorKit extends DefaultEditorKit
                 Document doc = target.getDocument();
                 Caret caret = target.getCaret();
                 int offset = SearchHelper.findNextWord(target.getText().toCharArray(), caret.getDot(), doc.getLength(),
-                    -1, false);
+                    -1, false, false);
                 try
                 {
                     doc.remove(offset, caret.getDot());
