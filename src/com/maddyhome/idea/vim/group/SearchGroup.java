@@ -39,6 +39,8 @@ import gnu.regexp.RESyntax;
 import java.nio.CharBuffer;
 import java.util.StringTokenizer;
 import java.awt.Color;
+import java.text.NumberFormat;
+import java.text.ParsePosition;
 import javax.swing.JOptionPane;
 
 /**
@@ -59,6 +61,16 @@ public class SearchGroup extends AbstractActionGroup
     {
     }
 
+    public String getLastSearch()
+    {
+        return lastSearch;
+    }
+
+    public String getLastPattern()
+    {
+        return lastPattern;
+    }
+
     public boolean searchAndReplace(Editor editor, DataContext context, TextRange range, String pattern, String replace,
         int flags)
     {
@@ -72,7 +84,7 @@ public class SearchGroup extends AbstractActionGroup
 
         int pflags = RE.REG_MULTILINE;
         // If the user set the i flag or they didn't set the I flag but the ignorecase option is set, then ignore case
-        if ((flags & IGNORE_CASE) != 0 || ((flags & NO_IGNORE_CASE) == 0 && shouldIgnoreCase(pattern)))
+        if ((flags & IGNORE_CASE) != 0 || ((flags & NO_IGNORE_CASE) == 0 && shouldIgnoreCase(pattern, false)))
         {
             pflags |= RE.REG_ICASE;
         }
@@ -141,8 +153,9 @@ public class SearchGroup extends AbstractActionGroup
                     if ((flags & CONFIRM) != 0 && checkConfirm)
                     {
                         editor.getSelectionModel().setSelection(start + spos, start + epos);
-                        int choice = JOptionPane.showOptionDialog(null, "Replace with " + match + " ?", "Confirm Replace",
-                            JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, getConfirmButtons(), null);
+                        int choice = JOptionPane.showOptionDialog(null, "Replace with " + match + " ?",
+                            "Confirm Replace", JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
+                            getConfirmButtons(), null);
                         editor.getSelectionModel().removeSelection();
                         switch (choice)
                         {
@@ -191,9 +204,9 @@ public class SearchGroup extends AbstractActionGroup
         return res;
     }
 
-    private boolean shouldIgnoreCase(String pattern)
+    private boolean shouldIgnoreCase(String pattern, boolean noSmartCase)
     {
-        boolean sc = Options.getInstance().isSet("smartcase");
+        boolean sc = noSmartCase ? false : Options.getInstance().isSet("smartcase");
         boolean ic = Options.getInstance().isSet("ignorecase");
         if (ic && !(sc && StringHelper.containsUpperCase(pattern)))
         {
@@ -274,7 +287,20 @@ public class SearchGroup extends AbstractActionGroup
         return confirmBtns;
     }
 
-    public int search(Editor editor, DataContext context, String command, int count, int flags)
+    public int search(Editor editor, DataContext context, String command, int count, int flags, boolean moveCursor)
+    {
+        int res = search(editor, context, command, editor.getCaretModel().getOffset(), count, flags);
+
+        if (res != -1 && moveCursor)
+        {
+            CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
+            MotionGroup.moveCaret(editor, context, res);
+        }
+
+        return res;
+    }
+
+    public int search(Editor editor, DataContext context, String command, int startOffset, int count, int flags)
     {
         int dir = 1;
         char type = '/';
@@ -286,25 +312,33 @@ public class SearchGroup extends AbstractActionGroup
             type = '?';
         }
 
+        // TODO - broke - doesn't handle ranges and backslashes
         if (command.length() > 0)
         {
             StringTokenizer tokenizer = new StringTokenizer(command, Character.toString(type));
             if (command.charAt(0) != type)
             {
                 pattern = tokenizer.nextToken();
+                logger.debug("pattern=" + pattern);
                 if (!tokenizer.hasMoreTokens())
                 {
+                    logger.debug("no offset");
                     offset = "";
                 }
+                else
+                {
+                    offset = tokenizer.nextToken("\n").substring(1);
+                    logger.debug("offset=" + offset);
+                }
             }
-            if (tokenizer.hasMoreTokens())
-            {
-                offset = tokenizer.nextToken();
-            }
-
-            if (command.charAt(command.length() - 1) == type)
+            else if (command.length() == 1)
             {
                 offset = "";
+            }
+            else
+            {
+                offset = tokenizer.nextToken("\n").substring(1);
+                logger.debug("offset=" + offset);
             }
         }
 
@@ -312,11 +346,11 @@ public class SearchGroup extends AbstractActionGroup
         lastOffset = offset;
         lastDir = dir;
 
-        int res = findIt(editor, context, editor.getCaretModel().getOffset(), count, lastDir);
-        if (res != -1)
-        {
-            MotionGroup.moveCaret(editor, context, res);
-        }
+        logger.debug("lastSearch=" + lastSearch);
+        logger.debug("lastOffset=" + lastOffset);
+        logger.debug("lastDir=" + lastDir);
+
+        int res = findItOffset(editor, context, startOffset, count, lastDir, false);
 
         return res;
     }
@@ -343,9 +377,10 @@ public class SearchGroup extends AbstractActionGroup
         MotionGroup.moveCaret(editor, context, range.getStartOffset());
 
         lastSearch = pattern.toString();
+        lastOffset = "";
         lastDir = dir;
 
-        int res = findIt(editor, context, editor.getCaretModel().getOffset(), count, lastDir);
+        int res = findItOffset(editor, context, editor.getCaretModel().getOffset(), count, lastDir, true);
         if (res != -1)
         {
             MotionGroup.moveCaret(editor, context, res);
@@ -356,17 +391,124 @@ public class SearchGroup extends AbstractActionGroup
 
     public int searchNext(Editor editor, DataContext context, int count)
     {
-        return findIt(editor, context, editor.getCaretModel().getOffset(), count, lastDir);
+        return findItOffset(editor, context, editor.getCaretModel().getOffset(), count, lastDir, false);
     }
 
     public int searchPrevious(Editor editor, DataContext context, int count)
     {
-        return findIt(editor, context, editor.getCaretModel().getOffset(), count, -lastDir);
+        return findItOffset(editor, context, editor.getCaretModel().getOffset(), count, -lastDir, false);
     }
 
-    private int findIt(Editor editor, DataContext context, int startOffset, int count, int dir)
+    private int findItOffset(Editor editor, DataContext context, int startOffset, int count, int dir,
+        boolean noSmartCase)
     {
-        int res = -1;
+        TextRange range = findIt(editor, context, startOffset, count, dir, noSmartCase);
+        if (range == null)
+        {
+            return -1;
+        }
+
+        ParsePosition pp = new ParsePosition(0);
+        int res = range.getStartOffset();
+
+        if (lastOffset.length() == 0)
+        {
+            return range.getStartOffset();
+        }
+        else if (Character.isDigit(lastOffset.charAt(0)) || lastOffset.charAt(0) == '+' || lastOffset.charAt(0) == '-')
+        {
+            int lineOffset = 0;
+            if (lastOffset.equals("+"))
+            {
+                lineOffset = 1;
+            }
+            else if (lastOffset.equals("-"))
+            {
+                lineOffset = -1;
+            }
+            else
+            {
+                if (lastOffset.charAt(0) == '+')
+                {
+                    lastOffset = lastOffset.substring(1);
+                }
+                NumberFormat nf = NumberFormat.getIntegerInstance();
+                pp = new ParsePosition(0);
+                Number num = nf.parse(lastOffset, pp);
+                if (num != null)
+                {
+                    lineOffset = num.intValue();
+                }
+            }
+
+            int line = editor.offsetToLogicalPosition(range.getStartOffset()).line;
+            int newLine = EditorHelper.normalizeLine(editor, line + lineOffset);
+
+            res = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor, newLine);
+        }
+        else if ("ebs".indexOf(lastOffset.charAt(0)) != -1)
+        {
+            int charOffset = 0;
+            if (lastOffset.length() >= 2)
+            {
+                if ("+-".indexOf(lastOffset.charAt(1)) != -1)
+                {
+                    charOffset = 1;
+                }
+                NumberFormat nf = NumberFormat.getIntegerInstance();
+                pp = new ParsePosition(lastOffset.charAt(1) == '+' ? 2 : 1);
+                Number num = nf.parse(lastOffset, pp);
+                if (num != null)
+                {
+                    charOffset = num.intValue();
+                }
+            }
+
+            int base = range.getStartOffset();
+            if (lastOffset.charAt(0) == 'e')
+            {
+                base = range.getEndOffset() - 1;
+            }
+
+            res = Math.max(0, Math.min(base + charOffset, EditorHelper.getFileSize(editor) - 1));
+        }
+
+        int ppos = pp.getIndex();
+        if (ppos < lastOffset.length() - 1 && lastOffset.charAt(ppos) == ';')
+        {
+            int flags;
+            if (lastOffset.charAt(ppos + 1) == '/')
+            {
+                flags = Command.FLAG_SEARCH_FWD;
+            }
+            else if (lastOffset.charAt(ppos + 1) == '?')
+            {
+                flags = Command.FLAG_SEARCH_REV;
+            }
+            else
+            {
+                return res;
+            }
+
+            if (lastOffset.length() - ppos > 2)
+            {
+                ppos++;
+            }
+            
+            res = search(editor, context, lastOffset.substring(ppos + 1), res, 1, flags);
+
+            return res;
+        }
+        else
+        {
+            return res;
+        }
+    }
+
+    private TextRange findIt(Editor editor, DataContext context, int startOffset, int count, int dir,
+        boolean noSmartCase)
+    {
+        TextRange res = null;
 
         if (lastSearch == null || lastSearch.length() == 0)
         {
@@ -374,7 +516,7 @@ public class SearchGroup extends AbstractActionGroup
         }
 
         int pflags = RE.REG_MULTILINE;
-        if (shouldIgnoreCase(lastSearch))
+        if (shouldIgnoreCase(lastSearch, noSmartCase))
         {
             pflags |= RE.REG_ICASE;
         }
@@ -503,13 +645,14 @@ public class SearchGroup extends AbstractActionGroup
                             match_ok = false;
                             for (;;)
                             {
-                                if (!at_first_line || (match.getStartIndex() + extra_col <= start_pos.column))
+                                if (!at_first_line || (match.getEndIndex() + extra_col <= start_pos.column))
                                 {
                                     /* Remember this position, we use it if it's
                                     * the last match in the line. */
                                     match_ok = true;
                                     startcol = match.getStartIndex(); //regmatch.startpos[0].col;
-                                    endpos = new LogicalPosition(lnum, match.getEndIndex()); //endpos = regmatch.endpos[0];
+                                    endpos = new LogicalPosition(lnum, match.getEndIndex());
+                                    //endpos = regmatch.endpos[0];
                                 }
                                 else
                                     break;
@@ -640,12 +783,12 @@ public class SearchGroup extends AbstractActionGroup
                     EMSG2(_("E385: search hit BOTTOM without match for: %s"), mr_pattern);
             }
             */
-            res = -1; //return FAIL;
+            res = null; //return FAIL;
         }
         else
         {
-            res = editor.logicalPositionToOffset(pos);
-            //highlightMatch(editor, res, editor.logicalPositionToOffset(endpos));
+            res = new TextRange(editor.logicalPositionToOffset(pos), editor.logicalPositionToOffset(endpos));
+            //highlightMatch(editor, res.getStartOffset(), res.getEndOffset());
         }
 
         return res;
