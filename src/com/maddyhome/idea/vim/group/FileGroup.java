@@ -67,6 +67,15 @@ public class FileGroup extends AbstractActionGroup
     }
 
     /**
+     * Close all editors
+     * @param context The data context
+     */
+    public void closeAllFiles(DataContext context)
+    {
+        KeyHandler.executeAction("CloseAllEditors", context);
+    }
+
+    /**
      * Saves all files in the project
      * @param context The data context
      */

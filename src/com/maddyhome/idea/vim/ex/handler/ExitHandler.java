@@ -21,13 +21,11 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.project.ProjectManager;
-import com.maddyhome.idea.vim.KeyHandler;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.ex.CommandHandler;
+import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.ex.CommandName;
+import com.maddyhome.idea.vim.group.CommandGroups;
 
 /**
  *
@@ -46,14 +44,7 @@ public class ExitHandler extends CommandHandler
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException
     {
-        if (ProjectManager.getInstance().getOpenProjects().length == 1)
-        {
-            CommandGroups.getInstance().getFile().exitIdea();
-        }
-        else
-        {
-            CommandGroups.getInstance().getFile().closeProject(context);
-        }
+        CommandGroups.getInstance().getFile().closeAllFiles(context);
 
         return true;
     }

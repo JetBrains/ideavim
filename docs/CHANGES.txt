@@ -9,8 +9,7 @@ New Commands
   These are NOT in VIM but are very useful when working with mixed case method
   and variable names. Like their normal w, e, b, and ge counterparts, these may
   be used as operators for the c and d commands.
-- :qall, :quitall, :wqall, and :xall closes the current project or exits IDEA
-  if only one project is open.
+- :qall, :quitall, :wqall, and :xall - closes all editors.
 - :wall - same as :write - save all files.
 - :xit and :exit - sames :wq - save files and close current editor.
 - :close and :hide - same as :quit - close current editor.
@@ -30,6 +29,9 @@ Bug Fixes
   resulting in garbled text.
 - Ex commands that take a count instead of a range (:next, :Next, etc.) were
   getting the current line number as the count instead of one.
+- The == command can now be repeated with the . command.
+- Backslashes (\) in the replace text of a :substitute command was not being
+  handled correctly in all cases.
 
 0.2.0 to 0.3.0
 

@@ -1,4 +1,4 @@
-*index.txt*     For @NAME@ version @VERSION@.  Last change: 2003 May 4
+*index.txt*     For @NAME@ version @VERSION@.  Last change: 2003 May 4.
 
 
                   @NAME@ REFERENCE MANUAL    by Rick Maddy
@@ -759,8 +759,8 @@ The commands are sorted on the non-optional part of their name.
 |:promptrepl|   :promptr[epl]   Search/Replace dialog
 |:put|          :pu[t]          insert contents of register in the text
 |:quit|         :q[uit]         close current window
-|:qall|         :qa[ll]         close current project, exit IDEA if last
-|:quitall|      :quita[ll]      close current project, exit IDEA if last
+|:qall|         :qa[ll]         close all editors
+|:quitall|      :quita[ll]      close all editors
 |:redo|         :red[o]         redo one undone change
 |:registers|    :reg[isters]    display the contents of registers
 |:rewind|       :rew[ind]       go to the first file in the argument list
@@ -777,9 +777,9 @@ The commands are sorted on the non-optional part of their name.
 |:wprevious|    :wp[revious]    write to a file and go to previous file in
                                 argument list
 |:wq|           :wq             write to a file and close current window
-|:wqall|        :wqa[ll]        write to a file and quit window or Vim
+|:wqall|        :wqa[ll]        close all editors
 |:xit|          :x[it]          write to a file and close current window
-|:xall|         :xa[ll]         close current project, exit IDEA if last
+|:xall|         :xa[ll]         close all editors
 |:yank|         :y[ank]         yank lines into a register
 |:~|            :~              repeat last ":substitute"
 

@@ -28,7 +28,7 @@
     <property name="install" value="install" />
     <property name="dist" value="dist" />
     <!-- Update to your IntelliJ installtion -->
-    <property name="idea.home" value="/opt/IntelliJ" />
+    <property name="idea.home" value="/opt/idea3.0.4" />
 
     <property name="project" value="IdeaVIM" />
     <!-- Update this prior to building a new distribution -->
