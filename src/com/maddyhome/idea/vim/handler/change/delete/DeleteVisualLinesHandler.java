@@ -37,6 +37,6 @@ public class DeleteVisualLinesHandler extends VisualOperatorActionHandler
         range = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
             EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
 
-        return CommandGroups.getInstance().getChange().deleteRange(editor, context, range, Command.FLAG_MOT_LINEWISE);
+        return CommandGroups.getInstance().getChange().deleteRange(editor, context, range, Command.FLAG_MOT_LINEWISE, false);
     }
 }

@@ -33,6 +33,6 @@ public class DeleteVisualHandler extends VisualOperatorActionHandler
 {
     protected boolean execute(Editor editor, DataContext context, Command cmd, TextRange range)
     {
-        return CommandGroups.getInstance().getChange().deleteRange(editor, context, range, Command.FLAG_MOT_INCLUSIVE);
+        return CommandGroups.getInstance().getChange().deleteRange(editor, context, range, Command.FLAG_MOT_INCLUSIVE, false);
     }
 }

@@ -202,7 +202,7 @@ public class CopyGroup extends AbstractActionGroup
             MotionGroup.moveCaret(editor, context, start);
 
             CommandGroups.getInstance().getChange().deleteRange(editor, context, range,
-                CommandState.getInstance().getSubMode());
+                CommandState.getInstance().getSubMode(), false);
 
             return true;
         }
