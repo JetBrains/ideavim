@@ -1,5 +1,7 @@
 package com.maddyhome.idea.vim.common;
 
+import java.util.Comparator;
+
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
  * Copyright (C) 2003 Rick Maddy
@@ -29,10 +31,20 @@ public class Register
      * @param type The register type (linewise or characterwise)
      * @param text The text to store
      */
-    public Register(int type, String text)
+    public Register(char key, int type, String text)
     {
+        this.key = key;
         this.type = type;
         this.text = text;
+    }
+
+    /**
+     * Gets the key the register is assigned to
+     * @return The register key
+     */
+    public char getKey()
+    {
+        return key;
     }
 
     /**
@@ -62,6 +74,28 @@ public class Register
         this.text = this.text + text;
     }
 
+    public static class KeySorter implements Comparator
+    {
+        public int compare(Object o1, Object o2)
+        {
+            Register a = (Register)o1;
+            Register b = (Register)o2;
+            if (a.key < b.key)
+            {
+                return -1;
+            }
+            else if (a.key > b.key)
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+    }
+
+    private char key;
     private int type;
     private String text;
 }
