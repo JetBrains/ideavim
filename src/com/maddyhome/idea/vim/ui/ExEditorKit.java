@@ -164,13 +164,6 @@ public class ExEditorKit extends DefaultEditorKit
 
                         doc.remove(dot - delChars, delChars);
                     }
-                    else
-                    {
-                        if (doc.getLength() == 0)
-                        {
-                            target.postActionEvent();
-                        }
-                    }
                 }
                 catch (BadLocationException bl)
                 {
