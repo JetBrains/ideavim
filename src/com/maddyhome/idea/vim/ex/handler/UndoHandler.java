@@ -35,7 +35,7 @@ public class UndoHandler extends CommandHandler
     {
         super(new CommandName[] {
             new CommandName("u", "ndo")
-        }, RANGE_FORBIDDEN | ARGUMENT_FORBIDDEN);
+        }, RANGE_FORBIDDEN | ARGUMENT_FORBIDDEN | WRITABLE);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd)

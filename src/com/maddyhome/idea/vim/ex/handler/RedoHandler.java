@@ -35,7 +35,7 @@ public class RedoHandler extends CommandHandler
     {
         super(new CommandName[] {
             new CommandName("red", "o")
-        }, RANGE_FORBIDDEN | ARGUMENT_FORBIDDEN);
+        }, RANGE_FORBIDDEN | ARGUMENT_FORBIDDEN | WRITABLE);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd)
