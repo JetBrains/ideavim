@@ -757,23 +757,16 @@ public class ChangeGroup extends AbstractActionGroup
             return (EditorHelper.getFileSize(editor) == 0);
         }
 
-        // This is a kludge for dw, dW, and d[w. They are changed to d$ if we are
-        // deleting the last word on a line and there is no count.
-        // Without this kludge we end up deleting the newline too.
-        // TODO - this is all wrong - It seems Vim does this different - research
+        // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is deleted when it shouldn't be.
         String text = new String(editor.getDocument().getChars(), range.getStartOffset(),
             range.getEndOffset() - range.getStartOffset());
-        if (text.indexOf('\n') >= 0 && count * argument.getMotion().getCount() == 1)
+        if (text.indexOf('\n') >= 0 && !(range.getStartOffset() == 0 || editor.getDocument().getChars()[range.getStartOffset() - 1] == '\n'))
         {
             String id = ActionManager.getInstance().getId(argument.getMotion().getAction());
             logger.debug("action id=" + id);
             if (id.equals("VimMotionWordRight") || id.equals("VimMotionBigWordRight") || id.equals("VimMotionCamelRight"))
             {
-                logger.debug("kludge delete to d$");
-                argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionLastColumn"));
-                argument.getMotion().setFlags(Command.FLAG_MOT_INCLUSIVE);
-
-                range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true, false);
+                range = new TextRange(range.getStartOffset(), range.getEndOffset() - 1);
             }
         }
 
