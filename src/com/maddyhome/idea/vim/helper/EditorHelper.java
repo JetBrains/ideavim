@@ -287,9 +287,9 @@ public class EditorHelper
      * @param col The column number to normalize
      * @return The normalized column number
      */
-    public static int normalizeVisualColumn(Editor editor, int vline, int col)
+    public static int normalizeVisualColumn(Editor editor, int vline, int col, boolean allowEnd)
     {
-        col = Math.min(Math.max(0, col), getVisualLineLength(editor, vline) - 1);
+        col = Math.min(Math.max(0, col), getVisualLineLength(editor, vline) - (allowEnd ? 0 : 1));
 
         return col;
     }
