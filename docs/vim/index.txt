@@ -1,5 +1,5 @@
 *index.txt*     For @NAME@ version @VERSION@.  Last change: 2004 Jan 21.
-
+                       For IDEA version @IDEA-VERSION@
 
                   @NAME@ REFERENCE MANUAL    by Rick Maddy
 

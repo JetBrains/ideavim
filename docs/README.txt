@@ -1,4 +1,4 @@
-@NAME@ - Version @VERSION@
+@NAME@ - Version @VERSION@ for IDEA @IDEA-VERSION@
 
 This plugin attempts to emulate the functionality of VIM within IDEA. It
 actually emulates 'gvim' more than 'vim' since IDEA is a graphical IDE (of
@@ -7,20 +7,19 @@ course).
 
 Installation
 
+Use IDEA's plugin manager to install the latest version of the plugin.
+
+First Time Installation
+
 UNIX/Linux
 
-Copy @NAME@.jar to $IDEA_HOME/plugins where IDEA_HOME is where IntelliJ IDEA
-has been installed.
-
-Copy vim.xml to $HOME/.IntelliJIdea/config/keymaps. You will have to create
-the keymaps directory if it doesn't exist.
+Copy vim.xml from the plugin to $HOME/.IntelliJIdea/config/keymaps. You will
+have to create the keymaps directory if it doesn't exist.
 
 Windows
 
-Copy @NAME@.jar to %IDEA_HOME%\plugins where IDEA_HOME is where IntelliJ IDEA
-has been installed.
-
-Copy vim.xml to C:\Documents and Settings\<user>\.IntelliJIdea\config\keymaps
+Copy vim.xml from the plugin to
+C:\Documents and Settings\<user>\.IntelliJIdea\config\keymaps.
 You will have to create the keymaps directory if it doesn't exist.
 
 Starting

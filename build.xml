@@ -30,11 +30,12 @@
     <property name="install" value="install" />
     <property name="dist" value="dist" />
     <!-- Update to your IntelliJ installtion -->
-    <property name="idea.home" value="/opt/idea-1126" />
+    <property name="idea.home" value="/opt/idea-1131" />
 
     <property name="project" value="IdeaVIM" />
     <!-- Update this prior to building a new distribution -->
-    <property name="version" value="0.6.5" />
+    <property name="idea-version" value="4.x" />
+    <property name="version" value="0.7.0" />
 
     <path id="build.classpath">
         <pathelement path="${idea.home}/lib/idea.jar" />
@@ -84,48 +85,52 @@
 
     <target name="dist-bin" depends="clean, build" description="Creates a tar file containing the plugin distribution" >
         <mkdir dir="dist" />
-        <delete dir="${project}-${version}" />
-        <mkdir dir="${project}-${version}"/>
-        <copy todir="${project}-${version}">
+        <delete dir="${project}-${version}-${idea-version}" />
+        <mkdir dir="${project}-${version}-${idea-version}"/>
+        <copy todir="${project}-${version}-${idea-version}">
             <fileset dir="." includes="license/**"/>
             <fileset dir="${install}" includes="**"/>
         </copy>
-        <copy todir="${project}-${version}/lib">
+        <copy todir="${project}-${version}-${idea-version}/lib">
             <fileset dir="${build}" includes="*.jar"/>
         </copy>
-        <copy todir="${project}-${version}/docs">
+        <copy todir="${project}-${version}-${idea-version}/docs">
             <filterset>
                 <filter token="NAME" value="${project}" />
                 <filter token="VERSION" value="${version}" />
+                <filter token="IDEA-VERSION" value="${idea-version}" />
             </filterset>
             <fileset dir="docs" includes="vim/*.txt" excludes="javadoc" />
         </copy>
-        <copy file="docs/README.txt" tofile="${project}-${version}/README" >
+        <copy file="docs/README.txt" tofile="${project}-${version}-${idea-version}/README" >
             <filterset>
                 <filter token="NAME" value="${project}" />
                 <filter token="VERSION" value="${version}" />
+                <filter token="IDEA-VERSION" value="${idea-version}" />
             </filterset>
         </copy>
-        <copy file="docs/CHANGES.txt" tofile="${project}-${version}/CHANGES" >
+        <copy file="docs/CHANGES.txt" tofile="${project}-${version}-${idea-version}/CHANGES" >
             <filterset>
                 <filter token="NAME" value="${project}" />
                 <filter token="VERSION" value="${version}" />
+                <filter token="IDEA-VERSION" value="${idea-version}" />
             </filterset>
         </copy>
-        <copy file="docs/NOTES.txt" tofile="${project}-${version}/NOTES" >
+        <copy file="docs/NOTES.txt" tofile="${project}-${version}-${idea-version}/NOTES" >
             <filterset>
                 <filter token="NAME" value="${project}" />
                 <filter token="VERSION" value="${version}" />
+                <filter token="IDEA-VERSION" value="${idea-version}" />
             </filterset>
         </copy>
         <mkdir dir="${dist}"/>
-        <tar basedir="." destfile="${dist}/${project}-${version}-bin.tar.gz" compression="gzip" includes="${project}-${version}/**" />
-        <zip basedir="." zipfile="${dist}/${project}-${version}.zip" compress="true" includes="${project}-${version}/**" />
+        <tar basedir="." destfile="${dist}/${project}-${version}-${idea-version}-bin.tar.gz" compression="gzip" includes="${project}-${version}-${idea-version}/**" />
+        <zip basedir="." zipfile="${dist}/${project}-${version}-${idea-version}.zip" compress="true" includes="${project}-${version}-${idea-version}/**" />
     </target>
 
     <target name="dist-src" depends="clean" description="Creates the source tar file" >
         <mkdir dir="dist" />
-        <tar basedir="." destfile="${dist}/${project}-${version}-src.tar.gz" excludes="*.iws,dist/**,scratch/**,web/docs/**" compression="gzip"/>
+        <tar basedir="." destfile="${dist}/${project}-${version}-${idea-version}-src.tar.gz" excludes="*.iws,dist/**,scratch/**,web/docs/**" compression="gzip"/>
     </target>
 
     <target name="javadoc" depends="build" description="Generates Javadoc for all source code" >
