@@ -19,10 +19,19 @@ package com.maddyhome.idea.vim.group;
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
+import com.intellij.openapi.actionSystem.DataConstants;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
+import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.ex.CommandParser;
+import com.maddyhome.idea.vim.ex.ExException;
+import com.maddyhome.idea.vim.ui.CommandEntryPanel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.CharArrayReader;
@@ -32,6 +41,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -45,6 +55,46 @@ public class ProcessGroup extends AbstractActionGroup
     public String getLastCommand()
     {
         return lastCommand;
+    }
+
+    public void startExCommand(Editor editor, DataContext context, Command cmd)
+    {
+        String initText = getRange(cmd);
+        CommandEntryPanel panel = CommandEntryPanel.getInstance();
+        panel.addActionListener(new ExEntryListener(editor, context));
+
+        panel.activate(((Editor)context.getData(DataConstants.EDITOR)).getContentComponent(), ":", initText);
+    }
+
+    public void startFilterCommand(Editor editor, DataContext context, Command cmd)
+    {
+        String initText = getRange(cmd) + "!";
+        CommandEntryPanel panel = CommandEntryPanel.getInstance();
+        panel.addActionListener(new ExEntryListener(editor, context));
+
+        panel.activate(((Editor)context.getData(DataConstants.EDITOR)).getContentComponent(), ":", initText);
+    }
+
+    private String getRange(Command cmd)
+    {
+        String initText = "";
+        if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
+        {
+            initText = "'<,'>";
+        }
+        else if (cmd.getRawCount() > 0)
+        {
+            if (cmd.getCount() == 1)
+            {
+                initText = ".";
+            }
+            else
+            {
+                initText = ".,.+" + (cmd.getCount() - 1);
+            }
+        }
+
+        return initText;
     }
 
     public boolean executeFilter(Editor editor, DataContext context, TextRange range, String command)
@@ -94,6 +144,54 @@ public class ProcessGroup extends AbstractActionGroup
             logger.debug("buf="+buf);
             to.write(buf, 0, cnt);
         }
+    }
+
+    private static class ExEntryListener implements ActionListener
+    {
+        public ExEntryListener(Editor editor, DataContext context)
+        {
+            this.editor = editor;
+            this.context = context;
+        }
+
+        public void actionPerformed(final ActionEvent e)
+        {
+            CommandEntryPanel.getInstance().removeActionListener(this);
+
+            SwingUtilities.invokeLater(new Runnable()
+            {
+                public void run()
+                {
+                    try
+                    {
+                        ProcessGroup.logger.debug("processing command");
+                        CommandEntryPanel.getInstance().deactivate(true);
+                        CommandParser.getInstance().processCommand(editor, context, e.getActionCommand(), 1);
+                        if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
+                        {
+                            CommandGroups.getInstance().getMotion().exitVisual(editor);
+                        }
+                    }
+                    catch (ExException ex)
+                    {
+                        // TODO - display error
+                        ProcessGroup.logger.info(ex.getMessage());
+                        VimPlugin.indicateError();
+                    }
+                    catch (Exception bad)
+                    {
+                        ProcessGroup.logger.error(bad);
+                        VimPlugin.indicateError();
+                    }
+                    finally
+                    {
+                    }
+                }
+            });
+        }
+
+        private Editor editor;
+        private DataContext context;
     }
 
     private String lastCommand;

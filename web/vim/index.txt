@@ -103,6 +103,10 @@ tag             char          note action in Normal mode        ~
 |quote|         "{a-zA-Z0-9.%#:-"}  use buffer {a-zA-Z0-9.%#:-"} for next
                                    delete, yank or put (uppercase to append)
                                    ({.%#:} only work with put)
+|!|             !{motion}{filter}
+                                2  filter Nmove text through the {filter}
+                                   command
+|!!|            !!{filter}      2  filter N lines through the {filter} command
 |@:|            @:                 repeat the previous ":" command N times
 |#|             #               1  search backward for the Nth occurrence of
                                    the ident under the cursor
@@ -381,6 +385,8 @@ here are those that are different.
 tag             command       note action in Visual mode        ~
 ------------------------------------------------------------------------------
 |v_CTRL-\_CTRL-N| CTRL-\ CTRL-N    stop Visual mode
+|v_!|           !{filter}       2  filter the highlighted lines through the
+                                   external command {filter}
 |v_:|           :                  start a command-line with the highlighted
                                    lines as a range
 |v_<|           <               2  shift the highlighted lines one

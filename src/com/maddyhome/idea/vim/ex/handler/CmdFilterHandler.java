@@ -60,9 +60,16 @@ public class CmdFilterHandler extends CommandHandler
             // Filter
             TextRange range = cmd.getTextRange(editor, context, false);
             String command = cmd.getArgument();
-            if (command.equals("!"))
+            if (command.indexOf('!') != -1)
             {
-                command = CommandGroups.getInstance().getProcess().getLastCommand();
+                String last = CommandGroups.getInstance().getProcess().getLastCommand();
+                if (last == null || last.length() == 0)
+                {
+                    return false;
+                }
+
+                command.replaceAll("!", last);
+
             }
 
             if (command == null || command.length() == 0)

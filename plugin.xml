@@ -144,6 +144,9 @@
         <action id="VimChangeVisual" class="com.maddyhome.idea.vim.action.change.change.ChangeVisualAction" text="Change Motion"/>
         <action id="VimChangeVisualCharacter" class="com.maddyhome.idea.vim.action.change.change.ChangeVisualCharacterAction" text="Change Motion"/>
         <action id="VimChangeVisualLines" class="com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesAction" text="Change Motion"/>
+        <action id="VimFilterMotion" class="com.maddyhome.idea.vim.action.change.change.FilterMotionAction" text="Filter Lines"/>
+        <action id="VimFilterCountLines" class="com.maddyhome.idea.vim.action.change.change.FilterCountLinesAction" text="Filter Lines"/>
+        <action id="VimFilterVisualLines" class="com.maddyhome.idea.vim.action.change.change.FilterVisualLinesAction" text="Filter Visual Lines"/>
 
         <!-- Shift -->
         <action id="VimAutoIndentLines" class="com.maddyhome.idea.vim.action.change.shift.AutoIndentLinesAction" text="Auto Indent Lines"/>
