@@ -351,6 +351,7 @@ public class KeyHandler
 
             if (!editor.getDocument().isWritable() && !cmd.isReadType())
             {
+                editor.getDocument().fireReadOnlyModificationAttempt();
                 VimPlugin.indicateError();
                 reset();
             }
