@@ -5,21 +5,27 @@
     <vendor email="rick@maddyhome.com">Rick Maddy</vendor>
     <change-notes>
 <![CDATA[
+New Features<br>
+- Added support for digraphs. Currently you can use Ctrl-k {char1}{char2} to
+  enter a special character. This works while in Insert/Replace mode, as an
+  argument to the r, F, T, f, and t commands, or while entering an ex command.
+  The :digraphs command has been added to display the currently supported
+  digraphs. Certain special cases of the Ctrl-K {char1}{char2} sequence are not
+  supported. This supports all two character digraphs as listed in RFC1345.
+  This amounts to 1,338 digraphs! Ensure the file encoding can handle the
+  characters you enter.<br>
+- Added support for the 'digraph' option. If set, digraphs may be entered using
+  {char1} [BackSpace] {char2}. This works in Insert/Replace mode or while
+  entering an ex command.<br>
+- Added support for Ctrl-v {digits}. This works while in Insert/Replace mode,
+  as an argument to the r, F, T, f, and t commands, or while entering an ex
+  command.<br>
+- A new Vim.xml keymap needs to be installed or Ctrl-K needs to be removed
+  from all source control menus.<br>
+<br>
 Bug Fixes<br>
-- Fixed c<motion and d<motion> exception if the motion was invalid.<br>
-- Fixed focus problem with : and / and ? commands.<br>
-- Fixed word motion on strings such as 1/2/3.<br>
-- Fixed <count><word motion> which didn't always match doing <count>
-independent <word motion> commands.<br>
-- Fixed <count>cw on strings such as 1/2/3.<br>
-- Fixed <count>dw which could delete <count> lines instead.<br>
-- The results of the :registers, :marks, and :set commands are now displayed
-properly. This "more" window hadn't been working for a while.<br>
-- Fixed cursor position when issuing the O command on the first line.<br>
-- The confirmation dialog used with the :s//c command now has a default button
-and mnemonics for all buttons.<br>
-- A space is now properly allowed between the range and the command in a :
-command such as :1,2 co 4<br>
+- Fixed backspace in ex entry. Deleting the first character was closing the ex
+  entry window.<br>
 ]]>
     </change-notes>
     <idea-version min="4.0" max="4.5"/>

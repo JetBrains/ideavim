@@ -6,7 +6,6 @@ Bugs to fix:
 
 Requested Functionality to add:
 
-- Support Ctrl-k and Ctrl-v in ex mode
 - Highlight all searches (:set hls, :set nohls, :nohls)
 - More fold region support
 - Window support (need access to splitter)
