@@ -400,4 +400,15 @@ public class EditorHelper
         LogicalPosition pos = editor.offsetToLogicalPosition(offset);
         return editor.getDocument().getLineEndOffset(pos.line);
     }
+
+    /**
+     * Returns the text of the requested logical line
+     * @param editor The editor
+     * @param lline The logical line to get the text for
+     * @return The requested line
+     */
+    public static String getLineText(Editor editor, int lline)
+    {
+        return getText(editor, getLineStartOffset(editor, lline), getLineEndOffset(editor, lline));
+    }
 }
