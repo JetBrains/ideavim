@@ -62,7 +62,8 @@ You may obtain the plugin by visiting the files page on
 <h3>Versions</h3>
 
 The VIM plugin has been developed and tested with IntelliJ IDEA 3.0.2 (#695) and 3.0.3 (#698).
-It is not known at this time if older or newer versions will work correctly.
+It is not known at this time if older or newer versions will work correctly. Minimal testing was done with
+build #811 and it appeared to work just fine.
 
 <hr>
 

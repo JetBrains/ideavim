@@ -479,6 +479,7 @@ The commands are sorted on the non-optional part of their name.
 |:quit|         :q[uit]         quit current window (when one window quit Vim)
 |:registers|    :reg[isters]    display the contents of registers
 |:rewind|       :rew[ind]       go to the first file in the argument list
+|:set|          :se[t]          show or set options
 |:substitute|   :s[ubstitute]   search and replace text
 |:t|            :t              same as ":copy"
 |:write|        :w[rite]        write to a file
