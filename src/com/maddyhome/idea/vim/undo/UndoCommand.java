@@ -22,6 +22,7 @@ package com.maddyhome.idea.vim.undo;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.diagnostic.Logger;
+import com.maddyhome.idea.vim.group.MotionGroup;
 import java.util.ArrayList;
 
 /**
@@ -61,7 +62,8 @@ public class UndoCommand
             change.redo(editor, context);
         }
 
-        editor.getCaretModel().moveToOffset(endOffset);
+        //editor.getCaretModel().moveToOffset(endOffset);
+        MotionGroup.moveCaret(editor, context, endOffset);
     }
 
     public void undo(Editor editor, DataContext context)
@@ -73,7 +75,8 @@ public class UndoCommand
             change.undo(editor, context);
         }
 
-        editor.getCaretModel().moveToOffset(startOffset);
+        //editor.getCaretModel().moveToOffset(startOffset);
+        MotionGroup.moveCaret(editor, context, startOffset);
     }
 
     public String toString()
