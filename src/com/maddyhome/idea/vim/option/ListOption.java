@@ -22,8 +22,8 @@ package com.maddyhome.idea.vim.option;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.StringTokenizer;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * This is an option that accepts an arbitrary list of values
