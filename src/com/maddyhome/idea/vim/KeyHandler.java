@@ -33,8 +33,8 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.RegisterGroup;
-import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
+import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.key.ArgumentNode;
 import com.maddyhome.idea.vim.key.BranchNode;
 import com.maddyhome.idea.vim.key.CommandNode;
@@ -180,7 +180,11 @@ public class KeyHandler
             keys.add(key);
             logger.debug("keys now " + keys);
 
-            if (digraph == null && DigraphSequence.isDigraphStart(key))
+            // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
+            // return the node matching this keystroke
+            Node node = currentNode.getChild(key);
+
+            if (digraph == null && !(node instanceof CommandNode) && DigraphSequence.isDigraphStart(key))
             {
                 digraph = new DigraphSequence();
             }
@@ -206,9 +210,6 @@ public class KeyHandler
                 return;
             }
 
-            // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
-            // return the node matching this keystroke
-            Node node = currentNode.getChild(key);
             // If this is a branch node we have entered only part of a multikey command
             if (node instanceof BranchNode)
             {

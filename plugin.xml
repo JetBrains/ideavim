@@ -103,7 +103,9 @@ are based on the "General|Search result" color setting.<br>
         <action id="VimVisualExitMode" class="com.maddyhome.idea.vim.action.motion.visual.VisualExitModeAction" text="Exit Visual Mode"/>
         <action id="VimVisualToggleCharacterMode" class="com.maddyhome.idea.vim.action.motion.visual.VisualToggleCharacterModeAction" text="Toggle Character Selection"/>
         <action id="VimVisualToggleLineMode" class="com.maddyhome.idea.vim.action.motion.visual.VisualToggleLineModeAction" text="Toggle Line Selection"/>
+        <action id="VimVisualToggleBlockMode" class="com.maddyhome.idea.vim.action.motion.visual.VisualToggleBlockModeAction" text="Toggle Block Selection"/>
         <action id="VimVisualSwapEnds" class="com.maddyhome.idea.vim.action.motion.visual.VisualSwapEndsAction" text="Swap Visual Selection Ends"/>
+        <action id="VimVisualSwapEndsBlock" class="com.maddyhome.idea.vim.action.motion.visual.VisualSwapEndsBlockAction" text="Swap Visual Selection Ends"/>
         <action id="VimVisualSelectPrevious" class="com.maddyhome.idea.vim.action.motion.visual.VisualSelectPreviousAction" text="Swap Visual Selection Ends"/>
         <action id="VimVisualSwapSelections" class="com.maddyhome.idea.vim.action.motion.visual.VisualSwapSelectionsAction" text="Swap Visual Selection Ends"/>
 

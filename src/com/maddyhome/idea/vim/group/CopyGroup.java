@@ -23,12 +23,12 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
-import com.intellij.openapi.util.TextRange;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Register;
+import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 
 /**
@@ -181,6 +181,7 @@ public class CopyGroup extends AbstractActionGroup
             int end = editor.getSelectionModel().getSelectionEnd();
             int pos = 0;
             // If a linewise paste, the text is inserted after the current line.
+            // TODO - deal with visual block
             if ((reg.getType() & Command.FLAG_MOT_LINEWISE) != 0)
             {
                 MotionGroup.moveCaret(editor, context, end);

@@ -38,7 +38,6 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -46,12 +45,14 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Register;
+import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.undo.UndoManager;
+
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import javax.swing.KeyStroke;
@@ -815,7 +816,14 @@ public class ChangeGroup extends AbstractActionGroup
         }
         else
         {
-            boolean res = deleteText(editor, context, range.getStartOffset(), range.getEndOffset(), type);
+            boolean res = true;
+            int[] starts = range.getStartOffsets();
+            int[] ends = range.getEndOffsets();
+            for (int i = ends.length - 1; i >= 0; i--)
+            {
+                res = deleteText(editor, context, starts[i], ends[i], type);
+            }
+
             if (res && editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) &&
                 editor.getCaretModel().getOffset() != 0 && !isChange)
             {
@@ -911,13 +919,19 @@ public class ChangeGroup extends AbstractActionGroup
     public boolean changeCharacterRange(Editor editor, DataContext context, TextRange range, char ch)
     {
         char[] chars = editor.getDocument().getChars();
-        for (int i = range.getStartOffset(); i < range.getEndOffset(); i++)
+        int[] starts = range.getStartOffsets();
+        int[] ends = range.getStartOffsets();
+        for (int j = ends.length - 1; j >= 0; j--)
         {
-            if (i < chars.length && '\n' != chars[i])
+            for (int i = starts[j]; i < ends[j]; i++)
             {
-                replaceText(editor, context, i, i + 1, Character.toString(ch));
+                if (i < chars.length && '\n' != chars[i])
+                {
+                    replaceText(editor, context, i, i + 1, Character.toString(ch));
+                }
             }
         }
+
         return true;
     }
 
@@ -1155,7 +1169,12 @@ public class ChangeGroup extends AbstractActionGroup
         }
         else
         {
-            changeCase(editor, context, range.getStartOffset(), range.getEndOffset(), type);
+            int[] starts = range.getStartOffsets();
+            int[] ends = range.getEndOffsets();
+            for (int i = ends.length - 1; i >= 0; i--)
+            {
+                changeCase(editor, context, starts[i], ends[i], type);
+            }
             MotionGroup.moveCaret(editor, context, range.getStartOffset());
 
             return true;
@@ -1234,6 +1253,7 @@ public class ChangeGroup extends AbstractActionGroup
         indentRange(editor, context, range, 1, dir);
     }
 
+    // TODO - work with visual block mode
     public void indentRange(Editor editor, DataContext context, TextRange range, int count, int dir)
     {
         logger.debug("count=" + count);

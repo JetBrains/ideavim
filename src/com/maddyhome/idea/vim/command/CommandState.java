@@ -19,12 +19,12 @@ package com.maddyhome.idea.vim.command;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.option.Options;
-import com.intellij.openapi.diagnostic.Logger;
 
 import java.util.Stack;
 
@@ -190,6 +190,9 @@ public class CommandState
                 {
                     case Command.FLAG_MOT_LINEWISE:
                         msg.append("VISUAL LINE");
+                        break;
+                    case Command.FLAG_MOT_BLOCKWISE:
+                        msg.append("VISUAL BLOCK");
                         break;
                     default:
                         msg.append("VISUAL");

@@ -39,11 +39,9 @@ import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
@@ -51,6 +49,7 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.command.VisualRange;
 import com.maddyhome.idea.vim.common.Mark;
+import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
@@ -58,6 +57,8 @@ import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.ui.ExEntryPanel;
+
 import java.awt.event.MouseEvent;
 
 /**
@@ -1166,6 +1167,7 @@ public class MotionGroup extends AbstractActionGroup
 
     public boolean toggleVisual(Editor editor, DataContext context, int count, int rawCount, int mode)
     {
+        logger.debug("toggleVisual: mode=" + mode);
         int currentMode = CommandState.getInstance().getSubMode();
         if (CommandState.getInstance().getMode() != CommandState.MODE_VISUAL)
         {
@@ -1209,11 +1211,11 @@ public class MotionGroup extends AbstractActionGroup
     {
         int lines = range.getLines();
         int chars = range.getColumns();
-        if (range.getType() == Command.FLAG_MOT_LINEWISE || lines > 1)
+        if (range.getType() == Command.FLAG_MOT_LINEWISE || range.getType() == Command.FLAG_MOT_BLOCKWISE || lines > 1)
         {
             lines *= count;
         }
-        else
+        if ((range.getType() == Command.FLAG_MOT_CHARACTERWISE && lines == 1) || range.getType() == Command.FLAG_MOT_BLOCKWISE)
         {
             chars *= count;
         }
@@ -1225,7 +1227,7 @@ public class MotionGroup extends AbstractActionGroup
         {
             res = new TextRange(start, moveCaretToLine(editor, context, endLine));
         }
-        else
+        else if (range.getType() == Command.FLAG_MOT_CHARACTERWISE)
         {
             if (lines > 1)
             {
@@ -1236,6 +1238,11 @@ public class MotionGroup extends AbstractActionGroup
             {
                 res = new TextRange(start, EditorHelper.normalizeOffset(editor, sp.line, start + chars - 1, false));
             }
+        }
+        else
+        {
+            res = new TextRange(start, moveCaretToLineStart(editor, endLine) +
+                Math.min(EditorHelper.getLineLength(editor, endLine), chars));
         }
 
         return res;
@@ -1286,7 +1293,7 @@ public class MotionGroup extends AbstractActionGroup
             chars = ep.column;
             type = Command.FLAG_MOT_LINEWISE;
         }
-        else
+        else if (CommandState.getInstance().getSubMode() == Command.FLAG_MOT_CHARACTERWISE)
         {
             type = Command.FLAG_MOT_CHARACTERWISE;
             if (lines > 1)
@@ -1298,14 +1305,27 @@ public class MotionGroup extends AbstractActionGroup
                 chars = ep.column - sp.column + 1;
             }
         }
+        else
+        {
+            chars = ep.column;
+            type = Command.FLAG_MOT_BLOCKWISE;
+        }
 
         return new VisualChange(lines, chars, type);
     }
 
     public TextRange getVisualRange(Editor editor)
     {
-        return new TextRange(editor.getSelectionModel().getSelectionStart(),
-            editor.getSelectionModel().getSelectionEnd());
+        if (editor.getSelectionModel().hasBlockSelection())
+        {
+            return new TextRange(editor.getSelectionModel().getBlockSelectionStarts(),
+                editor.getSelectionModel().getBlockSelectionEnds());
+        }
+        else
+        {
+            return new TextRange(editor.getSelectionModel().getSelectionStart(),
+                editor.getSelectionModel().getSelectionEnd());
+        }
     }
 
     private void updateSelection(Editor editor, DataContext context, int offset)
@@ -1334,12 +1354,19 @@ public class MotionGroup extends AbstractActionGroup
             logger.debug("start=" + start + ", end=" + end);
             editor.getSelectionModel().setSelection(start, end);
         }
-        else
+        else if (CommandState.getInstance().getSubMode() == Command.FLAG_MOT_LINEWISE)
         {
             start = EditorHelper.getLineStartForOffset(editor, start);
             end = EditorHelper.getLineEndForOffset(editor, end);
             logger.debug("start=" + start + ", end=" + end);
             editor.getSelectionModel().setSelection(start, end);
+        }
+        else
+        {
+            LogicalPosition lstart = editor.offsetToLogicalPosition(start);
+            LogicalPosition lend = editor.offsetToLogicalPosition(end);
+            logger.debug("lstart=" + lstart + ", lend=" + lend);
+            editor.getSelectionModel().setBlockSelection(lstart, lend);
         }
 
         CommandGroups.getInstance().getMark().setMark(editor, context, '<', start);
@@ -1351,6 +1378,26 @@ public class MotionGroup extends AbstractActionGroup
         int t = visualEnd;
         visualEnd = visualStart;
         visualStart = t;
+
+        moveCaret(editor, context, visualEnd);
+
+        return true;
+    }
+
+    public boolean swapVisualEndsBlock(Editor editor, DataContext context)
+    {
+        if (CommandState.getInstance().getSubMode() != Command.FLAG_MOT_BLOCKWISE)
+        {
+            return swapVisualEnds(editor, context);
+        }
+
+        LogicalPosition lstart = editor.getSelectionModel().getBlockStart();
+        LogicalPosition lend = editor.getSelectionModel().getBlockEnd();
+        LogicalPosition nstart = new LogicalPosition(lstart.line, lend.column);
+        LogicalPosition nend = new LogicalPosition(lend.line, lstart.column);
+
+        visualStart = editor.logicalPositionToOffset(nstart);
+        visualEnd = editor.logicalPositionToOffset(nend);
 
         moveCaret(editor, context, visualEnd);
 
@@ -1388,7 +1435,7 @@ public class MotionGroup extends AbstractActionGroup
             makingChanges = true;
 
             Editor editor = selectionEvent.getEditor();
-            TextRange range = selectionEvent.getNewRange();
+            TextRange range = new TextRange(selectionEvent.getNewRange().getStartOffset(), selectionEvent.getNewRange().getEndOffset());
 
             Editor[] editors = EditorFactory.getInstance().getEditors(editor.getDocument());
             for (int i = 0; i < editors.length; i++)

@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.key;
 
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
+
 import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 
@@ -264,11 +265,12 @@ public class RegisterActions
             new Shortcut('P'),
             new Shortcut('p')
         });
-        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimVisualSwapEnds", Command.OTHER_READONLY, new Shortcut[] {
-            new Shortcut('O'),
-            new Shortcut('o')
-        });
-        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimVisualSwapSelections", Command.OTHER_READONLY, new Shortcut("gv"));
+        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimVisualSwapEnds", Command.OTHER_READONLY,
+            new Shortcut('o'));
+        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimVisualSwapEndsBlock", Command.OTHER_READONLY,
+            new Shortcut('O'));
+        parser.registerAction(KeyParser.MAPPING_VISUAL, "VimVisualSwapSelections", Command.OTHER_READONLY,
+            new Shortcut("gv"));
 
         // ************************* Normal Mode Actions *************************
         // Copy/Paste Actions
@@ -679,6 +681,8 @@ public class RegisterActions
             new Shortcut('v'));
         parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimVisualToggleLineMode", Command.OTHER_READONLY, Command.FLAG_MOT_LINEWISE,
             new Shortcut('V'));
+        parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimVisualToggleBlockMode", Command.OTHER_READONLY, Command.FLAG_MOT_BLOCKWISE,
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_MASK)));
         parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimMotionMark", Command.OTHER_READONLY,
             new Shortcut('m'), Argument.CHARACTER);
         // TODO - why don't these work on RO files?

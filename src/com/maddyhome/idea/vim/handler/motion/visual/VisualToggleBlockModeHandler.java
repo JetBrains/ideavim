@@ -1,4 +1,4 @@
-package com.maddyhome.idea.vim.handler.change.change;
+package com.maddyhome.idea.vim.handler.motion.visual;
 
 /*
 * IdeaVim - A Vim emulator plugin for IntelliJ Idea
@@ -22,18 +22,16 @@ package com.maddyhome.idea.vim.handler.change.change;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
-import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import com.maddyhome.idea.vim.helper.CharacterHelper;
+import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
 
 /**
  *
  */
-public class ChangeCaseLowerVisualHandler extends VisualOperatorActionHandler
+public class VisualToggleBlockModeHandler extends AbstractEditorActionHandler
 {
-    protected boolean execute(Editor editor, DataContext context, Command cmd, TextRange range)
+    protected boolean execute(Editor editor, DataContext context, Command cmd)
     {
-        return CommandGroups.getInstance().getChange().changeCaseRange(editor, context, range, CharacterHelper.CASE_LOWER);
+        return CommandGroups.getInstance().getMotion().toggleVisual(editor, context, cmd.getCount(), cmd.getRawCount(), Command.FLAG_MOT_BLOCKWISE);
     }
 }

@@ -23,6 +23,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
+
 import java.util.List;
 
 /**
@@ -34,10 +35,11 @@ public class Command
     /** Motion flags */
     public static final int FLAG_MOT_LINEWISE = 1 << 1;
     public static final int FLAG_MOT_CHARACTERWISE = 1 << 2;
-    public static final int FLAG_MOT_INCLUSIVE = 1 << 3;
-    public static final int FLAG_MOT_EXCLUSIVE = 1 << 4;
+    public static final int FLAG_MOT_BLOCKWISE = 1 << 3;
+    public static final int FLAG_MOT_INCLUSIVE = 1 << 4;
+    public static final int FLAG_MOT_EXCLUSIVE = 1 << 5;
     /** Indicates that the cursor position should be saved prior to this motion command */
-    public static final int FLAG_SAVE_JUMP = 1 << 5;
+    public static final int FLAG_SAVE_JUMP = 1 << 6;
 
     /** Special command flag that indicates it is not to be repeated */
     public static final int FLAG_NO_REPEAT = 1 << 8;
