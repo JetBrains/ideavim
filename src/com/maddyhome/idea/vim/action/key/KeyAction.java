@@ -22,11 +22,9 @@ package com.maddyhome.idea.vim.action.key;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataConstants;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.ui.CommandEntryPanel;
 import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 
@@ -44,11 +42,6 @@ public class KeyAction extends AnAction
 
         if (event.getInputEvent() instanceof KeyEvent)
         {
-            if (CommandEntryPanel.getInstance().isActive())
-            {
-                CommandEntryPanel.getInstance().dispatchEvent(event.getInputEvent());
-            }
-            else
             {
                 KeyStroke key = KeyStroke.getKeyStrokeForEvent((KeyEvent)event.getInputEvent());
                 Editor editor = (Editor)event.getDataContext().getData(DataConstants.EDITOR);
@@ -59,6 +52,4 @@ public class KeyAction extends AnAction
             }
         }
     }
-
-    private static Logger logger = Logger.getInstance(KeyAction.class.getName());
 }
