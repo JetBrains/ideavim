@@ -898,7 +898,14 @@ public class MotionGroup extends AbstractActionGroup
     {
         int line = EditorHelper.normalizeVisualLine(editor, EditorHelper.getCurrentVisualLine(editor) + cntForward);
 
-        return moveCaretToLineEnd(editor, EditorHelper.visualLineToLogicalLine(editor, line), allowPastEnd);
+        if (line <= 0)
+        {
+            return 0;
+        }
+        else
+        {
+            return moveCaretToLineEnd(editor, EditorHelper.visualLineToLogicalLine(editor, line), allowPastEnd);
+        }
     }
 
     public int moveCaretToLineStart(Editor editor)
