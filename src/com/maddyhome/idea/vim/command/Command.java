@@ -27,6 +27,30 @@ import com.intellij.openapi.actionSystem.AnAction;
  */
 public class Command
 {
+    /** Motion flags */
+    public static final int FLAG_MOT_LINEWISE = 1 << 1;
+    public static final int FLAG_MOT_CHARACTERWISE = 1 << 2;
+    public static final int FLAG_MOT_INCLUSIVE = 1 << 3;
+    public static final int FLAG_MOT_EXCLUSIVE = 1 << 4;
+
+    /** Special command flag that indicates it is not to be repeated */
+    public static final int FLAG_NO_REPEAT = 1 << 8;
+    /** This insert command should clear all saved keystrokes from the current insert */
+    public static final int FLAG_CLEAR_STROKES = 1 << 9;
+    /** This keystroke should be saved as part of the current insert */
+    public static final int FLAG_SAVE_STROKE = 1 << 10;
+
+    /** Search Flags */
+    public static final int FLAG_SEARCH_FWD = 1 << 16;
+    public static final int FLAG_SEARCH_REV = 1 << 17;
+
+    /** Special flag used for any mappings involving operators */
+    public static final int FLAG_OP_PEND = 1 << 24;
+    /** This command starts a multi-command undo transaction */
+    public static final int FLAG_MULTIKEY_UNDO = 1 << 25;
+    /** This command should be followed by another command */
+    public static final int FLAG_EXPECT_MORE = 1 << 26;
+
     /** Represents commands that actually move the cursor and can be arguments to operators */
     public static final int MOTION = 1;
     /** Represents commands that insert new text into the editor */
