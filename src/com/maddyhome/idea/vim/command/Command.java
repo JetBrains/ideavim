@@ -77,8 +77,9 @@ public class Command
     /** Represents other types of commands */
     public static final int OTHER_READONLY = 9;
     public static final int OTHER_WRITABLE = 10;
+    public static final int OTHER_READ_WRITE = 11;
 
-    public static boolean isReadOnlyType(int type)
+    public static boolean isReadType(int type)
     {
         boolean res = false;
         switch (type)
@@ -87,6 +88,25 @@ public class Command
             case COPY:
             case SELECT_REGISTER:
             case OTHER_READONLY:
+            case OTHER_READ_WRITE:
+                res = true;
+        }
+
+        return res;
+    }
+
+    public static boolean isWriteType(int type)
+    {
+        boolean res = false;
+        switch (type)
+        {
+            case INSERT:
+            case DELETE:
+            case CHANGE:
+            case PASTE:
+            case RESET:
+            case OTHER_WRITABLE:
+            case OTHER_READ_WRITE:
                 res = true;
         }
 
