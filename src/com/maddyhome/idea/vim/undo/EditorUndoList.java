@@ -22,6 +22,8 @@ package com.maddyhome.idea.vim.undo;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.option.NumberOption;
+import com.maddyhome.idea.vim.option.Options;
 import java.util.ArrayList;
 
 /**
@@ -54,19 +56,29 @@ public class EditorUndoList
         }
 
         logger.info("endCommand");
-        while (pointer < undos.size())
+        int max = getMaxUndos();
+        if (max == 0)
         {
-            undos.remove(pointer);
+            undos.clear();
+            undos.add(currentCommand);
+        }
+        else
+        {
+            while (pointer < undos.size())
+            {
+                undos.remove(pointer);
+            }
+
+            undos.add(currentCommand);
+
+            if (undos.size() > max)
+            {
+                undos.remove(0);
+            }
         }
 
         currentCommand.complete(editor);
-        undos.add(currentCommand);
         currentCommand = null;
-
-        if (undos.size() > maxUndos)
-        {
-            undos.remove(0);
-        }
 
         pointer = undos.size();
     }
@@ -97,6 +109,11 @@ public class EditorUndoList
 
     public boolean undo(Editor editor, DataContext context)
     {
+        if (pointer == 0 && getMaxUndos() == 0)
+        {
+            return redo(editor, context);
+        }
+
         if (pointer > 0)
         {
             pointer--;
@@ -108,6 +125,11 @@ public class EditorUndoList
         }
 
         return false;
+    }
+
+    private int getMaxUndos()
+    {
+        return ((NumberOption)Options.getInstance().getOption("undolevels")).value();
     }
 
     public String toString()
@@ -124,7 +146,6 @@ public class EditorUndoList
     private UndoCommand currentCommand;
     private ArrayList undos = new ArrayList();
     private int pointer = 0;
-    private int maxUndos = 1000;
 
     private static Logger logger = Logger.getInstance(EditorUndoList.class.getName());
 }

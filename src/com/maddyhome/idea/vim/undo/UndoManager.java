@@ -31,7 +31,7 @@ import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import java.util.HashMap;
 
 /**
- *
+ * TODO - support undolevels option
  */
 public class UndoManager
 {
