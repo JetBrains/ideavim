@@ -1,7 +1,7 @@
 <project name="IdeaVim" default="deploy" basedir=".">
     <!--
     * IdeaVim - A Vim emulator plugin for IntelliJ Idea
-    * Copyright (C) 2003 Rick Maddy
+    * Copyright (C) 2003-2004 Rick Maddy
     *
     * This program is free software; you can redistribute it and/or
     * modify it under the terms of the GNU General Public License
@@ -30,7 +30,7 @@
     <property name="install" value="install" />
     <property name="dist" value="dist" />
     <!-- Update to your IntelliJ installtion -->
-    <property name="idea.home" value="/opt/idea-1050" />
+    <property name="idea.home" value="/opt/idea-1120" />
 
     <property name="project" value="IdeaVIM" />
     <!-- Update this prior to building a new distribution -->
@@ -76,8 +76,8 @@
     </target>
 
     <target name="deploy" depends="build" description="Copies plugin to IntelliJ plugin directory" >
-        <mkdir dir="${idea.home}/plugins"/>
-        <copy file="${build}/${project}.jar" todir="${idea.home}/plugins/" />
+        <mkdir dir="${idea.home}/plugins/IdeaVIM-${version}/lib"/>
+        <copy file="${build}/${project}.jar" todir="${idea.home}/plugins/IdeaVIM-${version}/lib" />
     </target>
 
     <target name="dist" depends="dist-src, dist-bin" description="Creates the src and bin distribution files" />
