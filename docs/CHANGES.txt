@@ -1,6 +1,12 @@
 History of changes for @NAME@ for IDEA @IDEA-VERSION@
 
-@VERSION@ from 0.8.2
+@VERSION@ from 0.8.4
+Bug Fixes
+- The Escape key is passed up to IDEA if not used by VIM first. This fix solves
+  minor issues such as not being able to clear highlighted text using the
+  Ctrl-Shift-F7, for example.
+
+0.8.3 from 0.8.2
 Bug Fixes
 - After a fresh install it is possible to get a NPE when loading the first
   project. Now fixed.
