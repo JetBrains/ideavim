@@ -60,10 +60,8 @@ public class ClipboardHandler
         catch (IOException e)
         {
         }
-        finally
-        {
-            return res;
-        }
+
+        return res;
     }
 
     /**

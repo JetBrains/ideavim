@@ -7,6 +7,7 @@ Bugs to fix:
 Requested Functionality to add:
 
 - Highlight all searches (:set hls, :set nohls, :nohls)
+- Visual Column mode
 - More fold region support
 - Window support (need access to splitter)
 - Text objects (visual and operator modes)
