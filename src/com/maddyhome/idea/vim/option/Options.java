@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.option;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ui.MorePanel;
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,10 +34,14 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 
 /**
- *
+ * Maintains the set of support options
  */
 public class Options
 {
+    /**
+     * Gets the singleton instance of the options
+     * @return The singleton
+     */
     public synchronized static Options getInstance()
     {
         if (ourInstance == null)
@@ -46,6 +51,27 @@ public class Options
         return ourInstance;
     }
 
+    /**
+     * Convenience method to check if a boolean option is set or not
+     * @param name The name of the option to check
+     * @return True if set, false if not set or name is invalid or not a boolean option
+     */
+    public boolean isSet(String name)
+    {
+        Option opt = getOption(name);
+        if (opt != null && opt instanceof ToggleOption)
+        {
+            return ((ToggleOption)opt).getValue();
+        }
+
+        return false;
+    }
+
+    /**
+     * Gets an option by the supplied name or short name.
+     * @param name The option's name or short name
+     * @return The option with the given name or short name. null if there is no such option
+     */
     public Option getOption(String name)
     {
         Option res = (Option)options.get(name);
@@ -56,12 +82,20 @@ public class Options
 
         return res;
     }
-    
+
+    /**
+     * Gets all options
+     * @return All options
+     */
     Collection allOptions()
     {
         return options.values();
     }
 
+    /**
+     * Gets only options that have values different from their default values
+     * @return The set of changed options
+     */
     Collection changedOptions()
     {
         ArrayList res = new ArrayList();
@@ -77,20 +111,47 @@ public class Options
         return res;
     }
 
+    /**
+     * This parses a set of :set commands. The following types of commands are supported:
+     * <ul>
+     * <li>:set - show all changed options</li>
+     * <li>:set all - show all options</li>
+     * <li>:set all& - reset all options to default values</li>
+     * <li>:set {option} - set option of boolean, display others</li>
+     * <li>:set {option}? - display option</li>
+     * <li>:set no{option} - reset boolean option</li>
+     * <li>:set inv{option} - toggle boolean option</li>
+     * <li>:set {option}! - toggle boolean option</li>
+     * <li>:set {option}& - set option to default</li>
+     * <li>:set {option}={value} - set option to new value</li>
+     * <li>:set {option}:{value} - set option to new value</li>
+     * <li>:set {option}+={value} - append or add to option value</li>
+     * <li>:set {option}-={value} - remove or subtract from option value</li>
+     * <li>:set {option}^={value} - prepend or multiply option value</li>
+     * </ul>
+     * @param editor The editor the command was entered for, null if no editor - reading .vimrc
+     * @param args The :set command arguments
+     * @param failOnBad True if processing should stop when a bad argument is found, false if a bad argument is simply
+     *        skipped and processing continues.
+     * @return True if no errors were found, false if there were any errors
+     */
     public boolean parseOptionLine(Editor editor, String args, boolean failOnBad)
     {
+        // No arguments so we show changed values
         if (args.length() == 0)
         {
-            showOptions(editor, changedOptions());
+            showOptions(editor, changedOptions(), true);
 
             return true;
         }
+        // Arg is all so show all options
         else if (args.equals("all"))
         {
-            showOptions(editor, allOptions());
+            showOptions(editor, allOptions(), true);
 
             return true;
         }
+        // Reset all options to default
         else if (args.equals("all&"))
         {
             resetAllOptions();
@@ -98,27 +159,39 @@ public class Options
             return true;
         }
 
+        // We now have 1 or more option operators separator by spaces
         int error = 0;
         String option = "";
         StringTokenizer tokenizer = new StringTokenizer(args);
+        ArrayList toShow = new ArrayList();
         while (tokenizer.hasMoreTokens())
         {
             String token = tokenizer.nextToken();
+            // See if a space has been backslashed, if no get the rest of the text
+            while (token.endsWith("\\"))
+            {
+                token = token.substring(0, token.length() - 1) + ' ';
+                if (tokenizer.hasMoreTokens())
+                {
+                    token += tokenizer.nextToken();
+                }
+            }
+
+            // Print the value of an option
             if (token.endsWith("?"))
             {
                 option = token.substring(0, token.length() - 1);
                 Option opt = getOption(option);
                 if (opt != null)
                 {
-                    ArrayList list = new ArrayList();
-                    list.add(opt);
-                    showOptions(editor, list);
+                    toShow.add(opt);
                 }
                 else
                 {
                     error = UNKNOWN_OPTION;
                 }
             }
+            // Reset a boolean option
             else if (token.startsWith("no"))
             {
                 option = token.substring(2);
@@ -139,6 +212,7 @@ public class Options
                     error = UNKNOWN_OPTION;
                 }
             }
+            // Toggle a boolean option
             else if (token.startsWith("inv"))
             {
                 option = token.substring(3);
@@ -159,6 +233,7 @@ public class Options
                     error = UNKNOWN_OPTION;
                 }
             }
+            // Toggle a boolean option
             else if (token.endsWith("!"))
             {
                 option = token.substring(0, token.length() - 1);
@@ -179,6 +254,7 @@ public class Options
                     error = UNKNOWN_OPTION;
                 }
             }
+            // Reset option to default
             else if (token.endsWith("&"))
             {
                 option = token.substring(0, token.length() - 1);
@@ -192,28 +268,30 @@ public class Options
                     error = UNKNOWN_OPTION;
                 }
             }
+            // This must be one of =, :, +=, -=, or ^=
             else
             {
+                // Look for the = or : first
                 int eq = token.indexOf('=');
                 if (eq == -1)
                 {
                     eq = token.indexOf(':');
                 }
+                // No operator so only the option name was given
                 if (eq == -1)
                 {
                     option = token;
                     Option opt = getOption(option);
                     if (opt != null)
                     {
+                        // Valid option so set booleans or display others
                         if (opt instanceof ToggleOption)
                         {
                             ((ToggleOption)opt).set();
                         }
                         else
                         {
-                            ArrayList list = new ArrayList();
-                            list.add(opt);
-                            showOptions(editor, list);
+                            toShow.add(opt);
                         }
                     }
                     else
@@ -221,22 +299,27 @@ public class Options
                         error = UNKNOWN_OPTION;
                     }
                 }
+                // We have an operator
                 else
                 {
+                    // Make sure there is an option name
                     if (eq > 0)
                     {
+                        // See if an operator before the equal sign
                         char op = token.charAt(eq - 1);
                         int end = eq;
                         if ("+-^".indexOf(op) != -1)
                         {
                             end--;
                         }
+                        // Get option name and value after operator
                         option = token.substring(0, end);
                         String value = token.substring(eq + 1);
                         Option opt = getOption(option);
                         if (opt != null)
                         {
                             option = token;
+                            // If not a boolean
                             if (opt instanceof TextOption)
                             {
                                 TextOption to = (TextOption)opt;
@@ -260,6 +343,7 @@ public class Options
                                     error = INVALID_ARGUMENT;
                                 }
                             }
+                            // boolean option - no good
                             else
                             {
                                 error = INVALID_ARGUMENT;
@@ -283,14 +367,24 @@ public class Options
             }
         }
 
-        if (editor != null)
+        // Now show all options that were individually requested
+        if (toShow.size() > 0)
         {
-            
+            showOptions(editor, toShow, false);
+        }
+
+        // TODO - display message in status bar
+        if (editor != null && error != 0)
+        {
+            VimPlugin.indicateError();
         }
 
         return error == 0;
     }
 
+    /**
+     * Resets all options to their default value
+     */
     private void resetAllOptions()
     {
         Collection opts = allOptions();
@@ -301,7 +395,13 @@ public class Options
         }
     }
 
-    private void showOptions(Editor editor, Collection opts)
+    /**
+     * Shows the set of options
+     * @param editor The editor to show them in - if null, this is aborted
+     * @param opts The list of options to display
+     * @param showIntro True if intro is displayed, false if not
+     */
+    private void showOptions(Editor editor, Collection opts, boolean showIntro)
     {
         if (editor == null)
         {
@@ -343,7 +443,10 @@ public class Options
         logger.debug("height=" + height);
 
         StringBuffer res = new StringBuffer();
-        res.append("--- Options ---\n");
+        if (showIntro)
+        {
+            res.append("--- Options ---\n");
+        }
         for (int h = 0; h < height; h++)
         {
             for (int c = 0; c < colCount; c++)
@@ -383,14 +486,21 @@ public class Options
         panel.setVisible(true);
     }
 
+    /**
+     * Create all the options
+     */
     private Options()
     {
         createDefaultOptions();
         loadVimrc();
     }
 
+    /**
+     * Attempts to load all :set commands from the user's .vimrc file if found
+     */
     private void loadVimrc()
     {
+        // Look in the JVM's idea of the user's home directory for .vimrc or _vimrc
         String home = System.getProperty("user.home");
         if (home != null)
         {
@@ -425,13 +535,16 @@ public class Options
         }
     }
 
+    /**
+     * Creates all the supported options
+     */
     private void createDefaultOptions()
     {
         addOption(new ToggleOption("gdefault", "gd", false));
         addOption(new ToggleOption("hlsearch", "hls", false));
         addOption(new ToggleOption("ignorecase", "ic", false));
         addOption(new ToggleOption("incsearch", "is", false));
-        addOption(new ListOption("matchpairs", "mps", new String[] { "(:)", "{:}", "[:]" }));
+        addOption(new ListOption("matchpairs", "mps", new String[] { "(:)", "{:}", "[:]" }, ".:."));
         addOption(new ToggleOption("more", "more", true));
         addOption(new NumberOption("scroll", "scr", 0));
         addOption(new BoundStringOption("selection", "sel", "inclusive", new String[] { "old", "inclusive", "exclusive" }));
