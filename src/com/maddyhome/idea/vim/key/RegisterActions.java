@@ -637,7 +637,7 @@ public class RegisterActions
             new Shortcut("g#"));
 
         // ********************** Command Line Actions ************************
-        parser.registerAction(KeyParser.MAPPING_CMD_LINE, "VimProcessExEntry", Command.OTHER_READONLY, new Shortcut[] {
+        parser.registerAction(KeyParser.MAPPING_CMD_LINE, "VimProcessExEntry", Command.OTHER_READ_WRITE, new Shortcut[] {
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_J, KeyEvent.CTRL_MASK)),
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.CTRL_MASK))
