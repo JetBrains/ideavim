@@ -159,7 +159,7 @@ public class RegisterGroup extends AbstractActionGroup
         }
 
         // Also add it to the default register if the default wasn't specified
-        if (register != REGISTER_DEFAULT)
+        if (register != REGISTER_DEFAULT && ".:/".indexOf(register) == -1)
         {
             registers.put(new Character(REGISTER_DEFAULT), new Register(REGISTER_DEFAULT, type, text));
             logger.debug("register '" + register + "' contains: \"" + text + "\"");
@@ -194,8 +194,11 @@ public class RegisterGroup extends AbstractActionGroup
             logger.debug("register '" + '0' + "' contains: \"" + text + "\"");
         }
 
-        CommandGroups.getInstance().getMark().setMark(editor, context, '[', start);
-        CommandGroups.getInstance().getMark().setMark(editor, context, ']', end);
+        if (start != -1)
+        {
+            CommandGroups.getInstance().getMark().setMark(editor, context, '[', start);
+            CommandGroups.getInstance().getMark().setMark(editor, context, ']', end);
+        }
 
         return true;
     }
