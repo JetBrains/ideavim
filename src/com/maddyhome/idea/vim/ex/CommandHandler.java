@@ -42,6 +42,8 @@ public abstract class CommandHandler
     public static final int ARGUMENT_OPTIONAL = 16;
     /** Indicates that an argument can't be specified for this command */
     public static final int ARGUMENT_FORBIDDEN = 32;
+    /** Indicates that the command takes a count, not a range - effects default */
+    public static final int RANGE_IS_COUNT = 64;
 
     /** Indicates that this is a command that modifies the editor */
     public static final int WRITABLE = 256;
@@ -197,6 +199,11 @@ public abstract class CommandHandler
         if ((argFlags & ARGUMENT_REQUIRED) != 0 && cmd.getArgument().length() == 0)
         {
             throw new MissingArgumentException();
+        }
+
+        if ((argFlags & RANGE_IS_COUNT) != 0)
+        {
+            cmd.getRanges().setDefaultLine(1);
         }
 
         if ((argFlags & WRITABLE) != 0)

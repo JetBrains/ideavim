@@ -63,6 +63,16 @@ public class Ranges
     }
 
     /**
+     * Sets the default line to be used by this range if no range was actually given by the user. -1 is used to
+     * mean the current line.
+     * @param line The line or -1 for current line
+     */
+    public void setDefaultLine(int line)
+    {
+        defaultLine = line;
+    }
+
+    /**
      * Gets the line of the last range specified in the range list
      * @param editor The editor to get the line for
      * @param context The data context
@@ -191,7 +201,7 @@ public class Ranges
         if (done) return;
 
         // Start with the range being the current line
-        startLine = editor.getCaretModel().getLogicalPosition().line;
+        startLine = defaultLine == -1 ? editor.getCaretModel().getLogicalPosition().line : defaultLine;
         endLine = startLine;
         boolean lastZero = false;
         // Now process each range, moving the cursor if appropriate
@@ -231,6 +241,7 @@ public class Ranges
     private int startLine = 0;
     private int endLine = 0;
     private int count = 0;
+    private int defaultLine = -1;
     private boolean done = false;
     private ArrayList ranges;
 }

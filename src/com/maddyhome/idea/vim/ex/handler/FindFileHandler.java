@@ -33,7 +33,7 @@ public class FindFileHandler extends CommandHandler
 {
     public FindFileHandler()
     {
-        super("fin", "d", RANGE_OPTIONAL | ARGUMENT_OPTIONAL);
+        super("fin", "d", RANGE_FORBIDDEN | ARGUMENT_OPTIONAL);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException

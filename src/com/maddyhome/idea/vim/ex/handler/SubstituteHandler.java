@@ -39,86 +39,11 @@ public class SubstituteHandler extends CommandHandler
             new CommandName("s", "ubstitute"),
             new CommandName("&", ""),
             new CommandName("~", "")
-        }, WRITABLE);
+        }, RANGE_OPTIONAL | ARGUMENT_OPTIONAL | WRITABLE);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException
     {
-        /*
-        String arg = cmd.getArgument();
-        logger.debug("arg="+arg);
-        String pattern = "";
-        String replace = "~";
-        String args = "";
-        String count = "";
-        // Are there any aruments at all?
-        if (arg.length() > 0)
-        {
-            // Are there flags and possible count?
-            if (Character.isLetter(arg.charAt(0)) || arg.charAt(0) == '&')
-            {
-                StringTokenizer tokenizer = new StringTokenizer(arg, " ");
-                args = tokenizer.nextToken();
-                if (tokenizer.hasMoreTokens())
-                {
-                    count = tokenizer.nextToken();
-                }
-            }
-            // Is there just a count?
-            else if (Character.isDigit(arg.charAt(0)))
-            {
-                count = arg;
-            }
-            // We have a pattern and maybe flags and a count
-            else
-            {
-                StringTokenizer tokenizer = new StringTokenizer(arg.substring(1), Character.toString(arg.charAt(0)));
-                try
-                {
-                    if (tokenizer.hasMoreTokens())
-                    {
-                        pattern = tokenizer.nextToken();
-                    }
-                    if (tokenizer.hasMoreTokens())
-                    {
-                        replace = tokenizer.nextToken();
-                    }
-                    if (tokenizer.hasMoreTokens())
-                    {
-                        args = tokenizer.nextToken(" " + arg.charAt(0));
-                    }
-                    if (tokenizer.hasMoreTokens())
-                    {
-                        count = tokenizer.nextToken(" ");
-                    }
-                }
-                catch (NoSuchElementException e)
-                {
-                }
-
-                if (args.length() > 0 && Character.isDigit(args.charAt(0)))
-                {
-                    args = "";
-                    count = args;
-                }
-            }
-        }
-
-        logger.debug("pattern="+pattern);
-        logger.debug("replace="+replace);
-        logger.debug("args="+args);
-        logger.debug("count="+count);
-
-        cmd.setArgument(count);
-        TextRange range = cmd.getTextRange(editor, context, count.length() > 0);
-
-        int sflags = SearchGroup.argsToFlags(args);
-        if (cmd.getCommand().equals("~"))
-        {
-            sflags |= SearchGroup.REUSE;
-        }
-        */
-
         LineRange range = cmd.getLineRange(editor, context, false);
         return CommandGroups.getInstance().getSearch().searchAndReplace(editor, context, range, cmd.getCommand(),
             cmd.getArgument());

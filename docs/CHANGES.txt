@@ -14,6 +14,8 @@ Bug Fixes
 - Visual mode became unusable without doing a Ctrl-\ Ctrl-n command after each
   visual mode command. This unstable mode also caused undo to work improperly
   resulting in garbled text.
+- Ex commands that take a count instead of a range (:next, :Next, etc.) were
+  getting the current line number as the count instead of one.
 
 0.2.0 to 0.3.0
 

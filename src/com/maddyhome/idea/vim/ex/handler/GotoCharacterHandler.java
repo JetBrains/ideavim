@@ -34,7 +34,7 @@ public class GotoCharacterHandler extends CommandHandler
 {
     public GotoCharacterHandler()
     {
-        super("go", "to", RANGE_OPTIONAL | ARGUMENT_OPTIONAL, Command.FLAG_MOT_EXCLUSIVE);
+        super("go", "to", RANGE_OPTIONAL | ARGUMENT_OPTIONAL | RANGE_IS_COUNT, Command.FLAG_MOT_EXCLUSIVE);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd)
