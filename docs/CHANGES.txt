@@ -11,7 +11,7 @@ New Commands
   be used as operators for the c and d commands.
 - :qall, :quitall, :wqall, and :xall - closes all editors.
 - :wall - same as :write - save all files.
-- :xit and :exit - sames :wq - save files and close current editor.
+- :xit and :exit - same :wq - save files and close current editor.
 - :close and :hide - same as :quit - close current editor.
 - :only - Close all editors except the current editor.
 - :display - same as :registers - display register contents.
