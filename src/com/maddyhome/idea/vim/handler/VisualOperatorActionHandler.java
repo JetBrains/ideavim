@@ -26,10 +26,8 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.group.CommandGroups;
-import com.maddyhome.idea.vim.undo.UndoManager;
-import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.helper.EditorData;
-import javax.swing.SwingUtilities;
+import com.maddyhome.idea.vim.undo.UndoManager;
 
 /**
  *
@@ -49,8 +47,6 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
         }
         TextRange range = CommandGroups.getInstance().getMotion().getVisualRange(editor);
         VisualChange change = CommandGroups.getInstance().getMotion().getVisualOperatorRange(editor, cmd.getFlags());
-        CommandState.getInstance().setMode(CommandState.MODE_COMMAND);
-        CommandState.getInstance().setMappingMode(KeyParser.MAPPING_NORMAL);
         boolean res = execute(editor, context, cmd, range);
 
         if (res)
@@ -72,13 +68,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
             }
         }
 
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run()
-            {
-                CommandGroups.getInstance().getMotion().resetVisual(editor);
-            }
-
-        });
+        CommandGroups.getInstance().getMotion().exitVisual(editor);
 
         return res;
     }
