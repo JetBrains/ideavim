@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.ex.handler.CmdFilterHandler;
 import com.maddyhome.idea.vim.ex.handler.CopyTextHandler;
 import com.maddyhome.idea.vim.ex.handler.DeleteLinesHandler;
+import com.maddyhome.idea.vim.ex.handler.DigraphHandler;
 import com.maddyhome.idea.vim.ex.handler.DumpLineHandler;
 import com.maddyhome.idea.vim.ex.handler.EditFileHandler;
 import com.maddyhome.idea.vim.ex.handler.ExitHandler;
@@ -43,6 +44,7 @@ import com.maddyhome.idea.vim.ex.handler.MarkHandler;
 import com.maddyhome.idea.vim.ex.handler.MarksHandler;
 import com.maddyhome.idea.vim.ex.handler.MoveTextHandler;
 import com.maddyhome.idea.vim.ex.handler.NextFileHandler;
+import com.maddyhome.idea.vim.ex.handler.NoHLSearchHandler;
 import com.maddyhome.idea.vim.ex.handler.OnlyHandler;
 import com.maddyhome.idea.vim.ex.handler.PreviousFileHandler;
 import com.maddyhome.idea.vim.ex.handler.PromptFindHandler;
@@ -66,13 +68,11 @@ import com.maddyhome.idea.vim.ex.handler.WriteNextFileHandler;
 import com.maddyhome.idea.vim.ex.handler.WritePreviousFileHandler;
 import com.maddyhome.idea.vim.ex.handler.WriteQuitHandler;
 import com.maddyhome.idea.vim.ex.handler.YankLinesHandler;
-import com.maddyhome.idea.vim.ex.handler.DigraphHandler;
-import com.maddyhome.idea.vim.ex.handler.NoHLSearchHandler;
 import com.maddyhome.idea.vim.ex.range.AbstractRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
+import com.maddyhome.idea.vim.helper.ApiHelper;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
-import com.maddyhome.idea.vim.helper.ApiHelper;
 
 /**
  * Maintains a tree of Ex commands based on the required and optional parts of the command names. Parses and
@@ -156,6 +156,8 @@ public class CommandParser
         new WritePreviousFileHandler();
         new WriteQuitHandler();
         new YankLinesHandler();
+
+        //logger.debug("root=" + root);
     }
 
     /**
@@ -673,6 +675,10 @@ public class CommandParser
                 if (cn == null)
                 {
                     cn = node.addChild(text.charAt(i), handler);
+                }
+                else if (cn.getCommandHandler() == null)
+                {
+                    cn.setCommandHandler(handler);
                 }
 
                 node = cn;

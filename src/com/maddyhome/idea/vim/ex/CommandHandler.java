@@ -25,6 +25,8 @@ import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
 import com.maddyhome.idea.vim.undo.UndoManager;
 
+import java.util.Arrays;
+
 /**
  * Base class for all Ex command handlers.
  */
@@ -289,6 +291,18 @@ public abstract class CommandHandler
      * @throws ExException if the range or arguments are invalid for the command
      */
     public abstract boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException;
+
+    public String toString()
+    {
+        StringBuffer res = new StringBuffer();
+        res.append(this.getClass().getName()).append("{");
+        res.append("names=" + Arrays.asList(names));
+        res.append(",argFlags=" + argFlags);
+        res.append(",optFlags=" + optFlags);
+        res.append("}");
+
+        return res.toString();
+    }
 
     protected CommandName[] names;
     protected int argFlags;

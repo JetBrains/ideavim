@@ -59,6 +59,17 @@ public class CommandNode
         this.command = command;
     }
 
+    public String toString()
+    {
+        StringBuffer res = new StringBuffer();
+        res.append("CommandNode{");
+        res.append("command=" + command);
+        res.append(",children=" + nodes);
+        res.append("}");
+
+        return res.toString();
+    }
+
     private CommandHandler command;
     private HashMap nodes = new HashMap();
 }

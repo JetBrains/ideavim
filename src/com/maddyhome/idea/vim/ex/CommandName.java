@@ -40,6 +40,17 @@ public class CommandName
         return optional;
     }
 
+    public String toString()
+    {
+        StringBuffer buf = new StringBuffer();
+        buf.append("CommandName{");
+        buf.append("required=").append(required);
+        buf.append(",optional=").append(optional);
+        buf.append('}');
+
+        return buf.toString();
+    }
+    
     private String required;
     private String optional;
 }

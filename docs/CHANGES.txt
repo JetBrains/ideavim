@@ -5,6 +5,7 @@ Bug Fixes
 - The Escape key is passed up to IDEA if not used by VIM first. This fix solves
   minor issues such as not being able to clear highlighted text using the
   Ctrl-Shift-F7, for example.
+- :quit command now works in all forms (e.g. :q, :qu, :qui, :quit).
 
 0.8.3 from 0.8.2
 Bug Fixes
