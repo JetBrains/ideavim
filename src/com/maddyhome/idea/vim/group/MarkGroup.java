@@ -409,7 +409,7 @@ public class MarkGroup extends AbstractActionGroup
     public static void updateMarkFromDelete(Editor editor, HashMap marks, int delStartOff, int delLength)
     {
         // Skip all this work if there are no marks
-        if (marks != null && marks.size() > 0)
+        if (marks != null && marks.size() > 0 && editor != null)
         {
             // Calculate the logical position of the start and end of the deleted text
             int delEndOff = delStartOff + delLength;
@@ -465,7 +465,7 @@ public class MarkGroup extends AbstractActionGroup
      */
     public static void updateMarkFromInsert(Editor editor, HashMap marks, int insStartOff, int insLength)
     {
-        if (marks != null && marks.size() > 0)
+        if (marks != null && marks.size() > 0 && editor != null)
         {
             int insEndOff = insStartOff + insLength;
             LogicalPosition insStart = editor.offsetToLogicalPosition(insStartOff);
@@ -553,7 +553,14 @@ public class MarkGroup extends AbstractActionGroup
         {
             Editor[] editors = EditorFactory.getInstance().getEditors(doc);
 
-            return editors[0];
+            if (editors.length > 0)
+            {
+                return editors[0];
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 
