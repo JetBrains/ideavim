@@ -25,10 +25,16 @@ import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.group.CommandGroups;
 
 /**
- *
+ * Represents the line specified by a mark
  */
 public class MarkRange extends AbstractRange
 {
+    /**
+     * Create the mark range
+     * @param mark The mark name
+     * @param offset The range offset
+     * @param move True if cursor should be moved
+     */
     public MarkRange(char mark, int offset, boolean move)
     {
         super(offset, move);
@@ -36,7 +42,14 @@ public class MarkRange extends AbstractRange
         this.mark = mark;
     }
 
-    public int getRangeLine(Editor editor, DataContext context)
+    /**
+     * Gets the line number specified by this range without regard to any offset.
+     * @param editor The editor to get the line for
+     * @param context The data context
+     * @param lastZero True if last line was set to start of file
+     * @return The zero based line number, -1 if there is no such mark set in the file
+     */
+    public int getRangeLine(Editor editor, DataContext context, boolean lastZero)
     {
         Mark mark = CommandGroups.getInstance().getMark().getFileMark(editor, this.mark);
 

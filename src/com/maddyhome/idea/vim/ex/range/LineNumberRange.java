@@ -24,10 +24,18 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 
 /**
- *
+ * Represents a specific line, the current line, or the last line of a file
  */
 public class LineNumberRange extends AbstractRange
 {
+    public static final int CURRENT_LINE = -3;
+    public static final int LAST_LINE = -4;
+
+    /**
+     * Create a range for the current line
+     * @param offset The range offset
+     * @param move True if cursor should be moved
+     */
     public LineNumberRange(int offset, boolean move)
     {
         super(offset, move);
@@ -35,6 +43,11 @@ public class LineNumberRange extends AbstractRange
         this.line = CURRENT_LINE;
     }
 
+    /**
+     * Create a range for the given line
+     * @param offset The range offset
+     * @param move True if cursor should be moved
+     */
     public LineNumberRange(int line, int offset, boolean move)
     {
         super(offset, move);
@@ -42,14 +55,14 @@ public class LineNumberRange extends AbstractRange
         this.line = line;
     }
 
-    public LineNumberRange(boolean last, int offset, boolean move)
-    {
-        super(offset, move);
-
-        this.line = last ? LAST_LINE : CURRENT_LINE;
-    }
-
-    protected int getRangeLine(Editor editor, DataContext context)
+    /**
+     * Gets the line number specified by this range without regard to any offset.
+     * @param editor The editor to get the line for
+     * @param context The data context
+     * @param lastZero True if last line was set to start of file
+     * @return The zero based line number, -1 for start of file
+     */
+    protected int getRangeLine(Editor editor, DataContext context, boolean lastZero)
     {
         if (line == CURRENT_LINE)
         {
@@ -76,7 +89,4 @@ public class LineNumberRange extends AbstractRange
     }
 
     private int line;
-
-    private static final int CURRENT_LINE = -1;
-    private static final int LAST_LINE = -2;
 }

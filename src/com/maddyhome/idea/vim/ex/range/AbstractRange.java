@@ -24,36 +24,53 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.Range;
 
 /**
- *
+ * Base for all Ex command ranges
  */
 public abstract class AbstractRange implements Range
 {
+    /**
+     * Factory method used to create an appropriate range based on the range text
+     * @param str The range text
+     * @param offset Any offset specified after the range
+     * @param move True if cursor should be moved to range line
+     * @return The ranges appropriate to the text
+     */
     public static Range[] createRange(String str, int offset, boolean move)
     {
+        // Current line
         if (str.equals(".") || str.length() == 0)
         {
             return new Range[] { new LineNumberRange(offset, move) };
         }
+        // All lines
         else if (str.equals("%"))
         {
-            return new Range[] { new LineNumberRange(0, 0, move), new LineNumberRange(true, offset, move) };
+            return new Range[] {
+                new LineNumberRange(0, 0, move),
+                new LineNumberRange(LineNumberRange.LAST_LINE, offset, move)
+            };
         }
+        // Last line
         else if (str.equals("$"))
         {
-            return new Range[] { new LineNumberRange(true, offset, move) };
+            return new Range[] { new LineNumberRange(LineNumberRange.LAST_LINE, offset, move) };
         }
+        // Mark like
         else if (str.startsWith("'") && str.length() == 2)
         {
             return new Range[] { new MarkRange(str.charAt(1), offset, move) };
         }
-        else if (str.startsWith("/") || str.startsWith("\\/"))
+        // Pattern
+        else if (str.startsWith("/") || str.startsWith("\\/") || str.startsWith("\\&"))
         {
-            // TODO
+            return new Range[] { new SearchRange(str, offset, move) };
         }
+        // Pattern
         else if (str.startsWith("?") || str.startsWith("\\?"))
         {
-            // TODO
+            return new Range[] { new SearchRange(str, offset, move) };
         }
+        // Specific line number (1 based)
         else
         {
             try
@@ -70,20 +87,45 @@ public abstract class AbstractRange implements Range
         return null;
     }
 
+    /**
+     * Create the range
+     * @param offset The line offset
+     * @param move True if cursor moved
+     */
     public AbstractRange(int offset, boolean move)
     {
         this.offset = offset;
         this.move = move;
     }
 
+    /**
+     * Gets the line offset
+     * @return The line offset
+     */
     protected int getOffset()
     {
         return offset;
     }
 
-    public int getLine(Editor editor, DataContext context)
+    /**
+     * Should the cursor move
+     * @return True if cursor should move, false if not
+     */
+    public boolean isMove()
     {
-        int line = getRangeLine(editor, context);
+        return move;
+    }
+
+    /**
+     * Gets the line number (0 based) specificied by this range. Includes the offset.
+     * @param editor The editor to get the line for
+     * @param context The data context
+     * @param lastZero True if last line was set to start of file
+     * @return The zero based line number, -1 if unable to get the line number
+     */
+    public int getLine(Editor editor, DataContext context, boolean lastZero)
+    {
+        int line = getRangeLine(editor, context, lastZero);
 
         return line + offset;
     }
@@ -96,8 +138,15 @@ public abstract class AbstractRange implements Range
 
         return res.toString();
     }
-    
-    protected abstract int getRangeLine(Editor editor, DataContext context);
+
+    /**
+     * Gets the line number specified by this range without regard to any offset.
+     * @param editor The editor to get the line for
+     * @param context The data context
+     * @param lastZero True if last line was set to start of file
+     * @return The zero based line number, -1 if inable to get the line number
+     */
+    protected abstract int getRangeLine(Editor editor, DataContext context, boolean lastZero);
 
     protected int offset;
     protected boolean move;
