@@ -22,6 +22,7 @@ package com.maddyhome.idea.vim.common;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import java.util.Comparator;
 
 /**
  * This represents a file mark. Each mark has a line and a column, the file it applies to, and the mark key
@@ -170,6 +171,27 @@ public class Mark
         res.append(filename);
 
         return res.toString();
+    }
+
+    public static class KeySorter implements Comparator
+    {
+        public int compare(Object o1, Object o2)
+        {
+            Mark a = (Mark)o1;
+            Mark b = (Mark)o2;
+            if (a.key < b.key)
+            {
+                return -1;
+            }
+            else if (a.key > b.key)
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
     }
 
     private char key;
