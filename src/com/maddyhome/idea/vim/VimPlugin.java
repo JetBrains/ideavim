@@ -119,6 +119,7 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
             win.setType(ToolWindowType.DOCKED, null);
             if (isEnabled())
             {
+                showing.put(proj, new Boolean(win.isVisible()));
                 win.setAutoHide(false);
                 win.show(null);
             }
@@ -133,7 +134,16 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
             if (isEnabled())
             {
                 win.setAutoHide(false);
-                win.hide(null);
+                boolean hide = false;
+                Boolean wasVisible = (Boolean)showing.get(proj);
+                if (wasVisible != null)
+                {
+                    hide = !wasVisible.booleanValue();
+                }
+                if (hide)
+                {
+                    win.hide(null);
+                }
             }
         }
     }
@@ -341,6 +351,7 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
     private VimTypedActionHandler vimHandler;
     private RegisterActions actions;
     private static HashMap toolWindows = new HashMap();
+    private static HashMap showing = new HashMap();
     //private MarkGroup.MarkUpdater markUpdater = new MarkGroup.MarkUpdater();
 
     private static boolean enabled = true;
