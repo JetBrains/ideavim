@@ -54,6 +54,7 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
+import com.maddyhome.idea.vim.helper.ApiHelper;
 import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.NumberOption;
@@ -1360,7 +1361,7 @@ public class MotionGroup extends AbstractActionGroup
 
     public TextRange getVisualRange(Editor editor)
     {
-        if (editor.getSelectionModel().hasBlockSelection())
+        if (ApiHelper.supportsBlockSelection() && editor.getSelectionModel().hasBlockSelection())
         {
             return new TextRange(editor.getSelectionModel().getBlockSelectionStarts(),
                 editor.getSelectionModel().getBlockSelectionEnds());
@@ -1413,7 +1414,7 @@ public class MotionGroup extends AbstractActionGroup
             logger.debug("start=" + start + ", end=" + end);
             editor.getSelectionModel().setSelection(start, end);
         }
-        else
+        else if (ApiHelper.supportsBlockSelection())
         {
             LogicalPosition lstart = editor.offsetToLogicalPosition(start);
             LogicalPosition lend = editor.offsetToLogicalPosition(end);

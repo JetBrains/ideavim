@@ -48,6 +48,7 @@ import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
+import com.maddyhome.idea.vim.helper.ApiHelper;
 import com.maddyhome.idea.vim.option.OptionChangeEvent;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.Options;
@@ -60,6 +61,7 @@ import org.jdom.Element;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Color;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.ArrayList;
@@ -85,14 +87,17 @@ public class SearchGroup extends AbstractActionGroup
 
     public SearchGroup()
     {
-        Options.getInstance().getOption("hlsearch").addOptionChangeListener(new OptionChangeListener()
+        if (ApiHelper.supportsColorSchemes())
         {
-            public void valueChange(OptionChangeEvent event)
+            Options.getInstance().getOption("hlsearch").addOptionChangeListener(new OptionChangeListener()
             {
-                showSearchHighlight = Options.getInstance().isSet("hlsearch");
-                updateHighlight();
-            }
-        });
+                public void valueChange(OptionChangeEvent event)
+                {
+                    showSearchHighlight = Options.getInstance().isSet("hlsearch");
+                    updateHighlight();
+                }
+            });
+        }
     }
 
     public String getLastSearch()
@@ -693,11 +698,21 @@ public class SearchGroup extends AbstractActionGroup
 
     public void updateHighlight()
     {
+        if (!ApiHelper.supportsColorSchemes())
+        {
+            return;
+        }
+
         highlightSearch(false);
     }
 
     private void searchHighlight(boolean noSmartCase)
     {
+        if (!ApiHelper.supportsColorSchemes())
+        {
+            return;
+        }
+
         showSearchHighlight = Options.getInstance().isSet("hlsearch");
 
         highlightSearch(noSmartCase);
@@ -705,6 +720,11 @@ public class SearchGroup extends AbstractActionGroup
 
     private void highlightSearch(boolean noSmartCase)
     {
+        if (!ApiHelper.supportsColorSchemes())
+        {
+            return;
+        }
+
         Project[] projects = ProjectManager.getInstance().getOpenProjects();
         for (int i = 0; i < projects.length; i++)
         {
@@ -735,6 +755,11 @@ public class SearchGroup extends AbstractActionGroup
 
     private void highlightSearchLines(Editor editor, boolean noSmartCase, int startLine, int endLine)
     {
+        if (!ApiHelper.supportsColorSchemes())
+        {
+            return;
+        }
+
         TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
         ArrayList hls = (ArrayList)EditorData.getLastHighlights(editor);
         if (hls == null)
@@ -1204,13 +1229,26 @@ public class SearchGroup extends AbstractActionGroup
 
     private RangeHighlighter highlightConfirm(Editor editor, int start, int end)
     {
-        TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SELECTION_FOREGROUND_COLOR);
-        return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.ADDITIONAL_SYNTAX + 2,
-            color, HighlighterTargetArea.EXACT_RANGE);
+        if (ApiHelper.supportsColorSchemes())
+        {
+            TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SELECTION_FOREGROUND_COLOR);
+            return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.ADDITIONAL_SYNTAX + 2,
+                color, HighlighterTargetArea.EXACT_RANGE);
+        }
+        else
+        {
+            return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.SELECTION,
+                new TextAttributes(Color.BLACK, Color.YELLOW, null, null, 0), HighlighterTargetArea.EXACT_RANGE);
+        }
     }
 
     private RangeHighlighter highlightMatch(Editor editor, int start, int end)
     {
+        if (!ApiHelper.supportsColorSchemes())
+        {
+            return null;
+        }
+
         TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
         return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.ADDITIONAL_SYNTAX + 1,
             color, HighlighterTargetArea.EXACT_RANGE);
@@ -1218,12 +1256,22 @@ public class SearchGroup extends AbstractActionGroup
 
     public void clearSearchHighlight(Editor editor, DataContext context)
     {
+        if (!ApiHelper.supportsColorSchemes())
+        {
+            return;
+        }
+
         showSearchHighlight = false;
         updateHighlight();
     }
 
     private void removeSearchHighlight(Editor editor)
     {
+        if (!ApiHelper.supportsColorSchemes())
+        {
+            return;
+        }
+
         Collection ehl = EditorData.getLastHighlights(editor);
         if (ehl == null)
         {

@@ -46,6 +46,7 @@ import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.group.SearchGroup;
 import com.maddyhome.idea.vim.helper.DocumentManager;
 import com.maddyhome.idea.vim.helper.EditorData;
+import com.maddyhome.idea.vim.helper.ApiHelper;
 import com.maddyhome.idea.vim.key.RegisterActions;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.MorePanel;
@@ -140,7 +141,10 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
                 FileEditorManager.getInstance(project).addFileEditorManagerListener(new MotionGroup.MotionEditorChange());
                 FileEditorManager.getInstance(project).addFileEditorManagerListener(new MorePanel.MoreEditorChangeListener());
                 FileEditorManager.getInstance(project).addFileEditorManagerListener(new FileGroup.SelectionCheck());
-                FileEditorManager.getInstance(project).addFileEditorManagerListener(new SearchGroup.SelectionCheck());
+                if (ApiHelper.supportsColorSchemes())
+                {
+                    FileEditorManager.getInstance(project).addFileEditorManagerListener(new SearchGroup.SelectionCheck());
+                }
 
                 DocumentManager.getInstance().openProject(project);
 

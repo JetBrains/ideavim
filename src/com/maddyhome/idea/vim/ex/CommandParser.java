@@ -72,6 +72,7 @@ import com.maddyhome.idea.vim.ex.range.AbstractRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
+import com.maddyhome.idea.vim.helper.ApiHelper;
 
 /**
  * Maintains a tree of Ex commands based on the required and optional parts of the command names. Parses and
@@ -127,7 +128,10 @@ public class CommandParser
         new MarksHandler();
         new MoveTextHandler();
         new NextFileHandler();
-        new NoHLSearchHandler();
+        if (ApiHelper.supportsColorSchemes())
+        {
+            new NoHLSearchHandler();
+        }
         new OnlyHandler();
         new PreviousFileHandler();
         new PromptFindHandler();

@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
+import com.maddyhome.idea.vim.helper.ApiHelper;
 import com.maddyhome.idea.vim.ui.MorePanel;
 import java.io.BufferedReader;
 import java.io.File;
@@ -545,7 +546,10 @@ public class Options
     {
         addOption(new ToggleOption("digraph", "dg", false));
         addOption(new ToggleOption("gdefault", "gd", false));
-        addOption(new ToggleOption("hlsearch", "hls", false));
+        if (ApiHelper.supportsColorSchemes())
+        {
+            addOption(new ToggleOption("hlsearch", "hls", false));
+        }
         addOption(new ToggleOption("ignorecase", "ic", false));
         //addOption(new ToggleOption("incsearch", "is", false));
         addOption(new ListOption("matchpairs", "mps", new String[] { "(:)", "{:}", "[:]" }, ".:."));
