@@ -42,13 +42,13 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.LineRange;
+import com.maddyhome.idea.vim.helper.ApiHelper;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
-import com.maddyhome.idea.vim.helper.ApiHelper;
 import com.maddyhome.idea.vim.option.OptionChangeEvent;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.Options;
@@ -59,9 +59,9 @@ import com.maddyhome.idea.vim.regexp.RegExp;
 import org.jdom.CDATA;
 import org.jdom.Element;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.Color;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.ArrayList;
@@ -729,6 +729,11 @@ public class SearchGroup extends AbstractActionGroup
         for (int i = 0; i < projects.length; i++)
         {
             Editor editor = FileEditorManager.getInstance(projects[i]).getSelectedTextEditor();
+            if (editor == null)
+            {
+                continue;
+            }
+
             String els = EditorData.getLastSearch(editor);
             if (!showSearchHighlight)
             {
