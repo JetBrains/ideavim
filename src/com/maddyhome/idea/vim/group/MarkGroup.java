@@ -33,6 +33,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.SearchHelper;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -86,8 +87,15 @@ public class MarkGroup extends AbstractActionGroup
         // Make sure this is a valid mark
         if (VALID_GET_MARKS.indexOf(ch) < 0) return null;
 
+        if ("{}".indexOf(ch) >= 0)
+        {
+            int offset = SearchHelper.findNextParagraph(editor, ch == '{' ? -1 : 1);
+            offset = EditorHelper.normalizeOffset(editor, offset, false);
+            LogicalPosition lp = editor.offsetToLogicalPosition(offset);
+            mark = new Mark(ch, lp.line, lp.column, EditorData.getVirtualFile(editor));
+        }
         // If this is a file mark, get the mark from this file
-        if (FILE_MARKS.indexOf(ch) >= 0)
+        else if (FILE_MARKS.indexOf(ch) >= 0)
         {
             HashMap fmarks = getFileMarks(editor);
             mark = (Mark)fmarks.get(new Character(ch));
@@ -550,7 +558,7 @@ public class MarkGroup extends AbstractActionGroup
     private static final String WR_GLOBAL_MARKS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final String WR_FILE_MARKS = "abcdefghijklmnopqrstuvwxyz'";
     private static final String RO_GLOBAL_MARKS = "0123456789";
-    private static final String RO_FILE_MARKS = "[]<>^";
+    private static final String RO_FILE_MARKS = "[]<>^{}";
     private static final String SAVE_FILE_MARKS = WR_FILE_MARKS + ".^[]\"";
 
     private static final String GLOBAL_MARKS = WR_GLOBAL_MARKS + RO_GLOBAL_MARKS;
