@@ -22,5 +22,5 @@ all source control menus. This is accomplished as follows:
 VIM Emulator plugin for IntelliJ IDEA. See the enclosed README file in the
 binary distribution for installation instructions. See docs/vim/index.txt for
 a complete list of supported VIM commands. This release has been tested with
-IDEA 4.0 to 4.0.3. (builds #1162 - 1182) and Pallada (through build 2152).
+IDEA 4.0 to 4.0.3. (builds #1162 - 1182) and IDEA 4.5.1 (through build 2239).
 

@@ -11,6 +11,7 @@ Bug Fixes
   the first or last character of the file was punctuation.
 - Fixed NullPointerException appearing in system log when viewing a .form file.
 - Fixed extraneous characters getting added to a register during recording.
+- Use file type's indent size instead of tab size for indenting text.
 
 0.8.2 from 0.8.1
 - Fixed typo in plugin.xml for new 'since-build'

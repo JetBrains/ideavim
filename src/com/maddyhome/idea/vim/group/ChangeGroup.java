@@ -39,6 +39,10 @@ import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.fileTypes.FileTypeManager;
+import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
+import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
@@ -1260,8 +1264,18 @@ public class ChangeGroup extends AbstractActionGroup
         if (range == null) return;
 
         Project proj = (Project)context.getData(DataConstants.PROJECT);
-        int tabSize = editor.getSettings().getTabSize(proj);
-        boolean useTabs = editor.getSettings().isUseTabCharacter(proj);
+        int tabSize = 8;
+        int indentSize = 8;
+        boolean useTabs = true;
+        VirtualFile file = EditorData.getVirtualFile(editor);
+        if (file != null)
+        {
+            FileType type = FileTypeManager.getInstance().getFileTypeByFile(file);
+            CodeStyleSettings settings = CodeStyleSettingsManager.getSettings(proj);
+            tabSize = settings.getTabSize(type);
+            indentSize = settings.getIndentSize(type);
+            useTabs = settings.useTabCharacter(type);
+        }
 
         int sline = editor.offsetToLogicalPosition(range.getStartOffset()).line;
         int eline = editor.offsetToLogicalPosition(range.getEndOffset()).line;
