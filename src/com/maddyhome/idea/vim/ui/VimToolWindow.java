@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.ui;
  */
 
 import javax.swing.JPanel;
+import javax.swing.JLabel;
 
 /**
  *
@@ -40,6 +41,8 @@ public class VimToolWindow extends JPanel
      */
     private VimToolWindow()
     {
+        add(new JLabel("Resize so just the window title is visible"));
+
         setSize(0,0);
     }
 
