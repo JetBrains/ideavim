@@ -8,12 +8,15 @@ import com.maddyhome.idea.vim.ex.handler.DeleteLinesHandler;
 import com.maddyhome.idea.vim.ex.handler.EditFileHandler;
 import com.maddyhome.idea.vim.ex.handler.FindFileHandler;
 import com.maddyhome.idea.vim.ex.handler.GotoCharacterHandler;
+import com.maddyhome.idea.vim.ex.handler.GotoLineHandler;
 import com.maddyhome.idea.vim.ex.handler.HelpHandler;
 import com.maddyhome.idea.vim.ex.handler.JoinLinesHandler;
 import com.maddyhome.idea.vim.ex.handler.MarkHandler;
 import com.maddyhome.idea.vim.ex.handler.MoveTextHandler;
 import com.maddyhome.idea.vim.ex.handler.NextFileHandler;
 import com.maddyhome.idea.vim.ex.handler.PreviousFileHandler;
+import com.maddyhome.idea.vim.ex.handler.PromptFindHandler;
+import com.maddyhome.idea.vim.ex.handler.PromptReplaceHandler;
 import com.maddyhome.idea.vim.ex.handler.PutLinesHandler;
 import com.maddyhome.idea.vim.ex.handler.QuitHandler;
 import com.maddyhome.idea.vim.ex.handler.SelectFileHandler;
@@ -25,12 +28,8 @@ import com.maddyhome.idea.vim.ex.handler.SubstituteHandler;
 import com.maddyhome.idea.vim.ex.handler.WriteHandler;
 import com.maddyhome.idea.vim.ex.handler.WriteQuitHandler;
 import com.maddyhome.idea.vim.ex.handler.YankLinesHandler;
-import com.maddyhome.idea.vim.ex.handler.GotoLineHandler;
-import com.maddyhome.idea.vim.ex.handler.PromptFindHandler;
-import com.maddyhome.idea.vim.ex.handler.PromptReplaceHandler;
+import com.maddyhome.idea.vim.ex.handler.CmdFilterHandler;
 import com.maddyhome.idea.vim.ex.range.AbstractRange;
-import com.maddyhome.idea.vim.group.CommandGroups;
-import com.maddyhome.idea.vim.group.MotionGroup;
 
 /*
 * IdeaVim - A Vim emulator plugin for IntelliJ Idea
@@ -72,6 +71,7 @@ public class CommandParser
 
     public void registerHandlers()
     {
+        new CmdFilterHandler();
         new CopyTextHandler();
         new DeleteLinesHandler();
         new EditFileHandler();
@@ -183,10 +183,14 @@ public class CommandParser
                     case STATE_COMMAND:
                         if (Character.isLetter(ch) ||
                             (command.length() == 0 && "~<>@=#*&!".indexOf(ch) >= 0) ||
-                            (command.length() > 0 && ch == command.charAt(command.length() - 1) && "!@<>".indexOf(ch) >= 0))
+                            (command.length() > 0 && ch == command.charAt(command.length() - 1) && "<>".indexOf(ch) >= 0))
                         {
                             command.append(ch);
                             reprocess = false;
+                            if (!Character.isLetter(ch))
+                            {
+                                state = STATE_CMD_ARG;
+                            }
                         }
                         else
                         {
