@@ -42,7 +42,7 @@ public class MotionPercentOrMatchHandler extends MotionEditorActionHandler
         }
     }
 
-    protected void preMove(Editor editor, DataContext context, Command cmd)
+    public void process(Command cmd)
     {
         if (cmd.getRawCount() == 0)
         {

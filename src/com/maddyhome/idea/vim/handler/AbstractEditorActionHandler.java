@@ -40,5 +40,10 @@ public abstract class AbstractEditorActionHandler extends EditorActionHandler
         }
     }
 
+    public void process(Command cmd)
+    {
+        // No-op
+    }
+
     protected abstract boolean execute(Editor editor, DataContext context, Command cmd);
 }

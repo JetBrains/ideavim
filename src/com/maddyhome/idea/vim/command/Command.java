@@ -20,6 +20,9 @@ package com.maddyhome.idea.vim.command;
  */
 
 import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.editor.actionSystem.EditorAction;
+import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
+import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
 
 /**
  * This represents a single Vim command to be executed. It may optionally include an argument if appropriate for
@@ -114,6 +117,16 @@ public class Command
         this.type = type;
         this.flags = flags;
         this.argument = arg;
+
+        if (action instanceof EditorAction)
+        {
+            EditorAction eaction = (EditorAction)action;
+            EditorActionHandler handler = eaction.getHandler();
+            if (handler instanceof AbstractEditorActionHandler)
+            {
+                ((AbstractEditorActionHandler)handler).process(this);
+            }
+        }
     }
 
     /**
