@@ -26,24 +26,44 @@ import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.undo.UndoManager;
 
 /**
- *
+ * Base class for all Ex command handlers.
  */
 public abstract class CommandHandler
 {
+    /** Indicates that a range must be specified with this command */
     public static final int RANGE_REQUIRED = 1;
+    /** Indicates that a range is optional for this command */
     public static final int RANGE_OPTIONAL = 2;
+    /** Indicates that a range can't be specified for this command */
     public static final int RANGE_FORBIDDEN = 4;
+    /** Indicates that an argument must be specified with this command */
     public static final int ARGUMENT_REQUIRED = 8;
+    /** Indicates that an argument is optional for this command */
     public static final int ARGUMENT_OPTIONAL = 16;
+    /** Indicates that an argument can't be specified for this command */
     public static final int ARGUMENT_FORBIDDEN = 32;
+
+    /** Indicates that this is a command that modifies the editor */
     public static final int WRITABLE = 256;
+    /** Indicates that this command does not modify the editor */
     public static final int READ_ONLY = 512;
 
+    /**
+     * Create the handler
+     * @param names A list of names this command answers to
+     * @param flags Range and Arguments commands
+     */
     public CommandHandler(CommandName[] names, int flags)
     {
         this(names, flags, 0);
     }
 
+    /**
+     * Create the handler
+     * @param names A list of names this command answers to
+     * @param argFlags Range and Arguments commands
+     * @param optFlags Other command specific flags
+     */
     public CommandHandler(CommandName[] names, int argFlags, int optFlags)
     {
         this.names = names;
@@ -53,49 +73,127 @@ public abstract class CommandHandler
         CommandParser.getInstance().addHandler(this);
     }
 
+    /**
+     * Create the handler
+     * @param text The required portion of the command name
+     * @param optional The optional portion of the command name
+     * @param argFlags Range and Arguments commands
+     */
     public CommandHandler(String text, String optional, int argFlags)
     {
         this(text, optional, argFlags, 0);
     }
 
+    /**
+     * Create the handler
+     * @param text The required portion of the command name
+     * @param optional The optional portion of the command name
+     * @param argFlags Range and Arguments commands
+     * @param optFlags Other command specific flags
+     */
     public CommandHandler(String text, String optional, int argFlags, int optFlags)
     {
         this(new CommandName[] { new CommandName(text, optional) }, argFlags, optFlags);
     }
 
+    /**
+     * Create the handler. Do not register the handler with the parser
+     * @param argFlags Range and Arguments commands
+     */
+    public CommandHandler(int argFlags)
+    {
+        this(argFlags, 0);
+    }
+
+    /**
+     * Create the handler. Do not register the handler with the parser
+     * @param argFlags Range and Arguments commands
+     * @param optFlags Other command specific flags
+     */
+    public CommandHandler(int argFlags, int optFlags)
+    {
+        this.names = null;
+        this.argFlags = argFlags;
+        this.optFlags = optFlags;
+    }
+
+    /**
+     * Gets the required portion of the command name
+     * @return The required portion of the command name. Returns the first if there are several names
+     */
     public String getRequired()
     {
-        return names[0].getRequired();
+        if (names == null)
+        {
+            return null;
+        }
+        else
+        {
+            return names[0].getRequired();
+        }
     }
 
+    /**
+     * Gets the optional portion of the command name
+     * @return The optional portion of the command name. Returns the first if there are several names
+     */
     public String getOptional()
     {
-        return names[0].getOptional();
+        if (names == null)
+        {
+            return null;
+        }
+        else
+        {
+            return names[0].getOptional();
+        }
     }
 
+    /**
+     * Gets all the command names
+     * @return The command names
+     */
     public CommandName[] getNames()
     {
         return names;
     }
 
+    /**
+     * Gets the range and argument flags
+     * @return The range and argument flags
+     */
     public int getArgFlags()
     {
         return argFlags;
     }
 
+    /**
+     * Gets the command specific flags
+     * @return The command flags
+     */
     public int getOptFlags()
     {
         return optFlags;
     }
 
+    /**
+     * Executes a command. The range and arugments are validated first.
+     * @param editor The editor to run the command in
+     * @param context The data context
+     * @param cmd The command as entered by the user
+     * @param count The count entered by the user prior to the command
+     * @throws ExException if the range or argument is invalid or unable to run the command
+     */
     public void process(final Editor editor, final DataContext context, final ExCommand cmd, final int count) throws
         ExException
     {
+        // No range allowed
         if ((argFlags & RANGE_FORBIDDEN) != 0 && cmd.getRanges().size() != 0)
         {
             throw new NoRangeAllowedException();
         }
 
+        // Argument required
         if ((argFlags & ARGUMENT_REQUIRED) != 0 && cmd.getArgument().length() == 0)
         {
             throw new MissingArgumentException();
@@ -157,6 +255,14 @@ public abstract class CommandHandler
         }
     }
 
+    /**
+     * Performs the action of the handler.
+     * @param editor The editor to perform the action in.
+     * @param context The data context
+     * @param cmd The complete Ex command including range, command, and arguments
+     * @return True if able to perform the command, false if not
+     * @throws ExException if the range or arguments are invalid for the command
+     */
     public abstract boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException;
 
     protected CommandName[] names;
