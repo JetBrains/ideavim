@@ -835,6 +835,15 @@ public class ChangeGroup extends AbstractActionGroup
                 argument.getMotion().setFlags(Command.FLAG_MOT_INCLUSIVE);
             }
         }
+        else if (id.equals("VimMotionCamelRight"))
+        {
+            if (EditorHelper.getFileSize(editor) > 0 &&
+                !Character.isWhitespace(editor.getDocument().getChars()[editor.getCaretModel().getOffset()]))
+            {
+                argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionCamelEndRight"));
+                argument.getMotion().setFlags(Command.FLAG_MOT_INCLUSIVE);
+            }
+        }
 
         boolean res = deleteMotion(editor, context, count, rawCount, argument);
         if (res)

@@ -121,6 +121,114 @@ public class SearchHelper
         return res;
     }
 
+    public static int findNextCamelStart(Editor editor, int count)
+    {
+        char[] chars = editor.getDocument().getChars();
+        int pos = editor.getCaretModel().getOffset();
+        int size = EditorHelper.getFileSize(editor);
+
+        int found = 0;
+        int step = count >= 0 ? 1 : -1;
+        if (pos < 0 || pos >= size)
+        {
+            return pos;
+        }
+
+        int res = pos;
+        pos += step;
+        while (pos >= 0 && pos < size && found < Math.abs(count))
+        {
+            if (Character.isUpperCase(chars[pos]))
+            {
+                if ((pos == 0 || !Character.isUpperCase(chars[pos - 1])) ||
+                    (pos == size - 1 || Character.isLowerCase(chars[pos + 1])))
+                {
+                    res = pos;
+                    found++;
+                }
+            }
+            else if (Character.isLowerCase(chars[pos]))
+            {
+                if (pos == 0 || !Character.isLetter(chars[pos - 1]))
+                {
+                    res = pos;
+                    found++;
+                }
+            }
+            else if (Character.isDigit(chars[pos]))
+            {
+                if (pos == 0 || !Character.isDigit(chars[pos - 1]))
+                {
+                    res = pos;
+                    found++;
+                }
+            }
+
+            pos += step;
+        }
+
+        if (found < Math.abs(count))
+        {
+            res = -1;
+        }
+
+        return res;
+    }
+
+    public static int findNextCamelEnd(Editor editor, int count)
+    {
+        char[] chars = editor.getDocument().getChars();
+        int pos = editor.getCaretModel().getOffset();
+        int size = EditorHelper.getFileSize(editor);
+
+        int found = 0;
+        int step = count >= 0 ? 1 : -1;
+        if (pos < 0 || pos >= size)
+        {
+            return pos;
+        }
+
+        int res = pos;
+        pos += step;
+        while (pos >= 0 && pos < size && found < Math.abs(count))
+        {
+            if (Character.isUpperCase(chars[pos]))
+            {
+                if (pos == size - 1 || !Character.isLetter(chars[pos + 1]) ||
+                    (Character.isUpperCase(chars[pos + 1]) && pos <= size - 2 && Character.isLowerCase(chars[pos + 2])))
+                {
+                    res = pos;
+                    found++;
+                }
+            }
+            else if (Character.isLowerCase(chars[pos]))
+            {
+                if (pos == size - 1 || !Character.isLowerCase(chars[pos + 1]))
+                {
+                    res = pos;
+                    found++;
+                }
+            }
+            else if (Character.isDigit(chars[pos]))
+            {
+                if (pos == size - 1 || !Character.isDigit(chars[pos + 1]))
+                {
+                    res = pos;
+                    found++;
+                }
+            }
+
+            pos += step;
+        }
+
+        if (found < Math.abs(count))
+        {
+            res = -1;
+        }
+
+        return res;
+    }
+
     /**
      * This finds the offset to the start of the next/previous word/WORD.
      * @param editor The editor to find the words in

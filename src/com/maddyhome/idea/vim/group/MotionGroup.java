@@ -372,6 +372,42 @@ public class MotionGroup extends AbstractActionGroup
     }
 
     /**
+     * This moves the caret to the start of the next/previous camel word.
+     * @param count The number of words to skip
+     * @param editor The editor to move in
+     */
+    public int moveCaretToNextCamel(Editor editor, int count)
+    {
+        if ((editor.getCaretModel().getOffset() == 0 && count < 0) ||
+            (editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0))
+        {
+            return -1;
+        }
+        else
+        {
+            return SearchHelper.findNextCamelStart(editor, count);
+        }
+    }
+
+    /**
+     * This moves the caret to the start of the next/previous camel word.
+     * @param count The number of words to skip
+     * @param editor The editor to move in
+     */
+    public int moveCaretToNextCamelEnd(Editor editor, int count)
+    {
+        if ((editor.getCaretModel().getOffset() == 0 && count < 0) ||
+            (editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0))
+        {
+            return -1;
+        }
+        else
+        {
+            return SearchHelper.findNextCamelEnd(editor, count);
+        }
+    }
+
+    /**
      * This moves the caret to the start of the next/previous word/WORD.
      * @param count The number of words to skip
      * @param skipPunc If true then find WORD, if false then find word

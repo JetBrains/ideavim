@@ -301,6 +301,11 @@ tag             command            action in Normal mode        ~
 
 tag             char          note action in Normal mode        ~
 ------------------------------------------------------------------------------
+|[b|            [b              1  cursor N camel words backward
+|[w|            [w              1  cursor N camel words forward
+|]b|            ]b              1  cursor backward to the end of camel word N
+|]w|            ]w              1  cursor forward to the end of camel word N
+
 
 ==============================================================================
 2.4 Commands starting with 'g'                                          *g*

@@ -49,6 +49,10 @@
         <action id="VimMotionUp" class="com.maddyhome.idea.vim.action.motion.updown.MotionUpAction" text="Up"/>
         <action id="VimMotionUpFirstNonSpace" class="com.maddyhome.idea.vim.action.motion.updown.MotionUpFirstNonSpaceAction" text="Up to First non-Space"/>
         <!-- Text -->
+        <action id="VimMotionCamelEndLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionCamelEndLeftAction" text="Camel Word End Left"/>
+        <action id="VimMotionCamelEndRight" class="com.maddyhome.idea.vim.action.motion.text.MotionCamelEndRightAction" text="Camel Word End Right"/>
+        <action id="VimMotionCamelLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionCamelLeftAction" text="Camel Word Left"/>
+        <action id="VimMotionCamelRight" class="com.maddyhome.idea.vim.action.motion.text.MotionCamelRightAction" text="Camel Word Right"/>
         <action id="VimMotionNthCharacter" class="com.maddyhome.idea.vim.action.motion.text.MotionNthCharacterAction" text="Nth Character"/>
         <action id="VimMotionWordEndLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionWordEndLeftAction" text="Word End Left"/>
         <action id="VimMotionWORDEndLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionWORDEndLeftAction" text="WORD End Left"/>

@@ -342,6 +342,10 @@ public class RegisterActions
         // TODO - add zl, z<right>
         // TODO - add zs
 
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionCamelEndLeft", Command.MOTION, Command.FLAG_MOT_INCLUSIVE, new Shortcut("]b"));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionCamelEndRight", Command.MOTION, Command.FLAG_MOT_INCLUSIVE, new Shortcut("]w"));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionCamelLeft", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut("[b"));
+        parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionCamelRight", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut("[w"));
         parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionColumn", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut('|'));
         parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionDown", Command.MOTION, Command.FLAG_MOT_LINEWISE, new Shortcut[] {
             new Shortcut('j'),

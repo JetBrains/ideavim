@@ -1,6 +1,16 @@
 History of changes for @NAME@
 
-0.2.0 to @VERSION@
+0.3.0 to @VERSION@
+
+New Commands
+- Added support for [w, ]w, [b, and ]b. These move the cursor forward to start
+  of next camel word, forward to end of next camel word, backward to start of
+  previous camel word, and backward to end of previous camel word respectively.
+  These are NOT in VIM but are very useful when working with mixed case method
+  and variable names. Like their normal w, e, b, and ge counterparts, these may
+  be used as operators for the c and d commands.
+
+0.2.0 to 0.3.0
 
 Redone Commands
 - / and ? and all their variants are now supported properly, including offsets.
