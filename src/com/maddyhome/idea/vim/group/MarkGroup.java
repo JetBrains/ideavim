@@ -36,6 +36,8 @@ import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
+import com.maddyhome.idea.vim.VimPlugin;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -528,6 +530,8 @@ public class MarkGroup extends AbstractActionGroup
          */
         public void beforeDocumentChange(DocumentEvent event)
         {
+            if (!VimPlugin.isEnabled()) return;
+
             logger.debug("MarkUpdater before, event = " + event);
             if (event.getOldLength() == 0) return;
 
@@ -542,6 +546,8 @@ public class MarkGroup extends AbstractActionGroup
          */
         public void documentChanged(DocumentEvent event)
         {
+            if (!VimPlugin.isEnabled()) return;
+
             logger.debug("MarkUpdater after, event = " + event);
             if (event.getNewLength() == 0 || (event.getNewLength() == 1 && !event.getNewFragment().equals("\n"))) return;
 

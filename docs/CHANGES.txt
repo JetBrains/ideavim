@@ -12,6 +12,7 @@ Bug Fixes
 - Fixed NullPointerException appearing in system log when viewing a .form file.
 - Fixed extraneous characters getting added to a register during recording.
 - Use file type's indent size instead of tab size for indenting text.
+- Restore caret if plugin is disabled.
 
 0.8.2 from 0.8.1
 - Fixed typo in plugin.xml for new 'since-build'

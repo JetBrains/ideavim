@@ -23,11 +23,14 @@ import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorActionManager;
 import com.intellij.openapi.editor.actionSystem.TypedAction;
 import com.intellij.openapi.editor.event.EditorFactoryAdapter;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerAdapter;
@@ -51,6 +54,7 @@ import com.maddyhome.idea.vim.key.RegisterActions;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.MorePanel;
 import com.maddyhome.idea.vim.undo.UndoManager;
+import com.maddyhome.idea.vim.command.CommandState;
 import org.jdom.Element;
 
 import java.awt.Toolkit;
@@ -119,6 +123,13 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
         EditorFactory.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
             public void editorCreated(EditorFactoryEvent event)
             {
+                isBlockCursor = event.getEditor().getSettings().isBlockCursor();
+
+                if (VimPlugin.isEnabled())
+                {
+                    event.getEditor().getSettings().setBlockCursor(!CommandState.inInsertMode());
+                }
+
                 EditorData.initializeEditor(event.getEditor());
             }
 
@@ -291,6 +302,27 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
         }
     }
 
+    public static void turnOnPlugin()
+    {
+        KeyHandler.getInstance().fullReset();
+        setCursors(true);
+    }
+
+    public static void turnOffPlugin()
+    {
+        KeyHandler.getInstance().fullReset();
+        setCursors(isBlockCursor);
+    }
+
+    private static void setCursors(boolean isBlock)
+    {
+        Editor[] editors = EditorFactory.getInstance().getAllEditors();
+        for (int j = 0; j < editors.length; j++)
+        {
+            editors[j].getSettings().setBlockCursor(isBlock);
+        }
+    }
+
     /**
      * This class is used to handle the Vim Plugin enabled/disabled toggle. This is most likely used as a menu
      * option but could also be used as a toolbar item.
@@ -314,7 +346,17 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
          */
         public void setSelected(AnActionEvent event, boolean b)
         {
+            if (!b)
+            {
+                turnOffPlugin();
+            }
+
             enabled = b;
+
+            if (b)
+            {
+                turnOnPlugin();
+            }
         }
     }
 
@@ -322,6 +364,7 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
     private RegisterActions actions;
     //private static HashMap toolWindows = new HashMap();
     private MarkGroup.MarkUpdater markUpdater = new MarkGroup.MarkUpdater();
+    private static boolean isBlockCursor = false;
 
     private static boolean enabled = true;
     private static Logger logger = Logger.getInstance(VimPlugin.class.getName());

@@ -56,6 +56,7 @@ import com.maddyhome.idea.vim.regexp.CharHelper;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
+import com.maddyhome.idea.vim.VimPlugin;
 import org.jdom.CDATA;
 import org.jdom.Element;
 
@@ -1435,6 +1436,8 @@ public class SearchGroup extends AbstractActionGroup
         {
             public void documentChanged(DocumentEvent event)
             {
+                if (!VimPlugin.isEnabled()) return;
+
                 Project[] projs = ProjectManager.getInstance().getOpenProjects();
                 VirtualFile vf = FileDocumentManager.getInstance().getFile(event.getDocument());
                 for (int i = 0; i < projs.length; i++)

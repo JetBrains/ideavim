@@ -31,6 +31,8 @@ import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.fileEditor.FileDocumentManagerAdapter;
 import com.intellij.openapi.fileEditor.VetoDocumentSavingException;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.maddyhome.idea.vim.VimPlugin;
+
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -177,6 +179,8 @@ public class UndoManager
     {
         public void documentChanged(DocumentEvent event)
         {
+            if (!VimPlugin.isEnabled()) return;
+
             EditorUndoList list = (EditorUndoList)UndoManager.getInstance().getEditors().get(event.getDocument());
             if (list != null)
             {

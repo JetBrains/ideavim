@@ -91,8 +91,6 @@ public class ChangeGroup extends AbstractActionGroup
                         }
                     }
                 });
-
-                editor.getSettings().setBlockCursor(!CommandState.inInsertMode());
             }
        });
     }
@@ -1437,6 +1435,8 @@ public class ChangeGroup extends AbstractActionGroup
          */
         public void fileOpened(FileEditorManager fileEditorManager, VirtualFile virtualFile)
         {
+            if (!VimPlugin.isEnabled()) return;
+
             resetCursor(virtualFile, EditorData.getProject(fileEditorManager), false);
         }
 
