@@ -37,6 +37,10 @@ Bug Fixes
 - Status was not always show proper mode.
 - r<Enter> now works as expected.
 - Toggling between insert and replace mode wasn't working properly.
+- The cursor wasn't always restored correctly after an undo.
+- Yanking the last line and then putting it elsewhere sometimes resulted in the
+  old and new line not having a newline between them.
+- Repeating of o and O commands, including with count, works properly now.
 
 0.6.4 to 0.6.5
 

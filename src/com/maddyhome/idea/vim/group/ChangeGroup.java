@@ -55,6 +55,7 @@ import com.maddyhome.idea.vim.undo.UndoManager;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 /**
  * Provides all the insert/replace related functionality
@@ -150,13 +151,24 @@ public class ChangeGroup extends AbstractActionGroup
      * @param editor The editor to insert into
      * @param context The data context
      */
-    public void insertNewLineAbove(Editor editor, DataContext context)
+    public void insertNewLineAbove(final Editor editor, final DataContext context)
     {
         if (EditorHelper.getCurrentVisualLine(editor) == 0)
         {
             MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor));
             initInsert(editor, context, CommandState.MODE_INSERT);
-            KeyHandler.executeAction("VimEditorEnter", context);
+            
+            CommandState state = CommandState.getInstance();
+            if (state.getMode() != CommandState.MODE_REPEAT)
+            {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run()
+                    {
+                        KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), context);
+                    }
+                });
+            }
+            //KeyHandler.executeAction("VimEditorEnter", context);
             MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
         }
         else
@@ -171,11 +183,22 @@ public class ChangeGroup extends AbstractActionGroup
      * @param editor The editor to insert into
      * @param context The data context
      */
-    public void insertNewLineBelow(Editor editor, DataContext context)
+    public void insertNewLineBelow(final Editor editor, final DataContext context)
     {
         MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, true));
         initInsert(editor, context, CommandState.MODE_INSERT);
-        KeyHandler.executeAction("VimEditorEnter", context);
+
+        CommandState state = CommandState.getInstance();
+        if (state.getMode() != CommandState.MODE_REPEAT)
+        {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run()
+                {
+                    KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), context);
+                }
+            });
+        }
+        //KeyHandler.executeAction("VimEditorEnter", context);
     }
 
     /**
