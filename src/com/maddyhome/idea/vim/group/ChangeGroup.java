@@ -986,6 +986,11 @@ public class ChangeGroup extends AbstractActionGroup
         }
     }
 
+    public void autoIndentLines(Editor editor, DataContext context, int lines)
+    {
+        KeyHandler.executeAction("AutoIndentLines", context);
+    }
+
     public void indentLines(Editor editor, DataContext context, int lines, int dir)
     {
         int cnt = 1;
