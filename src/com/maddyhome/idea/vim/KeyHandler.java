@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
+import com.maddyhome.idea.vim.helper.DigraphSequence;
 import com.maddyhome.idea.vim.key.ArgumentNode;
 import com.maddyhome.idea.vim.key.BranchNode;
 import com.maddyhome.idea.vim.key.CommandNode;
@@ -169,65 +170,26 @@ public class KeyHandler
                 mode = STATE_ERROR;
             }
         }
+        /*
         else if (currentArg == Argument.DIGRAPH)
         {
-            logger.debug("currentArg == DIGRAPH(" + digraphState + ")");
-            switch (digraphState)
+            //logger.debug("currentArg == DIGRAPH(" + digraphState + ")");
+            int res = digraph.processKey(key, editor, context);
+            switch (res)
             {
-                case 0:
-                    // We should have a Ctrl-K if this is a true digraph or a regular character
-                    if (key.getKeyCode() == KeyEvent.VK_K && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0)
-                    {
-                        // we have a Ctrl-K - start of a digraph
-                        digraphState = 1;
-                        logger.debug("we have Ctrl-K");
-                    }
-                    else
-                    {
-                        // We have a regular character
-                        currentArg = Argument.CHARACTER;
-                        handleKey(editor, key, context);
-                    }
+                case DigraphSequence.RES_OK:
                     break;
-                case 1:
-                    logger.debug("first key: " + chKey);
-                    if (chKey != 0)
-                    {
-                        Argument arg = new Argument(chKey);
-                        Command cmd = (Command)currentCmd.peek();
-                        cmd.setArgument(arg);
-                        digraphState = 2;
-                    }
-                    else
-                    {
-                        Argument arg = new Argument((char)11);
-                        Command cmd = (Command)currentCmd.peek();
-                        cmd.setArgument(arg);
-                        mode = STATE_READY;
-                    }
+                case DigraphSequence.RES_BAD:
+                    mode = STATE_READY;
+                    digraph = null;
                     break;
-                case 2:
-                    logger.debug("second key: " + chKey);
-                    if (chKey != 0)
-                    {
-                        char char1 = ((Command)currentCmd.peek()).getArgument().getCharacter();
-                        char digraph = CommandGroups.getInstance().getDigraph().getDigraph(char1, chKey);
-
-                        Argument arg = new Argument(digraph);
-                        Command cmd = (Command)currentCmd.peek();
-                        cmd.setArgument(arg);
-                        mode = STATE_READY;
-                    }
-                    else
-                    {
-                        Argument arg = new Argument((char)11);
-                        Command cmd = (Command)currentCmd.peek();
-                        cmd.setArgument(arg);
-                        mode = STATE_READY;
-                    }
+                case DigraphSequence.RES_DONE:
+                    currentArg = Argument.CHARACTER;
+                    digraph = null;
                     break;
             }
         }
+        */
         // If we are this far - sheesh, then the user must be entering a command or a non-single-character argument
         // to an entered command. Let's figure out which it is
         else
@@ -235,6 +197,32 @@ public class KeyHandler
             // For debugging purposes we track the keys entered for this command
             keys.add(key);
             logger.debug("keys now " + keys);
+
+            if (digraph == null && DigraphSequence.isDigraphStart(key))
+            {
+                digraph = new DigraphSequence();
+            }
+            if (digraph != null)
+            {
+                int res = digraph.processKey(key, editor, context);
+                switch (res)
+                {
+                    case DigraphSequence.RES_OK:
+                        break;
+                    case DigraphSequence.RES_BAD:
+                        digraph = null;
+                        break;
+                    case DigraphSequence.RES_DONE:
+                        if (currentArg == Argument.DIGRAPH)
+                        {
+                            currentArg = Argument.CHARACTER;
+                        }
+                        digraph = null;
+                        break;
+                }
+
+                return;
+            }
 
             // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
             // return the node matching this keystroke
@@ -314,7 +302,8 @@ public class KeyHandler
                 switch (arg.getArgType())
                 {
                     case Argument.DIGRAPH:
-                        digraphState = 0;
+                        //digraphState = 0;
+                        digraph = new DigraphSequence();
                         // No break - fall through
                     case Argument.CHARACTER:
                     case Argument.MOTION:
@@ -352,7 +341,27 @@ public class KeyHandler
                 if (CommandState.getInstance().getMode() == CommandState.MODE_INSERT ||
                     CommandState.getInstance().getMode() == CommandState.MODE_REPLACE)
                 {
-                    if (!CommandGroups.getInstance().getChange().processKey(editor, context, key))
+                    /*
+                    if (digraph == null && DigraphSequence.isDigraphStart(key))
+                    {
+                        digraph = new DigraphSequence();
+                    }
+                    if (digraph != null)
+                    {
+                        int res = digraph.processKey(key, editor, context);
+                        switch (res)
+                        {
+                            case DigraphSequence.RES_OK:
+                                break;
+                            case DigraphSequence.RES_BAD:
+                                digraph = null;
+                                break;
+                            case DigraphSequence.RES_DONE:
+                                digraph = null;
+                                break;
+                        }
+                    }
+                    else */ if (!CommandGroups.getInstance().getChange().processKey(editor, context, key))
                     {
                         shouldRecord = false;
                     }
@@ -500,7 +509,8 @@ public class KeyHandler
         mode = STATE_NEW_COMMAND;
         currentCmd.clear();
         currentArg = Argument.NONE;
-        digraphState = 0;
+        //digraphState = 0;
+        digraph = null;
         logger.debug("reset");
     }
 
@@ -579,7 +589,8 @@ public class KeyHandler
     private Stack currentCmd = new Stack();
     private int currentArg;
     private TypedActionHandler origHandler;
-    private int digraphState;
+    //private int digraphState;
+    private DigraphSequence digraph = null;
 
     private static KeyHandler instance;
 

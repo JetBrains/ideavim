@@ -535,41 +535,6 @@ public class ChangeGroup extends AbstractActionGroup
     {
         logger.debug("processKey(" + key + ")");
 
-        switch (digraphState)
-        {
-            case 0:
-                if (key.getKeyCode() == KeyEvent.VK_K && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0)
-                {
-                    digraphState = 1;
-                    return true;
-                }
-                break;
-            case 1:
-                if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED)
-                {
-                    digraphChar = key.getKeyChar();
-                    digraphState = 2;
-
-                    return true;
-                }
-                else
-                {
-                    digraphState = 0;
-                    return false;
-                }
-            case 2:
-                if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED)
-                {
-                    char ch = CommandGroups.getInstance().getDigraph().getDigraph(digraphChar, key.getKeyChar());
-                    if (ch != key.getKeyChar())
-                    {
-                        key = KeyStroke.getKeyStroke(ch);
-                    }
-                }
-                digraphState = 0;
-                break;
-        }
-
         if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED)
         {
             // Regular characters are not handled by us, pass them back to Idea. We just keep track of the keystroke
@@ -1469,8 +1434,6 @@ public class ChangeGroup extends AbstractActionGroup
     private int insertStart;
     private Command lastInsert;
     private boolean inInsert;
-    private int digraphState = 0;
-    private char digraphChar;
 
     private static Logger logger = Logger.getInstance(ChangeGroup.class.getName());
 }

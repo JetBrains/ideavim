@@ -35,7 +35,7 @@
     <property name="project" value="IdeaVIM" />
     <!-- Update this prior to building a new distribution -->
     <property name="idea-version" value="4.x" />
-    <property name="version" value="0.7.2" />
+    <property name="version" value="0.7.3" />
 
     <path id="build.classpath">
         <pathelement path="${idea.home}/lib/idea.jar" />
@@ -58,6 +58,7 @@
         <mkdir dir="${classes}"/>
         <javac destdir="${classes}" debug="on" classpathref="build.classpath" >
             <src path="${src}"/>
+            <include name="com/maddyhome/idea/**" />
         </javac>
         <mkdir dir="${classes}/META-INF"/>
         <copy file="plugin.xml" todir="${classes}/META-INF">

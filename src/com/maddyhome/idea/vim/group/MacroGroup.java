@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.group;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2004 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,7 +20,10 @@ package com.maddyhome.idea.vim.group;
  */
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.DataConstants;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.command.CommandProcessor;
+import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.common.Register;
 import java.util.List;
@@ -87,7 +90,7 @@ public class MacroGroup extends AbstractActionGroup
      * @param keys The list of keys to playback
      * @param pos The position within the list for the specific key to queue
      */
-    private void playbackKeys(final Editor editor, final DataContext context, final List keys, final int pos)
+    public void playbackKeys(final Editor editor, final DataContext context, final List keys, final int pos)
     {
         if (pos >= keys.size())
         {
@@ -103,7 +106,7 @@ public class MacroGroup extends AbstractActionGroup
         // the keys one at a time. With the old loop approach, all the keys got queued, then any events they caused
         // were queued - after the keys. This is what caused the problem.
         final KeyStroke stroke = (KeyStroke)keys.get(pos);
-        Runnable run = new Runnable() {
+        final Runnable run = new Runnable() {
             public void run()
             {
                 // Handle one keystroke then queue up the next key
@@ -115,7 +118,12 @@ public class MacroGroup extends AbstractActionGroup
             }
         };
 
-        SwingUtilities.invokeLater(run);
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run()
+            {
+                CommandProcessor.getInstance().executeCommand((Project)context.getData(DataConstants.PROJECT), run, "foo", "bar");
+            }
+        });
     }
 
     private char lastRegister = 0;

@@ -62,6 +62,8 @@ tag             char            action  ~
                                 line
 |i_CTRL-U|      CTRL-U          delete all entered characters in the current
                                 line
+|i_CTRL-V_digit| CTRL-V {number} insert three digit decimal number as a single
+                                byte.
 |i_CTRL-W|      CTRL-W          delete word before the cursor
 |i_CTRL-Y|      CTRL-Y          insert the character which is above the cursor
 |i_<Esc>|       <Esc>           end insert mode
@@ -111,8 +113,6 @@ and don't auto-indent
 insert the contents of a register literally
 and fix indent.
 |i_CTRL-V|      CTRL-V {char}   insert next non-digit literally
-|i_CTRL-V_digit| CTRL-V {number} insert three digit decimal number as a single
-                                byte.
 |i_^_CTRL-D|    ^ CTRL-D        delete all indent in the current line, restore
                                 it in the next line
 
