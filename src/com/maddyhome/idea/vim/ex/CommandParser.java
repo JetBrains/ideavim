@@ -3,6 +3,7 @@ package com.maddyhome.idea.vim.ex;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.ex.handler.CmdFilterHandler;
 import com.maddyhome.idea.vim.ex.handler.CopyTextHandler;
 import com.maddyhome.idea.vim.ex.handler.DeleteLinesHandler;
 import com.maddyhome.idea.vim.ex.handler.EditFileHandler;
@@ -12,6 +13,7 @@ import com.maddyhome.idea.vim.ex.handler.GotoLineHandler;
 import com.maddyhome.idea.vim.ex.handler.HelpHandler;
 import com.maddyhome.idea.vim.ex.handler.JoinLinesHandler;
 import com.maddyhome.idea.vim.ex.handler.MarkHandler;
+import com.maddyhome.idea.vim.ex.handler.MarksHandler;
 import com.maddyhome.idea.vim.ex.handler.MoveTextHandler;
 import com.maddyhome.idea.vim.ex.handler.NextFileHandler;
 import com.maddyhome.idea.vim.ex.handler.PreviousFileHandler;
@@ -19,6 +21,7 @@ import com.maddyhome.idea.vim.ex.handler.PromptFindHandler;
 import com.maddyhome.idea.vim.ex.handler.PromptReplaceHandler;
 import com.maddyhome.idea.vim.ex.handler.PutLinesHandler;
 import com.maddyhome.idea.vim.ex.handler.QuitHandler;
+import com.maddyhome.idea.vim.ex.handler.RegistersHandler;
 import com.maddyhome.idea.vim.ex.handler.SelectFileHandler;
 import com.maddyhome.idea.vim.ex.handler.SelectFirstFileHandler;
 import com.maddyhome.idea.vim.ex.handler.SelectLastFileHandler;
@@ -28,7 +31,6 @@ import com.maddyhome.idea.vim.ex.handler.SubstituteHandler;
 import com.maddyhome.idea.vim.ex.handler.WriteHandler;
 import com.maddyhome.idea.vim.ex.handler.WriteQuitHandler;
 import com.maddyhome.idea.vim.ex.handler.YankLinesHandler;
-import com.maddyhome.idea.vim.ex.handler.CmdFilterHandler;
 import com.maddyhome.idea.vim.ex.range.AbstractRange;
 
 /*
@@ -81,6 +83,7 @@ public class CommandParser
         new HelpHandler();
         new JoinLinesHandler();
         new MarkHandler();
+        new MarksHandler();
         new MoveTextHandler();
         new NextFileHandler();
         new PreviousFileHandler();
@@ -88,6 +91,7 @@ public class CommandParser
         new PromptReplaceHandler();
         new PutLinesHandler();
         new QuitHandler();
+        new RegistersHandler();
         new SelectFileHandler();
         new SelectFirstFileHandler();
         new SelectLastFileHandler();
