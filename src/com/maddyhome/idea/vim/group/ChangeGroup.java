@@ -165,11 +165,15 @@ public class ChangeGroup extends AbstractActionGroup
                     public void run()
                     {
                         KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), context);
+                        MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
                     }
                 });
             }
-            //KeyHandler.executeAction("VimEditorEnter", context);
-            MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
+            else
+            {
+                //KeyHandler.executeAction("VimEditorEnter", context);
+                MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
+            }
         }
         else
         {
