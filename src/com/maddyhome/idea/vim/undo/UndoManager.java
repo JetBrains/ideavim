@@ -67,6 +67,7 @@ public class UndoManager
 
     public void beginCommand(Editor editor)
     {
+        logger.debug("begin command");
         EditorUndoList list = getEditorUndoList(editor);
         list.beginCommand(editor);
     }
@@ -86,6 +87,7 @@ public class UndoManager
 
     public boolean undo(Editor editor, DataContext context)
     {
+        logger.debug("undo");
         EditorUndoList list = getEditorUndoList(editor);
         boolean res = list.undo(editor, context);
         logger.debug("undo: list=" + list);

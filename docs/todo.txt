@@ -1,6 +1,5 @@
 Bugs to fix:
 
-- Undo doesn't leave cursor in right place.
 - Replace mode - fix cursor. Can't figure out how to keep block cursor.
 - Yanking/putting on last line of file not quite right.
 - Repeating (via .) the O command affects prior line of text.

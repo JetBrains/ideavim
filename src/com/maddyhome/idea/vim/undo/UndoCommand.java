@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.undo;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.diagnostic.Logger;
 import java.util.ArrayList;
 
 /**
@@ -32,6 +33,7 @@ public class UndoCommand
     {
         this.editor = editor;
         startOffset = editor.getCaretModel().getOffset();
+        logger.debug("new undo command: startOffset=" + startOffset);
     }
 
     public void complete()
@@ -41,9 +43,11 @@ public class UndoCommand
 
     public void addChange(DocumentChange change)
     {
+        logger.debug("new change");
         if (changes.size() == 0)
         {
-            startOffset = editor.getCaretModel().getOffset();
+//            startOffset = editor.getCaretModel().getOffset();
+            logger.debug("startOffest=" + startOffset);
         }
 
         changes.add(change);
@@ -62,6 +66,7 @@ public class UndoCommand
 
     public void undo(Editor editor, DataContext context)
     {
+        logger.debug("undo: startOffset=" + startOffset);
         for (int i = changes.size() - 1; i >= 0; i--)
         {
             DocumentChange change = (DocumentChange)changes.get(i);
@@ -92,4 +97,6 @@ public class UndoCommand
     private int startOffset;
     private int endOffset;
     private ArrayList changes = new ArrayList();
+
+    private static Logger logger = Logger.getInstance(UndoCommand.class.getName());
 }
