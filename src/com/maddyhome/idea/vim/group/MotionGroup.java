@@ -199,7 +199,7 @@ public class MotionGroup extends AbstractActionGroup
      * @return The motion's range
      */
     public static TextRange getMotionRange(Editor editor, DataContext context, int count, int rawCount,
-        Argument argument, boolean moveCursor)
+        Argument argument, boolean incNewline, boolean moveCursor)
     {
         Command cmd = argument.getMotion();
         // Normalize the counts between the command and the motion argument
@@ -237,7 +237,8 @@ public class MotionGroup extends AbstractActionGroup
             }
 
             start = EditorHelper.getLineStartForOffset(editor, start);
-            end = Math.min(EditorHelper.getLineEndForOffset(editor, end) + 1, EditorHelper.getFileSize(editor));
+            end = Math.min(EditorHelper.getLineEndForOffset(editor, end) + (incNewline ? 1 : 0),
+                EditorHelper.getFileSize(editor));
         }
         // If characterwise and inclusive, add the last character to the range
         else if ((flags & Command.FLAG_MOT_INCLUSIVE) != 0)
@@ -1057,7 +1058,7 @@ public class MotionGroup extends AbstractActionGroup
         CommandState.getInstance().setVisualType(mode);
         if (mode == 0)
         {
-            resetVisual(editor);
+            exitVisual(editor);
         }
         else
         {
@@ -1089,7 +1090,7 @@ public class MotionGroup extends AbstractActionGroup
         }
         else if (mode == currentMode)
         {
-            resetVisual(editor);
+            exitVisual(editor);
         }
         else
         {
@@ -1100,16 +1101,23 @@ public class MotionGroup extends AbstractActionGroup
         return true;
     }
 
+    public void exitVisual(Editor editor)
+    {
+        resetVisual(editor);
+        if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
+        {
+            CommandState.getInstance().reset();
+        }
+    }
+
     public void resetVisual(Editor editor)
     {
         EditorData.setLastVisualRange(editor, new VisualRange(visualStart,
             visualEnd, CommandState.getInstance().getVisualType()));
 
-        //if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
-        //{
-            CommandState.getInstance().reset();
-        //}
         editor.getSelectionModel().removeSelection();
+
+        CommandState.getInstance().setVisualType(0);
     }
 
     public TextRange getVisualRange(Editor editor)
