@@ -22,10 +22,12 @@ package com.maddyhome.idea.vim;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataConstants;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
+import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -347,11 +349,11 @@ public class KeyHandler
                 Runnable action = new ActionRunner(editor, context, cmd, key);
                 if (Command.isReadOnlyType(cmd.getType()))
                 {
-                    RunnableHelper.runReadCommand(action);
+                    RunnableHelper.runReadCommand((Project)context.getData(DataConstants.PROJECT), action);
                 }
                 else
                 {
-                    RunnableHelper.runWriteCommand(action);
+                    RunnableHelper.runWriteCommand((Project)context.getData(DataConstants.PROJECT), action);
                 }
             }
         }
