@@ -13,11 +13,15 @@ New Commands
 - Added support for :& - search and replace
 - Added support for :~ - search and replace
 - Added support for @: - repeat last Ex command
+- Added support for :{range}!{filter} [arg] command - filter text
+- Added support for :{range}!! command - repeat filter
 
 Bug Fixes
 - Using the '%' range in Ex commands ignored the first line
 - Selecting a register for a command after using Ctrl-O in insert mode sent
   the user back to insert mode before they could enter the command.
+- Many commands caused exceptions if the current file is empty.
+- Let mouse clicks move cursor to end-of-line while in Insert or Replace mode.
 
 Keymappings
 - F1
