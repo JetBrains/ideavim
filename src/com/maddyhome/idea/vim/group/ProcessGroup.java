@@ -130,7 +130,7 @@ public class ProcessGroup extends AbstractActionGroup
         }
         catch (ExException ex)
         {
-            VimPlugin.showMessage(ex.getMessage());
+            //VimPlugin.showMessage(ex.getMessage());
             ProcessGroup.logger.info(ex.getMessage());
             VimPlugin.indicateError();
             res = false;
