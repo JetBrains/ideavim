@@ -176,7 +176,10 @@ public class UndoManager
         public void documentChanged(DocumentEvent event)
         {
             EditorUndoList list = (EditorUndoList)UndoManager.getInstance().getEditors().get(event.getDocument());
-            list.addChange(new DocumentChange(event.getOffset(), event.getOldFragment(), event.getNewFragment()));
+            if (list != null)
+            {
+                list.addChange(new DocumentChange(event.getOffset(), event.getOldFragment(), event.getNewFragment()));
+            }
         }
     }
 
