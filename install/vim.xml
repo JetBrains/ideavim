@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<keymap version="1" name="Vim" disable-mnemonics="false" parent="$default">
+<keymap version="1" name="vim" disable-mnemonics="false" parent="$default">
   <action id="$Copy">
     <keyboard-shortcut id="$Copy" first-keystroke="control INSERT" />
   </action>
