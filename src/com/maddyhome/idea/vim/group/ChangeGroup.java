@@ -819,9 +819,12 @@ public class ChangeGroup extends AbstractActionGroup
 
         // Special case - if char is newline, only add one despite count
         int num = count;
+        String space = null;
         if (ch == '\n')
         {
             num = 1;
+            space = EditorHelper.getLeadingWhitespace(editor, editor.offsetToLogicalPosition(offset).line);
+            logger.debug("space='" + space + "'");
         }
 
         StringBuffer repl = new StringBuffer(count);
@@ -832,7 +835,17 @@ public class ChangeGroup extends AbstractActionGroup
 
         replaceText(editor, context, offset, offset + count, repl.toString());
 
-        //TODO - move cursor and indent line of new char was newline
+        // Indent new line if we replaced with a newline
+        if (ch == '\n')
+        {
+            insertText(editor, context, offset + 1, space);
+            int slen = space.length();
+            if (slen == 0)
+            {
+                slen++;
+            }
+            editor.getCaretModel().moveToOffset(offset + slen);
+        }
 
         return true;
     }

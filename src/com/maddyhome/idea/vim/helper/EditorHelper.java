@@ -347,6 +347,37 @@ public class EditorHelper
         return normalizeOffset(editor, lline, offset, allowEnd);
     }
 
+    public static int getLeadingCharacterOffset(Editor editor, int lline)
+    {
+        int start = getLineStartOffset(editor, lline);
+        int end = getLineEndOffset(editor, lline, true);
+        char[] chars = editor.getDocument().getChars();
+        int pos = end;
+        for (int offset = start; offset < end; offset++)
+        {
+            if (offset >= chars.length)
+            {
+                break;
+            }
+
+            if (!Character.isWhitespace(chars[offset]))
+            {
+                pos = offset;
+                break;
+            }
+        }
+
+        return pos;
+    }
+
+    public static String getLeadingWhitespace(Editor editor, int lline)
+    {
+        int start = getLineStartOffset(editor, lline);
+        int end = getLeadingCharacterOffset(editor, lline);
+
+        return new String(editor.getDocument().getChars(), start, end - start);
+    }
+
     /**
      * Gets the editor for the virtual file within the editor mananger.
      * @param manager The file editor manager

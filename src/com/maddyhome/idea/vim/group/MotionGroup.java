@@ -849,25 +849,7 @@ public class MotionGroup extends AbstractActionGroup
 
     public int moveCaretToLineStartSkipLeading(Editor editor, int lline)
     {
-        int start = EditorHelper.getLineStartOffset(editor, lline);
-        int end = EditorHelper.getLineEndOffset(editor, lline, true);
-        char[] chars = editor.getDocument().getChars();
-        int pos = end;
-        for (int offset = start; offset < end; offset++)
-        {
-            if (offset >= chars.length)
-            {
-                break;
-            }
-
-            if (!Character.isWhitespace(chars[offset]))
-            {
-                pos = offset;
-                break;
-            }
-        }
-
-        return pos;
+        return EditorHelper.getLeadingCharacterOffset(editor, lline);
     }
 
     public int moveCaretToLineEndSkipLeadingOffset(Editor editor, int offset)

@@ -140,7 +140,6 @@ public class FileGroup extends AbstractActionGroup
      */
     public void saveFile(Editor editor, DataContext context)
     {
-        // TODO - this needs to be fixed
         FileDocumentManager.getInstance().saveDocument(editor.getDocument());
     }
 
@@ -150,7 +149,6 @@ public class FileGroup extends AbstractActionGroup
      */
     public void saveFiles(DataContext context)
     {
-        // TODO - this needs to be fixed
         FileDocumentManager.getInstance().saveAllDocuments();
     }
 

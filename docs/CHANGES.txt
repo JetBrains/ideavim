@@ -33,6 +33,7 @@ Bug Fixes
 - Fixed several exceptions related to edit fields in dialog boxes.
 - Fixed some exceptions related to the undo manager.
 - Status was not always show proper mode.
+- r<Enter> now works as expected.
 
 0.6.4 to 0.6.5
 
