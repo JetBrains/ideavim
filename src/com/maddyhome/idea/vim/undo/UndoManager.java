@@ -99,6 +99,8 @@ public class UndoManager
         logger.info("editorOpened");
         if (!editor.isViewer())
         {
+            // Paranoid - make sure there is only one listener of our on this editor
+            editor.getDocument().removeDocumentListener(listener);
             editor.getDocument().addDocumentListener(listener);
             addEditorUndoList(editor);
         }
