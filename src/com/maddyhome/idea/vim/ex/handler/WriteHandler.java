@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
+import com.maddyhome.idea.vim.group.CommandGroups;
 
 /**
  *
@@ -33,14 +34,13 @@ public class WriteHandler extends CommandHandler
     public WriteHandler()
     {
         super(new CommandName[] {
-            new CommandName("w", "rite"),
-            new CommandName("wa", "ll")
+            new CommandName("w", "rite")
         }, RANGE_OPTIONAL | ARGUMENT_OPTIONAL);
     }
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd)
     {
-        //CommandGroups.getInstance().getFile().saveFiles(context);
+        CommandGroups.getInstance().getFile().saveFile(editor, context);
 
         return true;
     }
