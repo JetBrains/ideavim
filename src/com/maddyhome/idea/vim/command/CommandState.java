@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.option.Options;
 import java.util.Stack;
 
 /**
@@ -114,7 +115,11 @@ public class CommandState
 
     private void updateStatus()
     {
-        StringBuffer msg = new StringBuffer(getStatusString(modes.size() - 1));
+        StringBuffer msg = new StringBuffer();
+        if (Options.getInstance().isSet("showmode"))
+        {
+            msg.append(getStatusString(modes.size() - 1));
+        }
 
         if (isRecording())
         {
