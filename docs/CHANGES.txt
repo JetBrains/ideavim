@@ -1,6 +1,34 @@
 History of changes for @NAME@
 
-0.6.4 to @VERSION@
+0.6.5 to @VERSION@
+
+New Features
+- Highlighting lines of code by clicking and/or dragging in the line number area
+  now leaves you in visual line mode.
+- Undoing all changes in a file now correctly marks the file as unchanged.
+- All the :write commands (:w :wn :wN :wq) save just the one file now. To save
+  all files use the :wall command.
+- Enhanced the :e command. Support for :e# and :e <filename> have been added.
+  :e# selects the previous tab. :e <filename> will search the entire project
+  and open the first matching file. Relative paths are supported too. :e with
+  no argument will still bring up the File Open dialog.
+- Added support for the gP and gp commands.
+- Added support for the z+ and z^ commands.
+- Added :class command to bring up "Go To Class" dialog. If followed by a
+  classname, open the corresponding Java file. Not in VIM.
+- Added :symbol command to bring up "Go To Symbol" dialog. Not in VIM.
+
+Bug Fixes
+- Under certain conditions, highlighting text left you in multiple layers of
+  visual mode. This is now fixed.
+- The gv command resulted in too much text being selected in many cases.
+- The gv command now properly restores the cursor position.
+- Fixed exception caused by using the :undo and :redo commands.
+- Re-enabled all the :write related commands. Hopefully the deadlock has been
+  solved.
+- Fixed error referencing unknown class FileCloseAction.
+
+0.6.4 to 0.6.5
 
 Support for Aurora build #1050 and higher.
 
