@@ -54,7 +54,7 @@ public class CopyTextHandler extends CommandHandler
         int offset = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor, line + 1);
 
         String text = EditorHelper.getText(editor, range.getStartOffset(), range.getEndOffset());
-        CommandGroups.getInstance().getCopy().putText(editor, context, offset, text, Command.FLAG_MOT_LINEWISE, 1, true);
+        CommandGroups.getInstance().getCopy().putText(editor, context, offset, text, Command.FLAG_MOT_LINEWISE, 1, true, false);
 
         return true;
     }

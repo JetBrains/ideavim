@@ -67,11 +67,11 @@ public class PutLinesHandler extends CommandHandler
         MotionGroup.moveCaret(editor, context, EditorHelper.getLineStartOffset(editor, line));
         if (before)
         {
-            return CommandGroups.getInstance().getCopy().putTextBeforeCursor(editor, context, 1, true);
+            return CommandGroups.getInstance().getCopy().putTextBeforeCursor(editor, context, 1, true, false);
         }
         else
         {
-            return CommandGroups.getInstance().getCopy().putTextAfterCursor(editor, context, 1, true);
+            return CommandGroups.getInstance().getCopy().putTextAfterCursor(editor, context, 1, true, false);
         }
     }
 }
