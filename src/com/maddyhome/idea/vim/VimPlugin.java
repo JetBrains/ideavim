@@ -41,6 +41,7 @@ import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.key.RegisterActions;
+import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.MorePanel;
 import java.awt.Toolkit;
 import org.jdom.Element;
@@ -193,7 +194,10 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable
      */
     public static void indicateError()
     {
-        Toolkit.getDefaultToolkit().beep();
+        if (!Options.getInstance().isSet("visualbell"))
+        {
+            Toolkit.getDefaultToolkit().beep();
+        }
     }
 
     /**
