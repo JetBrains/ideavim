@@ -339,7 +339,7 @@ public class KeyHandler
             // Save off the command we are about to execute
             CommandState.getInstance().setCommand(cmd);
 
-            if (!editor.getDocument().isWritable() && !Command.isReadOnlyType(cmd.getType()))
+            if (!editor.getDocument().isWritable() && !Command.isReadType(cmd.getType()))
             {
                 VimPlugin.indicateError();
                 reset();
@@ -347,13 +347,13 @@ public class KeyHandler
             else
             {
                 Runnable action = new ActionRunner(editor, context, cmd, key);
-                if (Command.isReadOnlyType(cmd.getType()))
+                if (Command.isWriteType(cmd.getType()))
                 {
-                    RunnableHelper.runReadCommand((Project)context.getData(DataConstants.PROJECT), action);
+                    RunnableHelper.runWriteCommand((Project)context.getData(DataConstants.PROJECT), action);
                 }
                 else
                 {
-                    RunnableHelper.runWriteCommand((Project)context.getData(DataConstants.PROJECT), action);
+                    RunnableHelper.runReadCommand((Project)context.getData(DataConstants.PROJECT), action);
                 }
             }
         }
