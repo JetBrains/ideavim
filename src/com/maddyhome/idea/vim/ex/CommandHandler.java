@@ -51,6 +51,7 @@ public abstract class CommandHandler
     public static final int WRITABLE = 256;
     /** Indicates that this command does not modify the editor */
     public static final int READ_ONLY = 512;
+    public static final int DONT_SAVE_LAST = 1024;
 
     /**
      * Create the handler
@@ -227,8 +228,7 @@ public abstract class CommandHandler
                     }
                     catch (ExException e)
                     {
-                        MessageHelper.EMSG(e.getMessage());
-                        VimPlugin.indicateError();
+                        //MessageHelper.EMSG(e.getMessage());
                         res = false;
                     }
                     finally
@@ -240,6 +240,7 @@ public abstract class CommandHandler
                         else
                         {
                             UndoManager.getInstance().abortCommand(editor);
+                            VimPlugin.indicateError();
                         }
                         UndoManager.getInstance().beginCommand(editor);
                     }
@@ -251,17 +252,27 @@ public abstract class CommandHandler
             RunnableHelper.runReadCommand(new Runnable() {
                 public void run()
                 {
+                    boolean res = true;
                     try
                     {
                         for (int i = 0; i < count; i++)
                         {
-                            execute(editor, context, cmd);
+                            res = execute(editor, context, cmd);
+                        }
+
+                        if (!res)
+                        {
+                            VimPlugin.indicateError();
                         }
                     }
                     catch (ExException e)
                     {
-                        MessageHelper.EMSG(e.getMessage());
+                        //MessageHelper.EMSG(e.getMessage());
                         VimPlugin.indicateError();
+                        res = false;
+                    }
+                    finally
+                    {
                     }
                 }
             });
