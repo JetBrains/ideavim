@@ -752,9 +752,9 @@ public class ChangeGroup extends AbstractActionGroup
     public boolean deleteMotion(Editor editor, DataContext context, int count, int rawCount, Argument argument, boolean isChange)
     {
         TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true, false);
-        if (range == null && EditorHelper.getFileSize(editor) == 0)
+        if (range == null)
         {
-            return true;
+            return (EditorHelper.getFileSize(editor) == 0);
         }
 
         // This is a kludge for dw, dW, and d[w. They are changed to d$ if we are

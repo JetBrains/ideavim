@@ -1,6 +1,11 @@
 History of changes for @NAME@ for IDEA @IDEA-VERSION@
 
-0.7.0 to @VERSION@
+0.7.1 to @VERSION@
+
+Bug Fixes
+- Fixed c<motion and d<motion> exception if the motion was invalid.
+
+0.7.0 to 0.7.1
 
 Bug Fixes
 - Opening a non-text file resulted in some exceptions. This could happen when
