@@ -104,9 +104,11 @@ public class CopyGroup extends AbstractActionGroup
      * @param editor The editor to paste into
      * @param context The data context
      * @param count The number of times to perform the paste
+     * @param cursorAfter
      * @return true if able to paste, false if not
      */
-    public boolean putTextBeforeCursor(Editor editor, DataContext context, int count, boolean indent)
+    public boolean putTextBeforeCursor(Editor editor, DataContext context, int count, boolean indent,
+        boolean cursorAfter)
     {
         // What register are we getting the text from?
         Register reg = CommandGroups.getInstance().getRegister().getLastRegister();
@@ -123,7 +125,7 @@ public class CopyGroup extends AbstractActionGroup
                 pos = editor.getCaretModel().getOffset();
             }
 
-            putText(editor, context, pos, reg.getText(), reg.getType(), count, indent);
+            putText(editor, context, pos, reg.getText(), reg.getType(), count, indent, cursorAfter);
 
             return true;
         }
@@ -136,9 +138,11 @@ public class CopyGroup extends AbstractActionGroup
      * @param editor The editor to paste into
      * @param context The data context
      * @param count The number of times to perform the paste
+     * @param cursorAfter
      * @return true if able to paste, false if not
      */
-    public boolean putTextAfterCursor(Editor editor, DataContext context, int count, boolean indent)
+    public boolean putTextAfterCursor(Editor editor, DataContext context, int count, boolean indent,
+        boolean cursorAfter)
     {
         Register reg = CommandGroups.getInstance().getRegister().getLastRegister();
         if (reg != null)
@@ -160,7 +164,7 @@ public class CopyGroup extends AbstractActionGroup
                 pos = editor.getCaretModel().getOffset() + 1;
             }
 
-            putText(editor, context, pos, reg.getText(), reg.getType(), count, indent);
+            putText(editor, context, pos, reg.getText(), reg.getType(), count, indent, cursorAfter);
 
             return true;
         }
@@ -193,7 +197,7 @@ public class CopyGroup extends AbstractActionGroup
                 pos = end;
             }
 
-            putText(editor, context, pos, reg.getText(), reg.getType(), count, true);
+            putText(editor, context, pos, reg.getText(), reg.getType(), count, true, false);
 
             MotionGroup.moveCaret(editor, context, start);
 
@@ -215,9 +219,10 @@ public class CopyGroup extends AbstractActionGroup
      * @param type The type of paste (linewise or characterwise)
      * @param count The number of times to paste the text
      * @param indent True if pasted lines should be autoindented, false if not
+     * @param cursorAfter If true move cursor to just after pasted text
      */
     public void putText(Editor editor, DataContext context, int offset, String text, int type, int count,
-        boolean indent)
+        boolean indent, boolean cursorAfter)
     {
         // TODO - What about auto imports?
         for (int i = 0; i < count; i++)
@@ -241,9 +246,17 @@ public class CopyGroup extends AbstractActionGroup
         // Adjust the cursor position after the paste
         if ((type & Command.FLAG_MOT_LINEWISE) != 0)
         {
-            MotionGroup.moveCaret(editor, context, offset);
-            MotionGroup.moveCaret(editor, context,
-                CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor));
+            if (cursorAfter)
+            {
+                int pos = EditorHelper.normalizeOffset(editor, offset + count * text.length(), false);
+                MotionGroup.moveCaret(editor, context, pos);
+            }
+            else
+            {
+                MotionGroup.moveCaret(editor, context, offset);
+                MotionGroup.moveCaret(editor, context,
+                    CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor));
+            }
         }
         else
         {
