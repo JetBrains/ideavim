@@ -17,6 +17,9 @@ New Features
 - Added :class command to bring up "Go To Class" dialog. If followed by a
   classname, open the corresponding Java file. Not in VIM.
 - Added :symbol command to bring up "Go To Symbol" dialog. Not in VIM.
+- Editors use block cursor for command mode and a vertical bar for
+  insert/replace mode.
+- Better support for split view editing.
 
 Bug Fixes
 - Under certain conditions, highlighting text left you in multiple layers of
@@ -27,6 +30,9 @@ Bug Fixes
 - Re-enabled all the :write related commands. Hopefully the deadlock has been
   solved.
 - Fixed error referencing unknown class FileCloseAction.
+- Fixed several exceptions related to edit fields in dialog boxes.
+- Fixed some exceptions related to the undo manager.
+- Status was not always show proper mode.
 
 0.6.4 to 0.6.5
 

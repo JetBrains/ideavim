@@ -1,5 +1,8 @@
 Bugs to fix:
 
+- Replace mode - fix cursor and use of Insert key. Pressing Enter in Replace
+  mode doesn't work as expected.
+- In split mode - selections should be same in both.
 - Yanking/putting on last line of file not quite right.
 - Repeating (via .) the O command affects prior line of text.
 
