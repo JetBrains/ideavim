@@ -25,6 +25,8 @@ tag             char            action  ~
 |i_CTRL-I|      CTRL-I          same as <Tab>
 |i_<NL>|        <NL>            same as <CR>
 |i_CTRL-J|      CTRL-J          same as <CR>
+|i_CTRL-K|      CTRL-K {char1} {char2}
+                                enter digraph
 |i_<CR>|        <CR>            begin new line
 |i_CTRL-M|      CTRL-M          same as <CR>
 |i_CTRL-N|      CTRL-N          find next match for keyword in front of the
@@ -510,6 +512,7 @@ The commands are sorted on the non-optional part of their name.
 |:close|        :clo[se]        close current window
 |:copy|         :co[py]         copy lines
 |:delete|       :d[elete]       delete lines
+|:digraphs|     :dig[raphs]     show or enter digraphs
 |:display|      :di[splay]      display registers
 |:edit|         :e[dit]         Opens the 'File Open...' dialog
 |:exit|         :exi[t]         same as ":xit"

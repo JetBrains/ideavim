@@ -46,6 +46,8 @@ tag             char            action  ~
 |i_CTRL-I|      CTRL-I          same as <Tab>
 |i_<NL>|        <NL>            same as <CR>
 |i_CTRL-J|      CTRL-J          same as <CR>
+|i_CTRL-K|      CTRL-K {char1} {char2}
+                                enter digraph
 |i_<CR>|        <CR>            begin new line
 |i_CTRL-M|      CTRL-M          same as <CR>
 |i_CTRL-N|      CTRL-N          find next match for keyword in front of the
@@ -100,8 +102,6 @@ tag             char            action  ~
 |i_CTRL-G_k|    CTRL-G <Up>     line up, to column where inserting started
 |i_digraph|     {char1}<BS>{char2}
                                 enter digraph (only when 'digraph' option set)
-|i_CTRL-K|      CTRL-K {char1} {char2}
-                                enter digraph
 |i_CTRL-R_CTRL-R| CTRL-R CTRL-R {0-9a-z"%#*:=}
 insert the contents of a register literally
 |i_CTRL-R_CTRL-O| CTRL-R CTRL-O {0-9a-z"%#*:=}
@@ -749,6 +749,7 @@ The commands are sorted on the non-optional part of their name.
 |:close|        :clo[se]        close current window
 |:copy|         :co[py]         copy lines
 |:delete|       :d[elete]       delete lines
+|:digraphs|     :dig[raphs]     show or enter digraphs
 |:display|      :di[splay]      display registers
 |:edit|         :e[dit]         edit a file
 |:exit|         :exi[t]         same as ":xit"
@@ -811,7 +812,6 @@ TODO:
 |:cunabbrev|    :cuna[bbrev]    like ":unabbrev" but for Command-line mode
 |:cunmenu|      :cunme[nu]      remove menu for Command-line mode
 |:cwindow|      :cw[indow]      open or close quickfix window
-|:digraphs|     :dig[raphs]     show or enter digraphs
 |:ex|           :ex             same as ":edit"
 |:foldclose|    :foldc[lose]    close folds
 |:foldopen|     :foldo[pen]     open folds

@@ -135,10 +135,10 @@ Some Ex commands
 Some :set options
 Full VIM regular expressions for search and search/replace
 macros
+Diagraphs
 
 Not Supported (yet)
 Keymaps
-Diagraphs
 Various, lesser used (by me anyway), commands
 Jumplists
 Window commands

@@ -2,6 +2,15 @@ History of changes for @NAME@ for IDEA @IDEA-VERSION@
 
 @VERSION@ from 0.7.1
 
+New Features
+- Added support for digraphs. Currently you can use Ctrl-K {char1}{char2} to
+  enter a special character. This works while in Insert/Replace mode, or as an
+  argument to the r, F, T, f, and t commands. The :digraphs command has been
+  added to display the currently supported digraphs. Certain special cases of
+  the Ctrl-K {char1}{char2} sequence are not supported.
+
+0.7.2 from 0.7.1
+
 Bug Fixes
 - Fixed c<motion and d<motion> exception if the motion was invalid.
 - Fixed focus problem with : and / and ? commands.
