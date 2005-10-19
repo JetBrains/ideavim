@@ -41,9 +41,39 @@ public class RegisterActions
         return instance;
     }
 
+    public void enable()
+    {
+        KeyParser.setupActionHandler("GenerateConstructor");
+        KeyParser.setupActionHandler("GenerateGetter");
+        KeyParser.setupActionHandler("GenerateSetter");
+        KeyParser.setupActionHandler("GenerateGetterAndSetter");
+        KeyParser.setupActionHandler("GenerateEquals");
+
+        KeyParser.setupActionHandler("AutoIndentLines", "VimAutoIndentVisual");
+        KeyParser.setupActionHandler("ReformatCode", "VimReformatVisual");
+        KeyParser.setupActionHandler("CommentByLineComment", "VimCommentLineComment");
+        KeyParser.setupActionHandler("CommentByBlockComment", "VimCommentBlockComment");
+        KeyParser.setupActionHandler("SurroundWith", "VimSurroundWith");
+    }
+
+    public void disable()
+    {
+        KeyParser.resetActionHandler("GenerateConstructor");
+        KeyParser.resetActionHandler("GenerateGetter");
+        KeyParser.resetActionHandler("GenerateSetter");
+        KeyParser.resetActionHandler("GenerateGetterAndSetter");
+        KeyParser.resetActionHandler("GenerateEquals");
+
+        KeyParser.resetActionHandler("AutoIndentLines", "VimAutoIndentVisual");
+        KeyParser.resetActionHandler("ReformatCode", "VimReformatVisual");
+        KeyParser.resetActionHandler("CommentByLineComment", "VimCommentLineComment");
+        KeyParser.resetActionHandler("CommentByBlockComment", "VimCommentBlockComment");
+        KeyParser.resetActionHandler("SurroundWith", "VimSurroundWith");
+    }
+
     private RegisterActions()
     {
-        // Update many of the builting IDEA actions with our key handlers.
+        // Update many of the built-in IDEA actions with our key handlers.
         // This group allows us to propagate the keystroke if action acts on something other than an editor
         KeyParser.setupActionHandler("EditorBackSpace", "VimEditorBackSpace", KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0));
         KeyParser.setupActionHandler("EditorDelete", "VimEditorDelete", KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
@@ -60,11 +90,6 @@ public class RegisterActions
         KeyParser.setupActionHandler("EditorUp", "VimEditorUp", KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0));
 
         // All the Alt keys
-        KeyParser.setupActionHandler("GenerateConstructor");
-        KeyParser.setupActionHandler("GenerateGetter");
-        KeyParser.setupActionHandler("GenerateSetter");
-        KeyParser.setupActionHandler("GenerateGetterAndSetter");
-        KeyParser.setupActionHandler("GenerateEquals");
 
         // All the Ctrl keys
         KeyParser.setupActionHandler("EditorDeleteToWordEnd", null, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, KeyEvent.CTRL_MASK));

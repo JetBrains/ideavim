@@ -260,6 +260,20 @@ public class Command
         this.keys = keys;
     }
 
+    public String toString()
+    {
+        final StringBuffer buf = new StringBuffer();
+        buf.append("Command");
+        buf.append("{count=").append(count);
+        buf.append(",action=").append(action);
+        buf.append(",type=").append(type);
+        buf.append(",flags=").append(flags);
+        buf.append(",argument=").append(argument);
+        buf.append(",keys=").append(keys);
+        buf.append('}');
+        return buf.toString();
+    }
+
     private int count;
     private AnAction action;
     private int type;

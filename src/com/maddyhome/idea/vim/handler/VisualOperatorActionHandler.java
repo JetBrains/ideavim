@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.handler;
 */
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -36,6 +37,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
 {
     protected final boolean execute(final Editor editor, DataContext context, Command cmd)
     {
+        logger.debug("execute, cmd=" + cmd);
         if (!cmd.isReadType())
         {
             UndoManager.getInstance().endCommand(editor);
@@ -45,15 +47,41 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
         {
             CommandGroups.getInstance().getMotion().toggleVisual(editor, context, 1, 1, 0);
         }
-        TextRange range = CommandGroups.getInstance().getMotion().getVisualRange(editor);
-        VisualChange change = CommandGroups.getInstance().getMotion().getVisualOperatorRange(editor, cmd.getFlags());
-        CommandGroups.getInstance().getMotion().exitVisual(editor);
-        
+
+        TextRange range = null;
+        VisualChange change = null;
+        if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
+        {
+            range = CommandGroups.getInstance().getMotion().getVisualRange(editor);
+            change = CommandGroups.getInstance().getMotion().getVisualOperatorRange(editor, cmd.getFlags());
+            logger.debug("range=" + range);
+            logger.debug("change=" + change);
+        }
+
+        // If this is a mutli key change then exit visual now
+        if ((cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) != 0)
+        {
+            logger.debug("multikey undo - exit visual");
+            CommandGroups.getInstance().getMotion().exitVisual(editor);
+        }
+
         boolean res = execute(editor, context, cmd, range);
+
+        // If this was a "simple" command then exit visual now
+        if ((cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) == 0)
+        {
+            logger.debug("not multikey undo - exit visual");
+            CommandGroups.getInstance().getMotion().exitVisual(editor);
+        }
 
         if (res)
         {
-            EditorData.setLastVisualOperatorRange(editor, change);
+            logger.debug("res");
+            if (change != null)
+            {
+                EditorData.setLastVisualOperatorRange(editor, change);
+            }
+
             if ((cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) == 0 && !cmd.isReadType())
             {
                 UndoManager.getInstance().endCommand(editor);
@@ -74,4 +102,6 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
     }
 
     protected abstract boolean execute(Editor editor, DataContext context, Command cmd, TextRange range);
+
+    private static Logger logger = Logger.getInstance(VisualOperatorActionHandler.class.getName());
 }

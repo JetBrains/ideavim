@@ -30,12 +30,12 @@
     <property name="install" value="install" />
     <property name="dist" value="dist" />
     <!-- Update to your IntelliJ installtion -->
-    <property name="idea.home" value="/opt/idea-4.5.3" />
+    <property name="idea.home" value="/opt/idea-4.5.4" />
 
     <property name="project" value="IdeaVIM" />
     <!-- Update this prior to building a new distribution -->
     <property name="idea-version" value="4.x" />
-    <property name="version" value="0.8.4" />
+    <property name="version" value="0.8.6" />
 
     <path id="build.classpath">
         <pathelement path="${idea.home}/lib/idea.jar" />

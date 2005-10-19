@@ -29,13 +29,11 @@ import com.maddyhome.idea.vim.undo.UndoManager;
 /**
  *
  */
-public class TxActionWrapper extends AnAction
+public class TxActionWrapper extends AbstractDelegateAction
 {
     public TxActionWrapper(AnAction origAction)
     {
-        this.origAction = origAction;
-        copyFrom(origAction);
-        logger.debug("origAction=" + origAction);
+        super(origAction);
     }
 
     public void actionPerformed(AnActionEvent event)
@@ -50,7 +48,7 @@ public class TxActionWrapper extends AnAction
             UndoManager.getInstance().beginCommand(editor);
         }
 
-        origAction.actionPerformed(event);
+        getOrigAction().actionPerformed(event);
 
         if (doTx)
         {
@@ -58,8 +56,6 @@ public class TxActionWrapper extends AnAction
             UndoManager.getInstance().beginCommand(editor);
         }
     }
-
-    private AnAction origAction;
 
     private static Logger logger = Logger.getInstance(TxActionWrapper.class.getName());
 }

@@ -6,18 +6,14 @@
     <change-notes>
 <![CDATA[
 Bug Fixes<br>
-- After a fresh install it is possible to get a NPE when loading the first
-project. Now fixed.<br>
-- Fixed :class and :find. These were also broken by the focus fix in 0.7.2.<br>
-- Fixed * and # commands on one letter words.<br>
-- Fixed * and # commands on last word of line with trailing punctuation.<br>
-- Fixed b and e commands when trying to move to first or last word of file and
-the first or last character of the file was punctuation.<br>
-- Fixed NullPointerException appearing in system log when viewing a .form file.<br>
-- Fixed extraneous characters getting added to a register during recording.<br>
-- Use file type's indent size instead of tab size for indenting text.<br>
-- Restore caret if plugin is disabled.<br>
-- Fixed ability to delete blank line at end of files.<br>
+- The Escape key is passed up to IDEA if not used by VIM first. This fix solves
+  minor issues such as not being able to clear highlighted text using the
+  Ctrl-Shift-F7, for example.<br>
+- :quit command now works in all forms (e.g. :q, :qu, :qui, :quit).<br>
+- Performing a change command while in visual mode now properly terminates
+  visual mode.<br>
+- Fixed internal error caused when trying to use visual mode with IDEA's
+  "column mode".<br>
 ]]>
     </change-notes>
     <idea-version since-build="1162"/>
@@ -178,8 +174,11 @@ the first or last character of the file was punctuation.<br>
         <action id="VimFilterMotion" class="com.maddyhome.idea.vim.action.change.change.FilterMotionAction" text="Filter Lines"/>
         <action id="VimFilterCountLines" class="com.maddyhome.idea.vim.action.change.change.FilterCountLinesAction" text="Filter Lines"/>
         <action id="VimFilterVisualLines" class="com.maddyhome.idea.vim.action.change.change.FilterVisualLinesAction" text="Filter Visual Lines"/>
-        <action id="VimAutoIndentVisual" class="com.maddyhome.idea.vim.action.change.change.AutoIndentVisualAction" text="Auto Indent Selection"/>
-        <action id="VimReformatVisual" class="com.maddyhome.idea.vim.action.change.change.ReformatVisualAction" text="Reformat Selection"/>
+        <action id="VimAutoIndentVisual" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Auto Indent Selection"/>
+        <action id="VimReformatVisual" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Reformat Selection"/>
+        <action id="VimCommentBlockComment" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Block Comment"/>
+        <action id="VimCommentLineComment" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Line Comment"/>
+        <action id="VimSurroundWith" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Surround With"/>
 
         <!-- Shift -->
         <action id="VimAutoIndentLines" class="com.maddyhome.idea.vim.action.change.shift.AutoIndentLinesAction" text="Auto Indent Lines"/>

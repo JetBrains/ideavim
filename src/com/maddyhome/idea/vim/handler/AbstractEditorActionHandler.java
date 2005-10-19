@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.handler;
  */
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -32,6 +33,7 @@ public abstract class AbstractEditorActionHandler extends EditorActionHandler
 {
     public final void execute(Editor editor, DataContext context)
     {
+        logger.debug("execute");
         CommandState state = CommandState.getInstance();
         Command cmd = state.getCommand();
         if (!execute(editor, context, cmd))
@@ -46,4 +48,6 @@ public abstract class AbstractEditorActionHandler extends EditorActionHandler
     }
 
     protected abstract boolean execute(Editor editor, DataContext context, Command cmd);
+
+    private static Logger logger = Logger.getInstance(AbstractEditorActionHandler.class.getName());
 }

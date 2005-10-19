@@ -24,9 +24,13 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
+import com.intellij.openapi.keymap.Keymap;
+import com.intellij.openapi.keymap.KeymapManager;
+import com.maddyhome.idea.vim.action.DelegateAction;
 import com.maddyhome.idea.vim.action.TxActionWrapper;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.handler.key.EditorKeyHandler;
+
 import java.util.HashMap;
 import javax.swing.KeyStroke;
 
@@ -88,6 +92,74 @@ public class KeyParser
         amgr.unregisterAction(ideaActName);
         TxActionWrapper taw = new TxActionWrapper(action);
         amgr.registerAction(ideaActName, taw);
+    }
+
+    public static void resetActionHandler(String ideaActName)
+    {
+        ActionManager amgr = ActionManager.getInstance();
+        AnAction action = amgr.getAction(ideaActName);
+        if (action instanceof DelegateAction)
+        {
+            amgr.unregisterAction(ideaActName);
+            amgr.registerAction(ideaActName, ((DelegateAction)action).getOrigAction());
+        }
+    }
+
+    public static void setupActionHandler(String ideaActName, String vimActName)
+    {
+        logger.debug("ideaActName=" + ideaActName);
+        logger.debug("vimActName=" + vimActName);
+
+        ActionManager amgr = ActionManager.getInstance();
+        AnAction iaction = amgr.getAction(ideaActName);
+        AnAction vaction = amgr.getAction(vimActName);
+        if (vaction instanceof DelegateAction)
+        {
+            DelegateAction daction = (DelegateAction)vaction;
+            daction.setOrigAction(iaction);
+
+            Keymap keymap = KeymapManager.getInstance().getActiveKeymap();
+            com.intellij.openapi.actionSystem.Shortcut[] icuts = keymap.getShortcuts(ideaActName);
+            keymap.removeAllActionShortcuts(ideaActName);
+
+            amgr.unregisterAction(ideaActName);
+            amgr.unregisterAction(vimActName);
+
+            amgr.registerAction(ideaActName, vaction);
+
+            for (int i = 0; i < icuts.length; i++)
+            {
+                keymap.addShortcut(ideaActName, icuts[i]);
+            }
+        }
+    }
+
+    public static void resetActionHandler(String ideaActName, String vimActName)
+    {
+        logger.debug("ideaActName=" + ideaActName);
+        logger.debug("vimActName=" + vimActName);
+
+        ActionManager amgr = ActionManager.getInstance();
+        AnAction vaction = amgr.getAction(ideaActName);
+        if (vaction instanceof DelegateAction)
+        {
+            DelegateAction daction = (DelegateAction)vaction;
+            AnAction iaction = daction.getOrigAction();
+
+            Keymap keymap = KeymapManager.getInstance().getActiveKeymap();
+            com.intellij.openapi.actionSystem.Shortcut[] icuts = keymap.getShortcuts(ideaActName);
+            keymap.removeAllActionShortcuts(ideaActName);
+
+            amgr.unregisterAction(ideaActName);
+
+            amgr.registerAction(ideaActName, iaction);
+            amgr.registerAction(vimActName, vaction);
+
+            for (int i = 0; i < icuts.length; i++)
+            {
+                keymap.addShortcut(ideaActName, icuts[i]);
+            }
+        }
     }
 
     public static void setupActionHandler(String ideaActName, String vimActName, KeyStroke stroke)
