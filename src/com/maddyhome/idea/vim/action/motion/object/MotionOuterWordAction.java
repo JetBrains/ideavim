@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.action.motion.object;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2004 Rick Maddy
+ * Copyright (C) 2003-2005 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,8 +19,13 @@ package com.maddyhome.idea.vim.action.motion.object;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.action.motion.TextObjectAction;
-import com.maddyhome.idea.vim.handler.motion.object.MotionOuterWordHandler;
+import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.group.CommandGroups;
+import com.maddyhome.idea.vim.handler.motion.TextObjectActionHandler;
+import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  */
@@ -28,6 +33,14 @@ public class MotionOuterWordAction extends TextObjectAction
 {
     public MotionOuterWordAction()
     {
-        super(new MotionOuterWordHandler());
+        super(new Handler());
+    }
+
+    private static class Handler extends TextObjectActionHandler
+    {
+        public TextRange getRange(Editor editor, DataContext context, int count, int rawCount, Argument argument)
+        {
+            return CommandGroups.getInstance().getMotion().getWordRange(editor, context, count, true, false);
+        }
     }
 }

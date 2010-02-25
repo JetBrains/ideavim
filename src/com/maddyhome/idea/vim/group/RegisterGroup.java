@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.group;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2005 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,18 +25,19 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Register;
+import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.ui.ClipboardHandler;
+import org.jdom.CDATA;
+import org.jdom.Element;
+
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import javax.swing.KeyStroke;
-import org.jdom.CDATA;
-import org.jdom.Element;
 
 /**
  * This group works with command associated with copying and pasting text
@@ -72,7 +73,7 @@ public class RegisterGroup extends AbstractActionGroup
         if (VALID_REGISTERS.indexOf(reg) != -1)
         {
             lastRegister = reg;
-            logger.debug("register selected: " + lastRegister);
+            if (logger.isDebugEnabled()) logger.debug("register selected: " + lastRegister);
 
             return true;
         }
@@ -95,33 +96,37 @@ public class RegisterGroup extends AbstractActionGroup
      * Stores text into the last register
      * @param editor The editor to get the text from
      * @param context The data context
-     * @param start The start offset of the text to store
-     * @param end The end offset of the text to store
+     * @param range The range of the text to store
      * @param type The type of copy - linewise or characterwise
+     * @param isDelete is from a delete
+     * @param isYank is from a yank
      * @return true if able to store the text into the register, false if not
      */
-    public boolean storeText(Editor editor, DataContext context, int start, int end, int type, boolean isDelete, boolean isYank)
+    public boolean storeText(Editor editor, DataContext context, TextRange range, int type, boolean isDelete, boolean isYank)
     {
         if (isRegisterWritable())
         {
-            String text = EditorHelper.getText(editor, start, end);
+            String text = EditorHelper.getText(editor, range);
 
-            return storeTextInternal(editor, context, start, end, text, type, lastRegister, isDelete, isYank);
+            return storeTextInternal(editor, context, range, text, type, lastRegister, isDelete, isYank);
         }
 
         return false;
     }
 
-    public void storeKeys(List strokes, int type, char register)
+    public void storeKeys(List<KeyStroke> strokes, int type, char register)
     {
-        registers.put(new Character(register), new Register(register, type, strokes));
+        registers.put(register, new Register(register, type, strokes));
     }
 
-    public boolean storeTextInternal(Editor editor, DataContext context, int start, int end, String text, int type, char register, boolean isDelete, boolean isYank)
+    public boolean storeTextInternal(Editor editor, DataContext context, TextRange range, String text, int type,
+        char register, boolean isDelete, boolean isYank)
     {
         // Null register doesn't get saved
         if (lastRegister == '_') return true;
 
+        int start = range.getStartOffset();
+        int end = range.getEndOffset();
         // Normalize the start and end
         if (start > end)
         {
@@ -139,7 +144,7 @@ public class RegisterGroup extends AbstractActionGroup
         if (Character.isUpperCase(register))
         {
             char lreg = Character.toLowerCase(register);
-            Register r = (Register)registers.get(new Character(lreg));
+            Register r = registers.get(new Character(lreg));
             // Append the text if the lowercase register existed
             if (r != null)
             {
@@ -148,8 +153,8 @@ public class RegisterGroup extends AbstractActionGroup
             // Set the text if the lowercase register didn't exist yet
             else
             {
-                registers.put(new Character(lreg), new Register(lreg, type, text));
-                logger.debug("register '" + register + "' contains: \"" + text + "\"");
+                registers.put(lreg, new Register(lreg, type, text));
+                if (logger.isDebugEnabled()) logger.debug("register '" + register + "' contains: \"" + text + "\"");
             }
         }
         else if (register == '*' || register == '+')
@@ -159,15 +164,15 @@ public class RegisterGroup extends AbstractActionGroup
         // Put the text in the specified register
         else
         {
-            registers.put(new Character(register), new Register(register, type, text));
-            logger.debug("register '" + register + "' contains: \"" + text + "\"");
+            registers.put(register, new Register(register, type, text));
+            if (logger.isDebugEnabled()) logger.debug("register '" + register + "' contains: \"" + text + "\"");
         }
 
         // Also add it to the default register if the default wasn't specified
         if (register != REGISTER_DEFAULT && ".:/".indexOf(register) == -1)
         {
-            registers.put(new Character(REGISTER_DEFAULT), new Register(REGISTER_DEFAULT, type, text));
-            logger.debug("register '" + register + "' contains: \"" + text + "\"");
+            registers.put(REGISTER_DEFAULT, new Register(REGISTER_DEFAULT, type, text));
+            if (logger.isDebugEnabled()) logger.debug("register '" + register + "' contains: \"" + text + "\"");
         }
 
         // Deletes go into register 1. Old 1 goes to 2, etc. Old 8 to 9, old 9 is lost
@@ -175,34 +180,35 @@ public class RegisterGroup extends AbstractActionGroup
         {
             for (char d = '8'; d >= '1'; d--)
             {
-                Register t = (Register)registers.get(new Character(d));
+                Register t = registers.get(new Character(d));
                 if (t != null)
                 {
-                    registers.put(new Character((char)(d + 1)), t);
+                    t.rename((char)(d + 1));
+                    registers.put((char)(d + 1), t);
                 }
             }
-            registers.put(new Character('1'), new Register('1', type, text));
+            registers.put('1', new Register('1', type, text));
 
             // Deletes small than one line also go the the - register
             if (type == Command.FLAG_MOT_CHARACTERWISE)
             {
                 if (editor.offsetToLogicalPosition(start).line == editor.offsetToLogicalPosition(end).line)
                 {
-                    registers.put(new Character('-'), new Register('-', type, text));
+                    registers.put('-', new Register('-', type, text));
                 }
             }
         }
         // Yanks also go to register 0 if the default register was used
         else if (register == REGISTER_DEFAULT)
         {
-            registers.put(new Character('0'), new Register('0', type, text));
-            logger.debug("register '" + '0' + "' contains: \"" + text + "\"");
+            registers.put('0', new Register('0', type, text));
+            if (logger.isDebugEnabled()) logger.debug("register '" + '0' + "' contains: \"" + text + "\"");
         }
 
         if (start != -1)
         {
             CommandGroups.getInstance().getMark().setMark(editor, context, '[', start);
-            CommandGroups.getInstance().getMark().setMark(editor, context, ']', end);
+            CommandGroups.getInstance().getMark().setMark(editor, context, ']', end - 1);
         }
 
         return true;
@@ -248,7 +254,7 @@ public class RegisterGroup extends AbstractActionGroup
         }
         else
         {
-            reg = (Register)registers.get(new Character(r));
+            reg = registers.get(new Character(r));
         }
 
         return reg;
@@ -263,21 +269,21 @@ public class RegisterGroup extends AbstractActionGroup
         return lastRegister;
     }
 
-    public List getRegisters()
+    public List<Register> getRegisters()
     {
-        ArrayList res = new ArrayList(registers.values());
-        Collections.sort(res, new Register.KeySorter());
+        ArrayList<Register> res = new ArrayList<Register>(registers.values());
+        Collections.sort(res, new Register.KeySorter<Register>());
 
         return res;
     }
 
-    public boolean startRecording(char register)
+    public boolean startRecording(Editor editor, char register)
     {
         if (RECORDABLE_REGISTER.indexOf(register) != -1)
         {
-            CommandState.getInstance().setRecording(true);
+            CommandState.getInstance(editor).setRecording(true);
             recordRegister = register;
-            recordList = new ArrayList();
+            recordList = new ArrayList<KeyStroke>();
             return true;
         }
         else
@@ -302,7 +308,7 @@ public class RegisterGroup extends AbstractActionGroup
         }
     }
 
-    public void finishRecording()
+    public void finishRecording(Editor editor)
     {
         if (recordRegister != 0)
         {
@@ -315,13 +321,13 @@ public class RegisterGroup extends AbstractActionGroup
             if (reg == null)
             {
                 reg = new Register(Character.toLowerCase(recordRegister), Command.FLAG_MOT_CHARACTERWISE, recordList);
-                registers.put(new Character(Character.toLowerCase(recordRegister)), reg);
+                registers.put(Character.toLowerCase(recordRegister), reg);
             }
             else
             {
                 reg.addKeys(recordList);
             }
-            CommandState.getInstance().setRecording(false);
+            CommandState.getInstance(editor).setRecording(false);
         }
 
         recordRegister = 0;
@@ -333,11 +339,11 @@ public class RegisterGroup extends AbstractActionGroup
      */
     public void saveData(Element element)
     {
+        logger.debug("saveData");
         Element regs = new Element("registers");
-        for (Iterator iterator = registers.keySet().iterator(); iterator.hasNext();)
+        for (Character key : registers.keySet())
         {
-            Character key = (Character)iterator.next();
-            Register register = (Register)registers.get(key);
+            Register register = registers.get(key);
 
             Element reg = new Element("register");
             reg.setAttribute("name", String.valueOf(key));
@@ -345,17 +351,22 @@ public class RegisterGroup extends AbstractActionGroup
             if (register.isText())
             {
                 Element text = new Element("text");
-                CDATA data = new CDATA(CDATA.normalizeString(register.getText()));
+                CDATA data = new CDATA(/*CDATA.normalizeString*/(StringHelper.entities(register.getText())));
                 text.addContent(data);
                 reg.addContent(text);
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("register='" + register.getText() + "'");
+                    logger.debug("data=" + data);
+                    logger.debug("text=" + text);
+                }
             }
             else
             {
                 Element keys = new Element("keys");
-                List list = register.getKeys();
-                for (int i = 0; i < list.size(); i++)
+                List<KeyStroke> list = register.getKeys();
+                for (KeyStroke stroke : list)
                 {
-                    KeyStroke stroke = (KeyStroke)list.get(i);
                     Element k = new Element("key");
                     k.setAttribute("char", Integer.toString(stroke.getKeyChar()));
                     k.setAttribute("code", Integer.toString(stroke.getKeyCode()));
@@ -380,25 +391,23 @@ public class RegisterGroup extends AbstractActionGroup
         Element regs = element.getChild("registers");
         if (regs != null)
         {
-            List list = regs.getChildren("register");
-            for (int i = 0; i < list.size(); i++)
+            List<Element> list = regs.getChildren("register");
+            for (Element reg : list)
             {
-                Element reg = (Element)list.get(i);
-                Character key = new Character(reg.getAttributeValue("name").charAt(0));
-                Register register = null;
+                Character key = reg.getAttributeValue("name").charAt(0);
+                Register register;
                 if (reg.getChild("text") != null)
                 {
-                    register = new Register(key.charValue(), Integer.parseInt(reg.getAttributeValue("type")),
-                        reg.getChild("text").getTextNormalize());
+                    register = new Register(key, Integer.parseInt(reg.getAttributeValue("type")),
+                        StringHelper.unentities(reg.getChild("text").getText/*Normalize*/()));
                 }
                 else
                 {
                     Element keys = reg.getChild("keys");
-                    List klist = keys.getChildren("key");
-                    List strokes = new ArrayList();
-                    for (int j = 0; j < klist.size(); j++)
+                    List<Element> klist = keys.getChildren("key");
+                    List<KeyStroke> strokes = new ArrayList<KeyStroke>();
+                    for (Element kelem : klist)
                     {
-                        Element kelem = (Element)klist.get(j);
                         int code = Integer.parseInt(kelem.getAttributeValue("code"));
                         int mods = Integer.parseInt(kelem.getAttributeValue("mods"));
                         char ch = (char)Integer.parseInt(kelem.getAttributeValue("char"));
@@ -411,7 +420,7 @@ public class RegisterGroup extends AbstractActionGroup
                             strokes.add(KeyStroke.getKeyStroke(new Character(ch), mods));
                         }
                     }
-                    register = new Register(key.charValue(), Integer.parseInt(reg.getAttributeValue("type")), strokes);
+                    register = new Register(key, Integer.parseInt(reg.getAttributeValue("type")), strokes);
                 }
                 registers.put(key, register);
             }
@@ -419,9 +428,9 @@ public class RegisterGroup extends AbstractActionGroup
     }
 
     private char lastRegister = REGISTER_DEFAULT;
-    private HashMap registers = new HashMap();
+    private HashMap<Character, Register> registers = new HashMap<Character, Register>();
     private char recordRegister = 0;
-    private List recordList = null;
+    private List<KeyStroke> recordList = null;
 
     private static final String WRITABLE_REGISTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-*+_/\"";
     private static final String READONLY_REGISTERS = ":.%#=/";

@@ -1,33 +1,35 @@
 package com.maddyhome.idea.vim.undo;
 
 /*
-* IdeaVim - A Vim emulator plugin for IntelliJ Idea
-* Copyright (C) 2003 Rick Maddy
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
+ * IdeaVim - A Vim emulator plugin for IntelliJ Idea
+ * Copyright (C) 2003-2006 Rick Maddy
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 
-import com.intellij.openapi.actionSystem.DataConstants;
-import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.maddyhome.idea.vim.helper.DocumentManager;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.Options;
+
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -72,9 +74,10 @@ public class EditorUndoList
 
     public void endCommand()
     {
+        logger.info("endCommand");
         if (currentCommand != null && currentCommand.size() > 0)
         {
-            logger.info("endCommand");
+            logger.debug("ended");
             int max = getMaxUndos();
             if (max == 0)
             {
@@ -99,16 +102,27 @@ public class EditorUndoList
             currentCommand.complete();
 
             pointer = undos.size();
+
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("this=" + this);
+            }
         }
 
         currentCommand = null;
     }
 
+    public int size()
+    {
+        return currentCommand == null ? 0 : currentCommand.size();
+    }
+
     public void addChange(DocumentChange change)
     {
+        logger.info("addChange");
         if (!inUndo && currentCommand != null)
         {
-            logger.info("addChange");
+            logger.info("added");
             currentCommand.addChange(change);
         }
         /*
@@ -125,8 +139,8 @@ public class EditorUndoList
     {
         if (pointer < undos.size())
         {
-            UndoCommand cmd = (UndoCommand)undos.get(pointer);
-            logger.debug("redo command " + pointer);
+            UndoCommand cmd = undos.get(pointer);
+            if (logger.isDebugEnabled()) logger.debug("redo command " + pointer);
             pointer++;
             inUndo = true;
             cmd.redo(editor, context);
@@ -148,16 +162,55 @@ public class EditorUndoList
         if (pointer > 0)
         {
             pointer--;
-            UndoCommand cmd = (UndoCommand)undos.get(pointer);
-            logger.debug("undo command " + pointer);
+            UndoCommand cmd = undos.get(pointer);
+            if (logger.isDebugEnabled()) logger.debug("undo command " + pointer);
             inUndo = true;
             cmd.undo(editor, context);
             inUndo = false;
 
             if (pointer == 0 && restorable)
             {
-                Project p = (Project)context.getData(DataConstants.PROJECT);
+                Project p = PlatformDataKeys.PROJECT.getData(context); // API change - don't merge
                 DocumentManager.getInstance().reloadDocument(editor.getDocument(), p);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean undoLine(Editor editor, DataContext context)
+    {
+        if (pointer == 0 && getMaxUndos() == 0)
+        {
+            return redo(editor, context);
+        }
+
+        if (pointer > 0)
+        {
+            int lastLine = -1;
+
+            pointer--;
+            UndoCommand cmd = undos.get(pointer);
+            if (logger.isDebugEnabled()) logger.debug("undo command " + pointer);
+            while (cmd.isOneLine() && (lastLine == -1 || cmd.getLine() == lastLine))
+            {
+                lastLine = cmd.getLine();
+
+                inUndo = true;
+                cmd.undo(editor, context);
+                inUndo = false;
+
+                if (pointer > 0)
+                {
+                    pointer--;
+                    cmd = undos.get(pointer);
+                }
+                else
+                {
+                    break;
+                }
             }
 
             return true;
@@ -175,8 +228,8 @@ public class EditorUndoList
     {
         StringBuffer res = new StringBuffer();
         res.append("EditorUndoList[");
-        res.append("pointer=" + pointer);
-        res.append(", undos=" + undos);
+        res.append("pointer=").append(pointer);
+        res.append(", undos=").append(undos);
         res.append("]");
 
         return res.toString();
@@ -184,7 +237,7 @@ public class EditorUndoList
 
     //private Editor editor;
     private UndoCommand currentCommand;
-    private ArrayList undos = new ArrayList();
+    private List<UndoCommand> undos = new ArrayList<UndoCommand>();
     private int pointer = 0;
     private boolean inUndo = false;
     private boolean restorable = true;

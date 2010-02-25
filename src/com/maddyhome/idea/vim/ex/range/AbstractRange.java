@@ -1,27 +1,27 @@
 package com.maddyhome.idea.vim.ex.range;
 
 /*
-* IdeaVim - A Vim emulator plugin for IntelliJ Idea
-* Copyright (C) 2003 Rick Maddy
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
+ * IdeaVim - A Vim emulator plugin for IntelliJ Idea
+ * Copyright (C) 2003-2005 Rick Maddy
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.Range;
+import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  * Base for all Ex command ranges
@@ -81,9 +81,11 @@ public abstract class AbstractRange implements Range
             }
             catch (NumberFormatException e)
             {
+                // Ignore - we'll send back bad range later.
             }
         }
 
+        // User entered an invalid range.
         return null;
     }
 
@@ -132,11 +134,12 @@ public abstract class AbstractRange implements Range
 
     public String toString()
     {
-        StringBuffer res = new StringBuffer();
-        res.append("offset=" + offset);
-        res.append(", move=" + move);
-
-        return res.toString();
+        final StringBuffer sb = new StringBuffer();
+        sb.append("AbstractRange");
+        sb.append("{offset=").append(offset);
+        sb.append(", move=").append(move);
+        sb.append('}');
+        return sb.toString();
     }
 
     /**

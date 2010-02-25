@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.action.change.insert;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2005 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,16 +19,29 @@ package com.maddyhome.idea.vim.action.change.insert;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
-import com.maddyhome.idea.vim.handler.change.insert.InsertLineStartHandler;
+import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.group.CommandGroups;
+import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
+import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  */
-public class
-    InsertLineStartAction extends EditorAction
+public class InsertLineStartAction extends EditorAction
 {
     public InsertLineStartAction()
     {
-        super(new InsertLineStartHandler());
+        super(new Handler());
+    }
+
+    private static class Handler extends ChangeEditorActionHandler
+    {
+        public boolean execute(Editor editor, DataContext context, int count, int rawCount, Argument argument)
+        {
+            CommandGroups.getInstance().getChange().insertLineStart(editor, context);
+
+            return true;
+        }
     }
 }

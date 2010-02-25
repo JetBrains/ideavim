@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.handler.motion;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2004 Rick Maddy
+ * Copyright (C) 2003-2005 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,10 +24,10 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
-import com.maddyhome.idea.vim.common.TextRange;
 
 /**
  */
@@ -35,26 +35,32 @@ public abstract class TextObjectActionHandler extends AbstractEditorActionHandle
 {
     protected final boolean execute(Editor editor, DataContext context, Command cmd)
     {
-        if (CommandState.getInstance().getMode() == CommandState.MODE_VISUAL)
+        if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL)
         {
             TextRange range = getRange(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+            if (range == null)
+            {
+                return false;
+            }
+
             TextRange vr = CommandGroups.getInstance().getMotion().getRawVisualRange();
 
-            int newstart = vr.getEndOffset() >= vr.getStartOffset() ? range.getStartOffset() : range.getEndOffset();
-            int newend = vr.getEndOffset() >= vr.getStartOffset() ? range.getEndOffset() : range.getStartOffset();
+            boolean block = (cmd.getFlags() & Command.FLAG_TEXT_BLOCK) != 0;
+            int newstart = block || vr.getEndOffset() >= vr.getStartOffset() ? range.getStartOffset() : range.getEndOffset();
+            int newend = block || vr.getEndOffset() >= vr.getStartOffset() ? range.getEndOffset() : range.getStartOffset();
 
-            if (vr.getStartOffset() == vr.getEndOffset())
+            if (vr.getStartOffset() == vr.getEndOffset() || block)
             {
                 CommandGroups.getInstance().getMotion().moveVisualStart(editor, newstart);
             }
 
-            if ((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) != 0 &&
-                CommandState.getInstance().getSubMode() != Command.FLAG_MOT_LINEWISE)
+            if (((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) != 0 && (cmd.getFlags() & Command.FLAG_VISUAL_CHARACTERWISE) == 0) &&
+                CommandState.getInstance(editor).getSubMode() != Command.FLAG_MOT_LINEWISE)
             {
                 CommandGroups.getInstance().getMotion().toggleVisual(editor, context, 1, 0, Command.FLAG_MOT_LINEWISE);
             }
-            else if ((cmd.getFlags() & Command.FLAG_MOT_CHARACTERWISE) != 0 &&
-                CommandState.getInstance().getSubMode() != Command.FLAG_MOT_CHARACTERWISE)
+            else if (((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) == 0 || (cmd.getFlags() & Command.FLAG_VISUAL_CHARACTERWISE) != 0) &&
+                CommandState.getInstance(editor).getSubMode() == Command.FLAG_MOT_LINEWISE)
             {
                 CommandGroups.getInstance().getMotion().toggleVisual(editor, context, 1, 0, Command.FLAG_MOT_CHARACTERWISE);
             }

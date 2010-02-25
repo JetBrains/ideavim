@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.group;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2004 Rick Maddy
+ * Copyright (C) 2003-2006 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,24 +21,25 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.DataConstants;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.VisualPosition;
-import com.intellij.openapi.editor.event.DocumentAdapter;
-import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.EditorFactoryAdapter;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.editor.event.EditorMouseAdapter;
 import com.intellij.openapi.editor.event.EditorMouseEvent;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
+import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
@@ -56,13 +57,14 @@ import com.maddyhome.idea.vim.helper.CharacterHelper;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.key.KeyParser;
-import com.maddyhome.idea.vim.undo.DocumentChange;
+import com.maddyhome.idea.vim.option.BoundListOption;
+import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.undo.UndoManager;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.List;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
@@ -83,20 +85,45 @@ public class ChangeGroup extends AbstractActionGroup
             public void editorCreated(EditorFactoryEvent event)
             {
                 Editor editor = event.getEditor();
-                editor.addEditorMouseListener(new EditorMouseAdapter() {
-                    public void mouseClicked(EditorMouseEvent event)
-                    {
-                        if (!VimPlugin.isEnabled()) return;
-
-                        if (CommandState.getInstance().getMode() == CommandState.MODE_INSERT ||
-                            CommandState.getInstance().getMode() == CommandState.MODE_REPLACE)
-                        {
-                            clearStrokes(event.getEditor());
-                        }
-                    }
-                });
+                editor.addEditorMouseListener(listener);
+                EditorData.setChangeGroup(editor, true);
             }
+
+            public void editorReleased(EditorFactoryEvent event)
+            {
+                Editor editor = event.getEditor();
+                if (EditorData.getChangeGroup(editor))
+                {
+                    editor.removeEditorMouseListener(listener);
+                    EditorData.setChangeGroup(editor, false);
+                }
+            }
+
+            private EditorMouseAdapter listener = new EditorMouseAdapter()
+            {
+                public void mouseClicked(EditorMouseEvent event)
+                {
+                    Editor editor = event.getEditor();
+                    if (!VimPlugin.isEnabled())
+                    {
+                        return;
+                    }
+
+                    if (CommandState.getInstance(editor).getMode() == CommandState.MODE_INSERT ||
+                        CommandState.getInstance(editor).getMode() == CommandState.MODE_REPLACE)
+                    {
+                        clearStrokes(editor);
+                    }
+                }
+            };
        });
+    }
+
+    public void setInsertRepeat(int lines, int column, boolean append)
+    {
+        repeatLines = lines;
+        repeatColumn = column;
+        repeatAppend = append;
     }
 
     /**
@@ -164,22 +191,25 @@ public class ChangeGroup extends AbstractActionGroup
         {
             MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor));
             initInsert(editor, context, CommandState.MODE_INSERT);
-            
-            CommandState state = CommandState.getInstance();
-            if (state.getMode() != CommandState.MODE_REPEAT)
+
+            if (!editor.isOneLineMode())
             {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run()
-                    {
-                        KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), context);
-                        MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
-                    }
-                });
-            }
-            else
-            {
-                //KeyHandler.executeAction("VimEditorEnter", context);
-                MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
+                CommandState state = CommandState.getInstance(editor);
+                if (state.getMode() != CommandState.MODE_REPEAT)
+                {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        public void run()
+                        {
+                            KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), context);
+                            MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
+                        }
+                    });
+                }
+                else
+                {
+                    //KeyHandler.executeAction("VimEditorEnter", context);
+                    MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
+                }
             }
         }
         else
@@ -199,7 +229,7 @@ public class ChangeGroup extends AbstractActionGroup
         MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, true));
         initInsert(editor, context, CommandState.MODE_INSERT);
 
-        CommandState state = CommandState.getInstance();
+        CommandState state = CommandState.getInstance(editor);
         if (state.getMode() != CommandState.MODE_REPEAT)
         {
             SwingUtilities.invokeLater(new Runnable() {
@@ -295,7 +325,7 @@ public class ChangeGroup extends AbstractActionGroup
         if (vp.column < len)
         {
             int offset = EditorHelper.visualPostionToOffset(editor, vp);
-            char ch = editor.getDocument().getChars()[offset];
+            char ch = EditorHelper.getDocumentChars(editor).charAt(offset);
             processKey(editor, context, KeyStroke.getKeyStroke(ch));
             res = true;
         }
@@ -362,7 +392,7 @@ public class ChangeGroup extends AbstractActionGroup
      */
     private void initInsert(Editor editor, DataContext context, int mode)
     {
-        CommandState state = CommandState.getInstance();
+        CommandState state = CommandState.getInstance(editor);
 
         insertStart = editor.getCaretModel().getOffset();
         CommandGroups.getInstance().getMark().setMark(editor, context, '[', insertStart);
@@ -377,11 +407,11 @@ public class ChangeGroup extends AbstractActionGroup
             // If this command doesn't allow repeating, set the count to 1
             if ((state.getCommand().getFlags() & Command.FLAG_NO_REPEAT) != 0)
             {
-                repeatInsert(editor, context, 1);
+                repeatInsert(editor, context, 1, false);
             }
             else
             {
-                repeatInsert(editor, context, state.getCommand().getCount());
+                repeatInsert(editor, context, state.getCommand().getCount(), false);
             }
             if (mode == CommandState.MODE_REPLACE)
             {
@@ -409,12 +439,52 @@ public class ChangeGroup extends AbstractActionGroup
      * @param editor The editor to insert into
      * @param context The data context
      * @param count The number of times to repeat the previous insert
+     * @param started
      */
-    private void repeatInsert(Editor editor, DataContext context, int count)
+    private void repeatInsert(Editor editor, DataContext context, int count, boolean started)
     {
-        repeatInsertText(editor, context, count);
+        int cpos;
+        if (repeatLines > 0)
+        {
+            int vline = EditorHelper.getCurrentVisualLine(editor);
+            int lline = EditorHelper.getCurrentLogicalLine(editor);
+            cpos = editor.logicalPositionToOffset(new LogicalPosition(vline, repeatColumn));
+            for (int i = 0; i < repeatLines; i++)
+            {
+                if (repeatAppend && repeatColumn < MotionGroup.LAST_COLUMN &&
+                    EditorHelper.getVisualLineLength(editor, vline + i) < repeatColumn)
+                {
+                    String pad = EditorHelper.pad(editor, lline + i, repeatColumn);
+                    if (pad.length() > 0)
+                    {
+                        int off = editor.getDocument().getLineEndOffset(lline + i);
+                        insertText(editor, context, off, pad);
+                    }
+                }
+                if (repeatColumn >= MotionGroup.LAST_COLUMN)
+                {
+                    editor.getCaretModel().moveToOffset(
+                        CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, lline + i, true));
+                    repeatInsertText(editor, context, started ? (i == 0 ? count : count+1) : count);
+                }
+                else if (EditorHelper.getVisualLineLength(editor, vline + i) >= repeatColumn)
+                {
+                    editor.getCaretModel().moveToVisualPosition(new VisualPosition(vline + i, repeatColumn));
+                    repeatInsertText(editor, context, started ? (i == 0 ? count : count+1) : count);
+                }
+            }
+        }
+        else
+        {
+            repeatInsertText(editor, context, count);
+            cpos = CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, -1, false);
+        }
 
-        MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, -1, false));
+        repeatLines = 0;
+        repeatColumn = 0;
+        repeatAppend = false;
+
+        MotionGroup.moveCaret(editor, context, cpos);
     }
 
     /**
@@ -425,25 +495,19 @@ public class ChangeGroup extends AbstractActionGroup
      */
     private void repeatInsertText(Editor editor, DataContext context, int count)
     {
-        logger.debug("repeatInsertText");
         for (int i = 0; i < count; i++)
         {
             // Treat other keys special by performing the appropriate action they represent in insert/replace mode
-            for (int k = 0; k < lastStrokes.size(); k++)
+            for (Object lastStroke : lastStrokes)
             {
-                Object obj = lastStrokes.get(k);
-                if (obj instanceof AnAction)
+                if (lastStroke instanceof AnAction)
                 {
-                    KeyHandler.executeAction((AnAction)obj, context);
-                    strokes.add(obj);
+                    KeyHandler.executeAction((AnAction)lastStroke, context);
+                    strokes.add(lastStroke);
                 }
-                else if (obj instanceof Character)
+                else if (lastStroke instanceof Character)
                 {
-                    processKey(editor, context, KeyStroke.getKeyStroke(((Character)obj).charValue()));
-                }
-                else if (obj instanceof List)
-                {
-                    processChanges(editor, context, (List)obj);
+                    processKey(editor, context, KeyStroke.getKeyStroke((Character)lastStroke));
                 }
             }
         }
@@ -459,7 +523,7 @@ public class ChangeGroup extends AbstractActionGroup
         logger.debug("processing escape");
         int cnt = lastInsert.getCount();
         // Turn off overwrite mode if we were in replace mode
-        if (CommandState.getInstance().getMode() == CommandState.MODE_REPLACE)
+        if (CommandState.getInstance(editor).getMode() == CommandState.MODE_REPLACE)
         {
             KeyHandler.executeAction("VimInsertReplaceToggle", context);
         }
@@ -476,13 +540,13 @@ public class ChangeGroup extends AbstractActionGroup
         //CommandGroups.getInstance().getRegister().storeKeys(lastStrokes, Command.FLAG_MOT_CHARACTERWISE, '.');
 
         // If the insert/replace command was preceded by a count, repeat again N - 1 times
-        repeatInsert(editor, context, cnt - 1);
+        repeatInsert(editor, context, cnt - 1, true);
 
         CommandGroups.getInstance().getMark().setMark(editor, context, '^', editor.getCaretModel().getOffset());
         CommandGroups.getInstance().getMark().setMark(editor, context, ']', editor.getCaretModel().getOffset());
-        CommandState.getInstance().popState();
+        CommandState.getInstance(editor).popState();
 
-        if (!CommandState.inInsertMode())
+        if (!CommandState.inInsertMode(editor))
         {
             resetCursor(editor, false);
         }
@@ -499,12 +563,17 @@ public class ChangeGroup extends AbstractActionGroup
      */
     public void processEnter(Editor editor, DataContext context)
     {
-        if (CommandState.getInstance().getMode() == CommandState.MODE_REPLACE)
+        if (editor.isOneLineMode())
+        {
+            return;
+        }
+
+        if (CommandState.getInstance(editor).getMode() == CommandState.MODE_REPLACE)
         {
             KeyHandler.executeAction("VimEditorToggleInsertState", context);
         }
         KeyHandler.executeAction("VimEditorEnter", context);
-        if (CommandState.getInstance().getMode() == CommandState.MODE_REPLACE)
+        if (CommandState.getInstance(editor).getMode() == CommandState.MODE_REPLACE)
         {
             KeyHandler.executeAction("VimEditorToggleInsertState", context);
         }
@@ -519,7 +588,7 @@ public class ChangeGroup extends AbstractActionGroup
     public void processInsert(Editor editor, DataContext context)
     {
         KeyHandler.executeAction("VimEditorToggleInsertState", context);
-        CommandState.getInstance().toggleInsertOverwrite();
+        CommandState.getInstance(editor).toggleInsertOverwrite();
         inInsert = !inInsert;
     }
 
@@ -531,7 +600,7 @@ public class ChangeGroup extends AbstractActionGroup
      */
     public void processSingleCommand(Editor editor, DataContext context)
     {
-        CommandState.getInstance().pushState(CommandState.MODE_COMMAND, CommandState.SUBMODE_SINGLE_COMMAND,
+        CommandState.getInstance(editor).pushState(CommandState.MODE_COMMAND, CommandState.SUBMODE_SINGLE_COMMAND,
             KeyParser.MAPPING_NORMAL);
         clearStrokes(editor);
     }
@@ -543,40 +612,30 @@ public class ChangeGroup extends AbstractActionGroup
      * @param key The user entered keystroke
      * @return true if this was a regular character, false if not
      */
-    public boolean processKey(Editor editor, DataContext context, KeyStroke key)
+    public boolean processKey(final Editor editor, final DataContext context, final KeyStroke key)
     {
-        logger.debug("processKey(" + key + ")");
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("processKey(" + key + ")");
+        }
 
         if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED)
         {
             // Regular characters are not handled by us, pass them back to Idea. We just keep track of the keystroke
             // for repeating later.
-            strokes.add(new Character(key.getKeyChar()));
+            strokes.add(key.getKeyChar());
 
-            KeyHandler.getInstance().getOriginalHandler().execute(editor, key.getKeyChar(), context);
+            ApplicationManager.getApplication().runWriteAction(new Runnable() {
+                public void run()
+                {
+                    KeyHandler.getInstance().getOriginalHandler().execute(editor, key.getKeyChar(), context);
+                }
+            });
 
             return true;
         }
 
         return false;
-    }
-
-    public boolean processChanges(Editor editor, DataContext context, List changes)
-    {
-        logger.debug("processChanges");
-        for (int i = 0; i < changes.size(); i++)
-        {
-            TextChange change = (TextChange)changes.get(i);
-            int offset = editor.getCaretModel().getOffset();
-            logger.debug("offset=" + offset);
-            DocumentChange dc = new DocumentChange(offset, change.getOldText(), change.getNewText());
-            dc.redo(editor, context);
-            editor.getCaretModel().moveToOffset(offset + change.getNewText().length() - change.getOldText().length() + change.getOffset());
-        }
-
-        strokes.add(changes);
-
-        return true;
     }
 
     /**
@@ -608,7 +667,7 @@ public class ChangeGroup extends AbstractActionGroup
 
     /**
      * Clears all the keystrokes from the current insert command
-     * @param editor
+     * @param editor The editor to clear strokes from.
      */
     private void clearStrokes(Editor editor)
     {
@@ -628,7 +687,7 @@ public class ChangeGroup extends AbstractActionGroup
         int offset = CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, count, true);
         if (offset != -1)
         {
-            boolean res = deleteText(editor, context, editor.getCaretModel().getOffset(), offset, Command.FLAG_MOT_INCLUSIVE);
+            boolean res = deleteText(editor, context, new TextRange(editor.getCaretModel().getOffset(), offset), Command.FLAG_MOT_INCLUSIVE);
             int pos = editor.getCaretModel().getOffset();
             int norm = EditorHelper.normalizeOffset(editor, EditorHelper.getCurrentLogicalLine(editor), pos, false);
             if (norm != pos)
@@ -654,11 +713,14 @@ public class ChangeGroup extends AbstractActionGroup
         int start = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor);
         int offset = Math.min(CommandGroups.getInstance().getMotion().moveCaretToLineEndOffset(editor,
             count - 1, true) + 1, EditorHelper.getFileSize(editor, true));
-        logger.debug("start="+start);
-        logger.debug("offset="+offset);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("start="+start);
+            logger.debug("offset="+offset);
+        }
         if (offset != -1)
         {
-            boolean res = deleteText(editor, context, start, offset, Command.FLAG_MOT_LINEWISE);
+            boolean res = deleteText(editor, context, new TextRange(start, offset), Command.FLAG_MOT_LINEWISE);
             if (res && editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) &&
                 editor.getCaretModel().getOffset() != 0)
             {
@@ -684,7 +746,7 @@ public class ChangeGroup extends AbstractActionGroup
         int offset = CommandGroups.getInstance().getMotion().moveCaretToLineEndOffset(editor, count - 1, true);
         if (offset != -1)
         {
-            boolean res = deleteText(editor, context, editor.getCaretModel().getOffset(), offset, Command.FLAG_MOT_INCLUSIVE);
+            boolean res = deleteText(editor, context, new TextRange(editor.getCaretModel().getOffset(), offset), Command.FLAG_MOT_INCLUSIVE);
             int pos = CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, -1, false);
             if (pos != -1)
             {
@@ -711,6 +773,7 @@ public class ChangeGroup extends AbstractActionGroup
         if (count < 2) count = 2;
         int lline = EditorHelper.getCurrentLogicalLine(editor);
         int total = EditorHelper.getLineCount(editor);
+        //noinspection SimplifiableIfStatement
         if (lline + count > total)
         {
             return false;
@@ -765,7 +828,7 @@ public class ChangeGroup extends AbstractActionGroup
             {
                 offset = CommandGroups.getInstance().getMotion().moveCaretToLineStartOffset(editor, 1);
             }
-            deleteText(editor, context, editor.getCaretModel().getOffset(), offset, Command.FLAG_MOT_INCLUSIVE);
+            deleteText(editor, context, new TextRange(editor.getCaretModel().getOffset(), offset), 0);
             if (spaces)
             {
                 insertText(editor, context, start, " ");
@@ -783,6 +846,7 @@ public class ChangeGroup extends AbstractActionGroup
      * @param count The number of times to repear the deletion
      * @param rawCount The actual count entered by the user
      * @param argument The motion command
+     * @param isChange if from a change
      * @return true if able to delete the text, false if not
      */
     public boolean deleteMotion(Editor editor, DataContext context, int count, int rawCount, Argument argument, boolean isChange)
@@ -794,12 +858,15 @@ public class ChangeGroup extends AbstractActionGroup
         }
 
         // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is deleted when it shouldn't be.
-        String text = new String(editor.getDocument().getChars(), range.getStartOffset(),
-            range.getEndOffset() - range.getStartOffset());
-        if (text.indexOf('\n') >= 0 && !(range.getStartOffset() == 0 || editor.getDocument().getChars()[range.getStartOffset() - 1] == '\n'))
+        String text = EditorHelper.getDocumentChars(editor).subSequence(range.getStartOffset(),
+            range.getEndOffset()).toString();
+        if (text.indexOf('\n') >= 0 && !(range.getStartOffset() == 0 || EditorHelper.getDocumentChars(editor).charAt(range.getStartOffset() - 1) == '\n'))
         {
             String id = ActionManager.getInstance().getId(argument.getMotion().getAction());
-            logger.debug("action id=" + id);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("action id=" + id);
+            }
             if (id.equals("VimMotionWordRight") || id.equals("VimMotionBigWordRight") || id.equals("VimMotionCamelRight"))
             {
                 range = new TextRange(range.getStartOffset(), range.getEndOffset() - 1);
@@ -836,7 +903,7 @@ public class ChangeGroup extends AbstractActionGroup
      * @param context The data context
      * @param range The range to delete
      * @param type The type of deletion (FLAG_MOT_LINEWISE, FLAG_MOT_EXCLUSIVE, or FLAG_MOT_INCLUSIVE)
-     * @param isChange
+     * @param isChange If from a change
      * @return true if able to delete the text, false if not
      */
     public boolean deleteRange(Editor editor, DataContext context, TextRange range, int type, boolean isChange)
@@ -847,19 +914,17 @@ public class ChangeGroup extends AbstractActionGroup
         }
         else
         {
-            boolean res = true;
-            int[] starts = range.getStartOffsets();
-            int[] ends = range.getEndOffsets();
-            for (int i = ends.length - 1; i >= 0; i--)
-            {
-                res = deleteText(editor, context, starts[i], ends[i], type);
-            }
+            boolean res = deleteText(editor, context, range, type);
 
             if (res && editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) &&
                 editor.getCaretModel().getOffset() != 0 && !isChange)
             {
                 MotionGroup.moveCaret(editor, context,
                     CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeadingOffset(editor, -1));
+            }
+            else if (res && range.isMultiple())
+            {
+                MotionGroup.moveCaret(editor, context, range.getStartOffset());
             }
             else if (res && !isChange)
             {
@@ -913,7 +978,10 @@ public class ChangeGroup extends AbstractActionGroup
         {
             num = 1;
             space = EditorHelper.getLeadingWhitespace(editor, editor.offsetToLogicalPosition(offset).line);
-            logger.debug("space='" + space + "'");
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("space='" + space + "'");
+            }
         }
 
         StringBuffer repl = new StringBuffer(count);
@@ -949,14 +1017,38 @@ public class ChangeGroup extends AbstractActionGroup
      */
     public boolean changeCharacterRange(Editor editor, DataContext context, TextRange range, char ch)
     {
-        char[] chars = editor.getDocument().getChars();
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("change range: " + range + " to " + ch);
+        }
+        /*
+        int max = range.getMaxLength();
+        StringBuffer chs = new StringBuffer(max);
+        for (int i = 0; i < max; i++)
+        {
+            chs.append(ch);
+        }
+
+        for (int i = 0; i < range.size(); i++)
+        {
+            int soff = range.getStartOffsets()[i];
+            int eoff = EditorHelper.getLineEndForOffset(editor, range.getEndOffsets()[i]) - 1;
+            eoff = Math.min(eoff, range.getEndOffsets()[i]);
+            if (eoff > soff)
+            {
+                replaceText(editor, context, soff, eoff, chs.substring(0, eoff - soff));
+            }
+        }
+        */
+
+        CharSequence chars = EditorHelper.getDocumentChars(editor);
         int[] starts = range.getStartOffsets();
-        int[] ends = range.getStartOffsets();
+        int[] ends = range.getEndOffsets();
         for (int j = ends.length - 1; j >= 0; j--)
         {
             for (int i = starts[j]; i < ends[j]; i++)
             {
-                if (i < chars.length && '\n' != chars[i])
+                if (i < chars.length() && '\n' != chars.charAt(i))
                 {
                     replaceText(editor, context, i, i + 1, Character.toString(ch));
                 }
@@ -975,6 +1067,13 @@ public class ChangeGroup extends AbstractActionGroup
      */
     public boolean changeCharacters(Editor editor, DataContext context, int count)
     {
+        int len = EditorHelper.getLineLength(editor);
+        int col = EditorHelper.getCurrentLogicalColumn(editor);
+        if (col + count >= len)
+        {
+            return changeEndOfLine(editor, context, 1);
+        }
+
         boolean res = deleteCharacter(editor, context, count);
         if (res)
         {
@@ -1040,7 +1139,7 @@ public class ChangeGroup extends AbstractActionGroup
         if (id.equals("VimMotionWordRight"))
         {
             if (EditorHelper.getFileSize(editor) > 0 &&
-                !Character.isWhitespace(editor.getDocument().getChars()[editor.getCaretModel().getOffset()]))
+                !Character.isWhitespace(EditorHelper.getDocumentChars(editor).charAt(editor.getCaretModel().getOffset())))
             {
                 kludge = true;
                 argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionWordEndRight"));
@@ -1050,7 +1149,7 @@ public class ChangeGroup extends AbstractActionGroup
         else if (id.equals("VimMotionBigWordRight"))
         {
             if (EditorHelper.getFileSize(editor) > 0 &&
-                !Character.isWhitespace(editor.getDocument().getChars()[editor.getCaretModel().getOffset()]))
+                !Character.isWhitespace(EditorHelper.getDocumentChars(editor).charAt(editor.getCaretModel().getOffset())))
             {
                 kludge = true;
                 skipPunc = true;
@@ -1061,7 +1160,7 @@ public class ChangeGroup extends AbstractActionGroup
         else if (id.equals("VimMotionCamelRight"))
         {
             if (EditorHelper.getFileSize(editor) > 0 &&
-                !Character.isWhitespace(editor.getDocument().getChars()[editor.getCaretModel().getOffset()]))
+                !Character.isWhitespace(EditorHelper.getDocumentChars(editor).charAt(editor.getCaretModel().getOffset())))
             {
                 kludge = true;
                 argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionCamelEndRight"));
@@ -1074,13 +1173,16 @@ public class ChangeGroup extends AbstractActionGroup
             int pos = editor.getCaretModel().getOffset();
             int size = EditorHelper.getFileSize(editor);
             int cnt = count * argument.getMotion().getCount();
-            int pos1 = SearchHelper.findNextWordEnd(editor.getDocument().getChars(), pos, size, cnt, skipPunc, false, false);
-            int pos2 = SearchHelper.findNextWordEnd(editor.getDocument().getChars(), pos1, size, -cnt, skipPunc, false, false);
-            logger.debug("pos=" + pos);
-            logger.debug("pos1=" + pos1);
-            logger.debug("pos2=" + pos2);
-            logger.debug("count=" + count);
-            logger.debug("arg.count=" + argument.getMotion().getCount());
+            int pos1 = SearchHelper.findNextWordEnd(EditorHelper.getDocumentChars(editor), pos, size, cnt, skipPunc, false, false);
+            int pos2 = SearchHelper.findNextWordEnd(EditorHelper.getDocumentChars(editor), pos1, size, -cnt, skipPunc, false, false);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("pos=" + pos);
+                logger.debug("pos1=" + pos1);
+                logger.debug("pos2=" + pos2);
+                logger.debug("count=" + count);
+                logger.debug("arg.count=" + argument.getMotion().getCount());
+            }
             if (pos2 == pos)
             {
                 if (count > 1)
@@ -1108,6 +1210,53 @@ public class ChangeGroup extends AbstractActionGroup
         return res;
     }
 
+    public boolean blockInsert(Editor editor, DataContext context, TextRange range, boolean append)
+    {
+        LogicalPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
+        int lines = range.size();
+        int line = start.line;
+        int col = start.column;
+        if (!range.isMultiple())
+        {
+            col = 0;
+        }
+        else if (append)
+        {
+            col += range.getMaxLength();
+            if (EditorData.getLastColumn(editor) == MotionGroup.LAST_COLUMN)
+            {
+                col = MotionGroup.LAST_COLUMN;
+            }
+        }
+
+        int len = EditorHelper.getLineLength(editor, line);
+        if (col < MotionGroup.LAST_COLUMN && len < col)
+        {
+            String pad = EditorHelper.pad(editor, line, col);
+            int off = editor.getDocument().getLineEndOffset(line);
+            insertText(editor, context, off, pad);
+        }
+
+        if (range.isMultiple() || !append)
+        {
+            editor.getCaretModel().moveToOffset(editor.logicalPositionToOffset(new LogicalPosition(line, col)));
+        }
+        if (range.isMultiple())
+        {
+            setInsertRepeat(lines, col, append);
+        }
+        if (range.isMultiple() || !append)
+        {
+            insertBeforeCursor(editor, context);
+        }
+        else
+        {
+            insertAfterCursor(editor, context);
+        }
+
+        return true;
+    }
+
     /**
      * Deletes the range of text and enters insert mode
      * @param editor The editor to change
@@ -1118,6 +1267,17 @@ public class ChangeGroup extends AbstractActionGroup
      */
     public boolean changeRange(Editor editor, DataContext context, TextRange range, int type)
     {
+        int col = 0;
+        int lines = 0;
+        if (type == Command.FLAG_MOT_BLOCKWISE)
+        {
+            lines = range.size();
+            col = editor.offsetToLogicalPosition(range.getStartOffset()).column;
+            if (EditorData.getLastColumn(editor) == MotionGroup.LAST_COLUMN)
+            {
+                col = MotionGroup.LAST_COLUMN;
+            }
+        }
         boolean after = range.getEndOffset() >= EditorHelper.getFileSize(editor);
         boolean res = deleteRange(editor, context, range, type, true);
         if (res)
@@ -1135,6 +1295,10 @@ public class ChangeGroup extends AbstractActionGroup
             }
             else
             {
+                if (type == Command.FLAG_MOT_BLOCKWISE)
+                {
+                    setInsertRepeat(lines, col, false);
+                }
                 insertBeforeCursor(editor, context);
             }
         }
@@ -1229,16 +1393,16 @@ public class ChangeGroup extends AbstractActionGroup
             start = t;
         }
 
-        char[] chars = editor.getDocument().getChars();
+        CharSequence chars = EditorHelper.getDocumentChars(editor);
         for (int i = start; i < end; i++)
         {
-            if (i >= chars.length)
+            if (i >= chars.length())
             {
                 break;
             }
 
-            char ch = CharacterHelper.changeCase(chars[i], type);
-            if (ch != chars[i])
+            char ch = CharacterHelper.changeCase(chars.charAt(i), type);
+            if (ch != chars.charAt(i))
             {
                 replaceText(editor, context, i, i + 1, Character.toString(ch));
             }
@@ -1247,14 +1411,14 @@ public class ChangeGroup extends AbstractActionGroup
 
     public void autoIndentLines(Editor editor, DataContext context, int lines)
     {
-        KeyHandler.executeAction("AutoIndentLines", context);
+        KeyHandler.executeAction("OrigAutoIndentLines", context);
     }
 
     public void indentLines(Editor editor, DataContext context, int lines, int dir)
     {
         int cnt = 1;
-        if (CommandState.getInstance().getMode() == CommandState.MODE_INSERT ||
-            CommandState.getInstance().getMode() == CommandState.MODE_REPLACE)
+        if (CommandState.getInstance(editor).getMode() == CommandState.MODE_INSERT ||
+            CommandState.getInstance(editor).getMode() == CommandState.MODE_REPLACE)
         {
             if (strokes.size() > 0)
             {
@@ -1262,7 +1426,7 @@ public class ChangeGroup extends AbstractActionGroup
                 if (stroke instanceof Character)
                 {
                     Character key = (Character)stroke;
-                    if (key.charValue() == '0')
+                    if (key == '0')
                     {
                         deleteCharacter(editor, context, -1);
                         cnt = 99;
@@ -1284,13 +1448,15 @@ public class ChangeGroup extends AbstractActionGroup
         indentRange(editor, context, range, 1, dir);
     }
 
-    // TODO - work with visual block mode
     public void indentRange(Editor editor, DataContext context, TextRange range, int count, int dir)
     {
-        logger.debug("count=" + count);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("count=" + count);
+        }
         if (range == null) return;
 
-        Project proj = (Project)context.getData(DataConstants.PROJECT);
+        Project proj = PlatformDataKeys.PROJECT.getData(context); // API change - don't merge
         int tabSize = 8;
         int indentSize = 8;
         boolean useTabs = true;
@@ -1312,25 +1478,24 @@ public class ChangeGroup extends AbstractActionGroup
             eline--;
         }
 
-        for (int l = sline; l <= eline; l++)
+        if (range.isMultiple())
         {
-            int soff = EditorHelper.getLineStartOffset(editor, l);
-            int woff = CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor, l);
-            int col = editor.offsetToVisualPosition(woff).column;
-            int newCol = Math.max(0, col + dir * tabSize * count);
-            if (dir == 1 || col > 0)
+            int col = editor.offsetToLogicalPosition(range.getStartOffset()).column;
+            int size = indentSize * count;
+            if (dir == 1)
             {
+                // Right shift blockwise selection
                 StringBuffer space = new StringBuffer();
                 int tabCnt = 0;
-                int spcCnt = 0;
+                int spcCnt;
                 if (useTabs)
                 {
-                    tabCnt = newCol / tabSize;
-                    spcCnt = newCol % tabSize;
+                    tabCnt = size / tabSize;
+                    spcCnt = size % tabSize;
                 }
                 else
                 {
-                    spcCnt = newCol;
+                    spcCnt = size;
                 }
 
                 for (int i = 0; i < tabCnt; i++)
@@ -1342,15 +1507,95 @@ public class ChangeGroup extends AbstractActionGroup
                     space.append(' ');
                 }
 
-                replaceText(editor, context, soff, woff, space.toString());
+                for (int l = sline; l <= eline; l++)
+                {
+                    int len = EditorHelper.getLineLength(editor, l);
+                    if (len > col)
+                    {
+                        LogicalPosition spos = new LogicalPosition(l, col);
+                        insertText(editor, context, editor.logicalPositionToOffset(spos), space.toString());
+                    }
+                }
+            }
+            else
+            {
+                // Left shift blockwise selection
+                CharSequence chars = EditorHelper.getDocumentChars(editor);
+                for (int l = sline; l <= eline; l++)
+                {
+                    int len = EditorHelper.getLineLength(editor, l);
+                    if (len > col)
+                    {
+                        LogicalPosition spos = new LogicalPosition(l, col);
+                        LogicalPosition epos = new LogicalPosition(l, col + size - 1);
+                        int wsoff = editor.logicalPositionToOffset(spos);
+                        int weoff = editor.logicalPositionToOffset(epos);
+                        int pos;
+                        for (pos = wsoff; pos <= weoff; pos++)
+                        {
+                            if (CharacterHelper.charType(chars.charAt(pos), false) != CharacterHelper.TYPE_SPACE)
+                            {
+                                break;
+                            }
+                        }
+                        if (pos > wsoff)
+                        {
+                            deleteText(editor, context, new TextRange(wsoff, pos), 0);
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            // Shift non-blockwise selection
+            for (int l = sline; l <= eline; l++)
+            {
+                int soff = EditorHelper.getLineStartOffset(editor, l);
+                int woff = CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor, l);
+                int col = editor.offsetToVisualPosition(woff).column;
+                int newCol = Math.max(0, col + dir * indentSize * count);
+                if (dir == 1 || col > 0)
+                {
+                    StringBuffer space = new StringBuffer();
+                    int tabCnt = 0;
+                    int spcCnt;
+                    if (useTabs)
+                    {
+                        tabCnt = newCol / tabSize;
+                        spcCnt = newCol % tabSize;
+                    }
+                    else
+                    {
+                        spcCnt = newCol;
+                    }
+
+                    for (int i = 0; i < tabCnt; i++)
+                    {
+                        space.append('\t');
+                    }
+                    for (int i = 0; i < spcCnt; i++)
+                    {
+                        space.append(' ');
+                    }
+
+                    replaceText(editor, context, soff, woff, space.toString());
+                }
             }
         }
 
-        if (CommandState.getInstance().getMode() != CommandState.MODE_INSERT &&
-            CommandState.getInstance().getMode() != CommandState.MODE_REPLACE)
+        if (CommandState.getInstance(editor).getMode() != CommandState.MODE_INSERT &&
+            CommandState.getInstance(editor).getMode() != CommandState.MODE_REPLACE)
         {
-            MotionGroup.moveCaret(editor, context,
-                CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor, sline));
+            if (!range.isMultiple())
+            {
+                MotionGroup.moveCaret(editor, context,
+                    CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor, sline));
+            }
+            else
+            {
+                MotionGroup.moveCaret(editor, context, range.getStartOffset());
+            }
         }
 
         EditorData.setLastColumn(editor, editor.getCaretModel().getVisualPosition().column);
@@ -1378,34 +1623,33 @@ public class ChangeGroup extends AbstractActionGroup
      * register.
      * @param editor The editor to delete from
      * @param context The data context
-     * @param start The start offset to delete
-     * @param end The end offset to delete
+     * @param range The range to delete
      * @param type The type of deletion (FLAG_MOT_LINEWISE, FLAG_MOT_CHARACTERWISE)
      * @return true if able to delete the text, false if not
      */
-    private boolean deleteText(Editor editor, DataContext context, int start, int end, int type)
+    private boolean deleteText(Editor editor, DataContext context, TextRange range, int type)
     {
-        if (start > end)
+        if (range.size() == 1 && range.getStartOffset() > range.getEndOffset())
         {
-            int t = start;
-            start = end;
-            end = t;
+            int start = Math.max(0, Math.min(range.getStartOffset(), EditorHelper.getFileSize(editor, true)));
+            int end = Math.max(0, Math.min(range.getEndOffset(), EditorHelper.getFileSize(editor, true)));
+            range = new TextRange(end, start);
         }
 
-        logger.debug("start="+start);
-        logger.debug("end="+end);
-        start = Math.max(0, Math.min(start, EditorHelper.getFileSize(editor, true)));
-        end = Math.max(0, Math.min(end, EditorHelper.getFileSize(editor, true)));
-        logger.debug("start="+start);
-        logger.debug("end="+end);
-
-        if (CommandGroups.getInstance().getRegister().storeText(editor, context, start, end, type, true, false))
+        if (type == 0 || CommandGroups.getInstance().getRegister().storeText(editor, context, range, type, true, false))
         {
-            editor.getDocument().deleteString(start, end);
+            for (int i = range.size() - 1; i >= 0; i--)
+            {
+                editor.getDocument().deleteString(range.getStartOffsets()[i], range.getEndOffsets()[i]);
+            }
 
-            CommandGroups.getInstance().getMark().setMark(editor, context, '.', start);
-            CommandGroups.getInstance().getMark().setMark(editor, context, '[', start);
-            CommandGroups.getInstance().getMark().setMark(editor, context, ']', start);
+            if (type != 0)
+            {
+                int start = range.getStartOffset();
+                CommandGroups.getInstance().getMark().setMark(editor, context, '.', start);
+                CommandGroups.getInstance().getMark().setMark(editor, context, '[', start);
+                CommandGroups.getInstance().getMark().setMark(editor, context, ']', start);
+            }
 
             return true;
         }
@@ -1448,11 +1692,122 @@ public class ChangeGroup extends AbstractActionGroup
     {
         logger.debug("resetCursor");
         Document doc = FileDocumentManager.getInstance().getDocument(virtualFile);
+        if (doc == null) return; // Must be no text editor (such as image)
         Editor[] editors = EditorFactory.getInstance().getEditors(doc, proj);
-        logger.debug("There are " + editors.length + " editors for virtual file " + virtualFile.getName());
-        for (int i = 0; i < editors.length; i++)
+        if (logger.isDebugEnabled())
         {
-            editors[i].getSettings().setBlockCursor(!insert);
+            logger.debug("There are " + editors.length + " editors for virtual file " + virtualFile.getName());
+        }
+        for (Editor editor : editors)
+        {
+            editor.getSettings().setBlockCursor(!insert);
+        }
+    }
+
+    public boolean changeNumber(Editor editor, DataContext context, int count)
+    {
+        BoundListOption nf = (BoundListOption)Options.getInstance().getOption("nrformats");
+        boolean alpha = nf.contains("alpha");
+        boolean hex = nf.contains("hex");
+        boolean octal = nf.contains("octal");
+
+        TextRange range = SearchHelper.findNumberUnderCursor(editor, alpha, hex, octal);
+        if (range == null)
+        {
+            logger.debug("no number on line");
+            return false;
+        }
+        else
+        {
+            String text = EditorHelper.getText(editor, range);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("found range " + range);
+                logger.debug("text=" + text);
+            }
+            String number = text;
+            if (text.length() == 0)
+            {
+                return false;
+            }
+
+            char ch = text.charAt(0);
+            if (hex && text.toLowerCase().startsWith("0x"))
+            {
+                for (int i = text.length() - 1; i >= 2; i--)
+                {
+                    int index = "abcdefABCDEF".indexOf(text.charAt(i));
+                    if (index >= 0)
+                    {
+                        lastLower = index < 6;
+                        break;
+                    }
+                }
+
+                int num = (int)Long.parseLong(text.substring(2), 16);
+                num += count;
+                number = Integer.toHexString(num);
+                number = StringHelper.pad(number, text.length() - 2, '0');
+
+                if (!lastLower)
+                {
+                    number = number.toUpperCase();
+                }
+
+                number = text.substring(0, 2) + number;
+            }
+            else if (octal && text.startsWith("0") && text.length() > 1)
+            {
+                int num = (int)Long.parseLong(text, 8);
+                num += count;
+                number = Integer.toOctalString(num);
+                number = "0" + StringHelper.pad(number, text.length() - 1, '0');
+            }
+            else if (alpha && ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')))
+            {
+                ch += count;
+                if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))
+                {
+                    number = "" + ch;
+                }
+            }
+            else if (ch == '-' || (ch >= '0' && ch <= '9'))
+            {
+                boolean pad = ch == '0';
+                int len = text.length();
+                if (ch == '-' && text.charAt(1) == '0')
+                {
+                    pad = true;
+                    len--;
+                }
+
+                int num = Integer.parseInt(text);
+                num += count;
+                number = Integer.toString(num);
+
+                if (!octal && pad)
+                {
+                    boolean neg = false;
+                    if (number.charAt(0) == '-')
+                    {
+                        neg = true;
+                        number = number.substring(1);
+                    }
+                    number = StringHelper.pad(number, len, '0');
+                    if (neg)
+                    {
+                        number = "-" + number;
+                    }
+                }
+            }
+
+            if (!text.equals(number))
+            {
+                replaceText(editor, context, range.getStartOffset(), range.getEndOffset(), number);
+                editor.getCaretModel().moveToOffset(range.getStartOffset() + number.length() - 1);
+            }
+
+            return true;
         }
     }
 
@@ -1484,8 +1839,13 @@ public class ChangeGroup extends AbstractActionGroup
 
             logger.debug("selected file changed");
 
-            CommandState.getInstance().reset();
-            KeyHandler.getInstance().fullReset();
+            FileEditor fe = event.getOldEditor();
+            if (fe instanceof TextEditor)
+            {
+                Editor editor = ((TextEditor)event.getOldEditor()).getEditor();
+                CommandState.getInstance(editor).reset();
+                KeyHandler.getInstance().fullReset(editor);
+            }
 
             VirtualFile virtualFile = event.getOldFile();
             if (virtualFile != null)
@@ -1496,89 +1856,15 @@ public class ChangeGroup extends AbstractActionGroup
 
     }
 
-    public static class TextChangeListener extends DocumentAdapter
-    {
-        private int beforeOffset = 0;
-        private Editor editor;
-        private DataContext context;
-        private List changes = new ArrayList();
-
-        public TextChangeListener(Editor editor, DataContext context)
-        {
-            this.editor = editor;
-            this.context = context;
-        }
-
-        public void beforeDocumentChange(DocumentEvent event)
-        {
-            beforeOffset = event.getOffset();
-            logger.debug("beforeOffset=" + beforeOffset);
-        }
-
-        public void documentChanged(DocumentEvent event)
-        {
-            int afterOffset = event.getOffset();
-            logger.debug("afterOffset=" + afterOffset);
-            TextChange chg = new TextChange(afterOffset - beforeOffset, event.getOldFragment(), event.getNewFragment());
-            logger.debug("chg=" + chg);
-            changes.add(chg);
-
-            //complete(event.getDocument());
-        }
-
-        public void complete(/* Document document */)
-        {
-            logger.debug("changes=" + changes);
-            CommandGroups.getInstance().getChange().strokes.add(changes);
-            editor.getDocument().removeDocumentListener(this);
-        }
-    }
-
-    private static class TextChange
-    {
-        private int offset;
-        private String oldText;
-        private String newText;
-
-        public TextChange(int offset, String oldText, String newText)
-        {
-            this.offset = offset;
-            this.oldText = oldText;
-            this.newText = newText;
-        }
-
-        public int getOffset()
-        {
-            return offset;
-        }
-
-        public String getOldText()
-        {
-            return oldText;
-        }
-
-        public String getNewText()
-        {
-            return newText;
-        }
-
-        public String toString()
-        {
-            final StringBuffer buf = new StringBuffer();
-            buf.append("TextChange");
-            buf.append("{offset=").append(offset);
-            buf.append(",oldText=").append(oldText);
-            buf.append(",newText=").append(newText);
-            buf.append('}');
-            return buf.toString();
-        }
-    }
-
     private ArrayList strokes = new ArrayList();
     private ArrayList lastStrokes;
     private int insertStart;
     private Command lastInsert;
     private boolean inInsert;
+    private int repeatLines;
+    private int repeatColumn;
+    private boolean repeatAppend;
+    private boolean lastLower = true;
 
     private static Logger logger = Logger.getInstance(ChangeGroup.class.getName());
 }

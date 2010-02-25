@@ -1,6 +1,8 @@
+package com.maddyhome.idea.vim.ex.handler;
+
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2004 Rick Maddy
+ * Copyright (C) 2003-2005 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,21 +18,21 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.maddyhome.idea.vim.ex.handler;
 
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.CommandGroups;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.ui.MorePanel;
-import java.util.Iterator;
+
 import java.util.List;
 
 /**
@@ -47,14 +49,13 @@ public class MarksHandler extends CommandHandler
 
     public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException
     {
-        List marks = CommandGroups.getInstance().getMark().getMarks(editor);
+        List<Mark> marks = CommandGroups.getInstance().getMark().getMarks(editor);
 
         String spaces = "     ";
         StringBuffer text = new StringBuffer();
         text.append("mark  line  col file/text\n");
-        for (Iterator iterator = marks.iterator(); iterator.hasNext();)
+        for (Mark mark : marks)
         {
-            Mark mark = (Mark)iterator.next();
             text.append(" ");
             text.append(mark.getKey());
 
@@ -69,7 +70,8 @@ public class MarksHandler extends CommandHandler
             text.append(num);
 
             text.append(" ");
-            if (EditorData.getVirtualFile(editor).equals(mark.getFile()))
+            VirtualFile vf = EditorData.getVirtualFile(editor);
+            if (vf != null && vf.getPath().equals(mark.getFilename()))
             {
                 text.append(StringHelper.escape(EditorHelper.getLineText(editor, mark.getLogicalLine()).trim()));
             }

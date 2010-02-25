@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.group;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2006 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,7 +19,6 @@ package com.maddyhome.idea.vim.group;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
@@ -29,7 +28,10 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+
+import java.util.StringTokenizer;
 
 /**
  * This group works with command associated with copying and pasting text
@@ -54,9 +56,9 @@ public class CopyGroup extends AbstractActionGroup
      */
     public boolean yankMotion(Editor editor, DataContext context, int count, int rawCount, Argument argument)
     {
-        TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true, true);
+        TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true, false);
 
-        return yankRange(editor, context, range, argument.getMotion().getFlags());
+        return yankRange(editor, context, range, argument.getMotion().getFlags(), true);
     }
 
     /**
@@ -73,7 +75,7 @@ public class CopyGroup extends AbstractActionGroup
             editor, count - 1, true) + 1, EditorHelper.getFileSize(editor));
         if (offset != -1)
         {
-            return yankRange(editor, context, new TextRange(start, offset), Command.FLAG_MOT_LINEWISE);
+            return yankRange(editor, context, new TextRange(start, offset), Command.FLAG_MOT_LINEWISE, false);
         }
 
         return false;
@@ -85,15 +87,24 @@ public class CopyGroup extends AbstractActionGroup
      * @param context The data context
      * @param range The range of text to yank
      * @param type The type of yank - characterwise or linewise
+     * @param moveCursor
      * @return true if able to yank the range, false if not
      */
-    public boolean yankRange(Editor editor, DataContext context, TextRange range, int type)
+    public boolean yankRange(Editor editor, DataContext context, TextRange range, int type, boolean moveCursor)
     {
         if (range != null)
         {
-            logger.debug("yanking range");
-            return CommandGroups.getInstance().getRegister().storeText(editor, context, range.getStartOffset(),
-                range.getEndOffset(), type, false, true);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("yanking range: " + range);
+            }
+            boolean res = CommandGroups.getInstance().getRegister().storeText(editor, context, range, type, false, true);
+            if (moveCursor)
+            {
+                MotionGroup.moveCaret(editor, context, range.normalize().getStartOffset());
+            }
+
+            return res;
         }
 
         return false;
@@ -114,7 +125,12 @@ public class CopyGroup extends AbstractActionGroup
         Register reg = CommandGroups.getInstance().getRegister().getLastRegister();
         if (reg != null)
         {
-            int pos = 0;
+            if ((reg.getType() & Command.FLAG_MOT_LINEWISE) != 0 && editor.isOneLineMode())
+            {
+                return false;
+            }
+
+            int pos;
             // If a linewise put the text is inserted before the current line.
             if ((reg.getType() & Command.FLAG_MOT_LINEWISE) != 0)
             {
@@ -125,7 +141,7 @@ public class CopyGroup extends AbstractActionGroup
                 pos = editor.getCaretModel().getOffset();
             }
 
-            putText(editor, context, pos, reg.getText(), reg.getType(), count, indent, cursorAfter);
+            putText(editor, context, pos, reg.getText(), reg.getType(), count, indent, cursorAfter, 0);
 
             return true;
         }
@@ -147,16 +163,22 @@ public class CopyGroup extends AbstractActionGroup
         Register reg = CommandGroups.getInstance().getRegister().getLastRegister();
         if (reg != null)
         {
-            int pos = 0;
+            if ((reg.getType() & Command.FLAG_MOT_LINEWISE) != 0 && editor.isOneLineMode())
+            {
+                return false;
+            }
+
+            int pos;
             // If a linewise paste, the text is inserted after the current line.
             if ((reg.getType() & Command.FLAG_MOT_LINEWISE) != 0)
             {
                 pos = Math.min(editor.getDocument().getTextLength(),
                     CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, true) + 1);
                 if (pos > 0 && pos == editor.getDocument().getTextLength() &&
-                    editor.getDocument().getChars()[pos - 1] != '\n')
+                    EditorHelper.getDocumentChars(editor).charAt(pos - 1) != '\n')
                 {
                     editor.getDocument().insertString(pos, "\n");
+                    pos++;
                 }
             }
             else
@@ -164,7 +186,7 @@ public class CopyGroup extends AbstractActionGroup
                 pos = editor.getCaretModel().getOffset() + 1;
             }
 
-            putText(editor, context, pos, reg.getText(), reg.getType(), count, indent, cursorAfter);
+            putText(editor, context, pos, reg.getText(), reg.getType(), count, indent, cursorAfter, 0);
 
             return true;
         }
@@ -172,38 +194,68 @@ public class CopyGroup extends AbstractActionGroup
         return false;
     }
 
-    public boolean putVisualRange(Editor editor, DataContext context, TextRange range, int count)
+    public boolean putVisualRange(Editor editor, DataContext context, TextRange range, int count, boolean indent,
+        boolean cursorAfter)
     {
+        int type = CommandState.getInstance(editor).getSubMode();
         Register reg = CommandGroups.getInstance().getRegister().getLastRegister();
+        // Without this reset, the deleted text goes into the same register we just pasted from.
+        CommandGroups.getInstance().getRegister().resetRegister();
         if (reg != null)
         {
-            int start = editor.getSelectionModel().getSelectionStart();
-            int end = editor.getSelectionModel().getSelectionEnd();
-            int pos = 0;
-            // If a linewise paste, the text is inserted after the current line.
-            // TODO - deal with visual block
+            if ((reg.getType() & Command.FLAG_MOT_LINEWISE) != 0 && editor.isOneLineMode())
+            {
+                return false;
+            }
+
+            int start = range.getStartOffset();
+            int end = range.getEndOffset();
+            int endLine = editor.offsetToLogicalPosition(end).line;
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("start=" + start);
+                logger.debug("end=" + end);
+            }
+
+            if ((type & Command.FLAG_MOT_LINEWISE) != 0)
+            {
+                range = new TextRange(range.getStartOffset(),
+                    Math.min(range.getEndOffset() + 1, EditorHelper.getFileSize(editor)));
+            }
+
+            CommandGroups.getInstance().getChange().deleteRange(editor, context, range, type, false);
+
+            editor.getCaretModel().moveToOffset(start);
+
+            int pos = start;
             if ((reg.getType() & Command.FLAG_MOT_LINEWISE) != 0)
             {
-                MotionGroup.moveCaret(editor, context, end);
-                pos = Math.min(editor.getDocument().getTextLength(),
-                    CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, true) + 1);
-                if (pos > 0 && pos == editor.getDocument().getTextLength() &&
-                    editor.getDocument().getChars()[pos - 1] != '\n')
+                if ((type & Command.FLAG_MOT_LINEWISE) != 0)
                 {
-                    editor.getDocument().insertString(pos, "\n");
+                }
+                else if ((type & Command.FLAG_MOT_BLOCKWISE) != 0)
+                {
+                    pos = editor.getDocument().getLineEndOffset(endLine) + 1;
+                }
+                else
+                {
+                    editor.getDocument().insertString(start, "\n");
+                    pos = start + 1;
                 }
             }
-            else
+            else if ((reg.getType() & Command.FLAG_MOT_BLOCKWISE) != 0)
             {
-                pos = end;
+            }
+            else /* Characterwise */
+            {
+                if ((type & Command.FLAG_MOT_LINEWISE) != 0)
+                {
+                    editor.getDocument().insertString(start, "\n");
+                }
             }
 
-            putText(editor, context, pos, reg.getText(), reg.getType(), count, true, false);
-
-            MotionGroup.moveCaret(editor, context, start);
-
-            CommandGroups.getInstance().getChange().deleteRange(editor, context, range,
-                CommandState.getInstance().getSubMode(), false);
+            putText(editor, context, pos, reg.getText(), reg.getType(), count,
+                indent && reg.getType() == Command.FLAG_MOT_LINEWISE, cursorAfter, type);
 
             return true;
         }
@@ -221,29 +273,243 @@ public class CopyGroup extends AbstractActionGroup
      * @param count The number of times to paste the text
      * @param indent True if pasted lines should be autoindented, false if not
      * @param cursorAfter If true move cursor to just after pasted text
+     * @param mode The type of hightlight prior to the put.
      */
     public void putText(Editor editor, DataContext context, int offset, String text, int type, int count,
-        boolean indent, boolean cursorAfter)
+        boolean indent, boolean cursorAfter, int mode)
     {
-        // TODO - What about auto imports?
-        for (int i = 0; i < count; i++)
+        if (logger.isDebugEnabled())
         {
-            CommandGroups.getInstance().getChange().insertText(editor, context, offset, text);
+            logger.debug("offset=" + offset);
+            logger.debug("type=" + type);
+            logger.debug("mode=" + mode);
+        }
+
+        if ((mode & Command.FLAG_MOT_LINEWISE) != 0 && editor.isOneLineMode())
+        {
+            return;
+        }
+
+        // Don't indent if this there isn't anything about a linewise selection or register
+        if (indent && (type & Command.FLAG_MOT_LINEWISE) == 0 && (mode & Command.FLAG_MOT_LINEWISE) == 0)
+        {
+            indent = false;
+        }
+
+        if ((type & Command.FLAG_MOT_LINEWISE) != 0 && text.length() > 0 && text.charAt(text.length() - 1) != '\n')
+        {
+            text = text + '\n';
+        }
+
+        int insertCnt = 0;
+        int endOffset = offset;
+        if ((type & Command.FLAG_MOT_BLOCKWISE) == 0)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                CommandGroups.getInstance().getChange().insertText(editor, context, offset, text);
+                insertCnt += text.length();
+                endOffset += text.length();
+            }
+        }
+        else
+        {
+            LogicalPosition start = editor.offsetToLogicalPosition(offset);
+            int col = (mode & Command.FLAG_MOT_LINEWISE) != 0 ? 0 : start.column;
+            int line = start.line;
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("col=" + col + ", line=" + line);
+            }
+            int lines = 1;
+            for (int i = 0; i < text.length(); i++)
+            {
+                if (text.charAt(i) == '\n')
+                {
+                    lines++;
+                }
+            }
+
+            if (line + lines >= EditorHelper.getLineCount(editor))
+            {
+                for (int i = 0; i < line + lines - EditorHelper.getLineCount(editor); i++)
+                {
+                    CommandGroups.getInstance().getChange().insertText(editor, context, EditorHelper.getFileSize(editor, true), "\n");
+                    insertCnt++;
+                }
+            }
+
+            StringTokenizer parser = new StringTokenizer(text, "\n");
+            int maxlen = 0;
+            while (parser.hasMoreTokens())
+            {
+                String segment = parser.nextToken();
+                maxlen = Math.max(maxlen, segment.length());
+            }
+
+            parser = new StringTokenizer(text, "\n");
+            while (parser.hasMoreTokens())
+            {
+                String segment = parser.nextToken();
+                String origSegment = segment;
+                if (segment.length() < maxlen)
+                {
+                    logger.debug("short line");
+                    StringBuffer extra = new StringBuffer(maxlen - segment.length());
+                    for (int i = segment.length(); i < maxlen; i++)
+                    {
+                        extra.append(' ');
+                    }
+                    segment = segment + extra.toString();
+                    if (col != 0 && col < EditorHelper.getLineLength(editor, line))
+                    {
+                        origSegment = segment;
+                    }
+                }
+                String pad = EditorHelper.pad(editor, line, col);
+
+                int insoff = editor.logicalPositionToOffset(new LogicalPosition(line, col));
+                endOffset = insoff;
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("segment='" + segment + "'");
+                    logger.debug("origSegment='" + origSegment + "'");
+                    logger.debug("insoff=" + insoff);
+                }
+                for (int i = 0; i < count; i++)
+                {
+                    String txt = i == 0 ? origSegment : segment;
+                    CommandGroups.getInstance().getChange().insertText(editor, context, insoff, txt);
+                    insertCnt += txt.length();
+                    endOffset += txt.length();
+                }
+
+
+                if ((mode & Command.FLAG_MOT_LINEWISE) != 0)
+                {
+                    CommandGroups.getInstance().getChange().insertText(editor, context, endOffset, "\n");
+                    insertCnt++;
+                    endOffset++;
+                }
+                else
+                {
+                    if (pad.length() > 0)
+                    {
+                        CommandGroups.getInstance().getChange().insertText(editor, context, insoff, pad);
+                        insertCnt += pad.length();
+                        endOffset += pad.length();
+                    }
+                }
+
+                line++;
+            }
         }
 
         LogicalPosition slp = editor.offsetToLogicalPosition(offset);
+        /*
         int adjust = 0;
         if ((type & Command.FLAG_MOT_LINEWISE) != 0)
         {
             adjust = -1;
         }
-        LogicalPosition elp = editor.offsetToLogicalPosition(offset + count * text.length() + adjust);
+        */
+        LogicalPosition elp = editor.offsetToLogicalPosition(endOffset - 1);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("slp.line=" + slp.line);
+            logger.debug("elp.line=" + elp.line);
+        }
+        if (indent)
+        {
+            int startOff = editor.getDocument().getLineStartOffset(slp.line);
+            int endOff = editor.getDocument().getLineEndOffset(elp.line);
+            editor.getSelectionModel().setSelection(startOff, endOff);
+            KeyHandler.executeAction("OrigAutoIndentLines", context);
+        }
+        /*
+        boolean indented = false;
         for (int i = slp.line; indent && i <= elp.line; i++)
         {
             MotionGroup.moveCaret(editor, context, editor.logicalPositionToOffset(new LogicalPosition(i, 0)));
-            KeyHandler.executeAction("AutoIndentLines", context);
+            KeyHandler.executeAction("OrigAutoIndentLines", context);
+            indented = true;
+        }
+        */
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("insertCnt=" + insertCnt);
+        }
+        if (indent)
+        {
+            endOffset = EditorHelper.getLineEndOffset(editor, elp.line, true);
+            insertCnt = endOffset - offset;
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("insertCnt=" + insertCnt);
+            }
         }
 
+        int cursorMode;
+        if ((type & Command.FLAG_MOT_BLOCKWISE) != 0)
+        {
+            if ((mode & Command.FLAG_MOT_LINEWISE) != 0)
+            {
+                cursorMode = cursorAfter ? 4 : 1;
+            }
+            else
+            {
+                cursorMode = cursorAfter ? 5 : 1;
+            }
+        }
+        else if ((type & Command.FLAG_MOT_LINEWISE) != 0)
+        {
+            if ((mode & Command.FLAG_MOT_LINEWISE) != 0)
+            {
+                cursorMode = cursorAfter ? 4 : 3;
+            }
+            else
+            {
+                cursorMode = cursorAfter ? 4 : 3;
+            }
+        }
+        else /* Characterwise */
+        {
+            if ((mode & Command.FLAG_MOT_LINEWISE) != 0)
+            {
+                cursorMode = cursorAfter ? 4 : 1;
+            }
+            else
+            {
+                cursorMode = cursorAfter ? 5 : 2;
+            }
+        }
+
+        switch (cursorMode)
+        {
+            case 1:
+                MotionGroup.moveCaret(editor, context, offset);
+                break;
+            case 2:
+                MotionGroup.moveCaret(editor, context, endOffset - 1);
+                break;
+            case 3:
+                MotionGroup.moveCaret(editor, context, offset);
+                MotionGroup.moveCaret(editor, context,
+                    CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor));
+                break;
+            case 4:
+                MotionGroup.moveCaret(editor, context, endOffset + 1);
+                break;
+            case 5:
+                int pos = Math.min(endOffset, EditorHelper.getLineEndForOffset(editor, endOffset - 1) - 1);
+                MotionGroup.moveCaret(editor, context, pos);
+                break;
+        }
+
+        CommandGroups.getInstance().getMark().setMark(editor, context, '[', offset);
+        CommandGroups.getInstance().getMark().setMark(editor, context, ']', endOffset);
+
+        /*
         // Adjust the cursor position after the paste
         if ((type & Command.FLAG_MOT_LINEWISE) != 0)
         {
@@ -263,6 +529,7 @@ public class CopyGroup extends AbstractActionGroup
         {
             MotionGroup.moveCaret(editor, context, offset + count * text.length() - 1);
         }
+        */
     }
 
     private static Logger logger = Logger.getInstance(CopyGroup.class.getName());

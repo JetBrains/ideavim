@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.action.motion.updown;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2005 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,8 +19,12 @@ package com.maddyhome.idea.vim.action.motion.updown;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
-import com.maddyhome.idea.vim.handler.motion.updown.MotionDownLess1FirstNonSpaceHandler;
+import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.group.CommandGroups;
+import com.maddyhome.idea.vim.handler.motion.MotionEditorActionHandler;
+import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  */
@@ -28,6 +32,14 @@ public class MotionDownLess1FirstNonSpaceAction extends MotionEditorAction
 {
     public MotionDownLess1FirstNonSpaceAction()
     {
-        super(new MotionDownLess1FirstNonSpaceHandler());
+        super(new Handler());
+    }
+
+    private static class Handler extends MotionEditorActionHandler
+    {
+        public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument)
+        {
+            return CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeadingOffset(editor, count - 1);
+        }
     }
 }

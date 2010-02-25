@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.action.motion.visual;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2005 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,8 +19,12 @@ package com.maddyhome.idea.vim.action.motion.visual;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
-import com.maddyhome.idea.vim.handler.visual.VisualExitModeHandler;
+import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
+import com.maddyhome.idea.vim.group.CommandGroups;
+import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  *
@@ -29,7 +33,15 @@ public class VisualExitModeAction extends EditorAction
 {
     public VisualExitModeAction()
     {
-        super(new VisualExitModeHandler());
+        super(new Handler());
+    }
+
+    private static class Handler extends EditorActionHandler
+    {
+        public void execute(Editor editor, DataContext context)
+        {
+            CommandGroups.getInstance().getMotion().processEscape(editor, context);
+        }
     }
 }
 

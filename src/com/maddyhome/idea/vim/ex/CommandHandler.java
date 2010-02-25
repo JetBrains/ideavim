@@ -1,6 +1,8 @@
+package com.maddyhome.idea.vim.ex;
+
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2004 Rick Maddy
+ * Copyright (C) 2003-2006 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,16 +18,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.maddyhome.idea.vim.ex;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
 import com.maddyhome.idea.vim.undo.UndoManager;
-
-import java.util.Arrays;
 
 /**
  * Base class for all Ex command handlers.
@@ -192,7 +192,7 @@ public abstract class CommandHandler
      * @param count The count entered by the user prior to the command
      * @throws ExException if the range or argument is invalid or unable to run the command
      */
-    public void process(final Editor editor, final DataContext context, final ExCommand cmd, final int count) throws
+    public boolean process(final Editor editor, final DataContext context, final ExCommand cmd, final int count) throws
         ExException
     {
         // No range allowed
@@ -200,6 +200,12 @@ public abstract class CommandHandler
         {
             MessageHelper.EMSG(Msg.e_norange);
             throw new NoRangeAllowedException();
+        }
+
+        if ((argFlags & RANGE_REQUIRED) != 0 && cmd.getRanges().size() == 0)
+        {
+            MessageHelper.EMSG(Msg.e_rangereq);
+            throw new MissingRangeException();
         }
 
         // Argument required
@@ -214,12 +220,14 @@ public abstract class CommandHandler
             cmd.getRanges().setDefaultLine(1);
         }
 
+        CommandState.getInstance(editor).setFlags(optFlags);
+
+        boolean res = true;
         if ((argFlags & WRITABLE) != 0)
         {
             //RunnableHelper.runWriteCommand((Project)context.getData(DataConstants.PROJECT), new Runnable() {
             //    public void run()
             //    {
-                    boolean res = true;
                     try
                     {
                         UndoManager.getInstance().endCommand(editor);
@@ -255,7 +263,6 @@ public abstract class CommandHandler
             //RunnableHelper.runReadCommand((Project)context.getData(DataConstants.PROJECT), new Runnable() {
             //    public void run()
             //    {
-                    boolean res = true;
                     try
                     {
                         for (int i = 0; i < count; i++)
@@ -272,14 +279,12 @@ public abstract class CommandHandler
                     {
                         //MessageHelper.EMSG(e.getMessage());
                         VimPlugin.indicateError();
-                        res = false;
-                    }
-                    finally
-                    {
                     }
             //    }
             //});
         }
+
+        return res;
     }
 
     /**
@@ -291,18 +296,6 @@ public abstract class CommandHandler
      * @throws ExException if the range or arguments are invalid for the command
      */
     public abstract boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException;
-
-    public String toString()
-    {
-        StringBuffer res = new StringBuffer();
-        res.append(this.getClass().getName()).append("{");
-        res.append("names=" + Arrays.asList(names));
-        res.append(",argFlags=" + argFlags);
-        res.append(",optFlags=" + optFlags);
-        res.append("}");
-
-        return res.toString();
-    }
 
     protected CommandName[] names;
     protected int argFlags;

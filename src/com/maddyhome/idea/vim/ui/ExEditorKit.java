@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.ui;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2004 Rick Maddy
+ * Copyright (C) 2003-2006 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,17 +20,19 @@ package com.maddyhome.idea.vim.ui;
  */
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.group.CommandGroups;
+import com.maddyhome.idea.vim.helper.DigraphSequence;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import javax.swing.Action;
-import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Document;
-import javax.swing.text.JTextComponent;
 import javax.swing.text.TextAction;
 
 /**
@@ -56,7 +58,7 @@ public class ExEditorKit extends DefaultEditorKit
      */
     public String getContentType()
     {
-        return "text/plain";
+        return "text/ideavim";
     }
 
     /**
@@ -68,7 +70,10 @@ public class ExEditorKit extends DefaultEditorKit
      */
     public Action[] getActions()
     {
-        return TextAction.augmentList(super.getActions(), this.exActions);
+        Action[] res = TextAction.augmentList(super.getActions(), this.exActions);
+        if (logger.isDebugEnabled()) logger.debug("res.length=" + res.length);
+
+        return res;
     }
 
     /**
@@ -82,25 +87,144 @@ public class ExEditorKit extends DefaultEditorKit
         return new ExDocument();
     }
 
+    public static KeyStroke convert(ActionEvent event)
+    {
+        String cmd = event.getActionCommand();
+        int mods = event.getModifiers();
+        if (cmd != null && cmd.length() > 0)
+        {
+            char ch = cmd.charAt(0);
+            if (ch < ' ')
+            {
+                if (mods == KeyEvent.CTRL_MASK)
+                {
+                    return KeyStroke.getKeyStroke(KeyEvent.VK_A + ch - 1, mods);
+                }
+            }
+            else
+            {
+                return KeyStroke.getKeyStroke(new Character(ch), mods);
+            }
+        }
+
+        return null;
+    }
+
+    public static final String DefaultExKey = "default-ex-key";
+    public static final String CancelEntry = "cancel-entry";
+    public static final String CompleteEntry = "complete-entry";
+    public static final String EscapeChar = "escape";
     public static final String DeletePreviousChar = "delete-prev-char";
     public static final String DeletePreviousWord = "delete-prev-word";
     public static final String DeleteToCursor = "delete-to-cursor";
+    public static final String DeleteFromCursor = "delete-from-cursor";
     public static final String ToggleInsertReplace = "toggle-insert";
     public static final String InsertRegister = "insert-register";
     public static final String InsertWord = "insert-word";
     public static final String InsertWORD = "insert-WORD";
-    public static final String HistoryRecent = "history-recent";
-    public static final String HistoryOld = "history-old";
-    public static final String HistoryRecentFilter = "history-recent-filter";
-    public static final String HistoryOldFilter = "history-old-filter";
+    public static final String HistoryUp = "history-up";
+    public static final String HistoryDown = "history-down";
+    public static final String HistoryUpFilter = "history-up-filter";
+    public static final String HistoryDownFilter = "history-down-filter";
+    public static final String StartDigraph = "start-digraph";
 
-    //TODO - add rest of actions
     protected Action[] exActions = new Action[] {
-        new DeletePreviousCharAction(),
-        new DeletePreviousWordAction(),
-        new DeleteToCursorAction(),
-        new ToggleInsertReplaceAction()
+        new ExEditorKit.CancelEntryAction(),
+        new ExEditorKit.CompleteEntryAction(),
+        new ExEditorKit.EscapeCharAction(),
+        new ExEditorKit.DeletePreviousCharAction(),
+        new ExEditorKit.DeletePreviousWordAction(),
+        new ExEditorKit.DeleteToCursorAction(),
+        new ExEditorKit.DeleteFromCursorAction(),
+        new ExEditorKit.HistoryUpAction(),
+        new ExEditorKit.HistoryDownAction(),
+        new ExEditorKit.HistoryUpFilterAction(),
+        new ExEditorKit.HistoryDownFilterAction(),
+        new ExEditorKit.ToggleInsertReplaceAction(),
+        new ExEditorKit.StartDigraphAction()
     };
+
+    public static class DefaultExKeyHandler extends DefaultKeyTypedAction
+    {
+        public void actionPerformed(ActionEvent e)
+        {
+            ExTextField target = (ExTextField)getTextComponent(e);
+            KeyStroke key = convert(e);
+            if (key != null)
+            {
+                char ch = target.checkKey(convert(e));
+                if (ch > 0)
+                {
+                    ActionEvent event = new ActionEvent(e.getSource(), e.getID(), "" + ch, e.getWhen(), e.getModifiers());
+                    super.actionPerformed(event);
+
+                    target.saveLastEntry();
+                }
+            }
+            else
+            {
+                super.actionPerformed(e);
+
+                target.saveLastEntry();
+            }
+        }
+    }
+
+    public static class HistoryUpAction extends TextAction
+    {
+        public HistoryUpAction()
+        {
+            super(HistoryUp);
+        }
+
+        public void actionPerformed(ActionEvent actionEvent)
+        {
+            ExTextField target = (ExTextField)getTextComponent(actionEvent);
+            target.selectHistory(true, false);
+        }
+    }
+
+    public static class HistoryDownAction extends TextAction
+    {
+        public HistoryDownAction()
+        {
+            super(HistoryDown);
+        }
+
+        public void actionPerformed(ActionEvent actionEvent)
+        {
+            ExTextField target = (ExTextField)getTextComponent(actionEvent);
+            target.selectHistory(false, false);
+        }
+    }
+
+    public static class HistoryUpFilterAction extends TextAction
+    {
+        public HistoryUpFilterAction()
+        {
+            super(HistoryUpFilter);
+        }
+
+        public void actionPerformed(ActionEvent actionEvent)
+        {
+            ExTextField target = (ExTextField)getTextComponent(actionEvent);
+            target.selectHistory(true, true);
+        }
+    }
+
+    public static class HistoryDownFilterAction extends TextAction
+    {
+        public HistoryDownFilterAction()
+        {
+            super(HistoryDownFilter);
+        }
+
+        public void actionPerformed(ActionEvent actionEvent)
+        {
+            ExTextField target = (ExTextField)getTextComponent(actionEvent);
+            target.selectHistory(false, true);
+        }
+    }
 
     // TODO - how do I get the argument (register name)?
     public static class InsertRegisterAction extends TextAction
@@ -115,12 +239,59 @@ public class ExEditorKit extends DefaultEditorKit
          */
         public void actionPerformed(ActionEvent e)
         {
-            JTextComponent target = getTextComponent(e);
-            if (target != null && target.isEditable())
-            {
-            }
+            ExTextField target = (ExTextField)getTextComponent(e);
+            target.saveLastEntry();
+
         }
 
+    }
+
+    public static class CompleteEntryAction extends TextAction
+    {
+        public CompleteEntryAction()
+        {
+            super(CompleteEntry);
+        }
+
+        public void actionPerformed(ActionEvent actionEvent)
+        {
+            logger.debug("complete entry");
+            KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+
+            KeyHandler.getInstance().handleKey(
+                ExEntryPanel.getInstance().getEntry().getEditor(),
+                stroke,
+                ExEntryPanel.getInstance().getEntry().getContext());
+        }
+    }
+
+    public static class CancelEntryAction extends TextAction
+    {
+        public CancelEntryAction()
+        {
+            super(CancelEntry);
+        }
+
+        public void actionPerformed(ActionEvent e)
+        {
+            CommandGroups.getInstance().getProcess().cancelExEntry(
+                ExEntryPanel.getInstance().getEntry().getEditor(),
+                ExEntryPanel.getInstance().getEntry().getContext());
+        }
+    }
+
+    public static class EscapeCharAction extends TextAction
+    {
+        public EscapeCharAction()
+        {
+            super(EscapeChar);
+        }
+
+        public void actionPerformed(ActionEvent e)
+        {
+            ExTextField target = (ExTextField)getTextComponent(e);
+            target.escape();
+        }
     }
 
     public static class DeletePreviousCharAction extends TextAction
@@ -135,48 +306,48 @@ public class ExEditorKit extends DefaultEditorKit
          */
         public void actionPerformed(ActionEvent e)
         {
-            JTextField target = (JTextField)getTextComponent(e);
-            if ((target != null) && (target.isEditable()))
+            ExTextField target = (ExTextField)getTextComponent(e);
+            target.saveLastEntry();
+
+            try
             {
-                try
+                Document doc = target.getDocument();
+                Caret caret = target.getCaret();
+                int dot = caret.getDot();
+                int mark = caret.getMark();
+                if (dot != mark)
                 {
-                    Document doc = target.getDocument();
-                    Caret caret = target.getCaret();
-                    int dot = caret.getDot();
-                    int mark = caret.getMark();
-                    if (dot != mark)
-                    {
-                        doc.remove(Math.min(dot, mark), Math.abs(dot - mark));
-                    }
-                    else if (dot > 0)
-                    {
-                        int delChars = 1;
+                    doc.remove(Math.min(dot, mark), Math.abs(dot - mark));
+                }
+                else if (dot > 0)
+                {
+                    int delChars = 1;
 
-                        if (dot > 1)
+                    if (dot > 1)
+                    {
+                        String dotChars = doc.getText(dot - 2, 2);
+                        char c0 = dotChars.charAt(0);
+                        char c1 = dotChars.charAt(1);
+
+                        if (c0 >= '\uD800' && c0 <= '\uDBFF' &&
+                            c1 >= '\uDC00' && c1 <= '\uDFFF')
                         {
-                            String dotChars = doc.getText(dot - 2, 2);
-                            char c0 = dotChars.charAt(0);
-                            char c1 = dotChars.charAt(1);
-
-                            if (c0 >= '\uD800' && c0 <= '\uDBFF' &&
-                                c1 >= '\uDC00' && c1 <= '\uDFFF')
-                            {
-                                delChars = 2;
-                            }
+                            delChars = 2;
                         }
+                    }
 
-                        doc.remove(dot - delChars, delChars);
-                    }
-                    else
-                    {
-                        CommandGroups.getInstance().getProcess().cancelExEntry(
-                            ExEntryPanel.getInstance().getEntry().getEditor(),
-                            ExEntryPanel.getInstance().getEntry().getContext());
-                    }
+                    doc.remove(dot - delChars, delChars);
                 }
-                catch (BadLocationException bl)
+                else
                 {
+                    CommandGroups.getInstance().getProcess().cancelExEntry(
+                        ExEntryPanel.getInstance().getEntry().getEditor(),
+                        ExEntryPanel.getInstance().getEntry().getContext());
                 }
+            }
+            catch (BadLocationException bl)
+            {
+                // ignore
             }
         }
     }
@@ -193,20 +364,22 @@ public class ExEditorKit extends DefaultEditorKit
          */
         public void actionPerformed(ActionEvent e)
         {
-            JTextComponent target = getTextComponent(e);
-            if (target != null && target.isEditable())
+            ExTextField target = (ExTextField)getTextComponent(e);
+            target.saveLastEntry();
+
+            Document doc = target.getDocument();
+            Caret caret = target.getCaret();
+            int offset = SearchHelper.findNextWord(target.getText(), caret.getDot(), target.getText().length(),
+                -1, false, false);
+            if (logger.isDebugEnabled()) logger.debug("offset=" + offset);
+            try
             {
-                Document doc = target.getDocument();
-                Caret caret = target.getCaret();
-                int offset = SearchHelper.findNextWord(target.getText().toCharArray(), caret.getDot(), doc.getLength(),
-                    -1, false, false);
-                try
-                {
-                    doc.remove(offset, caret.getDot());
-                }
-                catch (BadLocationException ex)
-                {
-                }
+                int pos = caret.getDot();
+                doc.remove(offset, pos - offset);
+            }
+            catch (BadLocationException ex)
+            {
+                // ignore
             }
         }
     }
@@ -223,18 +396,46 @@ public class ExEditorKit extends DefaultEditorKit
          */
         public void actionPerformed(ActionEvent e)
         {
-            JTextComponent target = getTextComponent(e);
-            if (target != null && target.isEditable())
+            ExTextField target = (ExTextField)getTextComponent(e);
+            target.saveLastEntry();
+
+            Document doc = target.getDocument();
+            Caret caret = target.getCaret();
+            try
             {
-                Document doc = target.getDocument();
-                Caret caret = target.getCaret();
-                try
-                {
-                    doc.remove(0, caret.getDot());
-                }
-                catch (BadLocationException ex)
-                {
-                }
+                doc.remove(0, caret.getDot());
+            }
+            catch (BadLocationException ex)
+            {
+                // ignore
+            }
+        }
+    }
+
+    public static class DeleteFromCursorAction extends TextAction
+    {
+        public DeleteFromCursorAction()
+        {
+            super(DeleteFromCursor);
+        }
+
+        /**
+         * Invoked when an action occurs.
+         */
+        public void actionPerformed(ActionEvent e)
+        {
+            ExTextField target = (ExTextField)getTextComponent(e);
+            target.saveLastEntry();
+
+            Document doc = target.getDocument();
+            Caret caret = target.getCaret();
+            try
+            {
+                doc.remove(caret.getDot(), doc.getLength());
+            }
+            catch (BadLocationException ex)
+            {
+                // ignore
             }
         }
     }
@@ -254,9 +455,26 @@ public class ExEditorKit extends DefaultEditorKit
         public void actionPerformed(ActionEvent e)
         {
             logger.debug("actionPerformed");
-            JTextComponent target = getTextComponent(e);
-            ExDocument doc = (ExDocument)target.getDocument();
-            doc.toggleInsertReplace();
+            ExTextField target = (ExTextField)getTextComponent(e);
+            target.toggleInsertReplace();
+        }
+    }
+
+    public static class StartDigraphAction extends TextAction
+    {
+        public StartDigraphAction()
+        {
+            super(StartDigraph);
+        }
+
+        public void actionPerformed(ActionEvent actionEvent)
+        {
+            ExTextField target = (ExTextField)getTextComponent(actionEvent);
+            KeyStroke key = convert(actionEvent);
+            if (key != null && DigraphSequence.isDigraphStart(key))
+            {
+                target.startDigraph(convert(actionEvent));
+            }
         }
     }
 

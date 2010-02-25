@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.helper;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2005 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,6 +19,7 @@ package com.maddyhome.idea.vim.helper;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
@@ -26,8 +27,11 @@ import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.VisualPosition;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.common.CharacterPosition;
+import com.maddyhome.idea.vim.common.TextRange;
+
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.nio.CharBuffer;
@@ -77,6 +81,17 @@ public class EditorHelper
         return editor.getCaretModel().getLogicalPosition().column;
     }
 
+    public static int getVisualLineAtTopOfScreen(Editor editor)
+    {
+        int lh = editor.getLineHeight();
+        return (editor.getScrollingModel().getVerticalScrollOffset() + lh - 1) / lh;
+    }
+
+    public static int getCurrentVisualScreenLine(Editor editor)
+    {
+        return getCurrentVisualLine(editor) - getVisualLineAtTopOfScreen(editor) + 1;
+    }
+
     /**
      * Gets the number of characters on the current line. This will be different than the number of visual
      * characters if there are "real" tabs in the line.
@@ -108,6 +123,13 @@ public class EditorHelper
             return Math.max(0, editor.offsetToLogicalPosition(editor.getDocument().getLineEndOffset(lline)).column);
         }
     }
+
+    /*
+    public static int getMaximumLineLength(Editor editor)
+    {
+        int width = editor.getScrollingModel().
+    }
+    */
 
     /**
      * Gets the number of characters on the specified visual line. This will be different than the number of visual
@@ -143,7 +165,7 @@ public class EditorHelper
     {
         int len = editor.getDocument().getLineCount();
         if (editor.getDocument().getTextLength() > 0 &&
-            editor.getDocument().getChars()[editor.getDocument().getTextLength() - 1] == '\n')
+            EditorHelper.getDocumentChars(editor).charAt(editor.getDocument().getTextLength() - 1) == '\n')
         {
             len--;
         }
@@ -164,13 +186,14 @@ public class EditorHelper
     /**
      * Gets the actual number of characters in the file
      * @param editor The editor
+     * @param incEnd True include newline
      * @return The file's character count
      */
     public static int getFileSize(Editor editor, boolean incEnd)
     {
         Document doc = editor.getDocument();
         int len = doc.getTextLength();
-        if (!incEnd && len >= 1 && doc.getChars()[len - 1] == '\n')
+        if (!incEnd && len >= 1 && EditorHelper.getDocumentChars(editor).charAt(len - 1) == '\n')
         {
             len--;
         }
@@ -186,7 +209,11 @@ public class EditorHelper
      */
     public static int getScreenHeight(Editor editor)
     {
-        return editor.getScrollingModel().getVisibleArea().height / editor.getLineHeight();
+        int lh = editor.getLineHeight();
+        int height = editor.getScrollingModel().getVisibleArea().y +
+            editor.getScrollingModel().getVisibleArea().height -
+            getVisualLineAtTopOfScreen(editor) * lh;
+        return height / lh;
     }
 
     /**
@@ -204,6 +231,34 @@ public class EditorHelper
     }
 
     /**
+     * Gets the number of pixels per column of text.
+     * @param editor The editor
+     * @return The number of pixels
+     */
+    public static int getColumnWidth(Editor editor)
+    {
+        Rectangle rect = editor.getScrollingModel().getVisibleArea();
+        if (rect.width == 0) return 0;
+        Point pt = new Point(rect.width, 0);
+        VisualPosition vp = editor.xyToVisualPosition(pt);
+        if (vp.column == 0) return 0;
+
+        return rect.width / vp.column;
+    }
+
+    /**
+     * Gets the column currently displayed at the left edge of the editor.
+     * @param editor The editor
+     * @return The column number
+     */
+    public static int getVisualColumnAtLeftOfScreen(Editor editor)
+    {
+        int cw = getColumnWidth(editor);
+        if (cw == 0) return 0;
+        return (editor.getScrollingModel().getHorizontalScrollOffset() + cw - 1) / cw;
+    }
+
+    /**
      * Converts a visual line number to a logical line number.
      * @param editor The editor
      * @param vline The visual line number to convert
@@ -211,7 +266,8 @@ public class EditorHelper
      */
     public static int visualLineToLogicalLine(Editor editor, int vline)
     {
-        return editor.visualToLogicalPosition(new VisualPosition(vline, 0)).line;
+        int lline = editor.visualToLogicalPosition(new VisualPosition(vline, 0)).line;
+        return normalizeLine(editor, lline);
     }
 
     /**
@@ -252,6 +308,7 @@ public class EditorHelper
      * Returns the offset of the end of the requested line.
      * @param editor The editor
      * @param lline The logical line to get the end offset for.
+     * @param incEnd True include newline
      * @return 0 if line is &lt 0, file size of line is bigger than file, else the end offset for the line
      */
     public static int getLineEndOffset(Editor editor, int lline, boolean incEnd)
@@ -279,7 +336,7 @@ public class EditorHelper
      */
     public static int normalizeVisualLine(Editor editor, int vline)
     {
-        vline = Math.min(Math.max(0, vline), getVisualLineCount(editor) - 1);
+        vline = Math.max(0, Math.min(vline, getVisualLineCount(editor) - 1));
 
         return vline;
     }
@@ -304,11 +361,12 @@ public class EditorHelper
      * @param editor The editor
      * @param vline The visual line number
      * @param col The column number to normalize
+     * @param allowEnd True if newline allowed
      * @return The normalized column number
      */
     public static int normalizeVisualColumn(Editor editor, int vline, int col, boolean allowEnd)
     {
-        col = Math.min(Math.max(0, col), getVisualLineLength(editor, vline) - (allowEnd ? 0 : 1));
+        col = Math.max(0, Math.min(col, getVisualLineLength(editor, vline) - (allowEnd ? 0 : 1)));
 
         return col;
     }
@@ -319,11 +377,12 @@ public class EditorHelper
      * @param editor The editor
      * @param lline The logical line number
      * @param col The column number to normalize
+     * @param allowEnd True if newline allowed
      * @return The normalized column number
      */
-    public static int normalizeColumn(Editor editor, int lline, int col)
+    public static int normalizeColumn(Editor editor, int lline, int col, boolean allowEnd)
     {
-        col = Math.min(Math.max(0, getLineLength(editor, lline) - 1), col);
+        col = Math.min(Math.max(0, getLineLength(editor, lline) - (allowEnd ? 0 : 1)), col);
 
         return col;
     }
@@ -345,7 +404,7 @@ public class EditorHelper
         }
 
         int min = getLineStartOffset(editor, lline);
-        int max = getLineEndOffset(editor, lline, allowEnd);;
+        int max = getLineEndOffset(editor, lline, allowEnd);
         offset = Math.max(Math.min(offset, max), min);
 
         return offset;
@@ -354,24 +413,29 @@ public class EditorHelper
     public static int normalizeOffset(Editor editor, int offset, boolean allowEnd)
     {
         int lline = editor.offsetToLogicalPosition(offset).line;
-        
+
         return normalizeOffset(editor, lline, offset, allowEnd);
     }
 
     public static int getLeadingCharacterOffset(Editor editor, int lline)
     {
-        int start = getLineStartOffset(editor, lline);
+        return getLeadingCharacterOffset(editor, lline, 0);
+    }
+
+    public static int getLeadingCharacterOffset(Editor editor, int lline, int col)
+    {
+        int start = getLineStartOffset(editor, lline) + col;
         int end = getLineEndOffset(editor, lline, true);
-        char[] chars = editor.getDocument().getChars();
+        CharSequence chars = EditorHelper.getDocumentChars(editor);
         int pos = end;
         for (int offset = start; offset < end; offset++)
         {
-            if (offset >= chars.length)
+            if (offset >= chars.length())
             {
                 break;
             }
 
-            if (!Character.isWhitespace(chars[offset]))
+            if (!Character.isWhitespace(chars.charAt(offset)))
             {
                 pos = offset;
                 break;
@@ -386,7 +450,7 @@ public class EditorHelper
         int start = getLineStartOffset(editor, lline);
         int end = getLeadingCharacterOffset(editor, lline);
 
-        return new String(editor.getDocument().getChars(), start, end - start);
+        return EditorHelper.getDocumentChars(editor).subSequence(start, end).toString();
     }
 
     /**
@@ -432,7 +496,48 @@ public class EditorHelper
      */
     public static String getText(Editor editor, int start, int end)
     {
-        return new String(editor.getDocument().getChars(), start, end - start);
+      // Fix for IOOBE
+      final CharSequence documentChars = EditorHelper.getDocumentChars(editor);
+      if (!(0<=start && start < end && start < documentChars.length() && 0<=end && end <= documentChars.length())){
+        return "";
+      }
+      return documentChars.subSequence(start, end).toString();
+    }
+
+    public static String getText(Editor editor, TextRange range)
+    {
+        int len = range.size();
+        if (len == 1)
+        {
+            return getText(editor, range.getStartOffset(), range.getEndOffset());
+        }
+        else
+        {
+            StringBuffer res = new StringBuffer();
+            int max = range.getMaxLength();
+
+            for (int i = 0; i < len; i++)
+            {
+                if (i > 0)
+                {
+                    res.append('\n');
+                }
+                String line = getText(editor, range.getStartOffsets()[i], range.getEndOffsets()[i]);
+                if (line.length() == 0)
+                {
+                    for (int j = 0; j < max; j++)
+                    {
+                        res.append(' ');
+                    }
+                }
+                else
+                {
+                    res.append(line);
+                }
+            }
+
+            return res.toString();
+        }
     }
 
     /**
@@ -455,6 +560,7 @@ public class EditorHelper
      */
     public static int getLineEndForOffset(Editor editor, int offset)
     {
+        if (logger.isDebugEnabled()) logger.debug("editor=" + editor);
         LogicalPosition pos = editor.offsetToLogicalPosition(offset);
         return editor.getDocument().getLineEndOffset(pos.line);
     }
@@ -490,7 +596,70 @@ public class EditorHelper
 
     public static CharBuffer getLineBuffer(Editor editor, int lline)
     {
-        return CharBuffer.wrap(editor.getDocument().getChars(), getLineStartOffset(editor, lline),
-            getLineCharCount(editor, lline));
+        int start = getLineStartOffset(editor, lline);
+        return CharBuffer.wrap(EditorHelper.getDocumentChars(editor), start, start + getLineCharCount(editor, lline));
     }
+
+    public static boolean isLineEmpty(Editor editor, int lline, boolean allowBlanks)
+    {
+        CharSequence chars = EditorHelper.getDocumentChars(editor);
+        int offset = getLineStartOffset(editor, lline);
+        if (chars.charAt(offset) == '\n')
+        {
+            return true;
+        }
+        else if (allowBlanks)
+        {
+            for (; offset < chars.length(); offset++)
+            {
+                if (chars.charAt(offset) == '\n')
+                {
+                    return true;
+                }
+                else if (!Character.isWhitespace(chars.charAt(offset)))
+                {
+                    return false;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public static String pad(Editor editor, int lline, int to)
+    {
+        StringBuffer res = new StringBuffer();
+
+        int len = getLineLength(editor, lline);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("lline=" + lline);
+            logger.debug("len=" + len);
+            logger.debug("to=" + to);
+        }
+        if (len < to)
+        {
+            // TODO - use tabs as needed
+            for (int i = len; i < to; i++)
+            {
+                res.append(' ');
+            }
+        }
+
+        return res.toString();
+    }
+
+    public static CharSequence getDocumentChars(Editor editor)
+    {
+        return editor.getDocument().getCharsSequence(); // API change - don't merge
+    }
+
+    public static boolean canEdit(Project project, Editor editor)
+    {
+        return (editor.getDocument().isWritable() ||  // API change - don't merge
+            FileDocumentManager.fileForDocumentCheckedOutSuccessfully(editor.getDocument(), project)) &&  // API change - don't merge
+            !EditorData.isConsoleOutput(editor);
+    }
+
+    private static final Logger logger = Logger.getInstance(EditorHelper.class.getName());
 }

@@ -3,7 +3,7 @@ package com.maddyhome.idea.vim.ex;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2004 Rick Maddy
+ * Copyright (C) 2003-2006 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -26,6 +26,8 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.common.Register;
+import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.ex.handler.AsciiHandler;
 import com.maddyhome.idea.vim.ex.handler.CmdFilterHandler;
 import com.maddyhome.idea.vim.ex.handler.CopyTextHandler;
 import com.maddyhome.idea.vim.ex.handler.DeleteLinesHandler;
@@ -39,7 +41,9 @@ import com.maddyhome.idea.vim.ex.handler.FindSymbolHandler;
 import com.maddyhome.idea.vim.ex.handler.GotoCharacterHandler;
 import com.maddyhome.idea.vim.ex.handler.GotoLineHandler;
 import com.maddyhome.idea.vim.ex.handler.HelpHandler;
+import com.maddyhome.idea.vim.ex.handler.HistoryHandler;
 import com.maddyhome.idea.vim.ex.handler.JoinLinesHandler;
+import com.maddyhome.idea.vim.ex.handler.JumpsHandler;
 import com.maddyhome.idea.vim.ex.handler.MarkHandler;
 import com.maddyhome.idea.vim.ex.handler.MarksHandler;
 import com.maddyhome.idea.vim.ex.handler.MoveTextHandler;
@@ -70,7 +74,9 @@ import com.maddyhome.idea.vim.ex.handler.WriteQuitHandler;
 import com.maddyhome.idea.vim.ex.handler.YankLinesHandler;
 import com.maddyhome.idea.vim.ex.range.AbstractRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
+import com.maddyhome.idea.vim.group.HistoryGroup;
 import com.maddyhome.idea.vim.helper.ApiHelper;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
 
@@ -104,7 +110,6 @@ public class CommandParser
      */
     private CommandParser()
     {
-        //registerHandlers();
     }
 
     /**
@@ -114,6 +119,7 @@ public class CommandParser
     {
         if (registered) return;
 
+        new AsciiHandler();
         new CmdFilterHandler();
         new CopyTextHandler();
         new DeleteLinesHandler();
@@ -127,7 +133,9 @@ public class CommandParser
         new GotoCharacterHandler();
         //new GotoLineHandler(); - not needed here
         new HelpHandler();
+        new HistoryHandler();
         new JoinLinesHandler();
+        new JumpsHandler();
         new MarkHandler();
         new MarksHandler();
         new MoveTextHandler();
@@ -203,12 +211,15 @@ public class CommandParser
             return result | RES_EMPTY;
         }
 
+        // Save the command history
+        CommandGroups.getInstance().getHistory().addEntry(HistoryGroup.COMMAND, cmd);
+
         // Parse the command
         ParseResult res = parse(cmd);
         String command = res.getCommand();
 
         // If there is no command, just a range, use the 'goto line' handler
-        CommandHandler handler = null;
+        CommandHandler handler;
         if (command.length() == 0)
         {
             handler = new GotoLineHandler();
@@ -245,14 +256,14 @@ public class CommandParser
         }
 
         // Run the command
-        handler.process(editor, context, new ExCommand(res.getRanges(), command, res.getArgument()), count);
-        if ((handler.getArgFlags() & CommandHandler.DONT_SAVE_LAST) == 0)
+        boolean ok = handler.process(editor, context, new ExCommand(res.getRanges(), command, res.getArgument()), count);
+        if (ok && (handler.getArgFlags() & CommandHandler.DONT_SAVE_LAST) == 0)
         {
-            CommandGroups.getInstance().getRegister().storeTextInternal(editor, context, -1, -1, cmd,
+            CommandGroups.getInstance().getRegister().storeTextInternal(editor, context, new TextRange(-1, -1), cmd,
                 Command.FLAG_MOT_CHARACTERWISE, ':', false, false);
         }
 
-        if ((handler.getArgFlags() & CommandHandler.KEEP_FOCUS) != 0)
+        if (ok && (handler.getArgFlags() & CommandHandler.KEEP_FOCUS) != 0)
         {
             result |= RES_MORE_PANEL;
         }
@@ -274,7 +285,10 @@ public class CommandParser
     public ParseResult parse(String cmd) throws ExException
     {
         // This is a complicated state machine that should probably be rewritten
-        logger.debug("processing `" + cmd + "'");
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("processing `" + cmd + "'");
+        }
         int state = STATE_START;
         Ranges ranges = new Ranges(); // The list of ranges
         StringBuffer command = new StringBuffer(); // The command
@@ -315,7 +329,7 @@ public class CommandParser
                         break;
                     case STATE_COMMAND: // Reading the actual command name
                         // For commands that start with a non-letter, treat other non-letter characters as part of
-                        // the argument except for < or >
+                        // the argument except for !, <, or >
                         if (Character.isLetter(ch) ||
                             (command.length() == 0 && "~<>@=#*&!".indexOf(ch) >= 0) ||
                             (command.length() > 0 && ch == command.charAt(command.length() - 1) &&
@@ -323,7 +337,7 @@ public class CommandParser
                         {
                             command.append(ch);
                             reprocess = false;
-                            if (!Character.isLetter(ch) && "<>".indexOf(ch) == 0)
+                            if (!Character.isLetter(ch) && "<>".indexOf(ch) < 0)
                             {
                                 state = STATE_CMD_ARG;
                             }
@@ -501,6 +515,13 @@ public class CommandParser
                         break;
                     case STATE_RANGE_DONE: // We have hit the end of a range - process it
                         Range[] range = AbstractRange.createRange(location.toString(), offsetTotal, move);
+                        if (range == null)
+                        {
+                            error = MessageHelper.getMsg(Msg.e_badrange, Character.toString(ch));
+                            state = STATE_ERROR;
+                            reprocess = false;
+                            break;
+                        }
                         ranges.addRange(range);
                         // Could there be more ranges - nope - at end, start command
                         if (ch == ':' || ch == '\n')
@@ -628,9 +649,12 @@ public class CommandParser
             }
         }
 
-        logger.debug("ranges = " + ranges);
-        logger.debug("command = " + command);
-        logger.debug("argument = " + argument);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("ranges = " + ranges);
+            logger.debug("command = " + command);
+            logger.debug("argument = " + argument);
+        }
 
         return new ParseResult(ranges, command.toString(), argument.toString().trim());
     }
@@ -643,10 +667,10 @@ public class CommandParser
     {
         // Iterator through each command name alias
         CommandName[] names = handler.getNames();
-        for (int c = 0; c < names.length; c++)
+        for (CommandName name : names)
         {
             CommandNode node = root;
-            String text = names[c].getRequired();
+            String text = name.getRequired();
             // Build a tree for each character in the required portion of the command name
             for (int i = 0; i < text.length() - 1; i++)
             {
@@ -672,7 +696,7 @@ public class CommandParser
             node = cn;
 
             // Now add the handler for each character in the optional portion of the command name
-            text = names[c].getOptional();
+            text = name.getOptional();
             for (int i = 0; i < text.length(); i++)
             {
                 cn = node.getChild(text.charAt(i));
@@ -719,4 +743,3 @@ public class CommandParser
 
     private static Logger logger = Logger.getInstance(CommandParser.class.getName());
 }
-
