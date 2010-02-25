@@ -1,0 +1,350 @@
+<idea-plugin url="http://sourceforge.net/projects/ideavim/">
+    <name>IdeaVIM</name>
+    <description><![CDATA[
+        VIM Emulator. This plugin provides nearly complete vi/vim/gvim emulation while editing files in IDEA.
+        The following functionality is supported:
+        <ul>
+            <li>Motion keys</li>
+            <li>Deletion/Changing</li>
+            <li>Insert mode commands</li>
+            <li>Marks</li>
+            <li>Registers</li>
+            <li>VIM undo/redo</li>
+            <li>Visual mode commands</li>
+            <li>Some Ex commands</li>
+            <li>Some :set options</li>
+            <li>Full VIM regular expressions for search and search/replace</li>
+            <li>Macros</li>
+            <li>Diagraphs</li>
+            <li>Command line history</li>
+            <li>Search history</li>
+            <li>Jumplists</li>
+            <li>VIM help</li>
+        </ul>
+    ]]></description>
+    <version>@VERSION@-@IDEA-VERSION@</version>
+    <vendor logo="/icons/vim16x16.png">Rick Maddy, JetBrains</vendor>
+    <change-notes>
+<![CDATA[
+<b>NOTE:</b> Please see the README file if upgrading to this version from
+version 0.10.1 - 0.10.3. (The Vim keymap is required again).<br>
+<br>
+Bug Fixes <br>
+- Any form of searching broke due to a bug in JDK 1.6.0_10. Made changes to work around the bug so searching now works again.<br>
+]]>
+    </change-notes>
+
+    <helpset file="help.jar" path="/VimHelp.hs"/>
+    <idea-version since-build="@SINCE-VERSION@"/>
+
+    <!-- Mark the plugin as compatible with RubyMine and other products based on the IntelliJ platform -->
+    <depends>com.intellij.modules.lang</depends>
+    <resource-bundle xmlns="">messages</resource-bundle>
+  
+    <application-components>
+        <component>
+            <implementation-class>com.maddyhome.idea.vim.VimPlugin</implementation-class>
+        </component>
+    </application-components>
+
+    <project-components>
+    </project-components>
+
+    <actions>
+        <action id="VimPluginToggle" class="com.maddyhome.idea.vim.VimPlugin$VimPluginToggleAction" text="VIM Emulator" description="Toggle the Vim Plugin On/Off">
+            <keyboard-shortcut first-keystroke="control alt V" keymap="$default"/>
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+
+        <!-- Motions -->
+        <!-- Left/Right -->
+        <action id="VimMotionColumn" class="com.maddyhome.idea.vim.action.motion.leftright.MotionColumnAction" text="Move to Column"/>
+        <action id="VimMotionFirstColumn" class="com.maddyhome.idea.vim.action.motion.leftright.MotionFirstColumnAction" text="Start of Line"/>
+        <action id="VimMotionFirstScreenColumn" class="com.maddyhome.idea.vim.action.motion.leftright.MotionFirstScreenColumnAction" text="Start of Screen Line"/>
+        <action id="VimMotionFirstNonSpace" class="com.maddyhome.idea.vim.action.motion.leftright.MotionFirstNonSpaceAction" text="First Character of Line"/>
+        <action id="VimMotionFirstScreenNonSpace" class="com.maddyhome.idea.vim.action.motion.leftright.MotionFirstScreenNonSpaceAction" text="First Character of Screen Line"/>
+        <action id="VimMotionLastColumn" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnAction" text="End of Line"/>
+        <action id="VimMotionLastScreenColumn" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLastScreenColumnAction" text="End of Screen Line"/>
+        <action id="VimMotionLastMatchChar" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLastMatchCharAction" text="Repeat Last Character Match"/>
+        <action id="VimMotionLastMatchCharReverse" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLastMatchCharReverseAction" text="Repeat Last Character Match in Reverse"/>
+        <action id="VimMotionLastNonSpace" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLastNonSpaceAction" text="Last Character of Line"/>
+        <action id="VimMotionLeft" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftAction" text="Left"/>
+        <action id="VimMotionLeftWrap" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftWrapAction" text="Left"/>
+        <action id="VimMotionLeftMatchChar" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftMatchCharAction" text="Move Left to Character"/>
+        <action id="VimMotionLeftTillMatchChar" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftTillMatchCharAction" text="Move Left till Character"/>
+        <action id="VimMotionMiddleColumn" class="com.maddyhome.idea.vim.action.motion.leftright.MotionMiddleColumnAction" text="Middle of Screen"/>
+        <action id="VimMotionRight" class="com.maddyhome.idea.vim.action.motion.leftright.MotionRightAction" text="Right"/>
+        <action id="VimMotionRightWrap" class="com.maddyhome.idea.vim.action.motion.leftright.MotionRightWrapAction" text="Right"/>
+        <action id="VimMotionRightMatchChar" class="com.maddyhome.idea.vim.action.motion.leftright.MotionRightMatchCharAction" text="Move Right to Character"/>
+        <action id="VimMotionRightTillMatchChar" class="com.maddyhome.idea.vim.action.motion.leftright.MotionRightTillMatchCharAction" text="Move Right till Character"/>
+        <!-- Up/Down -->
+        <action id="VimMotionDown" class="com.maddyhome.idea.vim.action.motion.updown.MotionDownAction" text="Down"/>
+        <action id="VimMotionDownFirstNonSpace" class="com.maddyhome.idea.vim.action.motion.updown.MotionDownFirstNonSpaceAction" text="Down to First non-Space"/>
+        <action id="VimMotionDownLess1FirstNonSpace" class="com.maddyhome.idea.vim.action.motion.updown.MotionDownLess1FirstNonSpaceAction" text="Down to First non-Space"/>
+        <action id="VimMotionGotoLineFirst" class="com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineFirstAction" text="Goto Line"/>
+        <action id="VimMotionGotoLineLast" class="com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastAction" text="Goto Line"/>
+        <action id="VimMotionGotoLineLastEnd" class="com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastEndAction" text="Goto Line End"/>
+        <action id="VimMotionPercentOrMatch" class="com.maddyhome.idea.vim.action.motion.updown.MotionPercentOrMatchAction" text="Percent Down or Match"/>
+        <action id="VimMotionUp" class="com.maddyhome.idea.vim.action.motion.updown.MotionUpAction" text="Up"/>
+        <action id="VimMotionUpFirstNonSpace" class="com.maddyhome.idea.vim.action.motion.updown.MotionUpFirstNonSpaceAction" text="Up to First non-Space"/>
+        <!-- Text -->
+        <action id="VimMotionCamelEndLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionCamelEndLeftAction" text="Camel Word End Left"/>
+        <action id="VimMotionCamelEndRight" class="com.maddyhome.idea.vim.action.motion.text.MotionCamelEndRightAction" text="Camel Word End Right"/>
+        <action id="VimMotionCamelLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionCamelLeftAction" text="Camel Word Left"/>
+        <action id="VimMotionCamelRight" class="com.maddyhome.idea.vim.action.motion.text.MotionCamelRightAction" text="Camel Word Right"/>
+        <action id="VimMotionNthCharacter" class="com.maddyhome.idea.vim.action.motion.text.MotionNthCharacterAction" text="Nth Character"/>
+        <action id="VimMotionWordEndLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionWordEndLeftAction" text="Word End Left"/>
+        <action id="VimMotionBigWordEndLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionBigWordEndLeftAction" text="BigWord End Left"/>
+        <action id="VimMotionWordEndRight" class="com.maddyhome.idea.vim.action.motion.text.MotionWordEndRightAction" text="Word End Right"/>
+        <action id="VimMotionBigWordEndRight" class="com.maddyhome.idea.vim.action.motion.text.MotionBigWordEndRightAction" text="BigWord End Right"/>
+        <action id="VimMotionWordLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionWordLeftAction" text="Word Left"/>
+        <action id="VimMotionBigWordLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionBigWordLeftAction" text="BigWord Left"/>
+        <action id="VimMotionWordRight" class="com.maddyhome.idea.vim.action.motion.text.MotionWordRightAction" text="Word Right"/>
+        <action id="VimMotionBigWordRight" class="com.maddyhome.idea.vim.action.motion.text.MotionBigWordRightAction" text="BigWord Right"/>
+        <action id="VimMotionSentenceStartNext" class="com.maddyhome.idea.vim.action.motion.text.MotionSentenceNextStartAction" text="Next Sentence Start"/>
+        <action id="VimMotionSentenceStartPrevious" class="com.maddyhome.idea.vim.action.motion.text.MotionSentencePreviousStartAction" text="Previous Sentence Start"/>
+        <action id="VimMotionSentenceEndNext" class="com.maddyhome.idea.vim.action.motion.text.MotionSentenceNextEndAction" text="Next Sentence End"/>
+        <action id="VimMotionSentenceEndPrevious" class="com.maddyhome.idea.vim.action.motion.text.MotionSentencePreviousEndAction" text="Previous Sentence End"/>
+        <action id="VimMotionParagraphNext" class="com.maddyhome.idea.vim.action.motion.text.MotionParagraphNextAction" text="Next Paragraph"/>
+        <action id="VimMotionParagraphPrevious" class="com.maddyhome.idea.vim.action.motion.text.MotionParagraphPreviousAction" text="Previous Paragraph"/>
+        <action id="VimMotionUnmatchedBraceClose" class="com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedBraceCloseAction" text="Unmatched }"/>
+        <action id="VimMotionUnmatchedBraceOpen" class="com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedBraceOpenAction" text="Unmatched {"/>
+        <action id="VimMotionUnmatchedParenClose" class="com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedParenCloseAction" text="Unmatched )"/>
+        <action id="VimMotionUnmatchedParenOpen" class="com.maddyhome.idea.vim.action.motion.text.MotionUnmatchedParenOpenAction" text="Unmatched ("/>
+        <action id="VimMotionSectionBackwardEnd" class="com.maddyhome.idea.vim.action.motion.text.MotionSectionBackwardEndAction" text="Section End Backward"/>
+        <action id="VimMotionSectionBackwardStart" class="com.maddyhome.idea.vim.action.motion.text.MotionSectionBackwardStartAction" text="Section Start Backward"/>
+        <action id="VimMotionSectionForwardEnd" class="com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardEndAction" text="Section End Forward"/>
+        <action id="VimMotionSectionForwardStart" class="com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardStartAction" text="Section Start Forward"/>
+        <action id="VimMotionMethodBackwardEnd" class="com.maddyhome.idea.vim.action.motion.text.MotionMethodPreviousEndAction" text="Previous Method End"/>
+        <action id="VimMotionMethodBackwardStart" class="com.maddyhome.idea.vim.action.motion.text.MotionMethodPreviousStartAction" text="Previous Method Start"/>
+        <action id="VimMotionMethodForwardEnd" class="com.maddyhome.idea.vim.action.motion.text.MotionMethodNextEndAction" text="Next Method End"/>
+        <action id="VimMotionMethodForwardStart" class="com.maddyhome.idea.vim.action.motion.text.MotionMethodNextStartAction" text="Next Method Start"/>
+        <!-- Text Objects -->
+        <action id="VimMotionTextOuterWord" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterWordAction" text="Select outer word"/>
+        <action id="VimMotionTextOuterBigWord" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBigWordAction" text="Select outer WORD"/>
+        <action id="VimMotionTextInnerWord" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerWordAction" text="Select inner word"/>
+        <action id="VimMotionTextInnerBigWord" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerBigWordAction" text="Select inner WORD"/>
+        <action id="VimMotionInnerBlockAngle" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockAngleAction" text="Select inner &lt; block"/>
+        <action id="VimMotionInnerBlockBrace" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBraceAction" text="Select inner { block"/>
+        <action id="VimMotionInnerBlockBracket" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBracketAction" text="Select inner [ block"/>
+        <action id="VimMotionInnerBlockParen" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockParenAction" text="Select inner ( block"/>
+        <action id="VimMotionOuterBlockAngle" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockAngleAction" text="Select outer &lt; block"/>
+        <action id="VimMotionOuterBlockBrace" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBraceAction" text="Select outer { block"/>
+        <action id="VimMotionOuterBlockBracket" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBracketAction" text="Select outer [ block"/>
+        <action id="VimMotionOuterBlockParen" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockParenAction" text="Select outer ( block"/>
+        <action id="VimMotionInnerParagraph" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerParagraphAction" text="Select Inner Paragraph"/>
+        <action id="VimMotionOuterParagraph" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterParagraphAction" text="Select Outer Paragraph"/>
+        <action id="VimMotionInnerSentence" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerSentenceAction" text="Select Inner Sentence"/>
+        <action id="VimMotionOuterSentence" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterSentenceAction" text="Select Outer Sentence"/>
+        <!-- Marks -->
+        <action id="VimMotionMark" class="com.maddyhome.idea.vim.action.motion.mark.MotionMarkAction" text="Mark"/>
+        <action id="VimMotionGotoFileMark" class="com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction" text="Goto Mark"/>
+        <action id="VimMotionGotoFileMarkLine" class="com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkLineAction" text="Goto Mark Line"/>
+        <action id="VimMotionGotoMark" class="com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkAction" text="Goto Mark"/>
+        <action id="VimMotionGotoMarkLine" class="com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkLineAction" text="Goto Mark Line"/>
+        <action id="VimMotionJumpNext" class="com.maddyhome.idea.vim.action.motion.mark.MotionJumpNextAction" text="Goto Next Jump"/>
+        <action id="VimMotionJumpPrevious" class="com.maddyhome.idea.vim.action.motion.mark.MotionJumpPreviousAction" text="Goto Previous Jump"/>
+        <action id="VimForward" class="com.maddyhome.idea.vim.action.motion.mark.MotionJumpNextAction" text="Forward"/>
+        <action id="VimBack" class="com.maddyhome.idea.vim.action.motion.mark.MotionJumpPreviousAction" text="Back"/>
+        <!-- Screen -->
+        <action id="VimMotionFirstScreenLine" class="com.maddyhome.idea.vim.action.motion.screen.MotionFirstScreenLineAction" text="First Screen Line"/>
+        <action id="VimMotionLastScreenLine" class="com.maddyhome.idea.vim.action.motion.screen.MotionLastScreenLineAction" text="Last Screen Line"/>
+        <action id="VimMotionLastScreenLineEnd" class="com.maddyhome.idea.vim.action.motion.screen.MotionLastScreenLineEndAction" text="Last Screen Line End"/>
+        <action id="VimMotionMiddleScreenLine" class="com.maddyhome.idea.vim.action.motion.screen.MotionMiddleScreenLineAction" text="Middle Screen Line"/>
+        <!-- Scroll -->
+        <action id="VimMotionScrollFirstScreenLinePageStart" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLinePageStartAction" text="Scroll Line to Top"/>
+        <action id="VimMotionScrollFirstScreenLineStart" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLineStartAction" text="Scroll Line to Top"/>
+        <action id="VimMotionScrollFirstScreenLine" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLineAction" text="Scroll Line to Top"/>
+        <action id="VimMotionScrollHalfPageDown" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfPageDownAction" text="Scroll Half Page Down"/>
+        <action id="VimMotionScrollHalfPageUp" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfPageUpAction" text="Scroll Half Page Up"/>
+        <action id="VimMotionScrollLastScreenLine" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLineAction" text="Scroll Line to Bottom"/>
+        <action id="VimMotionScrollLastScreenLinePageStart" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLinePageStartAction" text="Scroll Line to Bottom"/>
+        <action id="VimMotionScrollLastScreenLineStart" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenLineStartAction" text="Scroll Line to Bottom"/>
+        <action id="VimMotionScrollLineDown" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLineDownAction" text="Scroll Line Down"/>
+        <action id="VimMotionScrollLineUp" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLineUpAction" text="Scroll Line Up"/>
+        <action id="VimMotionScrollMiddleScreenLine" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollMiddleScreenLineAction" text="Scroll Line to Middle"/>
+        <action id="VimMotionScrollMiddleScreenLineStart" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollMiddleScreenLineStartAction" text="Scroll Line to Middle"/>
+        <action id="VimMotionScrollPageDown" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownAction" text="Scroll Page Down"/>
+        <action id="VimMotionScrollPageUp" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpAction" text="Scroll Page Up"/>
+        <action id="VimMotionScrollFirstScreenColumn" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenColumnAction" text="Scroll Column to first column"/>
+        <action id="VimMotionScrollLastScreenColumn" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenColumnAction" text="Scroll Column to last column"/>
+        <action id="VimMotionScrollColumnLeft" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnLeftAction" text="Scroll Column Left"/>
+        <action id="VimMotionScrollColumnRight" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnRightAction" text="Scroll Column Right"/>
+        <!-- Visual -->
+        <action id="VimVisualExitMode" class="com.maddyhome.idea.vim.action.motion.visual.VisualExitModeAction" text="Exit Visual Mode"/>
+        <action id="VimVisualToggleCharacterMode" class="com.maddyhome.idea.vim.action.motion.visual.VisualToggleCharacterModeAction" text="Toggle Character Selection"/>
+        <action id="VimVisualToggleLineMode" class="com.maddyhome.idea.vim.action.motion.visual.VisualToggleLineModeAction" text="Toggle Line Selection"/>
+        <action id="VimVisualToggleBlockMode" class="com.maddyhome.idea.vim.action.motion.visual.VisualToggleBlockModeAction" text="Toggle Block Selection"/>
+        <action id="VimVisualSwapEnds" class="com.maddyhome.idea.vim.action.motion.visual.VisualSwapEndsAction" text="Swap Visual Selection Ends"/>
+        <action id="VimVisualSwapEndsBlock" class="com.maddyhome.idea.vim.action.motion.visual.VisualSwapEndsBlockAction" text="Swap Visual Selection Ends"/>
+        <action id="VimVisualSelectPrevious" class="com.maddyhome.idea.vim.action.motion.visual.VisualSelectPreviousAction" text="Swap Visual Selection Ends"/>
+        <action id="VimVisualSwapSelections" class="com.maddyhome.idea.vim.action.motion.visual.VisualSwapSelectionsAction" text="Swap Visual Selection Ends"/>
+
+        <!-- Insert -->
+        <action id="VimInsertAfterCursor" class="com.maddyhome.idea.vim.action.change.insert.InsertAfterCursorAction" text="Insert After Cursor"/>
+        <action id="VimInsertAfterLineEnd" class="com.maddyhome.idea.vim.action.change.insert.InsertAfterLineEndAction" text="Insert After Line End"/>
+        <action id="VimInsertAtPreviousInsert" class="com.maddyhome.idea.vim.action.change.insert.InsertAtPreviousInsertAction" text="Insert Before Cursor"/>
+        <action id="VimInsertBeforeCursor" class="com.maddyhome.idea.vim.action.change.insert.InsertBeforeCursorAction" text="Insert Before Cursor"/>
+        <action id="VimInsertBeforeFirstNonBlank" class="com.maddyhome.idea.vim.action.change.insert.InsertBeforeFirstNonBlankAction" text="Insert Before First non-Blank"/>
+        <action id="VimInsertCharacterAboveCursor" class="com.maddyhome.idea.vim.action.change.insert.InsertCharacterAboveCursorAction" text="Insert Character Above Cursor"/>
+        <action id="VimInsertCharacterBelowCursor" class="com.maddyhome.idea.vim.action.change.insert.InsertCharacterBelowCursorAction" text="Insert Character Below Cursor"/>
+        <action id="VimInsertDeleteInsertedText" class="com.maddyhome.idea.vim.action.change.insert.InsertDeleteInsertedTextAction" text="Delete Inserted Text"/>
+        <action id="VimInsertDeletePreviousWord" class="com.maddyhome.idea.vim.action.change.insert.InsertDeletePreviousWordAction" text="Delete Previous Word"/>
+        <action id="VimInsertEnter" class="com.maddyhome.idea.vim.action.change.insert.InsertEnterAction" text="Enter"/>
+        <action id="VimInsertExitMode" class="com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction" text="Exit Insert Mode"/>
+        <action id="VimInsertHelp" class="com.maddyhome.idea.vim.action.change.insert.InsertHelpAction" text="Help"/>
+        <action id="VimInsertLineStart" class="com.maddyhome.idea.vim.action.change.insert.InsertLineStartAction" text="Insert at Line Start"/>
+        <action id="VimInsertNewLineAbove" class="com.maddyhome.idea.vim.action.change.insert.InsertNewLineAboveAction" text="Insert New Line Above"/>
+        <action id="VimInsertNewLineBelow" class="com.maddyhome.idea.vim.action.change.insert.InsertNewLineBelowAction" text="Insert New Line Below"/>
+        <action id="VimInsertPreviousInsert" class="com.maddyhome.idea.vim.action.change.insert.InsertPreviousInsertAction" text="Insert Previous Text"/>
+        <action id="VimInsertPreviousInsertExit" class="com.maddyhome.idea.vim.action.change.insert.InsertPreviousInsertExitAction" text="Insert Previous Text"/>
+        <action id="VimInsertRegister" class="com.maddyhome.idea.vim.action.change.insert.InsertRegisterAction" text="Insert Register"/>
+        <action id="VimInsertReplaceToggle" class="com.maddyhome.idea.vim.action.change.insert.InsertInsertAction" text="Toggle Insert/Replace"/>
+        <action id="VimInsertSingleCommand" class="com.maddyhome.idea.vim.action.change.insert.InsertSingleCommandAction" text="Execute Command"/>
+        <action id="VimVisualBlockInsert" class="com.maddyhome.idea.vim.action.change.insert.VisualBlockInsertAction" text="Visual Block Insert"/>
+        <action id="VimVisualBlockAppend" class="com.maddyhome.idea.vim.action.change.insert.VisualBlockAppendAction" text="Visual Block Append"/>
+
+        <!-- Delete -->
+        <action id="VimDeleteCharacter" class="com.maddyhome.idea.vim.action.change.delete.DeleteCharacterAction" text="Delete Character"/>
+        <action id="VimDeleteCharacterLeft" class="com.maddyhome.idea.vim.action.change.delete.DeleteCharacterLeftAction" text="Delete Character Left"/>
+        <action id="VimDeleteCharacterRight" class="com.maddyhome.idea.vim.action.change.delete.DeleteCharacterRightAction" text="Delete Character Right"/>
+        <action id="VimDeleteEndOfLine" class="com.maddyhome.idea.vim.action.change.delete.DeleteEndOfLineAction" text="Delete End-of-Line"/>
+        <action id="VimDeleteJoinLines" class="com.maddyhome.idea.vim.action.change.delete.DeleteJoinLinesAction" text="Delete Join Lines"/>
+        <action id="VimDeleteJoinLinesSpaces" class="com.maddyhome.idea.vim.action.change.delete.DeleteJoinLinesSpacesAction" text="Delete Join Lines"/>
+        <action id="VimDeleteJoinVisualLines" class="com.maddyhome.idea.vim.action.change.delete.DeleteJoinVisualLinesAction" text="Delete Join Lines"/>
+        <action id="VimDeleteJoinVisualLinesSpaces" class="com.maddyhome.idea.vim.action.change.delete.DeleteJoinVisualLinesSpacesAction" text="Delete Join Lines"/>
+        <action id="VimDeleteLine" class="com.maddyhome.idea.vim.action.change.delete.DeleteLineAction" text="Delete Line"/>
+        <action id="VimDeleteMotion" class="com.maddyhome.idea.vim.action.change.delete.DeleteMotionAction" text="Delete Motion"/>
+        <action id="VimDeleteVisual" class="com.maddyhome.idea.vim.action.change.delete.DeleteVisualAction" text="Delete Selection"/>
+        <action id="VimDeleteVisualLines" class="com.maddyhome.idea.vim.action.change.delete.DeleteVisualLinesAction" text="Delete Selected Lines"/>
+        <action id="VimDeleteVisualLinesEnd" class="com.maddyhome.idea.vim.action.change.delete.DeleteVisualLinesEndAction" text="Delete Selected Lines"/>
+
+        <!-- Change -->
+        <action id="VimChangeCaseLowerMotion" class="com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerMotionAction" text="Change Motion to Lower Case"/>
+        <action id="VimChangeCaseLowerVisual" class="com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerVisualAction" text="Change Motion to Lower Case"/>
+        <action id="VimChangeCaseToggleCharacter" class="com.maddyhome.idea.vim.action.change.change.ChangeCaseToggleCharacterAction" text="Change Toggle Case"/>
+        <action id="VimChangeCaseToggleMotion" class="com.maddyhome.idea.vim.action.change.change.ChangeCaseToggleMotionAction" text="Change Motion Toggle Case"/>
+        <action id="VimChangeCaseToggleVisual" class="com.maddyhome.idea.vim.action.change.change.ChangeCaseToggleVisualAction" text="Change Motion Toggle Case"/>
+        <action id="VimChangeCaseUpperMotion" class="com.maddyhome.idea.vim.action.change.change.ChangeCaseUpperMotionAction" text="Change Motion to Upper Case"/>
+        <action id="VimChangeCaseUpperVisual" class="com.maddyhome.idea.vim.action.change.change.ChangeCaseUpperVisualAction" text="Change Motion to Upper Case"/>
+        <action id="VimChangeCharacter" class="com.maddyhome.idea.vim.action.change.change.ChangeCharacterAction" text="Change Character"/>
+        <action id="VimChangeCharacters" class="com.maddyhome.idea.vim.action.change.change.ChangeCharactersAction" text="Change Characters"/>
+        <action id="VimChangeEndOfLine" class="com.maddyhome.idea.vim.action.change.change.ChangeEndOfLineAction" text="Change to End-of-Line"/>
+        <action id="VimChangeLine" class="com.maddyhome.idea.vim.action.change.change.ChangeLineAction" text="Change Line"/>
+        <action id="VimChangeMotion" class="com.maddyhome.idea.vim.action.change.change.ChangeMotionAction" text="Change Motion"/>
+        <action id="VimChangeNumberInc" class="com.maddyhome.idea.vim.action.change.change.ChangeNumberIncAction" text="Increment Number"/>
+        <action id="VimChangeNumberDec" class="com.maddyhome.idea.vim.action.change.change.ChangeNumberDecAction" text="Decrement Number"/>
+        <action id="VimChangeReplace" class="com.maddyhome.idea.vim.action.change.change.ChangeReplaceAction" text="Replace"/>
+        <action id="VimChangeVisual" class="com.maddyhome.idea.vim.action.change.change.ChangeVisualAction" text="Change Motion"/>
+        <action id="VimChangeVisualCharacter" class="com.maddyhome.idea.vim.action.change.change.ChangeVisualCharacterAction" text="Change Motion"/>
+        <action id="VimChangeVisualLines" class="com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesAction" text="Change Motion"/>
+        <action id="VimChangeVisualLinesEnd" class="com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesEndAction" text="Change Motion"/>
+        <action id="VimFilterMotion" class="com.maddyhome.idea.vim.action.change.change.FilterMotionAction" text="Filter Lines"/>
+        <action id="VimFilterCountLines" class="com.maddyhome.idea.vim.action.change.change.FilterCountLinesAction" text="Filter Lines"/>
+        <action id="VimFilterVisualLines" class="com.maddyhome.idea.vim.action.change.change.FilterVisualLinesAction" text="Filter Visual Lines"/>
+        <action id="VimAutoIndentVisual" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Auto Indent Selection"/>
+        <action id="VimReformatVisual" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Reformat Selection"/>
+        <action id="VimCommentByBlockComment" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Block Comment"/>
+        <action id="VimCommentByLineComment" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Line Comment"/>
+        <action id="VimSurroundWith" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Surround With"/>
+        <action id="VimSurroundWithLiveTemplate" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Surround With Live Template"/>
+        <action id="VimMoveStatementDown" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Move Statement Down"/>
+        <action id="VimMoveStatementUp" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Move Statement Up"/>
+
+        <!-- Shift -->
+        <action id="VimAutoIndentLines" class="com.maddyhome.idea.vim.action.change.shift.AutoIndentLinesAction" text="Auto Indent Lines"/>
+        <action id="VimShiftLeftLines" class="com.maddyhome.idea.vim.action.change.shift.ShiftLeftLinesAction" text="Shift Lines Left"/>
+        <action id="VimShiftLeftMotion" class="com.maddyhome.idea.vim.action.change.shift.ShiftLeftMotionAction" text="Shift Motion Left"/>
+        <action id="VimShiftLeftVisual" class="com.maddyhome.idea.vim.action.change.shift.ShiftLeftVisualAction" text="Shift Visual Left"/>
+        <action id="VimShiftRightLines" class="com.maddyhome.idea.vim.action.change.shift.ShiftRightLinesAction" text="Shift Lines Right"/>
+        <action id="VimShiftRightMotion" class="com.maddyhome.idea.vim.action.change.shift.ShiftRightMotionAction" text="Shift Motion Right"/>
+        <action id="VimShiftRightVisual" class="com.maddyhome.idea.vim.action.change.shift.ShiftRightVisualAction" text="Shift Visual Right"/>
+
+        <!-- Copy -->
+        <action id="VimCopyPutTextAfterCursor" class="com.maddyhome.idea.vim.action.copy.PutTextAfterCursorAction" text="Put Text"/>
+        <action id="VimCopyPutTextBeforeCursor" class="com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorAction" text="Put Text"/>
+        <action id="VimCopyPutTextAfterCursorNoIndent" class="com.maddyhome.idea.vim.action.copy.PutTextAfterCursorNoIndentAction" text="Put Text"/>
+        <action id="VimCopyPutTextBeforeCursorNoIndent" class="com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction" text="Put Text"/>
+        <action id="VimCopyPutTextAfterCursorMoveCursor" class="com.maddyhome.idea.vim.action.copy.PutTextAfterCursorActionMoveCursor" text="Put Text"/>
+        <action id="VimCopyPutTextBeforeCursorMoveCursor" class="com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorActionMoveCursor" text="Put Text"/>
+        <action id="VimCopySelectRegister" class="com.maddyhome.idea.vim.action.copy.SelectRegisterAction" text="Select Register"/>
+        <action id="VimCopyYankLine" class="com.maddyhome.idea.vim.action.copy.YankLineAction" text="Yank Line"/>
+        <action id="VimCopyYankMotion" class="com.maddyhome.idea.vim.action.copy.YankMotionAction" text="Yank Motion"/>
+        <action id="VimCopyYankVisual" class="com.maddyhome.idea.vim.action.copy.YankVisualAction" text="Yank Motion"/>
+        <action id="VimCopyYankVisualLines" class="com.maddyhome.idea.vim.action.copy.YankVisualLinesAction" text="Yank Motion"/>
+        <action id="VimVisualPutText" class="com.maddyhome.idea.vim.action.copy.PutVisualTextAction" text="Paste over Selection"/>
+        <action id="VimVisualPutTextNoIndent" class="com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction" text="Paste over Selection"/>
+        <action id="VimVisualPutTextMoveCursor" class="com.maddyhome.idea.vim.action.copy.PutVisualTextMoveCursorAction" text="Paste over Selection"/>
+
+        <!-- File -->
+        <action id="VimFileSaveClose" class="com.maddyhome.idea.vim.action.file.FileSaveCloseAction" text="Save and Close Editor"/>
+        <action id="VimFilePrevious" class="com.maddyhome.idea.vim.action.file.FilePreviousAction" text="Selects Previous Editor"/>
+        <action id="VimFileGetAscii" class="com.maddyhome.idea.vim.action.file.FileGetAsciiAction" text="Get ASCII Info"/>
+        <action id="VimFileGetHex" class="com.maddyhome.idea.vim.action.file.FileGetHexAction" text="Get Hex Info"/>
+        <action id="VimFileGetFileInfo" class="com.maddyhome.idea.vim.action.file.FileGetFileInfoAction" text="Get File Info"/>
+        <action id="VimFileGetLocationInfo" class="com.maddyhome.idea.vim.action.file.FileGetLocationInfoAction" text="Get Location Info"/>
+
+        <!-- Search -->
+        <action id="VimSearchFwdEntry" class="com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction" text="Search Forward"/>
+        <action id="VimSearchRevEntry" class="com.maddyhome.idea.vim.action.motion.search.SearchEntryRevAction" text="Search Backward"/>
+        <action id="VimSearchAgainNext" class="com.maddyhome.idea.vim.action.motion.search.SearchAgainNextAction" text="Search Again"/>
+        <action id="VimSearchAgainPrevious" class="com.maddyhome.idea.vim.action.motion.search.SearchAgainPreviousAction" text="Search Again"/>
+        <action id="VimSearchWholeWordForward" class="com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction" text="Search Again"/>
+        <action id="VimSearchWholeWordBackward" class="com.maddyhome.idea.vim.action.motion.search.SearchWholeWordBackwardAction" text="Search Again"/>
+        <action id="VimSearchWordForward" class="com.maddyhome.idea.vim.action.motion.search.SearchWordForwardAction" text="Search Again"/>
+        <action id="VimSearchWordBackward" class="com.maddyhome.idea.vim.action.motion.search.SearchWordBackwardAction" text="Search Again"/>
+        <action id="VimGotoDeclaration" class="com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction" text="Goto Declaration"/>
+
+        <!-- Macro -->
+        <action id="VimToggleRecording" class="com.maddyhome.idea.vim.action.macro.ToggleRecordingAction" text="Record Keystrokes"/>
+        <action id="VimPlaybackRegister" class="com.maddyhome.idea.vim.action.macro.PlaybackRegisterAction" text="Playback Register"/>
+        <action id="VimPlaybackLastRegister" class="com.maddyhome.idea.vim.action.macro.PlaybackLastRegisterAction" text="Playback Last Register"/>
+
+        <!-- Command Line -->
+        <action id="VimExBackspace" class="com.maddyhome.idea.vim.action.ex.BackspaceAction" text="Backspace"/>
+        <action id="VimProcessExEntry" class="com.maddyhome.idea.vim.action.ex.ProcessExEntryAction" text="Process Ex Entry"/>
+        <action id="VimProcessExKey" class="com.maddyhome.idea.vim.action.ex.ProcessExKeyAction" text="Process Ex Key"/>
+        <action id="VimCancelExEntry" class="com.maddyhome.idea.vim.action.ex.CancelExEntryAction" text="Cancel Ex Entry"/>
+
+        <!-- Other -->
+        <action id="VimLastSearchReplace" class="com.maddyhome.idea.vim.action.change.change.ChangeLastSearchReplaceAction" text="Repeat Last :s"/>
+        <action id="VimLastGlobalSearchReplace" class="com.maddyhome.idea.vim.action.change.change.ChangeLastGlobalSearchReplaceAction" text="Repeat Last :s"/>
+        <action id="VimRepeatChange" class="com.maddyhome.idea.vim.action.change.RepeatChangeAction" text="Repeat Change"/>
+        <action id="VimRepeatExCommand" class="com.maddyhome.idea.vim.action.change.RepeatExCommandAction" text="Repeat Ex Command"/>
+        <action id="VimExEntry" class="com.maddyhome.idea.vim.action.ExEntryAction" text="Enter Ex Command"/>
+        <action id="VimResetMode" class="com.maddyhome.idea.vim.action.ResetModeAction" text="Reset Mode"/>
+        <action id="VimRedo" class="com.maddyhome.idea.vim.action.change.RedoAction" text="Redo"/>
+        <action id="VimUndo" class="com.maddyhome.idea.vim.action.change.UndoAction" text="Undo"/>
+        <action id="VimGenerateConstructor" class="com.maddyhome.idea.vim.action.TxActionWrapper" text="Generate Constructor"/>
+        <action id="VimGenerateGetter" class="com.maddyhome.idea.vim.action.TxActionWrapper" text="Generate Getter"/>
+        <action id="VimGenerateSetter" class="com.maddyhome.idea.vim.action.TxActionWrapper" text="Generate Setter"/>
+        <action id="VimGenerateGetterAndSetter" class="com.maddyhome.idea.vim.action.TxActionWrapper" text="Generate Getter and Setter"/>
+        <action id="VimGenerateEquals" class="com.maddyhome.idea.vim.action.TxActionWrapper" text="Generate Equals"/>
+        <action id="VimClassNameCompletion" class="com.maddyhome.idea.vim.action.OriginalDelegateAction" text="Class Name Completion"/>
+        <action id="VimCodeCompletion" class="com.maddyhome.idea.vim.action.OriginalDelegateAction" text="Code Completion"/>
+        <action id="VimSmartTypeCompletion" class="com.maddyhome.idea.vim.action.OriginalDelegateAction" text="Smart Type Completion"/>
+        <action id="VimWordCompletion" class="com.maddyhome.idea.vim.action.OriginalDelegateAction" text="Word Completion"/>
+        <action id="VimInsertLiveTemplate" class="com.maddyhome.idea.vim.action.OriginalDelegateAction" text="Insert Live Template"/>
+        <action id="VimHelpTopics" class="com.maddyhome.idea.vim.action.OriginalDelegateAction" text="Help Topics"/>
+
+        <!-- Keys -->
+        <action id="VimKeyHandler" class="com.maddyhome.idea.vim.action.key.KeyAction" text="Keys"/>
+        <action id="VimDummyHandler" class="com.maddyhome.idea.vim.action.key.DummyAction" text="Keys"/>
+        <action id="VimNotImplementedHandler" class="com.maddyhome.idea.vim.action.key.NotImplementedAction" text="Reserved For Future Use"/>
+        <action id="VimEditorBackSpace" class="com.maddyhome.idea.vim.action.key.BackSpaceAction" text="Backspace"/>
+        <action id="VimEditorDelete" class="com.maddyhome.idea.vim.action.key.DeleteAction" text="Delete"/>
+        <action id="VimEditorDown" class="com.maddyhome.idea.vim.action.key.DownAction" text="Down"/>
+        <action id="VimEditorEnter" class="com.maddyhome.idea.vim.action.key.EnterAction" text="Enter"/>
+        <action id="VimEditorEscape" class="com.maddyhome.idea.vim.action.key.EscapeAction" text="Escape"/>
+        <action id="VimEditorLeft" class="com.maddyhome.idea.vim.action.key.LeftAction" text="Left"/>
+        <action id="VimEditorLineEnd" class="com.maddyhome.idea.vim.action.key.LineEndAction" text="LineEnd"/>
+        <action id="VimEditorLineStart" class="com.maddyhome.idea.vim.action.key.LineStartAction" text="LineStart"/>
+        <action id="VimEditorPageDown" class="com.maddyhome.idea.vim.action.key.PageDownAction" text="PageDown"/>
+        <action id="VimEditorPageUp" class="com.maddyhome.idea.vim.action.key.PageUpAction" text="PageUp"/>
+        <action id="VimEditorRight" class="com.maddyhome.idea.vim.action.key.RightAction" text="Right"/>
+        <action id="VimEditorTab" class="com.maddyhome.idea.vim.action.key.TabAction" text="Tab"/>
+        <action id="VimEditorToggleInsertState" class="com.maddyhome.idea.vim.action.key.ToggleInsertStateAction" text="Insert/Overwrite"/>
+        <action id="VimEditorUp" class="com.maddyhome.idea.vim.action.key.UpAction" text="Up"/>
+        <action id="VimDigraphEntry" class="com.maddyhome.idea.vim.action.key.KeyAction" text="Digraph Entry"/>
+    </actions>
+</idea-plugin>
