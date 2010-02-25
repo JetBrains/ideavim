@@ -83,7 +83,7 @@
     <target name="copy">
         <mkdir dir="${classes}"/>
         <mkdir dir="${classes}/META-INF"/>
-        <copy file="resources/META-INF/plugin.xml" todir="${classes}/META-INF">
+        <copy file="META-INF/plugin.xml" todir="${classes}/META-INF">
             <filterset>
                 <filter token="NAME" value="${project}"/>
                 <filter token="VERSION" value="${version}"/>
