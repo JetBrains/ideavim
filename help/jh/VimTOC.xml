@@ -1,0 +1,88 @@
+<?xml version='1.0' encoding='ISO-8859-1'  ?>
+<!DOCTYPE toc
+    PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 1.0//EN"
+    "http://java.sun.com/products/javahelp/toc_2_0.dtd">
+<toc version="1.0">
+    <tocitem text="@NAME@" target="vim.help%2Etxt" image="vim.logo">
+        <tocitem text="Overview of the most common commands you will use" target="vim.quickref" image="doc"/>
+        <tocitem text="30 minutes training course for beginners" target="vim.tutor" image="doc"/>
+        <tocitem text="Vim on the World Wide Web" target="vim.www" image="doc"/>
+        <tocitem text="Where to send bug reports" target="vim.bugs" image="doc"/>
+        <tocitem text="Getting Started" target="" image="folder">
+            <tocitem text="About the manuals" target="vim.usr_01%2Etxt" image="doc"/>
+            <tocitem text="The first steps in Vim" target="vim.usr_02%2Etxt" image="doc"/>
+            <tocitem text="Moving around" target="vim.usr_03%2Etxt" image="doc"/>
+            <tocitem text="Making small changes" target="vim.usr_04%2Etxt" image="doc"/>
+            <tocitem text="Set your settings" target="vim.usr_05%2Etxt" image="doc"/>
+            <tocitem text="Using syntax highlighting" target="vim.usr_06%2Etxt" image="doc"/>
+            <tocitem text="Editing more than one file" target="vim.usr_07%2Etxt" image="doc"/>
+            <tocitem text="Splitting windows" target="vim.usr_08%2Etxt" image="doc"/>
+            <tocitem text="Using the GUI" target="vim.usr_09%2Etxt" image="doc"/>
+            <tocitem text="Making big changes" target="vim.usr_10%2Etxt" image="doc"/>
+            <tocitem text="Recovering from a crash" target="vim.usr_11%2Etxt" image="doc"/>
+            <tocitem text="Clever tricks" target="vim.usr_12%2Etxt" image="doc"/>
+        </tocitem>
+        <tocitem text="Editing Effectively" target="" image="folder">
+            <tocitem text="Typing command-line commands quickly" target="vim.usr_20%2Etxt" image="doc"/>
+            <tocitem text="Go away and come back" target="vim.usr_21%2Etxt" image="doc"/>
+            <tocitem text="Finding the file to edit" target="vim.usr_22%2Etxt" image="doc"/>
+            <tocitem text="Editing other files" target="vim.usr_23%2Etxt" image="doc"/>
+            <tocitem text="Inserting quickly" target="vim.usr_24%2Etxt" image="doc"/>
+            <tocitem text="Editing formatted text" target="vim.usr_25%2Etxt" image="doc"/>
+            <tocitem text="Repeating" target="vim.usr_26%2Etxt" image="doc"/>
+            <tocitem text="Search commands and patterns" target="vim.usr_27%2Etxt" image="doc"/>
+            <tocitem text="Folding" target="vim.usr_28%2Etxt" image="doc"/>
+            <tocitem text="Moving through programs" target="vim.usr_29%2Etxt" image="doc"/>
+            <tocitem text="Editing programs" target="vim.usr_30%2Etxt" image="doc"/>
+            <tocitem text="Exploiting the GUI" target="vim.usr_31%2Etxt" image="doc"/>
+        </tocitem>
+        <tocitem text="General subjects" target="" image="folder">
+            <tocitem text="General introduction to Vim; notation used in help files" target="vim.intro%2Etxt" image="doc"/>
+            <tocitem text="Overview and quick reference (this file)" target="vim.help%2Etxt" image="doc"/>
+            <tocitem text="Alphabetical index of all commands" target="vim.index%2Etxt" image="doc"/>
+            <tocitem text="How to do the most common editing tasks" target="vim.howto%2Etxt" image="doc"/>
+            <tocitem text="Various tips on using Vim" target="vim.tips%2Etxt" image="doc"/>
+            <tocitem text="(error) messages and explanations" target="vim.message%2Etxt" image="doc"/>
+            <tocitem text="Known problems and desired extensions" target="vim.todo%2Etxt" image="doc"/>
+        </tocitem>
+
+        <tocitem text="Basic Editing" target="" image="folder">
+            <tocitem text="Starting Vim, Vim command arguments, initialisation" target="vim.starting%2Etxt" image="doc"/>
+            <tocitem text="Editing and writing files" target="vim.editing%2Etxt" image="doc"/>
+            <tocitem text="Commands for moving around" target="vim.motion%2Etxt" image="doc"/>
+            <tocitem text="Scrolling the text in the window" target="vim.scroll%2Etxt" image="doc"/>
+            <tocitem text="Insert and Replace mode" target="vim.insert%2Etxt" image="doc"/>
+            <tocitem text="Deleting and replacing text" target="vim.change%2Etxt" image="doc"/>
+            <tocitem text="Automatic indenting for C and other languages" target="vim.indent%2Etxt" image="doc"/>
+            <tocitem text="Undo and Redo" target="vim.undo%2Etxt" image="doc"/>
+            <tocitem text="Repeating commands, Vim scripts and debugging" target="vim.repeat%2Etxt" image="doc"/>
+            <tocitem text="Using the Visual mode (selecting a text area)" target="vim.visual%2Etxt" image="doc"/>
+            <tocitem text="Various remaining commands" target="vim.various%2Etxt" image="doc"/>
+            <tocitem text="Recovering from a crash" target="vim.recover%2Etxt" image="doc"/>
+        </tocitem>
+
+        <tocitem text="Advanced Editing" target="" image="folder">
+            <tocitem text="Command-line editing" target="vim.cmdline%2Etxt" image="doc"/>
+            <tocitem text="Description of all options" target="vim.options%2Etxt" image="doc"/>
+            <tocitem text="Regexp patterns and search commands" target="vim.pattern%2Etxt" image="doc"/>
+            <tocitem text="Key mapping and abbreviations" target="vim.map%2Etxt" image="doc"/>
+            <tocitem text="Tags and special searches" target="vim.tagsrch%2Etxt" image="doc"/>
+            <tocitem text="Commands for a quick edit-compile-fix cycle" target="vim.quickfix%2Etxt" image="doc"/>
+            <tocitem text="Commands for using multiple windows and buffers" target="vim.windows%2Etxt" image="doc"/>
+            <tocitem text="Syntax highlighting" target="vim.syntax%2Etxt" image="doc"/>
+            <tocitem text="Working with two or three versions of the same file" target="vim.diff%2Etxt" image="doc"/>
+            <tocitem text="Automatically executing commands on an event" target="vim.autocmd%2Etxt" image="doc"/>
+            <tocitem text="Settings done specifically for a type of file" target="vim.filetype%2Etxt" image="doc"/>
+            <tocitem text="Expression evaluation, conditional commands" target="vim.eval%2Etxt" image="doc"/>
+            <tocitem text="Hide (fold) ranges of lines" target="vim.fold%2Etxt" image="doc"/>
+        </tocitem>
+
+        <tocitem text="Special Issues" target="" image="folder">
+            <tocitem text="List of available digraphs" target="vim.digraph%2Etxt" image="doc"/>
+        </tocitem>
+
+        <tocitem text="Versions" target="" image="folder">
+            <tocitem text="Main differences between @NAME@ and Vim" target="vim.vi_diff%2Etxt" image="doc"/>
+        </tocitem>
+    </tocitem>
+</toc>

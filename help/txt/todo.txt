@@ -1,0 +1,33 @@
+*todo.txt*      For @NAME@ version @VERSION@.  Last change: 2006 Dec 29
+
+
+                  VIM REFERENCE MANUAL    by Rick Maddy
+
+
+                              TODO list for @NAME@         *todo*
+
+
+                                                        *known-bugs*
+-------------------- Known bugs and current work -----------------------
+
+- :dig doesn't bring up the window (it flashes a split second).
+- Split text when typing fast after o command.
+- Replace mode - fix caret. Can't figure out how to keep block caret.
+- Repeating a last change doesn't include text inserted by IDEA using code
+  completion.
+
+---------------------  extensions and improvements ----------------------
+                                                    *extensions-improvements*
+
+- Support Select mode
+- Show message after shifting lines with :< or :>
+- Backspace in Replace mode deletes instead of restoring
+- Support incsearch option
+- Support U (line undo)
+- Modify FileGroup.openFile to support ~ in filename, and files outside roots
+- :write doesn't support a range or arguments
+- Support :global
+- Support gf
+- Ctrl-w and Ctrl-u in insert mode flaky near end of line or end of file
+- Support all the other Vim commands that make sense under IDEA.
+
