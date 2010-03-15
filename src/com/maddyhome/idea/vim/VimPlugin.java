@@ -35,6 +35,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
 import com.intellij.openapi.keymap.impl.KeymapManagerImpl;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerAdapter;
@@ -475,7 +476,7 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable//, Co
      * This class is used to handle the Vim Plugin enabled/disabled toggle. This is most likely used as a menu option
      * but could also be used as a toolbar item.
      */
-    public static class VimPluginToggleAction extends ToggleAction {
+    public static class VimPluginToggleAction extends ToggleAction implements DumbAware {
         /**
          * Indicates if the toggle is on or off
          *
