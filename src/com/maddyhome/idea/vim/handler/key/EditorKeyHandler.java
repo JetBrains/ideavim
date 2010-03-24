@@ -19,6 +19,8 @@ package com.maddyhome.idea.vim.handler.key;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.codeInsight.lookup.Lookup;
+import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.diagnostic.Logger;
@@ -28,7 +30,7 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
 /**
  *
@@ -51,7 +53,18 @@ public class EditorKeyHandler extends EditorActionHandler
     {
         logger.debug("execute");
         //if (isEnabled(editor, context))
-        if (editor != null && VimPlugin.isEnabled())
+
+        // Do not launch vim actions in case of lookup enabled
+        boolean isEnabled = editor != null && VimPlugin.isEnabled();
+        if (isEnabled)
+        {
+          final Lookup lookup = LookupManager.getActiveLookup(editor);
+          if (lookup != null && lookup.isCompletion())
+          {
+            isEnabled = false;
+          }
+        }
+        if (isEnabled)
         {
             handle(editor, context);
         }
