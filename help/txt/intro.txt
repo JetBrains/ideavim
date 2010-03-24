@@ -165,7 +165,8 @@ Additional maillists:
 
 Bug reports:                            *bugs* *bug-reports* *bugreport.vim*
 
-Bug reports and other requests can be made on SourceForge at
+Bug reports and other requests can be made on JetBrains issue tracker (preferrable way) or on SourceForge at
+http://youtrack.jetbrains.net/issues/VIM or
 http://sourceforge.net/projects/ideavim
 <!--
 Send bug reports to: Vim bugs <bugs@vim.org>
