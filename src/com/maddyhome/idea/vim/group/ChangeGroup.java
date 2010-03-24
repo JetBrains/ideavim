@@ -43,6 +43,7 @@ import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
@@ -1704,14 +1705,14 @@ public class ChangeGroup extends AbstractActionGroup
         }
     }
 
-    public boolean changeNumber(Editor editor, DataContext context, int count)
+    public boolean changeNumber(final Editor editor, final DataContext context, final int count)
     {
-        BoundListOption nf = (BoundListOption)Options.getInstance().getOption("nrformats");
-        boolean alpha = nf.contains("alpha");
-        boolean hex = nf.contains("hex");
-        boolean octal = nf.contains("octal");
+        final BoundListOption nf = (BoundListOption)Options.getInstance().getOption("nrformats");
+        final boolean alpha = nf.contains("alpha");
+        final boolean hex = nf.contains("hex");
+        final boolean octal = nf.contains("octal");
 
-        TextRange range = SearchHelper.findNumberUnderCursor(editor, alpha, hex, octal);
+        final TextRange range = SearchHelper.findNumberUnderCursor(editor, alpha, hex, octal);
         if (range == null)
         {
             logger.debug("no number on line");
@@ -1763,15 +1764,15 @@ public class ChangeGroup extends AbstractActionGroup
                 number = Integer.toOctalString(num);
                 number = "0" + StringHelper.pad(number, text.length() - 1, '0');
             }
-            else if (alpha && ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')))
+            else if (alpha && Character.isLetter(ch))
             {
                 ch += count;
-                if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))
+                if (Character.isLetter(ch))
                 {
                     number = "" + ch;
                 }
             }
-            else if (ch == '-' || (ch >= '0' && ch <= '9'))
+            else if (ch == '-' || Character.isDigit(ch))
             {
                 boolean pad = ch == '0';
                 int len = text.length();
