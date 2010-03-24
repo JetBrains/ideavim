@@ -1,5 +1,7 @@
-<idea-plugin url="http://sourceforge.net/projects/ideavim/">
+<idea-plugin url="http://plugins.intellij.net/plugin/?id=164">
+<!--<idea-plugin url="http://sourceforge.net/projects/ideavim/">-->
     <name>IdeaVIM</name>
+    <id>IdeaVIM</id>
     <description><![CDATA[
         VIM Emulator. This plugin provides nearly complete vi/vim/gvim emulation while editing files in IDEA.
         The following functionality is supported:
