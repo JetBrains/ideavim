@@ -34,7 +34,7 @@
 
     <!-- Update this prior to building a new distribution -->
     <property name="idea-version" value="9.x"/>
-    <property name="version" value="0.12.6"/>
+    <property name="version" value="0.12.7"/>
     <property name="since-version" value="93.1"/>
     <property name="compiler.build" value="javac15"/>
 
