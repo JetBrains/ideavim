@@ -1630,11 +1630,9 @@ public class ChangeGroup extends AbstractActionGroup
      */
     private boolean deleteText(Editor editor, DataContext context, TextRange range, int type)
     {
-        if (range.size() == 1 && range.getStartOffset() > range.getEndOffset())
-        {
-            int start = Math.max(0, Math.min(range.getStartOffset(), EditorHelper.getFileSize(editor, true)));
-            int end = Math.max(0, Math.min(range.getEndOffset(), EditorHelper.getFileSize(editor, true)));
-            range = new TextRange(end, start);
+        // Fix for http://youtrack.jetbrains.net/issue/VIM-35
+        if (!range.normalize(EditorHelper.getFileSize(editor, true))){
+          return false;
         }
 
         if (type == 0 || CommandGroups.getInstance().getRegister().storeText(editor, context, range, type, true, false))
