@@ -36,7 +36,6 @@
     <property name="idea-version" value="10.x"/>
     <property name="version" value="0.13.1"/>
     <property name="since-version" value="105.1"/>
-    <property name="compiler.build" value="javac16"/>
 
     <!-- Define task -->
     <path id="ant-contrib">
