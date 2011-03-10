@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.key;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2005 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,18 +28,25 @@ import com.intellij.openapi.actionSystem.AnAction;
 public class ArgumentNode implements Node
 {
     /**
-     * Creates a node for the given action
-     * @param action The action this arguments is mapped to
-     * @param cmdType The type of the command this argument is for
-     * @param argType The type of the argument
-     * @param flags Any special flags associated with this argument
+     * Creates a node for the given action.
+     * @param actionId The id of the action.
+     * @param action The action this arguments is mapped to.
+     * @param cmdType The type of the command this argument is for.
+     * @param argType The type of the argument.
+     * @param flags Any special flags associated with this argument.
      */
-    public ArgumentNode(AnAction action, int cmdType, int argType, int flags)
+    public ArgumentNode(String actionId, AnAction action, int cmdType, int argType, int flags)
     {
+        this.actionId = actionId;
         this.action = action;
         this.argType = argType;
         this.cmdType = cmdType;
         this.flags = flags;
+    }
+
+    public String getActionId()
+    {
+        return actionId;
     }
 
     /**
@@ -82,6 +89,8 @@ public class ArgumentNode implements Node
     {
         StringBuffer res = new StringBuffer();
         res.append("ArgumentNode[");
+        res.append("actionId=");
+        res.append(actionId);
         res.append("action=");
         res.append(action);
         res.append("argType=");
@@ -103,6 +112,7 @@ public class ArgumentNode implements Node
         if (argType != node.argType) return false;
         if (cmdType != node.cmdType) return false;
         if (flags != node.flags) return false;
+        if (!actionId.equals(node.actionId)) return false;
         if (!action.equals(node.action)) return false;
 
         return true;
@@ -112,12 +122,14 @@ public class ArgumentNode implements Node
     {
         int result;
         result = action.hashCode();
+        result = 29 * result + actionId.hashCode();
         result = 29 * result + argType;
         result = 29 * result + cmdType;
         result = 29 * result + flags;
         return result;
     }
 
+    protected String actionId;
     protected AnAction action;
     protected int argType;
     protected int cmdType;

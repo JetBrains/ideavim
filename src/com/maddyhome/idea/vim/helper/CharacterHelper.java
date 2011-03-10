@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.helper;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2005 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -63,7 +63,7 @@ public class CharacterHelper
      * @param ch The character to change
      * @param type One of <code>CASE_TOGGLE</code>, <code>CASE_UPPER</code>, or <code>CASE_LOWER</code>
      * @return The character with changed case or the original if not a letter
-     */ 
+     */
     public static char changeCase(char ch, char type)
     {
         switch (type)

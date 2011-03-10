@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.key;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2005 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -43,10 +43,8 @@ public abstract class ParentNode implements Node
      */
     public Node getChild(Object key)
     {
-        Node res = (Node)children.get(key);
-
-        return res;
+        return children.get(key);
     }
 
-    protected HashMap children = new HashMap();
+    protected HashMap<Object, Node> children = new HashMap<Object, Node>();
 }

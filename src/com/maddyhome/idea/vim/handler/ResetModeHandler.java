@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.handler;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2005 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -32,7 +32,7 @@ public class ResetModeHandler extends EditorActionHandler
 {
     public void execute(Editor editor, DataContext context)
     {
-        CommandState.getInstance().reset();
-        KeyHandler.getInstance().fullReset();
+        CommandState.getInstance(editor).reset();
+        KeyHandler.getInstance().fullReset(editor);
     }
 }

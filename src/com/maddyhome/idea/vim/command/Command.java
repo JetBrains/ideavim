@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.command;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2004 Rick Maddy
+ * Copyright (C) 2003-2006 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
 
+import javax.swing.*;
 import java.util.List;
 
 /**
@@ -40,6 +41,8 @@ public class Command
     public static final int FLAG_MOT_EXCLUSIVE = 1 << 5;
     /** Indicates that the cursor position should be saved prior to this motion command */
     public static final int FLAG_SAVE_JUMP = 1 << 6;
+    /** Special flag that says this is characterwise only for visual mode */
+    public static final int FLAG_VISUAL_CHARACTERWISE = 1 << 7;
 
     /** Special command flag that indicates it is not to be repeated */
     public static final int FLAG_NO_REPEAT = 1 << 8;
@@ -49,12 +52,21 @@ public class Command
     public static final int FLAG_SAVE_STROKE = 1 << 10;
     /** This is a backspace command */
     public static final int FLAG_IS_BACKSPACE = 1 << 11;
-    public static final int FLAG_SAVE_CHANGES = 1 << 12;
+
+    public static final int FLAG_IGNORE_SCROLL_JUMP = 1 << 12;
+    public static final int FLAG_IGNORE_SIDE_SCROLL_JUMP = 1 << 13;
+
+    /** Indicates a command can accept a count in mid command */
+    public static final int FLAG_ALLOW_MID_COUNT = 1 << 14;
 
     /** Search Flags */
     public static final int FLAG_SEARCH_FWD = 1 << 16;
     public static final int FLAG_SEARCH_REV = 1 << 17;
 
+    public static final int FLAG_KEEP_VISUAL = 1 << 20;
+    public static final int FLAG_FORCE_VISUAL = 1 << 21;
+    public static final int FLAG_FORCE_LINEWISE = 1 << 22;
+    public static final int FLAG_DELEGATE = 1 << 23;
     /** Special flag used for any mappings involving operators */
     public static final int FLAG_OP_PEND = 1 << 24;
     /** This command starts a multi-command undo transaction */
@@ -65,6 +77,8 @@ public class Command
     public static final int FLAG_NO_ARG_RECORDING = 1 << 27;
     /** Indicate that the character argument may come from a digraph */
     public static final int FLAG_ALLOW_DIGRAPH = 1 << 28;
+    public static final int FLAG_COMPLETE_EX = 1 << 29;
+    public static final int FLAG_TEXT_BLOCK = 1 << 30;
 
     /** Represents commands that actually move the cursor and can be arguments to operators */
     public static final int MOTION = 1;
@@ -127,9 +141,9 @@ public class Command
      * @param type The type of the command
      * @param flags Any custom flags specific to this command
      */
-    public Command(int count, AnAction action, int type, int flags)
+    public Command(int count, String actionId, AnAction action, int type, int flags)
     {
-        this(count, action, type, flags, null);
+        this(count, actionId, action, type, flags, null);
     }
 
     /**
@@ -140,9 +154,10 @@ public class Command
      * @param flags Any custom flags specific to this command
      * @param arg The argument to this command
      */
-    public Command(int count, AnAction action, int type, int flags, Argument arg)
+    public Command(int count, String actionId, AnAction action, int type, int flags, Argument arg)
     {
         this.count = count;
+        this.actionId = actionId;
         this.action = action;
         this.type = type;
         this.flags = flags;
@@ -214,6 +229,16 @@ public class Command
         this.flags = flags;
     }
 
+    public String getActionId()
+    {
+        return actionId;
+    }
+
+    public void setActionId(String actionId)
+    {
+        this.actionId = actionId;
+    }
+
     /**
      * Gets the action to execute when the command is run
      * @return The command's action
@@ -250,34 +275,37 @@ public class Command
         this.argument = argument;
     }
 
-    public List getKeys()
+    public List<KeyStroke> getKeys()
     {
         return keys;
     }
 
-    public void setKeys(List keys)
+    public void setKeys(List<KeyStroke> keys)
     {
         this.keys = keys;
     }
 
     public String toString()
     {
-        final StringBuffer buf = new StringBuffer();
-        buf.append("Command");
-        buf.append("{count=").append(count);
-        buf.append(",action=").append(action);
-        buf.append(",type=").append(type);
-        buf.append(",flags=").append(flags);
-        buf.append(",argument=").append(argument);
-        buf.append(",keys=").append(keys);
-        buf.append('}');
-        return buf.toString();
+        StringBuffer res = new StringBuffer();
+        res.append("Command {");
+        res.append("count=").append(count);
+        res.append(",actionId=").append(actionId);
+        res.append(",action=").append(action);
+        res.append(",type=").append(type);
+        res.append(",flags=").append(flags);
+        res.append(",argument=").append(argument);
+        res.append(",keys=").append(keys);
+        res.append("}");
+
+        return res.toString();
     }
 
     private int count;
+    private String actionId;
     private AnAction action;
     private int type;
     private int flags;
     private Argument argument;
-    private List keys;
+    private List<KeyStroke> keys;
 }

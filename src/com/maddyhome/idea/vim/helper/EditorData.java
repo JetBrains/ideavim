@@ -1,6 +1,8 @@
+package com.maddyhome.idea.vim.helper;
+
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2004 Rick Maddy
+ * Copyright (C) 2003-2005 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,21 +18,23 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.maddyhome.idea.vim.helper;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.command.VisualRange;
 import com.maddyhome.idea.vim.undo.UndoManager;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 
 /**
@@ -45,7 +49,7 @@ public class EditorData
      */
     public static void initializeEditor(Editor editor)
     {
-        logger.debug("editor created: " + editor);
+        if (logger.isDebugEnabled()) logger.debug("editor created: " + editor);
         UndoManager.getInstance().editorOpened(editor);
     }
 
@@ -55,8 +59,12 @@ public class EditorData
      */
     public static void uninitializeEditor(Editor editor)
     {
-        logger.debug("editor closed: " + editor);
+        if (logger.isDebugEnabled()) logger.debug("editor closed: " + editor);
         UndoManager.getInstance().editorClosed(editor);
+        editor.putUserData(COMMAND_STATE, null);
+        editor.putUserData(LAST_HIGHLIGHTS, null);
+        editor.putUserData(VISUAL, null);
+        editor.putUserData(VISUAL_OP, null);
     }
 
     /**
@@ -66,14 +74,14 @@ public class EditorData
      */
     public static int getLastColumn(Editor editor)
     {
-        Integer col = (Integer)editor.getUserData(LAST_COLUMN);
+        Integer col = editor.getUserData(LAST_COLUMN);
         if (col == null)
         {
             return EditorHelper.getCurrentVisualColumn(editor);
         }
         else
         {
-            return col.intValue();
+            return col;
         }
     }
 
@@ -84,14 +92,14 @@ public class EditorData
      */
     public static void setLastColumn(Editor editor, int col)
     {
-        editor.putUserData(LAST_COLUMN, new Integer(col));
+        editor.putUserData(LAST_COLUMN, col);
         int t = getLastColumn(editor);
-        logger.debug("setLastColumn(" + col + ") is now " + t);
+        if (logger.isDebugEnabled()) logger.debug("setLastColumn(" + col + ") is now " + t);
     }
 
     public static String getLastSearch(Editor editor)
     {
-        return (String)editor.getUserData(LAST_SEARCH);
+        return editor.getUserData(LAST_SEARCH);
     }
 
     public static void setLastSearch(Editor editor, String search)
@@ -99,12 +107,12 @@ public class EditorData
         editor.putUserData(LAST_SEARCH, search);
     }
 
-    public static Collection getLastHighlights(Editor editor)
+    public static Collection<RangeHighlighter> getLastHighlights(Editor editor)
     {
-        return (Collection)editor.getUserData(LAST_HIGHLIGHTS);
+        return editor.getUserData(LAST_HIGHLIGHTS);
     }
 
-    public static void setLastHighlights(Editor editor, Collection highlights)
+    public static void setLastHighlights(Editor editor, Collection<RangeHighlighter> highlights)
     {
         editor.putUserData(LAST_HIGHLIGHTS, highlights);
     }
@@ -116,8 +124,7 @@ public class EditorData
      */
     public static VisualRange getLastVisualRange(Editor editor)
     {
-        VisualRange res = (VisualRange)editor.getDocument().getUserData(VISUAL);
-        return res;
+        return editor.getDocument().getUserData(VISUAL);
     }
 
     /**
@@ -137,8 +144,7 @@ public class EditorData
      */
     public static VisualChange getLastVisualOperatorRange(Editor editor)
     {
-        VisualChange res = (VisualChange)editor.getDocument().getUserData(VISUAL_OP);
-        return res;
+        return editor.getDocument().getUserData(VISUAL_OP);
     }
 
     /**
@@ -151,6 +157,66 @@ public class EditorData
         editor.getDocument().putUserData(VISUAL_OP, range);
     }
 
+    public static CommandState getCommandState(Editor editor)
+    {
+        return editor.getUserData(COMMAND_STATE);
+    }
+
+    public static void setCommandState(Editor editor, CommandState state)
+    {
+        editor.putUserData(COMMAND_STATE, state);
+    }
+
+    public static boolean getChangeGroup(Editor editor)
+    {
+        Boolean res = editor.getUserData(CHANGE_GROUP);
+        if (res != null)
+        {
+            return res;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public static void setChangeGroup(Editor editor, boolean adapter)
+    {
+        editor.putUserData(CHANGE_GROUP, adapter);
+    }
+
+    public static boolean getMotionGroup(Editor editor)
+    {
+        Boolean res = editor.getUserData(MOTION_GROUP);
+        if (res != null)
+        {
+            return res;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public static void setMotionGroup(Editor editor, boolean adapter)
+    {
+        editor.putUserData(MOTION_GROUP, adapter);
+    }
+
+    public static boolean isConsoleOutput(Editor editor)
+    {
+        Object res = editor.getUserData(CONSOLE_OUTPUT);
+        logger.debug("isConsoleOutput for editor " + editor + " - " + res);
+        if (res != null)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     /**
      * Gets the project associated with the editor.
      * @param editor The editor to get the project for
@@ -158,21 +224,21 @@ public class EditorData
      */
     public static Project getProject(Editor editor)
     {
-        Project proj = (Project)editor.getUserData(PROJECT);
+        Project proj = editor.getUserData(PROJECT);
         if (proj == null)
         {
             // If we don't have the project already we need to scan all open projects and check all their
             // open editors until there is a match
             Project[] projs = ProjectManager.getInstance().getOpenProjects();
-            for (int p = 0; p < projs.length; p++)
+            for (Project p : projs)
             {
-                Editor[] editors = EditorFactory.getInstance().getEditors(editor.getDocument(), projs[p]);
-                for (int e = 0; e < editors.length; e++)
+                Editor[] editors = EditorFactory.getInstance().getEditors(editor.getDocument(), p);
+                for (Editor e : editors)
                 {
-                    if (editors[e].equals(editor))
+                    if (e.equals(editor))
                     {
-                        editor.putUserData(PROJECT, projs[p]);
-                        proj = projs[p];
+                        editor.putUserData(PROJECT, p);
+                        proj = p;
                         break;
                     }
                 }
@@ -185,12 +251,12 @@ public class EditorData
     public static Project getProject(FileEditorManager mgr)
     {
         Project[] projs = ProjectManager.getInstance().getOpenProjects();
-        for (int p = 0; p < projs.length; p++)
+        for (Project proj : projs)
         {
-            FileEditorManager fem = FileEditorManager.getInstance(projs[p]);
+            FileEditorManager fem = FileEditorManager.getInstance(proj);
             if (fem.equals(mgr))
             {
-                return projs[p];
+                return proj;
             }
         }
 
@@ -212,12 +278,50 @@ public class EditorData
      */
     private EditorData() {}
 
-    private static final Key LAST_COLUMN = new Key("lastColumn");
-    private static final Key PROJECT = new Key("project");
-    private static final Key VISUAL = new Key("lastVisual");
-    private static final Key VISUAL_OP = new Key("lastVisualOp");
-    private static final Key LAST_SEARCH = new Key("lastSearch");
-    private static final Key LAST_HIGHLIGHTS = new Key("lastHighlights");
+    private static final Key<Integer> LAST_COLUMN = new Key<Integer>("lastColumn");
+    private static final Key<Project> PROJECT = new Key<Project>("project");
+    private static final Key<VisualRange> VISUAL = new Key<VisualRange>("lastVisual");
+    private static final Key<VisualChange> VISUAL_OP = new Key<VisualChange>("lastVisualOp");
+    private static final Key<String> LAST_SEARCH = new Key<String>("lastSearch");
+    private static final Key<Collection<RangeHighlighter>> LAST_HIGHLIGHTS = new Key<Collection<RangeHighlighter>>("lastHighlights");
+    private static final Key<CommandState> COMMAND_STATE = new Key<CommandState>("commandState");
+    private static final Key<Boolean> CHANGE_GROUP = new Key<Boolean>("changeGroup");
+    private static final Key<Boolean> MOTION_GROUP = new Key<Boolean>("motionGroup");
+    private static Key CONSOLE_OUTPUT = Key.create("CONSOLE_VIEW_IN_EDITOR_VIEW");
 
     private static Logger logger = Logger.getInstance(EditorData.class.getName());
+
+    static {
+        try
+        {
+            // Yikes! The console output pane is really an editor. I need to be able to differentiate this editor
+            // from other editors. After an email with Jetbrains I learned that the class to look at was ConsoleViewImpl
+            // This class creates the editor and adds itself as user data to the editor. Unfortunately the Key used
+            // for the user data is a private static in the class. And the name is obfuscated (why should this be easy).
+            // This code looks at all the fields in ConsoleViewImpl and looks for a field of type Key. It is assumed
+            // the first Key is the one I need. The key is created as:
+            // private static final Key c = Key.create("CONSOLE_VIEW_IN_EDITOR_VIEW");
+            // I tried to create a Key with the same name but it doesn't work. Most likely the Key implementation is
+            // coded such that two keys with the same name are treated as different keys - oh well.
+            // This code will work as long as the key I need is the first one in the ConsoleViewImpl.
+            Class cvi = Class.forName("com.intellij.execution.impl.ConsoleViewImpl");
+            Field[] flds = cvi.getDeclaredFields();
+            for (Field f: flds) {
+                if (f.getType().equals(Key.class)) {
+                    f.setAccessible(true);
+                    Key key = (Key)f.get(null);
+                    CONSOLE_OUTPUT = key;
+                    break;
+                }
+            }
+        }
+        catch (ClassNotFoundException e)
+        {
+            logger.error("ConsoleViewImpl not found");
+        }
+        catch (IllegalAccessException e)
+        {
+            logger.error("Can't access field 'c'");
+        }
+    }
 }

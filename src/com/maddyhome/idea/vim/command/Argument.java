@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.command;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2004 Rick Maddy
+ * Copyright (C) 2003-2006 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -34,6 +34,8 @@ public class Argument
     public static final int STRING = 3;
     /** This is for arguments consisting of a digraph or a regular character */
     public static final int DIGRAPH = 4;
+    /** This is for argumaents consisting of an ex string */
+    public static final int EX_STRING = 5;
 
     /**
      * Creates a character argument
@@ -113,12 +115,25 @@ public class Argument
                 return motionArg;
             case CHARACTER:
             case DIGRAPH:
-                return new Character(charArg);
+                return charArg;
             case STRING:
                 return strArg;
         }
 
         throw new IllegalStateException("Unexpected argType of " + type);
+    }
+
+    public String toString()
+    {
+        StringBuffer res = new StringBuffer();
+        res.append("Argument {");
+        res.append("charArg=").append(charArg);
+        res.append(",motionArg=").append(motionArg);
+        res.append(",strArg=").append(strArg);
+        res.append(",type=").append(type);
+        res.append("}");
+
+        return res.toString();
     }
 
     private char charArg = 0;

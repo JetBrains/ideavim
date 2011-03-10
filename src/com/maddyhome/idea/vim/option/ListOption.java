@@ -1,27 +1,26 @@
 package com.maddyhome.idea.vim.option;
 
 /*
-* IdeaVim - A Vim emulator plugin for IntelliJ Idea
-* Copyright (C) 2003 Rick Maddy
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
+ * IdeaVim - A Vim emulator plugin for IntelliJ Idea
+ * Copyright (C) 2003-2005 Rick Maddy
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -41,8 +40,8 @@ public class ListOption extends TextOption
     {
         super(name, abbrev);
 
-        this.dflt = new ArrayList(Arrays.asList(dflt));
-        this.value = new ArrayList(this.dflt);
+        this.dflt = new ArrayList<String>(Arrays.asList(dflt));
+        this.value = new ArrayList<String>(this.dflt);
         this.pattern = pattern;
     }
 
@@ -54,14 +53,15 @@ public class ListOption extends TextOption
     {
         StringBuffer res = new StringBuffer();
         int cnt = 0;
-        for (Iterator iterator = value.iterator(); iterator.hasNext(); cnt++)
+        for (String s : value)
         {
-            String s = (String)iterator.next();
             if (cnt > 0)
             {
                 res.append(",");
             }
             res.append(s);
+
+            cnt++;
         }
 
         return res.toString();
@@ -71,7 +71,7 @@ public class ListOption extends TextOption
      * Gets the option's values as a list
      * @return The option's values
      */
-    public List values()
+    public List<String> values()
     {
         return value;
     }
@@ -130,7 +130,7 @@ public class ListOption extends TextOption
         return remove(parseVals(val));
     }
 
-    protected boolean set(ArrayList vals)
+    protected boolean set(List<String> vals)
     {
         if (vals == null)
         {
@@ -143,7 +143,7 @@ public class ListOption extends TextOption
         return true;
     }
 
-    protected boolean append(ArrayList vals)
+    protected boolean append(List<String> vals)
     {
         if (vals == null)
         {
@@ -156,7 +156,7 @@ public class ListOption extends TextOption
         return true;
     }
 
-    protected boolean prepend(ArrayList vals)
+    protected boolean prepend(List<String> vals)
     {
         if (vals == null)
         {
@@ -169,7 +169,7 @@ public class ListOption extends TextOption
         return true;
     }
 
-    protected boolean remove(ArrayList vals)
+    protected boolean remove(List<String> vals)
     {
         if (vals == null)
         {
@@ -182,9 +182,9 @@ public class ListOption extends TextOption
         return true;
     }
 
-    protected ArrayList parseVals(String val)
+    protected List<String> parseVals(String val)
     {
-        ArrayList res = new ArrayList();
+        List<String> res = new ArrayList<String>();
         StringTokenizer tokenizer = new StringTokenizer(val, ",");
         while (tokenizer.hasMoreTokens())
         {
@@ -218,7 +218,7 @@ public class ListOption extends TextOption
     {
         if (!dflt.equals(value))
         {
-            value = new ArrayList(dflt);
+            value = new ArrayList<String>(dflt);
             fireOptionChangeEvent();
         }
     }
@@ -238,7 +238,7 @@ public class ListOption extends TextOption
         return res.toString();
     }
 
-    protected ArrayList dflt;
-    protected ArrayList value;
+    protected List<String> dflt;
+    protected List<String> value;
     protected String pattern;
 }

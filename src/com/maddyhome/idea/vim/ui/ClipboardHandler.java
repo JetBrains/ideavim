@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.ui;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2005 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,13 +19,8 @@ package com.maddyhome.idea.vim.ui;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import java.awt.HeadlessException;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.*;
+import java.awt.datatransfer.*;
 import java.io.IOException;
 
 /**
@@ -53,12 +48,15 @@ public class ClipboardHandler
         }
         catch (HeadlessException e)
         {
+            // ignore
         }
         catch (UnsupportedFlavorException e)
         {
+            // ignore
         }
         catch (IOException e)
         {
+            // ignore
         }
 
         return res;
@@ -78,6 +76,7 @@ public class ClipboardHandler
         }
         catch (HeadlessException e)
         {
+            // ignore
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.maddyhome.idea.vim.action;
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2004 Rick Maddy
+ * Copyright (C) 2003-2005 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -38,7 +38,10 @@ public abstract class AbstractDelegateEditorAction extends EditorAction implemen
 
     public void setOrigAction(AnAction origAction)
     {
-        logger.debug("origAction=" + origAction);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("origAction=" + origAction);
+        }
         this.origAction = origAction;
         copyFrom(origAction);
     }

@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.regexp;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2005 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,133 +25,6 @@ import com.intellij.openapi.editor.LogicalPosition;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
-
-/*
- * NOTICE:
- *
- * This code was translated, by hand, into Java from the original Vim 6.1
- * source code with some minor changes here and there.
- */
-
-/*
- * Handling of regular expressions: vim_regcomp(), vim_regexec(), vim_regsub()
- *
- * NOTICE:
- *
- * This is NOT the original regular expression code as written by Henry
- * Spencer.  This code has been modified specifically for use with the VIM
- * editor, and should not be used separately from Vim.  If you want a good
- * regular expression library, get the original code.  The copyright notice
- * that follows is from the original.
- *
- * END NOTICE
- *
- *      Copyright (c) 1986 by University of Toronto.
- *      Written by Henry Spencer.  Not derived from licensed software.
- *
- *      Permission is granted to anyone to use this software for any
- *      purpose on any computer system, and to redistribute it freely,
- *      subject to the following restrictions:
- *
- *      1. The author is not responsible for the consequences of use of
- *              this software, no matter how awful, even if they arise
- *              from defects in it.
- *
- *      2. The origin of this software must not be misrepresented, either
- *              by explicit claim or by omission.
- *
- *      3. Altered versions must be plainly marked as such, and must not
- *              be misrepresented as being the original software.
- *
- * Beware that some of this code is subtly aware of the way operator
- * precedence is structured in regular expressions.  Serious changes in
- * regular-expression syntax might require a total rethink.
- *
- * Changes have been made by Tony Andrews, Olaf 'Rhialto' Seibert, Robert Webb
- * and Bram Moolenaar.
- * Named character class support added by Walter Briscoe (1998 Jul 01)
- */
-
-/*
- * The "internal use only" fields in regexp.h are present to pass info from
- * compile to execute that permits the execute phase to run lots faster on
- * simple cases.  They are:
- *
- * regstart     char that must begin a match; NUL if none obvious; Can be a
- *              multi-byte character.
- * reganch      is the match anchored (at beginning-of-line only)?
- * regmust      string (pointer into program) that match must include, or null
- * regmlen      length of regmust string
- * regflags     RF_ values or'ed together
- *
- * Regstart and reganch permit very fast decisions on suitable starting points
- * for a match, cutting down the work a lot.  Regmust permits fast rejection
- * of lines that cannot possibly match.  The regmust tests are costly enough
- * that vim_regcomp() supplies a regmust only if the r.e. contains something
- * potentially expensive (at present, the only such thing detected is * or +
- * at the start of the r.e., which can involve a lot of backup).  Regmlen is
- * supplied because the test in vim_regexec() needs it and vim_regcomp() is
- * computing it anyway.
- */
-
-/*
- * Structure for regexp "program".  This is essentially a linear encoding
- * of a nondeterministic finite-state machine (aka syntax charts or
- * "railroad normal form" in parsing technology).  Each node is an opcode
- * plus a "next" pointer, possibly plus an operand.  "Next" pointers of
- * all nodes except BRANCH and BRACES_COMPLEX implement concatenation; a "next"
- * pointer with a BRANCH on both ends of it is connecting two alternatives.
- * (Here we have one of the subtle syntax dependencies: an individual BRANCH
- * (as opposed to a collection of them) is never concatenated with anything
- * because of operator precedence).  The "next" pointer of a BRACES_COMPLEX
- * node points to the node after the stuff to be repeated.  The operand of some
- * types of node is a literal string; for others, it is a node leading into a
- * sub-FSM.  In particular, the operand of a BRANCH node is the first node of
- * the branch.  (NB this is *not* a tree structure: the tail of the branch
- * connects to the thing following the set of BRANCHes.)
- *
- * pattern      is coded like:
- *
- *                        +-----------------+
- *                        |                 V
- * <aa>\|<bb>   BRANCH <aa> BRANCH <bb> --> END
- *                   |      ^    |          ^
- *                   +------+    +----------+
- *
- *
- *                     +------------------+
- *                     V                  |
- * <aa>*        BRANCH BRANCH <aa> --> BACK BRANCH --> NOTHING --> END
- *                   |      |               ^                      ^
- *                   |      +---------------+                      |
- *                   +---------------------------------------------+
- *
- *
- *                                      +-------------------------+
- *                                      V                         |
- * <aa>\{}      BRANCH BRACE_LIMITS --> BRACE_COMPLEX <aa> --> BACK  END
- *                   |                              |                ^
- *                   |                              +----------------+
- *                   +-----------------------------------------------+
- *
- *
- * <aa>\@!<bb>  BRANCH NOMATCH <aa> --> END  <bb> --> END
- *                   |       |                ^       ^
- *                   |       +----------------+       |
- *                   +--------------------------------+
- *
- *                                                    +---------+
- *                                                    |         V
- * \z[abc]      BRANCH BRANCH  a  BRANCH  b  BRANCH  c  BRANCH  NOTHING --> END
- *                   |      |          |          |     ^                   ^
- *                   |      |          |          +-----+                   |
- *                   |      |          +----------------+                   |
- *                   |      +---------------------------+                   |
- *                   +------------------------------------------------------+
- *
- * They all start with a BRANCH for "\|" alternaties, even when there is only
- * one alternative.
- */
 
 public class RegExp
 {
@@ -667,8 +540,8 @@ public class RegExp
             else if ((scan.OP() == BOW
                 || scan.OP() == EOW
                 || scan.OP() == NOTHING
-                || scan.OP() == MOPEN + 0 || scan.OP() == NOPEN
-                || scan.OP() == MCLOSE + 0 || scan.OP() == NCLOSE)
+                || scan.OP() == MOPEN || scan.OP() == NOPEN
+                || scan.OP() == MCLOSE || scan.OP() == NCLOSE)
                 && regnext(scan).OP() == EXACTLY)
             {
                 r.regstart = regnext(scan).OPERAND().charAt();
@@ -700,12 +573,15 @@ public class RegExp
                         len = so.strlen();
                     }
                 }
-                r.regmust = longest.ref(0);
+                if (longest != null)
+                {
+                    r.regmust = longest.ref(0);
+                }
                 r.regmlen = len;
             }
         }
 
-        logger.debug(regdump(expr, r));
+        if (logger.isDebugEnabled()) logger.debug(regdump(expr, r));
 
         return r;
     }
@@ -1476,11 +1352,11 @@ public class RegExp
                             break;
 
                         case 's':
-                            ret = regnode(MOPEN + 0);
+                            ret = regnode(MOPEN);
                             break;
 
                         case 'e':
-                            ret = regnode(MCLOSE + 0);
+                            ret = regnode(MCLOSE);
                             break;
 
                         default:
@@ -2014,10 +1890,10 @@ public class RegExp
      */
     private CharPointer re_put_long(CharPointer p, int val)
     {
-        p.set((char)((val >> 24) & 0377)).inc();
-        p.set((char)((val >> 16) & 0377)).inc();
-        p.set((char)((val >> 8) & 0377)).inc();
-        p.set((char)(val & 0377)).inc();
+        p.set((char)((val >> 24) & 0xff)).inc();
+        p.set((char)((val >> 16) & 0xff)).inc();
+        p.set((char)((val >> 8) & 0xff)).inc();
+        p.set((char)(val & 0xff)).inc();
         return p;
     }
 
@@ -2050,8 +1926,8 @@ public class RegExp
             offset = val.pointer() - scan.pointer();
         }
 
-        scan.ref(1).set((char)(((char)offset >> 8) & 0377));
-        scan.ref(2).set((char)(offset & 0377));
+        scan.ref(1).set((char)(((char)offset >> 8) & 0xff));
+        scan.ref(2).set((char)(offset & 0xff));
     }
 
     /*
@@ -2419,7 +2295,7 @@ public class RegExp
      * Return zero if there is no match.  Return number of lines contained in the
      * match otherwise.
      */
-    public int vim_regexec_multi(regmmatch_T rmp, /*win_T win,*/ Editor buf, int lnum, int col)
+    public int vim_regexec_multi(regmmatch_T rmp, /*win_T win,*/ Editor buf, int lcount, int lnum, int col)
 
     /* window in which to search or null */
     /* buffer in which to search */
@@ -2434,7 +2310,7 @@ public class RegExp
         reg_buf = buf;
         //reg_win = win;
         reg_firstlnum = lnum;
-        reg_maxline = EditorHelper.getLineCount(reg_buf) - lnum;
+        reg_maxline = lcount - lnum;
         ireg_ic = rmp.rmm_ic;
 
         /* Need to switch to buffer "buf" to make vim_iswordc() work. */
@@ -2592,9 +2468,7 @@ public class RegExp
      */
     private reg_extmatch_T make_extmatch()
     {
-        reg_extmatch_T em = new reg_extmatch_T();
-
-        return em;
+        return new reg_extmatch_T();
     }
 
     /*
@@ -3052,7 +2926,7 @@ public class RegExp
                     case BACK:
                         break;
 
-                    case MOPEN + 0:   /* Match start: \zs */
+                    case MOPEN:   /* Match start: \zs */
                     case MOPEN + 1:   /* \( */
                     case MOPEN + 2:
                     case MOPEN + 3:
@@ -3082,11 +2956,7 @@ public class RegExp
 
                     case NOPEN:       /* \%( */
                     case NCLOSE:      /* \) after \%( */
-                        if (regmatch(next))
-                        {
-                            return true;
-                        }
-                        return false;
+                        return regmatch(next);
                         /* break; Not Reached */
 
                     case ZOPEN + 1:
@@ -3116,7 +2986,7 @@ public class RegExp
                         }
                         /* break; Not Reached */
 
-                    case MCLOSE + 0:  /* Match end: \ze */
+                    case MCLOSE:  /* Match end: \ze */
                     case MCLOSE + 1:  /* \) */
                     case MCLOSE + 2:
                     case MCLOSE + 3:
@@ -3370,7 +3240,7 @@ public class RegExp
                         }
                         break;
 
-                    case BRACE_COMPLEX + 0:
+                    case BRACE_COMPLEX:
                     case BRACE_COMPLEX + 1:
                     case BRACE_COMPLEX + 2:
                     case BRACE_COMPLEX + 3:
@@ -4322,17 +4192,20 @@ public class RegExp
      */
     private CharPointer cstrchr(CharPointer s, char c)
     {
-        CharPointer p;
-        int cc;
-
         if (!ireg_ic)
         {
             return s.strchr(c);
+        }
+        else
+        {
+            return s.istrchr(c);
         }
 
         /* tolower() and toupper() can be slow, comparing twice should be a lot
          * faster (esp. when using MS Visual C++!).
          * For UTF-8 need to use folded case. */
+        /* was 1,173ms
+        int cc;
         if (CharacterClasses.isUpper(c))
         {
             cc = Character.toLowerCase(c);
@@ -4345,17 +4218,35 @@ public class RegExp
         {
             return s.strchr(c);
         }
+        */
 
         /* Faster version for when there are no multi-byte characters. */
+        /*
+        CharPointer p = s.ref(0);
+        char ch;
+        while ((ch = p.charAt()) != '\u0000')
+        {
+            if (ch == c || ch == cc)
+            {
+                return p;
+            }
+
+            p.inc();
+        }
+        */
+
+        /* was 2,053ms
         for (p = s.ref(0); !p.isNul(); p.inc())
         {
-            if (p.charAt() == c || p.charAt() == cc)
+            char ch = p.charAt();
+            if (ch == c || ch == cc)
             {
                 return p;
             }
         }
+        */
 
-        return null;
+        //return null;
     }
 
     /***************************************************************
@@ -4426,7 +4317,7 @@ public class RegExp
     //    return newsub;
     //}
 
-    /*
+    /**
      * vim_regsub() - perform substitutions after a vim_regexec() or
      * vim_regexec_multi() match.
      *
@@ -5129,7 +5020,7 @@ public class RegExp
             case END:
                 p = "END";
                 break;
-            case MOPEN + 0:
+            case MOPEN:
                 p = "MATCH START";
                 break;
             case MOPEN + 1:
@@ -5144,7 +5035,7 @@ public class RegExp
                 buf.append("MOPEN").append(op.OP() - MOPEN);
                 p = null;
                 break;
-            case MCLOSE + 0:
+            case MCLOSE:
                 p = "MATCH END";
                 break;
             case MCLOSE + 1:
@@ -5240,7 +5131,7 @@ public class RegExp
             case BRACE_SIMPLE:
                 p = "BRACE_SIMPLE";
                 break;
-            case BRACE_COMPLEX + 0:
+            case BRACE_COMPLEX:
             case BRACE_COMPLEX + 1:
             case BRACE_COMPLEX + 2:
             case BRACE_COMPLEX + 3:

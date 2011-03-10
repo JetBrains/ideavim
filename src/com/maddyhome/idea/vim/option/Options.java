@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.option;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2004 Rick Maddy
+ * Copyright (C) 2003-2008 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,19 +22,15 @@ package com.maddyhome.idea.vim.option;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.helper.ApiHelper;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
-import com.maddyhome.idea.vim.helper.ApiHelper;
 import com.maddyhome.idea.vim.ui.MorePanel;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * Maintains the set of support options
@@ -77,10 +73,10 @@ public class Options
      */
     public Option getOption(String name)
     {
-        Option res = (Option)options.get(name);
+        Option res = options.get(name);
         if (res == null)
         {
-            res = (Option)abbrevs.get(name);
+            res = abbrevs.get(name);
         }
 
         return res;
@@ -90,7 +86,7 @@ public class Options
      * Gets all options
      * @return All options
      */
-    Collection allOptions()
+    Collection<Option> allOptions()
     {
         return options.values();
     }
@@ -99,12 +95,11 @@ public class Options
      * Gets only options that have values different from their default values
      * @return The set of changed options
      */
-    Collection changedOptions()
+    Collection<Option> changedOptions()
     {
-        ArrayList res = new ArrayList();
-        for (Iterator iterator = options.values().iterator(); iterator.hasNext();)
+        ArrayList<Option> res = new ArrayList<Option>();
+        for (Option option: options.values())
         {
-            Option option = (Option)iterator.next();
             if (!option.isDefault())
             {
                 res.add(option);
@@ -158,16 +153,15 @@ public class Options
         else if (args.equals("all&"))
         {
             resetAllOptions();
-            
+
             return true;
         }
 
         // We now have 1 or more option operators separator by spaces
         String error = null;
         String token = null;
-        String option = "";
         StringTokenizer tokenizer = new StringTokenizer(args);
-        ArrayList toShow = new ArrayList();
+        ArrayList<Option> toShow = new ArrayList<Option>();
         while (tokenizer.hasMoreTokens())
         {
             token = tokenizer.nextToken();
@@ -184,7 +178,7 @@ public class Options
             // Print the value of an option
             if (token.endsWith("?"))
             {
-                option = token.substring(0, token.length() - 1);
+                String option = token.substring(0, token.length() - 1);
                 Option opt = getOption(option);
                 if (opt != null)
                 {
@@ -198,7 +192,7 @@ public class Options
             // Reset a boolean option
             else if (token.startsWith("no"))
             {
-                option = token.substring(2);
+                String option = token.substring(2);
                 Option opt = getOption(option);
                 if (opt != null)
                 {
@@ -219,7 +213,7 @@ public class Options
             // Toggle a boolean option
             else if (token.startsWith("inv"))
             {
-                option = token.substring(3);
+                String option = token.substring(3);
                 Option opt = getOption(option);
                 if (opt != null)
                 {
@@ -240,7 +234,7 @@ public class Options
             // Toggle a boolean option
             else if (token.endsWith("!"))
             {
-                option = token.substring(0, token.length() - 1);
+                String option = token.substring(0, token.length() - 1);
                 Option opt = getOption(option);
                 if (opt != null)
                 {
@@ -261,7 +255,7 @@ public class Options
             // Reset option to default
             else if (token.endsWith("&"))
             {
-                option = token.substring(0, token.length() - 1);
+                String option = token.substring(0, token.length() - 1);
                 Option opt = getOption(option);
                 if (opt != null)
                 {
@@ -284,8 +278,7 @@ public class Options
                 // No operator so only the option name was given
                 if (eq == -1)
                 {
-                    option = token;
-                    Option opt = getOption(option);
+                    Option opt = getOption(token);
                     if (opt != null)
                     {
                         // Valid option so set booleans or display others
@@ -317,17 +310,16 @@ public class Options
                             end--;
                         }
                         // Get option name and value after operator
-                        option = token.substring(0, end);
+                        String option = token.substring(0, end);
                         String value = token.substring(eq + 1);
                         Option opt = getOption(option);
                         if (opt != null)
                         {
-                            option = token;
                             // If not a boolean
                             if (opt instanceof TextOption)
                             {
                                 TextOption to = (TextOption)opt;
-                                boolean res = true;
+                                boolean res;
                                 switch (op)
                                 {
                                     case '+':
@@ -391,10 +383,9 @@ public class Options
      */
     private void resetAllOptions()
     {
-        Collection opts = allOptions();
-        for (Iterator iterator = opts.iterator(); iterator.hasNext();)
+        Collection<Option> opts = allOptions();
+        for (Option option : opts)
         {
-            Option option = (Option)iterator.next();
             option.resetDefault();
         }
     }
@@ -405,18 +396,17 @@ public class Options
      * @param opts The list of options to display
      * @param showIntro True if intro is displayed, false if not
      */
-    private void showOptions(Editor editor, Collection opts, boolean showIntro)
+    private void showOptions(Editor editor, Collection<Option> opts, boolean showIntro)
     {
         if (editor == null)
         {
             return;
         }
 
-        ArrayList cols = new ArrayList();
-        ArrayList extra = new ArrayList();
-        for (Iterator iterator = opts.iterator(); iterator.hasNext();)
+        ArrayList<Option> cols = new ArrayList<Option>();
+        ArrayList<Option> extra = new ArrayList<Option>();
+        for (Option option : opts)
         {
-            Option option = (Option)iterator.next();
             if (option.toString().length() > 19)
             {
                 extra.add(option);
@@ -427,8 +417,8 @@ public class Options
             }
         }
 
-        Collections.sort(cols, new Option.NameSorter());
-        Collections.sort(extra, new Option.NameSorter());
+        Collections.sort(cols, new Option.NameSorter<Option>());
+        Collections.sort(extra, new Option.NameSorter<Option>());
 
         String pad = "                    ";
         MorePanel panel = MorePanel.getInstance(editor);
@@ -442,9 +432,12 @@ public class Options
         int empty = cols.size() % colCount;
         empty = empty == 0 ? colCount : empty;
 
-        logger.debug("width=" + width);
-        logger.debug("colCount=" + colCount);
-        logger.debug("height=" + height);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("width=" + width);
+            logger.debug("colCount=" + colCount);
+            logger.debug("height=" + height);
+        }
 
         StringBuffer res = new StringBuffer();
         if (showIntro)
@@ -466,7 +459,7 @@ public class Options
                     pos -= c - empty;
                 }
 
-                Option opt = (Option)cols.get(pos);
+                Option opt = cols.get(pos);
                 String val = opt.toString();
                 res.append(val);
                 res.append(pad.substring(0, 20 - val.length()));
@@ -474,9 +467,8 @@ public class Options
             res.append("\n");
         }
 
-        for (int i = 0; i < extra.size(); i++)
+        for (Option opt : extra)
         {
-            Option opt = (Option)extra.get(i);
             String val = opt.toString();
             int seg = (val.length() - 1) / width;
             for (int j = 0; j <= seg; j++)
@@ -487,7 +479,6 @@ public class Options
         }
 
         panel.setText(res.toString());
-        panel.setVisible(true);
     }
 
     /**
@@ -518,7 +509,7 @@ public class Options
                 }
             }
 
-            logger.debug("found vimrc at " + rc);
+            if (logger.isDebugEnabled()) logger.debug("found vimrc at " + rc);
 
             try
             {
@@ -535,6 +526,7 @@ public class Options
             }
             catch (Exception e)
             {
+                // no-op
             }
         }
     }
@@ -546,6 +538,7 @@ public class Options
     {
         addOption(new ToggleOption("digraph", "dg", false));
         addOption(new ToggleOption("gdefault", "gd", false));
+        addOption(new NumberOption("history", "hi", 20, 1, Integer.MAX_VALUE));
         if (ApiHelper.supportsColorSchemes())
         {
             addOption(new ToggleOption("hlsearch", "hls", false));
@@ -554,9 +547,14 @@ public class Options
         //addOption(new ToggleOption("incsearch", "is", false));
         addOption(new ListOption("matchpairs", "mps", new String[] { "(:)", "{:}", "[:]" }, ".:."));
         addOption(new ToggleOption("more", "more", true));
+        addOption(new BoundListOption("nrformats", "nf", new String[] { "octal", "hex" }, new String[] { "octal", "hex", "alpha" }));
         addOption(new NumberOption("scroll", "scr", 0));
+        addOption(new NumberOption("scrolljump", "sj", 1));
+        addOption(new NumberOption("scrolloff", "so", 0));
         addOption(new BoundStringOption("selection", "sel", "inclusive", new String[] { "old", "inclusive", "exclusive" }));
         addOption(new ToggleOption("showmode", "smd", false));
+        addOption(new NumberOption("sidescroll", "ss", 0));
+        addOption(new NumberOption("sidescrolloff", "siso", 0));
         addOption(new ToggleOption("smartcase", "scs", false));
         addOption(new NumberOption("undolevels", "ul", 1000, -1, Integer.MAX_VALUE));
         addOption(new ToggleOption("visualbell", "vb", false));
@@ -569,8 +567,8 @@ public class Options
         abbrevs.put(option.getAbbreviation(), option);
     }
 
-    private HashMap options = new HashMap();
-    private HashMap abbrevs = new HashMap();
+    private HashMap<String, Option> options = new HashMap<String, Option>();
+    private HashMap<String, Option> abbrevs = new HashMap<String, Option>();
 
     private static Options ourInstance;
 

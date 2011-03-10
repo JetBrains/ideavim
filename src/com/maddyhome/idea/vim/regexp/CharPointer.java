@@ -1,23 +1,23 @@
 package com.maddyhome.idea.vim.regexp;
 
 /*
-* IdeaVim - A Vim emulator plugin for IntelliJ Idea
-* Copyright (C) 2003 Rick Maddy
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
+ * IdeaVim - A Vim emulator plugin for IntelliJ Idea
+ * Copyright (C) 2003-2005 Rick Maddy
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 
 import java.nio.CharBuffer;
 
@@ -171,7 +171,11 @@ public class CharPointer
         }
         else
         {
-            return seq.subSequence(pointer, normalize(pointer + len)).toString();
+            int start = pointer;
+            int end = normalize(pointer + len);
+            int slen = seq.length();
+            //return seq.subSequence(start, end - start).toString();
+            return CharBuffer.wrap(seq, start, end).toString();
         }
     }
 
@@ -200,7 +204,8 @@ public class CharPointer
             return -1;
         }
 
-        String s = seq.subSequence(pointer, normalize(pointer + len)).toString();
+        //String s = seq.subSequence(pointer, normalize(pointer + len)).toString();
+        String s = CharBuffer.wrap(seq, pointer, normalize(pointer + len)).toString();
 
         if (len > str.length())
         {
@@ -217,14 +222,41 @@ public class CharPointer
             return -1;
         }
 
-        String s = seq.subSequence(pointer, normalize(pointer + len)).toString();
+        //CharSequence cs1 = seq.subSequence(pointer, normalize(pointer + len));
+        //CharSequence cs2 = str.seq.subSequence(str.pointer, str.normalize(str.pointer + len));
+        CharSequence cs1 = CharBuffer.wrap(seq, pointer, normalize(pointer + len));
+        CharSequence cs2 = CharBuffer.wrap(str.seq, str.pointer, str.normalize(str.pointer + len));
 
-        if (len > str.strlen())
+        int l = cs1.length();
+        if (l != cs2.length())
         {
-            len = str.strlen();
+            return 1;
         }
 
+        for (int i = 0; i < l; i++)
+        {
+            char c1 = cs1.charAt(i);
+            char c2 = cs2.charAt(i);
+
+            if (c1 != c2)
+            {
+                return 1;
+            }
+        }
+
+        return 0;
+
+        /*
+        int slen = str.strlen();
+        if (len > slen)
+        {
+            len = slen;
+        }
+
+        String s = seq.subSequence(pointer, normalize(pointer + len)).toString();
+
         return s.compareTo(str.substring(len));
+        */
     }
 
     public int strnicmp(CharPointer str, int len)
@@ -234,14 +266,42 @@ public class CharPointer
             return -1;
         }
 
-        String s = seq.subSequence(pointer, normalize(pointer + len)).toString();
+        //CharSequence cs1 = seq.subSequence(pointer, normalize(pointer + len));
+        //CharSequence cs2 = str.seq.subSequence(str.pointer, str.normalize(str.pointer + len));
+        CharSequence cs1 = CharBuffer.wrap(seq, pointer, normalize(pointer + len));
+        CharSequence cs2 = CharBuffer.wrap(str.seq, str.pointer, str.normalize(str.pointer + len));
 
-        if (len > str.strlen())
+        int l = cs1.length();
+        if (l != cs2.length())
         {
-            len = str.strlen();
+            return 1;
         }
 
+        for (int i = 0; i < l; i++)
+        {
+            char c1 = cs1.charAt(i);
+            char c2 = cs2.charAt(i);
+
+            if (Character.toLowerCase(c1) != Character.toLowerCase(c2) &&
+                Character.toUpperCase(c1) != Character.toUpperCase(c2))
+            {
+                return 1;
+            }
+        }
+
+        return 0;
+
+        /* was 2,407ms
+        int slen = str.strlen();
+        if (len > slen)
+        {
+            len = slen;
+        }
+
+        String s = seq.subSequence(pointer, normalize(pointer + len)).toString();
+
         return s.compareToIgnoreCase(str.substring(len));
+        */
     }
 
     public CharPointer strchr(char c)
@@ -251,6 +311,18 @@ public class CharPointer
             return null;
         }
 
+        int len = seq.length();
+        for (int i = pointer; i < len; i++)
+        {
+            if (seq.charAt(i) == c)
+            {
+                return ref(i - pointer);
+            }
+        }
+
+        return null;
+
+        /*
         String str = seq.subSequence(pointer, pointer + strlen()).toString();
         int pos = str.indexOf(c);
         if (pos != -1)
@@ -261,6 +333,30 @@ public class CharPointer
         {
             return null;
         }
+        */
+    }
+
+    public CharPointer istrchr(char c)
+    {
+        if (end())
+        {
+            return null;
+        }
+
+        int len = seq.length();
+        char cc = Character.toUpperCase(c);
+        c = Character.toLowerCase(c);
+
+        for (int i = pointer; i < len; i++)
+        {
+            char ch = seq.charAt(i);
+            if (ch == c || ch == cc)
+            {
+                return ref(i - pointer);
+            }
+        }
+
+        return null;
     }
 
     public boolean isNul()
@@ -296,7 +392,7 @@ public class CharPointer
     public int NEXT()
     {
 //    #define NEXT(p)         (((*((p) + 1) & 0377) << 8) + (*((p) + 2) & 0377))
-        return ((((int)seq.charAt(pointer + 1) & 0377) << 8) + ((int)seq.charAt(pointer + 2) & 0377));
+        return ((((int)seq.charAt(pointer + 1) & 0xff) << 8) + ((int)seq.charAt(pointer + 2) & 0xff));
     }
 
     public int OPERAND_MIN()

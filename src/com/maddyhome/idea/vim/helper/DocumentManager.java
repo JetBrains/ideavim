@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.helper;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2006 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -23,14 +23,13 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
+import com.intellij.openapi.fileEditor.FileDocumentManagerAdapter;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vcs.AbstractVcsHelper;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vcs.FileStatusManager;
 import com.intellij.openapi.vfs.VirtualFile;
+
 import java.util.HashSet;
-import java.util.Iterator;
 
 public class DocumentManager
 {
@@ -39,12 +38,13 @@ public class DocumentManager
         return instance;
     }
 
-    public void openProject(Project project)
+    public void init()
     {
         logger.debug("opening project");
-        FileEditorManager.getInstance(project).addFileEditorManagerListener(listener);
+        //FileDocumentManager.getInstance().addFileDocumentManagerListener(listener);
     }
 
+    /*
     public void closeProject(Project project)
     {
         logger.debug("closing project");
@@ -58,8 +58,9 @@ public class DocumentManager
             removeListeners(FileDocumentManager.getInstance().getDocument(files[i]));
         }
 
-        FileEditorManager.getInstance(project).removeFileEditorManagerListener(listener);
+        FileDocumentManager.getInstance().removeFileDocumentManagerListener(listener);
     }
+    */
 
     public void addDocumentListener(DocumentListener listener)
     {
@@ -70,33 +71,70 @@ public class DocumentManager
     {
         logger.debug("marking as up-to-date");
         VirtualFile vf = FileDocumentManager.getInstance().getFile(doc);
-        logger.debug("project=" + p.getName() + ":" + p.getProjectFile());
-        logger.debug("file=" + vf);
+        if (logger.isDebugEnabled()) logger.debug("file=" + vf);
         if (vf != null)
         {
             removeListeners(doc);
             FileDocumentManager.getInstance().reloadFromDisk(doc);
-            AbstractVcsHelper.getInstance(p).markFileAsUpToDate(vf);
+            //AbstractVcsHelper.getInstance(p).markFileAsUpToDate(vf);
             FileStatusManager.getInstance(p).fileStatusChanged(vf);
             addListeners(doc);
         }
     }
 
-    private void addListeners(Document doc)
+    public void addListeners(Document doc)
     {
-        Iterator iter = docListeners.iterator();
-        while (iter.hasNext())
+        Object marker = doc.getUserData(LISTENER_MARKER);
+        if (marker != null)
         {
-            doc.addDocumentListener((DocumentListener)iter.next());
+            return;
+        }
+
+        doc.putUserData(LISTENER_MARKER, "foo");
+        for (DocumentListener docListener : docListeners)
+        {
+            //try
+            //{
+            doc.addDocumentListener(docListener);
+            //}
+            /*
+            catch (AssertionError e)
+            {
+                // Ignore - I have no way to avoid adding a listenter twice.
+            }
+            catch (Throwable e)
+            {
+                // Ignore - I have no way to avoid adding a listenter twice.
+            }
+            */
         }
     }
 
-    private void removeListeners(Document doc)
+    public void removeListeners(Document doc)
     {
-        Iterator iter = docListeners.iterator();
-        while (iter.hasNext())
+        Object marker = doc.getUserData(LISTENER_MARKER);
+        if (marker == null)
         {
-            doc.removeDocumentListener((DocumentListener)iter.next());
+            return;
+        }
+
+        doc.putUserData(LISTENER_MARKER, null);
+        for (DocumentListener docListener : docListeners)
+        {
+            //try
+            //{
+            doc.removeDocumentListener(docListener);
+            //}
+            /*
+            catch (AssertionError e)
+            {
+                // Ignore - I have no way to avoid removing a listenter twice.
+            }
+            catch (Throwable e)
+            {
+                // Ignore - I have no way to avoid removing a listenter twice.
+            }
+            */
         }
     }
 
@@ -104,8 +142,9 @@ public class DocumentManager
     {
     }
 
-    private class FileEditorListener extends FileEditorManagerAdapter
+    private class FileDocumentListener extends FileDocumentManagerAdapter
     {
+        /* This doesn't seem to get called at all
         public void fileOpened(FileEditorManager fileEditorManager, VirtualFile virtualFile)
         {
             logger.debug("opened vf=" + virtualFile.getPresentableName());
@@ -125,11 +164,19 @@ public class DocumentManager
                 removeListeners(doc);
             }
         }
+        */
+
+        public void fileContentLoaded(VirtualFile file, Document document)
+        {
+            if (logger.isDebugEnabled()) logger.debug("loaded vf=" + file.getName());
+            //addListeners(document);
+        }
     }
 
-    private FileEditorListener listener = new FileEditorListener();
-    private HashSet docListeners = new HashSet();
+    //private FileDocumentListener listener = new FileDocumentListener();
+    private HashSet<DocumentListener> docListeners = new HashSet<DocumentListener>();
 
+    private static final Key<String> LISTENER_MARKER = new Key<String>("listenerMarker");
     private static DocumentManager instance = new DocumentManager();
     private static Logger logger = Logger.getInstance(DocumentManager.class.getName());
 }

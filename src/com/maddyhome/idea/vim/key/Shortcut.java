@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.key;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2005 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@ package com.maddyhome.idea.vim.key;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
 /**
  * This is a simple wrapper around a set of keystrokes. The various constructors make it easy to create the
@@ -60,7 +60,7 @@ public class Shortcut
 
     /**
      * Creates a shortcut based on the supplied list of keystrokes
-     * @param keys
+     * @param keys The keys
      */
     public Shortcut(KeyStroke[] keys)
     {

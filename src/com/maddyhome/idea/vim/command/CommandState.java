@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.command;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2004 Rick Maddy
+ * Copyright (C) 2003-2006 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,10 +20,13 @@ package com.maddyhome.idea.vim.command;
  */
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.RegisterGroup;
+import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.key.KeyParser;
+import com.maddyhome.idea.vim.key.ParentNode;
 import com.maddyhome.idea.vim.option.Options;
 
 import java.util.Stack;
@@ -53,20 +56,28 @@ public class CommandState
     /**
      * Gets the command state singleton
      * @return The singleton instance
+     * @param editor
      */
-    public synchronized static CommandState getInstance()
+    public static CommandState getInstance(Editor editor)
     {
-        if (ourInstance == null)
+        if (editor == null)
         {
-            ourInstance = new CommandState();
+            return new CommandState();
         }
 
-        return ourInstance;
+        CommandState res = EditorData.getCommandState(editor);
+        if (res == null)
+        {
+            res = new CommandState();
+            EditorData.setCommandState(editor, res);
+        }
+
+        return res;
     }
 
-    public static boolean inInsertMode()
+    public static boolean inInsertMode(Editor editor)
     {
-        return (getInstance().getMode() == MODE_INSERT || getInstance().getMode() == MODE_REPLACE);
+        return (getInstance(editor).getMode() == MODE_INSERT || getInstance(editor).getMode() == MODE_REPLACE);
     }
 
     /**
@@ -84,7 +95,18 @@ public class CommandState
      */
     public void setCommand(Command cmd)
     {
-            command = cmd;
+        command = cmd;
+        setFlags(cmd.getFlags());
+    }
+
+    public void setFlags(int flags)
+    {
+        this.flags = flags;
+    }
+
+    public int getFlags()
+    {
+        return flags;
     }
 
     public void pushState(int mode, int submode, int mapping)
@@ -92,7 +114,10 @@ public class CommandState
         logger.debug("pushState");
         modes.push(new State(mode, submode, mapping));
         updateStatus();
-        logger.debug("state=" + this);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("state=" + this);
+        }
     }
 
     public void popState()
@@ -100,7 +125,10 @@ public class CommandState
         logger.debug("popState");
         modes.pop();
         updateStatus();
-        logger.debug("state=" + this);
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("state=" + this);
+        }
     }
 
     /**
@@ -109,7 +137,10 @@ public class CommandState
      */
     public int getMode()
     {
-        logger.debug("getMode=" + currentState().getMode());
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("getMode=" + currentState().getMode());
+        }
         //return mode;
         return currentState().getMode();
     }
@@ -147,10 +178,10 @@ public class CommandState
 
     private String getStatusString(int pos)
     {
-        State state = null;
+        State state;
         if (pos >= 0 && pos < modes.size())
         {
-            state = (State)modes.get(pos);
+            state = modes.get(pos);
         }
         else if (pos < 0)
         {
@@ -179,7 +210,7 @@ public class CommandState
             case MODE_VISUAL:
                 if (pos > 0)
                 {
-                    State tmp = (State)modes.get(pos - 1);
+                    State tmp = modes.get(pos - 1);
                     if (tmp.getMode() == MODE_COMMAND && tmp.getSubmode() == SUBMODE_SINGLE_COMMAND)
                     {
                         msg.append(getStatusString(pos - 1));
@@ -250,7 +281,10 @@ public class CommandState
     public int getMappingMode()
     {
         //return mappingMode;
-        logger.debug("getMappingMode=" + currentState().getMapping());
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("getMappingMode=" + currentState().getMapping());
+        }
         return currentState().getMapping();
     }
 
@@ -293,11 +327,21 @@ public class CommandState
         updateStatus();
     }
 
+    public ParentNode getCurrentNode()
+    {
+        return currentNode;
+    }
+
+    public void setCurrentNode(ParentNode currentNode)
+    {
+        this.currentNode = currentNode;
+    }
+
     private State currentState()
     {
         if (modes.size() > 0)
         {
-            return (State)modes.peek();
+            return modes.peek();
         }
         else
         {
@@ -375,14 +419,16 @@ public class CommandState
         private int mapping;
     }
 
-    private Stack modes = new Stack();
+    private Stack<State> modes = new Stack<State>();
     private State defaultState = new State(MODE_COMMAND, 0, KeyParser.MAPPING_NORMAL);
     private Command command;
-    private Command lastChange;
-    private char lastRegister = RegisterGroup.REGISTER_DEFAULT;
+    private int flags;
     private boolean isRecording = false;
 
-    private static CommandState ourInstance;
+    private ParentNode currentNode = KeyParser.getInstance().getKeyRoot(getMappingMode());
+
+    private static Command lastChange = null;
+    private static char lastRegister = RegisterGroup.REGISTER_DEFAULT;
 
     private static Logger logger = Logger.getInstance(CommandState.class.getName());
 }

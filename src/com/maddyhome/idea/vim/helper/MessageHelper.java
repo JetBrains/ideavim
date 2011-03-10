@@ -2,7 +2,7 @@ package com.maddyhome.idea.vim.helper;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003 Rick Maddy
+ * Copyright (C) 2003-2005 Rick Maddy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.helper;
  */
 
 import com.maddyhome.idea.vim.VimPlugin;
+
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
@@ -45,16 +46,14 @@ public class MessageHelper
 
     public static String getMsg(String key)
     {
-        String msg = bundle.getString(key);
-
-        return msg;
+        return bundle.getString(key);
     }
 
     public static String getMsg(String key, String val)
     {
         String msg = bundle.getString(key);
 
-        msg = MessageFormat.format(msg, new Object[] { val });
+        msg = MessageFormat.format(msg, val);
 
         return msg;
     }

@@ -1,34 +1,46 @@
 package com.maddyhome.idea.vim.helper;
 
+/*
+ * IdeaVim - A Vim emulator plugin for IntelliJ Idea
+ * Copyright (C) 2003-2005 Rick Maddy
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
+import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.KeyStroke;
-
-/*
-* IdeaVim - A Vim emulator plugin for IntelliJ Idea
-* Copyright (C) 2003 Rick Maddy
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
 
 /**
  *
  */
 public class StringHelper
 {
+    public static String pad(String text, int len, char ch)
+    {
+        int l = text.length();
+        StringBuffer res = new StringBuffer(text);
+        for (int i = l; i < len; i++)
+        {
+            res.insert(0, ch);
+        }
+
+        return res.toString();
+    }
+
     public static String escape(String text)
     {
         StringBuffer res = new StringBuffer(text.length());
@@ -57,9 +69,117 @@ public class StringHelper
         return res.toString();
     }
 
-    public static List stringToKeys(String str)
+    public static String entities(String text)
     {
-        ArrayList res = new ArrayList();
+        StringBuffer res = new StringBuffer(text.length());
+
+        for (int i = 0; i < text.length(); i++)
+        {
+            char ch = text.charAt(i);
+            switch (ch)
+            {
+                case '!':
+                    res.append("&#33;");
+                    break;
+                case '[':
+                    res.append("&#91;");
+                    break;
+                case ']':
+                    res.append("&#93;");
+                    break;
+                case ' ':
+                    res.append("&#32;");
+                    break;
+                case '&':
+                    res.append("&amp;");
+                    break;
+                case '\t':
+                    res.append("&#9;");
+                    break;
+                case '\n':
+                    res.append("&#10;");
+                    break;
+                case '\r':
+                    res.append("&#13;");
+                    break;
+                default:
+                    res.append(ch);
+            }
+        }
+
+        return res.toString();
+    }
+
+    public static String unentities(String text)
+    {
+        StringBuffer res = new StringBuffer(text.length());
+
+        for (int i = 0; i < text.length(); i++)
+        {
+            char ch = text.charAt(i);
+            switch (ch)
+            {
+                case '&':
+                    int semi = text.indexOf(';', i);
+                    if (semi > i)
+                    {
+                        char newch = ch;
+                        String entity = text.substring(i, semi + 1);
+                        if (entity.equals("&#32;"))
+                        {
+                            newch = ' ';
+                        }
+                        else if (entity.equals("&#33;"))
+                        {
+                            newch = '!';
+                            i = semi;
+                        }
+                        else if (entity.equals("&#91;"))
+                        {
+                            newch = '[';
+                            i = semi;
+                        }
+                        else if (entity.equals("&#93;"))
+                        {
+                            newch = ']';
+                            i = semi;
+                        }
+                        else if (entity.equals("&amp;"))
+                        {
+                            newch = '&';
+                            i = semi;
+                        }
+                        else if (entity.equals("&#9;"))
+                        {
+                            newch = '\t';
+                        }
+                        else if (entity.equals("&#10;"))
+                        {
+                            newch = '\n';
+                        }
+                        else if (entity.equals("&#13;"))
+                        {
+                            newch = '\r';
+                        }
+                        if (newch != ch)
+                        {
+                            ch = newch;
+                            i = semi;
+                        }
+                    }
+                    res.append(ch);
+                    break;
+                default:
+                    res.append(ch);
+            }
+        }
+
+        return res.toString();
+    }
+
+    public static List<KeyStroke> stringToKeys(String str)
+    {
+        ArrayList<KeyStroke> res = new ArrayList<KeyStroke>();
         for (int i = 0; i < str.length(); i++)
         {
             res.add(KeyStroke.getKeyStroke(str.charAt(i)));
@@ -68,12 +188,11 @@ public class StringHelper
         return res;
     }
 
-    public static String keysToString(List keys)
+    public static String keysToString(List<KeyStroke> keys)
     {
         StringBuffer res = new StringBuffer();
-        for (int i = 0; i < keys.size(); i++)
+        for (KeyStroke key : keys)
         {
-            KeyStroke key = (KeyStroke)keys.get(i);
             if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED)
             {
                 res.append(key.getKeyChar());

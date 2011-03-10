@@ -1,27 +1,27 @@
 package com.maddyhome.idea.vim.option;
 
 /*
-* IdeaVim - A Vim emulator plugin for IntelliJ Idea
-* Copyright (C) 2003 Rick Maddy
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
+ * IdeaVim - A Vim emulator plugin for IntelliJ Idea
+ * Copyright (C) 2003-2005 Rick Maddy
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
+import java.util.List;
 
 /**
  * Represents an VIM options that can be set with the :set command. Listeners can be set that are interested in knowing
@@ -95,9 +95,8 @@ public abstract class Option
     protected void fireOptionChangeEvent()
     {
         OptionChangeEvent event = new OptionChangeEvent(this);
-        for (Iterator iterator = listeners.iterator(); iterator.hasNext();)
+        for (OptionChangeListener listener : listeners)
         {
-            OptionChangeListener listener = (OptionChangeListener)iterator.next();
             listener.valueChange(event);
         }
     }
@@ -105,9 +104,9 @@ public abstract class Option
     /**
      * Helper method used to sort lists of options by their name
      */
-    static class NameSorter implements Comparator
+    static class NameSorter<V> implements Comparator<V>
     {
-        public int compare(Object o1, Object o2)
+        public int compare(V o1, V o2)
         {
             return ((Option)o1).name.compareTo(((Option)o2).name);
         }
@@ -115,5 +114,5 @@ public abstract class Option
 
     protected String name;
     protected String abbrev;
-    protected ArrayList listeners = new ArrayList();
+    protected List<OptionChangeListener> listeners = new ArrayList<OptionChangeListener>();
 }
