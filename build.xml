@@ -67,8 +67,8 @@
         </path>
 
         <mkdir dir="${classes}"/>
-        <javac destdir="${classes}" debug="on" deprecation="on" classpathref="build.classpath" source="1.5"
-               target="1.5">
+        <javac destdir="${classes}" debug="on" deprecation="on" classpathref="build.classpath" source="1.6"
+               target="1.6">
             <src path="${src}"/>
             <include name="com/maddyhome/idea/**"/>
         </javac>
