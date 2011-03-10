@@ -177,10 +177,19 @@
     </unzip>
   </target>
 
+  <target name="build-plugin" depends="build"
+          description="Creates plugin zip file, which can be distributed using Plugins Manager">
+    <mkdir dir="${build}/production/IdeaVIM/lib"/>
+    <copy file="${build}/${project}.jar" todir="${build}/production/IdeaVIM/lib"/>
+    <mkdir dir="${build}/production/IdeaVIM/help"/>
+    <copy file="${build}/help.jar" todir="${build}/production/IdeaVIM/help"/>
+    <zip destfile="${build}/ideaVIM.zip" basedir="${build}/production"/>
+  </target>
+
   <target name="dist" depends="dist-src, dist-bin" description="Creates the src and bin distribution files"/>
 
   <!-- Prepare layout for plugin distribution and creates zip file which can be published -->
-  <target name="dist-bin" depends="clean, build" description="Creates a zip file containing the plugin distribution">
+  <target name="dist-bin" depends="clean, build" description="Creates a zip file containing the plugin sources">
     <mkdir dir="dist"/>
     <delete dir="${project}-${version}-${idea-version}"/>
     <mkdir dir="${project}-${version}-${idea-version}"/>
