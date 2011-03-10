@@ -488,6 +488,7 @@ public class SearchHelper
     private static int findNextWordOne(CharSequence chars, int pos, int size, int step, boolean skipPunc, boolean spaceWords)
     {
         boolean found = false;
+        pos = pos < size ? pos : size - 1;
         // For back searches, skip any current whitespace so we start at the end of a word
         if (step < 0 && pos > 0)
         {
