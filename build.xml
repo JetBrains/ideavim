@@ -72,12 +72,8 @@
     </javac>
   </target>
 
-  <target name="classes.jar">
-    <mkdir dir="${build}"/>
-    <jar basedir="${classes}" jarfile="${build}/${project}.jar" compress="yes"/>
-  </target>
-
-  <target name="copy">
+  <!-- Create ideavim.jar for packing inside zip plugin package -->
+  <target name="jar">
     <mkdir dir="${classes}"/>
     <mkdir dir="${classes}/META-INF"/>
     <copy file="resources/META-INF/plugin.xml" todir="${classes}/META-INF">
@@ -94,8 +90,11 @@
     <copy todir="${classes}">
       <fileset dir="${resources}"/>
     </copy>
+    <mkdir dir="${build}"/>
+    <jar basedir="${classes}" jarfile="${build}/${project}.jar" compress="yes"/>
   </target>
 
+  <!-- Create help files -->
   <target name="help" depends="clean.help, compile">
     <mkdir dir="${build}/help/txt"/>
     <mkdir dir="${build}/help/vim"/>
@@ -166,30 +165,22 @@
     <jar basedir="${build}/help" jarfile="${build}/help.jar"/>
   </target>
 
-  <target name="build" depends="unzip, clean.build, compile, copy, classes.jar, help"
-          description="Compiles all source code and created plugin jar file">
+  <target name="build" depends="unzip, clean.build, compile, jar, help" description="Compiles all source code and created plugin jar file">
   </target>
 
+  <!-- Unpack ideaIC-*.zip file for ideavim compilation -->
   <target name="unzip" description="Unzip downloaded artifacts and set up idea.home">
     <delete dir="${idea}/unzip"/>
     <mkdir dir="${idea}/unzip"/>
     <unzip dest="${idea}/unzip">
-      <fileset dir="${idea}" includes="ideaIC-*.win.zip"/>
+      <fileset dir="${idea}" includes="ideaIC-*.zip"/>
     </unzip>
-  </target>
-
-  <target name="build-plugin" depends="build"
-          description="Creates plugin zip file, which can be distributed using Plugins Manager">
-    <mkdir dir="${build}/production/IdeaVIM/lib"/>
-    <copy file="${build}/${project}.jar" todir="${build}/production/IdeaVIM/lib"/>
-    <mkdir dir="${build}/production/IdeaVIM/help"/>
-    <copy file="${build}/help.jar" todir="${build}/production/IdeaVIM/help"/>
-    <zip destfile="${build}/ideaVIM.zip" basedir="${build}/production"/>
   </target>
 
   <target name="dist" depends="dist-src, dist-bin" description="Creates the src and bin distribution files"/>
 
-  <target name="dist-bin" depends="clean, build" description="Creates a tar file containing the plugin distribution">
+  <!-- Prepare layout for plugin distribution and creates zip file which can be published -->
+  <target name="dist-bin" depends="clean, build" description="Creates a zip file containing the plugin distribution">
     <mkdir dir="dist"/>
     <delete dir="${project}-${version}-${idea-version}"/>
     <mkdir dir="${project}-${version}-${idea-version}"/>
@@ -235,12 +226,14 @@
     <zip basedir="." zipfile="${dist}/${project}-${version}-${idea-version}.zip" compress="true" includes="${project}/**"/>
   </target>
 
+ <!-- Packs all the sources -->
   <target name="dist-src" depends="clean" description="Creates the source tar file">
     <mkdir dir="dist"/>
     <tar basedir="." destfile="${dist}/${project}-${version}-${idea-version}-src.tar.gz"
          excludes=".idea/**,idea/**,*.iws,dist/**,scratch/**,web/docs/**" compression="gzip"/>
   </target>
 
+  <!-- Use this task to create javadoc for the sources -->
   <target name="javadoc" depends="build" description="Generates Javadoc for all source code">
     <delete dir="${javadoc}"/>
     <mkdir dir="${javadoc}"/>
