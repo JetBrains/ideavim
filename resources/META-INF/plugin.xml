@@ -1,5 +1,4 @@
 <idea-plugin url="http://plugins.intellij.net/plugin/?id=164">
-<!--<idea-plugin url="http://sourceforge.net/projects/ideavim/">-->
     <name>IdeaVIM</name>
     <id>IdeaVIM</id>
     <description><![CDATA[
@@ -26,15 +25,6 @@
     ]]></description>
     <version>@VERSION@-@IDEA-VERSION@</version>
     <vendor logo="/icons/vim16x16.png">Rick Maddy, JetBrains</vendor>
-    <change-notes>
-<![CDATA[
-<b>NOTE:</b> Please see the README file if upgrading to this version from
-version 0.10.1 - 0.10.3. (The Vim keymap is required again).<br>
-<br>
-Bug Fixes <br>
-- Any form of searching broke due to a bug in JDK 1.6.0_10. Made changes to work around the bug so searching now works again.<br>
-]]>
-    </change-notes>
 
     <helpset file="help.jar" path="/VimHelp.hs"/>
     <idea-version since-build="@SINCE-VERSION@"/>
