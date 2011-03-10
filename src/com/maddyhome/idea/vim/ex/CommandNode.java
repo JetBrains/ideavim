@@ -24,41 +24,34 @@ import java.util.HashMap;
 /**
  *
  */
-public class CommandNode
-{
-    public CommandNode()
-    {
-        command = null;
-    }
+public class CommandNode {
+  public CommandNode() {
+    command = null;
+  }
 
-    public CommandNode(CommandHandler command)
-    {
-        this.command = command;
-    }
+  public CommandNode(CommandHandler command) {
+    this.command = command;
+  }
 
-    public CommandNode addChild(char ch, CommandHandler command)
-    {
-        CommandNode res = new CommandNode(command);
-        nodes.put(ch, res);
+  public CommandNode addChild(char ch, CommandHandler command) {
+    CommandNode res = new CommandNode(command);
+    nodes.put(ch, res);
 
-        return res;
-    }
+    return res;
+  }
 
-    public CommandNode getChild(char ch)
-    {
-        return nodes.get(ch);
-    }
+  public CommandNode getChild(char ch) {
+    return nodes.get(ch);
+  }
 
-    public CommandHandler getCommandHandler()
-    {
-        return command;
-    }
+  public CommandHandler getCommandHandler() {
+    return command;
+  }
 
-    public void setCommandHandler(CommandHandler command)
-    {
-        this.command = command;
-    }
+  public void setCommandHandler(CommandHandler command) {
+    this.command = command;
+  }
 
-    private CommandHandler command;
-    private HashMap<Character, CommandNode> nodes = new HashMap<Character, CommandNode>();
+  private CommandHandler command;
+  private HashMap<Character, CommandNode> nodes = new HashMap<Character, CommandNode>();
 }

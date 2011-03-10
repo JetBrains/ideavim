@@ -23,64 +23,59 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
-import com.intellij.openapi.actionSystem.DataContext;
 
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
 /**
  * This handler accepts all regular keystrokes and passes them on to the Vim Key handler
  */
-public class VimTypedActionHandler implements TypedActionHandler
-{
-    /**
-     * Creates an instance of the key handler
-     * @param origHandler The original key handler
-     */
-    public VimTypedActionHandler(TypedActionHandler origHandler)
-    {
-        this.origHandler = origHandler;
-        handler = KeyHandler.getInstance();
-        handler.setOriginalHandler(origHandler);
+public class VimTypedActionHandler implements TypedActionHandler {
+  /**
+   * Creates an instance of the key handler
+   *
+   * @param origHandler The original key handler
+   */
+  public VimTypedActionHandler(TypedActionHandler origHandler) {
+    this.origHandler = origHandler;
+    handler = KeyHandler.getInstance();
+    handler.setOriginalHandler(origHandler);
+  }
+
+  /**
+   * Gives the original key handler
+   *
+   * @return The original key handler
+   */
+  public TypedActionHandler getOriginalTypedHandler() {
+    return origHandler;
+  }
+
+  /**
+   * All characters typed into an editor will get sent to this handler. Only letters, numbers, and punctuation
+   * are sent here. Keys like Tab, Enter, Home, Backspace, etc. and all Control-Letter etc. argType keys are not
+   * sent by Idea to this handler.
+   *
+   * @param editor    The editor the character was typed into
+   * @param charTyped The character that was typed
+   * @param context   The data context
+   */
+  public void execute(Editor editor, char charTyped, DataContext context) {
+    // If the plugin is disabled we simply resend the character to the original handler
+    if (!VimPlugin.isEnabled()) {
+      origHandler.execute(editor, charTyped, context);
+      return;
     }
 
-    /**
-     * Gives the original key handler
-     * @return The original key handler
-     */
-    public TypedActionHandler getOriginalTypedHandler()
-    {
-        return origHandler;
+    try {
+      handler.handleKey(editor, KeyStroke.getKeyStroke(charTyped), context);
     }
-
-    /**
-     * All characters typed into an editor will get sent to this handler. Only letters, numbers, and punctuation
-     * are sent here. Keys like Tab, Enter, Home, Backspace, etc. and all Control-Letter etc. argType keys are not
-     * sent by Idea to this handler.
-     * @param editor The editor the character was typed into
-     * @param charTyped The character that was typed
-     * @param context The data context
-     */
-    public void execute(Editor editor, char charTyped, DataContext context)
-    {
-        // If the plugin is disabled we simply resend the character to the original handler
-        if (!VimPlugin.isEnabled())
-        {
-            origHandler.execute(editor, charTyped, context);
-            return;
-        }
-
-        try
-        {
-            handler.handleKey(editor, KeyStroke.getKeyStroke(charTyped), context);
-        }
-        catch (Throwable e)
-        {
-            logger.error(e);
-        }
+    catch (Throwable e) {
+      logger.error(e);
     }
+  }
 
-    private TypedActionHandler origHandler;
-    private KeyHandler handler;
+  private TypedActionHandler origHandler;
+  private KeyHandler handler;
 
-    private static Logger logger = Logger.getInstance(VimTypedActionHandler.class.getName());
+  private static Logger logger = Logger.getInstance(VimTypedActionHandler.class.getName());
 }

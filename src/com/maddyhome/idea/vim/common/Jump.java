@@ -19,10 +19,8 @@ package com.maddyhome.idea.vim.common;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-public class Jump extends FileLocation
-{
-    public Jump(int lline, int col, String filename)
-    {
-        super(lline, col, filename);
-    }
+public class Jump extends FileLocation {
+  public Jump(int lline, int col, String filename) {
+    super(lline, col, filename);
+  }
 }

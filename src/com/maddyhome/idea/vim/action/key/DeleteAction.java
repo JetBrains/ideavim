@@ -25,10 +25,8 @@ import com.maddyhome.idea.vim.handler.key.DummyEditorHandler;
 /**
  *
  */
-public class DeleteAction extends EditorAction
-{
-    public DeleteAction()
-    {
-        super(new DummyEditorHandler());
-    }
+public class DeleteAction extends EditorAction {
+  public DeleteAction() {
+    super(new DummyEditorHandler());
+  }
 }

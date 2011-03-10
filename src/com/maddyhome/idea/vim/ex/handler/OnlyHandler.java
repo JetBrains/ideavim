@@ -19,29 +19,26 @@ package com.maddyhome.idea.vim.ex.handler;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.group.CommandGroups;
-import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  *
  */
-public class OnlyHandler extends CommandHandler
-{
-    public OnlyHandler()
-    {
-        super(new CommandName[] {
-            new CommandName("on", "ly")
-        }, ARGUMENT_OPTIONAL);
-    }
+public class OnlyHandler extends CommandHandler {
+  public OnlyHandler() {
+    super(new CommandName[]{
+      new CommandName("on", "ly")
+    }, ARGUMENT_OPTIONAL);
+  }
 
-    public boolean execute(Editor editor, DataContext context, ExCommand cmd)
-    {
-        CommandGroups.getInstance().getFile().closeAllButCurrent(context);
+  public boolean execute(Editor editor, DataContext context, ExCommand cmd) {
+    CommandGroups.getInstance().getFile().closeAllButCurrent(context);
 
-        return true;
-    }
+    return true;
+  }
 }

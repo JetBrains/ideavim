@@ -31,281 +31,313 @@ import java.util.List;
  * This represents a single Vim command to be executed. It may optionally include an argument if appropriate for
  * the command. The command has a count and a type.
  */
-public class Command
-{
-    /** Motion flags */
-    public static final int FLAG_MOT_LINEWISE = 1 << 1;
-    public static final int FLAG_MOT_CHARACTERWISE = 1 << 2;
-    public static final int FLAG_MOT_BLOCKWISE = 1 << 3;
-    public static final int FLAG_MOT_INCLUSIVE = 1 << 4;
-    public static final int FLAG_MOT_EXCLUSIVE = 1 << 5;
-    /** Indicates that the cursor position should be saved prior to this motion command */
-    public static final int FLAG_SAVE_JUMP = 1 << 6;
-    /** Special flag that says this is characterwise only for visual mode */
-    public static final int FLAG_VISUAL_CHARACTERWISE = 1 << 7;
+public class Command {
+  /**
+   * Motion flags
+   */
+  public static final int FLAG_MOT_LINEWISE = 1 << 1;
+  public static final int FLAG_MOT_CHARACTERWISE = 1 << 2;
+  public static final int FLAG_MOT_BLOCKWISE = 1 << 3;
+  public static final int FLAG_MOT_INCLUSIVE = 1 << 4;
+  public static final int FLAG_MOT_EXCLUSIVE = 1 << 5;
+  /**
+   * Indicates that the cursor position should be saved prior to this motion command
+   */
+  public static final int FLAG_SAVE_JUMP = 1 << 6;
+  /**
+   * Special flag that says this is characterwise only for visual mode
+   */
+  public static final int FLAG_VISUAL_CHARACTERWISE = 1 << 7;
 
-    /** Special command flag that indicates it is not to be repeated */
-    public static final int FLAG_NO_REPEAT = 1 << 8;
-    /** This insert command should clear all saved keystrokes from the current insert */
-    public static final int FLAG_CLEAR_STROKES = 1 << 9;
-    /** This keystroke should be saved as part of the current insert */
-    public static final int FLAG_SAVE_STROKE = 1 << 10;
-    /** This is a backspace command */
-    public static final int FLAG_IS_BACKSPACE = 1 << 11;
+  /**
+   * Special command flag that indicates it is not to be repeated
+   */
+  public static final int FLAG_NO_REPEAT = 1 << 8;
+  /**
+   * This insert command should clear all saved keystrokes from the current insert
+   */
+  public static final int FLAG_CLEAR_STROKES = 1 << 9;
+  /**
+   * This keystroke should be saved as part of the current insert
+   */
+  public static final int FLAG_SAVE_STROKE = 1 << 10;
+  /**
+   * This is a backspace command
+   */
+  public static final int FLAG_IS_BACKSPACE = 1 << 11;
 
-    public static final int FLAG_IGNORE_SCROLL_JUMP = 1 << 12;
-    public static final int FLAG_IGNORE_SIDE_SCROLL_JUMP = 1 << 13;
+  public static final int FLAG_IGNORE_SCROLL_JUMP = 1 << 12;
+  public static final int FLAG_IGNORE_SIDE_SCROLL_JUMP = 1 << 13;
 
-    /** Indicates a command can accept a count in mid command */
-    public static final int FLAG_ALLOW_MID_COUNT = 1 << 14;
+  /**
+   * Indicates a command can accept a count in mid command
+   */
+  public static final int FLAG_ALLOW_MID_COUNT = 1 << 14;
 
-    /** Search Flags */
-    public static final int FLAG_SEARCH_FWD = 1 << 16;
-    public static final int FLAG_SEARCH_REV = 1 << 17;
+  /**
+   * Search Flags
+   */
+  public static final int FLAG_SEARCH_FWD = 1 << 16;
+  public static final int FLAG_SEARCH_REV = 1 << 17;
 
-    public static final int FLAG_KEEP_VISUAL = 1 << 20;
-    public static final int FLAG_FORCE_VISUAL = 1 << 21;
-    public static final int FLAG_FORCE_LINEWISE = 1 << 22;
-    public static final int FLAG_DELEGATE = 1 << 23;
-    /** Special flag used for any mappings involving operators */
-    public static final int FLAG_OP_PEND = 1 << 24;
-    /** This command starts a multi-command undo transaction */
-    public static final int FLAG_MULTIKEY_UNDO = 1 << 25;
-    /** This command should be followed by another command */
-    public static final int FLAG_EXPECT_MORE = 1 << 26;
-    /** This flag indicates the command's argument isn't used while recording */
-    public static final int FLAG_NO_ARG_RECORDING = 1 << 27;
-    /** Indicate that the character argument may come from a digraph */
-    public static final int FLAG_ALLOW_DIGRAPH = 1 << 28;
-    public static final int FLAG_COMPLETE_EX = 1 << 29;
-    public static final int FLAG_TEXT_BLOCK = 1 << 30;
+  public static final int FLAG_KEEP_VISUAL = 1 << 20;
+  public static final int FLAG_FORCE_VISUAL = 1 << 21;
+  public static final int FLAG_FORCE_LINEWISE = 1 << 22;
+  public static final int FLAG_DELEGATE = 1 << 23;
+  /**
+   * Special flag used for any mappings involving operators
+   */
+  public static final int FLAG_OP_PEND = 1 << 24;
+  /**
+   * This command starts a multi-command undo transaction
+   */
+  public static final int FLAG_MULTIKEY_UNDO = 1 << 25;
+  /**
+   * This command should be followed by another command
+   */
+  public static final int FLAG_EXPECT_MORE = 1 << 26;
+  /**
+   * This flag indicates the command's argument isn't used while recording
+   */
+  public static final int FLAG_NO_ARG_RECORDING = 1 << 27;
+  /**
+   * Indicate that the character argument may come from a digraph
+   */
+  public static final int FLAG_ALLOW_DIGRAPH = 1 << 28;
+  public static final int FLAG_COMPLETE_EX = 1 << 29;
+  public static final int FLAG_TEXT_BLOCK = 1 << 30;
 
-    /** Represents commands that actually move the cursor and can be arguments to operators */
-    public static final int MOTION = 1;
-    /** Represents commands that insert new text into the editor */
-    public static final int INSERT = 2;
-    /** Represents commands that remove text from the editor */
-    public static final int DELETE = 3;
-    /** Represents commands that change text in the editor */
-    public static final int CHANGE = 4;
-    /** Represents commands that copy text in the editor */
-    public static final int COPY = 5;
-    /** Represents commands that paste text into the editor */
-    public static final int PASTE = 6;
-    public static final int RESET = 7;
-    /** Represents commands that select the register */
-    public static final int SELECT_REGISTER = 8;
-    /** Represents other types of commands */
-    public static final int OTHER_READONLY = 9;
-    public static final int OTHER_WRITABLE = 10;
-    public static final int OTHER_READ_WRITE = 11;
+  /**
+   * Represents commands that actually move the cursor and can be arguments to operators
+   */
+  public static final int MOTION = 1;
+  /**
+   * Represents commands that insert new text into the editor
+   */
+  public static final int INSERT = 2;
+  /**
+   * Represents commands that remove text from the editor
+   */
+  public static final int DELETE = 3;
+  /**
+   * Represents commands that change text in the editor
+   */
+  public static final int CHANGE = 4;
+  /**
+   * Represents commands that copy text in the editor
+   */
+  public static final int COPY = 5;
+  /**
+   * Represents commands that paste text into the editor
+   */
+  public static final int PASTE = 6;
+  public static final int RESET = 7;
+  /**
+   * Represents commands that select the register
+   */
+  public static final int SELECT_REGISTER = 8;
+  /**
+   * Represents other types of commands
+   */
+  public static final int OTHER_READONLY = 9;
+  public static final int OTHER_WRITABLE = 10;
+  public static final int OTHER_READ_WRITE = 11;
 
-    public boolean isReadType()
-    {
-        boolean res = false;
-        switch (type)
-        {
-            case MOTION:
-            case COPY:
-            case SELECT_REGISTER:
-            case OTHER_READONLY:
-            case OTHER_READ_WRITE:
-                res = true;
-        }
-
-        return res;
+  public boolean isReadType() {
+    boolean res = false;
+    switch (type) {
+      case MOTION:
+      case COPY:
+      case SELECT_REGISTER:
+      case OTHER_READONLY:
+      case OTHER_READ_WRITE:
+        res = true;
     }
 
-    public boolean isWriteType()
-    {
-        boolean res = false;
-        switch (type)
-        {
-            case INSERT:
-            case DELETE:
-            case CHANGE:
-            case PASTE:
-            case RESET:
-            case OTHER_WRITABLE:
-            case OTHER_READ_WRITE:
-                res = true;
-        }
+    return res;
+  }
 
-        return res;
+  public boolean isWriteType() {
+    boolean res = false;
+    switch (type) {
+      case INSERT:
+      case DELETE:
+      case CHANGE:
+      case PASTE:
+      case RESET:
+      case OTHER_WRITABLE:
+      case OTHER_READ_WRITE:
+        res = true;
     }
 
-    /**
-     * Creates a command that doesn't require an argument
-     * @param count The number entered prior to the command (zero if no specific number)
-     * @param action The action to be executed when the command is run
-     * @param type The type of the command
-     * @param flags Any custom flags specific to this command
-     */
-    public Command(int count, String actionId, AnAction action, int type, int flags)
-    {
-        this(count, actionId, action, type, flags, null);
+    return res;
+  }
+
+  /**
+   * Creates a command that doesn't require an argument
+   *
+   * @param count  The number entered prior to the command (zero if no specific number)
+   * @param action The action to be executed when the command is run
+   * @param type   The type of the command
+   * @param flags  Any custom flags specific to this command
+   */
+  public Command(int count, String actionId, AnAction action, int type, int flags) {
+    this(count, actionId, action, type, flags, null);
+  }
+
+  /**
+   * Creates a command that requires an argument
+   *
+   * @param count  The number entered prior to the command (zero if no specific number)
+   * @param action The action to be executed when the command is run
+   * @param type   The type of the command
+   * @param flags  Any custom flags specific to this command
+   * @param arg    The argument to this command
+   */
+  public Command(int count, String actionId, AnAction action, int type, int flags, Argument arg) {
+    this.count = count;
+    this.actionId = actionId;
+    this.action = action;
+    this.type = type;
+    this.flags = flags;
+    this.argument = arg;
+
+    if (action instanceof EditorAction) {
+      EditorAction eaction = (EditorAction)action;
+      EditorActionHandler handler = eaction.getHandler();
+      if (handler instanceof AbstractEditorActionHandler) {
+        ((AbstractEditorActionHandler)handler).process(this);
+      }
     }
+  }
 
-    /**
-     * Creates a command that requires an argument
-     * @param count The number entered prior to the command (zero if no specific number)
-     * @param action The action to be executed when the command is run
-     * @param type The type of the command
-     * @param flags Any custom flags specific to this command
-     * @param arg The argument to this command
-     */
-    public Command(int count, String actionId, AnAction action, int type, int flags, Argument arg)
-    {
-        this.count = count;
-        this.actionId = actionId;
-        this.action = action;
-        this.type = type;
-        this.flags = flags;
-        this.argument = arg;
+  /**
+   * Returns the command count. A zero count is returned as one since that is the default for most commands
+   *
+   * @return The command count
+   */
+  public int getCount() {
+    return count == 0 ? 1 : count;
+  }
 
-        if (action instanceof EditorAction)
-        {
-            EditorAction eaction = (EditorAction)action;
-            EditorActionHandler handler = eaction.getHandler();
-            if (handler instanceof AbstractEditorActionHandler)
-            {
-                ((AbstractEditorActionHandler)handler).process(this);
-            }
-        }
-    }
+  /**
+   * Updates the command count to the new value
+   *
+   * @param count The new command count
+   */
+  public void setCount(int count) {
+    this.count = count;
+  }
 
-    /**
-     * Returns the command count. A zero count is returned as one since that is the default for most commands
-     * @return The command count
-     */
-    public int getCount()
-    {
-        return count == 0 ? 1 : count;
-    }
+  /**
+   * Gets to actual count entered by the user, including zero if no count was specified. Some commands need to
+   * know whether an actual count was specified or not.
+   *
+   * @return The actual count entered by the user
+   */
+  public int getRawCount() {
+    return count;
+  }
 
-    /**
-     * Updates the command count to the new value
-     * @param count The new command count
-     */
-    public void setCount(int count)
-    {
-        this.count = count;
-    }
+  /**
+   * Gets the command type
+   *
+   * @return The command type
+   */
+  public int getType() {
+    return type;
+  }
 
-    /**
-     * Gets to actual count entered by the user, including zero if no count was specified. Some commands need to
-     * know whether an actual count was specified or not.
-     * @return The actual count entered by the user
-     */
-    public int getRawCount()
-    {
-        return count;
-    }
+  /**
+   * Gets the flags associated with the command
+   *
+   * @return The command flags
+   */
+  public int getFlags() {
+    return flags;
+  }
 
-    /**
-     * Gets the command type
-     * @return The command type
-     */
-    public int getType()
-    {
-        return type;
-    }
+  /**
+   * Sets new flags for the command
+   *
+   * @param flags The new flags
+   */
+  public void setFlags(int flags) {
+    this.flags = flags;
+  }
 
-    /**
-     * Gets the flags associated with the command
-     * @return The command flags
-     */
-    public int getFlags()
-    {
-        return flags;
-    }
+  public String getActionId() {
+    return actionId;
+  }
 
-    /**
-     * Sets new flags for the command
-     * @param flags The new flags
-     */
-    public void setFlags(int flags)
-    {
-        this.flags = flags;
-    }
+  public void setActionId(String actionId) {
+    this.actionId = actionId;
+  }
 
-    public String getActionId()
-    {
-        return actionId;
-    }
+  /**
+   * Gets the action to execute when the command is run
+   *
+   * @return The command's action
+   */
+  public AnAction getAction() {
+    return action;
+  }
 
-    public void setActionId(String actionId)
-    {
-        this.actionId = actionId;
-    }
+  /**
+   * Sets a new action for the command
+   *
+   * @param action The new action
+   */
+  public void setAction(AnAction action) {
+    this.action = action;
+  }
 
-    /**
-     * Gets the action to execute when the command is run
-     * @return The command's action
-     */
-    public AnAction getAction()
-    {
-        return action;
-    }
+  /**
+   * Gets the command's argument, if any.
+   *
+   * @return The command's argument, null if there isn't one
+   */
+  public Argument getArgument() {
+    return argument;
+  }
 
-    /**
-     * Sets a new action for the command
-     * @param action The new action
-     */
-    public void setAction(AnAction action)
-    {
-        this.action = action;
-    }
+  /**
+   * Sets the command's argument to the new value
+   *
+   * @param argument The new argument, can be null to clear the argument
+   */
+  public void setArgument(Argument argument) {
+    this.argument = argument;
+  }
 
-    /**
-     * Gets the command's argument, if any.
-     * @return The command's argument, null if there isn't one
-     */
-    public Argument getArgument()
-    {
-        return argument;
-    }
+  public List<KeyStroke> getKeys() {
+    return keys;
+  }
 
-    /**
-     * Sets the command's argument to the new value
-     * @param argument The new argument, can be null to clear the argument
-     */
-    public void setArgument(Argument argument)
-    {
-        this.argument = argument;
-    }
+  public void setKeys(List<KeyStroke> keys) {
+    this.keys = keys;
+  }
 
-    public List<KeyStroke> getKeys()
-    {
-        return keys;
-    }
+  public String toString() {
+    StringBuffer res = new StringBuffer();
+    res.append("Command {");
+    res.append("count=").append(count);
+    res.append(",actionId=").append(actionId);
+    res.append(",action=").append(action);
+    res.append(",type=").append(type);
+    res.append(",flags=").append(flags);
+    res.append(",argument=").append(argument);
+    res.append(",keys=").append(keys);
+    res.append("}");
 
-    public void setKeys(List<KeyStroke> keys)
-    {
-        this.keys = keys;
-    }
+    return res.toString();
+  }
 
-    public String toString()
-    {
-        StringBuffer res = new StringBuffer();
-        res.append("Command {");
-        res.append("count=").append(count);
-        res.append(",actionId=").append(actionId);
-        res.append(",action=").append(action);
-        res.append(",type=").append(type);
-        res.append(",flags=").append(flags);
-        res.append(",argument=").append(argument);
-        res.append(",keys=").append(keys);
-        res.append("}");
-
-        return res.toString();
-    }
-
-    private int count;
-    private String actionId;
-    private AnAction action;
-    private int type;
-    private int flags;
-    private Argument argument;
-    private List<KeyStroke> keys;
+  private int count;
+  private String actionId;
+  private AnAction action;
+  private int type;
+  private int flags;
+  private Argument argument;
+  private List<KeyStroke> keys;
 }

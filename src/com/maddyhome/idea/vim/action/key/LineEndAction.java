@@ -25,10 +25,8 @@ import com.maddyhome.idea.vim.handler.key.DummyEditorHandler;
 /**
  *
  */
-public class LineEndAction extends EditorAction
-{
-    public LineEndAction()
-    {
-        super(new DummyEditorHandler());
-    }
+public class LineEndAction extends EditorAction {
+  public LineEndAction() {
+    super(new DummyEditorHandler());
+  }
 }

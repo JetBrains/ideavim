@@ -23,35 +23,29 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 
-public abstract class AbstractDelegateEditorAction extends EditorAction implements DelegateAction
-{
-    protected AbstractDelegateEditorAction(EditorActionHandler handler)
-    {
-        super(handler);
+public abstract class AbstractDelegateEditorAction extends EditorAction implements DelegateAction {
+  protected AbstractDelegateEditorAction(EditorActionHandler handler) {
+    super(handler);
+  }
+
+  protected AbstractDelegateEditorAction(EditorActionHandler handler, EditorAction origAction) {
+    this(handler);
+    setOrigAction(origAction);
+  }
+
+  public void setOrigAction(AnAction origAction) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("origAction=" + origAction);
     }
+    this.origAction = origAction;
+    copyFrom(origAction);
+  }
 
-    protected AbstractDelegateEditorAction(EditorActionHandler handler, EditorAction origAction)
-    {
-        this(handler);
-        setOrigAction(origAction);
-    }
+  public AnAction getOrigAction() {
+    return origAction;
+  }
 
-    public void setOrigAction(AnAction origAction)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("origAction=" + origAction);
-        }
-        this.origAction = origAction;
-        copyFrom(origAction);
-    }
+  private AnAction origAction;
 
-    public AnAction getOrigAction()
-    {
-        return origAction;
-    }
-
-    private AnAction origAction;
-
-    private static Logger logger = Logger.getInstance(AbstractDelegateEditorAction.class.getName());
+  private static Logger logger = Logger.getInstance(AbstractDelegateEditorAction.class.getName());
 }

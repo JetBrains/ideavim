@@ -25,10 +25,8 @@ import com.maddyhome.idea.vim.handler.ResetModeHandler;
 /**
  *
  */
-public class ResetModeAction extends EditorAction
-{
-    public ResetModeAction()
-    {
-        super(new ResetModeHandler());
-    }
+public class ResetModeAction extends EditorAction {
+  public ResetModeAction() {
+    super(new ResetModeHandler());
+  }
 }

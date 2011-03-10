@@ -22,28 +22,24 @@ package com.maddyhome.idea.vim.key;
 /**
  * Represents the root of the key/action tree
  */
-public class RootNode extends ParentNode
-{
-    public String toString()
-    {
-        StringBuffer res = new StringBuffer();
-        res.append("RootNode[");
-        res.append("children=[");
-        int cnt = 0;
-        for (Object key : children.keySet())
-        {
-            Node node = (Node)children.get(key);
-            if (cnt > 0)
-            {
-                res.append(",");
-            }
-            res.append(key);
-            res.append("->");
-            res.append(node);
-            cnt++;
-        }
-        res.append("]");
-
-        return res.toString();
+public class RootNode extends ParentNode {
+  public String toString() {
+    StringBuffer res = new StringBuffer();
+    res.append("RootNode[");
+    res.append("children=[");
+    int cnt = 0;
+    for (Object key : children.keySet()) {
+      Node node = (Node)children.get(key);
+      if (cnt > 0) {
+        res.append(",");
+      }
+      res.append(key);
+      res.append("->");
+      res.append(node);
+      cnt++;
     }
+    res.append("]");
+
+    return res.toString();
+  }
 }

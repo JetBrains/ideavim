@@ -19,53 +19,44 @@ package com.maddyhome.idea.vim.regexp;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-public class Flags
-{
-    public Flags()
-    {
-        flags = 0;
-    }
+public class Flags {
+  public Flags() {
+    flags = 0;
+  }
 
-    public Flags(int flags)
-    {
-        this.flags = flags;
-    }
+  public Flags(int flags) {
+    this.flags = flags;
+  }
 
-    public int get()
-    {
-        return flags;
-    }
+  public int get() {
+    return flags;
+  }
 
-    public boolean isSet(int flag)
-    {
-        return ((this.flags & flag) != 0);
-    }
+  public boolean isSet(int flag) {
+    return ((this.flags & flag) != 0);
+  }
 
-    public boolean allSet(int flags)
-    {
-        return ((this.flags & flags) == flags);
-    }
+  public boolean allSet(int flags) {
+    return ((this.flags & flags) == flags);
+  }
 
-    public int init(int flags)
-    {
-        this.flags = flags;
+  public int init(int flags) {
+    this.flags = flags;
 
-        return this.flags;
-    }
+    return this.flags;
+  }
 
-    public int set(int flags)
-    {
-        this.flags |= flags;
+  public int set(int flags) {
+    this.flags |= flags;
 
-        return this.flags;
-    }
+    return this.flags;
+  }
 
-    public int unset(int flags)
-    {
-        this.flags &= ~flags;
+  public int unset(int flags) {
+    this.flags &= ~flags;
 
-        return this.flags;
-    }
+    return this.flags;
+  }
 
-    private int flags;
+  private int flags;
 }

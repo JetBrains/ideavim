@@ -24,23 +24,22 @@ import org.jdom.Element;
 /**
  * This base class provides empty implemtations for the interface methods.
  */
-public abstract class AbstractActionGroup implements ActionGroup
-{
-    /**
-     * Allows the group to save its state and any configuration. This does nothing.
-     * @param element The plugin's root XML element that this group can add a child to
-     */
-    public void saveData(Element element)
-    {
-        // no-op
-    }
+public abstract class AbstractActionGroup implements ActionGroup {
+  /**
+   * Allows the group to save its state and any configuration. This does nothing.
+   *
+   * @param element The plugin's root XML element that this group can add a child to
+   */
+  public void saveData(Element element) {
+    // no-op
+  }
 
-    /**
-     * Allows the group to restore its state and any configuration. This does nothing.
-     * @param element The plugin's root XML element that this group can add a child to
-     */
-    public void readData(Element element)
-    {
-        // no-op
-    }
+  /**
+   * Allows the group to restore its state and any configuration. This does nothing.
+   *
+   * @param element The plugin's root XML element that this group can add a child to
+   */
+  public void readData(Element element) {
+    // no-op
+  }
 }

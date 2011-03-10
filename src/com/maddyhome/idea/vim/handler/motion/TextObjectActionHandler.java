@@ -31,45 +31,38 @@ import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
 
 /**
  */
-public abstract class TextObjectActionHandler extends AbstractEditorActionHandler
-{
-    protected final boolean execute(Editor editor, DataContext context, Command cmd)
-    {
-        if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL)
-        {
-            TextRange range = getRange(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
-            if (range == null)
-            {
-                return false;
-            }
+public abstract class TextObjectActionHandler extends AbstractEditorActionHandler {
+  protected final boolean execute(Editor editor, DataContext context, Command cmd) {
+    if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
+      TextRange range = getRange(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+      if (range == null) {
+        return false;
+      }
 
-            TextRange vr = CommandGroups.getInstance().getMotion().getRawVisualRange();
+      TextRange vr = CommandGroups.getInstance().getMotion().getRawVisualRange();
 
-            boolean block = (cmd.getFlags() & Command.FLAG_TEXT_BLOCK) != 0;
-            int newstart = block || vr.getEndOffset() >= vr.getStartOffset() ? range.getStartOffset() : range.getEndOffset();
-            int newend = block || vr.getEndOffset() >= vr.getStartOffset() ? range.getEndOffset() : range.getStartOffset();
+      boolean block = (cmd.getFlags() & Command.FLAG_TEXT_BLOCK) != 0;
+      int newstart = block || vr.getEndOffset() >= vr.getStartOffset() ? range.getStartOffset() : range.getEndOffset();
+      int newend = block || vr.getEndOffset() >= vr.getStartOffset() ? range.getEndOffset() : range.getStartOffset();
 
-            if (vr.getStartOffset() == vr.getEndOffset() || block)
-            {
-                CommandGroups.getInstance().getMotion().moveVisualStart(editor, newstart);
-            }
+      if (vr.getStartOffset() == vr.getEndOffset() || block) {
+        CommandGroups.getInstance().getMotion().moveVisualStart(editor, newstart);
+      }
 
-            if (((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) != 0 && (cmd.getFlags() & Command.FLAG_VISUAL_CHARACTERWISE) == 0) &&
-                CommandState.getInstance(editor).getSubMode() != Command.FLAG_MOT_LINEWISE)
-            {
-                CommandGroups.getInstance().getMotion().toggleVisual(editor, context, 1, 0, Command.FLAG_MOT_LINEWISE);
-            }
-            else if (((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) == 0 || (cmd.getFlags() & Command.FLAG_VISUAL_CHARACTERWISE) != 0) &&
-                CommandState.getInstance(editor).getSubMode() == Command.FLAG_MOT_LINEWISE)
-            {
-                CommandGroups.getInstance().getMotion().toggleVisual(editor, context, 1, 0, Command.FLAG_MOT_CHARACTERWISE);
-            }
+      if (((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) != 0 && (cmd.getFlags() & Command.FLAG_VISUAL_CHARACTERWISE) == 0) &&
+          CommandState.getInstance(editor).getSubMode() != Command.FLAG_MOT_LINEWISE) {
+        CommandGroups.getInstance().getMotion().toggleVisual(editor, context, 1, 0, Command.FLAG_MOT_LINEWISE);
+      }
+      else if (((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) == 0 || (cmd.getFlags() & Command.FLAG_VISUAL_CHARACTERWISE) != 0) &&
+               CommandState.getInstance(editor).getSubMode() == Command.FLAG_MOT_LINEWISE) {
+        CommandGroups.getInstance().getMotion().toggleVisual(editor, context, 1, 0, Command.FLAG_MOT_CHARACTERWISE);
+      }
 
-            MotionGroup.moveCaret(editor, context, newend);
-        }
-
-        return true;
+      MotionGroup.moveCaret(editor, context, newend);
     }
 
-    public abstract TextRange getRange(Editor editor, DataContext context, int count, int rawCount, Argument argument);
+    return true;
+  }
+
+  public abstract TextRange getRange(Editor editor, DataContext context, int count, int rawCount, Argument argument);
 }

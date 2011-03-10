@@ -19,36 +19,30 @@ package com.maddyhome.idea.vim.action.change;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
-import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  */
-public class RepeatExCommandAction extends EditorAction
-{
-    public RepeatExCommandAction()
-    {
-        super(new Handler());
-    }
+public class RepeatExCommandAction extends EditorAction {
+  public RepeatExCommandAction() {
+    super(new Handler());
+  }
 
-    private static class Handler extends AbstractEditorActionHandler
-    {
-        public boolean execute(Editor editor, DataContext context, Command command)
-        {
-            int count = command.getCount();
-            try
-            {
-                return CommandParser.getInstance().processLastCommand(editor, context, count);
-            }
-            catch (ExException e)
-            {
-                return false;
-            }
-        }
+  private static class Handler extends AbstractEditorActionHandler {
+    public boolean execute(Editor editor, DataContext context, Command command) {
+      int count = command.getCount();
+      try {
+        return CommandParser.getInstance().processLastCommand(editor, context, count);
+      }
+      catch (ExException e) {
+        return false;
+      }
     }
+  }
 }

@@ -30,45 +30,37 @@ import com.maddyhome.idea.vim.undo.UndoManager;
 /**
  *
  */
-public class TxActionWrapper extends AbstractDelegateAction
-{
-    public TxActionWrapper()
-    {
+public class TxActionWrapper extends AbstractDelegateAction {
+  public TxActionWrapper() {
+  }
+
+  public TxActionWrapper(AnAction origAction) {
+    super(origAction);
+  }
+
+  public void actionPerformed(AnActionEvent event) {
+    logger.debug("actionPerformed");
+
+    final Editor editor = event.getData(PlatformDataKeys.EDITOR); // API change - don't merge
+    if (editor == null || !VimPlugin.isEnabled()) {
+      getOrigAction().actionPerformed(event);
     }
+    else {
+      boolean doTx = !UndoManager.getInstance().inCommand(editor);
+      logger.debug("doTx = " + doTx);
+      if (doTx) {
+        UndoManager.getInstance().endCommand(editor);
+        UndoManager.getInstance().beginCommand(editor);
+      }
 
-    public TxActionWrapper(AnAction origAction)
-    {
-        super(origAction);
+      getOrigAction().actionPerformed(event);
+
+      if (doTx) {
+        UndoManager.getInstance().endCommand(editor);
+        UndoManager.getInstance().beginCommand(editor);
+      }
     }
+  }
 
-    public void actionPerformed(AnActionEvent event)
-    {
-        logger.debug("actionPerformed");
-
-        final Editor editor = event.getData(PlatformDataKeys.EDITOR); // API change - don't merge
-        if (editor == null || !VimPlugin.isEnabled())
-        {
-            getOrigAction().actionPerformed(event);
-        }
-        else
-        {
-            boolean doTx = !UndoManager.getInstance().inCommand(editor);
-            logger.debug("doTx = " + doTx);
-            if (doTx)
-            {
-                UndoManager.getInstance().endCommand(editor);
-                UndoManager.getInstance().beginCommand(editor);
-            }
-
-            getOrigAction().actionPerformed(event);
-
-            if (doTx)
-            {
-                UndoManager.getInstance().endCommand(editor);
-                UndoManager.getInstance().beginCommand(editor);
-            }
-        }
-    }
-
-    private static Logger logger = Logger.getInstance(TxActionWrapper.class.getName());
+  private static Logger logger = Logger.getInstance(TxActionWrapper.class.getName());
 }

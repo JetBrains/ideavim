@@ -22,107 +22,99 @@ package com.maddyhome.idea.vim.option;
 /**
  * Represents a boolean option
  */
-public class ToggleOption extends Option
-{
-    /**
-     * Creates the option
-     * @param name The option's name
-     * @param abbrev The short name
-     * @param dflt The default value
-     */
-    ToggleOption(String name, String abbrev, boolean dflt)
-    {
-        super(name, abbrev);
+public class ToggleOption extends Option {
+  /**
+   * Creates the option
+   *
+   * @param name   The option's name
+   * @param abbrev The short name
+   * @param dflt   The default value
+   */
+  ToggleOption(String name, String abbrev, boolean dflt) {
+    super(name, abbrev);
 
-        this.dflt = dflt;
-        this.value = dflt;
+    this.dflt = dflt;
+    this.value = dflt;
+  }
+
+  /**
+   * The option's value
+   *
+   * @return The value
+   */
+  public boolean getValue() {
+    return value;
+  }
+
+  /**
+   * Sets the on (true)
+   */
+  public void set() {
+    update(true);
+  }
+
+  /**
+   * Resets the option (false)
+   */
+  public void reset() {
+    update(false);
+  }
+
+  /**
+   * Toggles the option's value (false to true, true to false)
+   */
+  public void toggle() {
+    update(!value);
+  }
+
+  /**
+   * Helper to set the value only it is changing and notify listeners
+   *
+   * @param val The new value
+   */
+  private void update(boolean val) {
+    boolean old = value;
+    value = val;
+    if (val != old) {
+      fireOptionChangeEvent();
+    }
+  }
+
+  /**
+   * The display value of the option [no]{name}
+   *
+   * @return The option's display value
+   */
+  public String toString() {
+    StringBuffer res = new StringBuffer();
+    if (!value) {
+      res.append("no");
+    }
+    else {
+      res.append("  ");
     }
 
-    /**
-     * The option's value
-     * @return The value
-     */
-    public boolean getValue()
-    {
-        return value;
-    }
+    res.append(getName());
 
-    /**
-     * Sets the on (true)
-     */
-    public void set()
-    {
-        update(true);
-    }
+    return res.toString();
+  }
 
-    /**
-     * Resets the option (false)
-     */
-    public void reset()
-    {
-        update(false);
-    }
+  /**
+   * Checks to see if the option's current value equals the default value
+   *
+   * @return True if equal to default, false if not.
+   */
+  public boolean isDefault() {
+    return value == dflt;
+  }
 
-    /**
-     * Toggles the option's value (false to true, true to false)
-     */
-    public void toggle()
-    {
-        update(!value);
-    }
+  /**
+   * Sets the option to its default value.
+   */
+  public void resetDefault() {
+    value = dflt;
+  }
 
-    /**
-     * Helper to set the value only it is changing and notify listeners
-     * @param val The new value
-     */
-    private void update(boolean val)
-    {
-        boolean old = value;
-        value = val;
-        if (val != old)
-        {
-            fireOptionChangeEvent();
-        }
-    }
-
-    /**
-     * The display value of the option [no]{name}
-     * @return The option's display value
-     */
-    public String toString()
-    {
-        StringBuffer res = new StringBuffer();
-        if (!value)
-        {
-            res.append("no");
-        }
-        else
-        {
-            res.append("  ");
-        }
-
-        res.append(getName());
-
-        return res.toString();
-    }
-
-    /**
-     * Checks to see if the option's current value equals the default value
-     * @return True if equal to default, false if not.
-     */
-    public boolean isDefault()
-    {
-        return value == dflt;
-    }
-
-    /**
-     * Sets the option to its default value.
-     */
-    public void resetDefault()
-    {
-        value = dflt;
-    }
-
-    protected boolean dflt;
-    protected boolean value;
+  protected boolean dflt;
+  protected boolean value;
 }

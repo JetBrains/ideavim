@@ -22,6 +22,5 @@ package com.maddyhome.idea.vim.key;
 /**
  * Marker interface for all key/action tree nodes
  */
-public interface Node
-{
+public interface Node {
 }

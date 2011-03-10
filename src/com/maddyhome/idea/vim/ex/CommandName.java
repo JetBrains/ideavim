@@ -22,24 +22,20 @@ package com.maddyhome.idea.vim.ex;
 /**
  *
  */
-public class CommandName
-{
-    public CommandName(String required, String optional)
-    {
-        this.required = required;
-        this.optional = optional;
-    }
+public class CommandName {
+  public CommandName(String required, String optional) {
+    this.required = required;
+    this.optional = optional;
+  }
 
-    public String getRequired()
-    {
-        return required;
-    }
+  public String getRequired() {
+    return required;
+  }
 
-    public String getOptional()
-    {
-        return optional;
-    }
+  public String getOptional() {
+    return optional;
+  }
 
-    private String required;
-    private String optional;
+  private String required;
+  private String optional;
 }

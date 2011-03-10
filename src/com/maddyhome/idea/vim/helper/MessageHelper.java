@@ -27,45 +27,38 @@ import java.util.ResourceBundle;
 /**
  *
  */
-public class MessageHelper
-{
-    public static void EMSG(String key)
-    {
-        VimPlugin.showMessage(getMsg(key));
-    }
+public class MessageHelper {
+  public static void EMSG(String key) {
+    VimPlugin.showMessage(getMsg(key));
+  }
 
-    public static void EMSG(String key, String val)
-    {
-        VimPlugin.showMessage(getMsg(key, val));
-    }
+  public static void EMSG(String key, String val) {
+    VimPlugin.showMessage(getMsg(key, val));
+  }
 
-    public static void EMSG(String key, String val, String val2)
-    {
-        VimPlugin.showMessage(getMsg(key, new Object[] { val, val2 }));
-    }
+  public static void EMSG(String key, String val, String val2) {
+    VimPlugin.showMessage(getMsg(key, new Object[]{val, val2}));
+  }
 
-    public static String getMsg(String key)
-    {
-        return bundle.getString(key);
-    }
+  public static String getMsg(String key) {
+    return bundle.getString(key);
+  }
 
-    public static String getMsg(String key, String val)
-    {
-        String msg = bundle.getString(key);
+  public static String getMsg(String key, String val) {
+    String msg = bundle.getString(key);
 
-        msg = MessageFormat.format(msg, val);
+    msg = MessageFormat.format(msg, val);
 
-        return msg;
-    }
+    return msg;
+  }
 
-    public static String getMsg(String key, Object[] vals)
-    {
-        String msg = bundle.getString(key);
+  public static String getMsg(String key, Object[] vals) {
+    String msg = bundle.getString(key);
 
-        msg = MessageFormat.format(msg, vals);
+    msg = MessageFormat.format(msg, vals);
 
-        return msg;
-    }
+    return msg;
+  }
 
-    private static ResourceBundle bundle = ResourceBundle.getBundle("messages");
+  private static ResourceBundle bundle = ResourceBundle.getBundle("messages");
 }

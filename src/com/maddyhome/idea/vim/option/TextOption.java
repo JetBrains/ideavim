@@ -19,20 +19,18 @@ package com.maddyhome.idea.vim.option;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-public abstract class TextOption extends Option
-{
-    TextOption(String name, String abbrev)
-    {
-        super(name, abbrev);
-    }
+public abstract class TextOption extends Option {
+  TextOption(String name, String abbrev) {
+    super(name, abbrev);
+  }
 
-    public abstract String getValue();
+  public abstract String getValue();
 
-    public abstract boolean set(String val);
+  public abstract boolean set(String val);
 
-    public abstract boolean append(String val);
+  public abstract boolean append(String val);
 
-    public abstract boolean prepend(String val);
+  public abstract boolean prepend(String val);
 
-    public abstract boolean remove(String val);
+  public abstract boolean remove(String val);
 }

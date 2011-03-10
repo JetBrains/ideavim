@@ -25,10 +25,8 @@ import com.maddyhome.idea.vim.handler.key.DummyEditorHandler;
 /**
  *
  */
-public class ToggleInsertStateAction extends EditorAction
-{
-    public ToggleInsertStateAction()
-    {
-        super(new DummyEditorHandler());
-    }
+public class ToggleInsertStateAction extends EditorAction {
+  public ToggleInsertStateAction() {
+    super(new DummyEditorHandler());
+  }
 }

@@ -19,39 +19,33 @@ package com.maddyhome.idea.vim.action.motion.scroll;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 
 /**
  */
-public class MotionScrollLastScreenLinePageStartAction extends EditorAction
-{
-    public MotionScrollLastScreenLinePageStartAction()
-    {
-        super(new Handler());
-    }
+public class MotionScrollLastScreenLinePageStartAction extends EditorAction {
+  public MotionScrollLastScreenLinePageStartAction() {
+    super(new Handler());
+  }
 
-    private static class Handler extends AbstractEditorActionHandler
-    {
-        protected boolean execute(Editor editor, DataContext context, Command cmd)
-        {
-            int raw = cmd.getRawCount();
-            int cnt = cmd.getCount();
-            if (raw == 0)
-            {
-                int lines = EditorHelper.getScreenHeight(editor);
+  private static class Handler extends AbstractEditorActionHandler {
+    protected boolean execute(Editor editor, DataContext context, Command cmd) {
+      int raw = cmd.getRawCount();
+      int cnt = cmd.getCount();
+      if (raw == 0) {
+        int lines = EditorHelper.getScreenHeight(editor);
 
-                return CommandGroups.getInstance().getMotion().scrollLine(editor, context, -lines);
-            }
-            else
-            {
-                return CommandGroups.getInstance().getMotion().scrollLineToLastScreenLine(editor, context, raw, cnt, true);
-            }
-        }
+        return CommandGroups.getInstance().getMotion().scrollLine(editor, context, -lines);
+      }
+      else {
+        return CommandGroups.getInstance().getMotion().scrollLineToLastScreenLine(editor, context, raw, cnt, true);
+      }
     }
+  }
 }

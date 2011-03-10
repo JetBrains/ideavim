@@ -25,10 +25,8 @@ import com.maddyhome.idea.vim.handler.key.DummyEditorHandler;
 /**
  *
  */
-public class EscapeAction extends EditorAction
-{
-    public EscapeAction()
-    {
-        super(new DummyEditorHandler());
-    }
+public class EscapeAction extends EditorAction {
+  public EscapeAction() {
+    super(new DummyEditorHandler());
+  }
 }

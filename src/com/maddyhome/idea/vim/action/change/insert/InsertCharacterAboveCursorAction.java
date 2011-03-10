@@ -19,32 +19,27 @@ package com.maddyhome.idea.vim.action.change.insert;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
-import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  */
-public class InsertCharacterAboveCursorAction extends EditorAction
-{
-    public InsertCharacterAboveCursorAction()
-    {
-        super(new Handler());
-    }
+public class InsertCharacterAboveCursorAction extends EditorAction {
+  public InsertCharacterAboveCursorAction() {
+    super(new Handler());
+  }
 
-    private static class Handler extends AbstractEditorActionHandler
-    {
-        protected boolean execute(Editor editor, DataContext context, Command cmd)
-        {
-            if (editor.isOneLineMode())
-            {
-                return false;
-            }
+  private static class Handler extends AbstractEditorActionHandler {
+    protected boolean execute(Editor editor, DataContext context, Command cmd) {
+      if (editor.isOneLineMode()) {
+        return false;
+      }
 
-            return CommandGroups.getInstance().getChange().insertCharacterAroundCursor(editor, context, -1);
-        }
+      return CommandGroups.getInstance().getChange().insertCharacterAroundCursor(editor, context, -1);
     }
+  }
 }

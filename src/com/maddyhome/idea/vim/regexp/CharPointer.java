@@ -24,422 +24,355 @@ import java.nio.CharBuffer;
 /**
  *
  */
-public class CharPointer
-{
-    public static final CharPointer INIT = new CharPointer();
+public class CharPointer {
+  public static final CharPointer INIT = new CharPointer();
 
-    public CharPointer(String text)
-    {
-        seq = text;
-        readonly = true;
+  public CharPointer(String text) {
+    seq = text;
+    readonly = true;
+  }
+
+  public CharPointer(CharBuffer text) {
+    seq = text;
+    readonly = true;
+  }
+
+  public CharPointer(StringBuffer text) {
+    seq = text;
+    readonly = false;
+  }
+
+  private CharPointer(CharPointer ptr, int offset) {
+    seq = ptr.seq;
+    readonly = ptr.readonly;
+    pointer = ptr.pointer + offset;
+  }
+
+  private CharPointer() {
+    seq = null;
+    pointer = -1;
+    readonly = true;
+  }
+
+  public int pointer() {
+    return pointer;
+  }
+
+  public boolean isInit() {
+    return seq == null && pointer == -1;
+  }
+
+  public CharPointer set(char ch) {
+    return set(ch, 0);
+  }
+
+  public CharPointer set(char ch, int offset) {
+    if (seq == null) {
+      return this;
     }
 
-    public CharPointer(CharBuffer text)
-    {
-        seq = text;
-        readonly = true;
+    if (readonly) {
+      throw new IllegalStateException("readonly string");
     }
 
-    public CharPointer(StringBuffer text)
-    {
-        seq = text;
-        readonly = false;
+    StringBuffer data = (StringBuffer)seq;
+    while (pointer + offset >= data.length()) {
+      data.append('\u0000');
+    }
+    data.setCharAt(pointer + offset, ch);
+
+    return this;
+  }
+
+  public char charAtInc() {
+    char res = charAt(0);
+    inc();
+
+    return res;
+  }
+
+  public char charAt() {
+    return charAt(0);
+  }
+
+  public char charAt(int offset) {
+    if (end(offset)) {
+      return '\u0000';
     }
 
-    private CharPointer(CharPointer ptr, int offset)
-    {
-        seq = ptr.seq;
-        readonly = ptr.readonly;
-        pointer = ptr.pointer + offset;
+    return seq.charAt(pointer + offset);
+  }
+
+  public CharPointer inc() {
+    return inc(1);
+  }
+
+  public CharPointer inc(int cnt) {
+    pointer += cnt;
+
+    return this;
+  }
+
+  public CharPointer dec() {
+    return dec(1);
+  }
+
+  public CharPointer dec(int cnt) {
+    pointer -= cnt;
+
+    return this;
+  }
+
+  public CharPointer assign(CharPointer ptr) {
+    seq = ptr.seq;
+    pointer = ptr.pointer;
+    readonly = ptr.readonly;
+
+    return this;
+  }
+
+  public CharPointer ref(int offset) {
+    if (this.equals(INIT)) {
+      return INIT;
     }
 
-    private CharPointer()
-    {
-        seq = null;
-        pointer = -1;
-        readonly = true;
+    return new CharPointer(this, offset);
+  }
+
+  public String substring(int len) {
+    if (end()) {
+      return "";
+    }
+    else {
+      int start = pointer;
+      int end = normalize(pointer + len);
+      int slen = seq.length();
+      //return seq.subSequence(start, end - start).toString();
+      return CharBuffer.wrap(seq, start, end).toString();
+    }
+  }
+
+  public int strlen() {
+    if (end()) {
+      return 0;
     }
 
-    public int pointer()
-    {
-        return pointer;
+    for (int i = pointer; i < seq.length(); i++) {
+      if (seq.charAt(i) == '\u0000') {
+        return i - pointer;
+      }
     }
 
-    public boolean isInit()
-    {
-        return seq == null && pointer == -1;
+    return seq.length() - pointer;
+  }
+
+  public int strncmp(String str, int len) {
+    if (end()) {
+      return -1;
     }
 
-    public CharPointer set(char ch)
-    {
-        return set(ch, 0);
+    //String s = seq.subSequence(pointer, normalize(pointer + len)).toString();
+    String s = CharBuffer.wrap(seq, pointer, normalize(pointer + len)).toString();
+
+    if (len > str.length()) {
+      len = str.length();
     }
 
-    public CharPointer set(char ch, int offset)
-    {
-        if (seq == null)
-        {
-            return this;
-        }
+    return s.compareTo(str.substring(0, len));
+  }
 
-        if (readonly)
-        {
-            throw new IllegalStateException("readonly string");
-        }
-
-        StringBuffer data = (StringBuffer)seq;
-        while (pointer + offset >= data.length())
-        {
-            data.append('\u0000');
-        }
-        data.setCharAt(pointer + offset, ch);
-
-        return this;
+  public int strncmp(CharPointer str, int len) {
+    if (end()) {
+      return -1;
     }
 
-    public char charAtInc()
-    {
-        char res = charAt(0);
-        inc();
+    //CharSequence cs1 = seq.subSequence(pointer, normalize(pointer + len));
+    //CharSequence cs2 = str.seq.subSequence(str.pointer, str.normalize(str.pointer + len));
+    CharSequence cs1 = CharBuffer.wrap(seq, pointer, normalize(pointer + len));
+    CharSequence cs2 = CharBuffer.wrap(str.seq, str.pointer, str.normalize(str.pointer + len));
 
-        return res;
+    int l = cs1.length();
+    if (l != cs2.length()) {
+      return 1;
     }
 
-    public char charAt()
-    {
-        return charAt(0);
+    for (int i = 0; i < l; i++) {
+      char c1 = cs1.charAt(i);
+      char c2 = cs2.charAt(i);
+
+      if (c1 != c2) {
+        return 1;
+      }
     }
 
-    public char charAt(int offset)
-    {
-        if (end(offset))
-        {
-            return '\u0000';
-        }
+    return 0;
 
-        return seq.charAt(pointer + offset);
+    /*
+    int slen = str.strlen();
+    if (len > slen)
+    {
+        len = slen;
     }
 
-    public CharPointer inc()
-    {
-        return inc(1);
+    String s = seq.subSequence(pointer, normalize(pointer + len)).toString();
+
+    return s.compareTo(str.substring(len));
+    */
+  }
+
+  public int strnicmp(CharPointer str, int len) {
+    if (end()) {
+      return -1;
     }
 
-    public CharPointer inc(int cnt)
-    {
-        pointer += cnt;
+    //CharSequence cs1 = seq.subSequence(pointer, normalize(pointer + len));
+    //CharSequence cs2 = str.seq.subSequence(str.pointer, str.normalize(str.pointer + len));
+    CharSequence cs1 = CharBuffer.wrap(seq, pointer, normalize(pointer + len));
+    CharSequence cs2 = CharBuffer.wrap(str.seq, str.pointer, str.normalize(str.pointer + len));
 
-        return this;
+    int l = cs1.length();
+    if (l != cs2.length()) {
+      return 1;
     }
 
-    public CharPointer dec()
-    {
-        return dec(1);
+    for (int i = 0; i < l; i++) {
+      char c1 = cs1.charAt(i);
+      char c2 = cs2.charAt(i);
+
+      if (Character.toLowerCase(c1) != Character.toLowerCase(c2) &&
+          Character.toUpperCase(c1) != Character.toUpperCase(c2)) {
+        return 1;
+      }
     }
 
-    public CharPointer dec(int cnt)
-    {
-        pointer -= cnt;
+    return 0;
 
-        return this;
+    /* was 2,407ms
+    int slen = str.strlen();
+    if (len > slen)
+    {
+        len = slen;
     }
 
-    public CharPointer assign(CharPointer ptr)
-    {
-        seq = ptr.seq;
-        pointer = ptr.pointer;
-        readonly = ptr.readonly;
+    String s = seq.subSequence(pointer, normalize(pointer + len)).toString();
 
-        return this;
+    return s.compareToIgnoreCase(str.substring(len));
+    */
+  }
+
+  public CharPointer strchr(char c) {
+    if (end()) {
+      return null;
     }
 
-    public CharPointer ref(int offset)
-    {
-        if (this.equals(INIT))
-        {
-            return INIT;
-        }
-
-        return new CharPointer(this, offset);
+    int len = seq.length();
+    for (int i = pointer; i < len; i++) {
+      if (seq.charAt(i) == c) {
+        return ref(i - pointer);
+      }
     }
 
-    public String substring(int len)
+    return null;
+
+    /*
+    String str = seq.subSequence(pointer, pointer + strlen()).toString();
+    int pos = str.indexOf(c);
+    if (pos != -1)
     {
-        if (end())
-        {
-            return "";
-        }
-        else
-        {
-            int start = pointer;
-            int end = normalize(pointer + len);
-            int slen = seq.length();
-            //return seq.subSequence(start, end - start).toString();
-            return CharBuffer.wrap(seq, start, end).toString();
-        }
+        return ref(pos);
     }
-
-    public int strlen()
+    else
     {
-        if (end())
-        {
-            return 0;
-        }
-
-        for (int i = pointer; i < seq.length(); i++)
-        {
-            if (seq.charAt(i) == '\u0000')
-            {
-                return i - pointer;
-            }
-        }
-
-        return seq.length() - pointer;
-    }
-
-    public int strncmp(String str, int len)
-    {
-        if (end())
-        {
-            return -1;
-        }
-
-        //String s = seq.subSequence(pointer, normalize(pointer + len)).toString();
-        String s = CharBuffer.wrap(seq, pointer, normalize(pointer + len)).toString();
-
-        if (len > str.length())
-        {
-            len = str.length();
-        }
-
-        return s.compareTo(str.substring(0, len));
-    }
-
-    public int strncmp(CharPointer str, int len)
-    {
-        if (end())
-        {
-            return -1;
-        }
-
-        //CharSequence cs1 = seq.subSequence(pointer, normalize(pointer + len));
-        //CharSequence cs2 = str.seq.subSequence(str.pointer, str.normalize(str.pointer + len));
-        CharSequence cs1 = CharBuffer.wrap(seq, pointer, normalize(pointer + len));
-        CharSequence cs2 = CharBuffer.wrap(str.seq, str.pointer, str.normalize(str.pointer + len));
-
-        int l = cs1.length();
-        if (l != cs2.length())
-        {
-            return 1;
-        }
-
-        for (int i = 0; i < l; i++)
-        {
-            char c1 = cs1.charAt(i);
-            char c2 = cs2.charAt(i);
-
-            if (c1 != c2)
-            {
-                return 1;
-            }
-        }
-
-        return 0;
-
-        /*
-        int slen = str.strlen();
-        if (len > slen)
-        {
-            len = slen;
-        }
-
-        String s = seq.subSequence(pointer, normalize(pointer + len)).toString();
-
-        return s.compareTo(str.substring(len));
-        */
-    }
-
-    public int strnicmp(CharPointer str, int len)
-    {
-        if (end())
-        {
-            return -1;
-        }
-
-        //CharSequence cs1 = seq.subSequence(pointer, normalize(pointer + len));
-        //CharSequence cs2 = str.seq.subSequence(str.pointer, str.normalize(str.pointer + len));
-        CharSequence cs1 = CharBuffer.wrap(seq, pointer, normalize(pointer + len));
-        CharSequence cs2 = CharBuffer.wrap(str.seq, str.pointer, str.normalize(str.pointer + len));
-
-        int l = cs1.length();
-        if (l != cs2.length())
-        {
-            return 1;
-        }
-
-        for (int i = 0; i < l; i++)
-        {
-            char c1 = cs1.charAt(i);
-            char c2 = cs2.charAt(i);
-
-            if (Character.toLowerCase(c1) != Character.toLowerCase(c2) &&
-                Character.toUpperCase(c1) != Character.toUpperCase(c2))
-            {
-                return 1;
-            }
-        }
-
-        return 0;
-
-        /* was 2,407ms
-        int slen = str.strlen();
-        if (len > slen)
-        {
-            len = slen;
-        }
-
-        String s = seq.subSequence(pointer, normalize(pointer + len)).toString();
-
-        return s.compareToIgnoreCase(str.substring(len));
-        */
-    }
-
-    public CharPointer strchr(char c)
-    {
-        if (end())
-        {
-            return null;
-        }
-
-        int len = seq.length();
-        for (int i = pointer; i < len; i++)
-        {
-            if (seq.charAt(i) == c)
-            {
-                return ref(i - pointer);
-            }
-        }
-
-        return null;
-
-        /*
-        String str = seq.subSequence(pointer, pointer + strlen()).toString();
-        int pos = str.indexOf(c);
-        if (pos != -1)
-        {
-            return ref(pos);
-        }
-        else
-        {
-            return null;
-        }
-        */
-    }
-
-    public CharPointer istrchr(char c)
-    {
-        if (end())
-        {
-            return null;
-        }
-
-        int len = seq.length();
-        char cc = Character.toUpperCase(c);
-        c = Character.toLowerCase(c);
-
-        for (int i = pointer; i < len; i++)
-        {
-            char ch = seq.charAt(i);
-            if (ch == c || ch == cc)
-            {
-                return ref(i - pointer);
-            }
-        }
-
         return null;
     }
+    */
+  }
 
-    public boolean isNul()
-    {
-        return charAt() == '\u0000';
+  public CharPointer istrchr(char c) {
+    if (end()) {
+      return null;
     }
 
-    public boolean end()
-    {
-        return end(0);
+    int len = seq.length();
+    char cc = Character.toUpperCase(c);
+    c = Character.toLowerCase(c);
+
+    for (int i = pointer; i < len; i++) {
+      char ch = seq.charAt(i);
+      if (ch == c || ch == cc) {
+        return ref(i - pointer);
+      }
     }
 
-    public boolean end(int offset)
-    {
-        if (seq == null)
-        {
-            return true;
-        }
+    return null;
+  }
 
-        return pointer + offset >= seq.length();
+  public boolean isNul() {
+    return charAt() == '\u0000';
+  }
+
+  public boolean end() {
+    return end(0);
+  }
+
+  public boolean end(int offset) {
+    if (seq == null) {
+      return true;
     }
 
-    public int OP()
-    {
-        return (int)charAt();
-    }
+    return pointer + offset >= seq.length();
+  }
 
-    public CharPointer OPERAND()
-    {
-        return ref(3);
-    }
+  public int OP() {
+    return (int)charAt();
+  }
 
-    public int NEXT()
-    {
+  public CharPointer OPERAND() {
+    return ref(3);
+  }
+
+  public int NEXT() {
 //    #define NEXT(p)         (((*((p) + 1) & 0377) << 8) + (*((p) + 2) & 0377))
-        return ((((int)seq.charAt(pointer + 1) & 0xff) << 8) + ((int)seq.charAt(pointer + 2) & 0xff));
-    }
+    return ((((int)seq.charAt(pointer + 1) & 0xff) << 8) + ((int)seq.charAt(pointer + 2) & 0xff));
+  }
 
-    public int OPERAND_MIN()
-    {
+  public int OPERAND_MIN() {
 //    #define OPERAND_MIN(p)  (((long)(p)[3] << 24) + ((long)(p)[4] << 16) \
 //    + ((long)(p)[5] << 8) + (long)(p)[6])
-        return (((int)seq.charAt(pointer + 3) << 24) + ((int)seq.charAt(pointer + 4) << 16) +
+    return (((int)seq.charAt(pointer + 3) << 24) + ((int)seq.charAt(pointer + 4) << 16) +
             ((int)seq.charAt(pointer + 5) << 8) + ((int)seq.charAt(pointer + 6)));
-    }
+  }
 
-    public int OPERAND_MAX()
-    {
-        return (((int)seq.charAt(pointer + 7) << 24) + ((int)seq.charAt(pointer + 8) << 16) +
+  public int OPERAND_MAX() {
+    return (((int)seq.charAt(pointer + 7) << 24) + ((int)seq.charAt(pointer + 8) << 16) +
             ((int)seq.charAt(pointer + 9) << 8) + ((int)seq.charAt(pointer + 10)));
-    }
+  }
 
-    public char OPERAND_CMP()
-    {
+  public char OPERAND_CMP() {
 //    #define OPERAND_CMP(p)  (p)[7]
-        return seq.charAt(pointer + 7);
+    return seq.charAt(pointer + 7);
+  }
+
+  public boolean equals(Object obj) {
+    if (obj instanceof CharPointer) {
+      CharPointer ptr = (CharPointer)obj;
+      if (ptr.seq == seq && ptr.pointer == pointer) {
+        return true;
+      }
     }
 
-    public boolean equals(Object obj)
-    {
-        if (obj instanceof CharPointer)
-        {
-            CharPointer ptr = (CharPointer)obj;
-            if (ptr.seq == seq && ptr.pointer == pointer)
-            {
-                return true;
-            }
-        }
+    return false;
+  }
 
-        return false;
-    }
+  private int normalize(int pos) {
+    return Math.min(seq.length(), pos);
+  }
 
-    private int normalize(int pos)
-    {
-        return Math.min(seq.length(), pos);
-    }
+  public String toString() {
+    return substring(strlen());
+  }
 
-    public String toString()
-    {
-        return substring(strlen());
-    }
-
-    private CharSequence seq;
-    private int pointer;
-    private boolean readonly = true;
+  private CharSequence seq;
+  private int pointer;
+  private boolean readonly = true;
 }

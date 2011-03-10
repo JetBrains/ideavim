@@ -26,58 +26,48 @@ import java.util.List;
 /**
  *
  */
-public class BoundListOption extends ListOption
-{
-    BoundListOption(String name, String abbrev, String[] dflt, String[] values)
-    {
-        super(name, abbrev, dflt, null);
+public class BoundListOption extends ListOption {
+  BoundListOption(String name, String abbrev, String[] dflt, String[] values) {
+    super(name, abbrev, dflt, null);
 
-        this.values = new ArrayList<String>(Arrays.asList(values));
+    this.values = new ArrayList<String>(Arrays.asList(values));
+  }
+
+  public boolean set(String val) {
+    List<String> vals = parseVals(val);
+    if (values.containsAll(vals)) {
+      set(vals);
     }
 
-    public boolean set(String val)
-    {
-        List<String> vals = parseVals(val);
-        if (values.containsAll(vals))
-        {
-            set(vals);
-        }
+    return true;
+  }
 
-        return true;
+  public boolean append(String val) {
+    List<String> vals = parseVals(val);
+    if (values.containsAll(vals)) {
+      append(vals);
     }
 
-    public boolean append(String val)
-    {
-        List<String> vals = parseVals(val);
-        if (values.containsAll(vals))
-        {
-            append(vals);
-        }
+    return true;
+  }
 
-        return true;
+  public boolean prepend(String val) {
+    List<String> vals = parseVals(val);
+    if (values.containsAll(vals)) {
+      prepend(vals);
     }
 
-    public boolean prepend(String val)
-    {
-        List<String> vals = parseVals(val);
-        if (values.containsAll(vals))
-        {
-            prepend(vals);
-        }
+    return true;
+  }
 
-        return true;
+  public boolean remove(String val) {
+    List<String> vals = parseVals(val);
+    if (values.containsAll(vals)) {
+      remove(vals);
     }
 
-    public boolean remove(String val)
-    {
-        List<String> vals = parseVals(val);
-        if (values.containsAll(vals))
-        {
-            remove(vals);
-        }
+    return true;
+  }
 
-        return true;
-    }
-
-    protected List<String> values;
+  protected List<String> values;
 }

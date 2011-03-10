@@ -22,33 +22,27 @@ package com.maddyhome.idea.vim.action;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.diagnostic.Logger;
 
-public abstract class AbstractDelegateAction extends AnAction implements DelegateAction
-{
-    protected AbstractDelegateAction()
-    {
+public abstract class AbstractDelegateAction extends AnAction implements DelegateAction {
+  protected AbstractDelegateAction() {
+  }
+
+  protected AbstractDelegateAction(AnAction origAction) {
+    setOrigAction(origAction);
+  }
+
+  public void setOrigAction(AnAction origAction) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("origAction=" + origAction);
     }
+    this.origAction = origAction;
+    copyFrom(origAction);
+  }
 
-    protected AbstractDelegateAction(AnAction origAction)
-    {
-        setOrigAction(origAction);
-    }
+  public AnAction getOrigAction() {
+    return origAction;
+  }
 
-    public void setOrigAction(AnAction origAction)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("origAction=" + origAction);
-        }
-        this.origAction = origAction;
-        copyFrom(origAction);
-    }
+  private AnAction origAction;
 
-    public AnAction getOrigAction()
-    {
-        return origAction;
-    }
-
-    private AnAction origAction;
-
-    private static Logger logger = Logger.getInstance(AbstractDelegateAction.class.getName());
+  private static Logger logger = Logger.getInstance(AbstractDelegateAction.class.getName());
 }

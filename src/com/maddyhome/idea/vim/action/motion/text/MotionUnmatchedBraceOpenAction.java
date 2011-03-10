@@ -28,18 +28,14 @@ import com.maddyhome.idea.vim.handler.motion.MotionEditorActionHandler;
 
 /**
  */
-public class MotionUnmatchedBraceOpenAction extends MotionEditorAction
-{
-    public MotionUnmatchedBraceOpenAction()
-    {
-        super(new Handler());
-    }
+public class MotionUnmatchedBraceOpenAction extends MotionEditorAction {
+  public MotionUnmatchedBraceOpenAction() {
+    super(new Handler());
+  }
 
-    private static class Handler extends MotionEditorActionHandler
-    {
-        public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument)
-        {
-            return CommandGroups.getInstance().getMotion().moveCaretToUnmatchedBlock(editor, count, '{');
-        }
+  private static class Handler extends MotionEditorActionHandler {
+    public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
+      return CommandGroups.getInstance().getMotion().moveCaretToUnmatchedBlock(editor, count, '{');
     }
+  }
 }

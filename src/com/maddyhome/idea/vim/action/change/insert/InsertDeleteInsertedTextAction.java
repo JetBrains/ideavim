@@ -19,27 +19,23 @@ package com.maddyhome.idea.vim.action.change.insert;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
-import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  */
-public class InsertDeleteInsertedTextAction extends EditorAction
-{
-    public InsertDeleteInsertedTextAction()
-    {
-        super(new Handler());
-    }
+public class InsertDeleteInsertedTextAction extends EditorAction {
+  public InsertDeleteInsertedTextAction() {
+    super(new Handler());
+  }
 
-    private static class Handler extends AbstractEditorActionHandler
-    {
-        public boolean execute(Editor editor, DataContext context, Command cmd)
-        {
-            return CommandGroups.getInstance().getChange().insertDeleteInsertedText(editor, context);
-        }
+  private static class Handler extends AbstractEditorActionHandler {
+    public boolean execute(Editor editor, DataContext context, Command cmd) {
+      return CommandGroups.getInstance().getChange().insertDeleteInsertedText(editor, context);
     }
+  }
 }

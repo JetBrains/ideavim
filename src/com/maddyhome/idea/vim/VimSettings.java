@@ -21,67 +21,56 @@ package com.maddyhome.idea.vim;
 
 import java.util.HashSet;
 
-public class VimSettings
-{
-    public boolean isEnabled()
-    {
-        return enabled;
+public class VimSettings {
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+  }
+
+  public HashSet getChoices() {
+    return choices;
+  }
+
+  public void setChoices(HashSet choices) {
+    this.choices = choices;
+  }
+
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
 
-    public void setEnabled(boolean enabled)
-    {
-        this.enabled = enabled;
+    final VimSettings that = (VimSettings)o;
+
+    if (enabled != that.enabled) {
+      return false;
     }
 
-    public HashSet getChoices()
-    {
-        return choices;
-    }
+    return choices.equals(that.choices);
+  }
 
-    public void setChoices(HashSet choices)
-    {
-        this.choices = choices;
-    }
+  public int hashCode() {
+    int result;
+    result = (enabled ? 1 : 0);
+    result = 29 * result + choices.hashCode();
+    return result;
+  }
 
-    public boolean equals(Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass())
-        {
-            return false;
-        }
+  public String toString() {
+    final StringBuffer sb = new StringBuffer();
+    sb.append("VimSettings");
+    sb.append("{enabled=").append(enabled);
+    sb.append(", choices=").append(choices);
+    sb.append('}');
+    return sb.toString();
+  }
 
-        final VimSettings that = (VimSettings)o;
-
-        if (enabled != that.enabled)
-        {
-            return false;
-        }
-
-        return choices.equals(that.choices);
-    }
-
-    public int hashCode()
-    {
-        int result;
-        result = (enabled ? 1 : 0);
-        result = 29 * result + choices.hashCode();
-        return result;
-    }
-
-    public String toString()
-    {
-        final StringBuffer sb = new StringBuffer();
-        sb.append("VimSettings");
-        sb.append("{enabled=").append(enabled);
-        sb.append(", choices=").append(choices);
-        sb.append('}');
-        return sb.toString();
-    }
-
-    private boolean enabled;
-    private HashSet choices = new HashSet();
+  private boolean enabled;
+  private HashSet choices = new HashSet();
 }

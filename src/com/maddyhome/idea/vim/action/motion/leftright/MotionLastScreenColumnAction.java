@@ -19,6 +19,7 @@ package com.maddyhome.idea.vim.action.motion.leftright;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
@@ -27,45 +28,36 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.handler.motion.MotionEditorActionHandler;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.Options;
 
 /**
  */
-public class MotionLastScreenColumnAction extends MotionEditorAction
-{
-    public MotionLastScreenColumnAction()
-    {
-        super(new Handler());
+public class MotionLastScreenColumnAction extends MotionEditorAction {
+  public MotionLastScreenColumnAction() {
+    super(new Handler());
+  }
+
+  private static class Handler extends MotionEditorActionHandler {
+    public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
+      boolean allow = false;
+      if (CommandState.getInstance(editor).getMode() == CommandState.MODE_INSERT ||
+          CommandState.getInstance(editor).getMode() == CommandState.MODE_REPLACE) {
+        allow = true;
+      }
+      else if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
+        BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
+        if (!opt.getValue().equals("old")) {
+          allow = true;
+        }
+      }
+
+      return CommandGroups.getInstance().getMotion().moveCaretToLineScreenEnd(editor, allow);
     }
 
-    private static class Handler extends MotionEditorActionHandler
-    {
-        public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument)
-        {
-            boolean allow = false;
-            if (CommandState.getInstance(editor).getMode() == CommandState.MODE_INSERT ||
-                CommandState.getInstance(editor).getMode() == CommandState.MODE_REPLACE)
-            {
-                allow = true;
-            }
-            else if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL)
-            {
-                BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
-                if (!opt.getValue().equals("old"))
-                {
-                    allow = true;
-                }
-
-            }
-
-            return CommandGroups.getInstance().getMotion().moveCaretToLineScreenEnd(editor, allow);
-        }
-
-        protected void postMove(Editor editor, DataContext context, Command cmd)
-        {
-            EditorData.setLastColumn(editor, MotionGroup.LAST_COLUMN);
-        }
-    }}
+    protected void postMove(Editor editor, DataContext context, Command cmd) {
+      EditorData.setLastColumn(editor, MotionGroup.LAST_COLUMN);
+    }
+  }
+}

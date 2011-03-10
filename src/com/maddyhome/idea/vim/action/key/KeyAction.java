@@ -21,62 +21,51 @@ package com.maddyhome.idea.vim.action.key;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.ShortcutSet;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.actionSystem.ShortcutSet;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 
+import javax.swing.*;
 import java.awt.event.KeyEvent;
-import javax.swing.KeyStroke;
 
 /**
  */
-public class KeyAction extends AnAction
-{
-    public void actionPerformed(AnActionEvent event)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("actionPerformed=" + event);
-        }
-        if (!VimPlugin.isEnabled())
-        {
-            return;
-        }
-
-        if (event.getInputEvent() instanceof KeyEvent)
-        {
-            KeyEvent ke = (KeyEvent)event.getInputEvent();
-            Editor editor = event.getData(PlatformDataKeys.EDITOR);
-            if (editor != null)
-            {
-                KeyStroke key = KeyStroke.getKeyStrokeForEvent(ke);
-                KeyHandler.getInstance().handleKey(editor, key, event.getDataContext());
-            }
-            else
-            {
-                if (ExEntryPanel.getInstance().isActive())
-                {
-                    KeyEvent e = new KeyEvent(ke.getComponent(), ke.getID(), ke.getWhen(), ke.getModifiers(),
-                        ke.getKeyCode(), ke.getKeyChar(), ke.getKeyLocation());
-                    ExEntryPanel.getInstance().processKey(e);
-                }
-            }
-        }
+public class KeyAction extends AnAction {
+  public void actionPerformed(AnActionEvent event) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("actionPerformed=" + event);
+    }
+    if (!VimPlugin.isEnabled()) {
+      return;
     }
 
-    protected void setShortcutSet(ShortcutSet shortcutSet)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("setShortcutSet=" + shortcutSet);
+    if (event.getInputEvent() instanceof KeyEvent) {
+      KeyEvent ke = (KeyEvent)event.getInputEvent();
+      Editor editor = event.getData(PlatformDataKeys.EDITOR);
+      if (editor != null) {
+        KeyStroke key = KeyStroke.getKeyStrokeForEvent(ke);
+        KeyHandler.getInstance().handleKey(editor, key, event.getDataContext());
+      }
+      else {
+        if (ExEntryPanel.getInstance().isActive()) {
+          KeyEvent e = new KeyEvent(ke.getComponent(), ke.getID(), ke.getWhen(), ke.getModifiers(),
+                                    ke.getKeyCode(), ke.getKeyChar(), ke.getKeyLocation());
+          ExEntryPanel.getInstance().processKey(e);
         }
-        super.setShortcutSet(shortcutSet);
+      }
     }
+  }
 
-    private static Logger logger = Logger.getInstance(KeyAction.class.getName());
+  protected void setShortcutSet(ShortcutSet shortcutSet) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("setShortcutSet=" + shortcutSet);
+    }
+    super.setShortcutSet(shortcutSet);
+  }
+
+  private static Logger logger = Logger.getInstance(KeyAction.class.getName());
 }

@@ -19,52 +19,42 @@ package com.maddyhome.idea.vim.ex.handler;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.ex.CommandHandler;
-import com.maddyhome.idea.vim.ex.CommandName;
-import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.ex.LineRange;
-import com.intellij.openapi.actionSystem.DataContext;
+import com.maddyhome.idea.vim.ex.*;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 
 /**
  *
  */
-public class DumpLineHandler extends CommandHandler
-{
-    public DumpLineHandler()
-    {
-        super(new CommandName[] {
-            new CommandName("dump", "line")
-        }, RANGE_OPTIONAL);
-    }
+public class DumpLineHandler extends CommandHandler {
+  public DumpLineHandler() {
+    super(new CommandName[]{
+      new CommandName("dump", "line")
+    }, RANGE_OPTIONAL);
+  }
 
-    public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException
-    {
-        LineRange range = cmd.getLineRange(editor, context, false);
+  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+    LineRange range = cmd.getLineRange(editor, context, false);
 
-        CharSequence chars = EditorHelper.getDocumentChars(editor);
-        for (int l = range.getStartLine(); l <= range.getEndLine(); l++)
-        {
-            int start = editor.getDocument().getLineStartOffset(l);
-            int end = editor.getDocument().getLineEndOffset(l);
+    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    for (int l = range.getStartLine(); l <= range.getEndLine(); l++) {
+      int start = editor.getDocument().getLineStartOffset(l);
+      int end = editor.getDocument().getLineEndOffset(l);
 
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Line " + l + ", start offset=" + start + ", end offset=" + end);
+      if (logger.isDebugEnabled()) {
+        logger.debug("Line " + l + ", start offset=" + start + ", end offset=" + end);
 
-                for (int i = start; i <= end; i++)
-                {
-                    logger.debug("Offset " + i + ", char=" + chars.charAt(i) + ", lp=" + editor.offsetToLogicalPosition(i) +
-                        ", vp=" + editor.offsetToVisualPosition(i));
-                }
-            }
+        for (int i = start; i <= end; i++) {
+          logger.debug("Offset " + i + ", char=" + chars.charAt(i) + ", lp=" + editor.offsetToLogicalPosition(i) +
+                       ", vp=" + editor.offsetToVisualPosition(i));
         }
-
-        return true;
+      }
     }
 
-    private static Logger logger = Logger.getInstance(DumpLineHandler.class.getName());
+    return true;
+  }
+
+  private static Logger logger = Logger.getInstance(DumpLineHandler.class.getName());
 }

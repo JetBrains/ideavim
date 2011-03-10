@@ -29,19 +29,16 @@ import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
 /**
  *
  */
-public class VisualToggleLineModeAction extends EditorAction
-{
-    public VisualToggleLineModeAction()
-    {
-        super(new Handler());
-    }
+public class VisualToggleLineModeAction extends EditorAction {
+  public VisualToggleLineModeAction() {
+    super(new Handler());
+  }
 
-    private static class Handler extends AbstractEditorActionHandler
-    {
-        protected boolean execute(Editor editor, DataContext context, Command cmd)
-        {
-            return CommandGroups.getInstance().getMotion().toggleVisual(editor, context, cmd.getCount(), cmd.getRawCount(), Command.FLAG_MOT_LINEWISE);
-        }
+  private static class Handler extends AbstractEditorActionHandler {
+    protected boolean execute(Editor editor, DataContext context, Command cmd) {
+      return CommandGroups.getInstance().getMotion()
+        .toggleVisual(editor, context, cmd.getCount(), cmd.getRawCount(), Command.FLAG_MOT_LINEWISE);
     }
+  }
 }
 

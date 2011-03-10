@@ -21,8 +21,8 @@ package com.maddyhome.idea.vim.handler;
 
 import com.intellij.openapi.actionSystem.AnAction;
 
-public interface DelegateActionHandler
-{
-    void setOrigAction(AnAction origAction);
-    AnAction getOrigAction();
+public interface DelegateActionHandler {
+  void setOrigAction(AnAction origAction);
+
+  AnAction getOrigAction();
 }

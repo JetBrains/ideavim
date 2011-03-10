@@ -22,22 +22,19 @@ package com.maddyhome.idea.vim.ex;
 /**
  * Exception class
  */
-public class InvalidCommandException extends ExException
-{
-    /**
-     * Constructs an <code>InvalidCommandException</code> with no specified detail message.
-     */
-    public InvalidCommandException()
-    {
-    }
+public class InvalidCommandException extends ExException {
+  /**
+   * Constructs an <code>InvalidCommandException</code> with no specified detail message.
+   */
+  public InvalidCommandException() {
+  }
 
-    /**
-     * Constructs an <code>InvalidCommandException</code> with the specified detail message.
-     *
-     * @param   s   the detail message.
-     */
-    public InvalidCommandException(String s)
-    {
-        super(s);
-    }
+  /**
+   * Constructs an <code>InvalidCommandException</code> with the specified detail message.
+   *
+   * @param s the detail message.
+   */
+  public InvalidCommandException(String s) {
+    super(s);
+  }
 }

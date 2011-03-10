@@ -19,89 +19,83 @@ package com.maddyhome.idea.vim.common;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-public abstract class FileLocation
-{
-    protected FileLocation(int lline, int col, String filename)
-    {
-        this.line = lline;
-        this.col = col;
-        this.filename = filename;
-    }
+public abstract class FileLocation {
+  protected FileLocation(int lline, int col, String filename) {
+    this.line = lline;
+    this.col = col;
+    this.filename = filename;
+  }
 
-    /**
-     * Clears the mark indicating that it is no longer a valid mark
-     */
-    public void clear()
-    {
-        line = -1;
-        col = -1;
-        filename = null;
-    }
+  /**
+   * Clears the mark indicating that it is no longer a valid mark
+   */
+  public void clear() {
+    line = -1;
+    col = -1;
+    filename = null;
+  }
 
-    /**
-     * Checks to see if the mark has been invalidated
-     * @return true is invalid or clear, false if not
-     */
-    public boolean isClear()
-    {
-        return (line == -1 && col == -1);
-    }
+  /**
+   * Checks to see if the mark has been invalidated
+   *
+   * @return true is invalid or clear, false if not
+   */
+  public boolean isClear() {
+    return (line == -1 && col == -1);
+  }
 
-    /**
-     * The mark's line
-     * @return The mark's line
-     */
-    public int getLogicalLine()
-    {
-        return line;
-    }
+  /**
+   * The mark's line
+   *
+   * @return The mark's line
+   */
+  public int getLogicalLine() {
+    return line;
+  }
 
-    /**
-     * Updates the mark's lline
-     * @param lline The new lline for the mark
-     */
-    public void setLogicalLine(int lline)
-    {
-        this.line = lline;
-    }
+  /**
+   * Updates the mark's lline
+   *
+   * @param lline The new lline for the mark
+   */
+  public void setLogicalLine(int lline) {
+    this.line = lline;
+  }
 
-    /**
-     * The mark's column
-     * @return The mark's columnn
-     */
-    public int getCol()
-    {
-        return col;
-    }
+  /**
+   * The mark's column
+   *
+   * @return The mark's columnn
+   */
+  public int getCol() {
+    return col;
+  }
 
-    /**
-     * Gets the filename the mark is associate with
-     * @return The mark's filename
-     */
-    public String getFilename()
-    {
-        if (filename != null)
-        {
-            return filename;
-        }
-        else
-        {
-            return null;
-        }
+  /**
+   * Gets the filename the mark is associate with
+   *
+   * @return The mark's filename
+   */
+  public String getFilename() {
+    if (filename != null) {
+      return filename;
     }
-
-    public String toString()
-    {
-        final StringBuffer sb = new StringBuffer();
-        sb.append("FileLocation");
-        sb.append("{col=").append(col);
-        sb.append(", line=").append(line);
-        sb.append(", filename='").append(filename).append('\'');
-        sb.append('}');
-        return sb.toString();
+    else {
+      return null;
     }
+  }
 
-    private int line;
-    private int col;
-    private String filename;
+  public String toString() {
+    final StringBuffer sb = new StringBuffer();
+    sb.append("FileLocation");
+    sb.append("{col=").append(col);
+    sb.append(", line=").append(line);
+    sb.append(", filename='").append(filename).append('\'');
+    sb.append('}');
+    return sb.toString();
+  }
+
+  private int line;
+  private int col;
+  private String filename;
 }

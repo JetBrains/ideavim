@@ -26,182 +26,177 @@ import org.jdom.Element;
  * This singleton maintains the instances of all the key groups. All the key/action mappings get created the first
  * this singleton is accessed.
  */
-public class CommandGroups
-{
-    /**
-     * Gets the singleton instance
-     * @return The singleton instance
-     */
-    public static CommandGroups getInstance()
-    {
-        if (instance == null)
-        {
-            instance = new CommandGroups();
-        }
-
-        return instance;
+public class CommandGroups {
+  /**
+   * Gets the singleton instance
+   *
+   * @return The singleton instance
+   */
+  public static CommandGroups getInstance() {
+    if (instance == null) {
+      instance = new CommandGroups();
     }
 
-    /**
-     * Creates all the groups
-     */
-    private CommandGroups()
-    {
-        motion = new MotionGroup();
-        change = new ChangeGroup();
-        copy = new CopyGroup();
-        mark = new MarkGroup();
-        register = new RegisterGroup();
-        file = new FileGroup();
-        search = new SearchGroup();
-        process = new ProcessGroup();
-        macro = new MacroGroup();
-        digraph = new DigraphGroup();
-        history = new HistoryGroup();
-    }
+    return instance;
+  }
 
-    /**
-     * Returns the motion group
-     * @return The motion group
-     */
-    public MotionGroup getMotion()
-    {
-        return motion;
-    }
+  /**
+   * Creates all the groups
+   */
+  private CommandGroups() {
+    motion = new MotionGroup();
+    change = new ChangeGroup();
+    copy = new CopyGroup();
+    mark = new MarkGroup();
+    register = new RegisterGroup();
+    file = new FileGroup();
+    search = new SearchGroup();
+    process = new ProcessGroup();
+    macro = new MacroGroup();
+    digraph = new DigraphGroup();
+    history = new HistoryGroup();
+  }
 
-    /**
-     * Returns the change group
-     * @return The change group
-     */
-    public ChangeGroup getChange()
-    {
-        return change;
-    }
+  /**
+   * Returns the motion group
+   *
+   * @return The motion group
+   */
+  public MotionGroup getMotion() {
+    return motion;
+  }
 
-    /**
-     * Returns the copy group
-     * @return The copy group
-     */
-    public CopyGroup getCopy()
-    {
-        return copy;
-    }
+  /**
+   * Returns the change group
+   *
+   * @return The change group
+   */
+  public ChangeGroup getChange() {
+    return change;
+  }
 
-    /**
-     * Returns the mark group
-     * @return The mark group
-     */
-    public MarkGroup getMark()
-    {
-        return mark;
-    }
+  /**
+   * Returns the copy group
+   *
+   * @return The copy group
+   */
+  public CopyGroup getCopy() {
+    return copy;
+  }
 
-    /**
-     * Returns the register group
-     * @return The register group
-     */
-    public RegisterGroup getRegister()
-    {
-        return register;
-    }
+  /**
+   * Returns the mark group
+   *
+   * @return The mark group
+   */
+  public MarkGroup getMark() {
+    return mark;
+  }
 
-    /**
-     * Returns the file group
-     * @return The file group
-     */
-    public FileGroup getFile()
-    {
-        return file;
-    }
+  /**
+   * Returns the register group
+   *
+   * @return The register group
+   */
+  public RegisterGroup getRegister() {
+    return register;
+  }
 
-    /**
-     * Returns the search group
-     * @return The search group
-     */
-    public SearchGroup getSearch()
-    {
-        return search;
-    }
+  /**
+   * Returns the file group
+   *
+   * @return The file group
+   */
+  public FileGroup getFile() {
+    return file;
+  }
 
-    /**
-     * Returns the process group
-     * @return The process group
-     */
-    public ProcessGroup getProcess()
-    {
-        return process;
-    }
+  /**
+   * Returns the search group
+   *
+   * @return The search group
+   */
+  public SearchGroup getSearch() {
+    return search;
+  }
 
-    /**
-     * Returns the macro group
-     * @return The macro group
-     */
-    public MacroGroup getMacro()
-    {
-        return macro;
-    }
+  /**
+   * Returns the process group
+   *
+   * @return The process group
+   */
+  public ProcessGroup getProcess() {
+    return process;
+  }
 
-    public DigraphGroup getDigraph()
-    {
-        return digraph;
-    }
+  /**
+   * Returns the macro group
+   *
+   * @return The macro group
+   */
+  public MacroGroup getMacro() {
+    return macro;
+  }
 
-    public HistoryGroup getHistory()
-    {
-        return history;
-    }
+  public DigraphGroup getDigraph() {
+    return digraph;
+  }
 
-    /**
-     * Tells each group to save its data.
-     * @param element The plugin's root element
-     */
-    public void saveData(Element element)
-    {
-        motion.saveData(element);
-        change.saveData(element);
-        copy.saveData(element);
-        mark.saveData(element);
-        register.saveData(element);
-        file.saveData(element);
-        search.saveData(element);
-        process.saveData(element);
-        macro.saveData(element);
-        digraph.saveData(element);
-        history.saveData(element);
-    }
+  public HistoryGroup getHistory() {
+    return history;
+  }
 
-    /**
-     * Tells each group to read its data.
-     * @param element The plugin's root element
-     */
-    public void readData(Element element)
-    {
-        logger.debug("readData");
-        motion.readData(element);
-        change.readData(element);
-        copy.readData(element);
-        mark.readData(element);
-        register.readData(element);
-        file.readData(element);
-        search.readData(element);
-        process.readData(element);
-        macro.readData(element);
-        digraph.readData(element);
-        history.readData(element);
-    }
+  /**
+   * Tells each group to save its data.
+   *
+   * @param element The plugin's root element
+   */
+  public void saveData(Element element) {
+    motion.saveData(element);
+    change.saveData(element);
+    copy.saveData(element);
+    mark.saveData(element);
+    register.saveData(element);
+    file.saveData(element);
+    search.saveData(element);
+    process.saveData(element);
+    macro.saveData(element);
+    digraph.saveData(element);
+    history.saveData(element);
+  }
 
-    private static CommandGroups instance;
-    private MotionGroup motion;
-    private ChangeGroup change;
-    private CopyGroup copy;
-    private MarkGroup mark;
-    private RegisterGroup register;
-    private FileGroup file;
-    private SearchGroup search;
-    private ProcessGroup process;
-    private MacroGroup macro;
-    private DigraphGroup digraph;
-    private HistoryGroup history;
+  /**
+   * Tells each group to read its data.
+   *
+   * @param element The plugin's root element
+   */
+  public void readData(Element element) {
+    logger.debug("readData");
+    motion.readData(element);
+    change.readData(element);
+    copy.readData(element);
+    mark.readData(element);
+    register.readData(element);
+    file.readData(element);
+    search.readData(element);
+    process.readData(element);
+    macro.readData(element);
+    digraph.readData(element);
+    history.readData(element);
+  }
 
-    private static Logger logger = Logger.getInstance(CommandGroups.class.getName());
+  private static CommandGroups instance;
+  private MotionGroup motion;
+  private ChangeGroup change;
+  private CopyGroup copy;
+  private MarkGroup mark;
+  private RegisterGroup register;
+  private FileGroup file;
+  private SearchGroup search;
+  private ProcessGroup process;
+  private MacroGroup macro;
+  private DigraphGroup digraph;
+  private HistoryGroup history;
+
+  private static Logger logger = Logger.getInstance(CommandGroups.class.getName());
 }

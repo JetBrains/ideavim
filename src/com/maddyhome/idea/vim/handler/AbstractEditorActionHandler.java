@@ -30,32 +30,27 @@ import com.maddyhome.idea.vim.command.CommandState;
 
 /**
  */
-public abstract class AbstractEditorActionHandler extends EditorActionHandler
-{
-    public final void execute(Editor editor, DataContext context)
-    {
-        logger.debug("execute");
-        if ((editor == null || !VimPlugin.isEnabled()) && this instanceof DelegateActionHandler)
-        {
-            KeyHandler.executeAction(((DelegateActionHandler)this).getOrigAction(), context);
+public abstract class AbstractEditorActionHandler extends EditorActionHandler {
+  public final void execute(Editor editor, DataContext context) {
+    logger.debug("execute");
+    if ((editor == null || !VimPlugin.isEnabled()) && this instanceof DelegateActionHandler) {
+      KeyHandler.executeAction(((DelegateActionHandler)this).getOrigAction(), context);
 
-            return;
-        }
-
-        CommandState state = CommandState.getInstance(editor);
-        Command cmd = state.getCommand();
-        if (!execute(editor, context, cmd))
-        {
-            VimPlugin.indicateError();
-        }
+      return;
     }
 
-    public void process(Command cmd)
-    {
-        // No-op
+    CommandState state = CommandState.getInstance(editor);
+    Command cmd = state.getCommand();
+    if (!execute(editor, context, cmd)) {
+      VimPlugin.indicateError();
     }
+  }
 
-    protected abstract boolean execute(Editor editor, DataContext context, Command cmd);
+  public void process(Command cmd) {
+    // No-op
+  }
 
-    private static Logger logger = Logger.getInstance(AbstractEditorActionHandler.class.getName());
+  protected abstract boolean execute(Editor editor, DataContext context, Command cmd);
+
+  private static Logger logger = Logger.getInstance(AbstractEditorActionHandler.class.getName());
 }

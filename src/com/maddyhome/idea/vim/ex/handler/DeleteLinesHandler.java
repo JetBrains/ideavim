@@ -19,6 +19,7 @@ package com.maddyhome.idea.vim.ex.handler;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -27,33 +28,28 @@ import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.RegisterGroup;
-import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  *
  */
-public class DeleteLinesHandler extends CommandHandler
-{
-    public DeleteLinesHandler()
-    {
-        super("d", "elete", RANGE_OPTIONAL | ARGUMENT_OPTIONAL | WRITABLE);
+public class DeleteLinesHandler extends CommandHandler {
+  public DeleteLinesHandler() {
+    super("d", "elete", RANGE_OPTIONAL | ARGUMENT_OPTIONAL | WRITABLE);
+  }
+
+  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+    StringBuffer arg = new StringBuffer(cmd.getArgument());
+    char register = RegisterGroup.REGISTER_DEFAULT;
+    if (arg.length() > 0 && (arg.charAt(0) < '0' || arg.charAt(0) > '9')) {
+      register = arg.charAt(0);
+      arg.deleteCharAt(0);
+      cmd.setArgument(arg.toString());
     }
 
-    public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException
-    {
-        StringBuffer arg = new StringBuffer(cmd.getArgument());
-        char register = RegisterGroup.REGISTER_DEFAULT;
-        if (arg.length() > 0 && (arg.charAt(0) < '0' || arg.charAt(0) > '9'))
-        {
-            register = arg.charAt(0);
-            arg.deleteCharAt(0);
-            cmd.setArgument(arg.toString());
-        }
+    CommandGroups.getInstance().getRegister().selectRegister(register);
 
-        CommandGroups.getInstance().getRegister().selectRegister(register);
+    TextRange range = cmd.getTextRange(editor, context, true);
 
-        TextRange range = cmd.getTextRange(editor, context, true);
-
-        return CommandGroups.getInstance().getChange().deleteRange(editor, context, range, Command.FLAG_MOT_LINEWISE, false);
-    }
+    return CommandGroups.getInstance().getChange().deleteRange(editor, context, range, Command.FLAG_MOT_LINEWISE, false);
+  }
 }

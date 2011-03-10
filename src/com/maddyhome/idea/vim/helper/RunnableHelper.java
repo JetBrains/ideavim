@@ -28,51 +28,43 @@ import com.maddyhome.idea.vim.KeyHandler;
 /**
  * This provides some helper methods to run code as a command and an application write action
  */
-public class RunnableHelper
-{
-    public static void runReadCommand(Project project, Runnable cmd, String name, Object groupId)
-    {
-        if (logger.isDebugEnabled()) logger.debug("read command " + cmd);
-        CommandProcessor.getInstance().executeCommand(project, new ReadAction(cmd), name, groupId);
+public class RunnableHelper {
+  public static void runReadCommand(Project project, Runnable cmd, String name, Object groupId) {
+    if (logger.isDebugEnabled()) logger.debug("read command " + cmd);
+    CommandProcessor.getInstance().executeCommand(project, new ReadAction(cmd), name, groupId);
+  }
+
+  public static void runWriteCommand(Project project, Runnable cmd, String name, Object groupId) {
+    if (logger.isDebugEnabled()) logger.debug("write command " + cmd);
+    CommandProcessor.getInstance().executeCommand(project, new WriteAction(cmd), name, groupId);
+  }
+
+  static class ReadAction implements Runnable {
+    ReadAction(Runnable cmd) {
+      this.cmd = cmd;
     }
 
-    public static void runWriteCommand(Project project, Runnable cmd, String name, Object groupId)
-    {
-        if (logger.isDebugEnabled()) logger.debug("write command " + cmd);
-        CommandProcessor.getInstance().executeCommand(project, new WriteAction(cmd), name, groupId);
+    public void run() {
+      ApplicationManager.getApplication().runReadAction(cmd);
     }
 
-    static class ReadAction implements Runnable
-    {
-        ReadAction(Runnable cmd)
-        {
-            this.cmd = cmd;
-        }
+    Runnable cmd;
+  }
 
-        public void run()
-        {
-            ApplicationManager.getApplication().runReadAction(cmd);
-        }
-
-        Runnable cmd;
+  static class WriteAction implements Runnable {
+    WriteAction(Runnable cmd) {
+      this.cmd = cmd;
     }
 
-    static class WriteAction implements Runnable
-    {
-        WriteAction(Runnable cmd)
-        {
-            this.cmd = cmd;
-        }
-
-        public void run()
-        {
-            ApplicationManager.getApplication().runWriteAction(cmd);
-        }
-
-        Runnable cmd;
+    public void run() {
+      ApplicationManager.getApplication().runWriteAction(cmd);
     }
 
-    private RunnableHelper() {}
+    Runnable cmd;
+  }
 
-    private static Logger logger = Logger.getInstance(KeyHandler.class.getName());
+  private RunnableHelper() {
+  }
+
+  private static Logger logger = Logger.getInstance(KeyHandler.class.getName());
 }

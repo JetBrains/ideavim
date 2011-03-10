@@ -25,49 +25,39 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.intellij.openapi.actionSystem.DataContext;
 
+import javax.swing.*;
 import java.awt.event.KeyEvent;
-import javax.swing.KeyStroke;
 
-public class PassThruDelegateAction extends AbstractDelegateAction
-{
-    public PassThruDelegateAction(KeyStroke stroke)
-    {
-        this.stroke = stroke;
+public class PassThruDelegateAction extends AbstractDelegateAction {
+  public PassThruDelegateAction(KeyStroke stroke) {
+    this.stroke = stroke;
+  }
+
+  public void actionPerformed(AnActionEvent event) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("actionPerformed key=" + stroke);
     }
-
-    public void actionPerformed(AnActionEvent event)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("actionPerformed key=" + stroke);
-        }
-        final Editor editor = event.getData(PlatformDataKeys.EDITOR); // API change - don't merge
-        if (editor == null || !VimPlugin.isEnabled())
-        {
-            getOrigAction().actionPerformed(event);
-        }
-        else if (event.getInputEvent() instanceof KeyEvent)
-        {
-            KeyStroke key = KeyStroke.getKeyStrokeForEvent((KeyEvent)event.getInputEvent());
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("event = KeyEvent: " + key);
-            }
-            KeyHandler.getInstance().handleKey(editor, key, event.getDataContext());
-        }
-        else
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("event is a " + event.getInputEvent().getClass().getName());
-            }
-            KeyHandler.getInstance().handleKey(editor, stroke, event.getDataContext());
-        }
+    final Editor editor = event.getData(PlatformDataKeys.EDITOR); // API change - don't merge
+    if (editor == null || !VimPlugin.isEnabled()) {
+      getOrigAction().actionPerformed(event);
     }
+    else if (event.getInputEvent() instanceof KeyEvent) {
+      KeyStroke key = KeyStroke.getKeyStrokeForEvent((KeyEvent)event.getInputEvent());
+      if (logger.isDebugEnabled()) {
+        logger.debug("event = KeyEvent: " + key);
+      }
+      KeyHandler.getInstance().handleKey(editor, key, event.getDataContext());
+    }
+    else {
+      if (logger.isDebugEnabled()) {
+        logger.debug("event is a " + event.getInputEvent().getClass().getName());
+      }
+      KeyHandler.getInstance().handleKey(editor, stroke, event.getDataContext());
+    }
+  }
 
-    private KeyStroke stroke;
+  private KeyStroke stroke;
 
-    private static Logger logger = Logger.getInstance(PassThruDelegateAction.class.getName());
+  private static Logger logger = Logger.getInstance(PassThruDelegateAction.class.getName());
 }

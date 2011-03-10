@@ -19,13 +19,13 @@ package com.maddyhome.idea.vim.ex.handler;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.CommandGroups;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
@@ -33,30 +33,25 @@ import com.maddyhome.idea.vim.helper.Msg;
 /**
  *
  */
-public class MarkHandler extends CommandHandler
-{
-    public MarkHandler()
-    {
-        super(new CommandName[] {
-            new CommandName("ma", "rk"),
-            new CommandName("k", "")
-        }, RANGE_OPTIONAL | ARGUMENT_REQUIRED);
-    }
+public class MarkHandler extends CommandHandler {
+  public MarkHandler() {
+    super(new CommandName[]{
+      new CommandName("ma", "rk"),
+      new CommandName("k", "")
+    }, RANGE_OPTIONAL | ARGUMENT_REQUIRED);
+  }
 
-    public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException
-    {
-        char mark = cmd.getArgument().charAt(0);
-        int line = cmd.getLine(editor, context);
-        int offset = EditorHelper.getLineStartOffset(editor, line);
+  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+    char mark = cmd.getArgument().charAt(0);
+    int line = cmd.getLine(editor, context);
+    int offset = EditorHelper.getLineStartOffset(editor, line);
 
-        if (Character.isLetter(mark) || "'`".indexOf(mark) != -1)
-        {
-            return CommandGroups.getInstance().getMark().setMark(editor, context, mark, offset);
-        }
-        else
-        {
-            MessageHelper.EMSG(Msg.E191);
-            return false;
-        }
+    if (Character.isLetter(mark) || "'`".indexOf(mark) != -1) {
+      return CommandGroups.getInstance().getMark().setMark(editor, context, mark, offset);
     }
+    else {
+      MessageHelper.EMSG(Msg.E191);
+      return false;
+    }
+  }
 }

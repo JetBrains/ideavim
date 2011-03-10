@@ -19,6 +19,7 @@ package com.maddyhome.idea.vim.ex.handler;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.common.Jump;
@@ -27,7 +28,6 @@ import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.CommandGroups;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
@@ -38,69 +38,60 @@ import java.util.List;
 /**
  *
  */
-public class JumpsHandler extends CommandHandler
-{
-    public JumpsHandler()
-    {
-        super(new CommandName[] {
-            new CommandName("ju", "mps")
-        }, ARGUMENT_FORBIDDEN | KEEP_FOCUS);
+public class JumpsHandler extends CommandHandler {
+  public JumpsHandler() {
+    super(new CommandName[]{
+      new CommandName("ju", "mps")
+    }, ARGUMENT_FORBIDDEN | KEEP_FOCUS);
+  }
+
+  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+    List<Jump> jumps = CommandGroups.getInstance().getMark().getJumps();
+    int spot = CommandGroups.getInstance().getMark().getJumpSpot();
+
+    String spaces = "     ";
+    StringBuffer text = new StringBuffer();
+    text.append("  jump line  col file/text\n");
+    int i = jumps.size();
+    for (Jump jump : jumps) {
+      if (i - spot - 1 == 0) {
+        text.append("> ");
+      }
+      else {
+        text.append("  ");
+      }
+      text.append(StringHelper.pad(Integer.toString(Math.abs(i - spot - 1)), 3, ' '));
+
+      text.append(" ");
+      String num = Integer.toString(jump.getLogicalLine() + 1);
+      text.append(spaces.substring(0, 5 - num.length()));
+      text.append(num);
+
+      text.append("  ");
+      num = Integer.toString(jump.getCol() + 1);
+      text.append(spaces.substring(0, 3 - num.length()));
+      text.append(num);
+
+      text.append(" ");
+      VirtualFile vf = EditorData.getVirtualFile(editor);
+      if (vf != null && vf.getPath().equals(jump.getFilename())) {
+        text.append(StringHelper.escape(EditorHelper.getLineText(editor, jump.getLogicalLine()).trim()));
+      }
+      else {
+        text.append(jump.getFilename());
+      }
+
+      text.append("\n");
+      i--;
     }
 
-    public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException
-    {
-        List<Jump> jumps = CommandGroups.getInstance().getMark().getJumps();
-        int spot = CommandGroups.getInstance().getMark().getJumpSpot();
-
-        String spaces = "     ";
-        StringBuffer text = new StringBuffer();
-        text.append("  jump line  col file/text\n");
-        int i = jumps.size();
-        for (Jump jump : jumps)
-        {
-            if (i - spot - 1 == 0)
-            {
-                text.append("> ");
-            }
-            else
-            {
-                text.append("  ");
-            }
-            text.append(StringHelper.pad(Integer.toString(Math.abs(i - spot - 1)), 3, ' '));
-
-            text.append(" ");
-            String num = Integer.toString(jump.getLogicalLine() + 1);
-            text.append(spaces.substring(0, 5 - num.length()));
-            text.append(num);
-
-            text.append("  ");
-            num = Integer.toString(jump.getCol() + 1);
-            text.append(spaces.substring(0, 3 - num.length()));
-            text.append(num);
-
-            text.append(" ");
-            VirtualFile vf = EditorData.getVirtualFile(editor);
-            if (vf != null && vf.getPath().equals(jump.getFilename()))
-            {
-                text.append(StringHelper.escape(EditorHelper.getLineText(editor, jump.getLogicalLine()).trim()));
-            }
-            else
-            {
-                text.append(jump.getFilename());
-            }
-
-            text.append("\n");
-            i--;
-        }
-
-        if (spot == -1)
-        {
-            text.append(">\n");
-        }
-
-        MorePanel panel = MorePanel.getInstance(editor);
-        panel.setText(text.toString());
-
-        return true;
+    if (spot == -1) {
+      text.append(">\n");
     }
+
+    MorePanel panel = MorePanel.getInstance(editor);
+    panel.setText(text.toString());
+
+    return true;
+  }
 }

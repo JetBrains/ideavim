@@ -24,71 +24,60 @@ import com.intellij.openapi.command.CommandEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.common.TextRange;
 
-public class DelegateCommandListener extends CommandAdapter
-{
-    public static DelegateCommandListener getInstance()
-    {
-        return instance;
+public class DelegateCommandListener extends CommandAdapter {
+  public static DelegateCommandListener getInstance() {
+    return instance;
+  }
+
+  public void setRunnable(StartFinishRunnable runnable) {
+    this.runnable = runnable;
+    inCommand = false;
+  }
+
+  public StartFinishRunnable getRunnable() {
+    return runnable;
+  }
+
+  public void commandStarted(CommandEvent event) {
+    inCommand = true;
+    if (logger.isDebugEnabled()) {
+      logger.debug("Command started: " + event);
+      logger.debug("Name: " + event.getCommandName());
+      logger.debug("Group: " + event.getCommandGroupId());
     }
 
-    public void setRunnable(StartFinishRunnable runnable)
-    {
-        this.runnable = runnable;
-        inCommand = false;
+    if (runnable != null) {
+      runnable.start();
+    }
+  }
+
+  public void commandFinished(CommandEvent event) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Command finished: " + event);
+      logger.debug("Name: " + event.getCommandName());
+      logger.debug("Group: " + event.getCommandGroupId());
     }
 
-    public StartFinishRunnable getRunnable()
-    {
-        return runnable;
+    if (runnable != null && inCommand) {
+      runnable.finish();
+      runnable = null;
     }
 
-    public void commandStarted(CommandEvent event)
-    {
-        inCommand = true;
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Command started: " + event);
-            logger.debug("Name: " + event.getCommandName());
-            logger.debug("Group: " + event.getCommandGroupId());
-        }
+    inCommand = false;
+  }
 
-        if (runnable != null)
-        {
-            runnable.start();
-        }
-    }
+  private DelegateCommandListener() {
+  }
 
-    public void commandFinished(CommandEvent event)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Command finished: " + event);
-            logger.debug("Name: " + event.getCommandName());
-            logger.debug("Group: " + event.getCommandGroupId());
-        }
+  public static interface StartFinishRunnable {
+    TextRange start();
 
-        if (runnable != null && inCommand)
-        {
-            runnable.finish();
-            runnable = null;
-        }
+    void finish();
+  }
 
-        inCommand = false;
-    }
+  private boolean inCommand = false;
+  private StartFinishRunnable runnable;
 
-    private DelegateCommandListener()
-    {
-    }
-
-    public static interface StartFinishRunnable
-    {
-        TextRange start();
-        void finish();
-    }
-
-    private boolean inCommand = false;
-    private StartFinishRunnable runnable;
-
-    private static Logger logger = Logger.getInstance(DelegateCommandListener.class.getName());
-    private static DelegateCommandListener instance = new DelegateCommandListener();
+  private static Logger logger = Logger.getInstance(DelegateCommandListener.class.getName());
+  private static DelegateCommandListener instance = new DelegateCommandListener();
 }

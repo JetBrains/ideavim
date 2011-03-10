@@ -19,44 +19,36 @@ package com.maddyhome.idea.vim.ex.handler;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.ex.CommandHandler;
-import com.maddyhome.idea.vim.ex.CommandName;
-import com.maddyhome.idea.vim.ex.CommandParser;
-import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.ex.ParseResult;
+import com.maddyhome.idea.vim.ex.*;
 import com.maddyhome.idea.vim.group.CommandGroups;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 
 /**
  *
  */
-public class CopyTextHandler extends CommandHandler
-{
-    public CopyTextHandler()
-    {
-        super(new CommandName[] {
-            new CommandName("co", "py"),
-            new CommandName("t", "")
-        }, RANGE_OPTIONAL | ARGUMENT_REQUIRED | WRITABLE);
-    }
+public class CopyTextHandler extends CommandHandler {
+  public CopyTextHandler() {
+    super(new CommandName[]{
+      new CommandName("co", "py"),
+      new CommandName("t", "")
+    }, RANGE_OPTIONAL | ARGUMENT_REQUIRED | WRITABLE);
+  }
 
-    public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException
-    {
-        TextRange range = cmd.getTextRange(editor, context, false);
+  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+    TextRange range = cmd.getTextRange(editor, context, false);
 
-        ParseResult pr = CommandParser.getInstance().parse(cmd.getArgument());
-        int line = pr.getRanges().getFirstLine(editor, context);
-        int offset = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor, line + 1);
+    ParseResult pr = CommandParser.getInstance().parse(cmd.getArgument());
+    int line = pr.getRanges().getFirstLine(editor, context);
+    int offset = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor, line + 1);
 
-        String text = EditorHelper.getText(editor, range.getStartOffset(), range.getEndOffset());
-        CommandGroups.getInstance().getCopy().putText(editor, context, offset, text, Command.FLAG_MOT_LINEWISE, 1, true,
-            false, 0);
+    String text = EditorHelper.getText(editor, range.getStartOffset(), range.getEndOffset());
+    CommandGroups.getInstance().getCopy().putText(editor, context, offset, text, Command.FLAG_MOT_LINEWISE, 1, true,
+                                                  false, 0);
 
-        return true;
-    }
+    return true;
+  }
 }

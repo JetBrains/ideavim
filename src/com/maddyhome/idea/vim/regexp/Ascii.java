@@ -19,12 +19,11 @@ package com.maddyhome.idea.vim.regexp;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-public interface Ascii
-{
-    char BS = 010;
-    char TAB = 011;
-    char NL = 012;
-    char CR = 015;
-    char ESC = 033;
-    char Ctrl_H = 8;
+public interface Ascii {
+  char BS = 010;
+  char TAB = 011;
+  char NL = 012;
+  char CR = 015;
+  char ESC = 033;
+  char Ctrl_H = 8;
 }

@@ -24,26 +24,22 @@ import javax.swing.*;
 /**
  *
  */
-public class VimToolWindow extends JPanel
-{
-    public static VimToolWindow getInstance()
-    {
-        if (instance == null)
-        {
-            instance = new VimToolWindow();
-        }
-
-        return instance;
+public class VimToolWindow extends JPanel {
+  public static VimToolWindow getInstance() {
+    if (instance == null) {
+      instance = new VimToolWindow();
     }
 
-    /**
-     */
-    private VimToolWindow()
-    {
-        add(new JLabel("Resize so just the window title is visible"));
+    return instance;
+  }
 
-        setSize(0,0);
-    }
+  /**
+   */
+  private VimToolWindow() {
+    add(new JLabel("Resize so just the window title is visible"));
 
-    private static VimToolWindow instance;
+    setSize(0, 0);
+  }
+
+  private static VimToolWindow instance;
 }

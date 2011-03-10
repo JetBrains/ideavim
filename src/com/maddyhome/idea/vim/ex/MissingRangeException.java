@@ -22,22 +22,19 @@ package com.maddyhome.idea.vim.ex;
 /**
  * Exception class
  */
-public class MissingRangeException extends ExException
-{
-    /**
-     * Constructs an <code>InvalidArgumentException</code> with no specified detail message.
-     */
-    public MissingRangeException()
-    {
-    }
+public class MissingRangeException extends ExException {
+  /**
+   * Constructs an <code>InvalidArgumentException</code> with no specified detail message.
+   */
+  public MissingRangeException() {
+  }
 
-    /**
-     * Constructs an <code>InvalidArgumentException</code> with the specified detail message.
-     *
-     * @param   s   the detail message.
-     */
-    public MissingRangeException(String s)
-    {
-        super(s);
-    }
+  /**
+   * Constructs an <code>InvalidArgumentException</code> with the specified detail message.
+   *
+   * @param s the detail message.
+   */
+  public MissingRangeException(String s) {
+    super(s);
+  }
 }

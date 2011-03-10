@@ -27,92 +27,88 @@ import java.util.List;
  * Represents an VIM options that can be set with the :set command. Listeners can be set that are interested in knowing
  * when the value of the option changes.
  */
-public abstract class Option
-{
-    /**
-     * Create the option
-     * @param name The name of the option
-     * @param abbrev The short name
-     */
-    protected Option(String name, String abbrev)
-    {
-        this.name = name;
-        this.abbrev = abbrev;
+public abstract class Option {
+  /**
+   * Create the option
+   *
+   * @param name   The name of the option
+   * @param abbrev The short name
+   */
+  protected Option(String name, String abbrev) {
+    this.name = name;
+    this.abbrev = abbrev;
+  }
+
+  /**
+   * Registers an option change listener. The listener will receive an OptionChangeEvent whenever the value of this
+   * option changes.
+   *
+   * @param listener The listener
+   */
+  public void addOptionChangeListener(OptionChangeListener listener) {
+    listeners.add(listener);
+  }
+
+  /**
+   * Removes the listener from the list.
+   *
+   * @param listener The listener
+   */
+  public void removeOptionChangeListener(OptionChangeListener listener) {
+    listeners.remove(listener);
+  }
+
+  /**
+   * The name of the option
+   *
+   * @return The option's name
+   */
+  public String getName() {
+    return name;
+  }
+
+  /**
+   * The short name of the option
+   *
+   * @return The option's short name
+   */
+  public String getAbbreviation() {
+    return abbrev;
+  }
+
+  /**
+   * Checks to see if the option's current value equals the default value
+   *
+   * @return True if equal to default, false if not.
+   */
+  public abstract boolean isDefault();
+
+  /**
+   * Sets the option to its default value.
+   */
+  public abstract void resetDefault();
+
+  /**
+   * Lets all listeners know that the value has changed. Subclasses are responsible for calling this when their
+   * value changes.
+   */
+  protected void fireOptionChangeEvent() {
+    OptionChangeEvent event = new OptionChangeEvent(this);
+    for (OptionChangeListener listener : listeners) {
+      listener.valueChange(event);
     }
+  }
 
-    /**
-     * Registers an option change listener. The listener will receive an OptionChangeEvent whenever the value of this
-     * option changes.
-     * @param listener The listener
-     */
-    public void addOptionChangeListener(OptionChangeListener listener)
-    {
-        listeners.add(listener);
+  /**
+   * Helper method used to sort lists of options by their name
+   */
+  static class NameSorter<V> implements Comparator<V> {
+    public int compare(V o1, V o2) {
+      return ((Option)o1).name.compareTo(((Option)o2).name);
     }
+  }
 
-    /**
-     * Removes the listener from the list.
-     * @param listener The listener
-     */
-    public void removeOptionChangeListener(OptionChangeListener listener)
-    {
-        listeners.remove(listener);
-    }
-
-    /**
-     * The name of the option
-     * @return The option's name
-     */
-    public String getName()
-    {
-        return name;
-    }
-
-    /**
-     * The short name of the option
-     * @return The option's short name
-     */
-    public String getAbbreviation()
-    {
-        return abbrev;
-    }
-
-    /**
-     * Checks to see if the option's current value equals the default value
-     * @return True if equal to default, false if not.
-     */
-    public abstract boolean isDefault();
-
-    /**
-     * Sets the option to its default value.
-     */
-    public abstract void resetDefault();
-
-    /**
-     * Lets all listeners know that the value has changed. Subclasses are responsible for calling this when their
-     * value changes.
-     */
-    protected void fireOptionChangeEvent()
-    {
-        OptionChangeEvent event = new OptionChangeEvent(this);
-        for (OptionChangeListener listener : listeners)
-        {
-            listener.valueChange(event);
-        }
-    }
-
-    /**
-     * Helper method used to sort lists of options by their name
-     */
-    static class NameSorter<V> implements Comparator<V>
-    {
-        public int compare(V o1, V o2)
-        {
-            return ((Option)o1).name.compareTo(((Option)o2).name);
-        }
-    }
-
-    protected String name;
-    protected String abbrev;
-    protected List<OptionChangeListener> listeners = new ArrayList<OptionChangeListener>();
+  protected String name;
+  protected String abbrev;
+  protected List<OptionChangeListener> listeners = new ArrayList<OptionChangeListener>();
 }

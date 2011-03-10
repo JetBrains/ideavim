@@ -25,10 +25,8 @@ import com.maddyhome.idea.vim.handler.key.DummyEditorHandler;
 /**
  *
  */
-public class UpAction extends EditorAction
-{
-    public UpAction()
-    {
-        super(new DummyEditorHandler());
-    }
+public class UpAction extends EditorAction {
+  public UpAction() {
+    super(new DummyEditorHandler());
+  }
 }

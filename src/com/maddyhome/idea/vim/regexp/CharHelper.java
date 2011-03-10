@@ -19,29 +19,25 @@ package com.maddyhome.idea.vim.regexp;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-public class CharHelper
-{
-    public static CharPointer skipwhite(CharPointer ptr)
-    {
-        while (CharacterClasses.isWhite(ptr.charAt()))
-        {
-            ptr.inc();
-        }
-
-        return ptr;
+public class CharHelper {
+  public static CharPointer skipwhite(CharPointer ptr) {
+    while (CharacterClasses.isWhite(ptr.charAt())) {
+      ptr.inc();
     }
 
-    public static int getdigits(CharPointer ptr)
-    {
-        int res = 0;
-        while (CharacterClasses.isDigit(ptr.charAt()))
-        {
-            res = res * 10 + (ptr.charAt() - '0');
-            ptr.inc();
-        }
+    return ptr;
+  }
 
-        return res;
+  public static int getdigits(CharPointer ptr) {
+    int res = 0;
+    while (CharacterClasses.isDigit(ptr.charAt())) {
+      res = res * 10 + (ptr.charAt() - '0');
+      ptr.inc();
     }
 
-    private CharHelper() {}
+    return res;
+  }
+
+  private CharHelper() {
+  }
 }

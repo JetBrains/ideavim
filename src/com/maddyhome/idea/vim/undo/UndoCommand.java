@@ -19,10 +19,10 @@ package com.maddyhome.idea.vim.undo;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.group.MotionGroup;
-import com.intellij.openapi.actionSystem.DataContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,86 +30,73 @@ import java.util.List;
 /**
  *
  */
-public class UndoCommand
-{
-    public UndoCommand(Editor editor)
-    {
-        this.editor = editor;
-        startOffset = editor.getCaretModel().getOffset();
-        if (logger.isDebugEnabled()) logger.debug("new undo command: startOffset=" + startOffset);
-    }
+public class UndoCommand {
+  public UndoCommand(Editor editor) {
+    this.editor = editor;
+    startOffset = editor.getCaretModel().getOffset();
+    if (logger.isDebugEnabled()) logger.debug("new undo command: startOffset=" + startOffset);
+  }
 
-    public void complete()
-    {
-        endOffset = editor.getCaretModel().getOffset();
-    }
+  public void complete() {
+    endOffset = editor.getCaretModel().getOffset();
+  }
 
-    public boolean isOneLine()
-    {
-        return false; // TODO
-    }
+  public boolean isOneLine() {
+    return false; // TODO
+  }
 
-    public int getLine()
-    {
-        return -1; // TODO
-    }
+  public int getLine() {
+    return -1; // TODO
+  }
 
-    public void addChange(DocumentChange change)
-    {
-        logger.debug("new change");
-        if (changes.size() == 0)
-        {
+  public void addChange(DocumentChange change) {
+    logger.debug("new change");
+    if (changes.size() == 0) {
 //            startOffset = editor.getCaretModel().getOffset();
-            if (logger.isDebugEnabled()) logger.debug("startOffest=" + startOffset);
-        }
-
-        changes.add(change);
+      if (logger.isDebugEnabled()) logger.debug("startOffest=" + startOffset);
     }
 
-    public void redo(Editor editor, DataContext context)
-    {
-        for (DocumentChange change : changes)
-        {
-            change.redo(editor, context);
-        }
+    changes.add(change);
+  }
 
-        //editor.getCaretModel().moveToOffset(endOffset);
-        MotionGroup.moveCaret(editor, context, endOffset);
+  public void redo(Editor editor, DataContext context) {
+    for (DocumentChange change : changes) {
+      change.redo(editor, context);
     }
 
-    public void undo(Editor editor, DataContext context)
-    {
-        if (logger.isDebugEnabled()) logger.debug("undo: startOffset=" + startOffset);
-        for (int i = changes.size() - 1; i >= 0; i--)
-        {
-            DocumentChange change = changes.get(i);
-            change.undo(editor, context);
-        }
+    //editor.getCaretModel().moveToOffset(endOffset);
+    MotionGroup.moveCaret(editor, context, endOffset);
+  }
 
-        //editor.getCaretModel().moveToOffset(startOffset);
-        MotionGroup.moveCaret(editor, context, startOffset);
+  public void undo(Editor editor, DataContext context) {
+    if (logger.isDebugEnabled()) logger.debug("undo: startOffset=" + startOffset);
+    for (int i = changes.size() - 1; i >= 0; i--) {
+      DocumentChange change = changes.get(i);
+      change.undo(editor, context);
     }
 
-    public String toString()
-    {
-        final StringBuffer sb = new StringBuffer();
-        sb.append("UndoCommand");
-        sb.append("{startOffset=").append(startOffset);
-        sb.append(", endOffset=").append(endOffset);
-        sb.append(", changes=").append(changes);
-        sb.append('}');
-        return sb.toString();
-    }
+    //editor.getCaretModel().moveToOffset(startOffset);
+    MotionGroup.moveCaret(editor, context, startOffset);
+  }
 
-    public int size()
-    {
-        return changes.size();
-    }
+  public String toString() {
+    final StringBuffer sb = new StringBuffer();
+    sb.append("UndoCommand");
+    sb.append("{startOffset=").append(startOffset);
+    sb.append(", endOffset=").append(endOffset);
+    sb.append(", changes=").append(changes);
+    sb.append('}');
+    return sb.toString();
+  }
 
-    private Editor editor;
-    private int startOffset;
-    private int endOffset;
-    private List<DocumentChange> changes = new ArrayList<DocumentChange>();
+  public int size() {
+    return changes.size();
+  }
 
-    private static Logger logger = Logger.getInstance(UndoCommand.class.getName());
+  private Editor editor;
+  private int startOffset;
+  private int endOffset;
+  private List<DocumentChange> changes = new ArrayList<DocumentChange>();
+
+  private static Logger logger = Logger.getInstance(UndoCommand.class.getName());
 }

@@ -25,113 +25,108 @@ import com.intellij.openapi.actionSystem.AnAction;
  * This represents a command argument node in the key/action tree. Currently arguments of argType character
  * and motion command are used.
  */
-public class ArgumentNode implements Node
-{
-    /**
-     * Creates a node for the given action.
-     * @param actionId The id of the action.
-     * @param action The action this arguments is mapped to.
-     * @param cmdType The type of the command this argument is for.
-     * @param argType The type of the argument.
-     * @param flags Any special flags associated with this argument.
-     */
-    public ArgumentNode(String actionId, AnAction action, int cmdType, int argType, int flags)
-    {
-        this.actionId = actionId;
-        this.action = action;
-        this.argType = argType;
-        this.cmdType = cmdType;
-        this.flags = flags;
-    }
+public class ArgumentNode implements Node {
+  /**
+   * Creates a node for the given action.
+   *
+   * @param actionId The id of the action.
+   * @param action   The action this arguments is mapped to.
+   * @param cmdType  The type of the command this argument is for.
+   * @param argType  The type of the argument.
+   * @param flags    Any special flags associated with this argument.
+   */
+  public ArgumentNode(String actionId, AnAction action, int cmdType, int argType, int flags) {
+    this.actionId = actionId;
+    this.action = action;
+    this.argType = argType;
+    this.cmdType = cmdType;
+    this.flags = flags;
+  }
 
-    public String getActionId()
-    {
-        return actionId;
-    }
+  public String getActionId() {
+    return actionId;
+  }
 
-    /**
-     * Gets the action of the argument
-     * @return The argument's action
-     */
-    public AnAction getAction()
-    {
-        return action;
-    }
+  /**
+   * Gets the action of the argument
+   *
+   * @return The argument's action
+   */
+  public AnAction getAction() {
+    return action;
+  }
 
-    /**
-     * Gets the argument type
-     * @return The argument's type
-     */
-    public int getArgType()
-    {
-        return argType;
-    }
+  /**
+   * Gets the argument type
+   *
+   * @return The argument's type
+   */
+  public int getArgType() {
+    return argType;
+  }
 
-    /**
-     * Gets the type of the command this arguments is for
-     * @return The argument's command type
-     */
-    public int getCmdType()
-    {
-        return cmdType;
-    }
+  /**
+   * Gets the type of the command this arguments is for
+   *
+   * @return The argument's command type
+   */
+  public int getCmdType() {
+    return cmdType;
+  }
 
-    /**
-     * Gets the argument flags
-     * @return The argument's flags
-     */
-    public int getFlags()
-    {
-        return flags;
-    }
+  /**
+   * Gets the argument flags
+   *
+   * @return The argument's flags
+   */
+  public int getFlags() {
+    return flags;
+  }
 
-    public String toString()
-    {
-        StringBuffer res = new StringBuffer();
-        res.append("ArgumentNode[");
-        res.append("actionId=");
-        res.append(actionId);
-        res.append("action=");
-        res.append(action);
-        res.append("argType=");
-        res.append(argType);
-        res.append("flags=");
-        res.append(flags);
-        res.append("]");
+  public String toString() {
+    StringBuffer res = new StringBuffer();
+    res.append("ArgumentNode[");
+    res.append("actionId=");
+    res.append(actionId);
+    res.append("action=");
+    res.append(action);
+    res.append("argType=");
+    res.append(argType);
+    res.append("flags=");
+    res.append(flags);
+    res.append("]");
 
-        return res.toString();
-    }
+    return res.toString();
+  }
 
-    public boolean equals(Object o)
-    {
-        if (this == o) return true;
-        if (!(o instanceof ArgumentNode)) return false;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof ArgumentNode)) return false;
 
-        final ArgumentNode node = (ArgumentNode)o;
+    final ArgumentNode node = (ArgumentNode)o;
 
-        if (argType != node.argType) return false;
-        if (cmdType != node.cmdType) return false;
-        if (flags != node.flags) return false;
-        if (!actionId.equals(node.actionId)) return false;
-        if (!action.equals(node.action)) return false;
+    if (argType != node.argType) return false;
+    if (cmdType != node.cmdType) return false;
+    if (flags != node.flags) return false;
+    if (!actionId.equals(node.actionId)) return false;
+    if (!action.equals(node.action)) return false;
 
-        return true;
-    }
+    return true;
+  }
 
-    public int hashCode()
-    {
-        int result;
-        result = action.hashCode();
-        result = 29 * result + actionId.hashCode();
-        result = 29 * result + argType;
-        result = 29 * result + cmdType;
-        result = 29 * result + flags;
-        return result;
-    }
+  public int hashCode() {
+    int result;
+    result = action.hashCode();
+    result = 29 * result + actionId.hashCode();
+    result = 29 * result + argType;
+    result = 29 * result + cmdType;
+    result = 29 * result + flags;
+    return result;
+  }
 
-    protected String actionId;
-    protected AnAction action;
-    protected int argType;
-    protected int cmdType;
-    protected int flags;
+  protected String actionId;
+  protected AnAction action;
+  protected int argType;
+  protected int cmdType;
+  protected int flags;
 }

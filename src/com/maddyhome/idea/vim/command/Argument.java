@@ -22,122 +22,131 @@ package com.maddyhome.idea.vim.command;
 /**
  * This represents a command argument.
  */
-public class Argument
-{
-    /** This represents no argument */
-    public static final int NONE = 0;
-    /** This is for arguments of type motion command */
-    public static final int MOTION = 1;
-    /** This is for arguments of type character */
-    public static final int CHARACTER = 2;
-    /** This is for arguments of type string */
-    public static final int STRING = 3;
-    /** This is for arguments consisting of a digraph or a regular character */
-    public static final int DIGRAPH = 4;
-    /** This is for argumaents consisting of an ex string */
-    public static final int EX_STRING = 5;
+public class Argument {
+  /**
+   * This represents no argument
+   */
+  public static final int NONE = 0;
+  /**
+   * This is for arguments of type motion command
+   */
+  public static final int MOTION = 1;
+  /**
+   * This is for arguments of type character
+   */
+  public static final int CHARACTER = 2;
+  /**
+   * This is for arguments of type string
+   */
+  public static final int STRING = 3;
+  /**
+   * This is for arguments consisting of a digraph or a regular character
+   */
+  public static final int DIGRAPH = 4;
+  /**
+   * This is for argumaents consisting of an ex string
+   */
+  public static final int EX_STRING = 5;
 
-    /**
-     * Creates a character argument
-     * @param charArg The character
-     */
-    public Argument(char charArg)
-    {
-        this.charArg = charArg;
-        type = CHARACTER;
-    }
+  /**
+   * Creates a character argument
+   *
+   * @param charArg The character
+   */
+  public Argument(char charArg) {
+    this.charArg = charArg;
+    type = CHARACTER;
+  }
 
-    /**
-     * Creates a motion command argument
-     * @param motionArg The motion command
-     */
-    public Argument(Command motionArg)
-    {
-        this.motionArg = motionArg;
-        type = MOTION;
-    }
+  /**
+   * Creates a motion command argument
+   *
+   * @param motionArg The motion command
+   */
+  public Argument(Command motionArg) {
+    this.motionArg = motionArg;
+    type = MOTION;
+  }
 
-    /**
-     * Creates a string argument
-     * @param strArg The string
-     */
-    public Argument(String strArg)
-    {
-        this.strArg = strArg;
-        type = STRING;
-    }
+  /**
+   * Creates a string argument
+   *
+   * @param strArg The string
+   */
+  public Argument(String strArg) {
+    this.strArg = strArg;
+    type = STRING;
+  }
 
-    /**
-     * Returns the argument type
-     * @return The argument type
-     */
-    public int getType()
-    {
-        return type;
-    }
+  /**
+   * Returns the argument type
+   *
+   * @return The argument type
+   */
+  public int getType() {
+    return type;
+  }
 
-    /**
-     * Returns the character if this is a character argument
-     * @return The character if this is a character argument, null character if not
-     */
-    public char getCharacter()
-    {
-        return charArg;
-    }
+  /**
+   * Returns the character if this is a character argument
+   *
+   * @return The character if this is a character argument, null character if not
+   */
+  public char getCharacter() {
+    return charArg;
+  }
 
-    /**
-     * Returns the motion command if this is a motion command argument
-     * @return The motion command if this is a motion command argument, null if not
-     */
-    public Command getMotion()
-    {
+  /**
+   * Returns the motion command if this is a motion command argument
+   *
+   * @return The motion command if this is a motion command argument, null if not
+   */
+  public Command getMotion() {
+    return motionArg;
+  }
+
+  /**
+   * Returns the string if this is a string argument
+   *
+   * @return The string if this is a string argument, null if not
+   */
+  public String getString() {
+    return strArg;
+  }
+
+  /**
+   * Returns the argument as an object
+   *
+   * @return The argument (MOTION = Command, CHARACTER = Character, STRING = String)
+   */
+  public Object getArgument() {
+    switch (type) {
+      case MOTION:
         return motionArg;
-    }
-
-    /**
-     * Returns the string if this is a string argument
-     * @return The string if this is a string argument, null if not
-     */
-    public String getString()
-    {
+      case CHARACTER:
+      case DIGRAPH:
+        return charArg;
+      case STRING:
         return strArg;
     }
 
-    /**
-     * Returns the argument as an object
-     * @return The argument (MOTION = Command, CHARACTER = Character, STRING = String)
-     */
-    public Object getArgument()
-    {
-        switch (type)
-        {
-            case MOTION:
-                return motionArg;
-            case CHARACTER:
-            case DIGRAPH:
-                return charArg;
-            case STRING:
-                return strArg;
-        }
+    throw new IllegalStateException("Unexpected argType of " + type);
+  }
 
-        throw new IllegalStateException("Unexpected argType of " + type);
-    }
+  public String toString() {
+    StringBuffer res = new StringBuffer();
+    res.append("Argument {");
+    res.append("charArg=").append(charArg);
+    res.append(",motionArg=").append(motionArg);
+    res.append(",strArg=").append(strArg);
+    res.append(",type=").append(type);
+    res.append("}");
 
-    public String toString()
-    {
-        StringBuffer res = new StringBuffer();
-        res.append("Argument {");
-        res.append("charArg=").append(charArg);
-        res.append(",motionArg=").append(motionArg);
-        res.append(",strArg=").append(strArg);
-        res.append(",type=").append(type);
-        res.append("}");
+    return res.toString();
+  }
 
-        return res.toString();
-    }
-
-    private char charArg = 0;
-    private Command motionArg = null;
-    private String strArg = null;
-    private int type;
+  private char charArg = 0;
+  private Command motionArg = null;
+  private String strArg = null;
+  private int type;
 }

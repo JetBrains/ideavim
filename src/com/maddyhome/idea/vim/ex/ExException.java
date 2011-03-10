@@ -22,22 +22,19 @@ package com.maddyhome.idea.vim.ex;
 /**
  * Exception class
  */
-public class ExException extends Exception
-{
-    /**
-     * Constructs an <code>ExException</code> with no specified detail message.
-     */
-    public ExException()
-    {
-    }
+public class ExException extends Exception {
+  /**
+   * Constructs an <code>ExException</code> with no specified detail message.
+   */
+  public ExException() {
+  }
 
-    /**
-     * Constructs an <code>ExException</code> with the specified detail message.
-     *
-     * @param   s   the detail message.
-     */
-    public ExException(String s)
-    {
-        super(s);
-    }
+  /**
+   * Constructs an <code>ExException</code> with the specified detail message.
+   *
+   * @param s the detail message.
+   */
+  public ExException(String s) {
+    super(s);
+  }
 }

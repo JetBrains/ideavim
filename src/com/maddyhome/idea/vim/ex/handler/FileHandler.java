@@ -19,28 +19,25 @@ package com.maddyhome.idea.vim.ex.handler;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.group.CommandGroups;
-import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  *
  */
-public class FileHandler extends CommandHandler
-{
-    public FileHandler()
-    {
-        super("f", "ile", ARGUMENT_FORBIDDEN | RANGE_FORBIDDEN | RANGE_IS_COUNT);
-    }
+public class FileHandler extends CommandHandler {
+  public FileHandler() {
+    super("f", "ile", ARGUMENT_FORBIDDEN | RANGE_FORBIDDEN | RANGE_IS_COUNT);
+  }
 
-    public boolean execute(Editor editor, DataContext context, ExCommand cmd)
-    {
-        int count = cmd.getCount(editor, context, 0, false);
+  public boolean execute(Editor editor, DataContext context, ExCommand cmd) {
+    int count = cmd.getCount(editor, context, 0, false);
 
-        CommandGroups.getInstance().getFile().displayFileInfo(editor, count > 0);
+    CommandGroups.getInstance().getFile().displayFileInfo(editor, count > 0);
 
-        return true;
-    }
+    return true;
+  }
 }

@@ -19,6 +19,7 @@ package com.maddyhome.idea.vim.ex.handler;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.ex.CommandHandler;
@@ -26,47 +27,39 @@ import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.CommandGroups;
-import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  *
  */
-public class EditFileHandler extends CommandHandler
-{
-    public EditFileHandler()
-    {
-        super(new CommandName[] {
-            new CommandName("bro", "wse"),
-            new CommandName("e", "dit")
-        }, RANGE_FORBIDDEN | ARGUMENT_OPTIONAL | DONT_REOPEN);
-    }
+public class EditFileHandler extends CommandHandler {
+  public EditFileHandler() {
+    super(new CommandName[]{
+      new CommandName("bro", "wse"),
+      new CommandName("e", "dit")
+    }, RANGE_FORBIDDEN | ARGUMENT_OPTIONAL | DONT_REOPEN);
+  }
 
-    public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException
-    {
-        String arg = cmd.getArgument();
-        if (arg != null)
-        {
-            if (arg.equals("#"))
-            {
-                CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
-                CommandGroups.getInstance().getFile().selectPreviousTab(context);
-
-                return true;
-            }
-            else if (arg.length() > 0)
-            {
-                boolean res = CommandGroups.getInstance().getFile().openFile(arg, context);
-                if (res)
-                {
-                    CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
-                }
-
-                return res;
-            }
-        }
-
-        KeyHandler.executeAction("OpenFile", context);
+  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+    String arg = cmd.getArgument();
+    if (arg != null) {
+      if (arg.equals("#")) {
+        CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
+        CommandGroups.getInstance().getFile().selectPreviousTab(context);
 
         return true;
+      }
+      else if (arg.length() > 0) {
+        boolean res = CommandGroups.getInstance().getFile().openFile(arg, context);
+        if (res) {
+          CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
+        }
+
+        return res;
+      }
     }
+
+    KeyHandler.executeAction("OpenFile", context);
+
+    return true;
+  }
 }

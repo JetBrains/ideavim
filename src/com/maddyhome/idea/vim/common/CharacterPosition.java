@@ -24,10 +24,8 @@ import com.intellij.openapi.editor.LogicalPosition;
 /**
  *
  */
-public class CharacterPosition extends LogicalPosition
-{
-    public CharacterPosition(int line, int col)
-    {
-        super(line, col);
-    }
+public class CharacterPosition extends LogicalPosition {
+  public CharacterPosition(int line, int col) {
+    super(line, col);
+  }
 }

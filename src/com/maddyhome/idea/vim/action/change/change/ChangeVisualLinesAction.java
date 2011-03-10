@@ -19,32 +19,28 @@ package com.maddyhome.idea.vim.action.change.change;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 
 /**
  */
-public class ChangeVisualLinesAction extends EditorAction
-{
-    public ChangeVisualLinesAction()
-    {
-        super(new Handler());
-    }
+public class ChangeVisualLinesAction extends EditorAction {
+  public ChangeVisualLinesAction() {
+    super(new Handler());
+  }
 
-    private static class Handler extends VisualOperatorActionHandler
-    {
-        protected boolean execute(Editor editor, DataContext context, Command cmd, TextRange range)
-        {
-            range = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
-                EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
+  private static class Handler extends VisualOperatorActionHandler {
+    protected boolean execute(Editor editor, DataContext context, Command cmd, TextRange range) {
+      range = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
+                            EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
 
-            return CommandGroups.getInstance().getChange().changeRange(editor, context, range, Command.FLAG_MOT_LINEWISE);
-        }
+      return CommandGroups.getInstance().getChange().changeRange(editor, context, range, Command.FLAG_MOT_LINEWISE);
     }
+  }
 }

@@ -27,18 +27,15 @@ import com.maddyhome.idea.vim.handler.motion.MotionEditorActionHandler;
 
 /**
  */
-public abstract class MotionEditorAction extends EditorAction
-{
-    public MotionEditorAction(MotionEditorActionHandler handler)
-    {
-        super(handler);
-        this.handler = handler;
-    }
+public abstract class MotionEditorAction extends EditorAction {
+  public MotionEditorAction(MotionEditorActionHandler handler) {
+    super(handler);
+    this.handler = handler;
+  }
 
-    public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument)
-    {
-        return handler.getOffset(editor, context, count, rawCount, argument);
-    }
+  public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
+    return handler.getOffset(editor, context, count, rawCount, argument);
+  }
 
-    private MotionEditorActionHandler handler;
+  private MotionEditorActionHandler handler;
 }

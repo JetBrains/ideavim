@@ -19,27 +19,24 @@ package com.maddyhome.idea.vim.ex.handler;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.maddyhome.idea.vim.undo.UndoManager;
 
 /**
  *
  */
-public class UndoHandler extends CommandHandler
-{
-    public UndoHandler()
-    {
-        super(new CommandName[] {
-            new CommandName("u", "ndo")
-        }, RANGE_FORBIDDEN | ARGUMENT_FORBIDDEN | WRITABLE);
-    }
+public class UndoHandler extends CommandHandler {
+  public UndoHandler() {
+    super(new CommandName[]{
+      new CommandName("u", "ndo")
+    }, RANGE_FORBIDDEN | ARGUMENT_FORBIDDEN | WRITABLE);
+  }
 
-    public boolean execute(Editor editor, DataContext context, ExCommand cmd)
-    {
-        return UndoManager.getInstance().undo(editor, context);
-    }
+  public boolean execute(Editor editor, DataContext context, ExCommand cmd) {
+    return UndoManager.getInstance().undo(editor, context);
+  }
 }

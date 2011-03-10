@@ -19,34 +19,31 @@ package com.maddyhome.idea.vim.ex.handler;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.group.CommandGroups;
-import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  *
  */
-public class WritePreviousFileHandler extends CommandHandler
-{
-    public WritePreviousFileHandler()
-    {
-        super(new CommandName[] {
-            new CommandName("wN", "ext"),
-            new CommandName("wp", "revious")
-        }, RANGE_OPTIONAL | ARGUMENT_OPTIONAL | RANGE_IS_COUNT);
-    }
+public class WritePreviousFileHandler extends CommandHandler {
+  public WritePreviousFileHandler() {
+    super(new CommandName[]{
+      new CommandName("wN", "ext"),
+      new CommandName("wp", "revious")
+    }, RANGE_OPTIONAL | ARGUMENT_OPTIONAL | RANGE_IS_COUNT);
+  }
 
-    public boolean execute(Editor editor, DataContext context, ExCommand cmd)
-    {
-        int count = cmd.getCount(editor, context, 1, true);
+  public boolean execute(Editor editor, DataContext context, ExCommand cmd) {
+    int count = cmd.getCount(editor, context, 1, true);
 
-        CommandGroups.getInstance().getFile().saveFile(editor, context);
-        CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
-        CommandGroups.getInstance().getFile().selectNextFile(-count, context);
+    CommandGroups.getInstance().getFile().saveFile(editor, context);
+    CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
+    CommandGroups.getInstance().getFile().selectNextFile(-count, context);
 
-        return true;
-    }
+    return true;
+  }
 }

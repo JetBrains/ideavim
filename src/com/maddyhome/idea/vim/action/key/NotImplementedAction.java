@@ -25,10 +25,8 @@ import com.maddyhome.idea.vim.VimPlugin;
 
 /**
  */
-public class NotImplementedAction extends AnAction
-{
-    public void actionPerformed(AnActionEvent event)
-    {
-        VimPlugin.indicateError();
-    }
+public class NotImplementedAction extends AnAction {
+  public void actionPerformed(AnActionEvent event) {
+    VimPlugin.indicateError();
+  }
 }

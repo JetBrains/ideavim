@@ -19,6 +19,7 @@ package com.maddyhome.idea.vim.ex.handler;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
@@ -27,51 +28,41 @@ import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.group.RegisterGroup;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 
 /**
  *
  */
-public class PutLinesHandler extends CommandHandler
-{
-    public PutLinesHandler()
-    {
-        super(new CommandName[] {
-            new CommandName("pu", "t")
-        }, RANGE_OPTIONAL | ARGUMENT_REQUIRED | WRITABLE);
+public class PutLinesHandler extends CommandHandler {
+  public PutLinesHandler() {
+    super(new CommandName[]{
+      new CommandName("pu", "t")
+    }, RANGE_OPTIONAL | ARGUMENT_REQUIRED | WRITABLE);
+  }
+
+  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+    int line = cmd.getLine(editor, context);
+    String arg = cmd.getArgument();
+    boolean before = false;
+    if (arg.length() > 0 && arg.charAt(0) == '!') {
+      before = true;
+      arg = arg.substring(1).trim();
+    }
+    if (arg.length() > 0) {
+      if (!CommandGroups.getInstance().getRegister().selectRegister(arg.charAt(0))) {
+        return false;
+      }
+    }
+    else {
+      CommandGroups.getInstance().getRegister().selectRegister(RegisterGroup.REGISTER_DEFAULT);
     }
 
-    public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException
-    {
-        int line = cmd.getLine(editor, context);
-        String arg = cmd.getArgument();
-        boolean before = false;
-        if (arg.length() > 0 && arg.charAt(0) == '!')
-        {
-            before = true;
-            arg = arg.substring(1).trim();
-        }
-        if (arg.length() > 0)
-        {
-            if (!CommandGroups.getInstance().getRegister().selectRegister(arg.charAt(0)))
-            {
-                return false;
-            }
-        }
-        else
-        {
-            CommandGroups.getInstance().getRegister().selectRegister(RegisterGroup.REGISTER_DEFAULT);
-        }
-
-        MotionGroup.moveCaret(editor, context, EditorHelper.getLineStartOffset(editor, line));
-        if (before)
-        {
-            return CommandGroups.getInstance().getCopy().putTextBeforeCursor(editor, context, 1, true, false);
-        }
-        else
-        {
-            return CommandGroups.getInstance().getCopy().putTextAfterCursor(editor, context, 1, true, false);
-        }
+    MotionGroup.moveCaret(editor, context, EditorHelper.getLineStartOffset(editor, line));
+    if (before) {
+      return CommandGroups.getInstance().getCopy().putTextBeforeCursor(editor, context, 1, true, false);
     }
+    else {
+      return CommandGroups.getInstance().getCopy().putTextAfterCursor(editor, context, 1, true, false);
+    }
+  }
 }

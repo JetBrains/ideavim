@@ -24,24 +24,19 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.group.CommandGroups;
-import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  *
  */
-public class VisualExitModeAction extends EditorAction
-{
-    public VisualExitModeAction()
-    {
-        super(new Handler());
-    }
+public class VisualExitModeAction extends EditorAction {
+  public VisualExitModeAction() {
+    super(new Handler());
+  }
 
-    private static class Handler extends EditorActionHandler
-    {
-        public void execute(Editor editor, DataContext context)
-        {
-            CommandGroups.getInstance().getMotion().processEscape(editor, context);
-        }
+  private static class Handler extends EditorActionHandler {
+    public void execute(Editor editor, DataContext context) {
+      CommandGroups.getInstance().getMotion().processEscape(editor, context);
     }
+  }
 }
 

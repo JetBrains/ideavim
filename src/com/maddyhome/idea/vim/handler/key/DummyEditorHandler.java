@@ -26,14 +26,11 @@ import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 /**
  *
  */
-public class DummyEditorHandler extends EditorActionHandler
-{
-    public DummyEditorHandler()
-    {
-    }
+public class DummyEditorHandler extends EditorActionHandler {
+  public DummyEditorHandler() {
+  }
 
-    public void execute(Editor editor, DataContext context)
-    {
-        // no-op
-    }
+  public void execute(Editor editor, DataContext context) {
+    // no-op
+  }
 }

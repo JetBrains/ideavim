@@ -22,19 +22,16 @@ package com.maddyhome.idea.vim.helper;
 /**
  * Used to see if the API supports certain functionality.
  */
-public class ApiHelper
-{
-    public static boolean supportsColorSchemes()
-    {
-        return hasColorSchemes;
-    }
+public class ApiHelper {
+  public static boolean supportsColorSchemes() {
+    return hasColorSchemes;
+  }
 
-    public static boolean supportsBlockSelection()
-    {
-        return hasBlockSelection;
-    }
+  public static boolean supportsBlockSelection() {
+    return hasBlockSelection;
+  }
 
-    // By now all versions of IDEA support these APIs.
-    private static boolean hasColorSchemes = true;
-    private static boolean hasBlockSelection = true;
+  // By now all versions of IDEA support these APIs.
+  private static boolean hasColorSchemes = true;
+  private static boolean hasBlockSelection = true;
 }

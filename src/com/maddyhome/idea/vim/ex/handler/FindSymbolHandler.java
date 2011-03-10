@@ -19,40 +19,35 @@ package com.maddyhome.idea.vim.ex.handler;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.intellij.openapi.actionSystem.DataContext;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 /**
  *
  */
-public class FindSymbolHandler extends CommandHandler
-{
-    public FindSymbolHandler()
-    {
-        super("sym", "bol", RANGE_FORBIDDEN | ARGUMENT_OPTIONAL | DONT_REOPEN);
+public class FindSymbolHandler extends CommandHandler {
+  public FindSymbolHandler() {
+    super("sym", "bol", RANGE_FORBIDDEN | ARGUMENT_OPTIONAL | DONT_REOPEN);
+  }
+
+  public boolean execute(Editor editor, final DataContext context, ExCommand cmd) throws ExException {
+    String arg = cmd.getArgument();
+    if (arg != null && arg.length() > 0) {
+      // TODO - jump to specific symbol
     }
 
-    public boolean execute(Editor editor, final DataContext context, ExCommand cmd) throws ExException
-    {
-        String arg = cmd.getArgument();
-        if (arg != null && arg.length() > 0)
-        {
-            // TODO - jump to specific symbol
-        }
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        KeyHandler.executeAction("GotoSymbol", context);
+      }
+    });
 
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run()
-            {
-                KeyHandler.executeAction("GotoSymbol", context);
-            }
-        });
-
-        return true;
-    }
+    return true;
+  }
 }

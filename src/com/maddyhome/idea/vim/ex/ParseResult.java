@@ -22,31 +22,26 @@ package com.maddyhome.idea.vim.ex;
 /**
  *
  */
-public class ParseResult
-{
-    public ParseResult(Ranges ranges, String command, String argument)
-    {
-        this.ranges = ranges;
-        this.argument = argument;
-        this.command = command;
-    }
+public class ParseResult {
+  public ParseResult(Ranges ranges, String command, String argument) {
+    this.ranges = ranges;
+    this.argument = argument;
+    this.command = command;
+  }
 
-    public String getCommand()
-    {
-        return command;
-    }
+  public String getCommand() {
+    return command;
+  }
 
-    public String getArgument()
-    {
-        return argument;
-    }
+  public String getArgument() {
+    return argument;
+  }
 
-    public Ranges getRanges()
-    {
-        return ranges;
-    }
+  public Ranges getRanges() {
+    return ranges;
+  }
 
-    protected Ranges ranges;
-    protected String command;
-    protected String argument;
+  protected Ranges ranges;
+  protected String command;
+  protected String argument;
 }

@@ -19,47 +19,41 @@ package com.maddyhome.idea.vim.ex.handler;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.CommandGroups;
-import com.intellij.openapi.actionSystem.DataContext;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 /**
  *
  */
-public class FindFileHandler extends CommandHandler
-{
-    public FindFileHandler()
-    {
-        super("fin", "d", RANGE_FORBIDDEN | ARGUMENT_OPTIONAL | DONT_REOPEN);
+public class FindFileHandler extends CommandHandler {
+  public FindFileHandler() {
+    super("fin", "d", RANGE_FORBIDDEN | ARGUMENT_OPTIONAL | DONT_REOPEN);
+  }
+
+  public boolean execute(Editor editor, final DataContext context, ExCommand cmd) throws ExException {
+    String arg = cmd.getArgument();
+    if (arg != null && arg.length() > 0) {
+      boolean res = CommandGroups.getInstance().getFile().openFile(arg, context);
+      if (res) {
+        CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
+      }
+
+      return res;
     }
 
-    public boolean execute(Editor editor, final DataContext context, ExCommand cmd) throws ExException
-    {
-        String arg = cmd.getArgument();
-        if (arg != null && arg.length() > 0)
-        {
-            boolean res = CommandGroups.getInstance().getFile().openFile(arg, context);
-            if (res)
-            {
-                CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
-            }
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        KeyHandler.executeAction("GotoFile", context);
+      }
+    });
 
-            return res;
-        }
-
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run()
-            {
-                KeyHandler.executeAction("GotoFile", context);
-            }
-        });
-
-        return true;
-    }
+    return true;
+  }
 }

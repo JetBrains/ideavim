@@ -31,251 +31,210 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HistoryGroup extends AbstractActionGroup
-{
-    public static final String SEARCH = "search";
-    public static final String COMMAND = "cmd";
-    public static final String EXPRESSION = "expr";
-    public static final String INPUT = "input";
+public class HistoryGroup extends AbstractActionGroup {
+  public static final String SEARCH = "search";
+  public static final String COMMAND = "cmd";
+  public static final String EXPRESSION = "expr";
+  public static final String INPUT = "input";
 
-    public void addEntry(String key, String text)
-    {
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("Add entry '" + text + "' to " + key);
-        }
-
-        HistoryBlock block = blocks(key);
-        block.addEntry(text);
+  public void addEntry(String key, String text) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Add entry '" + text + "' to " + key);
     }
 
-    public String getEntry(String key, int index)
-    {
-        HistoryBlock block = blocks(key);
+    HistoryBlock block = blocks(key);
+    block.addEntry(text);
+  }
 
-        return block.getEntry(index);
+  public String getEntry(String key, int index) {
+    HistoryBlock block = blocks(key);
+
+    return block.getEntry(index);
+  }
+
+  public List<HistoryEntry> getEntries(String key, int first, int last) {
+    HistoryBlock block = blocks(key);
+
+    List<HistoryEntry> entries = block.getEntries();
+    List<HistoryEntry> res = new ArrayList<HistoryEntry>();
+    if (first < 0) {
+      if (-first > entries.size()) {
+        first = Integer.MAX_VALUE;
+      }
+      else {
+        HistoryEntry entry = entries.get(entries.size() + first);
+        first = entry.getNumber();
+      }
+    }
+    if (last < 0) {
+      if (-last > entries.size()) {
+        last = Integer.MIN_VALUE;
+      }
+      else {
+        HistoryEntry entry = entries.get(entries.size() + last);
+        last = entry.getNumber();
+      }
+    }
+    else if (last == 0) {
+      last = Integer.MAX_VALUE;
     }
 
-    public List<HistoryEntry> getEntries(String key, int first, int last)
-    {
-        HistoryBlock block = blocks(key);
-
-        List<HistoryEntry> entries = block.getEntries();
-        List<HistoryEntry> res = new ArrayList<HistoryEntry>();
-        if (first < 0)
-        {
-            if (-first > entries.size())
-            {
-                first = Integer.MAX_VALUE;
-            }
-            else
-            {
-                HistoryEntry entry = entries.get(entries.size() + first);
-                first = entry.getNumber();
-            }
-        }
-        if (last < 0)
-        {
-            if (-last > entries.size())
-            {
-                last = Integer.MIN_VALUE;
-            }
-            else
-            {
-                HistoryEntry entry = entries.get(entries.size() + last);
-                last = entry.getNumber();
-            }
-        }
-        else if (last == 0)
-        {
-            last = Integer.MAX_VALUE;
-        }
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("first=" + first);
-            logger.debug("last=" + last);
-        }
-
-        for (HistoryEntry entry : entries)
-        {
-            if (entry.getNumber() >= first && entry.getNumber() <= last)
-            {
-                res.add(entry);
-            }
-        }
-
-        return res;
+    if (logger.isDebugEnabled()) {
+      logger.debug("first=" + first);
+      logger.debug("last=" + last);
     }
 
-    private HistoryBlock blocks(String key)
-    {
-        HistoryBlock block = histories.get(key);
-        if (block == null)
-        {
-            block = new HistoryBlock();
-            histories.put(key, block);
-        }
-
-        return block;
+    for (HistoryEntry entry : entries) {
+      if (entry.getNumber() >= first && entry.getNumber() <= last) {
+        res.add(entry);
+      }
     }
 
-    /**
-     * Allows the group to save its state and any configuration. This does nothing.
-     *
-     * @param element The plugin's root XML element that this group can add a child to
-     */
-    public void saveData(Element element)
-    {
-        logger.debug("saveData");
-        Element hist = new Element("history");
+    return res;
+  }
 
-        saveData(hist, SEARCH);
-        saveData(hist, COMMAND);
-        saveData(hist, EXPRESSION);
-        saveData(hist, INPUT);
-
-        element.addContent(hist);
+  private HistoryBlock blocks(String key) {
+    HistoryBlock block = histories.get(key);
+    if (block == null) {
+      block = new HistoryBlock();
+      histories.put(key, block);
     }
 
-    private void saveData(Element element, String key)
-    {
-        HistoryBlock block = histories.get(key);
-        if (block == null)
-        {
-            return;
-        }
+    return block;
+  }
 
-        Element root = new Element("history-" + key);
+  /**
+   * Allows the group to save its state and any configuration. This does nothing.
+   *
+   * @param element The plugin's root XML element that this group can add a child to
+   */
+  public void saveData(Element element) {
+    logger.debug("saveData");
+    Element hist = new Element("history");
 
-        List<HistoryEntry> elems = block.getEntries();
-        for (HistoryEntry entry : elems)
-        {
-            Element text = new Element("entry");
-            CDATA data = new CDATA(StringHelper.entities(entry.getEntry()));
-            text.addContent(data);
-            root.addContent(text);
-        }
+    saveData(hist, SEARCH);
+    saveData(hist, COMMAND);
+    saveData(hist, EXPRESSION);
+    saveData(hist, INPUT);
 
-        element.addContent(root);
+    element.addContent(hist);
+  }
+
+  private void saveData(Element element, String key) {
+    HistoryBlock block = histories.get(key);
+    if (block == null) {
+      return;
     }
 
-    /**
-     * Allows the group to restore its state and any configuration. This does nothing.
-     *
-     * @param element The plugin's root XML element that this group can add a child to
-     */
-    public void readData(Element element)
-    {
-        logger.debug("readData");
-        Element hist = element.getChild("history");
-        if (hist == null)
-        {
-            return;
-        }
+    Element root = new Element("history-" + key);
 
-        readData(hist, SEARCH);
-        readData(hist, COMMAND);
-        readData(hist, EXPRESSION);
-        readData(hist, INPUT);
+    List<HistoryEntry> elems = block.getEntries();
+    for (HistoryEntry entry : elems) {
+      Element text = new Element("entry");
+      CDATA data = new CDATA(StringHelper.entities(entry.getEntry()));
+      text.addContent(data);
+      root.addContent(text);
     }
 
-    private void readData(Element element, String key)
-    {
-        HistoryBlock block = histories.get(key);
-        if (block != null)
-        {
-            return;
-        }
+    element.addContent(root);
+  }
 
-        block = new HistoryBlock();
-        histories.put(key, block);
-
-        Element root = element.getChild("history-" + key);
-        if (root != null)
-        {
-            List items = root.getChildren("entry");
-            for (Object item : items)
-            {
-                block.addEntry(StringHelper.unentities(((Element)item).getText()));
-            }
-        }
+  /**
+   * Allows the group to restore its state and any configuration. This does nothing.
+   *
+   * @param element The plugin's root XML element that this group can add a child to
+   */
+  public void readData(Element element) {
+    logger.debug("readData");
+    Element hist = element.getChild("history");
+    if (hist == null) {
+      return;
     }
 
-    private static int maxLength()
-    {
-        NumberOption opt = (NumberOption)Options.getInstance().getOption("history");
+    readData(hist, SEARCH);
+    readData(hist, COMMAND);
+    readData(hist, EXPRESSION);
+    readData(hist, INPUT);
+  }
 
-        return opt.value();
+  private void readData(Element element, String key) {
+    HistoryBlock block = histories.get(key);
+    if (block != null) {
+      return;
     }
 
-    private static class HistoryBlock
-    {
-        public void addEntry(String text)
-        {
-            for (int i = 0; i < entries.size(); i++)
-            {
-                HistoryEntry entry = entries.get(i);
-                if (text.equals(entry.getEntry()))
-                {
-                    entries.remove(i);
-                    break;
-                }
-            }
+    block = new HistoryBlock();
+    histories.put(key, block);
 
-            entries.add(new HistoryEntry(++counter, text));
+    Element root = element.getChild("history-" + key);
+    if (root != null) {
+      List items = root.getChildren("entry");
+      for (Object item : items) {
+        block.addEntry(StringHelper.unentities(((Element)item).getText()));
+      }
+    }
+  }
 
-            if (entries.size() > maxLength())
-            {
-                entries.remove(0);
-            }
+  private static int maxLength() {
+    NumberOption opt = (NumberOption)Options.getInstance().getOption("history");
+
+    return opt.value();
+  }
+
+  private static class HistoryBlock {
+    public void addEntry(String text) {
+      for (int i = 0; i < entries.size(); i++) {
+        HistoryEntry entry = entries.get(i);
+        if (text.equals(entry.getEntry())) {
+          entries.remove(i);
+          break;
         }
+      }
 
-        public String getEntry(int index)
-        {
-            if (index < entries.size())
-            {
-                HistoryEntry entry = entries.get(index);
-                return entry.getEntry();
-            }
-            else
-            {
-                return null;
-            }
-        }
+      entries.add(new HistoryEntry(++counter, text));
 
-        public List<HistoryEntry> getEntries()
-        {
-            return entries;
-        }
-
-        private List<HistoryEntry> entries = new ArrayList<HistoryEntry>();
-        private int counter;
+      if (entries.size() > maxLength()) {
+        entries.remove(0);
+      }
     }
 
-    public static class HistoryEntry
-    {
-        public HistoryEntry(int number, String entry)
-        {
-            this.number = number;
-            this.entry = entry;
-        }
-
-        public int getNumber()
-        {
-            return number;
-        }
-
-        public String getEntry()
-        {
-            return entry;
-        }
-
-        private int number;
-        private String entry;
+    public String getEntry(int index) {
+      if (index < entries.size()) {
+        HistoryEntry entry = entries.get(index);
+        return entry.getEntry();
+      }
+      else {
+        return null;
+      }
     }
 
-    private Map<String, HistoryBlock> histories = new HashMap<String, HistoryBlock>();
+    public List<HistoryEntry> getEntries() {
+      return entries;
+    }
 
-    private static Logger logger = Logger.getInstance(HistoryGroup.class.getName());
+    private List<HistoryEntry> entries = new ArrayList<HistoryEntry>();
+    private int counter;
+  }
+
+  public static class HistoryEntry {
+    public HistoryEntry(int number, String entry) {
+      this.number = number;
+      this.entry = entry;
+    }
+
+    public int getNumber() {
+      return number;
+    }
+
+    public String getEntry() {
+      return entry;
+    }
+
+    private int number;
+    private String entry;
+  }
+
+  private Map<String, HistoryBlock> histories = new HashMap<String, HistoryBlock>();
+
+  private static Logger logger = Logger.getInstance(HistoryGroup.class.getName());
 }

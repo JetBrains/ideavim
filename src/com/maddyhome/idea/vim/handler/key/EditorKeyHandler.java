@@ -35,99 +35,84 @@ import javax.swing.*;
 /**
  *
  */
-public class EditorKeyHandler extends EditorActionHandler
-{
-    //public EditorKeyHandler(EditorActionHandler origHandler, KeyStroke stroke)
-    //{
-    //    this(origHandler, stroke, false);
-    //}
+public class EditorKeyHandler extends EditorActionHandler {
+  //public EditorKeyHandler(EditorActionHandler origHandler, KeyStroke stroke)
+  //{
+  //    this(origHandler, stroke, false);
+  //}
 
-    public EditorKeyHandler(EditorActionHandler origHandler, KeyStroke stroke, boolean special)
+  public EditorKeyHandler(EditorActionHandler origHandler, KeyStroke stroke, boolean special) {
+    this.origHandler = origHandler;
+    this.stroke = stroke;
+    this.special = special;
+  }
+
+  public void execute(Editor editor, DataContext context) {
+    logger.debug("execute");
+    //if (isEnabled(editor, context))
+
+    // Do not launch vim actions in case of lookup enabled
+    boolean isEnabled = editor != null && VimPlugin.isEnabled();
+    if (isEnabled) {
+      final Lookup lookup = LookupManager.getActiveLookup(editor);
+      if (lookup != null && lookup.isCompletion()) {
+        isEnabled = false;
+      }
+    }
+    if (isEnabled) {
+      handle(editor, context);
+    }
+    else {
+      original(editor, context);
+    }
+  }
+
+  protected void original(Editor editor, DataContext context) {
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("original for " + stroke);
+      logger.debug("original is " + origHandler.getClass().getName());
+      logger.debug("editor viewer=" + editor.isViewer());
+      logger.debug("project=" + PlatformDataKeys.PROJECT.getData(context)); // API change - don't merge
+    }
+    origHandler.execute(editor, context);
+  }
+
+  protected void handle(Editor editor, DataContext context) {
+    KeyHandler.getInstance().handleKey(editor, stroke, context);
+  }
+
+  public boolean isEnabled(Editor editor, DataContext dataContext) {
+    boolean res = true;
+    if (editor == null || !VimPlugin.isEnabled()
+        // Enable correct enter handler processing in Rename, Watches etc
+        || (special && PlatformDataKeys.VIRTUAL_FILE.getData(dataContext) == null)) {
+      logger.debug("no editor or disabled");
+      res = origHandler.isEnabled(editor, dataContext);
+    }
+    else if (PlatformDataKeys.VIRTUAL_FILE.getData(dataContext) == null) // API change - don't merge
     {
-        this.origHandler = origHandler;
-        this.stroke = stroke;
-        this.special = special;
+      logger.debug("no file");
+      if (!special) {
+        logger.debug("not special");
+        res = origHandler.isEnabled(editor, dataContext);
+      }
+      else {
+        int mode = CommandState.getInstance(editor).getMode();
+        if (mode != CommandState.MODE_INSERT && mode != CommandState.MODE_REPLACE) {
+          logger.debug("not insert or replace");
+          res = origHandler.isEnabled(editor, dataContext);
+        }
+      }
     }
 
-    public void execute(Editor editor, DataContext context)
-    {
-        logger.debug("execute");
-        //if (isEnabled(editor, context))
+    if (logger.isDebugEnabled()) logger.debug("res=" + res);
+    return res;
+  }
 
-        // Do not launch vim actions in case of lookup enabled
-        boolean isEnabled = editor != null && VimPlugin.isEnabled();
-        if (isEnabled)
-        {
-          final Lookup lookup = LookupManager.getActiveLookup(editor);
-          if (lookup != null && lookup.isCompletion())
-          {
-            isEnabled = false;
-          }
-        }
-        if (isEnabled)
-        {
-            handle(editor, context);
-        }
-        else
-        {
-            original(editor, context);
-        }
-    }
+  protected EditorActionHandler origHandler;
+  protected KeyStroke stroke;
+  protected boolean special;
 
-    protected void original(Editor editor, DataContext context)
-    {
-
-        if (logger.isDebugEnabled())
-        {
-            logger.debug("original for " + stroke);
-            logger.debug("original is " + origHandler.getClass().getName());
-            logger.debug("editor viewer=" + editor.isViewer());
-            logger.debug("project=" + PlatformDataKeys.PROJECT.getData(context)); // API change - don't merge
-        }
-        origHandler.execute(editor, context);
-    }
-
-    protected void handle(Editor editor, DataContext context)
-    {
-        KeyHandler.getInstance().handleKey(editor, stroke, context);
-    }
-
-    public boolean isEnabled(Editor editor, DataContext dataContext)
-    {
-        boolean res = true;
-        if (editor == null || !VimPlugin.isEnabled() 
-            // Enable correct enter handler processing in Rename, Watches etc
-            || (special && PlatformDataKeys.VIRTUAL_FILE.getData(dataContext) == null))
-        {
-            logger.debug("no editor or disabled");
-            res = origHandler.isEnabled(editor, dataContext);
-        }
-        else if (PlatformDataKeys.VIRTUAL_FILE.getData(dataContext) == null) // API change - don't merge
-        {
-            logger.debug("no file");
-            if (!special)
-            {
-                logger.debug("not special");
-                res = origHandler.isEnabled(editor, dataContext);
-            }
-            else
-            {
-                int mode = CommandState.getInstance(editor).getMode();
-                if (mode != CommandState.MODE_INSERT && mode != CommandState.MODE_REPLACE)
-                {
-                    logger.debug("not insert or replace");
-                    res = origHandler.isEnabled(editor, dataContext);
-                }
-            }
-        }
-
-        if (logger.isDebugEnabled()) logger.debug("res=" + res);
-        return res;
-    }
-
-    protected EditorActionHandler origHandler;
-    protected KeyStroke stroke;
-    protected boolean special;
-
-    private static Logger logger = Logger.getInstance(EditorKeyHandler.class.getName());
+  private static Logger logger = Logger.getInstance(EditorKeyHandler.class.getName());
 }

@@ -25,10 +25,8 @@ import com.maddyhome.idea.vim.handler.key.DummyEditorHandler;
 /**
  *
  */
-public class PageDownAction extends EditorAction
-{
-    public PageDownAction()
-    {
-        super(new DummyEditorHandler());
-    }
+public class PageDownAction extends EditorAction {
+  public PageDownAction() {
+    super(new DummyEditorHandler());
+  }
 }

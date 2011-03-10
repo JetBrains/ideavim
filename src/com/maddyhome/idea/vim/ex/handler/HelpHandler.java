@@ -19,56 +19,47 @@ package com.maddyhome.idea.vim.ex.handler;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.help.HelpManager;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  *
  */
-public class HelpHandler extends CommandHandler
-{
-    public HelpHandler()
-    {
-        super("h", "elp", ARGUMENT_OPTIONAL | DONT_REOPEN);
+public class HelpHandler extends CommandHandler {
+  public HelpHandler() {
+    super("h", "elp", ARGUMENT_OPTIONAL | DONT_REOPEN);
+  }
+
+  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+    String key = cmd.getArgument();
+    if (key.length() == 0) {
+      key = "help.txt";
+    }
+    else if ("*".equals(key)) {
+      key = "star";
     }
 
-    public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException
-    {
-        String key = cmd.getArgument();
-        if (key.length() == 0)
-        {
-            key = "help.txt";
-        }
-        else if ("*".equals(key))
-        {
-            key = "star";
-        }
+    HelpManager mgr = HelpManager.getInstance();
+    mgr.invokeHelp("vim." + encode(key));
 
-        HelpManager mgr = HelpManager.getInstance();
-        mgr.invokeHelp("vim." + encode(key));
+    return true;
+  }
 
-        return true;
+  private static String encode(String key) {
+    StringBuffer res = new StringBuffer();
+    for (int i = 0; i < key.length(); i++) {
+      if ("%\"~<>=#&?/.".indexOf(key.charAt(i)) >= 0) {
+        res.append('%').append(Integer.toHexString((int)key.charAt(i)).toUpperCase());
+      }
+      else {
+        res.append(key.charAt(i));
+      }
     }
 
-    private static String encode(String key)
-    {
-        StringBuffer res = new StringBuffer();
-        for (int i = 0; i < key.length(); i++)
-        {
-            if ("%\"~<>=#&?/.".indexOf(key.charAt(i)) >= 0)
-            {
-                res.append('%').append(Integer.toHexString((int)key.charAt(i)).toUpperCase());
-            }
-            else
-            {
-                res.append(key.charAt(i));
-            }
-        }
-
-        return res.toString();
-    }
+    return res.toString();
+  }
 }

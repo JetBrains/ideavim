@@ -24,19 +24,17 @@ import java.util.EventObject;
 /**
  * This event indicates that the value of the option has changed
  */
-public class OptionChangeEvent extends EventObject
-{
-    public OptionChangeEvent(Option option)
-    {
-        super(option);
-    }
+public class OptionChangeEvent extends EventObject {
+  public OptionChangeEvent(Option option) {
+    super(option);
+  }
 
-    /**
-     * Gets the changed option.
-     * @return The changed option
-     */
-    public Option getOption()
-    {
-        return (Option)getSource();
-    }
+  /**
+   * Gets the changed option.
+   *
+   * @return The changed option
+   */
+  public Option getOption() {
+    return (Option)getSource();
+  }
 }

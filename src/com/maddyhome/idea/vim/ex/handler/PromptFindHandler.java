@@ -19,27 +19,24 @@ package com.maddyhome.idea.vim.ex.handler;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  *
  */
-public class PromptFindHandler extends CommandHandler
-{
-    public PromptFindHandler()
-    {
-        super("pro", "mptfind", 0);
-    }
+public class PromptFindHandler extends CommandHandler {
+  public PromptFindHandler() {
+    super("pro", "mptfind", 0);
+  }
 
-    public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException
-    {
-        KeyHandler.executeAction("Find", context);
+  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+    KeyHandler.executeAction("Find", context);
 
-        return true;
-    }
+    return true;
+  }
 }

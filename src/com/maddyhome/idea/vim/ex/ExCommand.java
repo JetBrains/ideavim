@@ -19,102 +19,85 @@ package com.maddyhome.idea.vim.ex;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  *
  */
-public class ExCommand
-{
-    public ExCommand(Ranges ranges, String command, String argument)
-    {
-        this.ranges = ranges;
-        this.argument = argument;
-        this.command = command;
+public class ExCommand {
+  public ExCommand(Ranges ranges, String command, String argument) {
+    this.ranges = ranges;
+    this.argument = argument;
+    this.command = command;
+  }
+
+  public int getLine(Editor editor, DataContext context) {
+    return ranges.getLine(editor, context);
+  }
+
+  public int getCount(Editor editor, DataContext context, int defaultCount, boolean checkCount) {
+    int count = -1;
+    if (checkCount) {
+      count = getCountArgument();
     }
 
-    public int getLine(Editor editor, DataContext context)
-    {
-        return ranges.getLine(editor, context);
+    int res = ranges.getCount(editor, context, count);
+    if (res == -1) {
+      res = defaultCount;
     }
 
-    public int getCount(Editor editor, DataContext context, int defaultCount, boolean checkCount)
-    {
-        int count = -1;
-        if (checkCount)
-        {
-            count = getCountArgument();
-        }
+    return res;
+  }
 
-        int res = ranges.getCount(editor, context, count);
-        if (res == -1)
-        {
-            res = defaultCount;
-        }
-
-        return res;
+  public LineRange getLineRange(Editor editor, DataContext context, boolean checkCount) {
+    int count = -1;
+    if (checkCount) {
+      count = getCountArgument();
     }
 
-    public LineRange getLineRange(Editor editor, DataContext context, boolean checkCount)
-    {
-        int count = -1;
-        if (checkCount)
-        {
-            count = getCountArgument();
-        }
+    return ranges.getLineRange(editor, context, count);
+  }
 
-        return ranges.getLineRange(editor, context, count);
+  public TextRange getTextRange(Editor editor, DataContext context, boolean checkCount) {
+    int count = -1;
+    if (checkCount) {
+      count = getCountArgument();
     }
 
-    public TextRange getTextRange(Editor editor, DataContext context, boolean checkCount)
-    {
-        int count = -1;
-        if (checkCount)
-        {
-            count = getCountArgument();
-        }
+    return ranges.getTextRange(editor, context, count);
+  }
 
-        return ranges.getTextRange(editor, context, count);
+  protected int getCountArgument() {
+    try {
+      return Integer.parseInt(argument);
     }
-
-    protected int getCountArgument()
-    {
-        try
-        {
-            return Integer.parseInt(argument);
-        }
-        catch (NumberFormatException e)
-        {
-            return -1;
-        }
+    catch (NumberFormatException e) {
+      return -1;
     }
+  }
 
-    public String getCommand()
-    {
-        return command;
-    }
+  public String getCommand() {
+    return command;
+  }
 
-    public String getArgument()
-    {
-        return argument;
-    }
+  public String getArgument() {
+    return argument;
+  }
 
-    public void setArgument(String argument)
-    {
-        this.argument = argument;
-    }
+  public void setArgument(String argument) {
+    this.argument = argument;
+  }
 
-    public Ranges getRanges()
-    {
-        return ranges;
-    }
+  public Ranges getRanges() {
+    return ranges;
+  }
 
-    protected Ranges ranges;
-    protected String command;
-    protected String argument;
+  protected Ranges ranges;
+  protected String command;
+  protected String argument;
 
-    private static Logger logger = Logger.getInstance(ExCommand.class.getName());
+  private static Logger logger = Logger.getInstance(ExCommand.class.getName());
 }

@@ -25,10 +25,8 @@ import com.maddyhome.idea.vim.handler.key.DummyEditorHandler;
 /**
  *
  */
-public class BackSpaceAction extends EditorAction
-{
-    public BackSpaceAction()
-    {
-        super(new DummyEditorHandler());
-    }
+public class BackSpaceAction extends EditorAction {
+  public BackSpaceAction() {
+    super(new DummyEditorHandler());
+  }
 }

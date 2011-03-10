@@ -32,213 +32,181 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import java.util.*;
 
-public class VimSettingsPanel
-{
-    public VimSettingsPanel()
-    {
-        setupControls();
+public class VimSettingsPanel {
+  public VimSettingsPanel() {
+    setupControls();
+  }
+
+  public JComponent getMainComponent() {
+    return mainPanel;
+  }
+
+  public void setOptions(VimSettings options, HashMap<KeyStroke, KeyConflict> conflicts) {
+    pluginEnable.setSelected(options.isEnabled());
+
+    keys.setModel(new ConflictTableModel(conflicts));
+    sizeColumns();
+    scrollPane.getVerticalScrollBar().setValue(0);
+  }
+
+  private void sizeColumns() {
+    TableColumn choice = keys.getColumn(keys.getColumnName(0));
+    choice.sizeWidthToFit();
+    TableColumn key = keys.getColumn(keys.getColumnName(1));
+    key.sizeWidthToFit();
+
+    int width = getPreferredWidthForColumn(choice);
+    choice.setMinWidth(width);
+    choice.setMaxWidth(width);
+
+    width = getPreferredWidthForColumn(key);
+    key.setMinWidth(width);
+    key.setMaxWidth(width);
+
+    keys.sizeColumnsToFit(0);
+  }
+
+  private int getPreferredWidthForColumn(TableColumn column) {
+    return Math.max(columnHeaderWidth(column), widestCellInColumn(column));
+  }
+
+  private int widestCellInColumn(TableColumn column) {
+    int c = column.getModelIndex();
+    int res = 0;
+
+    TableCellRenderer renderer = keys.getDefaultRenderer(keys.getColumnClass(c));
+    for (int r = 0; r < keys.getRowCount(); r++) {
+      int width = renderer.getTableCellRendererComponent(
+        keys, keys.getValueAt(r, c), false, false, r, c).getPreferredSize().width;
+      res = Math.max(res, width);
     }
 
-    public JComponent getMainComponent()
-    {
-        return mainPanel;
-    }
+    return res;
+  }
 
-    public void setOptions(VimSettings options, HashMap<KeyStroke, KeyConflict> conflicts)
-    {
-        pluginEnable.setSelected(options.isEnabled());
+  private int columnHeaderWidth(TableColumn column) {
+    TableCellRenderer renderer = keys.getTableHeader().getDefaultRenderer();
 
-        keys.setModel(new ConflictTableModel(conflicts));
-        sizeColumns();
-        scrollPane.getVerticalScrollBar().setValue(0);
-    }
+    return renderer.getTableCellRendererComponent(
+      keys, column.getHeaderValue(), false, false, 0, 0).getPreferredSize().width + 2;
+  }
 
-    private void sizeColumns()
-    {
-        TableColumn choice = keys.getColumn(keys.getColumnName(0));
-        choice.sizeWidthToFit();
-        TableColumn key = keys.getColumn(keys.getColumnName(1));
-        key.sizeWidthToFit();
+  public VimSettings getOptions() {
+    VimSettings res = new VimSettings();
+    res.setEnabled(pluginEnable.isSelected());
+    res.setChoices(((ConflictTableModel)keys.getModel()).getChoices());
 
-        int width = getPreferredWidthForColumn(choice);
-        choice.setMinWidth(width);
-        choice.setMaxWidth(width);
+    return res;
+  }
 
-        width = getPreferredWidthForColumn(key);
-        key.setMinWidth(width);
-        key.setMaxWidth(width);
+  public boolean isModified(VimSettings options) {
+    return !getOptions().equals(options);
+  }
 
-        keys.sizeColumnsToFit(0);
-    }
+  private void setupControls() {
+  }
 
-    private int getPreferredWidthForColumn(TableColumn column)
-    {
-        return Math.max(columnHeaderWidth(column), widestCellInColumn(column));
-    }
-
-    private int widestCellInColumn(TableColumn column)
-    {
-        int c = column.getModelIndex();
-        int res = 0;
-
-        TableCellRenderer renderer = keys.getDefaultRenderer(keys.getColumnClass(c));
-        for (int r = 0; r < keys.getRowCount(); r++)
-        {
-            int width = renderer.getTableCellRendererComponent(
-                keys, keys.getValueAt(r, c), false, false, r, c).getPreferredSize().width;
-            res = Math.max(res, width);
+  private static class ConflictTableModel extends AbstractTableModel {
+    public ConflictTableModel(HashMap<KeyStroke, KeyConflict> conflicts) {
+      TreeMap<String, KeyStroke> keys = new TreeMap<String, KeyStroke>();
+      for (KeyStroke stroke : conflicts.keySet()) {
+        KeyConflict conf = conflicts.get(stroke);
+        if (conf.hasConflict()) {
+          keys.put(KeymapUtil.getKeystrokeText(stroke), stroke);
         }
+      }
 
-        return res;
-    }
+      orig = new boolean[keys.size()];
+      keystokes = new KeyStroke[keys.size()];
+      data = new Object[keys.size()][4];
 
-    private int columnHeaderWidth(TableColumn column)
-    {
-        TableCellRenderer renderer = keys.getTableHeader().getDefaultRenderer();
+      ActionManager mgr = ActionManager.getInstance();
+      Iterator iter = keys.keySet().iterator();
+      for (int i = 0; iter.hasNext(); i++) {
+        String keyLabel = (String)iter.next();
+        KeyStroke stroke = keys.get(keyLabel);
+        KeyConflict conf = conflicts.get(stroke);
 
-        return renderer.getTableCellRendererComponent(
-            keys, column.getHeaderValue(), false, false, 0, 0).getPreferredSize().width + 2;
-    }
+        orig[i] = !conf.isPluginWins();
+        keystokes[i] = stroke;
+        data[i][0] = !conf.isPluginWins();
+        data[i][1] = keyLabel;
 
-    public VimSettings getOptions()
-    {
-        VimSettings res = new VimSettings();
-        res.setEnabled(pluginEnable.isSelected());
-        res.setChoices(((ConflictTableModel)keys.getModel()).getChoices());
-
-        return res;
-    }
-
-    public boolean isModified(VimSettings options)
-    {
-        return !getOptions().equals(options);
-    }
-
-    private void setupControls()
-    {
-    }
-
-    private static class ConflictTableModel extends AbstractTableModel
-    {
-        public ConflictTableModel(HashMap<KeyStroke, KeyConflict> conflicts)
-        {
-            TreeMap<String, KeyStroke> keys = new TreeMap<String, KeyStroke>();
-            for (KeyStroke stroke : conflicts.keySet())
-            {
-                KeyConflict conf = conflicts.get(stroke);
-                if (conf.hasConflict())
-                {
-                    keys.put(KeymapUtil.getKeystrokeText(stroke), stroke);
-                }
+        TreeSet<String> actions = new TreeSet<String>();
+        for (String id : conf.getIdeaActions().keySet()) {
+          String desc = null;
+          AnAction act = mgr.getAction(id);
+          if (act != null) {
+            Presentation pres = act.getTemplatePresentation();
+            if (pres != null) {
+              desc = pres.getText();
             }
-
-            orig = new boolean[keys.size()];
-            keystokes = new KeyStroke[keys.size()];
-            data = new Object[keys.size()][4];
-
-            ActionManager mgr = ActionManager.getInstance();
-            Iterator iter = keys.keySet().iterator();
-            for (int i = 0; iter.hasNext(); i++)
-            {
-                String keyLabel = (String)iter.next();
-                KeyStroke stroke = keys.get(keyLabel);
-                KeyConflict conf = conflicts.get(stroke);
-
-                orig[i] = !conf.isPluginWins();
-                keystokes[i] = stroke;
-                data[i][0] = !conf.isPluginWins();
-                data[i][1] = keyLabel;
-
-                TreeSet<String> actions = new TreeSet<String>();
-                for (String id : conf.getIdeaActions().keySet())
-                {
-                    String desc = null;
-                    AnAction act = mgr.getAction(id);
-                    if (act != null)
-                    {
-                        Presentation pres = act.getTemplatePresentation();
-                        if (pres != null)
-                        {
-                            desc = pres.getText();
-                        }
-                    }
-                    if (desc != null)
-                    {
-                        actions.add(desc);
-                    }
-                }
-
-                data[i][2] = actions.toString();
-
-                actions = new TreeSet<String>();
-                List<String> pacts = conf.getPluginActions();
-                for (String id : pacts)
-                {
-                    actions.add(mgr.getAction(id).getTemplatePresentation().getText());
-                }
-
-                data[i][3] = actions.toString();
-            }
+          }
+          if (desc != null) {
+            actions.add(desc);
+          }
         }
 
-        public HashSet getChoices()
-        {
-            HashSet<KeyStroke> res = new HashSet<KeyStroke>();
-            for (int i = 0; i < getRowCount(); i++)
-            {
-                Boolean val = (Boolean)getValueAt(i, 0);
-                if (val)
-                {
-                    res.add(keystokes[i]);
-                }
-            }
+        data[i][2] = actions.toString();
 
-            return res;
+        actions = new TreeSet<String>();
+        List<String> pacts = conf.getPluginActions();
+        for (String id : pacts) {
+          actions.add(mgr.getAction(id).getTemplatePresentation().getText());
         }
 
-        public int getColumnCount()
-        {
-            return labels.length;
-        }
-
-        public int getRowCount()
-        {
-            return data == null ? 0 : data.length;
-        }
-
-        public Object getValueAt(int row, int col)
-        {
-            return data[row][col];
-        }
-
-        public boolean isCellEditable(int row, int col)
-        {
-            return col == 0;
-        }
-
-        public Class getColumnClass(int col)
-        {
-            return col == 0 ? Boolean.class : String.class;
-        }
-
-        public void setValueAt(Object object, int row, int col)
-        {
-            data[row][col] = object;
-        }
-
-        public String getColumnName(int col)
-        {
-            return labels[col];
-        }
-
-        boolean[] orig;
-        KeyStroke[] keystokes;
-        Object[][] data;
-        String[] labels = new String[] { "Use IDEA Action", "KeyStroke", "IDEA Actions", "VIM Actions" };
+        data[i][3] = actions.toString();
+      }
     }
 
-    private JPanel mainPanel;
-    private JTable keys;
-    private JCheckBox pluginEnable;
-    private JScrollPane scrollPane;
+    public HashSet getChoices() {
+      HashSet<KeyStroke> res = new HashSet<KeyStroke>();
+      for (int i = 0; i < getRowCount(); i++) {
+        Boolean val = (Boolean)getValueAt(i, 0);
+        if (val) {
+          res.add(keystokes[i]);
+        }
+      }
+
+      return res;
+    }
+
+    public int getColumnCount() {
+      return labels.length;
+    }
+
+    public int getRowCount() {
+      return data == null ? 0 : data.length;
+    }
+
+    public Object getValueAt(int row, int col) {
+      return data[row][col];
+    }
+
+    public boolean isCellEditable(int row, int col) {
+      return col == 0;
+    }
+
+    public Class getColumnClass(int col) {
+      return col == 0 ? Boolean.class : String.class;
+    }
+
+    public void setValueAt(Object object, int row, int col) {
+      data[row][col] = object;
+    }
+
+    public String getColumnName(int col) {
+      return labels[col];
+    }
+
+    boolean[] orig;
+    KeyStroke[] keystokes;
+    Object[][] data;
+    String[] labels = new String[]{"Use IDEA Action", "KeyStroke", "IDEA Actions", "VIM Actions"};
+  }
+
+  private JPanel mainPanel;
+  private JTable keys;
+  private JCheckBox pluginEnable;
+  private JScrollPane scrollPane;
 }

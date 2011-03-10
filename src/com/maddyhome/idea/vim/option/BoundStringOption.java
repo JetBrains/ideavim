@@ -19,67 +19,54 @@ package com.maddyhome.idea.vim.option;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-public class BoundStringOption extends StringOption
-{
-    BoundStringOption(String name, String abbrev, String dflt, String[] values)
-    {
-        super(name, abbrev, dflt);
+public class BoundStringOption extends StringOption {
+  BoundStringOption(String name, String abbrev, String dflt, String[] values) {
+    super(name, abbrev, dflt);
 
-        this.values = values;
+    this.values = values;
+  }
+
+  public boolean set(String val) {
+    if (isValid(val)) {
+      return super.set(val);
     }
 
-    public boolean set(String val)
-    {
-        if (isValid(val))
-        {
-            return super.set(val);
-        }
+    return false;
+  }
 
-        return false;
+  public boolean append(String val) {
+    if (isValid(val) && getValue().length() == 0) {
+      return super.set(val);
     }
 
-    public boolean append(String val)
-    {
-        if (isValid(val) && getValue().length() == 0)
-        {
-            return super.set(val);
-        }
+    return false;
+  }
 
-        return false;
+  public boolean prepend(String val) {
+    if (isValid(val) && getValue().length() == 0) {
+      return super.set(val);
     }
 
-    public boolean prepend(String val)
-    {
-        if (isValid(val) && getValue().length() == 0)
-        {
-            return super.set(val);
-        }
+    return false;
+  }
 
-        return false;
+  public boolean remove(String val) {
+    if (getValue().equals(val)) {
+      return super.remove(val);
     }
 
-    public boolean remove(String val)
-    {
-        if (getValue().equals(val))
-        {
-            return super.remove(val);
-        }
+    return false;
+  }
 
-        return false;
+  private boolean isValid(String val) {
+    for (String value : values) {
+      if (value.equals(val)) {
+        return true;
+      }
     }
 
-    private boolean isValid(String val)
-    {
-        for (String value : values)
-        {
-            if (value.equals(val))
-            {
-                return true;
-            }
-        }
+    return false;
+  }
 
-        return false;
-    }
-
-    protected String[] values;
+  protected String[] values;
 }

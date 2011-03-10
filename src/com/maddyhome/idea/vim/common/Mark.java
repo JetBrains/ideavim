@@ -24,74 +24,64 @@ import java.util.Comparator;
 /**
  * This represents a file mark. Each mark has a line and a column, the file it applies to, and the mark key
  */
-public class Mark extends FileLocation
-{
-    /**
-     * Creates a file mark
-     * @param key The mark's key
-     * @param lline The logical line within the file
-     * @param col The column within the line
-     * @param filename The file being marked
-     */
-    public Mark(char key, int lline, int col, String filename)
-    {
-        super(lline, col, filename);
+public class Mark extends FileLocation {
+  /**
+   * Creates a file mark
+   *
+   * @param key      The mark's key
+   * @param lline    The logical line within the file
+   * @param col      The column within the line
+   * @param filename The file being marked
+   */
+  public Mark(char key, int lline, int col, String filename) {
+    super(lline, col, filename);
 
-        this.key = key;
+    this.key = key;
+  }
+
+  /**
+   * The mark's key
+   *
+   * @return The mark's key
+   */
+  public char getKey() {
+    return key;
+  }
+
+  public boolean equals(Object object) {
+    if (object instanceof Mark) {
+      if (((Mark)object).key == key) {
+        return true;
+      }
     }
 
-    /**
-     * The mark's key
-     * @return The mark's key
-     */
-    public char getKey()
-    {
-        return key;
+    return false;
+  }
+
+  public String toString() {
+    final StringBuffer sb = new StringBuffer();
+    sb.append("Mark{");
+    sb.append(super.toString());
+    sb.append(",key=").append(key);
+    sb.append('}');
+    return sb.toString();
+  }
+
+  public static class KeySorter<V> implements Comparator<V> {
+    public int compare(V o1, V o2) {
+      Mark a = (Mark)o1;
+      Mark b = (Mark)o2;
+      if (a.key < b.key) {
+        return -1;
+      }
+      else if (a.key > b.key) {
+        return 1;
+      }
+      else {
+        return 0;
+      }
     }
+  }
 
-    public boolean equals(Object object)
-    {
-        if (object instanceof Mark)
-        {
-            if (((Mark)object).key == key)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public String toString()
-    {
-        final StringBuffer sb = new StringBuffer();
-        sb.append("Mark{");
-        sb.append(super.toString());
-        sb.append(",key=").append(key);
-        sb.append('}');
-        return sb.toString();
-    }
-
-    public static class KeySorter<V> implements Comparator<V>
-    {
-        public int compare(V o1, V o2)
-        {
-            Mark a = (Mark)o1;
-            Mark b = (Mark)o2;
-            if (a.key < b.key)
-            {
-                return -1;
-            }
-            else if (a.key > b.key)
-            {
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
-        }
-    }
-
-    private char key;
+  private char key;
 }

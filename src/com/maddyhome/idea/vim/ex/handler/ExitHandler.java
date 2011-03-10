@@ -19,33 +19,30 @@ package com.maddyhome.idea.vim.ex.handler;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.CommandGroups;
-import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  *
  */
-public class ExitHandler extends CommandHandler
-{
-    public ExitHandler()
-    {
-        super(new CommandName[] {
-            new CommandName("qa", "ll"),
-            new CommandName("quita", "ll"),
-            new CommandName("wqa", "ll"),
-            new CommandName("xa", "ll")
-        }, DONT_REOPEN);
-    }
+public class ExitHandler extends CommandHandler {
+  public ExitHandler() {
+    super(new CommandName[]{
+      new CommandName("qa", "ll"),
+      new CommandName("quita", "ll"),
+      new CommandName("wqa", "ll"),
+      new CommandName("xa", "ll")
+    }, DONT_REOPEN);
+  }
 
-    public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException
-    {
-        CommandGroups.getInstance().getFile().closeAllFiles(context);
+  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+    CommandGroups.getInstance().getFile().closeAllFiles(context);
 
-        return true;
-    }
+    return true;
+  }
 }

@@ -19,18 +19,12 @@ package com.maddyhome.idea.vim.ex.handler;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.ex.CommandHandler;
-import com.maddyhome.idea.vim.ex.CommandParser;
-import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.ex.InvalidRangeException;
-import com.maddyhome.idea.vim.ex.LineRange;
-import com.maddyhome.idea.vim.ex.ParseResult;
+import com.maddyhome.idea.vim.ex.*;
 import com.maddyhome.idea.vim.group.CommandGroups;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
@@ -38,39 +32,34 @@ import com.maddyhome.idea.vim.helper.Msg;
 /**
  *
  */
-public class MoveTextHandler extends CommandHandler
-{
-    public MoveTextHandler()
-    {
-        super("m", "ove", RANGE_OPTIONAL | ARGUMENT_REQUIRED | WRITABLE);
+public class MoveTextHandler extends CommandHandler {
+  public MoveTextHandler() {
+    super("m", "ove", RANGE_OPTIONAL | ARGUMENT_REQUIRED | WRITABLE);
+  }
+
+  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+    TextRange range = cmd.getTextRange(editor, context, false);
+    LineRange lr = cmd.getLineRange(editor, context, false);
+    int adj = lr.getEndLine() - lr.getStartLine() + 1;
+
+    ParseResult pr = CommandParser.getInstance().parse(cmd.getArgument());
+    int line = pr.getRanges().getFirstLine(editor, context);
+
+    if (line >= lr.getEndLine()) {
+      line -= adj;
+    }
+    else if (line >= lr.getStartLine()) {
+      throw new InvalidRangeException(MessageHelper.getMsg(Msg.e_backrange));
     }
 
-    public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException
-    {
-        TextRange range = cmd.getTextRange(editor, context, false);
-        LineRange lr = cmd.getLineRange(editor, context, false);
-        int adj = lr.getEndLine() - lr.getStartLine() + 1;
+    String text = EditorHelper.getText(editor, range.getStartOffset(), range.getEndOffset());
 
-        ParseResult pr = CommandParser.getInstance().parse(cmd.getArgument());
-        int line = pr.getRanges().getFirstLine(editor, context);
+    editor.getDocument().deleteString(range.getStartOffset(), range.getEndOffset());
 
-        if (line >= lr.getEndLine())
-        {
-            line -= adj;
-        }
-        else if (line >= lr.getStartLine())
-        {
-            throw new InvalidRangeException(MessageHelper.getMsg(Msg.e_backrange));
-        }
+    int offset = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor, line + 1);
+    CommandGroups.getInstance().getCopy().putText(editor, context, offset, text, Command.FLAG_MOT_LINEWISE, 1, true,
+                                                  false, 0);
 
-        String text = EditorHelper.getText(editor, range.getStartOffset(), range.getEndOffset());
-
-        editor.getDocument().deleteString(range.getStartOffset(), range.getEndOffset());
-
-        int offset = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor, line + 1);
-        CommandGroups.getInstance().getCopy().putText(editor, context, offset, text, Command.FLAG_MOT_LINEWISE, 1, true,
-            false, 0);
-
-        return true;
-    }
+    return true;
+  }
 }

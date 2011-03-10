@@ -19,31 +19,27 @@ package com.maddyhome.idea.vim.action.change;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.maddyhome.idea.vim.undo.UndoManager;
 
 /**
  */
-public class UndoAction extends EditorAction
-{
-    public UndoAction()
-    {
-        super(new Handler());
-    }
+public class UndoAction extends EditorAction {
+  public UndoAction() {
+    super(new Handler());
+  }
 
-    private static class Handler extends AbstractEditorActionHandler
-    {
-        protected boolean execute(Editor editor, DataContext context, Command cmd)
-        {
-            UndoManager.getInstance().endCommand(editor);
-            boolean res =  UndoManager.getInstance().undo(editor, context);
-            UndoManager.getInstance().beginCommand(editor);
+  private static class Handler extends AbstractEditorActionHandler {
+    protected boolean execute(Editor editor, DataContext context, Command cmd) {
+      UndoManager.getInstance().endCommand(editor);
+      boolean res = UndoManager.getInstance().undo(editor, context);
+      UndoManager.getInstance().beginCommand(editor);
 
-            return res;
-        }
+      return res;
     }
+  }
 }

@@ -26,112 +26,107 @@ import javax.swing.*;
 /**
  * This node represents a command in the key/action tree
  */
-public class CommandNode implements Node
-{
-    /**
-     * Creates a command node for the key and action
-     * @param key The final keystroke in this command
-     * @param actName The name of the action
-     * @param action The action that executes this command
-     * @param cmdType The type of the command
-     * @param flags Any special flags needs by the command
-     */
-    public CommandNode(KeyStroke key, String actName, AnAction action, int cmdType, int flags)
-    {
-        this.key = key;
-        this.actionId = actName;
-        this.action = action;
-        this.type = cmdType;
-        this.flags = flags;
-    }
+public class CommandNode implements Node {
+  /**
+   * Creates a command node for the key and action
+   *
+   * @param key     The final keystroke in this command
+   * @param actName The name of the action
+   * @param action  The action that executes this command
+   * @param cmdType The type of the command
+   * @param flags   Any special flags needs by the command
+   */
+  public CommandNode(KeyStroke key, String actName, AnAction action, int cmdType, int flags) {
+    this.key = key;
+    this.actionId = actName;
+    this.action = action;
+    this.type = cmdType;
+    this.flags = flags;
+  }
 
-    public String getActionId()
-    {
-        return actionId;
-    }
+  public String getActionId() {
+    return actionId;
+  }
 
-    /**
-     * Gets the command's action
-     * @return The command's action
-     */
-    public AnAction getAction()
-    {
-        return action;
-    }
+  /**
+   * Gets the command's action
+   *
+   * @return The command's action
+   */
+  public AnAction getAction() {
+    return action;
+  }
 
-    /**
-     * Gets the command's keystroke
-     * @return The command's keystroke
-     */
-    public KeyStroke getKey()
-    {
-        return key;
-    }
+  /**
+   * Gets the command's keystroke
+   *
+   * @return The command's keystroke
+   */
+  public KeyStroke getKey() {
+    return key;
+  }
 
-    /**
-     * Gets the command's type
-     * @return The command's type
-     */
-    public int getCmdType()
-    {
-        return type;
-    }
+  /**
+   * Gets the command's type
+   *
+   * @return The command's type
+   */
+  public int getCmdType() {
+    return type;
+  }
 
-    /**
-     * Gets the command's flags
-     * @return The command's flags
-     */
-    public int getFlags()
-    {
-        return flags;
-    }
+  /**
+   * Gets the command's flags
+   *
+   * @return The command's flags
+   */
+  public int getFlags() {
+    return flags;
+  }
 
-    public String toString()
-    {
-        StringBuffer res = new StringBuffer();
-        res.append("CommandNode[key=");
-        res.append(key);
-        res.append(",actionId=");
-        res.append(actionId);
-        res.append(",action=");
-        res.append(action);
-        res.append(",argType=");
-        res.append(type);
-        res.append("]");
+  public String toString() {
+    StringBuffer res = new StringBuffer();
+    res.append("CommandNode[key=");
+    res.append(key);
+    res.append(",actionId=");
+    res.append(actionId);
+    res.append(",action=");
+    res.append(action);
+    res.append(",argType=");
+    res.append(type);
+    res.append("]");
 
-        return res.toString();
-    }
+    return res.toString();
+  }
 
-    public boolean equals(Object o)
-    {
-        if (this == o) return true;
-        if (!(o instanceof CommandNode)) return false;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (!(o instanceof CommandNode)) return false;
 
-        final CommandNode node = (CommandNode)o;
+    final CommandNode node = (CommandNode)o;
 
-        if (flags != node.flags) return false;
-        if (type != node.type) return false;
-        if (!actionId.equals(node.actionId)) return false;
-        if (!action.equals(node.action)) return false;
-        if (!key.equals(node.key)) return false;
+    if (flags != node.flags) return false;
+    if (type != node.type) return false;
+    if (!actionId.equals(node.actionId)) return false;
+    if (!action.equals(node.action)) return false;
+    if (!key.equals(node.key)) return false;
 
-        return true;
-    }
+    return true;
+  }
 
-    public int hashCode()
-    {
-        int result;
-        result = key.hashCode();
-        result = 29 * result + actionId.hashCode();
-        result = 29 * result + action.hashCode();
-        result = 29 * result + type;
-        result = 29 * result + flags;
-        return result;
-    }
+  public int hashCode() {
+    int result;
+    result = key.hashCode();
+    result = 29 * result + actionId.hashCode();
+    result = 29 * result + action.hashCode();
+    result = 29 * result + type;
+    result = 29 * result + flags;
+    return result;
+  }
 
-    protected KeyStroke key;
-    protected AnAction action;
-    protected String actionId;
-    protected int type;
-    protected int flags;
+  protected KeyStroke key;
+  protected AnAction action;
+  protected String actionId;
+  protected int type;
+  protected int flags;
 }

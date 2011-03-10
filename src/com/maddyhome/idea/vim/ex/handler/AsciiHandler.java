@@ -28,17 +28,14 @@ import com.maddyhome.idea.vim.group.CommandGroups;
 /**
  *
  */
-public class AsciiHandler extends CommandHandler
-{
-    public AsciiHandler()
-    {
-        super("as", "cii", ARGUMENT_FORBIDDEN | RANGE_FORBIDDEN);
-    }
+public class AsciiHandler extends CommandHandler {
+  public AsciiHandler() {
+    super("as", "cii", ARGUMENT_FORBIDDEN | RANGE_FORBIDDEN);
+  }
 
-    public boolean execute(Editor editor, DataContext context, ExCommand cmd)
-    {
-        CommandGroups.getInstance().getFile().displayAsciiInfo(editor);
+  public boolean execute(Editor editor, DataContext context, ExCommand cmd) {
+    CommandGroups.getInstance().getFile().displayAsciiInfo(editor);
 
-        return true;
-    }
+    return true;
+  }
 }

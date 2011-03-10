@@ -19,34 +19,29 @@ package com.maddyhome.idea.vim.action.motion.leftright;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.motion.MotionEditorActionHandler;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.maddyhome.idea.vim.helper.EditorData;
 
 /**
  */
-public class MotionColumnAction extends MotionEditorAction
-{
-    public MotionColumnAction()
-    {
-        super(new Handler());
+public class MotionColumnAction extends MotionEditorAction {
+  public MotionColumnAction() {
+    super(new Handler());
+  }
+
+  private static class Handler extends MotionEditorActionHandler {
+    public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
+      return CommandGroups.getInstance().getMotion().moveCaretToColumn(editor, count - 1, false);
     }
 
-    private static class Handler extends MotionEditorActionHandler
-    {
-        public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument)
-        {
-            return CommandGroups.getInstance().getMotion().moveCaretToColumn(editor, count - 1, false);
-        }
-
-        protected void postMove(Editor editor, DataContext context, Command cmd)
-        {
-            EditorData.setLastColumn(editor, cmd.getCount() - 1);
-        }
+    protected void postMove(Editor editor, DataContext context, Command cmd) {
+      EditorData.setLastColumn(editor, cmd.getCount() - 1);
     }
+  }
 }

@@ -22,32 +22,26 @@ package com.maddyhome.idea.vim.ex;
 /**
  *
  */
-public class LineRange
-{
-    public LineRange(int startLine, int endLine)
-    {
-        if (endLine >= startLine)
-        {
-            this.startLine = startLine;
-            this.endLine = endLine;
-        }
-        else
-        {
-            this.startLine = endLine;
-            this.endLine = startLine;
-        }
+public class LineRange {
+  public LineRange(int startLine, int endLine) {
+    if (endLine >= startLine) {
+      this.startLine = startLine;
+      this.endLine = endLine;
     }
-
-    public int getStartLine()
-    {
-        return startLine;
+    else {
+      this.startLine = endLine;
+      this.endLine = startLine;
     }
+  }
 
-    public int getEndLine()
-    {
-        return endLine;
-    }
+  public int getStartLine() {
+    return startLine;
+  }
 
-    private int startLine;
-    private int endLine;
+  public int getEndLine() {
+    return endLine;
+  }
+
+  private int startLine;
+  private int endLine;
 }

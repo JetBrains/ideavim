@@ -24,22 +24,17 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.group.CommandGroups;
-import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  */
-public class InsertHelpAction extends EditorAction
-{
-    public InsertHelpAction()
-    {
-        super(new Handler());
-    }
+public class InsertHelpAction extends EditorAction {
+  public InsertHelpAction() {
+    super(new Handler());
+  }
 
-    private static class Handler extends EditorActionHandler
-    {
-        public void execute(Editor editor, DataContext context)
-        {
-            CommandGroups.getInstance().getChange().insertHelp(editor, context);
-        }
+  private static class Handler extends EditorActionHandler {
+    public void execute(Editor editor, DataContext context) {
+      CommandGroups.getInstance().getChange().insertHelp(editor, context);
     }
+  }
 }

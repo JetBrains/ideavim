@@ -19,51 +19,44 @@ package com.maddyhome.idea.vim.command;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-public class VisualRange
-{
-    public VisualRange(int start, int end, int type, int offset)
-    {
-        this.start = start;
-        this.end = end;
-        this.type = type;
-        this.offset = offset;
-    }
+public class VisualRange {
+  public VisualRange(int start, int end, int type, int offset) {
+    this.start = start;
+    this.end = end;
+    this.type = type;
+    this.offset = offset;
+  }
 
-    public int getStart()
-    {
-        return start;
-    }
+  public int getStart() {
+    return start;
+  }
 
-    public int getEnd()
-    {
-        return end;
-    }
+  public int getEnd() {
+    return end;
+  }
 
-    public int getType()
-    {
-        return type;
-    }
+  public int getType() {
+    return type;
+  }
 
-    public int getOffset()
-    {
-        return offset;
-    }
+  public int getOffset() {
+    return offset;
+  }
 
-    public String toString()
-    {
-        StringBuffer res = new StringBuffer();
-        res.append("VisualRange[");
-        res.append("start=").append(start);
-        res.append(", end=").append(end);
-        res.append(", type=").append(type);
-        res.append(", offset=").append(offset);
-        res.append("]");
+  public String toString() {
+    StringBuffer res = new StringBuffer();
+    res.append("VisualRange[");
+    res.append("start=").append(start);
+    res.append(", end=").append(end);
+    res.append(", type=").append(type);
+    res.append(", offset=").append(offset);
+    res.append("]");
 
-        return res.toString();
-    }
+    return res.toString();
+  }
 
-    int start;
-    int end;
-    int type;
-    int offset;
+  int start;
+  int end;
+  int type;
+  int offset;
 }

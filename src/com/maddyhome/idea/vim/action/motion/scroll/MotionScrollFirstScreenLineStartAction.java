@@ -28,19 +28,15 @@ import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
 
 /**
  */
-public class MotionScrollFirstScreenLineStartAction extends EditorAction
-{
-    public MotionScrollFirstScreenLineStartAction()
-    {
-        super(new Handler());
-    }
+public class MotionScrollFirstScreenLineStartAction extends EditorAction {
+  public MotionScrollFirstScreenLineStartAction() {
+    super(new Handler());
+  }
 
-    private static class Handler extends AbstractEditorActionHandler
-    {
-        protected boolean execute(Editor editor, DataContext context, Command cmd)
-        {
-            return CommandGroups.getInstance().getMotion().scrollLineToFirstScreenLine(editor, context, cmd.getRawCount(),
-                cmd.getCount(), true);
-        }
+  private static class Handler extends AbstractEditorActionHandler {
+    protected boolean execute(Editor editor, DataContext context, Command cmd) {
+      return CommandGroups.getInstance().getMotion().scrollLineToFirstScreenLine(editor, context, cmd.getRawCount(),
+                                                                                 cmd.getCount(), true);
     }
+  }
 }

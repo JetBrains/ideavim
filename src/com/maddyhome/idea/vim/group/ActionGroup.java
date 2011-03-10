@@ -24,12 +24,11 @@ import org.jdom.Element;
 /**
  * This is the base for all key mapping groups
  */
-public interface ActionGroup
-{
-    /**
-     * Allows the group to save its state and any configuration.
-     * @param element The plugin's root XML element that this group can add a child to
-     */
-    void saveData(Element element);
-
+public interface ActionGroup {
+  /**
+   * Allows the group to save its state and any configuration.
+   *
+   * @param element The plugin's root XML element that this group can add a child to
+   */
+  void saveData(Element element);
 }

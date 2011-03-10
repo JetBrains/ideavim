@@ -19,105 +19,85 @@ package com.maddyhome.idea.vim.undo;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  *
  */
-public class DocumentChange
-{
-    public DocumentChange(int offset, String oldText, String newText)
-    {
-        this.offset = offset;
-        this.oldText = oldText;
-        this.newText = newText;
+public class DocumentChange {
+  public DocumentChange(int offset, String oldText, String newText) {
+    this.offset = offset;
+    this.oldText = oldText;
+    this.newText = newText;
+  }
+
+  public int getOffset() {
+    return offset;
+  }
+
+  public String getOldText() {
+    return oldText;
+  }
+
+  public String getNewText() {
+    return newText;
+  }
+
+  public void redo(Editor editor, DataContext context) {
+    if (oldText.length() > 0) {
+      if (newText.length() > 0) {
+        editor.getDocument().replaceString(offset, offset + oldText.length(), newText);
+      }
+      else {
+        editor.getDocument().deleteString(offset, offset + oldText.length());
+      }
     }
-
-    public int getOffset()
-    {
-        return offset;
+    else {
+      if (newText.length() > 0) {
+        editor.getDocument().insertString(offset, newText);
+      }
+      else {
+        // Both empty - no-op
+      }
     }
+  }
 
-    public String getOldText()
-    {
-        return oldText;
+  public void undo(Editor editor, DataContext context) {
+    if (logger.isDebugEnabled()) logger.debug("undo command = " + this);
+    if (oldText.length() > 0) {
+      if (newText.length() > 0) {
+        editor.getDocument().replaceString(offset, offset + newText.length(), oldText);
+      }
+      else {
+        editor.getDocument().insertString(offset, oldText);
+      }
     }
-
-    public String getNewText()
-    {
-        return newText;
+    else {
+      if (newText.length() > 0) {
+        editor.getDocument().deleteString(offset, offset + newText.length());
+      }
+      else {
+        // Both empty - no-op
+      }
     }
+  }
 
-    public void redo(Editor editor, DataContext context)
-    {
-        if (oldText.length() > 0)
-        {
-            if (newText.length() > 0)
-            {
-                editor.getDocument().replaceString(offset, offset + oldText.length(), newText);
-            }
-            else
-            {
-                editor.getDocument().deleteString(offset, offset + oldText.length());
-            }
-        }
-        else
-        {
-            if (newText.length() > 0)
-            {
-                editor.getDocument().insertString(offset, newText);
-            }
-            else
-            {
-                // Both empty - no-op
-            }
-        }
-    }
+  public String toString() {
+    StringBuffer res = new StringBuffer();
+    res.append("DocumentChange[");
+    res.append("offset=").append(offset);
+    res.append(", oldText=\"").append(oldText);
+    res.append("\", newText=\"").append(newText);
+    res.append("\"]");
 
-    public void undo(Editor editor, DataContext context)
-    {
-        if (logger.isDebugEnabled()) logger.debug("undo command = " + this);
-        if (oldText.length() > 0)
-        {
-            if (newText.length() > 0)
-            {
-                editor.getDocument().replaceString(offset, offset + newText.length(), oldText);
-            }
-            else
-            {
-                editor.getDocument().insertString(offset, oldText);
-            }
-        }
-        else
-        {
-            if (newText.length() > 0)
-            {
-                editor.getDocument().deleteString(offset, offset + newText.length());
-            }
-            else
-            {
-                // Both empty - no-op
-            }
-        }
-    }
+    return res.toString();
+  }
 
-    public String toString()
-    {
-        StringBuffer res = new StringBuffer();
-        res.append("DocumentChange[");
-        res.append("offset=").append(offset);
-        res.append(", oldText=\"").append(oldText);
-        res.append("\", newText=\"").append(newText);
-        res.append("\"]");
+  private int offset;
+  private String oldText;
+  private String newText;
 
-        return res.toString();
-    }
-
-    private int offset;
-    private String oldText;
-    private String newText;
-
-    private static Logger logger = Logger.getInstance(DocumentChange.class.getName());
+  private static Logger logger = Logger.getInstance(DocumentChange.class.getName());
 }

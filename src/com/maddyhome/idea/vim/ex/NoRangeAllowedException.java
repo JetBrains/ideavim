@@ -22,22 +22,19 @@ package com.maddyhome.idea.vim.ex;
 /**
  * Exception class
  */
-public class NoRangeAllowedException extends ExException
-{
-    /**
-     * Constructs an <code>NoRangeAllowedException</code> with no specified detail message.
-     */
-    public NoRangeAllowedException()
-    {
-    }
+public class NoRangeAllowedException extends ExException {
+  /**
+   * Constructs an <code>NoRangeAllowedException</code> with no specified detail message.
+   */
+  public NoRangeAllowedException() {
+  }
 
-    /**
-     * Constructs an <code>NoRangeAllowedException</code> with the specified detail message.
-     *
-     * @param   s   the detail message.
-     */
-    public NoRangeAllowedException(String s)
-    {
-        super(s);
-    }
+  /**
+   * Constructs an <code>NoRangeAllowedException</code> with the specified detail message.
+   *
+   * @param s the detail message.
+   */
+  public NoRangeAllowedException(String s) {
+    super(s);
+  }
 }

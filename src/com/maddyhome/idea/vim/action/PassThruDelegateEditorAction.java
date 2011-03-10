@@ -25,48 +25,38 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.intellij.openapi.actionSystem.DataContext;
 
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
-public class PassThruDelegateEditorAction extends AbstractDelegateEditorAction
-{
-    public PassThruDelegateEditorAction(KeyStroke stroke, EditorActionHandler origHandler)
-    {
-        super(new MyHandler(stroke, origHandler));
+public class PassThruDelegateEditorAction extends AbstractDelegateEditorAction {
+  public PassThruDelegateEditorAction(KeyStroke stroke, EditorActionHandler origHandler) {
+    super(new MyHandler(stroke, origHandler));
+  }
+
+  private static Logger logger = Logger.getInstance(PassThruDelegateEditorAction.class.getName());
+
+  private static class MyHandler extends EditorActionHandler {
+    public MyHandler(KeyStroke stroke, EditorActionHandler handler) {
+      this.stroke = stroke;
+      this.origHandler = handler;
     }
 
-    private static Logger logger = Logger.getInstance(PassThruDelegateEditorAction.class.getName());
-
-    private static class MyHandler extends EditorActionHandler
-    {
-        public MyHandler(KeyStroke stroke, EditorActionHandler handler)
-        {
-            this.stroke = stroke;
-            this.origHandler = handler;
+    public void execute(Editor editor, DataContext dataContext) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("actionPerformed key=" + stroke);
+      }
+      if (editor == null || !VimPlugin.isEnabled()) {
+        origHandler.execute(editor, dataContext);
+      }
+      else {
+        if (logger.isDebugEnabled()) {
+          logger.debug("event = KeyEvent: " + stroke);
         }
-
-        public void execute(Editor editor, DataContext dataContext)
-        {
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("actionPerformed key=" + stroke);
-            }
-            if (editor == null || !VimPlugin.isEnabled())
-            {
-                origHandler.execute(editor, dataContext);
-            }
-            else
-            {
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("event = KeyEvent: " + stroke);
-                }
-                KeyHandler.getInstance().handleKey(editor, stroke, dataContext);
-            }
-        }
-
-        private KeyStroke stroke;
-        private EditorActionHandler origHandler;
+        KeyHandler.getInstance().handleKey(editor, stroke, dataContext);
+      }
     }
+
+    private KeyStroke stroke;
+    private EditorActionHandler origHandler;
+  }
 }

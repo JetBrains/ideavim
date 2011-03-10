@@ -24,27 +24,26 @@ import java.util.HashMap;
 /**
  * This abstract node is used as a base for any node that can contain child nodes
  */
-public abstract class ParentNode implements Node
-{
-    /**
-     * This adds a child node keyed by the supplied key
-     * @param child The child node
-     * @param key The key to map the child to
-     */
-    public void addChild(Node child, Object key)
-    {
-        children.put(key, child);
-    }
+public abstract class ParentNode implements Node {
+  /**
+   * This adds a child node keyed by the supplied key
+   *
+   * @param child The child node
+   * @param key   The key to map the child to
+   */
+  public void addChild(Node child, Object key) {
+    children.put(key, child);
+  }
 
-    /**
-     * Returns the child node associated with the supplied key. The key must be the same as used in {@link #addChild}
-     * @param key The key used to find the child
-     * @return The child mapped to key or null if no such mapping found
-     */
-    public Node getChild(Object key)
-    {
-        return children.get(key);
-    }
+  /**
+   * Returns the child node associated with the supplied key. The key must be the same as used in {@link #addChild}
+   *
+   * @param key The key used to find the child
+   * @return The child mapped to key or null if no such mapping found
+   */
+  public Node getChild(Object key) {
+    return children.get(key);
+  }
 
-    protected HashMap<Object, Node> children = new HashMap<Object, Node>();
+  protected HashMap<Object, Node> children = new HashMap<Object, Node>();
 }

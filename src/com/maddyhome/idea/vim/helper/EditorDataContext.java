@@ -23,37 +23,31 @@ import com.intellij.openapi.editor.Editor;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-public class EditorDataContext implements DataContext
-{
-    public EditorDataContext(Editor editor)
-    {
-        this.editor = editor;
+public class EditorDataContext implements DataContext {
+  public EditorDataContext(Editor editor) {
+    this.editor = editor;
+  }
+
+  /**
+   * Returns the object corresponding to the specified data identifier. Some of the supported data identifiers are
+   * defined in the {@link PlatformDataKeys} class.
+   *
+   * @param dataId the data identifier for which the value is requested.
+   * @return the value, or null if no value is available in the current context for this identifier.
+   */
+  public Object getData(String dataId) {
+    if (PlatformDataKeys.EDITOR.getName().equals(dataId)) {
+      return editor;
+    }
+    else if (PlatformDataKeys.PROJECT.getName().equals(dataId)) {
+      return EditorData.getProject(editor);
+    }
+    else if (PlatformDataKeys.VIRTUAL_FILE.getName().equals(dataId)) {
+      return EditorData.getVirtualFile(editor);
     }
 
-    /**
-     * Returns the object corresponding to the specified data identifier. Some of the supported data identifiers are
-     * defined in the {@link PlatformDataKeys} class.
-     *
-     * @param dataId the data identifier for which the value is requested.
-     * @return the value, or null if no value is available in the current context for this identifier.
-     */
-    public Object getData(String dataId)
-    {
-        if (PlatformDataKeys.EDITOR.getName().equals(dataId))
-        {
-            return editor;
-        }
-        else if (PlatformDataKeys.PROJECT.getName().equals(dataId))
-        {
-            return EditorData.getProject(editor);
-        }
-        else if (PlatformDataKeys.VIRTUAL_FILE.getName().equals(dataId))
-        {
-            return EditorData.getVirtualFile(editor);
-        }
+    return null;
+  }
 
-        return null;
-    }
-
-    private Editor editor;
+  private Editor editor;
 }

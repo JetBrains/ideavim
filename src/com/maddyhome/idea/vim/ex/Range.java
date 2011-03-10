@@ -19,26 +19,27 @@ package com.maddyhome.idea.vim.ex;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Editor;
 
 /**
  * Represents an Ex command range
  */
-public interface Range
-{
-    /**
-     * Get the line number this range represents
-     * @param editor The editor to get the line for
-     * @param context The data context
-     * @param lastZero True if the last line set represents before the start of the false
-     * @return The zero based logical line in the editor that the range represents
-     */
-    int getLine(Editor editor, DataContext context, boolean lastZero);
+public interface Range {
+  /**
+   * Get the line number this range represents
+   *
+   * @param editor   The editor to get the line for
+   * @param context  The data context
+   * @param lastZero True if the last line set represents before the start of the false
+   * @return The zero based logical line in the editor that the range represents
+   */
+  int getLine(Editor editor, DataContext context, boolean lastZero);
 
-    /**
-     * Should the cursor be moved to this range's line?
-     * @return True if cursor should be moved, false if not
-     */
-    boolean isMove();
+  /**
+   * Should the cursor be moved to this range's line?
+   *
+   * @return True if cursor should be moved, false if not
+   */
+  boolean isMove();
 }

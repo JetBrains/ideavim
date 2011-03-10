@@ -25,10 +25,8 @@ import com.maddyhome.idea.vim.handler.key.DummyEditorHandler;
 /**
  *
  */
-public class TabAction extends EditorAction
-{
-    public TabAction()
-    {
-        super(new DummyEditorHandler());
-    }
+public class TabAction extends EditorAction {
+  public TabAction() {
+    super(new DummyEditorHandler());
+  }
 }

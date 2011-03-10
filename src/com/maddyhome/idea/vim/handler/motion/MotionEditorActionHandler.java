@@ -29,41 +29,33 @@ import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
 
 /**
  */
-public abstract class MotionEditorActionHandler extends AbstractEditorActionHandler
-{
-    protected final boolean execute(Editor editor, DataContext context, Command cmd)
-    {
-        preMove(editor, context, cmd);
+public abstract class MotionEditorActionHandler extends AbstractEditorActionHandler {
+  protected final boolean execute(Editor editor, DataContext context, Command cmd) {
+    preMove(editor, context, cmd);
 
-        int offset = getOffset(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
-        if (offset == -1)
-        {
-            return false;
-        }
-        else if (offset >= 0)
-        {
-            if ((cmd.getFlags() & Command.FLAG_SAVE_JUMP) != 0)
-            {
-                CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
-            }
-            MotionGroup.moveCaret(editor, context, offset);
-            postMove(editor, context, cmd);
-
-            return true;
-        }
-        else
-        {
-            return true;
-        }
+    int offset = getOffset(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+    if (offset == -1) {
+      return false;
     }
+    else if (offset >= 0) {
+      if ((cmd.getFlags() & Command.FLAG_SAVE_JUMP) != 0) {
+        CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
+      }
+      MotionGroup.moveCaret(editor, context, offset);
+      postMove(editor, context, cmd);
 
-    public abstract int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument);
-
-    protected void preMove(Editor editor, DataContext context, Command cmd)
-    {
+      return true;
     }
-
-    protected void postMove(Editor editor, DataContext context, Command cmd)
-    {
+    else {
+      return true;
     }
+  }
+
+  public abstract int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument);
+
+  protected void preMove(Editor editor, DataContext context, Command cmd) {
+  }
+
+  protected void postMove(Editor editor, DataContext context, Command cmd) {
+  }
 }

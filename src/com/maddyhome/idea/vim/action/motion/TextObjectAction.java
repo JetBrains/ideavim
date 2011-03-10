@@ -28,18 +28,15 @@ import com.maddyhome.idea.vim.handler.motion.TextObjectActionHandler;
 
 /**
  */
-public abstract class TextObjectAction extends EditorAction
-{
-    public TextObjectAction(TextObjectActionHandler handler)
-    {
-        super(handler);
-        this.handler = handler;
-    }
+public abstract class TextObjectAction extends EditorAction {
+  public TextObjectAction(TextObjectActionHandler handler) {
+    super(handler);
+    this.handler = handler;
+  }
 
-    public TextRange getRange(Editor editor, DataContext context, int count, int rawCount, Argument argument)
-    {
-        return handler.getRange(editor, context, count, rawCount, argument);
-    }
+  public TextRange getRange(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
+    return handler.getRange(editor, context, count, rawCount, argument);
+  }
 
-    private TextObjectActionHandler handler;
+  private TextObjectActionHandler handler;
 }

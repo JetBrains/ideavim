@@ -19,27 +19,23 @@ package com.maddyhome.idea.vim.action.copy;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
-import com.intellij.openapi.actionSystem.DataContext;
 
 /**
  */
-public class PutTextBeforeCursorAction extends EditorAction
-{
-    public PutTextBeforeCursorAction()
-    {
-        super(new Handler());
-    }
+public class PutTextBeforeCursorAction extends EditorAction {
+  public PutTextBeforeCursorAction() {
+    super(new Handler());
+  }
 
-    private static class Handler extends ChangeEditorActionHandler
-    {
-        public boolean execute(Editor editor, DataContext context, int count, int rawCount, Argument argument)
-        {
-            return CommandGroups.getInstance().getCopy().putTextBeforeCursor(editor, context, count, true, false);
-        }
+  private static class Handler extends ChangeEditorActionHandler {
+    public boolean execute(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
+      return CommandGroups.getInstance().getCopy().putTextBeforeCursor(editor, context, count, true, false);
     }
+  }
 }

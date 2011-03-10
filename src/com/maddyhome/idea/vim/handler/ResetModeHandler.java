@@ -28,11 +28,9 @@ import com.maddyhome.idea.vim.command.CommandState;
 /**
  *
  */
-public class ResetModeHandler extends EditorActionHandler
-{
-    public void execute(Editor editor, DataContext context)
-    {
-        CommandState.getInstance(editor).reset();
-        KeyHandler.getInstance().fullReset(editor);
-    }
+public class ResetModeHandler extends EditorActionHandler {
+  public void execute(Editor editor, DataContext context) {
+    CommandState.getInstance(editor).reset();
+    KeyHandler.getInstance().fullReset(editor);
+  }
 }

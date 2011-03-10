@@ -29,18 +29,14 @@ import com.maddyhome.idea.vim.handler.motion.TextObjectActionHandler;
 
 /**
  */
-public class MotionInnerBigWordAction extends TextObjectAction
-{
-    public MotionInnerBigWordAction()
-    {
-        super(new Handler());
-    }
+public class MotionInnerBigWordAction extends TextObjectAction {
+  public MotionInnerBigWordAction() {
+    super(new Handler());
+  }
 
-    private static class Handler extends TextObjectActionHandler
-    {
-        public TextRange getRange(Editor editor, DataContext context, int count, int rawCount, Argument argument)
-        {
-            return CommandGroups.getInstance().getMotion().getWordRange(editor, context, count, false, true);
-        }
+  private static class Handler extends TextObjectActionHandler {
+    public TextRange getRange(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
+      return CommandGroups.getInstance().getMotion().getWordRange(editor, context, count, false, true);
     }
+  }
 }
