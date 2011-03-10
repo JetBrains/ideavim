@@ -1,258 +1,256 @@
 <project name="IdeaVim">
-    <!--
-    * IdeaVim - A Vim emulator plugin for IntelliJ Idea
-    * Copyright (C) 2003-2009 Rick Maddy, Oleg Shpynov
-    *
-    * This program is free software; you can redistribute it and/or
-    * modify it under the terms of the GNU General Public License
-    * as published by the Free Software Foundation; either version 2
-    * of the License, or (at your option) any later version.
-    *
-    * This program is distributed in the hope that it will be useful,
-    * but WITHOUT ANY WARRANTY; without even the implied warranty of
-    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    * GNU General Public License for more details.
-    *
-    * You should have received a copy of the GNU General Public License
-    * along with this program; if not, write to the Free Software
-    * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-    -->
+  <!--
+  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
+  * Copyright (C) 2003-2009 Rick Maddy, Oleg Shpynov
+  *
+  * This program is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU General Public License
+  * as published by the Free Software Foundation; either version 2
+  * of the License, or (at your option) any later version.
+  *
+  * This program is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  *
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+  -->
+  <property file="build.properties"/>
 
-    <property name="idea" value="${basedir}/idea"/>
-    <property name="src" value="${basedir}/src"/>
-    <property name="resources" value="${basedir}/resources"/>
-    <property name="classes" value="${basedir}/classes"/>
-    <property name="javadoc" value="${basedir}/docs/javadoc"/>
-    <property name="build" value="${basedir}/build"/>
-    <property name="build" value="${basedir}/build"/>
-    <property name="install" value="${basedir}/install"/>
-    <property name="dist" value="${basedir}/dist"/>
+  <property name="idea" value="${basedir}/idea"/>
+  <property name="src" value="${basedir}/src"/>
+  <property name="resources" value="${basedir}/resources"/>
+  <property name="javadoc" value="${basedir}/docs/javadoc"/>
+  <property name="install" value="${basedir}/install"/>
 
-    <!-- Update to your IntelliJ installation -->
-    <property name="idea.home" value="${idea}/unzip"/>
-    <property name="project" value="IdeaVIM"/>
+  <!--Output-->
+  <property name="out" value="${basedir}"/>
+  <property name="classes" value="${out}/classes"/>
+  <property name="build" value="${out}/build"/>
+  <property name="dist" value="${out}/dist"/>
 
-    <!-- Update this prior to building a new distribution -->
-    <property name="idea-version" value="10.x"/>
-    <property name="version" value="0.13.1"/>
-    <property name="since-version" value="105.1"/>
+  <!-- Update to your IntelliJ installation -->
+  <property name="idea.home" value="${idea}/unzip"/>
+  <property name="project" value="IdeaVIM"/>
 
-    <!-- Define task -->
-    <path id="ant-contrib">
-        <pathelement path="lib/ant-contrib-1.0b3.jar"/>
+  <!-- Define task -->
+  <path id="ant-contrib">
+    <pathelement path="lib/ant-contrib-1.0b3.jar"/>
+  </path>
+  <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="ant-contrib"/>
+
+  <target name="clean.build">
+    <delete dir="${build}"/>
+    <delete dir="${classes}"/>
+  </target>
+
+  <target name="clean.help">
+    <delete dir="${build}/help"/>
+  </target>
+
+
+  <target name="clean" depends="clean.build,clean.help" description="Removes all generated files">
+    <delete dir="${javadoc}"/>
+    <delete dir="${project}"/>
+  </target>
+
+  <target name="compile">
+    <path id="build.classpath">
+      <fileset dir="${idea.home}/lib">
+        <include name="*.jar"/>
+      </fileset>
+      <pathelement path="${classes}"/>
     </path>
-    <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="ant-contrib"/>
 
-    <target name="clean.build">
-        <delete dir="${build}"/>
-        <delete dir="${classes}"/>
-    </target>
+    <mkdir dir="${classes}"/>
+    <javac destdir="${classes}" debug="on" deprecation="on" classpathref="build.classpath" source="1.6"
+           target="1.6">
+      <src path="${src}"/>
+      <include name="com/maddyhome/idea/**"/>
+    </javac>
+  </target>
 
-    <target name="clean.help">
-        <delete dir="${build}/help"/>
-    </target>
+  <target name="classes.jar">
+    <mkdir dir="${build}"/>
+    <jar basedir="${classes}" jarfile="${build}/${project}.jar" compress="yes"/>
+  </target>
 
+  <target name="copy">
+    <mkdir dir="${classes}"/>
+    <mkdir dir="${classes}/META-INF"/>
+    <copy file="resources/META-INF/plugin.xml" todir="${classes}/META-INF">
+      <filterset>
+        <filter token="NAME" value="${project}"/>
+        <filter token="VERSION" value="${version}"/>
+        <filter token="IDEA-VERSION" value="${idea-version}"/>
+        <filter token="SINCE-VERSION" value="${since-version}"/>
+      </filterset>
+    </copy>
+    <copy todir="${classes}">
+      <fileset dir="${src}" excludes="**/*.java"/>
+    </copy>
+    <copy todir="${classes}">
+      <fileset dir="${resources}"/>
+    </copy>
+  </target>
 
-    <target name="clean" depends="clean.build,clean.help" description="Removes all generated files">
-        <delete dir="${javadoc}"/>
-        <delete dir="${project}"/>
-    </target>
+  <target name="help" depends="clean.help, compile">
+    <mkdir dir="${build}/help/txt"/>
+    <mkdir dir="${build}/help/vim"/>
 
-    <target name="compile">
-        <path id="build.classpath">
-            <fileset dir="${idea.home}/lib">
-                <include name="*.jar"/>
-            </fileset>
-            <pathelement path="${classes}"/>
-        </path>
+    <copy todir="${build}/help/txt">
+      <fileset dir="help/txt">
+        <include name="*.txt"/>
+      </fileset>
+      <filterset>
+        <filter token="NAME" value="${project}"/>
+        <filter token="VERSION" value="${version}"/>
+      </filterset>
+    </copy>
 
-        <mkdir dir="${classes}"/>
-        <javac destdir="${classes}" debug="on" deprecation="on" classpathref="build.classpath" source="1.6"
-               target="1.6">
-            <src path="${src}"/>
-            <include name="com/maddyhome/idea/**"/>
-        </javac>
-    </target>
+    <!-- Generate tags by shortcuts or actions -->
+    <fileset dir="${build}/help/txt" id="txt.files">
+      <include name="*.txt"/>
+    </fileset>
+    <pathconvert property="helpfiles" refid="txt.files" pathsep=" "/>
+    <java failonerror="true" classname="com.maddyhome.idea.vim.help.MakeTags" classpath="${classes}"
+          output="${build}/help/vim/tags" error="error">
+      <arg line="${helpfiles}"/>
+    </java>
 
-    <target name="classes.jar">
-        <mkdir dir="${build}"/>
-        <jar basedir="${classes}" jarfile="${build}/${project}.jar" compress="yes"/>
-    </target>
+    <exec executable="sort" output="${build}/help/vim/tags.sort">
+      <arg value="-u"/>
+      <arg file="${build}/help/vim/tags"/>
+    </exec>
+    <move file="${build}/help/vim/tags.sort" tofile="${build}/help/vim/tags"/>
 
-    <target name="copy">
-        <mkdir dir="${classes}"/>
-        <mkdir dir="${classes}/META-INF"/>
-        <copy file="resources/META-INF/plugin.xml" todir="${classes}/META-INF">
-            <filterset>
-                <filter token="NAME" value="${project}"/>
-                <filter token="VERSION" value="${version}"/>
-                <filter token="IDEA-VERSION" value="${idea-version}"/>
-                <filter token="SINCE-VERSION" value="${since-version}"/>
-            </filterset>
-        </copy>
-        <copy todir="${classes}">
-            <fileset dir="${src}" excludes="**/*.java"/>
-        </copy>
-        <copy todir="${classes}">
-            <fileset dir="${resources}"/>
-        </copy>
-    </target>
+    <exec executable="perl">
+      <arg file="help/vim2jh.pl"/>
+      <arg path="${build}/help"/>
+      <arg path="${build}/help/vim/tags"/>
+      <arg line="${helpfiles}"/>
+    </exec>
 
-    <target name="help" depends="clean.help, compile">
-        <mkdir dir="${build}/help/txt"/>
-        <mkdir dir="${build}/help/vim"/>
+    <copy todir="${build}/help">
+      <fileset dir="help">
+        <include name="images/"/>
+      </fileset>
+    </copy>
 
-        <copy todir="${build}/help/txt">
-            <fileset dir="help/txt">
-                <include name="*.txt"/>
-            </fileset>
-            <filterset>
-                <filter token="NAME" value="${project}"/>
-                <filter token="VERSION" value="${version}"/>
-            </filterset>
-        </copy>
+    <copy todir="${build}/help">
+      <fileset dir="help/jh">
+        <include name="*"/>
+      </fileset>
+      <filterset>
+        <filter token="NAME" value="${project}"/>
+        <filter token="VERSION" value="${version}"/>
+      </filterset>
+    </copy>
 
-        <!-- Generate tags by shortcuts or actions -->
-        <fileset dir="${build}/help/txt" id="txt.files">
-            <include name="*.txt"/>
-        </fileset>
-        <pathconvert property="helpfiles" refid="txt.files" pathsep=" "/>
-        <java failonerror="true" classname="com.maddyhome.idea.vim.help.MakeTags" classpath="${classes}"
-              output="${build}/help/vim/tags" error="error">
-            <arg line="${helpfiles}"/>
-        </java>
+    <delete dir="${build}/help/txt"/>
 
-        <exec executable="sort" output="${build}/help/vim/tags.sort">
-            <arg value="-u"/>
-            <arg file="${build}/help/vim/tags"/>
-        </exec>
-        <move file="${build}/help/vim/tags.sort" tofile="${build}/help/vim/tags"/>
+    <fileset dir="${build}/help/vim" id="html.files">
+      <include name="*.html"/>
+    </fileset>
+    <pathconvert property="htmlfiles" refid="html.files" pathsep=" "/>
+    <propertyregex property="srchfiles" input="${htmlfiles}" regexp="${build}/help/" replace="" global="true"/>
 
-        <exec executable="perl">
-            <arg file="help/vim2jh.pl"/>
-            <arg path="${build}/help"/>
-            <arg path="${build}/help/vim/tags"/>
-            <arg line="${helpfiles}"/>
-        </exec>
+    <java classname="com.sun.java.help.search.Indexer" classpath="lib/jhall.jar" fork="true" dir="${build}/help">
+      <arg value="-db"/>
+      <arg value="MasterSearchIndex"/>
+      <arg line="${srchfiles}"/>
+    </java>
 
-        <copy todir="${build}/help">
-            <fileset dir="help">
-                <include name="images/"/>
-            </fileset>
-        </copy>
+    <jar basedir="${build}/help" jarfile="${build}/help.jar"/>
+  </target>
 
-        <copy todir="${build}/help">
-            <fileset dir="help/jh">
-                <include name="*"/>
-            </fileset>
-            <filterset>
-                <filter token="NAME" value="${project}"/>
-                <filter token="VERSION" value="${version}"/>
-            </filterset>
-        </copy>
+  <target name="build" depends="unzip, clean.build, compile, copy, classes.jar, help"
+          description="Compiles all source code and created plugin jar file">
+  </target>
 
-        <delete dir="${build}/help/txt"/>
+  <target name="unzip" description="Unzip downloaded artifacts and set up idea.home">
+    <delete dir="${idea}/unzip"/>
+    <mkdir dir="${idea}/unzip"/>
+    <unzip dest="${idea}/unzip">
+      <fileset dir="${idea}" includes="ideaIC-*.win.zip"/>
+    </unzip>
+  </target>
 
-        <fileset dir="${build}/help/vim" id="html.files">
-            <include name="*.html"/>
-        </fileset>
-        <pathconvert property="htmlfiles" refid="html.files" pathsep=" "/>
-        <propertyregex property="srchfiles" input="${htmlfiles}" regexp="${build}/help/" replace="" global="true"/>
+  <target name="build-plugin" depends="build"
+          description="Creates plugin zip file, which can be distributed using Plugins Manager">
+    <mkdir dir="${build}/production/IdeaVIM/lib"/>
+    <copy file="${build}/${project}.jar" todir="${build}/production/IdeaVIM/lib"/>
+    <mkdir dir="${build}/production/IdeaVIM/help"/>
+    <copy file="${build}/help.jar" todir="${build}/production/IdeaVIM/help"/>
+    <zip destfile="${build}/ideaVIM.zip" basedir="${build}/production"/>
+  </target>
 
-        <java classname="com.sun.java.help.search.Indexer" classpath="lib/jhall.jar" fork="true" dir="${build}/help">
-            <arg value="-db"/>
-            <arg value="MasterSearchIndex"/>
-            <arg line="${srchfiles}"/>
-        </java>
+  <target name="dist" depends="dist-src, dist-bin" description="Creates the src and bin distribution files"/>
 
-        <jar basedir="${build}/help" jarfile="${build}/help.jar"/>
-    </target>
+  <target name="dist-bin" depends="clean, build" description="Creates a tar file containing the plugin distribution">
+    <mkdir dir="dist"/>
+    <delete dir="${project}-${version}-${idea-version}"/>
+    <mkdir dir="${project}-${version}-${idea-version}"/>
+    <copy todir="${project}-${version}-${idea-version}">
+      <fileset dir="." includes="license/**"/>
+      <fileset dir="${install}" includes="**"/>
+    </copy>
+    <copy todir="${project}-${version}-${idea-version}/lib">
+      <fileset dir="${build}" includes="*.jar" excludes="help.jar"/>
+    </copy>
+    <copy todir="${project}-${version}-${idea-version}/help">
+      <fileset dir="${build}" includes="help.jar"/>
+    </copy>
+    <copy todir="${project}-${version}-${idea-version}/docs">
+      <filterset>
+        <filter token="NAME" value="${project}"/>
+        <filter token="VERSION" value="${version}"/>
+        <filter token="IDEA-VERSION" value="${idea-version}"/>
+      </filterset>
+      <fileset dir="docs" includes="vim/*.txt" excludes="javadoc"/>
+    </copy>
+    <copy file="docs/README.txt" tofile="${project}-${version}-${idea-version}/README">
+      <filterset>
+        <filter token="NAME" value="${project}"/>
+        <filter token="VERSION" value="${version}"/>
+        <filter token="IDEA-VERSION" value="${idea-version}"/>
+      </filterset>
+    </copy>
+    <copy file="docs/CHANGES.txt" tofile="${project}-${version}-${idea-version}/CHANGES">
+      <filterset>
+        <filter token="NAME" value="${project}"/>
+        <filter token="VERSION" value="${version}"/>
+        <filter token="IDEA-VERSION" value="${idea-version}"/>
+      </filterset>
+    </copy>
+    <copy file="docs/NOTES.txt" tofile="${project}-${version}-${idea-version}/NOTES">
+      <filterset>
+        <filter token="NAME" value="${project}"/>
+        <filter token="VERSION" value="${version}"/>
+        <filter token="IDEA-VERSION" value="${idea-version}"/>
+      </filterset>
+    </copy>
+    <tar basedir="." destfile="${dist}/${project}-${version}-${idea-version}-bin.tar.gz" compression="gzip"
+         includes="${project}-${version}-${idea-version}/**"/>
+    <move todir="${project}">
+      <fileset dir="${project}-${version}-${idea-version}"/>
+    </move>
+    <zip basedir="." zipfile="${dist}/${project}-${version}-${idea-version}.zip" compress="true"
+         includes="${project}/**"/>
+  </target>
 
-    <target name="build" depends="unzip, clean.build, compile, copy, classes.jar, help"
-            description="Compiles all source code and created plugin jar file">
-    </target>
+  <target name="dist-src" depends="clean" description="Creates the source tar file">
+    <mkdir dir="dist"/>
+    <tar basedir="." destfile="${dist}/${project}-${version}-${idea-version}-src.tar.gz"
+         excludes=".idea/**,idea/**,*.iws,dist/**,scratch/**,web/docs/**" compression="gzip"/>
+  </target>
 
-    <target name="unzip" description="Unzip downloaded artifacts and set up idea.home">
-        <delete dir="${idea}/unzip"/>
-        <mkdir dir="${idea}/unzip"/>
-        <unzip dest="${idea}/unzip">
-            <fileset dir="${idea}" includes="ideaIC-*.win.zip"/>
-        </unzip>
-    </target>
-
-    <target name="build-plugin" depends="build"
-            description="Creates plugin zip file, which can be distributed using Plugins Manager">
-        <mkdir dir="${build}/production/IdeaVIM/lib"/>
-        <copy file="${build}/${project}.jar" todir="${build}/production/IdeaVIM/lib"/>
-        <mkdir dir="${build}/production/IdeaVIM/help"/>
-        <copy file="${build}/help.jar" todir="${build}/production/IdeaVIM/help"/>
-        <zip destfile="${build}/ideaVIM.zip" basedir="${build}/production"/>
-    </target>
-
-    <target name="dist" depends="dist-src, dist-bin" description="Creates the src and bin distribution files"/>
-
-    <target name="dist-bin" depends="clean, build" description="Creates a tar file containing the plugin distribution">
-        <mkdir dir="dist"/>
-        <delete dir="${project}-${version}-${idea-version}"/>
-        <mkdir dir="${project}-${version}-${idea-version}"/>
-        <copy todir="${project}-${version}-${idea-version}">
-            <fileset dir="." includes="license/**"/>
-            <fileset dir="${install}" includes="**"/>
-        </copy>
-        <copy todir="${project}-${version}-${idea-version}/lib">
-            <fileset dir="${build}" includes="*.jar" excludes="help.jar"/>
-        </copy>
-        <copy todir="${project}-${version}-${idea-version}/help">
-            <fileset dir="${build}" includes="help.jar"/>
-        </copy>
-        <copy todir="${project}-${version}-${idea-version}/docs">
-            <filterset>
-                <filter token="NAME" value="${project}"/>
-                <filter token="VERSION" value="${version}"/>
-                <filter token="IDEA-VERSION" value="${idea-version}"/>
-            </filterset>
-            <fileset dir="docs" includes="vim/*.txt" excludes="javadoc"/>
-        </copy>
-        <copy file="docs/README.txt" tofile="${project}-${version}-${idea-version}/README">
-            <filterset>
-                <filter token="NAME" value="${project}"/>
-                <filter token="VERSION" value="${version}"/>
-                <filter token="IDEA-VERSION" value="${idea-version}"/>
-            </filterset>
-        </copy>
-        <copy file="docs/CHANGES.txt" tofile="${project}-${version}-${idea-version}/CHANGES">
-            <filterset>
-                <filter token="NAME" value="${project}"/>
-                <filter token="VERSION" value="${version}"/>
-                <filter token="IDEA-VERSION" value="${idea-version}"/>
-            </filterset>
-        </copy>
-        <copy file="docs/NOTES.txt" tofile="${project}-${version}-${idea-version}/NOTES">
-            <filterset>
-                <filter token="NAME" value="${project}"/>
-                <filter token="VERSION" value="${version}"/>
-                <filter token="IDEA-VERSION" value="${idea-version}"/>
-            </filterset>
-        </copy>
-        <tar basedir="." destfile="${dist}/${project}-${version}-${idea-version}-bin.tar.gz" compression="gzip"
-             includes="${project}-${version}-${idea-version}/**"/>
-        <move todir="${project}">
-            <fileset dir="${project}-${version}-${idea-version}"/>
-        </move>
-        <zip basedir="." zipfile="${dist}/${project}-${version}-${idea-version}.zip" compress="true"
-             includes="${project}/**"/>
-    </target>
-
-    <target name="dist-src" depends="clean" description="Creates the source tar file">
-        <mkdir dir="dist"/>
-        <tar basedir="." destfile="${dist}/${project}-${version}-${idea-version}-src.tar.gz"
-             excludes=".idea/**,idea/**,*.iws,dist/**,scratch/**,web/docs/**" compression="gzip"/>
-    </target>
-
-    <target name="javadoc" depends="build" description="Generates Javadoc for all source code">
-        <delete dir="${javadoc}"/>
-        <mkdir dir="${javadoc}"/>
-        <javadoc classpathref="build.classpath" access="protected" destdir="${javadoc}" packagenames="com.*"
-                 sourcepath="src" use="true"/>
-    </target>
+  <target name="javadoc" depends="build" description="Generates Javadoc for all source code">
+    <delete dir="${javadoc}"/>
+    <mkdir dir="${javadoc}"/>
+    <javadoc classpathref="build.classpath" access="protected" destdir="${javadoc}" packagenames="com.*"
+             sourcepath="src" use="true"/>
+  </target>
 </project>
