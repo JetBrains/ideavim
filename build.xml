@@ -232,13 +232,7 @@
         <filter token="IDEA-VERSION" value="${idea-version}"/>
       </filterset>
     </copy>
-    <tar basedir="." destfile="${dist}/${project}-${version}-${idea-version}-bin.tar.gz" compression="gzip"
-         includes="${project}-${version}-${idea-version}/**"/>
-    <move todir="${project}">
-      <fileset dir="${project}-${version}-${idea-version}"/>
-    </move>
-    <zip basedir="." zipfile="${dist}/${project}-${version}-${idea-version}.zip" compress="true"
-         includes="${project}/**"/>
+    <zip basedir="." zipfile="${dist}/${project}-${version}-${idea-version}.zip" compress="true" includes="${project}/**"/>
   </target>
 
   <target name="dist-src" depends="clean" description="Creates the source tar file">
