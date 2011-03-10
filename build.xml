@@ -33,10 +33,10 @@
     <property name="project" value="IdeaVIM"/>
 
     <!-- Update this prior to building a new distribution -->
-    <property name="idea-version" value="9.x"/>
-    <property name="version" value="0.12.7"/>
-    <property name="since-version" value="93.1"/>
-    <property name="compiler.build" value="javac15"/>
+    <property name="idea-version" value="10.x"/>
+    <property name="version" value="0.13.1"/>
+    <property name="since-version" value="105.1"/>
+    <property name="compiler.build" value="javac16"/>
 
     <!-- Define task -->
     <path id="ant-contrib">
@@ -83,7 +83,7 @@
     <target name="copy">
         <mkdir dir="${classes}"/>
         <mkdir dir="${classes}/META-INF"/>
-        <copy file="META-INF/plugin.xml" todir="${classes}/META-INF">
+        <copy file="resources/META-INF/plugin.xml" todir="${classes}/META-INF">
             <filterset>
                 <filter token="NAME" value="${project}"/>
                 <filter token="VERSION" value="${version}"/>
@@ -177,7 +177,7 @@
         <delete dir="${idea}/unzip"/>
         <mkdir dir="${idea}/unzip"/>
         <unzip dest="${idea}/unzip">
-            <fileset dir="${idea}" includes="idea*-jdk15.zip"/>
+            <fileset dir="${idea}" includes="ideaIC-*.win.zip"/>
         </unzip>
     </target>
 
