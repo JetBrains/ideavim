@@ -22,21 +22,8 @@ package com.maddyhome.idea.vim.group;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.EditorFactory;
-import com.intellij.openapi.editor.LogicalPosition;
-import com.intellij.openapi.editor.ScrollType;
-import com.intellij.openapi.editor.VisualPosition;
-import com.intellij.openapi.editor.event.EditorFactoryAdapter;
-import com.intellij.openapi.editor.event.EditorFactoryEvent;
-import com.intellij.openapi.editor.event.EditorMouseEvent;
-import com.intellij.openapi.editor.event.EditorMouseEventArea;
-import com.intellij.openapi.editor.event.EditorMouseListener;
-import com.intellij.openapi.editor.event.EditorMouseMotionListener;
-import com.intellij.openapi.editor.event.SelectionEvent;
-import com.intellij.openapi.editor.event.SelectionListener;
-import com.intellij.openapi.editor.event.VisibleAreaEvent;
-import com.intellij.openapi.editor.event.VisibleAreaListener;
+import com.intellij.openapi.editor.*;
+import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
@@ -48,11 +35,7 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.action.motion.TextObjectAction;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.command.VisualChange;
-import com.maddyhome.idea.vim.command.VisualRange;
+import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.Jump;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -104,12 +87,7 @@ public class MotionGroup extends AbstractActionGroup
                                 ApplicationManager.getApplication().invokeLater(new Runnable() {
                                     public void run()
                                     {
-                                        editor.addEditorMouseListener(mouseHandler);
-                                        editor.addEditorMouseMotionListener(mouseHandler);
-
-                                        editor.getSelectionModel().addSelectionListener(selectionHandler);
-                                        editor.getScrollingModel().addVisibleAreaListener(scrollHandler);
-
+                                        addEditorListener(editor);
                                         EditorData.setMotionGroup(editor, true);
                                     }
                                 });
@@ -124,17 +102,46 @@ public class MotionGroup extends AbstractActionGroup
                 Editor editor = event.getEditor();
                 if (EditorData.getMotionGroup(editor))
                 {
+                                removeEditorListener(editor);
+                                EditorData.setMotionGroup(editor, false);
+                            }
+                        }
+                    });
+                }
+
+                public void turnOn()
+                {
+                    Editor[] editors = EditorFactory.getInstance().getAllEditors();
+                    for (Editor editor : editors) {
+                        addEditorListener(editor);
+                    }
+                }
+
+                public void turnOff()
+                {
+                    Editor[] editors = EditorFactory.getInstance().getAllEditors();
+                    for (Editor editor : editors) {
+                        removeEditorListener(editor);
+                    }
+                }
+
+                private void addEditorListener(Editor editor)
+                {
+                    editor.addEditorMouseListener(mouseHandler);
+                    editor.addEditorMouseMotionListener(mouseHandler);
+
+                    editor.getSelectionModel().addSelectionListener(selectionHandler);
+                    editor.getScrollingModel().addVisibleAreaListener(scrollHandler);
+                }
+
+                private void removeEditorListener(Editor editor)
+                {
                     editor.removeEditorMouseListener(mouseHandler);
                     editor.removeEditorMouseMotionListener(mouseHandler);
 
                     editor.getSelectionModel().removeSelectionListener(selectionHandler);
                     editor.getScrollingModel().removeVisibleAreaListener(scrollHandler);
-
-                    EditorData.setMotionGroup(editor, false);
                 }
-            }
-        });
-    }
 
     /**
      * Process mouse clicks by setting/resetting visual mode. There are some strange scenerios to handle.

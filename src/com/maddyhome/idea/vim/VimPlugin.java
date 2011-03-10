@@ -32,9 +32,6 @@ import com.intellij.openapi.editor.event.EditorFactoryAdapter;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
-import com.intellij.openapi.keymap.KeymapManager;
-import com.intellij.openapi.keymap.ex.KeymapManagerEx;
-import com.intellij.openapi.keymap.impl.KeymapManagerImpl;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
@@ -46,12 +43,7 @@ import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
-import com.maddyhome.idea.vim.group.ChangeGroup;
-import com.maddyhome.idea.vim.group.CommandGroups;
-import com.maddyhome.idea.vim.group.FileGroup;
-import com.maddyhome.idea.vim.group.MarkGroup;
-import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.group.SearchGroup;
+import com.maddyhome.idea.vim.group.*;
 import com.maddyhome.idea.vim.helper.ApiHelper;
 import com.maddyhome.idea.vim.helper.DelegateCommandListener;
 import com.maddyhome.idea.vim.helper.DocumentManager;
@@ -62,7 +54,7 @@ import com.maddyhome.idea.vim.undo.UndoManager;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.Toolkit;
+import java.awt.*;
 import java.util.ArrayList;
 
 /**
@@ -358,6 +350,8 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable//, Co
         //RegisterActions.getInstance().enable();
         setCursors(true);
         setSmoothScrolling(false);
+
+        CommandGroups.getInstance().getMotion().turnOn();
     }
 
     public void turnOffPlugin() {
@@ -365,6 +359,8 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable//, Co
         //RegisterActions.getInstance().disable();
         setCursors(isBlockCursor);
         setSmoothScrolling(isSmoothScrolling);
+
+        CommandGroups.getInstance().getMotion().turnOff();
     }
 
     private void setCursors(boolean isBlock) {
