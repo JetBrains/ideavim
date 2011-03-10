@@ -19,6 +19,8 @@ package com.maddyhome.idea.vim.helper;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import java.util.Arrays;
+
 /**
  * This helper class is used when working with various character level operations
  */
@@ -30,6 +32,26 @@ public class CharacterHelper {
   public static final int TYPE_CHAR = 1;
   public static final int TYPE_PUNC = 2;
   public static final int TYPE_SPACE = 3;
+  public static final int TYPE_KANA = 4;
+  public static final int TYPE_WIDE_ALPHANUM = 5;
+  public static final int TYPE_WIDE_PUNC = 6;
+  public static final int TYPE_WIDE_HIRAGANA = 7;
+  public static final int TYPE_WIDE_KATAKANA = 8;
+  public static final int TYPE_OTHER = 9;
+
+  private static char[] ALL_HALF_SYMBOL =
+    "\u3001\u3002\uff0c\uff0e\uff1a\uff1b\uff1f\uff01\uff40\uff3e\uff3f\uff0f\uff5e\uff5c\u2018\u2019\u201c\u201d\uff08\uff09\uff3b\uff3d\uff5b\uff5d\uff0b\uff0d\uff1d\uff1c\uff1e\uffe5\uff04\uff05\uff03\uff06\uff0a\uff20"
+      .toCharArray();
+  private static char[] ALL_WIDE_SYMBOL = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~".toCharArray();
+  private static char[] ALL_HALFKANA =
+    "\uff61\uff62\uff63\uff64\uff65\uff66\uff67\uff68\uff69\uff6a\uff6b\uff6c\uff6d\uff6e\uff6f\uff70\uff71\uff72\uff73\uff74\uff75\uff76\uff77\uff78\uff79\uff7a\uff7b\uff7c\uff7d\uff7e\uff7f\uff80\uff81\uff82\uff83\uff84\uff85\uff86\uff87\uff88\uff89\uff8a\uff8b\uff8c\uff8d\uff8e\uff8f\uff90\uff91\uff92\uff93\uff94\uff95\uff96\uff97\uff98\uff99\uff9a\uff9b\uff9c\uff9d\uff9e\uff9f"
+      .toCharArray();
+
+  static {
+    Arrays.sort(ALL_HALF_SYMBOL);
+    Arrays.sort(ALL_WIDE_SYMBOL);
+    Arrays.sort(ALL_HALFKANA);
+  }
 
   /**
    * This returns the type of the supplied character. The logic is as follows:<br>
@@ -46,12 +68,50 @@ public class CharacterHelper {
     if (Character.isWhitespace(ch)) {
       return TYPE_SPACE;
     }
-    else if (skipPunc || Character.isLetterOrDigit(ch) || ch == '_') {
+    else if (skipPunc || isHalfAlphaNum(ch) || ch == '_') {
       return TYPE_CHAR;
     }
-    else {
+    else if (isHalfSymbol(ch)) {
       return TYPE_PUNC;
     }
+    else if (isHalfKana(ch)) {
+      return TYPE_KANA;
+    }
+    else if (isWideAlphaNum(ch)) {
+      return TYPE_WIDE_ALPHANUM;
+    }
+    else if (isWideSymbol(ch)) {
+      return TYPE_WIDE_PUNC;
+    }
+    else if (Character.UnicodeBlock.of(ch) == Character.UnicodeBlock.HIRAGANA) {
+      return TYPE_WIDE_HIRAGANA;
+    }
+    else if (Character.UnicodeBlock.of(ch) == Character.UnicodeBlock.KATAKANA) {
+      return TYPE_WIDE_KATAKANA;
+    }
+    else {
+      return TYPE_OTHER;
+    }
+  }
+
+  private static boolean isHalfAlphaNum(char ch) {
+    return (0x30 <= ch && ch <= 0x39) || (0x41 <= ch && ch <= 0x5A) || (0x61 <= ch && ch <= 0x7A);
+  }
+
+  private static boolean isWideAlphaNum(char ch) {
+    return (0xFF10 <= ch && ch <= 0xFF19) || (0xFF21 <= ch && ch <= 0xFF3A) || (0xFF41 <= ch && ch <= 0xFF5A);
+  }
+
+  private static boolean isHalfSymbol(char ch) {
+    return Arrays.binarySearch(ALL_HALF_SYMBOL, ch) > 0;
+  }
+
+  private static boolean isWideSymbol(char ch) {
+    return Arrays.binarySearch(ALL_WIDE_SYMBOL, ch) > 0;
+  }
+
+  private static boolean isHalfKana(char ch) {
+    return Arrays.binarySearch(ALL_HALFKANA, ch) > 0;
   }
 
   /**
