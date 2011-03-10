@@ -24,16 +24,19 @@
   <property name="resources" value="${basedir}/resources"/>
   <property name="javadoc" value="${basedir}/docs/javadoc"/>
   <property name="install" value="${basedir}/install"/>
+  <property name="idea.home" value="${idea}/unzip"/>
+  <!-- Add timestamp to the plugin date -->
+  <tstamp>
+    <format property="buildtime" pattern="dd.MM.yyyy" locale="en,UK"/>
+  </tstamp>
+  <property name="version" value="${version-id}-${buildtime}"/>
+  <property name="filename" value="ideavim-${version}-${idea-version}"/>
 
   <!--Output-->
   <property name="out" value="${basedir}"/>
   <property name="classes" value="${out}/classes"/>
   <property name="build" value="${out}/build"/>
   <property name="dist" value="${out}/dist"/>
-
-  <!-- Update to your IntelliJ installation -->
-  <property name="idea.home" value="${idea}/unzip"/>
-  <property name="project" value="IdeaVIM"/>
 
   <!-- Define task -->
   <path id="ant-contrib">
@@ -53,7 +56,7 @@
 
   <target name="clean" depends="clean.build,clean.help" description="Removes all generated files">
     <delete dir="${javadoc}"/>
-    <delete dir="${project}"/>
+    <delete dir="IdeaVim"/>
   </target>
 
   <target name="compile">
@@ -78,7 +81,7 @@
     <mkdir dir="${classes}/META-INF"/>
     <copy file="resources/META-INF/plugin.xml" todir="${classes}/META-INF">
       <filterset>
-        <filter token="NAME" value="${project}"/>
+        <filter token="NAME" value="IdeaVim"/>
         <filter token="VERSION" value="${version}"/>
         <filter token="IDEA-VERSION" value="${idea-version}"/>
         <filter token="SINCE-VERSION" value="${since-version}"/>
@@ -91,7 +94,7 @@
       <fileset dir="${resources}"/>
     </copy>
     <mkdir dir="${build}"/>
-    <jar basedir="${classes}" jarfile="${build}/${project}.jar" compress="yes"/>
+    <jar basedir="${classes}" jarfile="${build}/IdeaVim.jar" compress="yes"/>
   </target>
 
   <!-- Create help files -->
@@ -104,7 +107,7 @@
         <include name="*.txt"/>
       </fileset>
       <filterset>
-        <filter token="NAME" value="${project}"/>
+        <filter token="NAME" value="IdeaVim"/>
         <filter token="VERSION" value="${version}"/>
       </filterset>
     </copy>
@@ -143,7 +146,7 @@
         <include name="*"/>
       </fileset>
       <filterset>
-        <filter token="NAME" value="${project}"/>
+        <filter token="NAME" value="IdeaVim"/>
         <filter token="VERSION" value="${version}"/>
       </filterset>
     </copy>
@@ -180,7 +183,7 @@
   <target name="build-plugin" depends="build"
           description="Creates plugin zip file, which can be distributed using Plugins Manager">
     <mkdir dir="${build}/production/IdeaVIM/lib"/>
-    <copy file="${build}/${project}.jar" todir="${build}/production/IdeaVIM/lib"/>
+    <copy file="${build}/IdeaVim.jar" todir="${build}/production/IdeaVIM/lib"/>
     <mkdir dir="${build}/production/IdeaVIM/help"/>
     <copy file="${build}/help.jar" todir="${build}/production/IdeaVIM/help"/>
     <zip destfile="${build}/ideaVIM.zip" basedir="${build}/production"/>
@@ -191,54 +194,54 @@
   <!-- Prepare layout for plugin distribution and creates zip file which can be published -->
   <target name="dist-bin" depends="clean, build" description="Creates a zip file containing the plugin sources">
     <mkdir dir="dist"/>
-    <delete dir="${project}-${version}-${idea-version}"/>
-    <mkdir dir="${project}-${version}-${idea-version}"/>
-    <copy todir="${project}-${version}-${idea-version}">
+    <delete dir="${filename}"/>
+    <mkdir dir="${filename}"/>
+    <copy todir="${filename}">
       <fileset dir="." includes="license/**"/>
       <fileset dir="${install}" includes="**"/>
     </copy>
-    <copy todir="${project}-${version}-${idea-version}/lib">
+    <copy todir="${filename}/lib">
       <fileset dir="${build}" includes="*.jar" excludes="help.jar"/>
     </copy>
-    <copy todir="${project}-${version}-${idea-version}/help">
+    <copy todir="${filename}/help">
       <fileset dir="${build}" includes="help.jar"/>
     </copy>
-    <copy todir="${project}-${version}-${idea-version}/docs">
+    <copy todir="${filename}/docs">
       <filterset>
-        <filter token="NAME" value="${project}"/>
+        <filter token="NAME" value="IdeaVim"/>
         <filter token="VERSION" value="${version}"/>
         <filter token="IDEA-VERSION" value="${idea-version}"/>
       </filterset>
       <fileset dir="docs" includes="vim/*.txt" excludes="javadoc"/>
     </copy>
-    <copy file="docs/README.txt" tofile="${project}-${version}-${idea-version}/README">
+    <copy file="docs/README.txt" tofile="${filename}/README">
       <filterset>
-        <filter token="NAME" value="${project}"/>
+        <filter token="NAME" value="IdeaVim"/>
         <filter token="VERSION" value="${version}"/>
         <filter token="IDEA-VERSION" value="${idea-version}"/>
       </filterset>
     </copy>
-    <copy file="docs/CHANGES.txt" tofile="${project}-${version}-${idea-version}/CHANGES">
+    <copy file="docs/CHANGES.txt" tofile="${filename}/CHANGES">
       <filterset>
-        <filter token="NAME" value="${project}"/>
+        <filter token="NAME" value="IdeaVim"/>
         <filter token="VERSION" value="${version}"/>
         <filter token="IDEA-VERSION" value="${idea-version}"/>
       </filterset>
     </copy>
-    <copy file="docs/NOTES.txt" tofile="${project}-${version}-${idea-version}/NOTES">
+    <copy file="docs/NOTES.txt" tofile="${filename}/NOTES">
       <filterset>
-        <filter token="NAME" value="${project}"/>
+        <filter token="NAME" value="IdeaVim"/>
         <filter token="VERSION" value="${version}"/>
         <filter token="IDEA-VERSION" value="${idea-version}"/>
       </filterset>
     </copy>
-    <zip basedir="." zipfile="${dist}/${project}-${version}-${idea-version}.zip" compress="true" includes="${project}/**"/>
+    <zip basedir="." zipfile="${dist}/${filename}.zip" compress="true" includes="IdeaVim/**"/>
   </target>
 
  <!-- Packs all the sources -->
   <target name="dist-src" depends="clean" description="Creates the source tar file">
     <mkdir dir="dist"/>
-    <tar basedir="." destfile="${dist}/${project}-${version}-${idea-version}-src.tar.gz"
+    <tar basedir="." destfile="${dist}/${filename}-src.tar.gz"
          excludes=".idea/**,idea/**,*.iws,dist/**,scratch/**,web/docs/**" compression="gzip"/>
   </target>
 
