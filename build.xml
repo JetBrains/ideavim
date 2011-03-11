@@ -22,15 +22,15 @@
   <property name="idea" value="${basedir}/idea"/>
   <property name="src" value="${basedir}/src"/>
   <property name="resources" value="${basedir}/resources"/>
-  <property name="javadoc" value="${basedir}/docs/javadoc"/>
   <property name="install" value="${basedir}/install"/>
   <property name="idea.home" value="${idea}/unzip"/>
+
   <!-- Add timestamp to the plugin date -->
   <tstamp>
     <format property="buildtime" pattern="dd.MM.yyyy-hh:mm" locale="en,UK"/>
   </tstamp>
-  <property name="version" value="${version-id}-${buildtime}"/>
-  <property name="filename" value="ideavim-${version}-${idea-version}"/>
+  <property name="version" value="${version-id}-${idea-version}-${buildtime}"/>
+  <property name="filename" value="ideavim-${version}"/>
 
   <!--Output-->
   <property name="out" value="${basedir}"/>
@@ -44,21 +44,14 @@
   </path>
   <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="ant-contrib"/>
 
-  <target name="clean.build">
+  <!-- Clean all the generated stuff -->
+  <target name="clean" description="Removes all generated files">
     <delete dir="${build}"/>
     <delete dir="${classes}"/>
+    <delete dir="${dist}"/>
   </target>
 
-  <target name="clean.help">
-    <delete dir="${build}/help"/>
-  </target>
-
-
-  <target name="clean" depends="clean.build,clean.help" description="Removes all generated files">
-    <delete dir="${javadoc}"/>
-    <delete dir="IdeaVim"/>
-  </target>
-
+  <!-- Compile all the sources to the ${classes} folder -->
   <target name="compile">
     <path id="build.classpath">
       <fileset dir="${idea.home}/lib">
@@ -98,7 +91,7 @@
   </target>
 
   <!-- Create help files -->
-  <target name="help" depends="clean.help, compile">
+  <target name="help" depends="clean, compile">
     <mkdir dir="${build}/help/txt"/>
     <mkdir dir="${build}/help/vim"/>
 
@@ -168,88 +161,68 @@
     <jar basedir="${build}/help" jarfile="${build}/help.jar"/>
   </target>
 
-  <target name="build" depends="unzip, clean.build, compile, jar, help" description="Compiles all source code and created plugin jar file">
-  </target>
+  <target name="build" depends="unzip, clean, compile, jar, help" description="Compiles all source code and created plugin jar file"/>
 
-  <!-- Unpack ideaIC-*.zip file for ideavim compilation -->
+  <!-- Unpack idea-*.zip file for ideavim compilation -->
   <target name="unzip" description="Unzip downloaded artifacts and set up idea.home">
     <delete dir="${idea}/unzip"/>
     <mkdir dir="${idea}/unzip"/>
     <unzip dest="${idea}/unzip">
-      <fileset dir="${idea}" includes="ideaIC-*.zip"/>
+      <fileset dir="${idea}" includes="idea*.zip"/>
     </unzip>
-  </target>
-
-  <target name="build-plugin" depends="build"
-          description="Creates plugin zip file, which can be distributed using Plugins Manager">
-    <mkdir dir="${build}/production/IdeaVIM/lib"/>
-    <copy file="${build}/IdeaVim.jar" todir="${build}/production/IdeaVIM/lib"/>
-    <mkdir dir="${build}/production/IdeaVIM/help"/>
-    <copy file="${build}/help.jar" todir="${build}/production/IdeaVIM/help"/>
-    <zip destfile="${build}/ideaVIM.zip" basedir="${build}/production"/>
   </target>
 
   <target name="dist" depends="dist-src, dist-bin" description="Creates the src and bin distribution files"/>
 
   <!-- Prepare layout for plugin distribution and creates zip file which can be published -->
   <target name="dist-bin" depends="clean, build" description="Creates a zip file containing the plugin sources">
-    <mkdir dir="dist"/>
-    <delete dir="${filename}"/>
-    <mkdir dir="${filename}"/>
-    <copy todir="${filename}">
-      <fileset dir="." includes="license/**"/>
+    <delete dir="${build}/IdeaVim"/>
+    <mkdir dir="${build}/IdeaVim"/>
+    <copy todir="${build}/IdeaVim">
+      <fileset dir="${basedir}" includes="license/**"/>
       <fileset dir="${install}" includes="**"/>
     </copy>
-    <copy todir="${filename}/lib">
+    <copy todir="${build}/IdeaVim/lib">
       <fileset dir="${build}" includes="*.jar" excludes="help.jar"/>
     </copy>
-    <copy todir="${filename}/help">
+    <copy todir="${build}/IdeaVim/help">
       <fileset dir="${build}" includes="help.jar"/>
     </copy>
-    <copy todir="${filename}/docs">
+    <copy todir="${build}/IdeaVim/docs">
       <filterset>
         <filter token="NAME" value="IdeaVim"/>
         <filter token="VERSION" value="${version}"/>
         <filter token="IDEA-VERSION" value="${idea-version}"/>
       </filterset>
-      <fileset dir="docs" includes="vim/*.txt" excludes="javadoc"/>
+      <fileset dir="${basedir}/docs" includes="vim/*.txt" excludes="javadoc"/>
     </copy>
-    <copy file="docs/README.txt" tofile="${filename}/README">
-      <filterset>
-        <filter token="NAME" value="IdeaVim"/>
-        <filter token="VERSION" value="${version}"/>
-        <filter token="IDEA-VERSION" value="${idea-version}"/>
-      </filterset>
-    </copy>
-    <copy file="docs/CHANGES.txt" tofile="${filename}/CHANGES">
+    <copy file="${basedir}/docs/README.txt" tofile="${build}/IdeaVim/README">
       <filterset>
         <filter token="NAME" value="IdeaVim"/>
         <filter token="VERSION" value="${version}"/>
         <filter token="IDEA-VERSION" value="${idea-version}"/>
       </filterset>
     </copy>
-    <copy file="docs/NOTES.txt" tofile="${filename}/NOTES">
+    <copy file="${basedir}/docs/CHANGES.txt" tofile="${build}/IdeaVim/CHANGES">
       <filterset>
         <filter token="NAME" value="IdeaVim"/>
         <filter token="VERSION" value="${version}"/>
         <filter token="IDEA-VERSION" value="${idea-version}"/>
       </filterset>
     </copy>
-    <zip basedir="." zipfile="${dist}/${filename}.zip" compress="true" includes="IdeaVim/**"/>
+    <copy file="${basedir}/docs/NOTES.txt" tofile="${build}/IdeaVim/NOTES">
+      <filterset>
+        <filter token="NAME" value="IdeaVim"/>
+        <filter token="VERSION" value="${version}"/>
+        <filter token="IDEA-VERSION" value="${idea-version}"/>
+      </filterset>
+    </copy>
+    <zip basedir="${build}" zipfile="${dist}/${filename}.zip" compress="true" includes="IdeaVim/**"/>
   </target>
 
  <!-- Packs all the sources -->
   <target name="dist-src" depends="clean" description="Creates the source tar file">
-    <mkdir dir="dist"/>
-    <tar basedir="." destfile="${dist}/${filename}-src.tar.gz"
-         excludes=".idea/**,idea/**,*.iws,dist/**,scratch/**,web/docs/**" compression="gzip"/>
-  </target>
-
-  <!-- Use this task to create javadoc for the sources -->
-  <target name="javadoc" depends="build" description="Generates Javadoc for all source code">
-    <delete dir="${javadoc}"/>
-    <mkdir dir="${javadoc}"/>
-    <javadoc classpathref="build.classpath" access="protected" destdir="${javadoc}" packagenames="com.*"
-             sourcepath="src" use="true"/>
+    <mkdir dir="${dist}"/>
+    <tar basedir="." destfile="${dist}/${filename}-src.tar.gz" excludes=".git/**,.idea/**,idea/**,*.iws,*.iml" compression="gzip"/>
   </target>
 </project>
