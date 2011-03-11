@@ -163,8 +163,15 @@
 
   <target name="build" depends="unzip, clean, compile, jar, help" description="Compiles all source code and created plugin jar file"/>
 
+  <!-- Donwload IntelliJ IDEA distribution -->
+  <target name="download" description="Downloads IntellIJ IDEA artifacts">
+    <delete dir="${idea}"/>
+    <mkdir dir="${idea}"/>
+    <get src="${idea.download.url}" dest="${idea}"/>
+  </target>
+
   <!-- Unpack idea-*.zip file for ideavim compilation -->
-  <target name="unzip" description="Unzip downloaded artifacts and set up idea.home">
+  <target name="unzip" depends="download" description="Unzip downloaded artifacts and set up idea.home">
     <delete dir="${idea}/unzip"/>
     <mkdir dir="${idea}/unzip"/>
     <unzip dest="${idea}/unzip">
