@@ -27,7 +27,7 @@
   <property name="idea.home" value="${idea}/unzip"/>
   <!-- Add timestamp to the plugin date -->
   <tstamp>
-    <format property="buildtime" pattern="dd.MM.yyyy" locale="en,UK"/>
+    <format property="buildtime" pattern="dd.MM.yyyy-hh:mm" locale="en,UK"/>
   </tstamp>
   <property name="version" value="${version-id}-${buildtime}"/>
   <property name="filename" value="ideavim-${version}-${idea-version}"/>
