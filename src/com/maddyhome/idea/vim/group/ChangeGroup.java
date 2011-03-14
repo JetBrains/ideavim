@@ -1627,7 +1627,9 @@ public class ChangeGroup extends AbstractActionGroup {
       FileEditor fe = event.getOldEditor();
       if (fe instanceof TextEditor) {
         Editor editor = ((TextEditor)event.getOldEditor()).getEditor();
-        CommandState.getInstance(editor).reset();
+        if (logger.isDebugEnabled()) {
+          logger.debug("reset state for " + editor);
+        }
         KeyHandler.getInstance().fullReset(editor);
       }
 

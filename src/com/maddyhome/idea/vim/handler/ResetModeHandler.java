@@ -23,14 +23,12 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.KeyHandler;
-import com.maddyhome.idea.vim.command.CommandState;
 
 /**
  *
  */
 public class ResetModeHandler extends EditorActionHandler {
   public void execute(Editor editor, DataContext context) {
-    CommandState.getInstance(editor).reset();
     KeyHandler.getInstance().fullReset(editor);
   }
 }
