@@ -30,7 +30,10 @@ import com.intellij.openapi.editor.event.EditorFactoryAdapter;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.editor.event.EditorMouseAdapter;
 import com.intellij.openapi.editor.event.EditorMouseEvent;
-import com.intellij.openapi.fileEditor.*;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
@@ -1621,7 +1624,7 @@ public class ChangeGroup extends AbstractActionGroup {
      */
     public void selectionChanged(FileEditorManagerEvent event) {
       if (!VimPlugin.isEnabled()) return;
-
+/*    TODO[oleg] don't we break anything with this persistense editor states?
       logger.debug("selected file changed");
 
       FileEditor fe = event.getOldEditor();
@@ -1637,6 +1640,7 @@ public class ChangeGroup extends AbstractActionGroup {
       if (virtualFile != null) {
         resetCursor(virtualFile, EditorData.getProject(event.getManager()), false);
       }
+      */
     }
   }
 
