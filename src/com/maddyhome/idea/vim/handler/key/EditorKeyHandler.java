@@ -98,8 +98,7 @@ public class EditorKeyHandler extends EditorActionHandler {
         res = origHandler.isEnabled(editor, dataContext);
       }
       else {
-        int mode = CommandState.getInstance(editor).getMode();
-        if (mode != CommandState.MODE_INSERT && mode != CommandState.MODE_REPLACE) {
+        if (!CommandState.inInsertMode(editor)) {
           logger.debug("not insert or replace");
           res = origHandler.isEnabled(editor, dataContext);
         }

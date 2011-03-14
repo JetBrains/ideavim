@@ -39,8 +39,7 @@ public class MotionGotoLineLastEndAction extends MotionEditorAction {
   private static class Handler extends MotionEditorActionHandler {
     public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
       boolean allow = false;
-      if (CommandState.getInstance(editor).getMode() == CommandState.MODE_INSERT ||
-          CommandState.getInstance(editor).getMode() == CommandState.MODE_REPLACE) {
+      if (CommandState.inInsertMode(editor)) {
         allow = true;
       }
       else if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {

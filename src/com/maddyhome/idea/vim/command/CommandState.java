@@ -85,7 +85,8 @@ public class CommandState {
   }
 
   public static boolean inInsertMode(Editor editor) {
-    return (getInstance(editor).getMode() == MODE_INSERT || getInstance(editor).getMode() == MODE_REPLACE);
+    final int mode = getInstance(editor).getMode();
+    return mode == MODE_INSERT || mode == MODE_REPLACE;
   }
 
   /**

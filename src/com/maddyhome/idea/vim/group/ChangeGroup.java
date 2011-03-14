@@ -87,8 +87,7 @@ public class ChangeGroup extends AbstractActionGroup {
             return;
           }
 
-          if (CommandState.getInstance(editor).getMode() == CommandState.MODE_INSERT ||
-              CommandState.getInstance(editor).getMode() == CommandState.MODE_REPLACE) {
+          if (CommandState.inInsertMode(editor)) {
             clearStrokes(editor);
           }
         }
@@ -1268,8 +1267,7 @@ public class ChangeGroup extends AbstractActionGroup {
 
   public void indentLines(Editor editor, DataContext context, int lines, int dir) {
     int cnt = 1;
-    if (CommandState.getInstance(editor).getMode() == CommandState.MODE_INSERT ||
-        CommandState.getInstance(editor).getMode() == CommandState.MODE_REPLACE) {
+    if (CommandState.inInsertMode(editor)) {
       if (strokes.size() > 0) {
         Object stroke = strokes.get(strokes.size() - 1);
         if (stroke instanceof Character) {
@@ -1405,8 +1403,7 @@ public class ChangeGroup extends AbstractActionGroup {
       }
     }
 
-    if (CommandState.getInstance(editor).getMode() != CommandState.MODE_INSERT &&
-        CommandState.getInstance(editor).getMode() != CommandState.MODE_REPLACE) {
+    if (!CommandState.inInsertMode(editor)) {
       if (!range.isMultiple()) {
         MotionGroup.moveCaret(editor, context,
                               CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor, sline));

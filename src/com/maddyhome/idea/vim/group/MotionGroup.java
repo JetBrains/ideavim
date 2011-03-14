@@ -991,9 +991,7 @@ public class MotionGroup extends AbstractActionGroup {
       col = newcol;
     }
 
-    newcol = EditorHelper.normalizeVisualColumn(editor, newline, newcol,
-                                                CommandState.getInstance(editor).getMode() == CommandState.MODE_INSERT ||
-                                                CommandState.getInstance(editor).getMode() == CommandState.MODE_REPLACE);
+    newcol = EditorHelper.normalizeVisualColumn(editor, newline, newcol, CommandState.inInsertMode(editor));
 
     if (newline != cline || newcol != ocol) {
       int offset = EditorHelper.visualPostionToOffset(editor, new VisualPosition(newline, newcol));
@@ -1214,11 +1212,7 @@ public class MotionGroup extends AbstractActionGroup {
     else {
       int col = EditorData.getLastColumn(editor);
       int line = EditorHelper.normalizeVisualLine(editor, pos.line + count);
-      VisualPosition newPos = new VisualPosition(line, EditorHelper.normalizeVisualColumn(editor, line, col,
-                                                                                          CommandState.getInstance(editor).getMode() ==
-                                                                                          CommandState.MODE_INSERT ||
-                                                                                          CommandState.getInstance(editor).getMode() ==
-                                                                                          CommandState.MODE_REPLACE));
+      VisualPosition newPos = new VisualPosition(line, EditorHelper.normalizeVisualColumn(editor, line, col, CommandState.inInsertMode(editor)));
 
       return EditorHelper.visualPostionToOffset(editor, newPos);
     }
@@ -1794,8 +1788,7 @@ public class MotionGroup extends AbstractActionGroup {
       if (ignore) return;
 
       Editor editor = visibleAreaEvent.getEditor();
-      if (CommandState.getInstance(editor).getMode() == CommandState.MODE_INSERT ||
-          CommandState.getInstance(editor).getMode() == CommandState.MODE_REPLACE) {
+      if (CommandState.inInsertMode(editor)) {
         return;
       }
 
