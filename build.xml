@@ -25,7 +25,7 @@
   <property name="install" value="${basedir}/install"/>
   <property name="idea.home" value="${idea}/unzip"/>
 
-  <property name="version" value="${version-id}.${build.number}-${idea-version}"/>
+  <property name="version" value="${version-id}.${build.number}"/>
   <property name="filename" value="ideavim-${version}"/>
 
   <!--Output-->
