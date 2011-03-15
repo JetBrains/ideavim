@@ -213,13 +213,6 @@
         <filter token="IDEA-VERSION" value="${idea-version}"/>
       </filterset>
     </copy>
-    <copy file="${basedir}/docs/NOTES.txt" tofile="${build}/IdeaVim/NOTES">
-      <filterset>
-        <filter token="NAME" value="IdeaVim"/>
-        <filter token="VERSION" value="${version}"/>
-        <filter token="IDEA-VERSION" value="${idea-version}"/>
-      </filterset>
-    </copy>
     <zip basedir="${build}" zipfile="${dist}/${filename}.zip" compress="true" includes="IdeaVim/**"/>
   </target>
 

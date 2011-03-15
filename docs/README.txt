@@ -1,44 +1,12 @@
-@NAME@ - Version @VERSION@ for IDEA @IDEA-VERSION@
+@NAME@ - Version @VERSION@
+Minimal compatible IDE version @IDEA-VERSION@
 
-This plugin attempts to emulate the functionality of VIM within IDEA. It
-actually emulates 'gvim' more than 'vim' since IDEA is a graphical IDE (of
-course).
-
+This plugin attempts to emulate the functionality of VIM within IntelliJ platform based products. It actually emulates 'gvim' more than 'vim'. IdeaVim can be used with IntellIJ IDEA, RubyMine, PyCharm, PhpStorm and WebStorm ides.
 
 Installation
 
 Use IDEA's plugin manager to install the latest version of the plugin.
-
-First Time Installation
-
-UNIX/Linux
-
-Copy Vim.xml from the plugin to $HOME/.IntelliJIdea/config/keymaps. You will
-have to create the keymaps directory if it doesn't exist.
-
-Windows
-
-Copy Vim.xml from the plugin to
-C:\Documents and Settings\<user>\.IntelliJIdea\config\keymaps.
-You will have to create the keymaps directory if it doesn't exist.
-
-Starting
-
-Once the files have been installed into their proper locations, start IDEA
-normally and then perform the following steps. These only need to be done the
-first time:
-
-1) Select the "Tools" menu. There should be a new menu option labeled
-   "VIM Emulator". This should have a checkmark next to it. If not, please
-   select this menu to check it. If this menu option is not available, you did
-   not copy @NAME@.jar into the correct location.
-2) Select the "Options|Keymaps" menu. There should be a new keymap labeled "vim"
-   listed in the top listbox. If there is no such keymap listed you did not
-   install the vim.xml file in the proper location. Please highlight "vim" and
-   click on the "Set Active" button. Click "OK" to save these changes.
-
-At this point you must use VIM keystrokes in all editors.
-
+Start IDEA normally and Enable VIM emulation using "Tools|VIM Emulator" menu item. At this point you must use VIM keystrokes in all editors.
 
 Disabling the @NAME@ Plugin
 
@@ -48,7 +16,7 @@ than "vim" the active keymap. At this point IDEA will work with it's regular
 keyboard shortcuts.
 
 
-Changes to IDEA
+Changes to the IDE
 
 Undo/Redo
 
@@ -61,7 +29,7 @@ file will result in strange behavior and you will most likely lose changes.
 
 Escape
 
-In IDEA, the Escape key is used during editing to cancel code completion
+In IDE, the Escape key is used during editing to cancel code completion
 windows and parameter tooltips. While in VIM Insert mode, Escape is used to
 return back to Normal mode. If you are typing in Insert mode and a code
 completion window is popped up, pressing Escape will both cancel the window
@@ -73,7 +41,7 @@ the method call. (I would love to receive solutions for both of these issues.)
 Menu Changes
 
 In order to emulate the keystrokes used by VIM, several of the default hotkeys
-used by IDEA had to be changed. Below is a list of IDEA menus, their default
+used by IDE had to be changed. Below is a list of IDE menus, their default
 keyboard shortcuts, and their new VIM keystrokes.
 
 File
