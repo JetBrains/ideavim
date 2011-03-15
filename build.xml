@@ -25,11 +25,7 @@
   <property name="install" value="${basedir}/install"/>
   <property name="idea.home" value="${idea}/unzip"/>
 
-  <!-- Add timestamp to the plugin date -->
-  <tstamp>
-    <format property="builddate" pattern="ddMMyyyy" locale="en,UK"/>
-  </tstamp>
-  <property name="version" value="${version-id}-${idea-version}-${builddate}.${build.number}"/>
+  <property name="version" value="${version-id}.${build.number}-${idea-version}"/>
   <property name="filename" value="ideavim-${version}"/>
 
   <!--Output-->
