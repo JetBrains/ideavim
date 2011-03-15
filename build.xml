@@ -27,9 +27,9 @@
 
   <!-- Add timestamp to the plugin date -->
   <tstamp>
-    <format property="buildtime" pattern="dd.MM.yyyy-hh.mm" locale="en,UK"/>
+    <format property="builddate" pattern="ddMMyyyy" locale="en,UK"/>
   </tstamp>
-  <property name="version" value="${version-id}-${idea-version}-${buildtime}"/>
+  <property name="version" value="${version-id}-${idea-version}-${builddate}.${build.number}"/>
   <property name="filename" value="ideavim-${version}"/>
 
   <!--Output-->
