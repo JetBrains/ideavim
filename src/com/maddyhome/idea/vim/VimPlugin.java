@@ -23,6 +23,9 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.components.ApplicationComponent;
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
@@ -36,9 +39,6 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerAdapter;
-import com.intellij.openapi.util.InvalidDataException;
-import com.intellij.openapi.util.JDOMExternalizable;
-import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -67,7 +67,15 @@ import java.util.ArrayList;
  *
  * @version 0.1
  */
-public class VimPlugin implements ApplicationComponent, JDOMExternalizable//, Configurable
+@State(
+    name = "VimSettings",
+    storages = {
+        @Storage(
+            id = "main",
+            file = "$APP_CONFIG$/vim_settings.xml"
+        )}
+)
+public class VimPlugin implements ApplicationComponent, PersistentStateComponent<Element>
 {
 
   private static VimPlugin instance;
@@ -144,10 +152,7 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable//, Co
         }
 
         EditorData.initializeEditor(event.getEditor());
-        //if (EditorData.getVirtualFile(event.getEditor()) == null)
-        //{
         DocumentManager.getInstance().addListeners(event.getEditor().getDocument());
-        //}
       }
 
       public void editorReleased(EditorFactoryEvent event) {
@@ -197,16 +202,9 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable//, Co
     LOG.debug("done");
   }
 
-  /**
-   * This is called by the framework to load custom configuration data. The data is stored in
-   * <code>$HOME/.IntelliJIdea/config/options/other.xml</code> though this is handled by the openAPI.
-   *
-   * @param element The element specific to the Vim Plugin. All the plugin's custom state information is children of
-   *                this element.
-   * @throws InvalidDataException if any of the configuration data is invalid
-   */
-  public void readExternal(Element element) throws InvalidDataException {
-    LOG.debug("readExternal");
+  @Override
+  public void loadState(Element element) {
+    LOG.debug("Loading state");
 
     // Restore whether the plugin is enabled or not
     Element state = element.getChild("state");
@@ -217,22 +215,17 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable//, Co
     CommandGroups.getInstance().readData(element);
   }
 
-  /**
-   * This is called by the framework to store custom configuration data. The data is stored in
-   * <code>$HOME/.IntelliJIdea/config/options/other.xml</code> though this is handled by the openAPI.
-   *
-   * @param element The element specific to the Vim Plugin. All the plugin's custom state information is children of
-   *                this element.
-   * @throws WriteExternalException if unable to save and of the configuration data
-   */
-  public void writeExternal(Element element) throws WriteExternalException {
-    LOG.debug("writeExternal");
+  @Override
+  public Element getState() {
+    LOG.debug("Saving state");
+
     // Save whether the plugin is enabled or not
-    Element elem = new Element("state");
-    elem.setAttribute("enabled", Boolean.toString(enabled));
-    element.addContent(elem);
+    Element element = new Element("state");
+    element.setAttribute("enabled", Boolean.toString(enabled));
+    element.addContent(element);
 
     CommandGroups.getInstance().saveData(element);
+    return element;
   }
 
   /**
@@ -270,13 +263,6 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable//, Co
   }
 
   public static void showMessage(String msg) {
-    /*
-    for (Iterator iterator = toolWindows.values().iterator(); iterator.hasNext();)
-    {
-        ToolWindow window = (ToolWindow)iterator.next();
-        window.setTitle(msg);
-    }
-    */
     ProjectManager pm = ProjectManager.getInstance();
     Project[] projs = pm.getOpenProjects();
     for (Project proj : projs) {
