@@ -83,6 +83,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private RegisterActions actions;
   private boolean isBlockCursor = false;
   private boolean isSmoothScrolling = false;
+  private String previousKeyMap = "";
 
   private boolean enabled = true;
   private static Logger LOG = Logger.getInstance(VimPlugin.class.getName());
@@ -109,6 +110,14 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     return "VimPlugin";
   }
 
+  public String getPreviousKeyMap() {
+    return previousKeyMap;
+  }
+
+  public void setPreviousKeyMap(final String keymap) {
+    previousKeyMap = keymap;
+  }
+
   /**
    * Initialize the Vim Plugin. This plugs the vim key handler into the editor action mananger.
    */
@@ -126,6 +135,12 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     setupListeners();
 
     getActions();
+
+    // Ensure that Vim keymap is installed and install if not
+    VimKeyMapUtil.installKeyBoardBindings(this);
+
+    // Turn on proper keymap
+    VimKeyMapUtil.enableKeyBoardBindings(VimPlugin.isEnabled());
 
     LOG.debug("done");
   }
@@ -210,6 +225,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     Element state = element.getChild("state");
     if (state != null) {
       enabled = Boolean.valueOf(state.getAttributeValue("enabled"));
+      previousKeyMap = state.getAttributeValue("keymap");
     }
 
     CommandGroups.getInstance().readData(element);
@@ -222,6 +238,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     // Save whether the plugin is enabled or not
     Element element = new Element("state");
     element.setAttribute("enabled", Boolean.toString(enabled));
+    element.setAttribute("keymap", previousKeyMap);
     element.addContent(element);
 
     CommandGroups.getInstance().saveData(element);
@@ -247,6 +264,8 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     if (set) {
       getInstance().turnOnPlugin();
     }
+
+    VimKeyMapUtil.enableKeyBoardBindings(set);
   }
 
   /**
