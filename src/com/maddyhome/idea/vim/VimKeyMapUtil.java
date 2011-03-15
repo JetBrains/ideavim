@@ -84,7 +84,7 @@ public class VimKeyMapUtil {
     if (keymapName2Enable.isEmpty()){
       return;
     }
-    if (keymapName2Enable.equals(manager.getActiveKeymap())){
+    if (keymapName2Enable.equals(manager.getActiveKeymap().getName())){
       return;
     }
     LOG.debug("Enabling keymap:" + keymapName2Enable);

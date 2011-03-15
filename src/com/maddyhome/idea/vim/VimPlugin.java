@@ -210,7 +210,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
    */
   public void disposeComponent() {
     LOG.debug("disposeComponent");
-    setEnabled(false);
+    turnOffPlugin();
     EditorActionManager manager = EditorActionManager.getInstance();
     TypedAction action = manager.getTypedAction();
     action.setupHandler(vimHandler.getOriginalTypedHandler());
