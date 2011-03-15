@@ -218,7 +218,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   }
 
   @Override
-  public void loadState(Element element) {
+  public void loadState(final Element element) {
     LOG.debug("Loading state");
 
     // Restore whether the plugin is enabled or not
@@ -235,11 +235,12 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   public Element getState() {
     LOG.debug("Saving state");
 
+    final Element element = new Element("ideavim");
     // Save whether the plugin is enabled or not
-    Element element = new Element("state");
-    element.setAttribute("enabled", Boolean.toString(enabled));
-    element.setAttribute("keymap", previousKeyMap);
-    element.addContent(element);
+    final Element state = new Element("state");
+    state.setAttribute("enabled", Boolean.toString(enabled));
+    state.setAttribute("keymap", previousKeyMap);
+    element.addContent(state);
 
     CommandGroups.getInstance().saveData(element);
     return element;
