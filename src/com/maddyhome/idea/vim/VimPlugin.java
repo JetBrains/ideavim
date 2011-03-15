@@ -173,15 +173,10 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable//, Co
     // we need to force the generation of the key map when the first project is opened.
     ProjectManager.getInstance().addProjectManagerListener(new ProjectManagerAdapter() {
       public void projectOpened(Project project) {
-        FileEditorManagerListener l = new ChangeGroup.InsertCheck();
-        listeners.add(l);
-        l = new MotionGroup.MotionEditorChange();
-        listeners.add(l);
-        l = new FileGroup.SelectionCheck();
-        listeners.add(l);
+        listeners.add(new MotionGroup.MotionEditorChange());
+        listeners.add(new FileGroup.SelectionCheck());
         if (ApiHelper.supportsColorSchemes()) {
-          l = new SearchGroup.EditorSelectionCheck();
-          listeners.add(l);
+          listeners.add(new SearchGroup.EditorSelectionCheck());
         }
 
         for (FileEditorManagerListener listener : listeners) {

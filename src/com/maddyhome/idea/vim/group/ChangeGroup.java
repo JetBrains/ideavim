@@ -31,9 +31,6 @@ import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.editor.event.EditorMouseAdapter;
 import com.intellij.openapi.editor.event.EditorMouseEvent;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
-import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
@@ -1597,50 +1594,6 @@ public class ChangeGroup extends AbstractActionGroup {
       }
 
       return true;
-    }
-  }
-
-  /**
-   * This class listens for editor tab changes so any insert/replace modes that need to be reset can be
-   */
-  public static class InsertCheck extends FileEditorManagerAdapter {
-    /**
-     * Ensure that all open editors get a block cursor for command mode.
-     *
-     * @param fileEditorManager
-     * @param virtualFile
-     */
-    public void fileOpened(FileEditorManager fileEditorManager, VirtualFile virtualFile) {
-      if (!VimPlugin.isEnabled()) return;
-
-      resetCursor(virtualFile, EditorData.getProject(fileEditorManager), false);
-    }
-
-    /**
-     * The user has changed the editor they are working with - exit insert/replace mode, and complete any
-     * appropriate repeat.
-     *
-     * @param event
-     */
-    public void selectionChanged(FileEditorManagerEvent event) {
-      if (!VimPlugin.isEnabled()) return;
-/*    TODO[oleg] don't we break anything with this persistense editor states?
-      logger.debug("selected file changed");
-
-      FileEditor fe = event.getOldEditor();
-      if (fe instanceof TextEditor) {
-        Editor editor = ((TextEditor)event.getOldEditor()).getEditor();
-        if (logger.isDebugEnabled()) {
-          logger.debug("reset state for " + editor);
-        }
-        KeyHandler.getInstance().fullReset(editor);
-      }
-
-      VirtualFile virtualFile = event.getOldFile();
-      if (virtualFile != null) {
-        resetCursor(virtualFile, EditorData.getProject(event.getManager()), false);
-      }
-      */
     }
   }
 
