@@ -10,7 +10,6 @@ import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.impl.KeymapImpl;
 import com.intellij.openapi.keymap.impl.KeymapManagerImpl;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jdom.Document;
@@ -47,9 +46,11 @@ public class VimKeyMapUtil {
     final File vimKeyMapFile = new File(PathManager.getPluginsPath() + File.separatorChar + "IdeaVim" + File.separatorChar + VIM_XML);
     if (!vimKeyMapFile.exists() || !vimKeyMapFile.isFile()){
       LOG.debug("vim keyboard file not found");
-      Messages.showMessageDialog("Installation of the Vim keymap failed because Vim keymap file not found.\n" +
-                                 "Some functions may work incorrect. For more details please refer to : http://youtrack.jetbrains.net/issues/VIM",
-                                 "Vim keymap installation failed", Messages.getErrorIcon());
+      Notifications.Bus.notify(new Notification("ideavim", "IdeaVim",
+                                                "Installation of the Vim keymap failed because Vim keymap file not found.\n" +
+                                                "Some functions may work incorrect. " +
+                                                "For more details please refer to : http://youtrack.jetbrains.net/issues/VIM",
+                                                NotificationType.ERROR));
       return;
     }
     try {
@@ -59,7 +60,7 @@ public class VimKeyMapUtil {
       final Document document = StorageUtil.loadDocument(new FileInputStream(vimKeyMapVFile.getPath()));
       if (document == null){
         LOG.debug("Failed to install vim keymap. Vim.xml file is corrupted");
-        Notifications.Bus.notify(new Notification("ideavim", "Failure",
+        Notifications.Bus.notify(new Notification("ideavim", "IdeaVim",
                                                   "Failed to install vim keymap. Vim.xml file is corrupted", NotificationType.ERROR));
         return;
       }
@@ -67,11 +68,11 @@ public class VimKeyMapUtil {
       final Keymap[] allKeymaps = manager.getAllKeymaps();
       vimKeyMap.readExternal(document.getRootElement(), allKeymaps);
       manager.addKeymap(vimKeyMap);
-      Notifications.Bus.notify(new Notification("ideavim", "Success", "Successfully installed vim keymap", NotificationType.INFORMATION));
+      Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", "Successfully installed vim keymap", NotificationType.INFORMATION));
     }
     catch (Exception e) {
       LOG.debug("Failed to install vim keymap.\n" + e.getMessage());
-      Notifications.Bus.notify(new Notification("ideavim", "Failure", "Failed to install vim keymap.\n" + e.getMessage(), NotificationType.ERROR));
+      Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", "Failed to install vim keymap.\n" + e.getMessage(), NotificationType.ERROR));
       return;
     }
   }
@@ -89,7 +90,7 @@ public class VimKeyMapUtil {
     LOG.debug("Enabling keymap:" + keymapName2Enable);
     final Keymap keymap = manager.getKeymap(keymapName2Enable);
     if (keymap == null){
-      Notifications.Bus.notify(new Notification("ideavim", "Failure", "Failed to enable keymap: " + keymapName2Enable, NotificationType.ERROR));
+      Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", "Failed to enable keymap: " + keymapName2Enable, NotificationType.ERROR));
       LOG.debug("Failed to enable keymap: " + keymapName2Enable);
       return;
     }
@@ -101,7 +102,7 @@ public class VimKeyMapUtil {
     manager.setActiveKeymap(keymap);
 
     final String keyMapPresentableName = "$default".equals(keymapName2Enable) ? "Default" : keymapName2Enable;
-    Notifications.Bus.notify(new Notification("ideavim", "KeyMap", keyMapPresentableName + " keymap was enabled", NotificationType.INFORMATION));
+    Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", keyMapPresentableName + " keymap was enabled", NotificationType.INFORMATION));
     LOG.debug(keymapName2Enable + " keymap was enabled");
   }
 
