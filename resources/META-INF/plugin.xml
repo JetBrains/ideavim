@@ -49,6 +49,8 @@
         </action>
 
         <!-- Motions -->
+        <action id="VimMotionPreviousTab" class="com.maddyhome.idea.vim.action.motion.tabs.MotionPreviousTabAction" text="Move to Previous Tab"/>
+        <action id="VimMotionNextTab" class="com.maddyhome.idea.vim.action.motion.tabs.MotionNextTabAction" text="Move to Next Tab"/>
         <!-- Left/Right -->
         <action id="VimMotionColumn" class="com.maddyhome.idea.vim.action.motion.leftright.MotionColumnAction" text="Move to Column"/>
         <action id="VimMotionFirstColumn" class="com.maddyhome.idea.vim.action.motion.leftright.MotionFirstColumnAction" text="Start of Line"/>

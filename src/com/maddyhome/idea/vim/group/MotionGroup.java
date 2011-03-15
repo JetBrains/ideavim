@@ -19,7 +19,7 @@ package com.maddyhome.idea.vim.group;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
@@ -1269,6 +1269,31 @@ public class MotionGroup extends AbstractActionGroup {
       }
     }
   }
+
+  public int moveCaretGotoPreviousTab(final DataContext context) {
+    final AnAction previousTab = ActionManager.getInstance().getAction("PreviousTab");
+    previousTab.actionPerformed(new AnActionEvent(
+      null,
+      context,
+      "",
+      new Presentation(),
+      ActionManager.getInstance(),
+      0));
+    return 0;
+  }
+
+  public int moveCaretGotoNextTab(final DataContext context) {
+    final AnAction previousTab = ActionManager.getInstance().getAction("NextTab");
+    previousTab.actionPerformed(new AnActionEvent(
+      null,
+      context,
+      "",
+      new Presentation(),
+      ActionManager.getInstance(),
+      0));
+    return 0;
+  }
+
 
   public static void scrollCaretIntoView(Editor editor) {
     int cline = EditorHelper.getCurrentVisualLine(editor);

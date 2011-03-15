@@ -38,26 +38,6 @@ public class RegisterActions {
     return instance;
   }
 
-  /*
-  public void enable()
-  {
-      if (!enabled)
-      {
-          KeyParser.getInstance().setupShortcuts();
-          enabled = true;
-      }
-  }
-
-  public void disable()
-  {
-      if (enabled)
-      {
-          KeyParser.getInstance().resetShortcuts();
-          enabled = false;
-      }
-  }
-  */
-
   private RegisterActions() {
     KeyParser parser = KeyParser.getInstance();
 
@@ -451,6 +431,10 @@ public class RegisterActions {
     // TODO - add zj
     // TODO - add zk
 
+    parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionPreviousTab", Command.MOTION, Command.FLAG_MOT_INCLUSIVE,
+                          new Shortcut("gt"));
+    parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionNextTab", Command.MOTION, Command.FLAG_MOT_INCLUSIVE,
+                          new Shortcut("gT"));
     parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionCamelEndLeft", Command.MOTION, Command.FLAG_MOT_INCLUSIVE,
                           new Shortcut("]b"));
     parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionCamelEndRight", Command.MOTION, Command.FLAG_MOT_INCLUSIVE,
@@ -751,37 +735,6 @@ public class RegisterActions {
         new Shortcut(KeyStroke.getKeyStroke((char)0x0a)),
         new Shortcut(KeyStroke.getKeyStroke((char)0x0d))
       });
-    /*
-    parser.registerAction(KeyParser.MAPPING_CMD_LINE, "VimCancelExEntry", Command.OTHER_READONLY, new Shortcut[] {
-        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)),
-        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_MASK)),
-        new Shortcut(KeyStroke.getKeyStroke((char)0x03, KeyEvent.CTRL_MASK)),
-        new Shortcut(KeyStroke.getKeyStroke('[', KeyEvent.CTRL_MASK)),
-        new Shortcut(KeyStroke.getKeyStroke((char)0x1b))
-    });
-    parser.registerAction(KeyParser.MAPPING_CMD_LINE, "VimExBackspace", Command.OTHER_READONLY, Command.FLAG_IS_BACKSPACE, new Shortcut[] {
-        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)),
-        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK)),
-        new Shortcut(KeyStroke.getKeyStroke((char)0x08))
-    });
-    parser.registerAction(KeyParser.MAPPING_CMD_LINE, "VimProcessExKey", Command.OTHER_READONLY, new Shortcut[] {
-        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0)),
-        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_MASK)),
-        new Shortcut(KeyStroke.getKeyStroke((char)0x02, KeyEvent.CTRL_MASK)),
-        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0)),
-        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_MASK)),
-        new Shortcut(KeyStroke.getKeyStroke((char)0x05, KeyEvent.CTRL_MASK)),
-        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, 0)),
-        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)),
-        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_MASK)),
-        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_MASK)),
-        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0)),
-        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_MASK)),
-        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_MASK)),
-        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)),
-        new Shortcut(KeyStroke.getKeyStroke((char)0x7f))
-    });
-    */
 
     // ********************** Various Mode Actions ************************
     parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimCommentByLineComment", Command.CHANGE,
