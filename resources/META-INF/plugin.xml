@@ -23,7 +23,7 @@
             <li>VIM help</li>
         </ul>
     ]]></description>
-    <version>@VERSION@-@IDEA-VERSION@</version>
+    <version>@VERSION@</version>
     <vendor logo="/icons/vim16x16.png">Rick Maddy, JetBrains</vendor>
 
     <helpset file="help.jar" path="/VimHelp.hs"/>

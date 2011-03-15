@@ -1,11 +1,11 @@
-*usr_11.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_11.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                            Recovering from a crash
 
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Did your computer crash?  And you just spent hours editing?  Don't panic!  Vim
 keeps enough information on harddisk to be able to restore most of your work.

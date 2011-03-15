@@ -1,7 +1,7 @@
-*cmdline.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Dec 01
+*cmdline.txt*   For IdeaVim version @VERSION@.  Last change: 2006 Dec 01
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
                                 *Cmdline-mode* *Command-line-mode*
@@ -296,7 +296,7 @@ terminals)
 ==============================================================================
 2. Command-line completion                              *cmdline-completion*
 
-Not currently supported by @NAME@
+Not currently supported by IdeaVim
 <!--
 When editing the command-line, a few commands can be used to complete the
 word before the cursor.  This is available for:

@@ -1,6 +1,6 @@
-*usr_26.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_26.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                                   Repeating
 
@@ -103,7 +103,7 @@ The CTRL-X command does subtraction in a similar way.
 ==============================================================================
 *26.3*  Making a change in many files
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Suppose you have a variable called "x_cnt" and you want to change it to
 "x_counter".  This variable is used in several of your C files.  You need to
@@ -139,7 +139,7 @@ Check this with the ":buffers" command (or ":ls").
 ==============================================================================
 *26.4*  Using Vim from a shell script
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Suppose you have a lot of files in which you need to change the string
 "-person-" to "Jones" and then print it.  How do you do that?  One way is to

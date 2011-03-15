@@ -1,6 +1,6 @@
-*usr_04.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_04.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                              Making small changes
 
@@ -42,9 +42,9 @@ command deletes four words.
 
         To err is human. you need a computer. ~
 
-@NAME@ only deletes up to the position where the motion takes the cursor.  That's
-because @NAME@ knows that you probably don't want to delete the first character
-of a word.  If you use the "e" command to move to the end of a word, @NAME@
+IdeaVim only deletes up to the position where the motion takes the cursor.  That's
+because IdeaVim knows that you probably don't want to delete the first character
+of a word.  If you use the "e" command to move to the end of a word, IdeaVim
 guesses that you do want to include that last character:
 
         To err is human. you need a computer. ~
@@ -98,7 +98,7 @@ example used here for the "cw" command.  The c operator works just like the
 d operator, with one exception: "cw".  It actually works like "ce", change to
 end of word.  Thus the space after the word isn't included.  This is an
 exception that dates back to the old Vi.  Since many people are used to it
-now, the inconsistency has remained in @NAME@.
+now, the inconsistency has remained in IdeaVim.
 
 
 MORE CHANGES
@@ -160,7 +160,7 @@ line break.
 ==============================================================================
 *04.3*  Repeating a change
 
-The "." command is one of the most simple yet powerful commands in @NAME@.  It
+The "." command is one of the most simple yet powerful commands in IdeaVim.  It
 repeats the last change.  For instance, suppose you are editing an HTML file
 and want to delete all the <B> tags.  You position the cursor on the first <
 and delete the <B> with the command "df>".  You then go to the < of the next
@@ -270,7 +270,7 @@ where they open a new line below or above the cursor.
 *04.5*  Moving text
 
 When you delete something with the "d", "x", or another command, the text is
-saved.  You can paste it back by using the p command. (The @NAME@ name for
+saved.  You can paste it back by using the p command. (The IdeaVim name for
 this is put).
    Take a look at how this works.  First you will delete an entire line, by
 putting the cursor on the line you want to delete and typing "dd".  Now you
@@ -312,7 +312,7 @@ same deleted line.
 SWAPPING TWO CHARACTERS
 
 Frequently when you are typing, your fingers get ahead of your brain (or the
-other way around?).  The result is a typo such as "teh" for "the".  @NAME@
+other way around?).  The result is a typo such as "teh" for "the".  IdeaVim
 makes it easy to correct such problems.  Just put the cursor on the e of "teh"
 and execute the command "xp".  This works as follows: "x" deletes the
 character e and places it in a register.  "p" puts the text after the cursor,
@@ -328,7 +328,7 @@ To copy text from one place to another, you could delete it, use "u" to undo
 the deletion and then "p" to put it somewhere else.  There is an easier way:
 yanking.  The "y" operator copies text into a register.  Then a "p" command
 can be used to put it.
-   Yanking is just a @NAME@ name for copying.  The "c" letter was already used
+   Yanking is just a IdeaVim name for copying.  The "c" letter was already used
 for the change operator, and "y" was still available.  Calling this
 operator "yank" made it easier to remember to use the "y" key.
 
@@ -362,10 +362,10 @@ Use "y$" to yank to the end of the line.
 
 First select some text with Visual mode, then use the
 Edit/Copy menu.  The selected text is now copied to the clipboard.  You can
-paste the text in other programs.  In @NAME@ itself too.
+paste the text in other programs.  In IdeaVim itself too.
 
 If you have copied text to the clipboard in another application, you can paste
-it in @NAME@ with the Edit/Paste menu.  This works in Normal mode and Insert
+it in IdeaVim with the Edit/Paste menu.  This works in Normal mode and Insert
 mode.  In Visual mode the selected text is replaced with the pasted text.
 
 The "Cut" menu item deletes the text before it's put on the clipboard.  The
@@ -404,7 +404,7 @@ stands for "A Word".  Thus "daw" is "Delete A Word".  To be precise, the white
 space after the word is also deleted (the white space before the word at the
 end of the line).
 
-Using text objects is the third way to make changes in @NAME@.  We already had
+Using text objects is the third way to make changes in IdeaVim.  We already had
 operator-motion and Visual mode.  Now we add operator-text object.
    It is very similar to operator-motion, but instead of operating on the text
 between the cursor position before and after a movement command, the text
@@ -446,7 +446,7 @@ You can find a long list of text objects here: |text-objects|.
 ==============================================================================
 *04.9*  Replace mode
 
-The "R" command causes @NAME@ to enter replace mode.  In this mode, each
+The "R" command causes IdeaVim to enter replace mode.  In this mode, each
 character you type replaces the one under the cursor.  This continues until
 you type <Esc>.
    In this example you start Replace mode on the first "t" of "text":

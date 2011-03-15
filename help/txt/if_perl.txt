@@ -1,11 +1,11 @@
-*if_perl.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*if_perl.txt*   For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 Perl and Vim                            *perl* *Perl*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 1. Editing Perl files                   |perl-editing|
 2. Compiling VIM with Perl interface    |perl-compiling|

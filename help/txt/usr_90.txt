@@ -1,10 +1,10 @@
-*usr_90.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_90.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                                 Installing Vim
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!-- TODO - write up install for plugin
                                                                 *install*
 Before you can use Vim you have to install it.  Depending on your system it's

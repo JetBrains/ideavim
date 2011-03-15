@@ -1,7 +1,7 @@
-*digraph.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*digraph.txt*   For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Digraphs                                                *digraphs* *Digraphs*
@@ -39,7 +39,7 @@ disabled, the ":digraph" command will display an error message.
 -->
 
 Example of the output of ":digraphs": >
- TH Þ  222  ss ß  223  a! à  224  a' á  225  a> â  226  a? ã  227  a: ä  228
+ TH ï¿½  222  ss ï¿½  223  a! ï¿½  224  a' ï¿½  225  a> ï¿½  226  a? ï¿½  227  a: ï¿½  228
 
 The first two characters in each column are the characters you have to type to
 enter the digraph.
@@ -137,7 +137,7 @@ a standard meaning:
         Five                    5       Hiragana
         Six                     6       Katakana
 
-Example: a: is ä  and o: is ö
+Example: a: is ï¿½  and o: is ï¿½
 
 These are the RFC1345 digraphs for the one-byte characters.  See the output of
 ":digraphs" for the others. All two character digraphs from RFC1345 are
@@ -223,99 +223,99 @@ $       DO      0x24     36     DOLLAR SIGN
 ~^      PM      0x9e    158     PRIVACY MESSAGE (PM)
 ~_      AC      0x9f    159     APPLICATION PROGRAM COMMAND (APC)
 |       NS      0xa0    160     NO-BREAK SPACE
-¡        !I      0xa1    161     INVERTED EXCLAMATION MARK
-¢        Ct      0xa2    162     CENT SIGN
-£        Pd      0xa3    163     POUND SIGN
-¤        Cu      0xa4    164     CURRENCY SIGN
-¥        Ye      0xa5    165     YEN SIGN
-¦        BB      0xa6    166     BROKEN BAR
-§        SE      0xa7    167     SECTION SIGN
-¨        ':      0xa8    168     DIAERESIS
-©        Co      0xa9    169     COPYRIGHT SIGN
-ª        -a      0xaa    170     FEMININE ORDINAL INDICATOR
-«        <<      0xab    171     LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
-¬        NO      0xac    172     NOT SIGN
-­        --      0xad    173     SOFT HYPHEN
-®        Rg      0xae    174     REGISTERED SIGN
-¯        'm      0xaf    175     MACRON
-°        DG      0xb0    176     DEGREE SIGN
-±        +-      0xb1    177     PLUS-MINUS SIGN
-²        2S      0xb2    178     SUPERSCRIPT TWO
-³        3S      0xb3    179     SUPERSCRIPT THREE
-´        ''      0xb4    180     ACUTE ACCENT
-µ        My      0xb5    181     MICRO SIGN
-¶        PI      0xb6    182     PILCROW SIGN
-·        .M      0xb7    183     MIDDLE DOT
-¸        ',      0xb8    184     CEDILLA
-¹        1S      0xb9    185     SUPERSCRIPT ONE
-º        -o      0xba    186     MASCULINE ORDINAL INDICATOR
-»        >>      0xbb    187     RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
-¼        14      0xbc    188     VULGAR FRACTION ONE QUARTER
-½        12      0xbd    189     VULGAR FRACTION ONE HALF
-¾        34      0xbe    190     VULGAR FRACTION THREE QUARTERS
-¿        ?I      0xbf    191     INVERTED QUESTION MARK
-À        A!      0xc0    192     LATIN CAPITAL LETTER A WITH GRAVE
-Á        A'      0xc1    193     LATIN CAPITAL LETTER A WITH ACUTE
-Â        A>      0xc2    194     LATIN CAPITAL LETTER A WITH CIRCUMFLEX
-Ã        A?      0xc3    195     LATIN CAPITAL LETTER A WITH TILDE
-Ä        A:      0xc4    196     LATIN CAPITAL LETTER A WITH DIAERESIS
-Å        AA      0xc5    197     LATIN CAPITAL LETTER A WITH RING ABOVE
-Æ        AE      0xc6    198     LATIN CAPITAL LETTER AE
-Ç        C,      0xc7    199     LATIN CAPITAL LETTER C WITH CEDILLA
-È        E!      0xc8    200     LATIN CAPITAL LETTER E WITH GRAVE
-É        E'      0xc9    201     LATIN CAPITAL LETTER E WITH ACUTE
-Ê        E>      0xca    202     LATIN CAPITAL LETTER E WITH CIRCUMFLEX
-Ë        E:      0xcb    203     LATIN CAPITAL LETTER E WITH DIAERESIS
-Ì        I!      0xcc    204     LATIN CAPITAL LETTER I WITH GRAVE
-Í        I'      0xcd    205     LATIN CAPITAL LETTER I WITH ACUTE
-Î        I>      0xce    206     LATIN CAPITAL LETTER I WITH CIRCUMFLEX
-Ï        I:      0xcf    207     LATIN CAPITAL LETTER I WITH DIAERESIS
-Ð        D-      0xd0    208     LATIN CAPITAL LETTER ETH (Icelandic)
-Ñ        N?      0xd1    209     LATIN CAPITAL LETTER N WITH TILDE
-Ò        O!      0xd2    210     LATIN CAPITAL LETTER O WITH GRAVE
-Ó        O'      0xd3    211     LATIN CAPITAL LETTER O WITH ACUTE
-Ô        O>      0xd4    212     LATIN CAPITAL LETTER O WITH CIRCUMFLEX
-Õ        O?      0xd5    213     LATIN CAPITAL LETTER O WITH TILDE
-Ö        O:      0xd6    214     LATIN CAPITAL LETTER O WITH DIAERESIS
-×        *X      0xd7    215     MULTIPLICATION SIGN
-Ø        O/      0xd8    216     LATIN CAPITAL LETTER O WITH STROKE
-Ù        U!      0xd9    217     LATIN CAPITAL LETTER U WITH GRAVE
-Ú        U'      0xda    218     LATIN CAPITAL LETTER U WITH ACUTE
-Û        U>      0xdb    219     LATIN CAPITAL LETTER U WITH CIRCUMFLEX
-Ü        U:      0xdc    220     LATIN CAPITAL LETTER U WITH DIAERESIS
-Ý        Y'      0xdd    221     LATIN CAPITAL LETTER Y WITH ACUTE
-Þ        TH      0xde    222     LATIN CAPITAL LETTER THORN (Icelandic)
-ß        ss      0xdf    223     LATIN SMALL LETTER SHARP S (German)
-à        a!      0xe0    224     LATIN SMALL LETTER A WITH GRAVE
-á        a'      0xe1    225     LATIN SMALL LETTER A WITH ACUTE
-â        a>      0xe2    226     LATIN SMALL LETTER A WITH CIRCUMFLEX
-ã        a?      0xe3    227     LATIN SMALL LETTER A WITH TILDE
-ä        a:      0xe4    228     LATIN SMALL LETTER A WITH DIAERESIS
-å        aa      0xe5    229     LATIN SMALL LETTER A WITH RING ABOVE
-æ        ae      0xe6    230     LATIN SMALL LETTER AE
-ç        c,      0xe7    231     LATIN SMALL LETTER C WITH CEDILLA
-è        e!      0xe8    232     LATIN SMALL LETTER E WITH GRAVE
-é        e'      0xe9    233     LATIN SMALL LETTER E WITH ACUTE
-ê        e>      0xea    234     LATIN SMALL LETTER E WITH CIRCUMFLEX
-ë        e:      0xeb    235     LATIN SMALL LETTER E WITH DIAERESIS
-ì        i!      0xec    236     LATIN SMALL LETTER I WITH GRAVE
-í        i'      0xed    237     LATIN SMALL LETTER I WITH ACUTE
-î        i>      0xee    238     LATIN SMALL LETTER I WITH CIRCUMFLEX
-ï        i:      0xef    239     LATIN SMALL LETTER I WITH DIAERESIS
-ð        d-      0xf0    240     LATIN SMALL LETTER ETH (Icelandic)
-ñ        n?      0xf1    241     LATIN SMALL LETTER N WITH TILDE
-ò        o!      0xf2    242     LATIN SMALL LETTER O WITH GRAVE
-ó        o'      0xf3    243     LATIN SMALL LETTER O WITH ACUTE
-ô        o>      0xf4    244     LATIN SMALL LETTER O WITH CIRCUMFLEX
-õ        o?      0xf5    245     LATIN SMALL LETTER O WITH TILDE
-ö        o:      0xf6    246     LATIN SMALL LETTER O WITH DIAERESIS
-÷        -:      0xf7    247     DIVISION SIGN
-ø        o/      0xf8    248     LATIN SMALL LETTER O WITH STROKE
-ù        u!      0xf9    249     LATIN SMALL LETTER U WITH GRAVE
-ú        u'      0xfa    250     LATIN SMALL LETTER U WITH ACUTE
-û        u>      0xfb    251     LATIN SMALL LETTER U WITH CIRCUMFLEX
-ü        u:      0xfc    252     LATIN SMALL LETTER U WITH DIAERESIS
-ý        y'      0xfd    253     LATIN SMALL LETTER Y WITH ACUTE
-þ        th      0xfe    254     LATIN SMALL LETTER THORN (Icelandic)
-ÿ        y:      0xff    255     LATIN SMALL LETTER Y WITH DIAERESIS
+ï¿½        !I      0xa1    161     INVERTED EXCLAMATION MARK
+ï¿½        Ct      0xa2    162     CENT SIGN
+ï¿½        Pd      0xa3    163     POUND SIGN
+ï¿½        Cu      0xa4    164     CURRENCY SIGN
+ï¿½        Ye      0xa5    165     YEN SIGN
+ï¿½        BB      0xa6    166     BROKEN BAR
+ï¿½        SE      0xa7    167     SECTION SIGN
+ï¿½        ':      0xa8    168     DIAERESIS
+ï¿½        Co      0xa9    169     COPYRIGHT SIGN
+ï¿½        -a      0xaa    170     FEMININE ORDINAL INDICATOR
+ï¿½        <<      0xab    171     LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
+ï¿½        NO      0xac    172     NOT SIGN
+ï¿½        --      0xad    173     SOFT HYPHEN
+ï¿½        Rg      0xae    174     REGISTERED SIGN
+ï¿½        'm      0xaf    175     MACRON
+ï¿½        DG      0xb0    176     DEGREE SIGN
+ï¿½        +-      0xb1    177     PLUS-MINUS SIGN
+ï¿½        2S      0xb2    178     SUPERSCRIPT TWO
+ï¿½        3S      0xb3    179     SUPERSCRIPT THREE
+ï¿½        ''      0xb4    180     ACUTE ACCENT
+ï¿½        My      0xb5    181     MICRO SIGN
+ï¿½        PI      0xb6    182     PILCROW SIGN
+ï¿½        .M      0xb7    183     MIDDLE DOT
+ï¿½        ',      0xb8    184     CEDILLA
+ï¿½        1S      0xb9    185     SUPERSCRIPT ONE
+ï¿½        -o      0xba    186     MASCULINE ORDINAL INDICATOR
+ï¿½        >>      0xbb    187     RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
+ï¿½        14      0xbc    188     VULGAR FRACTION ONE QUARTER
+ï¿½        12      0xbd    189     VULGAR FRACTION ONE HALF
+ï¿½        34      0xbe    190     VULGAR FRACTION THREE QUARTERS
+ï¿½        ?I      0xbf    191     INVERTED QUESTION MARK
+ï¿½        A!      0xc0    192     LATIN CAPITAL LETTER A WITH GRAVE
+ï¿½        A'      0xc1    193     LATIN CAPITAL LETTER A WITH ACUTE
+ï¿½        A>      0xc2    194     LATIN CAPITAL LETTER A WITH CIRCUMFLEX
+ï¿½        A?      0xc3    195     LATIN CAPITAL LETTER A WITH TILDE
+ï¿½        A:      0xc4    196     LATIN CAPITAL LETTER A WITH DIAERESIS
+ï¿½        AA      0xc5    197     LATIN CAPITAL LETTER A WITH RING ABOVE
+ï¿½        AE      0xc6    198     LATIN CAPITAL LETTER AE
+ï¿½        C,      0xc7    199     LATIN CAPITAL LETTER C WITH CEDILLA
+ï¿½        E!      0xc8    200     LATIN CAPITAL LETTER E WITH GRAVE
+ï¿½        E'      0xc9    201     LATIN CAPITAL LETTER E WITH ACUTE
+ï¿½        E>      0xca    202     LATIN CAPITAL LETTER E WITH CIRCUMFLEX
+ï¿½        E:      0xcb    203     LATIN CAPITAL LETTER E WITH DIAERESIS
+ï¿½        I!      0xcc    204     LATIN CAPITAL LETTER I WITH GRAVE
+ï¿½        I'      0xcd    205     LATIN CAPITAL LETTER I WITH ACUTE
+ï¿½        I>      0xce    206     LATIN CAPITAL LETTER I WITH CIRCUMFLEX
+ï¿½        I:      0xcf    207     LATIN CAPITAL LETTER I WITH DIAERESIS
+ï¿½        D-      0xd0    208     LATIN CAPITAL LETTER ETH (Icelandic)
+ï¿½        N?      0xd1    209     LATIN CAPITAL LETTER N WITH TILDE
+ï¿½        O!      0xd2    210     LATIN CAPITAL LETTER O WITH GRAVE
+ï¿½        O'      0xd3    211     LATIN CAPITAL LETTER O WITH ACUTE
+ï¿½        O>      0xd4    212     LATIN CAPITAL LETTER O WITH CIRCUMFLEX
+ï¿½        O?      0xd5    213     LATIN CAPITAL LETTER O WITH TILDE
+ï¿½        O:      0xd6    214     LATIN CAPITAL LETTER O WITH DIAERESIS
+ï¿½        *X      0xd7    215     MULTIPLICATION SIGN
+ï¿½        O/      0xd8    216     LATIN CAPITAL LETTER O WITH STROKE
+ï¿½        U!      0xd9    217     LATIN CAPITAL LETTER U WITH GRAVE
+ï¿½        U'      0xda    218     LATIN CAPITAL LETTER U WITH ACUTE
+ï¿½        U>      0xdb    219     LATIN CAPITAL LETTER U WITH CIRCUMFLEX
+ï¿½        U:      0xdc    220     LATIN CAPITAL LETTER U WITH DIAERESIS
+ï¿½        Y'      0xdd    221     LATIN CAPITAL LETTER Y WITH ACUTE
+ï¿½        TH      0xde    222     LATIN CAPITAL LETTER THORN (Icelandic)
+ï¿½        ss      0xdf    223     LATIN SMALL LETTER SHARP S (German)
+ï¿½        a!      0xe0    224     LATIN SMALL LETTER A WITH GRAVE
+ï¿½        a'      0xe1    225     LATIN SMALL LETTER A WITH ACUTE
+ï¿½        a>      0xe2    226     LATIN SMALL LETTER A WITH CIRCUMFLEX
+ï¿½        a?      0xe3    227     LATIN SMALL LETTER A WITH TILDE
+ï¿½        a:      0xe4    228     LATIN SMALL LETTER A WITH DIAERESIS
+ï¿½        aa      0xe5    229     LATIN SMALL LETTER A WITH RING ABOVE
+ï¿½        ae      0xe6    230     LATIN SMALL LETTER AE
+ï¿½        c,      0xe7    231     LATIN SMALL LETTER C WITH CEDILLA
+ï¿½        e!      0xe8    232     LATIN SMALL LETTER E WITH GRAVE
+ï¿½        e'      0xe9    233     LATIN SMALL LETTER E WITH ACUTE
+ï¿½        e>      0xea    234     LATIN SMALL LETTER E WITH CIRCUMFLEX
+ï¿½        e:      0xeb    235     LATIN SMALL LETTER E WITH DIAERESIS
+ï¿½        i!      0xec    236     LATIN SMALL LETTER I WITH GRAVE
+ï¿½        i'      0xed    237     LATIN SMALL LETTER I WITH ACUTE
+ï¿½        i>      0xee    238     LATIN SMALL LETTER I WITH CIRCUMFLEX
+ï¿½        i:      0xef    239     LATIN SMALL LETTER I WITH DIAERESIS
+ï¿½        d-      0xf0    240     LATIN SMALL LETTER ETH (Icelandic)
+ï¿½        n?      0xf1    241     LATIN SMALL LETTER N WITH TILDE
+ï¿½        o!      0xf2    242     LATIN SMALL LETTER O WITH GRAVE
+ï¿½        o'      0xf3    243     LATIN SMALL LETTER O WITH ACUTE
+ï¿½        o>      0xf4    244     LATIN SMALL LETTER O WITH CIRCUMFLEX
+ï¿½        o?      0xf5    245     LATIN SMALL LETTER O WITH TILDE
+ï¿½        o:      0xf6    246     LATIN SMALL LETTER O WITH DIAERESIS
+ï¿½        -:      0xf7    247     DIVISION SIGN
+ï¿½        o/      0xf8    248     LATIN SMALL LETTER O WITH STROKE
+ï¿½        u!      0xf9    249     LATIN SMALL LETTER U WITH GRAVE
+ï¿½        u'      0xfa    250     LATIN SMALL LETTER U WITH ACUTE
+ï¿½        u>      0xfb    251     LATIN SMALL LETTER U WITH CIRCUMFLEX
+ï¿½        u:      0xfc    252     LATIN SMALL LETTER U WITH DIAERESIS
+ï¿½        y'      0xfd    253     LATIN SMALL LETTER Y WITH ACUTE
+ï¿½        th      0xfe    254     LATIN SMALL LETTER THORN (Icelandic)
+ï¿½        y:      0xff    255     LATIN SMALL LETTER Y WITH DIAERESIS
 

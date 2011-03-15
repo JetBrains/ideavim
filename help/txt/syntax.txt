@@ -1,12 +1,12 @@
-*syntax.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*syntax.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Syntax highlighting             *syntax* *syntax-highlighting* *coloring*
 
-This information does not apply to @NAME@. IDEA handles all the syntax
+This information does not apply to IdeaVim. IDEA handles all the syntax
 highlighting.
 <!--
 Syntax highlighting enables Vim to show parts of the text in another font or

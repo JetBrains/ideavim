@@ -1,7 +1,7 @@
-*options.txt*   For @NAME@ version @VERSION@.  Last change: 2004 June 29.
-                       For IDEA version @IDEA-VERSION@
+*options.txt*   For IdeaVim version @VERSION@.  Last change: 2004 June 29.
+                       For IntellIJ platform version @PLATFORM_VERSION@
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Options                                                 *options*

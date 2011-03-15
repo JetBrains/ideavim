@@ -1,7 +1,7 @@
-*scroll.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*scroll.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Scrolling                                               *scrolling*
@@ -169,7 +169,7 @@ ze                      Scroll the screen horizontally to position the cursor
 ==============================================================================
 5. Scrolling synchronously                              *scroll-binding*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Occasionally, it is desirable to bind two or more windows together such that
 when one window is scrolled, the other windows are scrolled also.  In Vim,
@@ -220,7 +220,7 @@ This allows quick adjustment of the relative offset of 'scrollbind' windows.
 ==============================================================================
 6. Scrolling with a mouse wheel                         *scroll-mouse-wheel*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 When your mouse has a scroll wheel, it should work with Vim in the GUI.  How
 it works depends on your system.  It might also work in an xterm

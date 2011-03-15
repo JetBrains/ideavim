@@ -1,12 +1,12 @@
-*usr_03.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Dec 31
+*usr_03.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Dec 31
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                              Moving around
 
 
 Before you can insert or delete text the cursor has to be moved to the right
-place.  @NAME@ has a large number of commands to position the cursor.  This
+place.  IdeaVim has a large number of commands to position the cursor.  This
 chapter shows you how to use the most important ones.  You can find a list of
 these commands below |Q_lr|.
 
@@ -28,7 +28,7 @@ Table of contents: |usr_toc.txt|
 ==============================================================================
 *03.1*  Word movement
 
-To move the cursor forward one word, use the "w" command.  Like most @NAME@
+To move the cursor forward one word, use the "w" command.  Like most IdeaVim
 commands, you can use a numeric prefix to move past multiple words.  For
 example, "3w" moves three words.  This figure shows how it works:
 
@@ -481,7 +481,7 @@ thus searching wraps around the end of the file.
 INTERMEZZO
 
 If you like one of the options mentioned before, and set it each time you use
-@NAME@, you can put the command in your Vim startup file.
+IdeaVim, you can put the command in your Vim startup file.
 <!--
    Edit the file, as mentioned at |not-compatible|.  Or use this command to
 find out where it is: >
@@ -494,7 +494,7 @@ Edit the file, for example with: >
         :edit ~/.vimrc
 
 Then add a line with the command to set the option, just like you typed it in
-@NAME@.  Example: >
+IdeaVim.  Example: >
 
         Go:set hlsearch<Esc>
 
@@ -503,12 +503,12 @@ Then add a line with the command to set the option, just like you typed it in
 
         ZZ
 
-If you now start @NAME@ again, the 'hlsearch' option will already be set.
+If you now start IdeaVim again, the 'hlsearch' option will already be set.
 
 ==============================================================================
 *03.9*  Simple search patterns
 
-The @NAME@ editor uses regular expressions to specify what to search for.
+The IdeaVim editor uses regular expressions to specify what to search for.
 Regular expressions are an extremely powerful and compact way to specify a
 search pattern.  Unfortunately, this power comes at a price, because regular
 expressions are a bit tricky to specify.
@@ -569,7 +569,7 @@ Searching for "ter\." only finds the second match.
 ==============================================================================
 *03.10* Using marks
 
-When you make a jump to a position with the "G" command, @NAME@ remembers the
+When you make a jump to a position with the "G" command, IdeaVim remembers the
 position from before this jump.  This position is called a mark.  To go back
 where you came from, use this command: >
 
@@ -620,9 +620,9 @@ you used last is marked with a ">".
 
 NAMED MARKS
 
-@NAME@ enables you to place your own marks in the text.  The command "ma" marks
+IdeaVim enables you to place your own marks in the text.  The command "ma" marks
 the place under the cursor as mark a.  You can place 26 marks (a through z) in
-your text.  You can't see them, it's just a position that @NAME@ remembers.
+your text.  You can't see them, it's just a position that IdeaVim remembers.
    To go to a mark, use the command `{mark}, where "{mark} is the mark letter.
 Thus to move to the a mark:
 >

@@ -1,12 +1,12 @@
-*windows.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*windows.txt*   For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Editing with multiple windows and buffers.              *windows* *buffers*
 
-This information does not apply to @NAME@. IDEA handles all the windowing
+This information does not apply to IdeaVim. IDEA handles all the windowing
 features.
 <!--
 The commands which have been added to use multiple windows and buffers are

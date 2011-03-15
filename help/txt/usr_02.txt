@@ -1,15 +1,15 @@
-*usr_02.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_02.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
-                            The first steps in @NAME@
+                            The first steps in IdeaVim
 
 
-This chapter provides just enough information to edit a file with @NAME@.  Not
+This chapter provides just enough information to edit a file with IdeaVim.  Not
 well or fast, but you can edit.  Take some time to practice with these
 commands, they form the base for what follows.
 
-|02.1|  Running @NAME@ for the First Time
+|02.1|  Running IdeaVim for the First Time
 |02.2|  Inserting text
 |02.3|  Moving around
 |02.4|  Deleting characters
@@ -23,9 +23,9 @@ commands, they form the base for what follows.
 Table of contents: |usr_toc.txt|
 
 ==============================================================================
-*02.1*  Running @NAME@ for the First Time
+*02.1*  Running IdeaVim for the First Time
 
-Since @NAME@ runs within IDEA you run @NAME@ by starting IDEA.
+Since IdeaVim runs within IDEA you run IdeaVim by starting IDEA.
 <!--
 To start Vim, enter this command: >
 
@@ -72,11 +72,11 @@ that later.
 ==============================================================================
 *02.2*  Inserting text
 
-The @NAME@ editor is a modal editor.  That means that the editor behaves
+The IdeaVim editor is a modal editor.  That means that the editor behaves
 differently, depending on which mode you are in.  The two basic modes are
 called Normal mode and Insert mode.  In Normal mode the characters you type
 are commands.  In Insert mode the characters are inserted as text.
-   Since you have just started @NAME@ it will be in Normal mode.  To start Insert
+   Since you have just started IdeaVim it will be in Normal mode.  To start Insert
 mode you type the "i" command (i for Insert).  Then you can enter
 the text.  It will be inserted into the file.  Do not worry if you make
 mistakes; you can correct them later.  To enter the following programmer's
@@ -104,11 +104,11 @@ To be able to see what mode you are in, type this command: >
 
         :set showmode
 
-You will notice that when typing the colon @NAME@ moves the cursor to the last
+You will notice that when typing the colon IdeaVim moves the cursor to the last
 line of the window.  That's where you type colon commands (commands that start
 with a colon).  Finish this command by pressing the <Enter> key (all commands
 that start with a colon are finished this way).
-   Now, if you type the "i" command @NAME@ will display VIM - INSERT in the
+   Now, if you type the "i" command IdeaVim will display VIM - INSERT in the
 status bar.  This indicates you are in Insert mode.
 
         +---------------------------------------+
@@ -312,7 +312,7 @@ can go to any of the situations you had.
 ==============================================================================
 *02.6*  Other editing commands
 
-@NAME@ has a large number of commands to change the text.  See |Q_in| and below.
+IdeaVim has a large number of commands to change the text.  See |Q_in| and below.
 Here are a few often used ones.
 
 
@@ -374,7 +374,7 @@ count always comes before the command it applies to.
 ==============================================================================
 *02.7*  Getting out
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 To exit, use the "ZZ" command.  This command writes the file and exits.
 
@@ -413,7 +413,7 @@ original version of the file.
 ==============================================================================
 *02.8*  Finding help
 
-Everything you always wanted to know can be found in the @NAME@ help files.
+Everything you always wanted to know can be found in the IdeaVim help files.
 Don't be afraid to ask!
    To get generic help use this command: >
 
@@ -468,7 +468,7 @@ CTRL-A), you need to spell it with the prefix "CTRL-". >
 
         :help CTRL-A
 
-The @NAME@ editor has many different modes.  By default, the help system displays
+The IdeaVim editor has many different modes.  By default, the help system displays
 the normal-mode commands.  For example, the following command displays help
 for the normal-mode CTRL-H command: >
 
@@ -481,14 +481,14 @@ following command: >
         :help i_CTRL-H
 
 <!--
-When you start the @NAME@ editor, you can use several command-line arguments.
+When you start the IdeaVim editor, you can use several command-line arguments.
 These all begin with a dash (-).  To find what the -t argument does, for
 example, use the command: >
 
         :help -t
 
 -->
-The @NAME@ editor has a number of options that enable you to configure and
+The IdeaVim editor has a number of options that enable you to configure and
 customize the editor.  If you want help for an option, you need to enclose it
 in single quotation marks.  To find out what the 'number' option does, for
 example, use the following command: >

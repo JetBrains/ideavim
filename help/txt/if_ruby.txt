@@ -1,11 +1,11 @@
-*if_ruby.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*if_ruby.txt*   For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 The Ruby Interface to Vim                               *ruby* *Ruby*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 
 1. Commands                     |ruby-commands|

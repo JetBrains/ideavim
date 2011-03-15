@@ -1,12 +1,12 @@
-*filetype.txt*  For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*filetype.txt*  For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Filetypes                                               *filetype* *file-type*
 
-This information does not apply to @NAME@. IDEA handles this functionality.
+This information does not apply to IdeaVim. IDEA handles this functionality.
 <!--
 1. Filetypes                                    |filetypes|
 2. Filetype plugin                              |filetype-plugins|

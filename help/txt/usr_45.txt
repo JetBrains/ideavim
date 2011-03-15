@@ -1,11 +1,11 @@
-*usr_45.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_45.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                              Select your language
 
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 The messages in Vim can be given in several languages.  This chapter explains
 how to change which one is used.  Also, the different ways to work with files

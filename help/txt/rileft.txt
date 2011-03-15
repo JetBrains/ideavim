@@ -1,12 +1,12 @@
-*rileft.txt*    For @NAME@ version 6.2.  Last change: 2006 Nov 12
+*rileft.txt*    For IdeaVim version 6.2.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Right to Left display mode for Vim                              *rileft*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 
 These functions were originally created by Avner Lottem:

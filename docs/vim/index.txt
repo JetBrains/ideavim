@@ -1,7 +1,7 @@
-*index.txt*     For @NAME@ version @VERSION@.  Last change: 2004 June 29.
-                       For IDEA version @IDEA-VERSION@
+*index.txt*     For IdeaVim version @VERSION@.  Last change: 2004 June 29.
+                       For IntellIJ platform version @PLATFORM_VERSION@
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
                                                                 *index*
 This file contains a list of all commands for each mode, with a tag and a
@@ -865,7 +865,7 @@ TODO:
 |:vunmenu|      :vunme[nu]      remove menu for Visual mode
 
 ==============================================================================
-Commands that will probably never be implemented in @NAME@
+Commands that will probably never be implemented in IdeaVim
 ==============================================================================
 6. Insert mode                                          *insert-index*
 

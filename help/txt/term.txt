@@ -1,12 +1,12 @@
-*term.txt*      For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*term.txt*      For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Terminal information                                    *terminal-info*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Vim uses information about the terminal you are using to fill the screen and
 recognize what keys you hit.  If this information is not correct the screen

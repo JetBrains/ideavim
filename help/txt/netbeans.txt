@@ -1,13 +1,13 @@
-*netbeans.txt*  For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*netbeans.txt*  For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 NetBeans ExternalEditor Integration Features            *netbeans*
                                                         *netbeans-support*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 1.  Introduction                                |netbeans-intro|
 2.  NetBeans Key Bindings                       |netbeans-keybindings|

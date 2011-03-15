@@ -1,12 +1,12 @@
-*if_sniff.txt*  For @NAME@ version @VERSON@.  Last change: 2006 Nov 12
+*if_sniff.txt*  For IdeaVim version @VERSON@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 SNiFF+ and Vim                              *sniff*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 1. Introduction                             |sniff-intro|
 2. Commands                                 |sniff-commands|

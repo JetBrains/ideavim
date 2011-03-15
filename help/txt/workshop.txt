@@ -1,12 +1,12 @@
-*workshop.txt*  For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*workshop.txt*  For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Sun Visual WorkShop Features                    *workshop* *workshop-support*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 1. Introduction                                         |workshop-intro|
 2. Commands                                             |workshop-commands|

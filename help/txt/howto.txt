@@ -1,7 +1,7 @@
-*howto.txt*     For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*howto.txt*     For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 How to ...                              *howdoi* *how-do-i* *howto* *how-to*

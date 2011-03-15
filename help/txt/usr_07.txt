@@ -1,11 +1,11 @@
-*usr_07.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Dec 29
+*usr_07.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Dec 29
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                           Editing more than one file
 
 
-No matter how many files you have, you can edit them without leaving @NAME@.
+No matter how many files you have, you can edit them without leaving IdeaVim.
 Define a list of files to work on and jump from one to the other.  Copy text
 from one file and put it in another one.
 
@@ -32,7 +32,7 @@ To start editing another file, use this command: >
 
         :edit foo.txt
 
-@NAME@ will locate the file within the current IDEA project and open it in
+IdeaVim will locate the file within the current IDEA project and open it in
 another editor or select the editor if already open.
 <!--
     TODO - add new info when add support for files outside project.
@@ -291,7 +291,7 @@ positions without placing marks there.
 ==============================================================================
 *07.4*  Backup files
 
-This information does not apply to @NAME@, it is handled by IDEA.
+This information does not apply to IdeaVim, it is handled by IDEA.
 <!--
 Usually Vim does not produce a backup file. If you want to have one, all you
 need to do is execute the following command: >
@@ -376,13 +376,13 @@ USING REGISTERS
 When you want to copy several pieces of text from one file to another, having
 to switch between the files and writing the target file takes a lot of time.
 To avoid this, copy each piece of text to its own register.
-   A register is a place where @NAME@ stores text.  Here we will use the
+   A register is a place where IdeaVim stores text.  Here we will use the
 registers named a to z (later you will find out there are others).  Let's copy
 a sentence to the f register (f for First): >
 
         "fyas
 
-The "yas" command yanks a sentence like before.  It's the "f that tells @NAME@
+The "yas" command yanks a sentence like before.  It's the "f that tells IdeaVim
 the text should be place in the f register.  This must come just before the
 yank command.
    Now yank three whole lines to the l register (l for line): >
@@ -434,7 +434,7 @@ end of a file.
 ==============================================================================
 *07.6*  Viewing a file
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Sometimes you only want to see what a file contains, without the intention to
 ever write it back.  There is the risk that you type ":w" without thinking and
@@ -477,7 +477,7 @@ only voluntary though, since these commands will remove the protection: >
 ==============================================================================
 *07.7*  Changing the file name
 
-This information does not apply to @NAME@. Use Refactor|Rename in IDEA.
+This information does not apply to IdeaVim. Use Refactor|Rename in IDEA.
 <!--
 A clever way to start editing a new file is by using an existing file that
 contains most of what you need.  For example, you start writing a new program

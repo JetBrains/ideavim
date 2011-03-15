@@ -1,4 +1,4 @@
-*insert.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*insert.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
                   VIM REFERENCE MANUAL    by Rick Maddy
@@ -383,7 +383,7 @@ Visual blockwise command "I" |v_b_I|.
 ==============================================================================
 3. 'textwidth' and 'wrapmargin' options                 *ins-textwidth*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 The 'textwidth' option can be used to automatically break a line before it
 gets too long.  Set the 'textwidth' option to the desired maximum line
@@ -429,7 +429,7 @@ mode: hit "v", move to the end of the block, and type "gq".  See also |gq|.
 ==============================================================================
 4. 'expandtab', 'smarttab' and 'softtabstop' options    *ins-expandtab*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 If the 'expandtab' option is on, spaces will be used to fill the amount of
 whitespace of the tab.  If you want to enter a real <Tab>, type CTRL-V first
@@ -539,7 +539,7 @@ entering new data while keeping all the columns aligned.
 ==============================================================================
 7. Insert mode completion                               *ins-completion*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 
 Use IDEA's built in code completion while in Insert or Replace mode.
 <!--
@@ -937,7 +937,7 @@ too long when appending characters a line break is automatically inserted.
 ==============================================================================
 9. Ex insert commands                                   *inserting-ex*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
                                                         *:a* *:append*
 :{range}a[ppend]        Insert several lines of text below the specified

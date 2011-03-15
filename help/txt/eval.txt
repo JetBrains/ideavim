@@ -1,12 +1,12 @@
-*eval.txt*      For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*eval.txt*      For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Expression evaluation                   *expression* *expr* *E15* *eval*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Using expressions is introduced in chapter 41 of the user manual |usr_41.txt|.
 
@@ -1042,8 +1042,8 @@ char2nr({expr})                                         *char2nr()*
                         char2nr(" ")            returns 32
                         char2nr("ABC")          returns 65
 <               The current 'encoding' is used.  Example for "utf-8": >
-                        char2nr("á")             returns 225
-                        char2nr("á"[0])          returns 195
+                        char2nr("ï¿½")             returns 225
+                        char2nr("ï¿½"[0])          returns 195
 
 cindent({lnum})                                         *cindent()*
                 Get the amount of indent for line {lnum} according the C

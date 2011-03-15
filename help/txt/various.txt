@@ -1,7 +1,7 @@
-*various.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*various.txt*   For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Various commands                                        *various*
@@ -639,7 +639,7 @@ command:
 ==============================================================================
 3. Printing                                             *printing*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 On MS-Windows Vim can print your text on any installed printer.  On other
 systems a PostScript file is produced.  This can be directly sent to a
@@ -1004,7 +1004,7 @@ accidental blank pages.
 ==============================================================================
 4. Using Vim like less or more                                  *less*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 If you use the less or more program to view a file, you don't get syntax
 highlighting.  Thus you would like to use Vim instead.  You can do this by

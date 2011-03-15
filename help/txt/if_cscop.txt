@@ -1,12 +1,12 @@
-*if_cscop.txt*  For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*if_cscop.txt*  For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
                                                         *cscope* *Cscope*
 This document explains how to use Vim's cscope interface.
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Cscope is a tool like ctags, but think of it as ctags on steroids since it
 does a lot more than what ctags provides.  In Vim, jumping to a result from

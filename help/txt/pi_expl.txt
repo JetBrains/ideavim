@@ -1,13 +1,13 @@
-*pi_expl.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*pi_expl.txt*   For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
                                                 *file-explorer* *file-browser*
 Plugin for exploring (or browsing) directories and files
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 1. Starting the file explorer           |expl-starting|
 

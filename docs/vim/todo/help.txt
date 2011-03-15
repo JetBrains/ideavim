@@ -1,8 +1,8 @@
-*help.txt*      For @NAME@ version @VERSION@.  Last change: 2003 Apr 14
+*help.txt*      For IdeaVim version @VERSION@.  Last change: 2003 Apr 14
 
-                        @NAME@ - main help file
+                        IdeaVim - main help file
 
-VIM stands for Vi IMproved.  @NAME@ was made by Rick Maddy, but only
+VIM stands for Vi IMproved.  IdeaVim was made by Rick Maddy, but only
 through the help of many others.  See |credits|.
 ------------------------------------------------------------------------------
                                                 *doc-file-list* *Q_ct*

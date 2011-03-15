@@ -1,12 +1,12 @@
-*recover.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*recover.txt*   For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Recovery after a crash                                  *crash-recovery*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 You have spent several hours typing in that text that has to be finished
 next morning, and then disaster strikes: Your computer crashes.

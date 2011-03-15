@@ -1,32 +1,32 @@
-*usr_01.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_01.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                               About the manuals
 
 
-This chapter introduces the manuals available with @NAME@.  Read this to know the
+This chapter introduces the manuals available with IdeaVim.  Read this to know the
 conditions under which the commands are explained.
 
 |01.1|  Two manuals
-|01.2|  @NAME@ installed
-|01.3|  Using the @NAME@ tutor
+|01.2|  IdeaVim installed
+|01.3|  Using the IdeaVim tutor
 |01.4|  Copyright
 
-     Next chapter: |usr_02.txt|  The first steps in @NAME@
+     Next chapter: |usr_02.txt|  The first steps in IdeaVim
 Table of contents: |usr_toc.txt|
 
 ==============================================================================
 *01.1*  Two manuals
 
-The @NAME@ documentation consists of two parts:
+The IdeaVim documentation consists of two parts:
 
 1. The User manual
    Task oriented explanations, from simple to complex.  Reads from start to
    end like a book.
 
 2. The Reference manual
-   Precise description of how everything in @NAME@ works.
+   Precise description of how everything in IdeaVim works.
 
 The notation used in these manuals is explained here: |notation|
 
@@ -48,10 +48,10 @@ on it.
 Other subjects can be found with the ":help" command, see |help.txt|.
 
 ==============================================================================
-*01.2*  @NAME@ installed
+*01.2*  IdeaVim installed
 
-Most of the manuals assume that @NAME@ has been properly installed.  If you
-didn't do that yet, or if @NAME@ doesn't run properly (e.g., files can't be found
+Most of the manuals assume that IdeaVim has been properly installed.  If you
+didn't do that yet, or if IdeaVim doesn't run properly (e.g., files can't be found
 or in the GUI the menus do not show up) first read the chapter on
 installation: |usr_90.txt|.
 <!--
@@ -102,7 +102,7 @@ For more info see |vimrc| and |compatible-default|.
 ==============================================================================
 *01.3*  Using the Vim tutor                             *tutor* *vimtutor*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Instead of reading the text (boring!) you can use the vimtutor to learn your
 first Vim commands.  This is a 30 minute tutorial that teaches the most basic
@@ -154,8 +154,8 @@ filename.  For French:
 ==============================================================================
 *01.4*  Copyright                                       *manual-copyright*
 
-The @NAME@ user manual and reference manual are derived from the original Vim
-manuals. They have been copied and modified as appropriate for @NAME@.
+The IdeaVim user manual and reference manual are derived from the original Vim
+manuals. They have been copied and modified as appropriate for IdeaVim.
 
 The Vim user manual and reference manual are Copyright (c) 1988-2003 by Bram
 Moolenaar. This material may be distributed only subject to the terms and

@@ -1,7 +1,7 @@
-*starting.txt*  For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*starting.txt*  For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Starting Vim                                            *starting*
@@ -19,7 +19,7 @@ Starting Vim                                            *starting*
 ==============================================================================
 1. Vim arguments                                        *vim-arguments*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Most often, Vim is started to edit a single file with the command
 
@@ -539,7 +539,7 @@ X11 GUI support.  See |gui-resources|.
 -->
 2. Vim on the Amiga                                     *starting-amiga*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Starting Vim from the Workbench                         *workbench*
 -------------------------------
@@ -592,7 +592,7 @@ resizing.  Under Amiga DOS 1.3, it is advised to use the fastfonts program,
 -->
 3. Running eVim                                                 *evim-keys*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 EVim runs Vim as click-and-type editor.  This is very unlike the original Vi
 idea.  But it helps for people that don't use Vim often enough to learn the
@@ -647,7 +647,7 @@ commands, use CTRL-L. |i_CTRL-L|
 -->
 4. Initialization                               *initialization* *startup*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 This section is about the non-GUI version of Vim.  See |gui-fork| for
 additional initialization when starting the GUI.
@@ -929,7 +929,7 @@ though.
 -->
 5. $VIM and $VIMRUNTIME
                                                                 *$VIM*
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 The environment variable "$VIM" is used to locate various user files for Vim,
 such as the user startup script ".vimrc".  This depends on the system, see
@@ -989,7 +989,7 @@ To change it later, use a ":let" command like this: >
 -->
 6. Suspending                                           *suspend*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
                                         *iconize* *iconise* *CTRL-Z* *v_CTRL-Z*
 CTRL-Z                  Suspend Vim, like ":stop".
@@ -1024,7 +1024,7 @@ to get the selection would make the program hang).
 -->
 7. Saving settings                                      *save-settings*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Mostly you will edit your vimrc files manually.  This gives you the greatest
 flexibility.  There are a few commands to generate a vimrc file automatically.
@@ -1087,7 +1087,7 @@ option, which has several side effects.  See |'compatible'|.
 -->
 8. Views and Sessions                                   *views-sessions*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 This is introduced in sections |21.4| and |21.5| of the user manual.
 
@@ -1223,9 +1223,9 @@ To automatically save and restore views for *.c files: >
 -->
 9. The viminfo file                             *viminfo* *viminfo-file* *E136*
                                                 *E575* *E576* *E577*
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 
-Though @NAME@ does rember the following across executions of IDEA:
+Though IdeaVim does rember the following across executions of IDEA:
 - Contents of registers.
 - Marks for several files.
 - File marks, pointing to locations in files.

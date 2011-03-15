@@ -1,13 +1,13 @@
-*mbyte.txt*     For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*mbyte.txt*     For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Multi-byte support                              *multibyte* *multi-byte*
                                                 *Chinese* *Japanese* *Korean*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 This is about editing text in languages which have many characters that can
 not be represented using one byte (one octet).  Examples are Chinese, Japanese

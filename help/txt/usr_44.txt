@@ -1,11 +1,11 @@
-*usr_44.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_44.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                          Your own syntax highlighted
 
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Vim comes with highlighting for a couple of hundred different file types.  If
 the file you are editing isn't included, read this chapter to find out how to

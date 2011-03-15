@@ -1,6 +1,6 @@
-*usr_10.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_10.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                              Making big changes
 
@@ -346,7 +346,7 @@ Now you can type the command you want to use.  It will use the range "."
 ==============================================================================
 *10.4*  The global command
 
-This functionality is not currently support by @NAME@.
+This functionality is not currently support by IdeaVim.
 <!--
 The ":global" command is one of the more powerful features of Vim.  It allows
 you to find a match for a pattern and execute a command there.  The general
@@ -553,7 +553,7 @@ If you don't want the white space to be changed, use the "gJ" command.
 ==============================================================================
 *10.6*  Reading and writing part of a file
 
-This functionality is not currently support by @NAME@.
+This functionality is not currently support by IdeaVim.
 <!--
 When you are writing an e-mail message, you may want to include another file.
 This can be done with the ":read {filename}" command.  The text of the file is
@@ -630,7 +630,7 @@ as you like.
 ==============================================================================
 *10.7*  Formatting text
 
-This functionality is not currently support by @NAME@.
+This functionality is not currently support by IdeaVim.
 <!--
 When you are typing plain text, it's nice if the length of each line is
 automatically trimmed to fit in the window.  To make this happen while

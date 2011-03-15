@@ -1,12 +1,12 @@
-*autocmd.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*autocmd.txt*   For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Automatic commands                                      *autocommand*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 For a basic explanation, see section |40.3| in the user manual.
 

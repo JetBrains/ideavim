@@ -1,11 +1,11 @@
-*usr_31.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_31.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                               Exploiting the GUI
 
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Vim works well in a terminal, but the GUI has a few extra items.  A file
 browser can be used for commands that use a file.  A dialog to make a choice

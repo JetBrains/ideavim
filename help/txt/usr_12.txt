@@ -1,6 +1,6 @@
-*usr_12.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_12.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                                 Clever tricks
 
@@ -177,7 +177,7 @@ after it.  That way you don't have this problem again.
 ==============================================================================
 *12.4*  Reverse line order
 
-This functionality is not currently support by @NAME@.
+This functionality is not currently support by IdeaVim.
 <!--
 The |:global| command can be combined with the |:move| command to move all the
 lines before the first line, resulting in a reversed file.  The command is: >
@@ -205,7 +205,7 @@ type: >
 ==============================================================================
 *12.5*  Count words
 
-This functionality is not currently support by @NAME@.
+This functionality is not currently support by IdeaVim.
 <!--
 Sometimes you have to write a text with a maximum number of words.  Vim can
 count the words for you.
@@ -237,7 +237,7 @@ For other ways to count words, lines and other items, see |count-items|.
 ==============================================================================
 *12.6*  Find a man page                                 *find-manpage*
 
-This functionality is not currently support by @NAME@.
+This functionality is not currently support by IdeaVim.
 
 Though similar functionality is provided. The "K" command activates IDEA's
 Quick Documentation Lookup.
@@ -321,7 +321,7 @@ matches can be found.
 ==============================================================================
 *12.8*  Find where a word is used
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 If you are a UNIX user, you can use a combination of Vim and the grep command
 to edit all the files that contain a given word.  This is extremely useful if

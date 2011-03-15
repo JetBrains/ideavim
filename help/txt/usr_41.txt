@@ -1,11 +1,11 @@
-*usr_41.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_41.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                               Write a Vim script
 
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 The Vim script language is used for the startup vimrc file, syntax files, and
 many other things.  This chapter explains the items that can be used in a Vim

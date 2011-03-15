@@ -1,7 +1,7 @@
-*fold.txt*      For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*fold.txt*      For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Folding                                         *Folding* *folding*

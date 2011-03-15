@@ -70,10 +70,8 @@
     <mkdir dir="${classes}/META-INF"/>
     <copy file="resources/META-INF/plugin.xml" todir="${classes}/META-INF">
       <filterset>
-        <filter token="NAME" value="IdeaVim"/>
         <filter token="VERSION" value="${version}"/>
-        <filter token="IDEA-VERSION" value="${idea-version}"/>
-        <filter token="SINCE-VERSION" value="${since-version}"/>
+        <filter token="SINCE-VERSION" value="${platform-version}"/>
       </filterset>
     </copy>
     <copy todir="${classes}">
@@ -96,7 +94,6 @@
         <include name="*.txt"/>
       </fileset>
       <filterset>
-        <filter token="NAME" value="IdeaVim"/>
         <filter token="VERSION" value="${version}"/>
       </filterset>
     </copy>
@@ -135,7 +132,6 @@
         <include name="*"/>
       </fileset>
       <filterset>
-        <filter token="NAME" value="IdeaVim"/>
         <filter token="VERSION" value="${version}"/>
       </filterset>
     </copy>
@@ -193,24 +189,21 @@
     </copy>
     <copy todir="${build}/IdeaVim/docs">
       <filterset>
-        <filter token="NAME" value="IdeaVim"/>
         <filter token="VERSION" value="${version}"/>
-        <filter token="IDEA-VERSION" value="${idea-version}"/>
+        <filter token="PLATFORM_VERSION" value="${platform-version}"/>
       </filterset>
       <fileset dir="${basedir}/docs" includes="vim/*.txt" excludes="javadoc"/>
     </copy>
     <copy file="${basedir}/docs/README.txt" tofile="${build}/IdeaVim/README">
       <filterset>
-        <filter token="NAME" value="IdeaVim"/>
         <filter token="VERSION" value="${version}"/>
-        <filter token="IDEA-VERSION" value="${idea-version}"/>
+        <filter token="PLATFORM_VERSION" value="${platform-version}"/>
       </filterset>
     </copy>
     <copy file="${basedir}/docs/CHANGES.txt" tofile="${build}/IdeaVim/CHANGES">
       <filterset>
-        <filter token="NAME" value="IdeaVim"/>
         <filter token="VERSION" value="${version}"/>
-        <filter token="IDEA-VERSION" value="${idea-version}"/>
+        <filter token="PLATFORM_VERSION" value="${platform-version}"/>
       </filterset>
     </copy>
     <zip basedir="${build}" zipfile="${dist}/${filename}.zip" compress="true" includes="IdeaVim/**"/>

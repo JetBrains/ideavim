@@ -1,12 +1,12 @@
-*debugger.txt*  For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*debugger.txt*  For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Debugger Support Features                               *debugger-support*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 1. Debugger Features            |debugger-features|
 2. Vim Compile Options          |debugger-compilation|

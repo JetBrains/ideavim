@@ -1,11 +1,11 @@
-*usr_06.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_06.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                           Using syntax highlighting
 
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Black and white text is boring.  With colors your file comes to life.  This
 not only looks nice, it also speeds up your work.  Change the colors used for

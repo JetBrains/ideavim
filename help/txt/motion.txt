@@ -1,7 +1,7 @@
-*motion.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Dec 31
+*motion.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Dec 31
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Cursor motions                                  *cursor-motions* *navigation*

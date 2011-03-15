@@ -1,7 +1,7 @@
-*editing.txt*   For @NAME@ version @VERSION@.  Last change: 2007 Jan 01
+*editing.txt*   For IdeaVim version @VERSION@.  Last change: 2007 Jan 01
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Editing files                                           *edit-files*
@@ -632,7 +632,7 @@ still access any desired file.
 ==============================================================================
 4. The current directory                                *current-directory*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 You may use the |:cd| and |:lcd| commands to change to another directory, so
 you will not have to type that directory name in front of the file names.  It
@@ -1288,7 +1288,7 @@ MULTIPLE WINDOWS AND BUFFERS                            *window-exit*
 ==============================================================================
 8. Editing binary files                                 *edit-binary*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Although Vim was made to edit text files, it is possible to edit binary
 files.  The |-b| Vim argument (b for binary) makes Vim do file I/O in binary
@@ -1327,7 +1327,7 @@ There are a few things to remember when editing binary files:
 ==============================================================================
 9. Encryption                                           *encryption*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Vim is able to write files encrypted, and read them back.  The encrypted text
 cannot be read without the right key.
@@ -1406,7 +1406,7 @@ Notes:
 ==============================================================================
 10. Timestamps                                  *timestamp* *timestamps*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Vim remembers the modification timestamp of a file when you begin editing it.
 This is used to avoid that you have two different versions of the same file

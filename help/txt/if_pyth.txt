@@ -1,12 +1,12 @@
-*if_pyth.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*if_pyth.txt*   For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 The Python Interface to Vim                             *python* *Python*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 1. Commands                     |python-commands|
 2. The vim module               |python-vim|

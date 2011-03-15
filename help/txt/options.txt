@@ -1,7 +1,7 @@
-*options.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Dec 01
+*options.txt*   For IdeaVim version @VERSION@.  Last change: 2006 Dec 01
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Options                                                 *options*
@@ -3550,7 +3550,7 @@ A jump table for the options with a short description can be found at |Q_op|.
         8 bits of each character will be used.
 
         Example (for Greek):                                    *greek*  >
-            :set langmap=ÁA,ÂB,ØC,ÄD,ÅE,ÖF,ÃG,ÇH,ÉI,ÎJ,ÊK,ËL,ÌM,ÍN,ÏO,ÐP,QQ,ÑR,ÓS,ÔT,ÈU,ÙV,WW,×X,ÕY,ÆZ,áa,âb,øc,äd,åe,öf,ãg,çh,éi,îj,êk,ël,ìm,ín,ïo,ðp,qq,ñr,ós,ôt,èu,ùv,òw,÷x,õy,æz
+            :set langmap=ï¿½A,ï¿½B,ï¿½C,ï¿½D,ï¿½E,ï¿½F,ï¿½G,ï¿½H,ï¿½I,ï¿½J,ï¿½K,ï¿½L,ï¿½M,ï¿½N,ï¿½O,ï¿½P,QQ,ï¿½R,ï¿½S,ï¿½T,ï¿½U,ï¿½V,WW,ï¿½X,ï¿½Y,ï¿½Z,ï¿½a,ï¿½b,ï¿½c,ï¿½d,ï¿½e,ï¿½f,ï¿½g,ï¿½h,ï¿½i,ï¿½j,ï¿½k,ï¿½l,ï¿½m,ï¿½n,ï¿½o,ï¿½p,qq,ï¿½r,ï¿½s,ï¿½t,ï¿½u,ï¿½v,ï¿½w,ï¿½x,ï¿½y,ï¿½z
 <       Example (exchanges meaning of z and y for commands): >
             :set langmap=zy,yz,ZY,YZ
 <

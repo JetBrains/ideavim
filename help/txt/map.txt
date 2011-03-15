@@ -1,12 +1,12 @@
-*map.txt*       For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*map.txt*       For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Key mapping, abbreviations and user-defined commands.
 
-Mapping is not currently supported by @NAME@.
+Mapping is not currently supported by IdeaVim.
 <!--
 This subject is introduced in sections |05.3|, |24.7| and |40.1| of the user
 manual.
@@ -243,9 +243,9 @@ scenario: >
         :imap <M-C> foo
         :set encoding=utf-8
 The mapping for <M-C> is defined with the latin1 encoding, resulting in a 0xc3
-byte.  If you type the character á (0xea <M-a>) in UTF-8 encoding this is the
+byte.  If you type the character ï¿½ (0xea <M-a>) in UTF-8 encoding this is the
 two bytes 0xc3 0xa1.  You don't want the 0xc3 byte to be mapped then,
-otherwise it would be impossible to type the á character.
+otherwise it would be impossible to type the ï¿½ character.
 
                                                         *map-listing*
 When listing mappings the characters in the first two columns are:

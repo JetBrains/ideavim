@@ -1,12 +1,12 @@
-*arabic.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*arabic.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Arabic Language support (options & mappings) for Vim            *Arabic*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 {Vi does not have any of these commands}
 

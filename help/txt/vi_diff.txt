@@ -1,12 +1,12 @@
-*vi_diff.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*vi_diff.txt*   For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
-Differences between @NAME@ and Vim                          *vi-differences*
+Differences between IdeaVim and Vim                          *vi-differences*
 
-Throughout the help files differences between @NAME@ and Vim are given in
+Throughout the help files differences between IdeaVim and Vim are given in
 curly braces, like "{not in Vim}".  This file only lists what has not been
 mentioned in other files and gives an overview.
 
@@ -20,7 +20,7 @@ mentioned in other files and gives an overview.
 ==============================================================================
 1. Missing commands                                     *missing-commands*
 
-This command is in Vim, but not in @NAME@:
+This command is in Vim, but not in IdeaVim:
 
 Lots - TODO
 <!--
@@ -30,7 +30,7 @@ Lots - TODO
 ==============================================================================
 2. Missing options                                      *missing-options*
 
-These options are in the Vim, but not in @NAME@.  If you try to set one of
+These options are in the Vim, but not in IdeaVim.  If you try to set one of
 them you won't get an error message, but the value is not used and cannot be
 printed.
 
@@ -42,7 +42,7 @@ Lots - TODO
 ==============================================================================
 3. Limits                                               *limits*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Vim has only a few limits for the files that can be edited {Vi: can not handle
 <Nul> characters and characters above 128, has limited line length, many other
@@ -91,7 +91,7 @@ values for different files.  'maxmemtot' works always.
 4. The most interesting additions                       *vim-additions*
 
 <!--
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 Vi compatibility.                                       |'compatible'|
         Although Vim is 99% Vi compatible, some things in Vi can be
         considered to be a bug, or at least need improvement.  But still, Vim
@@ -379,7 +379,7 @@ Multi-language support                                  |multi-lang|
 ==============================================================================
 5. Other vim features                                   *other-features*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 A random collection of nice extra features.
 
@@ -703,7 +703,7 @@ The AUX: device of the Amiga is supported.
 ==============================================================================
 6. Command-line arguments                               *cmdline-arguments*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Different versions of Vi have different command-line arguments.  This can be
 confusing.  To help you, this section gives an overview of the differences.

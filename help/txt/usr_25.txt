@@ -1,11 +1,11 @@
-*usr_25.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_25.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                              Editing formatted text
 
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Text hardly ever comes in one sentence per line.  This chapter is about
 breaking sentences to make them fit on a page and other formatting.

@@ -1,6 +1,6 @@
-*usr_29.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_29.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                             Moving through programs
 
@@ -23,7 +23,7 @@ Table of contents: |usr_toc.txt|
 ==============================================================================
 *29.1*  Using tags
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 What is a tag?  It is a location where an identifier is defined.  An example
 is a function definition in a C or C++ program.  A list of tags is kept in a
@@ -276,7 +276,7 @@ declared, but also where it is used.  See |cscope|.
 ==============================================================================
 *29.2*  The preview window
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 When you edit code that contains a function call, you need to use the correct
 arguments.  To know what values to pass you can look at how the function is
@@ -451,7 +451,7 @@ comment with "]/".  This only works for /* - */ comments.
 ==============================================================================
 *29.4*  Finding global identifiers
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 You are editing a C program and wonder if a variable is declared as "int" or
 "unsigned".  A quick way to find this is with the "[I" command.
@@ -583,7 +583,7 @@ it work with other languages than C or C++.
 ==============================================================================
 *29.5*  Finding local identifiers
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 The "[I" command searches included files.  To search in the current file only,
 and jump to the first place where the word under the cursor is used: >

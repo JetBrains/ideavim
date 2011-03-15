@@ -1,11 +1,11 @@
-*usr_30.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_30.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                               Editing programs
 
 
-This information does not apply to @NAME@. Most of these features are built
+This information does not apply to IdeaVim. Most of these features are built
 into IDEA.
 <!--
 Vim has various commands that aid in writing computer programs.  Compile a

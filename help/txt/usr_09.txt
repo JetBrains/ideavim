@@ -1,6 +1,6 @@
-*usr_09.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_09.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                                 Using the GUI
 
@@ -21,7 +21,7 @@ Table of contents: |usr_toc.txt|
 ==============================================================================
 *09.1*  Parts of the GUI
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 You might have an icon on your desktop that starts gVim.  Otherwise, one of
 these commands should do it: >
@@ -127,7 +127,7 @@ This adds the 'l' flag to 'guioptions'.
 ==============================================================================
 *09.2*  Using the mouse
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Standards are wonderful.  In Microsoft Windows, you can use the mouse to
 select text in a standard manner.  The X Window system also has a standard
@@ -265,7 +265,7 @@ from the cursor position until the end of the line to the clipboard: >
 
         "+y$
 
-Remember, "y" is yank, which is @NAME@'s copy command.
+Remember, "y" is yank, which is IdeaVim's copy command.
    To insert the contents of the real clipboard before the cursor: >
 
         "+P
@@ -278,7 +278,7 @@ instead of the star (*) register.
 ==============================================================================
 *09.4*  Select mode
 
-This functionality is not currently support by @NAME@.
+This functionality is not currently support by IdeaVim.
 <!--
 And now something that is used more often on MS-Windows than on X-Windows.
 But both can do it.  You already know about Visual mode.  Select mode is like

@@ -1,4 +1,4 @@
-*indent.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*indent.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
                   VIM REFERENCE MANUAL    by Rick Maddy
@@ -6,7 +6,7 @@
 
 This file is about indenting C programs and other files.
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 
 Indenting is handled as expected by IDEA.
 <!--

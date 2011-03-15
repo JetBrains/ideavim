@@ -1,6 +1,6 @@
-*usr_toc.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_toc.txt*   For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                               Table Of Contents                 *user-manual*
 

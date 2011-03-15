@@ -1,7 +1,7 @@
-*intro.txt*     For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*intro.txt*     For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Introduction to Vim                                     *ref* *reference*
@@ -18,7 +18,7 @@ Introduction to Vim                                     *ref* *reference*
 ==============================================================================
 1. Introduction                                         *intro*
 
-@NAME@ is an attempt to replicate the features of Vim withing the context of
+IdeaVim is an attempt to replicate the features of Vim withing the context of
 IntelliJ IDEA. Not all the functionality of Vim applies within IDEA. And not
 all appropriate features are implemented.
 
@@ -40,9 +40,9 @@ It can be accessed from within Vim with the <Help> or <F1> key and with the
 is not located in the default place.  You can jump to subjects like with tags:
 Use CTRL-] to jump to a subject under the cursor, use CTRL-T to jump back.
 
-Throughout this manual the differences between Vim and @NAME@ are mentioned in
-curly braces, like this: {@NAME@ does not support this feature}.  See
-|vi_diff.txt| for a summary of the differences between @NAME@ and Vim.
+Throughout this manual the differences between Vim and IdeaVim are mentioned in
+curly braces, like this: {IdeaVim does not support this feature}.  See
+|vi_diff.txt| for a summary of the differences between IdeaVim and Vim.
 
 <!--
 This manual refers to Vim on various machines.  There may be small differences
@@ -51,7 +51,7 @@ document, there is a separate document for each supported system, see
 |sys-file-list|.
 
 -->
-This manual is a reference for all the @NAME@ commands and options.  This is not
+This manual is a reference for all the IdeaVim commands and options.  This is not
 an introduction to the use of Vi or Vim, it gets a bit complicated here and
 <!--
 there.  For beginners, there is a hands-on |tutor|.  To learn using Vim, read
@@ -84,12 +84,12 @@ only briefly mentioned.  There is also a German translation.
 Published by O'Reilly.  ISBN: 1-56592-426-6.
 
 ==============================================================================
-2. @NAME@ on the internet                                  *internet*
+2. IdeaVim on the internet                                  *internet*
 
                         *www* *faq* *FAQ* *distribution* *download*
-@NAME@ is hosted on SourceForge.
+IdeaVim is hosted on SourceForge.
 
-        @NAME@ home page: http://ideavim.sourceforge.net
+        IdeaVim home page: http://ideavim.sourceforge.net
 
 <!--
 The Vim pages contain the most recent information about Vim.  They also
@@ -227,7 +227,7 @@ introduce Y2K problems, but those are not really part of Vim itself.
 ==============================================================================
 3. Credits                                              *credits* *author*
 
-@NAME@ was written by Rick Maddy <rick@maddyhome.com>.
+IdeaVim was written by Rick Maddy <rick@maddyhome.com>.
 
 Most of Vim was written by Bram Moolenaar.
 
@@ -563,7 +563,7 @@ examples and use them directly.  Or type them literally, including the '<' and
 ==============================================================================
 5. Modes, introduction                          *vim-modes-intro* *vim-modes*
 
-@NAME@ has four BASIC modes:
+IdeaVim has four BASIC modes:
 
                                         *Normal* *Normal-mode* *command-mode*
 Normal mode             In Normal mode you can enter all the normal editor
@@ -750,7 +750,7 @@ gQ                      Switch to "Ex" mode, but really behave like typing ":"
 ==============================================================================
 7. The window contents                                  *window-contents*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 In Normal mode and Insert/Replace mode the screen window will show the current
 contents of the buffer: What You See Is What You Get.  There are two

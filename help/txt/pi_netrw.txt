@@ -1,11 +1,11 @@
-*pi_netrw.txt*  For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*pi_netrw.txt*  For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 *ftp* *http* *scp* *rcp* *Nread* *Nwrite* *netrw* *netrw.vim* *network*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Network-Oriented File Transfers with Vim
 

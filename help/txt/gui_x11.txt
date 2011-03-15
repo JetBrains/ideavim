@@ -1,12 +1,12 @@
-*gui_x11.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*gui_x11.txt*   For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Vim's Graphical User Interface                          *gui-x11* *GUI-X11*
                                                         *Athena* *Motif*
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 1. Starting the X11 GUI         |gui-x11-start|
 2. GUI Resources                |gui-resources|

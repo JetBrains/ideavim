@@ -1,6 +1,6 @@
-*usr_24.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_24.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                              Inserting quickly
 
@@ -96,7 +96,7 @@ There are a few more, see |ins-special-special|.
 ==============================================================================
 *24.2*  Showing matches
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 When you type a ) it would be nice to see with which ( it matches.  To make
 Vim do that use this command: >
@@ -122,7 +122,7 @@ The time is specified in tenths of a second.
 ==============================================================================
 *24.3*  Completion
 
-This information does not apply to @NAME@. Use IDEA's code completion features.
+This information does not apply to IdeaVim. Use IDEA's code completion features.
 <!--
 Vim can automatically complete words on insertion.  You type the first part of
 a word, press CTRL-P, and Vim guesses the rest.
@@ -344,7 +344,7 @@ use the command CTRL-R CTRL-R {register}.
 ==============================================================================
 *24.7*  Abbreviations
 
-This functionality is not currently support by @NAME@.
+This functionality is not currently support by IdeaVim.
 <!--
 An abbreviation is a short word that takes the place of a long one.  For
 example, "ad" stands for "advertisement".  Vim enables you to type an
@@ -518,8 +518,8 @@ a 16 bit and a 32 bit number (e.g., for a Unicode character): >
 *24.9*  Digraphs
 
 Some characters are not on the keyboard.  For example, the copyright character
-(©).  To type these characters in Vim, you use digraphs, where two characters
-represent one.  To enter a ©, for example, you press three keys: >
+(ï¿½).  To type these characters in Vim, you use digraphs, where two characters
+represent one.  To enter a ï¿½, for example, you press three keys: >
 
         CTRL-K Co
 
@@ -529,12 +529,12 @@ To find out what digraphs are available, use the following command: >
 
 Vim will display the digraph table.  Here are three lines of it:
 
-  AC ~_ 159  NS |  160  !I ¡  161  Ct ¢  162  Pd £  163  Cu ¤  164  Ye ¥  165 ~
-  BB ¦  166  SE §  167  ': ¨  168  Co ©  169  -a ª  170  << «  171  NO ¬  172 ~
-  -- ­  173  Rg ®  174  'm ¯  175  DG °  176  +- ±  177  2S ²  178  3S ³  179 ~
+  AC ~_ 159  NS |  160  !I ï¿½  161  Ct ï¿½  162  Pd ï¿½  163  Cu ï¿½  164  Ye ï¿½  165 ~
+  BB ï¿½  166  SE ï¿½  167  ': ï¿½  168  Co ï¿½  169  -a ï¿½  170  << ï¿½  171  NO ï¿½  172 ~
+  -- ï¿½  173  Rg ï¿½  174  'm ï¿½  175  DG ï¿½  176  +- ï¿½  177  2S ï¿½  178  3S ï¿½  179 ~
 
 This shows, for example, that the digraph you get by typing CTRL-K Pd is the
-character (£).  This is character number 163 (decimal).
+character (ï¿½).  This is character number 163 (decimal).
    Pd is short for Pound.  Most digraphs are selected to give you a hint about
 the character they will produce.  If you look through the list you will
 understand the logic.
@@ -550,9 +550,9 @@ that combination.  Thus CTRL-K dP also works.  Since there is no digraph for
 
 You can define your own digraphs.  Example: >
 
-        :digraph a" ä
+        :digraph a" ï¿½
 
-This defines that CTRL-K a" inserts an ä character.  You can also specify the
+This defines that CTRL-K a" inserts an ï¿½ character.  You can also specify the
 character with a decimal number.  This defines the same digraph: >
 
         :digraph a" 228

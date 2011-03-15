@@ -1,12 +1,12 @@
-*remote.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*remote.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Vim client-server communication                         *client-server*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 1. Common functionality         |clientserver|
 2. X11 specific items           |x11-clientserver|

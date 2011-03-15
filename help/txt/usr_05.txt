@@ -1,6 +1,6 @@
-*usr_05.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Dec 01
+*usr_05.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Dec 01
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                               Set your settings
 
@@ -29,7 +29,7 @@ You probably got tired of typing commands that you use very often.  To start
 with all your favorite option settings and mappings, you write them in what is
 -->
 with all your favorite option settings, you write them in what is
-called the vimrc file.  @NAME@ reads this file when it starts up.
+called the vimrc file.  IdeaVim reads this file when it starts up.
 
 <!--
 If you have trouble finding your vimrc file, use this command: >
@@ -54,17 +54,17 @@ For MS-DOS and MS-Windows it is mostly one of these: >
         $HOME/.vimrc
 
 The vimrc file can contain all the commands that you type after a colon.  The
-most simple ones are for setting options.  For example, if you want @NAME@ to
+most simple ones are for setting options.  For example, if you want IdeaVim to
 always start with the 'hlsearch' option on, add this line you your vimrc
 file: >
 
         set hlsearch
 
-For this new line to take effect you need to exit @NAME@ and start it again.
-Later you will learn how to do this without exiting @NAME@.
+For this new line to take effect you need to exit IdeaVim and start it again.
+Later you will learn how to do this without exiting IdeaVim.
 
 This chapter only explains the most basic items.  For more information on how
-to write a @NAME@ script file: |usr_41.txt|.
+to write a IdeaVim script file: |usr_41.txt|.
 
 ==============================================================================
 *05.2*  The example vimrc file explained                *vimrc_example.vim*
@@ -101,7 +101,7 @@ character before where Insert mode started.
 
         set autoindent
 
-This makes @NAME@ use the indent of the previous line for a newly created line.
+This makes IdeaVim use the indent of the previous line for a newly created line.
 Thus there is the same amount of white space before the new line.  For example
 when pressing <Enter> in Insert mode, and when using the "o" command to open a
 new line.
@@ -234,7 +234,7 @@ typing commands at the command-line.
 ==============================================================================
 *05.3*  Simple mappings
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 A mapping enables you to bind a set of Vim commands to a single key.  Suppose,
 for example, that you need to surround certain words with curly braces.  In
@@ -284,7 +284,7 @@ least the ones for Normal mode.  More about mappings in section |40.1|.
 ==============================================================================
 *05.4*  Adding a plugin                                 *add-plugin* *plugin*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Vim's functionality can be extended by adding plugins.  A plugin is nothing
 more than a Vim script file that is loaded automatically when Vim starts.  You
@@ -430,7 +430,7 @@ Further reading:
 ==============================================================================
 *05.5*  Adding a help file              *add-local-help* *matchit-install*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 If you are lucky, the plugin you installed also comes with a help file.  We
 will explain how to install the help file, so that you can easily find help
@@ -538,7 +538,7 @@ default by putting a ampersand (&) after the option name.  Example: >
 <!--
 NOT WRAPPING LINES
 
-@NAME@ normally wraps long lines, so that you can see all of the text.  Sometimes
+IdeaVim normally wraps long lines, so that you can see all of the text.  Sometimes
 it's better to let the text continue right of the window.  Then you need to
 scroll the text left-right to see all of a long line.  Switch wrapping of with
 this command: >
@@ -546,7 +546,7 @@ this command: >
         :set nowrap
 
 -->
-@NAME@ will automatically scroll the text when you move to text that is not
+IdeaVim will automatically scroll the text when you move to text that is not
 displayed.  To see a context of ten characters, do this: >
 
         :set sidescroll=10

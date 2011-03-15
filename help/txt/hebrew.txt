@@ -1,12 +1,12 @@
-*hebrew.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*hebrew.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-           @NAME@ REFERENCE MANUAL    by Rick Maddy
+           IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Hebrew Language support (options & mapping) for Vim             *hebrew*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 The supporting 'rightleft' functionality was originally created by Avner
 Lottem:

@@ -1,11 +1,11 @@
-*pi_spec.txt*   For @NAME@ version @VESION@.  Last change: 2006 Nov 12
+*pi_spec.txt*   For IdeaVim version @VESION@.  Last change: 2006 Nov 12
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 This is a filetype plugin to work with rpm spec files.
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Currently, this Vim plugin allows you to easily update the %changelog
 section in RPM spec files. It will even create a section for you if it

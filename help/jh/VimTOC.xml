@@ -3,7 +3,7 @@
     PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 1.0//EN"
     "http://java.sun.com/products/javahelp/toc_2_0.dtd">
 <toc version="1.0">
-    <tocitem text="@NAME@" target="vim.help%2Etxt" image="vim.logo">
+    <tocitem text="IdeaVim" target="vim.help%2Etxt" image="vim.logo">
         <tocitem text="Overview of the most common commands you will use" target="vim.quickref" image="doc"/>
         <tocitem text="30 minutes training course for beginners" target="vim.tutor" image="doc"/>
         <tocitem text="Vim on the World Wide Web" target="vim.www" image="doc"/>
@@ -82,7 +82,7 @@
         </tocitem>
 
         <tocitem text="Versions" target="" image="folder">
-            <tocitem text="Main differences between @NAME@ and Vim" target="vim.vi_diff%2Etxt" image="doc"/>
+            <tocitem text="Main differences between IdeaVim and Vim" target="vim.vi_diff%2Etxt" image="doc"/>
         </tocitem>
     </tocitem>
 </toc>

@@ -1,11 +1,11 @@
-*usr_42.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_42.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                               Add new menus
 
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 By now you know that Vim is very flexible.  This includes the menus used in
 the GUI.  You can define your own menu entries to make certain commands easily

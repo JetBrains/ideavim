@@ -1,11 +1,11 @@
-*usr_08.txt*    For @NAME@ version @VERSION@.  Last change: 2002 Nov 12
+*usr_08.txt*    For IdeaVim version @VERSION@.  Last change: 2002 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                               Splitting windows
 
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Display two different files above each other.  Or view two locations in the
 file at the same time.  See the difference between two files by putting them

@@ -1,14 +1,14 @@
-*message.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*message.txt*   For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 This file contains an alphabetical list of messages and error messages that
 Vim produces.  You can use this if you don't understand what the message
 means.  It is not complete though.
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 1. Old messages         |:messages|
 2. Error messages       |error-messages|

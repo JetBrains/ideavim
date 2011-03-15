@@ -1,12 +1,12 @@
-*farsi.txt*     For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*farsi.txt*     For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Right to Left and Farsi Mapping for Vim         *farsi* *Farsi*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 {Vi does not have any of these commands}
 
@@ -197,34 +197,34 @@ o  Keyboard
 
         -------------------------------------
         `  1  2  3  4  5  6  7  8  9  0  -  =
-        ¢  ±  ²  ³  ´  µ  ¶  ·  ¸  ¹  °  ­  ½
+        ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½
         -------------------------------------
         ~  !  @  #  $  %  ^  &  *  (  )  _  +
-        ~  £  §  ®  ¤  ¥  ª  ¬  è  ¨  ©  é  «
+        ~  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½
         -------------------------------------
         q  w  e  r  t  z  u  i  o  p  [  ]
-        Ó  Ò  Æ  Ù  Ø  Õ  Ö  à  Ê  É  Ç  ˆ
+        ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½
         -------------------------------------
         Q  W  E  R  T  Z  U  I  O  P  {  }
-        ÷  õ  ô  ó  ò  ý  ð  ö  [  ]  {  }
+        ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  [  ]  {  }
         -------------------------------------
         a  s  d  f  g  h  j  k  l  ;  '  \
-        Ñ  Ð  á  Ã  Ü  Á  Å  Þ  Ý  Ú  Û  ë
+        ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½
         -------------------------------------
         A  S  D  F  G  H  J  K  L  :  "  |
-        ù  û  þ  ú  ø  À  ü  æ  ç  º  »  ê
+        ï¿½  ï¿½ ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½
         -------------------------------------
         <  y  x  c  v  b  n  m  ,  .  /
-        ¾  ×  Ô  Î  Í  Ì  Ë  Ä  ß  ¦  ¯
+        ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½
         -------------------------------------
         >  Y  X  C  V  B  N  M  <  >  ?
-        ¼  ñ  Ô  Ï  Í  ¡  Ë  Â  ¾  ¼  ¿
+        ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½  ï¿½
         -------------------------------------
 
 Note:
-        ¡  stands for Farsi PSP (break without space)
+        ï¿½  stands for Farsi PSP (break without space)
 
-        ¢  stands for Farsi PCN (for HAMZE attribute )
+        ï¿½  stands for Farsi PCN (for HAMZE attribute )
 
 Restrictions
 ------------

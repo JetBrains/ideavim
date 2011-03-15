@@ -1,7 +1,7 @@
-*change.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Dec 01
+*change.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Dec 01
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 This file describes commands that delete or change text.  In this context,
@@ -1025,7 +1025,7 @@ and ":put" commands and with CTRL-R.
                 the command was completely from a mapping.
 
 6. Expression register "=                               *quote_=* *quote=*
-This is not supported by @NAME@
+This is not supported by IdeaVim
 <!--
 This is not really a register that stores text, but is a way to use an
 expression in commands which use a register.  The expression register is

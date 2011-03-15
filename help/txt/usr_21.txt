@@ -1,6 +1,6 @@
-*usr_21.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Dec 01
+*usr_21.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Dec 01
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                            Go away and come back
 
@@ -24,7 +24,7 @@ Table of contents: |usr_toc.txt|
 ==============================================================================
 *21.1*  Suspend and resume
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Like most Unix programs Vim can be suspended by pressing CTRL-Z.  This stops
 Vim and takes you back to the shell it was started in.  You can then do any
@@ -50,7 +50,7 @@ started.  CTRL-Z will minimize the Vim window instead.
 ==============================================================================
 *21.2*  Executing shell commands
 
-This functionality is not currently support by @NAME@.
+This functionality is not currently support by IdeaVim.
 <!--
 To execute a single shell command from Vim use ":!{command}".  For example, to
 see a directory listing: >
@@ -93,8 +93,8 @@ work well enough, start a new terminal to run the shell in.  For example with:
 ==============================================================================
 *21.3*  Remembering information; viminfo
 
-@NAME@ has a much simpler form of viminfo. The following status information
-is stored by @NAME@ and restored each time IDEA is restarted:
+IdeaVim has a much simpler form of viminfo. The following status information
+is stored by IdeaVim and restored each time IDEA is restarted:
 
         Command-line and Search pattern history
         Text in registers
@@ -213,7 +213,7 @@ different purpose.
 ==============================================================================
 *21.4*  Sessions
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Suppose you are editing along, and it is the end of the day.  You want to quit
 work and pick up where you left off the next day.  You can do this by saving
@@ -365,7 +365,7 @@ And to restore this again: >
 ==============================================================================
 *21.5*  Views
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 A session stores the looks of the whole of Vim.  When you want to store the
 properties for one window only, use a view.
@@ -421,7 +421,7 @@ You can restore it with: >
 ==============================================================================
 *21.6*  Modelines
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 When editing a specific file, you might set options specifically for that
 file.  Typing these commands each time is boring.  Using a session or view for

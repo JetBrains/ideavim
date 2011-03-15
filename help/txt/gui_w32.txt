@@ -1,12 +1,12 @@
-*gui_w32.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*gui_w32.txt*   For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Vim's Win32 Graphical User Interface                    *gui-w32* *win32-gui*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 1. Starting the GUI             |gui-w32-start|
 2. Vim as default editor        |vim-default-editor|

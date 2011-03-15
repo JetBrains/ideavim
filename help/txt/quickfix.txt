@@ -1,10 +1,10 @@
-*quickfix.txt*  For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*quickfix.txt*  For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 This subject is introduced in section |30.1| of the user manual.
 

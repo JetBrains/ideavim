@@ -1,5 +1,4 @@
-@NAME@ - Version @VERSION@
-Minimal compatible IDE version @IDEA-VERSION@
+IdeaVim - Version @VERSION@ for IntellIJ platform version @PLATFORM_VERSION@
 
 This plugin attempts to emulate the functionality of VIM within IntelliJ platform based products. It actually emulates 'gvim' more than 'vim'. IdeaVim can be used with IntellIJ IDEA, RubyMine, PyCharm, PhpStorm and WebStorm ides.
 
@@ -13,7 +12,7 @@ Installation
 Use IDEA's plugin manager to install the latest version of the plugin.
 Start IDEA normally and Enable VIM emulation using "Tools|VIM Emulator" menu item. At this point you must use VIM keystrokes in all editors.
 
-Disabling the @NAME@ Plugin
+Disabling the IdeaVim Plugin
 
 If you wish to disable the plugin, select the "Tools|VIM Emulator" menu so
 it is unchecked. You must also select "Options|Keymaps" and make a keymap other
@@ -25,10 +24,10 @@ Changes to the IDE
 
 Undo/Redo
 
-The @NAME@ plugin uses it's own undo/redo functionality so it is important
+The IdeaVim plugin uses it's own undo/redo functionality so it is important
 that you use the standard VIM keys 'u' and 'Ctrl-R' for undo/redo instead of
 the built in undo/redo. An exception might be if you wish to undo the creation
-of a new class. For this you must select the Edit|Undo menu since @NAME@
+of a new class. For this you must select the Edit|Undo menu since IdeaVim
 doesn't support this feature. Using the built in undo/redo while editing a
 file will result in strange behavior and you will most likely lose changes.
 

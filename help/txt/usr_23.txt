@@ -1,11 +1,11 @@
-*usr_23.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_23.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                              Editing other files
 
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 This chapter is about editing files that are not ordinary files.  With Vim you
 can edit files that are compressed or encrypted.  Some files need to be

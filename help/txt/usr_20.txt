@@ -1,6 +1,6 @@
-*usr_20.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Dec 01
+*usr_20.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Dec 01
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                      Typing command-line commands quickly
 
@@ -159,7 +159,7 @@ You can find the full list of long and short names here: |option-list|.
 ==============================================================================
 *20.3*  Command line completion
 
-This functionality is not currently support by @NAME@.
+This functionality is not currently support by IdeaVim.
 <!--
 This is one of those Vim features that, by itself, is a reason to switch from
 Vi to Vim.  Once you have used this, you can't do without.
@@ -333,7 +333,7 @@ for next.
 ==============================================================================
 *20.5*  Command line window
 
-This functionality is not currently support by @NAME@.
+This functionality is not currently support by IdeaVim.
 <!--
 Typing the text in the command line works different from typing text in Insert
 mode.  It doesn't allow many commands to change the text.  For most commands

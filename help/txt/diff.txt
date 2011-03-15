@@ -1,11 +1,11 @@
-*diff.txt*      For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*diff.txt*      For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
                                 *diff* *vimdiff* *gvimdiff* *diff-mode*
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 This file describes the +diff feature: Showing differences between two or
 three versions of the same file.

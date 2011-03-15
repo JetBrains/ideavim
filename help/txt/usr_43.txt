@@ -1,11 +1,11 @@
-*usr_43.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_43.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                                Using filetypes
 
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 When you are editing a file of a certain type, for example a C program or a
 shell script, you often use the same option settings and mappings.  You

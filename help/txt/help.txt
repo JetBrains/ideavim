@@ -1,6 +1,6 @@
-*help.txt*      For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*help.txt*      For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                        @NAME@ - main help file
+                        IdeaVim - main help file
 
 Jump to a subject:  Double-click the left mouse button on a tag between |bars|.
 

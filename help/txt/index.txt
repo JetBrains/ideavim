@@ -1,7 +1,7 @@
-*index.txt*     For @NAME@ version @VERSION@.  Last change: 2007 Jan 01
+*index.txt*     For IdeaVim version @VERSION@.  Last change: 2007 Jan 01
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
                                                                 *index*
 This file contains a list of all commands for each mode, with a tag and a

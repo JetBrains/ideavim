@@ -1,4 +1,4 @@
-History of changes for @NAME@ for IDEA @IDEA-VERSION@
+History of changes for IdeaVim for IntellIJ platform version @PLATFORM_VERSION@
 
 @VERSION@ from 0.8.4
 Bug Fixes
@@ -193,7 +193,7 @@ Bug Unfixes
 0.6.0 from 0.4.1
 
 Support for Aurora build #939. It may work with slightly older versions too.
-This version will not work with IDEA 3.x. For IDEA 3.x you must use @NAME@
+This version will not work with IDEA 3.x. For IDEA 3.x you must use IdeaVim
 versions prior to 0.6.0.
 
 Bug Fixes

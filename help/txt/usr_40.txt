@@ -1,11 +1,11 @@
-*usr_40.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_40.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                               Make new commands
 
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 Vim is an extensible editor.  You can take a sequence of commands you use
 often and turn it into a new command.  Or redefine an existing command.

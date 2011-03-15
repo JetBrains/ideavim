@@ -1,11 +1,11 @@
-*usr_28.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*usr_28.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
-                     @NAME@ USER MANUAL - by Rick Maddy
+                     IdeaVim USER MANUAL - by Rick Maddy
 
                                    Folding
 
 
-This information does not apply to @NAME@. IDEA has its own built in folding
+This information does not apply to IdeaVim. IDEA has its own built in folding
 mechanism. Currently four Vim commands can be used to trigger IDEA's folding
 features:
 

@@ -1,7 +1,7 @@
-*visual.txt*    For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*visual.txt*    For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Visual mode                             *Visual* *Visual-mode* *visual-mode*

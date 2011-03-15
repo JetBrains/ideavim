@@ -1,12 +1,12 @@
-*pi_gzip.txt*   For @NAME@ version @VERSION@.  Last change: 2006 Nov 12
+*pi_gzip.txt*   For IdeaVim version @VERSION@.  Last change: 2006 Nov 12
 
 
-                  @NAME@ REFERENCE MANUAL    by Rick Maddy
+                  IdeaVim REFERENCE MANUAL    by Rick Maddy
 
 
 Editing compressed files with Vim               *gzip* *bzip2* *compress*
 
-This information does not apply to @NAME@.
+This information does not apply to IdeaVim.
 <!--
 1. Autocommands                 |gzip-autocmd|
 
