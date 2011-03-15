@@ -75,9 +75,6 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable//, Co
   private RegisterActions actions;
   private boolean isBlockCursor = false;
   private boolean isSmoothScrolling = false;
-  //private ImageIcon icon;
-  //private VimSettingsPanel settingsPanel;
-  //private VimSettings settings;
 
   private boolean enabled = true;
   private static Logger LOG = Logger.getInstance(VimPlugin.class.getName());
@@ -87,15 +84,6 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable//, Co
    */
   public VimPlugin() {
     LOG.debug("VimPlugin ctr");
-
-    /*
-    java.net.URL resource = getClass().getResource("/icons/vim32x32.png");
-    if (resource != null)
-    {
-        icon = new ImageIcon(resource);
-    }
-    */
-
     instance = this;
   }
 
@@ -182,56 +170,19 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable//, Co
         for (FileEditorManagerListener listener : listeners) {
           FileEditorManager.getInstance(project).addFileEditorManagerListener(listener);
         }
-
-        //DocumentManager.getInstance().openProject(project);
-
-        /*
-        ToolWindowManager mgr = ToolWindowManager.getInstance(project);
-        ToolWindow win = mgr.registerToolWindow("VIM", VimToolWindow.getInstance(), ToolWindowAnchor.BOTTOM);
-        setupToolWindow(win);
-        toolWindows.put(project, win);
-        */
       }
 
       public void projectClosed(Project project) {
         for (FileEditorManagerListener listener : listeners) {
           FileEditorManager.getInstance(project).removeFileEditorManagerListener(listener);
         }
-
         listeners.clear();
-
-        //DocumentManager.getInstance().closeProject(project);
-
-        /*
-        toolWindows.remove(project);
-        ToolWindowManager mgr = ToolWindowManager.getInstance(project);
-        mgr.unregisterToolWindow("VIM");
-        */
       }
 
       ArrayList<FileEditorManagerListener> listeners = new ArrayList<FileEditorManagerListener>();
     });
 
     CommandProcessor.getInstance().addCommandListener(DelegateCommandListener.getInstance());
-
-    /*
-    ApplicationManager.getApplication().addApplicationListener(new ApplicationAdapter() {
-        public void applicationExiting()
-        {
-            LOG.debug("application exiting");
-        }
-
-        public void writeActionStarted(Object action)
-        {
-            LOG.debug("writeActionStarted=" + action);
-        }
-
-        public void writeActionFinished(Object action)
-        {
-            LOG.debug("writeActionFinished=" + action);
-        }
-    });
-    */
   }
 
   /**
@@ -264,7 +215,6 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable//, Co
     }
 
     CommandGroups.getInstance().readData(element);
-    //KeyParser.getInstance().readData(element);
   }
 
   /**
@@ -283,7 +233,6 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable//, Co
     element.addContent(elem);
 
     CommandGroups.getInstance().saveData(element);
-    //KeyParser.getInstance().saveData(element);
   }
 
   /**
@@ -343,7 +292,6 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable//, Co
 
   public void turnOnPlugin() {
     KeyHandler.getInstance().fullReset(null);
-    //RegisterActions.getInstance().enable();
     setCursors(true);
     setSmoothScrolling(false);
 
@@ -352,7 +300,6 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable//, Co
 
   public void turnOffPlugin() {
     KeyHandler.getInstance().fullReset(null);
-    //RegisterActions.getInstance().disable();
     setCursors(isBlockCursor);
     setSmoothScrolling(isSmoothScrolling);
 
@@ -373,91 +320,10 @@ public class VimPlugin implements ApplicationComponent, JDOMExternalizable//, Co
     }
   }
 
-  /*
-  public String getDisplayName()
-  {
-      return "Vim";
-  }
-
-  public Icon getIcon()
-  {
-      return icon;
-  }
-
-  public String getHelpTopic()
-  {
-      return null;
-  }
-
-  public JComponent createComponent()
-  {
-      if (settingsPanel == null)
-      {
-          settingsPanel = new VimSettingsPanel();
-      }
-
-      return settingsPanel.getMainComponent();
-  }
-
-  public boolean isModified()
-  {
-      if (settingsPanel != null)
-      {
-          return settingsPanel.isModified(getSettings());
-      }
-
-      return false;
-  }
-
-  public void apply() throws ConfigurationException
-  {
-      VimSettings set = settingsPanel.getOptions();
-      if (set.isEnabled() != VimPlugin.isEnabled())
-      {
-          VimPlugin.setEnabled(set.isEnabled());
-      }
-
-      KeyParser.getInstance().setChoices(set.getChoices());
-
-      settings = set;
-  }
-
-  public void reset()
-  {
-      if (settingsPanel != null)
-      {
-          settingsPanel.setOptions(getSettings(), KeyParser.getInstance().getConflicts());
-      }
-  }
-
-  public void disposeUIResources()
-  {
-  }
-  */
-
-  /*
-  public VimSettings getSettings()
-  {
-      if (settings == null)
-      {
-          settings = new VimSettings();
-          settings.setChoices(KeyParser.getInstance().getChoices());
-      }
-      settings.setEnabled(isEnabled());
-
-      return settings;
-  }
-  */
 
   private RegisterActions getActions() {
     if (actions == null) {
       actions = RegisterActions.getInstance();
-      /*
-      if (VimPlugin.isEnabled())
-      {
-          actions.enable();
-      }
-      */
       CommandParser.getInstance().registerHandlers();
     }
 
