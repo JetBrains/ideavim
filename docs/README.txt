@@ -3,6 +3,11 @@ Minimal compatible IDE version @IDEA-VERSION@
 
 This plugin attempts to emulate the functionality of VIM within IntelliJ platform based products. It actually emulates 'gvim' more than 'vim'. IdeaVim can be used with IntellIJ IDEA, RubyMine, PyCharm, PhpStorm and WebStorm ides.
 
+Resources:
+Wiki: https://github.com/olegs/ideavim/wiki/About-IdeaVim-project
+HomePage: http://plugins.intellij.net/plugin/?id=164
+Automatical builds: http://teamcity.jetbrains.com/project.html?projectId=project55
+
 Installation
 
 Use IDEA's plugin manager to install the latest version of the plugin.
