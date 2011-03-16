@@ -10,12 +10,16 @@ import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.impl.KeymapImpl;
 import com.intellij.openapi.keymap.impl.KeymapManagerImpl;
+import com.intellij.openapi.util.JDOMUtil;
+import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jdom.Document;
+import org.jdom.Element;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 
 /**
  * @author oleg
@@ -30,21 +34,21 @@ public class VimKeyMapUtil {
     final KeymapManagerImpl manager = (KeymapManagerImpl)KeymapManager.getInstance();
 
     final Keymap keymap = manager.getKeymap("Vim");
-    if (keymap != null){
+    if (keymap != null) {
       return;
     }
 
     final String keyMapsPath = PathManager.getConfigPath() + File.separatorChar + "keymaps";
     final LocalFileSystem localFileSystem = LocalFileSystem.getInstance();
     final VirtualFile keyMapsFolder = localFileSystem.findFileByPath(keyMapsPath);
-    if (keyMapsFolder == null){
+    if (keyMapsFolder == null) {
       LOG.debug("Failed to install vim keymap. Empty keymaps folder");
       return;
     }
 
     LOG.debug("No vim keyboard installed found. Installing");
     final File vimKeyMapFile = new File(PathManager.getPluginsPath() + File.separatorChar + "IdeaVim" + File.separatorChar + VIM_XML);
-    if (!vimKeyMapFile.exists() || !vimKeyMapFile.isFile()){
+    if (!vimKeyMapFile.exists() || !vimKeyMapFile.isFile()) {
       LOG.debug("vim keyboard file not found");
       Notifications.Bus.notify(new Notification("ideavim", "IdeaVim",
                                                 "Installation of the Vim keymap failed because Vim keymap file not found.\n" +
@@ -57,13 +61,20 @@ public class VimKeyMapUtil {
       final VirtualFile vimKeyMap2Copy = localFileSystem.findFileByIoFile(vimKeyMapFile);
       final VirtualFile vimKeyMapVFile = localFileSystem.copyFile(vimPlugin, vimKeyMap2Copy, keyMapsFolder, VIM_XML);
 
-      final Document document = StorageUtil.loadDocument(new FileInputStream(vimKeyMapVFile.getPath()));
-      if (document == null){
+      final String path = vimKeyMapVFile.getPath();
+      final Document document = StorageUtil.loadDocument(new FileInputStream(path));
+      if (document == null) {
         LOG.debug("Failed to install vim keymap. Vim.xml file is corrupted");
         Notifications.Bus.notify(new Notification("ideavim", "IdeaVim",
                                                   "Failed to install vim keymap. Vim.xml file is corrupted", NotificationType.ERROR));
         return;
       }
+
+      // Prompt user to select the parent for the Vim keyboard
+      if (SystemInfo.isMac){
+        updateVimParentKeymap(path, document);
+      }
+
       final KeymapImpl vimKeyMap = new KeymapImpl();
       final Keymap[] allKeymaps = manager.getAllKeymaps();
       vimKeyMap.readExternal(document.getRootElement(), allKeymaps);
@@ -72,25 +83,42 @@ public class VimKeyMapUtil {
     }
     catch (Exception e) {
       LOG.debug("Failed to install vim keymap.\n" + e.getMessage());
-      Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", "Failed to install vim keymap.\n" + e.getMessage(), NotificationType.ERROR));
+      Notifications.Bus
+        .notify(new Notification("ideavim", "IdeaVim", "Failed to install vim keymap.\n" + e.getMessage(), NotificationType.ERROR));
       return;
     }
+  }
+
+  private static void updateVimParentKeymap(final String path, final Document document) throws IOException {
+    // We assume that user had already configured proper keymap to use on his system
+    final String newParentKeymap = KeymapManager.getInstance().getActiveKeymap().getName();
+    Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", "Successfully configured vim keymap be based on " + newParentKeymap,
+                                              NotificationType.INFORMATION));
+    final Element rootElement = document.getRootElement();
+    final String parent = rootElement.getAttributeValue("parent");
+    if (parent == "$default") {
+      rootElement.removeAttribute("parent");
+      rootElement.setAttribute("parent", newParentKeymap);
+    }
+    // Save modified keymap to the file
+    JDOMUtil.writeDocument(document, path, "\n");
   }
 
   public static void enableKeyBoardBindings(final boolean enabled) {
     LOG.debug("Enabling keymap");
     final KeymapManagerImpl manager = (KeymapManagerImpl)KeymapManager.getInstance();
     final String keymapName2Enable = enabled ? "Vim" : VimPlugin.getInstance().getPreviousKeyMap();
-    if (keymapName2Enable.isEmpty()){
+    if (keymapName2Enable.isEmpty()) {
       return;
     }
-    if (keymapName2Enable.equals(manager.getActiveKeymap().getName())){
+    if (keymapName2Enable.equals(manager.getActiveKeymap().getName())) {
       return;
     }
     LOG.debug("Enabling keymap:" + keymapName2Enable);
     final Keymap keymap = manager.getKeymap(keymapName2Enable);
-    if (keymap == null){
-      Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", "Failed to enable keymap: " + keymapName2Enable, NotificationType.ERROR));
+    if (keymap == null) {
+      Notifications.Bus
+        .notify(new Notification("ideavim", "IdeaVim", "Failed to enable keymap: " + keymapName2Enable, NotificationType.ERROR));
       LOG.debug("Failed to enable keymap: " + keymapName2Enable);
       return;
     }
@@ -102,8 +130,8 @@ public class VimKeyMapUtil {
     manager.setActiveKeymap(keymap);
 
     final String keyMapPresentableName = "$default".equals(keymapName2Enable) ? "Default" : keymapName2Enable;
-    Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", keyMapPresentableName + " keymap was enabled", NotificationType.INFORMATION));
+    Notifications.Bus
+      .notify(new Notification("ideavim", "IdeaVim", keyMapPresentableName + " keymap was enabled", NotificationType.INFORMATION));
     LOG.debug(keymapName2Enable + " keymap was enabled");
   }
-
 }
