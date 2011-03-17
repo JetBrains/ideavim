@@ -16,6 +16,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.ui.VimKeymapDialog;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -98,7 +99,7 @@ public class VimKeyMapUtil {
 
     // Save modified keymap to the file
     JDOMUtil.writeDocument(document, path, "\n");
-    Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", "Successfully configured vim keymap be based on " +
+    Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", "Successfully configured vim keymap to be based on " +
                                                                     getPresentableKeyMapName(keymapName),
                                               NotificationType.INFORMATION));
   }
@@ -144,5 +145,39 @@ public class VimKeyMapUtil {
     else {
       return keymapName;
     }
+  }
+
+
+  public static void reconfigureParentKeymap() {
+    final VirtualFile vimKeymapFile = getVimKeymapFile();
+    if (vimKeymapFile == null) {
+      Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", "Failed to find Vim keymap", NotificationType.ERROR));
+      return;
+    }
+
+    try {
+      final String path = vimKeymapFile.getPath();
+      final Document document = StorageUtil.loadDocument(new FileInputStream(path));
+      if (document == null) {
+        LOG.debug("Failed to install vim keymap. Vim.xml file is corrupted");
+        Notifications.Bus.notify(new Notification("ideavim", "IdeaVim",
+                                                  "Vim.xml file is corrupted", NotificationType.ERROR));
+        return;
+      }
+      // Prompt user to select the parent for the Vim keyboard
+      configureVimParentKeymap(path, document);
+    }
+    catch (Exception e) {
+      LOG.debug("Failed to reconfigure vim keymap.\n" + e.getMessage());
+      Notifications.Bus
+        .notify(new Notification("ideavim", "IdeaVim", "Failed to reconfigure vim keymap.\n" + e.getMessage(), NotificationType.ERROR));
+    }
+  }
+
+  @Nullable
+  public static VirtualFile getVimKeymapFile() {
+    final String keyMapsPath = PathManager.getConfigPath() + File.separatorChar + "keymaps";
+    final LocalFileSystem localFileSystem = LocalFileSystem.getInstance();
+    return localFileSystem.findFileByPath(keyMapsPath + File.separatorChar + VIM_XML);
   }
 }

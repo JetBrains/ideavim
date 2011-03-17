@@ -43,9 +43,12 @@
     </project-components>
 
     <actions>
-        <action id="VimPluginToggle" class="com.maddyhome.idea.vim.VimPlugin$VimPluginToggleAction" text="VIM Emulator" description="Toggle the Vim Plugin On/Off">
+        <action id="VimPluginToggle" class="com.maddyhome.idea.vim.VimPluginToggleAction" text="VIM Emulator" description="Toggle the Vim Plugin On/Off">
             <keyboard-shortcut first-keystroke="control alt V" keymap="$default"/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+        <action id="VimReconfigureKeymap" class="com.maddyhome.idea.vim.VimReconfigureKeymapAction" text="Reconfigure VIM Keymap" description="Reconfigure VIM keymap">
+            <add-to-group group-id="ToolsMenu" order="after VimPluginToggle"/>
         </action>
 
         <!-- Motions -->

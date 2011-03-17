@@ -5,6 +5,7 @@ import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.impl.KeymapManagerImpl;
 import com.intellij.openapi.util.SystemInfo;
+import com.maddyhome.idea.vim.VimPlugin;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class VimKeymapPanel {
     final ArrayList<Keymap> keymaps = new ArrayList<Keymap>();
     final KeymapManagerImpl manager = (KeymapManagerImpl)KeymapManager.getInstance();
     for (Keymap keymap : manager.getAllKeymaps()) {
-      if (matchesPlatform(keymap)) {
+      if (!"Vim".equals(keymap.getName()) && matchesPlatform(keymap)) {
         keymaps.add(keymap);
       }
     }
@@ -44,7 +45,9 @@ public class VimKeymapPanel {
         }
       }
     });
-    myKeymapComboBox.getModel().setSelectedItem(manager.getActiveKeymap());
+
+    final String previousKeyMap = VimPlugin.getInstance().getPreviousKeyMap();
+    myKeymapComboBox.getModel().setSelectedItem(previousKeyMap.isEmpty() ? manager.getActiveKeymap() : manager.getKeymap(previousKeyMap));
   }
 
   public JPanel getPanel() {
