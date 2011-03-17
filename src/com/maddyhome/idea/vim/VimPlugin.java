@@ -19,8 +19,10 @@ package com.maddyhome.idea.vim;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.ide.AppLifecycleListener;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -39,8 +41,10 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerAdapter;
+import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
+import com.intellij.util.messages.MessageBus;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.group.*;
@@ -91,9 +95,23 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   /**
    * Creates the Vim Plugin
    */
-  public VimPlugin() {
+  public VimPlugin(final MessageBus bus) {
     LOG.debug("VimPlugin ctr");
     instance = this;
+
+    bus.connect().subscribe(AppLifecycleListener.TOPIC, new AppLifecycleListener.Adapter() {
+      @Override
+      public void appFrameCreated(String[] commandLineArgs, @NotNull Ref<Boolean> willOpenProject) {
+        ApplicationManager.getApplication().invokeLater(new Runnable() {
+          public void run() {
+            // Ensure that Vim keymap is installed and install if not
+            VimKeyMapUtil.installKeyBoardBindings(instance);
+            // Turn on proper keymap
+            VimKeyMapUtil.enableKeyBoardBindings(VimPlugin.isEnabled());
+          }
+        });
+      }
+    });
   }
 
   public static VimPlugin getInstance() {
@@ -135,12 +153,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     setupListeners();
 
     getActions();
-
-    // Ensure that Vim keymap is installed and install if not
-    VimKeyMapUtil.installKeyBoardBindings(this);
-
-    // Turn on proper keymap
-    VimKeyMapUtil.enableKeyBoardBindings(VimPlugin.isEnabled());
 
     LOG.debug("done");
   }

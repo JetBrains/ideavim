@@ -11,9 +11,9 @@ import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.impl.KeymapImpl;
 import com.intellij.openapi.keymap.impl.KeymapManagerImpl;
 import com.intellij.openapi.util.JDOMUtil;
-import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.maddyhome.idea.vim.ui.VimKeymapDialog;
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -71,9 +71,7 @@ public class VimKeyMapUtil {
       }
 
       // Prompt user to select the parent for the Vim keyboard
-      if (SystemInfo.isMac){
-        updateVimParentKeymap(path, document);
-      }
+      configureVimParentKeymap(path, document);
 
       final KeymapImpl vimKeyMap = new KeymapImpl();
       final Keymap[] allKeymaps = manager.getAllKeymaps();
@@ -89,19 +87,19 @@ public class VimKeyMapUtil {
     }
   }
 
-  private static void updateVimParentKeymap(final String path, final Document document) throws IOException {
-    // We assume that user had already configured proper keymap to use on his system
-    final String newParentKeymap = KeymapManager.getInstance().getActiveKeymap().getName();
-    Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", "Successfully configured vim keymap be based on " + newParentKeymap,
-                                              NotificationType.INFORMATION));
+  private static void configureVimParentKeymap(final String path, final Document document) throws IOException {
+    final VimKeymapDialog vimKeymapDialog = new VimKeymapDialog();
+    vimKeymapDialog.show();
+
     final Element rootElement = document.getRootElement();
-    final String parent = rootElement.getAttributeValue("parent");
-    if (parent == "$default") {
-      rootElement.removeAttribute("parent");
-      rootElement.setAttribute("parent", newParentKeymap);
-    }
+    rootElement.removeAttribute("parent");
+    final String keymapName = vimKeymapDialog.getSelectedKeymap().getName();
+    rootElement.setAttribute("parent", keymapName);
+
     // Save modified keymap to the file
     JDOMUtil.writeDocument(document, path, "\n");
+    Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", "Successfully configured vim keymap be based on " + keymapName,
+                                              NotificationType.INFORMATION));
   }
 
   public static void enableKeyBoardBindings(final boolean enabled) {
