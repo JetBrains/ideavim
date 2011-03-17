@@ -61,8 +61,6 @@ public class CommandState {
   public static final int MODE_EX_ENTRY = 6;
 
   public static final int SUBMODE_SINGLE_COMMAND = 1;
-  public static final int SUBMODE_INSERT = 1;
-  public static final int SUBMODE_REPLACE = 1;
 
   /**
    * Gets the command state singleton
@@ -247,11 +245,6 @@ public class CommandState {
    */
   public void reset() {
     command = null;
-    /*
-    mode = MODE_COMMAND;
-    visualType = 0;
-    mappingMode = KeyParser.MAPPING_NORMAL;
-    */
     modes.clear();
     updateStatus();
   }
@@ -262,7 +255,6 @@ public class CommandState {
    * @return The current key mapping mode
    */
   public int getMappingMode() {
-    //return mappingMode;
     if (logger.isDebugEnabled()) {
       logger.debug("getMappingMode=" + currentState().getMapping());
     }
