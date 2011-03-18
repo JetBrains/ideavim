@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.components.JBScrollPane;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
@@ -375,7 +376,7 @@ public class MorePanel extends JPanel {
 
   private JLabel label = new JLabel("more");
   private JTextArea text = new JTextArea();
-  private JScrollPane scrollPane = new JScrollPane(text, JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+  private JScrollPane scrollPane = new JBScrollPane(text, JScrollPane.VERTICAL_SCROLLBAR_NEVER,
                                                    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
   private ComponentAdapter adapter;
   private Editor editor = null;
