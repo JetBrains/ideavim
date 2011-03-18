@@ -439,6 +439,9 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param count   The number of times to repeat the previous insert
    */
   private void repeatInsertText(Editor editor, DataContext context, int count) {
+    if (lastStrokes == null) {
+      return;
+    }
     for (int i = 0; i < count; i++) {
       // Treat other keys special by performing the appropriate action they represent in insert/replace mode
       for (Object lastStroke : lastStrokes) {
