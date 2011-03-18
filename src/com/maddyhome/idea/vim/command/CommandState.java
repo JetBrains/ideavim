@@ -138,11 +138,11 @@ public class CommandState {
    * @return The current runtime mode
    */
   public int getMode() {
+    final int mode = currentState().getMode();
     if (logger.isDebugEnabled()) {
-      logger.debug("getMode=" + currentState().getMode());
+      logger.debug("getMode=" + mode);
     }
-    //return mode;
-    return currentState().getMode();
+    return mode;
   }
 
   public int getSubMode() {
