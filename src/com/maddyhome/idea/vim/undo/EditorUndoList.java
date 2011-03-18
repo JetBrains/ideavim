@@ -36,8 +36,6 @@ import java.util.List;
  */
 public class EditorUndoList {
   public EditorUndoList(Editor editor) {
-    //this.editor = editor;
-
     beginCommand(editor);
   }
 
@@ -108,14 +106,6 @@ public class EditorUndoList {
       logger.info("added");
       currentCommand.addChange(change);
     }
-    /*
-    else if (!inUndo)
-    {
-        beginCommand(editor);
-        currentCommand.addChange(change);
-        endCommand(editor);
-    }
-    */
   }
 
   public boolean redo(Editor editor, DataContext context) {
@@ -147,7 +137,7 @@ public class EditorUndoList {
       inUndo = false;
 
       if (pointer == 0 && restorable) {
-        Project p = PlatformDataKeys.PROJECT.getData(context); // API change - don't merge
+        Project p = PlatformDataKeys.PROJECT.getData(context);
         DocumentManager.getInstance().reloadDocument(editor.getDocument(), p);
       }
 

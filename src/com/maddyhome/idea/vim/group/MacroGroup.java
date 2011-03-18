@@ -26,7 +26,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.common.Register;
-import com.maddyhome.idea.vim.undo.UndoManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -59,7 +58,6 @@ public class MacroGroup extends AbstractActionGroup {
       return false;
     }
 
-    UndoManager.getInstance().allowNewCommands(false);
     List<KeyStroke> keys = register.getKeys();
     playbackKeys(editor, context, project, keys, 0, 0, count);
 
@@ -103,11 +101,6 @@ public class MacroGroup extends AbstractActionGroup {
     }
     if (pos >= keys.size() || cnt >= total) {
       logger.debug("done");
-      if (!UndoManager.getInstance().allowNewCommands()) {
-        UndoManager.getInstance().allowNewCommands(true);
-        UndoManager.getInstance().endCommand(editor);
-        UndoManager.getInstance().beginCommand(editor);
-      }
 
       return;
     }

@@ -24,27 +24,15 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.undo.UndoManager;
 
 /**
  */
 public abstract class ChangeEditorActionHandler extends AbstractEditorActionHandler {
   protected final boolean execute(Editor editor, DataContext context, Command cmd) {
-    UndoManager.getInstance().endCommand(editor);
-    UndoManager.getInstance().beginCommand(editor);
     boolean worked = execute(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
     if (worked) {
-      if ((cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) == 0) {
-        UndoManager.getInstance().endCommand(editor);
-        UndoManager.getInstance().beginCommand(editor);
-      }
       CommandState.getInstance(editor).saveLastChangeCommand(cmd);
     }
-    else {
-      UndoManager.getInstance().abortCommand(editor);
-      UndoManager.getInstance().beginCommand(editor);
-    }
-
     return worked;
   }
 

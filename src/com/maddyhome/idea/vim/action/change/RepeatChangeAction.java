@@ -29,7 +29,6 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
 import com.maddyhome.idea.vim.key.KeyParser;
-import com.maddyhome.idea.vim.undo.UndoManager;
 
 /**
  */
@@ -60,8 +59,6 @@ public class RepeatChangeAction extends EditorAction {
         CommandGroups.getInstance().getRegister().selectRegister(state.getLastChangeRegister());
         try {
           KeyHandler.executeAction(cmd.getAction(), context);
-          UndoManager.getInstance().endCommand(editor);
-          UndoManager.getInstance().beginCommand(editor);
         }
         catch (Exception e) {
           // oops

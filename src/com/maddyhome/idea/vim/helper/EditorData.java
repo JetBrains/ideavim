@@ -32,7 +32,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.command.VisualRange;
-import com.maddyhome.idea.vim.undo.UndoManager;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -49,7 +48,6 @@ public class EditorData {
    */
   public static void initializeEditor(Editor editor) {
     if (logger.isDebugEnabled()) logger.debug("editor created: " + editor);
-    UndoManager.getInstance().editorOpened(editor);
   }
 
   /**
@@ -59,7 +57,6 @@ public class EditorData {
    */
   public static void uninitializeEditor(Editor editor) {
     if (logger.isDebugEnabled()) logger.debug("editor closed: " + editor);
-    UndoManager.getInstance().editorClosed(editor);
     editor.putUserData(COMMAND_STATE, null);
     editor.putUserData(LAST_HIGHLIGHTS, null);
     editor.putUserData(VISUAL, null);

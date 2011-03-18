@@ -48,7 +48,6 @@ import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.option.BoundListOption;
 import com.maddyhome.idea.vim.option.Options;
-import com.maddyhome.idea.vim.undo.UndoManager;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -490,9 +489,6 @@ public class ChangeGroup extends AbstractActionGroup {
     if (!CommandState.inInsertMode(editor)) {
       resetCursor(editor, false);
     }
-
-    UndoManager.getInstance().endCommand(editor);
-    UndoManager.getInstance().beginCommand(editor);
   }
 
   /**

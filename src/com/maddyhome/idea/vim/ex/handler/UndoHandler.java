@@ -24,7 +24,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.undo.UndoManager;
+import com.maddyhome.idea.vim.helper.UndoRedoHelper;
 
 /**
  *
@@ -37,6 +37,6 @@ public class UndoHandler extends CommandHandler {
   }
 
   public boolean execute(Editor editor, DataContext context, ExCommand cmd) {
-    return UndoManager.getInstance().undo(editor, context);
+    return UndoRedoHelper.undo(context);
   }
 }

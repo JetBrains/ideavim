@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
-import com.maddyhome.idea.vim.undo.UndoManager;
 
 /**
  * Base class for all Ex command handlers.
@@ -235,52 +234,32 @@ public abstract class CommandHandler {
 
     boolean res = true;
     if ((argFlags & WRITABLE) != 0) {
-      //RunnableHelper.runWriteCommand((Project)context.getData(DataConstants.PROJECT), new Runnable() {
-      //    public void run()
-      //    {
       try {
-        UndoManager.getInstance().endCommand(editor);
-        UndoManager.getInstance().beginCommand(editor);
         for (int i = 0; i < count && res; i++) {
           res = execute(editor, context, cmd);
         }
       }
       catch (ExException e) {
-        //MessageHelper.EMSG(e.getMessage());
         res = false;
       }
       finally {
-        if (res) {
-          UndoManager.getInstance().endCommand(editor);
-        }
-        else {
-          UndoManager.getInstance().abortCommand(editor);
+        if (!res) {
           VimPlugin.indicateError();
         }
-        UndoManager.getInstance().beginCommand(editor);
       }
-      //    }
-      //});
     }
     else {
-      //RunnableHelper.runReadCommand((Project)context.getData(DataConstants.PROJECT), new Runnable() {
-      //    public void run()
-      //    {
       try {
         for (int i = 0; i < count; i++) {
           res = execute(editor, context, cmd);
         }
-
         if (!res) {
           VimPlugin.indicateError();
         }
       }
       catch (ExException e) {
-        //MessageHelper.EMSG(e.getMessage());
         VimPlugin.indicateError();
       }
-      //    }
-      //});
     }
 
     return res;

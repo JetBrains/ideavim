@@ -31,7 +31,6 @@ import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.DelegateCommandListener;
 import com.maddyhome.idea.vim.helper.EditorData;
-import com.maddyhome.idea.vim.undo.UndoManager;
 
 /**
  *
@@ -81,10 +80,6 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
     @SuppressWarnings("Since15")
     public TextRange start() {
       logger.debug("start");
-      if (cmd == null || !cmd.isReadType()) {
-        UndoManager.getInstance().endCommand(editor);
-        UndoManager.getInstance().beginCommand(editor);
-      }
       wasRepeat = false;
       if (CommandState.getInstance(editor).getMode() == CommandState.MODE_REPEAT) {
         wasRepeat = true;
@@ -148,18 +143,8 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
           EditorData.setLastVisualOperatorRange(editor, change);
         }
 
-        if (cmd == null || ((cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) == 0 && !cmd.isReadType())) {
-          UndoManager.getInstance().endCommand(editor);
-          UndoManager.getInstance().beginCommand(editor);
-        }
         if (cmd != null) {
           CommandState.getInstance(editor).saveLastChangeCommand(cmd);
-        }
-      }
-      else {
-        if (cmd == null || !cmd.isReadType()) {
-          UndoManager.getInstance().abortCommand(editor);
-          UndoManager.getInstance().beginCommand(editor);
         }
       }
 

@@ -51,7 +51,6 @@ import com.maddyhome.idea.vim.helper.DocumentManager;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.key.RegisterActions;
 import com.maddyhome.idea.vim.option.Options;
-import com.maddyhome.idea.vim.undo.UndoManager;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
@@ -159,7 +158,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
    */
   private void setupListeners() {
     DocumentManager.getInstance().addDocumentListener(new MarkGroup.MarkUpdater());
-    DocumentManager.getInstance().addDocumentListener(new UndoManager.DocumentChangeListener());
     if (ApiHelper.supportsColorSchemes()) {
       DocumentManager.getInstance().addDocumentListener(new SearchGroup.DocumentSearchListener());
     }
@@ -338,7 +336,9 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   private RegisterActions getActions() {
     if (actions == null) {
+      // Register vim actions in command mode
       actions = RegisterActions.getInstance();
+      // Register ex handlers
       CommandParser.getInstance().registerHandlers();
     }
 

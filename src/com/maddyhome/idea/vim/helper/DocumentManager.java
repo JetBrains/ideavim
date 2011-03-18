@@ -23,7 +23,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileEditor.FileDocumentManagerAdapter;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vcs.FileStatusManager;
@@ -38,28 +37,9 @@ public class DocumentManager {
 
   public void init() {
     logger.debug("opening project");
-    //FileDocumentManager.getInstance().addFileDocumentManagerListener(listener);
   }
 
-  /*
-  public void closeProject(Project project)
-  {
-      logger.debug("closing project");
-
-      // This bit of code is here because FileEditorManager.fileClosed is not getting called
-      // for each open file when a project is closed. See IDEA bug 29727.
-      VirtualFile[] files = FileEditorManager.getInstance(project).getOpenFiles();
-      logger.debug("there are " + files.length + " open files");
-      for (int i = 0; i < files.length; i++)
-      {
-          removeListeners(FileDocumentManager.getInstance().getDocument(files[i]));
-      }
-
-      FileDocumentManager.getInstance().removeFileDocumentManagerListener(listener);
-  }
-  */
-
-  public void addDocumentListener(DocumentListener listener) {
+  public void addDocumentListener(final DocumentListener listener) {
     docListeners.add(listener);
   }
 
@@ -70,7 +50,6 @@ public class DocumentManager {
     if (vf != null) {
       removeListeners(doc);
       FileDocumentManager.getInstance().reloadFromDisk(doc);
-      //AbstractVcsHelper.getInstance(p).markFileAsUpToDate(vf);
       FileStatusManager.getInstance(p).fileStatusChanged(vf);
       addListeners(doc);
     }
@@ -84,20 +63,7 @@ public class DocumentManager {
 
     doc.putUserData(LISTENER_MARKER, "foo");
     for (DocumentListener docListener : docListeners) {
-      //try
-      //{
       doc.addDocumentListener(docListener);
-      //}
-      /*
-      catch (AssertionError e)
-      {
-          // Ignore - I have no way to avoid adding a listenter twice.
-      }
-      catch (Throwable e)
-      {
-          // Ignore - I have no way to avoid adding a listenter twice.
-      }
-      */
     }
   }
 
@@ -109,56 +75,11 @@ public class DocumentManager {
 
     doc.putUserData(LISTENER_MARKER, null);
     for (DocumentListener docListener : docListeners) {
-      //try
-      //{
       doc.removeDocumentListener(docListener);
-      //}
-      /*
-      catch (AssertionError e)
-      {
-          // Ignore - I have no way to avoid removing a listenter twice.
-      }
-      catch (Throwable e)
-      {
-          // Ignore - I have no way to avoid removing a listenter twice.
-      }
-      */
     }
   }
 
-  private DocumentManager() {
-  }
 
-  private class FileDocumentListener extends FileDocumentManagerAdapter {
-    /* This doesn't seem to get called at all
-    public void fileOpened(FileEditorManager fileEditorManager, VirtualFile virtualFile)
-    {
-        logger.debug("opened vf=" + virtualFile.getPresentableName());
-        Document doc = FileDocumentManager.getInstance().getDocument(virtualFile);
-        if (doc != null)
-        {
-            addListeners(doc);
-        }
-    }
-
-    public void fileClosed(FileEditorManager fileEditorManager, VirtualFile virtualFile)
-    {
-        logger.debug("closed vf=" + virtualFile.getName());
-        Document doc = FileDocumentManager.getInstance().getDocument(virtualFile);
-        if (doc != null)
-        {
-            removeListeners(doc);
-        }
-    }
-    */
-
-    public void fileContentLoaded(VirtualFile file, Document document) {
-      if (logger.isDebugEnabled()) logger.debug("loaded vf=" + file.getName());
-      //addListeners(document);
-    }
-  }
-
-  //private FileDocumentListener listener = new FileDocumentListener();
   private HashSet<DocumentListener> docListeners = new HashSet<DocumentListener>();
 
   private static final Key<String> LISTENER_MARKER = new Key<String>("listenerMarker");
