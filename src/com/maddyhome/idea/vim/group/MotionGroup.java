@@ -50,6 +50,7 @@ import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import com.maddyhome.idea.vim.ui.MorePanel;
 
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.io.File;
 
@@ -1820,21 +1821,17 @@ public class MotionGroup extends AbstractActionGroup {
         logger.debug("old=" + visibleAreaEvent.getOldRectangle());
         logger.debug("new=" + visibleAreaEvent.getNewRectangle());
       }
-      /*
-      if (visibleAreaEvent.getNewRectangle().y == visibleAreaEvent.getOldRectangle().y)
-      {
-          MotionGroup.scrollCaretIntoView(editor);
-      }
-      else
-      {
-          MotionGroup.moveCaretToView(editor, null);
-      }
-      */
+
       if (!visibleAreaEvent.getNewRectangle().equals(visibleAreaEvent.getOldRectangle())) {
-        if (!EditorData.isConsoleOutput(editor)) {
+        if (!EditorData.isConsoleOutput(editor) && !isTabSwitchEvent(visibleAreaEvent)) {
           MotionGroup.moveCaretToView(editor, null);
         }
       }
+    }
+
+    private static boolean isTabSwitchEvent(final VisibleAreaEvent visibleAreaEvent) {
+      final Rectangle newRectangle = visibleAreaEvent.getNewRectangle();
+      return newRectangle.width == 0 || newRectangle.height == 0;
     }
 
     private static boolean ignore = false;
