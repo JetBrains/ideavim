@@ -40,6 +40,19 @@
   </path>
   <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="ant-contrib"/>
 
+  <path id="build.classpath">
+    <fileset dir="${idea.home}/lib">
+      <include name="*.jar"/>
+    </fileset>
+    <pathelement path="${classes}"/>
+  </path>
+
+  <!-- The task requires the following libraries from IntelliJ IDEA distribution: -->
+  <!--   javac2.jar; jdom.jar; asm.jar; asm-commons.jar -->
+  <taskdef name="javac2" classname="com.intellij.ant.Javac2">
+    <classpath refid="build.classpath"/>
+  </taskdef>
+
   <!-- Clean all the generated stuff -->
   <target name="clean" description="Removes all generated files">
     <delete dir="${build}"/>
@@ -49,19 +62,14 @@
 
   <!-- Compile all the sources to the ${classes} folder -->
   <target name="compile">
-    <path id="build.classpath">
-      <fileset dir="${idea.home}/lib">
-        <include name="*.jar"/>
-      </fileset>
-      <pathelement path="${classes}"/>
-    </path>
-
     <mkdir dir="${classes}"/>
-    <javac destdir="${classes}" debug="on" deprecation="on" classpathref="build.classpath" source="1.6"
-           target="1.6">
+    <javac2 destdir="${classes}"
+            debug="on"
+            fork="true">
+      <classpath refid="build.classpath"/>
       <src path="${src}"/>
       <include name="com/maddyhome/idea/**"/>
-    </javac>
+    </javac2>
   </target>
 
   <!-- Create ideavim.jar for packing inside zip plugin package -->
