@@ -21,7 +21,7 @@ public class VimKeymapDialog extends DialogWrapper {
   }
 
   protected Action[] createActions() {
-    return new Action[]{getOKAction()};
+    return new Action[]{getOKAction(), getCancelAction()};
   }
 
   protected JComponent createCenterPanel() {

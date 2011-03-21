@@ -10,6 +10,7 @@ import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.impl.KeymapImpl;
 import com.intellij.openapi.keymap.impl.KeymapManagerImpl;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -100,7 +101,9 @@ public class VimKeyMapUtil {
   private static void configureVimParentKeymap(final String path, final Document document) throws IOException {
     final VimKeymapDialog vimKeymapDialog = new VimKeymapDialog();
     vimKeymapDialog.show();
-
+    if (vimKeymapDialog.getExitCode() != DialogWrapper.OK_EXIT_CODE){
+      return;
+    }
     final Element rootElement = document.getRootElement();
     rootElement.removeAttribute("parent");
     final String keymapName = vimKeymapDialog.getSelectedKeymap().getName();
