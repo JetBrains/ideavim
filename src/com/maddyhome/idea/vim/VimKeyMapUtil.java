@@ -81,9 +81,9 @@ public class VimKeyMapUtil {
       Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", "Successfully installed vim keymap", NotificationType.INFORMATION));
     }
     catch (Exception e) {
-      LOG.debug("Failed to install vim keymap.\n" + e.getMessage());
+      LOG.debug("Failed to install vim keymap.\n" + e);
       Notifications.Bus
-        .notify(new Notification("ideavim", "IdeaVim", "Failed to install vim keymap.\n" + e.getMessage(), NotificationType.ERROR));
+        .notify(new Notification("ideavim", "IdeaVim", "Failed to install vim keymap.\n" + e, NotificationType.ERROR));
       return;
     }
   }
@@ -168,9 +168,9 @@ public class VimKeyMapUtil {
       configureVimParentKeymap(path, document);
     }
     catch (Exception e) {
-      LOG.debug("Failed to reconfigure vim keymap.\n" + e.getMessage());
+      LOG.debug("Failed to reconfigure vim keymap.\n" + e);
       Notifications.Bus
-        .notify(new Notification("ideavim", "IdeaVim", "Failed to reconfigure vim keymap.\n" + e.getMessage(), NotificationType.ERROR));
+        .notify(new Notification("ideavim", "IdeaVim", "Failed to reconfigure vim keymap.\n" + e, NotificationType.ERROR));
     }
   }
 
