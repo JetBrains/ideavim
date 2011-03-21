@@ -98,11 +98,15 @@ public class VimKeyMapUtil {
     }
   }
 
-  private static void configureVimParentKeymap(final String path, final Document document) throws IOException {
+  /**
+   * Changes parent keymap for the Vim
+   * @return true if document was changed succesfully
+   */
+  private static boolean configureVimParentKeymap(final String path, final Document document) throws IOException {
     final VimKeymapDialog vimKeymapDialog = new VimKeymapDialog();
     vimKeymapDialog.show();
     if (vimKeymapDialog.getExitCode() != DialogWrapper.OK_EXIT_CODE){
-      return;
+      return false;
     }
     final Element rootElement = document.getRootElement();
     rootElement.removeAttribute("parent");
@@ -114,6 +118,7 @@ public class VimKeyMapUtil {
     Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", "Successfully configured vim keymap to be based on " +
                                                                     getPresentableKeyMapName(keymapName),
                                               NotificationType.INFORMATION));
+    return true;
   }
 
   public static void enableKeyBoardBindings(final boolean enabled) {
@@ -178,12 +183,21 @@ public class VimKeyMapUtil {
         return;
       }
       // Prompt user to select the parent for the Vim keyboard
-      configureVimParentKeymap(path, document);
+      if (configureVimParentKeymap(path, document)) {
+        final KeymapManagerImpl manager = (KeymapManagerImpl) KeymapManager.getInstance();
+        final KeymapImpl vimKeyMap = new KeymapImpl();
+        final Keymap[] allKeymaps = manager.getAllKeymaps();
+        vimKeyMap.readExternal(document.getRootElement(), allKeymaps);
+        manager.addKeymap(vimKeyMap);
+      }
     }
     catch (FileNotFoundException e) {
       reportError(e);
     }
     catch (IOException e) {
+      reportError(e);
+    }
+    catch (InvalidDataException e) {
       reportError(e);
     }
   }
