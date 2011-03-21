@@ -19,6 +19,8 @@ package com.maddyhome.idea.vim;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.codeInsight.lookup.Lookup;
+import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.ide.AppLifecycleListener;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
@@ -45,16 +47,15 @@ import com.intellij.util.messages.MessageBus;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.group.*;
-import com.maddyhome.idea.vim.helper.ApiHelper;
-import com.maddyhome.idea.vim.helper.DelegateCommandListener;
-import com.maddyhome.idea.vim.helper.DocumentManager;
-import com.maddyhome.idea.vim.helper.EditorData;
+import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.RegisterActions;
 import com.maddyhome.idea.vim.option.Options;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
 /**
@@ -87,6 +88,8 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   private boolean enabled = true;
   private static Logger LOG = Logger.getInstance(VimPlugin.class.getName());
+
+  private PropertyChangeListener myLookupPropertiesListener;
 
   /**
    * Creates the Vim Plugin
@@ -197,12 +200,27 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         for (FileEditorManagerListener listener : listeners) {
           FileEditorManager.getInstance(project).addFileEditorManagerListener(listener);
         }
+
+        myLookupPropertiesListener = new PropertyChangeListener() {
+          @Override
+          public void propertyChange(PropertyChangeEvent evt) {
+            if (LookupManager.PROP_ACTIVE_LOOKUP.equals(evt.getPropertyName())) {
+              final Lookup lookup = (Lookup)evt.getNewValue();
+              if (lookup != null) {
+                final Editor editor = lookup.getEditor();
+                CommandGroups.getInstance().getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
+              }
+            }
+          }
+        };
+        LookupManager.getInstance(project).addPropertyChangeListener(myLookupPropertiesListener);
       }
 
       public void projectClosed(Project project) {
         for (FileEditorManagerListener listener : listeners) {
           FileEditorManager.getInstance(project).removeFileEditorManagerListener(listener);
         }
+        LookupManager.getInstance(project).removePropertyChangeListener(myLookupPropertiesListener);
         listeners.clear();
       }
 
