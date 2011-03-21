@@ -47,12 +47,6 @@
     <pathelement path="${classes}"/>
   </path>
 
-  <!-- The task requires the following libraries from IntelliJ IDEA distribution: -->
-  <!--   javac2.jar; jdom.jar; asm.jar; asm-commons.jar -->
-  <taskdef name="javac2" classname="com.intellij.ant.Javac2">
-    <classpath refid="build.classpath"/>
-  </taskdef>
-
   <!-- Clean all the generated stuff -->
   <target name="clean" description="Removes all generated files">
     <delete dir="${build}"/>
@@ -63,6 +57,11 @@
   <!-- Compile all the sources to the ${classes} folder -->
   <target name="compile">
     <mkdir dir="${classes}"/>
+    <!-- The task requires the following libraries from IntelliJ IDEA distribution: -->
+    <!--   javac2.jar; jdom.jar; asm.jar; asm-commons.jar -->
+    <taskdef name="javac2" classname="com.intellij.ant.Javac2">
+      <classpath refid="build.classpath"/>
+    </taskdef>
     <javac2 destdir="${classes}"
             debug="on"
             fork="true">
