@@ -49,13 +49,12 @@ public class EditorKeyHandler extends EditorActionHandler {
 
   public void execute(Editor editor, DataContext context) {
     logger.debug("execute");
-    //if (isEnabled(editor, context))
 
     // Do not launch vim actions in case of lookup enabled
     boolean isEnabled = editor != null && VimPlugin.isEnabled();
     if (isEnabled) {
       final Lookup lookup = LookupManager.getActiveLookup(editor);
-      if (lookup != null && lookup.isCompletion()) {
+      if (lookup != null) {
         isEnabled = false;
       }
     }
