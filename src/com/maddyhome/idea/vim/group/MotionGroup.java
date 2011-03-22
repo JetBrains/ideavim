@@ -105,14 +105,20 @@ public class MotionGroup extends AbstractActionGroup {
   public void turnOn() {
     Editor[] editors = EditorFactory.getInstance().getAllEditors();
     for (Editor editor : editors) {
-      addEditorListener(editor);
+      if (!EditorData.getMotionGroup(editor)){
+        addEditorListener(editor);
+        EditorData.setMotionGroup(editor, true);
+      }
     }
   }
 
   public void turnOff() {
     Editor[] editors = EditorFactory.getInstance().getAllEditors();
     for (Editor editor : editors) {
-      removeEditorListener(editor);
+      if (EditorData.getMotionGroup(editor)){
+        removeEditorListener(editor);
+        EditorData.setMotionGroup(editor, false);
+      }
     }
   }
 

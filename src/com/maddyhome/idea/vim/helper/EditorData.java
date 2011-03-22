@@ -170,13 +170,7 @@ public class EditorData {
   }
 
   public static boolean getMotionGroup(Editor editor) {
-    Boolean res = editor.getUserData(MOTION_GROUP);
-    if (res != null) {
-      return res;
-    }
-    else {
-      return false;
-    }
+    return editor.getUserData(MOTION_GROUP) == Boolean.TRUE;
   }
 
   public static void setMotionGroup(Editor editor, boolean adapter) {
