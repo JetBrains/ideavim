@@ -110,13 +110,14 @@ public class VimKeyMapUtil {
     }
     final Element rootElement = document.getRootElement();
     rootElement.removeAttribute("parent");
-    final String keymapName = vimKeymapDialog.getSelectedKeymap().getName();
+    final Keymap selectedKeymap = vimKeymapDialog.getSelectedKeymap();
+    final String keymapName = selectedKeymap.getName();
     rootElement.setAttribute("parent", keymapName);
 
     // Save modified keymap to the file
     JDOMUtil.writeDocument(document, path, "\n");
     Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", "Successfully configured vim keymap to be based on " +
-                                                                    getPresentableKeyMapName(keymapName),
+                                                                    selectedKeymap.getPresentableName(),
                                               NotificationType.INFORMATION));
     return true;
   }
@@ -146,22 +147,10 @@ public class VimKeyMapUtil {
 
     manager.setActiveKeymap(keymap);
 
-    final String keyMapPresentableName = getPresentableKeyMapName(keymapName2Enable);
+    final String keyMapPresentableName = keymap.getPresentableName();
     Notifications.Bus
       .notify(new Notification("ideavim", "IdeaVim", keyMapPresentableName + " keymap was enabled", NotificationType.INFORMATION));
-    LOG.debug(keymapName2Enable + " keymap was enabled");
-  }
-
-  private static String getPresentableKeyMapName(final String keymapName) {
-    if (KeymapManager.DEFAULT_IDEA_KEYMAP.equals(keymapName)) {
-      return "IntelliJ IDEA Classic";
-    }
-    else if ("Mac OS X".equals(keymapName)) {
-      return "IntelliJ IDEA Classic - Mac OS X";
-    }
-    else {
-      return keymapName;
-    }
+    LOG.debug(keyMapPresentableName + " keymap was enabled");
   }
 
 

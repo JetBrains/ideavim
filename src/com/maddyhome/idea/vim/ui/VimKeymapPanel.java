@@ -34,15 +34,7 @@ public class VimKeymapPanel {
         if (keymap == null) {
           return;
         }
-        if (KeymapManager.DEFAULT_IDEA_KEYMAP.equals(keymap.getName())) {
-          setText("IntelliJ IDEA Classic");
-        }
-        else if ("Mac OS X".equals(keymap.getName())) {
-          setText("IntelliJ IDEA Classic - Mac OS X");
-        }
-        else {
-          setText(keymap.getPresentableName());
-        }
+        setText(keymap.getPresentableName());
       }
     });
 
