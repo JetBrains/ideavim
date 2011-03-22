@@ -13,9 +13,9 @@ public class VimKeymapDialog extends DialogWrapper {
 
   private VimKeymapPanel myVimKeymapPanel;
 
-  public VimKeymapDialog() {
+  public VimKeymapDialog(final String parentKeymap) {
     super(ProjectManager.getInstance().getDefaultProject());
-    myVimKeymapPanel = new VimKeymapPanel();
+    myVimKeymapPanel = new VimKeymapPanel(parentKeymap);
     setTitle("Vim Keymap settings");
     init();
   }

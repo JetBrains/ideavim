@@ -103,12 +103,13 @@ public class VimKeyMapUtil {
    * @return true if document was changed succesfully
    */
   private static boolean configureVimParentKeymap(final String path, final Document document) throws IOException {
-    final VimKeymapDialog vimKeymapDialog = new VimKeymapDialog();
+    final Element rootElement = document.getRootElement();
+    final String parentKeymap = rootElement.getAttributeValue("parent");
+    final VimKeymapDialog vimKeymapDialog = new VimKeymapDialog(parentKeymap);
     vimKeymapDialog.show();
     if (vimKeymapDialog.getExitCode() != DialogWrapper.OK_EXIT_CODE){
       return false;
     }
-    final Element rootElement = document.getRootElement();
     rootElement.removeAttribute("parent");
     final Keymap selectedKeymap = vimKeymapDialog.getSelectedKeymap();
     final String keymapName = selectedKeymap.getName();

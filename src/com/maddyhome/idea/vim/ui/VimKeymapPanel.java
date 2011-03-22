@@ -17,11 +17,16 @@ public class VimKeymapPanel {
   private JComboBox myKeymapComboBox;
   private JPanel myPanel;
 
-  public VimKeymapPanel() {
+  public VimKeymapPanel(final String parentKeymap) {
     final ArrayList<Keymap> keymaps = new ArrayList<Keymap>();
     final KeymapManagerImpl manager = (KeymapManagerImpl)KeymapManager.getInstance();
+    Keymap preselectedKeymap = null;
     for (Keymap keymap : manager.getAllKeymaps()) {
-      if (!"Vim".equals(keymap.getName()) && matchesPlatform(keymap)) {
+      final String name = keymap.getName();
+      if (!"Vim".equals(name) && matchesPlatform(keymap)) {
+      if (name.equals(parentKeymap)) {
+        preselectedKeymap = keymap;
+      }
         keymaps.add(keymap);
       }
     }
@@ -39,7 +44,8 @@ public class VimKeymapPanel {
     });
 
     final String previousKeyMap = VimPlugin.getInstance().getPreviousKeyMap();
-    myKeymapComboBox.getModel().setSelectedItem(previousKeyMap.isEmpty() ? manager.getActiveKeymap() : manager.getKeymap(previousKeyMap));
+    myKeymapComboBox.getModel().setSelectedItem(preselectedKeymap != null ? preselectedKeymap :
+                                                previousKeyMap.isEmpty() ? manager.getActiveKeymap() : manager.getKeymap(previousKeyMap));
   }
 
   public JPanel getPanel() {
