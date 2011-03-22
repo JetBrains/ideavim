@@ -737,7 +737,8 @@ public class RegisterActions {
       });
 
     // ********************** Various Mode Actions ************************
-    parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimCommentByLineComment", Command.CHANGE,
+    parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_INSERT | KeyParser.MAPPING_VISUAL,
+                          "VimCommentByLineComment", Command.CHANGE,
                           Command.FLAG_MOT_LINEWISE | Command.FLAG_KEEP_VISUAL);
     parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimCommentByBlockComment", Command.CHANGE,
                           Command.FLAG_MOT_LINEWISE);
