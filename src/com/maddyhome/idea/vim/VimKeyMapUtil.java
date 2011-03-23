@@ -126,6 +126,9 @@ public class VimKeyMapUtil {
   public static void enableKeyBoardBindings(final boolean enabled) {
     LOG.debug("Enabling keymap");
     final KeymapManagerImpl manager = (KeymapManagerImpl)KeymapManager.getInstance();
+    if (manager.getActiveKeymap().getName().equals("Vim") == enabled){
+      return;
+    }
     final String keymapName2Enable = enabled ? "Vim" : VimPlugin.getInstance().getPreviousKeyMap();
     if (keymapName2Enable.isEmpty()) {
       return;
