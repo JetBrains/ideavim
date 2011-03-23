@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.handler.key;
 
 import com.intellij.codeInsight.lookup.Lookup;
 import com.intellij.codeInsight.lookup.LookupManager;
+import com.intellij.injected.editor.EditorWindow;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.diagnostic.Logger;
@@ -36,10 +37,6 @@ import javax.swing.*;
  *
  */
 public class EditorKeyHandler extends EditorActionHandler {
-  //public EditorKeyHandler(EditorActionHandler origHandler, KeyStroke stroke)
-  //{
-  //    this(origHandler, stroke, false);
-  //}
 
   public EditorKeyHandler(EditorActionHandler origHandler, KeyStroke stroke, boolean special) {
     this.origHandler = origHandler;
@@ -49,6 +46,10 @@ public class EditorKeyHandler extends EditorActionHandler {
 
   public void execute(Editor editor, DataContext context) {
     logger.debug("execute");
+    // Fix for the VIM-61 "enter" key not inserting new line in insert mode and similar problems
+    // Actually one file can have several editors organized in the hierarhy.
+    // However ideavim should not care about and store it information within the top editor.
+    editor = editor instanceof EditorWindow ? ((EditorWindow)editor).getDelegate() : editor;
 
     // Do not launch vim actions in case of lookup enabled
     boolean isEnabled = editor != null && VimPlugin.isEnabled();
