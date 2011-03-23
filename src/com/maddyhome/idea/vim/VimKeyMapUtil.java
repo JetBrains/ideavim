@@ -202,6 +202,6 @@ public class VimKeyMapUtil {
   public static VirtualFile getVimKeymapFile() {
     final String keyMapsPath = PathManager.getConfigPath() + File.separatorChar + "keymaps";
     final LocalFileSystem localFileSystem = LocalFileSystem.getInstance();
-    return localFileSystem.findFileByPath(keyMapsPath + File.separatorChar + VIM_XML);
+    return localFileSystem.refreshAndFindFileByPath(keyMapsPath + File.separatorChar + VIM_XML);
   }
 }
