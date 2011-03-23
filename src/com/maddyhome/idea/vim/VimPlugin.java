@@ -41,8 +41,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerAdapter;
 import com.intellij.openapi.util.Ref;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
+import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.util.messages.MessageBus;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
@@ -168,16 +170,21 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
     EditorFactory.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
       public void editorCreated(EditorFactoryEvent event) {
-        isBlockCursor = event.getEditor().getSettings().isBlockCursor();
-        isSmoothScrolling = event.getEditor().getSettings().isAnimatedScrolling();
+        final Editor editor = event.getEditor();
+        isBlockCursor = editor.getSettings().isBlockCursor();
+        isSmoothScrolling = editor.getSettings().isAnimatedScrolling();
+        EditorData.initializeEditor(editor);
+        DocumentManager.getInstance().addListeners(editor.getDocument());
 
         if (VimPlugin.isEnabled()) {
-          event.getEditor().getSettings().setBlockCursor(!CommandState.inInsertMode(event.getEditor()));
-          event.getEditor().getSettings().setAnimatedScrolling(false);
+          // Turn on insert mode if editor doesn't have any file
+          final VirtualFile virtualFile = EditorData.getVirtualFile(editor);
+          if (virtualFile == null || virtualFile instanceof LightVirtualFile){
+            CommandGroups.getInstance().getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
+          }
+          editor.getSettings().setBlockCursor(!CommandState.inInsertMode(editor));
+          editor.getSettings().setAnimatedScrolling(false);
         }
-
-        EditorData.initializeEditor(event.getEditor());
-        DocumentManager.getInstance().addListeners(event.getEditor().getDocument());
       }
 
       public void editorReleased(EditorFactoryEvent event) {
