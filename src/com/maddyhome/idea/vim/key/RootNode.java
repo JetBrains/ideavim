@@ -29,7 +29,7 @@ public class RootNode extends ParentNode {
     res.append("children=[");
     int cnt = 0;
     for (Object key : children.keySet()) {
-      Node node = (Node)children.get(key);
+      Node node = children.get(key);
       if (cnt > 0) {
         res.append(",");
       }
