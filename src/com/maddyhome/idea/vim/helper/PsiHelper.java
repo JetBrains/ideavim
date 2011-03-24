@@ -106,7 +106,7 @@ public class PsiHelper {
 
   private static PsiFile getFile(Editor editor) {
     VirtualFile vf = EditorData.getVirtualFile(editor);
-    Project proj = EditorData.getProject(editor);
+    Project proj = editor.getProject();
     PsiManager mgr = PsiManager.getInstance(proj);
 
     return mgr.findFile(vf);

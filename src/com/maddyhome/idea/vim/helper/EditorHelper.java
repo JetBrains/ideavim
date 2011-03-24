@@ -440,7 +440,7 @@ public class EditorHelper {
     }
 
     Document doc = FileDocumentManager.getInstance().getDocument(file);
-    Editor[] editors = EditorFactory.getInstance().getEditors(doc, EditorData.getProject(manager));
+    Editor[] editors = EditorFactory.getInstance().getEditors(doc, manager.getProject());
     if (editors != null && editors.length > 0) {
       return editors[0];
     }

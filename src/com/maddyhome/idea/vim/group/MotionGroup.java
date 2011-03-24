@@ -539,7 +539,7 @@ public class MotionGroup extends AbstractActionGroup {
   }
 
   private Editor selectEditor(Editor editor, VirtualFile file) {
-    Project proj = EditorData.getProject(editor);
+    Project proj = editor.getProject();
 
     return CommandGroups.getInstance().getFile().selectEditor(proj, file);
   }

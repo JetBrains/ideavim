@@ -386,7 +386,7 @@ public class FileGroup extends AbstractActionGroup {
         msg.append(vf.getPath());
       }
       else {
-        Project project = EditorData.getProject(editor);
+        Project project = editor.getProject();
         VirtualFile root = ProjectRootManager.getInstance(project).getFileIndex().getContentRootForFile(vf);
         if (root != null) {
           msg.append(vf.getPath().substring(root.getPath().length() + 1));

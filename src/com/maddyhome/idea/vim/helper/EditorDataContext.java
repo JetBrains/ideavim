@@ -40,7 +40,7 @@ public class EditorDataContext implements DataContext {
       return editor;
     }
     else if (PlatformDataKeys.PROJECT.getName().equals(dataId)) {
-      return EditorData.getProject(editor);
+      return editor.getProject();
     }
     else if (PlatformDataKeys.VIRTUAL_FILE.getName().equals(dataId)) {
       return EditorData.getVirtualFile(editor);

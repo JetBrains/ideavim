@@ -307,12 +307,12 @@ public class MorePanel extends JPanel {
 
         VirtualFile vf = EditorData.getVirtualFile(editor);
         if (vf != null) {
-          FileEditorManager.getInstance(EditorData.getProject(editor)).openFile(vf, true);
+          FileEditorManager.getInstance(editor.getProject()).openFile(vf, true);
         }
 
         if (e != null && e.getKeyChar() != '\n') {
           KeyStroke key = KeyStroke.getKeyStrokeForEvent(e);
-          Project project = EditorData.getProject(editor);
+          Project project = editor.getProject();
           List<KeyStroke> keys = new ArrayList<KeyStroke>(1);
           keys.add(key);
           CommandGroups.getInstance().getMacro().playbackKeys(editor,

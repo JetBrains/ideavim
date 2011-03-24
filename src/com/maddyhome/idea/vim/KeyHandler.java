@@ -32,7 +32,10 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.RegisterGroup;
-import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.helper.DelegateCommandListener;
+import com.maddyhome.idea.vim.helper.DigraphSequence;
+import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.option.Options;
 
@@ -406,7 +409,7 @@ public class KeyHandler {
       lastWasBS = ((cmd.getFlags() & Command.FLAG_IS_BACKSPACE) != 0);
       logger.debug("lastWasBS=" + lastWasBS);
 
-      Project project = EditorData.getProject(editor);
+      Project project = editor.getProject();
       if (cmd.isReadType() || EditorHelper.canEdit(project, editor)) {
         Runnable action = new ActionRunner(editor, context, cmd, key);
         if (cmd.isWriteType()) {

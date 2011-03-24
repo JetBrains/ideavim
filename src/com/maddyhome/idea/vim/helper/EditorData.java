@@ -22,12 +22,8 @@ package com.maddyhome.idea.vim.helper;
 import com.intellij.injected.editor.EditorWindow;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -209,46 +205,6 @@ public class EditorData {
   }
 
   /**
-   * Gets the project associated with the editor.
-   *
-   * @param editor The editor to get the project for
-   * @return The editor's project
-   */
-  public static Project getProject(Editor editor) {
-    editor = getTopmostEditor(editor);
-    Project proj = editor.getUserData(PROJECT);
-    if (proj == null) {
-      // If we don't have the project already we need to scan all open projects and check all their
-      // open editors until there is a match
-      Project[] projs = ProjectManager.getInstance().getOpenProjects();
-      for (Project p : projs) {
-        Editor[] editors = EditorFactory.getInstance().getEditors(editor.getDocument(), p);
-        for (Editor e : editors) {
-          if (e.equals(editor)) {
-            editor.putUserData(PROJECT, p);
-            proj = p;
-            break;
-          }
-        }
-      }
-    }
-
-    return proj;
-  }
-
-  public static Project getProject(FileEditorManager mgr) {
-    Project[] projs = ProjectManager.getInstance().getOpenProjects();
-    for (Project proj : projs) {
-      FileEditorManager fem = FileEditorManager.getInstance(proj);
-      if (fem.equals(mgr)) {
-        return proj;
-      }
-    }
-
-    return null;
-  }
-
-  /**
    * Gets the virtual file associated with this editor
    *
    * @param editor The editor
@@ -266,7 +222,6 @@ public class EditorData {
   }
 
   private static final Key<Integer> LAST_COLUMN = new Key<Integer>("lastColumn");
-  private static final Key<Project> PROJECT = new Key<Project>("project");
   private static final Key<VisualRange> VISUAL = new Key<VisualRange>("lastVisual");
   private static final Key<VisualChange> VISUAL_OP = new Key<VisualChange>("lastVisualOp");
   private static final Key<String> LAST_SEARCH = new Key<String>("lastSearch");

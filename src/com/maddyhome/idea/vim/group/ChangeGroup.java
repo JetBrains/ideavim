@@ -1487,7 +1487,7 @@ public class ChangeGroup extends AbstractActionGroup {
     Document doc = editor.getDocument();
     VirtualFile vf = FileDocumentManager.getInstance().getFile(doc);
     if (vf != null) {
-      resetCursor(vf, EditorData.getProject(editor), insert);
+      resetCursor(vf, editor.getProject(), insert);
     }
     else {
       editor.getSettings().setBlockCursor(!insert);
