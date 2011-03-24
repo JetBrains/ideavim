@@ -1,23 +1,19 @@
-package com.maddyhome.idea.vim.group;
-
 /*
- * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2006 Rick Maddy
+ * Copyright 2000-2011 JetBrains s.r.o.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
@@ -52,7 +48,6 @@ import org.jdom.CDATA;
 import org.jdom.Element;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
@@ -75,14 +70,12 @@ public class SearchGroup extends AbstractActionGroup {
   public static final int REUSE = 128;
 
   public SearchGroup() {
-    if (ApiHelper.supportsColorSchemes()) {
-      Options.getInstance().getOption("hlsearch").addOptionChangeListener(new OptionChangeListener() {
-        public void valueChange(OptionChangeEvent event) {
-          showSearchHighlight = Options.getInstance().isSet("hlsearch");
-          updateHighlight();
-        }
-      });
-    }
+    Options.getInstance().getOption("hlsearch").addOptionChangeListener(new OptionChangeListener() {
+      public void valueChange(OptionChangeEvent event) {
+        showSearchHighlight = Options.getInstance().isSet("hlsearch");
+        updateHighlight();
+      }
+    });
   }
 
   public String getLastSearch() {
@@ -617,28 +610,15 @@ public class SearchGroup extends AbstractActionGroup {
   }
 
   public void updateHighlight() {
-    if (!ApiHelper.supportsColorSchemes()) {
-      return;
-    }
-
     highlightSearch(false);
   }
 
   private void searchHighlight(boolean noSmartCase) {
-    if (!ApiHelper.supportsColorSchemes()) {
-      return;
-    }
-
     showSearchHighlight = Options.getInstance().isSet("hlsearch");
-
     highlightSearch(noSmartCase);
   }
 
   private void highlightSearch(final boolean noSmartCase) {
-    if (!ApiHelper.supportsColorSchemes()) {
-      return;
-    }
-
     Project[] projects = ProjectManager.getInstance().getOpenProjects();
     for (Project project : projects) {
       Editor current = FileEditorManager.getInstance(project).getSelectedTextEditor();
@@ -675,10 +655,6 @@ public class SearchGroup extends AbstractActionGroup {
   }
 
   private static void highlightSearchLines(Editor editor, int startLine, int endLine, String text, boolean ic) {
-    if (!ApiHelper.supportsColorSchemes()) {
-      return;
-    }
-
     TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
     Collection<RangeHighlighter> hls = EditorData.getLastHighlights(editor);
     if (hls == null) {
@@ -1087,46 +1063,27 @@ public class SearchGroup extends AbstractActionGroup {
   }
 
   private RangeHighlighter highlightConfirm(Editor editor, int start, int end) {
-    if (ApiHelper.supportsColorSchemes()) {
-      TextAttributes color = new TextAttributes(
-        editor.getColorsScheme().getColor(EditorColors.SELECTION_FOREGROUND_COLOR),
-        editor.getColorsScheme().getColor(EditorColors.SELECTION_BACKGROUND_COLOR),
-        null, null, 0
-      );
-      return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.ADDITIONAL_SYNTAX + 2,
-                                                         color, HighlighterTargetArea.EXACT_RANGE);
-    }
-    else {
-      return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.SELECTION,
-                                                         new TextAttributes(Color.BLACK, Color.YELLOW, null, null, 0),
-                                                         HighlighterTargetArea.EXACT_RANGE);
-    }
+    TextAttributes color = new TextAttributes(
+      editor.getColorsScheme().getColor(EditorColors.SELECTION_FOREGROUND_COLOR),
+      editor.getColorsScheme().getColor(EditorColors.SELECTION_BACKGROUND_COLOR),
+      null, null, 0
+    );
+    return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.ADDITIONAL_SYNTAX + 2,
+                                                       color, HighlighterTargetArea.EXACT_RANGE);
   }
 
   private static RangeHighlighter highlightMatch(Editor editor, int start, int end) {
-    if (!ApiHelper.supportsColorSchemes()) {
-      return null;
-    }
-
     TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
     return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.ADDITIONAL_SYNTAX + 1,
                                                        color, HighlighterTargetArea.EXACT_RANGE);
   }
 
   public void clearSearchHighlight(Editor editor, DataContext context) {
-    if (!ApiHelper.supportsColorSchemes()) {
-      return;
-    }
-
     showSearchHighlight = false;
     updateHighlight();
   }
 
   private static void removeSearchHighlight(Editor editor) {
-    if (!ApiHelper.supportsColorSchemes()) {
-      return;
-    }
-
     Collection<RangeHighlighter> ehl = EditorData.getLastHighlights(editor);
     if (ehl == null) {
       return;

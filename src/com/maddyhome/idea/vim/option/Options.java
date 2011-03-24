@@ -1,28 +1,23 @@
-package com.maddyhome.idea.vim.option;
-
 /*
- * IdeaVim - A Vim emulator plugin for IntelliJ Idea
- * Copyright (C) 2003-2008 Rick Maddy
+ * Copyright 2000-2011 JetBrains s.r.o.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+package com.maddyhome.idea.vim.option;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.helper.ApiHelper;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
 import com.maddyhome.idea.vim.ui.MorePanel;
@@ -461,11 +456,8 @@ public class Options {
     addOption(new ToggleOption("digraph", "dg", false));
     addOption(new ToggleOption("gdefault", "gd", false));
     addOption(new NumberOption("history", "hi", 20, 1, Integer.MAX_VALUE));
-    if (ApiHelper.supportsColorSchemes()) {
-      addOption(new ToggleOption("hlsearch", "hls", false));
-    }
+    addOption(new ToggleOption("hlsearch", "hls", false));
     addOption(new ToggleOption("ignorecase", "ic", false));
-    //addOption(new ToggleOption("incsearch", "is", false));
     addOption(new ListOption("matchpairs", "mps", new String[]{"(:)", "{:}", "[:]"}, ".:."));
     addOption(new ToggleOption("more", "more", true));
     addOption(new BoundListOption("nrformats", "nf", new String[]{"octal", "hex"}, new String[]{"octal", "hex", "alpha"}));
