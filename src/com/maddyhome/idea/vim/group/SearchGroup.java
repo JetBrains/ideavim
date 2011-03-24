@@ -1078,7 +1078,7 @@ public class SearchGroup extends AbstractActionGroup {
                                                        color, HighlighterTargetArea.EXACT_RANGE);
   }
 
-  public void clearSearchHighlight(Editor editor, DataContext context) {
+  public void clearSearchHighlight() {
     showSearchHighlight = false;
     updateHighlight();
   }
