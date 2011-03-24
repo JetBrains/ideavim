@@ -19,6 +19,7 @@ package com.maddyhome.idea.vim.helper;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.injected.editor.EditorWindow;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
@@ -47,6 +48,7 @@ public class EditorData {
    * @param editor The editor to initialize
    */
   public static void initializeEditor(Editor editor) {
+    editor = getTopmostEditor(editor);
     if (logger.isDebugEnabled()) logger.debug("editor created: " + editor);
   }
 
@@ -56,6 +58,7 @@ public class EditorData {
    * @param editor The editor to cleanup
    */
   public static void uninitializeEditor(Editor editor) {
+    editor = getTopmostEditor(editor);
     if (logger.isDebugEnabled()) logger.debug("editor closed: " + editor);
     editor.putUserData(COMMAND_STATE, null);
     editor.putUserData(LAST_HIGHLIGHTS, null);
@@ -70,6 +73,7 @@ public class EditorData {
    * @return Returns the last column as set by {@link #setLastColumn} or the current cursor column
    */
   public static int getLastColumn(Editor editor) {
+    editor = getTopmostEditor(editor);
     Integer col = editor.getUserData(LAST_COLUMN);
     if (col == null) {
       return EditorHelper.getCurrentVisualColumn(editor);
@@ -86,24 +90,29 @@ public class EditorData {
    * @param editor The editor
    */
   public static void setLastColumn(Editor editor, int col) {
+    editor = getTopmostEditor(editor);
     editor.putUserData(LAST_COLUMN, col);
     int t = getLastColumn(editor);
     if (logger.isDebugEnabled()) logger.debug("setLastColumn(" + col + ") is now " + t);
   }
 
   public static String getLastSearch(Editor editor) {
+    editor = getTopmostEditor(editor);
     return editor.getUserData(LAST_SEARCH);
   }
 
   public static void setLastSearch(Editor editor, String search) {
+    editor = getTopmostEditor(editor);
     editor.putUserData(LAST_SEARCH, search);
   }
 
   public static Collection<RangeHighlighter> getLastHighlights(Editor editor) {
+    editor = getTopmostEditor(editor);
     return editor.getUserData(LAST_HIGHLIGHTS);
   }
 
   public static void setLastHighlights(Editor editor, Collection<RangeHighlighter> highlights) {
+    editor = getTopmostEditor(editor);
     editor.putUserData(LAST_HIGHLIGHTS, highlights);
   }
 
@@ -114,6 +123,7 @@ public class EditorData {
    * @return The last visual range, null if no previous range
    */
   public static VisualRange getLastVisualRange(Editor editor) {
+    editor = getTopmostEditor(editor);
     return editor.getDocument().getUserData(VISUAL);
   }
 
@@ -124,6 +134,7 @@ public class EditorData {
    * @param range  The visual range
    */
   public static void setLastVisualRange(Editor editor, VisualRange range) {
+    editor = getTopmostEditor(editor);
     editor.getDocument().putUserData(VISUAL, range);
   }
 
@@ -134,6 +145,7 @@ public class EditorData {
    * @return The last visual range, null if no previous range
    */
   public static VisualChange getLastVisualOperatorRange(Editor editor) {
+    editor = getTopmostEditor(editor);
     return editor.getDocument().getUserData(VISUAL_OP);
   }
 
@@ -144,18 +156,22 @@ public class EditorData {
    * @param range  The visual range
    */
   public static void setLastVisualOperatorRange(Editor editor, VisualChange range) {
+    editor = getTopmostEditor(editor);
     editor.getDocument().putUserData(VISUAL_OP, range);
   }
 
   public static CommandState getCommandState(Editor editor) {
+    editor = getTopmostEditor(editor);
     return editor.getUserData(COMMAND_STATE);
   }
 
   public static void setCommandState(Editor editor, CommandState state) {
+    editor = getTopmostEditor(editor);
     editor.putUserData(COMMAND_STATE, state);
   }
 
   public static boolean getChangeGroup(Editor editor) {
+    editor = getTopmostEditor(editor);
     Boolean res = editor.getUserData(CHANGE_GROUP);
     if (res != null) {
       return res;
@@ -166,18 +182,22 @@ public class EditorData {
   }
 
   public static void setChangeGroup(Editor editor, boolean adapter) {
+    editor = getTopmostEditor(editor);
     editor.putUserData(CHANGE_GROUP, adapter);
   }
 
   public static boolean getMotionGroup(Editor editor) {
+    editor = getTopmostEditor(editor);
     return editor.getUserData(MOTION_GROUP) == Boolean.TRUE;
   }
 
   public static void setMotionGroup(Editor editor, boolean adapter) {
+    editor = getTopmostEditor(editor);
     editor.putUserData(MOTION_GROUP, adapter);
   }
 
   public static boolean isConsoleOutput(Editor editor) {
+    editor = getTopmostEditor(editor);
     Object res = editor.getUserData(CONSOLE_OUTPUT);
     logger.debug("isConsoleOutput for editor " + editor + " - " + res);
     if (res != null) {
@@ -195,6 +215,7 @@ public class EditorData {
    * @return The editor's project
    */
   public static Project getProject(Editor editor) {
+    editor = getTopmostEditor(editor);
     Project proj = editor.getUserData(PROJECT);
     if (proj == null) {
       // If we don't have the project already we need to scan all open projects and check all their
@@ -234,6 +255,7 @@ public class EditorData {
    * @return The virtual file for the editor
    */
   public static VirtualFile getVirtualFile(Editor editor) {
+    editor = getTopmostEditor(editor);
     return FileDocumentManager.getInstance().getFile(editor.getDocument());
   }
 
@@ -285,5 +307,13 @@ public class EditorData {
     catch (IllegalAccessException e) {
       logger.error("Can't access field 'c'");
     }
+  }
+
+  public static Editor getTopmostEditor(Editor editor) {
+    // Fix for the VIM-61 "enter" key not inserting new line in insert mode and similar problems
+    // Actually one file can have several editors organized in the hierarhy.
+    // However ideavim should not care about and store it information within the top editor.
+    editor = editor instanceof EditorWindow ? ((EditorWindow)editor).getDelegate() : editor;
+    return editor;
   }
 }
