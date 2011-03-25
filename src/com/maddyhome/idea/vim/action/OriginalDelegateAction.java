@@ -19,30 +19,10 @@ package com.maddyhome.idea.vim.action;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 
-public abstract class AbstractDelegateAction extends AnAction implements DelegateAction {
-  protected AbstractDelegateAction() {
+public class OriginalDelegateAction extends AbstractDelegateAction {
+  public void actionPerformed(AnActionEvent event) {
+    getOrigAction().actionPerformed(event);
   }
-
-  protected AbstractDelegateAction(AnAction origAction) {
-    setOrigAction(origAction);
-  }
-
-  public void setOrigAction(AnAction origAction) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("origAction=" + origAction);
-    }
-    this.origAction = origAction;
-    copyFrom(origAction);
-  }
-
-  public AnAction getOrigAction() {
-    return origAction;
-  }
-
-  private AnAction origAction;
-
-  private static Logger logger = Logger.getInstance(AbstractDelegateAction.class.getName());
 }

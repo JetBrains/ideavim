@@ -317,6 +317,12 @@
         <action id="VimGenerateSetter" class="com.maddyhome.idea.vim.action.TxActionWrapper" text="Generate Setter"/>
         <action id="VimGenerateGetterAndSetter" class="com.maddyhome.idea.vim.action.TxActionWrapper" text="Generate Getter and Setter"/>
         <action id="VimGenerateEquals" class="com.maddyhome.idea.vim.action.TxActionWrapper" text="Generate Equals"/>
+        <action id="VimClassNameCompletion" class="com.maddyhome.idea.vim.action.OriginalDelegateAction" text="Class Name Completion"/>
+        <action id="VimCodeCompletion" class="com.maddyhome.idea.vim.action.OriginalDelegateAction" text="Code Completion"/>
+        <action id="VimSmartTypeCompletion" class="com.maddyhome.idea.vim.action.OriginalDelegateAction" text="Smart Type Completion"/>
+        <action id="VimWordCompletion" class="com.maddyhome.idea.vim.action.OriginalDelegateAction" text="Word Completion"/>
+        <action id="VimInsertLiveTemplate" class="com.maddyhome.idea.vim.action.OriginalDelegateAction" text="Insert Live Template"/>
+        <action id="VimHelpTopics" class="com.maddyhome.idea.vim.action.OriginalDelegateAction" text="Help Topics"/>
 
         <!-- Keys -->
         <action id="VimKeyHandler" class="com.maddyhome.idea.vim.action.key.KeyAction" text="Keys"/>
