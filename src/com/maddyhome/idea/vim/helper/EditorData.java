@@ -26,6 +26,7 @@ import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.testFramework.LightVirtualFile;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.command.VisualRange;
@@ -270,5 +271,14 @@ public class EditorData {
     // However ideavim should not care about and store it information within the top editor.
     editor = editor instanceof EditorWindow ? ((EditorWindow)editor).getDelegate() : editor;
     return editor;
+  }
+
+  /**
+   * Checks if editor is file editor, also it takes into account that editor can be placed in editors hierarhy
+   */
+  public static boolean isFileEditor(Editor editor){
+    editor = getTopmostEditor(editor);
+    final VirtualFile virtualFile = EditorData.getVirtualFile(editor);
+    return virtualFile != null && !(virtualFile instanceof LightVirtualFile);
   }
 }

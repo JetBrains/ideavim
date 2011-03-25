@@ -37,10 +37,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerAdapter;
 import com.intellij.openapi.util.Ref;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
-import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.util.messages.MessageBus;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
@@ -175,8 +173,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
         if (VimPlugin.isEnabled()) {
           // Turn on insert mode if editor doesn't have any file
-          final VirtualFile virtualFile = EditorData.getVirtualFile(editor);
-          if (virtualFile == null || virtualFile instanceof LightVirtualFile){
+          if (!EditorData.isFileEditor(editor)) {
             CommandGroups.getInstance().getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
           }
           editor.getSettings().setBlockCursor(!CommandState.inInsertMode(editor));
@@ -208,9 +205,12 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
           public void propertyChange(PropertyChangeEvent evt) {
             if (LookupManager.PROP_ACTIVE_LOOKUP.equals(evt.getPropertyName())) {
               final Lookup lookup = (Lookup)evt.getNewValue();
-              if (lookup != null) {
+              if (lookup != null && lookup.isFocused()) {
                 final Editor editor = lookup.getEditor();
-                CommandGroups.getInstance().getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
+                // Do not toggle on insert mode if already in it.
+                if (!CommandState.inInsertMode(editor)){
+                  CommandGroups.getInstance().getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
+                }
               }
             }
           }
