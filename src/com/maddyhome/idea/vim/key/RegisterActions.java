@@ -37,13 +37,17 @@ public class RegisterActions {
     KeyParser parser = KeyParser.getInstance();
 
     // ******************* Insert Mode Actions **********************
-    // The next few are now flagged as readonly due to changes in IDEA Diana (8.x)
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimClassNameCompletion", Command.OTHER_READONLY);
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimCodeCompletion", Command.OTHER_READONLY);
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimSmartTypeCompletion", Command.OTHER_READONLY);
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimWordCompletion", Command.OTHER_READONLY);
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertLiveTemplate", Command.INSERT);
+    // Delegation actions
+    parser.registerAction(KeyParser.MAPPING_INSERT, "VimClassNameCompletion", Command.INSERT, Command.FLAG_SAVE_STROKE,
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_MASK | KeyEvent.ALT_MASK)));
+    parser.registerAction(KeyParser.MAPPING_INSERT, "VimCodeCompletion", Command.INSERT, Command.FLAG_SAVE_STROKE,
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_MASK)));
+    parser.registerAction(KeyParser.MAPPING_INSERT, "VimSmartTypeCompletion", Command.INSERT, Command.FLAG_SAVE_STROKE,
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK)));
+    parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertLiveTemplate", Command.INSERT, Command.FLAG_SAVE_STROKE,
+            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_J, KeyEvent.CTRL_MASK)));
 
+    // Other insert actions
     parser
       .registerAction(KeyParser.MAPPING_INSERT, "VimEditorBackSpace", Command.INSERT, Command.FLAG_SAVE_STROKE | Command.FLAG_IS_BACKSPACE,
                       new Shortcut[]{
@@ -236,8 +240,6 @@ public class RegisterActions {
 
     // ************************* Normal Mode Actions *************************
     // Copy/Paste Actions
-    parser.registerAction(KeyParser.MAPPING_NORMAL, "HelpTopics", Command.OTHER_READONLY,
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0)));
     parser.registerAction(KeyParser.MAPPING_NORMAL, "VimCopyPutTextBeforeCursor", Command.PASTE,
                           new Shortcut('P'));
     parser.registerAction(KeyParser.MAPPING_NORMAL, "VimCopyPutTextAfterCursor", Command.PASTE,
@@ -869,9 +871,6 @@ public class RegisterActions {
       KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK)
     }));
 
-    // A few special keys that are not registered here but used by diagraphs.
-    //parser.addPossibleConflict(KeyStroke.getKeyStroke(KeyEvent.VK_K, KeyEvent.CTRL_MASK), "VimDigraphEntry");
-
     // "Reserve" these keys so they don't work in IDEA. Eventually these may be valid plugin commands.
     parser.registerAction(KeyParser.MAPPING_ALL, "VimNotImplementedHandler", Command.OTHER_READONLY, new Shortcut[]{
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_G, KeyEvent.CTRL_MASK)),
@@ -883,6 +882,13 @@ public class RegisterActions {
 
     // Update many of the built-in IDEA actions with our key handlers.
 
+    // Update completion actions
+    parser.setupActionHandler("ClassNameCompletion", "VimClassNameCompletion");
+    parser.setupActionHandler("CodeCompletion", "VimCodeCompletion");
+    parser.setupActionHandler("SmartTypeCompletion", "VimSmartTypeCompletion");
+    parser.setupActionHandler("InsertLiveTemplate", "VimInsertLiveTemplate");
+
+    // Update generate actions
     parser.setupActionHandler("GenerateConstructor", "VimGenerateConstructor");
     parser.setupActionHandler("GenerateGetter", "VimGenerateGetter");
     parser.setupActionHandler("GenerateSetter", "VimGenerateSetter");
@@ -893,7 +899,6 @@ public class RegisterActions {
     parser.setupActionHandler("ReformatCode", "VimReformatVisual");
 
     // This group allows us to propagate the keystroke if action acts on something other than an editor
-    parser.setupActionHandler("HelpTopics", "VimDummyHandler", KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
     parser.setupActionHandler("EditorBackSpace", "VimEditorBackSpace", KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0));
     parser.setupActionHandler("EditorDelete", "VimEditorDelete", KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
     parser.setupActionHandler("EditorDown", "VimEditorDown", KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0));
@@ -954,8 +959,6 @@ public class RegisterActions {
     parser.setupActionHandler("EditorMoveToPageBottomWithSelection", "VimDummyHandler",
                               KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
   }
-
-  //private boolean enabled = false;
 
   private static RegisterActions instance;
 }
