@@ -38,13 +38,13 @@ public class RegisterActions {
 
     // ******************* Insert Mode Actions **********************
     // Delegation actions
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimClassNameCompletion", Command.INSERT, Command.FLAG_SAVE_STROKE,
+    parser.registerAction(KeyParser.MAPPING_INSERT, "VimClassNameCompletion", Command.COMPLETION, Command.FLAG_SAVE_STROKE,
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_MASK | KeyEvent.ALT_MASK)));
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimCodeCompletion", Command.INSERT, Command.FLAG_SAVE_STROKE,
+    parser.registerAction(KeyParser.MAPPING_INSERT, "VimCodeCompletion", Command.COMPLETION, Command.FLAG_SAVE_STROKE,
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_MASK)));
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimSmartTypeCompletion", Command.INSERT, Command.FLAG_SAVE_STROKE,
+    parser.registerAction(KeyParser.MAPPING_INSERT, "VimSmartTypeCompletion", Command.COMPLETION, Command.FLAG_SAVE_STROKE,
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK)));
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertLiveTemplate", Command.INSERT, Command.FLAG_SAVE_STROKE,
+    parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertLiveTemplate", Command.COMPLETION, Command.FLAG_SAVE_STROKE,
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_J, KeyEvent.CTRL_MASK)));
 
     // Other insert actions

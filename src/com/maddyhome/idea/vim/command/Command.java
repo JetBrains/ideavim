@@ -142,6 +142,7 @@ public class Command {
   public static final int OTHER_READONLY = 9;
   public static final int OTHER_WRITABLE = 10;
   public static final int OTHER_READ_WRITE = 11;
+  public static final int COMPLETION = 12;
 
   public boolean isReadType() {
     boolean res = false;
@@ -151,6 +152,7 @@ public class Command {
       case SELECT_REGISTER:
       case OTHER_READONLY:
       case OTHER_READ_WRITE:
+      case COMPLETION:
         res = true;
     }
 
