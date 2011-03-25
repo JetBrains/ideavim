@@ -26,10 +26,6 @@ public abstract class AbstractDelegateAction extends AnAction implements Delegat
   protected AbstractDelegateAction() {
   }
 
-  protected AbstractDelegateAction(AnAction origAction) {
-    setOrigAction(origAction);
-  }
-
   public void setOrigAction(AnAction origAction) {
     if (logger.isDebugEnabled()) {
       logger.debug("origAction=" + origAction);

@@ -37,13 +37,6 @@ public class RegisterActions {
     KeyParser parser = KeyParser.getInstance();
 
     // ******************* Insert Mode Actions **********************
-    // The next few are now flagged as readonly due to changes in IDEA Diana (8.x)
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimClassNameCompletion", Command.OTHER_READONLY);
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimCodeCompletion", Command.OTHER_READONLY);
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimSmartTypeCompletion", Command.OTHER_READONLY);
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimWordCompletion", Command.OTHER_READONLY);
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertLiveTemplate", Command.INSERT);
-
     parser
       .registerAction(KeyParser.MAPPING_INSERT, "VimEditorBackSpace", Command.INSERT, Command.FLAG_SAVE_STROKE | Command.FLAG_IS_BACKSPACE,
                       new Shortcut[]{
@@ -385,11 +378,6 @@ public class RegisterActions {
                           new Shortcut('>'), Argument.MOTION);
 
     // Jump Actions
-
-    // Do not override default Forward/Back actions!
-    //parser.registerAction(KeyParser.MAPPING_NORMAL, "VimForward", Command.OTHER_READONLY);
-    //parser.registerAction(KeyParser.MAPPING_NORMAL, "VimBack", Command.OTHER_READONLY);
-
     parser.registerAction(KeyParser.MAPPING_NORMAL, "VimMotionJumpNext", Command.OTHER_READONLY, new Shortcut[]{
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0))
@@ -869,8 +857,6 @@ public class RegisterActions {
       KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK)
     }));
 
-    // A few special keys that are not registered here but used by diagraphs.
-    //parser.addPossibleConflict(KeyStroke.getKeyStroke(KeyEvent.VK_K, KeyEvent.CTRL_MASK), "VimDigraphEntry");
 
     // "Reserve" these keys so they don't work in IDEA. Eventually these may be valid plugin commands.
     parser.registerAction(KeyParser.MAPPING_ALL, "VimNotImplementedHandler", Command.OTHER_READONLY, new Shortcut[]{
@@ -954,8 +940,6 @@ public class RegisterActions {
     parser.setupActionHandler("EditorMoveToPageBottomWithSelection", "VimDummyHandler",
                               KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
   }
-
-  //private boolean enabled = false;
 
   private static RegisterActions instance;
 }
