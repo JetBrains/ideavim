@@ -463,6 +463,10 @@ public class ChangeGroup extends AbstractActionGroup {
    */
   public void processEscape(Editor editor, DataContext context) {
     logger.debug("processing escape");
+    // Prevent possible NPE
+    if (lastInsert == null){
+      return;
+    }
     int cnt = lastInsert.getCount();
     // Turn off overwrite mode if we were in replace mode
     if (CommandState.getInstance(editor).getMode() == CommandState.MODE_REPLACE) {
