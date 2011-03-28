@@ -173,7 +173,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
         if (VimPlugin.isEnabled()) {
           // Turn on insert mode if editor doesn't have any file
-          if (!EditorData.isFileEditor(editor)) {
+          if (!EditorData.isFileEditor(editor) && !CommandState.inInsertMode(editor)) {
             CommandGroups.getInstance().getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
           }
           editor.getSettings().setBlockCursor(!CommandState.inInsertMode(editor));
