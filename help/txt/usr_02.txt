@@ -25,7 +25,7 @@ Table of contents: |usr_toc.txt|
 ==============================================================================
 *02.1*  Running IdeaVim for the First Time
 
-Since IdeaVim runs within IDEA you run IdeaVim by starting IDEA.
+Since IdeaVim runs within IDE you run IdeaVim by starting IDE.
 <!--
 To start Vim, enter this command: >
 

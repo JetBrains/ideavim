@@ -122,7 +122,7 @@ The time is specified in tenths of a second.
 ==============================================================================
 *24.3*  Completion
 
-This information does not apply to IdeaVim. Use IDEA's code completion features.
+This information does not apply to IdeaVim. Use IDE's code completion features.
 <!--
 Vim can automatically complete words on insertion.  You type the first part of
 a word, press CTRL-P, and Vim guesses the rest.

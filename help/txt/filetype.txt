@@ -6,7 +6,7 @@
 
 Filetypes                                               *filetype* *file-type*
 
-This information does not apply to IdeaVim. IDEA handles this functionality.
+This information does not apply to IdeaVim. The IDE itself handles this functionality.
 <!--
 1. Filetypes                                    |filetypes|
 2. Filetype plugin                              |filetype-plugins|

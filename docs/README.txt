@@ -9,14 +9,14 @@ Automatical builds: http://teamcity.jetbrains.com/project.html?projectId=project
 
 Installation
 
-Use IDEA's plugin manager to install the latest version of the plugin.
-Start IDEA normally and Enable VIM emulation using "Tools|VIM Emulator" menu item. At this point you must use VIM keystrokes in all editors.
+Use the IDE's plugin manager to install the latest version of the plugin.
+Start the IDE normally and Enable VIM emulation using "Tools|VIM Emulator" menu item. At this point you must use VIM keystrokes in all editors.
 
 Disabling the IdeaVim Plugin
 
 If you wish to disable the plugin, select the "Tools|VIM Emulator" menu so
 it is unchecked. You must also select "Options|Keymaps" and make a keymap other
-than "vim" the active keymap. At this point IDEA will work with it's regular
+than "vim" the active keymap. At this point IDE will work with it's regular
 keyboard shortcuts.
 
 

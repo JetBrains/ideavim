@@ -19,7 +19,7 @@ Introduction to Vim                                     *ref* *reference*
 1. Introduction                                         *intro*
 
 IdeaVim is an attempt to replicate the features of Vim withing the context of
-IntelliJ IDEA. Not all the functionality of Vim applies within IDEA. And not
+the IntelliJ platform based IDEs. Not all the functionality of Vim applies within IdeaVim plugin. And not
 all appropriate features are implemented.
 
 <!--
@@ -226,7 +226,8 @@ introduce Y2K problems, but those are not really part of Vim itself.
 ==============================================================================
 3. Credits                                              *credits* *author*
 
-IdeaVim was written by Rick Maddy <rick@maddyhome.com>.
+IdeaVim was originally written by Rick Maddy <rick@maddyhome.com>
+and now is maintained at JetBrains by Oleg Shpynov <oleg.shpynov@jetbrains.com>
 
 Most of Vim was written by Bram Moolenaar.
 

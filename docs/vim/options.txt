@@ -184,7 +184,6 @@ is entered.  When an option is "reset", ":set nooption" is used.
                                  *'hlsearch'* *'hls'* *'nohlsearch'* *'nohls'*
 'hlsearch' 'hls'        boolean (default off)
                         global
-                        Not in IDEA 4.0.x
         When there is a previous search pattern, highlight all its matches.
         Note that only the matching text is highlighted, any offsets
         are not applied.

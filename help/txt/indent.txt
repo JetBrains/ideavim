@@ -8,7 +8,7 @@ This file is about indenting C programs and other files.
 
 This information does not apply to IdeaVim.
 
-Indenting is handled as expected by IDEA.
+Indenting is handled as expected by the IDE.
 <!--
 1. Indenting C programs         |C-indenting|
 2. Indenting by expression      |indent-expression|

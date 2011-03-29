@@ -5,8 +5,8 @@
                                    Folding
 
 
-This information does not apply to IdeaVim. IDEA has its own built in folding
-mechanism. Currently four Vim commands can be used to trigger IDEA's folding
+This information does not apply to IdeaVim. The IDE has its own built in folding
+mechanism. Currently four Vim commands can be used to trigger folding
 features:
 
     zc  Collapse Region

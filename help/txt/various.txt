@@ -502,7 +502,7 @@ g CTRL-A                Only when Vim was compiled with MEM_PROFILING defined
 
                         *help* *<Help>* *:h* *:help* *<F1>* *i_<F1>* *i_<Help>*
 <Help>          or
-:h[elp]                 Open the IDEA Help Topics window.
+:h[elp]                 Open the IDE Help Topics window.
 <!--
 :h[elp]                 Open a window and display the help file in read-only
                         mode.  If there is a help window open already, use

@@ -6,7 +6,7 @@
 
 Editing with multiple windows and buffers.              *windows* *buffers*
 
-This information does not apply to IdeaVim. IDEA handles all the windowing
+This information does not apply to IdeaVim. IDE itself handles all the windowing
 features.
 <!--
 The commands which have been added to use multiple windows and buffers are

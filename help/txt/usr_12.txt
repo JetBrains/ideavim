@@ -239,7 +239,7 @@ For other ways to count words, lines and other items, see |count-items|.
 
 This functionality is not currently support by IdeaVim.
 
-Though similar functionality is provided. The "K" command activates IDEA's
+Though similar functionality is provided. The "K" command activates IDE's
 Quick Documentation Lookup.
 <!--
 While editing a shell script or C program, you are using a command or function

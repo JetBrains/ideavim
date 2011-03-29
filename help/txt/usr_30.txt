@@ -6,7 +6,7 @@
 
 
 This information does not apply to IdeaVim. Most of these features are built
-into IDEA.
+into the IDE.
 <!--
 Vim has various commands that aid in writing computer programs.  Compile a
 program and directly jump to reported errors.  Automatically set the indent

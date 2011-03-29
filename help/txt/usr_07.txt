@@ -32,7 +32,7 @@ To start editing another file, use this command: >
 
         :edit foo.txt
 
-IdeaVim will locate the file within the current IDEA project and open it in
+IdeaVim will locate the file within the current project and open it in
 another editor or select the editor if already open.
 <!--
     TODO - add new info when add support for files outside project.
@@ -82,7 +82,7 @@ This command starts Vim and tells it that you will be editing three files.
 Vim displays just the first file.  After you have done your thing in this
 file, to edit the next file you use this command: >
 -->
-To select the next editor in IDEA you use this coomand: >
+To select the next editor in IDE you use this coomand: >
 
         :next
 
@@ -291,7 +291,7 @@ positions without placing marks there.
 ==============================================================================
 *07.4*  Backup files
 
-This information does not apply to IdeaVim, it is handled by IDEA.
+This information does not apply to IdeaVim, it is handled by IDE.
 <!--
 Usually Vim does not produce a backup file. If you want to have one, all you
 need to do is execute the following command: >
@@ -477,7 +477,7 @@ only voluntary though, since these commands will remove the protection: >
 ==============================================================================
 *07.7*  Changing the file name
 
-This information does not apply to IdeaVim. Use Refactor|Rename in IDEA.
+This information does not apply to IdeaVim. Use Refactor|Rename in IDE.
 <!--
 A clever way to start editing a new file is by using an existing file that
 contains most of what you need.  For example, you start writing a new program

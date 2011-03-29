@@ -751,7 +751,7 @@ either the first or second pattern in parentheses did not match, so either
 <
                                                 *:pro* *:promptfind*
 :promptf[ind] [string]
-                        Display IDEA's search dialog.
+                        Display search dialog.
 <!--
                         Put up a Search dialog.  When [string] is given, it is
                         used as the initial search string.
@@ -760,7 +760,7 @@ either the first or second pattern in parentheses did not match, so either
 
                                                 *:promptr* *:promptrepl*
 :promptr[epl] [string]
-                        Display IDEA's search and replace dialog.
+                        Display search and replace dialog.
 <!--
                         Put up a Search/Replace dialog.  When [string] is
                         given, it is used as the initial search string.

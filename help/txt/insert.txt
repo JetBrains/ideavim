@@ -541,7 +541,7 @@ entering new data while keeping all the columns aligned.
 
 This information does not apply to IdeaVim.
 
-Use IDEA's built in code completion while in Insert or Replace mode.
+Use IDE's built in code completion while in Insert or Replace mode.
 <!--
 In Insert and Replace modes, there are several commands to complete part of a
 keyword or line that has been typed.  This is useful if you are using

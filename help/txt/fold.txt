@@ -14,7 +14,7 @@ You can find an introduction on folding in chapter 28 of the user manual.
 3. Fold options         |fold-options|
 4. Behavior of folds    |fold-behavior|
 
-Most folding behavior is controlled by IDEA.
+Most folding behavior is controlled by the IDE itself.
 
 ==============================================================================
 1. Fold methods                                 *fold-methods*

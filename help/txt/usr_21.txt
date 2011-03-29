@@ -94,7 +94,7 @@ work well enough, start a new terminal to run the shell in.  For example with:
 *21.3*  Remembering information; viminfo
 
 IdeaVim has a much simpler form of viminfo. The following status information
-is stored by IdeaVim and restored each time IDEA is restarted:
+is stored by IdeaVim and restored each time the IDE is restarted:
 
         Command-line and Search pattern history
         Text in registers

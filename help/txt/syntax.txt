@@ -6,8 +6,8 @@
 
 Syntax highlighting             *syntax* *syntax-highlighting* *coloring*
 
-This information does not apply to IdeaVim. IDEA handles all the syntax
-highlighting.
+This information does not apply to IdeaVim. The IDE handles all the syntax
+highlighting itself.
 <!--
 Syntax highlighting enables Vim to show parts of the text in another font or
 color.  Those parts can be specific keywords or text matching a pattern.  Vim
