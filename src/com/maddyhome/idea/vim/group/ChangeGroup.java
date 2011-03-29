@@ -465,7 +465,7 @@ public class ChangeGroup extends AbstractActionGroup {
       KeyHandler.executeAction("VimInsertReplaceToggle", context);
     }
     // If this command doesn't allow repeats, set count to 1
-    if ((lastInsert.getFlags() & Command.FLAG_NO_REPEAT) != 0) {
+    if (lastInsert != null && (lastInsert.getFlags() & Command.FLAG_NO_REPEAT) != 0) {
       cnt = 1;
     }
 
