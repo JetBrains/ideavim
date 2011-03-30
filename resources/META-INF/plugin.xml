@@ -17,9 +17,6 @@
             <li>Full VIM regular expressions for search and search/replace</li>
             <li>Macros</li>
             <li>Diagraphs</li>
-            <li>Command line history</li>
-            <li>Search history</li>
-            <li>Jumplists</li>
             <li>VIM help</li>
         </ul>
     ]]></description>
