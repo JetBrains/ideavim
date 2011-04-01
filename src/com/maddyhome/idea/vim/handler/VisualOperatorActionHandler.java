@@ -53,7 +53,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
       range = runnable.start();
     }
 
-    boolean res = range != null ? execute(editor, context, cmd, range) : false;
+    boolean res = execute(editor, context, cmd, range);
 
     if (cmd != null && (cmd.getFlags() & Command.FLAG_DELEGATE) == 0) {
       runnable.setRes(res);
