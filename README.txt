@@ -4,8 +4,8 @@ This plugin attempts to emulate the functionality of VIM within IntelliJ platfor
 
 Resources:
 Wiki: https://github.com/olegs/ideavim/wiki/About-IdeaVim-project
-HomePage: http://plugins.intellij.net/plugin/?id=164
-Automatical builds: http://teamcity.jetbrains.com/project.html?projectId=project55
+Homepage: http://plugins.intellij.net/plugin/?id=164
+Automatic builds: http://teamcity.jetbrains.com/project.html?projectId=project55
 
 Installation
 
@@ -26,14 +26,14 @@ Undo/Redo
 
 The IdeaVim plugin uses it's own undo/redo functionality so it is important
 that you use the standard VIM keys 'u' and 'Ctrl-R' for undo/redo instead of
-the built in undo/redo. An exception might be if you wish to undo the creation
+the built in undo/redo. An exception might occur if you wish to undo the creation
 of a new class. For this you must select the Edit|Undo menu since IdeaVim
 doesn't support this feature. Using the built in undo/redo while editing a
 file will result in strange behavior and you will most likely lose changes.
 
 Escape
 
-In IDE, the Escape key is used during editing to cancel code completion
+In the IDE, the Escape key is used during editing to cancel code completion
 windows and parameter tooltips. While in VIM Insert mode, Escape is used to
 return back to Normal mode. If you are typing in Insert mode and a code
 completion window is popped up, pressing Escape will both cancel the window
@@ -105,13 +105,12 @@ VIM undo/redo
 Visual mode commands
 Some Ex commands
 Some :set options
-Full VIM regular expressions for search and search/replace
-macros
+Full VIM regexps for search and search/replace macros
 Diagraphs
 
 Not Supported (yet)
 Keymaps
-Various, lesser used (by me anyway), commands
+Various, less used (by me anyway), commands
 Jumplists
 Window commands
 Command line history
