@@ -3,7 +3,10 @@ package com.maddyhome.idea.vim;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
+import com.intellij.openapi.application.ApplicationNamesInfo;
 import com.intellij.openapi.application.PathManager;
+import com.intellij.openapi.application.ex.ApplicationEx;
+import com.intellij.openapi.application.ex.ApplicationManagerEx;
 import com.intellij.openapi.components.impl.stores.StorageUtil;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.keymap.Keymap;
@@ -11,10 +14,12 @@ import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.impl.KeymapImpl;
 import com.intellij.openapi.keymap.impl.KeymapManagerImpl;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.ui.UIUtil;
 import com.maddyhome.idea.vim.ui.VimKeymapDialog;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -98,6 +103,21 @@ public class VimKeyMapUtil {
     }
   }
 
+  private static void requestRestartOrShutdown() {
+    final ApplicationEx app = ApplicationManagerEx.getApplicationEx();
+    if (app.isRestartCapable()) {
+      if (Messages.showDialog("Restart " + ApplicationNamesInfo.getInstance().getProductName() + " to activate changes?",
+                              "Vim keymap changed", new String[]{"Shut Down", "&Postpone"}, 0, 0, Messages.getQuestionIcon()) == 0) {
+        app.restart();
+      }
+    } else {
+      if (Messages.showDialog("Shut down " + ApplicationNamesInfo.getInstance().getProductName() + " to activate changes?",
+                              "Vim keymap changed", new String[]{"Shut Down", "&Postpone"}, 0, 0, Messages.getQuestionIcon()) == 0){
+        app.exit(true);
+      }
+    }
+  }
+
   /**
    * Changes parent keymap for the Vim
    * @return true if document was changed succesfully
@@ -120,6 +140,7 @@ public class VimKeyMapUtil {
     Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", "Successfully configured vim keymap to be based on " +
                                                                     selectedKeymap.getPresentableName(),
                                               NotificationType.INFORMATION));
+
     return true;
   }
 
@@ -182,6 +203,7 @@ public class VimKeyMapUtil {
         final Keymap[] allKeymaps = manager.getAllKeymaps();
         vimKeyMap.readExternal(document.getRootElement(), allKeymaps);
         manager.addKeymap(vimKeyMap);
+        requestRestartOrShutdown();
       }
     }
     catch (FileNotFoundException e) {
