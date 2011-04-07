@@ -3,6 +3,7 @@ package com.maddyhome.idea.vim;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ApplicationNamesInfo;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.application.ex.ApplicationEx;
@@ -156,6 +157,14 @@ public class VimKeyMapUtil {
     }
     if (keymapName2Enable.equals(manager.getActiveKeymap().getName())) {
       return;
+    }
+    if (enabled) {
+      // Ask user before changing keymap to Vim.xml
+      if (Messages.showYesNoDialog("It is crucial to use predefined Vim keymap for IdeaVim plugin keymap.\nDo you want " +
+                                ApplicationManagerEx.getApplicationEx().getName() +
+                                " to enable it?", "Vim keymap", Messages.getQuestionIcon()) == Messages.NO){
+        return;
+      }
     }
     LOG.debug("Enabling keymap:" + keymapName2Enable);
     final Keymap keymap = manager.getKeymap(keymapName2Enable);

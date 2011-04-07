@@ -85,7 +85,8 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private boolean isSmoothScrolling = false;
   private String previousKeyMap = "";
 
-  private boolean enabled = true;
+  // Make VIM plugin disabled by default to fix mess with keyboard changes
+  private boolean enabled = false;
   private static Logger LOG = Logger.getInstance(VimPlugin.class.getName());
 
   private PropertyChangeListener myLookupPropertiesListener;
@@ -105,7 +106,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
             // Ensure that Vim keymap is installed and install if not
             VimKeyMapUtil.installKeyBoardBindings(instance);
             // Turn on proper keymap
-            VimKeyMapUtil.enableKeyBoardBindings(VimPlugin.isEnabled());
+            //VimKeyMapUtil.enableKeyBoardBindings(VimPlugin.isEnabled());
           }
         });
       }
