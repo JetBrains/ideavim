@@ -29,15 +29,16 @@
     <!-- Mark the plugin as compatible with RubyMine and other products based on the IntelliJ platform -->
     <depends>com.intellij.modules.lang</depends>
     <resource-bundle xmlns="">messages</resource-bundle>
-  
+
     <application-components>
         <component>
             <implementation-class>com.maddyhome.idea.vim.VimPlugin</implementation-class>
         </component>
     </application-components>
 
-    <project-components>
-    </project-components>
+    <extensions defaultExtensionNs="com.intellij">
+        <errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>
+    </extensions>
 
     <actions>
         <action id="VimPluginToggle" class="com.maddyhome.idea.vim.VimPluginToggleAction" text="VIM Emulator" description="Toggle the Vim Plugin On/Off">
