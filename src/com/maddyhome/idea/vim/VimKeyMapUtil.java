@@ -3,7 +3,6 @@ package com.maddyhome.idea.vim;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ApplicationNamesInfo;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.application.ex.ApplicationEx;
@@ -20,11 +19,11 @@ import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.ui.UIUtil;
 import com.maddyhome.idea.vim.ui.VimKeymapDialog;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.project.Project;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -104,16 +103,16 @@ public class VimKeyMapUtil {
     }
   }
 
-  private static void requestRestartOrShutdown() {
+  private static void requestRestartOrShutdown(final Project project) {
     final ApplicationEx app = ApplicationManagerEx.getApplicationEx();
     if (app.isRestartCapable()) {
-      if (Messages.showDialog("Restart " + ApplicationNamesInfo.getInstance().getProductName() + " to activate changes?",
-                              "Vim keymap changed", new String[]{"Shut Down", "&Postpone"}, 0, 0, Messages.getQuestionIcon()) == 0) {
+      if (Messages.showDialog(project, "Restart " + ApplicationNamesInfo.getInstance().getProductName() + " to activate changes?",
+                              "Vim keymap changed", new String[]{"Shut Down", "&Postpone"}, 0, Messages.getQuestionIcon()) == 0) {
         app.restart();
       }
     } else {
-      if (Messages.showDialog("Shut down " + ApplicationNamesInfo.getInstance().getProductName() + " to activate changes?",
-                              "Vim keymap changed", new String[]{"Shut Down", "&Postpone"}, 0, 0, Messages.getQuestionIcon()) == 0){
+      if (Messages.showDialog(project, "Shut down " + ApplicationNamesInfo.getInstance().getProductName() + " to activate changes?",
+                              "Vim keymap changed", new String[]{"Shut Down", "&Postpone"}, 0, Messages.getQuestionIcon()) == 0){
         app.exit(true);
       }
     }
@@ -188,7 +187,7 @@ public class VimKeyMapUtil {
   }
 
 
-  public static void reconfigureParentKeymap() {
+  public static void reconfigureParentKeymap(final Project project) {
     final VirtualFile vimKeymapFile = getVimKeymapFile();
     if (vimKeymapFile == null) {
       LOG.error("Failed to find Vim keymap");
@@ -212,7 +211,7 @@ public class VimKeyMapUtil {
         final Keymap[] allKeymaps = manager.getAllKeymaps();
         vimKeyMap.readExternal(document.getRootElement(), allKeymaps);
         manager.addKeymap(vimKeyMap);
-        requestRestartOrShutdown();
+        requestRestartOrShutdown(project);
       }
     }
     catch (FileNotFoundException e) {

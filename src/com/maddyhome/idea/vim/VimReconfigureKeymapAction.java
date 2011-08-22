@@ -3,6 +3,7 @@ package com.maddyhome.idea.vim;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAware;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
 
 /**
  * This action allows to reconfigure base parent keymap for the Vim keymap
@@ -16,6 +17,6 @@ public class VimReconfigureKeymapAction extends AnAction implements DumbAware {
 
   @Override
   public void actionPerformed(final AnActionEvent e) {
-    VimKeyMapUtil.reconfigureParentKeymap();
+      VimKeyMapUtil.reconfigureParentKeymap(e.getData(PlatformDataKeys.PROJECT));
   }
 }
