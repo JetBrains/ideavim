@@ -6,11 +6,12 @@ package com.maddyhome.idea.vim.lang.lexer;
 
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
+import static com.maddyhome.idea.vim.lang.lexer.VimScriptTokenTypes;
 
 %%
 
 %class _VimScriptLexer
-%implements FlexLexer, VimScriptTokenTypes
+%implements FlexLexer
 %final
 %public
 
