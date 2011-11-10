@@ -1,44 +1,25 @@
-<idea-plugin url="http://plugins.intellij.net/plugin/?id=164">
-    <name>IdeaVIM</name>
-    <id>IdeaVIM</id>
-    <description><![CDATA[
-        VIM Emulator. This plugin provides nearly complete vi/vim/gvim emulation while editing files in IntelliJ platform based products. It actually emulates 'gvim' more than 'vim'. IdeaVim can be used with IntellIJ IDEA, RubyMine, PyCharm, PhpStorm and WebStorm IDEs.
-        The following functionality is supported:
-        <ul>
-            <li>Motion keys</li>
-            <li>Deletion/Changing</li>
-            <li>Insert mode commands</li>
-            <li>Marks</li>
-            <li>Registers</li>
-            <li>VIM undo/redo</li>
-            <li>Visual mode commands</li>
-            <li>Some Ex commands</li>
-            <li>Some :set options</li>
-            <li>Full VIM regular expressions for search and search/replace</li>
-            <li>Macros</li>
-            <li>Diagraphs</li>
-            <li>VIM help</li>
-        </ul>
-    ]]></description>
-    <version>@VERSION@</version>
-    <vendor logo="/icons/vim16x16.png">Rick Maddy, JetBrains</vendor>
+<idea-plugin version="2">
+  <name>Plugin name here</name>
+  <description>short description of the plugin</description>
+  <version>1.0</version>
+  <vendor>YourCompany</vendor>
+  <idea-version since-build="8000"/>
 
-    <helpset file="help.jar" path="/VimHelp.hs"/>
-    <idea-version since-build="@SINCE-VERSION@"/>
-
-    <!-- Mark the plugin as compatible with RubyMine and other products based on the IntelliJ platform -->
-    <depends>com.intellij.modules.lang</depends>
-    <resource-bundle xmlns="">messages</resource-bundle>
-
-    <application-components>
+  <application-components>
         <component>
             <implementation-class>com.maddyhome.idea.vim.VimPlugin</implementation-class>
         </component>
     </application-components>
 
-    <extensions defaultExtensionNs="com.intellij">
+  <project-components>
+    <!-- Add your project components here -->
+  </project-components>
+
+  <extensions defaultExtensionNs="com.intellij">
         <errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>
-    </extensions>
+        <fileTypeFactory implementation="com.maddyhome.idea.vim.file.VimScriptFileTypeLoader"/>
+
+  </extensions>
 
     <actions>
         <action id="VimPluginToggle" class="com.maddyhome.idea.vim.VimPluginToggleAction" text="VIM Emulator" description="Toggle the Vim Plugin On/Off">

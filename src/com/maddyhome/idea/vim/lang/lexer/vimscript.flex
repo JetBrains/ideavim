@@ -6,7 +6,7 @@ package com.maddyhome.idea.vim.lang.lexer;
 
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
-import static com.maddyhome.idea.vim.lang.lexer.VimScriptTokenTypes;
+import static com.maddyhome.idea.vim.lang.lexer.VimScriptTokenTypes.*;
 
 %%
 
@@ -109,5 +109,5 @@ Identifier = {Name}
 {SpaceChar}                 { return WHITESPACE; }
 {NewLineChar}               {}
 
-<<EOF>>                     { return EOF; }
+<<EOF>>                     { return null; }
 .                           { return BAD_CHARACTER; }

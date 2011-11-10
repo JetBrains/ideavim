@@ -45,6 +45,6 @@ public class VimScriptFileType extends LanguageFileType {
 
   @Nullable
   public Icon getIcon() {
-    return IconLoader.findIcon("resources/icons/logo.png"); //TODO: am I really should do this?
+    return IconLoader.findIcon("/icons/logo.png"); //TODO: am I really should do this?
   }
 }
