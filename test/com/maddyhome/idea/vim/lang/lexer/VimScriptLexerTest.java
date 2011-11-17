@@ -92,6 +92,7 @@ public class VimScriptLexerTest {
         VimScriptTokenTypes.COMMENT,
         VimScriptTokenTypes.QUESTION_MARK,
         VimScriptTokenTypes.EXCLAMATION_MARK,
+        null
     };
 
     try {
@@ -127,6 +128,7 @@ public class VimScriptLexerTest {
         VimScriptTokenTypes.OP_ASSIGN,
         VimScriptTokenTypes.WHITESPACE,
         VimScriptTokenTypes.INTEGER,
+        null
     };
     ArrayList<IElementType> actual = new ArrayList<IElementType>();
     try {

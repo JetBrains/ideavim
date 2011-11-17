@@ -247,7 +247,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     LOG.debug("done");
   }
 
-  //@Override
+  @Override
   public void loadState(final Element element) {
     LOG.debug("Loading state");
 
