@@ -38,6 +38,8 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>
+        <fileTypeFactory implementation="com.maddyhome.idea.vim.file.VimScriptFileTypeLoader"/>
+        <lang.parserDefinition language="VimScript" implementationClass="com.maddyhome.idea.vim.lang.parser.VimScriptParserDefinition"/>
     </extensions>
 
     <actions>

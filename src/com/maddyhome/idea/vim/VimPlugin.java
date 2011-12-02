@@ -57,6 +57,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
+import com.intellij.lexer.XmlLexer;
+
 /**
  * This plugin attempts to emulate the keybinding and general functionality of Vim and gVim. See the supplied
  * documentation for a complete list of supported and unsupported Vim emulation. The code base contains some debugging
@@ -298,7 +300,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   }
 
   /**
-   * Inidicate to the user that an error has occurred. Just beep.
+   * Indicate to the user that an error has occurred. Just beep.
    */
   public static void indicateError() {
     if (!Options.getInstance().isSet("visualbell")) {
