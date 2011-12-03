@@ -13,6 +13,7 @@ import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.impl.KeymapImpl;
 import com.intellij.openapi.keymap.impl.KeymapManagerImpl;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.InvalidDataException;
@@ -23,7 +24,6 @@ import com.maddyhome.idea.vim.ui.VimKeymapDialog;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nullable;
-import com.intellij.openapi.project.Project;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -56,8 +56,14 @@ public class VimKeyMapUtil {
     }
 
     LOG.debug("No vim keyboard installed found. Installing");
-    final String keymapPath = PathManager.getPluginsPath() + File.separatorChar + "IdeaVim" + File.separatorChar + VIM_XML;
-    final File vimKeyMapFile = new File(keymapPath);
+    String keymapPath = PathManager.getPluginsPath() + File.separatorChar + "IdeaVim" + File.separatorChar + VIM_XML;
+    File vimKeyMapFile = new File(keymapPath);
+    // Look in development path
+    if (!vimKeyMapFile.exists() || !vimKeyMapFile.isFile()) {
+      final String resource = VimKeyMapUtil.class.getResource("").toString();
+      keymapPath = resource.toString().substring("file:".length(), resource.indexOf("out")) + "community/plugins/ideavim/install/" + VIM_XML;
+      vimKeyMapFile = new File(keymapPath);
+    }
     if (!vimKeyMapFile.exists() || !vimKeyMapFile.isFile()) {
       final String error = "Installation of the Vim keymap failed because Vim keymap file not found: " + keymapPath;
       LOG.error(error);
