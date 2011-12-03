@@ -19,6 +19,7 @@ import com.intellij.codeInsight.lookup.Lookup;
 import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.ide.AppLifecycleListener;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ex.ApplicationManagerEx;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -36,6 +37,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerAdapter;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
@@ -84,10 +86,11 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private RegisterActions actions;
   private boolean isBlockCursor = false;
   private boolean isSmoothScrolling = false;
-  private String previousKeyMap = "";
 
+  private String previousKeyMap = "";
   private boolean enabled = true;
-  private static Logger LOG = Logger.getInstance(VimPlugin.class.getName());
+
+  private static Logger LOG = Logger.getInstance(VimPlugin.class);
 
   private PropertyChangeListener myLookupPropertiesListener;
 
@@ -102,10 +105,23 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
       public void appFrameCreated(String[] commandLineArgs, @NotNull Ref<Boolean> willOpenProject) {
         ApplicationManager.getApplication().invokeLater(new Runnable() {
           public void run() {
-            // Ensure that Vim keymap is installed and install if not
-            VimKeyMapUtil.installKeyBoardBindings();
-            // Turn on proper keymap
-            VimKeyMapUtil.enableKeyBoardBindings(VimPlugin.isEnabled());
+            // Ensure that Vim keymap is installed and install if not.
+            // Moreover we can use installed keymap as indicator of the first time installed plugin
+            if (VimPlugin.isEnabled()) {
+              final boolean ideavimKeyMapPresent = VimKeyMapUtil.installKeyBoardBindings();
+              if (!ideavimKeyMapPresent) {
+                  // Ask user before changing keymap to Vim.xml
+                  if (Messages.showYesNoDialog("It is crucial to use Vim keymap for IdeaVim plugin correct work, " +
+                                               "however it was not installed correctly.\nDo you want " +
+                                               ApplicationManagerEx.getApplicationEx().getName() +
+                                               " to disable Vim emulation?", "Vim Plugin", Messages.getQuestionIcon()) == Messages.YES) {
+                    VimPlugin.getInstance().turnOffPlugin();
+                    return;
+                }
+              }
+            }
+            // Enable proper keymap bindings
+            VimKeyMapUtil.switchKeymapBindings(VimPlugin.isEnabled());
           }
         });
       }
@@ -282,18 +298,18 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     return getInstance().enabled;
   }
 
-  public static void setEnabled(boolean set) {
-    if (!set) {
+  public static void setEnabled(final boolean enabled) {
+    if (!enabled) {
       getInstance().turnOffPlugin();
     }
 
-    getInstance().enabled = set;
+    getInstance().enabled = enabled;
 
-    if (set) {
+    if (enabled) {
       getInstance().turnOnPlugin();
     }
 
-    VimKeyMapUtil.enableKeyBoardBindings(set);
+    VimKeyMapUtil.switchKeymapBindings(enabled);
   }
 
   /**

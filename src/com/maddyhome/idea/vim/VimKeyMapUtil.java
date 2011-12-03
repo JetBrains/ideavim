@@ -40,7 +40,7 @@ public class VimKeyMapUtil {
   private static final String IDEAVIM_NOTIFICATION_TITLE = "IdeaVim";
 
   /**
-   * @return true if keymap was not installed before and was successfully installed
+   * @return true if keymap was installed or was successfully installed
    */
   public static boolean installKeyBoardBindings() {
     LOG.debug("Check for keyboard bindings");
@@ -49,14 +49,14 @@ public class VimKeyMapUtil {
 
     final Keymap keymap = manager.getKeymap("Vim");
     if (keymap != null) {
-      return false;
+      return true;
     }
 
     final String keyMapsPath = PathManager.getConfigPath() + File.separatorChar + "keymaps";
     final LocalFileSystem localFileSystem = LocalFileSystem.getInstance();
     final VirtualFile keyMapsFolder = localFileSystem.refreshAndFindFileByPath(keyMapsPath);
     if (keyMapsFolder == null) {
-      LOG.debug("Failed to install vim keymap. Empty keymaps folder");
+      LOG.error("Failed to install vim keymap. Empty keymaps folder");
       return false;
     }
 
@@ -101,8 +101,6 @@ public class VimKeyMapUtil {
       final Keymap[] allKeymaps = manager.getAllKeymaps();
       vimKeyMap.readExternal(document.getRootElement(), allKeymaps);
       manager.addKeymap(vimKeyMap);
-      Notifications.Bus.notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
-                                                "Successfully installed vim keymap", NotificationType.INFORMATION));
       return true;
     }
     catch (Exception e) {
@@ -155,48 +153,48 @@ public class VimKeyMapUtil {
     return true;
   }
 
-  public static void enableKeyBoardBindings(final boolean enabled) {
+  /**
+   * @return true if keymap was switched successfully, false otherwise
+   */
+  public static boolean switchKeymapBindings(final boolean enableVimKeymap) {
     LOG.debug("Enabling keymap");
     final KeymapManagerImpl manager = (KeymapManagerImpl)KeymapManager.getInstance();
-    if (manager.getActiveKeymap().getName().equals("Vim") == enabled){
-      return;
+
+    // In case if Vim keymap is already in use or we don't need it, we have nothing to do
+    if (manager.getActiveKeymap().getName().equals("Vim") == enableVimKeymap){
+      return false;
     }
-    final String keymapName2Enable = enabled ? "Vim" : VimPlugin.getInstance().getPreviousKeyMap();
+
+    // Get keymap to enable
+    final String keymapName2Enable = enableVimKeymap ? "Vim" : VimPlugin.getInstance().getPreviousKeyMap();
     if (keymapName2Enable.isEmpty()) {
-      return;
+      return false;
     }
     if (keymapName2Enable.equals(manager.getActiveKeymap().getName())) {
-      return;
+      return false;
     }
-    if (enabled) {
-      // Ask user before changing keymap to Vim.xml
-      if (Messages.showYesNoDialog("It is crucial to use predefined Vim keymap for IdeaVim plugin keymap.\nDo you want " +
-                                ApplicationManagerEx.getApplicationEx().getName() +
-                                " to enable it?", "Vim keymap", Messages.getQuestionIcon()) == Messages.NO){
-        return;
-      }
-    }
+
     LOG.debug("Enabling keymap:" + keymapName2Enable);
     final Keymap keymap = manager.getKeymap(keymapName2Enable);
     if (keymap == null) {
-      Notifications.Bus
-        .notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
-                                 "Failed to enable keymap: " + keymapName2Enable, NotificationType.ERROR));
+      Notifications.Bus.notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+                                                "Failed to enable keymap: " + keymapName2Enable, NotificationType.ERROR));
       LOG.error("Failed to enable keymap: " + keymapName2Enable);
-      return;
+      return false;
     }
+
     // Save previous keymap to enable after VIM emulation is turned off
-    if (enabled) {
+    if (enableVimKeymap) {
       VimPlugin.getInstance().setPreviousKeyMap(manager.getActiveKeymap().getName());
     }
 
     manager.setActiveKeymap(keymap);
 
     final String keyMapPresentableName = keymap.getPresentableName();
-    Notifications.Bus
-      .notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
-                               keyMapPresentableName + " keymap was enabled", NotificationType.INFORMATION));
-    LOG.debug(keyMapPresentableName + " keymap was enabled");
+    Notifications.Bus.notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+                                              keyMapPresentableName + " keymap was successfully enabled", NotificationType.INFORMATION));
+    LOG.debug(keyMapPresentableName + " keymap was successfully enabled");
+    return true;
   }
 
 
