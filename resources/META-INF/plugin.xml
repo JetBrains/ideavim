@@ -2,7 +2,7 @@
     <name>IdeaVIM</name>
     <id>IdeaVIM</id>
     <description><![CDATA[
-        VIM Emulator. This plugin provides nearly complete vi/vim/gvim emulation while editing files in IntelliJ platform based products. It actually emulates 'gvim' more than 'vim'. IdeaVim can be used with IntellIJ IDEA, RubyMine, PyCharm, PhpStorm and WebStorm IDEs.
+        VIM Emulator. This plugin provides nearly complete vi/vim/gvim emulation while editing files in IntelliJ platform based products.
         The following functionality is supported:
         <ul>
             <li>Motion keys</li>
