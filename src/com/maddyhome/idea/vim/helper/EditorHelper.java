@@ -330,11 +330,24 @@ public class EditorHelper {
     return Math.max(Math.min(offset, max), min);
   }
 
-  public static int normalizeOffset(final Editor editor, final int offset, final boolean allowEnd) {
-    int lline = editor.offsetToLogicalPosition(offset).line;
-
-    return normalizeOffset(editor, lline, offset, allowEnd);
+  public static int normalizeOffset(final Editor editor, final int offset) {
+    return normalizeOffset(editor, offset, true);
   }
+
+  public static int normalizeOffset(final Editor editor, int offset, final boolean allowEnd) {
+    if (offset <= 0) {
+      return 0;
+    }
+    final int textLength = editor.getDocument().getTextLength();
+    if (offset > textLength) {
+      offset = textLength;
+    }
+    if (offset > 0 && !allowEnd && editor.getDocument().getCharsSequence().charAt(textLength - 1) == '\n'){
+      offset --;
+    }
+    return offset;
+  }
+
 
   public static int getLeadingCharacterOffset(final Editor editor, final int lline) {
     return getLeadingCharacterOffset(editor, lline, 0);
@@ -414,7 +427,7 @@ public class EditorHelper {
   public static String getText(final Editor editor, final int start, final int end) {
     if (start == end) return "";
     final CharSequence documentChars = editor.getDocument().getCharsSequence();
-    return documentChars.subSequence(normalizeOffset(editor, start, true), normalizeOffset(editor, end, true)).toString();
+    return documentChars.subSequence(normalizeOffset(editor, start), normalizeOffset(editor, end)).toString();
   }
 
   public static String getText(final Editor editor, final TextRange range) {
@@ -453,7 +466,7 @@ public class EditorHelper {
    * @return The offset of the line start
    */
   public static int getLineStartForOffset(final Editor editor, final int offset) {
-    LogicalPosition pos = editor.offsetToLogicalPosition(offset);
+    LogicalPosition pos = editor.offsetToLogicalPosition(normalizeOffset(editor, offset));
     return editor.getDocument().getLineStartOffset(pos.line);
   }
 
@@ -465,7 +478,7 @@ public class EditorHelper {
    * @return The offset of the line end
    */
   public static int getLineEndForOffset(final Editor editor, final int offset) {
-    LogicalPosition pos = editor.offsetToLogicalPosition(offset);
+    LogicalPosition pos = editor.offsetToLogicalPosition(normalizeOffset(editor, offset));
     return editor.getDocument().getLineEndOffset(pos.line);
   }
 
@@ -485,14 +498,14 @@ public class EditorHelper {
   }
 
   public static CharacterPosition offsetToCharacterPosition(final Editor editor, final int offset) {
-    int line = editor.getDocument().getLineNumber(offset);
+    int line = editor.getDocument().getLineNumber(normalizeOffset(editor, offset));
     int col = offset - editor.getDocument().getLineStartOffset(line);
 
     return new CharacterPosition(line, col);
   }
 
   public static int characterPositionToOffset(final Editor editor, final CharacterPosition pos) {
-    return editor.getDocument().getLineStartOffset(pos.line) + pos.column;
+    return editor.getDocument().getLineStartOffset(normalizeLine(editor, pos.line)) + pos.column;
   }
 
   public static CharBuffer getLineBuffer(final Editor editor, final int lline) {
