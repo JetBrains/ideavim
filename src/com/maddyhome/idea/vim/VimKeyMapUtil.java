@@ -34,19 +34,22 @@ import java.io.IOException;
  * @author oleg
  */
 public class VimKeyMapUtil {
-  private static Logger LOG = Logger.getInstance(VimKeyMapUtil.class.getName());
+  private static Logger LOG = Logger.getInstance(VimKeyMapUtil.class);
   private static final String VIM_XML = "Vim.xml";
   private static final String IDEAVIM_NOTIFICATION_ID = "ideavim";
   private static final String IDEAVIM_NOTIFICATION_TITLE = "IdeaVim";
 
-  public static void installKeyBoardBindings(final VimPlugin vimPlugin) {
+  /**
+   * @return true if keymap was not installed before and was successfully installed
+   */
+  public static boolean installKeyBoardBindings() {
     LOG.debug("Check for keyboard bindings");
 
     final KeymapManagerImpl manager = (KeymapManagerImpl)KeymapManager.getInstance();
 
     final Keymap keymap = manager.getKeymap("Vim");
     if (keymap != null) {
-      return;
+      return false;
     }
 
     final String keyMapsPath = PathManager.getConfigPath() + File.separatorChar + "keymaps";
@@ -54,7 +57,7 @@ public class VimKeyMapUtil {
     final VirtualFile keyMapsFolder = localFileSystem.refreshAndFindFileByPath(keyMapsPath);
     if (keyMapsFolder == null) {
       LOG.debug("Failed to install vim keymap. Empty keymaps folder");
-      return;
+      return false;
     }
 
     LOG.debug("No vim keyboard installed found. Installing");
@@ -70,7 +73,7 @@ public class VimKeyMapUtil {
       final String error = "Installation of the Vim keymap failed because Vim keymap file not found: " + keymapPath;
       LOG.error(error);
       Notifications.Bus.notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, error, NotificationType.ERROR));
-      return;
+      return false;
     }
     try {
       final VirtualFile vimKeyMap2Copy = localFileSystem.refreshAndFindFileByIoFile(vimKeyMapFile);
@@ -78,9 +81,9 @@ public class VimKeyMapUtil {
         final String error = "Installation of the Vim keymap failed because Vim keymap file not found: " + keymapPath;
         LOG.error(error);
         Notifications.Bus.notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, error, NotificationType.ERROR));
-        return;
+        return false;
       }
-      final VirtualFile vimKeyMapVFile = localFileSystem.copyFile(vimPlugin, vimKeyMap2Copy, keyMapsFolder, VIM_XML);
+      final VirtualFile vimKeyMapVFile = localFileSystem.copyFile(VimPlugin.getInstance(), vimKeyMap2Copy, keyMapsFolder, VIM_XML);
 
       final String path = vimKeyMapVFile.getPath();
       final Document document = StorageUtil.loadDocument(new FileInputStream(path));
@@ -88,7 +91,7 @@ public class VimKeyMapUtil {
         LOG.error("Failed to install vim keymap. Vim.xml file is corrupted");
         Notifications.Bus.notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
                                                   "Failed to install vim keymap. Vim.xml file is corrupted", NotificationType.ERROR));
-        return;
+        return false;
       }
 
       // Prompt user to select the parent for the Vim keyboard
@@ -100,15 +103,11 @@ public class VimKeyMapUtil {
       manager.addKeymap(vimKeyMap);
       Notifications.Bus.notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
                                                 "Successfully installed vim keymap", NotificationType.INFORMATION));
+      return true;
     }
-    catch (FileNotFoundException e) {
+    catch (Exception e) {
       reportError(e);
-    }
-    catch (InvalidDataException e) {
-      reportError(e);
-    }
-    catch (IOException e) {
-      reportError(e);
+      return false;
     }
   }
 

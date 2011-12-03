@@ -78,15 +78,15 @@ import java.util.ArrayList;
 public class VimPlugin implements ApplicationComponent, PersistentStateComponent<Element>
 {
 
-  private static VimPlugin instance;
+  private static final String IDEAVIM_COMPONENT_NAME = "VimPlugin";
+
   private VimTypedActionHandler vimHandler;
   private RegisterActions actions;
   private boolean isBlockCursor = false;
   private boolean isSmoothScrolling = false;
   private String previousKeyMap = "";
 
-  // Make VIM plugin disabled by default to fix mess with keyboard changes
-  private boolean enabled = false;
+  private boolean enabled = true;
   private static Logger LOG = Logger.getInstance(VimPlugin.class.getName());
 
   private PropertyChangeListener myLookupPropertiesListener;
@@ -96,7 +96,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
    */
   public VimPlugin(final MessageBus bus) {
     LOG.debug("VimPlugin ctr");
-    instance = this;
 
     bus.connect().subscribe(AppLifecycleListener.TOPIC, new AppLifecycleListener.Adapter() {
       @Override
@@ -104,9 +103,9 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         ApplicationManager.getApplication().invokeLater(new Runnable() {
           public void run() {
             // Ensure that Vim keymap is installed and install if not
-            VimKeyMapUtil.installKeyBoardBindings(instance);
+            VimKeyMapUtil.installKeyBoardBindings();
             // Turn on proper keymap
-            //VimKeyMapUtil.enableKeyBoardBindings(VimPlugin.isEnabled());
+            VimKeyMapUtil.enableKeyBoardBindings(VimPlugin.isEnabled());
           }
         });
       }
@@ -114,7 +113,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   }
 
   public static VimPlugin getInstance() {
-    return instance;
+    return (VimPlugin)ApplicationManager.getApplication().getComponent(IDEAVIM_COMPONENT_NAME);
   }
 
   /**
@@ -124,7 +123,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
    */
   @NotNull
   public String getComponentName() {
-    return "VimPlugin";
+    return IDEAVIM_COMPONENT_NAME;
   }
 
   public String getPreviousKeyMap() {
