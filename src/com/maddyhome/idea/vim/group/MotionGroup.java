@@ -201,7 +201,7 @@ public class MotionGroup extends AbstractActionGroup {
 
     visualOffset = editor.getCaretModel().getOffset();
 
-    EditorData.setLastColumn(editor, EditorHelper.getCurrentVisualColumn(editor));
+    EditorData.setLastColumn(editor, editor.getCaretModel().getVisualPosition().column);
     if (logger.isDebugEnabled()) {
       logger.debug("Mouse click: vp=" + editor.getCaretModel().getVisualPosition() +
                    "lp=" + editor.getCaretModel().getLogicalPosition() +
@@ -828,9 +828,9 @@ public class MotionGroup extends AbstractActionGroup {
       }
     }
 
-    int vcol = EditorHelper.getCurrentVisualColumn(editor);
+    int vcol = editor.getCaretModel().getVisualPosition().column;
     scrollColumnToLeftOfScreen(editor, EditorHelper.normalizeVisualColumn(editor,
-                                                                          EditorHelper.getCurrentVisualLine(editor), vcol - scol + 1,
+                                                                          editor.getCaretModel().getVisualPosition().line, vcol - scol + 1,
                                                                           false));
   }
 
@@ -853,16 +853,16 @@ public class MotionGroup extends AbstractActionGroup {
     }
 
     int vline = rawCount == 0 ?
-                EditorHelper.getCurrentVisualLine(editor) : EditorHelper.logicalLineToVisualLine(editor, count - 1);
+                editor.getCaretModel().getVisualPosition().line : EditorHelper.logicalLineToVisualLine(editor, count - 1);
     scrollLineToTopOfScreen(editor, EditorHelper.normalizeVisualLine(editor, vline - sline + 1));
-    if (vline != EditorHelper.getCurrentVisualLine(editor) || start) {
+    if (vline != editor.getCaretModel().getVisualPosition().line || start) {
       int offset;
       if (start) {
         offset = moveCaretToLineStartSkipLeading(editor, EditorHelper.visualLineToLogicalLine(editor, vline));
       }
       else {
         offset = moveCaretVertical(editor,
-                                   EditorHelper.visualLineToLogicalLine(editor, vline) - EditorHelper.getCurrentLogicalLine(editor));
+                                   EditorHelper.visualLineToLogicalLine(editor, vline) - editor.getCaretModel().getLogicalPosition().line);
       }
 
       moveCaret(editor, context, offset);
@@ -926,7 +926,7 @@ public class MotionGroup extends AbstractActionGroup {
 
   public boolean scrollColumn(Editor editor, DataContext context, int columns) {
     int vcol = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
-    vcol = EditorHelper.normalizeVisualColumn(editor, EditorHelper.getCurrentVisualLine(editor), vcol + columns,
+    vcol = EditorHelper.normalizeVisualColumn(editor, editor.getCaretModel().getVisualPosition().line, vcol + columns,
                                               false);
 
     scrollColumnToLeftOfScreen(editor, vcol);
@@ -962,7 +962,7 @@ public class MotionGroup extends AbstractActionGroup {
     }
 
     int vline = EditorHelper.getVisualLineAtTopOfScreen(editor);
-    int cline = EditorHelper.getCurrentVisualLine(editor);
+    int cline = editor.getCaretModel().getVisualPosition().line;
     int newline = cline;
     if (cline < vline + scrolloff) {
       newline = EditorHelper.normalizeVisualLine(editor, vline + scrolloff);
@@ -972,7 +972,7 @@ public class MotionGroup extends AbstractActionGroup {
     }
     if (logger.isDebugEnabled()) logger.debug("vline=" + vline + ", cline=" + cline + ", newline=" + newline);
 
-    int col = EditorHelper.getCurrentVisualColumn(editor);
+    int col = editor.getCaretModel().getVisualPosition().column;
     int ocol = col;
     if (col >= EditorHelper.getLineLength(editor) - 1) {
       col = EditorData.getLastColumn(editor);
@@ -995,7 +995,7 @@ public class MotionGroup extends AbstractActionGroup {
     newcol = EditorHelper.normalizeVisualColumn(editor, newline, newcol, CommandState.inInsertMode(editor));
 
     if (newline != cline || newcol != ocol) {
-      int offset = EditorHelper.visualPostionToOffset(editor, new VisualPosition(newline, newcol));
+      int offset = EditorHelper.visualPositionToOffset(editor, new VisualPosition(newline, newcol));
       moveCaret(editor, context, offset);
 
       EditorData.setLastColumn(editor, col);
@@ -1040,7 +1040,7 @@ public class MotionGroup extends AbstractActionGroup {
       return true;
     }
     else if (partial) {
-      int cline = EditorHelper.getCurrentVisualLine(editor);
+      int cline = editor.getCaretModel().getVisualPosition().line;
       int vline = cline + pages * height;
       vline = EditorHelper.normalizeVisualLine(editor, vline);
       if (cline == vline) {
@@ -1082,19 +1082,19 @@ public class MotionGroup extends AbstractActionGroup {
   }
 
   public int moveCaretToColumn(Editor editor, int count, boolean allowEnd) {
-    int line = EditorHelper.getCurrentLogicalLine(editor);
+    int line = editor.getCaretModel().getLogicalPosition().line;
     int pos = EditorHelper.normalizeColumn(editor, line, count, allowEnd);
 
     return editor.logicalPositionToOffset(new LogicalPosition(line, pos));
   }
 
   public int moveCaretToLineStartSkipLeading(Editor editor) {
-    int lline = EditorHelper.getCurrentLogicalLine(editor);
+    int lline = editor.getCaretModel().getLogicalPosition().line;
     return moveCaretToLineStartSkipLeading(editor, lline);
   }
 
   public int moveCaretToLineStartSkipLeadingOffset(Editor editor, int offset) {
-    int line = EditorHelper.normalizeVisualLine(editor, EditorHelper.getCurrentVisualLine(editor) + offset);
+    int line = EditorHelper.normalizeVisualLine(editor, editor.getCaretModel().getVisualPosition().line + offset);
     return moveCaretToLineStartSkipLeading(editor, EditorHelper.visualLineToLogicalLine(editor, line));
   }
 
@@ -1103,14 +1103,14 @@ public class MotionGroup extends AbstractActionGroup {
   }
 
   public int moveCaretToLineEndSkipLeadingOffset(Editor editor, int offset) {
-    int line = EditorHelper.normalizeVisualLine(editor, EditorHelper.getCurrentVisualLine(editor) + offset);
+    int line = EditorHelper.normalizeVisualLine(editor, editor.getCaretModel().getVisualPosition().line + offset);
     return moveCaretToLineEndSkipLeading(editor, EditorHelper.visualLineToLogicalLine(editor, line));
   }
 
   public int moveCaretToLineEndSkipLeading(Editor editor, int lline) {
     int start = EditorHelper.getLineStartOffset(editor, lline);
     int end = EditorHelper.getLineEndOffset(editor, lline, true);
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = start;
     for (int offset = end; offset > start; offset--) {
       if (offset >= chars.length()) {
@@ -1127,7 +1127,7 @@ public class MotionGroup extends AbstractActionGroup {
   }
 
   public int moveCaretToLineEnd(Editor editor, boolean allowPastEnd) {
-    return moveCaretToLineEnd(editor, EditorHelper.getCurrentLogicalLine(editor), allowPastEnd);
+    return moveCaretToLineEnd(editor, editor.getCaretModel().getLogicalPosition().line, allowPastEnd);
   }
 
   public int moveCaretToLineEnd(Editor editor, int lline, boolean allowPastEnd) {
@@ -1137,7 +1137,7 @@ public class MotionGroup extends AbstractActionGroup {
   }
 
   public int moveCaretToLineEndOffset(Editor editor, int cntForward, boolean allowPastEnd) {
-    int line = EditorHelper.normalizeVisualLine(editor, EditorHelper.getCurrentVisualLine(editor) + cntForward);
+    int line = EditorHelper.normalizeVisualLine(editor, editor.getCaretModel().getVisualPosition().line + cntForward);
 
     if (line < 0) {
       return 0;
@@ -1148,7 +1148,7 @@ public class MotionGroup extends AbstractActionGroup {
   }
 
   public int moveCaretToLineStart(Editor editor) {
-    int lline = EditorHelper.getCurrentLogicalLine(editor);
+    int lline = editor.getCaretModel().getLogicalPosition().line;
     return moveCaretToLineStart(editor, lline);
   }
 
@@ -1161,7 +1161,7 @@ public class MotionGroup extends AbstractActionGroup {
   }
 
   public int moveCaretToLineStartOffset(Editor editor, int offset) {
-    int line = EditorHelper.normalizeVisualLine(editor, EditorHelper.getCurrentVisualLine(editor) + offset);
+    int line = EditorHelper.normalizeVisualLine(editor, editor.getCaretModel().getVisualPosition().line + offset);
     return moveCaretToLineStart(editor, EditorHelper.visualLineToLogicalLine(editor, line));
   }
 
@@ -1172,7 +1172,7 @@ public class MotionGroup extends AbstractActionGroup {
 
   public int moveCaretToLineScreenStartSkipLeading(Editor editor) {
     int col = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
-    int lline = EditorHelper.getCurrentLogicalLine(editor);
+    int lline = editor.getCaretModel().getLogicalPosition().line;
     return EditorHelper.getLeadingCharacterOffset(editor, lline, col);
   }
 
@@ -1195,7 +1195,7 @@ public class MotionGroup extends AbstractActionGroup {
 
   public int moveCaretHorizontal(Editor editor, int count, boolean allowPastEnd) {
     int oldoffset = editor.getCaretModel().getOffset();
-    int offset = EditorHelper.normalizeOffset(editor, EditorHelper.getCurrentLogicalLine(editor), oldoffset + count,
+    int offset = EditorHelper.normalizeOffset(editor, editor.getCaretModel().getLogicalPosition().line, oldoffset + count,
                                               allowPastEnd);
     if (offset == oldoffset) {
       return -1;
@@ -1215,7 +1215,7 @@ public class MotionGroup extends AbstractActionGroup {
       int line = EditorHelper.normalizeVisualLine(editor, pos.line + count);
       VisualPosition newPos = new VisualPosition(line, EditorHelper.normalizeVisualColumn(editor, line, col, CommandState.inInsertMode(editor)));
 
-      return EditorHelper.visualPostionToOffset(editor, newPos);
+      return EditorHelper.visualPositionToOffset(editor, newPos);
     }
   }
 
@@ -1298,7 +1298,7 @@ public class MotionGroup extends AbstractActionGroup {
 
 
   public static void scrollCaretIntoView(Editor editor) {
-    int cline = EditorHelper.getCurrentVisualLine(editor);
+    int cline = editor.getCaretModel().getVisualPosition().line;
     int vline = EditorHelper.getVisualLineAtTopOfScreen(editor);
     boolean scrolljump = (CommandState.getInstance(editor).getFlags() & Command.FLAG_IGNORE_SCROLL_JUMP) == 0;
     int scrolloff = ((NumberOption)Options.getInstance().getOption("scrolloff")).value();
@@ -1347,7 +1347,7 @@ public class MotionGroup extends AbstractActionGroup {
       scrollLineToTopOfScreen(editor, line);
     }
 
-    int ccol = EditorHelper.getCurrentVisualColumn(editor);
+    int ccol = editor.getCaretModel().getVisualPosition().column;
     int vcol = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
     int width = EditorHelper.getScreenWidth(editor);
     scrolljump = (CommandState.getInstance(editor).getFlags() & Command.FLAG_IGNORE_SIDE_SCROLL_JUMP) == 0;

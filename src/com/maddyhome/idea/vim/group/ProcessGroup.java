@@ -34,7 +34,6 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.helper.EditorData;
-import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
@@ -250,7 +249,7 @@ public class ProcessGroup extends AbstractActionGroup {
 
   public boolean executeFilter(Editor editor, DataContext context, TextRange range, String command) throws IOException {
     if (logger.isDebugEnabled()) logger.debug("command=" + command);
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    CharSequence chars = editor.getDocument().getCharsSequence();
     StringReader car = new StringReader(chars.subSequence(range.getStartOffset(),
                                                           range.getEndOffset()).toString());
     StringWriter sw = new StringWriter();

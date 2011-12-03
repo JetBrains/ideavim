@@ -162,7 +162,7 @@ public class CopyGroup extends AbstractActionGroup {
         pos = Math.min(editor.getDocument().getTextLength(),
                        CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, true) + 1);
         if (pos > 0 && pos == editor.getDocument().getTextLength() &&
-            EditorHelper.getDocumentChars(editor).charAt(pos - 1) != '\n') {
+            editor.getDocument().getCharsSequence().charAt(pos - 1) != '\n') {
           editor.getDocument().insertString(pos, "\n");
           pos++;
         }

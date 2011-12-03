@@ -157,7 +157,7 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param context The data context
    */
   public void insertNewLineAbove(final Editor editor, final DataContext context) {
-    if (EditorHelper.getCurrentVisualLine(editor) == 0) {
+    if (editor.getCaretModel().getVisualPosition().line == 0) {
       MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor));
       initInsert(editor, context, CommandState.MODE_INSERT);
 
@@ -281,8 +281,8 @@ public class ChangeGroup extends AbstractActionGroup {
     vp = new VisualPosition(vp.line + dir, vp.column);
     int len = EditorHelper.getLineLength(editor, EditorHelper.visualLineToLogicalLine(editor, vp.line));
     if (vp.column < len) {
-      int offset = EditorHelper.visualPostionToOffset(editor, vp);
-      char ch = EditorHelper.getDocumentChars(editor).charAt(offset);
+      int offset = EditorHelper.visualPositionToOffset(editor, vp);
+      char ch = editor.getDocument().getCharsSequence().charAt(offset);
       processKey(editor, context, KeyStroke.getKeyStroke(ch));
       res = true;
     }
@@ -391,8 +391,8 @@ public class ChangeGroup extends AbstractActionGroup {
   private void repeatInsert(Editor editor, DataContext context, int count, boolean started) {
     int cpos;
     if (repeatLines > 0) {
-      int vline = EditorHelper.getCurrentVisualLine(editor);
-      int lline = EditorHelper.getCurrentLogicalLine(editor);
+      int vline = editor.getCaretModel().getVisualPosition().line;
+      int lline = editor.getCaretModel().getLogicalPosition().line;
       cpos = editor.logicalPositionToOffset(new LogicalPosition(vline, repeatColumn));
       for (int i = 0; i < repeatLines; i++) {
         if (repeatAppend && repeatColumn < MotionGroup.LAST_COLUMN &&
@@ -608,7 +608,7 @@ public class ChangeGroup extends AbstractActionGroup {
     if (offset != -1) {
       boolean res = deleteText(editor, context, new TextRange(editor.getCaretModel().getOffset(), offset), Command.FLAG_MOT_INCLUSIVE);
       int pos = editor.getCaretModel().getOffset();
-      int norm = EditorHelper.normalizeOffset(editor, EditorHelper.getCurrentLogicalLine(editor), pos, false);
+      int norm = EditorHelper.normalizeOffset(editor, editor.getCaretModel().getLogicalPosition().line, pos, false);
       if (norm != pos) {
         MotionGroup.moveCaret(editor, context, norm);
       }
@@ -685,7 +685,7 @@ public class ChangeGroup extends AbstractActionGroup {
    */
   public boolean deleteJoinLines(Editor editor, DataContext context, int count, boolean spaces) {
     if (count < 2) count = 2;
-    int lline = EditorHelper.getCurrentLogicalLine(editor);
+    int lline = editor.getCaretModel().getLogicalPosition().line;
     int total = EditorHelper.getLineCount(editor);
     //noinspection SimplifiableIfStatement
     if (lline + count > total) {
@@ -766,10 +766,10 @@ public class ChangeGroup extends AbstractActionGroup {
     }
 
     // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is deleted when it shouldn't be.
-    String text = EditorHelper.getDocumentChars(editor).subSequence(range.getStartOffset(),
+    String text = editor.getDocument().getCharsSequence().subSequence(range.getStartOffset(),
                                                                     range.getEndOffset()).toString();
     if (text.indexOf('\n') >= 0 &&
-        !(range.getStartOffset() == 0 || EditorHelper.getDocumentChars(editor).charAt(range.getStartOffset() - 1) == '\n')) {
+        !(range.getStartOffset() == 0 || editor.getDocument().getCharsSequence().charAt(range.getStartOffset() - 1) == '\n')) {
       String id = ActionManager.getInstance().getId(argument.getMotion().getAction());
       if (logger.isDebugEnabled()) {
         logger.debug("action id=" + id);
@@ -860,7 +860,7 @@ public class ChangeGroup extends AbstractActionGroup {
    * @return true if able to change count characters, false if not
    */
   public boolean changeCharacter(Editor editor, DataContext context, int count, char ch) {
-    int col = EditorHelper.getCurrentLogicalColumn(editor);
+    int col = editor.getCaretModel().getLogicalPosition().column;
     int len = EditorHelper.getLineLength(editor);
     int offset = editor.getCaretModel().getOffset();
     if (len - col < count) {
@@ -931,7 +931,7 @@ public class ChangeGroup extends AbstractActionGroup {
     }
     */
 
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    CharSequence chars = editor.getDocument().getCharsSequence();
     int[] starts = range.getStartOffsets();
     int[] ends = range.getEndOffsets();
     for (int j = ends.length - 1; j >= 0; j--) {
@@ -955,7 +955,7 @@ public class ChangeGroup extends AbstractActionGroup {
    */
   public boolean changeCharacters(Editor editor, DataContext context, int count) {
     int len = EditorHelper.getLineLength(editor);
-    int col = EditorHelper.getCurrentLogicalColumn(editor);
+    int col = editor.getCaretModel().getLogicalPosition().column;
     if (col + count >= len) {
       return changeEndOfLine(editor, context, 1);
     }
@@ -1021,7 +1021,7 @@ public class ChangeGroup extends AbstractActionGroup {
     boolean skipPunc = false;
     if (id.equals("VimMotionWordRight")) {
       if (EditorHelper.getFileSize(editor) > 0 &&
-          !Character.isWhitespace(EditorHelper.getDocumentChars(editor).charAt(editor.getCaretModel().getOffset()))) {
+          !Character.isWhitespace(editor.getDocument().getCharsSequence().charAt(editor.getCaretModel().getOffset()))) {
         kludge = true;
         argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionWordEndRight"));
         argument.getMotion().setFlags(Command.FLAG_MOT_INCLUSIVE);
@@ -1029,7 +1029,7 @@ public class ChangeGroup extends AbstractActionGroup {
     }
     else if (id.equals("VimMotionBigWordRight")) {
       if (EditorHelper.getFileSize(editor) > 0 &&
-          !Character.isWhitespace(EditorHelper.getDocumentChars(editor).charAt(editor.getCaretModel().getOffset()))) {
+          !Character.isWhitespace(editor.getDocument().getCharsSequence().charAt(editor.getCaretModel().getOffset()))) {
         kludge = true;
         skipPunc = true;
         argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionBigWordEndRight"));
@@ -1038,7 +1038,7 @@ public class ChangeGroup extends AbstractActionGroup {
     }
     else if (id.equals("VimMotionCamelRight")) {
       if (EditorHelper.getFileSize(editor) > 0 &&
-          !Character.isWhitespace(EditorHelper.getDocumentChars(editor).charAt(editor.getCaretModel().getOffset()))) {
+          !Character.isWhitespace(editor.getDocument().getCharsSequence().charAt(editor.getCaretModel().getOffset()))) {
         kludge = true;
         argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionCamelEndRight"));
         argument.getMotion().setFlags(Command.FLAG_MOT_INCLUSIVE);
@@ -1049,8 +1049,8 @@ public class ChangeGroup extends AbstractActionGroup {
       int pos = editor.getCaretModel().getOffset();
       int size = EditorHelper.getFileSize(editor);
       int cnt = count * argument.getMotion().getCount();
-      int pos1 = SearchHelper.findNextWordEnd(EditorHelper.getDocumentChars(editor), pos, size, cnt, skipPunc, false, false);
-      int pos2 = SearchHelper.findNextWordEnd(EditorHelper.getDocumentChars(editor), pos1, size, -cnt, skipPunc, false, false);
+      int pos1 = SearchHelper.findNextWordEnd(editor.getDocument().getCharsSequence(), pos, size, cnt, skipPunc, false, false);
+      int pos2 = SearchHelper.findNextWordEnd(editor.getDocument().getCharsSequence(), pos1, size, -cnt, skipPunc, false, false);
       if (logger.isDebugEnabled()) {
         logger.debug("pos=" + pos);
         logger.debug("pos1=" + pos1);
@@ -1240,7 +1240,7 @@ public class ChangeGroup extends AbstractActionGroup {
       start = t;
     }
 
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    CharSequence chars = editor.getDocument().getCharsSequence();
     for (int i = start; i < end; i++) {
       if (i >= chars.length()) {
         break;
@@ -1343,7 +1343,7 @@ public class ChangeGroup extends AbstractActionGroup {
       }
       else {
         // Left shift blockwise selection
-        CharSequence chars = EditorHelper.getDocumentChars(editor);
+        CharSequence chars = editor.getDocument().getCharsSequence();
         for (int l = sline; l <= eline; l++) {
           int len = EditorHelper.getLineLength(editor, l);
           if (len > col) {
@@ -1435,15 +1435,18 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param type    The type of deletion (FLAG_MOT_LINEWISE, FLAG_MOT_CHARACTERWISE)
    * @return true if able to delete the text, false if not
    */
-  private boolean deleteText(Editor editor, DataContext context, TextRange range, int type) {
+  private boolean deleteText(final Editor editor, final DataContext context, final TextRange range, final int type) {
     // Fix for http://youtrack.jetbrains.net/issue/VIM-35
     if (!range.normalize(EditorHelper.getFileSize(editor, true))) {
       return false;
     }
 
     if (type == 0 || CommandGroups.getInstance().getRegister().storeText(editor, context, range, type, true, false)) {
+      final Document document = editor.getDocument();
+      final int[] startOffsets = range.getStartOffsets();
+      final int[] endOffsets = range.getEndOffsets();
       for (int i = range.size() - 1; i >= 0; i--) {
-        editor.getDocument().deleteString(range.getStartOffsets()[i], range.getEndOffsets()[i]);
+        document.deleteString(startOffsets[i], endOffsets[i]);
       }
 
       if (type != 0) {

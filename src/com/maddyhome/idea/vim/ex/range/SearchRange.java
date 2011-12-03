@@ -24,7 +24,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.group.CommandGroups;
-import com.maddyhome.idea.vim.helper.EditorHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,7 +97,7 @@ public class SearchRange extends AbstractRange {
    */
   protected int getRangeLine(Editor editor, DataContext context, boolean lastZero) {
     // Each subsequent pattern is searched for starting in the line after the previous search match
-    int line = EditorHelper.getCurrentLogicalLine(editor);
+    int line = editor.getCaretModel().getLogicalPosition().line;
     int pos = -1;
     for (int i = 0; i < patterns.size(); i++) {
       String pattern = patterns.get(i);

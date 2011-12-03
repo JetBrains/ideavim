@@ -46,7 +46,7 @@ public class SearchHelper {
       end = offset - 1;
     }
 
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    CharSequence chars = editor.getDocument().getCharsSequence();
     for (int i = start; i <= end; i++) {
       if (!Character.isWhitespace(chars.charAt(i))) {
         return true;
@@ -57,8 +57,8 @@ public class SearchHelper {
   }
 
   public static int findSection(Editor editor, char type, int dir, int count) {
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
-    int line = EditorHelper.getCurrentLogicalLine(editor) + dir;
+    CharSequence chars = editor.getDocument().getCharsSequence();
+    int line = editor.getCaretModel().getLogicalPosition().line + dir;
     int maxline = EditorHelper.getLineCount(editor);
     int res = -1;
 
@@ -81,7 +81,7 @@ public class SearchHelper {
   }
 
   public static int findUnmatchedBlock(Editor editor, char type, int count) {
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = editor.getCaretModel().getOffset();
     int loc = blockChars.indexOf(type);
     // What direction should we go now (-1 is backward, 1 is forward)
@@ -94,7 +94,7 @@ public class SearchHelper {
   }
 
   public static TextRange findBlockRange(Editor editor, char type, int count, boolean isOuter) {
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = editor.getCaretModel().getOffset();
     int start = editor.getSelectionModel().getSelectionStart();
     int end = editor.getSelectionModel().getSelectionEnd();
@@ -148,9 +148,9 @@ public class SearchHelper {
    *         were found on the remainder of the current line.
    */
   public static int findMatchingPairOnCurrentLine(Editor editor) {
-    int line = EditorHelper.getCurrentLogicalLine(editor);
+    int line = editor.getCaretModel().getLogicalPosition().line;
     int end = EditorHelper.getLineEndOffset(editor, line, true);
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = editor.getCaretModel().getOffset();
     int loc = -1;
     // Search the remainder of the current line for one of the candidate characters
@@ -241,7 +241,7 @@ public class SearchHelper {
   }
 
   public static int findNextCamelStart(Editor editor, int count) {
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = editor.getCaretModel().getOffset();
     int size = EditorHelper.getFileSize(editor);
 
@@ -285,7 +285,7 @@ public class SearchHelper {
   }
 
   public static int findNextCamelEnd(Editor editor, int count) {
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = editor.getCaretModel().getOffset();
     int size = EditorHelper.getFileSize(editor);
 
@@ -341,7 +341,7 @@ public class SearchHelper {
    * This counts all the words in the file.
    */
   public static CountPosition countWords(Editor editor, int start, int end) {
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    CharSequence chars = editor.getDocument().getCharsSequence();
     int offset = editor.getCaretModel().getOffset();
 
     return countWords(chars, start, end, offset);
@@ -391,7 +391,7 @@ public class SearchHelper {
    * @return The offset of the match
    */
   public static int findNextWord(Editor editor, int count, boolean skipPunc) {
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = editor.getCaretModel().getOffset();
     int size = EditorHelper.getFileSize(editor);
 
@@ -475,7 +475,7 @@ public class SearchHelper {
   }
 
   public static TextRange findNumberUnderCursor(final Editor editor, final boolean alpha, final boolean hex, final boolean octal) {
-    int lline = EditorHelper.getCurrentLogicalLine(editor);
+    int lline = editor.getCaretModel().getLogicalPosition().line;
     String text = EditorHelper.getLineText(editor, lline).toLowerCase();
     int offset = EditorHelper.getLineStartOffset(editor, lline);
     int pos = editor.getCaretModel().getOffset() - offset;
@@ -607,8 +607,8 @@ public class SearchHelper {
    * @return The text range of the found word or null if there is no word under/after the cursor on the line
    */
   public static TextRange findWordUnderCursor(Editor editor) {
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
-    int stop = EditorHelper.getLineEndOffset(editor, EditorHelper.getCurrentLogicalLine(editor), true);
+    CharSequence chars = editor.getDocument().getCharsSequence();
+    int stop = EditorHelper.getLineEndOffset(editor, editor.getCaretModel().getLogicalPosition().line, true);
 
     int pos = editor.getCaretModel().getOffset();
     int start = pos;
@@ -659,7 +659,7 @@ public class SearchHelper {
       logger.debug("hasSelection=" + hasSelection);
     }
 
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    CharSequence chars = editor.getDocument().getCharsSequence();
     //int min = EditorHelper.getLineStartOffset(editor, EditorHelper.getCurrentLogicalLine(editor));
     //int max = EditorHelper.getLineEndOffset(editor, EditorHelper.getCurrentLogicalLine(editor), true);
     int min = 0;
@@ -790,7 +790,7 @@ public class SearchHelper {
    * @return The offset of match
    */
   public static int findNextWordEnd(Editor editor, int count, boolean skipPunc, boolean stayEnd) {
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = editor.getCaretModel().getOffset();
     int size = EditorHelper.getFileSize(editor);
 
@@ -912,10 +912,10 @@ public class SearchHelper {
    * @return The document offset of the matching character match, -1
    */
   public static int findNextCharacterOnLine(Editor editor, int count, char ch) {
-    int line = EditorHelper.getCurrentLogicalLine(editor);
+    int line = editor.getCaretModel().getLogicalPosition().line;
     int start = EditorHelper.getLineStartOffset(editor, line);
     int end = EditorHelper.getLineEndOffset(editor, line, true);
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    CharSequence chars = editor.getDocument().getCharsSequence();
     int found = 0;
     int step = count >= 0 ? 1 : -1;
     int pos = editor.getCaretModel().getOffset() + step;
@@ -941,7 +941,7 @@ public class SearchHelper {
     int dir = count > 0 ? 1 : -1;
     count = Math.abs(count);
     int total = count;
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    CharSequence chars = editor.getDocument().getCharsSequence();
     int start = editor.getCaretModel().getOffset();
     int max = EditorHelper.getFileSize(editor);
 
@@ -971,7 +971,7 @@ public class SearchHelper {
     int dir = count > 0 ? 1 : -1;
     count = Math.abs(count);
     int total = count;
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    CharSequence chars = editor.getDocument().getCharsSequence();
     int start = editor.getCaretModel().getOffset();
     int max = EditorHelper.getFileSize(editor);
 
@@ -1359,7 +1359,7 @@ public class SearchHelper {
   }
 
   public static TextRange findSentenceRange(Editor editor, int count, boolean isOuter) {
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    CharSequence chars = editor.getDocument().getCharsSequence();
     int max = EditorHelper.getFileSize(editor);
     int offset = editor.getCaretModel().getOffset();
     int ssel = editor.getSelectionModel().getSelectionStart();
@@ -1423,7 +1423,7 @@ public class SearchHelper {
   }
 
   private static int findNextParagraphLine(Editor editor, int count, boolean allowBlanks) {
-    int line = EditorHelper.getCurrentLogicalLine(editor);
+    int line = editor.getCaretModel().getLogicalPosition().line;
     int maxline = EditorHelper.getLineCount(editor);
     int dir = count > 0 ? 1 : -1;
     boolean skipLines = count > 1;
@@ -1477,7 +1477,7 @@ public class SearchHelper {
   }
 
   public static TextRange findParagraphRange(Editor editor, int count, boolean isOuter) {
-    int line = EditorHelper.getCurrentLogicalLine(editor);
+    int line = editor.getCaretModel().getLogicalPosition().line;
     int maxline = EditorHelper.getLineCount(editor);
     if (logger.isDebugEnabled()) logger.debug("starting on line " + line);
     int sline;

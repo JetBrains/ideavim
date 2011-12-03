@@ -23,7 +23,6 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.*;
-import com.maddyhome.idea.vim.helper.EditorHelper;
 
 /**
  *
@@ -38,7 +37,7 @@ public class DumpLineHandler extends CommandHandler {
   public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
     LineRange range = cmd.getLineRange(editor, context, false);
 
-    CharSequence chars = EditorHelper.getDocumentChars(editor);
+    CharSequence chars = editor.getDocument().getCharsSequence();
     for (int l = range.getStartLine(); l <= range.getEndLine(); l++) {
       int start = editor.getDocument().getLineStartOffset(l);
       int end = editor.getDocument().getLineEndOffset(l);

@@ -317,7 +317,7 @@ public class FileGroup extends AbstractActionGroup {
         msg.append("-").append(elp.column + 1);
       }
 
-      int lline = EditorHelper.getCurrentLogicalLine(editor);
+      int lline = editor.getCaretModel().getLogicalPosition().line;
       int total = EditorHelper.getLineCount(editor);
 
       msg.append("; Line ").append(lline + 1).append(" of ").append(total);
@@ -409,7 +409,7 @@ public class FileGroup extends AbstractActionGroup {
       msg.append("[+] ");
     }
 
-    int lline = EditorHelper.getCurrentLogicalLine(editor);
+    int lline = editor.getCaretModel().getLogicalPosition().line;
     int total = EditorHelper.getLineCount(editor);
     int pct = (int)((float)lline / (float)total * 100f + 0.5);
 

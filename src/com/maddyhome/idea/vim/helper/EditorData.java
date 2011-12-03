@@ -73,7 +73,7 @@ public class EditorData {
     editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     Integer col = editor.getUserData(LAST_COLUMN);
     if (col == null) {
-      return EditorHelper.getCurrentVisualColumn(editor);
+      return editor.getCaretModel().getVisualPosition().column;
     }
     else {
       return col;
@@ -195,14 +195,9 @@ public class EditorData {
 
   public static boolean isConsoleOutput(Editor editor) {
     editor = InjectedLanguageUtil.getTopLevelEditor(editor);
-    Object res = editor.getUserData(CONSOLE_OUTPUT);
+    Object res = editor.getUserData(CONSOLE_VIEW_IN_EDITOR_VIEW);
     logger.debug("isConsoleOutput for editor " + editor + " - " + res);
-    if (res != null) {
-      return true;
-    }
-    else {
-      return false;
-    }
+    return res != null;
   }
 
   /**
@@ -230,7 +225,7 @@ public class EditorData {
   private static final Key<CommandState> COMMAND_STATE = new Key<CommandState>("commandState");
   private static final Key<Boolean> CHANGE_GROUP = new Key<Boolean>("changeGroup");
   private static final Key<Boolean> MOTION_GROUP = new Key<Boolean>("motionGroup");
-  private static Key CONSOLE_OUTPUT = Key.create("CONSOLE_VIEW_IN_EDITOR_VIEW");
+  private static Key CONSOLE_VIEW_IN_EDITOR_VIEW = Key.create("CONSOLE_VIEW_IN_EDITOR_VIEW");
 
   private static Logger logger = Logger.getInstance(EditorData.class.getName());
 
@@ -252,7 +247,7 @@ public class EditorData {
         if (f.getType().equals(Key.class)) {
           f.setAccessible(true);
           Key key = (Key)f.get(null);
-          CONSOLE_OUTPUT = key;
+          CONSOLE_VIEW_IN_EDITOR_VIEW = key;
           break;
         }
       }
