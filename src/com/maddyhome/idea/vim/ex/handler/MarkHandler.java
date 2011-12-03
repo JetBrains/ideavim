@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
@@ -50,7 +51,7 @@ public class MarkHandler extends CommandHandler {
       return CommandGroups.getInstance().getMark().setMark(editor, context, mark, offset);
     }
     else {
-      MessageHelper.EMSG(Msg.E191);
+      VimPlugin.showMessage(MessageHelper.message(Msg.E191));
       return false;
     }
   }

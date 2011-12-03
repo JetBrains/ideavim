@@ -22,6 +22,7 @@ package com.maddyhome.idea.vim.regexp;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
@@ -285,11 +286,12 @@ public class RegExp {
   //EMSG_M_RET_null("E369: invalid item in %s%%[]", reg_magic == MAGIC_ALL)
 
   private void EMSG_RET_null(String key) {
-    MessageHelper.EMSG(key);
+    VimPlugin.showMessage(MessageHelper.message(key));
   }
 
   private void EMSG_M_RET_null(String key, boolean isMagic) {
-    MessageHelper.EMSG(key, isMagic ? "" : "\\");
+    String val = isMagic ? "" : "\\";
+    VimPlugin.showMessage(MessageHelper.message(key, val));
   }
 
   private void EMSG_ONE_RET_null() {
@@ -458,7 +460,7 @@ public class RegExp {
     Flags flags = new Flags();
 
     if (expr == null) {
-      MessageHelper.EMSG(Msg.e_null);
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_null));
       return null;
     }
 
@@ -594,7 +596,7 @@ public class RegExp {
     if (paren == REG_ZPAREN) {
       /* Make a ZOPEN node. */
       if (regnzpar >= NSUBEXP) {
-        MessageHelper.EMSG(Msg.E50);
+        VimPlugin.showMessage(MessageHelper.message(Msg.E50));
         return null;
       }
       parno = regnzpar;
@@ -663,7 +665,7 @@ public class RegExp {
     /* Check for proper termination. */
     if (paren != REG_NOPAREN && getchr() != Magic.RPAREN) {
       if (paren == REG_ZPAREN) {
-        MessageHelper.EMSG(Msg.E52);
+        VimPlugin.showMessage(MessageHelper.message(Msg.E52));
         return null;
       }
       else if (paren == REG_NPAREN) {
@@ -681,7 +683,7 @@ public class RegExp {
         return null;
       }
       else {
-        MessageHelper.EMSG(Msg.e_trailing);   /* "Can't happen". */
+        VimPlugin.showMessage(MessageHelper.message(Msg.e_trailing));
         return null;
       }
       /* NOTREACHED */
@@ -963,11 +965,12 @@ public class RegExp {
     if (re_multi_type(peekchr()) != NOT_MULTI) {
       /* Can't have a multi follow a multi. */
       if (peekchr() == Magic.STAR) {
-        MessageHelper.EMSG(Msg.E61, reg_magic >= MAGIC_ON ? "" : "\\");
+        String val = reg_magic >= MAGIC_ON ? "" : "\\";
+        VimPlugin.showMessage(MessageHelper.message(Msg.E61, val));
       }
       else {
-        MessageHelper.EMSG(Msg.E62, reg_magic >= MAGIC_ON ? "" : "\\",
-                           Character.toString((char)Magic.no_Magic(peekchr())));
+        String val = reg_magic >= MAGIC_ON ? "" : "\\";
+        VimPlugin.showMessage(MessageHelper.message(Msg.E62, val, Character.toString((char)Magic.no_Magic(peekchr()))));
       }
       return null;
     }
@@ -1078,7 +1081,7 @@ public class RegExp {
       case Magic.U:
         int i = classchars.indexOf(Magic.no_Magic(c));
         if (i == -1) {
-          MessageHelper.EMSG(Msg.E63);
+          VimPlugin.showMessage(MessageHelper.message(Msg.E63));
           return null;
         }
         ret = regnode(classcodes[i] + extra);
@@ -1117,8 +1120,8 @@ public class RegExp {
       case Magic.LCURLY:
       case Magic.STAR:
         c = Magic.no_Magic(c);
-        MessageHelper.EMSG(Msg.E64, (c == '*' ? reg_magic >= MAGIC_ON : reg_magic == MAGIC_ALL) ? "" : "\\",
-                           Character.toString((char)c));
+        String val = (c == '*' ? reg_magic >= MAGIC_ON : reg_magic == MAGIC_ALL) ? "" : "\\";
+        VimPlugin.showMessage(MessageHelper.message(Msg.E64, val, Character.toString((char)c)));
         return null;
       /* NOTREACHED */
 
@@ -1141,7 +1144,7 @@ public class RegExp {
           }
         }
         else {
-          MessageHelper.EMSG(Msg.e_nopresub);
+          VimPlugin.showMessage(MessageHelper.message(Msg.e_nopresub));
           return null;
         }
         break;
@@ -1186,7 +1189,7 @@ public class RegExp {
         switch (c) {
           case '(':
             if (reg_do_extmatch != REX_SET) {
-              MessageHelper.EMSG(Msg.E66);
+              VimPlugin.showMessage(MessageHelper.message(Msg.E66));
               return null;
             }
             if (one_exactly) {
@@ -1211,7 +1214,7 @@ public class RegExp {
           case '8':
           case '9':
             if (reg_do_extmatch != REX_USE) {
-              MessageHelper.EMSG(Msg.E67);
+              VimPlugin.showMessage(MessageHelper.message(Msg.E67));
               return null;
             }
             ret = regnode(ZREF + c - '0');
@@ -1227,7 +1230,7 @@ public class RegExp {
             break;
 
           default:
-            MessageHelper.EMSG(Msg.E68);
+            VimPlugin.showMessage(MessageHelper.message(Msg.E68));
             return null;
         }
       }
@@ -1410,7 +1413,7 @@ public class RegExp {
               endc = regparse.charAt();
               regparse.inc();
               if (startc > endc) {
-                MessageHelper.EMSG(Msg.e_invrange);
+                VimPlugin.showMessage(MessageHelper.message(Msg.e_invrange));
                 return null;
               }
               while (++startc <= endc) {
@@ -1564,7 +1567,7 @@ public class RegExp {
         regc('\u0000');
         prevchr_len = 1;        /* last char was the ']' */
         if (regparse.charAt() != ']') {
-          MessageHelper.EMSG(Msg.e_toomsbra);  /* Cannot happen? */
+          VimPlugin.showMessage(MessageHelper.message(Msg.e_toomsbra));
           return null;
         }
         skipchr();          /* let's be friends with the lexer again */
@@ -1960,7 +1963,8 @@ public class RegExp {
       regparse.inc();     /* Allow either \{...} or \{...\} */
     }
     if (regparse.charAt() != '}' || (maxval == 0 && minval == 0)) {
-      MessageHelper.EMSG(Msg.synerror, reg_magic == MAGIC_ALL ? "" : "\\");
+      String val = reg_magic == MAGIC_ALL ? "" : "\\";
+      VimPlugin.showMessage(MessageHelper.message(Msg.synerror, val));
       return null;
     }
 
@@ -2095,7 +2099,7 @@ public class RegExp {
 
     /* Be paranoid... */
     if (prog == null || line == null) {
-      MessageHelper.EMSG(Msg.e_null);
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_null));
       return retval;
     }
 
@@ -2178,7 +2182,7 @@ public class RegExp {
     }
 
     if (out_of_stack) {
-      MessageHelper.EMSG(Msg.E363);
+      VimPlugin.showMessage(MessageHelper.message(Msg.E363));
     }
 
     /* Didn't find a match. */
@@ -2905,7 +2909,7 @@ public class RegExp {
               brace_count[no] = 0;
             }
             else {
-              MessageHelper.EMSG(Msg.e_internal);            /* Shouldn't happen */
+              VimPlugin.showMessage(MessageHelper.message(Msg.e_internal));
               return false;
             }
           }
@@ -3207,7 +3211,7 @@ public class RegExp {
             return true;        /* Success! */
 
           default:
-            MessageHelper.EMSG(Msg.e_re_corr);
+            VimPlugin.showMessage(MessageHelper.message(Msg.e_re_corr));
             return false;
         }
       }
@@ -3219,7 +3223,7 @@ public class RegExp {
          * We get here only if there's trouble -- normally "case END" is the
          * terminating point.
          */
-    MessageHelper.EMSG(Msg.e_re_corr);
+    VimPlugin.showMessage(MessageHelper.message(Msg.e_re_corr));
     return false;
   }
 
@@ -3504,7 +3508,7 @@ public class RegExp {
         break;
 
       default:                  /* Oh dear.  Called inappropriately. */
-        MessageHelper.EMSG(Msg.e_re_corr);
+        VimPlugin.showMessage(MessageHelper.message(Msg.e_re_corr));
         break;
     }
 
@@ -3560,7 +3564,7 @@ public class RegExp {
      */
   private boolean prog_magic_wrong() {
     if ((reg_match == null ? reg_mmatch.regprog.program : reg_match.regprog.program).charAt(0) != REGMAGIC) {
-      MessageHelper.EMSG(Msg.e_re_corr);
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_re_corr));
       return true;
     }
     return false;
@@ -3919,7 +3923,7 @@ public class RegExp {
 
     /* Be paranoid... */
     if (source == null) {
-      MessageHelper.EMSG(Msg.e_null);
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_null));
       return null;
     }
     if (prog_magic_wrong()) {
@@ -4051,7 +4055,7 @@ public class RegExp {
                 }
               }
               else if (s.isNul()) /* we hit '\u0000'. */ {
-                MessageHelper.EMSG(Msg.e_re_damg);
+                VimPlugin.showMessage(MessageHelper.message(Msg.e_re_damg));
 
                 return dst.toString();
               }

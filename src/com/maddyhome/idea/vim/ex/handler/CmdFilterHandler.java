@@ -22,6 +22,7 @@ package com.maddyhome.idea.vim.ex.handler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
@@ -56,7 +57,7 @@ public class CmdFilterHandler extends CommandHandler {
       if (command.indexOf('!') != -1) {
         String last = CommandGroups.getInstance().getProcess().getLastCommand();
         if (last == null || last.length() == 0) {
-          MessageHelper.EMSG(Msg.e_noprev);
+          VimPlugin.showMessage(MessageHelper.message(Msg.e_noprev));
           return false;
         }
 

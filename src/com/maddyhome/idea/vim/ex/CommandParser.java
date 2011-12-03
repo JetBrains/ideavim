@@ -169,7 +169,7 @@ public class CommandParser {
       for (int i = 0; i < command.length(); i++) {
         node = node.getChild(command.charAt(i));
         if (node == null) {
-          MessageHelper.EMSG(Msg.NOT_EX_CMD, command);
+          VimPlugin.showMessage(MessageHelper.message(Msg.NOT_EX_CMD, command));
           // No such command
           throw new InvalidCommandException(cmd);
         }
@@ -180,7 +180,7 @@ public class CommandParser {
     }
 
     if (handler == null) {
-      MessageHelper.EMSG(Msg.NOT_EX_CMD, command);
+      VimPlugin.showMessage(MessageHelper.message(Msg.NOT_EX_CMD, command));
       throw new InvalidCommandException(cmd);
     }
 
@@ -310,7 +310,7 @@ public class CommandParser {
               reprocess = false;
             }
             else {
-              error = MessageHelper.getMsg(Msg.e_badrange, Character.toString(ch));
+              error = MessageHelper.message(Msg.e_badrange, Character.toString(ch));
               state = STATE_ERROR;
               reprocess = false;
             }
@@ -322,7 +322,7 @@ public class CommandParser {
               reprocess = false;
             }
             else {
-              error = MessageHelper.getMsg(Msg.e_backslash);
+              error = MessageHelper.message(Msg.e_backslash);
               state = STATE_ERROR;
               reprocess = false;
             }
@@ -415,7 +415,7 @@ public class CommandParser {
           case STATE_RANGE_DONE: // We have hit the end of a range - process it
             Range[] range = AbstractRange.createRange(location.toString(), offsetTotal, move);
             if (range == null) {
-              error = MessageHelper.getMsg(Msg.e_badrange, Character.toString(ch));
+              error = MessageHelper.message(Msg.e_badrange, Character.toString(ch));
               state = STATE_ERROR;
               reprocess = false;
               break;

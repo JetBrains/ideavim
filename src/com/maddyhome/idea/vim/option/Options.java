@@ -313,7 +313,7 @@ public class Options {
     }
 
     if (editor != null && error != null) {
-      VimPlugin.showMessage(MessageHelper.getMsg(error, token));
+      VimPlugin.showMessage(MessageHelper.message(error, token));
       VimPlugin.indicateError();
     }
 

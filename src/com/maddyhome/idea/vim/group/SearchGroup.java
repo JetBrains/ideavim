@@ -117,7 +117,7 @@ public class SearchGroup extends AbstractActionGroup {
         "0123456789cegriIp|\"".indexOf(cmd.charAt()) == -1) {
       /* don't accept alphanumeric for separator */
       if (CharacterClasses.isAlpha(cmd.charAt())) {
-        MessageHelper.EMSG(Msg.E146);
+        VimPlugin.showMessage(MessageHelper.message(Msg.E146));
         return false;
       }
       /*
@@ -128,7 +128,7 @@ public class SearchGroup extends AbstractActionGroup {
       if (cmd.charAt() == '\\') {
         cmd.inc();
         if ("/?&".indexOf(cmd.charAt()) == -1) {
-          MessageHelper.EMSG(Msg.e_backslash);
+          VimPlugin.showMessage(MessageHelper.message(Msg.e_backslash));
           return false;
         }
         if (cmd.charAt() != '&') {
@@ -168,7 +168,7 @@ public class SearchGroup extends AbstractActionGroup {
     }
     else        /* use previous pattern and substitution */ {
       if (lastReplace == null)    /* there is no previous command */ {
-        MessageHelper.EMSG(Msg.e_nopresub);
+        VimPlugin.showMessage(MessageHelper.message(Msg.e_nopresub));
         return false;
       }
       pat = null;             /* search_regcomp() will use previous pattern */
@@ -230,7 +230,7 @@ public class SearchGroup extends AbstractActionGroup {
     if (CharacterClasses.isDigit(cmd.charAt())) {
       int i = CharHelper.getdigits(cmd);
       if (i <= 0 && do_error) {
-        MessageHelper.EMSG(Msg.e_zerocount);
+        VimPlugin.showMessage(MessageHelper.message(Msg.e_zerocount));
         return false;
       }
       line1 = line2;
@@ -242,7 +242,7 @@ public class SearchGroup extends AbstractActionGroup {
     */
     cmd = CharHelper.skipwhite(cmd);
     if (!cmd.isNul() && cmd.charAt() != '"')        /* if not end-of-line or comment */ {
-      MessageHelper.EMSG(Msg.e_trailing);
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_trailing));
       return false;
     }
 
@@ -278,7 +278,7 @@ public class SearchGroup extends AbstractActionGroup {
     regmatch.regprog = sp.vim_regcomp(pattern, 1);
     if (regmatch.regprog == null) {
       if (do_error) {
-        MessageHelper.EMSG(Msg.e_invcmd);
+        VimPlugin.showMessage(MessageHelper.message(Msg.e_invcmd));
       }
       return false;
     }
@@ -413,7 +413,7 @@ public class SearchGroup extends AbstractActionGroup {
                                                                                                       lastMatch).line));
     }
     else {
-      MessageHelper.EMSG(Msg.e_patnotf2, pattern);
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));
     }
 
     return res;
@@ -1042,13 +1042,13 @@ public class SearchGroup extends AbstractActionGroup {
       //if ((options & SEARCH_MSG) == SEARCH_MSG)
       if (showMessages) {
         if (wrap) {
-          MessageHelper.EMSG(Msg.e_patnotf2, lastSearch);
+          VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, lastSearch));
         }
         else if (lnum <= 0) {
-          MessageHelper.EMSG(Msg.E384, lastSearch);
+          VimPlugin.showMessage(MessageHelper.message(Msg.E384, lastSearch));
         }
         else {
-          MessageHelper.EMSG(Msg.E385, lastSearch);
+          VimPlugin.showMessage(MessageHelper.message(Msg.E385, lastSearch));
         }
       }
       return null;

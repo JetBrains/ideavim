@@ -211,18 +211,18 @@ public abstract class CommandHandler {
                                                                                                                ExException {
     // No range allowed
     if ((argFlags & RANGE_FORBIDDEN) != 0 && cmd.getRanges().size() != 0) {
-      MessageHelper.EMSG(Msg.e_norange);
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_norange));
       throw new NoRangeAllowedException();
     }
 
     if ((argFlags & RANGE_REQUIRED) != 0 && cmd.getRanges().size() == 0) {
-      MessageHelper.EMSG(Msg.e_rangereq);
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_rangereq));
       throw new MissingRangeException();
     }
 
     // Argument required
     if ((argFlags & ARGUMENT_REQUIRED) != 0 && cmd.getArgument().length() == 0) {
-      MessageHelper.EMSG(Msg.e_argreq);
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_argreq));
       throw new MissingArgumentException();
     }
 

@@ -49,7 +49,7 @@ public class MoveTextHandler extends CommandHandler {
       line -= adj;
     }
     else if (line >= lr.getStartLine()) {
-      throw new InvalidRangeException(MessageHelper.getMsg(Msg.e_backrange));
+      throw new InvalidRangeException(MessageHelper.message(Msg.e_backrange));
     }
 
     String text = EditorHelper.getText(editor, range.getStartOffset(), range.getEndOffset());

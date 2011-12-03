@@ -19,46 +19,44 @@ package com.maddyhome.idea.vim.helper;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import com.maddyhome.idea.vim.VimPlugin;
+import com.intellij.CommonBundle;
+import com.intellij.reference.SoftReference;
+import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.PropertyKey;
 
-import java.text.MessageFormat;
+import java.lang.ref.Reference;
 import java.util.ResourceBundle;
 
 /**
  *
  */
 public class MessageHelper {
-  public static void EMSG(String key) {
-    VimPlugin.showMessage(getMsg(key));
+  private static Reference<ResourceBundle> ourBundle;
+
+  @NonNls
+  private static final String BUNDLE = "messages";
+
+  private MessageHelper() {
   }
 
-  public static void EMSG(String key, String val) {
-    VimPlugin.showMessage(getMsg(key, val));
+  public static String message(@PropertyKey(resourceBundle = BUNDLE)String key, Object... params) {
+    return CommonBundle.message(getBundle(), key, params);
   }
 
-  public static void EMSG(String key, String val, String val2) {
-    VimPlugin.showMessage(getMsg(key, new Object[]{val, val2}));
+  /*
+   * This method added for jruby access
+   */
+  public static String message(@PropertyKey(resourceBundle = BUNDLE)String key) {
+    return CommonBundle.message(getBundle(), key);
   }
 
-  public static String getMsg(String key) {
-    return bundle.getString(key);
+  protected static ResourceBundle getBundle() {
+    ResourceBundle bundle = null;
+    if (ourBundle != null) bundle = ourBundle.get();
+    if (bundle == null) {
+      bundle = ResourceBundle.getBundle(BUNDLE);
+      ourBundle = new SoftReference<ResourceBundle>(bundle);
+    }
+    return bundle;
   }
-
-  public static String getMsg(String key, String val) {
-    String msg = bundle.getString(key);
-
-    msg = MessageFormat.format(msg, val);
-
-    return msg;
-  }
-
-  public static String getMsg(String key, Object[] vals) {
-    String msg = bundle.getString(key);
-
-    msg = MessageFormat.format(msg, vals);
-
-    return msg;
-  }
-
-  private static ResourceBundle bundle = ResourceBundle.getBundle("messages");
 }
