@@ -113,12 +113,12 @@ public class VimKeyMapUtil {
     final ApplicationEx app = ApplicationManagerEx.getApplicationEx();
     if (app.isRestartCapable()) {
       if (Messages.showDialog(project, "Restart " + ApplicationNamesInfo.getInstance().getProductName() + " to activate changes?",
-                              "Vim keymap changed", new String[]{"Shut Down", "&Postpone"}, 0, Messages.getQuestionIcon()) == 0) {
+                              "Vim keymap changed", new String[]{"&Restart", "&Postpone"}, 0, Messages.getQuestionIcon()) == 0) {
         app.restart();
       }
     } else {
       if (Messages.showDialog(project, "Shut down " + ApplicationNamesInfo.getInstance().getProductName() + " to activate changes?",
-                              "Vim keymap changed", new String[]{"Shut Down", "&Postpone"}, 0, Messages.getQuestionIcon()) == 0){
+                              "Vim keymap changed", new String[]{"&Shut Down", "&Postpone"}, 0, Messages.getQuestionIcon()) == 0){
         app.exit(true);
       }
     }
