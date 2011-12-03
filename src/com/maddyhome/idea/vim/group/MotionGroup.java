@@ -451,7 +451,7 @@ public class MotionGroup extends AbstractActionGroup {
     }
   }
 
-  public int moveCaretToFileMarkLine(Editor editor, DataContext context, char ch) {
+  public int moveCaretToFileMarkLine(Editor editor, char ch) {
     Mark mark = CommandGroups.getInstance().getMark().getFileMark(editor, ch);
     if (mark != null) {
       int line = mark.getLogicalLine();
@@ -521,7 +521,7 @@ public class MotionGroup extends AbstractActionGroup {
     }
   }
 
-  public int moveCaretToFileMark(Editor editor, DataContext context, char ch) {
+  public int moveCaretToFileMark(Editor editor, char ch) {
     Mark mark = CommandGroups.getInstance().getMark().getFileMark(editor, ch);
     if (mark != null) {
       LogicalPosition lp = new LogicalPosition(mark.getLogicalLine(), mark.getCol());

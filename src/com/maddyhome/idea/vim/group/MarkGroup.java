@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import org.jdom.Element;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -77,6 +78,7 @@ public class MarkGroup extends AbstractActionGroup {
    * @param ch     The desired mark
    * @return The requested mark if set, null if not set
    */
+  @Nullable
   public Mark getMark(Editor editor, char ch) {
     Mark mark = null;
     if (ch == '`') ch = '\'';
@@ -99,11 +101,13 @@ public class MarkGroup extends AbstractActionGroup {
     }
     // If this is a file mark, get the mark from this file
     else if (FILE_MARKS.indexOf(ch) >= 0) {
-      HashMap fmarks = getFileMarks(editor.getDocument());
-      mark = (Mark)fmarks.get(new Character(ch));
-      if (mark != null && mark.isClear()) {
-        fmarks.remove(new Character(ch));
-        mark = null;
+      final HashMap fmarks = getFileMarks(editor.getDocument());
+      if (fmarks != null) {
+        mark = (Mark)fmarks.get(new Character(ch));
+        if (mark != null && mark.isClear()) {
+          fmarks.remove(new Character(ch));
+          mark = null;
+        }
       }
     }
     // This is a mark from another file
@@ -142,9 +146,13 @@ public class MarkGroup extends AbstractActionGroup {
    * @param ch     The mark to get
    * @return The mark in the current file, if set, null if no such mark
    */
+  @Nullable
   public Mark getFileMark(Editor editor, char ch) {
     if (ch == '`') ch = '\'';
-    HashMap fmarks = getFileMarks(editor.getDocument());
+    final HashMap fmarks = getFileMarks(editor.getDocument());
+    if (fmarks == null) {
+      return null;
+    }
     Mark mark = (Mark)fmarks.get(new Character(ch));
     if (mark != null && mark.isClear()) {
       fmarks.remove(new Character(ch));
@@ -202,11 +210,17 @@ public class MarkGroup extends AbstractActionGroup {
     // File specific marks get added to the file
     if (FILE_MARKS.indexOf(ch) >= 0) {
       HashMap<Character, Mark> fmarks = getFileMarks(editor.getDocument());
+      if (fmarks == null) {
+        return false;
+      }
       fmarks.put(ch, mark);
     }
     // Global marks get set to both the file and the global list of marks
     else if (GLOBAL_MARKS.indexOf(ch) >= 0) {
       HashMap<Character, Mark> fmarks = getFileMarks(editor.getDocument());
+      if (fmarks == null) {
+        return false;
+      }
       fmarks.put(ch, mark);
       Mark oldMark = globalMarks.put(ch, mark);
       if (oldMark != null) {
@@ -275,7 +289,10 @@ public class MarkGroup extends AbstractActionGroup {
   public List<Mark> getMarks(Editor editor) {
     HashSet<Mark> res = new HashSet<Mark>();
 
-    res.addAll(getFileMarks(editor.getDocument()).values());
+    final FileMarks<Character, Mark> marks = getFileMarks(editor.getDocument());
+    if (marks != null) {
+      res.addAll(marks.values());
+    }
     res.addAll(globalMarks.values());
 
     ArrayList<Mark> list = new ArrayList<Mark>(res);
@@ -300,7 +317,8 @@ public class MarkGroup extends AbstractActionGroup {
    * @return The map of marks. The keys are <code>Character</code>s of the mark names, the values are
    *         <code>Mark</code>s.
    */
-  private FileMarks<Character, Mark> getFileMarks(Document doc) {
+  @Nullable
+  private FileMarks<Character, Mark> getFileMarks(final Document doc) {
     VirtualFile vf = FileDocumentManager.getInstance().getFile(doc);
     if (vf == null) {
       return null;
@@ -309,7 +327,8 @@ public class MarkGroup extends AbstractActionGroup {
     return getFileMarks(vf.getPath());
   }
 
-  private HashMap<Character, Mark> getAllFileMarks(Document doc) {
+  @Nullable
+  private HashMap<Character, Mark> getAllFileMarks(final Document doc) {
     VirtualFile vf = FileDocumentManager.getInstance().getFile(doc);
     if (vf == null) {
       return null;
