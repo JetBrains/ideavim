@@ -36,6 +36,8 @@ import java.io.IOException;
 public class VimKeyMapUtil {
   private static Logger LOG = Logger.getInstance(VimKeyMapUtil.class.getName());
   private static final String VIM_XML = "Vim.xml";
+  private static final String IDEAVIM_NOTIFICATION_ID = "ideavim";
+  private static final String IDEAVIM_NOTIFICATION_TITLE = "IdeaVim";
 
   public static void installKeyBoardBindings(final VimPlugin vimPlugin) {
     LOG.debug("Check for keyboard bindings");
@@ -56,7 +58,7 @@ public class VimKeyMapUtil {
     }
 
     LOG.debug("No vim keyboard installed found. Installing");
-    String keymapPath = PathManager.getPluginsPath() + File.separatorChar + "IdeaVim" + File.separatorChar + VIM_XML;
+    String keymapPath = PathManager.getPluginsPath() + File.separatorChar + IDEAVIM_NOTIFICATION_TITLE + File.separatorChar + VIM_XML;
     File vimKeyMapFile = new File(keymapPath);
     // Look in development path
     if (!vimKeyMapFile.exists() || !vimKeyMapFile.isFile()) {
@@ -67,7 +69,7 @@ public class VimKeyMapUtil {
     if (!vimKeyMapFile.exists() || !vimKeyMapFile.isFile()) {
       final String error = "Installation of the Vim keymap failed because Vim keymap file not found: " + keymapPath;
       LOG.error(error);
-      Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", error, NotificationType.ERROR));
+      Notifications.Bus.notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, error, NotificationType.ERROR));
       return;
     }
     try {
@@ -75,7 +77,7 @@ public class VimKeyMapUtil {
       if (vimKeyMap2Copy == null){
         final String error = "Installation of the Vim keymap failed because Vim keymap file not found: " + keymapPath;
         LOG.error(error);
-        Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", error, NotificationType.ERROR));
+        Notifications.Bus.notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, error, NotificationType.ERROR));
         return;
       }
       final VirtualFile vimKeyMapVFile = localFileSystem.copyFile(vimPlugin, vimKeyMap2Copy, keyMapsFolder, VIM_XML);
@@ -84,19 +86,20 @@ public class VimKeyMapUtil {
       final Document document = StorageUtil.loadDocument(new FileInputStream(path));
       if (document == null) {
         LOG.error("Failed to install vim keymap. Vim.xml file is corrupted");
-        Notifications.Bus.notify(new Notification("ideavim", "IdeaVim",
+        Notifications.Bus.notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
                                                   "Failed to install vim keymap. Vim.xml file is corrupted", NotificationType.ERROR));
         return;
       }
 
       // Prompt user to select the parent for the Vim keyboard
-      configureVimParentKeymap(path, document);
+      configureVimParentKeymap(path, document, false);
 
       final KeymapImpl vimKeyMap = new KeymapImpl();
       final Keymap[] allKeymaps = manager.getAllKeymaps();
       vimKeyMap.readExternal(document.getRootElement(), allKeymaps);
       manager.addKeymap(vimKeyMap);
-      Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", "Successfully installed vim keymap", NotificationType.INFORMATION));
+      Notifications.Bus.notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+                                                "Successfully installed vim keymap", NotificationType.INFORMATION));
     }
     catch (FileNotFoundException e) {
       reportError(e);
@@ -128,7 +131,7 @@ public class VimKeyMapUtil {
    * Changes parent keymap for the Vim
    * @return true if document was changed succesfully
    */
-  private static boolean configureVimParentKeymap(final String path, final Document document) throws IOException {
+  private static boolean configureVimParentKeymap(final String path, final Document document, final boolean showNotification) throws IOException {
     final Element rootElement = document.getRootElement();
     final String parentKeymap = rootElement.getAttributeValue("parent");
     final VimKeymapDialog vimKeymapDialog = new VimKeymapDialog(parentKeymap);
@@ -143,9 +146,12 @@ public class VimKeyMapUtil {
 
     // Save modified keymap to the file
     JDOMUtil.writeDocument(document, path, "\n");
-    Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", "Successfully configured vim keymap to be based on " +
-                                                                    selectedKeymap.getPresentableName(),
-                                              NotificationType.INFORMATION));
+    if (showNotification) {
+      Notifications.Bus.notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+                                                "Successfully configured vim keymap to be based on " +
+                                                                      selectedKeymap.getPresentableName(),
+                                                NotificationType.INFORMATION));
+    }
 
     return true;
   }
@@ -175,7 +181,8 @@ public class VimKeyMapUtil {
     final Keymap keymap = manager.getKeymap(keymapName2Enable);
     if (keymap == null) {
       Notifications.Bus
-        .notify(new Notification("ideavim", "IdeaVim", "Failed to enable keymap: " + keymapName2Enable, NotificationType.ERROR));
+        .notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+                                 "Failed to enable keymap: " + keymapName2Enable, NotificationType.ERROR));
       LOG.error("Failed to enable keymap: " + keymapName2Enable);
       return;
     }
@@ -188,7 +195,8 @@ public class VimKeyMapUtil {
 
     final String keyMapPresentableName = keymap.getPresentableName();
     Notifications.Bus
-      .notify(new Notification("ideavim", "IdeaVim", keyMapPresentableName + " keymap was enabled", NotificationType.INFORMATION));
+      .notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+                               keyMapPresentableName + " keymap was enabled", NotificationType.INFORMATION));
     LOG.debug(keyMapPresentableName + " keymap was enabled");
   }
 
@@ -197,7 +205,8 @@ public class VimKeyMapUtil {
     final VirtualFile vimKeymapFile = getVimKeymapFile();
     if (vimKeymapFile == null) {
       LOG.error("Failed to find Vim keymap");
-      Notifications.Bus.notify(new Notification("ideavim", "IdeaVim", "Failed to find Vim keymap", NotificationType.ERROR));
+      Notifications.Bus.notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+                                                "Failed to find Vim keymap", NotificationType.ERROR));
       return;
     }
 
@@ -206,12 +215,12 @@ public class VimKeyMapUtil {
       final Document document = StorageUtil.loadDocument(new FileInputStream(path));
       if (document == null) {
         LOG.error("Failed to install vim keymap. Vim.xml file is corrupted");
-        Notifications.Bus.notify(new Notification("ideavim", "IdeaVim",
+        Notifications.Bus.notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
                                                   "Vim.xml file is corrupted", NotificationType.ERROR));
         return;
       }
       // Prompt user to select the parent for the Vim keyboard
-      if (configureVimParentKeymap(path, document)) {
+      if (configureVimParentKeymap(path, document, true)) {
         final KeymapManagerImpl manager = (KeymapManagerImpl) KeymapManager.getInstance();
         final KeymapImpl vimKeyMap = new KeymapImpl();
         final Keymap[] allKeymaps = manager.getAllKeymaps();
@@ -234,7 +243,8 @@ public class VimKeyMapUtil {
   private static void reportError(final Exception e) {
     LOG.error("Failed to reconfigure vim keymap.\n" + e);
     Notifications.Bus
-      .notify(new Notification("ideavim", "IdeaVim", "Failed to reconfigure vim keymap.\n" + e, NotificationType.ERROR));
+      .notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+                               "Failed to reconfigure vim keymap.\n" + e, NotificationType.ERROR));
   }
 
   @Nullable
