@@ -66,7 +66,7 @@ public class VimKeyMapUtil {
     // Look in development path
     if (!vimKeyMapFile.exists() || !vimKeyMapFile.isFile()) {
       final String resource = VimKeyMapUtil.class.getResource("").toString();
-      keymapPath = resource.toString().substring("file:".length(), resource.indexOf("out")) + "community/plugins/ideavim/install/" + VIM_XML;
+      keymapPath = resource.toString().substring("file:".length(), resource.indexOf("out")) + "community/plugins/ideavim/keymap/" + VIM_XML;
       vimKeyMapFile = new File(keymapPath);
     }
     if (!vimKeyMapFile.exists() || !vimKeyMapFile.isFile()) {

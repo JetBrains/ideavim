@@ -22,7 +22,7 @@
   <property name="idea" value="${basedir}/idea"/>
   <property name="src" value="${basedir}/src"/>
   <property name="resources" value="${basedir}/resources"/>
-  <property name="install" value="${basedir}/install"/>
+  <property name="keymap" value="${basedir}/keymap"/>
   <property name="idea.home" value="${idea}/unzip"/>
 
   <property name="version" value="${version-id}.${build.number}"/>
@@ -186,7 +186,7 @@
     <mkdir dir="${build}/IdeaVim"/>
     <copy todir="${build}/IdeaVim">
       <fileset dir="${basedir}" includes="license/**"/>
-      <fileset dir="${install}" includes="**"/>
+      <fileset dir="${keymap}" includes="**"/>
     </copy>
     <copy todir="${build}/IdeaVim/lib">
       <fileset dir="${build}" includes="*.jar" excludes="help.jar"/>
