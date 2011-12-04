@@ -33,10 +33,6 @@ public class TextRange {
     return starts != null && starts.length > 1;
   }
 
-  public int getLength() {
-    return getEndOffset() - getStartOffset();
-  }
-
   public int getMaxLength() {
     int max = 0;
     for (int i = 0; i < size(); i++) {
@@ -76,23 +72,26 @@ public class TextRange {
   }
 
   public TextRange normalize() {
-    if (size() == 1 && getEndOffset() < getStartOffset()) {
-      int t = starts[0];
-      starts[0] = ends[0];
-      ends[0] = t;
-    }
-
+    normalizeIndex(0);
     return this;
   }
 
+  private void normalizeIndex(final int index) {
+    if (index< size() && ends[index] < starts[index]) {
+      int t = starts[index];
+      starts[0] = ends[index];
+      ends[index] = t;
+    }
+  }
+
   public boolean normalize(final int fileSize) {
-    if (size() == 1) {
-      normalize();
-      starts[0] = Math.max(0, Math.min(starts[0], fileSize));
-      if (starts[0] == fileSize) {
+    for (int i=0;i<size();i++) {
+      normalizeIndex(i);
+      starts[i] = Math.max(0, Math.min(starts[i], fileSize));
+      if (starts[i] == fileSize) {
         return false;
       }
-      ends[0] = Math.max(0, Math.min(ends[0], fileSize));
+      ends[i] = Math.max(0, Math.min(ends[i], fileSize));
     }
     return true;
   }
