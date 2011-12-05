@@ -222,7 +222,7 @@ public class SearchHelper {
 
   private static boolean checkInString(CharSequence chars, int pos, boolean str) {
     int offset = pos;
-    while (offset >= 0 && chars.charAt(offset) != '\n') {
+    while (offset > 0 && chars.charAt(offset) != '\n') {
       offset--;
     }
 
