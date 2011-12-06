@@ -54,6 +54,7 @@ import com.maddyhome.idea.vim.option.Options;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -190,7 +191,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         if (VimPlugin.isEnabled()) {
           // Turn on insert mode if editor doesn't have any file
           if (!EditorData.isFileEditor(editor) && !CommandState.inInsertMode(editor)) {
-            CommandGroups.getInstance().getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
+            KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke('i'), new EditorDataContext(editor));
           }
           editor.getSettings().setBlockCursor(!CommandState.inInsertMode(editor));
           editor.getSettings().setAnimatedScrolling(false);
@@ -225,7 +226,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
                 final Editor editor = lookup.getEditor();
                 // Do not toggle on insert mode if already in it.
                 if (!CommandState.inInsertMode(editor)){
-                  CommandGroups.getInstance().getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
+                  KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke('i'), new EditorDataContext(editor));
                 }
               }
             }
