@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -57,7 +58,7 @@ public class MarkGroup extends AbstractActionGroup {
         Editor editor = event.getEditor();
         setMark(editor, null, '"', editor.getCaretModel().getOffset());
       }
-    });
+    }, ApplicationManager.getApplication());
   }
 
   /**

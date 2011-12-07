@@ -87,7 +87,7 @@ public class ChangeGroup extends AbstractActionGroup {
           }
         }
       };
-    });
+    }, ApplicationManager.getApplication());
   }
 
   public void setInsertRepeat(int lines, int column, boolean append) {

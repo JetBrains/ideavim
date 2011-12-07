@@ -18,6 +18,7 @@ package com.maddyhome.idea.vim;
 import com.intellij.codeInsight.lookup.Lookup;
 import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.ide.AppLifecycleListener;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ex.ApplicationManagerEx;
 import com.intellij.openapi.command.CommandProcessor;
@@ -32,7 +33,6 @@ import com.intellij.openapi.editor.actionSystem.EditorActionManager;
 import com.intellij.openapi.editor.actionSystem.TypedAction;
 import com.intellij.openapi.editor.event.EditorFactoryAdapter;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
@@ -42,6 +42,7 @@ import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
 import com.intellij.util.messages.MessageBus;
+import com.intellij.util.messages.MessageBusConnection;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.group.*;
@@ -58,7 +59,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 
 /**
  * This plugin attempts to emulate the keybinding and general functionality of Vim and gVim. See the supplied
@@ -94,11 +94,13 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private static Logger LOG = Logger.getInstance(VimPlugin.class);
 
   private PropertyChangeListener myLookupPropertiesListener;
+  private final Application myApp;
 
   /**
    * Creates the Vim Plugin
    */
-  public VimPlugin(final MessageBus bus) {
+  public VimPlugin(final MessageBus bus, final Application app) {
+    myApp = app;
     LOG.debug("VimPlugin ctr");
 
     bus.connect().subscribe(AppLifecycleListener.TOPIC, new AppLifecycleListener.Adapter() {
@@ -203,19 +205,16 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         event.getEditor().getSettings().setAnimatedScrolling(isSmoothScrolling);
         DocumentManager.getInstance().removeListeners(event.getEditor().getDocument());
       }
-    });
+    }, myApp);
 
     // Since the Vim plugin custom actions aren't available to the call to <code>initComponent()</code>
     // we need to force the generation of the key map when the first project is opened.
     ProjectManager.getInstance().addProjectManagerListener(new ProjectManagerAdapter() {
-      public void projectOpened(Project project) {
-        listeners.add(new MotionGroup.MotionEditorChange());
-        listeners.add(new FileGroup.SelectionCheck());
-        listeners.add(new SearchGroup.EditorSelectionCheck());
-
-        for (FileEditorManagerListener listener : listeners) {
-          FileEditorManager.getInstance(project).addFileEditorManagerListener(listener);
-        }
+      public void projectOpened(final Project project) {
+        final MessageBusConnection connection = project.getMessageBus().connect();
+        connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new MotionGroup.MotionEditorChange());
+        connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileGroup.SelectionCheck());
+        connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new SearchGroup.EditorSelectionCheck());
 
         myLookupPropertiesListener = new PropertyChangeListener() {
           @Override
@@ -243,15 +242,9 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         LookupManager.getInstance(project).addPropertyChangeListener(myLookupPropertiesListener);
       }
 
-      public void projectClosed(Project project) {
-        for (FileEditorManagerListener listener : listeners) {
-          FileEditorManager.getInstance(project).removeFileEditorManagerListener(listener);
-        }
+      public void projectClosed(final Project project) {
         LookupManager.getInstance(project).removePropertyChangeListener(myLookupPropertiesListener);
-        listeners.clear();
       }
-
-      ArrayList<FileEditorManagerListener> listeners = new ArrayList<FileEditorManagerListener>();
     });
 
     CommandProcessor.getInstance().addCommandListener(DelegateCommandListener.getInstance());

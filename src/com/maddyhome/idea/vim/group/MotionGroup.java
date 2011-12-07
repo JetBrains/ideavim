@@ -94,7 +94,7 @@ public class MotionGroup extends AbstractActionGroup {
           EditorData.setMotionGroup(editor, false);
         }
       }
-    });
+    }, ApplicationManager.getApplication());
   }
 
   public void turnOn() {
