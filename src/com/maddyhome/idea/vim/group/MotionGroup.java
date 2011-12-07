@@ -1474,7 +1474,7 @@ public class MotionGroup extends AbstractActionGroup {
     }
 
     if (mode == 0) {
-      exitVisual(editor);
+      exitVisual(editor, true);
     }
     else {
       CommandState.getInstance(editor).pushState(CommandState.MODE_VISUAL, mode, KeyParser.MAPPING_VISUAL);
@@ -1527,7 +1527,7 @@ public class MotionGroup extends AbstractActionGroup {
       MotionGroup.moveCaret(editor, context, visualEnd);
     }
     else if (mode == currentMode) {
-      exitVisual(editor);
+      exitVisual(editor, true);
     }
     else {
       CommandState.getInstance(editor).setSubMode(mode);
@@ -1570,20 +1570,22 @@ public class MotionGroup extends AbstractActionGroup {
     return res;
   }
 
-  public void exitVisual(Editor editor) {
-    resetVisual(editor);
+  public void exitVisual(final Editor editor, final boolean removeSelection) {
+    resetVisual(editor, removeSelection);
     if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
       CommandState.getInstance(editor).popState();
     }
   }
 
-  public void resetVisual(Editor editor) {
+  public void resetVisual(final Editor editor, final boolean removeSelection) {
     logger.debug("resetVisual");
     EditorData.setLastVisualRange(editor, new VisualRange(visualStart,
                                                           visualEnd, CommandState.getInstance(editor).getSubMode(), visualOffset));
     if (logger.isDebugEnabled()) logger.debug("visualStart=" + visualStart + ", visualEnd=" + visualEnd);
 
-    editor.getSelectionModel().removeSelection();
+    if (removeSelection) {
+      editor.getSelectionModel().removeSelection();
+    }
 
     CommandState.getInstance(editor).setSubMode(0);
   }
@@ -1756,7 +1758,7 @@ public class MotionGroup extends AbstractActionGroup {
   }
 
   public void processEscape(Editor editor, DataContext context) {
-    exitVisual(editor);
+    exitVisual(editor, true);
   }
 
   public static class MotionEditorChange extends FileEditorManagerAdapter {
@@ -1774,7 +1776,7 @@ public class MotionGroup extends AbstractActionGroup {
         Editor editor = ((TextEditor)fe).getEditor();
         if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
           CommandGroups.getInstance().getMotion().exitVisual(
-            EditorHelper.getEditor(event.getManager(), event.getOldFile()));
+            EditorHelper.getEditor(event.getManager(), event.getOldFile()), true);
         }
       }
     }

@@ -36,7 +36,7 @@ public class FilterVisualLinesAction extends EditorAction {
   private static class Handler extends AbstractEditorActionHandler {
     protected boolean execute(Editor editor, DataContext context, Command cmd) {
       CommandGroups.getInstance().getProcess().startFilterCommand(editor, context, cmd);
-      CommandGroups.getInstance().getMotion().resetVisual(editor);
+      CommandGroups.getInstance().getMotion().resetVisual(editor, true);
 
       return true;
     }

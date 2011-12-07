@@ -144,7 +144,7 @@ public class ProcessGroup extends AbstractActionGroup {
         flags = CommandParser.getInstance().processCommand(editor, context, text, 1);
         if (logger.isDebugEnabled()) logger.debug("flags=" + flags);
         if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
-          CommandGroups.getInstance().getMotion().exitVisual(editor);
+          CommandGroups.getInstance().getMotion().exitVisual(editor, true);
         }
       }
       else {

@@ -104,7 +104,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
       // If this is a mutli key change then exit visual now
       if (cmd != null && (cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) != 0) {
         logger.debug("multikey undo - exit visual");
-        CommandGroups.getInstance().getMotion().exitVisual(editor);
+        CommandGroups.getInstance().getMotion().exitVisual(editor, true);
       }
       else if (cmd != null && (cmd.getFlags() & Command.FLAG_FORCE_LINEWISE) != 0) {
         lastMode = CommandState.getInstance(editor).getSubMode();
@@ -130,7 +130,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
                           (cmd.getFlags() & Command.FLAG_EXPECT_MORE) == 0)) {
         logger.debug("not multikey undo - exit visual");
         if (cmd == null || (cmd.getFlags() & Command.FLAG_KEEP_VISUAL) == 0) {
-          CommandGroups.getInstance().getMotion().exitVisual(editor);
+          CommandGroups.getInstance().getMotion().exitVisual(editor, true);
         }
         if (wasRepeat) {
           EditorData.setLastColumn(editor, lastColumn);

@@ -220,13 +220,21 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         myLookupPropertiesListener = new PropertyChangeListener() {
           @Override
           public void propertyChange(PropertyChangeEvent evt) {
-            if (LookupManager.PROP_ACTIVE_LOOKUP.equals(evt.getPropertyName())) {
-              final Lookup lookup = (Lookup)evt.getNewValue();
-              if (lookup != null && lookup.isFocused()) {
-                final Editor editor = lookup.getEditor();
-                // Do not toggle on insert mode if already in it.
-                if (!CommandState.inInsertMode(editor)){
-                  KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke('i'), new EditorDataContext(editor));
+            if (VimPlugin.isEnabled()) {
+              if (LookupManager.PROP_ACTIVE_LOOKUP.equals(evt.getPropertyName())) {
+                final Lookup lookup = (Lookup)evt.getNewValue();
+                if (lookup != null && lookup.isFocused()) {
+                  final Editor editor = lookup.getEditor();
+                  // Exit visual state, in case if we are in it
+                  if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
+                    CommandGroups.getInstance().getMotion().exitVisual(editor, false);
+                    CommandGroups.getInstance().getRegister().resetRegister();
+                    KeyHandler.getInstance().reset(editor);
+                  }
+                  // Do not toggle on insert mode if already in it.
+                  if (!CommandState.inInsertMode(editor)) {
+                    KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke('i'), new EditorDataContext(editor));
+                  }
                 }
               }
             }
