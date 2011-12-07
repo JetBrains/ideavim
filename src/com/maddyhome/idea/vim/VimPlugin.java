@@ -42,7 +42,6 @@ import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
 import com.intellij.util.messages.MessageBus;
-import com.intellij.util.messages.MessageBusConnection;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.group.*;
@@ -211,10 +210,9 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     // we need to force the generation of the key map when the first project is opened.
     ProjectManager.getInstance().addProjectManagerListener(new ProjectManagerAdapter() {
       public void projectOpened(final Project project) {
-        final MessageBusConnection connection = project.getMessageBus().connect();
-        connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new MotionGroup.MotionEditorChange());
-        connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileGroup.SelectionCheck());
-        connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new SearchGroup.EditorSelectionCheck());
+        project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new MotionGroup.MotionEditorChange());
+        project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileGroup.SelectionCheck());
+        project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new SearchGroup.EditorSelectionCheck());
 
         myLookupPropertiesListener = new PropertyChangeListener() {
           @Override
