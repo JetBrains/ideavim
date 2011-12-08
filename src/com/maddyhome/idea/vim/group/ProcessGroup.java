@@ -69,7 +69,7 @@ public class ProcessGroup extends AbstractActionGroup {
 
   public String endSearchCommand(final Editor editor, DataContext context) {
     ExEntryPanel panel = ExEntryPanel.getInstance();
-    panel.deactivate(false);
+    panel.deactivate();
 
     final Project project = PlatformDataKeys.PROJECT.getData(context); // API change - don't merge
     SwingUtilities.invokeLater(new Runnable() {
@@ -131,7 +131,7 @@ public class ProcessGroup extends AbstractActionGroup {
 
   public boolean processExEntry(final Editor editor, final DataContext context) {
     ExEntryPanel panel = ExEntryPanel.getInstance();
-    panel.deactivate(false);
+    panel.deactivate();
     boolean res = true;
     int flags = 0;
     try {
@@ -202,7 +202,7 @@ public class ProcessGroup extends AbstractActionGroup {
     CommandState.getInstance(editor).popState();
     KeyHandler.getInstance().reset(editor);
     ExEntryPanel panel = ExEntryPanel.getInstance();
-    panel.deactivate(false);
+    panel.deactivate();
     final Project project = PlatformDataKeys.PROJECT.getData(context); // API change - don't merge
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {

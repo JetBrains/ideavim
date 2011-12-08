@@ -141,7 +141,7 @@ public class MotionGroup extends AbstractActionGroup {
    */
   private void processMouseClick(Editor editor, MouseEvent event) {
     if (ExEntryPanel.getInstance().isActive()) {
-      ExEntryPanel.getInstance().deactivate(false);
+      ExEntryPanel.getInstance().deactivate();
     }
 
     if (MorePanel.getInstance().isActive()) {
@@ -217,7 +217,7 @@ public class MotionGroup extends AbstractActionGroup {
    */
   private void processLineSelection(Editor editor, boolean update) {
     if (ExEntryPanel.getInstance().isActive()) {
-      ExEntryPanel.getInstance().deactivate(false);
+      ExEntryPanel.getInstance().deactivate();
     }
 
     if (MorePanel.getInstance().isActive()) {
@@ -254,7 +254,7 @@ public class MotionGroup extends AbstractActionGroup {
 
   private void processMouseReleased(Editor editor, int mode, int startOff, int endOff) {
     if (ExEntryPanel.getInstance().isActive()) {
-      ExEntryPanel.getInstance().deactivate(false);
+      ExEntryPanel.getInstance().deactivate();
     }
 
     if (MorePanel.getInstance().isActive()) {
@@ -1764,7 +1764,7 @@ public class MotionGroup extends AbstractActionGroup {
   public static class MotionEditorChange extends FileEditorManagerAdapter {
     public void selectionChanged(FileEditorManagerEvent event) {
       if (ExEntryPanel.getInstance().isActive()) {
-        ExEntryPanel.getInstance().deactivate(false);
+        ExEntryPanel.getInstance().deactivate();
       }
 
       if (MorePanel.getInstance().isActive()) {

@@ -88,7 +88,6 @@ public class ExEntryPanel extends JPanel {
    * @param count    A holder for the ex entry count
    */
   public void activate(Editor editor, DataContext context, String label, String initText, int count) {
-    //last = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
     entry.setEditor(editor, context);
     this.label.setText(label);
     this.count = count;
@@ -173,9 +172,8 @@ public class ExEntryPanel extends JPanel {
   /**
    * Turns off the ex entry field and puts the focus back to the original component
    *
-   * @param changeFocus true if focus should be put back, false if not
    */
-  public void deactivate(boolean changeFocus) {
+  public void deactivate() {
     logger.info("deactivate");
     if (!active) return;
     active = false;
@@ -184,19 +182,6 @@ public class ExEntryPanel extends JPanel {
     oldGlass.remove(this);
     oldGlass.setOpaque(wasOpaque);
     oldGlass.setLayout(oldLayout);
-    /*
-    if (changeFocus)
-    {
-        logger.debug("parent.requestFocus()");
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run()
-            {
-                //parent.requestFocus();
-                last.requestFocus();
-            }
-        });
-    }
-    */
     parent = null;
   }
 
@@ -217,7 +202,6 @@ public class ExEntryPanel extends JPanel {
   private boolean wasOpaque;
   private ComponentAdapter adapter;
   private int count;
-  //private Component last;
 
   private boolean active;
 
