@@ -831,7 +831,7 @@ public class SearchHelper {
       if (CharacterHelper.charType(chars.charAt(pos + 1), skipPunc) == CharacterHelper.TYPE_SPACE && !spaceWords) {
         pos = skipSpace(chars, pos + 1, step, size) - 1;
       }
-      if (CharacterHelper.charType(chars.charAt(pos), skipPunc) != CharacterHelper.charType(chars.charAt(pos + 1), skipPunc)) {
+      if (pos < size - 1 && CharacterHelper.charType(chars.charAt(pos), skipPunc) != CharacterHelper.charType(chars.charAt(pos + 1), skipPunc)) {
         pos += step;
       }
     }
