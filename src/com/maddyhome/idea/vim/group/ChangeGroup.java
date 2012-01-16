@@ -1175,7 +1175,7 @@ public class ChangeGroup extends AbstractActionGroup {
     else {
       changeCase(editor, context, editor.getCaretModel().getOffset(), offset, CharacterHelper.CASE_TOGGLE);
 
-      offset = EditorHelper.normalizeOffset(editor, offset, false);
+      offset = EditorHelper.normalizeOffset(editor, offset + 1, false);
       MotionGroup.moveCaret(editor, context, offset);
 
       return true;
