@@ -1479,7 +1479,7 @@ public class ChangeGroup extends AbstractActionGroup {
     CommandGroups.getInstance().getMark().setMark(editor, context, '.', start + str.length());
   }
 
-  private static void resetCursor(Editor editor, boolean insert) {
+  public static void resetCursor(Editor editor, boolean insert) {
     Document doc = editor.getDocument();
     VirtualFile vf = FileDocumentManager.getInstance().getFile(doc);
     if (vf != null) {

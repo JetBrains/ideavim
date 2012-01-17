@@ -19,10 +19,13 @@ package com.maddyhome.idea.vim;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.codeInsight.lookup.LookupEx;
+import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
@@ -59,9 +62,15 @@ public class VimTypedActionHandler implements TypedActionHandler {
    * @param charTyped The character that was typed
    * @param context   The data context
    */
-  public void execute(Editor editor, char charTyped, DataContext context) {
+  public void execute(@NotNull final Editor editor, final char charTyped, @NotNull final DataContext context) {
     // If the plugin is disabled we simply resend the character to the original handler
     if (!VimPlugin.isEnabled()) {
+      origHandler.execute(editor, charTyped, context);
+      return;
+    }
+    // In case if keystrokes go to lookup, we use original handler
+    final LookupEx lookup = LookupManager.getActiveLookup(editor);
+    if (lookup != null && lookup.isFocused()) {
       origHandler.execute(editor, charTyped, context);
       return;
     }

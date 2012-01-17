@@ -15,8 +15,6 @@
  */
 package com.maddyhome.idea.vim;
 
-import com.intellij.codeInsight.lookup.Lookup;
-import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.ide.AppLifecycleListener;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
@@ -59,8 +57,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 /**
  * This plugin attempts to emulate the keybinding and general functionality of Vim and gVim. See the supplied
@@ -97,7 +93,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   private static Logger LOG = Logger.getInstance(VimPlugin.class);
 
-  private PropertyChangeListener myLookupPropertiesListener;
   private final Application myApp;
 
   /**
@@ -230,36 +225,9 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new MotionGroup.MotionEditorChange());
         project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileGroup.SelectionCheck());
         project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new SearchGroup.EditorSelectionCheck());
-
-        myLookupPropertiesListener = new PropertyChangeListener() {
-          @Override
-          public void propertyChange(PropertyChangeEvent evt) {
-            if (VimPlugin.isEnabled()) {
-              if (LookupManager.PROP_ACTIVE_LOOKUP.equals(evt.getPropertyName())) {
-                final Lookup lookup = (Lookup)evt.getNewValue();
-                if (lookup != null && lookup.isFocused()) {
-                  final Editor editor = lookup.getEditor();
-                  // Exit visual state, in case if we are in it
-                  if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
-                    CommandGroups.getInstance().getMotion().exitVisual(editor, false);
-                    CommandGroups.getInstance().getRegister().resetRegister();
-                    KeyHandler.getInstance().reset(editor);
-                  }
-                  // Do not toggle on insert mode if already in it.
-                  if (!CommandState.inInsertMode(editor)) {
-                    KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke('i'), new EditorDataContext(editor));
-                  }
-                }
-              }
-            }
-          }
-        };
-        LookupManager.getInstance(project).addPropertyChangeListener(myLookupPropertiesListener);
       }
 
-      public void projectClosed(final Project project) {
-        LookupManager.getInstance(project).removePropertyChangeListener(myLookupPropertiesListener);
-      }
+      public void projectClosed(final Project project) {}
     });
 
     CommandProcessor.getInstance().addCommandListener(DelegateCommandListener.getInstance());
