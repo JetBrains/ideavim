@@ -83,17 +83,25 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   public static final String IDEAVIM_NOTIFICATION_ID = "ideavim";
   public static final String IDEAVIM_NOTIFICATION_TITLE = "IdeaVim";
 
+  private static final boolean BLOCK_CURSOR_VIM_VALUE = true;
+  private static final boolean ANIMATED_SCROLLING_VIM_VALUE = false;
+  private static final boolean REFRAIN_FROM_SCROLLING_VIM_VALUE = true;
+
   private VimTypedActionHandler vimHandler;
   private RegisterActions actions;
   private boolean isBlockCursor = false;
-  private boolean isSmoothScrolling = false;
+  private boolean isAnimatedScrolling = false;
+  private boolean isRefrainFromScrolling = false;
 
   private String previousKeyMap = "";
+
+  // It is enabled by default to avoid any special configuration after plugin installation
   private boolean enabled = true;
 
   private static Logger LOG = Logger.getInstance(VimPlugin.class);
 
   private final Application myApp;
+
 
   /**
    * Creates the Vim Plugin
@@ -197,7 +205,8 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
       public void editorCreated(EditorFactoryEvent event) {
         final Editor editor = event.getEditor();
         isBlockCursor = editor.getSettings().isBlockCursor();
-        isSmoothScrolling = editor.getSettings().isAnimatedScrolling();
+        isAnimatedScrolling = editor.getSettings().isAnimatedScrolling();
+        isRefrainFromScrolling = editor.getSettings().isRefrainFromScrolling();
         EditorData.initializeEditor(editor);
         DocumentManager.getInstance().addListeners(editor.getDocument());
 
@@ -207,13 +216,15 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
             KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke('i'), new EditorDataContext(editor));
           }
           editor.getSettings().setBlockCursor(!CommandState.inInsertMode(editor));
-          editor.getSettings().setAnimatedScrolling(false);
+          editor.getSettings().setAnimatedScrolling(ANIMATED_SCROLLING_VIM_VALUE);
+          editor.getSettings().setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
         }
       }
 
       public void editorReleased(EditorFactoryEvent event) {
         EditorData.uninitializeEditor(event.getEditor());
-        event.getEditor().getSettings().setAnimatedScrolling(isSmoothScrolling);
+        event.getEditor().getSettings().setAnimatedScrolling(isAnimatedScrolling);
+        event.getEditor().getSettings().setRefrainFromScrolling(isRefrainFromScrolling);
         DocumentManager.getInstance().removeListeners(event.getEditor().getDocument());
       }
     }, myApp);
@@ -326,8 +337,9 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   public void turnOnPlugin() {
     KeyHandler.getInstance().fullReset(null);
-    setCursors(true);
-    setSmoothScrolling(false);
+    setCursors(BLOCK_CURSOR_VIM_VALUE);
+    setAnimatedScrolling(ANIMATED_SCROLLING_VIM_VALUE);
+    setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
 
     CommandGroups.getInstance().getMotion().turnOn();
   }
@@ -335,7 +347,8 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   public void turnOffPlugin() {
     KeyHandler.getInstance().fullReset(null);
     setCursors(isBlockCursor);
-    setSmoothScrolling(isSmoothScrolling);
+    setAnimatedScrolling(isAnimatedScrolling);
+    setRefrainFromScrolling(isRefrainFromScrolling);
 
     CommandGroups.getInstance().getMotion().turnOff();
   }
@@ -347,13 +360,19 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     }
   }
 
-  private void setSmoothScrolling(boolean isOn) {
+  private void setAnimatedScrolling(boolean isOn) {
     Editor[] editors = EditorFactory.getInstance().getAllEditors();
     for (Editor editor : editors) {
       editor.getSettings().setAnimatedScrolling(isOn);
     }
   }
 
+  private void setRefrainFromScrolling(boolean isOn) {
+    Editor[] editors = EditorFactory.getInstance().getAllEditors();
+    for (Editor editor : editors) {
+      editor.getSettings().setRefrainFromScrolling(isOn);
+    }
+  }
 
   private RegisterActions getActions() {
     if (actions == null) {
