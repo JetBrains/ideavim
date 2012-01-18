@@ -171,7 +171,7 @@ public class CopyGroup extends AbstractActionGroup {
         pos = editor.getCaretModel().getOffset() + 1;
       }
       // In case when text is empty this can occur
-      if (pos >= editor.getDocument().getTextLength()) {
+      if (pos > 0 && pos >= editor.getDocument().getTextLength()) {
         pos--;
       }
       putText(editor, context, pos, reg.getText(), reg.getType(), count, indent, cursorAfter, 0);
