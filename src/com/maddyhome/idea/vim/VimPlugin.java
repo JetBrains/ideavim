@@ -15,7 +15,6 @@
  */
 package com.maddyhome.idea.vim;
 
-import com.intellij.ide.AppLifecycleListener;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
@@ -39,10 +38,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerAdapter;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
-import com.intellij.util.messages.MessageBus;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.group.*;
@@ -106,48 +103,9 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   /**
    * Creates the Vim Plugin
    */
-  public VimPlugin(final MessageBus bus, final Application app) {
+  public VimPlugin(final Application app) {
     myApp = app;
     LOG.debug("VimPlugin ctr");
-
-    bus.connect().subscribe(AppLifecycleListener.TOPIC, new AppLifecycleListener.Adapter() {
-      @Override
-      public void appFrameCreated(String[] commandLineArgs, @NotNull Ref<Boolean> willOpenProject) {
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
-          public void run() {
-            // Ensure that Vim keymap is installed and install if not.
-            // Moreover we can use installed keymap as indicator of the first time installed plugin
-            if (VimPlugin.isEnabled()) {
-              boolean vimKeyMapInstalled = VimKeyMapUtil.isVimKeymapInstalled();
-              // In case if keymap wasn't installed, we assume that this is the first launch after installation
-              if (!vimKeyMapInstalled) {
-                vimKeyMapInstalled = VimKeyMapUtil.installKeyBoardBindings();
-                if (!vimKeyMapInstalled) {
-                  if (Messages.showYesNoDialog("It is crucial to use Vim keymap for IdeaVim plugin correct work, " +
-                                               "however it was not installed correctly.\nDo you want " +
-                                               ApplicationManagerEx.getApplicationEx().getName() +
-                                               " to disable Vim emulation?", IDEAVIM_NOTIFICATION_TITLE, Messages.getQuestionIcon()) == Messages.YES) {
-                    VimPlugin.getInstance().turnOffPlugin();
-                    return;
-                  }
-
-                }
-                // Enable proper keymap bindings
-                VimKeyMapUtil.switchKeymapBindings(true);
-              }
-              // In this case we should warn if user doesn't use vim keymap
-              else {
-                if (!VimKeyMapUtil.isVimKeymapUsed()) {
-                  Notifications.Bus.notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
-                                                            "Vim keymap is not active, IdeaVim plugin may work incorrectly",
-                                                            NotificationType.WARNING));
-                }
-              }
-            }
-          }
-        });
-      }
-    });
   }
 
   public static VimPlugin getInstance() {
@@ -173,10 +131,16 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   }
 
   /**
-   * Initialize the Vim Plugin. This plugs the vim key handler into the editor action mananger.
+   * Initialize the Vim Plugin. This plugs the vim key handler into the editor action manager.
    */
   public void initComponent() {
     LOG.debug("initComponent");
+
+    ApplicationManager.getApplication().invokeLater(new Runnable() {
+      public void run() {
+        checkAndInstallKeymap();
+      }
+    });
 
     EditorActionManager manager = EditorActionManager.getInstance();
     TypedAction action = manager.getTypedAction();
@@ -191,6 +155,38 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     getActions();
 
     LOG.debug("done");
+  }
+
+  private static void checkAndInstallKeymap() {
+    // Ensure that Vim keymap is installed and install if not.
+    // Moreover we can use installed keymap as indicator of the first time installed plugin
+    if (VimPlugin.isEnabled()) {
+      boolean vimKeyMapInstalled = VimKeyMapUtil.isVimKeymapInstalled();
+      // In case if keymap wasn't installed, we assume that this is the first launch after installation
+      if (!vimKeyMapInstalled) {
+        vimKeyMapInstalled = VimKeyMapUtil.installKeyBoardBindings();
+        if (!vimKeyMapInstalled) {
+          if (Messages.showYesNoDialog("It is crucial to use Vim keymap for IdeaVim plugin correct work, " +
+                                       "however it was not installed correctly.\nDo you want " +
+                                       ApplicationManagerEx.getApplicationEx().getName() +
+                                       " to disable Vim emulation?", IDEAVIM_NOTIFICATION_TITLE, Messages.getQuestionIcon()) == Messages.YES) {
+            VimPlugin.getInstance().turnOffPlugin();
+            return;
+          }
+
+        }
+        // Enable proper keymap bindings
+        VimKeyMapUtil.switchKeymapBindings(true);
+      }
+      // In this case we should warn if user doesn't use vim keymap
+      else {
+        if (!VimKeyMapUtil.isVimKeymapUsed()) {
+          Notifications.Bus.notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+                                                    "Vim keymap is not active, IdeaVim plugin may work incorrectly",
+                                                    NotificationType.WARNING));
+        }
+      }
+    }
   }
 
   /**
