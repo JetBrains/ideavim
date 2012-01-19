@@ -33,6 +33,7 @@ import com.intellij.openapi.editor.actionSystem.EditorActionManager;
 import com.intellij.openapi.editor.actionSystem.TypedAction;
 import com.intellij.openapi.editor.event.EditorFactoryAdapter;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
@@ -234,7 +235,8 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new SearchGroup.EditorSelectionCheck());
       }
 
-      public void projectClosed(final Project project) {}
+      public void projectClosed(final Project project) {
+      }
     });
 
     CommandProcessor.getInstance().addCommandListener(DelegateCommandListener.getInstance());
@@ -352,6 +354,8 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private void setCursors(boolean isBlock) {
     Editor[] editors = EditorFactory.getInstance().getAllEditors();
     for (Editor editor : editors) {
+      // Vim plugin should be turned on in insert mode
+      ((EditorEx)editor).setInsertMode(true);
       editor.getSettings().setBlockCursor(isBlock);
     }
   }
