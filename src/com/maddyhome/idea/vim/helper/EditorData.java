@@ -25,7 +25,6 @@ import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.intellij.testFramework.LightVirtualFile;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.VisualChange;
@@ -45,7 +44,6 @@ public class EditorData {
    * @param editor The editor to initialize
    */
   public static void initializeEditor(Editor editor) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     if (logger.isDebugEnabled()) logger.debug("editor created: " + editor);
   }
 
@@ -55,7 +53,6 @@ public class EditorData {
    * @param editor The editor to cleanup
    */
   public static void uninitializeEditor(Editor editor) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     if (logger.isDebugEnabled()) logger.debug("editor closed: " + editor);
     editor.putUserData(COMMAND_STATE, null);
     editor.putUserData(LAST_HIGHLIGHTS, null);
@@ -70,7 +67,6 @@ public class EditorData {
    * @return Returns the last column as set by {@link #setLastColumn} or the current cursor column
    */
   public static int getLastColumn(Editor editor) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     Integer col = editor.getUserData(LAST_COLUMN);
     if (col == null) {
       return editor.getCaretModel().getVisualPosition().column;
@@ -87,29 +83,24 @@ public class EditorData {
    * @param editor The editor
    */
   public static void setLastColumn(Editor editor, int col) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     editor.putUserData(LAST_COLUMN, col);
     int t = getLastColumn(editor);
     if (logger.isDebugEnabled()) logger.debug("setLastColumn(" + col + ") is now " + t);
   }
 
   public static String getLastSearch(Editor editor) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     return editor.getUserData(LAST_SEARCH);
   }
 
   public static void setLastSearch(Editor editor, String search) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     editor.putUserData(LAST_SEARCH, search);
   }
 
   public static Collection<RangeHighlighter> getLastHighlights(Editor editor) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     return editor.getUserData(LAST_HIGHLIGHTS);
   }
 
   public static void setLastHighlights(Editor editor, Collection<RangeHighlighter> highlights) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     editor.putUserData(LAST_HIGHLIGHTS, highlights);
   }
 
@@ -120,7 +111,6 @@ public class EditorData {
    * @return The last visual range, null if no previous range
    */
   public static VisualRange getLastVisualRange(Editor editor) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     return editor.getDocument().getUserData(VISUAL);
   }
 
@@ -131,7 +121,6 @@ public class EditorData {
    * @param range  The visual range
    */
   public static void setLastVisualRange(Editor editor, VisualRange range) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     editor.getDocument().putUserData(VISUAL, range);
   }
 
@@ -142,7 +131,6 @@ public class EditorData {
    * @return The last visual range, null if no previous range
    */
   public static VisualChange getLastVisualOperatorRange(Editor editor) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     return editor.getDocument().getUserData(VISUAL_OP);
   }
 
@@ -153,22 +141,18 @@ public class EditorData {
    * @param range  The visual range
    */
   public static void setLastVisualOperatorRange(Editor editor, VisualChange range) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     editor.getDocument().putUserData(VISUAL_OP, range);
   }
 
   public static CommandState getCommandState(Editor editor) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     return editor.getUserData(COMMAND_STATE);
   }
 
   public static void setCommandState(Editor editor, CommandState state) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     editor.putUserData(COMMAND_STATE, state);
   }
 
   public static boolean getChangeGroup(Editor editor) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     Boolean res = editor.getUserData(CHANGE_GROUP);
     if (res != null) {
       return res;
@@ -179,22 +163,18 @@ public class EditorData {
   }
 
   public static void setChangeGroup(Editor editor, boolean adapter) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     editor.putUserData(CHANGE_GROUP, adapter);
   }
 
   public static boolean getMotionGroup(Editor editor) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     return editor.getUserData(MOTION_GROUP) == Boolean.TRUE;
   }
 
   public static void setMotionGroup(Editor editor, boolean adapter) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     editor.putUserData(MOTION_GROUP, adapter);
   }
 
   public static boolean isConsoleOutput(Editor editor) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     Object res = editor.getUserData(CONSOLE_VIEW_IN_EDITOR_VIEW);
     logger.debug("isConsoleOutput for editor " + editor + " - " + res);
     return res != null;
@@ -207,7 +187,6 @@ public class EditorData {
    * @return The virtual file for the editor
    */
   public static VirtualFile getVirtualFile(Editor editor) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     return FileDocumentManager.getInstance().getFile(editor.getDocument());
   }
 
@@ -264,7 +243,6 @@ public class EditorData {
    * Checks if editor is file editor, also it takes into account that editor can be placed in editors hierarhy
    */
   public static boolean isFileEditor(Editor editor){
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     final VirtualFile virtualFile = EditorData.getVirtualFile(editor);
     return virtualFile != null && !(virtualFile instanceof LightVirtualFile);
   }

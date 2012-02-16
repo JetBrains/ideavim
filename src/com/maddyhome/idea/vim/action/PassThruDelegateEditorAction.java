@@ -23,6 +23,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
+import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 
@@ -52,7 +53,7 @@ public class PassThruDelegateEditorAction extends AbstractDelegateEditorAction {
         if (logger.isDebugEnabled()) {
           logger.debug("event = KeyEvent: " + stroke);
         }
-        KeyHandler.getInstance().handleKey(editor, stroke, dataContext);
+        KeyHandler.getInstance().handleKey(InjectedLanguageUtil.getTopLevelEditor(editor), stroke, dataContext);
       }
     }
 

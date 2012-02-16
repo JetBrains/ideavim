@@ -23,6 +23,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
+import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
@@ -32,6 +33,7 @@ import com.maddyhome.idea.vim.command.CommandState;
  */
 public abstract class AbstractEditorActionHandler extends EditorActionHandler {
   public final void execute(Editor editor, DataContext context) {
+    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     logger.debug("execute");
     if ((editor == null || !VimPlugin.isEnabled()) && this instanceof DelegateActionHandler) {
       KeyHandler.executeAction(((DelegateActionHandler)this).getOrigAction(), context);

@@ -26,6 +26,7 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
+import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -55,7 +56,7 @@ public class EditorKeyHandler extends EditorActionHandler {
       }
     }
     if (isEnabled) {
-      handle(editor, context);
+      handle(InjectedLanguageUtil.getTopLevelEditor(editor), context);
     }
     else {
       original(editor, context);

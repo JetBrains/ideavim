@@ -22,6 +22,7 @@ package com.maddyhome.idea.vim.action.change.change;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
+import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
@@ -37,7 +38,7 @@ public class ChangeCaseLowerVisualAction extends EditorAction {
 
   private static class Handler extends VisualOperatorActionHandler {
     protected boolean execute(Editor editor, DataContext context, Command cmd, TextRange range) {
-      return CommandGroups.getInstance().getChange().changeCaseRange(editor, context, range, CharacterHelper.CASE_LOWER);
+      return CommandGroups.getInstance().getChange().changeCaseRange(InjectedLanguageUtil.getTopLevelEditor(editor), context, range, CharacterHelper.CASE_LOWER);
     }
   }
 }

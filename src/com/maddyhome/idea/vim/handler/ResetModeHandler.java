@@ -22,6 +22,7 @@ package com.maddyhome.idea.vim.handler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
+import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.KeyHandler;
 
 /**
@@ -29,6 +30,6 @@ import com.maddyhome.idea.vim.KeyHandler;
  */
 public class ResetModeHandler extends EditorActionHandler {
   public void execute(Editor editor, DataContext context) {
-    KeyHandler.getInstance().fullReset(editor);
+    KeyHandler.getInstance().fullReset(InjectedLanguageUtil.getTopLevelEditor(editor));
   }
 }

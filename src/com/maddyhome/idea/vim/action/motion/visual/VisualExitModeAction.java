@@ -23,6 +23,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
+import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.group.CommandGroups;
 
 /**
@@ -35,7 +36,7 @@ public class VisualExitModeAction extends EditorAction {
 
   private static class Handler extends EditorActionHandler {
     public void execute(Editor editor, DataContext context) {
-      CommandGroups.getInstance().getMotion().processEscape(editor, context);
+      CommandGroups.getInstance().getMotion().processEscape(InjectedLanguageUtil.getTopLevelEditor(editor), context);
     }
   }
 }
