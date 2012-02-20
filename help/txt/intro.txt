@@ -87,10 +87,8 @@ Published by O'Reilly.  ISBN: 1-56592-426-6.
 2. IdeaVim on the internet                                  *internet*
 
                         *www* *faq* *FAQ* *distribution* *download*
-IdeaVim's sources are hosted on the GitHub.
 
-        IdeaVim home page: http://plugins.intellij.net/plugin/?ruby&id=164
-        Sources: https://github.com/olegs/ideavim
+IdeaVim home page: http://plugins.intellij.net/plugin/?ruby&id=164
 
 <!--
 The Vim pages contain the most recent information about Vim.  They also
