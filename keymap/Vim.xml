@@ -2,12 +2,15 @@
 <keymap version="1" name="Vim" disable-mnemonics="false" parent="$default">
   <action id="$Copy">
     <keyboard-shortcut first-keystroke="control INSERT" />
+    <keyboard-shortcut first-keystroke="control C" />
   </action>
   <action id="$Cut">
     <keyboard-shortcut first-keystroke="shift DELETE" />
+    <keyboard-shortcut first-keystroke="control X" />
   </action>
   <action id="$Paste">
     <keyboard-shortcut first-keystroke="shift INSERT" />
+    <keyboard-shortcut first-keystroke="control V" />
   </action>
   <action id="$Redo">
     <keyboard-shortcut first-keystroke="shift alt BACK_SPACE" />
