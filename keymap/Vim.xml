@@ -41,29 +41,29 @@
   <action id="EditorDeleteLine" />
   <action id="EditorDeleteToWordEnd" />
   <action id="EditorDeleteToWordStart" />
-  <action id="EditorDownWithSelection" />
+  <!--  <action id="EditorDownWithSelection" />-->
   <action id="EditorDuplicate" />
-  <action id="EditorIndentSelection" />
+  <!--  <action id="EditorIndentSelection" />-->
   <action id="EditorJoinLines" />
-  <action id="EditorLeftWithSelection" />
-  <action id="EditorLineEndWithSelection" />
-  <action id="EditorLineStartWithSelection" />
+  <!--  <action id="EditorLeftWithSelection" />-->
+  <!--  <action id="EditorLineEndWithSelection" />-->
+  <!-- <action id="EditorLineStartWithSelection" />-->
   <action id="EditorMoveToPageBottom" />
-  <action id="EditorMoveToPageBottomWithSelection" />
+  <!--  <action id="EditorMoveToPageBottomWithSelection" />-->
   <action id="EditorMoveToPageTop" />
-  <action id="EditorMoveToPageTopWithSelection" />
+  <!--  <action id="EditorMoveToPageTopWithSelection" />-->
   <action id="EditorNextWord" />
-  <action id="EditorNextWordWithSelection" />
-  <action id="EditorPageDownWithSelection" />
-  <action id="EditorPageUpWithSelection" />
+  <!--  <action id="EditorNextWordWithSelection" />-->
+  <!--  <action id="EditorPageDownWithSelection" />-->
+  <!--  <action id="EditorPageUpWithSelection" />-->
   <action id="EditorPaste">
     <keyboard-shortcut first-keystroke="shift INSERT" />
     <keyboard-shortcut first-keystroke="meta V" />
   </action>
   <action id="EditorPreviousWord" />
-  <action id="EditorPreviousWordWithSelection" />
+  <!--  <action id="EditorPreviousWordWithSelection" />-->
   <action id="EditorRedo" />
-  <action id="EditorRightWithSelection" />
+  <!--  <action id="EditorRightWithSelection" />-->
   <action id="EditorScrollDown" />
   <action id="EditorScrollToCenter" />
   <action id="EditorScrollUp" />
@@ -72,14 +72,14 @@
   <action id="EditorSplitLine" />
   <action id="EditorStartNewLine" />
   <action id="EditorTextEnd" />
-  <action id="EditorTextEndWithSelection" />
+  <!--  <action id="EditorTextEndWithSelection" />-->
   <action id="EditorTextStart" />
-  <action id="EditorTextStartWithSelection" />
+  <!--  <action id="EditorTextStartWithSelection" />-->
   <action id="EditorToggleCase" />
   <action id="EditorUnSelectWord" />
   <action id="EditorUndo" />
-  <action id="EditorUnindentSelection" />
-  <action id="EditorUpWithSelection" />
+  <!--  <action id="EditorUnindentSelection" />-->
+  <!--  <action id="EditorUpWithSelection" />-->
   <action id="Find" />
   <action id="FindNext">
     <keyboard-shortcut first-keystroke="F3" />
@@ -169,10 +169,10 @@
     <keyboard-shortcut first-keystroke="KP_UP" />
     <keyboard-shortcut first-keystroke="shift control 2" />
     <keyboard-shortcut first-keystroke="shift control SPACE" />
-    <keyboard-shortcut first-keystroke="shift DOWN" />
-    <keyboard-shortcut first-keystroke="shift LEFT" />
-    <keyboard-shortcut first-keystroke="shift RIGHT" />
-    <keyboard-shortcut first-keystroke="shift UP" />
+    <!--<keyboard-shortcut first-keystroke="shift DOWN" />-->
+    <!--<keyboard-shortcut first-keystroke="shift LEFT" />-->
+    <!--<keyboard-shortcut first-keystroke="shift RIGHT" />-->
+    <!--<keyboard-shortcut first-keystroke="shift UP" />-->
   </action>
 </keymap>
 
