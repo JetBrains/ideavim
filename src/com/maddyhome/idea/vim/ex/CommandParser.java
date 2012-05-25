@@ -65,7 +65,9 @@ public class CommandParser {
     if (registered) return;
 
     new AsciiHandler();
+    new CloseHandler();
     new CmdFilterHandler();
+    new CompileHandler();
     new CopyTextHandler();
     new DeleteLinesHandler();
     new DigraphHandler();
@@ -75,7 +77,9 @@ public class CommandParser {
     new FindClassHandler();
     new FindFileHandler();
     new FindSymbolHandler();
+      new GenerateHandler();
     new GotoCharacterHandler();
+      new GrepHandler();
     //new GotoLineHandler(); - not needed here
     new HelpHandler();
     new HistoryHandler();
@@ -84,6 +88,7 @@ public class CommandParser {
     new MarkHandler();
     new MarksHandler();
     new MoveTextHandler();
+      new NewElementHandler();
     new NextFileHandler();
     new NoHLSearchHandler();
     new OnlyHandler();
@@ -101,6 +106,8 @@ public class CommandParser {
     new SetHandler();
     new ShiftLeftHandler();
     new ShiftRightHandler();
+      new SplitHorizontalHandler();
+      new SplitVerticalHandler();
     new SubstituteHandler();
     new UndoHandler();
     new WriteAllHandler();
