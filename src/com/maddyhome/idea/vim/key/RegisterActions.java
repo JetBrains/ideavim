@@ -843,6 +843,12 @@ public class RegisterActions {
         new Shortcut("i("),
         new Shortcut("i)")
       });
+    
+    parser.registerAction(KeyParser.MAPPING_VISUAL | KeyParser.MAPPING_OP_PEND, "VimMotionInnerBlockQuote", Command.MOTION,
+                          Command.FLAG_MOT_CHARACTERWISE | Command.FLAG_MOT_EXCLUSIVE | Command.FLAG_TEXT_BLOCK, new Shortcut[]{
+        new Shortcut("i\""),
+      });
+    
     parser.registerAction(KeyParser.MAPPING_VISUAL | KeyParser.MAPPING_OP_PEND, "VimMotionOuterBlockAngle", Command.MOTION,
                           Command.FLAG_MOT_CHARACTERWISE | Command.FLAG_MOT_INCLUSIVE | Command.FLAG_TEXT_BLOCK, new Shortcut[]{
         new Shortcut("a<"),
@@ -864,6 +870,11 @@ public class RegisterActions {
         new Shortcut("ab"),
         new Shortcut("a("),
         new Shortcut("a)")
+      });
+
+    parser.registerAction(KeyParser.MAPPING_VISUAL | KeyParser.MAPPING_OP_PEND, "VimMotionOuterBlockQuote", Command.MOTION,
+                          Command.FLAG_MOT_CHARACTERWISE | Command.FLAG_MOT_INCLUSIVE | Command.FLAG_TEXT_BLOCK, new Shortcut[]{
+        new Shortcut("a\""),
       });
 
     parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_OP_PEND, "VimResetMode", Command.RESET, new Shortcut(new KeyStroke[]{
