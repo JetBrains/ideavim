@@ -1,5 +1,6 @@
-package com.maddyhome.idea.vim.helper;
+package org.jetbrains.plugins.ideavim.helper;
 
+import com.maddyhome.idea.vim.helper.SearchHelper;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
