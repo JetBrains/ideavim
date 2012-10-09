@@ -516,10 +516,10 @@ public class RegisterActions {
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0))
     });
     parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLeftMatchChar", Command.MOTION,
-                          Command.FLAG_MOT_INCLUSIVE | Command.FLAG_ALLOW_DIGRAPH,
+                          Command.FLAG_MOT_EXCLUSIVE | Command.FLAG_ALLOW_DIGRAPH,
                           new Shortcut('F'), Argument.DIGRAPH);
     parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLeftTillMatchChar", Command.MOTION,
-                          Command.FLAG_MOT_INCLUSIVE | Command.FLAG_ALLOW_DIGRAPH,
+                          Command.FLAG_MOT_EXCLUSIVE | Command.FLAG_ALLOW_DIGRAPH,
                           new Shortcut('T'), Argument.DIGRAPH);
     parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionLeftWrap", Command.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut[]{
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)),
