@@ -23,6 +23,13 @@ public class MotionActionTest extends VimTestCase {
     assertEquals("two", selected);
   }
 
+  public void testVisualMotionInnerBigWord() {
+    final Editor editor = typeTextInFile("viW",
+                                         "one tw<caret>o.three four\n");
+    final String selected = editor.getSelectionModel().getSelectedText();
+    assertEquals("two.three", selected);
+  }
+
   @NotNull
   private Editor typeTextInFile(@NotNull String input, @NotNull String fileContents) {
     myFixture.configureByText("a.java", fileContents);
