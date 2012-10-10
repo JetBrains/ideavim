@@ -336,16 +336,14 @@ public class EditorHelper {
 
   public static int normalizeOffset(final Editor editor, int offset, final boolean allowEnd) {
     if (offset <= 0) {
-      return 0;
+      offset = 0;
     }
     final int textLength = editor.getDocument().getTextLength();
     if (offset > textLength) {
       offset = textLength;
     }
-    if (offset > 0 && !allowEnd && editor.getDocument().getCharsSequence().charAt(textLength - 1) == '\n'){
-      offset --;
-    }
-    return offset;
+    final int line = editor.offsetToLogicalPosition(offset).line;
+    return normalizeOffset(editor, line, offset, allowEnd);
   }
 
 
