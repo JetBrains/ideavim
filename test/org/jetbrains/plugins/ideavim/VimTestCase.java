@@ -10,6 +10,10 @@ import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
 import com.intellij.testFramework.fixtures.TestFixtureBuilder;
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl;
 
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author vlan
  */
@@ -42,5 +46,13 @@ public abstract class VimTestCase extends UsefulTestCase {
     myFixture.tearDown();
     myFixture = null;
     super.tearDown();
+  }
+
+  protected static List<KeyStroke> toKeyStrokes(String input) {
+    final List<KeyStroke> results = new ArrayList<KeyStroke>();
+    for (int i = 0; i < input.length(); i++) {
+      results.add(KeyStroke.getKeyStroke(input.charAt(i)));
+    }
+    return results;
   }
 }

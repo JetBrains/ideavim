@@ -8,7 +8,6 @@ import com.maddyhome.idea.vim.helper.RunnableHelper;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import javax.swing.*;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,14 +38,6 @@ public class ChangeActionTest extends VimTestCase {
            "}\n",
            "if (\n" +
            "}\n");
-  }
-
-  private static List<KeyStroke> toKeyStrokes(String input) {
-    final List<KeyStroke> results = new ArrayList<KeyStroke>();
-    for (int i = 0; i < input.length(); i++) {
-      results.add(KeyStroke.getKeyStroke(input.charAt(i)));
-    }
-    return results;
   }
 
   private void doTest(String input, String before, String after) {
