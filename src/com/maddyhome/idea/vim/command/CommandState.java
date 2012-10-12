@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.key.ParentNode;
 import com.maddyhome.idea.vim.option.Options;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Stack;
 
@@ -68,7 +69,7 @@ public class CommandState {
    * @param editor
    * @return The singleton instance
    */
-  public static CommandState getInstance(Editor editor) {
+  public static CommandState getInstance(@Nullable Editor editor) {
     if (editor == null) {
       return new CommandState();
     }

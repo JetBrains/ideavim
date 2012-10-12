@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.option.Options;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -83,7 +84,7 @@ public class KeyHandler {
   /**
    * Gets the original key handler
    *
-   * @return The orginal key handler
+   * @return The original key handler
    */
   public TypedActionHandler getOriginalHandler() {
     return origHandler;
@@ -124,7 +125,7 @@ public class KeyHandler {
 
         reset(editor);
       }
-      // At this point the user must be typing in a command. Most commands can be preceeded by a number. Let's
+      // At this point the user must be typing in a command. Most commands can be preceded by a number. Let's
       // check if a number can be entered at this point, and if so, did the user send us a digit.
       else if ((editorState.getMode() == CommandState.MODE_COMMAND ||
                 editorState.getMode() == CommandState.MODE_VISUAL) &&
@@ -174,7 +175,7 @@ public class KeyHandler {
           mode = STATE_BAD_COMMAND;
         }
       }
-      // If we are this far - sheesh, then the user must be entering a command or a non-single-character argument
+      // If we are this far, then the user must be entering a command or a non-single-character argument
       // to an entered command. Let's figure out which it is
       else {
         // For debugging purposes we track the keys entered for this command
@@ -210,15 +211,15 @@ public class KeyHandler {
           logger.debug("digraph done");
         }
 
-        // If this is a branch node we have entered only part of a multikey command
+        // If this is a branch node we have entered only part of a multi-key command
         if (node instanceof BranchNode) {
           logger.debug("branch node");
-          BranchNode bnode = (BranchNode)node;
+          BranchNode branchNode = (BranchNode)node;
           // Flag that we aren't allowing any more count digits (unless it's OK)
-          if ((bnode.getFlags() & Command.FLAG_ALLOW_MID_COUNT) == 0) {
+          if ((branchNode.getFlags() & Command.FLAG_ALLOW_MID_COUNT) == 0) {
             mode = STATE_COMMAND;
           }
-          editorState.setCurrentNode(bnode);
+          editorState.setCurrentNode(branchNode);
 
           ArgumentNode arg = (ArgumentNode)((BranchNode)editorState.getCurrentNode()).getArgumentNode();
           if (arg != null) {
@@ -286,7 +287,7 @@ public class KeyHandler {
           }
         }
         // If this is an argument node then the last keystroke was not part of the current command but should
-        // be the first keystroke of the current command's argument
+        // be the first keystroke of the argument of the current command
         else if (node instanceof ArgumentNode) {
           logger.debug("argument node");
           // Create a new command based on what the user has typed so far, excluding this keystroke.
@@ -386,8 +387,8 @@ public class KeyHandler {
         logger.debug("cmd=" + cmd);
       }
       // If we have a command and a motion command argument, both could possibly have their own counts. We
-      // need to adjust the counts so the motion gets the product of both counts and the command's count gets
-      // reset. Example 3c2w (change 2 words, three times) becomes c6w (change 6 words)
+      // need to adjust the counts so the motion gets the product of both counts and the count associated with
+      // the command gets reset. Example 3c2w (change 2 words, three times) becomes c6w (change 6 words)
       Argument arg = cmd.getArgument();
       if (logger.isDebugEnabled()) {
         logger.debug("arg=" + arg);
@@ -492,7 +493,7 @@ public class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  private void partialReset(Editor editor) {
+  private void partialReset(@Nullable Editor editor) {
     count = 0;
     keys = new ArrayList<KeyStroke>();
     CommandState editorState = CommandState.getInstance(editor);
@@ -505,7 +506,7 @@ public class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  public void reset(Editor editor) {
+  public void reset(@Nullable Editor editor) {
     partialReset(editor);
     mode = STATE_NEW_COMMAND;
     currentCmd.clear();

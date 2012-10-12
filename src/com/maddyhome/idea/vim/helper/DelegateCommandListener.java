@@ -23,19 +23,16 @@ import com.intellij.openapi.command.CommandAdapter;
 import com.intellij.openapi.command.CommandEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.common.TextRange;
+import org.jetbrains.annotations.Nullable;
 
 public class DelegateCommandListener extends CommandAdapter {
   public static DelegateCommandListener getInstance() {
     return instance;
   }
 
-  public void setRunnable(StartFinishRunnable runnable) {
+  public void setRunnable(@Nullable StartFinishRunnable runnable) {
     this.runnable = runnable;
     inCommand = false;
-  }
-
-  public StartFinishRunnable getRunnable() {
-    return runnable;
   }
 
   public void commandStarted(CommandEvent event) {
@@ -76,7 +73,7 @@ public class DelegateCommandListener extends CommandAdapter {
   }
 
   private boolean inCommand = false;
-  private StartFinishRunnable runnable;
+  @Nullable private StartFinishRunnable runnable;
 
   private static Logger logger = Logger.getInstance(DelegateCommandListener.class.getName());
   private static DelegateCommandListener instance = new DelegateCommandListener();
