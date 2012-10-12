@@ -323,7 +323,7 @@ public class Options {
   /**
    * Resets all options to their default value
    */
-  private void resetAllOptions() {
+  public void resetAllOptions() {
     Collection<Option> opts = allOptions();
     for (Option option : opts) {
       option.resetDefault();

@@ -387,7 +387,7 @@ public class SearchGroup extends AbstractActionGroup {
         lastLine = line;
 
         lnum += nmatch - 1;
-        if (do_all) {
+        if (do_all && startoff != endoff) {
           if (newpos != null) {
             searchcol = newpos.column;
           }
@@ -691,8 +691,14 @@ public class SearchGroup extends AbstractActionGroup {
         rh.setErrorStripeTooltip(text);
         hls.add(rh);
 
-        lnum += nmatch - 1;
-        searchcol = endpos.column;
+        if (startoff != endoff) {
+          lnum += nmatch - 1;
+          searchcol = endpos.column;
+        }
+        else {
+          lnum += nmatch;
+          searchcol = 0;
+        }
       }
       else {
         lnum++;
