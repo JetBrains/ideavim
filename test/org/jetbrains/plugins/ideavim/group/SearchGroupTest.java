@@ -25,7 +25,6 @@ public class SearchGroupTest extends VimTestCase {
   }
 
   public void testEOL() {
-    Options.getInstance().resetAllOptions();
     final int pos = search("$",
                            "<caret>one\n" +
                            "two\n");
@@ -34,16 +33,36 @@ public class SearchGroupTest extends VimTestCase {
 
   // VIM-146
   public void testEOLWithHighlightSearch() {
+    setHighlightSearch();
+    final int pos = search("$",
+                           "<caret>one\n" +
+                           "two\n");
+    assertEquals(3, pos);
+  }
+
+  public void testAndWithoutBranches() {
+    final int pos = search("\\&",
+                           "<caret>one\n" +
+                           "two\n");
+    assertEquals(1, pos);
+  }
+
+  // VIM-226
+  public void testAndWithoutBranchesWithHighlightSearch() {
+    setHighlightSearch();
+    final int pos = search("\\&",
+                           "<caret>one\n" +
+                           "two\n");
+    assertEquals(1, pos);
+  }
+
+  private void setHighlightSearch() {
     final Options options = Options.getInstance();
     options.resetAllOptions();
     final Option option = options.getOption("hlsearch");
     assertInstanceOf(option, ToggleOption.class);
     final ToggleOption highlightSearch = (ToggleOption)option;
     highlightSearch.set();
-    final int pos = search("$",
-                           "<caret>one\n" +
-                           "two\n");
-    assertEquals(3, pos);
   }
 
   private int search(final String pattern, String input) {

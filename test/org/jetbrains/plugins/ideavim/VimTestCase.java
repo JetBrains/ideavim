@@ -9,6 +9,7 @@ import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
 import com.intellij.testFramework.fixtures.TestFixtureBuilder;
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl;
+import com.maddyhome.idea.vim.option.Options;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ public abstract class VimTestCase extends UsefulTestCase {
                                                                                     new LightTempDirTestFixtureImpl(true));
     myFixture.setUp();
     myFixture.setTestDataPath(getTestDataPath());
+    Options.getInstance().resetAllOptions();
   }
 
   protected String getTestDataPath() {
