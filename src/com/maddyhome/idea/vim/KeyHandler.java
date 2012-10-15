@@ -110,11 +110,11 @@ public class KeyHandler {
       // If this is a "regular" character keystroke, get the character
       char chKey = key.getKeyChar() == KeyEvent.CHAR_UNDEFINED ? 0 : key.getKeyChar();
 
-      if ((editorState.getMode() == CommandState.MODE_COMMAND || mode == STATE_COMMAND) &&
+      if ((editorState.getMode() == CommandState.MODE_COMMAND || state == State.COMMAND) &&
           (key.getKeyCode() == KeyEvent.VK_ESCAPE ||
            (key.getKeyCode() == KeyEvent.VK_C && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0) ||
            (key.getKeyCode() == '[' && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0))) {
-        if (mode != STATE_COMMAND && count == 0 && currentArg == Argument.NONE && currentCmd.size() == 0 &&
+        if (state != State.COMMAND && count == 0 && currentArg == Argument.NONE && currentCmd.size() == 0 &&
             CommandGroups.getInstance().getRegister().getCurrentRegister() == RegisterGroup.REGISTER_DEFAULT) {
           if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
             KeyHandler.executeAction("VimEditorEscape", context);
@@ -129,7 +129,7 @@ public class KeyHandler {
       // check if a number can be entered at this point, and if so, did the user send us a digit.
       else if ((editorState.getMode() == CommandState.MODE_COMMAND ||
                 editorState.getMode() == CommandState.MODE_VISUAL) &&
-               mode == STATE_NEW_COMMAND && currentArg != Argument.CHARACTER && currentArg != Argument.DIGRAPH &&
+               state == State.NEW_COMMAND && currentArg != Argument.CHARACTER && currentArg != Argument.DIGRAPH &&
                Character.isDigit(chKey) &&
                (count != 0 || chKey != '0')) {
         // Update the count
@@ -139,7 +139,7 @@ public class KeyHandler {
       // Pressing delete while entering a count "removes" the last digit entered
       else if ((editorState.getMode() == CommandState.MODE_COMMAND ||
                 editorState.getMode() == CommandState.MODE_VISUAL) &&
-               mode == STATE_NEW_COMMAND && currentArg != Argument.CHARACTER && currentArg != Argument.DIGRAPH &&
+               state == State.NEW_COMMAND && currentArg != Argument.CHARACTER && currentArg != Argument.DIGRAPH &&
                key.getKeyCode() == KeyEvent.VK_DELETE && count != 0) {
         // "Remove" the last digit sent to us
         count /= 10;
@@ -168,11 +168,11 @@ public class KeyHandler {
           Argument arg = new Argument(chKey);
           Command cmd = currentCmd.peek();
           cmd.setArgument(arg);
-          mode = STATE_READY;
+          state = State.READY;
         }
         else {
           // Oops - this isn't a valid character argument
-          mode = STATE_BAD_COMMAND;
+          state = State.BAD_COMMAND;
         }
       }
       // If we are this far, then the user must be entering a command or a non-single-character argument
@@ -217,7 +217,7 @@ public class KeyHandler {
           BranchNode branchNode = (BranchNode)node;
           // Flag that we aren't allowing any more count digits (unless it's OK)
           if ((branchNode.getFlags() & Command.FLAG_ALLOW_MID_COUNT) == 0) {
-            mode = STATE_COMMAND;
+            state = State.COMMAND;
           }
           editorState.setCurrentNode(branchNode);
 
@@ -229,7 +229,7 @@ public class KeyHandler {
 
             if (arg.getArgType() == Argument.EX_STRING) {
               CommandGroups.getInstance().getProcess().startSearchCommand(editor, context, count, chKey);
-              mode = STATE_NEW_COMMAND;
+              state = State.NEW_COMMAND;
               currentArg = Argument.EX_STRING;
               editorState.pushState(CommandState.MODE_EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
             }
@@ -239,7 +239,7 @@ public class KeyHandler {
         else if (node instanceof CommandNode) {
           logger.debug("command node");
           // If all does well we are ready to process this command
-          mode = STATE_READY;
+          state = State.READY;
           CommandNode cmdNode = (CommandNode)node;
           // Did we just get the completed sequence for a motion command argument?
           if (currentArg == Argument.MOTION) {
@@ -260,7 +260,7 @@ public class KeyHandler {
             }
             else {
               // Oops - this wasn't a motion command. The user goofed and typed something else
-              mode = STATE_BAD_COMMAND;
+              state = State.BAD_COMMAND;
             }
           }
           else if (currentArg == Argument.EX_STRING && (cmdNode.getFlags() & Command.FLAG_COMPLETE_EX) != 0) {
@@ -282,7 +282,7 @@ public class KeyHandler {
             // programmer made a typo or forgot to add the action to the plugin.xml file
             if (cmd.getAction() == null) {
               logger.error("NULL action for keys '" + keys + "'");
-              mode = STATE_ERROR;
+              state = State.ERROR;
             }
           }
         }
@@ -303,7 +303,7 @@ public class KeyHandler {
               // No break - fall through
             case Argument.CHARACTER:
             case Argument.MOTION:
-              mode = STATE_NEW_COMMAND;
+              state = State.NEW_COMMAND;
               currentArg = arg.getArgType();
               // Is the current command an operator? If so set the state to only accept "operator pending"
               // commands
@@ -322,7 +322,7 @@ public class KeyHandler {
               break;
             default:
               // Oops - we aren't expecting any other type of argument
-              mode = STATE_ERROR;
+              state = State.ERROR;
           }
 
           // If the current keystroke is really the first character of an argument the user needs to enter,
@@ -360,7 +360,7 @@ public class KeyHandler {
           }
           // If we get here then the user has entered an unrecognized series of keystrokes
           else {
-            mode = STATE_BAD_COMMAND;
+            state = State.BAD_COMMAND;
           }
 
           lastChar = key.getKeyChar();
@@ -371,7 +371,7 @@ public class KeyHandler {
     }
 
     // Do we have a fully entered command at this point? If so, lets execute it
-    if (mode == STATE_READY) {
+    if (state == State.READY) {
       DelegateCommandListener.getInstance().setRunnable(null);
       // Let's go through the command stack and merge it all into one command. At this time there should never
       // be more than two commands on the stack - one is the actual command and the other would be a motion
@@ -430,12 +430,12 @@ public class KeyHandler {
         reset(editor);
       }
     }
-    else if (mode == STATE_BAD_COMMAND) {
+    else if (state == State.BAD_COMMAND) {
       VimPlugin.indicateError();
       reset(editor);
     }
     // We had some sort of error so reset the handler and let the user know (beep)
-    else if (mode == STATE_ERROR) {
+    else if (state == State.ERROR) {
       VimPlugin.indicateError();
       fullReset(editor);
     }
@@ -508,7 +508,7 @@ public class KeyHandler {
    */
   public void reset(@Nullable Editor editor) {
     partialReset(editor);
-    mode = STATE_NEW_COMMAND;
+    state = State.NEW_COMMAND;
     currentCmd.clear();
     currentArg = Argument.NONE;
     digraph = null;
@@ -581,9 +581,17 @@ public class KeyHandler {
     private KeyStroke key;
   }
 
+  private static enum State {
+    NEW_COMMAND,
+    COMMAND,
+    READY,
+    ERROR,
+    BAD_COMMAND
+  }
+
   private int count;
   private List<KeyStroke> keys;
-  private int mode;
+  private State state;
   private Stack<Command> currentCmd = new Stack<Command>();
   private int currentArg;
   private TypedActionHandler origHandler;
@@ -592,12 +600,5 @@ public class KeyHandler {
   private boolean lastWasBS;
 
   private static KeyHandler instance;
-
-  private static final int STATE_NEW_COMMAND = 1;
-  private static final int STATE_COMMAND = 2;
-  private static final int STATE_READY = 3;
-  private static final int STATE_ERROR = 4;
-  private static final int STATE_BAD_COMMAND = 5;
-
   private static Logger logger = Logger.getInstance(KeyHandler.class.getName());
 }
