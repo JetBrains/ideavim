@@ -1,12 +1,7 @@
 package org.jetbrains.plugins.ideavim.action;
 
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.project.Project;
-import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.helper.EditorDataContext;
-import com.maddyhome.idea.vim.helper.RunnableHelper;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import javax.swing.*;
@@ -98,23 +93,5 @@ public class MotionActionTest extends VimTestCase {
     assertEquals(7, offset);
     final int mode = CommandState.getInstance(editor).getMode();
     assertEquals(CommandState.MODE_COMMAND, mode);
-  }
-
-  @NotNull
-  private Editor typeTextInFile(@NotNull final List<KeyStroke> keys, @NotNull String fileContents) {
-    myFixture.configureByText("a.java", fileContents);
-    final Editor editor = myFixture.getEditor();
-    final KeyHandler keyHandler = KeyHandler.getInstance();
-    final EditorDataContext dataContext = new EditorDataContext(editor);
-    final Project project = myFixture.getProject();
-    RunnableHelper.runWriteCommand(project, new Runnable() {
-      @Override
-      public void run() {
-        for (KeyStroke key : keys) {
-          keyHandler.handleKey(editor, key, dataContext);
-        }
-      }
-    }, null, null);
-    return editor;
   }
 }
