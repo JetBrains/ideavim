@@ -103,8 +103,8 @@ public class KeyHandler {
     // Be careful: all the EditorActionHandler implementation should correctly process InjectedEditors
     editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     logger.debug("handleKey " + key);
-    CommandState editorState = CommandState.getInstance(editor);
-    boolean isRecording = editorState.isRecording();
+    final CommandState editorState = CommandState.getInstance(editor);
+    final boolean isRecording = editorState.isRecording();
     boolean shouldRecord = true;
     for (int loop = 0; loop < 2; loop++) {
       // If this is a "regular" character keystroke, get the character
@@ -330,9 +330,7 @@ public class KeyHandler {
           // handle the argument
           if (currentArg != Argument.NONE) {
             partialReset(editor);
-            boolean saveRecording = isRecording;
             handleKey(editor, key, context);
-            isRecording = saveRecording;
             shouldRecord = false; // Prevent this from getting recorded twice
           }
         }
