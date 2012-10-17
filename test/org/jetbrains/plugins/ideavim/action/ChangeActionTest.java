@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import javax.swing.*;
@@ -46,7 +47,7 @@ public class ChangeActionTest extends VimTestCase {
     final KeyHandler keyHandler = KeyHandler.getInstance();
     final EditorDataContext dataContext = new EditorDataContext(editor);
     final Project project = myFixture.getProject();
-    final List<KeyStroke> keys = toKeyStrokes(input);
+    final List<KeyStroke> keys = StringHelper.stringToKeys(input);
     RunnableHelper.runWriteCommand(project, new Runnable() {
       @Override
       public void run() {

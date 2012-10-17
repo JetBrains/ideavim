@@ -19,6 +19,8 @@ package com.maddyhome.idea.vim.helper;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -152,12 +154,12 @@ public class StringHelper {
     return res.toString();
   }
 
-  public static List<KeyStroke> stringToKeys(String str) {
-    ArrayList<KeyStroke> res = new ArrayList<KeyStroke>();
-    for (int i = 0; i < str.length(); i++) {
-      res.add(KeyStroke.getKeyStroke(str.charAt(i)));
+  @NotNull
+  public static List<KeyStroke> stringToKeys(@NotNull String s) {
+    final List<KeyStroke> res = new ArrayList<KeyStroke>();
+    for (int i = 0; i < s.length(); i++) {
+      res.add(KeyStroke.getKeyStroke(s.charAt(i)));
     }
-
     return res;
   }
 
