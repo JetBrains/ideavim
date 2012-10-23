@@ -213,126 +213,16 @@ public class KeyHandler {
 
         // If this is a branch node we have entered only part of a multi-key command
         if (node instanceof BranchNode) {
-          logger.debug("branch node");
-          BranchNode branchNode = (BranchNode)node;
-          // Flag that we aren't allowing any more count digits (unless it's OK)
-          if ((branchNode.getFlags() & Command.FLAG_ALLOW_MID_COUNT) == 0) {
-            state = State.COMMAND;
-          }
-          editorState.setCurrentNode(branchNode);
-
-          ArgumentNode arg = (ArgumentNode)((BranchNode)editorState.getCurrentNode()).getArgumentNode();
-          if (arg != null) {
-            if (editorState.isRecording() && (arg.getFlags() & Command.FLAG_NO_ARG_RECORDING) != 0) {
-              handleKey(editor, KeyStroke.getKeyStroke(' '), context);
-            }
-
-            if (arg.getArgType() == Argument.EX_STRING) {
-              CommandGroups.getInstance().getProcess().startSearchCommand(editor, context, count, chKey);
-              state = State.NEW_COMMAND;
-              currentArg = Argument.EX_STRING;
-              editorState.pushState(CommandState.MODE_EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
-            }
-          }
+          handleBranchNode(editor, context, editorState, chKey, (BranchNode)node);
         }
         // If this is a command node the user has entered a valid key sequence of a known command
         else if (node instanceof CommandNode) {
-          logger.debug("command node");
-          // If all does well we are ready to process this command
-          state = State.READY;
-          CommandNode cmdNode = (CommandNode)node;
-          // Did we just get the completed sequence for a motion command argument?
-          if (currentArg == Argument.MOTION) {
-            // We have been expecting a motion argument - is this one?
-            if (cmdNode.getCmdType() == Command.MOTION) {
-              // Create the motion command and add it to the stack
-              Command cmd = new Command(count, cmdNode.getActionId(), cmdNode.getAction(),
-                                        cmdNode.getCmdType(), cmdNode.getFlags());
-              cmd.setKeys(keys);
-              currentCmd.push(cmd);
-            }
-            else if (cmdNode.getCmdType() == Command.RESET) {
-              currentCmd.clear();
-              Command cmd = new Command(1, cmdNode.getActionId(), cmdNode.getAction(),
-                                        cmdNode.getCmdType(), cmdNode.getFlags());
-              cmd.setKeys(keys);
-              currentCmd.push(cmd);
-            }
-            else {
-              // Oops - this wasn't a motion command. The user goofed and typed something else
-              state = State.BAD_COMMAND;
-            }
-          }
-          else if (currentArg == Argument.EX_STRING && (cmdNode.getFlags() & Command.FLAG_COMPLETE_EX) != 0) {
-            String text = CommandGroups.getInstance().getProcess().endSearchCommand(editor, context);
-            Argument arg = new Argument(text);
-            Command cmd = currentCmd.peek();
-            cmd.setArgument(arg);
-            CommandState.getInstance(editor).popState();
-          }
-          // The user entered a valid command that doesn't take any arguments
-          else {
-            // Create the command and add it to the stack
-            Command cmd = new Command(count, cmdNode.getActionId(), cmdNode.getAction(),
-                                      cmdNode.getCmdType(), cmdNode.getFlags());
-            cmd.setKeys(keys);
-            currentCmd.push(cmd);
-
-            // This is a sanity check that the command has a valid action. This should only fail if the
-            // programmer made a typo or forgot to add the action to the plugin.xml file
-            if (cmd.getAction() == null) {
-              logger.error("NULL action for keys '" + keys + "'");
-              state = State.ERROR;
-            }
-          }
+          handleCommandNode(editor, context, (CommandNode)node);
         }
         // If this is an argument node then the last keystroke was not part of the current command but should
         // be the first keystroke of the argument of the current command
         else if (node instanceof ArgumentNode) {
-          logger.debug("argument node");
-          // Create a new command based on what the user has typed so far, excluding this keystroke.
-          ArgumentNode arg = (ArgumentNode)node;
-          Command cmd = new Command(count, arg.getActionId(), arg.getAction(), arg.getCmdType(), arg.getFlags());
-          cmd.setKeys(keys);
-          currentCmd.push(cmd);
-          // What type of argument does this command expect?
-          switch (arg.getArgType()) {
-            case Argument.DIGRAPH:
-              //digraphState = 0;
-              digraph = new DigraphSequence();
-              // No break - fall through
-            case Argument.CHARACTER:
-            case Argument.MOTION:
-              state = State.NEW_COMMAND;
-              currentArg = arg.getArgType();
-              // Is the current command an operator? If so set the state to only accept "operator pending"
-              // commands
-              if ((arg.getFlags() & Command.FLAG_OP_PEND) != 0) {
-                //CommandState.getInstance().setMappingMode(KeyParser.MAPPING_OP_PEND);
-                editorState.pushState(editorState.getMode(), editorState.getSubMode(),
-                                      KeyParser.MAPPING_OP_PEND);
-              }
-              break;
-            case Argument.EX_STRING:
-              /*
-              mode = STATE_NEW_COMMAND;
-              currentArg = arg.getArgType();
-              editorState.pushState(CommandState.MODE_EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
-              */
-              break;
-            default:
-              // Oops - we aren't expecting any other type of argument
-              state = State.ERROR;
-          }
-
-          // If the current keystroke is really the first character of an argument the user needs to enter,
-          // recursively go back and handle this keystroke again with all the state properly updated to
-          // handle the argument
-          if (currentArg != Argument.NONE) {
-            partialReset(editor);
-            handleKey(editor, key, context);
-            shouldRecord = false; // Prevent this from getting recorded twice
-          }
+          shouldRecord = handleArgumentNode(editor, key, context, editorState, shouldRecord, (ArgumentNode)node);
         }
         else {
           logger.debug("checking for digraph");
@@ -370,63 +260,7 @@ public class KeyHandler {
 
     // Do we have a fully entered command at this point? If so, lets execute it
     if (state == State.READY) {
-      DelegateCommandListener.getInstance().setRunnable(null);
-      // Let's go through the command stack and merge it all into one command. At this time there should never
-      // be more than two commands on the stack - one is the actual command and the other would be a motion
-      // command argument needed by the first command
-      Command cmd = currentCmd.pop();
-      while (currentCmd.size() > 0) {
-        Command top = currentCmd.pop();
-        top.setArgument(new Argument(cmd));
-        cmd = top;
-      }
-
-      if (logger.isDebugEnabled()) {
-        logger.debug("cmd=" + cmd);
-      }
-      // If we have a command and a motion command argument, both could possibly have their own counts. We
-      // need to adjust the counts so the motion gets the product of both counts and the count associated with
-      // the command gets reset. Example 3c2w (change 2 words, three times) becomes c6w (change 6 words)
-      Argument arg = cmd.getArgument();
-      if (logger.isDebugEnabled()) {
-        logger.debug("arg=" + arg);
-      }
-      if (arg != null && arg.getType() == Argument.MOTION) {
-        Command mot = arg.getMotion();
-        // If no count was entered for either command then nothing changes. If either had a count then
-        // the motion gets the product of both.
-        int cnt = cmd.getRawCount() == 0 && mot.getRawCount() == 0 ? 0 : cmd.getCount() * mot.getCount();
-        cmd.setCount(0);
-        mot.setCount(cnt);
-      }
-
-      // If we were in "operator pending" mode, reset back to normal mode.
-      if (editorState.getMappingMode() == KeyParser.MAPPING_OP_PEND) {
-        //CommandState.getInstance().setMappingMode(KeyParser.MAPPING_NORMAL);
-        editorState.popState();
-      }
-
-      // Save off the command we are about to execute
-      editorState.setCommand(cmd);
-
-      lastWasBS = ((cmd.getFlags() & Command.FLAG_IS_BACKSPACE) != 0);
-      logger.debug("lastWasBS=" + lastWasBS);
-
-      Project project = editor.getProject();
-      if (cmd.isReadType() || EditorHelper.canEdit(project, editor)) {
-        Runnable action = new ActionRunner(editor, context, cmd, key);
-        if (cmd.isWriteType()) {
-          RunnableHelper.runWriteCommand(project, action, cmd.getActionId(), null);
-        }
-        else {
-          RunnableHelper.runReadCommand(project, action, cmd.getActionId(), null);
-        }
-      }
-      else {
-        logger.info("write command on read-only file");
-        VimPlugin.indicateError();
-        reset(editor);
-      }
+      executeCommand(editor, key, context, editorState);
     }
     else if (state == State.BAD_COMMAND) {
       VimPlugin.indicateError();
@@ -439,6 +273,191 @@ public class KeyHandler {
     }
     else if (isRecording && shouldRecord) {
       CommandGroups.getInstance().getRegister().addKeyStroke(key);
+    }
+  }
+
+  private void executeCommand(Editor editor, KeyStroke key, DataContext context, CommandState editorState) {
+    DelegateCommandListener.getInstance().setRunnable(null);
+    // Let's go through the command stack and merge it all into one command. At this time there should never
+    // be more than two commands on the stack - one is the actual command and the other would be a motion
+    // command argument needed by the first command
+    Command cmd = currentCmd.pop();
+    while (currentCmd.size() > 0) {
+      Command top = currentCmd.pop();
+      top.setArgument(new Argument(cmd));
+      cmd = top;
+    }
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("cmd=" + cmd);
+    }
+    // If we have a command and a motion command argument, both could possibly have their own counts. We
+    // need to adjust the counts so the motion gets the product of both counts and the count associated with
+    // the command gets reset. Example 3c2w (change 2 words, three times) becomes c6w (change 6 words)
+    Argument arg = cmd.getArgument();
+    if (logger.isDebugEnabled()) {
+      logger.debug("arg=" + arg);
+    }
+    if (arg != null && arg.getType() == Argument.MOTION) {
+      Command mot = arg.getMotion();
+      // If no count was entered for either command then nothing changes. If either had a count then
+      // the motion gets the product of both.
+      int cnt = cmd.getRawCount() == 0 && mot.getRawCount() == 0 ? 0 : cmd.getCount() * mot.getCount();
+      cmd.setCount(0);
+      mot.setCount(cnt);
+    }
+
+    // If we were in "operator pending" mode, reset back to normal mode.
+    if (editorState.getMappingMode() == KeyParser.MAPPING_OP_PEND) {
+      //CommandState.getInstance().setMappingMode(KeyParser.MAPPING_NORMAL);
+      editorState.popState();
+    }
+
+    // Save off the command we are about to execute
+    editorState.setCommand(cmd);
+
+    lastWasBS = ((cmd.getFlags() & Command.FLAG_IS_BACKSPACE) != 0);
+    logger.debug("lastWasBS=" + lastWasBS);
+
+    Project project = editor.getProject();
+    if (cmd.isReadType() || EditorHelper.canEdit(project, editor)) {
+      Runnable action = new ActionRunner(editor, context, cmd, key);
+      if (cmd.isWriteType()) {
+        RunnableHelper.runWriteCommand(project, action, cmd.getActionId(), null);
+      }
+      else {
+        RunnableHelper.runReadCommand(project, action, cmd.getActionId(), null);
+      }
+    }
+    else {
+      logger.info("write command on read-only file");
+      VimPlugin.indicateError();
+      reset(editor);
+    }
+  }
+
+  private boolean handleArgumentNode(Editor editor,
+                                     KeyStroke key,
+                                     DataContext context,
+                                     CommandState editorState,
+                                     boolean shouldRecord,
+                                     ArgumentNode node) {
+    logger.debug("argument node");
+    // Create a new command based on what the user has typed so far, excluding this keystroke.
+    Command cmd = new Command(count, node.getActionId(), node.getAction(), node.getCmdType(), node.getFlags());
+    cmd.setKeys(keys);
+    currentCmd.push(cmd);
+    // What type of argument does this command expect?
+    switch (node.getArgType()) {
+      case Argument.DIGRAPH:
+        //digraphState = 0;
+        digraph = new DigraphSequence();
+        // No break - fall through
+      case Argument.CHARACTER:
+      case Argument.MOTION:
+        state = State.NEW_COMMAND;
+        currentArg = node.getArgType();
+        // Is the current command an operator? If so set the state to only accept "operator pending"
+        // commands
+        if ((node.getFlags() & Command.FLAG_OP_PEND) != 0) {
+          //CommandState.getInstance().setMappingMode(KeyParser.MAPPING_OP_PEND);
+          editorState.pushState(editorState.getMode(), editorState.getSubMode(),
+                                KeyParser.MAPPING_OP_PEND);
+        }
+        break;
+      case Argument.EX_STRING:
+        /*
+        mode = STATE_NEW_COMMAND;
+        currentArg = arg.getArgType();
+        editorState.pushState(CommandState.MODE_EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
+        */
+        break;
+      default:
+        // Oops - we aren't expecting any other type of argument
+        state = State.ERROR;
+    }
+
+    // If the current keystroke is really the first character of an argument the user needs to enter,
+    // recursively go back and handle this keystroke again with all the state properly updated to
+    // handle the argument
+    if (currentArg != Argument.NONE) {
+      partialReset(editor);
+      handleKey(editor, key, context);
+      shouldRecord = false; // Prevent this from getting recorded twice
+    }
+    return shouldRecord;
+  }
+
+  private void handleCommandNode(Editor editor, DataContext context, CommandNode node) {
+    logger.debug("command node");
+    // If all does well we are ready to process this command
+    state = State.READY;
+    // Did we just get the completed sequence for a motion command argument?
+    if (currentArg == Argument.MOTION) {
+      // We have been expecting a motion argument - is this one?
+      if (node.getCmdType() == Command.MOTION) {
+        // Create the motion command and add it to the stack
+        Command cmd = new Command(count, node.getActionId(), node.getAction(),
+                                  node.getCmdType(), node.getFlags());
+        cmd.setKeys(keys);
+        currentCmd.push(cmd);
+      }
+      else if (node.getCmdType() == Command.RESET) {
+        currentCmd.clear();
+        Command cmd = new Command(1, node.getActionId(), node.getAction(),
+                                  node.getCmdType(), node.getFlags());
+        cmd.setKeys(keys);
+        currentCmd.push(cmd);
+      }
+      else {
+        // Oops - this wasn't a motion command. The user goofed and typed something else
+        state = State.BAD_COMMAND;
+      }
+    }
+    else if (currentArg == Argument.EX_STRING && (node.getFlags() & Command.FLAG_COMPLETE_EX) != 0) {
+      String text = CommandGroups.getInstance().getProcess().endSearchCommand(editor, context);
+      Argument arg = new Argument(text);
+      Command cmd = currentCmd.peek();
+      cmd.setArgument(arg);
+      CommandState.getInstance(editor).popState();
+    }
+    // The user entered a valid command that doesn't take any arguments
+    else {
+      // Create the command and add it to the stack
+      Command cmd = new Command(count, node.getActionId(), node.getAction(),
+                                node.getCmdType(), node.getFlags());
+      cmd.setKeys(keys);
+      currentCmd.push(cmd);
+
+      // This is a sanity check that the command has a valid action. This should only fail if the
+      // programmer made a typo or forgot to add the action to the plugin.xml file
+      if (cmd.getAction() == null) {
+        logger.error("NULL action for keys '" + keys + "'");
+        state = State.ERROR;
+      }
+    }
+  }
+
+  private void handleBranchNode(Editor editor, DataContext context, CommandState editorState, char chKey, BranchNode node) {
+    logger.debug("branch node");
+    // Flag that we aren't allowing any more count digits (unless it's OK)
+    if ((node.getFlags() & Command.FLAG_ALLOW_MID_COUNT) == 0) {
+      state = State.COMMAND;
+    }
+    editorState.setCurrentNode(node);
+
+    ArgumentNode arg = (ArgumentNode)((BranchNode)editorState.getCurrentNode()).getArgumentNode();
+    if (arg != null) {
+      if (editorState.isRecording() && (arg.getFlags() & Command.FLAG_NO_ARG_RECORDING) != 0) {
+        handleKey(editor, KeyStroke.getKeyStroke(' '), context);
+      }
+
+      if (arg.getArgType() == Argument.EX_STRING) {
+        CommandGroups.getInstance().getProcess().startSearchCommand(editor, context, count, chKey);
+        state = State.NEW_COMMAND;
+        currentArg = Argument.EX_STRING;
+        editorState.pushState(CommandState.MODE_EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
+      }
     }
   }
 
