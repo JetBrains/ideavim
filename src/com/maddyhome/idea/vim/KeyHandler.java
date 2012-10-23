@@ -106,156 +106,154 @@ public class KeyHandler {
     final CommandState editorState = CommandState.getInstance(editor);
     final boolean isRecording = editorState.isRecording();
     boolean shouldRecord = true;
-    for (int loop = 0; loop < 2; loop++) {
-      // If this is a "regular" character keystroke, get the character
-      char chKey = key.getKeyChar() == KeyEvent.CHAR_UNDEFINED ? 0 : key.getKeyChar();
+    // If this is a "regular" character keystroke, get the character
+    char chKey = key.getKeyChar() == KeyEvent.CHAR_UNDEFINED ? 0 : key.getKeyChar();
 
-      if ((editorState.getMode() == CommandState.MODE_COMMAND || state == State.COMMAND) &&
-          (key.getKeyCode() == KeyEvent.VK_ESCAPE ||
-           (key.getKeyCode() == KeyEvent.VK_C && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0) ||
-           (key.getKeyCode() == '[' && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0))) {
-        if (state != State.COMMAND && count == 0 && currentArg == Argument.NONE && currentCmd.size() == 0 &&
-            CommandGroups.getInstance().getRegister().getCurrentRegister() == RegisterGroup.REGISTER_DEFAULT) {
-          if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            KeyHandler.executeAction("VimEditorEscape", context);
-            //getOriginalHandler().execute(editor, key.getKeyChar(), context);
+    if ((editorState.getMode() == CommandState.MODE_COMMAND || state == State.COMMAND) &&
+        (key.getKeyCode() == KeyEvent.VK_ESCAPE ||
+         (key.getKeyCode() == KeyEvent.VK_C && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0) ||
+         (key.getKeyCode() == '[' && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0))) {
+      if (state != State.COMMAND && count == 0 && currentArg == Argument.NONE && currentCmd.size() == 0 &&
+          CommandGroups.getInstance().getRegister().getCurrentRegister() == RegisterGroup.REGISTER_DEFAULT) {
+        if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
+          KeyHandler.executeAction("VimEditorEscape", context);
+          //getOriginalHandler().execute(editor, key.getKeyChar(), context);
+        }
+        VimPlugin.indicateError();
+      }
+
+      reset(editor);
+    }
+    // At this point the user must be typing in a command. Most commands can be preceded by a number. Let's
+    // check if a number can be entered at this point, and if so, did the user send us a digit.
+    else if ((editorState.getMode() == CommandState.MODE_COMMAND ||
+              editorState.getMode() == CommandState.MODE_VISUAL) &&
+             state == State.NEW_COMMAND && currentArg != Argument.CHARACTER && currentArg != Argument.DIGRAPH &&
+             Character.isDigit(chKey) &&
+             (count != 0 || chKey != '0')) {
+      // Update the count
+      count = count * 10 + (chKey - '0');
+      logger.debug("count now " + count);
+    }
+    // Pressing delete while entering a count "removes" the last digit entered
+    else if ((editorState.getMode() == CommandState.MODE_COMMAND ||
+              editorState.getMode() == CommandState.MODE_VISUAL) &&
+             state == State.NEW_COMMAND && currentArg != Argument.CHARACTER && currentArg != Argument.DIGRAPH &&
+             key.getKeyCode() == KeyEvent.VK_DELETE && count != 0) {
+      // "Remove" the last digit sent to us
+      count /= 10;
+      logger.debug("count now " + count);
+    }
+    // If we got this far the user is entering a command or supplying an argument to an entered command.
+    // First let's check to see if we are at the point of expecting a single character argument to a command.
+    else if (currentArg == Argument.CHARACTER) {
+      logger.debug("currentArg is Character");
+      // We are expecting a character argument - is this a regular character the user typed?
+      // Some special keys can be handled as character arguments - let's check for them here.
+      if (chKey == 0) {
+        switch (key.getKeyCode()) {
+          case KeyEvent.VK_TAB:
+            chKey = '\t';
+            break;
+          case KeyEvent.VK_ENTER:
+            chKey = '\n';
+            break;
+        }
+      }
+
+      if (chKey != 0) {
+        // Create the character argument, add it to the current command, and signal we are ready to process
+        // the command
+        Argument arg = new Argument(chKey);
+        Command cmd = currentCmd.peek();
+        cmd.setArgument(arg);
+        state = State.READY;
+      }
+      else {
+        // Oops - this isn't a valid character argument
+        state = State.BAD_COMMAND;
+      }
+    }
+    // If we are this far, then the user must be entering a command or a non-single-character argument
+    // to an entered command. Let's figure out which it is
+    else {
+      // For debugging purposes we track the keys entered for this command
+      keys.add(key);
+      if (logger.isDebugEnabled()) {
+        logger.debug("keys now " + keys);
+      }
+
+      // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
+      // return the node matching this keystroke
+      Node node = editorState.getCurrentNode().getChild(key);
+
+      if (digraph == null && !(node instanceof CommandNode) && DigraphSequence.isDigraphStart(key)) {
+        digraph = new DigraphSequence();
+      }
+      if (digraph != null) {
+        DigraphSequence.DigraphResult res = digraph.processKey(key, editor, context);
+        switch (res.getResult()) {
+          case DigraphSequence.DigraphResult.RES_OK:
+            return;
+          case DigraphSequence.DigraphResult.RES_BAD:
+            digraph = null;
+            return;
+          case DigraphSequence.DigraphResult.RES_DONE:
+            if (currentArg == Argument.DIGRAPH) {
+              currentArg = Argument.CHARACTER;
+            }
+            key = res.getStroke();
+            digraph = null;
+            handleKey(editor, key, context);
+            return;
+        }
+
+        logger.debug("digraph done");
+      }
+
+      // If this is a branch node we have entered only part of a multi-key command
+      if (node instanceof BranchNode) {
+        handleBranchNode(editor, context, editorState, chKey, (BranchNode)node);
+      }
+      // If this is a command node the user has entered a valid key sequence of a known command
+      else if (node instanceof CommandNode) {
+        handleCommandNode(editor, context, (CommandNode)node);
+      }
+      // If this is an argument node then the last keystroke was not part of the current command but should
+      // be the first keystroke of the argument of the current command
+      else if (node instanceof ArgumentNode) {
+        shouldRecord = handleArgumentNode(editor, key, context, editorState, shouldRecord, (ArgumentNode)node);
+      }
+      else {
+        logger.debug("checking for digraph");
+        logger.debug("lastWasBS=" + lastWasBS);
+        logger.debug("lastChar=" + lastChar);
+        if (lastWasBS && lastChar != 0 && Options.getInstance().isSet("digraph")) {
+          char dig = CommandGroups.getInstance().getDigraph().getDigraph(lastChar, key.getKeyChar());
+          logger.debug("dig=" + dig);
+          key = KeyStroke.getKeyStroke(dig);
+        }
+
+        // If we are in insert/replace mode send this key in for processing
+        if (editorState.getMode() == CommandState.MODE_INSERT ||
+            editorState.getMode() == CommandState.MODE_REPLACE) {
+          if (!CommandGroups.getInstance().getChange().processKey(editor, context, key)) {
+            shouldRecord = false;
           }
-          VimPlugin.indicateError();
         }
-
-        reset(editor);
-      }
-      // At this point the user must be typing in a command. Most commands can be preceded by a number. Let's
-      // check if a number can be entered at this point, and if so, did the user send us a digit.
-      else if ((editorState.getMode() == CommandState.MODE_COMMAND ||
-                editorState.getMode() == CommandState.MODE_VISUAL) &&
-               state == State.NEW_COMMAND && currentArg != Argument.CHARACTER && currentArg != Argument.DIGRAPH &&
-               Character.isDigit(chKey) &&
-               (count != 0 || chKey != '0')) {
-        // Update the count
-        count = count * 10 + (chKey - '0');
-        logger.debug("count now " + count);
-      }
-      // Pressing delete while entering a count "removes" the last digit entered
-      else if ((editorState.getMode() == CommandState.MODE_COMMAND ||
-                editorState.getMode() == CommandState.MODE_VISUAL) &&
-               state == State.NEW_COMMAND && currentArg != Argument.CHARACTER && currentArg != Argument.DIGRAPH &&
-               key.getKeyCode() == KeyEvent.VK_DELETE && count != 0) {
-        // "Remove" the last digit sent to us
-        count /= 10;
-        logger.debug("count now " + count);
-      }
-      // If we got this far the user is entering a command or supplying an argument to an entered command.
-      // First let's check to see if we are at the point of expecting a single character argument to a command.
-      else if (currentArg == Argument.CHARACTER) {
-        logger.debug("currentArg is Character");
-        // We are expecting a character argument - is this a regular character the user typed?
-        // Some special keys can be handled as character arguments - let's check for them here.
-        if (chKey == 0) {
-          switch (key.getKeyCode()) {
-            case KeyEvent.VK_TAB:
-              chKey = '\t';
-              break;
-            case KeyEvent.VK_ENTER:
-              chKey = '\n';
-              break;
+        else if (editorState.getMappingMode() == KeyParser.MAPPING_CMD_LINE) {
+          if (!CommandGroups.getInstance().getProcess().processExKey(editor, context, key, true)) {
+            shouldRecord = false;
           }
         }
-
-        if (chKey != 0) {
-          // Create the character argument, add it to the current command, and signal we are ready to process
-          // the command
-          Argument arg = new Argument(chKey);
-          Command cmd = currentCmd.peek();
-          cmd.setArgument(arg);
-          state = State.READY;
-        }
+        // If we get here then the user has entered an unrecognized series of keystrokes
         else {
-          // Oops - this isn't a valid character argument
           state = State.BAD_COMMAND;
         }
+
+        lastChar = key.getKeyChar();
+        partialReset(editor);
       }
-      // If we are this far, then the user must be entering a command or a non-single-character argument
-      // to an entered command. Let's figure out which it is
-      else {
-        // For debugging purposes we track the keys entered for this command
-        keys.add(key);
-        if (logger.isDebugEnabled()) {
-          logger.debug("keys now " + keys);
-        }
-
-        // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
-        // return the node matching this keystroke
-        Node node = editorState.getCurrentNode().getChild(key);
-
-        if (digraph == null && !(node instanceof CommandNode) && DigraphSequence.isDigraphStart(key)) {
-          digraph = new DigraphSequence();
-        }
-        if (digraph != null) {
-          DigraphSequence.DigraphResult res = digraph.processKey(key, editor, context);
-          switch (res.getResult()) {
-            case DigraphSequence.DigraphResult.RES_OK:
-              return;
-            case DigraphSequence.DigraphResult.RES_BAD:
-              digraph = null;
-              return;
-            case DigraphSequence.DigraphResult.RES_DONE:
-              if (currentArg == Argument.DIGRAPH) {
-                currentArg = Argument.CHARACTER;
-              }
-              key = res.getStroke();
-              digraph = null;
-              continue;
-          }
-
-          logger.debug("digraph done");
-        }
-
-        // If this is a branch node we have entered only part of a multi-key command
-        if (node instanceof BranchNode) {
-          handleBranchNode(editor, context, editorState, chKey, (BranchNode)node);
-        }
-        // If this is a command node the user has entered a valid key sequence of a known command
-        else if (node instanceof CommandNode) {
-          handleCommandNode(editor, context, (CommandNode)node);
-        }
-        // If this is an argument node then the last keystroke was not part of the current command but should
-        // be the first keystroke of the argument of the current command
-        else if (node instanceof ArgumentNode) {
-          shouldRecord = handleArgumentNode(editor, key, context, editorState, shouldRecord, (ArgumentNode)node);
-        }
-        else {
-          logger.debug("checking for digraph");
-          logger.debug("lastWasBS=" + lastWasBS);
-          logger.debug("lastChar=" + lastChar);
-          if (lastWasBS && lastChar != 0 && Options.getInstance().isSet("digraph")) {
-            char dig = CommandGroups.getInstance().getDigraph().getDigraph(lastChar, key.getKeyChar());
-            logger.debug("dig=" + dig);
-            key = KeyStroke.getKeyStroke(dig);
-          }
-
-          // If we are in insert/replace mode send this key in for processing
-          if (editorState.getMode() == CommandState.MODE_INSERT ||
-              editorState.getMode() == CommandState.MODE_REPLACE) {
-            if (!CommandGroups.getInstance().getChange().processKey(editor, context, key)) {
-              shouldRecord = false;
-            }
-          }
-          else if (editorState.getMappingMode() == KeyParser.MAPPING_CMD_LINE) {
-            if (!CommandGroups.getInstance().getProcess().processExKey(editor, context, key, true)) {
-              shouldRecord = false;
-            }
-          }
-          // If we get here then the user has entered an unrecognized series of keystrokes
-          else {
-            state = State.BAD_COMMAND;
-          }
-
-          lastChar = key.getKeyChar();
-          partialReset(editor);
-        }
-      }
-      break;
     }
 
     // Do we have a fully entered command at this point? If so, lets execute it
