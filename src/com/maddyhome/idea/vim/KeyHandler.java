@@ -109,37 +109,18 @@ public class KeyHandler {
     // If this is a "regular" character keystroke, get the character
     char chKey = key.getKeyChar() == KeyEvent.CHAR_UNDEFINED ? 0 : key.getKeyChar();
 
-    if ((editorState.getMode() == CommandState.MODE_COMMAND || state == State.COMMAND) &&
-        (key.getKeyCode() == KeyEvent.VK_ESCAPE ||
-         (key.getKeyCode() == KeyEvent.VK_C && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0) ||
-         (key.getKeyCode() == '[' && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0))) {
-      if (state != State.COMMAND && count == 0 && currentArg == Argument.NONE && currentCmd.size() == 0 &&
-          CommandGroups.getInstance().getRegister().getCurrentRegister() == RegisterGroup.REGISTER_DEFAULT) {
-        if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
-          KeyHandler.executeAction("VimEditorEscape", context);
-          //getOriginalHandler().execute(editor, key.getKeyChar(), context);
-        }
-        VimPlugin.indicateError();
-      }
-
-      reset(editor);
+    if (isEditorReset(key, editorState)) {
+      handleEditorReset(editor, key, context);
     }
     // At this point the user must be typing in a command. Most commands can be preceded by a number. Let's
     // check if a number can be entered at this point, and if so, did the user send us a digit.
-    else if ((editorState.getMode() == CommandState.MODE_COMMAND ||
-              editorState.getMode() == CommandState.MODE_VISUAL) &&
-             state == State.NEW_COMMAND && currentArg != Argument.CHARACTER && currentArg != Argument.DIGRAPH &&
-             Character.isDigit(chKey) &&
-             (count != 0 || chKey != '0')) {
+    else if (isCommandCount(editorState, chKey)) {
       // Update the count
       count = count * 10 + (chKey - '0');
       logger.debug("count now " + count);
     }
     // Pressing delete while entering a count "removes" the last digit entered
-    else if ((editorState.getMode() == CommandState.MODE_COMMAND ||
-              editorState.getMode() == CommandState.MODE_VISUAL) &&
-             state == State.NEW_COMMAND && currentArg != Argument.CHARACTER && currentArg != Argument.DIGRAPH &&
-             key.getKeyCode() == KeyEvent.VK_DELETE && count != 0) {
+    else if (isDeleteCommandCount(key, editorState)) {
       // "Remove" the last digit sent to us
       count /= 10;
       logger.debug("count now " + count);
@@ -147,32 +128,7 @@ public class KeyHandler {
     // If we got this far the user is entering a command or supplying an argument to an entered command.
     // First let's check to see if we are at the point of expecting a single character argument to a command.
     else if (currentArg == Argument.CHARACTER) {
-      logger.debug("currentArg is Character");
-      // We are expecting a character argument - is this a regular character the user typed?
-      // Some special keys can be handled as character arguments - let's check for them here.
-      if (chKey == 0) {
-        switch (key.getKeyCode()) {
-          case KeyEvent.VK_TAB:
-            chKey = '\t';
-            break;
-          case KeyEvent.VK_ENTER:
-            chKey = '\n';
-            break;
-        }
-      }
-
-      if (chKey != 0) {
-        // Create the character argument, add it to the current command, and signal we are ready to process
-        // the command
-        Argument arg = new Argument(chKey);
-        Command cmd = currentCmd.peek();
-        cmd.setArgument(arg);
-        state = State.READY;
-      }
-      else {
-        // Oops - this isn't a valid character argument
-        state = State.BAD_COMMAND;
-      }
+      handleCharArgument(key, chKey);
     }
     // If we are this far, then the user must be entering a command or a non-single-character argument
     // to an entered command. Let's figure out which it is
@@ -187,28 +143,8 @@ public class KeyHandler {
       // return the node matching this keystroke
       Node node = editorState.getCurrentNode().getChild(key);
 
-      if (digraph == null && !(node instanceof CommandNode) && DigraphSequence.isDigraphStart(key)) {
-        digraph = new DigraphSequence();
-      }
-      if (digraph != null) {
-        DigraphSequence.DigraphResult res = digraph.processKey(key, editor, context);
-        switch (res.getResult()) {
-          case DigraphSequence.DigraphResult.RES_OK:
-            return;
-          case DigraphSequence.DigraphResult.RES_BAD:
-            digraph = null;
-            return;
-          case DigraphSequence.DigraphResult.RES_DONE:
-            if (currentArg == Argument.DIGRAPH) {
-              currentArg = Argument.CHARACTER;
-            }
-            key = res.getStroke();
-            digraph = null;
-            handleKey(editor, key, context);
-            return;
-        }
-
-        logger.debug("digraph done");
+      if (handleDigraph(editor, key, context, node)) {
+        return;
       }
 
       // If this is a branch node we have entered only part of a multi-key command
@@ -272,6 +208,96 @@ public class KeyHandler {
     else if (isRecording && shouldRecord) {
       CommandGroups.getInstance().getRegister().addKeyStroke(key);
     }
+  }
+
+  private void handleEditorReset(Editor editor, KeyStroke key, DataContext context) {
+    if (state != State.COMMAND && count == 0 && currentArg == Argument.NONE && currentCmd.size() == 0 &&
+        CommandGroups.getInstance().getRegister().getCurrentRegister() == RegisterGroup.REGISTER_DEFAULT) {
+      if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
+        KeyHandler.executeAction("VimEditorEscape", context);
+        //getOriginalHandler().execute(editor, key.getKeyChar(), context);
+      }
+      VimPlugin.indicateError();
+    }
+
+    reset(editor);
+  }
+
+  private boolean isDeleteCommandCount(KeyStroke key, CommandState editorState) {
+    return (editorState.getMode() == CommandState.MODE_COMMAND ||
+              editorState.getMode() == CommandState.MODE_VISUAL) &&
+             state == State.NEW_COMMAND && currentArg != Argument.CHARACTER && currentArg != Argument.DIGRAPH &&
+             key.getKeyCode() == KeyEvent.VK_DELETE && count != 0;
+  }
+
+  private boolean isCommandCount(CommandState editorState, char chKey) {
+    return (editorState.getMode() == CommandState.MODE_COMMAND ||
+              editorState.getMode() == CommandState.MODE_VISUAL) &&
+             state == State.NEW_COMMAND && currentArg != Argument.CHARACTER && currentArg != Argument.DIGRAPH &&
+             Character.isDigit(chKey) &&
+             (count != 0 || chKey != '0');
+  }
+
+  private boolean isEditorReset(KeyStroke key, CommandState editorState) {
+    return (editorState.getMode() == CommandState.MODE_COMMAND || state == State.COMMAND) &&
+        (key.getKeyCode() == KeyEvent.VK_ESCAPE ||
+         (key.getKeyCode() == KeyEvent.VK_C && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0) ||
+         (key.getKeyCode() == '[' && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0));
+  }
+
+  private void handleCharArgument(KeyStroke key, char chKey) {
+    logger.debug("currentArg is Character");
+    // We are expecting a character argument - is this a regular character the user typed?
+    // Some special keys can be handled as character arguments - let's check for them here.
+    if (chKey == 0) {
+      switch (key.getKeyCode()) {
+        case KeyEvent.VK_TAB:
+          chKey = '\t';
+          break;
+        case KeyEvent.VK_ENTER:
+          chKey = '\n';
+          break;
+      }
+    }
+
+    if (chKey != 0) {
+      // Create the character argument, add it to the current command, and signal we are ready to process
+      // the command
+      Argument arg = new Argument(chKey);
+      Command cmd = currentCmd.peek();
+      cmd.setArgument(arg);
+      state = State.READY;
+    }
+    else {
+      // Oops - this isn't a valid character argument
+      state = State.BAD_COMMAND;
+    }
+  }
+
+  private boolean handleDigraph(Editor editor, KeyStroke key, DataContext context, Node node) {
+    if (digraph == null && !(node instanceof CommandNode) && DigraphSequence.isDigraphStart(key)) {
+      digraph = new DigraphSequence();
+    }
+    if (digraph != null) {
+      DigraphSequence.DigraphResult res = digraph.processKey(key, editor, context);
+      switch (res.getResult()) {
+        case DigraphSequence.DigraphResult.RES_OK:
+          return true;
+        case DigraphSequence.DigraphResult.RES_BAD:
+          digraph = null;
+          return true;
+        case DigraphSequence.DigraphResult.RES_DONE:
+          if (currentArg == Argument.DIGRAPH) {
+            currentArg = Argument.CHARACTER;
+          }
+          digraph = null;
+          handleKey(editor, res.getStroke(), context);
+          return true;
+      }
+
+      logger.debug("digraph done");
+    }
+    return false;
   }
 
   private void executeCommand(Editor editor, KeyStroke key, DataContext context, CommandState editorState) {
