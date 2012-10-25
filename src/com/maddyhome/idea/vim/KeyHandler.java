@@ -344,7 +344,7 @@ public class KeyHandler {
     logger.debug("lastWasBS=" + lastWasBS);
 
     Project project = editor.getProject();
-    if (cmd.isReadType() || EditorHelper.canEdit(project, editor)) {
+    if (cmd.isReadType() || (project != null && EditorHelper.canEdit(project, editor))) {
       Runnable action = new ActionRunner(editor, context, cmd, key);
       if (cmd.isWriteType()) {
         RunnableHelper.runWriteCommand(project, action, cmd.getActionId(), null);
