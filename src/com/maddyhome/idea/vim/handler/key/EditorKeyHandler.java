@@ -30,6 +30,8 @@ import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
@@ -38,13 +40,13 @@ import javax.swing.*;
  */
 public class EditorKeyHandler extends EditorActionHandler {
 
-  public EditorKeyHandler(EditorActionHandler origHandler, KeyStroke stroke, boolean special) {
+  public EditorKeyHandler(@NotNull EditorActionHandler origHandler, @NotNull KeyStroke stroke, boolean special) {
     this.origHandler = origHandler;
     this.stroke = stroke;
     this.special = special;
   }
 
-  public void execute(Editor editor, DataContext context) {
+  public void execute(@Nullable Editor editor, @NotNull DataContext context) {
     logger.debug("execute");
 
     // Do not launch vim actions in case of lookup enabled
@@ -74,11 +76,11 @@ public class EditorKeyHandler extends EditorActionHandler {
     origHandler.execute(editor, context);
   }
 
-  protected void handle(Editor editor, DataContext context) {
+  protected void handle(@NotNull Editor editor, @NotNull DataContext context) {
     KeyHandler.getInstance().handleKey(editor, stroke, context);
   }
 
-  public boolean isEnabled(Editor editor, DataContext dataContext) {
+  public boolean isEnabled(@Nullable Editor editor, @NotNull DataContext dataContext) {
     boolean res = true;
     if (editor == null || !VimPlugin.isEnabled()
         // Enable correct enter handler processing in Rename, Watches etc
@@ -105,8 +107,8 @@ public class EditorKeyHandler extends EditorActionHandler {
     return res;
   }
 
-  protected EditorActionHandler origHandler;
-  protected KeyStroke stroke;
+  @NotNull protected EditorActionHandler origHandler;
+  @NotNull protected KeyStroke stroke;
   protected boolean special;
 
   private static Logger logger = Logger.getInstance(EditorKeyHandler.class.getName());

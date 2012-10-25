@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.option.Options;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -57,11 +58,11 @@ public class KeyHandler {
    *
    * @return A reference to the singleton
    */
+  @NotNull
   public static KeyHandler getInstance() {
     if (instance == null) {
       instance = new KeyHandler();
     }
-
     return instance;
   }
 
@@ -98,7 +99,7 @@ public class KeyHandler {
    * @param key     The keystroke typed by the user
    * @param context The data context
    */
-  public void handleKey(Editor editor, KeyStroke key, DataContext context) {
+  public void handleKey(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context) {
     // All the editor actions should be performed with top level editor!!!
     // Be careful: all the EditorActionHandler implementation should correctly process InjectedEditors
     editor = InjectedLanguageUtil.getTopLevelEditor(editor);
@@ -141,7 +142,7 @@ public class KeyHandler {
 
       // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
       // return the node matching this keystroke
-      Node node = editorState.getCurrentNode().getChild(key);
+      final Node node = editorState.getCurrentNode().getChild(key);
 
       if (handleDigraph(editor, key, context, node)) {
         return;
@@ -210,7 +211,7 @@ public class KeyHandler {
     }
   }
 
-  private void handleEditorReset(Editor editor, KeyStroke key, DataContext context) {
+  private void handleEditorReset(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context) {
     if (state != State.COMMAND && count == 0 && currentArg == Argument.NONE && currentCmd.size() == 0 &&
         CommandGroups.getInstance().getRegister().getCurrentRegister() == RegisterGroup.REGISTER_DEFAULT) {
       if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
@@ -223,14 +224,14 @@ public class KeyHandler {
     reset(editor);
   }
 
-  private boolean isDeleteCommandCount(KeyStroke key, CommandState editorState) {
+  private boolean isDeleteCommandCount(@NotNull KeyStroke key, @NotNull CommandState editorState) {
     return (editorState.getMode() == CommandState.MODE_COMMAND ||
               editorState.getMode() == CommandState.MODE_VISUAL) &&
              state == State.NEW_COMMAND && currentArg != Argument.CHARACTER && currentArg != Argument.DIGRAPH &&
              key.getKeyCode() == KeyEvent.VK_DELETE && count != 0;
   }
 
-  private boolean isCommandCount(CommandState editorState, char chKey) {
+  private boolean isCommandCount(@NotNull CommandState editorState, char chKey) {
     return (editorState.getMode() == CommandState.MODE_COMMAND ||
               editorState.getMode() == CommandState.MODE_VISUAL) &&
              state == State.NEW_COMMAND && currentArg != Argument.CHARACTER && currentArg != Argument.DIGRAPH &&
@@ -238,14 +239,14 @@ public class KeyHandler {
              (count != 0 || chKey != '0');
   }
 
-  private boolean isEditorReset(KeyStroke key, CommandState editorState) {
+  private boolean isEditorReset(@NotNull KeyStroke key, @NotNull CommandState editorState) {
     return (editorState.getMode() == CommandState.MODE_COMMAND || state == State.COMMAND) &&
         (key.getKeyCode() == KeyEvent.VK_ESCAPE ||
          (key.getKeyCode() == KeyEvent.VK_C && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0) ||
          (key.getKeyCode() == '[' && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0));
   }
 
-  private void handleCharArgument(KeyStroke key, char chKey) {
+  private void handleCharArgument(@NotNull KeyStroke key, char chKey) {
     logger.debug("currentArg is Character");
     // We are expecting a character argument - is this a regular character the user typed?
     // Some special keys can be handled as character arguments - let's check for them here.
@@ -274,7 +275,7 @@ public class KeyHandler {
     }
   }
 
-  private boolean handleDigraph(Editor editor, KeyStroke key, DataContext context, Node node) {
+  private boolean handleDigraph(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context, @Nullable Node node) {
     if (digraph == null && !(node instanceof CommandNode) && DigraphSequence.isDigraphStart(key)) {
       digraph = new DigraphSequence();
     }
@@ -300,7 +301,8 @@ public class KeyHandler {
     return false;
   }
 
-  private void executeCommand(Editor editor, KeyStroke key, DataContext context, CommandState editorState) {
+  private void executeCommand(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context,
+                              @NotNull CommandState editorState) {
     DelegateCommandListener.getInstance().setRunnable(null);
     // Let's go through the command stack and merge it all into one command. At this time there should never
     // be more than two commands on the stack - one is the actual command and the other would be a motion
@@ -360,12 +362,12 @@ public class KeyHandler {
     }
   }
 
-  private boolean handleArgumentNode(Editor editor,
-                                     KeyStroke key,
-                                     DataContext context,
-                                     CommandState editorState,
+  private boolean handleArgumentNode(@NotNull Editor editor,
+                                     @NotNull KeyStroke key,
+                                     @NotNull DataContext context,
+                                     @NotNull CommandState editorState,
                                      boolean shouldRecord,
-                                     ArgumentNode node) {
+                                     @NotNull ArgumentNode node) {
     logger.debug("argument node");
     // Create a new command based on what the user has typed so far, excluding this keystroke.
     Command cmd = new Command(count, node.getActionId(), node.getAction(), node.getCmdType(), node.getFlags());
@@ -412,7 +414,7 @@ public class KeyHandler {
     return shouldRecord;
   }
 
-  private void handleCommandNode(Editor editor, DataContext context, CommandNode node) {
+  private void handleCommandNode(@NotNull Editor editor, @NotNull DataContext context, @NotNull CommandNode node) {
     logger.debug("command node");
     // If all does well we are ready to process this command
     state = State.READY;
@@ -462,7 +464,8 @@ public class KeyHandler {
     }
   }
 
-  private void handleBranchNode(Editor editor, DataContext context, CommandState editorState, char chKey, BranchNode node) {
+  private void handleBranchNode(@NotNull Editor editor, @NotNull DataContext context, @NotNull CommandState editorState, char key,
+                                @NotNull BranchNode node) {
     logger.debug("branch node");
     // Flag that we aren't allowing any more count digits (unless it's OK)
     if ((node.getFlags() & Command.FLAG_ALLOW_MID_COUNT) == 0) {
@@ -477,7 +480,7 @@ public class KeyHandler {
       }
 
       if (arg.getArgType() == Argument.EX_STRING) {
-        CommandGroups.getInstance().getProcess().startSearchCommand(editor, context, count, chKey);
+        CommandGroups.getInstance().getProcess().startSearchCommand(editor, context, count, key);
         state = State.NEW_COMMAND;
         currentArg = Argument.EX_STRING;
         editorState.pushState(CommandState.MODE_EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
@@ -562,7 +565,7 @@ public class KeyHandler {
    *
    * @param editor The editor to reset.
    */
-  public void fullReset(Editor editor) {
+  public void fullReset(@Nullable Editor editor) {
     CommandState.getInstance(editor).reset();
     reset(editor);
     lastChar = 0;

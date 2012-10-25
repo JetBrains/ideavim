@@ -26,6 +26,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.common.Register;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -94,8 +95,8 @@ public class MacroGroup extends AbstractActionGroup {
    * @param cnt     count
    * @param total   total
    */
-  public void playbackKeys(final Editor editor, final DataContext context, final Project project,
-                           final List<KeyStroke> keys, final int pos, final int cnt, final int total) {
+  public void playbackKeys(@NotNull final Editor editor, @NotNull final DataContext context, @NotNull final Project project,
+                           @NotNull final List<KeyStroke> keys, final int pos, final int cnt, final int total) {
     if (logger.isDebugEnabled()) {
       logger.debug("playbackKeys " + pos);
     }

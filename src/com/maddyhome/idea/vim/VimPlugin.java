@@ -199,7 +199,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     DocumentManager.getInstance().init();
 
     EditorFactory.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
-      public void editorCreated(EditorFactoryEvent event) {
+      public void editorCreated(@NotNull EditorFactoryEvent event) {
         final Editor editor = event.getEditor();
         isBlockCursor = editor.getSettings().isBlockCursor();
         isAnimatedScrolling = editor.getSettings().isAnimatedScrolling();
@@ -218,7 +218,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         }
       }
 
-      public void editorReleased(EditorFactoryEvent event) {
+      public void editorReleased(@NotNull EditorFactoryEvent event) {
         EditorData.uninitializeEditor(event.getEditor());
         event.getEditor().getSettings().setAnimatedScrolling(isAnimatedScrolling);
         event.getEditor().getSettings().setRefrainFromScrolling(isRefrainFromScrolling);
@@ -324,11 +324,13 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     Project[] projs = pm.getOpenProjects();
     for (Project proj : projs) {
       StatusBar bar = WindowManager.getInstance().getStatusBar(proj);
-      if (msg == null || msg.length() == 0) {
-        bar.setInfo("");
-      }
-      else {
-        bar.setInfo("VIM - " + msg);
+      if (bar != null) {
+        if (msg == null || msg.length() == 0) {
+          bar.setInfo("");
+        }
+        else {
+          bar.setInfo("VIM - " + msg);
+        }
       }
     }
   }

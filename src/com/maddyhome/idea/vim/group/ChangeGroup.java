@@ -44,6 +44,7 @@ import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.option.BoundListOption;
 import com.maddyhome.idea.vim.option.Options;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -61,13 +62,13 @@ public class ChangeGroup extends AbstractActionGroup {
     // We want to know when a user clicks the mouse somewhere in the editor so we can clear any
     // saved text for the current insert mode.
     EditorFactory.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
-      public void editorCreated(EditorFactoryEvent event) {
+      public void editorCreated(@NotNull EditorFactoryEvent event) {
         Editor editor = event.getEditor();
         editor.addEditorMouseListener(listener);
         EditorData.setChangeGroup(editor, true);
       }
 
-      public void editorReleased(EditorFactoryEvent event) {
+      public void editorReleased(@NotNull EditorFactoryEvent event) {
         Editor editor = event.getEditor();
         if (EditorData.getChangeGroup(editor)) {
           editor.removeEditorMouseListener(listener);
@@ -156,7 +157,7 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param editor  The editor to insert into
    * @param context The data context
    */
-  public void insertNewLineAbove(final Editor editor, final DataContext context) {
+  public void insertNewLineAbove(@NotNull final Editor editor, @NotNull final DataContext context) {
     if (editor.getCaretModel().getVisualPosition().line == 0) {
       MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor));
       initInsert(editor, context, CommandState.MODE_INSERT);
@@ -189,7 +190,7 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param editor  The editor to insert into
    * @param context The data context
    */
-  public void insertNewLineBelow(final Editor editor, final DataContext context) {
+  public void insertNewLineBelow(@NotNull final Editor editor, @NotNull final DataContext context) {
     MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, true));
     initInsert(editor, context, CommandState.MODE_INSERT);
 

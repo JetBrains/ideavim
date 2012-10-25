@@ -19,6 +19,9 @@ package com.maddyhome.idea.vim.key;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import javax.swing.*;
 
 /**
@@ -51,7 +54,8 @@ public class BranchNode extends ParentNode {
    * @param key The key used to find the child
    * @return The child mapped to key or an argument node or null if no such mapping found
    */
-  public Node getChild(Object key) {
+  @Nullable
+  public Node getChild(@NotNull Object key) {
     Node res = super.getChild(key);
     if (res == null) {
       res = children.get(ARGUMENT);

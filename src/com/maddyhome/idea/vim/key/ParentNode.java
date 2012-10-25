@@ -19,6 +19,9 @@ package com.maddyhome.idea.vim.key;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.HashMap;
 
 /**
@@ -31,7 +34,7 @@ public abstract class ParentNode implements Node {
    * @param child The child node
    * @param key   The key to map the child to
    */
-  public void addChild(Node child, Object key) {
+  public void addChild(@NotNull Node child, @NotNull Object key) {
     children.put(key, child);
   }
 
@@ -41,7 +44,8 @@ public abstract class ParentNode implements Node {
    * @param key The key used to find the child
    * @return The child mapped to key or null if no such mapping found
    */
-  public Node getChild(Object key) {
+  @Nullable
+  public Node getChild(@NotNull Object key) {
     return children.get(key);
   }
 
