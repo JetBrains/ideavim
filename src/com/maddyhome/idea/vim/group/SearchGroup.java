@@ -389,6 +389,7 @@ public class SearchGroup extends AbstractActionGroup {
         lnum += nmatch - 1;
         if (do_all && startoff != endoff) {
           if (newpos != null) {
+            lnum = newpos.line;
             searchcol = newpos.column;
           }
           else {
