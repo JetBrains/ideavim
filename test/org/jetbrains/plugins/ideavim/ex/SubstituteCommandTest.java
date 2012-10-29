@@ -61,6 +61,18 @@ public class SubstituteCommandTest extends VimTestCase {
            "two\n");
   }
 
+  public void testDotToNul() {
+    doTest("s/\\./\\n/g",
+           "<caret>one.two.three\n",
+           "one\u0000two\u0000three\n");
+  }
+
+  public void testToNL() {
+    doTest("s/\\./\\r/g",
+           "<caret>one.two.three\n",
+           "one\ntwo\nthree\n");
+  }
+
   private void doTest(final String command, String before, String after) {
     myFixture.configureByText("a.java", before);
     final Editor editor = myFixture.getEditor();

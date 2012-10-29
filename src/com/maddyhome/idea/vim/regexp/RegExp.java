@@ -3975,13 +3975,14 @@ public class RegExp {
         if (no < 0)           /* Ordinary character. */ {
           if (c == '\\' && !src.isNul()) {
             /* Check for abbreviations -- webb */
+            // In vim '\u0000' is represented in memory as '\n', and '\n' as '\r', see :help NL-used-for-Nul
             switch (src.charAt()) {
               case 'r':
-                c = '\r';
+                c = '\n';
                 src.inc();
                 break;
               case 'n':
-                c = '\n';
+                c = '\u0000';
                 src.inc();
                 break;
               case 't':
