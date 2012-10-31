@@ -71,7 +71,7 @@ public class SearchGroupTest extends VimTestCase {
     final EditorDataContext dataContext = new EditorDataContext(editor);
     final Project project = myFixture.getProject();
     final SearchGroup searchGroup = CommandGroups.getInstance().getSearch();
-    final Ref<Integer> ref = Ref.create();
+    final Ref<Integer> ref = Ref.create(-1);
     RunnableHelper.runReadCommand(project, new Runnable() {
       @Override
       public void run() {
