@@ -53,14 +53,6 @@ public class SubstituteCommandTest extends VimTestCase {
            "two\n");
   }
 
-  public void testEmptyToQuote() {
-    doTest("s//'/g",
-           "<caret>one\n" +
-           "two\n",
-           "'one\n" +
-           "two\n");
-  }
-
   public void testDotToNul() {
     doTest("s/\\./\\n/g",
            "<caret>one.two.three\n",
