@@ -3,6 +3,7 @@ package com.maddyhome.idea.vim;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ApplicationNamesInfo;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.application.ex.ApplicationEx;
@@ -97,7 +98,9 @@ public class VimKeyMapUtil {
       }
 
       // Prompt user to select the parent for the Vim keyboard
-      configureVimParentKeymap(path, document, false);
+      if (!ApplicationManager.getApplication().isUnitTestMode()) {
+        configureVimParentKeymap(path, document, false);
+      }
 
       final KeymapImpl vimKeyMap = new KeymapImpl();
       final Keymap[] allKeymaps = manager.getAllKeymaps();
