@@ -55,10 +55,6 @@
     <pathelement path="${tools.jar}"/>
   </path>
 
-  <taskdef name="javac2" classname="com.intellij.ant.Javac2">
-    <classpath refid="build.classpath"/>
-  </taskdef>
-
   <!-- Clean all the generated stuff -->
   <target name="clean" description="Removes all generated files">
     <delete dir="${out}"/>
@@ -67,6 +63,9 @@
   <!-- Compile all the sources to the ${classes} folder -->
   <target name="compile">
     <mkdir dir="${classes}"/>
+    <taskdef name="javac2" classname="com.intellij.ant.Javac2">
+      <classpath refid="build.classpath"/>
+    </taskdef>
     <!-- The task requires the following libraries from IntelliJ IDEA distribution: -->
     <!--   javac2.jar; jdom.jar; asm.jar; asm-commons.jar -->
     <javac2 destdir="${classes}" debug="on" fork="true" includeantruntime="false">
@@ -221,6 +220,9 @@
 
   <target name="compile-tests" depends="compile">
     <mkdir dir="${classes}"/>
+    <taskdef name="javac2" classname="com.intellij.ant.Javac2">
+      <classpath refid="build.classpath"/>
+    </taskdef>
     <javac2 destdir="${classes}" debug="on" fork="true" includeantruntime="false">
       <classpath refid="build.classpath"/>
       <src path="${test}"/>
