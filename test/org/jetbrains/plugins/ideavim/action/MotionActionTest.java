@@ -88,7 +88,7 @@ public class MotionActionTest extends VimTestCase {
     keys.add(KeyStroke.getKeyStroke('O'));
     keys.add(KeyStroke.getKeyStroke(':'));
     final Editor editor = typeTextInFile(keys,
-                                         "Hallo, Öster<caret>reich!\n");
+                                         "Hallo, \u00d6ster<caret>reich!\n");
     final int offset = editor.getCaretModel().getOffset();
     assertEquals(7, offset);
     final int mode = CommandState.getInstance(editor).getMode();
