@@ -22,17 +22,20 @@
   <property name="idea" value="${basedir}/idea"/>
   <property name="src" value="${basedir}/src"/>
   <property name="resources" value="${basedir}/resources"/>
+  <property name="test" value="${basedir}/test"/>
   <property name="keymap" value="${basedir}/keymap"/>
   <property name="idea.home" value="${idea}/unzip"/>
-
+  <property environment="env"/>
+  <property name="tools.jar" value="${env.JAVA_HOME}/lib/tools.jar"/>
   <property name="version" value="${version-id}.${build.number}"/>
   <property name="filename" value="ideavim-${version}"/>
 
   <!--Output-->
-  <property name="out" value="${basedir}"/>
+  <property name="out" value="${basedir}/out"/>
   <property name="classes" value="${out}/classes"/>
   <property name="build" value="${out}/build"/>
   <property name="dist" value="${out}/dist"/>
+  <property name="test-reports" value="${out}/test-reports"/>
 
   <!-- Define task -->
   <path id="ant-contrib">
@@ -47,11 +50,18 @@
     <pathelement path="${classes}"/>
   </path>
 
+  <path id="test.classpath">
+    <path refid="build.classpath"/>
+    <pathelement path="${tools.jar}"/>
+  </path>
+
+  <taskdef name="javac2" classname="com.intellij.ant.Javac2">
+    <classpath refid="build.classpath"/>
+  </taskdef>
+
   <!-- Clean all the generated stuff -->
   <target name="clean" description="Removes all generated files">
-    <delete dir="${build}"/>
-    <delete dir="${classes}"/>
-    <delete dir="${dist}"/>
+    <delete dir="${out}"/>
   </target>
 
   <!-- Compile all the sources to the ${classes} folder -->
@@ -59,12 +69,7 @@
     <mkdir dir="${classes}"/>
     <!-- The task requires the following libraries from IntelliJ IDEA distribution: -->
     <!--   javac2.jar; jdom.jar; asm.jar; asm-commons.jar -->
-    <taskdef name="javac2" classname="com.intellij.ant.Javac2">
-      <classpath refid="build.classpath"/>
-    </taskdef>
-    <javac2 destdir="${classes}"
-            debug="on"
-            fork="true">
+    <javac2 destdir="${classes}" debug="on" fork="true" includeantruntime="false">
       <classpath refid="build.classpath"/>
       <src path="${src}"/>
       <include name="com/maddyhome/idea/**"/>
@@ -162,11 +167,10 @@
 
   <target name="build" depends="unzip, clean, compile, jar, help" description="Compiles all source code and created plugin jar file"/>
 
-  <!-- Donwload IntelliJ IDEA distribution -->
-  <target name="download" description="Downloads IntellIJ IDEA artifacts">
-    <delete dir="${idea}"/>
+  <!-- Download IntelliJ IDEA distribution -->
+  <target name="download" description="Downloads IntelliJ IDEA artifacts">
     <mkdir dir="${idea}"/>
-    <get src="${idea.download.url}" dest="${idea}"/>
+    <get src="${idea.download.url}" dest="${idea}" skipexisting="true"/>
   </target>
 
   <!-- Unpack idea-*.zip file for ideavim compilation -->
@@ -209,9 +213,56 @@
     <zip basedir="${build}" zipfile="${dist}/${filename}.zip" compress="true" includes="IdeaVim/**"/>
   </target>
 
- <!-- Packs all the sources -->
+  <!-- Packs all the sources -->
   <target name="dist-src" depends="clean" description="Creates the source tar file">
     <mkdir dir="${dist}"/>
     <tar basedir="." destfile="${dist}/${filename}-src.tar.gz" excludes=".git/**,.idea/**,idea/**,*.iws,*.iml" compression="gzip"/>
+  </target>
+
+  <target name="compile-tests" depends="compile">
+    <mkdir dir="${classes}"/>
+    <javac2 destdir="${classes}" debug="on" fork="true" includeantruntime="false">
+      <classpath refid="build.classpath"/>
+      <src path="${test}"/>
+      <include name="org/jetbrains/plugins/ideavim/**"/>
+    </javac2>
+  </target>
+
+  <target name="prepare-tests" depends="compile-tests">
+    <mkdir dir="${classes}/META-INF"/>
+    <copy file="resources/META-INF/plugin.xml" todir="${classes}/META-INF">
+      <filterset>
+        <filter token="VERSION" value="${version}"/>
+        <filter token="SINCE-VERSION" value="${platform-version}"/>
+      </filterset>
+    </copy>
+    <copy todir="${classes}">
+      <fileset dir="${resources}"/>
+    </copy>
+    <mkdir dir="${out}/IdeaVim"/>
+    <copy todir="${out}/IdeaVim">
+      <fileset dir="${keymap}" includes="**"/>
+    </copy>
+  </target>
+
+  <target name="test" depends="unzip, clean, prepare-tests">
+    <mkdir dir="${test-reports}"/>
+    <junit fork="true" logfailedtests="false" printsummary="true">
+      <classpath refid="test.classpath"/>
+
+      <jvmarg value="-Xmx256M"/>
+      <jvmarg value="-ea"/>
+      <jvmarg value="-Djava.awt.headless=true"/>
+      <jvmarg value="-Didea.plugins.path=${out}"/>
+      <jvmarg value="-Didea.load.plugins.id=IdeaVIM"/>
+
+      <formatter type="plain"/>
+
+      <batchtest todir="${test-reports}">
+        <fileset dir="${test}">
+          <include name="**/*Test.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
   </target>
 </project>
