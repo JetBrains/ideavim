@@ -179,8 +179,9 @@
   <target name="unzip" depends="download" description="Unzip downloaded artifacts and set up idea.home">
     <delete dir="${idea}/unzip"/>
     <mkdir dir="${idea}/unzip"/>
+    <basename property="idea.filename" file="${idea.download.url}"/>
     <unzip dest="${idea}/unzip">
-      <fileset dir="${idea}" includes="idea*.zip"/>
+      <fileset dir="${idea}" includes="${idea.filename}"/>
     </unzip>
   </target>
 
