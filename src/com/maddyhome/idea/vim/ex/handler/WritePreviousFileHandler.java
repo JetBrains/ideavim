@@ -41,7 +41,7 @@ public class WritePreviousFileHandler extends CommandHandler {
     int count = cmd.getCount(editor, context, 1, true);
 
     CommandGroups.getInstance().getFile().saveFile(editor, context);
-    CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
+    CommandGroups.getInstance().getMark().saveJumpLocation(editor);
     CommandGroups.getInstance().getFile().selectNextFile(-count, context);
 
     return true;

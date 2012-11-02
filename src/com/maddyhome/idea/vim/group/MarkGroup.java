@@ -19,8 +19,6 @@ package com.maddyhome.idea.vim.group;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
@@ -40,6 +38,7 @@ import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -56,7 +55,7 @@ public class MarkGroup extends AbstractActionGroup {
       public void editorReleased(EditorFactoryEvent event) {
         // Save off the last caret position of the file before it is closed
         Editor editor = event.getEditor();
-        setMark(editor, null, '"', editor.getCaretModel().getOffset());
+        setMark(editor, '"', editor.getCaretModel().getOffset());
       }
     }, ApplicationManager.getApplication());
   }
@@ -65,11 +64,10 @@ public class MarkGroup extends AbstractActionGroup {
    * Saves the caret location prior to doing a jump
    *
    * @param editor  The editor the jump will occur in
-   * @param context The data context
    */
-  public void saveJumpLocation(Editor editor, DataContext context) {
-    addJump(editor, context, true);
-    setMark(editor, context, '\'');
+  public void saveJumpLocation(@NotNull Editor editor) {
+    addJump(editor, true);
+    setMark(editor, '\'');
   }
 
   /**
@@ -167,14 +165,12 @@ public class MarkGroup extends AbstractActionGroup {
    * Sets the specified mark to the caret position of the editor
    *
    * @param editor  The editor to get the current position from
-   * @param context The data context
    * @param ch      The mark set set
    * @return True if a valid, writable mark, false if not
    */
-  public boolean setMark(Editor editor, DataContext context, char ch) {
-    //noinspection SimplifiableIfStatement
+  public boolean setMark(Editor editor, char ch) {
     if (VALID_SET_MARKS.indexOf(ch) >= 0) {
-      return setMark(editor, context, ch, editor.getCaretModel().getOffset());
+      return setMark(editor, ch, editor.getCaretModel().getOffset());
     }
     else {
       return false;
@@ -185,24 +181,15 @@ public class MarkGroup extends AbstractActionGroup {
    * Sets the specified mark to the specified location.
    *
    * @param editor  The editor the mark is associated with
-   * @param context The data context
    * @param ch      The mark to set
    * @param offset  The offset to set the mark to
    * @return true if able to set the mark, false if not
    */
-  public boolean setMark(Editor editor, DataContext context, char ch, int offset) {
+  public boolean setMark(@NotNull Editor editor, char ch, int offset) {
     if (ch == '`') ch = '\'';
     LogicalPosition lp = editor.offsetToLogicalPosition(offset);
 
-    VirtualFile vf = null;
-    if (context != null) {
-      vf = PlatformDataKeys.VIRTUAL_FILE.getData(context); // API change - don't merge
-    }
-
-    if (vf == null) {
-      vf = EditorData.getVirtualFile(editor);
-    }
-
+    final VirtualFile vf = EditorData.getVirtualFile(editor);
     if (vf == null) {
       return false;
     }
@@ -232,20 +219,12 @@ public class MarkGroup extends AbstractActionGroup {
     return true;
   }
 
-  public void addJump(Editor editor, DataContext context, boolean reset) {
-    addJump(editor, context, editor.getCaretModel().getOffset(), reset);
+  public void addJump(@NotNull Editor editor, boolean reset) {
+    addJump(editor, editor.getCaretModel().getOffset(), reset);
   }
 
-  private void addJump(Editor editor, DataContext context, int offset, boolean reset) {
-    VirtualFile vf = null;
-    if (context != null) {
-      vf = PlatformDataKeys.VIRTUAL_FILE.getData(context); // API change - don't merge
-    }
-
-    if (vf == null) {
-      vf = EditorData.getVirtualFile(editor);
-    }
-
+  private void addJump(@NotNull Editor editor, int offset, boolean reset) {
+    final VirtualFile vf = EditorData.getVirtualFile(editor);
     if (vf == null) {
       return;
     }

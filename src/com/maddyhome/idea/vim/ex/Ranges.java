@@ -204,8 +204,8 @@ public class Ranges {
       startLine = endLine;
       endLine = range.getLine(editor, context, lastZero);
       if (range.isMove()) {
-        MotionGroup.moveCaret(editor, context,
-                              CommandGroups.getInstance().getMotion().moveCaretToLine(editor, context, endLine));
+        MotionGroup.moveCaret(editor,
+                              CommandGroups.getInstance().getMotion().moveCaretToLine(editor, endLine));
       }
       // Did that last range represent the start of the file?
       lastZero = (endLine < 0);

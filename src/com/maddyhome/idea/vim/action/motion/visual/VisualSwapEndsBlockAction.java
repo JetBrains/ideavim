@@ -36,7 +36,7 @@ public class VisualSwapEndsBlockAction extends EditorAction {
 
   private static class Handler extends AbstractEditorActionHandler {
     protected boolean execute(Editor editor, DataContext context, Command cmd) {
-      return CommandGroups.getInstance().getMotion().swapVisualEndsBlock(editor, context);
+      return CommandGroups.getInstance().getMotion().swapVisualEndsBlock(editor);
     }
   }
 }

@@ -36,7 +36,7 @@ public class MotionInnerBigWordAction extends TextObjectAction {
 
   private static class Handler extends TextObjectActionHandler {
     public TextRange getRange(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return CommandGroups.getInstance().getMotion().getWordRange(editor, context, count, false, true);
+      return CommandGroups.getInstance().getMotion().getWordRange(editor, count, false, true);
     }
   }
 }

@@ -39,7 +39,7 @@ public class SelectFileHandler extends CommandHandler {
     if (count > 0) {
       boolean res = CommandGroups.getInstance().getFile().selectFile(count - 1, context);
       if (res) {
-        CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
+        CommandGroups.getInstance().getMark().saveJumpLocation(editor);
       }
 
       return res;

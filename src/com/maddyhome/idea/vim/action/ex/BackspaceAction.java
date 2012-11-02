@@ -37,7 +37,7 @@ public class BackspaceAction extends EditorAction {
 
   private static class Handler extends AbstractEditorActionHandler {
     protected boolean execute(Editor editor, DataContext context, Command cmd) {
-      return CommandGroups.getInstance().getProcess().processExKey(editor, context,
+      return CommandGroups.getInstance().getProcess().processExKey(editor,
                                                                    (KeyStroke)cmd.getKeys().get(0), false);
     }
   }

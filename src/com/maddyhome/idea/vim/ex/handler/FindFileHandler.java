@@ -42,7 +42,7 @@ public class FindFileHandler extends CommandHandler {
     if (arg != null && arg.length() > 0) {
       boolean res = CommandGroups.getInstance().getFile().openFile(arg, context);
       if (res) {
-        CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
+        CommandGroups.getInstance().getMark().saveJumpLocation(editor);
       }
 
       return res;

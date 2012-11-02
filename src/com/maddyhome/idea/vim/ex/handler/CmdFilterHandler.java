@@ -69,7 +69,7 @@ public class CmdFilterHandler extends CommandHandler {
       }
 
       try {
-        return CommandGroups.getInstance().getProcess().executeFilter(editor, context, range, command);
+        return CommandGroups.getInstance().getProcess().executeFilter(editor, range, command);
       }
       catch (IOException e) {
         throw new ExException(e.getMessage());

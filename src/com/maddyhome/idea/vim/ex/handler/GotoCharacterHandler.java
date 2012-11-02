@@ -41,7 +41,7 @@ public class GotoCharacterHandler extends CommandHandler {
     if (count > 0) {
       int res = CommandGroups.getInstance().getMotion().moveCaretToNthCharacter(editor, count - 1);
       if (res != -1) {
-        MotionGroup.moveCaret(editor, context, res);
+        MotionGroup.moveCaret(editor, res);
 
         return true;
       }

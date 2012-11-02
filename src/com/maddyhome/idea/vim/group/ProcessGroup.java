@@ -97,7 +97,7 @@ public class ProcessGroup extends AbstractActionGroup {
     panel.activate(editor, context, ":", initText, 1);
   }
 
-  public boolean processExKey(Editor editor, DataContext context, KeyStroke stroke, boolean charOnly) {
+  public boolean processExKey(Editor editor, KeyStroke stroke, boolean charOnly) {
     // This will only get called if somehow the key focus ended up in the editor while the ex entry window
     // is open. So I'll put focus back in the editor and process the key.
 
@@ -148,7 +148,7 @@ public class ProcessGroup extends AbstractActionGroup {
         }
       }
       else {
-        int pos = CommandGroups.getInstance().getSearch().search(editor, context, text, panel.getCount(),
+        int pos = CommandGroups.getInstance().getSearch().search(editor, text, panel.getCount(),
                                                                  panel.getLabel().equals("/")
                                                                  ? Command.FLAG_SEARCH_FWD
                                                                  : Command.FLAG_SEARCH_REV, true);
@@ -247,7 +247,7 @@ public class ProcessGroup extends AbstractActionGroup {
     return initText;
   }
 
-  public boolean executeFilter(Editor editor, DataContext context, TextRange range, String command) throws IOException {
+  public boolean executeFilter(Editor editor, TextRange range, String command) throws IOException {
     if (logger.isDebugEnabled()) logger.debug("command=" + command);
     CharSequence chars = editor.getDocument().getCharsSequence();
     StringReader car = new StringReader(chars.subSequence(range.getStartOffset(),

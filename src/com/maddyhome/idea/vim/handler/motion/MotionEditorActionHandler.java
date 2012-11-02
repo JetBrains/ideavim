@@ -39,9 +39,9 @@ public abstract class MotionEditorActionHandler extends AbstractEditorActionHand
     }
     else if (offset >= 0) {
       if ((cmd.getFlags() & Command.FLAG_SAVE_JUMP) != 0) {
-        CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
+        CommandGroups.getInstance().getMark().saveJumpLocation(editor);
       }
-      MotionGroup.moveCaret(editor, context, offset);
+      MotionGroup.moveCaret(editor, offset);
       postMove(editor, context, cmd);
 
       return true;

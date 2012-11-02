@@ -104,7 +104,7 @@ public class RegisterGroup extends AbstractActionGroup {
     if (isRegisterWritable()) {
       String text = EditorHelper.getText(editor, range);
 
-      return storeTextInternal(editor, context, range, text, type, lastRegister, isDelete, isYank);
+      return storeTextInternal(editor, range, text, type, lastRegister, isDelete, isYank);
     }
 
     return false;
@@ -114,7 +114,7 @@ public class RegisterGroup extends AbstractActionGroup {
     registers.put(register, new Register(register, type, strokes));
   }
 
-  public boolean storeTextInternal(Editor editor, DataContext context, TextRange range, String text, int type,
+  public boolean storeTextInternal(Editor editor, TextRange range, String text, int type,
                                    char register, boolean isDelete, boolean isYank) {
     // Null register doesn't get saved
     if (lastRegister == '_') return true;
@@ -186,8 +186,8 @@ public class RegisterGroup extends AbstractActionGroup {
     }
 
     if (start != -1) {
-      CommandGroups.getInstance().getMark().setMark(editor, context, '[', start);
-      CommandGroups.getInstance().getMark().setMark(editor, context, ']', end - 1);
+      CommandGroups.getInstance().getMark().setMark(editor, '[', start);
+      CommandGroups.getInstance().getMark().setMark(editor, ']', end - 1);
     }
 
     return true;

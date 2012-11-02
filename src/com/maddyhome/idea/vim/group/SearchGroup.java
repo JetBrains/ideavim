@@ -86,9 +86,9 @@ public class SearchGroup extends AbstractActionGroup {
     return lastPattern;
   }
 
-  private void setLastPattern(Editor editor, DataContext context, String lastPattern) {
+  private void setLastPattern(Editor editor, String lastPattern) {
     this.lastPattern = lastPattern;
-    CommandGroups.getInstance().getRegister().storeTextInternal(editor, context, new TextRange(-1, -1),
+    CommandGroups.getInstance().getRegister().storeTextInternal(editor, new TextRange(-1, -1),
                                                                 lastPattern, Command.FLAG_MOT_CHARACTERWISE, '/', false, false);
 
     CommandGroups.getInstance().getHistory().addEntry(HistoryGroup.SEARCH, lastPattern);
@@ -265,7 +265,7 @@ public class SearchGroup extends AbstractActionGroup {
     }
 
     lastSubstitute = pattern;
-    setLastPattern(editor, context, pattern);
+    setLastPattern(editor, pattern);
 
     //int start = editor.logicalPositionToOffset(new LogicalPosition(line1, 0));
     //int end = editor.logicalPositionToOffset(new LogicalPosition(line2, EditorHelper.getLineLength(editor, line2)));
@@ -328,7 +328,7 @@ public class SearchGroup extends AbstractActionGroup {
       int nmatch = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol);
       if (nmatch > 0) {
         if (firstMatch) {
-          CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
+          CommandGroups.getInstance().getMark().saveJumpLocation(editor);
           firstMatch = false;
         }
 
@@ -408,7 +408,7 @@ public class SearchGroup extends AbstractActionGroup {
     }
 
     if (lastMatch != -1) {
-      MotionGroup.moveCaret(editor, context,
+      MotionGroup.moveCaret(editor,
                             CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor,
                                                                                                     editor.offsetToLogicalPosition(
                                                                                                       lastMatch).line));
@@ -511,18 +511,18 @@ public class SearchGroup extends AbstractActionGroup {
     return confirmBtns;
   }
 
-  public int search(Editor editor, DataContext context, String command, int count, int flags, boolean moveCursor) {
-    int res = search(editor, context, command, editor.getCaretModel().getOffset(), count, flags);
+  public int search(Editor editor, String command, int count, int flags, boolean moveCursor) {
+    int res = search(editor, command, editor.getCaretModel().getOffset(), count, flags);
 
     if (res != -1 && moveCursor) {
-      CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
-      MotionGroup.moveCaret(editor, context, res);
+      CommandGroups.getInstance().getMark().saveJumpLocation(editor);
+      MotionGroup.moveCaret(editor, res);
     }
 
     return res;
   }
 
-  public int search(Editor editor, DataContext context, String command, int startOffset, int count, int flags) {
+  public int search(Editor editor, String command, int startOffset, int count, int flags) {
     int dir = 1;
     char type = '/';
     String pattern = lastSearch;
@@ -558,7 +558,7 @@ public class SearchGroup extends AbstractActionGroup {
     }
 
     lastSearch = pattern;
-    setLastPattern(editor, context, pattern);
+    setLastPattern(editor, pattern);
     lastOffset = offset;
     lastDir = dir;
 
@@ -570,10 +570,10 @@ public class SearchGroup extends AbstractActionGroup {
 
     searchHighlight(false);
 
-    return findItOffset(editor, context, startOffset, count, lastDir, false);
+    return findItOffset(editor, startOffset, count, lastDir, false);
   }
 
-  public int searchWord(Editor editor, DataContext context, int count, boolean whole, int dir) {
+  public int searchWord(Editor editor, int count, boolean whole, int dir) {
     TextRange range = SearchHelper.findWordUnderCursor(editor);
     if (range == null) {
       return -1;
@@ -588,26 +588,26 @@ public class SearchGroup extends AbstractActionGroup {
       pattern.append("\\>");
     }
 
-    MotionGroup.moveCaret(editor, context, range.getStartOffset());
+    MotionGroup.moveCaret(editor, range.getStartOffset());
 
     lastSearch = pattern.toString();
-    setLastPattern(editor, context, lastSearch);
+    setLastPattern(editor, lastSearch);
     lastOffset = "";
     lastDir = dir;
 
     searchHighlight(true);
 
-    return findItOffset(editor, context, editor.getCaretModel().getOffset(), count, lastDir, true);
+    return findItOffset(editor, editor.getCaretModel().getOffset(), count, lastDir, true);
   }
 
-  public int searchNext(Editor editor, DataContext context, int count) {
+  public int searchNext(Editor editor, int count) {
     searchHighlight(false);
-    return findItOffset(editor, context, editor.getCaretModel().getOffset(), count, lastDir, false);
+    return findItOffset(editor, editor.getCaretModel().getOffset(), count, lastDir, false);
   }
 
-  public int searchPrevious(Editor editor, DataContext context, int count) {
+  public int searchPrevious(Editor editor, int count) {
     searchHighlight(false);
-    return findItOffset(editor, context, editor.getCaretModel().getOffset(), count, -lastDir, false);
+    return findItOffset(editor, editor.getCaretModel().getOffset(), count, -lastDir, false);
   }
 
   public void updateHighlight() {
@@ -708,7 +708,7 @@ public class SearchGroup extends AbstractActionGroup {
     }
   }
 
-  private int findItOffset(Editor editor, DataContext context, int startOffset, int count, int dir,
+  private int findItOffset(Editor editor, int startOffset, int count, int dir,
                            boolean noSmartCase) {
     boolean wrap = Options.getInstance().isSet("wrapscan");
     TextRange range = findIt(editor, startOffset, count, dir, noSmartCase, wrap, true, true);
@@ -788,7 +788,7 @@ public class SearchGroup extends AbstractActionGroup {
         ppos++;
       }
 
-      res = search(editor, context, lastOffset.substring(ppos + 1), res, 1, flags);
+      res = search(editor, lastOffset.substring(ppos + 1), res, 1, flags);
 
       return res;
     }

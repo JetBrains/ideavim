@@ -37,7 +37,7 @@ public class GotoDeclarationAction extends EditorAction {
 
   private static class Handler extends AbstractEditorActionHandler {
     protected boolean execute(Editor editor, DataContext context, Command cmd) {
-      CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
+      CommandGroups.getInstance().getMark().saveJumpLocation(editor);
       KeyHandler.executeAction("GotoDeclaration", context);
 
       return true;

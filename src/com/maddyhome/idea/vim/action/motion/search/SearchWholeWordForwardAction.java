@@ -36,7 +36,7 @@ public class SearchWholeWordForwardAction extends MotionEditorAction {
 
   private static class Handler extends MotionEditorActionHandler {
     public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return CommandGroups.getInstance().getSearch().searchWord(editor, context, count, true, 1);
+      return CommandGroups.getInstance().getSearch().searchWord(editor, count, true, 1);
     }
   }
 }

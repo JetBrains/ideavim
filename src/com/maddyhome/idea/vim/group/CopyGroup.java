@@ -95,7 +95,7 @@ public class CopyGroup extends AbstractActionGroup {
       }
       boolean res = CommandGroups.getInstance().getRegister().storeText(editor, context, range, type, false, true);
       if (moveCursor) {
-        MotionGroup.moveCaret(editor, context, range.normalize().getStartOffset());
+        MotionGroup.moveCaret(editor, range.normalize().getStartOffset());
       }
 
       return res;
@@ -426,27 +426,27 @@ public class CopyGroup extends AbstractActionGroup {
 
     switch (cursorMode) {
       case 1:
-        MotionGroup.moveCaret(editor, context, offset);
+        MotionGroup.moveCaret(editor, offset);
         break;
       case 2:
-        MotionGroup.moveCaret(editor, context, endOffset - 1);
+        MotionGroup.moveCaret(editor, endOffset - 1);
         break;
       case 3:
-        MotionGroup.moveCaret(editor, context, offset);
-        MotionGroup.moveCaret(editor, context,
+        MotionGroup.moveCaret(editor, offset);
+        MotionGroup.moveCaret(editor,
                               CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor));
         break;
       case 4:
-        MotionGroup.moveCaret(editor, context, endOffset + 1);
+        MotionGroup.moveCaret(editor, endOffset + 1);
         break;
       case 5:
         int pos = Math.min(endOffset, EditorHelper.getLineEndForOffset(editor, endOffset - 1) - 1);
-        MotionGroup.moveCaret(editor, context, pos);
+        MotionGroup.moveCaret(editor, pos);
         break;
     }
 
-    CommandGroups.getInstance().getMark().setMark(editor, context, '[', offset);
-    CommandGroups.getInstance().getMark().setMark(editor, context, ']', endOffset);
+    CommandGroups.getInstance().getMark().setMark(editor, '[', offset);
+    CommandGroups.getInstance().getMark().setMark(editor, ']', endOffset);
 
     /*
     // Adjust the cursor position after the paste

@@ -35,7 +35,7 @@ public class MotionGotoLineLastAction extends MotionEditorAction {
 
   private static class Handler extends MotionEditorActionHandler {
     public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return CommandGroups.getInstance().getMotion().moveCaretGotoLineLast(editor, context, rawCount, count - 1);
+      return CommandGroups.getInstance().getMotion().moveCaretGotoLineLast(editor, rawCount, count - 1);
     }
   }
 }

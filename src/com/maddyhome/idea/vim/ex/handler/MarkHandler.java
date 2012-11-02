@@ -48,7 +48,7 @@ public class MarkHandler extends CommandHandler {
     int offset = EditorHelper.getLineStartOffset(editor, line);
 
     if (Character.isLetter(mark) || "'`".indexOf(mark) != -1) {
-      return CommandGroups.getInstance().getMark().setMark(editor, context, mark, offset);
+      return CommandGroups.getInstance().getMark().setMark(editor, mark, offset);
     }
     else {
       VimPlugin.showMessage(MessageHelper.message(Msg.E191));

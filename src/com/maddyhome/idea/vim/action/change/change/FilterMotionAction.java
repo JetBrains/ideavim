@@ -48,7 +48,7 @@ public class FilterMotionAction extends EditorAction {
       LogicalPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
       LogicalPosition end = editor.offsetToLogicalPosition(range.getEndOffset());
       if (current.line != start.line) {
-        MotionGroup.moveCaret(editor, context, range.getStartOffset());
+        MotionGroup.moveCaret(editor, range.getStartOffset());
       }
 
       int count;

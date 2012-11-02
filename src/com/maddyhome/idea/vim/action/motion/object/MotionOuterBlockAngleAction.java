@@ -36,7 +36,7 @@ public class MotionOuterBlockAngleAction extends TextObjectAction {
 
   private static class Handler extends TextObjectActionHandler {
     public TextRange getRange(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return CommandGroups.getInstance().getMotion().getBlockRange(editor, context, count, true, '<');
+      return CommandGroups.getInstance().getMotion().getBlockRange(editor, count, true, '<');
     }
   }
 }

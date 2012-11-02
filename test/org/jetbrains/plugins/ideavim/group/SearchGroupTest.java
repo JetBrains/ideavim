@@ -6,7 +6,6 @@ import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.SearchGroup;
-import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.option.Option;
 import com.maddyhome.idea.vim.option.Options;
@@ -68,14 +67,13 @@ public class SearchGroupTest extends VimTestCase {
   private int search(final String pattern, String input) {
     myFixture.configureByText("a.java", input);
     final Editor editor = myFixture.getEditor();
-    final EditorDataContext dataContext = new EditorDataContext(editor);
     final Project project = myFixture.getProject();
     final SearchGroup searchGroup = CommandGroups.getInstance().getSearch();
     final Ref<Integer> ref = Ref.create(-1);
     RunnableHelper.runReadCommand(project, new Runnable() {
       @Override
       public void run() {
-        final int n = searchGroup.search(editor, dataContext, pattern, 1, Command.FLAG_SEARCH_FWD, false);
+        final int n = searchGroup.search(editor, pattern, 1, Command.FLAG_SEARCH_FWD, false);
         ref.set(n);
       }
     }, null, null);

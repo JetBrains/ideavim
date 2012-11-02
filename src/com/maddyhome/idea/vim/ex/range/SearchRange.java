@@ -109,7 +109,7 @@ public class SearchRange extends AbstractRange {
         pos = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor, line);
       }
 
-      pos = CommandGroups.getInstance().getSearch().search(editor, context, pattern, pos, 1, flag);
+      pos = CommandGroups.getInstance().getSearch().search(editor, pattern, pos, 1, flag);
       if (pos == -1) {
         break;
       }

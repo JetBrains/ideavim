@@ -43,7 +43,7 @@ public class EditFileHandler extends CommandHandler {
     String arg = cmd.getArgument();
     if (arg != null) {
       if (arg.equals("#")) {
-        CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
+        CommandGroups.getInstance().getMark().saveJumpLocation(editor);
         CommandGroups.getInstance().getFile().selectPreviousTab(context);
 
         return true;
@@ -51,7 +51,7 @@ public class EditFileHandler extends CommandHandler {
       else if (arg.length() > 0) {
         boolean res = CommandGroups.getInstance().getFile().openFile(arg, context);
         if (res) {
-          CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
+          CommandGroups.getInstance().getMark().saveJumpLocation(editor);
         }
 
         return res;

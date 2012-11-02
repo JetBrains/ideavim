@@ -36,7 +36,7 @@ public class SearchWordBackwardAction extends MotionEditorAction {
 
   private static class Handler extends MotionEditorActionHandler {
     public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return CommandGroups.getInstance().getSearch().searchWord(editor, context, count, false, -1);
+      return CommandGroups.getInstance().getSearch().searchWord(editor, count, false, -1);
     }
   }
 }

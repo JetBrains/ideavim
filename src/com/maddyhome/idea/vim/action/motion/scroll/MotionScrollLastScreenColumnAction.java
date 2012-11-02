@@ -35,7 +35,7 @@ public class MotionScrollLastScreenColumnAction extends EditorAction {
 
   private static class Handler extends AbstractEditorActionHandler {
     protected boolean execute(Editor editor, DataContext context, Command cmd) {
-      return CommandGroups.getInstance().getMotion().scrollColumnToLastScreenColumn(editor, context);
+      return CommandGroups.getInstance().getMotion().scrollColumnToLastScreenColumn(editor);
     }
   }
 }

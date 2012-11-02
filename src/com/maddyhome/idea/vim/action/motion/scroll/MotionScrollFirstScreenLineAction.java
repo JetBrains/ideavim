@@ -35,7 +35,7 @@ public class MotionScrollFirstScreenLineAction extends EditorAction {
 
   private static class Handler extends AbstractEditorActionHandler {
     protected boolean execute(Editor editor, DataContext context, Command cmd) {
-      return CommandGroups.getInstance().getMotion().scrollLineToFirstScreenLine(editor, context, cmd.getRawCount(), cmd.getCount(), false);
+      return CommandGroups.getInstance().getMotion().scrollLineToFirstScreenLine(editor, cmd.getRawCount(), cmd.getCount(), false);
     }
   }
 }

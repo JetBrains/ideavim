@@ -49,7 +49,7 @@ public class MotionGotoLineLastEndAction extends MotionEditorAction {
         }
       }
 
-      return CommandGroups.getInstance().getMotion().moveCaretGotoLineLastEnd(editor, context, rawCount, count - 1, allow);
+      return CommandGroups.getInstance().getMotion().moveCaretGotoLineLastEnd(editor, rawCount, count - 1, allow);
     }
   }
 }

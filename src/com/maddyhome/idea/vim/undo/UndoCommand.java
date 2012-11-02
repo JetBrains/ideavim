@@ -65,7 +65,7 @@ public class UndoCommand {
     }
 
     //editor.getCaretModel().moveToOffset(endOffset);
-    MotionGroup.moveCaret(editor, context, endOffset);
+    MotionGroup.moveCaret(editor, endOffset);
   }
 
   public void undo(Editor editor, DataContext context) {
@@ -76,7 +76,7 @@ public class UndoCommand {
     }
 
     //editor.getCaretModel().moveToOffset(startOffset);
-    MotionGroup.moveCaret(editor, context, startOffset);
+    MotionGroup.moveCaret(editor, startOffset);
   }
 
   public String toString() {

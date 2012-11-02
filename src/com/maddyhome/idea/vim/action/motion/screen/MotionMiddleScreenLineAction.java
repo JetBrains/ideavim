@@ -35,7 +35,7 @@ public class MotionMiddleScreenLineAction extends MotionEditorAction {
 
   private static class Handler extends MotionEditorActionHandler {
     public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return CommandGroups.getInstance().getMotion().moveCaretToMiddleScreenLine(editor, context);
+      return CommandGroups.getInstance().getMotion().moveCaretToMiddleScreenLine(editor);
     }
   }
 }

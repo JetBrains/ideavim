@@ -179,7 +179,7 @@ public class KeyHandler {
           }
         }
         else if (editorState.getMappingMode() == KeyParser.MAPPING_CMD_LINE) {
-          if (!CommandGroups.getInstance().getProcess().processExKey(editor, context, key, true)) {
+          if (!CommandGroups.getInstance().getProcess().processExKey(editor, key, true)) {
             shouldRecord = false;
           }
         }

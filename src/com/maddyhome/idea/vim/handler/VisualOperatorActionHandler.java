@@ -45,7 +45,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
       if (logger.isDebugEnabled()) logger.debug("range=" + range);
     }
 
-    VisualStartFinishRunnable runnable = new VisualStartFinishRunnable(editor, context, cmd);
+    VisualStartFinishRunnable runnable = new VisualStartFinishRunnable(editor, cmd);
     if (cmd == null || (cmd.getFlags() & Command.FLAG_DELEGATE) != 0) {
       DelegateCommandListener.getInstance().setRunnable(runnable);
     }
@@ -66,9 +66,8 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
   protected abstract boolean execute(Editor editor, DataContext context, Command cmd, TextRange range);
 
   private static class VisualStartFinishRunnable implements DelegateCommandListener.StartFinishRunnable {
-    public VisualStartFinishRunnable(Editor editor, DataContext context, Command cmd) {
+    public VisualStartFinishRunnable(Editor editor, Command cmd) {
       this.editor = editor;
-      this.context = context;
       this.cmd = cmd;
       this.res = true;
     }
@@ -85,7 +84,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
         wasRepeat = true;
         lastColumn = EditorData.getLastColumn(editor);
         VisualChange range = EditorData.getLastVisualOperatorRange(editor);
-        CommandGroups.getInstance().getMotion().toggleVisual(editor, context, 1, 1, 0);
+        CommandGroups.getInstance().getMotion().toggleVisual(editor, 1, 1, 0);
         if (range.getColumns() == MotionGroup.LAST_COLUMN) {
           EditorData.setLastColumn(editor, MotionGroup.LAST_COLUMN);
         }
@@ -109,7 +108,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
       else if (cmd != null && (cmd.getFlags() & Command.FLAG_FORCE_LINEWISE) != 0) {
         lastMode = CommandState.getInstance(editor).getSubMode();
         if (lastMode != Command.FLAG_MOT_LINEWISE && (cmd.getFlags() & Command.FLAG_FORCE_VISUAL) != 0) {
-          CommandGroups.getInstance().getMotion().toggleVisual(editor, context, 1, 0,
+          CommandGroups.getInstance().getMotion().toggleVisual(editor, 1, 0,
                                                                Command.FLAG_MOT_LINEWISE);
         }
       }
@@ -122,7 +121,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
 
       if (cmd != null && (cmd.getFlags() & Command.FLAG_FORCE_LINEWISE) != 0) {
         if (lastMode != Command.FLAG_MOT_LINEWISE && (cmd.getFlags() & Command.FLAG_FORCE_VISUAL) != 0) {
-          CommandGroups.getInstance().getMotion().toggleVisual(editor, context, 1, 0, lastMode);
+          CommandGroups.getInstance().getMotion().toggleVisual(editor, 1, 0, lastMode);
         }
       }
 
@@ -155,7 +154,6 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
 
     private Command cmd;
     private Editor editor;
-    private DataContext context;
     private boolean res;
     private int lastMode;
     private boolean wasRepeat;

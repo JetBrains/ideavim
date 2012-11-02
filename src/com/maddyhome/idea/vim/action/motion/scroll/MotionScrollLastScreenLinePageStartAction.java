@@ -41,10 +41,10 @@ public class MotionScrollLastScreenLinePageStartAction extends EditorAction {
       if (raw == 0) {
         int lines = EditorHelper.getScreenHeight(editor);
 
-        return CommandGroups.getInstance().getMotion().scrollLine(editor, context, -lines);
+        return CommandGroups.getInstance().getMotion().scrollLine(editor, -lines);
       }
       else {
-        return CommandGroups.getInstance().getMotion().scrollLineToLastScreenLine(editor, context, raw, cnt, true);
+        return CommandGroups.getInstance().getMotion().scrollLineToLastScreenLine(editor, raw, cnt, true);
       }
     }
   }

@@ -36,7 +36,7 @@ public class SearchAgainPreviousAction extends MotionEditorAction {
 
   private static class Handler extends MotionEditorActionHandler {
     public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return CommandGroups.getInstance().getSearch().searchPrevious(editor, context, count);
+      return CommandGroups.getInstance().getSearch().searchPrevious(editor, count);
     }
   }
 }

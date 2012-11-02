@@ -192,7 +192,7 @@ public class CommandParser {
     // Run the command
     boolean ok = handler.process(editor, context, new ExCommand(res.getRanges(), command, res.getArgument()), count);
     if (ok && (handler.getArgFlags() & CommandHandler.DONT_SAVE_LAST) == 0) {
-      CommandGroups.getInstance().getRegister().storeTextInternal(editor, context, new TextRange(-1, -1), cmd,
+      CommandGroups.getInstance().getRegister().storeTextInternal(editor, new TextRange(-1, -1), cmd,
                                                                   Command.FLAG_MOT_CHARACTERWISE, ':', false, false);
     }
 

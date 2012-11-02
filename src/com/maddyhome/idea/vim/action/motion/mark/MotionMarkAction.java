@@ -35,7 +35,7 @@ public class MotionMarkAction extends EditorAction {
 
   private static class Handler extends AbstractEditorActionHandler {
     protected boolean execute(Editor editor, DataContext context, Command cmd) {
-      return CommandGroups.getInstance().getMark().setMark(editor, context, cmd.getArgument().getCharacter());
+      return CommandGroups.getInstance().getMark().setMark(editor, cmd.getArgument().getCharacter());
     }
   }
 }

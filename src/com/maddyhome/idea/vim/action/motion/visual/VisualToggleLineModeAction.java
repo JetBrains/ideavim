@@ -37,7 +37,7 @@ public class VisualToggleLineModeAction extends EditorAction {
   private static class Handler extends AbstractEditorActionHandler {
     protected boolean execute(Editor editor, DataContext context, Command cmd) {
       return CommandGroups.getInstance().getMotion()
-        .toggleVisual(editor, context, cmd.getCount(), cmd.getRawCount(), Command.FLAG_MOT_LINEWISE);
+        .toggleVisual(editor, cmd.getCount(), cmd.getRawCount(), Command.FLAG_MOT_LINEWISE);
     }
   }
 }

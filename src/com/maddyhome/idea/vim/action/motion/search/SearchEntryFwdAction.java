@@ -37,7 +37,7 @@ public class SearchEntryFwdAction extends MotionEditorAction {
 
   private static class Handler extends MotionEditorActionHandler {
     public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return CommandGroups.getInstance().getSearch().search(editor, context, argument.getString(),
+      return CommandGroups.getInstance().getSearch().search(editor, argument.getString(),
                                                             count, Command.FLAG_SEARCH_FWD, false);
     }
   }

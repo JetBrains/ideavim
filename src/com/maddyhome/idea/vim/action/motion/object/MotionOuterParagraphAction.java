@@ -36,7 +36,7 @@ public class MotionOuterParagraphAction extends TextObjectAction {
 
   private static class Handler extends TextObjectActionHandler {
     public TextRange getRange(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return CommandGroups.getInstance().getMotion().getParagraphRange(editor, context, count, true);
+      return CommandGroups.getInstance().getMotion().getParagraphRange(editor, count, true);
     }
   }
 }

@@ -36,7 +36,7 @@ public class NextFileHandler extends CommandHandler {
   public boolean execute(Editor editor, DataContext context, ExCommand cmd) {
     int count = cmd.getCount(editor, context, 1, true);
 
-    CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
+    CommandGroups.getInstance().getMark().saveJumpLocation(editor);
     CommandGroups.getInstance().getFile().selectNextFile(count, context);
 
     return true;

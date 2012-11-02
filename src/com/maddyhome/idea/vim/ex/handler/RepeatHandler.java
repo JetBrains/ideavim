@@ -44,8 +44,8 @@ public class RepeatHandler extends CommandHandler {
       arg = lastArg;
     }
 
-    MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLine(editor,
-                                                                                                   context, line));
+    MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretToLine(editor,
+                                                                                                   line));
     lastArg = arg;
 
     if (arg == ':') {

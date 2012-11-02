@@ -35,7 +35,7 @@ public class MotionGotoLineFirstAction extends MotionEditorAction {
 
   private static class Handler extends MotionEditorActionHandler {
     public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return CommandGroups.getInstance().getMotion().moveCaretGotoLineFirst(editor, context, count - 1);
+      return CommandGroups.getInstance().getMotion().moveCaretGotoLineFirst(editor, count - 1);
     }
   }
 }

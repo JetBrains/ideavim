@@ -114,7 +114,7 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param context The data context
    */
   public void insertBeforeFirstNonBlank(Editor editor, DataContext context) {
-    MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor));
+    MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor));
     initInsert(editor, context, CommandState.MODE_INSERT);
   }
 
@@ -125,7 +125,7 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param context The data context
    */
   public void insertLineStart(Editor editor, DataContext context) {
-    MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor));
+    MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor));
     initInsert(editor, context, CommandState.MODE_INSERT);
   }
 
@@ -136,7 +136,7 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param context The data context
    */
   public void insertAfterCursor(Editor editor, DataContext context) {
-    MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, 1, true));
+    MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, 1, true));
     initInsert(editor, context, CommandState.MODE_INSERT);
   }
 
@@ -147,7 +147,7 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param context The data context
    */
   public void insertAfterLineEnd(Editor editor, DataContext context) {
-    MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, true));
+    MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, true));
     initInsert(editor, context, CommandState.MODE_INSERT);
   }
 
@@ -159,7 +159,7 @@ public class ChangeGroup extends AbstractActionGroup {
    */
   public void insertNewLineAbove(@NotNull final Editor editor, @NotNull final DataContext context) {
     if (editor.getCaretModel().getVisualPosition().line == 0) {
-      MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor));
+      MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor));
       initInsert(editor, context, CommandState.MODE_INSERT);
 
       if (!editor.isOneLineMode()) {
@@ -168,18 +168,18 @@ public class ChangeGroup extends AbstractActionGroup {
           SwingUtilities.invokeLater(new Runnable() {
             public void run() {
               KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), context);
-              MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
+              MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
             }
           });
         }
         else {
           //KeyHandler.executeAction("VimEditorEnter", context);
-          MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
+          MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
         }
       }
     }
     else {
-      MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
+      MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
       insertNewLineBelow(editor, context);
     }
   }
@@ -191,7 +191,7 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param context The data context
    */
   public void insertNewLineBelow(@NotNull final Editor editor, @NotNull final DataContext context) {
-    MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, true));
+    MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, true));
     initInsert(editor, context, CommandState.MODE_INSERT);
 
     CommandState state = CommandState.getInstance(editor);
@@ -214,7 +214,7 @@ public class ChangeGroup extends AbstractActionGroup {
   public void insertAtPreviousInsert(Editor editor, DataContext context) {
     int offset = CommandGroups.getInstance().getMotion().moveCaretToFileMarkLine(editor, '^');
     if (offset != -1) {
-      MotionGroup.moveCaret(editor, context, offset);
+      MotionGroup.moveCaret(editor, offset);
     }
 
     insertBeforeCursor(editor, context);
@@ -349,7 +349,7 @@ public class ChangeGroup extends AbstractActionGroup {
     CommandState state = CommandState.getInstance(editor);
 
     insertStart = editor.getCaretModel().getOffset();
-    CommandGroups.getInstance().getMark().setMark(editor, context, '[', insertStart);
+    CommandGroups.getInstance().getMark().setMark(editor, '[', insertStart);
 
     // If we are repeating the last insert/replace
     if (state.getMode() == CommandState.MODE_REPEAT) {
@@ -424,7 +424,7 @@ public class ChangeGroup extends AbstractActionGroup {
     repeatColumn = 0;
     repeatAppend = false;
 
-    MotionGroup.moveCaret(editor, context, cpos);
+    MotionGroup.moveCaret(editor, cpos);
   }
 
   /**
@@ -476,8 +476,8 @@ public class ChangeGroup extends AbstractActionGroup {
     // If the insert/replace command was preceded by a count, repeat again N - 1 times
     repeatInsert(editor, context, cnt == 0 ? 0 : cnt - 1, true);
 
-    CommandGroups.getInstance().getMark().setMark(editor, context, '^', editor.getCaretModel().getOffset());
-    CommandGroups.getInstance().getMark().setMark(editor, context, ']', editor.getCaretModel().getOffset());
+    CommandGroups.getInstance().getMark().setMark(editor, '^', editor.getCaretModel().getOffset());
+    CommandGroups.getInstance().getMark().setMark(editor, ']', editor.getCaretModel().getOffset());
     CommandState.getInstance(editor).popState();
 
     if (!CommandState.inInsertMode(editor)) {
@@ -611,7 +611,7 @@ public class ChangeGroup extends AbstractActionGroup {
       int pos = editor.getCaretModel().getOffset();
       int norm = EditorHelper.normalizeOffset(editor, editor.getCaretModel().getLogicalPosition().line, pos, false);
       if (norm != pos) {
-        MotionGroup.moveCaret(editor, context, norm);
+        MotionGroup.moveCaret(editor, norm);
       }
 
       return res;
@@ -641,7 +641,7 @@ public class ChangeGroup extends AbstractActionGroup {
       boolean res = deleteText(editor, context, new TextRange(start, offset), Command.FLAG_MOT_LINEWISE);
       if (res && editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) &&
           editor.getCaretModel().getOffset() != 0) {
-        MotionGroup.moveCaret(editor, context,
+        MotionGroup.moveCaret(editor,
                               CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeadingOffset(editor, -1));
       }
 
@@ -665,7 +665,7 @@ public class ChangeGroup extends AbstractActionGroup {
       boolean res = deleteText(editor, context, new TextRange(editor.getCaretModel().getOffset(), offset), Command.FLAG_MOT_INCLUSIVE);
       int pos = CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, -1, false);
       if (pos != -1) {
-        MotionGroup.moveCaret(editor, context, pos);
+        MotionGroup.moveCaret(editor, pos);
       }
 
       return res;
@@ -728,10 +728,10 @@ public class ChangeGroup extends AbstractActionGroup {
    */
   private boolean deleteJoinNLines(Editor editor, DataContext context, int startLine, int count, boolean spaces) {
     // start my moving the cursor to the very end of the first line
-    MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, startLine, true));
+    MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, startLine, true));
     for (int i = 1; i < count; i++) {
       int start = CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, true);
-      MotionGroup.moveCaret(editor, context, start);
+      MotionGroup.moveCaret(editor, start);
       int offset;
       if (spaces) {
         offset = CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeadingOffset(editor, 1);
@@ -742,7 +742,7 @@ public class ChangeGroup extends AbstractActionGroup {
       deleteText(editor, context, new TextRange(editor.getCaretModel().getOffset(), offset), 0);
       if (spaces) {
         insertText(editor, context, start, " ");
-        MotionGroup.moveCaret(editor, context, CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, -1, false));
+        MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, -1, false));
       }
     }
 
@@ -820,11 +820,11 @@ public class ChangeGroup extends AbstractActionGroup {
 
       if (res && editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) &&
           editor.getCaretModel().getOffset() != 0 && !isChange) {
-        MotionGroup.moveCaret(editor, context,
+        MotionGroup.moveCaret(editor,
                               CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeadingOffset(editor, -1));
       }
       else if (res && range.isMultiple()) {
-        MotionGroup.moveCaret(editor, context, range.getStartOffset());
+        MotionGroup.moveCaret(editor, range.getStartOffset());
       }
       else if (res && !isChange) {
         VisualPosition vp = editor.getCaretModel().getVisualPosition();
@@ -1177,7 +1177,7 @@ public class ChangeGroup extends AbstractActionGroup {
       changeCase(editor, context, editor.getCaretModel().getOffset(), offset, CharacterHelper.CASE_TOGGLE);
 
       offset = EditorHelper.normalizeOffset(editor, offset + 1, false);
-      MotionGroup.moveCaret(editor, context, offset);
+      MotionGroup.moveCaret(editor, offset);
 
       return true;
     }
@@ -1219,7 +1219,7 @@ public class ChangeGroup extends AbstractActionGroup {
       for (int i = ends.length - 1; i >= 0; i--) {
         changeCase(editor, context, starts[i], ends[i], type);
       }
-      MotionGroup.moveCaret(editor, context, range.getStartOffset());
+      MotionGroup.moveCaret(editor, range.getStartOffset());
 
       return true;
     }
@@ -1398,11 +1398,11 @@ public class ChangeGroup extends AbstractActionGroup {
 
     if (!CommandState.inInsertMode(editor)) {
       if (!range.isMultiple()) {
-        MotionGroup.moveCaret(editor, context,
+        MotionGroup.moveCaret(editor,
                               CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor, sline));
       }
       else {
-        MotionGroup.moveCaret(editor, context, range.getStartOffset());
+        MotionGroup.moveCaret(editor, range.getStartOffset());
       }
     }
 
@@ -1421,7 +1421,7 @@ public class ChangeGroup extends AbstractActionGroup {
     editor.getDocument().insertString(start, str);
     editor.getCaretModel().moveToOffset(start + str.length());
 
-    CommandGroups.getInstance().getMark().setMark(editor, context, '.', start);
+    CommandGroups.getInstance().getMark().setMark(editor, '.', start);
     //CommandGroups.getInstance().getMark().setMark(editor, context, '[', start);
     //CommandGroups.getInstance().getMark().setMark(editor, context, ']', start + str.length());
   }
@@ -1452,9 +1452,9 @@ public class ChangeGroup extends AbstractActionGroup {
 
       if (type != 0) {
         int start = range.getStartOffset();
-        CommandGroups.getInstance().getMark().setMark(editor, context, '.', start);
-        CommandGroups.getInstance().getMark().setMark(editor, context, '[', start);
-        CommandGroups.getInstance().getMark().setMark(editor, context, ']', start);
+        CommandGroups.getInstance().getMark().setMark(editor, '.', start);
+        CommandGroups.getInstance().getMark().setMark(editor, '[', start);
+        CommandGroups.getInstance().getMark().setMark(editor, ']', start);
       }
 
       return true;
@@ -1475,9 +1475,9 @@ public class ChangeGroup extends AbstractActionGroup {
   private void replaceText(Editor editor, DataContext context, int start, int end, String str) {
     editor.getDocument().replaceString(start, end, str);
 
-    CommandGroups.getInstance().getMark().setMark(editor, context, '[', start);
-    CommandGroups.getInstance().getMark().setMark(editor, context, ']', start + str.length());
-    CommandGroups.getInstance().getMark().setMark(editor, context, '.', start + str.length());
+    CommandGroups.getInstance().getMark().setMark(editor, '[', start);
+    CommandGroups.getInstance().getMark().setMark(editor, ']', start + str.length());
+    CommandGroups.getInstance().getMark().setMark(editor, '.', start + str.length());
   }
 
   public static void resetCursor(Editor editor, boolean insert) {

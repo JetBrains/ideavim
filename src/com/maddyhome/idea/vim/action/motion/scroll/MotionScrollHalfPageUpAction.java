@@ -35,7 +35,7 @@ public class MotionScrollHalfPageUpAction extends EditorAction {
 
   private static class Handler extends AbstractEditorActionHandler {
     protected boolean execute(Editor editor, DataContext context, Command cmd) {
-      return CommandGroups.getInstance().getMotion().scrollHalfPage(editor, context, -1, cmd.getRawCount());
+      return CommandGroups.getInstance().getMotion().scrollHalfPage(editor, -1, cmd.getRawCount());
     }
   }
 }

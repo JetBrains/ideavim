@@ -57,7 +57,7 @@ public class PutLinesHandler extends CommandHandler {
       CommandGroups.getInstance().getRegister().selectRegister(RegisterGroup.REGISTER_DEFAULT);
     }
 
-    MotionGroup.moveCaret(editor, context, EditorHelper.getLineStartOffset(editor, line));
+    MotionGroup.moveCaret(editor, EditorHelper.getLineStartOffset(editor, line));
     if (before) {
       return CommandGroups.getInstance().getCopy().putTextBeforeCursor(editor, context, 1, true, false);
     }

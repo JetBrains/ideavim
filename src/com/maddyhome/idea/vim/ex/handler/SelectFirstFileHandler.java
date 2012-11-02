@@ -40,7 +40,7 @@ public class SelectFirstFileHandler extends CommandHandler {
   public boolean execute(Editor editor, DataContext context, ExCommand cmd) {
     boolean res = CommandGroups.getInstance().getFile().selectFile(0, context);
     if (res) {
-      CommandGroups.getInstance().getMark().saveJumpLocation(editor, context);
+      CommandGroups.getInstance().getMark().saveJumpLocation(editor);
     }
 
     return res;

@@ -46,19 +46,19 @@ public abstract class TextObjectActionHandler extends AbstractEditorActionHandle
       int newend = block || vr.getEndOffset() >= vr.getStartOffset() ? range.getEndOffset() : range.getStartOffset();
 
       if (vr.getStartOffset() == vr.getEndOffset() || block) {
-        CommandGroups.getInstance().getMotion().moveVisualStart(editor, newstart);
+        CommandGroups.getInstance().getMotion().moveVisualStart(newstart);
       }
 
       if (((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) != 0 && (cmd.getFlags() & Command.FLAG_VISUAL_CHARACTERWISE) == 0) &&
           CommandState.getInstance(editor).getSubMode() != Command.FLAG_MOT_LINEWISE) {
-        CommandGroups.getInstance().getMotion().toggleVisual(editor, context, 1, 0, Command.FLAG_MOT_LINEWISE);
+        CommandGroups.getInstance().getMotion().toggleVisual(editor, 1, 0, Command.FLAG_MOT_LINEWISE);
       }
       else if (((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) == 0 || (cmd.getFlags() & Command.FLAG_VISUAL_CHARACTERWISE) != 0) &&
                CommandState.getInstance(editor).getSubMode() == Command.FLAG_MOT_LINEWISE) {
-        CommandGroups.getInstance().getMotion().toggleVisual(editor, context, 1, 0, Command.FLAG_MOT_CHARACTERWISE);
+        CommandGroups.getInstance().getMotion().toggleVisual(editor, 1, 0, Command.FLAG_MOT_CHARACTERWISE);
       }
 
-      MotionGroup.moveCaret(editor, context, newend);
+      MotionGroup.moveCaret(editor, newend);
     }
 
     return true;

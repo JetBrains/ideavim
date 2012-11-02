@@ -37,10 +37,10 @@ public class MotionPercentOrMatchAction extends MotionEditorAction {
   private static class Handler extends MotionEditorActionHandler {
     public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
       if (rawCount == 0) {
-        return CommandGroups.getInstance().getMotion().moveCaretToMatchingPair(editor, context);
+        return CommandGroups.getInstance().getMotion().moveCaretToMatchingPair(editor);
       }
       else {
-        return CommandGroups.getInstance().getMotion().moveCaretToLinePercent(editor, context, count);
+        return CommandGroups.getInstance().getMotion().moveCaretToLinePercent(editor, count);
       }
     }
 

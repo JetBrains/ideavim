@@ -35,7 +35,7 @@ public class MotionGotoMarkLineAction extends MotionEditorAction {
 
   private static class Handler extends MotionEditorActionHandler {
     public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return CommandGroups.getInstance().getMotion().moveCaretToMarkLine(editor, context, argument.getCharacter());
+      return CommandGroups.getInstance().getMotion().moveCaretToMarkLine(editor, argument.getCharacter());
     }
   }
 }
