@@ -88,11 +88,11 @@ public class ArgumentNode implements Node {
     res.append("ArgumentNode[");
     res.append("actionId=");
     res.append(actionId);
-    res.append("action=");
+    res.append(", action=");
     res.append(action);
-    res.append("argType=");
+    res.append(", argType=");
     res.append(argType);
-    res.append("flags=");
+    res.append(", flags=");
     res.append(flags);
     res.append("]");
 

@@ -88,11 +88,11 @@ public class CommandNode implements Node {
     StringBuffer res = new StringBuffer();
     res.append("CommandNode[key=");
     res.append(key);
-    res.append(",actionId=");
+    res.append(", actionId=");
     res.append(actionId);
-    res.append(",action=");
+    res.append(", action=");
     res.append(action);
-    res.append(",argType=");
+    res.append(", argType=");
     res.append(type);
     res.append("]");
 

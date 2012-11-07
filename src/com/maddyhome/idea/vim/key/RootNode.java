@@ -31,10 +31,10 @@ public class RootNode extends ParentNode {
     for (Object key : children.keySet()) {
       Node node = children.get(key);
       if (cnt > 0) {
-        res.append(",");
+        res.append(", ");
       }
       res.append(key);
-      res.append("->");
+      res.append(" -> ");
       res.append(node);
       cnt++;
     }

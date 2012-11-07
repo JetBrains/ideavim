@@ -85,15 +85,15 @@ public class BranchNode extends ParentNode {
     StringBuffer res = new StringBuffer();
     res.append("BranchNode[key=");
     res.append(key);
-    res.append("children=[");
+    res.append(", children=[");
     int cnt = 0;
     for (Object key : children.keySet()) {
       Node node = children.get(key);
       if (cnt > 0) {
-        res.append(",");
+        res.append(", ");
       }
       res.append(key);
-      res.append("->");
+      res.append(" -> ");
       res.append(node);
       cnt++;
     }
