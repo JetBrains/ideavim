@@ -62,7 +62,6 @@ public class ProcessGroup extends AbstractActionGroup {
     String initText = "";
     String label = "" + leader;
 
-    //CommandState.getInstance(editor).pushState(CommandState.MODE_EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.activate(editor, context, label, initText, count);
   }
@@ -92,7 +91,7 @@ public class ProcessGroup extends AbstractActionGroup {
     }
 
     String initText = getRange(editor, cmd);
-    CommandState.getInstance(editor).pushState(CommandState.MODE_EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
+    CommandState.getInstance(editor).pushState(CommandState.Mode.EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.activate(editor, context, ":", initText, 1);
   }
@@ -143,7 +142,7 @@ public class ProcessGroup extends AbstractActionGroup {
       if (panel.getLabel().equals(":")) {
         flags = CommandParser.getInstance().processCommand(editor, context, text, 1);
         if (logger.isDebugEnabled()) logger.debug("flags=" + flags);
-        if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
+        if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
           CommandGroups.getInstance().getMotion().exitVisual(editor, true);
         }
       }
@@ -225,14 +224,14 @@ public class ProcessGroup extends AbstractActionGroup {
 
   public void startFilterCommand(Editor editor, DataContext context, Command cmd) {
     String initText = getRange(editor, cmd) + "!";
-    CommandState.getInstance(editor).pushState(CommandState.MODE_EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
+    CommandState.getInstance(editor).pushState(CommandState.Mode.EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.activate(editor, context, ":", initText, 1);
   }
 
   private String getRange(Editor editor, Command cmd) {
     String initText = "";
-    if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
+    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
       initText = "'<,'>";
     }
     else if (cmd.getRawCount() > 0) {

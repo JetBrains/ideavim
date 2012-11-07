@@ -104,7 +104,7 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param context The data context
    */
   public void insertBeforeCursor(Editor editor, DataContext context) {
-    initInsert(editor, context, CommandState.MODE_INSERT);
+    initInsert(editor, context, CommandState.Mode.INSERT);
   }
 
   /**
@@ -115,7 +115,7 @@ public class ChangeGroup extends AbstractActionGroup {
    */
   public void insertBeforeFirstNonBlank(Editor editor, DataContext context) {
     MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor));
-    initInsert(editor, context, CommandState.MODE_INSERT);
+    initInsert(editor, context, CommandState.Mode.INSERT);
   }
 
   /**
@@ -126,7 +126,7 @@ public class ChangeGroup extends AbstractActionGroup {
    */
   public void insertLineStart(Editor editor, DataContext context) {
     MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor));
-    initInsert(editor, context, CommandState.MODE_INSERT);
+    initInsert(editor, context, CommandState.Mode.INSERT);
   }
 
   /**
@@ -137,7 +137,7 @@ public class ChangeGroup extends AbstractActionGroup {
    */
   public void insertAfterCursor(Editor editor, DataContext context) {
     MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, 1, true));
-    initInsert(editor, context, CommandState.MODE_INSERT);
+    initInsert(editor, context, CommandState.Mode.INSERT);
   }
 
   /**
@@ -148,7 +148,7 @@ public class ChangeGroup extends AbstractActionGroup {
    */
   public void insertAfterLineEnd(Editor editor, DataContext context) {
     MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, true));
-    initInsert(editor, context, CommandState.MODE_INSERT);
+    initInsert(editor, context, CommandState.Mode.INSERT);
   }
 
   /**
@@ -160,11 +160,11 @@ public class ChangeGroup extends AbstractActionGroup {
   public void insertNewLineAbove(@NotNull final Editor editor, @NotNull final DataContext context) {
     if (editor.getCaretModel().getVisualPosition().line == 0) {
       MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor));
-      initInsert(editor, context, CommandState.MODE_INSERT);
+      initInsert(editor, context, CommandState.Mode.INSERT);
 
       if (!editor.isOneLineMode()) {
         CommandState state = CommandState.getInstance(editor);
-        if (state.getMode() != CommandState.MODE_REPEAT) {
+        if (state.getMode() != CommandState.Mode.REPEAT) {
           SwingUtilities.invokeLater(new Runnable() {
             public void run() {
               KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), context);
@@ -192,10 +192,10 @@ public class ChangeGroup extends AbstractActionGroup {
    */
   public void insertNewLineBelow(@NotNull final Editor editor, @NotNull final DataContext context) {
     MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, true));
-    initInsert(editor, context, CommandState.MODE_INSERT);
+    initInsert(editor, context, CommandState.Mode.INSERT);
 
     CommandState state = CommandState.getInstance(editor);
-    if (state.getMode() != CommandState.MODE_REPEAT) {
+    if (state.getMode() != CommandState.Mode.REPEAT) {
       SwingUtilities.invokeLater(new Runnable() {
         public void run() {
           KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), context);
@@ -345,15 +345,15 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param context The data context
    * @param mode    The mode - inidicate insert or replace
    */
-  private void initInsert(Editor editor, DataContext context, int mode) {
+  private void initInsert(Editor editor, DataContext context, CommandState.Mode mode) {
     CommandState state = CommandState.getInstance(editor);
 
     insertStart = editor.getCaretModel().getOffset();
     CommandGroups.getInstance().getMark().setMark(editor, '[', insertStart);
 
     // If we are repeating the last insert/replace
-    if (state.getMode() == CommandState.MODE_REPEAT) {
-      if (mode == CommandState.MODE_REPLACE) {
+    if (state.getMode() == CommandState.Mode.REPEAT) {
+      if (mode == CommandState.Mode.REPLACE) {
         processInsert(editor, context);
       }
       // If this command doesn't allow repeating, set the count to 1
@@ -363,7 +363,7 @@ public class ChangeGroup extends AbstractActionGroup {
       else {
         repeatInsert(editor, context, state.getCommand().getCount(), false);
       }
-      if (mode == CommandState.MODE_REPLACE) {
+      if (mode == CommandState.Mode.REPLACE) {
         processInsert(editor, context);
       }
     }
@@ -372,7 +372,7 @@ public class ChangeGroup extends AbstractActionGroup {
       lastInsert = state.getCommand();
       strokes.clear();
       inInsert = true;
-      if (mode == CommandState.MODE_REPLACE) {
+      if (mode == CommandState.Mode.REPLACE) {
         processInsert(editor, context);
       }
       state.pushState(mode, 0, KeyParser.MAPPING_INSERT);
@@ -462,7 +462,7 @@ public class ChangeGroup extends AbstractActionGroup {
     logger.debug("processing escape");
     int cnt = lastInsert != null ? lastInsert.getCount() : 0;
     // Turn off overwrite mode if we were in replace mode
-    if (CommandState.getInstance(editor).getMode() == CommandState.MODE_REPLACE) {
+    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.REPLACE) {
       KeyHandler.executeAction("VimInsertReplaceToggle", context);
     }
     // If this command doesn't allow repeats, set count to 1
@@ -497,11 +497,11 @@ public class ChangeGroup extends AbstractActionGroup {
       return;
     }
 
-    if (CommandState.getInstance(editor).getMode() == CommandState.MODE_REPLACE) {
+    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.REPLACE) {
       KeyHandler.executeAction("VimEditorToggleInsertState", context);
     }
     KeyHandler.executeAction("VimEditorEnter", context);
-    if (CommandState.getInstance(editor).getMode() == CommandState.MODE_REPLACE) {
+    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.REPLACE) {
       KeyHandler.executeAction("VimEditorToggleInsertState", context);
     }
   }
@@ -527,7 +527,7 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param context The data context
    */
   public void processSingleCommand(Editor editor, DataContext context) {
-    CommandState.getInstance(editor).pushState(CommandState.MODE_COMMAND, CommandState.SUBMODE_SINGLE_COMMAND,
+    CommandState.getInstance(editor).pushState(CommandState.Mode.COMMAND, CommandState.SUBMODE_SINGLE_COMMAND,
                                                KeyParser.MAPPING_NORMAL);
     clearStrokes(editor);
   }
@@ -846,7 +846,7 @@ public class ChangeGroup extends AbstractActionGroup {
    * @return true
    */
   public boolean changeReplace(Editor editor, DataContext context) {
-    initInsert(editor, context, CommandState.MODE_REPLACE);
+    initInsert(editor, context, CommandState.Mode.REPLACE);
 
     return true;
   }
@@ -963,7 +963,7 @@ public class ChangeGroup extends AbstractActionGroup {
 
     boolean res = deleteCharacter(editor, context, count);
     if (res) {
-      initInsert(editor, context, CommandState.MODE_INSERT);
+      initInsert(editor, context, CommandState.Mode.INSERT);
     }
 
     return res;

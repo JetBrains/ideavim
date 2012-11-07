@@ -42,7 +42,7 @@ public class MotionRightAction extends MotionEditorAction {
       if (CommandState.inInsertMode(editor)) {
         allow = true;
       }
-      else if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
+      else if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
         BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
         if (!opt.getValue().equals("old")) {
           allow = true;

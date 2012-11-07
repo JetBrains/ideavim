@@ -297,7 +297,7 @@ public class FileGroup extends AbstractActionGroup {
     StringBuffer msg = new StringBuffer();
     Document doc = editor.getDocument();
 
-    if (CommandState.getInstance(editor).getMode() != CommandState.MODE_VISUAL) {
+    if (CommandState.getInstance(editor).getMode() != CommandState.Mode.VISUAL) {
       LogicalPosition lp = editor.getCaretModel().getLogicalPosition();
       int col = editor.getCaretModel().getOffset() - doc.getLineStartOffset(lp.line);
       int endoff = doc.getLineEndOffset(lp.line);

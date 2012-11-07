@@ -37,30 +37,15 @@ import java.util.Stack;
  * This singleton maintains various state information about commands being run
  */
 public class CommandState {
-  /**
-   * Indicates a runtime state of being in command mode
-   */
-  public static final int MODE_COMMAND = 1;
-  /**
-   * Indicates a runtime state of being in insert mode
-   */
-  public static final int MODE_INSERT = 2;
-  /**
-   * Indicates a runtime state of being in replace mode
-   */
-  public static final int MODE_REPLACE = 3;
-  /**
-   * Indicates a runtime state of being in repeat mode
-   */
-  public static final int MODE_REPEAT = 4;
-  /**
-   * Indicates a runtime state of being in visual mode
-   */
-  public static final int MODE_VISUAL = 5;
-  /**
-   * Indicates a runtime state of entering an Ex command
-   */
-  public static final int MODE_EX_ENTRY = 6;
+
+  public static enum Mode {
+    COMMAND,
+    INSERT,
+    REPLACE,
+    REPEAT,
+    VISUAL,
+    EX_ENTRY;
+  }
 
   public static final int SUBMODE_SINGLE_COMMAND = 1;
 
@@ -86,8 +71,8 @@ public class CommandState {
   }
 
   public static boolean inInsertMode(Editor editor) {
-    final int mode = getInstance(editor).getMode();
-    return mode == MODE_INSERT || mode == MODE_REPLACE;
+    final Mode mode = getInstance(editor).getMode();
+    return mode == Mode.INSERT || mode == Mode.REPLACE;
   }
 
   /**
@@ -117,7 +102,7 @@ public class CommandState {
     return flags;
   }
 
-  public void pushState(int mode, int submode, int mapping) {
+  public void pushState(@NotNull Mode mode, int submode, int mapping) {
     logger.debug("pushState");
     modes.push(new State(mode, submode, mapping));
     updateStatus();
@@ -140,8 +125,9 @@ public class CommandState {
    *
    * @return The current runtime mode
    */
-  public int getMode() {
-    final int mode = currentState().getMode();
+  @NotNull
+  public Mode getMode() {
+    final Mode mode = currentState().getMode();
     if (logger.isDebugEnabled()) {
       logger.debug("getMode=" + mode);
     }
@@ -187,21 +173,21 @@ public class CommandState {
 
     StringBuffer msg = new StringBuffer();
     switch (state.getMode()) {
-      case MODE_COMMAND:
+      case COMMAND:
         if (state.getSubmode() == SUBMODE_SINGLE_COMMAND) {
           msg.append('(').append(getStatusString(pos - 1).toLowerCase()).append(')');
         }
         break;
-      case MODE_INSERT:
+      case INSERT:
         msg.append("INSERT");
         break;
-      case MODE_REPLACE:
+      case REPLACE:
         msg.append("REPLACE");
         break;
-      case MODE_VISUAL:
+      case VISUAL:
         if (pos > 0) {
           State tmp = modes.get(pos - 1);
-          if (tmp.getMode() == MODE_COMMAND && tmp.getSubmode() == SUBMODE_SINGLE_COMMAND) {
+          if (tmp.getMode() == Mode.COMMAND && tmp.getSubmode() == SUBMODE_SINGLE_COMMAND) {
             msg.append(getStatusString(pos - 1));
             msg.append(" - ");
           }
@@ -227,13 +213,13 @@ public class CommandState {
    * mode.
    */
   public void toggleInsertOverwrite() {
-    int oldmode = getMode();
-    int newmode = oldmode;
-    if (oldmode == MODE_INSERT) {
-      newmode = MODE_REPLACE;
+    Mode oldmode = getMode();
+    Mode newmode = oldmode;
+    if (oldmode == Mode.INSERT) {
+      newmode = Mode.REPLACE;
     }
-    else if (oldmode == MODE_REPLACE) {
-      newmode = MODE_INSERT;
+    else if (oldmode == Mode.REPLACE) {
+      newmode = Mode.INSERT;
     }
 
     if (oldmode != newmode) {
@@ -335,17 +321,18 @@ public class CommandState {
    * Signleton, no public object creation
    */
   private CommandState() {
-    modes.push(new State(MODE_COMMAND, 0, KeyParser.MAPPING_NORMAL));
+    modes.push(new State(Mode.COMMAND, 0, KeyParser.MAPPING_NORMAL));
   }
 
   private class State {
-    public State(int mode, int submode, int mapping) {
+    public State(@NotNull Mode mode, int submode, int mapping) {
       this.mode = mode;
       this.submode = submode;
       this.mapping = mapping;
     }
 
-    public int getMode() {
+    @NotNull
+    public Mode getMode() {
       return mode;
     }
 
@@ -374,13 +361,13 @@ public class CommandState {
       return res.toString();
     }
 
-    private int mode;
+    @NotNull private Mode mode;
     private int submode;
     private int mapping;
   }
 
   private Stack<State> modes = new Stack<State>();
-  private State defaultState = new State(MODE_COMMAND, 0, KeyParser.MAPPING_NORMAL);
+  private State defaultState = new State(Mode.COMMAND, 0, KeyParser.MAPPING_NORMAL);
   private Command command;
   private int flags;
   private boolean isRecording = false;

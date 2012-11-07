@@ -160,7 +160,7 @@ public class MotionGroup extends AbstractActionGroup {
       case 0: // Triple click
         visualMode = Command.FLAG_MOT_LINEWISE;
         // Pop state of being in Visual Char mode
-        if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
+        if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
           CommandState.getInstance(editor).popState();
         }
 
@@ -177,8 +177,10 @@ public class MotionGroup extends AbstractActionGroup {
       case 0:
         VisualPosition vp = editor.getCaretModel().getVisualPosition();
         int col = EditorHelper.normalizeVisualColumn(editor, vp.line, vp.column,
-                                                     CommandState.getInstance(editor).getMode() == CommandState.MODE_INSERT ||
-                                                     CommandState.getInstance(editor).getMode() == CommandState.MODE_REPLACE);
+                                                     CommandState.getInstance(editor).getMode() ==
+                                                     CommandState.Mode.INSERT ||
+                                                     CommandState.getInstance(editor).getMode() ==
+                                                     CommandState.Mode.REPLACE);
         if (col != vp.column) {
           editor.getCaretModel().moveToVisualPosition(new VisualPosition(vp.line, col));
         }
@@ -226,12 +228,12 @@ public class MotionGroup extends AbstractActionGroup {
     }
 
     if (update) {
-      if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
+      if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
         updateSelection(editor, editor.getCaretModel().getOffset());
       }
     }
     else {
-      if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
+      if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
         CommandState.getInstance(editor).popState();
       }
 
@@ -263,7 +265,7 @@ public class MotionGroup extends AbstractActionGroup {
     }
 
     logger.debug("mouse released");
-    if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
+    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
       CommandState.getInstance(editor).popState();
     }
 
@@ -315,7 +317,7 @@ public class MotionGroup extends AbstractActionGroup {
   public TextRange getWordRange(Editor editor, int count, boolean isOuter, boolean isBig) {
     int dir = 1;
     boolean selection = false;
-    if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
+    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
       if (visualEnd < visualStart) {
         dir = -1;
       }
@@ -1264,7 +1266,7 @@ public class MotionGroup extends AbstractActionGroup {
       EditorData.setLastColumn(editor, editor.getCaretModel().getVisualPosition().column);
       scrollCaretIntoView(editor);
 
-      if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
+      if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
         CommandGroups.getInstance().getMotion().updateSelection(editor, offset);
       }
       else {
@@ -1408,7 +1410,7 @@ public class MotionGroup extends AbstractActionGroup {
     }
 
     if (logger.isDebugEnabled()) logger.debug("vr=" + vr);
-    CommandState.getInstance(editor).pushState(CommandState.MODE_VISUAL, vr.getType(), KeyParser.MAPPING_VISUAL);
+    CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, vr.getType(), KeyParser.MAPPING_VISUAL);
 
     visualStart = vr.getStart();
     visualEnd = vr.getEnd();
@@ -1478,7 +1480,7 @@ public class MotionGroup extends AbstractActionGroup {
       exitVisual(editor, true);
     }
     else {
-      CommandState.getInstance(editor).pushState(CommandState.MODE_VISUAL, mode, KeyParser.MAPPING_VISUAL);
+      CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, KeyParser.MAPPING_VISUAL);
     }
 
     KeyHandler.getInstance().reset(editor);
@@ -1503,7 +1505,7 @@ public class MotionGroup extends AbstractActionGroup {
   public boolean toggleVisual(Editor editor, int count, int rawCount, int mode) {
     if (logger.isDebugEnabled()) logger.debug("toggleVisual: mode=" + mode);
     int currentMode = CommandState.getInstance(editor).getSubMode();
-    if (CommandState.getInstance(editor).getMode() != CommandState.MODE_VISUAL) {
+    if (CommandState.getInstance(editor).getMode() != CommandState.Mode.VISUAL) {
       int start;
       int end;
       if (rawCount > 0) {
@@ -1522,7 +1524,7 @@ public class MotionGroup extends AbstractActionGroup {
       else {
         start = end = editor.getSelectionModel().getSelectionStart();
       }
-      CommandState.getInstance(editor).pushState(CommandState.MODE_VISUAL, mode, KeyParser.MAPPING_VISUAL);
+      CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, KeyParser.MAPPING_VISUAL);
       visualStart = start;
       updateSelection(editor, end);
       MotionGroup.moveCaret(editor, visualEnd);
@@ -1573,7 +1575,7 @@ public class MotionGroup extends AbstractActionGroup {
 
   public void exitVisual(final Editor editor, final boolean removeSelection) {
     resetVisual(editor, removeSelection);
-    if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
+    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
       CommandState.getInstance(editor).popState();
     }
   }
@@ -1775,7 +1777,7 @@ public class MotionGroup extends AbstractActionGroup {
       FileEditor fe = event.getOldEditor();
       if (fe instanceof TextEditor) {
         Editor editor = ((TextEditor)fe).getEditor();
-        if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
+        if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
           CommandGroups.getInstance().getMotion().exitVisual(
             EditorHelper.getEditor(event.getManager(), event.getOldFile()), true);
         }

@@ -33,7 +33,7 @@ import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
  */
 public abstract class TextObjectActionHandler extends AbstractEditorActionHandler {
   protected final boolean execute(Editor editor, DataContext context, Command cmd) {
-    if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
+    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
       TextRange range = getRange(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
       if (range == null) {
         return false;

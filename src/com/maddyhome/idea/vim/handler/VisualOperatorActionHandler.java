@@ -40,7 +40,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
     if (logger.isDebugEnabled()) logger.debug("execute, cmd=" + cmd);
 
     TextRange range = null;
-    if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
+    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
       range = CommandGroups.getInstance().getMotion().getVisualRange(editor);
       if (logger.isDebugEnabled()) logger.debug("range=" + range);
     }
@@ -80,7 +80,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
     public TextRange start() {
       logger.debug("start");
       wasRepeat = false;
-      if (CommandState.getInstance(editor).getMode() == CommandState.MODE_REPEAT) {
+      if (CommandState.getInstance(editor).getMode() == CommandState.Mode.REPEAT) {
         wasRepeat = true;
         lastColumn = EditorData.getLastColumn(editor);
         VisualChange range = EditorData.getLastVisualOperatorRange(editor);
@@ -91,7 +91,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
       }
 
       TextRange res = null;
-      if (CommandState.getInstance(editor).getMode() == CommandState.MODE_VISUAL) {
+      if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
         res = CommandGroups.getInstance().getMotion().getVisualRange(editor);
         if (!wasRepeat) {
           change = CommandGroups.getInstance().getMotion().getVisualOperatorRange(editor,

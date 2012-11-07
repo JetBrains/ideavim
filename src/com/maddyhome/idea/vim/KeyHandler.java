@@ -172,8 +172,8 @@ public class KeyHandler {
         }
 
         // If we are in insert/replace mode send this key in for processing
-        if (editorState.getMode() == CommandState.MODE_INSERT ||
-            editorState.getMode() == CommandState.MODE_REPLACE) {
+        if (editorState.getMode() == CommandState.Mode.INSERT ||
+            editorState.getMode() == CommandState.Mode.REPLACE) {
           if (!CommandGroups.getInstance().getChange().processKey(editor, context, key)) {
             shouldRecord = false;
           }
@@ -225,22 +225,22 @@ public class KeyHandler {
   }
 
   private boolean isDeleteCommandCount(@NotNull KeyStroke key, @NotNull CommandState editorState) {
-    return (editorState.getMode() == CommandState.MODE_COMMAND ||
-              editorState.getMode() == CommandState.MODE_VISUAL) &&
+    return (editorState.getMode() == CommandState.Mode.COMMAND ||
+              editorState.getMode() == CommandState.Mode.VISUAL) &&
              state == State.NEW_COMMAND && currentArg != Argument.CHARACTER && currentArg != Argument.DIGRAPH &&
              key.getKeyCode() == KeyEvent.VK_DELETE && count != 0;
   }
 
   private boolean isCommandCount(@NotNull CommandState editorState, char chKey) {
-    return (editorState.getMode() == CommandState.MODE_COMMAND ||
-              editorState.getMode() == CommandState.MODE_VISUAL) &&
+    return (editorState.getMode() == CommandState.Mode.COMMAND ||
+              editorState.getMode() == CommandState.Mode.VISUAL) &&
              state == State.NEW_COMMAND && currentArg != Argument.CHARACTER && currentArg != Argument.DIGRAPH &&
              Character.isDigit(chKey) &&
              (count != 0 || chKey != '0');
   }
 
   private boolean isEditorReset(@NotNull KeyStroke key, @NotNull CommandState editorState) {
-    return (editorState.getMode() == CommandState.MODE_COMMAND || state == State.COMMAND) &&
+    return (editorState.getMode() == CommandState.Mode.COMMAND || state == State.COMMAND) &&
         (key.getKeyCode() == KeyEvent.VK_ESCAPE ||
          (key.getKeyCode() == KeyEvent.VK_C && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0) ||
          (key.getKeyCode() == '[' && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0));
@@ -392,11 +392,6 @@ public class KeyHandler {
         }
         break;
       case Argument.EX_STRING:
-        /*
-        mode = STATE_NEW_COMMAND;
-        currentArg = arg.getArgType();
-        editorState.pushState(CommandState.MODE_EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
-        */
         break;
       default:
         // Oops - we aren't expecting any other type of argument
@@ -483,7 +478,7 @@ public class KeyHandler {
         CommandGroups.getInstance().getProcess().startSearchCommand(editor, context, count, key);
         state = State.NEW_COMMAND;
         currentArg = Argument.EX_STRING;
-        editorState.pushState(CommandState.MODE_EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
+        editorState.pushState(CommandState.Mode.EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
       }
     }
   }
@@ -590,8 +585,8 @@ public class KeyHandler {
       boolean wasRecording = editorState.isRecording();
 
       executeAction(cmd.getAction(), context);
-      if (editorState.getMode() == CommandState.MODE_INSERT ||
-          editorState.getMode() == CommandState.MODE_REPLACE) {
+      if (editorState.getMode() == CommandState.Mode.INSERT ||
+          editorState.getMode() == CommandState.Mode.REPLACE) {
         CommandGroups.getInstance().getChange().processCommand(editor, context, cmd);
       }
 

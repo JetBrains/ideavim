@@ -39,8 +39,8 @@ public class MotionActionTest extends VimTestCase {
                                          "three\n");
     final int offset = editor.getCaretModel().getOffset();
     assertEquals(2, offset);
-    final int mode = CommandState.getInstance(editor).getMode();
-    assertEquals(CommandState.MODE_COMMAND, mode);
+    final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
+    assertEquals(CommandState.Mode.COMMAND, mode);
   }
 
   public void testFewDigitsCountMove() {
@@ -67,8 +67,8 @@ public class MotionActionTest extends VimTestCase {
                                          "on<caret>e two\tthree\nfour\n");
     final int offset = editor.getCaretModel().getOffset();
     assertEquals(7, offset);
-    final int mode = CommandState.getInstance(editor).getMode();
-    assertEquals(CommandState.MODE_COMMAND, mode);
+    final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
+    assertEquals(CommandState.Mode.COMMAND, mode);
   }
 
   public void testIllegalCharArgument() {
@@ -78,8 +78,8 @@ public class MotionActionTest extends VimTestCase {
                                          "on<caret>e two three four five six seven\n");
     final int offset = editor.getCaretModel().getOffset();
     assertEquals(2, offset);
-    final int mode = CommandState.getInstance(editor).getMode();
-    assertEquals(CommandState.MODE_COMMAND, mode);
+    final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
+    assertEquals(CommandState.Mode.COMMAND, mode);
   }
 
   public void testBackToDigraph() {
@@ -91,7 +91,7 @@ public class MotionActionTest extends VimTestCase {
                                          "Hallo, \u00d6ster<caret>reich!\n");
     final int offset = editor.getCaretModel().getOffset();
     assertEquals(7, offset);
-    final int mode = CommandState.getInstance(editor).getMode();
-    assertEquals(CommandState.MODE_COMMAND, mode);
+    final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
+    assertEquals(CommandState.Mode.COMMAND, mode);
   }
 }
