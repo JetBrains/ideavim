@@ -20,6 +20,8 @@ package com.maddyhome.idea.vim.key;
  */
 
 import com.intellij.openapi.actionSystem.AnAction;
+import com.maddyhome.idea.vim.command.Command;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
@@ -36,7 +38,7 @@ public class CommandNode implements Node {
    * @param cmdType The type of the command
    * @param flags   Any special flags needs by the command
    */
-  public CommandNode(KeyStroke key, String actName, AnAction action, int cmdType, int flags) {
+  public CommandNode(KeyStroke key, String actName, AnAction action, @NotNull Command.Type cmdType, int flags) {
     this.key = key;
     this.actionId = actName;
     this.action = action;
@@ -71,7 +73,7 @@ public class CommandNode implements Node {
    *
    * @return The command's type
    */
-  public int getCmdType() {
+  public Command.Type getCmdType() {
     return type;
   }
 
@@ -119,7 +121,7 @@ public class CommandNode implements Node {
     result = key.hashCode();
     result = 29 * result + actionId.hashCode();
     result = 29 * result + action.hashCode();
-    result = 29 * result + type;
+    result = 29 * result + type.hashCode();
     result = 29 * result + flags;
     return result;
   }
@@ -127,6 +129,6 @@ public class CommandNode implements Node {
   protected KeyStroke key;
   protected AnAction action;
   protected String actionId;
-  protected int type;
+  protected Command.Type type;
   protected int flags;
 }

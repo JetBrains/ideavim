@@ -23,6 +23,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.List;
@@ -107,72 +108,70 @@ public class Command {
   public static final int FLAG_COMPLETE_EX = 1 << 29;
   public static final int FLAG_TEXT_BLOCK = 1 << 30;
 
-  /**
-   * Represents commands that actually move the cursor and can be arguments to operators
-   */
-  public static final int MOTION = 1;
-  /**
-   * Represents commands that insert new text into the editor
-   */
-  public static final int INSERT = 2;
-  /**
-   * Represents commands that remove text from the editor
-   */
-  public static final int DELETE = 3;
-  /**
-   * Represents commands that change text in the editor
-   */
-  public static final int CHANGE = 4;
-  /**
-   * Represents commands that copy text in the editor
-   */
-  public static final int COPY = 5;
-  /**
-   * Represents commands that paste text into the editor
-   */
-  public static final int PASTE = 6;
-  public static final int RESET = 7;
-  /**
-   * Represents commands that select the register
-   */
-  public static final int SELECT_REGISTER = 8;
-  /**
-   * Represents other types of commands
-   */
-  public static final int OTHER_READONLY = 9;
-  public static final int OTHER_WRITABLE = 10;
-  public static final int OTHER_READ_WRITE = 11;
-  public static final int COMPLETION = 12;
+  public static enum Type {
+    /**
+     * Represents undefined commands.
+     */
+    UNDEFINED,
+    /**
+     * Represents commands that actually move the cursor and can be arguments to operators.
+     */
+    MOTION,
+    /**
+     * Represents commands that insert new text into the editor.
+     */
+    INSERT,
+    /**
+     * Represents commands that remove text from the editor.
+     */
+    DELETE,
+    /**
+     * Represents commands that change text in the editor.
+     */
+    CHANGE,
+    /**
+     * Represents commands that copy text in the editor.
+     */
+    COPY,
+    PASTE,
+    RESET,
+    /**
+     * Represents commands that select the register.
+     */
+    SELECT_REGISTER,
+    OTHER_READONLY,
+    OTHER_WRITABLE,
+    OTHER_READ_WRITE,
+    COMPLETION;
 
-  public boolean isReadType() {
-    boolean res = false;
-    switch (type) {
-      case MOTION:
-      case COPY:
-      case SELECT_REGISTER:
-      case OTHER_READONLY:
-      case OTHER_READ_WRITE:
-      case COMPLETION:
-        res = true;
+    public boolean isRead() {
+      switch (this) {
+        case MOTION:
+        case COPY:
+        case SELECT_REGISTER:
+        case OTHER_READONLY:
+        case OTHER_READ_WRITE:
+        case COMPLETION:
+          return true;
+        default:
+          return false;
+      }
     }
 
-    return res;
-  }
-
-  public boolean isWriteType() {
-    boolean res = false;
-    switch (type) {
-      case INSERT:
-      case DELETE:
-      case CHANGE:
-      case PASTE:
-      case RESET:
-      case OTHER_WRITABLE:
-      case OTHER_READ_WRITE:
-        res = true;
+    public boolean isWrite() {
+      switch (this) {
+        case INSERT:
+        case DELETE:
+        case CHANGE:
+        case PASTE:
+        case RESET:
+        case OTHER_WRITABLE:
+        case OTHER_READ_WRITE:
+          return true;
+        default:
+          return false;
+      }
     }
-
-    return res;
   }
 
   /**
@@ -183,7 +182,7 @@ public class Command {
    * @param type   The type of the command
    * @param flags  Any custom flags specific to this command
    */
-  public Command(int count, String actionId, AnAction action, int type, int flags) {
+  public Command(int count, String actionId, AnAction action, @NotNull Type type, int flags) {
     this(count, actionId, action, type, flags, null);
   }
 
@@ -196,7 +195,7 @@ public class Command {
    * @param flags  Any custom flags specific to this command
    * @param arg    The argument to this command
    */
-  public Command(int count, String actionId, AnAction action, int type, int flags, Argument arg) {
+  public Command(int count, String actionId, AnAction action, @NotNull Type type, int flags, Argument arg) {
     this.count = count;
     this.actionId = actionId;
     this.action = action;
@@ -246,7 +245,8 @@ public class Command {
    *
    * @return The command type
    */
-  public int getType() {
+  @NotNull
+  public Type getType() {
     return type;
   }
 
@@ -338,7 +338,7 @@ public class Command {
   private int count;
   private String actionId;
   private AnAction action;
-  private int type;
+  @NotNull private Type type;
   private int flags;
   private Argument argument;
   private List<KeyStroke> keys;

@@ -31,7 +31,9 @@ import com.maddyhome.idea.vim.action.DelegateAction;
 import com.maddyhome.idea.vim.action.PassThruDelegateAction;
 import com.maddyhome.idea.vim.action.PassThruDelegateEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.handler.key.EditorKeyHandler;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -182,11 +184,11 @@ public class KeyParser {
    * @param actName The action the shortcut will execute
    * @param cmdType The type of the command
    */
-  public void registerAction(int mapping, String actName, int cmdType) {
+  public void registerAction(int mapping, String actName, @NotNull Command.Type cmdType) {
     registerAction(mapping, actName, cmdType, 0);
   }
 
-  public void registerAction(int mapping, String actName, int cmdType, int cmdFlags) {
+  public void registerAction(int mapping, String actName, Command.Type cmdType, int cmdFlags) {
     String ideaName = actName.substring(3);
     ActionManager amgr = ActionManager.getInstance();
     if (amgr.getAction(ideaName) == null) {
@@ -239,7 +241,7 @@ public class KeyParser {
    * @param cmdType  The type of the command
    * @param shortcut The shortcut to map to the action
    */
-  public void registerAction(int mapping, String actName, int cmdType, Shortcut shortcut) {
+  public void registerAction(int mapping, String actName, Command.Type cmdType, Shortcut shortcut) {
     registerAction(mapping, actName, cmdType, new Shortcut[]{shortcut});
   }
 
@@ -252,7 +254,7 @@ public class KeyParser {
    * @param cmdFlags Any special flags associated with this command
    * @param shortcut The shortcut to map to the action
    */
-  public void registerAction(int mapping, String actName, int cmdType, int cmdFlags, Shortcut shortcut) {
+  public void registerAction(int mapping, String actName, Command.Type cmdType, int cmdFlags, Shortcut shortcut) {
     registerAction(mapping, actName, cmdType, cmdFlags, new Shortcut[]{shortcut});
   }
 
@@ -265,7 +267,7 @@ public class KeyParser {
    * @param shortcut The shortcut to map to the action
    * @param argType  The type of argument required by the actions
    */
-  public void registerAction(int mapping, String actName, int cmdType, Shortcut shortcut, int argType) {
+  public void registerAction(int mapping, String actName, Command.Type cmdType, Shortcut shortcut, int argType) {
     registerAction(mapping, actName, cmdType, new Shortcut[]{shortcut}, argType);
   }
 
@@ -279,7 +281,7 @@ public class KeyParser {
    * @param shortcut The shortcut to map to the action
    * @param argType  The type of argument required by the actions
    */
-  public void registerAction(int mapping, String actName, int cmdType, int cmdFlags, Shortcut shortcut, int argType) {
+  public void registerAction(int mapping, String actName, Command.Type cmdType, int cmdFlags, Shortcut shortcut, int argType) {
     registerAction(mapping, actName, cmdType, cmdFlags, new Shortcut[]{shortcut}, argType);
   }
 
@@ -291,7 +293,7 @@ public class KeyParser {
    * @param cmdType   The type of the command
    * @param shortcuts The shortcuts to map to the action
    */
-  public void registerAction(int mapping, String actName, int cmdType, Shortcut[] shortcuts) {
+  public void registerAction(int mapping, String actName, Command.Type cmdType, Shortcut[] shortcuts) {
     registerAction(mapping, actName, cmdType, 0, shortcuts);
   }
 
@@ -304,7 +306,7 @@ public class KeyParser {
    * @param shortcuts The shortcuts to map to the action
    * @param argType   The type of argument required by the actions
    */
-  public void registerAction(int mapping, String actName, int cmdType, Shortcut[] shortcuts, int argType) {
+  public void registerAction(int mapping, String actName, Command.Type cmdType, Shortcut[] shortcuts, int argType) {
     registerAction(mapping, actName, cmdType, 0, shortcuts, argType);
   }
 
@@ -317,7 +319,7 @@ public class KeyParser {
    * @param cmdFlags  Any special flags associated with this command
    * @param shortcuts The shortcuts to map to the action
    */
-  public void registerAction(int mapping, String actName, int cmdType, int cmdFlags, Shortcut[] shortcuts) {
+  public void registerAction(int mapping, String actName, Command.Type cmdType, int cmdFlags, Shortcut[] shortcuts) {
     registerAction(mapping, actName, cmdType, cmdFlags, shortcuts, Argument.NONE);
   }
 
@@ -331,7 +333,7 @@ public class KeyParser {
    * @param shortcuts The shortcuts to map to the action
    * @param argType   The type of argument required by the actions
    */
-  public void registerAction(int mapping, String actName, int cmdType, int cmdFlags, Shortcut[] shortcuts, int argType) {
+  public void registerAction(int mapping, String actName, Command.Type cmdType, int cmdFlags, Shortcut[] shortcuts, int argType) {
     for (Shortcut shortcut : shortcuts) {
       registerAction(mapping, actName, cmdType, cmdFlags, shortcut.getKeys(), argType);
     }
@@ -347,7 +349,7 @@ public class KeyParser {
    * @param keys     The keystrokes to map to the action
    * @param argType  The type of argument required by the actions
    */
-  private void registerAction(int mapping, String actName, int cmdType, int cmdFlags, KeyStroke[] keys, int argType) {
+  private void registerAction(int mapping, String actName, Command.Type cmdType, int cmdFlags, KeyStroke[] keys, int argType) {
     // Look through all the possible mappings and see which ones apply to this action
     int map = 1;
     for (int m = 0; m < MAPPING_CNT; m++) {
@@ -378,7 +380,7 @@ public class KeyParser {
    * @param last     True if last
    * @return Node
    */
-  private Node addNode(ParentNode base, String actName, int cmdType, int cmdFlags, KeyStroke key, int argType, boolean last) {
+  private Node addNode(ParentNode base, String actName, Command.Type cmdType, int cmdFlags, KeyStroke key, int argType, boolean last) {
     // Lets get the actual action for the supplied action name
     ActionManager aMgr = ActionManager.getInstance();
     AnAction action = aMgr.getAction(actName);

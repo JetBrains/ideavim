@@ -619,7 +619,7 @@ public class MotionGroup extends AbstractActionGroup {
     // If we are doing this move as part of a change command (e.q. cw), we need to count the current end of
     // word if the cursor happens to be on the end of a word already. If this is a normal move, we don't count
     // the current word.
-    boolean stay = CommandState.getInstance(editor).getCommand().getType() == Command.CHANGE;
+    boolean stay = CommandState.getInstance(editor).getCommand().getType() == Command.Type.CHANGE;
     int pos = SearchHelper.findNextWordEnd(editor, count, skipPunc, stay);
     if (pos == -1) {
       if (count < 0) {

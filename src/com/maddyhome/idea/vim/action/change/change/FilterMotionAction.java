@@ -59,7 +59,7 @@ public class FilterMotionAction extends EditorAction {
         count = 1;
       }
 
-      Command command = new Command(count, null, null, 0, 0);
+      Command command = new Command(count, null, null, Command.Type.UNDEFINED, 0);
       CommandGroups.getInstance().getProcess().startFilterCommand(editor, context, command);
 
       return true;

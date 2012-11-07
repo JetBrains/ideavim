@@ -346,9 +346,9 @@ public class KeyHandler {
     logger.debug("lastWasBS=" + lastWasBS);
 
     Project project = editor.getProject();
-    if (cmd.isReadType() || (project != null && EditorHelper.canEdit(project, editor))) {
+    if (cmd.getType().isRead() || (project != null && EditorHelper.canEdit(project, editor))) {
       Runnable action = new ActionRunner(editor, context, cmd, key);
-      if (cmd.isWriteType()) {
+      if (cmd.getType().isWrite()) {
         RunnableHelper.runWriteCommand(project, action, cmd.getActionId(), null);
       }
       else {
@@ -421,14 +421,14 @@ public class KeyHandler {
     // Did we just get the completed sequence for a motion command argument?
     if (currentArg == Argument.MOTION) {
       // We have been expecting a motion argument - is this one?
-      if (node.getCmdType() == Command.MOTION) {
+      if (node.getCmdType() == Command.Type.MOTION) {
         // Create the motion command and add it to the stack
         Command cmd = new Command(count, node.getActionId(), node.getAction(),
                                   node.getCmdType(), node.getFlags());
         cmd.setKeys(keys);
         currentCmd.push(cmd);
       }
-      else if (node.getCmdType() == Command.RESET) {
+      else if (node.getCmdType() == Command.Type.RESET) {
         currentCmd.clear();
         Command cmd = new Command(1, node.getActionId(), node.getAction(),
                                   node.getCmdType(), node.getFlags());
@@ -599,7 +599,7 @@ public class KeyHandler {
 
       // By default the "empty" register is used by all commands so we want to reset whatever the last register
       // selected by the user was to the empty register - unless we just executed the "select register" command.
-      if (cmd.getType() != Command.SELECT_REGISTER) {
+      if (cmd.getType() != Command.Type.SELECT_REGISTER) {
         CommandGroups.getInstance().getRegister().resetRegister();
       }
 
