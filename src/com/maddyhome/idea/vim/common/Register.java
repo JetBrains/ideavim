@@ -19,7 +19,9 @@ package com.maddyhome.idea.vim.common;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.helper.StringHelper;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.Comparator;
@@ -33,17 +35,17 @@ public class Register {
    * Create a register of the specified type for the given text
    *
    * @param name The character
-   * @param type The register type (linewise or characterwise)
+   * @param type The register type
    * @param text The text to store
    */
-  public Register(char name, int type, String text) {
+  public Register(char name, @NotNull SelectionType type, String text) {
     this.name = name;
     this.type = type;
     this.text = text;
     this.keys = null;
   }
 
-  public Register(char name, int type, List<KeyStroke> keys) {
+  public Register(char name, @NotNull SelectionType type, List<KeyStroke> keys) {
     this.name = name;
     this.type = type;
     this.text = null;
@@ -68,7 +70,8 @@ public class Register {
    *
    * @return The register type
    */
-  public int getType() {
+  @NotNull
+  public SelectionType getType() {
     return type;
   }
 
@@ -151,7 +154,7 @@ public class Register {
   }
 
   private char name;
-  private int type;
+  @NotNull private SelectionType type;
   private String text;
   private List<KeyStroke> keys;
 }

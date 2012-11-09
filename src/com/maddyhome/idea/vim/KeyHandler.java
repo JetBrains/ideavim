@@ -478,7 +478,7 @@ public class KeyHandler {
         CommandGroups.getInstance().getProcess().startSearchCommand(editor, context, count, key);
         state = State.NEW_COMMAND;
         currentArg = Argument.EX_STRING;
-        editorState.pushState(CommandState.Mode.EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
+        editorState.pushState(CommandState.Mode.EX_ENTRY, CommandState.SubMode.NONE, KeyParser.MAPPING_CMD_LINE);
       }
     }
   }
@@ -602,7 +602,7 @@ public class KeyHandler {
       // mode we were in. This handles commands in those modes that temporarily allow us to execute normal
       // mode commands. An exception is if this command should leave us in the temporary mode such as
       // "select register"
-      if (editorState.getSubMode() == CommandState.SUBMODE_SINGLE_COMMAND &&
+      if (editorState.getSubMode() == CommandState.SubMode.SINGLE_COMMAND &&
           (cmd.getFlags() & Command.FLAG_EXPECT_MORE) == 0) {
         editorState.popState();
       }

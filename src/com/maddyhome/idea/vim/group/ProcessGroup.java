@@ -91,7 +91,7 @@ public class ProcessGroup extends AbstractActionGroup {
     }
 
     String initText = getRange(editor, cmd);
-    CommandState.getInstance(editor).pushState(CommandState.Mode.EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
+    CommandState.getInstance(editor).pushState(CommandState.Mode.EX_ENTRY, CommandState.SubMode.NONE, KeyParser.MAPPING_CMD_LINE);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.activate(editor, context, ":", initText, 1);
   }
@@ -224,7 +224,7 @@ public class ProcessGroup extends AbstractActionGroup {
 
   public void startFilterCommand(Editor editor, DataContext context, Command cmd) {
     String initText = getRange(editor, cmd) + "!";
-    CommandState.getInstance(editor).pushState(CommandState.Mode.EX_ENTRY, 0, KeyParser.MAPPING_CMD_LINE);
+    CommandState.getInstance(editor).pushState(CommandState.Mode.EX_ENTRY, CommandState.SubMode.NONE, KeyParser.MAPPING_CMD_LINE);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.activate(editor, context, ":", initText, 1);
   }

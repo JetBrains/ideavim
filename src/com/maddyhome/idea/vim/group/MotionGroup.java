@@ -149,16 +149,16 @@ public class MotionGroup extends AbstractActionGroup {
       MorePanel.getInstance().deactivate(false);
     }
 
-    int visualMode = 0;
+    CommandState.SubMode visualMode = CommandState.SubMode.NONE;
     switch (event.getClickCount() % 3) {
       case 1: // Single click or quad click
-        visualMode = 0;
+        visualMode = CommandState.SubMode.NONE;
         break;
       case 2: // Double click
-        visualMode = Command.FLAG_MOT_CHARACTERWISE;
+        visualMode = CommandState.SubMode.VISUAL_CHARACTER;
         break;
       case 0: // Triple click
-        visualMode = Command.FLAG_MOT_LINEWISE;
+        visualMode = CommandState.SubMode.VISUAL_LINE;
         // Pop state of being in Visual Char mode
         if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
           CommandState.getInstance(editor).popState();
@@ -174,7 +174,7 @@ public class MotionGroup extends AbstractActionGroup {
     setVisualMode(editor, visualMode);
 
     switch (CommandState.getInstance(editor).getSubMode()) {
-      case 0:
+      case NONE:
         VisualPosition vp = editor.getCaretModel().getVisualPosition();
         int col = EditorHelper.normalizeVisualColumn(editor, vp.line, vp.column,
                                                      CommandState.getInstance(editor).getMode() ==
@@ -186,7 +186,7 @@ public class MotionGroup extends AbstractActionGroup {
         }
         MotionGroup.scrollCaretIntoView(editor);
         break;
-      case Command.FLAG_MOT_CHARACTERWISE:
+      case VISUAL_CHARACTER:
         /*
         BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
         int adj = 1;
@@ -197,7 +197,7 @@ public class MotionGroup extends AbstractActionGroup {
         */
         editor.getCaretModel().moveToOffset(visualEnd);
         break;
-      case Command.FLAG_MOT_LINEWISE:
+      case VISUAL_LINE:
         editor.getCaretModel().moveToLogicalPosition(editor.xyToLogicalPosition(event.getPoint()));
         break;
     }
@@ -245,7 +245,7 @@ public class MotionGroup extends AbstractActionGroup {
       }
       editor.getSelectionModel().setSelection(start, end - 1);
 
-      setVisualMode(editor, Command.FLAG_MOT_LINEWISE);
+      setVisualMode(editor, CommandState.SubMode.VISUAL_LINE);
 
       VisualChange range = getVisualOperatorRange(editor, Command.FLAG_MOT_LINEWISE);
       if (logger.isDebugEnabled()) logger.debug("range=" + range);
@@ -255,7 +255,7 @@ public class MotionGroup extends AbstractActionGroup {
     }
   }
 
-  private void processMouseReleased(Editor editor, int mode, int startOff, int endOff) {
+  private void processMouseReleased(Editor editor, @NotNull CommandState.SubMode mode, int startOff, int endOff) {
     if (ExEntryPanel.getInstance().isActive()) {
       ExEntryPanel.getInstance().deactivate();
     }
@@ -278,7 +278,7 @@ public class MotionGroup extends AbstractActionGroup {
       logger.debug("end=" + end);
     }
 
-    if (mode == Command.FLAG_MOT_LINEWISE) {
+    if (mode == CommandState.SubMode.VISUAL_LINE) {
       end--;
       endOff--;
     }
@@ -288,7 +288,7 @@ public class MotionGroup extends AbstractActionGroup {
       start = end;
       end = t;
 
-      if (mode == Command.FLAG_MOT_CHARACTERWISE) {
+      if (mode == CommandState.SubMode.VISUAL_CHARACTER) {
         start--;
       }
     }
@@ -1451,10 +1451,10 @@ public class MotionGroup extends AbstractActionGroup {
     return true;
   }
 
-  public void setVisualMode(@NotNull Editor editor, int mode) {
+  public void setVisualMode(@NotNull Editor editor, @NotNull CommandState.SubMode mode) {
     logger.debug("setVisualMode");
-    int oldMode = CommandState.getInstance(editor).getSubMode();
-    if (mode == 0) {
+    CommandState.SubMode oldMode = CommandState.getInstance(editor).getSubMode();
+    if (mode == CommandState.SubMode.NONE) {
       int start = editor.getSelectionModel().getSelectionStart();
       int end = editor.getSelectionModel().getSelectionEnd();
       if (start != end) {
@@ -1463,20 +1463,20 @@ public class MotionGroup extends AbstractActionGroup {
         int lend = EditorHelper.getLineEndOffset(editor, line, true);
         if (logger.isDebugEnabled()) logger.debug("start=" + start + ", end=" + end + ", lstart=" + lstart + ", lend=" + lend);
         if (lstart == start && lend + 1 == end) {
-          mode = Command.FLAG_MOT_LINEWISE;
+          mode = CommandState.SubMode.VISUAL_LINE;
         }
         else {
-          mode = Command.FLAG_MOT_CHARACTERWISE;
+          mode = CommandState.SubMode.VISUAL_CHARACTER;
         }
       }
     }
 
-    if (oldMode == 0 && mode == 0) {
+    if (oldMode == CommandState.SubMode.NONE && mode == CommandState.SubMode.NONE) {
       editor.getSelectionModel().removeSelection();
       return;
     }
 
-    if (mode == 0) {
+    if (mode == CommandState.SubMode.NONE) {
       exitVisual(editor, true);
     }
     else {
@@ -1487,7 +1487,7 @@ public class MotionGroup extends AbstractActionGroup {
 
     visualStart = editor.getSelectionModel().getSelectionStart();
     visualEnd = editor.getSelectionModel().getSelectionEnd();
-    if (CommandState.getInstance(editor).getSubMode() == Command.FLAG_MOT_CHARACTERWISE) {
+    if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_CHARACTER) {
       BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
       int adj = 1;
       if (opt.getValue().equals("exclusive")) {
@@ -1502,9 +1502,9 @@ public class MotionGroup extends AbstractActionGroup {
     CommandGroups.getInstance().getMark().setMark(editor, '>', visualEnd);
   }
 
-  public boolean toggleVisual(Editor editor, int count, int rawCount, int mode) {
+  public boolean toggleVisual(Editor editor, int count, int rawCount, @NotNull CommandState.SubMode mode) {
     if (logger.isDebugEnabled()) logger.debug("toggleVisual: mode=" + mode);
-    int currentMode = CommandState.getInstance(editor).getSubMode();
+    CommandState.SubMode currentMode = CommandState.getInstance(editor).getSubMode();
     if (CommandState.getInstance(editor).getMode() != CommandState.Mode.VISUAL) {
       int start;
       int end;
@@ -1517,7 +1517,17 @@ public class MotionGroup extends AbstractActionGroup {
         else {
           if (logger.isDebugEnabled()) logger.debug("last visual change: " + range);
         }
-        mode = range.getType();
+        switch (range.getType()) {
+          case CHARACTER_WISE:
+            mode = CommandState.SubMode.VISUAL_CHARACTER;
+            break;
+          case LINE_WISE:
+            mode = CommandState.SubMode.VISUAL_LINE;
+            break;
+          case BLOCK_WISE:
+            mode = CommandState.SubMode.VISUAL_BLOCK;
+            break;
+        }
         start = editor.getCaretModel().getOffset();
         end = calculateVisualRange(editor, range, count);
       }
@@ -1543,20 +1553,20 @@ public class MotionGroup extends AbstractActionGroup {
   private int calculateVisualRange(Editor editor, VisualChange range, int count) {
     int lines = range.getLines();
     int chars = range.getColumns();
-    if (range.getType() == Command.FLAG_MOT_LINEWISE || range.getType() == Command.FLAG_MOT_BLOCKWISE || lines > 1) {
+    if (range.getType() == SelectionType.LINE_WISE || range.getType() == SelectionType.BLOCK_WISE || lines > 1) {
       lines *= count;
     }
-    if ((range.getType() == Command.FLAG_MOT_CHARACTERWISE && lines == 1) || range.getType() == Command.FLAG_MOT_BLOCKWISE) {
+    if ((range.getType() == SelectionType.CHARACTER_WISE && lines == 1) || range.getType() == SelectionType.BLOCK_WISE) {
       chars *= count;
     }
     int start = editor.getCaretModel().getOffset();
     LogicalPosition sp = editor.offsetToLogicalPosition(start);
     int endLine = sp.line + lines - 1;
     int res;
-    if (range.getType() == Command.FLAG_MOT_LINEWISE) {
+    if (range.getType() == SelectionType.LINE_WISE) {
       res = moveCaretToLine(editor, endLine);
     }
-    else if (range.getType() == Command.FLAG_MOT_CHARACTERWISE) {
+    else if (range.getType() == SelectionType.CHARACTER_WISE) {
       if (lines > 1) {
         res = moveCaretToLineStart(editor, endLine) +
               Math.min(EditorHelper.getLineLength(editor, endLine), chars);
@@ -1590,7 +1600,7 @@ public class MotionGroup extends AbstractActionGroup {
       editor.getSelectionModel().removeSelection();
     }
 
-    CommandState.getInstance(editor).setSubMode(0);
+    CommandState.getInstance(editor).setSubMode(CommandState.SubMode.NONE);
   }
 
   public VisualChange getVisualOperatorRange(Editor editor, int cmdFlags) {
@@ -1613,14 +1623,14 @@ public class MotionGroup extends AbstractActionGroup {
     LogicalPosition ep = editor.offsetToLogicalPosition(end);
     int lines = ep.line - sp.line + 1;
     int chars;
-    int type;
-    if (CommandState.getInstance(editor).getSubMode() == Command.FLAG_MOT_LINEWISE ||
+    SelectionType type;
+    if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_LINE ||
         (cmdFlags & Command.FLAG_MOT_LINEWISE) != 0) {
       chars = ep.column;
-      type = Command.FLAG_MOT_LINEWISE;
+      type = SelectionType.LINE_WISE;
     }
-    else if (CommandState.getInstance(editor).getSubMode() == Command.FLAG_MOT_CHARACTERWISE) {
-      type = Command.FLAG_MOT_CHARACTERWISE;
+    else if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_CHARACTER) {
+      type = SelectionType.CHARACTER_WISE;
       if (lines > 1) {
         chars = ep.column;
       }
@@ -1633,7 +1643,7 @@ public class MotionGroup extends AbstractActionGroup {
       if (EditorData.getLastColumn(editor) == MotionGroup.LAST_COLUMN) {
         chars = MotionGroup.LAST_COLUMN;
       }
-      type = Command.FLAG_MOT_BLOCKWISE;
+      type = SelectionType.BLOCK_WISE;
     }
 
     if (logger.isDebugEnabled()) {
@@ -1686,7 +1696,7 @@ public class MotionGroup extends AbstractActionGroup {
       end = t;
     }
 
-    if (CommandState.getInstance(editor).getSubMode() == Command.FLAG_MOT_CHARACTERWISE) {
+    if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_CHARACTER) {
       BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
       int lineend = EditorHelper.getLineEndForOffset(editor, end);
       if (logger.isDebugEnabled()) {
@@ -1701,7 +1711,7 @@ public class MotionGroup extends AbstractActionGroup {
       if (logger.isDebugEnabled()) logger.debug("start=" + start + ", end=" + end);
       editor.getSelectionModel().setSelection(start, end);
     }
-    else if (CommandState.getInstance(editor).getSubMode() == Command.FLAG_MOT_LINEWISE) {
+    else if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_LINE) {
       start = EditorHelper.getLineStartForOffset(editor, start);
       end = EditorHelper.getLineEndForOffset(editor, end);
       if (logger.isDebugEnabled()) logger.debug("start=" + start + ", end=" + end);
@@ -1729,7 +1739,7 @@ public class MotionGroup extends AbstractActionGroup {
   }
 
   public boolean swapVisualEndsBlock(Editor editor) {
-    if (CommandState.getInstance(editor).getSubMode() != Command.FLAG_MOT_BLOCKWISE) {
+    if (CommandState.getInstance(editor).getSubMode() != CommandState.SubMode.VISUAL_BLOCK) {
       return swapVisualEnds(editor);
     }
 
@@ -1855,10 +1865,10 @@ public class MotionGroup extends AbstractActionGroup {
           event.getArea() != EditorMouseEventArea.ANNOTATIONS_AREA) {
         if (dragEditor == null) {
           if (event.getArea() == EditorMouseEventArea.EDITING_AREA) {
-            mode = Command.FLAG_MOT_CHARACTERWISE;
+            mode = CommandState.SubMode.VISUAL_CHARACTER;
           }
           else if (event.getArea() != EditorMouseEventArea.ANNOTATIONS_AREA) {
-            mode = Command.FLAG_MOT_LINEWISE;
+            mode = CommandState.SubMode.VISUAL_LINE;
           }
           startOff = event.getEditor().getSelectionModel().getSelectionStart();
           endOff = event.getEditor().getSelectionModel().getSelectionEnd();
@@ -1907,7 +1917,7 @@ public class MotionGroup extends AbstractActionGroup {
     }
 
     private Editor dragEditor = null;
-    private int mode;
+    @NotNull private CommandState.SubMode mode;
     private int startOff;
     private int endOff;
   }

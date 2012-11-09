@@ -19,8 +19,10 @@ package com.maddyhome.idea.vim.command;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+
 public class VisualChange {
-  public VisualChange(int lines, int columns, int type) {
+  public VisualChange(int lines, int columns, @NotNull SelectionType type) {
     this.lines = lines;
     this.columns = columns;
     this.type = type;
@@ -34,7 +36,8 @@ public class VisualChange {
     return columns;
   }
 
-  public int getType() {
+  @NotNull
+  public SelectionType getType() {
     return type;
   }
 
@@ -51,5 +54,5 @@ public class VisualChange {
 
   int lines;
   int columns;
-  int type;
+  @NotNull SelectionType type;
 }

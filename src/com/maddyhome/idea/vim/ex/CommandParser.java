@@ -19,7 +19,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.handler.*;
@@ -193,7 +193,7 @@ public class CommandParser {
     boolean ok = handler.process(editor, context, new ExCommand(res.getRanges(), command, res.getArgument()), count);
     if (ok && (handler.getArgFlags() & CommandHandler.DONT_SAVE_LAST) == 0) {
       CommandGroups.getInstance().getRegister().storeTextInternal(editor, new TextRange(-1, -1), cmd,
-                                                                  Command.FLAG_MOT_CHARACTERWISE, ':', false, false);
+                                                                  SelectionType.CHARACTER_WISE, ':', false, false);
     }
 
     if (ok && (handler.getArgFlags() & CommandHandler.KEEP_FOCUS) != 0) {

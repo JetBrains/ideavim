@@ -21,7 +21,7 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
@@ -52,6 +52,6 @@ public class YankLinesHandler extends CommandHandler {
 
     TextRange range = cmd.getTextRange(editor, context, true);
 
-    return CommandGroups.getInstance().getCopy().yankRange(editor, context, range, Command.FLAG_MOT_LINEWISE, false);
+    return CommandGroups.getInstance().getCopy().yankRange(editor, context, range, SelectionType.LINE_WISE, false);
   }
 }

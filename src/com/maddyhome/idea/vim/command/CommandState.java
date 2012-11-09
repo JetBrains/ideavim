@@ -47,7 +47,13 @@ public class CommandState {
     EX_ENTRY;
   }
 
-  public static final int SUBMODE_SINGLE_COMMAND = 1;
+  public static enum SubMode {
+    NONE,
+    SINGLE_COMMAND,
+    VISUAL_CHARACTER,
+    VISUAL_LINE,
+    VISUAL_BLOCK;
+  }
 
   /**
    * Gets the command state singleton
@@ -102,7 +108,7 @@ public class CommandState {
     return flags;
   }
 
-  public void pushState(@NotNull Mode mode, int submode, int mapping) {
+  public void pushState(@NotNull Mode mode, @NotNull SubMode submode, int mapping) {
     logger.debug("pushState");
     modes.push(new State(mode, submode, mapping));
     updateStatus();
@@ -134,11 +140,12 @@ public class CommandState {
     return mode;
   }
 
-  public int getSubMode() {
+  @NotNull
+  public SubMode getSubMode() {
     return currentState().getSubmode();
   }
 
-  public void setSubMode(int submode) {
+  public void setSubMode(@NotNull SubMode submode) {
     currentState().setSubmode(submode);
     updateStatus();
   }
@@ -174,7 +181,7 @@ public class CommandState {
     StringBuffer msg = new StringBuffer();
     switch (state.getMode()) {
       case COMMAND:
-        if (state.getSubmode() == SUBMODE_SINGLE_COMMAND) {
+        if (state.getSubmode() == SubMode.SINGLE_COMMAND) {
           msg.append('(').append(getStatusString(pos - 1).toLowerCase()).append(')');
         }
         break;
@@ -187,16 +194,16 @@ public class CommandState {
       case VISUAL:
         if (pos > 0) {
           State tmp = modes.get(pos - 1);
-          if (tmp.getMode() == Mode.COMMAND && tmp.getSubmode() == SUBMODE_SINGLE_COMMAND) {
+          if (tmp.getMode() == Mode.COMMAND && tmp.getSubmode() == SubMode.SINGLE_COMMAND) {
             msg.append(getStatusString(pos - 1));
             msg.append(" - ");
           }
         }
         switch (state.getSubmode()) {
-          case Command.FLAG_MOT_LINEWISE:
+          case VISUAL_LINE:
             msg.append("VISUAL LINE");
             break;
-          case Command.FLAG_MOT_BLOCKWISE:
+          case VISUAL_BLOCK:
             msg.append("VISUAL BLOCK");
             break;
           default:
@@ -321,11 +328,11 @@ public class CommandState {
    * Signleton, no public object creation
    */
   private CommandState() {
-    modes.push(new State(Mode.COMMAND, 0, KeyParser.MAPPING_NORMAL));
+    modes.push(new State(Mode.COMMAND, SubMode.NONE, KeyParser.MAPPING_NORMAL));
   }
 
   private class State {
-    public State(@NotNull Mode mode, int submode, int mapping) {
+    public State(@NotNull Mode mode, @NotNull SubMode submode, int mapping) {
       this.mode = mode;
       this.submode = submode;
       this.mapping = mapping;
@@ -336,11 +343,12 @@ public class CommandState {
       return mode;
     }
 
-    public int getSubmode() {
+    @NotNull
+    public SubMode getSubmode() {
       return submode;
     }
 
-    public void setSubmode(int submode) {
+    public void setSubmode(@NotNull SubMode submode) {
       this.submode = submode;
     }
 
@@ -362,12 +370,12 @@ public class CommandState {
     }
 
     @NotNull private Mode mode;
-    private int submode;
+    @NotNull private SubMode submode;
     private int mapping;
   }
 
   private Stack<State> modes = new Stack<State>();
-  private State defaultState = new State(Mode.COMMAND, 0, KeyParser.MAPPING_NORMAL);
+  private State defaultState = new State(Mode.COMMAND, SubMode.NONE, KeyParser.MAPPING_NORMAL);
   private Command command;
   private int flags;
   private boolean isRecording = false;

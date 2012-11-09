@@ -19,8 +19,10 @@ package com.maddyhome.idea.vim.command;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+
 public class VisualRange {
-  public VisualRange(int start, int end, int type, int offset) {
+  public VisualRange(int start, int end, @NotNull CommandState.SubMode type, int offset) {
     this.start = start;
     this.end = end;
     this.type = type;
@@ -35,7 +37,8 @@ public class VisualRange {
     return end;
   }
 
-  public int getType() {
+  @NotNull
+  public CommandState.SubMode getType() {
     return type;
   }
 
@@ -57,6 +60,6 @@ public class VisualRange {
 
   int start;
   int end;
-  int type;
+  @NotNull CommandState.SubMode type;
   int offset;
 }

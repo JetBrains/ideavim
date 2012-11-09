@@ -54,7 +54,7 @@ public class RepeatChangeAction extends EditorAction {
         }
         Command save = state.getCommand();
         state.setCommand(cmd);
-        state.pushState(CommandState.Mode.REPEAT, 0, KeyParser.MAPPING_NORMAL);
+        state.pushState(CommandState.Mode.REPEAT, CommandState.SubMode.NONE, KeyParser.MAPPING_NORMAL);
         char reg = CommandGroups.getInstance().getRegister().getCurrentRegister();
         CommandGroups.getInstance().getRegister().selectRegister(state.getLastChangeRegister());
         try {

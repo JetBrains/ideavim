@@ -33,6 +33,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.LineRange;
@@ -89,7 +90,7 @@ public class SearchGroup extends AbstractActionGroup {
   private void setLastPattern(Editor editor, String lastPattern) {
     this.lastPattern = lastPattern;
     CommandGroups.getInstance().getRegister().storeTextInternal(editor, new TextRange(-1, -1),
-                                                                lastPattern, Command.FLAG_MOT_CHARACTERWISE, '/', false, false);
+                                                                lastPattern, SelectionType.CHARACTER_WISE, '/', false, false);
 
     CommandGroups.getInstance().getHistory().addEntry(HistoryGroup.SEARCH, lastPattern);
   }

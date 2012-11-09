@@ -23,6 +23,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
@@ -48,14 +49,14 @@ public class DeleteVisualLinesEndAction extends EditorAction {
 
         range = new TextRange(starts, ends);
         return CommandGroups.getInstance().getChange().deleteRange(editor, context, range,
-                                                                   Command.FLAG_MOT_BLOCKWISE, false);
+                                                                   SelectionType.BLOCK_WISE, false);
       }
       else {
         range = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
                               EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
 
         return CommandGroups.getInstance().getChange().deleteRange(editor, context, range,
-                                                                   Command.FLAG_MOT_LINEWISE, false);
+                                                                   SelectionType.LINE_WISE, false);
       }
     }
   }

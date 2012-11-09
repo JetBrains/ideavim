@@ -50,12 +50,12 @@ public abstract class TextObjectActionHandler extends AbstractEditorActionHandle
       }
 
       if (((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) != 0 && (cmd.getFlags() & Command.FLAG_VISUAL_CHARACTERWISE) == 0) &&
-          CommandState.getInstance(editor).getSubMode() != Command.FLAG_MOT_LINEWISE) {
-        CommandGroups.getInstance().getMotion().toggleVisual(editor, 1, 0, Command.FLAG_MOT_LINEWISE);
+          CommandState.getInstance(editor).getSubMode() != CommandState.SubMode.VISUAL_LINE) {
+        CommandGroups.getInstance().getMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE);
       }
       else if (((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) == 0 || (cmd.getFlags() & Command.FLAG_VISUAL_CHARACTERWISE) != 0) &&
-               CommandState.getInstance(editor).getSubMode() == Command.FLAG_MOT_LINEWISE) {
-        CommandGroups.getInstance().getMotion().toggleVisual(editor, 1, 0, Command.FLAG_MOT_CHARACTERWISE);
+               CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_LINE) {
+        CommandGroups.getInstance().getMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER);
       }
 
       MotionGroup.moveCaret(editor, newend);

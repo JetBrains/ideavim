@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.DelegateCommandListener;
 import com.maddyhome.idea.vim.helper.EditorData;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -84,7 +85,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
         wasRepeat = true;
         lastColumn = EditorData.getLastColumn(editor);
         VisualChange range = EditorData.getLastVisualOperatorRange(editor);
-        CommandGroups.getInstance().getMotion().toggleVisual(editor, 1, 1, 0);
+        CommandGroups.getInstance().getMotion().toggleVisual(editor, 1, 1, CommandState.SubMode.NONE);
         if (range.getColumns() == MotionGroup.LAST_COLUMN) {
           EditorData.setLastColumn(editor, MotionGroup.LAST_COLUMN);
         }
@@ -107,9 +108,8 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
       }
       else if (cmd != null && (cmd.getFlags() & Command.FLAG_FORCE_LINEWISE) != 0) {
         lastMode = CommandState.getInstance(editor).getSubMode();
-        if (lastMode != Command.FLAG_MOT_LINEWISE && (cmd.getFlags() & Command.FLAG_FORCE_VISUAL) != 0) {
-          CommandGroups.getInstance().getMotion().toggleVisual(editor, 1, 0,
-                                                               Command.FLAG_MOT_LINEWISE);
+        if (lastMode != CommandState.SubMode.VISUAL_LINE && (cmd.getFlags() & Command.FLAG_FORCE_VISUAL) != 0) {
+          CommandGroups.getInstance().getMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE);
         }
       }
 
@@ -120,7 +120,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
       logger.debug("finish");
 
       if (cmd != null && (cmd.getFlags() & Command.FLAG_FORCE_LINEWISE) != 0) {
-        if (lastMode != Command.FLAG_MOT_LINEWISE && (cmd.getFlags() & Command.FLAG_FORCE_VISUAL) != 0) {
+        if (lastMode != CommandState.SubMode.VISUAL_LINE && (cmd.getFlags() & Command.FLAG_FORCE_VISUAL) != 0) {
           CommandGroups.getInstance().getMotion().toggleVisual(editor, 1, 0, lastMode);
         }
       }
@@ -155,7 +155,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
     private Command cmd;
     private Editor editor;
     private boolean res;
-    private int lastMode;
+    @NotNull private CommandState.SubMode lastMode;
     private boolean wasRepeat;
     private int lastColumn;
     VisualChange change = null;

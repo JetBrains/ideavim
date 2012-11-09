@@ -22,8 +22,8 @@ package com.maddyhome.idea.vim.group;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.ui.ClipboardHandler;
 import org.jdom.CDATA;
 import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -95,12 +96,12 @@ public class RegisterGroup extends AbstractActionGroup {
    * @param editor   The editor to get the text from
    * @param context  The data context
    * @param range    The range of the text to store
-   * @param type     The type of copy - linewise or characterwise
+   * @param type     The type of copy
    * @param isDelete is from a delete
    * @param isYank   is from a yank
    * @return true if able to store the text into the register, false if not
    */
-  public boolean storeText(Editor editor, DataContext context, TextRange range, int type, boolean isDelete, boolean isYank) {
+  public boolean storeText(Editor editor, DataContext context, TextRange range, @NotNull SelectionType type, boolean isDelete, boolean isYank) {
     if (isRegisterWritable()) {
       String text = EditorHelper.getText(editor, range);
 
@@ -110,11 +111,11 @@ public class RegisterGroup extends AbstractActionGroup {
     return false;
   }
 
-  public void storeKeys(List<KeyStroke> strokes, int type, char register) {
+  public void storeKeys(List<KeyStroke> strokes, @NotNull SelectionType type, char register) {
     registers.put(register, new Register(register, type, strokes));
   }
 
-  public boolean storeTextInternal(Editor editor, TextRange range, String text, int type,
+  public boolean storeTextInternal(Editor editor, TextRange range, String text, @NotNull SelectionType type,
                                    char register, boolean isDelete, boolean isYank) {
     // Null register doesn't get saved
     if (lastRegister == '_') return true;
@@ -128,7 +129,7 @@ public class RegisterGroup extends AbstractActionGroup {
       end = t;
     }
 
-    if (type == Command.FLAG_MOT_LINEWISE && text.length() > 0 && text.charAt(text.length() - 1) != '\n') {
+    if (type == SelectionType.LINE_WISE && text.length() > 0 && text.charAt(text.length() - 1) != '\n') {
       text = text + '\n';
     }
 
@@ -173,7 +174,7 @@ public class RegisterGroup extends AbstractActionGroup {
       registers.put('1', new Register('1', type, text));
 
       // Deletes small than one line also go the the - register
-      if (type == Command.FLAG_MOT_CHARACTERWISE) {
+      if (type == SelectionType.CHARACTER_WISE) {
         if (editor.offsetToLogicalPosition(start).line == editor.offsetToLogicalPosition(end).line) {
           registers.put('-', new Register('-', type, text));
         }
@@ -221,7 +222,7 @@ public class RegisterGroup extends AbstractActionGroup {
     if (r == '*' || r == '+') {
       String text = ClipboardHandler.getClipboardText();
       if (text != null) {
-        reg = new Register(r, Command.FLAG_MOT_CHARACTERWISE, text);
+        reg = new Register(r, SelectionType.CHARACTER_WISE, text);
       }
     }
     else {
@@ -279,7 +280,7 @@ public class RegisterGroup extends AbstractActionGroup {
       }
 
       if (reg == null) {
-        reg = new Register(Character.toLowerCase(recordRegister), Command.FLAG_MOT_CHARACTERWISE, recordList);
+        reg = new Register(Character.toLowerCase(recordRegister), SelectionType.CHARACTER_WISE, recordList);
         registers.put(Character.toLowerCase(recordRegister), reg);
       }
       else {
@@ -304,7 +305,7 @@ public class RegisterGroup extends AbstractActionGroup {
 
       Element reg = new Element("register");
       reg.setAttribute("name", String.valueOf(key));
-      reg.setAttribute("type", Integer.toString(register.getType()));
+      reg.setAttribute("type", Integer.toString(register.getType().getValue()));
       if (register.isText()) {
         Element text = new Element("text");
         CDATA data = new CDATA(/*CDATA.normalizeString*/(StringHelper.entities(register.getText())));
@@ -348,7 +349,8 @@ public class RegisterGroup extends AbstractActionGroup {
         Character key = reg.getAttributeValue("name").charAt(0);
         Register register;
         if (reg.getChild("text") != null) {
-          register = new Register(key, Integer.parseInt(reg.getAttributeValue("type")),
+          final SelectionType type = SelectionType.fromValue(Integer.parseInt(reg.getAttributeValue("type")));
+          register = new Register(key, type != null ? type : SelectionType.CHARACTER_WISE,
                                   StringHelper.unentities(reg.getChild("text").getText/*Normalize*/()));
         }
         else {
@@ -366,7 +368,8 @@ public class RegisterGroup extends AbstractActionGroup {
               strokes.add(KeyStroke.getKeyStroke(new Character(ch), mods));
             }
           }
-          register = new Register(key, Integer.parseInt(reg.getAttributeValue("type")), strokes);
+          final SelectionType type = SelectionType.fromValue(Integer.parseInt(reg.getAttributeValue("type")));
+          register = new Register(key, type != null ? type : SelectionType.CHARACTER_WISE, strokes);
         }
         registers.put(key, register);
       }

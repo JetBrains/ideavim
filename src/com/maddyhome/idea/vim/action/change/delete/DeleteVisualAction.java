@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
@@ -38,13 +39,14 @@ public class DeleteVisualAction extends EditorAction {
 
   private static class Handler extends VisualOperatorActionHandler {
     protected boolean execute(Editor editor, DataContext context, Command cmd, TextRange range) {
-      int mode = CommandState.getInstance(editor).getSubMode();
-      if (mode == Command.FLAG_MOT_LINEWISE) {
+      CommandState.SubMode mode = CommandState.getInstance(editor).getSubMode();
+      if (mode == CommandState.SubMode.VISUAL_LINE) {
         range = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
                               EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
       }
 
-      return CommandGroups.getInstance().getChange().deleteRange(editor, context, range, mode, false);
+      return CommandGroups.getInstance().getChange().deleteRange(editor, context, range,
+                                                                 SelectionType.fromSubMode(mode), false);
     }
   }
 }

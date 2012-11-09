@@ -35,9 +35,7 @@ import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.*;
@@ -45,6 +43,7 @@ import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.option.BoundListOption;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -307,7 +306,7 @@ public class ChangeGroup extends AbstractActionGroup {
     }
 
     if (deleteTo != -1) {
-      deleteRange(editor, context, new TextRange(deleteTo, offset), Command.FLAG_MOT_EXCLUSIVE, false);
+      deleteRange(editor, context, new TextRange(deleteTo, offset), SelectionType.CHARACTER_WISE, false);
 
       return true;
     }
@@ -330,7 +329,7 @@ public class ChangeGroup extends AbstractActionGroup {
     }
 
     if (deleteTo != -1) {
-      deleteRange(editor, context, new TextRange(deleteTo, offset), Command.FLAG_MOT_EXCLUSIVE, false);
+      deleteRange(editor, context, new TextRange(deleteTo, offset), SelectionType.CHARACTER_WISE,false);
 
       return true;
     }
@@ -375,7 +374,7 @@ public class ChangeGroup extends AbstractActionGroup {
       if (mode == CommandState.Mode.REPLACE) {
         processInsert(editor, context);
       }
-      state.pushState(mode, 0, KeyParser.MAPPING_INSERT);
+      state.pushState(mode, CommandState.SubMode.NONE, KeyParser.MAPPING_INSERT);
 
       resetCursor(editor, true);
     }
@@ -527,7 +526,7 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param context The data context
    */
   public void processSingleCommand(Editor editor, DataContext context) {
-    CommandState.getInstance(editor).pushState(CommandState.Mode.COMMAND, CommandState.SUBMODE_SINGLE_COMMAND,
+    CommandState.getInstance(editor).pushState(CommandState.Mode.COMMAND, CommandState.SubMode.SINGLE_COMMAND,
                                                KeyParser.MAPPING_NORMAL);
     clearStrokes(editor);
   }
@@ -607,7 +606,7 @@ public class ChangeGroup extends AbstractActionGroup {
   public boolean deleteCharacter(Editor editor, DataContext context, int count) {
     int offset = CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, count, true);
     if (offset != -1) {
-      boolean res = deleteText(editor, context, new TextRange(editor.getCaretModel().getOffset(), offset), Command.FLAG_MOT_INCLUSIVE);
+      boolean res = deleteText(editor, context, new TextRange(editor.getCaretModel().getOffset(), offset), SelectionType.CHARACTER_WISE);
       int pos = editor.getCaretModel().getOffset();
       int norm = EditorHelper.normalizeOffset(editor, editor.getCaretModel().getLogicalPosition().line, pos, false);
       if (norm != pos) {
@@ -638,7 +637,7 @@ public class ChangeGroup extends AbstractActionGroup {
       logger.debug("offset=" + offset);
     }
     if (offset != -1) {
-      boolean res = deleteText(editor, context, new TextRange(start, offset), Command.FLAG_MOT_LINEWISE);
+      boolean res = deleteText(editor, context, new TextRange(start, offset), SelectionType.LINE_WISE);
       if (res && editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) &&
           editor.getCaretModel().getOffset() != 0) {
         MotionGroup.moveCaret(editor,
@@ -662,7 +661,7 @@ public class ChangeGroup extends AbstractActionGroup {
   public boolean deleteEndOfLine(Editor editor, DataContext context, int count) {
     int offset = CommandGroups.getInstance().getMotion().moveCaretToLineEndOffset(editor, count - 1, true);
     if (offset != -1) {
-      boolean res = deleteText(editor, context, new TextRange(editor.getCaretModel().getOffset(), offset), Command.FLAG_MOT_INCLUSIVE);
+      boolean res = deleteText(editor, context, new TextRange(editor.getCaretModel().getOffset(), offset), SelectionType.CHARACTER_WISE);
       int pos = CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, -1, false);
       if (pos != -1) {
         MotionGroup.moveCaret(editor, pos);
@@ -739,7 +738,7 @@ public class ChangeGroup extends AbstractActionGroup {
       else {
         offset = CommandGroups.getInstance().getMotion().moveCaretToLineStartOffset(editor, 1);
       }
-      deleteText(editor, context, new TextRange(editor.getCaretModel().getOffset(), offset), 0);
+      deleteText(editor, context, new TextRange(editor.getCaretModel().getOffset(), offset), null);
       if (spaces) {
         insertText(editor, context, start, " ");
         MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, -1, false));
@@ -798,7 +797,7 @@ public class ChangeGroup extends AbstractActionGroup {
         }
       }
     }
-    return deleteRange(editor, context, range, argument.getMotion().getFlags(), isChange);
+    return deleteRange(editor, context, range, SelectionType.fromCommandFlags(argument.getMotion().getFlags()), isChange);
   }
 
   /**
@@ -807,11 +806,11 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param editor   The editor to delete the text from
    * @param context  The data context
    * @param range    The range to delete
-   * @param type     The type of deletion (FLAG_MOT_LINEWISE, FLAG_MOT_EXCLUSIVE, or FLAG_MOT_INCLUSIVE)
+   * @param type     The type of deletion
    * @param isChange If from a change
    * @return true if able to delete the text, false if not
    */
-  public boolean deleteRange(Editor editor, DataContext context, TextRange range, int type, boolean isChange) {
+  public boolean deleteRange(Editor editor, DataContext context, TextRange range, @Nullable SelectionType type, boolean isChange) {
     if (range == null) {
       return false;
     }
@@ -1125,13 +1124,13 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param editor  The editor to change
    * @param context The data context
    * @param range   The range to change
-   * @param type    The type of the range (FLAG_MOT_LINEWISE, FLAG_MOT_CHARACTERWISE)
+   * @param type    The type of the range
    * @return true if able to delete the range, false if not
    */
-  public boolean changeRange(Editor editor, DataContext context, TextRange range, int type) {
+  public boolean changeRange(Editor editor, DataContext context, TextRange range, @NotNull SelectionType type) {
     int col = 0;
     int lines = 0;
-    if (type == Command.FLAG_MOT_BLOCKWISE) {
+    if (type == SelectionType.BLOCK_WISE) {
       lines = range.size();
       col = editor.offsetToLogicalPosition(range.getStartOffset()).column;
       if (EditorData.getLastColumn(editor) == MotionGroup.LAST_COLUMN) {
@@ -1141,7 +1140,7 @@ public class ChangeGroup extends AbstractActionGroup {
     boolean after = range.getEndOffset() >= EditorHelper.getFileSize(editor);
     boolean res = deleteRange(editor, context, range, type, true);
     if (res) {
-      if (type == Command.FLAG_MOT_LINEWISE) {
+      if (type == SelectionType.LINE_WISE) {
         if (after) {
           insertNewLineBelow(editor, context);
         }
@@ -1150,7 +1149,7 @@ public class ChangeGroup extends AbstractActionGroup {
         }
       }
       else {
-        if (type == Command.FLAG_MOT_BLOCKWISE) {
+        if (type == SelectionType.BLOCK_WISE) {
           setInsertRepeat(lines, col, false);
         }
         insertBeforeCursor(editor, context);
@@ -1359,7 +1358,7 @@ public class ChangeGroup extends AbstractActionGroup {
               }
             }
             if (pos > wsoff) {
-              deleteText(editor, context, new TextRange(wsoff, pos), 0);
+              deleteText(editor, context, new TextRange(wsoff, pos), null);
             }
           }
         }
@@ -1433,16 +1432,16 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param editor  The editor to delete from
    * @param context The data context
    * @param range   The range to delete
-   * @param type    The type of deletion (FLAG_MOT_LINEWISE, FLAG_MOT_CHARACTERWISE)
+   * @param type    The type of deletion
    * @return true if able to delete the text, false if not
    */
-  private boolean deleteText(final Editor editor, final DataContext context, final TextRange range, final int type) {
+  private boolean deleteText(final Editor editor, final DataContext context, final TextRange range, @Nullable SelectionType type) {
     // Fix for http://youtrack.jetbrains.net/issue/VIM-35
     if (!range.normalize(EditorHelper.getFileSize(editor, true))) {
       return false;
     }
 
-    if (type == 0 || CommandGroups.getInstance().getRegister().storeText(editor, context, range, type, true, false)) {
+    if (type == null || CommandGroups.getInstance().getRegister().storeText(editor, context, range, type, true, false)) {
       final Document document = editor.getDocument();
       final int[] startOffsets = range.getStartOffsets();
       final int[] endOffsets = range.getEndOffsets();
@@ -1450,7 +1449,7 @@ public class ChangeGroup extends AbstractActionGroup {
         document.deleteString(startOffsets[i], endOffsets[i]);
       }
 
-      if (type != 0) {
+      if (type != null) {
         int start = range.getStartOffset();
         CommandGroups.getInstance().getMark().setMark(editor, '.', start);
         CommandGroups.getInstance().getMark().setMark(editor, '[', start);
