@@ -90,6 +90,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private boolean isBlockCursor = false;
   private boolean isAnimatedScrolling = false;
   private boolean isRefrainFromScrolling = false;
+  private boolean error = false;
 
   private String previousKeyMap = "";
 
@@ -310,7 +311,10 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
    * Inidicate to the user that an error has occurred. Just beep.
    */
   public static void indicateError() {
-    if (!Options.getInstance().isSet("visualbell")) {
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      getInstance().error = true;
+    }
+    else if (!Options.getInstance().isSet("visualbell")) {
       Toolkit.getDefaultToolkit().beep();
     }
   }
@@ -385,5 +389,15 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     }
 
     return actions;
+  }
+
+  public boolean isError() {
+    return error;
+  }
+
+  public static void clearError() {
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      getInstance().error = false;
+    }
   }
 }

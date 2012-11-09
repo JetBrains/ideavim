@@ -100,6 +100,7 @@ public class KeyHandler {
    * @param context The data context
    */
   public void handleKey(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context) {
+    VimPlugin.clearError();
     // All the editor actions should be performed with top level editor!!!
     // Be careful: all the EditorActionHandler implementation should correctly process InjectedEditors
     editor = InjectedLanguageUtil.getTopLevelEditor(editor);
@@ -221,8 +222,8 @@ public class KeyHandler {
       VimPlugin.indicateError();
     }
 
-    reset(editor);
-  }
+      reset(editor);
+    }
 
   private boolean isDeleteCommandCount(@NotNull KeyStroke key, @NotNull CommandState editorState) {
     return (editorState.getMode() == CommandState.Mode.COMMAND ||
@@ -472,6 +473,11 @@ public class KeyHandler {
 
     ArgumentNode arg = (ArgumentNode)((BranchNode)editorState.getCurrentNode()).getArgumentNode();
     if (arg != null) {
+      if (currentArg == Argument.Type.MOTION && arg.getCmdType() != Command.Type.MOTION) {
+        editorState.popState();
+        state = State.BAD_COMMAND;
+        return;
+      }
       if (editorState.isRecording() && (arg.getFlags() & Command.FLAG_NO_ARG_RECORDING) != 0) {
         handleKey(editor, KeyStroke.getKeyStroke(' '), context);
       }
@@ -563,6 +569,7 @@ public class KeyHandler {
    * @param editor The editor to reset.
    */
   public void fullReset(@Nullable Editor editor) {
+    VimPlugin.clearError();
     CommandState.getInstance(editor).reset();
     reset(editor);
     lastChar = 0;

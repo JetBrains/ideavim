@@ -1,6 +1,7 @@
 package org.jetbrains.plugins.ideavim.action;
 
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import javax.swing.*;
@@ -46,16 +47,31 @@ public class CopyActionTest extends VimTestCase {
     myFixture.checkResult("twtwo\n");
   }
 
-  // TODO:
-  public void _testWrongYankQuoteMotion() {
-    final Editor editor = typeTextInFile(stringToKeys("y\""),
-                                         "one <caret>two\n" +
-                                         "three\n" +
-                                         "four\n");
+  public void testWrongYankQuoteMotion() {
+    final VimPlugin plugin = VimPlugin.getInstance();
+    assertFalse(plugin.isError());
+    typeTextInFile(stringToKeys("y\""),
+                   "one <caret>two\n" +
+                   "three\n" +
+                   "four\n");
+    assertTrue(plugin.isError());
   }
 
-  // TODO:
-  public void _testWrongYankRegisterMotion() {
+  public void testWrongYankQuoteYankLine() {
+    final VimPlugin plugin = VimPlugin.getInstance();
+    assertFalse(plugin.isError());
+    typeTextInFile(stringToKeys("y\"yyp"),
+                   "one <caret>two\n" +
+                   "three\n" +
+                   "four\n");
+    assertFalse(plugin.isError());
+    myFixture.checkResult("one two\n" +
+                          "one two\n" +
+                          "three\n" +
+                          "four\n");
+  }
+
+  public void testWrongYankRegisterMotion() {
     final Editor editor = typeTextInFile(stringToKeys("y\"0"),
                                          "one <caret>two\n" +
                                          "three\n" +
