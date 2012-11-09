@@ -41,6 +41,7 @@ public abstract class VimTestCase extends UsefulTestCase {
                                                                                     new LightTempDirTestFixtureImpl(true));
     myFixture.setUp();
     myFixture.setTestDataPath(getTestDataPath());
+    KeyHandler.getInstance().fullReset(myFixture.getEditor());
     Options.getInstance().resetAllOptions();
   }
 
