@@ -19,34 +19,21 @@ package com.maddyhome.idea.vim.command;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * This represents a command argument.
  */
 public class Argument {
-  /**
-   * This represents no argument
-   */
-  public static final int NONE = 0;
-  /**
-   * This is for arguments of type motion command
-   */
-  public static final int MOTION = 1;
-  /**
-   * This is for arguments of type character
-   */
-  public static final int CHARACTER = 2;
-  /**
-   * This is for arguments of type string
-   */
-  public static final int STRING = 3;
-  /**
-   * This is for arguments consisting of a digraph or a regular character
-   */
-  public static final int DIGRAPH = 4;
-  /**
-   * This is for argumaents consisting of an ex string
-   */
-  public static final int EX_STRING = 5;
+
+  public static enum Type {
+    NONE,
+    MOTION,
+    CHARACTER,
+    STRING,
+    DIGRAPH,
+    EX_STRING;
+  }
 
   /**
    * Creates a character argument
@@ -55,7 +42,7 @@ public class Argument {
    */
   public Argument(char charArg) {
     this.charArg = charArg;
-    type = CHARACTER;
+    type = Type.CHARACTER;
   }
 
   /**
@@ -65,7 +52,7 @@ public class Argument {
    */
   public Argument(Command motionArg) {
     this.motionArg = motionArg;
-    type = MOTION;
+    type = Type.MOTION;
   }
 
   /**
@@ -75,7 +62,7 @@ public class Argument {
    */
   public Argument(String strArg) {
     this.strArg = strArg;
-    type = STRING;
+    type = Type.STRING;
   }
 
   /**
@@ -83,7 +70,8 @@ public class Argument {
    *
    * @return The argument type
    */
-  public int getType() {
+  @NotNull
+  public Type getType() {
     return type;
   }
 
@@ -135,12 +123,12 @@ public class Argument {
 
   public String toString() {
     StringBuffer res = new StringBuffer();
-    res.append("Argument {");
+    res.append("Argument [");
     res.append("charArg=").append(charArg);
-    res.append(",motionArg=").append(motionArg);
-    res.append(",strArg=").append(strArg);
-    res.append(",type=").append(type);
-    res.append("}");
+    res.append(", motionArg=").append(motionArg);
+    res.append(", strArg=").append(strArg);
+    res.append(", type=").append(type);
+    res.append("]");
 
     return res.toString();
   }
@@ -148,5 +136,5 @@ public class Argument {
   private char charArg = 0;
   private Command motionArg = null;
   private String strArg = null;
-  private int type;
+  @NotNull private Type type;
 }

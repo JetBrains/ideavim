@@ -267,7 +267,8 @@ public class KeyParser {
    * @param shortcut The shortcut to map to the action
    * @param argType  The type of argument required by the actions
    */
-  public void registerAction(int mapping, String actName, Command.Type cmdType, Shortcut shortcut, int argType) {
+  public void registerAction(int mapping, String actName, Command.Type cmdType, Shortcut shortcut,
+                             @NotNull Argument.Type argType) {
     registerAction(mapping, actName, cmdType, new Shortcut[]{shortcut}, argType);
   }
 
@@ -281,7 +282,8 @@ public class KeyParser {
    * @param shortcut The shortcut to map to the action
    * @param argType  The type of argument required by the actions
    */
-  public void registerAction(int mapping, String actName, Command.Type cmdType, int cmdFlags, Shortcut shortcut, int argType) {
+  public void registerAction(int mapping, String actName, Command.Type cmdType, int cmdFlags, Shortcut shortcut,
+                             @NotNull Argument.Type argType) {
     registerAction(mapping, actName, cmdType, cmdFlags, new Shortcut[]{shortcut}, argType);
   }
 
@@ -306,7 +308,8 @@ public class KeyParser {
    * @param shortcuts The shortcuts to map to the action
    * @param argType   The type of argument required by the actions
    */
-  public void registerAction(int mapping, String actName, Command.Type cmdType, Shortcut[] shortcuts, int argType) {
+  public void registerAction(int mapping, String actName, Command.Type cmdType, Shortcut[] shortcuts,
+                             @NotNull Argument.Type argType) {
     registerAction(mapping, actName, cmdType, 0, shortcuts, argType);
   }
 
@@ -320,7 +323,7 @@ public class KeyParser {
    * @param shortcuts The shortcuts to map to the action
    */
   public void registerAction(int mapping, String actName, Command.Type cmdType, int cmdFlags, Shortcut[] shortcuts) {
-    registerAction(mapping, actName, cmdType, cmdFlags, shortcuts, Argument.NONE);
+    registerAction(mapping, actName, cmdType, cmdFlags, shortcuts, Argument.Type.NONE);
   }
 
   /**
@@ -333,7 +336,8 @@ public class KeyParser {
    * @param shortcuts The shortcuts to map to the action
    * @param argType   The type of argument required by the actions
    */
-  public void registerAction(int mapping, String actName, Command.Type cmdType, int cmdFlags, Shortcut[] shortcuts, int argType) {
+  public void registerAction(int mapping, String actName, Command.Type cmdType, int cmdFlags, Shortcut[] shortcuts,
+                             @NotNull Argument.Type argType) {
     for (Shortcut shortcut : shortcuts) {
       registerAction(mapping, actName, cmdType, cmdFlags, shortcut.getKeys(), argType);
     }
@@ -349,7 +353,8 @@ public class KeyParser {
    * @param keys     The keystrokes to map to the action
    * @param argType  The type of argument required by the actions
    */
-  private void registerAction(int mapping, String actName, Command.Type cmdType, int cmdFlags, KeyStroke[] keys, int argType) {
+  private void registerAction(int mapping, String actName, Command.Type cmdType, int cmdFlags, KeyStroke[] keys,
+                              @NotNull Argument.Type argType) {
     // Look through all the possible mappings and see which ones apply to this action
     int map = 1;
     for (int m = 0; m < MAPPING_CNT; m++) {
@@ -380,7 +385,8 @@ public class KeyParser {
    * @param last     True if last
    * @return Node
    */
-  private Node addNode(ParentNode base, String actName, Command.Type cmdType, int cmdFlags, KeyStroke key, int argType, boolean last) {
+  private Node addNode(ParentNode base, String actName, Command.Type cmdType, int cmdFlags, KeyStroke key,
+                       @NotNull Argument.Type argType, boolean last) {
     // Lets get the actual action for the supplied action name
     ActionManager aMgr = ActionManager.getInstance();
     AnAction action = aMgr.getAction(actName);
@@ -395,7 +401,7 @@ public class KeyParser {
     // Is this the first time we have seen this character at this point in the tree?
     if (node == null) {
       // If this is the last keystroke in the shortcut, and there is no argument, add a command node
-      if (last && argType == Argument.NONE) {
+      if (last && argType == Argument.Type.NONE) {
         node = new CommandNode(key, actName, action, cmdType, cmdFlags);
       }
       // If this are more keystrokes in the shortcut or there is an argument, add a branch node
@@ -407,7 +413,7 @@ public class KeyParser {
     }
 
     // If this is the last keystroke in the shortcut and we have an argument, add an argument node
-    if (last && node instanceof BranchNode && argType != Argument.NONE) {
+    if (last && node instanceof BranchNode && argType != Argument.Type.NONE) {
       ArgumentNode arg = new ArgumentNode(actName, action, cmdType, argType, cmdFlags);
       ((BranchNode)node).addChild(arg, BranchNode.ARGUMENT);
     }

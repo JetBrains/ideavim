@@ -128,7 +128,7 @@ public class KeyHandler {
     }
     // If we got this far the user is entering a command or supplying an argument to an entered command.
     // First let's check to see if we are at the point of expecting a single character argument to a command.
-    else if (currentArg == Argument.CHARACTER) {
+    else if (currentArg == Argument.Type.CHARACTER) {
       handleCharArgument(key, chKey);
     }
     // If we are this far, then the user must be entering a command or a non-single-character argument
@@ -212,7 +212,7 @@ public class KeyHandler {
   }
 
   private void handleEditorReset(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context) {
-    if (state != State.COMMAND && count == 0 && currentArg == Argument.NONE && currentCmd.size() == 0 &&
+    if (state != State.COMMAND && count == 0 && currentArg == Argument.Type.NONE && currentCmd.size() == 0 &&
         CommandGroups.getInstance().getRegister().getCurrentRegister() == RegisterGroup.REGISTER_DEFAULT) {
       if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
         KeyHandler.executeAction("VimEditorEscape", context);
@@ -227,14 +227,16 @@ public class KeyHandler {
   private boolean isDeleteCommandCount(@NotNull KeyStroke key, @NotNull CommandState editorState) {
     return (editorState.getMode() == CommandState.Mode.COMMAND ||
               editorState.getMode() == CommandState.Mode.VISUAL) &&
-             state == State.NEW_COMMAND && currentArg != Argument.CHARACTER && currentArg != Argument.DIGRAPH &&
+             state == State.NEW_COMMAND && currentArg != Argument.Type.CHARACTER && currentArg !=
+                                                                                              Argument.Type.DIGRAPH &&
              key.getKeyCode() == KeyEvent.VK_DELETE && count != 0;
   }
 
   private boolean isCommandCount(@NotNull CommandState editorState, char chKey) {
     return (editorState.getMode() == CommandState.Mode.COMMAND ||
               editorState.getMode() == CommandState.Mode.VISUAL) &&
-             state == State.NEW_COMMAND && currentArg != Argument.CHARACTER && currentArg != Argument.DIGRAPH &&
+             state == State.NEW_COMMAND && currentArg != Argument.Type.CHARACTER && currentArg !=
+                                                                                              Argument.Type.DIGRAPH &&
              Character.isDigit(chKey) &&
              (count != 0 || chKey != '0');
   }
@@ -288,8 +290,8 @@ public class KeyHandler {
           digraph = null;
           return true;
         case DigraphSequence.DigraphResult.RES_DONE:
-          if (currentArg == Argument.DIGRAPH) {
-            currentArg = Argument.CHARACTER;
+          if (currentArg == Argument.Type.DIGRAPH) {
+            currentArg = Argument.Type.CHARACTER;
           }
           digraph = null;
           handleKey(editor, res.getStroke(), context);
@@ -324,7 +326,7 @@ public class KeyHandler {
     if (logger.isDebugEnabled()) {
       logger.debug("arg=" + arg);
     }
-    if (arg != null && arg.getType() == Argument.MOTION) {
+    if (arg != null && arg.getType() == Argument.Type.MOTION) {
       Command mot = arg.getMotion();
       // If no count was entered for either command then nothing changes. If either had a count then
       // the motion gets the product of both.
@@ -375,12 +377,12 @@ public class KeyHandler {
     currentCmd.push(cmd);
     // What type of argument does this command expect?
     switch (node.getArgType()) {
-      case Argument.DIGRAPH:
+      case DIGRAPH:
         //digraphState = 0;
         digraph = new DigraphSequence();
         // No break - fall through
-      case Argument.CHARACTER:
-      case Argument.MOTION:
+      case CHARACTER:
+      case MOTION:
         state = State.NEW_COMMAND;
         currentArg = node.getArgType();
         // Is the current command an operator? If so set the state to only accept "operator pending"
@@ -391,7 +393,7 @@ public class KeyHandler {
                                 KeyParser.MAPPING_OP_PEND);
         }
         break;
-      case Argument.EX_STRING:
+      case EX_STRING:
         break;
       default:
         // Oops - we aren't expecting any other type of argument
@@ -401,7 +403,7 @@ public class KeyHandler {
     // If the current keystroke is really the first character of an argument the user needs to enter,
     // recursively go back and handle this keystroke again with all the state properly updated to
     // handle the argument
-    if (currentArg != Argument.NONE) {
+    if (currentArg != Argument.Type.NONE) {
       partialReset(editor);
       handleKey(editor, key, context);
       shouldRecord = false; // Prevent this from getting recorded twice
@@ -414,7 +416,7 @@ public class KeyHandler {
     // If all does well we are ready to process this command
     state = State.READY;
     // Did we just get the completed sequence for a motion command argument?
-    if (currentArg == Argument.MOTION) {
+    if (currentArg == Argument.Type.MOTION) {
       // We have been expecting a motion argument - is this one?
       if (node.getCmdType() == Command.Type.MOTION) {
         // Create the motion command and add it to the stack
@@ -435,7 +437,7 @@ public class KeyHandler {
         state = State.BAD_COMMAND;
       }
     }
-    else if (currentArg == Argument.EX_STRING && (node.getFlags() & Command.FLAG_COMPLETE_EX) != 0) {
+    else if (currentArg == Argument.Type.EX_STRING && (node.getFlags() & Command.FLAG_COMPLETE_EX) != 0) {
       String text = CommandGroups.getInstance().getProcess().endSearchCommand(editor, context);
       Argument arg = new Argument(text);
       Command cmd = currentCmd.peek();
@@ -474,10 +476,10 @@ public class KeyHandler {
         handleKey(editor, KeyStroke.getKeyStroke(' '), context);
       }
 
-      if (arg.getArgType() == Argument.EX_STRING) {
+      if (arg.getArgType() == Argument.Type.EX_STRING) {
         CommandGroups.getInstance().getProcess().startSearchCommand(editor, context, count, key);
         state = State.NEW_COMMAND;
-        currentArg = Argument.EX_STRING;
+        currentArg = Argument.Type.EX_STRING;
         editorState.pushState(CommandState.Mode.EX_ENTRY, CommandState.SubMode.NONE, KeyParser.MAPPING_CMD_LINE);
       }
     }
@@ -549,7 +551,7 @@ public class KeyHandler {
     partialReset(editor);
     state = State.NEW_COMMAND;
     currentCmd.clear();
-    currentArg = Argument.NONE;
+    currentArg = Argument.Type.NONE;
     digraph = null;
     logger.debug("reset");
   }
@@ -632,7 +634,7 @@ public class KeyHandler {
   private List<KeyStroke> keys;
   private State state;
   private Stack<Command> currentCmd = new Stack<Command>();
-  private int currentArg;
+  @NotNull private Argument.Type currentArg;
   private TypedActionHandler origHandler;
   private DigraphSequence digraph = null;
   private char lastChar;

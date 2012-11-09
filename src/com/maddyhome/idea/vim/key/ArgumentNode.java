@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.key;
  */
 
 import com.intellij.openapi.actionSystem.AnAction;
+import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,7 +38,8 @@ public class ArgumentNode implements Node {
    * @param argType  The type of the argument.
    * @param flags    Any special flags associated with this argument.
    */
-  public ArgumentNode(String actionId, AnAction action, @NotNull Command.Type cmdType, int argType, int flags) {
+  public ArgumentNode(String actionId, AnAction action, @NotNull Command.Type cmdType, @NotNull Argument.Type argType,
+                      int flags) {
     this.actionId = actionId;
     this.action = action;
     this.argType = argType;
@@ -63,7 +65,8 @@ public class ArgumentNode implements Node {
    *
    * @return The argument's type
    */
-  public int getArgType() {
+  @NotNull
+  public Argument.Type getArgType() {
     return argType;
   }
 
@@ -120,7 +123,7 @@ public class ArgumentNode implements Node {
     int result;
     result = action.hashCode();
     result = 29 * result + actionId.hashCode();
-    result = 29 * result + argType;
+    result = 29 * result + argType.ordinal();
     result = 29 * result + cmdType.hashCode();
     result = 29 * result + flags;
     return result;
@@ -128,7 +131,7 @@ public class ArgumentNode implements Node {
 
   protected String actionId;
   protected AnAction action;
-  protected int argType;
+  @NotNull protected Argument.Type argType;
   protected Command.Type cmdType;
   protected int flags;
 }
