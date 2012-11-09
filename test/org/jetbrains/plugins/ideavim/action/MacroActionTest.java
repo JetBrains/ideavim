@@ -15,6 +15,7 @@ import java.util.List;
  * @author vlan
  */
 public class MacroActionTest extends VimTestCase {
+  // |q|
   public void testRecordMacro() {
     final List<KeyStroke> keyStrokes = StringHelper.stringToKeys("qa3lq");
     final Editor editor = typeTextInFile(keyStrokes, "on<caret>e two three\n");

@@ -12,6 +12,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase;
  * @author vlan
  */
 public class SubstituteCommandTest extends VimTestCase {
+  // |:substitute|
   public void testOneLetter() {
     doTest("s/a/b/",
            "a<caret>baba\n" +
@@ -36,7 +37,7 @@ public class SubstituteCommandTest extends VimTestCase {
            "bb\n");
   }
 
-  // VIM-146
+  // VIM-146 |:substitute|
   public void testEOLtoQuote() {
     doTest("s/$/'/g",
            "<caret>one\n" +
@@ -65,7 +66,7 @@ public class SubstituteCommandTest extends VimTestCase {
            "one\ntwo\nthree\n");
   }
 
-  // VIM-289
+  // VIM-289 |:substitute|
   public void testDotToNLDot() {
     doTest("s/\\./\\r\\./g",
            "<caret>one.two.three\n",

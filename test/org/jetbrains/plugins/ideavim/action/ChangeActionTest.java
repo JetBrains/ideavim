@@ -16,6 +16,7 @@ import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
  * @author vlan
  */
 public class ChangeActionTest extends VimTestCase {
+  // |c| |t|
   public void testChangeLinesTillForwards() {
     doTest(stringToKeys("ct(for "),
            "<caret>if (condition) {\n" +
@@ -24,7 +25,7 @@ public class ChangeActionTest extends VimTestCase {
            "}\n");
   }
 
-  // VIM-276
+  // VIM-276 |c| |T|
   public void testChangeLinesTillBackwards() {
     doTest(stringToKeys("cT("),
            "if (condition) {<caret>\n" +
@@ -33,7 +34,7 @@ public class ChangeActionTest extends VimTestCase {
            "}\n");
   }
 
-  // VIM-276
+  // VIM-276 |c| |F|
   public void testChangeLinesToBackwards() {
     doTest(stringToKeys("cFc"),
            "if (condition) {<caret>\n" +
@@ -42,8 +43,7 @@ public class ChangeActionTest extends VimTestCase {
            "}\n");
   }
 
-  // VIM-311
-  // See |i_ctrl-o|
+  // VIM-311 |i_CTRL-O|
   public void testInsertSingleCommand() {
     final List<KeyStroke> keys = stringToKeys("idef");
     keys.add(KeyStroke.getKeyStroke("control O"));

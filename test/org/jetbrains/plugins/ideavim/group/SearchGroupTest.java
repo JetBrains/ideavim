@@ -16,6 +16,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase;
  * @author vlan
  */
 public class SearchGroupTest extends VimTestCase {
+  // |/|
   public void testOneLetter() {
     final int pos = search("w",
                            "<caret>one\n" +
@@ -30,7 +31,7 @@ public class SearchGroupTest extends VimTestCase {
     assertEquals(3, pos);
   }
 
-  // VIM-146
+  // VIM-146 |/|
   public void testEOLWithHighlightSearch() {
     setHighlightSearch();
     final int pos = search("$",
@@ -46,7 +47,7 @@ public class SearchGroupTest extends VimTestCase {
     assertEquals(1, pos);
   }
 
-  // VIM-226
+  // VIM-226 |/|
   public void testAndWithoutBranchesWithHighlightSearch() {
     setHighlightSearch();
     final int pos = search("\\&",

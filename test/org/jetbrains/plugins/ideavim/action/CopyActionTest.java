@@ -13,6 +13,39 @@ import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
  * @author vlan
  */
 public class CopyActionTest extends VimTestCase {
+  // |y| |p|
+  public void testYankPutCharacters() {
+    typeTextInFile(stringToKeys("y2hp"),
+                   "one two<caret> three\n");
+    myFixture.checkResult("one twwoo three\n");
+  }
+
+  // |yy|
+  public void testYankLine() {
+    typeTextInFile(stringToKeys("yyp"),
+                   "one\n" +
+                   "tw<caret>o\n" +
+                   "three\n");
+    myFixture.checkResult("one\n" +
+                          "two\n" +
+                          "two\n" +
+                          "three\n");
+  }
+
+  // |register| |y|
+  public void testYankRegister() {
+    typeTextInFile(stringToKeys("\"ayll\"byl\"ap\"bp"),
+                   "hel<caret>lo world\n");
+    myFixture.checkResult("hellolo world\n");
+  }
+
+  // |P|
+  public void testYankPutBefore() {
+    typeTextInFile(stringToKeys("y2lP"),
+                   "<caret>two\n");
+    myFixture.checkResult("twtwo\n");
+  }
+
   // TODO:
   public void _testWrongYankQuoteMotion() {
     final Editor editor = typeTextInFile(stringToKeys("y\""),

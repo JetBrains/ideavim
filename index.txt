@@ -1,0 +1,101 @@
+*index.txt*
+
+
+                  IDEAVIM REFERENCE MANUAL       based on Vim Reference Manual
+
+                                                                *index*
+This file contains a list of all commands for each mode, with a tag and a
+short description.  The lists are sorted on ASCII value.
+
+Tip: When looking for certain functionality, use a search command.  E.g.,
+to look for deleting something, use: "/delete".
+
+1. Insert mode                          |insert-index|
+2. Normal mode                          |normal-index|
+   2.1. Text objects                    |objects|
+3. Visual mode                          |visual-index|
+5. EX commands                          |ex-cmd-index|
+
+==============================================================================
+1. Insert mode                                          *insert-index*
+
+tag             char            action in Insert mode   ~
+-----------------------------------------------------------------------
+|i_CTRL-K|      CTRL-K {char1} {char2}
+                                enter digraph
+|i_CTRL-O|      CTRL-O          execute a single command and return to insert
+                                mode
+
+==============================================================================
+2. Normal mode                                          *normal-index*
+
+CHAR     any non-blank character
+WORD     a sequence of non-blank characters
+N        a number entered before the command
+{motion} a cursor movement command
+Nmove    the text that is moved over with a {motion}
+SECTION  a section that possibly starts with '}' instead of '{'
+
+note: 1 = cursor movement command; 2 = can be undone/redone
+
+tag             char          note action in Normal mode        ~
+------------------------------------------------------------------------------
+|quote|         "{a-zA-Z0-9.%#:-"}  use register {a-zA-Z0-9.%#:-"} for next
+                                   delete, yank or put (uppercase to append)
+                                   ({.%#:} only work with put)
+|/|             /{pattern}<CR>  1  search forward for the Nth occurrence of
+                                   {pattern}
+|F|             F{char}         1  cursor to the Nth occurrence of {char} to
+                                   the left
+|P|             ["x]P           2  put the text [from buffer x] before the
+                                   cursor N times
+|T|             T{char}         1  cursor till after Nth occurrence of {char}
+                                   to the left
+|Y|             ["x]Y              yank N lines [into buffer x]; synonym for
+                                   "yy"
+|c|             ["x]c{motion}   2  delete Nmove text [into buffer x] and start
+                                   insert
+|f|             f{char}         1  cursor to Nth occurrence of {char} to the
+                                   right
+|p|             ["x]p           2  put the text [from register x] after the
+                                   cursor N times
+|q|             q{0-9a-zA-Z"}      record typed characters into named register
+                                   {0-9a-zA-Z"} (uppercase to append)
+|q|             q                  (while recording) stops recording
+|t|             t{char}         1  cursor till before Nth occurrence of {char}
+                                   to the right
+|y|             ["x]y{motion}      yank Nmove text [into buffer x]
+|yy|            ["x]yy             yank N lines [into buffer x]
+
+==============================================================================
+2.1 Text objects                                                *objects*
+
+These can be used after an operator or in Visual mode to select an object.
+
+tag             command            action in op-pending and Visual mode ~
+------------------------------------------------------------------------------
+|v_iW|          iW                 "inner WORD"
+|v_iw|          iw                 "inner word"
+
+==============================================================================
+3. Visual mode                                          *visual-index*
+
+Most commands in Visual mode are the same as in Normal mode.  The ones listed
+here are those that are different.
+
+tag             command       note action in Visual mode        ~
+------------------------------------------------------------------------------
+|v_y|           y                  yank the highlighted area
+
+==============================================================================
+5. EX commands                                  *ex-cmd-index*
+
+This is a brief but complete listing of all the ":" commands, without
+mentioning any arguments.  The optional part of the command name is inside [].
+The commands are sorted on the non-optional part of their name.
+
+tag           command         action ~
+------------------------------------------------------------------------------
+|:display|      :di[splay]      display registers
+|:registers|    :reg[isters]    display the contents of registers
+|:substitute|   :s[ubstitute]   find and replace text

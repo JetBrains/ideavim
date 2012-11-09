@@ -58,7 +58,7 @@ public abstract class VimTestCase extends UsefulTestCase {
 
   @NotNull
   protected Editor typeTextInFile(@NotNull final List<KeyStroke> keys, @NotNull String fileContents) {
-    myFixture.configureByText("a.java", fileContents);
+    myFixture.configureByText("a.txt", fileContents);
     final Editor editor = myFixture.getEditor();
     final KeyHandler keyHandler = KeyHandler.getInstance();
     final EditorDataContext dataContext = new EditorDataContext(editor);
