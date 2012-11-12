@@ -1,6 +1,42 @@
-History of changes for IdeaVim for IntellIJ platform version @PLATFORM_VERSION@
+The Changelog
+=============
 
-@VERSION@ from 0.8.4
+History of changes in IdeaVim for the IntelliJ platform.
+
+
+0.23.111, 2012-11-12
+--------------------
+
+A bugfix release.
+
+* Register action for 'iW' selection
+* Vim compatible regexp substitutions for '\n' and '\r'
+* Index of supported commands covered with tests
+* VIM-276 T and F motions are exclusive, not inclusive
+* VIM-289 Fixed regexp substitute when the substitution contained newlines
+* VIM-185 Fixed NPE in KeyHandler.handleKey()
+* VIM-226 Added tests for the bug fixed together with VIM-146
+* VIM-146 Fixed handling of '$' in search and substitute commands
+* VIM-198 Fixed indexing bug in offset normalization
+* VIM-311 Test for single command sub-mode of insert mode
+* EA-33193 Fixed access to context data from different Swing events
+* Fixed command handling when motion expected, but another type of argument
+  found
+
+
+0.23.93, 2012-03-21
+-------------------
+
+A bugfix release. Vim.xml was fixed to use Command+C, Command+V on Mac OS.
+Unfortunately you need to update Vim.xml manually this time.
+
+...
+
+
+Previous Releases
+-----------------
+
+... from 0.8.4
 Bug Fixes
 - The Escape key is passed up to IDEA if not used by VIM first. This fix solves
   minor issues such as not being able to clear highlighted text using the
