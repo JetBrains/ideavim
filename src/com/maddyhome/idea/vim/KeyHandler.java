@@ -23,6 +23,7 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
@@ -349,13 +350,15 @@ public class KeyHandler {
     logger.debug("lastWasBS=" + lastWasBS);
 
     Project project = editor.getProject();
-    if (cmd.getType().isRead() || (project != null && EditorHelper.canEdit(project, editor))) {
-      Runnable action = new ActionRunner(editor, context, cmd, key);
-      if (cmd.getType().isWrite()) {
-        RunnableHelper.runWriteCommand(project, action, cmd.getActionId(), null);
-      }
-      else {
-        RunnableHelper.runReadCommand(project, action, cmd.getActionId(), null);
+    if (cmd.getType().isRead() || project == null || EditorHelper.canEdit(project, editor)) {
+      if (ApplicationManager.getApplication().isDispatchThread()) {
+        Runnable action = new ActionRunner(editor, context, cmd, key);
+        if (cmd.getType().isWrite()) {
+          RunnableHelper.runWriteCommand(project, action, cmd.getActionId(), null);
+        }
+        else {
+          RunnableHelper.runReadCommand(project, action, cmd.getActionId(), null);
+        }
       }
     }
     else {
