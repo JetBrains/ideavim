@@ -53,6 +53,13 @@ public class ChangeActionTest extends VimTestCase {
            "abcdx.\n");
   }
 
+  // VIM-312 |d| |0|
+  public void testDeleteEmptyRange() {
+    doTest(stringToKeys("d0"),
+           "<caret>hello\n",
+           "hello\n");
+  }
+
   private void doTest(final List<KeyStroke> keys, String before, String after) {
     myFixture.configureByText("a.java", before);
     final Editor editor = myFixture.getEditor();
