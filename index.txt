@@ -25,6 +25,7 @@ tag             char            action in Insert mode   ~
                                 enter digraph
 |i_CTRL-O|      CTRL-O          execute a single command and return to insert
                                 mode
+|i_CTRL-W|      CTRL-W          delete word before the cursor
 
 ==============================================================================
 2. Normal mode                                          *normal-index*
@@ -68,6 +69,7 @@ tag             char          note action in Normal mode        ~
 |d|             ["x]d{motion}   2  delete Nmove text [into buffer x]
 |f|             f{char}         1  cursor to Nth occurrence of {char} to the
                                    right
+|i|             i               2  insert text before the cursor N times
 |p|             ["x]p           2  put the text [from register x] after the
                                    cursor N times
 |q|             q{0-9a-zA-Z"}      record typed characters into named register

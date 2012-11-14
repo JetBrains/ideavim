@@ -322,19 +322,13 @@ public class ChangeGroup extends AbstractActionGroup {
    * @return true if able to delete text, false if not
    */
   public boolean insertDeletePreviousWord(Editor editor, DataContext context) {
-    int deleteTo = insertStart;
-    int offset = editor.getCaretModel().getOffset();
-    if (offset == insertStart) {
-      deleteTo = CommandGroups.getInstance().getMotion().moveCaretToNextWord(editor, -1, false);
+    final int deleteTo = CommandGroups.getInstance().getMotion().moveCaretToNextWord(editor, -1, false);
+    if (deleteTo == -1) {
+      return false;
     }
-
-    if (deleteTo != -1) {
-      deleteRange(editor, context, new TextRange(deleteTo, offset), SelectionType.CHARACTER_WISE,false);
-
-      return true;
-    }
-
-    return false;
+    final TextRange range = new TextRange(deleteTo, editor.getCaretModel().getOffset());
+    deleteRange(editor, context, range, SelectionType.CHARACTER_WISE, false);
+    return true;
   }
 
   /**
