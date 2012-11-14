@@ -60,6 +60,17 @@ public class ChangeActionTest extends VimTestCase {
            "hello\n");
   }
 
+  // VIM-112 |i| |i_CTRL-W|
+  public void testInsertDeletePreviousWord() {
+    final List<KeyStroke> keys = stringToKeys("ione two three");
+    keys.add(KeyStroke.getKeyStroke("control W"));
+    typeTextInFile(keys,
+                   "hello\n" +
+                   "<caret>\n");
+    myFixture.checkResult("hello\n" +
+                          "one two \n");
+  }
+
   // VIM-157 |~|
   public void testToggleCharCase() {
     doTest(stringToKeys("~~"),
