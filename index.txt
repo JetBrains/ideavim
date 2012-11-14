@@ -45,6 +45,16 @@ tag             char          note action in Normal mode        ~
                                    ({.%#:} only work with put)
 |/|             /{pattern}<CR>  1  search forward for the Nth occurrence of
                                    {pattern}
+|count|         0               1  cursor to the first char of the line
+|count|         1                  prepend to command to give a count
+|count|         2                       "
+|count|         3                       "
+|count|         4                       "
+|count|         5                       "
+|count|         6                       "
+|count|         7                       "
+|count|         8                       "
+|count|         9                       "
 |F|             F{char}         1  cursor to the Nth occurrence of {char} to
                                    the left
 |P|             ["x]P           2  put the text [from buffer x] before the
@@ -55,6 +65,7 @@ tag             char          note action in Normal mode        ~
                                    "yy"
 |c|             ["x]c{motion}   2  delete Nmove text [into buffer x] and start
                                    insert
+|d|             ["x]d{motion}   2  delete Nmove text [into buffer x]
 |f|             f{char}         1  cursor to Nth occurrence of {char} to the
                                    right
 |p|             ["x]p           2  put the text [from register x] after the

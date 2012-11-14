@@ -14,7 +14,7 @@ import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
  * @author vlan
  */
 public class CopyActionTest extends VimTestCase {
-  // |y| |p|
+  // |y| |p| |count|
   public void testYankPutCharacters() {
     typeTextInFile(stringToKeys("y2hp"),
                    "one two<caret> three\n");

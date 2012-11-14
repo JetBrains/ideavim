@@ -53,7 +53,7 @@ public class ChangeActionTest extends VimTestCase {
            "abcdx.\n");
   }
 
-  // VIM-312 |d| |0|
+  // VIM-321 |d| |count|
   public void testDeleteEmptyRange() {
     doTest(stringToKeys("d0"),
            "<caret>hello\n",
