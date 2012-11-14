@@ -4,6 +4,16 @@ The Changelog
 History of changes in IdeaVim for the IntelliJ platform.
 
 
+0.23.115, 2012-11-14
+--------------------
+
+A bugfix release.
+
+* VIM-318 Fixed executing editor commands for editors not bound to a project
+* VIM-321 Fixed IOOBE in delete empty range
+* VIM-112 Delete a single previous word with <C-W> in insert mode, not all inserted words
+
+
 0.23.111, 2012-11-12
 --------------------
 
