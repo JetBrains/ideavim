@@ -79,6 +79,9 @@ tag             char          note action in Normal mode        ~
                                    to the right
 |y|             ["x]y{motion}      yank Nmove text [into buffer x]
 |yy|            ["x]yy             yank N lines [into buffer x]
+|~|             ~               2  'tildeop' off: switch case of N characters
+                                   under cursor and move the cursor N
+                                   characters to the right
 
 ==============================================================================
 2.1 Text objects                                                *objects*

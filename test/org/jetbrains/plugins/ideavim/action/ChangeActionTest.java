@@ -60,6 +60,20 @@ public class ChangeActionTest extends VimTestCase {
            "hello\n");
   }
 
+  // VIM-157 |~|
+  public void testToggleCharCase() {
+    doTest(stringToKeys("~~"),
+           "<caret>hello world\n",
+           "HEllo world\n");
+  }
+
+  // VIM-157 |~|
+  public void testToggleCharCaseLineEnd() {
+    doTest(stringToKeys("~~"),
+           "hello wor<caret>ld\n",
+           "hello worLD\n");
+  }
+
   private void doTest(final List<KeyStroke> keys, String before, String after) {
     myFixture.configureByText("a.java", before);
     final Editor editor = myFixture.getEditor();
