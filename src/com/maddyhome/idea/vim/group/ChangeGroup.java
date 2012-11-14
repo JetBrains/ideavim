@@ -1162,18 +1162,13 @@ public class ChangeGroup extends AbstractActionGroup {
    * @return true if able to change count characters
    */
   public boolean changeCaseToggleCharacter(Editor editor, DataContext context, int count) {
-    int offset = CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, count, true);
+    final int offset = CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, count, true);
     if (offset == -1) {
       return false;
     }
-    else {
-      changeCase(editor, context, editor.getCaretModel().getOffset(), offset, CharacterHelper.CASE_TOGGLE);
-
-      offset = EditorHelper.normalizeOffset(editor, offset, false);
-      MotionGroup.moveCaret(editor, offset);
-
-      return true;
-    }
+    changeCase(editor, context, editor.getCaretModel().getOffset(), offset, CharacterHelper.CASE_TOGGLE);
+    MotionGroup.moveCaret(editor, EditorHelper.normalizeOffset(editor, offset, false));
+    return true;
   }
 
   /**
