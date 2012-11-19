@@ -3,6 +3,7 @@ package org.jetbrains.plugins.ideavim.action;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.VisualPosition;
 import com.maddyhome.idea.vim.command.CommandState;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import javax.swing.*;
@@ -39,18 +40,15 @@ public class MotionActionTest extends VimTestCase {
     final Editor editor = typeTextInFile(keys,
                                          "on<caret>e two\n" +
                                          "three\n");
-    final int offset = editor.getCaretModel().getOffset();
-    assertEquals(2, offset);
-    final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
-    assertEquals(CommandState.Mode.COMMAND, mode);
+    assertOffset(editor, 2);
+    assertMode(editor, CommandState.Mode.COMMAND);
   }
 
   // |h| |l|
   public void testLeftRightMove() {
     final Editor editor = typeTextInFile(stringToKeys("14l2h"),
                                          "on<caret>e two three four five six seven\n");
-    final int offset = editor.getCaretModel().getOffset();
-    assertEquals(14, offset);
+    assertOffset(editor, 14);
   }
 
   // |j| |k|
@@ -70,8 +68,7 @@ public class MotionActionTest extends VimTestCase {
     keys.add(KeyStroke.getKeyStroke('l'));
     final Editor editor = typeTextInFile(keys,
                                          "on<caret>e two three four five six seven\n");
-    final int offset = editor.getCaretModel().getOffset();
-    assertEquals(6, offset);
+    assertOffset(editor, 6);
   }
 
   // |f|
@@ -80,10 +77,8 @@ public class MotionActionTest extends VimTestCase {
     keys.add(KeyStroke.getKeyStroke("TAB"));
     final Editor editor = typeTextInFile(keys,
                                          "on<caret>e two\tthree\nfour\n");
-    final int offset = editor.getCaretModel().getOffset();
-    assertEquals(7, offset);
-    final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
-    assertEquals(CommandState.Mode.COMMAND, mode);
+    assertOffset(editor, 7);
+    assertMode(editor, CommandState.Mode.COMMAND);
   }
 
   public void testIllegalCharArgument() {
@@ -91,10 +86,8 @@ public class MotionActionTest extends VimTestCase {
     keys.add(KeyStroke.getKeyStroke("INSERT"));
     final Editor editor = typeTextInFile(keys,
                                          "on<caret>e two three four five six seven\n");
-    final int offset = editor.getCaretModel().getOffset();
-    assertEquals(2, offset);
-    final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
-    assertEquals(CommandState.Mode.COMMAND, mode);
+    assertOffset(editor, 2);
+    assertMode(editor, CommandState.Mode.COMMAND);
   }
 
   // |F| |i_CTRL-K|
@@ -105,9 +98,17 @@ public class MotionActionTest extends VimTestCase {
     keys.add(KeyStroke.getKeyStroke(':'));
     final Editor editor = typeTextInFile(keys,
                                          "Hallo, \u00d6ster<caret>reich!\n");
+    assertOffset(editor, 7);
+    assertMode(editor, CommandState.Mode.COMMAND);
+  }
+
+  public void assertOffset(@NotNull Editor editor, int expectedOffset) {
     final int offset = editor.getCaretModel().getOffset();
-    assertEquals(7, offset);
+    assertEquals(expectedOffset, offset);
+  }
+
+  public void assertMode(@NotNull Editor editor, @NotNull CommandState.Mode expectedMode) {
     final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
-    assertEquals(CommandState.Mode.COMMAND, mode);
+    assertEquals(expectedMode, mode);
   }
 }
