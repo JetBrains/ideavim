@@ -13,6 +13,7 @@ to look for deleting something, use: "/delete".
 1. Insert mode                          |insert-index|
 2. Normal mode                          |normal-index|
    2.1. Text objects                    |objects|
+   2.3. Square bracket commands         |[|
 3. Visual mode                          |visual-index|
 5. EX commands                          |ex-cmd-index|
 
@@ -44,6 +45,10 @@ tag             char          note action in Normal mode        ~
 |quote|         "{a-zA-Z0-9.%#:-"}  use register {a-zA-Z0-9.%#:-"} for next
                                    delete, yank or put (uppercase to append)
                                    ({.%#:} only work with put)
+|%|             %               1  find the next (curly/square) bracket on
+                                   this line and go to its match, or go to
+                                   matching comment bracket, or go to matching
+                                   preprocessor directive.
 |/|             /{pattern}<CR>  1  search forward for the Nth occurrence of
                                    {pattern}
 |count|         0               1  cursor to the first char of the line
@@ -95,6 +100,16 @@ tag             command            action in op-pending and Visual mode ~
 |v_iW|          iW                 "inner WORD"
 |v_ib|          ib                 "inner block" from "[(" to "])"
 |v_iw|          iw                 "inner word"
+
+==============================================================================
+2.3 Square bracket commands                                     *[* *]*
+
+tag             char          note action in Normal mode        ~
+------------------------------------------------------------------------------
+|[(|            [(              1  cursor N times back to unmatched '('
+|[{|            [{              1  cursor N times back to unmatched '{'
+|])|            ])              1  cursor N times forward to unmatched ')'
+|]}|            ]}              1  cursor N times forward to unmatched '}'
 
 ==============================================================================
 3. Visual mode                                          *visual-index*

@@ -109,6 +109,62 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("foo()\n");
   }
 
+  // |%|
+  public void testPercentMatchSimple() {
+    final Editor editor = typeTextInFile(stringToKeys("%"),
+                                         "foo(b<caret>ar)\n");
+    assertOffset(editor, 3);
+  }
+
+  // |%|
+  public void testPercentMatchMultiLine() {
+    final Editor editor = typeTextInFile(stringToKeys("%"),
+                                         "foo(bar,\n" +
+                                         "    baz,\n" +
+                                         "    <caret>quux)\n");
+    assertOffset(editor, 3);
+  }
+
+  // |%|
+  public void testPercentMatchParensInString() {
+    final Editor editor = typeTextInFile(stringToKeys("%"),
+                                         "foo(bar, \"foo(bar\", <caret>baz)\n");
+    assertOffset(editor, 3);
+  }
+
+  // |[(|
+  public void testUnmatchedOpenParenthesis() {
+    final Editor editor = typeTextInFile(stringToKeys("[("),
+                                         "foo(bar, foo(bar, <caret>baz\n" +
+                                         "bar(foo)\n");
+    assertOffset(editor, 12);
+  }
+
+  // |[{|
+  public void testUnmatchedOpenBracketMultiLine() {
+    final Editor editor = typeTextInFile(stringToKeys("[{"),
+                                         "foo {\n" +
+                                         "    bar,\n" +
+                                         "    b<caret>az\n");
+    assertOffset(editor, 4);
+  }
+
+  // |])|
+  public void testUnmatchedCloseParenthesisMultiLine() {
+    final Editor editor = typeTextInFile(stringToKeys("])"),
+                                         "foo(bar, <caret>baz,\n" +
+                                         "   quux)\n");
+    assertOffset(editor, 21);
+  }
+
+  // |]}|
+  public void testUnmatchedCloseBracket() {
+    final Editor editor = typeTextInFile(stringToKeys("]}"),
+                                         "{bar, <caret>baz}\n");
+    assertOffset(editor, 9);
+  }
+
+
   public void assertOffset(@NotNull Editor editor, int expectedOffset) {
     final int offset = editor.getCaretModel().getOffset();
     assertEquals(expectedOffset, offset);
