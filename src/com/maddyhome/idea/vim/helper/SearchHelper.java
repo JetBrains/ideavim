@@ -228,7 +228,7 @@ public class SearchHelper {
 
     boolean inString = false;
     boolean inChar = false;
-    for (int i = offset; i < pos; i++) {
+    for (int i = offset; i <= pos; i++) {
       if (!inChar && chars.charAt(i) == '"' && (i == 0 || chars.charAt(i - 1) != '\\')) {
         inString = !inString;
       }

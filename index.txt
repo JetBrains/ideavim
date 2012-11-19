@@ -90,7 +90,10 @@ These can be used after an operator or in Visual mode to select an object.
 
 tag             command            action in op-pending and Visual mode ~
 ------------------------------------------------------------------------------
+|v_i(|          i(                 same as ib
+|v_i)|          i)                 same as ib
 |v_iW|          iW                 "inner WORD"
+|v_ib|          ib                 "inner block" from "[(" to "])"
 |v_iw|          iw                 "inner word"
 
 ==============================================================================

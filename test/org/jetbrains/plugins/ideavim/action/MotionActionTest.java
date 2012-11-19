@@ -102,6 +102,13 @@ public class MotionActionTest extends VimTestCase {
     assertMode(editor, CommandState.Mode.COMMAND);
   }
 
+  // VIM-326 |d| |v_ib|
+  public void testDeleteInnerBlock() {
+    typeTextInFile(stringToKeys("di)"),
+                   "foo(\"b<caret>ar\")\n");
+    myFixture.checkResult("foo()\n");
+  }
+
   public void assertOffset(@NotNull Editor editor, int expectedOffset) {
     final int offset = editor.getCaretModel().getOffset();
     assertEquals(expectedOffset, offset);
