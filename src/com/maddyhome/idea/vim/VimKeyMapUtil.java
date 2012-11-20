@@ -1,5 +1,6 @@
 package com.maddyhome.idea.vim;
 
+import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import com.intellij.notification.Notification;
@@ -21,7 +22,6 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMUtil;
-import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.ui.VimKeymapDialog;
@@ -38,11 +38,12 @@ import static com.google.common.io.ByteStreams.toByteArray;
  * @author oleg
  */
 public class VimKeyMapUtil {
+  private static final Joiner PATH_JOINER = Joiner.on(File.separatorChar);
   public static final String VIM_KEYMAP_NAME = "Vim";
 
   private static final String VIM_XML = "Vim.xml";
-  private static final String KEYMAPS_PATH = FileUtil.join(PathManager.getConfigPath(), "keymaps");
-  private static final String INSTALLED_VIM_KEYMAP_PATH = FileUtil.join(KEYMAPS_PATH, VIM_XML);
+  private static final String KEYMAPS_PATH = PATH_JOINER.join(PathManager.getConfigPath(), "keymaps");
+  private static final String INSTALLED_VIM_KEYMAP_PATH = PATH_JOINER.join(KEYMAPS_PATH, VIM_XML);
 
   private static Logger LOG = Logger.getInstance(VimKeyMapUtil.class);
 
@@ -219,7 +220,7 @@ public class VimKeyMapUtil {
 
   @NotNull
   private static InputStream retrieveSourceKeymapStream() throws IOException {
-    String keymapPath = FileUtil.join(PathManager.getPluginsPath(), VimPlugin.IDEAVIM_NOTIFICATION_TITLE, VIM_XML);
+    String keymapPath = PATH_JOINER.join(PathManager.getPluginsPath(), VimPlugin.IDEAVIM_NOTIFICATION_TITLE, VIM_XML);
     try {
       return new FileInputStream(keymapPath);
     } catch (FileNotFoundException e) {

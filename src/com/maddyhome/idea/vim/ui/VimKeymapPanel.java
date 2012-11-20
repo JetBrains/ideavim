@@ -66,7 +66,7 @@ public class VimKeymapPanel {
       return SystemInfo.isMac;
     }
     else if (keymap.getName().equals("Default for GNOME") || keymap.getName().equals("Default for KDE") ||
-             keymap.getName().equals(KeymapManager.X_WINDOW_KEYMAP)) {
+             keymap.getName().equals("Default for XWin")) {
       return SystemInfo.isLinux;
     }
     return true;
