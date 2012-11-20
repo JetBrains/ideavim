@@ -38,8 +38,9 @@ import static com.google.common.io.ByteStreams.toByteArray;
  * @author oleg
  */
 public class VimKeyMapUtil {
+  public static final String VIM_KEYMAP_NAME = "Vim";
+
   private static final String VIM_XML = "Vim.xml";
-  private static final String VIM_KEYMAP_NAME = "Vim";
   private static final String KEYMAPS_PATH = FileUtil.join(PathManager.getConfigPath(), "keymaps");
   private static final String INSTALLED_VIM_KEYMAP_PATH = FileUtil.join(KEYMAPS_PATH, VIM_XML);
 
