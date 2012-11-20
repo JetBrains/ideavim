@@ -816,15 +816,8 @@ public class ChangeGroup extends AbstractActionGroup {
         MotionGroup.moveCaret(editor,
                               CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeadingOffset(editor, -1));
       }
-      else if (res && range.isMultiple()) {
+      else if (res && (range.isMultiple() || !isChange)) {
         MotionGroup.moveCaret(editor, range.getStartOffset());
-      }
-      else if (res && !isChange) {
-        VisualPosition vp = editor.getCaretModel().getVisualPosition();
-        int col = EditorHelper.normalizeVisualColumn(editor, vp.line, vp.column, false);
-        if (col != vp.column) {
-          editor.getCaretModel().moveToVisualPosition(new VisualPosition(vp.line, col));
-        }
       }
 
       return res;

@@ -133,6 +133,7 @@ public class MotionActionTest extends VimTestCase {
     final Editor editor = typeTextInFile(stringToKeys("di)"),
                                          "foo<caret>(bar)\n");
     myFixture.checkResult("foo()\n");
+    assertOffset(editor, 4);
   }
 
   // |d| |v_ib|
