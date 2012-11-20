@@ -116,6 +116,18 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("{}\n");
   }
 
+  // VIM-261 |c| |v_iB|
+  public void testChangeInnerBracketBlockMultiLine() {
+    final Editor editor = typeTextInFile(stringToKeys("ci{"),
+                                         "foo {\n" +
+                                         "    <caret>bar\n" +
+                                         "}\n");
+    myFixture.checkResult("foo {\n" +
+                          "\n" +
+                          "}\n");
+    assertOffset(editor, 6);
+  }
+
   // |%|
   public void testPercentMatchSimple() {
     final Editor editor = typeTextInFile(stringToKeys("%"),
