@@ -856,10 +856,7 @@ public class RegisterActions {
       });
     parser.registerAction(KeyParser.MAPPING_VISUAL | KeyParser.MAPPING_OP_PEND, "VimMotionInnerBlockBrace",
                           Command.Type.MOTION,
-                          Command.FLAG_MOT_LINEWISE |
-                          Command.FLAG_VISUAL_CHARACTERWISE |
-                          Command.FLAG_MOT_INCLUSIVE |
-                          Command.FLAG_TEXT_BLOCK, new Shortcut[]{
+                          Command.FLAG_MOT_CHARACTERWISE | Command.FLAG_MOT_INCLUSIVE | Command.FLAG_TEXT_BLOCK, new Shortcut[]{
         new Shortcut("iB"),
         new Shortcut("i{"),
         new Shortcut("i}")

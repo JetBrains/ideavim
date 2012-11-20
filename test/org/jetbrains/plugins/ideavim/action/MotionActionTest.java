@@ -109,6 +109,13 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("foo()\n");
   }
 
+  // VIM-314 |d| |v_iB|
+  public void testDeleteInnerBracketBlock() {
+    typeTextInFile(stringToKeys("di{"),
+                   "{foo, b<caret>ar, baz}\n");
+    myFixture.checkResult("{}\n");
+  }
+
   // |%|
   public void testPercentMatchSimple() {
     final Editor editor = typeTextInFile(stringToKeys("%"),
