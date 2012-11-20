@@ -38,9 +38,11 @@ import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerAdapter;
+import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
+import com.intellij.util.ui.UIUtil;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.group.*;
@@ -209,6 +211,10 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         DocumentManager.getInstance().addListeners(editor.getDocument());
 
         if (VimPlugin.isEnabled()) {
+          if (UIUtil.isRetina()) {
+                Registry.get("ide.mac.disableRetinaDrawingFix").setValue(true);
+          }
+
           // Turn on insert mode if editor doesn't have any file
           if (!EditorData.isFileEditor(editor) && !CommandState.inInsertMode(editor)) {
             KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke('i'), new EditorDataContext(editor));
@@ -216,6 +222,15 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
           editor.getSettings().setBlockCursor(!CommandState.inInsertMode(editor));
           editor.getSettings().setAnimatedScrolling(ANIMATED_SCROLLING_VIM_VALUE);
           editor.getSettings().setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
+
+          if (UIUtil.isRetina()) {
+            SwingUtilities.invokeLater(new Runnable() {
+              @Override
+              public void run() {
+                Registry.get("ide.mac.disableRetinaDrawingFix").setValue(false);
+              }
+            });
+          }
         }
       }
 
