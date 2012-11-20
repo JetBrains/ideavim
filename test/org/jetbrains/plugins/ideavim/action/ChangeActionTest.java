@@ -85,6 +85,20 @@ public class ChangeActionTest extends VimTestCase {
            "hello worLD\n");
   }
 
+  // VIM-85 |i| |gi| |gg|
+  public void testInsertAtPreviousAction() {
+    final List<KeyStroke> keys = stringToKeys("ihello");
+    keys.add(KeyStroke.getKeyStroke("ESCAPE"));
+    keys.addAll(stringToKeys("gggi world! "));
+    doTest(keys,
+           "one\n" +
+           "two <caret>three\n" +
+           "four\n",
+           "one\n" +
+           "two hello world! three\n" +
+           "four\n");
+  }
+
   private void doTest(final List<KeyStroke> keys, String before, String after) {
     myFixture.configureByText("a.java", before);
     final Editor editor = myFixture.getEditor();
