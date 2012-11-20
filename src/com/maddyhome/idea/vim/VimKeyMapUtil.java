@@ -1,5 +1,6 @@
 package com.maddyhome.idea.vim;
 
+import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
@@ -31,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 
-import static com.google.common.base.Strings.nullToEmpty;
+import static com.google.common.io.ByteStreams.toByteArray;
 
 /**
  * @author oleg
@@ -65,13 +66,12 @@ public class VimKeyMapUtil {
 
     LOG.debug("No vim keyboard installed found. Installing");
     try {
-      final InputStream sourceKeymapStream = retrieveSourceKeymapStream();
-      final Document document = StorageUtil.loadDocument(sourceKeymapStream);
+      final byte[] bytes = toByteArray(retrieveSourceKeymapStream());
+      Files.write(bytes, new File(INSTALLED_VIM_KEYMAP_PATH));
+      final Document document = StorageUtil.loadDocument(bytes);
       if (!ApplicationManager.getApplication().isUnitTestMode()) {
         // Prompt user to select the parent for the Vim keyboard
         configureVimParentKeymap(INSTALLED_VIM_KEYMAP_PATH, document, false);
-      } else {
-        FileUtil.copy(sourceKeymapStream, new FileOutputStream(INSTALLED_VIM_KEYMAP_PATH));
       }
       installKeymap(document);
     } catch (IOException e) {
@@ -237,7 +237,7 @@ public class VimKeyMapUtil {
   private static void reportError(final String message, @Nullable final Exception e) {
     LOG.error(message, e);
     Notifications.Bus.notify(new Notification(VimPlugin.IDEAVIM_NOTIFICATION_ID, VimPlugin.IDEAVIM_NOTIFICATION_TITLE,
-                                              message + nullToEmpty(e.toString()), NotificationType.ERROR));
+                                              message + String.valueOf(e), NotificationType.ERROR));
   }
 
   @Nullable
