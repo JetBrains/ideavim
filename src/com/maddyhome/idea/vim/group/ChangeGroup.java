@@ -211,12 +211,12 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param context The data context
    */
   public void insertAtPreviousInsert(Editor editor, DataContext context) {
-    int offset = CommandGroups.getInstance().getMotion().moveCaretToFileMarkLine(editor, '^');
+    int offset = CommandGroups.getInstance().getMotion().moveCaretToMark(editor, context, '^');
     if (offset != -1) {
       MotionGroup.moveCaret(editor, offset);
     }
 
-    insertBeforeCursor(editor, context);
+    insertAfterCursor(editor, context);
   }
 
   /**
