@@ -128,6 +128,20 @@ public class MotionActionTest extends VimTestCase {
     assertOffset(editor, 6);
   }
 
+  // VIM-275 |d| |v_ib|
+  public void testDeleteInnerParensBlockBeforeOpen() {
+    final Editor editor = typeTextInFile(stringToKeys("di)"),
+                                         "foo<caret>(bar)\n");
+    myFixture.checkResult("foo()\n");
+  }
+
+  // |d| |v_ib|
+  public void testDeleteInnerParensBlockBeforeClose() {
+    typeTextInFile(stringToKeys("di)"),
+                   "foo(bar<caret>)\n");
+    myFixture.checkResult("foo()\n");
+  }
+
   // |%|
   public void testPercentMatchSimple() {
     final Editor editor = typeTextInFile(stringToKeys("%"),

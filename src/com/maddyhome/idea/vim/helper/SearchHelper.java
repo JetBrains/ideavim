@@ -181,8 +181,8 @@ public class SearchHelper {
     int res = -1;
     boolean inString = checkInString(chars, pos, true);
     boolean inChar = checkInString(chars, pos, false);
+    boolean initial = true;
     int stack = 0;
-    pos += dir;
     // Search to start or end of file, as appropriate
     while (pos >= 0 && pos < chars.length() && cnt > 0) {
       // If we found a match and we're not in a string...
@@ -197,24 +197,27 @@ public class SearchHelper {
           stack--;
         }
       }
-      // We found another character like our original - belongs to another pair
-      else if (chars.charAt(pos) == found && !inString && !inChar) {
-        stack++;
-      }
-      // We found the start/end of a string
-      else if (!inChar && chars.charAt(pos) == '"' && (pos == 0 || chars.charAt(pos - 1) != '\\')) {
-        inString = !inString;
-      }
-      else if (!inString && chars.charAt(pos) == '\'' && (pos == 0 || chars.charAt(pos - 1) != '\\')) {
-        inChar = !inChar;
-      }
       // End of line - mark not in a string any more (in case we started in the middle of one
       else if (chars.charAt(pos) == '\n') {
         inString = false;
         inChar = false;
       }
+      else if (!initial) {
+        // We found another character like our original - belongs to another pair
+        if (!inString && !inChar && chars.charAt(pos) == found) {
+          stack++;
+        }
+        // We found the start/end of a string
+        else if (!inChar && chars.charAt(pos) == '"' && (pos == 0 || chars.charAt(pos - 1) != '\\')) {
+          inString = !inString;
+        }
+        else if (!inString && chars.charAt(pos) == '\'' && (pos == 0 || chars.charAt(pos - 1) != '\\')) {
+          inChar = !inChar;
+        }
+      }
 
       pos += dir;
+      initial = false;
     }
 
     return res;
