@@ -12,6 +12,7 @@ import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
 import com.intellij.testFramework.fixtures.TestFixtureBuilder;
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl;
 import com.maddyhome.idea.vim.KeyHandler;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.option.Options;
@@ -72,5 +73,15 @@ public abstract class VimTestCase extends UsefulTestCase {
       }
     }, null, null);
     return editor;
+  }
+
+  public void assertOffset(int expectedOffset) {
+    final int offset = myFixture.getEditor().getCaretModel().getOffset();
+    assertEquals(expectedOffset, offset);
+  }
+
+  public void assertMode(@NotNull CommandState.Mode expectedMode) {
+    final CommandState.Mode mode = CommandState.getInstance(myFixture.getEditor()).getMode();
+    assertEquals(expectedMode, mode);
   }
 }

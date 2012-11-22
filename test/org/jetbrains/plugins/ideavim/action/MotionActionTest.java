@@ -2,13 +2,12 @@ package org.jetbrains.plugins.ideavim.action;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.VisualPosition;
-import com.maddyhome.idea.vim.command.CommandState;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import javax.swing.*;
 import java.util.List;
 
+import static com.maddyhome.idea.vim.command.CommandState.Mode.COMMAND;
 import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
 
 /**
@@ -37,18 +36,18 @@ public class MotionActionTest extends VimTestCase {
     // We cannot check yet that the plugin indicates an error (see 'visualbell') after the second ESCAPE, so we just check the caret
     // position and the editor mode
     keys.add(KeyStroke.getKeyStroke("ESCAPE"));
-    final Editor editor = typeTextInFile(keys,
-                                         "on<caret>e two\n" +
-                                         "three\n");
-    assertOffset(editor, 2);
-    assertMode(editor, CommandState.Mode.COMMAND);
+    typeTextInFile(keys,
+                   "on<caret>e two\n" +
+                   "three\n");
+    assertOffset(2);
+    assertMode(COMMAND);
   }
 
   // |h| |l|
   public void testLeftRightMove() {
-    final Editor editor = typeTextInFile(stringToKeys("14l2h"),
-                                         "on<caret>e two three four five six seven\n");
-    assertOffset(editor, 14);
+    typeTextInFile(stringToKeys("14l2h"),
+                   "on<caret>e two three four five six seven\n");
+    assertOffset(14);
   }
 
   // |j| |k|
@@ -66,28 +65,28 @@ public class MotionActionTest extends VimTestCase {
     final List<KeyStroke> keys = stringToKeys("42");
     keys.add(KeyStroke.getKeyStroke("DELETE"));
     keys.add(KeyStroke.getKeyStroke('l'));
-    final Editor editor = typeTextInFile(keys,
-                                         "on<caret>e two three four five six seven\n");
-    assertOffset(editor, 6);
+    typeTextInFile(keys,
+                   "on<caret>e two three four five six seven\n");
+    assertOffset(6);
   }
 
   // |f|
   public void testForwardToTab() {
     final List<KeyStroke> keys = stringToKeys("f");
     keys.add(KeyStroke.getKeyStroke("TAB"));
-    final Editor editor = typeTextInFile(keys,
-                                         "on<caret>e two\tthree\nfour\n");
-    assertOffset(editor, 7);
-    assertMode(editor, CommandState.Mode.COMMAND);
+    typeTextInFile(keys,
+                   "on<caret>e two\tthree\nfour\n");
+    assertOffset(7);
+    assertMode(COMMAND);
   }
 
   public void testIllegalCharArgument() {
     final List<KeyStroke> keys = stringToKeys("f");
     keys.add(KeyStroke.getKeyStroke("INSERT"));
-    final Editor editor = typeTextInFile(keys,
-                                         "on<caret>e two three four five six seven\n");
-    assertOffset(editor, 2);
-    assertMode(editor, CommandState.Mode.COMMAND);
+    typeTextInFile(keys,
+                   "on<caret>e two three four five six seven\n");
+    assertOffset(2);
+    assertMode(COMMAND);
   }
 
   // |F| |i_CTRL-K|
@@ -96,10 +95,10 @@ public class MotionActionTest extends VimTestCase {
     keys.add(KeyStroke.getKeyStroke("control K"));
     keys.add(KeyStroke.getKeyStroke('O'));
     keys.add(KeyStroke.getKeyStroke(':'));
-    final Editor editor = typeTextInFile(keys,
-                                         "Hallo, \u00d6ster<caret>reich!\n");
-    assertOffset(editor, 7);
-    assertMode(editor, CommandState.Mode.COMMAND);
+    typeTextInFile(keys,
+                   "Hallo, \u00d6ster<caret>reich!\n");
+    assertOffset(7);
+    assertMode(COMMAND);
   }
 
   // VIM-326 |d| |v_ib|
@@ -118,22 +117,22 @@ public class MotionActionTest extends VimTestCase {
 
   // VIM-261 |c| |v_iB|
   public void testChangeInnerBracketBlockMultiLine() {
-    final Editor editor = typeTextInFile(stringToKeys("ci{"),
-                                         "foo {\n" +
-                                         "    <caret>bar\n" +
-                                         "}\n");
+    typeTextInFile(stringToKeys("ci{"),
+                   "foo {\n" +
+                   "    <caret>bar\n" +
+                   "}\n");
     myFixture.checkResult("foo {\n" +
                           "\n" +
                           "}\n");
-    assertOffset(editor, 6);
+    assertOffset(6);
   }
 
   // VIM-275 |d| |v_ib|
   public void testDeleteInnerParensBlockBeforeOpen() {
-    final Editor editor = typeTextInFile(stringToKeys("di)"),
-                                         "foo<caret>(bar)\n");
+    typeTextInFile(stringToKeys("di)"),
+                   "foo<caret>(bar)\n");
     myFixture.checkResult("foo()\n");
-    assertOffset(editor, 4);
+    assertOffset(4);
   }
 
   // |d| |v_ib|
@@ -145,91 +144,81 @@ public class MotionActionTest extends VimTestCase {
 
   // |%|
   public void testPercentMatchSimple() {
-    final Editor editor = typeTextInFile(stringToKeys("%"),
-                                         "foo(b<caret>ar)\n");
-    assertOffset(editor, 3);
+    typeTextInFile(stringToKeys("%"),
+                   "foo(b<caret>ar)\n");
+    assertOffset(3);
   }
 
   // |%|
   public void testPercentMatchMultiLine() {
-    final Editor editor = typeTextInFile(stringToKeys("%"),
-                                         "foo(bar,\n" +
-                                         "    baz,\n" +
-                                         "    <caret>quux)\n");
-    assertOffset(editor, 3);
+    typeTextInFile(stringToKeys("%"),
+                   "foo(bar,\n" +
+                   "    baz,\n" +
+                   "    <caret>quux)\n");
+    assertOffset(3);
   }
 
   // |%|
   public void testPercentMatchParensInString() {
-    final Editor editor = typeTextInFile(stringToKeys("%"),
-                                         "foo(bar, \"foo(bar\", <caret>baz)\n");
-    assertOffset(editor, 3);
+    typeTextInFile(stringToKeys("%"),
+                   "foo(bar, \"foo(bar\", <caret>baz)\n");
+    assertOffset(3);
   }
 
   // |[(|
   public void testUnmatchedOpenParenthesis() {
-    final Editor editor = typeTextInFile(stringToKeys("[("),
-                                         "foo(bar, foo(bar, <caret>baz\n" +
-                                         "bar(foo)\n");
-    assertOffset(editor, 12);
+    typeTextInFile(stringToKeys("[("),
+                   "foo(bar, foo(bar, <caret>baz\n" +
+                   "bar(foo)\n");
+    assertOffset(12);
   }
 
   // |[{|
   public void testUnmatchedOpenBracketMultiLine() {
-    final Editor editor = typeTextInFile(stringToKeys("[{"),
-                                         "foo {\n" +
-                                         "    bar,\n" +
-                                         "    b<caret>az\n");
-    assertOffset(editor, 4);
+    typeTextInFile(stringToKeys("[{"),
+                   "foo {\n" +
+                   "    bar,\n" +
+                   "    b<caret>az\n");
+    assertOffset(4);
   }
 
   // |])|
   public void testUnmatchedCloseParenthesisMultiLine() {
-    final Editor editor = typeTextInFile(stringToKeys("])"),
-                                         "foo(bar, <caret>baz,\n" +
-                                         "   quux)\n");
-    assertOffset(editor, 21);
+    typeTextInFile(stringToKeys("])"),
+                   "foo(bar, <caret>baz,\n" +
+                   "   quux)\n");
+    assertOffset(21);
   }
 
   // |]}|
   public void testUnmatchedCloseBracket() {
-    final Editor editor = typeTextInFile(stringToKeys("]}"),
-                                         "{bar, <caret>baz}\n");
-    assertOffset(editor, 9);
+    typeTextInFile(stringToKeys("]}"),
+                   "{bar, <caret>baz}\n");
+    assertOffset(9);
   }
 
   // VIM-331 |w|
   public void testNonAsciiLettersInWord() {
-    final Editor editor = typeTextInFile(stringToKeys("w"),
-                                         "Če<caret>ská republika");
-    assertOffset(editor, 6);
+    typeTextInFile(stringToKeys("w"),
+                   "Če<caret>ská republika");
+    assertOffset(6);
   }
 
   // |w|
   public void testEmptyLineIsWord() {
-    final Editor editor = typeTextInFile(stringToKeys("w"),
-                                         "<caret>one\n" +
-                                         "\n" +
-                                         "two\n");
-    assertOffset(editor, 4);
+    typeTextInFile(stringToKeys("w"),
+                   "<caret>one\n" +
+                   "\n" +
+                   "two\n");
+    assertOffset(4);
   }
 
   // |w|
   public void testNotEmptyLineIsNotWord() {
-    final Editor editor = typeTextInFile(stringToKeys("w"),
-                                         "<caret>one\n" +
-                                         " \n" +
-                                         "two\n");
-    assertOffset(editor, 6);
-  }
-
-  public void assertOffset(@NotNull Editor editor, int expectedOffset) {
-    final int offset = editor.getCaretModel().getOffset();
-    assertEquals(expectedOffset, offset);
-  }
-
-  public void assertMode(@NotNull Editor editor, @NotNull CommandState.Mode expectedMode) {
-    final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
-    assertEquals(expectedMode, mode);
+    typeTextInFile(stringToKeys("w"),
+                   "<caret>one\n" +
+                   " \n" +
+                   "two\n");
+    assertOffset(6);
   }
 }
