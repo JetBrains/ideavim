@@ -27,7 +27,7 @@ public class SearchHelperTest {
     String text = "first second";
     int nextWordPosition = SearchHelper.findNextWord(text, 0, text.length(), 3, true, false);
 
-    assertEquals(nextWordPosition, text.indexOf("second"));
+    assertEquals(nextWordPosition, text.length());
   }
 
   @Test

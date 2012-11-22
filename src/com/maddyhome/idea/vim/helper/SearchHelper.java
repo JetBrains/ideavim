@@ -473,6 +473,9 @@ public class SearchHelper {
     else if (pos <= 0) {
       res = 0;
     }
+    else if (pos >= size) {
+      res = size;
+    }
 
     return res;
   }
