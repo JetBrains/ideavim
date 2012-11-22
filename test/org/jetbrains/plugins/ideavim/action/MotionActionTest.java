@@ -221,4 +221,11 @@ public class MotionActionTest extends VimTestCase {
                    "two\n");
     assertOffset(6);
   }
+
+  // VIM-312 |w|
+  public void testLastWord() {
+    typeTextInFile(stringToKeys("w"),
+                   "<caret>one\n");
+    assertOffset(2);
+  }
 }

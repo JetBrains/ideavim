@@ -595,13 +595,16 @@ public class MotionGroup extends AbstractActionGroup {
    * @return position
    */
   public int moveCaretToNextWord(Editor editor, int count, boolean bigWord) {
-    if ((editor.getCaretModel().getOffset() == 0 && count < 0) ||
-        (editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
+    final int offset = editor.getCaretModel().getOffset();
+    final int size = EditorHelper.getFileSize(editor);
+    if ((offset == 0 && count < 0) || (offset >= size - 1 && count > 0)) {
       return -1;
     }
-    else {
-      return SearchHelper.findNextWord(editor, count, bigWord);
-    }
+    return normalize(SearchHelper.findNextWord(editor, count, bigWord), size);
+  }
+
+  private static int normalize(int pos, int size) {
+    return Math.max(0, Math.min(size - 1, pos));
   }
 
   /**
