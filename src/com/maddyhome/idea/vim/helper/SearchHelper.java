@@ -139,7 +139,7 @@ public class SearchHelper {
   }
 
   /**
-   * This looks on the current line, starting at the cursor postion for one of {, }, (, ), [, or ]. It then searches
+   * This looks on the current line, starting at the cursor position for one of {, }, (, ), [, or ]. It then searches
    * forward or backward, as appropriate for the associated match pair. String in double quotes are skipped over.
    * Single characters in single quotes are skipped too.
    *
@@ -386,28 +386,31 @@ public class SearchHelper {
   }
 
   /**
-   * This finds the offset to the start of the next/previous word/WORD.
+   * Find the offset to the start of the next/previous word/WORD.
+   *
+   * This function always returns a non-negative position according to the definition of 'next/previous word'
+   * in Vim. For example, for the last word the end of file position is returned.
    *
    * @param editor   The editor to find the words in
    * @param count    The number of words to skip. Negative for backward searches
-   * @param skipPunc If true then find WORD, if false then find word
+   * @param bigWord  Find WORD, as opposed to word
    * @return The offset of the match
    */
-  public static int findNextWord(Editor editor, int count, boolean skipPunc) {
+  public static int findNextWord(Editor editor, int count, boolean bigWord) {
     CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = editor.getCaretModel().getOffset();
     int size = EditorHelper.getFileSize(editor);
 
-    return findNextWord(chars, pos, size, count, skipPunc, false);
+    return findNextWord(chars, pos, size, count, bigWord, false);
   }
 
-  public static int findNextWord(CharSequence chars, int pos, int size, int count, boolean skipPunc, boolean spaceWords) {
+  public static int findNextWord(CharSequence chars, int pos, int size, int count, boolean bigWord, boolean spaceWords) {
     int step = count >= 0 ? 1 : -1;
     count = Math.abs(count);
 
     int res = pos;
     for (int i = 0; i < count; i++) {
-      res = findNextWordOne(chars, res, size, step, skipPunc, spaceWords);
+      res = findNextWordOne(chars, res, size, step, bigWord, spaceWords);
       if (res == pos || res == 0 || res == size - 1) {
         break;
       }
@@ -416,15 +419,15 @@ public class SearchHelper {
     return res;
   }
 
-  private static int findNextWordOne(CharSequence chars, int pos, int size, int step, boolean skipPunc, boolean spaceWords) {
+  private static int findNextWordOne(CharSequence chars, int pos, int size, int step, boolean bigWord, boolean spaceWords) {
     boolean found = false;
     pos = pos < size ? pos : size - 1;
     // For back searches, skip any current whitespace so we start at the end of a word
     if (step < 0 && pos > 0) {
-      if (CharacterHelper.charType(chars.charAt(pos - 1), skipPunc) == CharacterHelper.TYPE_SPACE && !spaceWords) {
+      if (CharacterHelper.charType(chars.charAt(pos - 1), bigWord) == CharacterHelper.TYPE_SPACE && !spaceWords) {
         pos = skipSpace(chars, pos - 1, step, size) + 1;
       }
-      if (CharacterHelper.charType(chars.charAt(pos), skipPunc) != CharacterHelper.charType(chars.charAt(pos - 1), skipPunc)) {
+      if (CharacterHelper.charType(chars.charAt(pos), bigWord) != CharacterHelper.charType(chars.charAt(pos - 1), bigWord)) {
         pos += step;
       }
     }
@@ -433,14 +436,14 @@ public class SearchHelper {
       return pos;
     }
 
-    int type = CharacterHelper.charType(chars.charAt(pos), skipPunc);
+    int type = CharacterHelper.charType(chars.charAt(pos), bigWord);
     if (type == CharacterHelper.TYPE_SPACE && step < 0 && pos > 0 && !spaceWords) {
-      type = CharacterHelper.charType(chars.charAt(pos - 1), skipPunc);
+      type = CharacterHelper.charType(chars.charAt(pos - 1), bigWord);
     }
 
     pos += step;
     while (pos >= 0 && pos < size && !found) {
-      int newType = CharacterHelper.charType(chars.charAt(pos), skipPunc);
+      int newType = CharacterHelper.charType(chars.charAt(pos), bigWord);
       if (newType != type) {
         if (newType == CharacterHelper.TYPE_SPACE && step >= 0 && !spaceWords) {
           pos = skipSpace(chars, pos, step, size);
@@ -453,7 +456,7 @@ public class SearchHelper {
           res = pos;
         }
 
-        type = CharacterHelper.charType(chars.charAt(res), skipPunc);
+        type = CharacterHelper.charType(chars.charAt(res), bigWord);
         found = true;
       }
 
@@ -792,25 +795,25 @@ public class SearchHelper {
    *
    * @param editor   The editor to search in
    * @param count    The number of words to skip. Negative for backward searches
-   * @param skipPunc If true then find WORD, if false then find word
+   * @param bigWord  If true then find WORD, if false then find word
    * @return The offset of match
    */
-  public static int findNextWordEnd(Editor editor, int count, boolean skipPunc, boolean stayEnd) {
+  public static int findNextWordEnd(Editor editor, int count, boolean bigWord, boolean stayEnd) {
     CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = editor.getCaretModel().getOffset();
     int size = EditorHelper.getFileSize(editor);
 
-    return findNextWordEnd(chars, pos, size, count, skipPunc, stayEnd, false);
+    return findNextWordEnd(chars, pos, size, count, bigWord, stayEnd, false);
   }
 
-  public static int findNextWordEnd(CharSequence chars, int pos, int size, int count, boolean skipPunc, boolean stayEnd,
+  public static int findNextWordEnd(CharSequence chars, int pos, int size, int count, boolean bigWord, boolean stayEnd,
                                     boolean spaceWords) {
     int step = count >= 0 ? 1 : -1;
     count = Math.abs(count);
 
     int res = pos;
     for (int i = 0; i < count; i++) {
-      res = findNextWordEndOne(chars, res, size, step, skipPunc, stayEnd, spaceWords);
+      res = findNextWordEndOne(chars, res, size, step, bigWord, stayEnd, spaceWords);
       if (res == pos || res == 0 || res == size - 1) {
         break;
       }
@@ -819,7 +822,7 @@ public class SearchHelper {
     return res;
   }
 
-  private static int findNextWordEndOne(CharSequence chars, int pos, int size, int step, boolean skipPunc, boolean stayEnd,
+  private static int findNextWordEndOne(CharSequence chars, int pos, int size, int step, boolean bigWord, boolean stayEnd,
                                         boolean spaceWords) {
     boolean found = false;
     // For forward searches, skip any current whitespace so we start at the start of a word
@@ -834,10 +837,10 @@ public class SearchHelper {
           pos = skipSpace(chars, pos, step, size);
       }
       */
-      if (CharacterHelper.charType(chars.charAt(pos + 1), skipPunc) == CharacterHelper.TYPE_SPACE && !spaceWords) {
+      if (CharacterHelper.charType(chars.charAt(pos + 1), bigWord) == CharacterHelper.TYPE_SPACE && !spaceWords) {
         pos = skipSpace(chars, pos + 1, step, size) - 1;
       }
-      if (pos < size - 1 && CharacterHelper.charType(chars.charAt(pos), skipPunc) != CharacterHelper.charType(chars.charAt(pos + 1), skipPunc)) {
+      if (pos < size - 1 && CharacterHelper.charType(chars.charAt(pos), bigWord) != CharacterHelper.charType(chars.charAt(pos + 1), bigWord)) {
         pos += step;
       }
     }
@@ -845,14 +848,14 @@ public class SearchHelper {
     if (pos < 0 || pos >= size) {
       return pos;
     }
-    int type = CharacterHelper.charType(chars.charAt(pos), skipPunc);
+    int type = CharacterHelper.charType(chars.charAt(pos), bigWord);
     if (type == CharacterHelper.TYPE_SPACE && step >= 0 && pos < size - 1 && !spaceWords) {
-      type = CharacterHelper.charType(chars.charAt(pos + 1), skipPunc);
+      type = CharacterHelper.charType(chars.charAt(pos + 1), bigWord);
     }
 
     pos += step;
     while (pos >= 0 && pos < size && !found) {
-      int newType = CharacterHelper.charType(chars.charAt(pos), skipPunc);
+      int newType = CharacterHelper.charType(chars.charAt(pos), bigWord);
       if (newType != type) {
         if (step >= 0) {
           res = pos - 1;
@@ -910,10 +913,10 @@ public class SearchHelper {
   }
 
   /**
-   * This locates the position with the document of the count'th occurence of ch on the current line
+   * This locates the position with the document of the count-th occurrence of ch on the current line
    *
    * @param editor The editor to search in
-   * @param count  The number of occurences of ch to locate. Negative for backward searches
+   * @param count  The number of occurrences of ch to locate. Negative for backward searches
    * @param ch     The character on the line to find
    * @return The document offset of the matching character match, -1
    */

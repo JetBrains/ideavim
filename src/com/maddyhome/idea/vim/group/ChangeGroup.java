@@ -1005,7 +1005,7 @@ public class ChangeGroup extends AbstractActionGroup {
     // Vim treats cw as ce and cW as cE if cursor is on a non-blank character
     String id = ActionManager.getInstance().getId(argument.getMotion().getAction());
     boolean kludge = false;
-    boolean skipPunc = false;
+    boolean bigWord = false;
     if (id.equals("VimMotionWordRight")) {
       if (EditorHelper.getFileSize(editor) > 0 &&
           !Character.isWhitespace(editor.getDocument().getCharsSequence().charAt(editor.getCaretModel().getOffset()))) {
@@ -1018,7 +1018,7 @@ public class ChangeGroup extends AbstractActionGroup {
       if (EditorHelper.getFileSize(editor) > 0 &&
           !Character.isWhitespace(editor.getDocument().getCharsSequence().charAt(editor.getCaretModel().getOffset()))) {
         kludge = true;
-        skipPunc = true;
+        bigWord = true;
         argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionBigWordEndRight"));
         argument.getMotion().setFlags(Command.FLAG_MOT_INCLUSIVE);
       }
@@ -1036,8 +1036,8 @@ public class ChangeGroup extends AbstractActionGroup {
       int pos = editor.getCaretModel().getOffset();
       int size = EditorHelper.getFileSize(editor);
       int cnt = count * argument.getMotion().getCount();
-      int pos1 = SearchHelper.findNextWordEnd(editor.getDocument().getCharsSequence(), pos, size, cnt, skipPunc, false, false);
-      int pos2 = SearchHelper.findNextWordEnd(editor.getDocument().getCharsSequence(), pos1, size, -cnt, skipPunc, false, false);
+      int pos1 = SearchHelper.findNextWordEnd(editor.getDocument().getCharsSequence(), pos, size, cnt, bigWord, false, false);
+      int pos2 = SearchHelper.findNextWordEnd(editor.getDocument().getCharsSequence(), pos1, size, -cnt, bigWord, false, false);
       if (logger.isDebugEnabled()) {
         logger.debug("pos=" + pos);
         logger.debug("pos1=" + pos1);

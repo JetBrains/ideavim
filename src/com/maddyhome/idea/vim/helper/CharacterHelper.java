@@ -56,19 +56,19 @@ public class CharacterHelper {
   /**
    * This returns the type of the supplied character. The logic is as follows:<br>
    * If the character is whitespace, <code>TYPE_SPACE</code> is returned.<br>
-   * If the punction is being skipped or the character is a letter, digit, or underscore, <code>TYPE_CHAR</code>
+   * If the punctuation is being skipped or the character is a letter, digit, or underscore, <code>TYPE_CHAR</code>
    * is returned.<br>
    * Otherwise <code>TYPE_PUNC</code> is returned.
    *
-   * @param ch       The character to analyze
-   * @param skipPunc True if punctuation is to be ignored, false if not
+   * @param ch                The character to analyze
+   * @param punctuationAsChar True if punctuation is to be ignored, false if not
    * @return The type of the character
    */
-  public static int charType(char ch, boolean skipPunc) {
+  public static int charType(char ch, boolean punctuationAsChar) {
     if (Character.isWhitespace(ch)) {
       return TYPE_SPACE;
     }
-    else if (skipPunc || isHalfAlphaNum(ch) || ch == '_') {
+    else if (punctuationAsChar || isHalfAlphaNum(ch) || ch == '_') {
       return TYPE_CHAR;
     }
     else if (isHalfSymbol(ch)) {

@@ -591,16 +591,16 @@ public class MotionGroup extends AbstractActionGroup {
    *
    * @param editor   The editor to move in
    * @param count    The number of words to skip
-   * @param skipPunc If true then find WORD, if false then find word
+   * @param bigWord  If true then find WORD, if false then find word
    * @return position
    */
-  public int moveCaretToNextWord(Editor editor, int count, boolean skipPunc) {
+  public int moveCaretToNextWord(Editor editor, int count, boolean bigWord) {
     if ((editor.getCaretModel().getOffset() == 0 && count < 0) ||
         (editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
       return -1;
     }
     else {
-      return SearchHelper.findNextWord(editor, count, skipPunc);
+      return SearchHelper.findNextWord(editor, count, bigWord);
     }
   }
 
@@ -609,10 +609,10 @@ public class MotionGroup extends AbstractActionGroup {
    *
    * @param editor   The editor to move in
    * @param count    The number of words to skip
-   * @param skipPunc If true then find WORD, if false then find word
+   * @param bigWord  If true then find WORD, if false then find word
    * @return position
    */
-  public int moveCaretToNextWordEnd(Editor editor, int count, boolean skipPunc) {
+  public int moveCaretToNextWordEnd(Editor editor, int count, boolean bigWord) {
     if ((editor.getCaretModel().getOffset() == 0 && count < 0) ||
         (editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
       return -1;
@@ -622,7 +622,7 @@ public class MotionGroup extends AbstractActionGroup {
     // word if the cursor happens to be on the end of a word already. If this is a normal move, we don't count
     // the current word.
     boolean stay = CommandState.getInstance(editor).getCommand().getType() == Command.Type.CHANGE;
-    int pos = SearchHelper.findNextWordEnd(editor, count, skipPunc, stay);
+    int pos = SearchHelper.findNextWordEnd(editor, count, bigWord, stay);
     if (pos == -1) {
       if (count < 0) {
         return moveCaretToLineStart(editor, 0);
@@ -745,7 +745,7 @@ public class MotionGroup extends AbstractActionGroup {
   /**
    * This moves the caret to the next/previous matching character on the current line
    *
-   * @param count  The number of occurences to move to
+   * @param count  The number of occurrences to move to
    * @param ch     The character to search for
    * @param editor The editor to search in
    * @return True if [count] character matches were found, false if not
@@ -764,7 +764,7 @@ public class MotionGroup extends AbstractActionGroup {
   /**
    * This moves the caret next to the next/previous matching character on the current line
    *
-   * @param count  The number of occurences to move to
+   * @param count  The number of occurrences to move to
    * @param ch     The character to search for
    * @param editor The editor to search in
    * @return True if [count] character matches were found, false if not
