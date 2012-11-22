@@ -198,6 +198,30 @@ public class MotionActionTest extends VimTestCase {
     assertOffset(editor, 9);
   }
 
+  // VIM-331 |w|
+  public void testNonAsciiLettersInWord() {
+    final Editor editor = typeTextInFile(stringToKeys("w"),
+                                         "Če<caret>ská republika");
+    assertOffset(editor, 6);
+  }
+
+  // |w|
+  public void testEmptyLineIsWord() {
+    final Editor editor = typeTextInFile(stringToKeys("w"),
+                                         "<caret>one\n" +
+                                         "\n" +
+                                         "two\n");
+    assertOffset(editor, 4);
+  }
+
+  // |w|
+  public void testNotEmptyLineIsNotWord() {
+    final Editor editor = typeTextInFile(stringToKeys("w"),
+                                         "<caret>one\n" +
+                                         " \n" +
+                                         "two\n");
+    assertOffset(editor, 6);
+  }
 
   public void assertOffset(@NotNull Editor editor, int expectedOffset) {
     final int offset = editor.getCaretModel().getOffset();

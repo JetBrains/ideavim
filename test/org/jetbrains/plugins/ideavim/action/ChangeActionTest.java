@@ -99,6 +99,56 @@ public class ChangeActionTest extends VimTestCase {
            "four\n");
   }
 
+  // VIM-312 |d| |w|
+  public void testDeleteLastWordInFile() {
+    doTest(stringToKeys("dw"),
+           "<caret>hello\n",
+           "\n");
+  }
+
+  // |d| |w|
+  public void testDeleteLastWordBeforeEOL() {
+    doTest(stringToKeys("dw"),
+           "one <caret>two\n" +
+           "three\n",
+           "one \n" +
+           "three\n");
+  }
+
+  // VIM-105 |d| |w|
+  public void testDeleteLastWordBeforeEOLs() {
+    doTest(stringToKeys("dw"),
+           "one <caret>two\n" +
+           "\n" +
+           "three\n",
+           "one \n" +
+           "\n" +
+           "three\n");
+  }
+
+  // VIM-105 |d| |w|
+  public void testDeleteLastWordBeforeEOLAndWhitespace() {
+    doTest(stringToKeys("dw"),
+           "one <caret>two\n" +
+           " three\n",
+           "one \n" +
+           " three\n");
+  }
+
+  // VIM-200 |c| |w|
+  public void testChangeWordAtLastChar() {
+    doTest(stringToKeys("cw"),
+           "on<caret>e two three\n",
+           "on two three\n");
+  }
+
+  // VIM-300 |c| |w|
+  public void testChangeWordTwoWordsWithoutWhitespace() {
+    doTest(stringToKeys("cw"),
+           "<caret>$value\n",
+           "value\n");
+  }
+
   private void doTest(final List<KeyStroke> keys, String before, String after) {
     myFixture.configureByText("a.java", before);
     final Editor editor = myFixture.getEditor();
