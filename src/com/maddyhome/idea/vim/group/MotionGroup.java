@@ -600,11 +600,7 @@ public class MotionGroup extends AbstractActionGroup {
     if ((offset == 0 && count < 0) || (offset >= size - 1 && count > 0)) {
       return -1;
     }
-    return normalize(SearchHelper.findNextWord(editor, count, bigWord), size);
-  }
-
-  private static int normalize(int pos, int size) {
-    return Math.max(0, Math.min(size - 1, pos));
+    return SearchHelper.findNextWord(editor, count, bigWord);
   }
 
   /**

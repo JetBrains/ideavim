@@ -102,8 +102,11 @@ public class ChangeActionTest extends VimTestCase {
   // VIM-312 |d| |w|
   public void testDeleteLastWordInFile() {
     doTest(stringToKeys("dw"),
-           "<caret>hello\n",
+           "one\n" +
+           "<caret>two\n",
+           "one\n" +
            "\n");
+    assertOffset(4);
   }
 
   // |d| |w|

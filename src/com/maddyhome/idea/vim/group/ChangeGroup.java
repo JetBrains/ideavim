@@ -811,10 +811,9 @@ public class ChangeGroup extends AbstractActionGroup {
     else {
       boolean res = deleteText(editor, context, range, type);
 
-      if (res && editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) &&
-          editor.getCaretModel().getOffset() != 0 && !isChange) {
-        MotionGroup.moveCaret(editor,
-                              CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeadingOffset(editor, -1));
+      final int size = EditorHelper.getFileSize(editor);
+      if (res && editor.getCaretModel().getOffset() > size) {
+        MotionGroup.moveCaret(editor, size - 1);
       }
       else if (res && (range.isMultiple() || !isChange)) {
         MotionGroup.moveCaret(editor, range.getStartOffset());
