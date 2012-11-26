@@ -892,20 +892,27 @@ public class SearchHelper {
   }
 
   /**
-   * This skips whitespace starting with the supplied position.
+   * Skip whitespace starting with the supplied position.
+   *
+   * An empty line is considered a whitespace break.
    *
    * @param chars  The text as a character array
    * @param offset The starting position
    * @param step   The direction to move
    * @param size   The size of the document
-   * @return The new position. This will be the first non-whitespace character found
+   * @return The new position. This will be the first non-whitespace character found or an empty line
    */
   public static int skipSpace(CharSequence chars, int offset, int step, int size) {
+    char prev = 0;
     while (offset >= 0 && offset < size) {
-      if (CharacterHelper.charType(chars.charAt(offset), false) != CharacterHelper.TYPE_SPACE) {
+      final char c = chars.charAt(offset);
+      if (c == '\n' && c == prev) {
         break;
       }
-
+      if (CharacterHelper.charType(c, false) != CharacterHelper.TYPE_SPACE) {
+        break;
+      }
+      prev = c;
       offset += step;
     }
 
