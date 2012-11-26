@@ -10,6 +10,8 @@ import com.maddyhome.idea.vim.VimPlugin;
 import javax.swing.*;
 import java.util.ArrayList;
 
+import static com.maddyhome.idea.vim.VimKeyMapUtil.VIM_KEYMAP_NAME;
+
 /**
  * @author oleg
  */
@@ -23,12 +25,12 @@ public class VimKeymapPanel {
     Keymap preselectedKeymap = null;
     for (Keymap keymap : manager.getAllKeymaps()) {
       final String name = keymap.getName();
-      if (!"Vim".equals(name) && matchesPlatform(keymap)) {
-      if (name.equals(parentKeymap)) {
-        preselectedKeymap = keymap;
-      }
-        keymaps.add(keymap);
-      }
+      if (!VIM_KEYMAP_NAME.equals(name) && matchesPlatform(keymap)) {
+        if (name.equals(parentKeymap)) {
+          preselectedKeymap = keymap;
+        }
+          keymaps.add(keymap);
+        }
     }
 
     myKeymapComboBox.setModel(new DefaultComboBoxModel(keymaps.toArray(new Keymap[keymaps.size()])));
