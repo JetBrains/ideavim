@@ -71,7 +71,7 @@
     </taskdef>
     <!-- The task requires the following libraries from IntelliJ IDEA distribution: -->
     <!--   javac2.jar; jdom.jar; asm.jar; asm-commons.jar -->
-    <javac2 destdir="${classes}" debug="on" fork="true" includeantruntime="false">
+    <javac2 destdir="${classes}" debug="on" fork="true" encoding="UTF-8" includeantruntime="false">
       <classpath refid="build.classpath"/>
       <src path="${src}"/>
       <include name="com/maddyhome/idea/**"/>
@@ -227,7 +227,7 @@
     <taskdef name="javac2" classname="com.intellij.ant.Javac2">
       <classpath refid="build.classpath"/>
     </taskdef>
-    <javac2 destdir="${classes}" debug="on" fork="true" includeantruntime="false">
+    <javac2 destdir="${classes}" debug="on" fork="true" encoding="UTF-8" includeantruntime="false">
       <classpath refid="build.classpath"/>
       <src path="${test}"/>
       <include name="org/jetbrains/plugins/ideavim/**"/>
