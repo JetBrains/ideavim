@@ -267,6 +267,13 @@ public class MotionActionTest extends VimTestCase {
     assertOffset(3);
   }
 
+  // VIM-58 |w|
+  public void testHalftWidthKanaToLetters() {
+    typeTextInFile(stringToKeys("w"),
+                   "ｳｳｳAAA");
+    assertOffset(3);
+  }
+
   // |w|
   public void testEmptyLineIsWord() {
     typeTextInFile(stringToKeys("w"),

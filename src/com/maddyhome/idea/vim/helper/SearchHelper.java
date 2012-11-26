@@ -424,7 +424,7 @@ public class SearchHelper {
     pos = pos < size ? pos : size - 1;
     // For back searches, skip any current whitespace so we start at the end of a word
     if (step < 0 && pos > 0) {
-      if (CharacterHelper.charType(chars.charAt(pos - 1), bigWord) == CharacterHelper.TYPE_SPACE && !spaceWords) {
+      if (CharacterHelper.charType(chars.charAt(pos - 1), bigWord) == CharacterHelper.CharacterType.WHITESPACE && !spaceWords) {
         pos = skipSpace(chars, pos - 1, step, size) + 1;
       }
       if (CharacterHelper.charType(chars.charAt(pos), bigWord) != CharacterHelper.charType(chars.charAt(pos - 1), bigWord)) {
@@ -436,16 +436,16 @@ public class SearchHelper {
       return pos;
     }
 
-    int type = CharacterHelper.charType(chars.charAt(pos), bigWord);
-    if (type == CharacterHelper.TYPE_SPACE && step < 0 && pos > 0 && !spaceWords) {
+    CharacterHelper.CharacterType type = CharacterHelper.charType(chars.charAt(pos), bigWord);
+    if (type == CharacterHelper.CharacterType.WHITESPACE && step < 0 && pos > 0 && !spaceWords) {
       type = CharacterHelper.charType(chars.charAt(pos - 1), bigWord);
     }
 
     pos += step;
     while (pos >= 0 && pos < size && !found) {
-      int newType = CharacterHelper.charType(chars.charAt(pos), bigWord);
+      CharacterHelper.CharacterType newType = CharacterHelper.charType(chars.charAt(pos), bigWord);
       if (newType != type) {
-        if (newType == CharacterHelper.TYPE_SPACE && step >= 0 && !spaceWords) {
+        if (newType == CharacterHelper.CharacterType.WHITESPACE && step >= 0 && !spaceWords) {
           pos = skipSpace(chars, pos, step, size);
           res = pos;
         }
@@ -621,10 +621,13 @@ public class SearchHelper {
 
     int pos = editor.getCaretModel().getOffset();
     int start = pos;
-    int[] types = new int[]{CharacterHelper.TYPE_CHAR, CharacterHelper.TYPE_PUNC};
+    CharacterHelper.CharacterType[] types = new CharacterHelper.CharacterType[] {
+      CharacterHelper.CharacterType.LETTER_OR_DIGIT,
+      CharacterHelper.CharacterType.PUNCTUATION
+    };
     for (int i = 0; i < 2; i++) {
       start = pos;
-      int type = CharacterHelper.charType(chars.charAt(start), false);
+      CharacterHelper.CharacterType type = CharacterHelper.charType(chars.charAt(start), false);
       if (type == types[i]) {
         // Search back for start of word
         while (start > 0 && CharacterHelper.charType(chars.charAt(start - 1), false) == types[i]) {
@@ -649,7 +652,7 @@ public class SearchHelper {
 
     int end;
     // Special case 1 character words because 'findNextWordEnd' returns one to many chars
-    if (start < stop && CharacterHelper.charType(chars.charAt(start + 1), false) != CharacterHelper.TYPE_CHAR) {
+    if (start < stop && CharacterHelper.charType(chars.charAt(start + 1), false) != CharacterHelper.CharacterType.LETTER_OR_DIGIT) {
       end = start + 1;
     }
     else {
@@ -680,7 +683,7 @@ public class SearchHelper {
     }
 
     int pos = editor.getCaretModel().getOffset();
-    boolean startSpace = CharacterHelper.charType(chars.charAt(pos), isBig) == CharacterHelper.TYPE_SPACE;
+    boolean startSpace = CharacterHelper.charType(chars.charAt(pos), isBig) == CharacterHelper.CharacterType.WHITESPACE;
     // Find word start
     boolean onWordStart = pos == min ||
                           CharacterHelper.charType(chars.charAt(pos - 1), isBig) != CharacterHelper.charType(chars.charAt(pos), isBig);
@@ -733,14 +736,14 @@ public class SearchHelper {
         firstEnd = findNextWordEnd(chars, pos, max, 1, isBig, true, false);
       }
       if (firstEnd < max) {
-        if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.TYPE_SPACE) {
+        if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
           goBack = true;
         }
       }
     }
     if (dir == -1 && isOuter && startSpace) {
       if (pos > min) {
-        if (CharacterHelper.charType(chars.charAt(pos - 1), false) != CharacterHelper.TYPE_SPACE) {
+        if (CharacterHelper.charType(chars.charAt(pos - 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
           goBack = true;
         }
       }
@@ -753,7 +756,7 @@ public class SearchHelper {
         firstEnd = findNextWordEnd(chars, pos, max, 1, isBig, true, false);
       }
       if (firstEnd < max) {
-        if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.TYPE_SPACE) {
+        if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
           goForward = true;
         }
       }
@@ -772,12 +775,12 @@ public class SearchHelper {
     }
 
     if (goForward) {
-      while (end < max && CharacterHelper.charType(chars.charAt(end + 1), false) == CharacterHelper.TYPE_SPACE) {
+      while (end < max && CharacterHelper.charType(chars.charAt(end + 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
         end++;
       }
     }
     if (goBack) {
-      while (start > min && CharacterHelper.charType(chars.charAt(start - 1), false) == CharacterHelper.TYPE_SPACE) {
+      while (start > min && CharacterHelper.charType(chars.charAt(start - 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
         start--;
       }
     }
@@ -828,7 +831,7 @@ public class SearchHelper {
     // For forward searches, skip any current whitespace so we start at the start of a word
     if (step > 0 && pos < size - 1) {
       /*
-      if (CharacterHelper.charType(chars[pos + step], false) == CharacterHelper.TYPE_SPACE)
+      if (CharacterHelper.charType(chars[pos + step], false) == CharacterHelper.WHITESPACE)
       {
           if (!stayEnd)
           {
@@ -837,7 +840,7 @@ public class SearchHelper {
           pos = skipSpace(chars, pos, step, size);
       }
       */
-      if (CharacterHelper.charType(chars.charAt(pos + 1), bigWord) == CharacterHelper.TYPE_SPACE && !spaceWords) {
+      if (CharacterHelper.charType(chars.charAt(pos + 1), bigWord) == CharacterHelper.CharacterType.WHITESPACE && !spaceWords) {
         pos = skipSpace(chars, pos + 1, step, size) - 1;
       }
       if (pos < size - 1 && CharacterHelper.charType(chars.charAt(pos), bigWord) != CharacterHelper.charType(chars.charAt(pos + 1), bigWord)) {
@@ -848,19 +851,19 @@ public class SearchHelper {
     if (pos < 0 || pos >= size) {
       return pos;
     }
-    int type = CharacterHelper.charType(chars.charAt(pos), bigWord);
-    if (type == CharacterHelper.TYPE_SPACE && step >= 0 && pos < size - 1 && !spaceWords) {
+    CharacterHelper.CharacterType type = CharacterHelper.charType(chars.charAt(pos), bigWord);
+    if (type == CharacterHelper.CharacterType.WHITESPACE && step >= 0 && pos < size - 1 && !spaceWords) {
       type = CharacterHelper.charType(chars.charAt(pos + 1), bigWord);
     }
 
     pos += step;
     while (pos >= 0 && pos < size && !found) {
-      int newType = CharacterHelper.charType(chars.charAt(pos), bigWord);
+      CharacterHelper.CharacterType newType = CharacterHelper.charType(chars.charAt(pos), bigWord);
       if (newType != type) {
         if (step >= 0) {
           res = pos - 1;
         }
-        else if (newType == CharacterHelper.TYPE_SPACE && step < 0 && !spaceWords) {
+        else if (newType == CharacterHelper.CharacterType.WHITESPACE && step < 0 && !spaceWords) {
           pos = skipSpace(chars, pos, step, size);
           res = pos;
         }
@@ -909,7 +912,7 @@ public class SearchHelper {
       if (c == '\n' && c == prev) {
         break;
       }
-      if (CharacterHelper.charType(c, false) != CharacterHelper.TYPE_SPACE) {
+      if (CharacterHelper.charType(c, false) != CharacterHelper.CharacterType.WHITESPACE) {
         break;
       }
       prev = c;

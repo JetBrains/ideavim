@@ -1334,7 +1334,7 @@ public class ChangeGroup extends AbstractActionGroup {
             int weoff = editor.logicalPositionToOffset(epos);
             int pos;
             for (pos = wsoff; pos <= weoff; pos++) {
-              if (CharacterHelper.charType(chars.charAt(pos), false) != CharacterHelper.TYPE_SPACE) {
+              if (CharacterHelper.charType(chars.charAt(pos), false) != CharacterHelper.CharacterType.WHITESPACE) {
                 break;
               }
             }
