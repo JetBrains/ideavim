@@ -204,6 +204,69 @@ public class MotionActionTest extends VimTestCase {
     assertOffset(6);
   }
 
+  // VIM-58 |w|
+  public void testHiraganaToPunctuation() {
+    typeTextInFile(stringToKeys("w"),
+                   "は<caret>はは!!!");
+    assertOffset(3);
+  }
+
+  // VIM-58 |w|
+  public void testHiraganaToFullWidthPunctuation() {
+    typeTextInFile(stringToKeys("w"),
+                   "は<caret>はは！！！");
+    assertOffset(3);
+  }
+
+  // VIM-58 |w|
+  public void testKatakanaToHiragana() {
+    typeTextInFile(stringToKeys("w"),
+                   "チ<caret>チチははは");
+    assertOffset(3);
+  }
+
+  // VIM-58 |w|
+  public void testKatakanaToHalfWidthKana() {
+    typeTextInFile(stringToKeys("w"),
+                   "チ<caret>チチｳｳｳ");
+    assertOffset(3);
+  }
+
+  // VIM-58 |w|
+  public void testKatakanaToDigits() {
+    typeTextInFile(stringToKeys("w"),
+                   "チ<caret>チチ123");
+    assertOffset(3);
+  }
+
+  // VIM-58 |w|
+  public void testKatakanaToLetters() {
+    typeTextInFile(stringToKeys("w"),
+                   "チ<caret>チチ123");
+    assertOffset(3);
+  }
+
+  // VIM-58 |w|
+  public void testKatakanaToFullWidthLatin() {
+    typeTextInFile(stringToKeys("w"),
+                   "チ<caret>チチＡＡＡ");
+    assertOffset(3);
+  }
+
+  // VIM-58 |w|
+  public void testKatakanaToFullWidthDigits() {
+    typeTextInFile(stringToKeys("w"),
+                   "チ<caret>チチ３３３");
+    assertOffset(3);
+  }
+
+  // VIM-58 |w|
+  public void testHiraganaToKatakana() {
+    typeTextInFile(stringToKeys("w"),
+                   "は<caret>ははチチチ");
+    assertOffset(3);
+  }
+
   // |w|
   public void testEmptyLineIsWord() {
     typeTextInFile(stringToKeys("w"),
