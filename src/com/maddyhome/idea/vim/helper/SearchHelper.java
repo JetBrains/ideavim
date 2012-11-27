@@ -315,7 +315,11 @@ public class SearchHelper {
     if (end == -1) {
       return null;
     }
-    return new TextRange(isOuter ? start : start + 1, end);
+    if (!isOuter) {
+      start++;
+      end--;
+    }
+    return new TextRange(start, end);
   }
 
   private static boolean checkInString(CharSequence chars, int pos, boolean str) {

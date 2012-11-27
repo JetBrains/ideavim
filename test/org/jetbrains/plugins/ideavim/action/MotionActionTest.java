@@ -287,6 +287,13 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("foo = [\"\", \"two\", \"three\"];\n");
   }
 
+  // VIM-132 |v_i"|
+  public void testInnerDoubleQuotedStringSelection() {
+    typeTextInFile(stringToKeys("vi\""),
+                   "foo = [\"o<caret>ne\", \"two\"];\n");
+    assertSelection("one");
+  }
+
   // |%|
   public void testPercentMatchSimple() {
     typeTextInFile(stringToKeys("%"),
