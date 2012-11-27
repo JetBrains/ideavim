@@ -247,6 +247,48 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("Foo bar\n");
   }
 
+  // VIM-132 |d| |v_i"|
+  public void testDeleteInnerDoubleQuoteString() {
+    typeTextInFile(stringToKeys("di\""),
+                   "foo = \"bar b<caret>az\";\n");
+    myFixture.checkResult("foo = \"\";\n");
+  }
+
+  // VIM-132 |d| |v_a"|
+  public void testDeleteOuterDoubleQuoteString() {
+    typeTextInFile(stringToKeys("da\""),
+                   "foo = \"bar b<caret>az\";\n");
+    myFixture.checkResult("foo = ;\n");
+  }
+
+  // VIM-132 |d| |v_i"|
+  public void testDeleteDoubleQuotedStringStart() {
+    typeTextInFile(stringToKeys("di\""),
+                   "foo = [\"one\", <caret>\"two\", \"three\"];\n");
+    myFixture.checkResult("foo = [\"one\", \"\", \"three\"];\n");
+  }
+
+  // VIM-132 |d| |v_i"|
+  public void testDeleteDoubleQuotedStringEnd() {
+    typeTextInFile(stringToKeys("di\""),
+                   "foo = [\"one\", \"two<caret>\", \"three\"];\n");
+    myFixture.checkResult("foo = [\"one\", \"\", \"three\"];\n");
+  }
+
+  // VIM-132 |d| |v_i"|
+  public void testDeleteDoubleQuotedStringWithEscapes() {
+    typeTextInFile(stringToKeys("di\""),
+                   "foo = \"fo\\\"o b<caret>ar\";\n");
+    myFixture.checkResult("foo = \"\";\n");
+  }
+
+  // VIM-132 |d| |v_i"|
+  public void testDeleteDoubleQuotedStringBefore() {
+    typeTextInFile(stringToKeys("di\""),
+                   "f<caret>oo = [\"one\", \"two\", \"three\"];\n");
+    myFixture.checkResult("foo = [\"\", \"two\", \"three\"];\n");
+  }
+
   // |%|
   public void testPercentMatchSimple() {
     typeTextInFile(stringToKeys("%"),
