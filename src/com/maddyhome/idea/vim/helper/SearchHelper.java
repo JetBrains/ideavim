@@ -27,6 +27,8 @@ import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionChangeEvent;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.Options;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -223,131 +225,97 @@ public class SearchHelper {
     return res;
   }
 
-  private static int findNextQuoteInLine(CharSequence chars, int pos) {
-    return findQuoteInLine(chars, pos, (byte) 1);
+  private enum Direction {
+    BACK(-1),
+    FORWARD(1);
+
+    private final int value;
+
+    private Direction(int i) {
+      value = i;
+    }
+
+    private int toInt() {
+      return value;
+    }
   }
 
-  private static int findPreviousQuoteInLine(CharSequence chars, int pos) {
-    return findQuoteInLine(chars, pos, (byte) -1);
+  private static int findNextQuoteInLine(@NotNull CharSequence chars, int pos) {
+    return findQuoteInLine(chars, pos, Direction.FORWARD);
+  }
+
+  private static int findPreviousQuoteInLine(@NotNull CharSequence chars, int pos) {
+    return findQuoteInLine(chars, pos, Direction.BACK);
   }
   
-  private static int findCurrentLineStart(CharSequence chars, int pos) {
-    return findLineBorder(chars, pos, (byte) -1);
+  private static int findFirstQuoteInLine(@NotNull Editor editor, int pos) {
+    final int start = EditorHelper.getLineStartForOffset(editor, pos);
+    return findNextQuoteInLine(editor.getDocument().getCharsSequence(), start);
   }
 
-  private static int findCurrentLineEnd(CharSequence chars, int pos) {
-    return findLineBorder(chars, pos, (byte) 1);
-  }
-  
-  private static int findFirstQuoteInLine(CharSequence chars, int pos) {
-    int offset = SearchHelper.findCurrentLineStart(chars, pos);
-    return SearchHelper.findNextQuoteInLine(chars, offset);
+  private static int findQuoteInLine(@NotNull CharSequence chars, int pos, @NotNull Direction direction) {
+    return findCharacterPosition(chars, pos, '"', true, false, direction);
   }
 
-  private static int findQuoteInLine(CharSequence chars, int pos, final byte direction) {
-      return findCharacterPosition(chars, pos, '"', true, false, direction);
-  }
-
-  private static int countCharactersInLine(CharSequence chars, int pos, char ch, boolean searchEscaped, final byte direction) {
+  private static int countCharactersInLine(@NotNull CharSequence chars, int pos, char c, boolean searchEscaped,
+                                           @NotNull Direction direction) {
     int cnt = 0;
-    int cPos = pos;
-    while ((cPos!= -1) && (chars.charAt(cPos + direction) != '\n' )) {
-      cPos = SearchHelper.findCharacterPosition(chars, cPos + direction, ch, searchEscaped, true, direction);
-      if (cPos != -1) {
+    while (pos != -1 && (chars.charAt(pos + direction.toInt()) != '\n')) {
+      pos = findCharacterPosition(chars, pos + direction.toInt(), c, searchEscaped, true, direction);
+      if (pos != -1) {
         cnt++;
       }
     }
     return cnt;
   }
 
-  private static int findLineBorder(CharSequence chars, int pos, final byte direction) {
-    if (chars.charAt(pos) == '\n') {
-      if (direction == 1) {
+  private static int findCharacterPosition(CharSequence chars, int pos, final char c, boolean currentLineOnly, boolean searchEscaped,
+                                           @NotNull Direction direction) {
+    while (pos >= 0 && pos < chars.length() && (!currentLineOnly || chars.charAt(pos) != '\n')) {
+      if (chars.charAt(pos) == c && (pos == 0 || searchEscaped || chars.charAt(pos - 1) != '\\')) {
         return pos;
       }
-      else {
-        pos--;
-      }
+      pos += direction.toInt();
     }
-
-    int newlinePosition = findCharacterPosition(chars, pos, '\n', false, false, direction);
-
-    if (newlinePosition == -1) {
-      if (direction == -1) {
-        return 0;
-      }
-      else {
-        return chars.length() > 0 ? chars.length() - 1 : 0;
-      }
-    }
-
-    if (direction == -1) {
-      return newlinePosition + 1;
-    }
-    else {
-      return newlinePosition;
-    }
-  }
-
-  private static int findCharacterPosition(CharSequence chars, int pos, final char ch, final boolean searchInsideCurrentLine, final boolean searchEscaped, final byte direction) {
-    int offset = pos;
-
-    while(offset >= 0 && offset < chars.length() && (!searchInsideCurrentLine || chars.charAt(offset) != '\n') ) {
-      if (chars.charAt(offset) == ch && (offset == 0 || searchEscaped || chars.charAt(offset - 1) != '\\')) {
-        return offset;
-      }
-      offset += direction;
-    }
-
     return -1;
   }
 
+  @Nullable
   public static TextRange findBlockQuoteInLineRange(Editor editor, boolean isOuter) {
-
-    CharSequence chars = editor.getDocument().getCharsSequence();
-    int pos = editor.getCaretModel().getOffset();
-
+    final CharSequence chars = editor.getDocument().getCharsSequence();
+    final int pos = editor.getCaretModel().getOffset();
     if (chars.charAt(pos) == '\n') {
-        return null;
-    }
-
-    int firstQuoteInBlock = SearchHelper.findPreviousQuoteInLine(chars, pos);
-
-    if (firstQuoteInBlock == -1) {
-      firstQuoteInBlock = SearchHelper.findFirstQuoteInLine(chars, pos);
-    }
-
-    if (firstQuoteInBlock == -1 ) {
       return null;
     }
 
-    int currentPosition = (firstQuoteInBlock > pos)?firstQuoteInBlock : pos;
-    int lastQuoteInBlock = currentPosition;
+    int start = findPreviousQuoteInLine(chars, pos);
+    if (start == -1) {
+      start = findFirstQuoteInLine(editor, pos);
+      if (start == -1) {
+        return null;
+      }
+    }
+    final int current = Math.max(start, pos);
+    int end = current;
 
-    if (chars.charAt(pos) == '"' && currentPosition == pos) {
-      int quoteNumberFromCurrentPositionToLineStart = SearchHelper.countCharactersInLine(chars, pos, '"', false, (byte) -1) + 1;
+    if (chars.charAt(pos) == '"' && current == pos) {
+      final int quotes = countCharactersInLine(chars, pos, '"', false, Direction.BACK) + 1;
 
-      if (quoteNumberFromCurrentPositionToLineStart % 2 == 0) {
-        firstQuoteInBlock = SearchHelper.findPreviousQuoteInLine(chars, currentPosition - 1);
+      if (quotes % 2 == 0) {
+        start = findPreviousQuoteInLine(chars, current - 1);
       }
       else {
-        lastQuoteInBlock = SearchHelper.findNextQuoteInLine(chars, currentPosition + 1);
+        end = findNextQuoteInLine(chars, current + 1);
       }
     }
     else {
-      lastQuoteInBlock = SearchHelper.findNextQuoteInLine(chars, currentPosition + 1);
+      end = findNextQuoteInLine(chars, current + 1);
     }
 
-    if (lastQuoteInBlock == -1) {
+    if (end == -1) {
       return null;
     }
-
-    if (isOuter) {
-      return new TextRange(firstQuoteInBlock, lastQuoteInBlock);
-    }
-    else {
-      return new TextRange(firstQuoteInBlock + 1, lastQuoteInBlock);
-    }
+    return new TextRange(isOuter ? start : start + 1, end);
   }
 
   private static boolean checkInString(CharSequence chars, int pos, boolean str) {
