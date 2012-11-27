@@ -223,6 +223,133 @@ public class SearchHelper {
     return res;
   }
 
+  private static int findNextQuoteInLine(CharSequence chars, int pos) {
+    return findQuoteInLine(chars, pos, (byte) 1);
+  }
+
+  private static int findPreviousQuoteInLine(CharSequence chars, int pos) {
+    return findQuoteInLine(chars, pos, (byte) -1);
+  }
+  
+  private static int findCurrentLineStart(CharSequence chars, int pos) {
+    return findLineBorder(chars, pos, (byte) -1);
+  }
+
+  private static int findCurrentLineEnd(CharSequence chars, int pos) {
+    return findLineBorder(chars, pos, (byte) 1);
+  }
+  
+  private static int findFirstQuoteInLine(CharSequence chars, int pos) {
+    int offset = SearchHelper.findCurrentLineStart(chars, pos);
+    return SearchHelper.findNextQuoteInLine(chars, offset);
+  }
+
+  private static int findQuoteInLine(CharSequence chars, int pos, final byte direction) {
+      return findCharacterPosition(chars, pos, '"', true, false, direction);
+  }
+
+  private static int countCharactersInLine(CharSequence chars, int pos, char ch, boolean searchEscaped, final byte direction) {
+    int cnt = 0;
+    int cPos = pos;
+    while ((cPos!= -1) && (chars.charAt(cPos + direction) != '\n' )) {
+      cPos = SearchHelper.findCharacterPosition(chars, cPos + direction, ch, searchEscaped, true, direction);
+      if (cPos != -1) {
+        cnt++;
+      }
+    }
+    return cnt;
+  }
+
+  private static int findLineBorder(CharSequence chars, int pos, final byte direction) {
+    if (chars.charAt(pos) == '\n') {
+      if (direction == 1) {
+        return pos;
+      }
+      else {
+        pos--;
+      }
+    }
+
+    int newlinePosition = findCharacterPosition(chars, pos, '\n', false, false, direction);
+
+    if (newlinePosition == -1) {
+      if (direction == -1) {
+        return 0;
+      }
+      else {
+        return chars.length() > 0 ? chars.length() - 1 : 0;
+      }
+    }
+
+    if (direction == -1) {
+      return newlinePosition + 1;
+    }
+    else {
+      return newlinePosition;
+    }
+  }
+
+  private static int findCharacterPosition(CharSequence chars, int pos, final char ch, final boolean searchInsideCurrentLine, final boolean searchEscaped, final byte direction) {
+    int offset = pos;
+
+    while(offset >= 0 && offset < chars.length() && (!searchInsideCurrentLine || chars.charAt(offset) != '\n') ) {
+      if (chars.charAt(offset) == ch && (offset == 0 || searchEscaped || chars.charAt(offset - 1) != '\\')) {
+        return offset;
+      }
+      offset += direction;
+    }
+
+    return -1;
+  }
+
+  public static TextRange findBlockQuoteInLineRange(Editor editor, boolean isOuter) {
+
+    CharSequence chars = editor.getDocument().getCharsSequence();
+    int pos = editor.getCaretModel().getOffset();
+
+    if (chars.charAt(pos) == '\n') {
+        return null;
+    }
+
+    int firstQuoteInBlock = SearchHelper.findPreviousQuoteInLine(chars, pos);
+
+    if (firstQuoteInBlock == -1) {
+      firstQuoteInBlock = SearchHelper.findFirstQuoteInLine(chars, pos);
+    }
+
+    if (firstQuoteInBlock == -1 ) {
+      return null;
+    }
+
+    int currentPosition = (firstQuoteInBlock > pos)?firstQuoteInBlock : pos;
+    int lastQuoteInBlock = currentPosition;
+
+    if (chars.charAt(pos) == '"' && currentPosition == pos) {
+      int quoteNumberFromCurrentPositionToLineStart = SearchHelper.countCharactersInLine(chars, pos, '"', false, (byte) -1) + 1;
+
+      if (quoteNumberFromCurrentPositionToLineStart % 2 == 0) {
+        firstQuoteInBlock = SearchHelper.findPreviousQuoteInLine(chars, currentPosition - 1);
+      }
+      else {
+        lastQuoteInBlock = SearchHelper.findNextQuoteInLine(chars, currentPosition + 1);
+      }
+    }
+    else {
+      lastQuoteInBlock = SearchHelper.findNextQuoteInLine(chars, currentPosition + 1);
+    }
+
+    if (lastQuoteInBlock == -1) {
+      return null;
+    }
+
+    if (isOuter) {
+      return new TextRange(firstQuoteInBlock, lastQuoteInBlock);
+    }
+    else {
+      return new TextRange(firstQuoteInBlock + 1, lastQuoteInBlock);
+    }
+  }
+
   private static boolean checkInString(CharSequence chars, int pos, boolean str) {
     int offset = pos;
     while (offset > 0 && chars.charAt(offset) != '\n') {
