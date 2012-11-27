@@ -15,7 +15,7 @@ public class MotionInnerBlockQuoteAction extends TextObjectAction {
 
   private static class Handler extends TextObjectActionHandler {
     public TextRange getRange(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return CommandGroups.getInstance().getMotion().getBlockQuoteRange(editor, context, false);
+      return CommandGroups.getInstance().getMotion().getBlockQuoteRange(editor, false);
     }
   }
 }
