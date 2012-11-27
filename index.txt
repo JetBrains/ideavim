@@ -95,6 +95,8 @@ These can be used after an operator or in Visual mode to select an object.
 
 tag             command            action in op-pending and Visual mode ~
 ------------------------------------------------------------------------------
+|v_aquote|      a"                 double quoted string
+|v_a'|          a'                 single quoted string
 |v_a(|          a(                 same as ab
 |v_a)|          a)                 same as ab
 |v_a<|          a<                 "a <>" from '<' to the matching '>'
@@ -103,12 +105,15 @@ tag             command            action in op-pending and Visual mode ~
 |v_aW|          aW                 "a WORD" (with white space)
 |v_a[|          a[                 "a []" from '[' to the matching ']'
 |v_a]|          a]                 same as a[
+|v_a`|          a`                 string in backticks
 |v_ab|          ab                 "a block" from "[(" to "])" (with braces)
 |v_ap|          ap                 "a paragraph" (with white space)
 |v_as|          as                 "a sentence" (with white space)
 |v_aw|          aw                 "a word" (with white space)
 |v_a{|          a{                 same as aB
 |v_a}|          a}                 same as aB
+|v_iquote|      i"                 double quoted string without the quotes
+|v_i'|          i'                 single quoted string without the quotes
 |v_i(|          i(                 same as ib
 |v_i)|          i)                 same as ib
 |v_i<|          i<                 "inner <>" from '<' to the matching '>'
@@ -117,6 +122,7 @@ tag             command            action in op-pending and Visual mode ~
 |v_iW|          iW                 "inner WORD"
 |v_i[|          i[                 "inner []" from '[' to the matching ']'
 |v_i]|          i]                 same as i[
+|v_i`|          i`                 string in backticks without the backticks
 |v_ib|          ib                 "inner block" from "[(" to "])"
 |v_ip|          ip                 "inner paragraph"
 |v_is|          is                 "inner sentence"
