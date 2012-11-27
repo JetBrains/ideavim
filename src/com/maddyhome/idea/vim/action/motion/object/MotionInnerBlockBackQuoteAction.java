@@ -8,14 +8,14 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.motion.TextObjectActionHandler;
 
-public class MotionOuterBlockQuoteAction extends TextObjectAction {
-  public MotionOuterBlockQuoteAction() {
-    super(new MotionOuterBlockQuoteAction.Handler());
+public class MotionInnerBlockBackQuoteAction extends TextObjectAction {
+  public MotionInnerBlockBackQuoteAction() {
+    super(new MotionInnerBlockBackQuoteAction.Handler());
   }
 
   private static class Handler extends TextObjectActionHandler {
     public TextRange getRange(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return CommandGroups.getInstance().getMotion().getBlockQuoteRange(editor, true);
+      return CommandGroups.getInstance().getMotion().getBlockQuoteRange(editor, '`', false);
     }
   }
 }

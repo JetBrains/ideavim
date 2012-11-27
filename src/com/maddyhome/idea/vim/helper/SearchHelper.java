@@ -240,21 +240,21 @@ public class SearchHelper {
     }
   }
 
-  private static int findNextQuoteInLine(@NotNull CharSequence chars, int pos) {
-    return findQuoteInLine(chars, pos, Direction.FORWARD);
+  private static int findNextQuoteInLine(@NotNull CharSequence chars, int pos, char quote) {
+    return findQuoteInLine(chars, pos, quote, Direction.FORWARD);
   }
 
-  private static int findPreviousQuoteInLine(@NotNull CharSequence chars, int pos) {
-    return findQuoteInLine(chars, pos, Direction.BACK);
+  private static int findPreviousQuoteInLine(@NotNull CharSequence chars, int pos, char quote) {
+    return findQuoteInLine(chars, pos, quote, Direction.BACK);
   }
   
-  private static int findFirstQuoteInLine(@NotNull Editor editor, int pos) {
+  private static int findFirstQuoteInLine(@NotNull Editor editor, int pos, char quote) {
     final int start = EditorHelper.getLineStartForOffset(editor, pos);
-    return findNextQuoteInLine(editor.getDocument().getCharsSequence(), start);
+    return findNextQuoteInLine(editor.getDocument().getCharsSequence(), start, quote);
   }
 
-  private static int findQuoteInLine(@NotNull CharSequence chars, int pos, @NotNull Direction direction) {
-    return findCharacterPosition(chars, pos, '"', true, false, direction);
+  private static int findQuoteInLine(@NotNull CharSequence chars, int pos, char quote, @NotNull Direction direction) {
+    return findCharacterPosition(chars, pos, quote, true, false, direction);
   }
 
   private static int countCharactersInLine(@NotNull CharSequence chars, int pos, char c, boolean searchEscaped,
@@ -281,16 +281,16 @@ public class SearchHelper {
   }
 
   @Nullable
-  public static TextRange findBlockQuoteInLineRange(Editor editor, boolean isOuter) {
+  public static TextRange findBlockQuoteInLineRange(Editor editor, char quote, boolean isOuter) {
     final CharSequence chars = editor.getDocument().getCharsSequence();
     final int pos = editor.getCaretModel().getOffset();
     if (chars.charAt(pos) == '\n') {
       return null;
     }
 
-    int start = findPreviousQuoteInLine(chars, pos);
+    int start = findPreviousQuoteInLine(chars, pos, quote);
     if (start == -1) {
-      start = findFirstQuoteInLine(editor, pos);
+      start = findFirstQuoteInLine(editor, pos, quote);
       if (start == -1) {
         return null;
       }
@@ -298,18 +298,18 @@ public class SearchHelper {
     final int current = Math.max(start, pos);
     int end = current;
 
-    if (chars.charAt(pos) == '"' && current == pos) {
-      final int quotes = countCharactersInLine(chars, pos, '"', false, Direction.BACK) + 1;
+    if (chars.charAt(pos) == quote && current == pos) {
+      final int quotes = countCharactersInLine(chars, pos, quote, false, Direction.BACK) + 1;
 
       if (quotes % 2 == 0) {
-        start = findPreviousQuoteInLine(chars, current - 1);
+        start = findPreviousQuoteInLine(chars, current - 1, quote);
       }
       else {
-        end = findNextQuoteInLine(chars, current + 1);
+        end = findNextQuoteInLine(chars, current + 1, quote);
       }
     }
     else {
-      end = findNextQuoteInLine(chars, current + 1);
+      end = findNextQuoteInLine(chars, current + 1, quote);
     }
 
     if (end == -1) {

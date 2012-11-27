@@ -123,12 +123,16 @@
         <action id="VimMotionInnerBlockBrace" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBraceAction" text="Select inner { block"/>
         <action id="VimMotionInnerBlockBracket" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBracketAction" text="Select inner [ block"/>
         <action id="VimMotionInnerBlockParen" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockParenAction" text="Select inner ( block"/>
-        <action id="VimMotionInnerBlockQuote" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockQuoteAction" text="Select inner quote block"/>
+        <action id="VimMotionInnerBlockDoubleQuote" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockDoubleQuoteAction" text="Select inner double quote block"/>
+        <action id="VimMotionInnerBlockSingleQuote" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockSingleQuoteAction" text="Select inner single quote block"/>
+        <action id="VimMotionInnerBlockBackQuote" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBackQuoteAction" text="Select inner back quote block"/>
         <action id="VimMotionOuterBlockAngle" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockAngleAction" text="Select outer &lt; block"/>
         <action id="VimMotionOuterBlockBrace" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBraceAction" text="Select outer { block"/>
         <action id="VimMotionOuterBlockBracket" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBracketAction" text="Select outer [ block"/>
         <action id="VimMotionOuterBlockParen" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockParenAction" text="Select outer ( block"/>
-        <action id="VimMotionOuterBlockQuote" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockQuoteAction" text="Select outer quote block"/>
+        <action id="VimMotionOuterBlockDoubleQuote" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockDoubleQuoteAction" text="Select outer double quote block"/>
+        <action id="VimMotionOuterBlockSingleQuote" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockSingleQuoteAction" text="Select outer single quote block"/>
+        <action id="VimMotionOuterBlockBackQuote" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBackQuoteAction" text="Select outer back quote block"/>
         <action id="VimMotionInnerParagraph" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerParagraphAction" text="Select Inner Paragraph"/>
         <action id="VimMotionOuterParagraph" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterParagraphAction" text="Select Outer Paragraph"/>
         <action id="VimMotionInnerSentence" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerSentenceAction" text="Select Inner Sentence"/>

@@ -294,6 +294,34 @@ public class MotionActionTest extends VimTestCase {
     assertSelection("one");
   }
 
+  // VIM-132 |d| |v_i'|
+  public void testDeleteInnerSingleQuoteString() {
+    typeTextInFile(stringToKeys("di'"),
+                   "foo = 'bar b<caret>az';\n");
+    myFixture.checkResult("foo = '';\n");
+  }
+
+  // VIM-132 |d| |v_i`|
+  public void testDeleteInnerBackQuoteString() {
+    typeTextInFile(stringToKeys("di`"),
+                   "foo = `bar b<caret>az`;\n");
+    myFixture.checkResult("foo = ``;\n");
+  }
+
+  // VIM-132 |d| |v_a'|
+  public void testDeleteOuterSingleQuoteString() {
+    typeTextInFile(stringToKeys("da'"),
+                   "foo = 'bar b<caret>az';\n");
+    myFixture.checkResult("foo = ;\n");
+  }
+
+  // VIM-132 |d| |v_a`|
+  public void testDeleteOuterBackQuoteString() {
+    typeTextInFile(stringToKeys("da`"),
+                   "foo = `bar b<caret>az`;\n");
+    myFixture.checkResult("foo = ;\n");
+  }
+
   // |%|
   public void testPercentMatchSimple() {
     typeTextInFile(stringToKeys("%"),
