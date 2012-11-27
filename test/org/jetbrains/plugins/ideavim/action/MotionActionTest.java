@@ -109,14 +109,21 @@ public class MotionActionTest extends VimTestCase {
   }
 
   // VIM-314 |d| |v_iB|
-  public void testDeleteInnerBracketBlock() {
+  public void testDeleteInnerCurlyBraceBlock() {
     typeTextInFile(stringToKeys("di{"),
                    "{foo, b<caret>ar, baz}\n");
     myFixture.checkResult("{}\n");
   }
 
+  // |d| |v_aB|
+  public void testDeleteOuterCurlyBraceBlock() {
+    typeTextInFile(stringToKeys("da{"),
+                   "x = {foo, b<caret>ar, baz};\n");
+    myFixture.checkResult("x = ;\n");
+  }
+
   // VIM-261 |c| |v_iB|
-  public void testChangeInnerBracketBlockMultiLine() {
+  public void testChangeInnerCurlyBraceBlockMultiLine() {
     typeTextInFile(stringToKeys("ci{"),
                    "foo {\n" +
                    "    <caret>bar\n" +
@@ -140,6 +147,104 @@ public class MotionActionTest extends VimTestCase {
     typeTextInFile(stringToKeys("di)"),
                    "foo(bar<caret>)\n");
     myFixture.checkResult("foo()\n");
+  }
+
+  // |d| |v_ab|
+  public void testDeleteOuterBlock() {
+    typeTextInFile(stringToKeys("da)"),
+                   "foo(b<caret>ar, baz);\n");
+    myFixture.checkResult("foo;\n");
+  }
+
+
+
+  // |d| |v_aw|
+  public void testDeleteOuterWord() {
+    typeTextInFile(stringToKeys("daw"),
+                   "one t<caret>wo three\n");
+    myFixture.checkResult("one three\n");
+  }
+
+  // |d| |v_aW|
+  public void testDeleteOuterBigWord() {
+    typeTextInFile(stringToKeys("daW"),
+                   "one \"t<caret>wo\" three\n");
+    myFixture.checkResult("one three\n");
+  }
+
+  // |d| |v_is|
+  public void testDeleteInnerSentence() {
+    typeTextInFile(stringToKeys("dis"),
+                   "Hello World! How a<caret>re you? Bye.\n");
+    myFixture.checkResult("Hello World!  Bye.\n");
+  }
+
+  // |d| |v_as|
+  public void testDeleteOuterSentence() {
+    typeTextInFile(stringToKeys("das"),
+                   "Hello World! How a<caret>re you? Bye.\n");
+    myFixture.checkResult("Hello World! Bye.\n");
+  }
+
+  // |d| |v_ip|
+  public void testDeleteInnerParagraph() {
+    typeTextInFile(stringToKeys("dip"),
+                   "Hello World!\n" +
+                   "\n" +
+                   "How a<caret>re you?\n" +
+                   "Bye.\n" +
+                   "\n" +
+                   "Bye.\n");
+    myFixture.checkResult("Hello World!\n" +
+                          "\n" +
+                          "\n" +
+                          "Bye.\n");
+  }
+
+  // |d| |v_ap|
+  public void testDeleteOuterParagraph() {
+    typeTextInFile(stringToKeys("dap"),
+                   "Hello World!\n" +
+                   "\n" +
+                   "How a<caret>re you?\n" +
+                   "Bye.\n" +
+                   "\n" +
+                   "Bye.\n");
+    myFixture.checkResult("Hello World!\n" +
+                          "\n" +
+                          "Bye.\n");
+  }
+
+  // |d| |v_a]|
+  public void testDeleteOuterBracketBlock() {
+    typeTextInFile(stringToKeys("da]"),
+                   "foo = [\n" +
+                   "    one,\n" +
+                   "    t<caret>wo,\n" +
+                   "    three\n" +
+                   "];\n");
+    myFixture.checkResult("foo = ;\n");
+  }
+
+  // |d| |v_i]|
+  public void testDeleteInnerBracketBlock() {
+    typeTextInFile(stringToKeys("di]"),
+                   "foo = [one, t<caret>wo];\n");
+    myFixture.checkResult("foo = [];\n");
+  }
+
+  // |d| |v_i>|
+  public void testDeleteInnerAngleBracketBlock() {
+    typeTextInFile(stringToKeys("di>"),
+                   "Foo<Foo, B<caret>ar> bar\n");
+    myFixture.checkResult("Foo<> bar\n");
+  }
+
+  // |d| |v_a>|
+  public void testDeleteOuterAngleBracketBlock() {
+    typeTextInFile(stringToKeys("da>"),
+                   "Foo<Foo, B<caret>ar> bar\n");
+    myFixture.checkResult("Foo bar\n");
   }
 
   // |%|

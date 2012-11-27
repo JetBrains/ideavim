@@ -95,11 +95,34 @@ These can be used after an operator or in Visual mode to select an object.
 
 tag             command            action in op-pending and Visual mode ~
 ------------------------------------------------------------------------------
+|v_a(|          a(                 same as ab
+|v_a)|          a)                 same as ab
+|v_a<|          a<                 "a <>" from '<' to the matching '>'
+|v_a>|          a>                 same as a<
+|v_aB|          aB                 "a Block" from "[{" to "]}" (with brackets)
+|v_aW|          aW                 "a WORD" (with white space)
+|v_a[|          a[                 "a []" from '[' to the matching ']'
+|v_a]|          a]                 same as a[
+|v_ab|          ab                 "a block" from "[(" to "])" (with braces)
+|v_ap|          ap                 "a paragraph" (with white space)
+|v_as|          as                 "a sentence" (with white space)
+|v_aw|          aw                 "a word" (with white space)
+|v_a{|          a{                 same as aB
+|v_a}|          a}                 same as aB
 |v_i(|          i(                 same as ib
 |v_i)|          i)                 same as ib
+|v_i<|          i<                 "inner <>" from '<' to the matching '>'
+|v_i>|          i>                 same as i<
+|v_iB|          iB                 "inner Block" from "[{" and "]}"
 |v_iW|          iW                 "inner WORD"
+|v_i[|          i[                 "inner []" from '[' to the matching ']'
+|v_i]|          i]                 same as i[
 |v_ib|          ib                 "inner block" from "[(" to "])"
+|v_ip|          ip                 "inner paragraph"
+|v_is|          is                 "inner sentence"
 |v_iw|          iw                 "inner word"
+|v_i{|          i{                 same as iB
+|v_i}|          i}                 same as iB
 
 ==============================================================================
 2.3 Square bracket commands                                     *[* *]*
