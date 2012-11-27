@@ -18,16 +18,14 @@ public class MotionActionTest extends VimTestCase {
   public void testVisualMotionInnerWordNewLineAtEOF() {
     final Editor editor = typeTextInFile(stringToKeys("viw"),
                                          "one tw<caret>o\n");
-    final String selected = editor.getSelectionModel().getSelectedText();
-    assertEquals("two", selected);
+    assertSelection("two");
   }
 
   // |v_iW|
   public void testVisualMotionInnerBigWord() {
     final Editor editor = typeTextInFile(stringToKeys("viW"),
                                          "one tw<caret>o.three four\n");
-    final String selected = editor.getSelectionModel().getSelectedText();
-    assertEquals("two.three", selected);
+    assertSelection("two.three");
   }
 
   public void testEscapeInCommand() {

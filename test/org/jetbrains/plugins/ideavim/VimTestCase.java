@@ -84,4 +84,9 @@ public abstract class VimTestCase extends UsefulTestCase {
     final CommandState.Mode mode = CommandState.getInstance(myFixture.getEditor()).getMode();
     assertEquals(expectedMode, mode);
   }
+
+  public void assertSelection(@NotNull String expected) {
+    final String selected = myFixture.getEditor().getSelectionModel().getSelectedText();
+    assertEquals(expected, selected);
+  }
 }
