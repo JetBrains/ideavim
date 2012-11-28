@@ -23,6 +23,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
@@ -42,8 +43,10 @@ public abstract class MotionEditorActionHandler extends AbstractEditorActionHand
       if ((cmd.getFlags() & Command.FLAG_SAVE_JUMP) != 0) {
         CommandGroups.getInstance().getMark().saveJumpLocation(editor);
       }
-      final int size = EditorHelper.getFileSize(editor);
-      offset = Math.min(offset, size - 1);
+      if (!CommandState.inInsertMode(editor)) {
+        final int size = EditorHelper.getFileSize(editor);
+        offset = Math.min(offset, size - 1);
+      }
       MotionGroup.moveCaret(editor, offset);
       postMove(editor, context, cmd);
 

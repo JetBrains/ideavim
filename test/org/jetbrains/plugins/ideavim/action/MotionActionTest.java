@@ -477,4 +477,12 @@ public class MotionActionTest extends VimTestCase {
                    "<caret>one\n");
     assertOffset(2);
   }
+
+  public void testRightToLastChar() {
+    final List<KeyStroke> keys = stringToKeys("i");
+    keys.add(KeyStroke.getKeyStroke("RIGHT"));
+    typeTextInFile(keys,
+                   "on<caret>e\n");
+    assertOffset(3);
+  }
 }
