@@ -16,27 +16,26 @@ import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
 public class MotionActionTest extends VimTestCase {
   // VIM-198 |v_iw|
   public void testVisualMotionInnerWordNewLineAtEOF() {
-    final Editor editor = typeTextInFile(stringToKeys("viw"),
-                                         "one tw<caret>o\n");
+    typeTextInFile(stringToKeys("viw"),
+                   "one tw<caret>o\n");
     assertSelection("two");
   }
 
   // |v_iW|
   public void testVisualMotionInnerBigWord() {
-    final Editor editor = typeTextInFile(stringToKeys("viW"),
-                                         "one tw<caret>o.three four\n");
+    typeTextInFile(stringToKeys("viW"),
+                   "one tw<caret>o.three four\n");
     assertSelection("two.three");
   }
 
   public void testEscapeInCommand() {
     final List<KeyStroke> keys = stringToKeys("f");
     keys.add(KeyStroke.getKeyStroke("ESCAPE"));
-    // We cannot check yet that the plugin indicates an error (see 'visualbell') after the second ESCAPE, so we just check the caret
-    // position and the editor mode
     keys.add(KeyStroke.getKeyStroke("ESCAPE"));
     typeTextInFile(keys,
                    "on<caret>e two\n" +
                    "three\n");
+    assertPluginError(true);
     assertOffset(2);
     assertMode(COMMAND);
   }
@@ -94,7 +93,7 @@ public class MotionActionTest extends VimTestCase {
     keys.add(KeyStroke.getKeyStroke('O'));
     keys.add(KeyStroke.getKeyStroke(':'));
     typeTextInFile(keys,
-                   "Hallo, \u00d6ster<caret>reich!\n");
+                   "Hallo, Öster<caret>reich!\n");
     assertOffset(7);
     assertMode(COMMAND);
   }

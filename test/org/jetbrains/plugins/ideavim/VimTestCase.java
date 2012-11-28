@@ -12,6 +12,7 @@ import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
 import com.intellij.testFramework.fixtures.TestFixtureBuilder;
 import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl;
 import com.maddyhome.idea.vim.KeyHandler;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
@@ -88,5 +89,10 @@ public abstract class VimTestCase extends UsefulTestCase {
   public void assertSelection(@NotNull String expected) {
     final String selected = myFixture.getEditor().getSelectionModel().getSelectedText();
     assertEquals(expected, selected);
+  }
+
+  public void assertPluginError(boolean isError) {
+    final VimPlugin plugin = VimPlugin.getInstance();
+    assertEquals(isError, plugin.isError());
   }
 }

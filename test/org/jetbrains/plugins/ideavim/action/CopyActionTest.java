@@ -1,7 +1,6 @@
 package org.jetbrains.plugins.ideavim.action;
 
 import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import javax.swing.*;
@@ -48,23 +47,21 @@ public class CopyActionTest extends VimTestCase {
   }
 
   public void testWrongYankQuoteMotion() {
-    final VimPlugin plugin = VimPlugin.getInstance();
-    assertFalse(plugin.isError());
+    assertPluginError(false);
     typeTextInFile(stringToKeys("y\""),
                    "one <caret>two\n" +
                    "three\n" +
                    "four\n");
-    assertTrue(plugin.isError());
+    assertPluginError(true);
   }
 
   public void testWrongYankQuoteYankLine() {
-    final VimPlugin plugin = VimPlugin.getInstance();
-    assertFalse(plugin.isError());
+    assertPluginError(false);
     typeTextInFile(stringToKeys("y\"yyp"),
                    "one <caret>two\n" +
                    "three\n" +
                    "four\n");
-    assertFalse(plugin.isError());
+    assertPluginError(false);
     myFixture.checkResult("one two\n" +
                           "one two\n" +
                           "three\n" +
