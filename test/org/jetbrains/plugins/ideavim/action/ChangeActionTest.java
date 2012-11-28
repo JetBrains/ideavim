@@ -136,6 +136,15 @@ public class ChangeActionTest extends VimTestCase {
            " three\n",
            "one \n" +
            " three\n");
+    assertOffset(3);
+  }
+
+  // VIM-105 |d| |w| |count|
+  public void testDeleteTwoWordsOnTwoLines() {
+    doTest(stringToKeys("d2w"),
+           "one <caret>two\n" +
+           "three four\n",
+           "one four\n");
   }
 
   // VIM-200 |c| |w|

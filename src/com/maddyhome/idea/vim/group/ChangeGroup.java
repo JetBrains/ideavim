@@ -761,15 +761,15 @@ public class ChangeGroup extends AbstractActionGroup {
 
     // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is deleted when it shouldn't be.
     String text = editor.getDocument().getCharsSequence().subSequence(range.getStartOffset(),
-                                                                    range.getEndOffset()).toString();
-    if (text.indexOf('\n') >= 0 &&
-        !(range.getStartOffset() == 0 || editor.getDocument().getCharsSequence().charAt(range.getStartOffset() - 1) == '\n')) {
-      String id = ActionManager.getInstance().getId(argument.getMotion().getAction());
-      if (logger.isDebugEnabled()) {
-        logger.debug("action id=" + id);
-      }
+                                                                      range.getEndOffset()).toString();
+    final int lastNewLine = text.lastIndexOf('\n');
+    if (lastNewLine > 0) {
+      final String id = ActionManager.getInstance().getId(argument.getMotion().getAction());
       if (id.equals("VimMotionWordRight") || id.equals("VimMotionBigWordRight") || id.equals("VimMotionCamelRight")) {
-        range = new TextRange(range.getStartOffset(), range.getEndOffset() - 1);
+        if (!SearchHelper.anyNonWhitespace(editor, range.getEndOffset(), -1)) {
+          final int start = range.getStartOffset();
+          range = new TextRange(start, start + lastNewLine);
+        }
       }
     }
 
@@ -816,7 +816,7 @@ public class ChangeGroup extends AbstractActionGroup {
         MotionGroup.moveCaret(editor, size - 1);
       }
       else if (res && (range.isMultiple() || !isChange)) {
-        MotionGroup.moveCaret(editor, range.getStartOffset());
+        MotionGroup.moveCaret(editor, EditorHelper.normalizeOffset(editor, range.getStartOffset(), false));
       }
 
       return res;
