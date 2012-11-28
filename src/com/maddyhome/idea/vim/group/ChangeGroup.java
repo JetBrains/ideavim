@@ -1007,8 +1007,11 @@ public class ChangeGroup extends AbstractActionGroup {
     boolean bigWord = false;
     final CharSequence chars = editor.getDocument().getCharsSequence();
     final int offset = editor.getCaretModel().getOffset();
-    if (EditorHelper.getFileSize(editor) > 0 && !Character.isWhitespace(chars.charAt(offset))) {
-      final boolean lastWordChar = offset <= EditorHelper.getFileSize(editor) ? Character.isWhitespace(chars.charAt(offset + 1)) : true;
+    final CharacterHelper.CharacterType charType = CharacterHelper.charType(chars.charAt(offset), false);
+    if (EditorHelper.getFileSize(editor) > 0 && charType != CharacterHelper.CharacterType.WHITESPACE) {
+      final boolean lastWordChar = offset <= EditorHelper.getFileSize(editor) ?
+                                   CharacterHelper.charType(chars.charAt(offset + 1), false) != charType :
+                                   true;
       if (lastWordChar) {
         final boolean res = deleteCharacter(editor, context, 1);
         if (res) {
