@@ -485,4 +485,11 @@ public class MotionActionTest extends VimTestCase {
                    "on<caret>e\n");
     assertOffset(3);
   }
+
+  public void testDownToLastEmptyLine() {
+    typeTextInFile(stringToKeys("j"),
+                   "<caret>one\n" +
+                   "\n");
+    assertOffset(4);
+  }
 }

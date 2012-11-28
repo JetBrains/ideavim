@@ -44,8 +44,7 @@ public abstract class MotionEditorActionHandler extends AbstractEditorActionHand
         CommandGroups.getInstance().getMark().saveJumpLocation(editor);
       }
       if (!CommandState.inInsertMode(editor)) {
-        final int size = EditorHelper.getFileSize(editor);
-        offset = Math.min(offset, size - 1);
+        offset = EditorHelper.normalizeOffset(editor, offset, false);
       }
       MotionGroup.moveCaret(editor, offset);
       postMove(editor, context, cmd);
