@@ -1005,26 +1005,29 @@ public class ChangeGroup extends AbstractActionGroup {
     String id = ActionManager.getInstance().getId(argument.getMotion().getAction());
     boolean kludge = false;
     boolean bigWord = false;
-    if (id.equals("VimMotionWordRight")) {
-      if (EditorHelper.getFileSize(editor) > 0 &&
-          !Character.isWhitespace(editor.getDocument().getCharsSequence().charAt(editor.getCaretModel().getOffset()))) {
+    final CharSequence chars = editor.getDocument().getCharsSequence();
+    final int offset = editor.getCaretModel().getOffset();
+    if (EditorHelper.getFileSize(editor) > 0 && !Character.isWhitespace(chars.charAt(offset))) {
+      final boolean lastWordChar = offset <= EditorHelper.getFileSize(editor) ? Character.isWhitespace(chars.charAt(offset + 1)) : true;
+      if (lastWordChar) {
+        final boolean res = deleteCharacter(editor, context, 1);
+        if (res) {
+          insertBeforeCursor(editor, context);
+        }
+        return res;
+      }
+      if (id.equals("VimMotionWordRight")) {
         kludge = true;
         argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionWordEndRight"));
         argument.getMotion().setFlags(Command.FLAG_MOT_INCLUSIVE);
       }
-    }
-    else if (id.equals("VimMotionBigWordRight")) {
-      if (EditorHelper.getFileSize(editor) > 0 &&
-          !Character.isWhitespace(editor.getDocument().getCharsSequence().charAt(editor.getCaretModel().getOffset()))) {
+      else if (id.equals("VimMotionBigWordRight")) {
         kludge = true;
         bigWord = true;
         argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionBigWordEndRight"));
         argument.getMotion().setFlags(Command.FLAG_MOT_INCLUSIVE);
       }
-    }
-    else if (id.equals("VimMotionCamelRight")) {
-      if (EditorHelper.getFileSize(editor) > 0 &&
-          !Character.isWhitespace(editor.getDocument().getCharsSequence().charAt(editor.getCaretModel().getOffset()))) {
+      else if (id.equals("VimMotionCamelRight")) {
         kludge = true;
         argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionCamelEndRight"));
         argument.getMotion().setFlags(Command.FLAG_MOT_INCLUSIVE);
@@ -1032,11 +1035,11 @@ public class ChangeGroup extends AbstractActionGroup {
     }
 
     if (kludge) {
-      int pos = editor.getCaretModel().getOffset();
+      int pos = offset;
       int size = EditorHelper.getFileSize(editor);
       int cnt = count * argument.getMotion().getCount();
-      int pos1 = SearchHelper.findNextWordEnd(editor.getDocument().getCharsSequence(), pos, size, cnt, bigWord, false, false);
-      int pos2 = SearchHelper.findNextWordEnd(editor.getDocument().getCharsSequence(), pos1, size, -cnt, bigWord, false, false);
+      int pos1 = SearchHelper.findNextWordEnd(chars, pos, size, cnt, bigWord, false, false);
+      int pos2 = SearchHelper.findNextWordEnd(chars, pos1, size, -cnt, bigWord, false, false);
       if (logger.isDebugEnabled()) {
         logger.debug("pos=" + pos);
         logger.debug("pos1=" + pos1);
