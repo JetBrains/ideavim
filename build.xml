@@ -23,7 +23,7 @@
   <property name="src" value="${basedir}/src"/>
   <property name="resources" value="${basedir}/resources"/>
   <property name="test" value="${basedir}/test"/>
-  <property name="keymap" value="${basedir}/keymap"/>
+  <property name="keymap" value="${basedir}/resources/Vim.xml"/>
   <property name="idea.home" value="${idea}/unzip"/>
   <property environment="env"/>
   <property name="tools.jar" value="${env.JAVA_HOME}/lib/tools.jar"/>
@@ -193,8 +193,8 @@
     <mkdir dir="${build}/IdeaVim"/>
     <copy todir="${build}/IdeaVim">
       <fileset dir="${basedir}" includes="license/**"/>
-      <fileset dir="${keymap}" includes="**"/>
     </copy>
+    <copy file="${keymap}" todir="${build}/IdeaVim"/>
     <copy todir="${build}/IdeaVim/lib">
       <fileset dir="${build}" includes="*.jar" excludes="help.jar"/>
     </copy>
@@ -246,9 +246,7 @@
       <fileset dir="${resources}"/>
     </copy>
     <mkdir dir="${out}/IdeaVim"/>
-    <copy todir="${out}/IdeaVim">
-      <fileset dir="${keymap}" includes="**"/>
-    </copy>
+    <copy file="${keymap}" todir="${build}/IdeaVim"/>
   </target>
 
   <target name="test" depends="unzip, clean, prepare-tests">
