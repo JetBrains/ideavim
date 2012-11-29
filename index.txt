@@ -4,8 +4,8 @@
                   IDEAVIM REFERENCE MANUAL       based on Vim Reference Manual
 
                                                                 *index*
-This file contains a list of all commands for each mode, with a tag and a
-short description.  The lists are sorted on ASCII value.
+This file contains a list of commands that are covered with tests, for each
+mode, with a tag and a short description. The lists are sorted on ASCII value.
 
 Tip: When looking for certain functionality, use a search command.  E.g.,
 to look for deleting something, use: "/delete".
