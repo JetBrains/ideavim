@@ -15,6 +15,7 @@ Features:
 
 Bug fixes:
 
+* VIM-325 External web help for Vim
 * VIM-300 Fixed `cw` at the last char of a word before next word without
   whitespace
 * VIM-200 Fixed `cw` at the last character of a word
