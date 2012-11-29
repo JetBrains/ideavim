@@ -3,6 +3,36 @@ The Changelog
 
 History of changes in IdeaVim for the IntelliJ platform.
 
+0.24, unreleased
+----------------
+
+Added Vim string object selection motions (see help topics `v_i"`, `v_a"`).
+Various bug fixes.
+
+Features:
+
+* VIM-132 String object selection motions
+
+Bug fixes:
+
+* VIM-300 Fixed `cw` at the last char of a word before next word without
+  whitespace
+* VIM-200 Fixed `cw` at the last character of a word
+* VIM-105 Fixed `w` motion for the last word in line
+* VIM-223 Fixed AE: BaseCodeCompletionAction.actionPerformed
+* VIM-331 Fixed word bounds in `w` motion for extended latin letters
+* Fixed `w` motion to stop at empty line
+* VIM-312 Fixed range and caret position after `dw` on the last single-word
+  line, `w` command argument for the last word in file
+* Fixed `w` motion at the last word
+* VIM-85 Bug fix for gi behaviour
+* Always move cursor at the beginning of the deleted range
+* VIM-275 Fixed edge cases for `i{` motion
+* VIM-314 Made `i{` motion characterwise, not linewise/characterwise in visual
+  mode
+* VIM-326 Fixed IOOBE in delete inner block motion inside string literals
+* VIM-157 Fixed regression in moving the cursor after `~`
+
 
 0.23.115, 2012-11-14
 --------------------
