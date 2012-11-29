@@ -207,7 +207,7 @@
         <filter token="PLATFORM_VERSION" value="${platform-version}"/>
       </filterset>
     </copy>
-    <copy file="${basedir}/CHANGES.txt" tofile="${build}/IdeaVim/CHANGES">
+    <copy file="${basedir}/CHANGES.md" tofile="${build}/IdeaVim/CHANGES">
       <filterset>
         <filter token="VERSION" value="${version}"/>
         <filter token="PLATFORM_VERSION" value="${platform-version}"/>
