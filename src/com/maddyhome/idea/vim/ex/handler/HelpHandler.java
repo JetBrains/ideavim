@@ -19,47 +19,46 @@ package com.maddyhome.idea.vim.ex.handler;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.help.HelpManager;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 /**
- *
+ * @author vlan
  */
 public class HelpHandler extends CommandHandler {
+  private static final String HELP_BASE_URL = "http://vimdoc.sourceforge.net";
+  private static final String HELP_ROOT_URL = HELP_BASE_URL + "/htmldoc/";
+  private static final String HELP_QUERY_URL = HELP_BASE_URL + "/search.php";
+
   public HelpHandler() {
-    super("h", "elp", ARGUMENT_OPTIONAL | DONT_REOPEN);
+    super("h", "elp", ARGUMENT_OPTIONAL);
   }
 
   public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
-    String key = cmd.getArgument();
-    if (key.length() == 0) {
-      key = "help.txt";
-    }
-    else if ("*".equals(key)) {
-      key = "star";
-    }
-
-    HelpManager mgr = HelpManager.getInstance();
-    mgr.invokeHelp("vim." + encode(key));
-
+    final String key = cmd.getArgument();
+    BrowserUtil.launchBrowser(helpTopicUrl(key));
     return true;
   }
 
-  private static String encode(String key) {
-    StringBuffer res = new StringBuffer();
-    for (int i = 0; i < key.length(); i++) {
-      if ("%\"~<>=#&?/.".indexOf(key.charAt(i)) >= 0) {
-        res.append('%').append(Integer.toHexString((int)key.charAt(i)).toUpperCase());
-      }
-      else {
-        res.append(key.charAt(i));
-      }
+  @NotNull
+  private static String helpTopicUrl(@Nullable String topic) {
+    if (topic == null || "".equals(topic)) {
+      return HELP_ROOT_URL;
     }
-
-    return res.toString();
+    try {
+      return String.format("%s?docs=help&search=%s", HELP_QUERY_URL, URLEncoder.encode(topic, "UTF-8"));
+    }
+    catch (UnsupportedEncodingException e) {
+      return HELP_ROOT_URL;
+    }
   }
 }
