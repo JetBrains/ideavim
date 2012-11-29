@@ -26,10 +26,11 @@ import java.util.List;
  * @author vlan
  */
 public abstract class VimTestCase extends UsefulTestCase {
+  private static final String ULTIMATE_MARKER_CLASS = "com.intellij.psi.css.CssFile";
   protected CodeInsightTestFixture myFixture;
 
   public VimTestCase() {
-    PlatformTestCase.initPlatformLangPrefix();
+    PlatformTestCase.initPlatformPrefix(ULTIMATE_MARKER_CLASS, "PlatformLangXml");
   }
 
   @Override
