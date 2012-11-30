@@ -41,9 +41,9 @@
         </option>
         <option name="OTHER_INDENT_OPTIONS">
           <value>
-            <option name="INDENT_SIZE" value="2" />
+            <option name="INDENT_SIZE" value="4" />
             <option name="CONTINUATION_INDENT_SIZE" value="4" />
-            <option name="TAB_SIZE" value="8" />
+            <option name="TAB_SIZE" value="4" />
             <option name="USE_TAB_CHARACTER" value="false" />
             <option name="SMART_TABS" value="false" />
             <option name="LABEL_INDENT_SIZE" value="0" />
@@ -53,7 +53,6 @@
         </option>
         <option name="FIELD_NAME_PREFIX" value="my" />
         <option name="STATIC_FIELD_NAME_PREFIX" value="our" />
-        <option name="RIGHT_MARGIN" value="140" />
         <option name="LINE_COMMENT_AT_FIRST_COLUMN" value="false" />
         <option name="BLOCK_COMMENT_AT_FIRST_COLUMN" value="false" />
         <option name="KEEP_LINE_BREAKS" value="false" />
