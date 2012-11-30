@@ -201,7 +201,7 @@
     <copy todir="${build}/IdeaVim/help">
       <fileset dir="${build}" includes="help.jar"/>
     </copy>
-    <copy file="${basedir}/README.txt" tofile="${build}/IdeaVim/README">
+    <copy file="${basedir}/README.md" tofile="${build}/IdeaVim/README">
       <filterset>
         <filter token="VERSION" value="${version}"/>
         <filter token="PLATFORM_VERSION" value="${platform-version}"/>
