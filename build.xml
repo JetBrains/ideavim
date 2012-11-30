@@ -116,9 +116,7 @@
   <target name="dist-bin" depends="clean, build" description="Creates a zip file containing the plugin sources">
     <delete dir="${build}/IdeaVim"/>
     <mkdir dir="${build}/IdeaVim"/>
-    <copy todir="${build}/IdeaVim">
-      <fileset dir="${basedir}" includes="license/**"/>
-    </copy>
+    <copy file="${basedir}/LICENSE.txt" tofile="${build}/IdeaVim/LICENSE"/>
     <copy file="${keymap}" todir="${build}/IdeaVim"/>
     <copy todir="${build}/IdeaVim/lib">
       <fileset dir="${build}" includes="*.jar"/>
