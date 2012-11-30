@@ -18,6 +18,9 @@ Contributors:
 * Dmitry Jemerov <yole@jetbrains.com>
 * Marquis Wang <marquis@marquiswang.com>
 * Julien Hoarau <madgnome@gmail.com>
+* Masanobu Imai <masanobu.imai@gmail.com>
+* poxu <poxvuibr@gmail.com>
+* Alexander Zolotov <alexander.zolotov@jetbrains.com>
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
