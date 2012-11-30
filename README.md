@@ -8,6 +8,7 @@ and AppCode.
 Resources:
 
 * [Plugin homepage](http://plugins.intellij.net/plugin/?id=164)
+* [Changelog](https://github.com/JetBrains/ideavim/blob/master/CHANGES.md)
 * [Continuous integration builds](http://teamcity.jetbrains.com/project.html?projectId=project55)
 
 
@@ -21,6 +22,7 @@ Emulator" menu item. At this point you must use Vim keystrokes in all editors.
 If you wish to disable the plugin, select the "Tools | VIM Emulator" menu so
 it is unchecked. At this point IDE will work with it's regular keyboard
 shortcuts.
+
 
 Summary of Supported Vim Features
 ---------------------------------
