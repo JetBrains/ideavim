@@ -32,6 +32,16 @@ public class CopyActionTest extends VimTestCase {
                           "three\n");
   }
 
+  // VIM-390 |yy| |p|
+  public void testYankLinePasteAtLastLine() {
+    typeTextInFile(stringToKeys("yyp"),
+                   "one two\n" +
+                   "<caret>three four\n");
+    myFixture.checkResult("one two\n" +
+                          "three four\n" +
+                          "three four\n");
+  }
+
   // |register| |y|
   public void testYankRegister() {
     typeTextInFile(stringToKeys("\"ayll\"byl\"ap\"bp"),
