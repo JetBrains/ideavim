@@ -127,7 +127,7 @@ keyboard shortcuts, and their new VIM keystrokes.
 Authors
 -------
 
-See [AUTHORS.txt](https://github.com/JetBrains/ideavim/blob/master/AUTHORS.txt)
+See [AUTHORS.md](https://github.com/JetBrains/ideavim/blob/master/AUTHORS.md)
 for a list of authors and contributors.
 
 
