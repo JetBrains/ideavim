@@ -38,10 +38,11 @@ Supported:
 * Visual mode commands
 * Some Ex commands
 * Some `:set` options
-* Full Vim regexps for search and search/replace macros
+* Full Vim regexps for search and search/replace
+* Macros
 * Digraphs
-* Command line history
-* Search history
+* Command line and search history
+* Vim web help
 
 Not supported (yet):
 
