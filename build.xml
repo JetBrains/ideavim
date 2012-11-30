@@ -37,12 +37,6 @@
   <property name="dist" value="${out}/dist"/>
   <property name="test-reports" value="${out}/test-reports"/>
 
-  <!-- Define task -->
-  <path id="ant-contrib">
-    <pathelement path="lib/ant-contrib-1.0b3.jar"/>
-  </path>
-  <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="ant-contrib"/>
-
   <path id="build.classpath">
     <fileset dir="${idea.home}/lib">
       <include name="*.jar"/>
@@ -98,76 +92,7 @@
     <jar basedir="${classes}" jarfile="${build}/IdeaVim.jar" compress="yes"/>
   </target>
 
-  <!-- Create help files -->
-  <target name="help" depends="clean, compile">
-    <mkdir dir="${build}/help/txt"/>
-    <mkdir dir="${build}/help/vim"/>
-
-    <copy todir="${build}/help/txt">
-      <fileset dir="help/txt">
-        <include name="*.txt"/>
-      </fileset>
-      <filterset>
-        <filter token="VERSION" value="${version}"/>
-      </filterset>
-    </copy>
-
-    <!-- Generate tags by shortcuts or actions -->
-    <fileset dir="${build}/help/txt" id="txt.files">
-      <include name="*.txt"/>
-    </fileset>
-    <pathconvert property="helpfiles" refid="txt.files" pathsep=" "/>
-    <java failonerror="true" classname="com.maddyhome.idea.vim.help.MakeTags" classpath="${classes}"
-          output="${build}/help/vim/tags" error="error">
-      <arg line="${helpfiles}"/>
-    </java>
-
-    <exec executable="sort" output="${build}/help/vim/tags.sort">
-      <arg value="-u"/>
-      <arg file="${build}/help/vim/tags"/>
-    </exec>
-    <move file="${build}/help/vim/tags.sort" tofile="${build}/help/vim/tags"/>
-
-    <exec executable="perl">
-      <arg file="help/vim2jh.pl"/>
-      <arg path="${build}/help"/>
-      <arg path="${build}/help/vim/tags"/>
-      <arg line="${helpfiles}"/>
-    </exec>
-
-    <copy todir="${build}/help">
-      <fileset dir="help">
-        <include name="images/"/>
-      </fileset>
-    </copy>
-
-    <copy todir="${build}/help">
-      <fileset dir="help/jh">
-        <include name="*"/>
-      </fileset>
-      <filterset>
-        <filter token="VERSION" value="${version}"/>
-      </filterset>
-    </copy>
-
-    <delete dir="${build}/help/txt"/>
-
-    <fileset dir="${build}/help/vim" id="html.files">
-      <include name="*.html"/>
-    </fileset>
-    <pathconvert property="htmlfiles" refid="html.files" pathsep=" "/>
-    <propertyregex property="srchfiles" input="${htmlfiles}" regexp="${build}/help/" replace="" global="true"/>
-
-    <java classname="com.sun.java.help.search.Indexer" classpath="lib/jhall.jar" fork="true" dir="${build}/help">
-      <arg value="-db"/>
-      <arg value="MasterSearchIndex"/>
-      <arg line="${srchfiles}"/>
-    </java>
-
-    <jar basedir="${build}/help" jarfile="${build}/help.jar"/>
-  </target>
-
-  <target name="build" depends="unzip, clean, compile, jar, help" description="Compiles all source code and created plugin jar file"/>
+  <target name="build" depends="unzip, clean, compile, jar" description="Compiles all source code and created plugin jar file"/>
 
   <!-- Download IntelliJ IDEA distribution -->
   <target name="download" description="Downloads IntelliJ IDEA artifacts">
@@ -196,23 +121,10 @@
     </copy>
     <copy file="${keymap}" todir="${build}/IdeaVim"/>
     <copy todir="${build}/IdeaVim/lib">
-      <fileset dir="${build}" includes="*.jar" excludes="help.jar"/>
+      <fileset dir="${build}" includes="*.jar"/>
     </copy>
-    <copy todir="${build}/IdeaVim/help">
-      <fileset dir="${build}" includes="help.jar"/>
-    </copy>
-    <copy file="${basedir}/README.md" tofile="${build}/IdeaVim/README">
-      <filterset>
-        <filter token="VERSION" value="${version}"/>
-        <filter token="PLATFORM_VERSION" value="${platform-version}"/>
-      </filterset>
-    </copy>
-    <copy file="${basedir}/CHANGES.md" tofile="${build}/IdeaVim/CHANGES">
-      <filterset>
-        <filter token="VERSION" value="${version}"/>
-        <filter token="PLATFORM_VERSION" value="${platform-version}"/>
-      </filterset>
-    </copy>
+    <copy file="${basedir}/README.md" tofile="${build}/IdeaVim/README"/>
+    <copy file="${basedir}/CHANGES.md" tofile="${build}/IdeaVim/CHANGES"/>
     <zip basedir="${build}" zipfile="${dist}/${filename}.zip" compress="true" includes="IdeaVim/**"/>
   </target>
 
