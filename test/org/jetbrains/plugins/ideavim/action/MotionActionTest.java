@@ -105,10 +105,24 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("foo()\n");
   }
 
+  // VIM-326 |d| |v_ib|
+  public void testDeleteInnerBlockCaretBeforeString() {
+    typeTextInFile(stringToKeys("di)"),
+                   "foo(<caret>\"bar\")\n");
+    myFixture.checkResult("foo()\n");
+  }
+
   // VIM-314 |d| |v_iB|
   public void testDeleteInnerCurlyBraceBlock() {
     typeTextInFile(stringToKeys("di{"),
                    "{foo, b<caret>ar, baz}\n");
+    myFixture.checkResult("{}\n");
+  }
+
+  // VIM-314 |d| |v_iB|
+  public void testDeleteInnerCurlyBraceBlockCaretBeforeString() {
+    typeTextInFile(stringToKeys("di{"),
+                   "{foo, <caret>\"bar\", baz}\n");
     myFixture.checkResult("{}\n");
   }
 
