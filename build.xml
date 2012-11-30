@@ -131,7 +131,7 @@
   <!-- Packs all the sources -->
   <target name="dist-src" depends="clean" description="Creates the source tar file">
     <mkdir dir="${dist}"/>
-    <tar basedir="." destfile="${dist}/${filename}-src.tar.gz" excludes=".git/**,.idea/**,idea/**,*.iws,*.iml" compression="gzip"/>
+    <tar basedir="." destfile="${dist}/${filename}-src.tar.gz" excludes=".git/**,.idea/**,idea/**,out/**,*.iws,*.iml" compression="gzip"/>
   </target>
 
   <target name="compile-tests" depends="compile">
