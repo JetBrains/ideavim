@@ -15,6 +15,7 @@ Features:
 
 Bug fixes:
 
+* VIM-296 Fixed `cc` at the last line
 * VIM-392 Fixed change action at the last char in word for non-word motions
 * VIM-390 Fixed paste a single line at the last line
 * VIM-325 External web help for Vim

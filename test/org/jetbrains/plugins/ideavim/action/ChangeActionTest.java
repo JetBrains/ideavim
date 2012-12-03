@@ -161,6 +161,16 @@ public class ChangeActionTest extends VimTestCase {
            "value\n");
   }
 
+  // VIM-296 |cc|
+  public void testChangeLineAtLastLine() {
+    doTest(stringToKeys("cc"),
+           "foo\n" +
+           "<caret>bar\n",
+           "foo\n" +
+           "\n");
+    assertOffset(4);
+  }
+
   private void doTest(final List<KeyStroke> keys, String before, String after) {
     myFixture.configureByText("a.java", before);
     final Editor editor = myFixture.getEditor();

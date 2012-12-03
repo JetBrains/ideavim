@@ -71,6 +71,7 @@ tag             char          note action in Normal mode        ~
                                    "yy"
 |c|             ["x]c{motion}   2  delete Nmove text [into buffer x] and start
                                    insert
+|cc|            ["x]cc          2  delete N lines [into buffer x] and start
 |d|             ["x]d{motion}   2  delete Nmove text [into buffer x]
 |f|             f{char}         1  cursor to Nth occurrence of {char} to the
                                    right

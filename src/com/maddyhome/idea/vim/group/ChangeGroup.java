@@ -165,15 +165,9 @@ public class ChangeGroup extends AbstractActionGroup {
       if (!editor.isOneLineMode()) {
         CommandState state = CommandState.getInstance(editor);
         if (state.getMode() != CommandState.Mode.REPEAT) {
-          SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-              KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), context);
-              MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
-            }
-          });
+          KeyHandler.executeAction("VimEditorEnter", context);
         }
         else {
-          //KeyHandler.executeAction("VimEditorEnter", context);
           MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
         }
       }
@@ -196,13 +190,8 @@ public class ChangeGroup extends AbstractActionGroup {
 
     CommandState state = CommandState.getInstance(editor);
     if (state.getMode() != CommandState.Mode.REPEAT) {
-      SwingUtilities.invokeLater(new Runnable() {
-        public void run() {
-          KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), context);
-        }
-      });
+      KeyHandler.executeAction("VimEditorEnter", context);
     }
-    //KeyHandler.executeAction("VimEditorEnter", context);
   }
 
   /**
@@ -967,7 +956,14 @@ public class ChangeGroup extends AbstractActionGroup {
   public boolean changeLine(Editor editor, DataContext context, int count) {
     boolean res = deleteLine(editor, context, count);
     if (res) {
-      insertNewLineAbove(editor, context);
+      final int lastLine = EditorHelper.getLineCount(editor) - 1;
+      final LogicalPosition pos = editor.offsetToLogicalPosition(editor.getCaretModel().getOffset());
+      if (pos.line >= lastLine) {
+        insertNewLineBelow(editor, context);
+      }
+      else {
+        insertNewLineAbove(editor, context);
+      }
     }
 
     return res;
