@@ -15,6 +15,8 @@ Features:
 
 Bug fixes:
 
+* VIM-394 Fixed `daw` for first and last words with no space at the right/left
+  in the current line
 * VIM-296 Fixed `cc` at the last line
 * VIM-392 Fixed change action at the last char in word for non-word motions
 * VIM-390 Fixed paste a single line at the last line
