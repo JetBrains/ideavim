@@ -200,8 +200,13 @@ public class KeyHandler {
       executeCommand(editor, key, context, editorState);
     }
     else if (state == State.BAD_COMMAND) {
-      VimPlugin.indicateError();
-      reset(editor);
+      if (editorState.getMappingMode() == KeyParser.MAPPING_OP_PEND) {
+        editorState.popState();
+      }
+      else {
+        VimPlugin.indicateError();
+        reset(editor);
+      }
     }
     // We had some sort of error so reset the handler and let the user know (beep)
     else if (state == State.ERROR) {

@@ -199,6 +199,14 @@ public class ChangeActionTest extends VimTestCase {
     assertOffset(1);
   }
 
+  // VIM-393 |d|
+  public void testDeleteBadArgument() {
+    doTest(stringToKeys("dDdd"),
+           "one\n" +
+           "two\n",
+           "two\n");
+  }
+
   private void doTest(final List<KeyStroke> keys, String before, String after) {
     myFixture.configureByText("a.java", before);
     final Editor editor = myFixture.getEditor();

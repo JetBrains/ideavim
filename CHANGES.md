@@ -15,6 +15,8 @@ Features:
 
 Bug fixes:
 
+* VIM-393 Fixed restoring editor state after invalid arguments with pending
+  operators
 * VIM-244 Fixed `dl` for the last character in line
 * VIM-394 Fixed `daw` for first and last words with no space at the right/left
   in the current line
