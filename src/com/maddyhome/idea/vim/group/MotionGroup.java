@@ -417,7 +417,7 @@ public class MotionGroup extends AbstractActionGroup {
     }
     // If characterwise and inclusive, add the last character to the range
     else if ((flags & Command.FLAG_MOT_INCLUSIVE) != 0) {
-      end = end + (start <= end ? 1 : -1);
+      end++;
     }
 
     // Normalize the range

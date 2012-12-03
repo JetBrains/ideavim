@@ -322,6 +322,13 @@ public class MotionActionTest extends VimTestCase {
     assertSelection("one");
   }
 
+  // |c| |v_i"|
+  public void testChangeEmptyQuotedString() {
+    typeTextInFile(stringToKeys("ci\""),
+                   "foo = \"<caret>\";\n");
+    myFixture.checkResult("foo = \"\";\n");
+  }
+
   // VIM-132 |d| |v_i'|
   public void testDeleteInnerSingleQuoteString() {
     typeTextInFile(stringToKeys("di'"),
