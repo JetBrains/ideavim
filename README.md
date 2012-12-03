@@ -37,7 +37,7 @@ Supported:
 * Undo/redo
 * Visual mode commands
 * Some Ex commands
-* Some `:set` options
+* Some [:set options](https://github.com/JetBrains/ideavim/blob/master/doc/set-commands.md)
 * Full Vim regexps for search and search/replace
 * Macros
 * Digraphs
