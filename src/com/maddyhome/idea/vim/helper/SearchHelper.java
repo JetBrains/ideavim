@@ -181,8 +181,9 @@ public class SearchHelper {
 
   private static int findBlockLocation(CharSequence chars, char found, char match, int dir, int pos, int cnt) {
     int res = -1;
-    boolean inString = checkInString(chars, pos, true);
-    boolean inChar = checkInString(chars, pos, false);
+    final int inCheckPos = dir < 0 && pos > 0 ? pos - 1 : pos;
+    boolean inString = checkInString(chars, inCheckPos, true);
+    boolean inChar = checkInString(chars, inCheckPos, false);
     boolean initial = true;
     int stack = 0;
     // Search to start or end of file, as appropriate
