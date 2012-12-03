@@ -3,7 +3,7 @@ The Changelog
 
 History of changes in IdeaVim for the IntelliJ platform.
 
-0.24, unreleased
+0.24, 2012-12-03
 ----------------
 
 Added Vim string object selection motions (see help topics `v_i"`, `v_a"`).
