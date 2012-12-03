@@ -46,7 +46,7 @@ public class DeleteVisualAction extends EditorAction {
       }
 
       return CommandGroups.getInstance().getChange().deleteRange(editor, context, range,
-                                                                 SelectionType.fromSubMode(mode), false);
+                                                                 SelectionType.fromSubMode(mode));
     }
   }
 }

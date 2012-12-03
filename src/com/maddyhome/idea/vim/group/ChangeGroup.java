@@ -15,6 +15,7 @@
  */
 package com.maddyhome.idea.vim.group;
 
+import com.google.common.collect.ImmutableSet;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -306,7 +307,7 @@ public class ChangeGroup extends AbstractActionGroup {
     }
 
     if (deleteTo != -1) {
-      deleteRange(editor, context, new TextRange(deleteTo, offset), SelectionType.CHARACTER_WISE, false);
+      deleteRange(editor, context, new TextRange(deleteTo, offset), SelectionType.CHARACTER_WISE);
 
       return true;
     }
@@ -327,7 +328,7 @@ public class ChangeGroup extends AbstractActionGroup {
       return false;
     }
     final TextRange range = new TextRange(deleteTo, editor.getCaretModel().getOffset());
-    deleteRange(editor, context, range, SelectionType.CHARACTER_WISE, false);
+    deleteRange(editor, context, range, SelectionType.CHARACTER_WISE);
     return true;
   }
 
@@ -791,7 +792,7 @@ public class ChangeGroup extends AbstractActionGroup {
         }
       }
     }
-    return deleteRange(editor, context, range, SelectionType.fromCommandFlags(argument.getMotion().getFlags()), isChange);
+    return deleteRange(editor, context, range, SelectionType.fromCommandFlags(argument.getMotion().getFlags()));
   }
 
   /**
@@ -801,24 +802,25 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param context  The data context
    * @param range    The range to delete
    * @param type     The type of deletion
-   * @param isChange If from a change
    * @return true if able to delete the text, false if not
    */
-  public boolean deleteRange(Editor editor, DataContext context, TextRange range, @Nullable SelectionType type, boolean isChange) {
+  public boolean deleteRange(Editor editor, DataContext context, TextRange range, @Nullable SelectionType type) {
     if (range == null) {
       return false;
     }
     else {
-      boolean res = deleteText(editor, context, range, type);
-
+      final boolean res = deleteText(editor, context, range, type);
       final int size = EditorHelper.getFileSize(editor);
-      if (res && editor.getCaretModel().getOffset() > size) {
-        MotionGroup.moveCaret(editor, size - 1);
+      if (res) {
+        final int pos;
+        if (editor.getCaretModel().getOffset() > size) {
+          pos = size - 1;
+        }
+        else {
+          pos = EditorHelper.normalizeOffset(editor, range.getStartOffset(), false);
+        }
+        MotionGroup.moveCaret(editor, pos);
       }
-      else if (res && (range.isMultiple() || !isChange)) {
-        MotionGroup.moveCaret(editor, EditorHelper.normalizeOffset(editor, range.getStartOffset(), false));
-      }
-
       return res;
     }
   }
@@ -1012,7 +1014,9 @@ public class ChangeGroup extends AbstractActionGroup {
       final boolean lastWordChar = offset <= EditorHelper.getFileSize(editor) ?
                                    CharacterHelper.charType(chars.charAt(offset + 1), false) != charType :
                                    true;
-      if (lastWordChar) {
+      final ImmutableSet<String> wordMotions = ImmutableSet.of(
+        "VimMotionWordRight", "VimMotionBigWordRight", "VimMotionCamelRight");
+      if (wordMotions.contains(id) && lastWordChar) {
         final boolean res = deleteCharacter(editor, context, 1);
         if (res) {
           insertBeforeCursor(editor, context);
@@ -1130,7 +1134,7 @@ public class ChangeGroup extends AbstractActionGroup {
       }
     }
     boolean after = range.getEndOffset() >= EditorHelper.getFileSize(editor);
-    boolean res = deleteRange(editor, context, range, type, true);
+    boolean res = deleteRange(editor, context, range, type);
     if (res) {
       if (type == SelectionType.LINE_WISE) {
         if (after) {

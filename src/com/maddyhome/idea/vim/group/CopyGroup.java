@@ -207,7 +207,7 @@ public class CopyGroup extends AbstractActionGroup {
                               Math.min(range.getEndOffset() + 1, EditorHelper.getFileSize(editor)));
       }
 
-      CommandGroups.getInstance().getChange().deleteRange(editor, context, range, SelectionType.fromSubMode(subMode), false);
+      CommandGroups.getInstance().getChange().deleteRange(editor, context, range, SelectionType.fromSubMode(subMode));
 
       editor.getCaretModel().moveToOffset(start);
 

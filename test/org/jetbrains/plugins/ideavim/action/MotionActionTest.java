@@ -112,6 +112,21 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("foo()\n");
   }
 
+  // VIM-326 |c| |v_ib|
+  public void testChangeInnerBlockCaretBeforeString() {
+    typeTextInFile(stringToKeys("ci)"),
+                   "foo(<caret>\"bar\")\n");
+    myFixture.checkResult("foo()\n");
+  }
+
+  // VIM-392 |c| |v_ib|
+  public void testChangeInnerBlockCaretBeforeBlock() {
+    typeTextInFile(stringToKeys("ci)"),
+                   "foo<caret>(bar)\n");
+    myFixture.checkResult("foo()\n");
+    assertOffset(4);
+  }
+
   // VIM-314 |d| |v_iB|
   public void testDeleteInnerCurlyBraceBlock() {
     typeTextInFile(stringToKeys("di{"),
