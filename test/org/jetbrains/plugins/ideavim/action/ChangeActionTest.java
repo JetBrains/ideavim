@@ -180,12 +180,23 @@ public class ChangeActionTest extends VimTestCase {
            "  , baz\n");
   }
 
+  // |d| |v_aw|
   public void testDeleteLastWordAfterPunctuation() {
     doTest(stringToKeys("daw"),
            "foo(<caret>bar\n" +
            "baz\n",
            "foo(\n" +
            "baz\n");
+  }
+
+  // VIM-244 |d| |l|
+  public void testDeleteLastCharInLine() {
+    doTest(stringToKeys("dl"),
+           "fo<caret>o\n" +
+           "bar\n",
+           "fo\n" +
+           "bar\n");
+    assertOffset(1);
   }
 
   private void doTest(final List<KeyStroke> keys, String before, String after) {
