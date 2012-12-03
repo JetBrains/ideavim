@@ -874,12 +874,12 @@ public class SearchHelper {
       logger.debug("goForward=" + goForward);
     }
 
-    if (goForward) {
+    if (goForward && anyNonWhitespace(editor, end, 1)) {
       while (end < max && CharacterHelper.charType(chars.charAt(end + 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
         end++;
       }
     }
-    if (goBack) {
+    if (goBack && anyNonWhitespace(editor, start, -1)) {
       while (start > min && CharacterHelper.charType(chars.charAt(start - 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
         start--;
       }

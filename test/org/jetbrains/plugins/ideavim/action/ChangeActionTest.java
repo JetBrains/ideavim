@@ -171,6 +171,23 @@ public class ChangeActionTest extends VimTestCase {
     assertOffset(4);
   }
 
+  // VIM-394 |d| |v_aw|
+  public void testDeleteIndentedWordBeforePunctuation() {
+    doTest(stringToKeys("daw"),
+           "foo\n" +
+           "  <caret>bar, baz\n",
+           "foo\n" +
+           "  , baz\n");
+  }
+
+  public void testDeleteLastWordAfterPunctuation() {
+    doTest(stringToKeys("daw"),
+           "foo(<caret>bar\n" +
+           "baz\n",
+           "foo(\n" +
+           "baz\n");
+  }
+
   private void doTest(final List<KeyStroke> keys, String before, String after) {
     myFixture.configureByText("a.java", before);
     final Editor editor = myFixture.getEditor();
