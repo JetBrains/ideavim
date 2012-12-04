@@ -128,6 +128,37 @@ keyboard shortcuts, and their new VIM keystrokes.
               Check In Project    Ctrl-K              <None>
 
 
+Development
+-----------
+
+### Development Environment
+
+1. Fork IdeaVim on GitHub and clone the repository on your local machine.
+
+2. Open the project in IntelliJ IDEA 11+ (Community or Ultimate) using "File |
+   Open... | /path/to/ideavim".
+
+3. Set up a JDK if you haven't got it yet. Use "File | Project Structure | SDKs
+   | Add new JDK".
+
+4. Set up an IntelliJ plugin SDK using "File | Project Structure | SDKs | Add
+   new IntelliJ IDEA Plugin SDK". The correct path to your current installation
+   of IntelliJ will be suggested automatically. You will be prompted to select a
+   JDK for your plugin SDK. Select the JDK from the previous step. You
+   **should** name your plugin SDK `IntelliJ Plugin SDK` in order to match the
+   name in the project settings stored in the Git repository.
+
+5. Select a project SDK for your project using "File | Project Structure |
+   Project | Project SDK". Choose the plugin SDK you have created at the
+   previous step.
+
+6. Build IdeaVim and run IntelliJ with IdeaVim enabled using the "IdeaVim" run
+   configuration (use "Run | Run... | IdeaVim").
+
+7. In order to be able to run tests in your IntelliJ edition uncomment the
+   appropriate lines in the constructor of the `VimTestCase` class.
+
+
 Authors
 -------
 
