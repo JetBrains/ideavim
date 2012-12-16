@@ -23,6 +23,7 @@ public class MacroActionTest extends VimTestCase {
     assertFalse(commandState.isRecording());
     final RegisterGroup registerGroup = CommandGroups.getInstance().getRegister();
     final Register register = registerGroup.getRegister('a');
+    assertNotNull(register);
     assertEquals("3l", register.getText());
   }
 }

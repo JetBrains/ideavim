@@ -20,15 +20,16 @@ package com.maddyhome.idea.vim.group;
  */
 
 import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
 
 /**
- * This is the base for all key mapping groups
+ * The base for all key mapping groups.
  */
 public interface ActionGroup {
   /**
    * Allows the group to save its state and any configuration.
    *
-   * @param element The plugin's root XML element that this group can add a child to
+   * @param element The root XML element of the plugin that this group can add a child to
    */
-  void saveData(Element element);
+  void saveData(@NotNull Element element);
 }

@@ -1428,7 +1428,7 @@ public class ChangeGroup extends AbstractActionGroup {
       return false;
     }
 
-    if (type == null || CommandGroups.getInstance().getRegister().storeText(editor, context, range, type, true, false)) {
+    if (type == null || CommandGroups.getInstance().getRegister().storeText(editor, range, type, true)) {
       final Document document = editor.getDocument();
       final int[] startOffsets = range.getStartOffsets();
       final int[] endOffsets = range.getEndOffsets();

@@ -23,8 +23,8 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.Options;
-import org.jdom.CDATA;
 import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,19 +37,13 @@ public class HistoryGroup extends AbstractActionGroup {
   public static final String EXPRESSION = "expr";
   public static final String INPUT = "input";
 
-  public void addEntry(String key, String text) {
+  public void addEntry(String key, @NotNull String text) {
     if (logger.isDebugEnabled()) {
       logger.debug("Add entry '" + text + "' to " + key);
     }
 
     HistoryBlock block = blocks(key);
     block.addEntry(text);
-  }
-
-  public String getEntry(String key, int index) {
-    HistoryBlock block = blocks(key);
-
-    return block.getEntry(index);
   }
 
   public List<HistoryEntry> getEntries(String key, int first, int last) {
@@ -103,12 +97,7 @@ public class HistoryGroup extends AbstractActionGroup {
     return block;
   }
 
-  /**
-   * Allows the group to save its state and any configuration. This does nothing.
-   *
-   * @param element The plugin's root XML element that this group can add a child to
-   */
-  public void saveData(Element element) {
+  public void saveData(@NotNull Element element) {
     logger.debug("saveData");
     Element hist = new Element("history");
 
@@ -121,30 +110,23 @@ public class HistoryGroup extends AbstractActionGroup {
   }
 
   private void saveData(Element element, String key) {
-    HistoryBlock block = histories.get(key);
+    final HistoryBlock block = histories.get(key);
     if (block == null) {
       return;
     }
 
-    Element root = new Element("history-" + key);
+    final Element root = new Element("history-" + key);
 
-    List<HistoryEntry> elems = block.getEntries();
-    for (HistoryEntry entry : elems) {
-      Element text = new Element("entry");
-      CDATA data = new CDATA(StringHelper.entities(entry.getEntry()));
-      text.addContent(data);
-      root.addContent(text);
+    for (HistoryEntry entry : block.getEntries()) {
+      final Element entryElement = new Element("entry");
+      StringHelper.setSafeXmlText(entryElement, entry.getEntry());
+      root.addContent(entryElement);
     }
 
     element.addContent(root);
   }
 
-  /**
-   * Allows the group to restore its state and any configuration. This does nothing.
-   *
-   * @param element The plugin's root XML element that this group can add a child to
-   */
-  public void readData(Element element) {
+  public void readData(@NotNull Element element) {
     logger.debug("readData");
     Element hist = element.getChild("history");
     if (hist == null) {
@@ -166,11 +148,15 @@ public class HistoryGroup extends AbstractActionGroup {
     block = new HistoryBlock();
     histories.put(key, block);
 
-    Element root = element.getChild("history-" + key);
+    final Element root = element.getChild("history-" + key);
     if (root != null) {
-      List items = root.getChildren("entry");
-      for (Object item : items) {
-        block.addEntry(StringHelper.unentities(((Element)item).getText()));
+      //noinspection unchecked
+      List<Element> items = root.getChildren("entry");
+      for (Element item : items) {
+        final String text = StringHelper.getSafeXmlText(item);
+        if (text != null) {
+          block.addEntry(text);
+        }
       }
     }
   }
@@ -182,7 +168,7 @@ public class HistoryGroup extends AbstractActionGroup {
   }
 
   private static class HistoryBlock {
-    public void addEntry(String text) {
+    public void addEntry(@NotNull String text) {
       for (int i = 0; i < entries.size(); i++) {
         HistoryEntry entry = entries.get(i);
         if (text.equals(entry.getEntry())) {
@@ -198,26 +184,17 @@ public class HistoryGroup extends AbstractActionGroup {
       }
     }
 
-    public String getEntry(int index) {
-      if (index < entries.size()) {
-        HistoryEntry entry = entries.get(index);
-        return entry.getEntry();
-      }
-      else {
-        return null;
-      }
-    }
-
+    @NotNull
     public List<HistoryEntry> getEntries() {
       return entries;
     }
 
-    private List<HistoryEntry> entries = new ArrayList<HistoryEntry>();
+    @NotNull private final List<HistoryEntry> entries = new ArrayList<HistoryEntry>();
     private int counter;
   }
 
   public static class HistoryEntry {
-    public HistoryEntry(int number, String entry) {
+    public HistoryEntry(int number, @NotNull String entry) {
       this.number = number;
       this.entry = entry;
     }
@@ -226,12 +203,13 @@ public class HistoryGroup extends AbstractActionGroup {
       return number;
     }
 
+    @NotNull
     public String getEntry() {
       return entry;
     }
 
     private int number;
-    private String entry;
+    @NotNull private String entry;
   }
 
   private Map<String, HistoryBlock> histories = new HashMap<String, HistoryBlock>();

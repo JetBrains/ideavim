@@ -94,7 +94,7 @@ public class CopyGroup extends AbstractActionGroup {
       if (logger.isDebugEnabled()) {
         logger.debug("yanking range: " + range);
       }
-      boolean res = CommandGroups.getInstance().getRegister().storeText(editor, context, range, type, false, true);
+      boolean res = CommandGroups.getInstance().getRegister().storeText(editor, range, type, false);
       if (moveCursor) {
         MotionGroup.moveCaret(editor, range.normalize().getStartOffset());
       }

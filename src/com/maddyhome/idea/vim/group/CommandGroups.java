@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.diagnostic.Logger;
 import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * This singleton maintains the instances of all the key groups. All the key/action mappings get created the first
@@ -149,9 +150,9 @@ public class CommandGroups {
   /**
    * Tells each group to save its data.
    *
-   * @param element The plugin's root element
+   * @param element The root XML element of the plugin
    */
-  public void saveData(Element element) {
+  public void saveData(@NotNull Element element) {
     motion.saveData(element);
     change.saveData(element);
     copy.saveData(element);
@@ -168,9 +169,9 @@ public class CommandGroups {
   /**
    * Tells each group to read its data.
    *
-   * @param element The plugin's root element
+   * @param element The root XML element of the plugin
    */
-  public void readData(Element element) {
+  public void readData(@NotNull Element element) {
     logger.debug("readData");
     motion.readData(element);
     change.readData(element);

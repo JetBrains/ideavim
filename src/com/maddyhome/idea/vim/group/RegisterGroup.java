@@ -19,7 +19,6 @@ package com.maddyhome.idea.vim.group;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -29,9 +28,9 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.ui.ClipboardHandler;
-import org.jdom.CDATA;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -45,27 +44,33 @@ import java.util.List;
  */
 public class RegisterGroup extends AbstractActionGroup {
   /**
-   * The regsister key for the default register
+   * The register key for the default register
    */
   public static final char REGISTER_DEFAULT = '"';
 
-  /**
-   * Creates the group
-   */
-  public RegisterGroup() {
-  }
+  private static final String WRITABLE_REGISTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-*+_/\"";
+  private static final String READONLY_REGISTERS = ":.%#=/";
+  private static final String RECORDABLE_REGISTER = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  private static final String PLAYBACK_REGISTER = RECORDABLE_REGISTER + "\".*+";
+  private static final String VALID_REGISTERS = WRITABLE_REGISTERS + READONLY_REGISTERS;
+
+  private static final Logger logger = Logger.getInstance(RegisterGroup.class.getName());
+
+  private char lastRegister = REGISTER_DEFAULT;
+  @NotNull private HashMap<Character, Register> registers = new HashMap<Character, Register>();
+  private char recordRegister = 0;
+  @Nullable private List<KeyStroke> recordList = null;
+  public RegisterGroup() {}
 
   /**
-   * Check to see if the last selected register can be written to
-   *
-   * @return true if writable register, false if not
+   * Check to see if the last selected register can be written to.
    */
   public boolean isRegisterWritable() {
     return READONLY_REGISTERS.indexOf(lastRegister) < 0;
   }
 
   /**
-   * Stores which register the user wishes to work with
+   * Store which register the user wishes to work with.
    *
    * @param reg The register name
    * @return true if a valid register name, false if not
@@ -83,7 +88,7 @@ public class RegisterGroup extends AbstractActionGroup {
   }
 
   /**
-   * Resets the selected register back to the default register
+   * Reset the selected register back to the default register.
    */
   public void resetRegister() {
     lastRegister = REGISTER_DEFAULT;
@@ -91,32 +96,27 @@ public class RegisterGroup extends AbstractActionGroup {
   }
 
   /**
-   * Stores text into the last register
+   * Store text into the last register.
    *
    * @param editor   The editor to get the text from
-   * @param context  The data context
    * @param range    The range of the text to store
    * @param type     The type of copy
    * @param isDelete is from a delete
-   * @param isYank   is from a yank
    * @return true if able to store the text into the register, false if not
    */
-  public boolean storeText(Editor editor, DataContext context, TextRange range, @NotNull SelectionType type, boolean isDelete, boolean isYank) {
+  public boolean storeText(@NotNull Editor editor, @NotNull TextRange range, @NotNull SelectionType type,
+                           boolean isDelete) {
     if (isRegisterWritable()) {
       String text = EditorHelper.getText(editor, range);
 
-      return storeTextInternal(editor, range, text, type, lastRegister, isDelete, isYank);
+      return storeTextInternal(editor, range, text, type, lastRegister, isDelete);
     }
 
     return false;
   }
 
-  public void storeKeys(List<KeyStroke> strokes, @NotNull SelectionType type, char register) {
-    registers.put(register, new Register(register, type, strokes));
-  }
-
-  public boolean storeTextInternal(Editor editor, TextRange range, String text, @NotNull SelectionType type,
-                                   char register, boolean isDelete, boolean isYank) {
+  public boolean storeTextInternal(@NotNull Editor editor, @NotNull TextRange range, @NotNull String text,
+                                   @NotNull SelectionType type, char register, boolean isDelete) {
     // Null register doesn't get saved
     if (lastRegister == '_') return true;
 
@@ -199,10 +199,12 @@ public class RegisterGroup extends AbstractActionGroup {
    *
    * @return The register, null if no such register
    */
+  @Nullable
   public Register getLastRegister() {
     return getRegister(lastRegister);
   }
 
+  @Nullable
   public Register getPlaybackRegister(char r) {
     if (PLAYBACK_REGISTER.indexOf(r) != 0) {
       return getRegister(r);
@@ -212,6 +214,7 @@ public class RegisterGroup extends AbstractActionGroup {
     }
   }
 
+  @Nullable
   public Register getRegister(char r) {
     // Uppercase registers actually get the lowercase register
     if (Character.isUpperCase(r)) {
@@ -241,6 +244,7 @@ public class RegisterGroup extends AbstractActionGroup {
     return lastRegister;
   }
 
+  @NotNull
   public List<Register> getRegisters() {
     ArrayList<Register> res = new ArrayList<Register>(registers.values());
     Collections.sort(res, new Register.KeySorter<Register>());
@@ -261,13 +265,13 @@ public class RegisterGroup extends AbstractActionGroup {
   }
 
   public void addKeyStroke(KeyStroke key) {
-    if (recordRegister != 0) {
+    if (recordRegister != 0 && recordList != null) {
       recordList.add(key);
     }
   }
 
-  public void addText(String text) {
-    if (recordRegister != 0) {
+  public void addText(@NotNull String text) {
+    if (recordRegister != 0 && recordList != null) {
       recordList.addAll(StringHelper.stringToKeys(text));
     }
   }
@@ -279,12 +283,14 @@ public class RegisterGroup extends AbstractActionGroup {
         reg = getRegister(recordRegister);
       }
 
-      if (reg == null) {
-        reg = new Register(Character.toLowerCase(recordRegister), SelectionType.CHARACTER_WISE, recordList);
-        registers.put(Character.toLowerCase(recordRegister), reg);
-      }
-      else {
-        reg.addKeys(recordList);
+      if (recordList != null) {
+        if (reg == null) {
+          reg = new Register(Character.toLowerCase(recordRegister), SelectionType.CHARACTER_WISE, recordList);
+          registers.put(Character.toLowerCase(recordRegister), reg);
+        }
+        else {
+          reg.addKeys(recordList);
+        }
       }
       CommandState.getInstance(editor).setRecording(false);
     }
@@ -292,100 +298,77 @@ public class RegisterGroup extends AbstractActionGroup {
     recordRegister = 0;
   }
 
-  /**
-   * Save all the registers
-   *
-   * @param element The plugin's root XML element that this group can add a child to
-   */
-  public void saveData(Element element) {
+  public void saveData(@NotNull final Element element) {
     logger.debug("saveData");
-    Element regs = new Element("registers");
+    final Element registersElement = new Element("registers");
     for (Character key : registers.keySet()) {
-      Register register = registers.get(key);
-
-      Element reg = new Element("register");
-      reg.setAttribute("name", String.valueOf(key));
-      reg.setAttribute("type", Integer.toString(register.getType().getValue()));
-      if (register.isText()) {
-        Element text = new Element("text");
-        CDATA data = new CDATA(/*CDATA.normalizeString*/(StringHelper.entities(register.getText())));
-        text.addContent(data);
-        reg.addContent(text);
-        if (logger.isDebugEnabled()) {
-          logger.debug("register='" + register.getText() + "'");
-          logger.debug("data=" + data);
-          logger.debug("text=" + text);
-        }
+      final Register register = registers.get(key);
+      final Element registerElement = new Element("register");
+      registerElement.setAttribute("name", String.valueOf(key));
+      registerElement.setAttribute("type", Integer.toString(register.getType().getValue()));
+      final String text = register.getText();
+      if (text != null) {
+        final Element textElement = new Element("text");
+        StringHelper.setSafeXmlText(textElement, text);
+        registerElement.addContent(textElement);
       }
       else {
-        Element keys = new Element("keys");
-        List<KeyStroke> list = register.getKeys();
+        final Element keys = new Element("keys");
+        final List<KeyStroke> list = register.getKeys();
         for (KeyStroke stroke : list) {
-          Element k = new Element("key");
+          final Element k = new Element("key");
           k.setAttribute("char", Integer.toString(stroke.getKeyChar()));
           k.setAttribute("code", Integer.toString(stroke.getKeyCode()));
           k.setAttribute("mods", Integer.toString(stroke.getModifiers()));
           keys.addContent(k);
         }
-        reg.addContent(keys);
+        registerElement.addContent(keys);
       }
-      regs.addContent(reg);
+      registersElement.addContent(registerElement);
     }
 
-    element.addContent(regs);
+    element.addContent(registersElement);
   }
 
-  /**
-   * Restore all the registers
-   *
-   * @param element The plugin's root XML element that this group can add a child to
-   */
-  public void readData(Element element) {
+  public void readData(@NotNull final Element element) {
     logger.debug("readData");
-    Element regs = element.getChild("registers");
-    if (regs != null) {
-      List<Element> list = regs.getChildren("register");
-      for (Element reg : list) {
-        Character key = reg.getAttributeValue("name").charAt(0);
-        Register register;
-        if (reg.getChild("text") != null) {
-          final SelectionType type = SelectionType.fromValue(Integer.parseInt(reg.getAttributeValue("type")));
-          register = new Register(key, type != null ? type : SelectionType.CHARACTER_WISE,
-                                  StringHelper.unentities(reg.getChild("text").getText/*Normalize*/()));
+    final Element registersElement = element.getChild("registers");
+    if (registersElement != null) {
+      //noinspection unchecked
+      final List<Element> registerElements = registersElement.getChildren("register");
+      for (Element registerElement : registerElements) {
+        final char key = registerElement.getAttributeValue("name").charAt(0);
+        final Register register;
+        final Element textElement = registerElement.getChild("text");
+        final String typeText = registerElement.getAttributeValue("type");
+        final SelectionType type = SelectionType.fromValue(Integer.parseInt(typeText));
+        if (textElement != null) {
+          final String text = StringHelper.getSafeXmlText(textElement);
+          if (text != null) {
+            register = new Register(key, type != null ? type : SelectionType.CHARACTER_WISE, text);
+          }
+          else {
+            register = null;
+          }
         }
         else {
-          Element keys = reg.getChild("keys");
-          List<Element> klist = keys.getChildren("key");
-          List<KeyStroke> strokes = new ArrayList<KeyStroke>();
-          for (Element kelem : klist) {
-            int code = Integer.parseInt(kelem.getAttributeValue("code"));
-            int mods = Integer.parseInt(kelem.getAttributeValue("mods"));
-            char ch = (char)Integer.parseInt(kelem.getAttributeValue("char"));
-            if (ch == KeyEvent.CHAR_UNDEFINED) {
-              strokes.add(KeyStroke.getKeyStroke(code, mods));
-            }
-            else {
-              strokes.add(KeyStroke.getKeyStroke(new Character(ch), mods));
-            }
+          final Element keysElement = registerElement.getChild("keys");
+          //noinspection unchecked
+          final List<Element> keyElements = keysElement.getChildren("key");
+          final List<KeyStroke> strokes = new ArrayList<KeyStroke>();
+          for (Element keyElement : keyElements) {
+            final int code = Integer.parseInt(keyElement.getAttributeValue("code"));
+            final int modifiers = Integer.parseInt(keyElement.getAttributeValue("mods"));
+            final char c = (char)Integer.parseInt(keyElement.getAttributeValue("char"));
+            //noinspection MagicConstant
+            strokes.add(c == KeyEvent.CHAR_UNDEFINED ?
+                        KeyStroke.getKeyStroke(code, modifiers) :
+                        KeyStroke.getKeyStroke(c));
           }
-          final SelectionType type = SelectionType.fromValue(Integer.parseInt(reg.getAttributeValue("type")));
           register = new Register(key, type != null ? type : SelectionType.CHARACTER_WISE, strokes);
         }
         registers.put(key, register);
       }
     }
   }
-
-  private char lastRegister = REGISTER_DEFAULT;
-  private HashMap<Character, Register> registers = new HashMap<Character, Register>();
-  private char recordRegister = 0;
-  private List<KeyStroke> recordList = null;
-
-  private static final String WRITABLE_REGISTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-*+_/\"";
-  private static final String READONLY_REGISTERS = ":.%#=/";
-  private static final String RECORDABLE_REGISTER = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  private static final String PLAYBACK_REGISTER = RECORDABLE_REGISTER + "\".*+";
-  private static final String VALID_REGISTERS = WRITABLE_REGISTERS + READONLY_REGISTERS;
-
-  private static Logger logger = Logger.getInstance(RegisterGroup.class.getName());
 }

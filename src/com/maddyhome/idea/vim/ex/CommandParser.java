@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.HistoryGroup;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Maintains a tree of Ex commands based on the required and optional parts of the command names. Parses and
@@ -124,14 +125,15 @@ public class CommandParser {
    * @throws ExException if any part of the command was invalid
    */
   public boolean processLastCommand(Editor editor, DataContext context, int count) throws ExException {
-    Register reg = CommandGroups.getInstance().getRegister().getRegister(':');
-    if (reg == null) {
-      return false;
+    final Register reg = CommandGroups.getInstance().getRegister().getRegister(':');
+    if (reg != null) {
+      final String text = reg.getText();
+      if (text != null) {
+        processCommand(editor, context, text, count);
+        return true;
+      }
     }
-
-    processCommand(editor, context, reg.getText(), count);
-
-    return true;
+    return false;
   }
 
   /**
@@ -144,7 +146,7 @@ public class CommandParser {
    * @return A bitwise collection of flags, if any, from the result of running the command.
    * @throws ExException if any part of the command is invalid or unknown
    */
-  public int processCommand(Editor editor, DataContext context, String cmd, int count) throws ExException {
+  public int processCommand(Editor editor, DataContext context, @NotNull String cmd, int count) throws ExException {
     // Nothing entered
     int result = 0;
     if (cmd.length() == 0) {
@@ -193,7 +195,7 @@ public class CommandParser {
     boolean ok = handler.process(editor, context, new ExCommand(res.getRanges(), command, res.getArgument()), count);
     if (ok && (handler.getArgFlags() & CommandHandler.DONT_SAVE_LAST) == 0) {
       CommandGroups.getInstance().getRegister().storeTextInternal(editor, new TextRange(-1, -1), cmd,
-                                                                  SelectionType.CHARACTER_WISE, ':', false, false);
+                                                                  SelectionType.CHARACTER_WISE, ':', false);
     }
 
     if (ok && (handler.getArgFlags() & CommandHandler.KEEP_FOCUS) != 0) {

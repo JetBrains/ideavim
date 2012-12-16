@@ -45,8 +45,9 @@ import com.maddyhome.idea.vim.regexp.CharHelper;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
-import org.jdom.CDATA;
 import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -87,10 +88,10 @@ public class SearchGroup extends AbstractActionGroup {
     return lastPattern;
   }
 
-  private void setLastPattern(Editor editor, String lastPattern) {
+  private void setLastPattern(Editor editor, @NotNull String lastPattern) {
     this.lastPattern = lastPattern;
     CommandGroups.getInstance().getRegister().storeTextInternal(editor, new TextRange(-1, -1),
-                                                                lastPattern, SelectionType.CHARACTER_WISE, '/', false, false);
+                                                                lastPattern, SelectionType.CHARACTER_WISE, '/', false);
 
     CommandGroups.getInstance().getHistory().addEntry(HistoryGroup.SEARCH, lastPattern);
   }
@@ -266,7 +267,9 @@ public class SearchGroup extends AbstractActionGroup {
     }
 
     lastSubstitute = pattern;
-    setLastPattern(editor, pattern);
+    if (pattern != null) {
+      setLastPattern(editor, pattern);
+    }
 
     //int start = editor.logicalPositionToOffset(new LogicalPosition(line1, 0));
     //int end = editor.logicalPositionToOffset(new LogicalPosition(line2, EditorHelper.getLineLength(editor, line2)));
@@ -559,7 +562,9 @@ public class SearchGroup extends AbstractActionGroup {
     }
 
     lastSearch = pattern;
-    setLastPattern(editor, pattern);
+    if (pattern != null) {
+      setLastPattern(editor, pattern);
+    }
     lastOffset = offset;
     lastDir = dir;
 
@@ -1107,43 +1112,23 @@ public class SearchGroup extends AbstractActionGroup {
     EditorData.setLastSearch(editor, null);
   }
 
-  /**
-   * Allows the group to save its state and any configuration. This does nothing.
-   *
-   * @param element The plugin's root XML element that this group can add a child to
-   */
-  public void saveData(Element element) {
+  public void saveData(@NotNull Element element) {
     logger.debug("saveData");
     Element search = new Element("search");
     if (lastSearch != null) {
-      Element text = new Element("last-search");
-      CDATA data = new CDATA(/*CDATA.normalizeString*/StringHelper.entities(lastSearch));
-      text.addContent(data);
-      search.addContent(text);
+      search.addContent(createElementWithText("last-search", lastSearch));
     }
     if (lastOffset != null) {
-      Element text = new Element("last-offset");
-      CDATA data = new CDATA(/*CDATA.normalizeString*/StringHelper.entities(lastOffset));
-      text.addContent(data);
-      search.addContent(text);
+      search.addContent(createElementWithText("last-offset", lastOffset));
     }
     if (lastPattern != null) {
-      Element text = new Element("last-pattern");
-      CDATA data = new CDATA(/*CDATA.normalizeString*/StringHelper.entities(lastPattern));
-      text.addContent(data);
-      search.addContent(text);
+      search.addContent(createElementWithText("last-pattern", lastPattern));
     }
     if (lastReplace != null) {
-      Element text = new Element("last-replace");
-      CDATA data = new CDATA(/*CDATA.normalizeString*/StringHelper.entities(lastReplace));
-      text.addContent(data);
-      search.addContent(text);
+      search.addContent(createElementWithText("last-replace", lastReplace));
     }
     if (lastSubstitute != null) {
-      Element text = new Element("last-substitute");
-      CDATA data = new CDATA(/*CDATA.normalizeString*/StringHelper.entities(lastSubstitute));
-      text.addContent(data);
-      search.addContent(text);
+      search.addContent(createElementWithText("last-substitute", lastSubstitute));
     }
     Element text = new Element("last-dir");
     text.addContent(Integer.toString(lastDir));
@@ -1157,33 +1142,23 @@ public class SearchGroup extends AbstractActionGroup {
     element.addContent(search);
   }
 
-  /**
-   * Allows the group to restore its state and any configuration. This does nothing.
-   *
-   * @param element The plugin's root XML element that this group can add a child to
-   */
-  public void readData(Element element) {
+  @NotNull
+  private static Element createElementWithText(@NotNull String name, @NotNull String text) {
+    return StringHelper.setSafeXmlText(new Element(name), text);
+  }
+
+  public void readData(@NotNull Element element) {
     logger.debug("readData");
     Element search = element.getChild("search");
     if (search == null) {
       return;
     }
 
-    if (search.getChild("last-search") != null) {
-      lastSearch = StringHelper.unentities(search.getChildText/*Normalize*/("last-search"));
-    }
-    if (search.getChild("last-offset") != null) {
-      lastOffset = StringHelper.unentities(search.getChildText/*Normalize*/("last-offset"));
-    }
-    if (search.getChild("last-pattern") != null) {
-      lastPattern = StringHelper.unentities(search.getChildText/*Normalize*/("last-pattern"));
-    }
-    if (search.getChild("last-replace") != null) {
-      lastReplace = StringHelper.unentities(search.getChildText/*Normalize*/("last-replace"));
-    }
-    if (search.getChild("last-substitute") != null) {
-      lastSubstitute = StringHelper.unentities(search.getChildText/*Normalize*/("last-substitute"));
-    }
+    lastSearch = getSafeChildText(search, "last-search");
+    lastOffset = getSafeChildText(search, "last-offset");
+    lastPattern = getSafeChildText(search, "last-pattern");
+    lastReplace = getSafeChildText(search, "last-replace");
+    lastSubstitute = getSafeChildText(search, "last-substitute");
 
     Element dir = search.getChild("last-dir");
     lastDir = Integer.parseInt(dir.getText());
@@ -1194,6 +1169,12 @@ public class SearchGroup extends AbstractActionGroup {
       logger.debug("show=" + show + "(" + show.getText() + ")");
       logger.debug("showSearchHighlight=" + showSearchHighlight);
     }
+  }
+
+  @Nullable
+  private static String getSafeChildText(@NotNull Element element, @NotNull String name) {
+    final Element child = element.getChild(name);
+    return child != null ? StringHelper.getSafeXmlText(child) : null;
   }
 
   private class ButtonActionListener implements ActionListener {

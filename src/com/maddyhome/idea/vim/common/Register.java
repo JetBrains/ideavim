@@ -22,8 +22,10 @@ package com.maddyhome.idea.vim.common;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.awt.event.KeyEvent;
 import java.util.Comparator;
 import java.util.List;
 
@@ -31,24 +33,19 @@ import java.util.List;
  * Represents a register.
  */
 public class Register {
-  /**
-   * Create a register of the specified type for the given text
-   *
-   * @param name The character
-   * @param type The register type
-   * @param text The text to store
-   */
-  public Register(char name, @NotNull SelectionType type, String text) {
+  private char name;
+  @NotNull private SelectionType type;
+  @NotNull private List<KeyStroke> keys;
+
+  public Register(char name, @NotNull SelectionType type, @NotNull String text) {
     this.name = name;
     this.type = type;
-    this.text = text;
-    this.keys = null;
+    this.keys = StringHelper.stringToKeys(text);
   }
 
-  public Register(char name, @NotNull SelectionType type, List<KeyStroke> keys) {
+  public Register(char name, @NotNull SelectionType type, @NotNull List<KeyStroke> keys) {
     this.name = name;
     this.type = type;
-    this.text = null;
     this.keys = keys;
   }
 
@@ -57,18 +54,14 @@ public class Register {
   }
 
   /**
-   * Gets the name the register is assigned to
-   *
-   * @return The register name
+   * Get the name the register is assigned to.
    */
   public char getName() {
     return name;
   }
 
   /**
-   * Get the register type
-   *
-   * @return The register type
+   * Get the register type.
    */
   @NotNull
   public SelectionType getType() {
@@ -76,65 +69,38 @@ public class Register {
   }
 
   /**
-   * Get the text in the register
-   *
-   * @return The register text
+   * Get the text in the register.
    */
+  @Nullable
   public String getText() {
-    if (text == null && keys != null) {
-      return StringHelper.keysToString(keys);
+    final StringBuilder builder = new StringBuilder();
+    for (KeyStroke key : keys) {
+      final char c = key.getKeyChar();
+      if (c == KeyEvent.CHAR_UNDEFINED) {
+        return null;
+      }
+      builder.append(c);
     }
-    return text;
+    return builder.toString();
   }
 
   /**
-   * Get the sequence of keys in the register
-   *
-   * @return The register keys
+   * Get the sequence of keys in the register.
    */
+  @NotNull
   public List<KeyStroke> getKeys() {
-    if (keys == null && text != null) {
-      return StringHelper.stringToKeys(text);
-    }
-
     return keys;
   }
 
   /**
-   * Appends the supplied text to any existing text
-   *
-   * @param text The text to add
+   * Append the supplied text to any existing text.
    */
-  public void addText(String text) {
-    if (this.text != null) {
-      this.text = this.text + text;
-    }
-    else if (this.keys != null) {
-      addKeys(StringHelper.stringToKeys(text));
-    }
-    else {
-      this.text = text;
-    }
+  public void addText(@NotNull String text) {
+    addKeys(StringHelper.stringToKeys(text));
   }
 
-  public void addKeys(List<KeyStroke> keys) {
-    if (this.keys != null) {
-      this.keys.addAll(keys);
-    }
-    else if (this.text != null) {
-      this.text = this.text + StringHelper.keysToString(keys);
-    }
-    else {
-      this.keys = keys;
-    }
-  }
-
-  public boolean isText() {
-    return text != null;
-  }
-
-  public boolean isKeys() {
-    return keys != null;
+  public void addKeys(@NotNull List<KeyStroke> keys) {
+    this.keys.addAll(keys);
   }
 
   public static class KeySorter<V> implements Comparator<V> {
@@ -152,9 +118,4 @@ public class Register {
       }
     }
   }
-
-  private char name;
-  @NotNull private SelectionType type;
-  private String text;
-  private List<KeyStroke> keys;
 }

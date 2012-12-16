@@ -19,17 +19,21 @@ package com.maddyhome.idea.vim.helper;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.intellij.util.Base64Converter;
+import org.jdom.CDATA;
+import org.jdom.Content;
+import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- */
 public class StringHelper {
+  private StringHelper() {}
+
   public static String pad(String text, int len, char ch) {
     int l = text.length();
     StringBuffer res = new StringBuffer(text);
@@ -40,67 +44,46 @@ public class StringHelper {
     return res.toString();
   }
 
-  public static String escape(String text) {
-    StringBuffer res = new StringBuffer(text.length());
+  @NotNull
+  public static String escape(@NotNull String s) {
+    return escape(stringToKeys(s));
+  }
 
-    for (int i = 0; i < text.length(); i++) {
-      char ch = text.charAt(i);
-      if (ch < ' ') {
-        res.append('^').append((char)(ch + 'A' - 1));
+  @NotNull
+  public static String escape(@NotNull List<KeyStroke> keys) {
+    final StringBuffer res = new StringBuffer();
+    for (KeyStroke key : keys) {
+      final char c = key.getKeyChar();
+      final int modifiers = key.getModifiers();
+      final int code = key.getKeyCode();
+      if (c < ' ') {
+        res.append('^').append((char)(c + 'A' - 1));
       }
-      else if (ch == '\n') {
+      else if (c == '\n') {
         res.append("^J");
       }
-      else if (ch == '\t') {
+      else if (c == '\t') {
         res.append("^I");
       }
+      else if (c == '\u0000') {
+        res.append("^@");
+      }
+      else if ((modifiers & KeyEvent.CTRL_DOWN_MASK) != 0) {
+        final char[] chars = Character.toChars(code);
+        if (chars.length == 1) {
+          res.append("^");
+          res.append(chars);
+        }
+      }
       else {
-        res.append(ch);
+        res.append(c);
       }
     }
-
     return res.toString();
   }
 
-  public static String entities(String text) {
-    StringBuffer res = new StringBuffer(text.length());
-
-    for (int i = 0; i < text.length(); i++) {
-      char ch = text.charAt(i);
-      switch (ch) {
-        case '!':
-          res.append("&#33;");
-          break;
-        case '[':
-          res.append("&#91;");
-          break;
-        case ']':
-          res.append("&#93;");
-          break;
-        case ' ':
-          res.append("&#32;");
-          break;
-        case '&':
-          res.append("&amp;");
-          break;
-        case '\t':
-          res.append("&#9;");
-          break;
-        case '\n':
-          res.append("&#10;");
-          break;
-        case '\r':
-          res.append("&#13;");
-          break;
-        default:
-          res.append(ch);
-      }
-    }
-
-    return res.toString();
-  }
-
-  public static String unentities(String text) {
+  @Deprecated
+  private static String unentities(String text) {
     StringBuffer res = new StringBuffer(text.length());
 
     for (int i = 0; i < text.length(); i++) {
@@ -163,54 +146,17 @@ public class StringHelper {
     return res;
   }
 
-  public static String keysToString(List<KeyStroke> keys) {
-    StringBuffer res = new StringBuffer();
+  @Nullable
+  public static String keysToString(@NotNull List<KeyStroke> keys) {
+    final StringBuilder builder = new StringBuilder();
     for (KeyStroke key : keys) {
-      if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
-        res.append(key.getKeyChar());
+      final char c = key.getKeyChar();
+      if (c == KeyEvent.CHAR_UNDEFINED) {
+        return null;
       }
-      else {
-        switch (key.getKeyCode()) {
-          case KeyEvent.VK_TAB:
-            res.append("\t");
-            break;
-          case KeyEvent.VK_ENTER:
-            res.append("\n");
-            break;
-          case KeyEvent.VK_BACK_SPACE:
-            res.append("\b");
-            break;
-          default:
-            res.append('<');
-            res.append(getModifiersText(key.getModifiers()));
-            res.append(KeyEvent.getKeyText(key.getKeyCode()));
-            res.append('>');
-        }
-      }
+      builder.append(c);
     }
-
-    return res.toString();
-  }
-
-  public static String getModifiersText(int modifiers) {
-    StringBuffer buf = new StringBuffer();
-    if ((modifiers & KeyEvent.META_MASK) != 0) {
-      buf.append("M-");
-    }
-    if ((modifiers & KeyEvent.CTRL_MASK) != 0) {
-      buf.append("C-");
-    }
-    if ((modifiers & KeyEvent.ALT_MASK) != 0) {
-      buf.append("A-");
-    }
-    if ((modifiers & KeyEvent.SHIFT_MASK) != 0) {
-      buf.append("S-");
-    }
-    if ((modifiers & KeyEvent.ALT_GRAPH_MASK) != 0) {
-      buf.append("G-");
-    }
-
-    return buf.toString();
+    return builder.toString();
   }
 
   public static boolean containsUpperCase(String text) {
@@ -223,6 +169,78 @@ public class StringHelper {
     return false;
   }
 
-  private StringHelper() {
+  /**
+   * Set the text of an XML element, safely encode it if needed.
+   */
+  public static Element setSafeXmlText(@NotNull Element element, @NotNull String text) {
+    final Character first = firstCharacter(text);
+    final Character last = lastCharacter(text);
+    if (!StringHelper.isXmlCharacterData(text) ||
+        first != null && Character.isWhitespace(first) ||
+        last != null && Character.isWhitespace(last)) {
+      element.setAttribute("encoding", "base64");
+      element.setText(Base64Converter.encode(text));
+    }
+    else {
+      element.setText(text);
+    }
+    return element;
+  }
+
+  @Nullable
+  private static Character lastCharacter(@NotNull String text) {
+    return text.length() > 0 ? text.charAt(text.length() - 1) : null;
+  }
+
+  @Nullable
+  private static Character firstCharacter(@NotNull String text) {
+    return text.length() > 0 ? text.charAt(0) : null;
+  }
+
+  /**
+   * Get the (potentially safely encoded) text of an XML element.
+   */
+  @Nullable
+  public static String getSafeXmlText(@NotNull Element element) {
+    final String text = element.getText();
+    //noinspection unchecked
+    final List<Content> contentItems = element.getContent();
+    for (Content content : contentItems) {
+      if (content instanceof CDATA) {
+        // TODO: Remove compatibility with the IdeaVim <= 0.24 settings style in the next versions
+        return unentities(text);
+      }
+    }
+    final String encoding = element.getAttributeValue("encoding");
+    if (encoding == null) {
+      return text;
+    }
+    else if (encoding.equals("base64")) {
+      return Base64Converter.decode(text);
+    }
+    return null;
+  }
+
+  /**
+   * Check if the text matches the CharData production from the XML grammar.
+   *
+   * This check is more restricted than CharData as it completely forbids '>'.
+   */
+  public static boolean isXmlCharacterData(@NotNull String text) {
+    for (char c : text.toCharArray()) {
+      if (!isXmlChar(c) || c == '<' || c == '>' || c == '&') {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Check if a char matches the Char production from the XML grammar.
+   *
+   * Characters beyond the Basic Multilingual Plane are not supported.
+   */
+  private static boolean isXmlChar(char c) {
+    return '\u0001' <= c && c <= '\uD7FF' || '\uE000' <= c && c <= '\uFFFD';
   }
 }

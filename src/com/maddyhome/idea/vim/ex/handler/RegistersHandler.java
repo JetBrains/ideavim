@@ -53,14 +53,12 @@ public class RegistersHandler extends CommandHandler {
       text.append(reg.getName());
 
       text.append("   ");
-      text.append(StringHelper.escape(reg.getText()));
+      text.append(StringHelper.escape(reg.getKeys()));
       text.append("\n");
     }
 
     MorePanel panel = MorePanel.getInstance(editor);
     panel.setText(text.toString());
-
-    //panel.setVisible(true);
 
     return true;
   }

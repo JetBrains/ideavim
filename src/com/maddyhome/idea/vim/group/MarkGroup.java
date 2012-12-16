@@ -347,12 +347,7 @@ public class MarkGroup extends AbstractActionGroup {
     return marks;
   }
 
-  /**
-   * Allows the group to save its state and any configuration.
-   *
-   * @param element The plugin's root XML element that this group can add a child to
-   */
-  public void saveData(Element element) {
+  public void saveData(@NotNull Element element) {
     Element marksElem = new Element("globalmarks");
     for (Mark mark : globalMarks.values()) {
       if (!mark.isClear()) {
@@ -423,12 +418,7 @@ public class MarkGroup extends AbstractActionGroup {
     element.addContent(jumpsElem);
   }
 
-  /**
-   * Allows the group to restore its state and any configuration.
-   *
-   * @param element The plugin's root XML element that this group can add a child to
-   */
-  public void readData(Element element) {
+  public void readData(@NotNull Element element) {
     // We need to keep the filename for now and create the virtual file later. Any attempt to call
     // LocalFileSystem.getInstance().findFileByPath() results in the following error:
     // Read access is allowed from event dispatch thread or inside read-action only
