@@ -19,7 +19,7 @@ package com.maddyhome.idea.vim.helper;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import com.intellij.util.Base64Converter;
+import org.apache.commons.codec.binary.Base64;
 import org.jdom.CDATA;
 import org.jdom.Content;
 import org.jdom.Element;
@@ -179,7 +179,8 @@ public class StringHelper {
         first != null && Character.isWhitespace(first) ||
         last != null && Character.isWhitespace(last)) {
       element.setAttribute("encoding", "base64");
-      element.setText(Base64Converter.encode(text));
+      final String encoded = new String(Base64.encodeBase64(text.getBytes()));
+      element.setText(encoded);
     }
     else {
       element.setText(text);
@@ -216,7 +217,7 @@ public class StringHelper {
       return text;
     }
     else if (encoding.equals("base64")) {
-      return Base64Converter.decode(text);
+      return new String(Base64.decodeBase64(text.getBytes()));
     }
     return null;
   }
