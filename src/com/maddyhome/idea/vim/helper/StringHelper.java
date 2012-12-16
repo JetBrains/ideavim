@@ -146,19 +146,6 @@ public class StringHelper {
     return res;
   }
 
-  @Nullable
-  public static String keysToString(@NotNull List<KeyStroke> keys) {
-    final StringBuilder builder = new StringBuilder();
-    for (KeyStroke key : keys) {
-      final char c = key.getKeyChar();
-      if (c == KeyEvent.CHAR_UNDEFINED) {
-        return null;
-      }
-      builder.append(c);
-    }
-    return builder.toString();
-  }
-
   public static boolean containsUpperCase(String text) {
     for (int i = 0; i < text.length(); i++) {
       if (Character.isUpperCase(text.charAt(i)) && (i == 0 || text.charAt(i - 1) == '\\')) {
