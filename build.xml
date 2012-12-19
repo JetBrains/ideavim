@@ -27,7 +27,7 @@
   <property name="idea.home" value="${idea}/unzip"/>
   <property environment="env"/>
   <property name="tools.jar" value="${env.JAVA_HOME}/lib/tools.jar"/>
-  <property name="version" value="${version-id}-${build.number}"/>
+  <property name="version" value="${version-id}"/>
   <property name="filename" value="ideavim-${version}"/>
 
   <!--Output-->
