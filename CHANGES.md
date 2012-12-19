@@ -3,6 +3,17 @@ The Changelog
 
 History of changes in IdeaVim for the IntelliJ platform.
 
+
+0.24.1, 2012-12-19
+------------------
+
+A bugfix release.
+
+* VIM-400 Fixed saving characters with key modifiers in plugin settings
+* VIM-319 Fixed saving plugin settings when registers contain the null
+  character
+
+
 0.24, 2012-12-03
 ----------------
 
