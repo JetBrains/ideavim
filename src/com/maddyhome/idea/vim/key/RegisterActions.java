@@ -398,7 +398,11 @@ public class RegisterActions {
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0))
     });
     parser.registerAction(KeyParser.MAPPING_NORMAL, "VimMotionJumpPrevious", Command.Type.OTHER_READONLY,
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK)));
+                          new Shortcut[] {
+                            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK)),
+                            // TODO: <C-T> is a tag command similar to <C-O>, the tag stack is not implemented
+                            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.CTRL_MASK))
+                          });
 
     parser.registerAction(KeyParser.MAPPING_NORMAL, "VimFileGetAscii", Command.Type.OTHER_READONLY,
                           new Shortcut("ga"));
@@ -769,12 +773,13 @@ public class RegisterActions {
     parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimMotionMark",
                           Command.Type.OTHER_READONLY,
                           new Shortcut('m'), Argument.Type.CHARACTER);
-    // TODO - why don't these work on RO files?
     parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimGotoDeclaration",
                           Command.Type.OTHER_READONLY,
                           Command.FLAG_SAVE_JUMP, new Shortcut[]{
         new Shortcut("gD"),
-        new Shortcut("gd")
+        new Shortcut("gd"),
+        // TODO: <C-]> is a tag command similar to gD, the tag stack is not implemented
+        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_CLOSE_BRACKET, KeyEvent.CTRL_MASK)),
       });
     parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimFileGetLocationInfo",
                           Command.Type.OTHER_READONLY,
