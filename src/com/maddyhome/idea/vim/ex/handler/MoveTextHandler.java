@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -38,7 +39,7 @@ public class MoveTextHandler extends CommandHandler {
     super("m", "ove", RANGE_OPTIONAL | ARGUMENT_REQUIRED | WRITABLE);
   }
 
-  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     TextRange range = cmd.getTextRange(editor, context, false);
     LineRange lr = cmd.getLineRange(editor, context, false);
     int adj = lr.getEndLine() - lr.getStartLine() + 1;

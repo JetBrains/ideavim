@@ -19,6 +19,8 @@ package com.maddyhome.idea.vim.option;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+
 public class BoundStringOption extends StringOption {
   BoundStringOption(String name, String abbrev, String dflt, String[] values) {
     super(name, abbrev, dflt);
@@ -50,7 +52,7 @@ public class BoundStringOption extends StringOption {
     return false;
   }
 
-  public boolean remove(String val) {
+  public boolean remove(@NotNull String val) {
     if (getValue().equals(val)) {
       return super.remove(val);
     }

@@ -22,9 +22,10 @@ package com.maddyhome.idea.vim.action;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.Editor;
+import org.jetbrains.annotations.NotNull;
 
 public class OriginalDelegateAction extends AbstractDelegateAction {
-  public void actionPerformed(AnActionEvent event) {
+  public void actionPerformed(@NotNull AnActionEvent event) {
     Editor editor = event.getData(PlatformDataKeys.EDITOR);
     if (editor != null) {
       getOrigAction().actionPerformed(event);

@@ -6,6 +6,7 @@ import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.impl.KeymapManagerImpl;
 import com.intellij.openapi.util.SystemInfo;
 import com.maddyhome.idea.vim.VimPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -54,11 +55,12 @@ public class VimKeymapPanel {
     return myPanel;
   }
 
+  @NotNull
   public Keymap getSelectedKeyMap(){
     return (Keymap) myKeymapComboBox.getSelectedItem();
   }
 
-  private static boolean matchesPlatform(final Keymap keymap) {
+  private static boolean matchesPlatform(@NotNull final Keymap keymap) {
     if (keymap.getName().equals(KeymapManager.DEFAULT_IDEA_KEYMAP)) {
       return !SystemInfo.isMac;
     }

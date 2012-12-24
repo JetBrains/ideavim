@@ -86,6 +86,7 @@ public class CommandState {
    *
    * @return The running command
    */
+  @Nullable
   public Command getCommand() {
     return command;
   }
@@ -95,7 +96,7 @@ public class CommandState {
    *
    * @param cmd The currently executing command
    */
-  public void setCommand(Command cmd) {
+  public void setCommand(@NotNull Command cmd) {
     command = cmd;
     setFlags(cmd.getFlags());
   }
@@ -166,6 +167,7 @@ public class CommandState {
     VimPlugin.showMode(msg.toString());
   }
 
+  @NotNull
   private String getStatusString(int pos) {
     State state;
     if (pos >= 0 && pos < modes.size()) {
@@ -262,6 +264,7 @@ public class CommandState {
    *
    * @return The last change command, null if there hasn't been a change yet
    */
+  @Nullable
   public Command getLastChangeCommand() {
     return lastChange;
   }
@@ -311,6 +314,7 @@ public class CommandState {
     }
   }
 
+  @NotNull
   public String toString() {
     final StringBuffer buf = new StringBuffer();
     buf.append("CommandState");
@@ -356,6 +360,7 @@ public class CommandState {
       return mapping;
     }
 
+    @NotNull
     public String toString() {
       StringBuffer res = new StringBuffer();
       res.append("State[mode=");
@@ -374,15 +379,15 @@ public class CommandState {
     private int mapping;
   }
 
-  private Stack<State> modes = new Stack<State>();
-  private State defaultState = new State(Mode.COMMAND, SubMode.NONE, KeyParser.MAPPING_NORMAL);
-  private Command command;
+  @NotNull private Stack<State> modes = new Stack<State>();
+  @NotNull private State defaultState = new State(Mode.COMMAND, SubMode.NONE, KeyParser.MAPPING_NORMAL);
+  @Nullable private Command command;
   private int flags;
   private boolean isRecording = false;
 
   private ParentNode currentNode = KeyParser.getInstance().getKeyRoot(getMappingMode());
 
-  private static Command lastChange = null;
+  @Nullable private static Command lastChange = null;
   private static char lastRegister = RegisterGroup.REGISTER_DEFAULT;
 
   private static Logger logger = Logger.getInstance(CommandState.class.getName());

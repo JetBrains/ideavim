@@ -46,6 +46,7 @@ public class VisualRange {
     return offset;
   }
 
+  @NotNull
   public String toString() {
     StringBuffer res = new StringBuffer();
     res.append("VisualRange[");

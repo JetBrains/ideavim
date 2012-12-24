@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import org.jetbrains.annotations.NotNull;
 
 /**
  */
@@ -38,7 +39,7 @@ public class DeleteVisualLinesAction extends EditorAction {
   }
 
   private static class Handler extends VisualOperatorActionHandler {
-    protected boolean execute(Editor editor, DataContext context, Command cmd, TextRange range) {
+    protected boolean execute(@NotNull Editor editor, DataContext context, Command cmd, TextRange range) {
       CommandState.SubMode mode = CommandState.getInstance(editor).getSubMode();
       if (mode == CommandState.SubMode.VISUAL_BLOCK) {
         return CommandGroups.getInstance().getChange().deleteRange(editor, range,

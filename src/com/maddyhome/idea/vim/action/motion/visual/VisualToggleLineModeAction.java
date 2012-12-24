@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -36,7 +37,7 @@ public class VisualToggleLineModeAction extends EditorAction {
   }
 
   private static class Handler extends AbstractEditorActionHandler {
-    protected boolean execute(Editor editor, DataContext context, Command cmd) {
+    protected boolean execute(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
       return CommandGroups.getInstance().getMotion()
         .toggleVisual(editor, cmd.getCount(), cmd.getRawCount(), CommandState.SubMode.VISUAL_LINE);
     }

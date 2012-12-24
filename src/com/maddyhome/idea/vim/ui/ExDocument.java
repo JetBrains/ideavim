@@ -19,6 +19,8 @@ package com.maddyhome.idea.vim.ui;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -62,7 +64,7 @@ public class ExDocument extends PlainDocument {
    *                              position within the document
    * @see Document#insertString
    */
-  public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+  public void insertString(int offs, @NotNull String str, AttributeSet a) throws BadLocationException {
     super.insertString(offs, str, a);
     int newOffs = offs + str.length();
     if (overwrite && newOffs < getLength()) {

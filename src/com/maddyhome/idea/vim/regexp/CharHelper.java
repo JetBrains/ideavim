@@ -19,8 +19,11 @@ package com.maddyhome.idea.vim.regexp;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+
 public class CharHelper {
-  public static CharPointer skipwhite(CharPointer ptr) {
+  @NotNull
+  public static CharPointer skipwhite(@NotNull CharPointer ptr) {
     while (CharacterClasses.isWhite(ptr.charAt())) {
       ptr.inc();
     }
@@ -28,7 +31,7 @@ public class CharHelper {
     return ptr;
   }
 
-  public static int getdigits(CharPointer ptr) {
+  public static int getdigits(@NotNull CharPointer ptr) {
     int res = 0;
     while (CharacterClasses.isDigit(ptr.charAt())) {
       res = res * 10 + (ptr.charAt() - '0');

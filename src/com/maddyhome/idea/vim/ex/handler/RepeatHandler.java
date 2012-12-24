@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.ex.*;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -36,7 +37,7 @@ public class RepeatHandler extends CommandHandler {
     }, RANGE_OPTIONAL | ARGUMENT_REQUIRED | DONT_SAVE_LAST);
   }
 
-  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, DataContext context, @NotNull ExCommand cmd) throws ExException {
     char arg = cmd.getArgument().charAt(0);
     int line = cmd.getLine(editor, context);
 

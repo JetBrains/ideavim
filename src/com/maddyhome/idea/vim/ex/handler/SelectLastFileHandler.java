@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.group.CommandGroups;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -33,7 +34,7 @@ public class SelectLastFileHandler extends CommandHandler {
     super("la", "st", ARGUMENT_OPTIONAL | DONT_REOPEN);
   }
 
-  public boolean execute(Editor editor, DataContext context, ExCommand cmd) {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, ExCommand cmd) {
     boolean res = CommandGroups.getInstance().getFile().selectFile(999, context);
     if (res) {
       CommandGroups.getInstance().getMark().saveJumpLocation(editor);

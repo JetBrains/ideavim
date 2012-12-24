@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.ex.Ranges;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 
@@ -42,7 +43,7 @@ public class CmdFilterHandler extends CommandHandler {
     super("!", "", RANGE_REQUIRED | ARGUMENT_OPTIONAL | WRITABLE);
   }
 
-  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, DataContext context, @NotNull ExCommand cmd) throws ExException {
     logger.info("execute");
 
     Ranges ranges = cmd.getRanges();

@@ -41,6 +41,8 @@ import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.HashMap;
@@ -52,7 +54,7 @@ public class FileGroup extends AbstractActionGroup {
   public FileGroup() {
   }
 
-  public boolean openFile(String filename, DataContext context) {
+  public boolean openFile(@NotNull String filename, @NotNull DataContext context) {
     if (logger.isDebugEnabled()) {
       logger.debug("openFile(" + filename + ")");
     }
@@ -112,7 +114,8 @@ public class FileGroup extends AbstractActionGroup {
     }
   }
 
-  private VirtualFile findFile(VirtualFile root, String filename) {
+  @Nullable
+  private VirtualFile findFile(@NotNull VirtualFile root, @NotNull String filename) {
     VirtualFile res = root.findFileByRelativePath(filename);
     if (res != null) {
       return res;
@@ -139,7 +142,7 @@ public class FileGroup extends AbstractActionGroup {
    *
    * @param context The data context
    */
-  public void closeFile(Editor editor, DataContext context) {
+  public void closeFile(Editor editor, @NotNull DataContext context) {
     Project proj = PlatformDataKeys.PROJECT.getData(context);
     FileEditorManager fem = FileEditorManager.getInstance(proj); // API change - don't merge
     //fem.closeFile(fem.getSelectedFile());
@@ -161,7 +164,7 @@ public class FileGroup extends AbstractActionGroup {
    *
    * @param context The data context
    */
-  public void closeAllButCurrent(DataContext context) {
+  public void closeAllButCurrent(@NotNull DataContext context) {
     KeyHandler.executeAction("CloseAllEditorsButCurrent", context);
   }
 
@@ -170,7 +173,7 @@ public class FileGroup extends AbstractActionGroup {
    *
    * @param context The data context
    */
-  public void closeAllFiles(DataContext context) {
+  public void closeAllFiles(@NotNull DataContext context) {
     KeyHandler.executeAction("CloseAllEditors", context);
   }
 
@@ -179,7 +182,7 @@ public class FileGroup extends AbstractActionGroup {
    *
    * @param context The data context
    */
-  public void saveFile(Editor editor, DataContext context) {
+  public void saveFile(@NotNull Editor editor, DataContext context) {
     FileDocumentManager.getInstance().saveDocument(editor.getDocument());
   }
 
@@ -192,7 +195,7 @@ public class FileGroup extends AbstractActionGroup {
     FileDocumentManager.getInstance().saveAllDocuments();
   }
 
-  public void closeProject(DataContext context) {
+  public void closeProject(@NotNull DataContext context) {
     KeyHandler.executeAction("CloseProject", context);
   }
 
@@ -206,7 +209,7 @@ public class FileGroup extends AbstractActionGroup {
    * @param count
    * @param context
    */
-  public boolean selectFile(int count, DataContext context) {
+  public boolean selectFile(int count, @NotNull DataContext context) {
     Project proj = PlatformDataKeys.PROJECT.getData(context);
     FileEditorManager fem = FileEditorManager.getInstance(proj); // API change - don't merge
     VirtualFile[] editors = fem.getOpenFiles();
@@ -228,7 +231,7 @@ public class FileGroup extends AbstractActionGroup {
    * @param count
    * @param context
    */
-  public void selectNextFile(int count, DataContext context) {
+  public void selectNextFile(int count, @NotNull DataContext context) {
     Project proj = PlatformDataKeys.PROJECT.getData(context);
     FileEditorManager fem = FileEditorManager.getInstance(proj); // API change - don't merge
     VirtualFile[] editors = fem.getOpenFiles();
@@ -245,7 +248,7 @@ public class FileGroup extends AbstractActionGroup {
   /**
    * Selects previous editor tab
    */
-  public void selectPreviousTab(DataContext context) {
+  public void selectPreviousTab(@NotNull DataContext context) {
     Project proj = PlatformDataKeys.PROJECT.getData(context);
     FileEditorManager fem = FileEditorManager.getInstance(proj); // API change - don't merge
     VirtualFile vf = lastSelections.get(fem);
@@ -257,7 +260,8 @@ public class FileGroup extends AbstractActionGroup {
     }
   }
 
-  public Editor selectEditor(Project project, VirtualFile file) {
+  @Nullable
+  public Editor selectEditor(Project project, @NotNull VirtualFile file) {
     FileEditorManager fMgr = FileEditorManager.getInstance(project);
     FileEditor[] feditors = fMgr.openFile(file, true);
     if (feditors != null && feditors.length > 0) {
@@ -269,7 +273,7 @@ public class FileGroup extends AbstractActionGroup {
     return null;
   }
 
-  public void displayAsciiInfo(Editor editor) {
+  public void displayAsciiInfo(@NotNull Editor editor) {
     int offset = editor.getCaretModel().getOffset();
     char ch = editor.getDocument().getCharsSequence().charAt(offset);
 
@@ -286,14 +290,14 @@ public class FileGroup extends AbstractActionGroup {
     VimPlugin.showMessage(msg.toString());
   }
 
-  public void displayHexInfo(Editor editor) {
+  public void displayHexInfo(@NotNull Editor editor) {
     int offset = editor.getCaretModel().getOffset();
     char ch = editor.getDocument().getCharsSequence().charAt(offset);
 
     VimPlugin.showMessage(Long.toHexString(ch));
   }
 
-  public void displayLocationInfo(Editor editor) {
+  public void displayLocationInfo(@NotNull Editor editor) {
     StringBuffer msg = new StringBuffer();
     Document doc = editor.getDocument();
 
@@ -377,7 +381,7 @@ public class FileGroup extends AbstractActionGroup {
     VimPlugin.showMessage(msg.toString());
   }
 
-  public void displayFileInfo(Editor editor, boolean fullPath) {
+  public void displayFileInfo(@NotNull Editor editor, boolean fullPath) {
     StringBuffer msg = new StringBuffer();
     VirtualFile vf = EditorData.getVirtualFile(editor);
     if (vf != null) {
@@ -437,12 +441,12 @@ public class FileGroup extends AbstractActionGroup {
      *
      * @param event
      */
-    public void selectionChanged(FileEditorManagerEvent event) {
+    public void selectionChanged(@NotNull FileEditorManagerEvent event) {
       lastSelections.put(event.getManager(), event.getOldFile());
     }
   }
 
-  private static HashMap<FileEditorManager, VirtualFile> lastSelections = new HashMap<FileEditorManager, VirtualFile>();
+  @NotNull private static HashMap<FileEditorManager, VirtualFile> lastSelections = new HashMap<FileEditorManager, VirtualFile>();
 
   private static Logger logger = Logger.getInstance(FileGroup.class.getName());
 }

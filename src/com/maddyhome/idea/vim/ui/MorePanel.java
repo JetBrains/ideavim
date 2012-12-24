@@ -29,6 +29,8 @@ import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.option.Options;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -51,7 +53,7 @@ public class MorePanel extends JPanel {
     return instance;
   }
 
-  public static MorePanel getInstance(Editor editor) {
+  public static MorePanel getInstance(@NotNull Editor editor) {
     if (instance == null) {
       instance = new MorePanel();
     }
@@ -63,7 +65,7 @@ public class MorePanel extends JPanel {
   /**
    * @param editor The editor that this more panel will be displayed over
    */
-  public void setEditor(Editor editor) {
+  public void setEditor(@NotNull Editor editor) {
     this.editor = editor;
     this.parent = editor.getContentComponent();
   }
@@ -127,7 +129,7 @@ public class MorePanel extends JPanel {
     return text.getText();
   }
 
-  public void setText(String data) {
+  public void setText(@NotNull String data) {
     if (data.length() > 0 && data.charAt(data.length() - 1) == '\n') {
       data = data.substring(0, data.length() - 1);
     }
@@ -191,7 +193,7 @@ public class MorePanel extends JPanel {
     return active;
   }
 
-  private static int countLines(String text) {
+  private static int countLines(@NotNull String text) {
     if (text.length() == 0) {
       return 0;
     }
@@ -300,7 +302,7 @@ public class MorePanel extends JPanel {
     close(null);
   }
 
-  private void close(final KeyEvent e) {
+  private void close(@Nullable final KeyEvent e) {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         deactivate(false);
@@ -330,7 +332,7 @@ public class MorePanel extends JPanel {
     /**
      * Invoked when a key has been pressed.
      */
-    public void keyTyped(KeyEvent e) {
+    public void keyTyped(@NotNull KeyEvent e) {
       if (parent.atEnd) {
         parent.close(e);
       }
@@ -374,18 +376,18 @@ public class MorePanel extends JPanel {
     private MorePanel parent;
   }
 
-  private JLabel label = new JLabel("more");
-  private JTextArea text = new JTextArea();
-  private JScrollPane scrollPane = new JBScrollPane(text, JScrollPane.VERTICAL_SCROLLBAR_NEVER,
+  @NotNull private JLabel label = new JLabel("more");
+  @NotNull private JTextArea text = new JTextArea();
+  @NotNull private JScrollPane scrollPane = new JBScrollPane(text, JScrollPane.VERTICAL_SCROLLBAR_NEVER,
                                                    JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
   private ComponentAdapter adapter;
-  private Editor editor = null;
-  private JComponent parent = null;
+  @Nullable private Editor editor = null;
+  @Nullable private JComponent parent = null;
   private boolean atEnd = false;
   private int lineHeight = 0;
 
-  private JComponent oldGlass = null;
-  private LayoutManager oldLayout = null;
+  @Nullable private JComponent oldGlass = null;
+  @Nullable private LayoutManager oldLayout = null;
   private boolean wasOpaque = false;
 
   private boolean active = false;

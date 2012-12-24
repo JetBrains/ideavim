@@ -1,5 +1,7 @@
 package com.maddyhome.idea.vim.help;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.*;
 
 /*
@@ -22,7 +24,7 @@ import java.io.*;
  */
 
 public class MakeTags {
-  public static void main(String[] args) {
+  public static void main(@NotNull String[] args) {
     if (args.length == 0) {
       System.err.println("Usage: java com.maddyhome.idea.vim.help.MakeTags <filelist> > tags");
       return;

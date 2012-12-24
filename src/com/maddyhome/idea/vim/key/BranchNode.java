@@ -81,6 +81,7 @@ public class BranchNode extends ParentNode {
     return flags;
   }
 
+  @NotNull
   public String toString() {
     StringBuffer res = new StringBuffer();
     res.append("BranchNode[key=");

@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.motion.MotionEditorActionHandler;
 import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.Options;
+import org.jetbrains.annotations.NotNull;
 
 /**
  */
@@ -37,7 +38,7 @@ public class MotionGotoLineLastEndAction extends MotionEditorAction {
   }
 
   private static class Handler extends MotionEditorActionHandler {
-    public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
+    public int getOffset(@NotNull Editor editor, DataContext context, int count, int rawCount, Argument argument) {
       boolean allow = false;
       if (CommandState.inInsertMode(editor)) {
         allow = true;

@@ -19,6 +19,8 @@ package com.maddyhome.idea.vim.option;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -103,12 +105,12 @@ public abstract class Option {
    * Helper method used to sort lists of options by their name
    */
   static class NameSorter<V> implements Comparator<V> {
-    public int compare(V o1, V o2) {
+    public int compare(@NotNull V o1, @NotNull V o2) {
       return ((Option)o1).name.compareTo(((Option)o2).name);
     }
   }
 
   protected String name;
   protected String abbrev;
-  protected List<OptionChangeListener> listeners = new ArrayList<OptionChangeListener>();
+  @NotNull protected List<OptionChangeListener> listeners = new ArrayList<OptionChangeListener>();
 }

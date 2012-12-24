@@ -34,7 +34,8 @@ import java.util.List;
 public class StringHelper {
   private StringHelper() {}
 
-  public static String pad(String text, int len, char ch) {
+  @NotNull
+  public static String pad(@NotNull String text, int len, char ch) {
     int l = text.length();
     StringBuffer res = new StringBuffer(text);
     for (int i = l; i < len; i++) {
@@ -82,8 +83,9 @@ public class StringHelper {
     return res.toString();
   }
 
+  @NotNull
   @Deprecated
-  private static String unentities(String text) {
+  private static String unentities(@NotNull String text) {
     StringBuffer res = new StringBuffer(text.length());
 
     for (int i = 0; i < text.length(); i++) {
@@ -146,7 +148,7 @@ public class StringHelper {
     return res;
   }
 
-  public static boolean containsUpperCase(String text) {
+  public static boolean containsUpperCase(@NotNull String text) {
     for (int i = 0; i < text.length(); i++) {
       if (Character.isUpperCase(text.charAt(i)) && (i == 0 || text.charAt(i - 1) == '\\')) {
         return true;
@@ -159,6 +161,7 @@ public class StringHelper {
   /**
    * Set the text of an XML element, safely encode it if needed.
    */
+  @NotNull
   public static Element setSafeXmlText(@NotNull Element element, @NotNull String text) {
     final Character first = firstCharacter(text);
     final Character last = lastCharacter(text);

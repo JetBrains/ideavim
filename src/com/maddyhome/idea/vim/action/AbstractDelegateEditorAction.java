@@ -22,18 +22,19 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractDelegateEditorAction extends EditorAction implements DelegateAction {
   protected AbstractDelegateEditorAction(EditorActionHandler handler) {
     super(handler);
   }
 
-  protected AbstractDelegateEditorAction(EditorActionHandler handler, EditorAction origAction) {
+  protected AbstractDelegateEditorAction(EditorActionHandler handler, @NotNull EditorAction origAction) {
     this(handler);
     setOrigAction(origAction);
   }
 
-  public void setOrigAction(AnAction origAction) {
+  public void setOrigAction(@NotNull AnAction origAction) {
     if (logger.isDebugEnabled()) {
       logger.debug("origAction=" + origAction);
     }

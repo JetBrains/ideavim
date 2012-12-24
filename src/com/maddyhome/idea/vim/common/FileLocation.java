@@ -19,6 +19,9 @@ package com.maddyhome.idea.vim.common;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 public abstract class FileLocation {
   protected FileLocation(int lline, int col, String filename) {
     this.line = lline;
@@ -76,6 +79,7 @@ public abstract class FileLocation {
    *
    * @return The mark's filename
    */
+  @Nullable
   public String getFilename() {
     if (filename != null) {
       return filename;
@@ -85,6 +89,7 @@ public abstract class FileLocation {
     }
   }
 
+  @NotNull
   public String toString() {
     final StringBuffer sb = new StringBuffer();
     sb.append("FileLocation");
@@ -97,5 +102,5 @@ public abstract class FileLocation {
 
   private int line;
   private int col;
-  private String filename;
+  @Nullable private String filename;
 }

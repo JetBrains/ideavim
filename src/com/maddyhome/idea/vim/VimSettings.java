@@ -19,6 +19,9 @@ package com.maddyhome.idea.vim;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.HashSet;
 
 public class VimSettings {
@@ -38,7 +41,7 @@ public class VimSettings {
     this.choices = choices;
   }
 
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) {
       return true;
     }
@@ -62,6 +65,7 @@ public class VimSettings {
     return result;
   }
 
+  @NotNull
   public String toString() {
     final StringBuffer sb = new StringBuffer();
     sb.append("VimSettings");

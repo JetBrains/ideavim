@@ -50,7 +50,7 @@ public class MacroGroup extends AbstractActionGroup {
    * @param count   The number of times to execute the macro
    * @return true if able to play the macro, false if invalid or empty register
    */
-  public boolean playbackRegister(Editor editor, DataContext context, Project project, char reg, int count) {
+  public boolean playbackRegister(@NotNull Editor editor, @NotNull DataContext context, @NotNull Project project, char reg, int count) {
     if (logger.isDebugEnabled()) {
       logger.debug("play bakc register " + reg + " " + count + " times");
     }
@@ -76,7 +76,7 @@ public class MacroGroup extends AbstractActionGroup {
    * @param count   The number of times to execute the macro
    * @return true if able to play the macro, false in no previous playback
    */
-  public boolean playbackLastRegister(Editor editor, DataContext context, Project project, int count) {
+  public boolean playbackLastRegister(@NotNull Editor editor, @NotNull DataContext context, @NotNull Project project, int count) {
     if (lastRegister != 0) {
       return playbackRegister(editor, context, project, lastRegister, count);
     }
@@ -137,7 +137,7 @@ public class MacroGroup extends AbstractActionGroup {
     });
   }
 
-  public void postKey(KeyStroke stroke, Editor editor) {
+  public void postKey(@NotNull KeyStroke stroke, @NotNull Editor editor) {
     final Component component = SwingUtilities.getAncestorOfClass(Window.class, editor.getComponent());
     final KeyEvent event = createKeyEvent(stroke, component);
     SwingUtilities.invokeLater(new Runnable() {
@@ -150,7 +150,8 @@ public class MacroGroup extends AbstractActionGroup {
     });
   }
 
-  private KeyEvent createKeyEvent(KeyStroke stroke, Component component) {
+  @NotNull
+  private KeyEvent createKeyEvent(@NotNull KeyStroke stroke, Component component) {
     return new KeyEvent(component,
                         stroke.getKeyChar() == KeyEvent.CHAR_UNDEFINED ? KeyEvent.KEY_PRESSED : KeyEvent.KEY_TYPED,
                         System.currentTimeMillis(), stroke.getModifiers(), stroke.getKeyCode(), stroke.getKeyChar());

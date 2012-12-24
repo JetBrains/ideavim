@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.group.CommandGroups;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -34,7 +35,7 @@ public class ShiftRightHandler extends CommandHandler {
     super(">", ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", ARGUMENT_OPTIONAL | WRITABLE);
   }
 
-  public boolean execute(Editor editor, DataContext context, ExCommand cmd) {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
     TextRange range = cmd.getTextRange(editor, context, true);
 
     CommandGroups.getInstance().getChange().indentRange(editor, context, range, cmd.getCommand().length(), 1);

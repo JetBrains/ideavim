@@ -19,6 +19,9 @@ package com.maddyhome.idea.vim.ex;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.HashMap;
 
 /**
@@ -33,6 +36,7 @@ public class CommandNode {
     this.command = command;
   }
 
+  @NotNull
   public CommandNode addChild(char ch, CommandHandler command) {
     CommandNode res = new CommandNode(command);
     nodes.put(ch, res);
@@ -44,6 +48,7 @@ public class CommandNode {
     return nodes.get(ch);
   }
 
+  @Nullable
   public CommandHandler getCommandHandler() {
     return command;
   }
@@ -52,6 +57,6 @@ public class CommandNode {
     this.command = command;
   }
 
-  private CommandHandler command;
-  private HashMap<Character, CommandNode> nodes = new HashMap<Character, CommandNode>();
+  @Nullable private CommandHandler command;
+  @NotNull private HashMap<Character, CommandNode> nodes = new HashMap<Character, CommandNode>();
 }

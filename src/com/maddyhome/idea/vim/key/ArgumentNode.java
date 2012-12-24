@@ -88,6 +88,7 @@ public class ArgumentNode implements Node {
     return flags;
   }
 
+  @NotNull
   public String toString() {
     StringBuffer res = new StringBuffer();
     res.append("ArgumentNode[");

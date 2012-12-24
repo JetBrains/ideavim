@@ -25,12 +25,13 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
  */
 public class ReformatVisualHandler extends VisualOperatorActionHandler {
-  protected boolean execute(Editor editor, DataContext context, Command cmd, TextRange range) {
+  protected boolean execute(Editor editor, @NotNull DataContext context, Command cmd, TextRange range) {
     KeyHandler.executeAction("ReformatCode", context);
 
     return true;

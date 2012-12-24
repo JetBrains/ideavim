@@ -65,7 +65,7 @@ public class EditorKeyHandler extends EditorActionHandler {
     }
   }
 
-  protected void original(Editor editor, DataContext context) {
+  protected void original(@NotNull Editor editor, @NotNull DataContext context) {
 
     if (logger.isDebugEnabled()) {
       logger.debug("original for " + stroke);

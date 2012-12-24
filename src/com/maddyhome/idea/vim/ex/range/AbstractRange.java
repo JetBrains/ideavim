@@ -22,6 +22,8 @@ package com.maddyhome.idea.vim.ex.range;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.Range;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Base for all Ex command ranges
@@ -35,7 +37,8 @@ public abstract class AbstractRange implements Range {
    * @param move   True if cursor should be moved to range line
    * @return The ranges appropriate to the text
    */
-  public static Range[] createRange(String str, int offset, boolean move) {
+  @Nullable
+  public static Range[] createRange(@NotNull String str, int offset, boolean move) {
     // Current line
     if (str.equals(".") || str.length() == 0) {
       return new Range[]{new LineNumberRange(offset, move)};
@@ -122,6 +125,7 @@ public abstract class AbstractRange implements Range {
     return line + offset;
   }
 
+  @NotNull
   public String toString() {
     final StringBuffer sb = new StringBuffer();
     sb.append("AbstractRange");

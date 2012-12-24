@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
+import org.jetbrains.annotations.NotNull;
 
 /**
  */
@@ -35,7 +36,7 @@ public class RepeatExCommandAction extends EditorAction {
   }
 
   private static class Handler extends AbstractEditorActionHandler {
-    public boolean execute(Editor editor, DataContext context, Command command) {
+    public boolean execute(@NotNull Editor editor, DataContext context, @NotNull Command command) {
       int count = command.getCount();
       try {
         return CommandParser.getInstance().processLastCommand(editor, context, count);

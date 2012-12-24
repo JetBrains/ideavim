@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.ex.range.AbstractRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +47,7 @@ public class Ranges {
    *
    * @param range The list of ranges to append to the current list
    */
-  public void addRange(Range[] range) {
+  public void addRange(@NotNull Range[] range) {
     for (Range aRange : range) {
       ranges.add(aRange);
     }
@@ -78,7 +79,7 @@ public class Ranges {
    * @param context The data context
    * @return The line number represented by the range
    */
-  public int getLine(Editor editor, DataContext context) {
+  public int getLine(@NotNull Editor editor, DataContext context) {
     processRange(editor, context);
 
     return endLine;
@@ -91,7 +92,7 @@ public class Ranges {
    * @param context The data context
    * @return The starting line number
    */
-  public int getFirstLine(Editor editor, DataContext context) {
+  public int getFirstLine(@NotNull Editor editor, DataContext context) {
     processRange(editor, context);
 
     return startLine;
@@ -106,7 +107,7 @@ public class Ranges {
    * @param count   The count given at the end of the command or -1 if no such count (use end line)
    * @return count if count != -1, else return end line of range
    */
-  public int getCount(Editor editor, DataContext context, int count) {
+  public int getCount(@NotNull Editor editor, DataContext context, int count) {
     if (count == -1) {
       return getLine(editor, context);
     }
@@ -124,7 +125,8 @@ public class Ranges {
    * @param count   The count given at the end of the command or -1 if no such count
    * @return The line range
    */
-  public LineRange getLineRange(Editor editor, DataContext context, int count) {
+  @NotNull
+  public LineRange getLineRange(@NotNull Editor editor, DataContext context, int count) {
     processRange(editor, context);
     int end;
     int start;
@@ -150,7 +152,8 @@ public class Ranges {
    * @param count   The count given at the end of the command or -1 if no such count
    * @return The text range
    */
-  public TextRange getTextRange(Editor editor, DataContext context, int count) {
+  @NotNull
+  public TextRange getTextRange(@NotNull Editor editor, DataContext context, int count) {
     LineRange lr = getLineRange(editor, context, count);
     int start = EditorHelper.getLineStartOffset(editor, lr.getStartLine());
     int end = EditorHelper.getLineEndOffset(editor, lr.getEndLine(), true) + 1;
@@ -165,7 +168,8 @@ public class Ranges {
    * @param context The data context
    * @return The range of the current line
    */
-  public static TextRange getCurrentLineRange(Editor editor, DataContext context) {
+  @NotNull
+  public static TextRange getCurrentLineRange(@NotNull Editor editor, DataContext context) {
     Ranges ranges = new Ranges();
 
     return ranges.getTextRange(editor, context, -1);
@@ -178,7 +182,8 @@ public class Ranges {
    * @param context The data context
    * @return The range of the current file
    */
-  public static TextRange getFileTextRange(Editor editor, DataContext context) {
+  @NotNull
+  public static TextRange getFileTextRange(@NotNull Editor editor, DataContext context) {
     Ranges ranges = new Ranges();
     ranges.addRange(AbstractRange.createRange("%", 0, false));
 
@@ -191,7 +196,7 @@ public class Ranges {
    * @param editor  The editor to get the lines for
    * @param context The data context
    */
-  private void processRange(Editor editor, DataContext context) {
+  private void processRange(@NotNull Editor editor, DataContext context) {
     // Already done
     if (done) return;
 
@@ -220,6 +225,7 @@ public class Ranges {
     done = true;
   }
 
+  @NotNull
   public String toString() {
     StringBuffer res = new StringBuffer();
     res.append("Ranges[ranges=").append(ranges);

@@ -19,6 +19,8 @@ package com.maddyhome.idea.vim.common;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+
 public class TextRange {
   public TextRange(int start, int end) {
     this(new int[]{start}, new int[]{end});
@@ -71,6 +73,7 @@ public class TextRange {
     return ends;
   }
 
+  @NotNull
   public TextRange normalize() {
     normalizeIndex(0);
     return this;
@@ -96,6 +99,7 @@ public class TextRange {
     return true;
   }
 
+  @NotNull
   public String toString() {
     final StringBuffer sb = new StringBuffer();
     sb.append("TextRange");

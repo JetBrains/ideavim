@@ -22,6 +22,8 @@ package com.maddyhome.idea.vim.helper;
 import com.intellij.CommonBundle;
 import com.intellij.reference.SoftReference;
 import org.jetbrains.annotations.NonNls;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.PropertyKey;
 
 import java.lang.ref.Reference;
@@ -31,7 +33,7 @@ import java.util.ResourceBundle;
  *
  */
 public class MessageHelper {
-  private static Reference<ResourceBundle> ourBundle;
+  @Nullable private static Reference<ResourceBundle> ourBundle;
 
   @NonNls
   private static final String BUNDLE = "messages";
@@ -39,17 +41,20 @@ public class MessageHelper {
   private MessageHelper() {
   }
 
-  public static String message(@PropertyKey(resourceBundle = BUNDLE)String key, Object... params) {
+  @NotNull
+  public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE)String key, Object... params) {
     return CommonBundle.message(getBundle(), key, params);
   }
 
   /*
    * This method added for jruby access
    */
-  public static String message(@PropertyKey(resourceBundle = BUNDLE)String key) {
+  @NotNull
+  public static String message(@NotNull @PropertyKey(resourceBundle = BUNDLE)String key) {
     return CommonBundle.message(getBundle(), key);
   }
 
+  @Nullable
   protected static ResourceBundle getBundle() {
     ResourceBundle bundle = null;
     if (ourBundle != null) bundle = ourBundle.get();

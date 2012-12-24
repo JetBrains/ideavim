@@ -25,6 +25,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -34,7 +35,7 @@ public class PassThruDelegateAction extends AbstractDelegateAction {
     this.stroke = stroke;
   }
 
-  public void actionPerformed(AnActionEvent event) {
+  public void actionPerformed(@NotNull AnActionEvent event) {
     if (logger.isDebugEnabled()) {
       logger.debug("actionPerformed key=" + stroke);
     }

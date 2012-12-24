@@ -23,6 +23,8 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.group.CommandGroups;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -31,7 +33,7 @@ public class DigraphSequence {
   public DigraphSequence() {
   }
 
-  public static boolean isDigraphStart(KeyStroke key) {
+  public static boolean isDigraphStart(@NotNull KeyStroke key) {
     if ((key.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
       if (key.getKeyCode() == KeyEvent.VK_K || key.getKeyCode() == KeyEvent.VK_V || key.getKeyCode() == KeyEvent.VK_Q) {
         return true;
@@ -41,7 +43,8 @@ public class DigraphSequence {
     return false;
   }
 
-  public DigraphResult processKey(KeyStroke key, Editor editor, DataContext context) {
+  @NotNull
+  public DigraphResult processKey(@NotNull KeyStroke key, @NotNull Editor editor, DataContext context) {
     switch (digraphState) {
       case DIG_STATE_START:
         logger.debug("DIG_STATE_START");
@@ -216,6 +219,7 @@ public class DigraphSequence {
       this.stroke = stroke;
     }
 
+    @Nullable
     public KeyStroke getStroke() {
       return stroke;
     }
@@ -225,7 +229,7 @@ public class DigraphSequence {
     }
 
     private int result;
-    private KeyStroke stroke;
+    @Nullable private KeyStroke stroke;
   }
 
   private int digraphState = DIG_STATE_START;

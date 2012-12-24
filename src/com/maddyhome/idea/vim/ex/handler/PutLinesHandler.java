@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -40,7 +41,7 @@ public class PutLinesHandler extends CommandHandler {
     }, RANGE_OPTIONAL | ARGUMENT_REQUIRED | WRITABLE);
   }
 
-  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     int line = cmd.getLine(editor, context);
     String arg = cmd.getArgument();
     boolean before = false;

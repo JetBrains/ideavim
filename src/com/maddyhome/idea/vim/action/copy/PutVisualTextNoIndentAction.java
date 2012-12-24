@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
+import org.jetbrains.annotations.NotNull;
 
 /**
  */
@@ -35,7 +36,7 @@ public class PutVisualTextNoIndentAction extends EditorAction {
   }
 
   private static class Handler extends VisualOperatorActionHandler {
-    protected boolean execute(Editor editor, DataContext context, Command cmd, TextRange range) {
+    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd, @NotNull TextRange range) {
       return CommandGroups.getInstance().getCopy().putVisualRange(editor, context, range, cmd.getCount(), false, false);
     }
   }

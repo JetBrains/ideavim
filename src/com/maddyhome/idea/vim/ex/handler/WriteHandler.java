@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.group.CommandGroups;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -36,7 +37,7 @@ public class WriteHandler extends CommandHandler {
     }, RANGE_OPTIONAL | ARGUMENT_OPTIONAL);
   }
 
-  public boolean execute(Editor editor, DataContext context, ExCommand cmd) {
+  public boolean execute(@NotNull Editor editor, DataContext context, ExCommand cmd) {
     CommandGroups.getInstance().getFile().saveFile(editor, context);
 
     return true;

@@ -24,6 +24,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.group.CommandGroups;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +96,7 @@ public class SearchRange extends AbstractRange {
    * @param lastZero True if last line was set to start of file
    * @return The zero based line number, -1 if the text was not found
    */
-  protected int getRangeLine(Editor editor, DataContext context, boolean lastZero) {
+  protected int getRangeLine(@NotNull Editor editor, DataContext context, boolean lastZero) {
     // Each subsequent pattern is searched for starting in the line after the previous search match
     int line = editor.getCaretModel().getLogicalPosition().line;
     int pos = -1;
@@ -126,6 +127,7 @@ public class SearchRange extends AbstractRange {
     }
   }
 
+  @NotNull
   public String toString() {
     StringBuffer res = new StringBuffer();
     res.append("SearchRange[");
@@ -138,8 +140,8 @@ public class SearchRange extends AbstractRange {
     return res.toString();
   }
 
-  private List<String> patterns = new ArrayList<String>();
-  private List<Integer> flags = new ArrayList<Integer>();
+  @NotNull private List<String> patterns = new ArrayList<String>();
+  @NotNull private List<Integer> flags = new ArrayList<Integer>();
 
   private static Logger logger = Logger.getInstance(SearchRange.class.getName());
 }

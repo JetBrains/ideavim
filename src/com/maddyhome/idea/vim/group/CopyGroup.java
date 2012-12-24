@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.StringTokenizer;
 
@@ -54,7 +55,7 @@ public class CopyGroup extends AbstractActionGroup {
    * @param argument The motion command argument
    * @return true if able to yank the text, false if not
    */
-  public boolean yankMotion(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
+  public boolean yankMotion(@NotNull Editor editor, DataContext context, int count, int rawCount, @NotNull Argument argument) {
     TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true, false);
     return yankRange(editor, range, SelectionType.fromCommandFlags(argument.getMotion().getFlags()), true);
   }
@@ -66,7 +67,7 @@ public class CopyGroup extends AbstractActionGroup {
    * @param count   The number of lines to yank
    * @return true if able to yank the lines, false if not
    */
-  public boolean yankLine(Editor editor, int count) {
+  public boolean yankLine(@NotNull Editor editor, int count) {
     int start = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor);
     int offset = Math.min(CommandGroups.getInstance().getMotion().moveCaretToLineEndOffset(
       editor, count - 1, true) + 1, EditorHelper.getFileSize(editor));
@@ -85,7 +86,7 @@ public class CopyGroup extends AbstractActionGroup {
    * @param type       The type of yank
    * @return true if able to yank the range, false if not
    */
-  public boolean yankRange(Editor editor, TextRange range, @NotNull SelectionType type, boolean moveCursor) {
+  public boolean yankRange(@NotNull Editor editor, @Nullable TextRange range, @NotNull SelectionType type, boolean moveCursor) {
     if (range != null) {
       if (logger.isDebugEnabled()) {
         logger.debug("yanking range: " + range);
@@ -109,7 +110,7 @@ public class CopyGroup extends AbstractActionGroup {
    * @param count       The number of times to perform the paste
    * @return true if able to paste, false if not
    */
-  public boolean putTextBeforeCursor(Editor editor, DataContext context, int count, boolean indent,
+  public boolean putTextBeforeCursor(@NotNull Editor editor, @NotNull DataContext context, int count, boolean indent,
                                      boolean cursorAfter) {
     // What register are we getting the text from?
     Register reg = CommandGroups.getInstance().getRegister().getLastRegister();
@@ -143,7 +144,7 @@ public class CopyGroup extends AbstractActionGroup {
    * @param count       The number of times to perform the paste
    * @return true if able to paste, false if not
    */
-  public boolean putTextAfterCursor(Editor editor, DataContext context, int count, boolean indent,
+  public boolean putTextAfterCursor(@NotNull Editor editor, @NotNull DataContext context, int count, boolean indent,
                                     boolean cursorAfter) {
     Register reg = CommandGroups.getInstance().getRegister().getLastRegister();
     if (reg != null) {
@@ -177,7 +178,7 @@ public class CopyGroup extends AbstractActionGroup {
     return false;
   }
 
-  public boolean putVisualRange(Editor editor, DataContext context, TextRange range, int count, boolean indent,
+  public boolean putVisualRange(@NotNull Editor editor, @NotNull DataContext context, @NotNull TextRange range, int count, boolean indent,
                                 boolean cursorAfter) {
     CommandState.SubMode subMode = CommandState.getInstance(editor).getSubMode();
     Register reg = CommandGroups.getInstance().getRegister().getLastRegister();
@@ -247,7 +248,7 @@ public class CopyGroup extends AbstractActionGroup {
    * @param cursorAfter If true move cursor to just after pasted text
    * @param mode        The type of hightlight prior to the put.
    */
-  public void putText(Editor editor, DataContext context, int offset, String text, @NotNull SelectionType type, int count,
+  public void putText(@NotNull Editor editor, @NotNull DataContext context, int offset, @NotNull String text, @NotNull SelectionType type, int count,
                       boolean indent, boolean cursorAfter, @NotNull CommandState.SubMode mode) {
     if (logger.isDebugEnabled()) {
       logger.debug("offset=" + offset);

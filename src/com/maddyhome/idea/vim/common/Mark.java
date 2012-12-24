@@ -19,6 +19,8 @@ package com.maddyhome.idea.vim.common;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Comparator;
 
 /**
@@ -48,7 +50,7 @@ public class Mark extends FileLocation {
     return key;
   }
 
-  public boolean equals(Object object) {
+  public boolean equals(@NotNull Object object) {
     if (object instanceof Mark) {
       if (((Mark)object).key == key) {
         return true;
@@ -58,6 +60,7 @@ public class Mark extends FileLocation {
     return false;
   }
 
+  @NotNull
   public String toString() {
     final StringBuffer sb = new StringBuffer();
     sb.append("Mark{");

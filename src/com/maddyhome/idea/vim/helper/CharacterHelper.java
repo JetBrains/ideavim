@@ -19,6 +19,8 @@ package com.maddyhome.idea.vim.helper;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * This helper class is used when working with various character level operations
  */
@@ -48,6 +50,7 @@ public class CharacterHelper {
    * @param punctuationAsLetters True if punctuation is to be ignored, false if not
    * @return The type of the character
    */
+  @NotNull
   public static CharacterType charType(char ch, boolean punctuationAsLetters) {
     final Character.UnicodeBlock block = Character.UnicodeBlock.of(ch);
     if (Character.isWhitespace(ch)) {

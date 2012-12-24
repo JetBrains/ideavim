@@ -19,6 +19,8 @@ package com.maddyhome.idea.vim.option;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Represents a boolean option
  */
@@ -85,6 +87,7 @@ public class ToggleOption extends Option {
    *
    * @return The option's display value
    */
+  @NotNull
   public String toString() {
     StringBuffer res = new StringBuffer();
     if (!value) {

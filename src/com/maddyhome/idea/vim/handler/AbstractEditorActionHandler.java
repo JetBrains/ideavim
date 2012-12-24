@@ -28,11 +28,12 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
+import org.jetbrains.annotations.NotNull;
 
 /**
  */
 public abstract class AbstractEditorActionHandler extends EditorActionHandler {
-  public final void execute(Editor editor, DataContext context) {
+  public final void execute(Editor editor, @NotNull DataContext context) {
     editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     logger.debug("execute");
     if ((editor == null || !VimPlugin.isEnabled()) && this instanceof DelegateActionHandler) {

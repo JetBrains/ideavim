@@ -19,6 +19,9 @@ package com.maddyhome.idea.vim.key;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,6 +49,7 @@ public class KeyConflict {
     this.pluginWins = pluginWins;
   }
 
+  @NotNull
   public HashMap<String, Integer> getIdeaActions() {
     return ideaActions;
   }
@@ -66,6 +70,7 @@ public class KeyConflict {
     return ideaActions.remove(action);
   }
 
+  @NotNull
   public List<String> getPluginActions() {
     return pluginActions;
   }
@@ -78,7 +83,7 @@ public class KeyConflict {
     return pluginActions.remove(action);
   }
 
-  public boolean equals(Object o) {
+  public boolean equals(@Nullable Object o) {
     if (this == o) {
       return true;
     }
@@ -110,6 +115,7 @@ public class KeyConflict {
     return result;
   }
 
+  @NotNull
   public String toString() {
     final StringBuffer sb = new StringBuffer();
     sb.append("KeyConflict");
@@ -123,6 +129,6 @@ public class KeyConflict {
 
   private KeyStroke keyStroke;
   private boolean pluginWins;
-  private HashMap<String, Integer> ideaActions = new HashMap<String, Integer>();
-  private List<String> pluginActions = new ArrayList<String>();
+  @NotNull private HashMap<String, Integer> ideaActions = new HashMap<String, Integer>();
+  @NotNull private List<String> pluginActions = new ArrayList<String>();
 }

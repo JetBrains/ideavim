@@ -23,6 +23,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.*;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -34,7 +35,7 @@ public class DumpLineHandler extends CommandHandler {
     }, RANGE_OPTIONAL);
   }
 
-  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, DataContext context, @NotNull ExCommand cmd) throws ExException {
     LineRange range = cmd.getLineRange(editor, context, false);
 
     CharSequence chars = editor.getDocument().getCharsSequence();

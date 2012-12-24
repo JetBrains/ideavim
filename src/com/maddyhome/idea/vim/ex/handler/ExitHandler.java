@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.CommandGroups;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -40,7 +41,7 @@ public class ExitHandler extends CommandHandler {
     }, DONT_REOPEN);
   }
 
-  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+  public boolean execute(Editor editor, @NotNull DataContext context, ExCommand cmd) throws ExException {
     CommandGroups.getInstance().getFile().closeAllFiles(context);
 
     return true;

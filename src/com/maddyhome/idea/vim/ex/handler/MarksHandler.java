@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.ui.MorePanel;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class MarksHandler extends CommandHandler {
     }, ARGUMENT_OPTIONAL | KEEP_FOCUS);
   }
 
-  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, DataContext context, ExCommand cmd) throws ExException {
     List<Mark> marks = CommandGroups.getInstance().getMark().getMarks(editor);
 
     String spaces = "     ";

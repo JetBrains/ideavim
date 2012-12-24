@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -35,7 +36,7 @@ public class GotoCharacterHandler extends CommandHandler {
     super("go", "to", RANGE_OPTIONAL | ARGUMENT_OPTIONAL | RANGE_IS_COUNT, Command.FLAG_MOT_EXCLUSIVE);
   }
 
-  public boolean execute(Editor editor, DataContext context, ExCommand cmd) {
+  public boolean execute(@NotNull Editor editor, DataContext context, @NotNull ExCommand cmd) {
     int count = cmd.getCount(editor, context, 1, true);
 
     if (count > 0) {

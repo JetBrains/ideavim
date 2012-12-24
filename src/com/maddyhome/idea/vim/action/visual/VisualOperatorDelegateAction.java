@@ -29,19 +29,20 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.DelegateActionHandler;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
+import org.jetbrains.annotations.NotNull;
 
 public class VisualOperatorDelegateAction extends AbstractDelegateEditorAction {
   public VisualOperatorDelegateAction() {
     super(new Handler());
   }
 
-  public void setOrigAction(AnAction origAction) {
+  public void setOrigAction(@NotNull AnAction origAction) {
     super.setOrigAction(origAction);
     ((Handler)getHandler()).setOrigAction(origAction);
   }
 
   private static class Handler extends VisualOperatorActionHandler implements DelegateActionHandler {
-    protected boolean execute(Editor editor, DataContext context, Command cmd, TextRange range) {
+    protected boolean execute(Editor editor, @NotNull DataContext context, Command cmd, TextRange range) {
       if (logger.isDebugEnabled()) {
         logger.debug("execute, cmd=" + cmd + ", range=" + range);
         logger.debug("origAction=" + origAction);

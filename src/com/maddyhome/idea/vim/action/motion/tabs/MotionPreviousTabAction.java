@@ -6,6 +6,7 @@ import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.motion.MotionEditorActionHandler;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author oleg
@@ -16,7 +17,7 @@ public class MotionPreviousTabAction extends MotionEditorAction {
   }
 
   private static class Handler extends MotionEditorActionHandler {
-    public int getOffset(final Editor editor, final DataContext context, final int count, final int rawCount, final Argument argument) {
+    public int getOffset(final Editor editor, @NotNull final DataContext context, final int count, final int rawCount, final Argument argument) {
       return CommandGroups.getInstance().getMotion().moveCaretGotoPreviousTab(context);
     }
   }

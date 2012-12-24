@@ -46,6 +46,7 @@ public class HistoryGroup extends AbstractActionGroup {
     block.addEntry(text);
   }
 
+  @NotNull
   public List<HistoryEntry> getEntries(String key, int first, int last) {
     HistoryBlock block = blocks(key);
 
@@ -109,7 +110,7 @@ public class HistoryGroup extends AbstractActionGroup {
     element.addContent(hist);
   }
 
-  private void saveData(Element element, String key) {
+  private void saveData(@NotNull Element element, String key) {
     final HistoryBlock block = histories.get(key);
     if (block == null) {
       return;
@@ -139,7 +140,7 @@ public class HistoryGroup extends AbstractActionGroup {
     readData(hist, INPUT);
   }
 
-  private void readData(Element element, String key) {
+  private void readData(@NotNull Element element, String key) {
     HistoryBlock block = histories.get(key);
     if (block != null) {
       return;
@@ -212,7 +213,7 @@ public class HistoryGroup extends AbstractActionGroup {
     @NotNull private String entry;
   }
 
-  private Map<String, HistoryBlock> histories = new HashMap<String, HistoryBlock>();
+  @NotNull private Map<String, HistoryBlock> histories = new HashMap<String, HistoryBlock>();
 
   private static Logger logger = Logger.getInstance(HistoryGroup.class.getName());
 }

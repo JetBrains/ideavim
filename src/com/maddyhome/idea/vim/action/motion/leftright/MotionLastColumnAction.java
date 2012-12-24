@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.handler.motion.MotionEditorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.Options;
+import org.jetbrains.annotations.NotNull;
 
 /**
  */
@@ -40,7 +41,7 @@ public class MotionLastColumnAction extends MotionEditorAction {
   }
 
   private static class Handler extends MotionEditorActionHandler {
-    public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
+    public int getOffset(@NotNull Editor editor, DataContext context, int count, int rawCount, Argument argument) {
       boolean allow = false;
       if (CommandState.inInsertMode(editor)) {
         allow = true;
@@ -55,7 +56,7 @@ public class MotionLastColumnAction extends MotionEditorAction {
       return CommandGroups.getInstance().getMotion().moveCaretToLineEndOffset(editor, count - 1, allow);
     }
 
-    protected void postMove(Editor editor, DataContext context, Command cmd) {
+    protected void postMove(@NotNull Editor editor, DataContext context, Command cmd) {
       EditorData.setLastColumn(editor, MotionGroup.LAST_COLUMN);
     }
   }

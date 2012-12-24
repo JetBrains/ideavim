@@ -28,6 +28,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -35,7 +36,7 @@ import java.awt.event.KeyEvent;
 /**
  */
 public class KeyAction extends AnAction {
-  public void actionPerformed(AnActionEvent event) {
+  public void actionPerformed(@NotNull AnActionEvent event) {
     if (logger.isDebugEnabled()) {
       logger.debug("actionPerformed=" + event);
     }

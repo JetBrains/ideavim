@@ -19,6 +19,8 @@ package com.maddyhome.idea.vim.key;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.swing.*;
 
 /**
@@ -40,7 +42,7 @@ public class Shortcut {
    *
    * @param keys The keystroke characters
    */
-  public Shortcut(String keys) {
+  public Shortcut(@NotNull String keys) {
     this.keys = new KeyStroke[keys.length()];
     for (int i = 0; i < keys.length(); i++) {
       this.keys[i] = KeyStroke.getKeyStroke(keys.charAt(i));

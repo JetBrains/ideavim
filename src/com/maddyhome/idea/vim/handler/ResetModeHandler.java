@@ -24,12 +24,13 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.KeyHandler;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
  */
 public class ResetModeHandler extends EditorActionHandler {
-  public void execute(Editor editor, DataContext context) {
+  public void execute(@NotNull Editor editor, DataContext context) {
     KeyHandler.getInstance().fullReset(InjectedLanguageUtil.getTopLevelEditor(editor));
   }
 }

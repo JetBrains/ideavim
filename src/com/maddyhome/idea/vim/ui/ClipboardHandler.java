@@ -19,6 +19,8 @@ package com.maddyhome.idea.vim.ui;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.Nullable;
+
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.io.IOException;
@@ -32,6 +34,7 @@ public class ClipboardHandler {
    *
    * @return The clipboard string or null if data isn't plain text
    */
+  @Nullable
   public static String getClipboardText() {
     String res = null;
     try {

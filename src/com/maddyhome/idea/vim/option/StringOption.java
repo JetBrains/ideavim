@@ -19,6 +19,8 @@ package com.maddyhome.idea.vim.option;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * An option that has an arbitrary string value
  */
@@ -90,7 +92,7 @@ public class StringOption extends TextOption {
    * @param val The substring to remove from the current value
    * @return True if the substring was removed, false if the value is not a substring of the current value
    */
-  public boolean remove(String val) {
+  public boolean remove(@NotNull String val) {
     int pos = value.indexOf(val);
     if (pos != -1) {
       value = value.substring(0, pos) + value.substring(pos + val.length());
@@ -126,6 +128,7 @@ public class StringOption extends TextOption {
    *
    * @return The option as a string for display
    */
+  @NotNull
   public String toString() {
     StringBuffer res = new StringBuffer();
     res.append("  ");

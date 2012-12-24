@@ -3,6 +3,7 @@ package com.maddyhome.idea.vim.ui;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.DialogWrapper;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
@@ -20,6 +21,7 @@ public class VimKeymapDialog extends DialogWrapper {
     init();
   }
 
+  @NotNull
   protected Action[] createActions() {
     return new Action[]{getOKAction(), getCancelAction()};
   }
@@ -28,6 +30,7 @@ public class VimKeymapDialog extends DialogWrapper {
     return myVimKeymapPanel.getPanel();
   }
 
+  @NotNull
   public Keymap getSelectedKeymap(){
     return myVimKeymapPanel.getSelectedKeyMap();
   }

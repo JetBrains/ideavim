@@ -25,6 +25,8 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Base class for all Ex command handlers.
@@ -148,6 +150,7 @@ public abstract class CommandHandler {
    *
    * @return The required portion of the command name. Returns the first if there are several names
    */
+  @Nullable
   public String getRequired() {
     if (names == null) {
       return null;
@@ -162,6 +165,7 @@ public abstract class CommandHandler {
    *
    * @return The optional portion of the command name. Returns the first if there are several names
    */
+  @Nullable
   public String getOptional() {
     if (names == null) {
       return null;
@@ -176,6 +180,7 @@ public abstract class CommandHandler {
    *
    * @return The command names
    */
+  @Nullable
   public CommandName[] getNames() {
     return names;
   }
@@ -207,7 +212,7 @@ public abstract class CommandHandler {
    * @param count   The count entered by the user prior to the command
    * @throws ExException if the range or argument is invalid or unable to run the command
    */
-  public boolean process(final Editor editor, final DataContext context, final ExCommand cmd, final int count) throws
+  public boolean process(final Editor editor, final DataContext context, @NotNull final ExCommand cmd, final int count) throws
                                                                                                                ExException {
     // No range allowed
     if ((argFlags & RANGE_FORBIDDEN) != 0 && cmd.getRanges().size() != 0) {
@@ -276,7 +281,7 @@ public abstract class CommandHandler {
    */
   public abstract boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException;
 
-  protected CommandName[] names;
+  @Nullable protected CommandName[] names;
   protected int argFlags;
   protected int optFlags;
 }

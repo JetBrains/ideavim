@@ -38,6 +38,7 @@ import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import com.maddyhome.idea.vim.ui.MorePanel;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.io.*;
@@ -53,7 +54,7 @@ public class ProcessGroup extends AbstractActionGroup {
     return lastCommand;
   }
 
-  public void startSearchCommand(Editor editor, DataContext context, int count, char leader) {
+  public void startSearchCommand(@NotNull Editor editor, DataContext context, int count, char leader) {
     if (editor.isOneLineMode()) // Don't allow searching in one line editors
     {
       return;
@@ -66,7 +67,7 @@ public class ProcessGroup extends AbstractActionGroup {
     panel.activate(editor, context, label, initText, count);
   }
 
-  public String endSearchCommand(final Editor editor, DataContext context) {
+  public String endSearchCommand(@NotNull final Editor editor, @NotNull DataContext context) {
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate();
 
@@ -84,7 +85,7 @@ public class ProcessGroup extends AbstractActionGroup {
     return panel.getText();
   }
 
-  public void startExCommand(Editor editor, DataContext context, Command cmd) {
+  public void startExCommand(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
     if (editor.isOneLineMode()) // Don't allow ex commands in one line editors
     {
       return;
@@ -96,7 +97,7 @@ public class ProcessGroup extends AbstractActionGroup {
     panel.activate(editor, context, ":", initText, 1);
   }
 
-  public boolean processExKey(Editor editor, KeyStroke stroke, boolean charOnly) {
+  public boolean processExKey(Editor editor, @NotNull KeyStroke stroke, boolean charOnly) {
     // This will only get called if somehow the key focus ended up in the editor while the ex entry window
     // is open. So I'll put focus back in the editor and process the key.
 
@@ -128,7 +129,7 @@ public class ProcessGroup extends AbstractActionGroup {
     */
   }
 
-  public boolean processExEntry(final Editor editor, final DataContext context) {
+  public boolean processExEntry(@NotNull final Editor editor, @NotNull final DataContext context) {
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate();
     boolean res = true;
@@ -197,7 +198,7 @@ public class ProcessGroup extends AbstractActionGroup {
     return res;
   }
 
-  public boolean cancelExEntry(final Editor editor, final DataContext context) {
+  public boolean cancelExEntry(@NotNull final Editor editor, @NotNull final DataContext context) {
     CommandState.getInstance(editor).popState();
     KeyHandler.getInstance().reset(editor);
     ExEntryPanel panel = ExEntryPanel.getInstance();
@@ -216,20 +217,21 @@ public class ProcessGroup extends AbstractActionGroup {
     return true;
   }
 
-  private void record(Editor editor, String text) {
+  private void record(Editor editor, @NotNull String text) {
     if (CommandState.getInstance(editor).isRecording()) {
       CommandGroups.getInstance().getRegister().addText(text);
     }
   }
 
-  public void startFilterCommand(Editor editor, DataContext context, Command cmd) {
+  public void startFilterCommand(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
     String initText = getRange(editor, cmd) + "!";
     CommandState.getInstance(editor).pushState(CommandState.Mode.EX_ENTRY, CommandState.SubMode.NONE, KeyParser.MAPPING_CMD_LINE);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.activate(editor, context, ":", initText, 1);
   }
 
-  private String getRange(Editor editor, Command cmd) {
+  @NotNull
+  private String getRange(Editor editor, @NotNull Command cmd) {
     String initText = "";
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
       initText = "'<,'>";
@@ -246,7 +248,7 @@ public class ProcessGroup extends AbstractActionGroup {
     return initText;
   }
 
-  public boolean executeFilter(Editor editor, TextRange range, String command) throws IOException {
+  public boolean executeFilter(@NotNull Editor editor, @NotNull TextRange range, String command) throws IOException {
     if (logger.isDebugEnabled()) logger.debug("command=" + command);
     CharSequence chars = editor.getDocument().getCharsSequence();
     StringReader car = new StringReader(chars.subSequence(range.getStartOffset(),
@@ -275,7 +277,7 @@ public class ProcessGroup extends AbstractActionGroup {
     return true;
   }
 
-  private void copy(Reader from, Writer to) throws IOException {
+  private void copy(@NotNull Reader from, @NotNull Writer to) throws IOException {
     char[] buf = new char[2048];
     int cnt;
     while ((cnt = from.read(buf)) != -1) {

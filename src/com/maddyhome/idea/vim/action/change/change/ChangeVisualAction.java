@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
+import org.jetbrains.annotations.NotNull;
 
 /**
  */
@@ -36,7 +37,7 @@ public class ChangeVisualAction extends EditorAction {
   }
 
   private static class Handler extends VisualOperatorActionHandler {
-    protected boolean execute(Editor editor, DataContext context, Command cmd, TextRange range) {
+    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, Command cmd, @NotNull TextRange range) {
       final SelectionType type = range.isMultiple() ? SelectionType.BLOCK_WISE : SelectionType.CHARACTER_WISE;
       return CommandGroups.getInstance().getChange().changeRange(editor, context, range, type);
     }

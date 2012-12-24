@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.CommandGroups;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -39,7 +40,7 @@ public class EditFileHandler extends CommandHandler {
     }, RANGE_FORBIDDEN | ARGUMENT_OPTIONAL | DONT_REOPEN);
   }
 
-  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     String arg = cmd.getArgument();
     if (arg != null) {
       if (arg.equals("#")) {

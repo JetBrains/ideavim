@@ -22,6 +22,7 @@ package com.maddyhome.idea.vim.ex.range;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a specific line, the current line, or the last line of a file
@@ -62,7 +63,7 @@ public class LineNumberRange extends AbstractRange {
    * @param lastZero True if last line was set to start of file
    * @return The zero based line number, -1 for start of file
    */
-  protected int getRangeLine(Editor editor, DataContext context, boolean lastZero) {
+  protected int getRangeLine(@NotNull Editor editor, DataContext context, boolean lastZero) {
     if (line == CURRENT_LINE) {
       line = editor.getCaretModel().getLogicalPosition().line;
     }
@@ -73,6 +74,7 @@ public class LineNumberRange extends AbstractRange {
     return line;
   }
 
+  @NotNull
   public String toString() {
     StringBuffer res = new StringBuffer();
     res.append("LineNumberRange[");

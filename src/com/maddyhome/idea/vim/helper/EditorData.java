@@ -29,6 +29,8 @@ import com.intellij.testFramework.LightVirtualFile;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.command.VisualRange;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -52,7 +54,7 @@ public class EditorData {
    *
    * @param editor The editor to cleanup
    */
-  public static void uninitializeEditor(Editor editor) {
+  public static void uninitializeEditor(@NotNull Editor editor) {
     if (logger.isDebugEnabled()) logger.debug("editor closed: " + editor);
     editor.putUserData(COMMAND_STATE, null);
     editor.putUserData(LAST_HIGHLIGHTS, null);
@@ -66,7 +68,7 @@ public class EditorData {
    * @param editor The editr to get the last column from
    * @return Returns the last column as set by {@link #setLastColumn} or the current cursor column
    */
-  public static int getLastColumn(Editor editor) {
+  public static int getLastColumn(@NotNull Editor editor) {
     Integer col = editor.getUserData(LAST_COLUMN);
     if (col == null) {
       return editor.getCaretModel().getVisualPosition().column;
@@ -82,25 +84,27 @@ public class EditorData {
    * @param col    The column
    * @param editor The editor
    */
-  public static void setLastColumn(Editor editor, int col) {
+  public static void setLastColumn(@NotNull Editor editor, int col) {
     editor.putUserData(LAST_COLUMN, col);
     int t = getLastColumn(editor);
     if (logger.isDebugEnabled()) logger.debug("setLastColumn(" + col + ") is now " + t);
   }
 
-  public static String getLastSearch(Editor editor) {
+  @Nullable
+  public static String getLastSearch(@NotNull Editor editor) {
     return editor.getUserData(LAST_SEARCH);
   }
 
-  public static void setLastSearch(Editor editor, String search) {
+  public static void setLastSearch(@NotNull Editor editor, String search) {
     editor.putUserData(LAST_SEARCH, search);
   }
 
-  public static Collection<RangeHighlighter> getLastHighlights(Editor editor) {
+  @Nullable
+  public static Collection<RangeHighlighter> getLastHighlights(@NotNull Editor editor) {
     return editor.getUserData(LAST_HIGHLIGHTS);
   }
 
-  public static void setLastHighlights(Editor editor, Collection<RangeHighlighter> highlights) {
+  public static void setLastHighlights(@NotNull Editor editor, Collection<RangeHighlighter> highlights) {
     editor.putUserData(LAST_HIGHLIGHTS, highlights);
   }
 
@@ -110,7 +114,8 @@ public class EditorData {
    * @param editor The editor to get the range for
    * @return The last visual range, null if no previous range
    */
-  public static VisualRange getLastVisualRange(Editor editor) {
+  @Nullable
+  public static VisualRange getLastVisualRange(@NotNull Editor editor) {
     return editor.getDocument().getUserData(VISUAL);
   }
 
@@ -120,7 +125,7 @@ public class EditorData {
    * @param editor The editor to set the range for
    * @param range  The visual range
    */
-  public static void setLastVisualRange(Editor editor, VisualRange range) {
+  public static void setLastVisualRange(@NotNull Editor editor, VisualRange range) {
     editor.getDocument().putUserData(VISUAL, range);
   }
 
@@ -130,7 +135,8 @@ public class EditorData {
    * @param editor The editor to get the range for
    * @return The last visual range, null if no previous range
    */
-  public static VisualChange getLastVisualOperatorRange(Editor editor) {
+  @Nullable
+  public static VisualChange getLastVisualOperatorRange(@NotNull Editor editor) {
     return editor.getDocument().getUserData(VISUAL_OP);
   }
 
@@ -140,19 +146,20 @@ public class EditorData {
    * @param editor The editor to set the range for
    * @param range  The visual range
    */
-  public static void setLastVisualOperatorRange(Editor editor, VisualChange range) {
+  public static void setLastVisualOperatorRange(@NotNull Editor editor, VisualChange range) {
     editor.getDocument().putUserData(VISUAL_OP, range);
   }
 
-  public static CommandState getCommandState(Editor editor) {
+  @Nullable
+  public static CommandState getCommandState(@NotNull Editor editor) {
     return editor.getUserData(COMMAND_STATE);
   }
 
-  public static void setCommandState(Editor editor, CommandState state) {
+  public static void setCommandState(@NotNull Editor editor, CommandState state) {
     editor.putUserData(COMMAND_STATE, state);
   }
 
-  public static boolean getChangeGroup(Editor editor) {
+  public static boolean getChangeGroup(@NotNull Editor editor) {
     Boolean res = editor.getUserData(CHANGE_GROUP);
     if (res != null) {
       return res;
@@ -162,19 +169,19 @@ public class EditorData {
     }
   }
 
-  public static void setChangeGroup(Editor editor, boolean adapter) {
+  public static void setChangeGroup(@NotNull Editor editor, boolean adapter) {
     editor.putUserData(CHANGE_GROUP, adapter);
   }
 
-  public static boolean getMotionGroup(Editor editor) {
+  public static boolean getMotionGroup(@NotNull Editor editor) {
     return editor.getUserData(MOTION_GROUP) == Boolean.TRUE;
   }
 
-  public static void setMotionGroup(Editor editor, boolean adapter) {
+  public static void setMotionGroup(@NotNull Editor editor, boolean adapter) {
     editor.putUserData(MOTION_GROUP, adapter);
   }
 
-  public static boolean isConsoleOutput(Editor editor) {
+  public static boolean isConsoleOutput(@NotNull Editor editor) {
     Object res = editor.getUserData(CONSOLE_VIEW_IN_EDITOR_VIEW);
     logger.debug("isConsoleOutput for editor " + editor + " - " + res);
     return res != null;
@@ -186,7 +193,8 @@ public class EditorData {
    * @param editor The editor
    * @return The virtual file for the editor
    */
-  public static VirtualFile getVirtualFile(Editor editor) {
+  @Nullable
+  public static VirtualFile getVirtualFile(@NotNull Editor editor) {
     return FileDocumentManager.getInstance().getFile(editor.getDocument());
   }
 
@@ -242,7 +250,7 @@ public class EditorData {
   /**
    * Checks if editor is file editor, also it takes into account that editor can be placed in editors hierarhy
    */
-  public static boolean isFileEditor(Editor editor){
+  public static boolean isFileEditor(@NotNull Editor editor){
     final VirtualFile virtualFile = EditorData.getVirtualFile(editor);
     return virtualFile != null && !(virtualFile instanceof LightVirtualFile);
   }

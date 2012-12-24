@@ -22,6 +22,7 @@ package com.maddyhome.idea.vim.undo;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -45,7 +46,7 @@ public class DocumentChange {
     return newText;
   }
 
-  public void redo(Editor editor, DataContext context) {
+  public void redo(@NotNull Editor editor, DataContext context) {
     if (oldText.length() > 0) {
       if (newText.length() > 0) {
         editor.getDocument().replaceString(offset, offset + oldText.length(), newText);
@@ -64,7 +65,7 @@ public class DocumentChange {
     }
   }
 
-  public void undo(Editor editor, DataContext context) {
+  public void undo(@NotNull Editor editor, DataContext context) {
     if (logger.isDebugEnabled()) logger.debug("undo command = " + this);
     if (oldText.length() > 0) {
       if (newText.length() > 0) {
@@ -84,6 +85,7 @@ public class DocumentChange {
     }
   }
 
+  @NotNull
   public String toString() {
     StringBuffer res = new StringBuffer();
     res.append("DocumentChange[");

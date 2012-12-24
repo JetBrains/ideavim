@@ -19,6 +19,9 @@ package com.maddyhome.idea.vim.regexp;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.nio.CharBuffer;
 
 /**
@@ -42,7 +45,7 @@ public class CharPointer {
     readonly = false;
   }
 
-  private CharPointer(CharPointer ptr, int offset) {
+  private CharPointer(@NotNull CharPointer ptr, int offset) {
     seq = ptr.seq;
     readonly = ptr.readonly;
     pointer = ptr.pointer + offset;
@@ -62,10 +65,12 @@ public class CharPointer {
     return seq == null && pointer == -1;
   }
 
+  @NotNull
   public CharPointer set(char ch) {
     return set(ch, 0);
   }
 
+  @NotNull
   public CharPointer set(char ch, int offset) {
     if (seq == null) {
       return this;
@@ -103,27 +108,32 @@ public class CharPointer {
     return seq.charAt(pointer + offset);
   }
 
+  @NotNull
   public CharPointer inc() {
     return inc(1);
   }
 
+  @NotNull
   public CharPointer inc(int cnt) {
     pointer += cnt;
 
     return this;
   }
 
+  @NotNull
   public CharPointer dec() {
     return dec(1);
   }
 
+  @NotNull
   public CharPointer dec(int cnt) {
     pointer -= cnt;
 
     return this;
   }
 
-  public CharPointer assign(CharPointer ptr) {
+  @NotNull
+  public CharPointer assign(@NotNull CharPointer ptr) {
     seq = ptr.seq;
     pointer = ptr.pointer;
     readonly = ptr.readonly;
@@ -131,6 +141,7 @@ public class CharPointer {
     return this;
   }
 
+  @NotNull
   public CharPointer ref(int offset) {
     if (this.equals(INIT)) {
       return INIT;
@@ -139,6 +150,7 @@ public class CharPointer {
     return new CharPointer(this, offset);
   }
 
+  @NotNull
   public String substring(int len) {
     if (end()) {
       return "";
@@ -166,7 +178,7 @@ public class CharPointer {
     return seq.length() - pointer;
   }
 
-  public int strncmp(String str, int len) {
+  public int strncmp(@NotNull String str, int len) {
     if (end()) {
       return -1;
     }
@@ -181,7 +193,7 @@ public class CharPointer {
     return s.compareTo(str.substring(0, len));
   }
 
-  public int strncmp(CharPointer str, int len) {
+  public int strncmp(@NotNull CharPointer str, int len) {
     if (end()) {
       return -1;
     }
@@ -220,7 +232,7 @@ public class CharPointer {
     */
   }
 
-  public int strnicmp(CharPointer str, int len) {
+  public int strnicmp(@NotNull CharPointer str, int len) {
     if (end()) {
       return -1;
     }
@@ -260,6 +272,7 @@ public class CharPointer {
     */
   }
 
+  @Nullable
   public CharPointer strchr(char c) {
     if (end()) {
       return null;
@@ -288,6 +301,7 @@ public class CharPointer {
     */
   }
 
+  @Nullable
   public CharPointer istrchr(char c) {
     if (end()) {
       return null;
@@ -327,6 +341,7 @@ public class CharPointer {
     return (int)charAt();
   }
 
+  @NotNull
   public CharPointer OPERAND() {
     return ref(3);
   }
@@ -368,11 +383,12 @@ public class CharPointer {
     return Math.min(seq.length(), pos);
   }
 
+  @NotNull
   public String toString() {
     return substring(strlen());
   }
 
-  private CharSequence seq;
+  @Nullable private CharSequence seq;
   private int pointer;
   private boolean readonly = true;
 }

@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
+import org.jetbrains.annotations.NotNull;
 
 /**
  */
@@ -37,7 +38,7 @@ public class YankVisualAction extends EditorAction {
   }
 
   private static class Handler extends VisualOperatorActionHandler {
-    protected boolean execute(Editor editor, DataContext context, Command cmd, TextRange range) {
+    protected boolean execute(@NotNull Editor editor, DataContext context, Command cmd, TextRange range) {
       final CommandState.SubMode subMode = CommandState.getInstance(editor).getSubMode();
       return CommandGroups.getInstance().getCopy().yankRange(editor, range,
                                                              SelectionType.fromSubMode(subMode), true);

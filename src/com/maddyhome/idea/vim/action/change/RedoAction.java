@@ -25,6 +25,7 @@ import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
 import com.maddyhome.idea.vim.helper.UndoRedoHelper;
+import org.jetbrains.annotations.NotNull;
 
 /**
  */
@@ -34,7 +35,7 @@ public class RedoAction extends EditorAction {
   }
 
   private static class Handler extends AbstractEditorActionHandler {
-    protected boolean execute(Editor editor, DataContext context, Command cmd) {
+    protected boolean execute(Editor editor, @NotNull DataContext context, Command cmd) {
       return UndoRedoHelper.redo(context);
     }
   }

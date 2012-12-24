@@ -19,6 +19,8 @@ package com.maddyhome.idea.vim.option;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.EventObject;
 
 /**
@@ -34,6 +36,7 @@ public class OptionChangeEvent extends EventObject {
    *
    * @return The changed option
    */
+  @NotNull
   public Option getOption() {
     return (Option)getSource();
   }

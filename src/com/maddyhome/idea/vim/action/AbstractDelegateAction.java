@@ -21,16 +21,17 @@ package com.maddyhome.idea.vim.action;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.diagnostic.Logger;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractDelegateAction extends AnAction implements DelegateAction {
   protected AbstractDelegateAction() {
   }
 
-  protected AbstractDelegateAction(AnAction origAction) {
+  protected AbstractDelegateAction(@NotNull AnAction origAction) {
     setOrigAction(origAction);
   }
 
-  public void setOrigAction(AnAction origAction) {
+  public void setOrigAction(@NotNull AnAction origAction) {
     if (logger.isDebugEnabled()) {
       logger.debug("origAction=" + origAction);
     }

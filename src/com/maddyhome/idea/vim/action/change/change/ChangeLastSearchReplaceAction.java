@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
+import org.jetbrains.annotations.NotNull;
 
 /**
  */
@@ -35,7 +36,7 @@ public class ChangeLastSearchReplaceAction extends EditorAction {
   }
 
   private static class Handler extends ChangeEditorActionHandler {
-    public boolean execute(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
+    public boolean execute(@NotNull Editor editor, DataContext context, int count, int rawCount, Argument argument) {
       int line = editor.getCaretModel().getLogicalPosition().line;
       LineRange range = new LineRange(line, line);
       return CommandGroups.getInstance().getSearch().searchAndReplace(editor, context, range, "s", "//~/");

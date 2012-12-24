@@ -7,6 +7,8 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.motion.TextObjectActionHandler;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class MotionOuterBlockBackQuoteAction extends TextObjectAction {
   public MotionOuterBlockBackQuoteAction() {
@@ -14,7 +16,8 @@ public class MotionOuterBlockBackQuoteAction extends TextObjectAction {
   }
 
   private static class Handler extends TextObjectActionHandler {
-    public TextRange getRange(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
+    @Nullable
+    public TextRange getRange(@NotNull Editor editor, DataContext context, int count, int rawCount, Argument argument) {
       return CommandGroups.getInstance().getMotion().getBlockQuoteRange(editor, '`', true);
     }
   }

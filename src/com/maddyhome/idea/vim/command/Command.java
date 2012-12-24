@@ -320,6 +320,7 @@ public class Command {
     this.keys = keys;
   }
 
+  @NotNull
   public String toString() {
     StringBuffer res = new StringBuffer();
     res.append("Command[");

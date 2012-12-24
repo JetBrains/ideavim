@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.helper.UndoRedoHelper;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -36,7 +37,7 @@ public class UndoHandler extends CommandHandler {
     }, RANGE_FORBIDDEN | ARGUMENT_FORBIDDEN | WRITABLE);
   }
 
-  public boolean execute(Editor editor, DataContext context, ExCommand cmd) {
+  public boolean execute(Editor editor, @NotNull DataContext context, ExCommand cmd) {
     return UndoRedoHelper.undo(context);
   }
 }

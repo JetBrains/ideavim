@@ -22,6 +22,8 @@ package com.maddyhome.idea.vim.ui;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -87,7 +89,7 @@ public class ExEntryPanel extends JPanel {
    * @param initText The initial text for the entry
    * @param count    A holder for the ex entry count
    */
-  public void activate(Editor editor, DataContext context, String label, String initText, int count) {
+  public void activate(@NotNull Editor editor, DataContext context, @NotNull String label, String initText, int count) {
     entry.setEditor(editor, context);
     this.label.setText(label);
     this.count = count;
@@ -134,7 +136,7 @@ public class ExEntryPanel extends JPanel {
    *
    * @param stroke The keystroke
    */
-  public void handleKey(KeyStroke stroke) {
+  public void handleKey(@NotNull KeyStroke stroke) {
     entry.handleKey(stroke);
   }
 
@@ -194,7 +196,7 @@ public class ExEntryPanel extends JPanel {
     return active;
   }
 
-  private JComponent parent;
+  @Nullable private JComponent parent;
   private JLabel label;
   private ExTextField entry;
   private JComponent oldGlass;

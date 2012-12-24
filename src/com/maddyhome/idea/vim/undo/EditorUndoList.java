@@ -27,6 +27,8 @@ import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.helper.DocumentManager;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.Options;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +37,7 @@ import java.util.List;
  *
  */
 public class EditorUndoList {
-  public EditorUndoList(Editor editor) {
+  public EditorUndoList(@NotNull Editor editor) {
     beginCommand(editor);
   }
 
@@ -50,7 +52,7 @@ public class EditorUndoList {
     return currentCommand != null;
   }
 
-  public void beginCommand(Editor editor) {
+  public void beginCommand(@NotNull Editor editor) {
     logger.info("beginCommand");
     if (inCommand()) {
       endCommand();
@@ -108,7 +110,7 @@ public class EditorUndoList {
     }
   }
 
-  public boolean redo(Editor editor, DataContext context) {
+  public boolean redo(@NotNull Editor editor, DataContext context) {
     if (pointer < undos.size()) {
       UndoCommand cmd = undos.get(pointer);
       if (logger.isDebugEnabled()) logger.debug("redo command " + pointer);
@@ -123,7 +125,7 @@ public class EditorUndoList {
     return false;
   }
 
-  public boolean undo(Editor editor, DataContext context) {
+  public boolean undo(@NotNull Editor editor, @NotNull DataContext context) {
     if (pointer == 0 && getMaxUndos() == 0) {
       return redo(editor, context);
     }
@@ -147,7 +149,7 @@ public class EditorUndoList {
     return false;
   }
 
-  public boolean undoLine(Editor editor, DataContext context) {
+  public boolean undoLine(@NotNull Editor editor, DataContext context) {
     if (pointer == 0 && getMaxUndos() == 0) {
       return redo(editor, context);
     }
@@ -184,6 +186,7 @@ public class EditorUndoList {
     return ((NumberOption)Options.getInstance().getOption("undolevels")).value();
   }
 
+  @NotNull
   public String toString() {
     StringBuffer res = new StringBuffer();
     res.append("EditorUndoList[");
@@ -195,8 +198,8 @@ public class EditorUndoList {
   }
 
   //private Editor editor;
-  private UndoCommand currentCommand;
-  private List<UndoCommand> undos = new ArrayList<UndoCommand>();
+  @Nullable private UndoCommand currentCommand;
+  @NotNull private List<UndoCommand> undos = new ArrayList<UndoCommand>();
   private int pointer = 0;
   private boolean inUndo = false;
   private boolean restorable = true;

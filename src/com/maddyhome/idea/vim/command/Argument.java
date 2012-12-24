@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.command;
  */
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This represents a command argument.
@@ -89,6 +90,7 @@ public class Argument {
    *
    * @return The motion command if this is a motion command argument, null if not
    */
+  @Nullable
   public Command getMotion() {
     return motionArg;
   }
@@ -98,6 +100,7 @@ public class Argument {
    *
    * @return The string if this is a string argument, null if not
    */
+  @Nullable
   public String getString() {
     return strArg;
   }
@@ -107,6 +110,7 @@ public class Argument {
    *
    * @return The argument (MOTION = Command, CHARACTER = Character, STRING = String)
    */
+  @Nullable
   public Object getArgument() {
     switch (type) {
       case MOTION:
@@ -121,6 +125,7 @@ public class Argument {
     throw new IllegalStateException("Unexpected argType of " + type);
   }
 
+  @NotNull
   public String toString() {
     StringBuffer res = new StringBuffer();
     res.append("Argument [");
@@ -134,7 +139,7 @@ public class Argument {
   }
 
   private char charArg = 0;
-  private Command motionArg = null;
-  private String strArg = null;
+  @Nullable private Command motionArg = null;
+  @Nullable private String strArg = null;
   @NotNull private Type type;
 }

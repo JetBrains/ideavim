@@ -80,15 +80,17 @@ public class SearchGroup extends AbstractActionGroup {
     });
   }
 
+  @Nullable
   public String getLastSearch() {
     return lastSearch;
   }
 
+  @Nullable
   public String getLastPattern() {
     return lastPattern;
   }
 
-  private void setLastPattern(Editor editor, @NotNull String lastPattern) {
+  private void setLastPattern(@NotNull Editor editor, @NotNull String lastPattern) {
     this.lastPattern = lastPattern;
     CommandGroups.getInstance().getRegister().storeTextInternal(editor, new TextRange(-1, -1),
                                                                 lastPattern, SelectionType.CHARACTER_WISE, '/', false);
@@ -96,7 +98,7 @@ public class SearchGroup extends AbstractActionGroup {
     CommandGroups.getInstance().getHistory().addEntry(HistoryGroup.SEARCH, lastPattern);
   }
 
-  public boolean searchAndReplace(Editor editor, DataContext context, LineRange range, String excmd, String exarg) {
+  public boolean searchAndReplace(@NotNull Editor editor, DataContext context, @NotNull LineRange range, @NotNull String excmd, String exarg) {
     boolean res = true;
 
     CharPointer cmd = new CharPointer(new StringBuffer(exarg));
@@ -444,14 +446,14 @@ public class SearchGroup extends AbstractActionGroup {
     return JOptionPane.CLOSED_OPTION;
   }
 
-  private boolean shouldIgnoreCase(String pattern, boolean noSmartCase) {
+  private boolean shouldIgnoreCase(@NotNull String pattern, boolean noSmartCase) {
     boolean sc = !noSmartCase && Options.getInstance().isSet("smartcase");
     boolean ic = Options.getInstance().isSet("ignorecase");
 
     return ic && !(sc && StringHelper.containsUpperCase(pattern));
   }
 
-  public static int argsToFlags(String args) {
+  public static int argsToFlags(@NotNull String args) {
     int res = 0;
     boolean global = Options.getInstance().isSet("gdefault");
     for (int i = 0; i < args.length(); i++) {
@@ -515,7 +517,7 @@ public class SearchGroup extends AbstractActionGroup {
     return confirmBtns;
   }
 
-  public int search(Editor editor, String command, int count, int flags, boolean moveCursor) {
+  public int search(@NotNull Editor editor, @NotNull String command, int count, int flags, boolean moveCursor) {
     int res = search(editor, command, editor.getCaretModel().getOffset(), count, flags);
 
     if (res != -1 && moveCursor) {
@@ -526,7 +528,7 @@ public class SearchGroup extends AbstractActionGroup {
     return res;
   }
 
-  public int search(Editor editor, String command, int startOffset, int count, int flags) {
+  public int search(@NotNull Editor editor, @NotNull String command, int startOffset, int count, int flags) {
     int dir = 1;
     char type = '/';
     String pattern = lastSearch;
@@ -579,7 +581,7 @@ public class SearchGroup extends AbstractActionGroup {
     return findItOffset(editor, startOffset, count, lastDir, false);
   }
 
-  public int searchWord(Editor editor, int count, boolean whole, int dir) {
+  public int searchWord(@NotNull Editor editor, int count, boolean whole, int dir) {
     TextRange range = SearchHelper.findWordUnderCursor(editor);
     if (range == null) {
       return -1;
@@ -606,12 +608,12 @@ public class SearchGroup extends AbstractActionGroup {
     return findItOffset(editor, editor.getCaretModel().getOffset(), count, lastDir, true);
   }
 
-  public int searchNext(Editor editor, int count) {
+  public int searchNext(@NotNull Editor editor, int count) {
     searchHighlight(false);
     return findItOffset(editor, editor.getCaretModel().getOffset(), count, lastDir, false);
   }
 
-  public int searchPrevious(Editor editor, int count) {
+  public int searchPrevious(@NotNull Editor editor, int count) {
     searchHighlight(false);
     return findItOffset(editor, editor.getCaretModel().getOffset(), count, -lastDir, false);
   }
@@ -657,11 +659,11 @@ public class SearchGroup extends AbstractActionGroup {
     }
   }
 
-  private void highlightSearchLines(Editor editor, boolean noSmartCase, int startLine, int endLine) {
+  private void highlightSearchLines(@NotNull Editor editor, boolean noSmartCase, int startLine, int endLine) {
     highlightSearchLines(editor, startLine, endLine, lastSearch, shouldIgnoreCase(lastSearch, noSmartCase));
   }
 
-  private static void highlightSearchLines(Editor editor, int startLine, int endLine, String text, boolean ic) {
+  private static void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine, String text, boolean ic) {
     TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
     Collection<RangeHighlighter> hls = EditorData.getLastHighlights(editor);
     if (hls == null) {
@@ -714,7 +716,7 @@ public class SearchGroup extends AbstractActionGroup {
     }
   }
 
-  private int findItOffset(Editor editor, int startOffset, int count, int dir,
+  private int findItOffset(@NotNull Editor editor, int startOffset, int count, int dir,
                            boolean noSmartCase) {
     boolean wrap = Options.getInstance().isSet("wrapscan");
     TextRange range = findIt(editor, startOffset, count, dir, noSmartCase, wrap, true, true);
@@ -803,7 +805,8 @@ public class SearchGroup extends AbstractActionGroup {
     }
   }
 
-  private TextRange findIt(Editor editor, int startOffset, int count, int dir,
+  @Nullable
+  private TextRange findIt(@NotNull Editor editor, int startOffset, int count, int dir,
                            boolean noSmartCase, boolean wrap, boolean showMessages, boolean wholeFile) {
     TextRange res = null;
 
@@ -1075,7 +1078,8 @@ public class SearchGroup extends AbstractActionGroup {
                          EditorHelper.characterPositionToOffset(editor, new CharacterPosition(endpos.lnum, endpos.col)));
   }
 
-  private RangeHighlighter highlightConfirm(Editor editor, int start, int end) {
+  @NotNull
+  private RangeHighlighter highlightConfirm(@NotNull Editor editor, int start, int end) {
     TextAttributes color = new TextAttributes(
       editor.getColorsScheme().getColor(EditorColors.SELECTION_FOREGROUND_COLOR),
       editor.getColorsScheme().getColor(EditorColors.SELECTION_BACKGROUND_COLOR),
@@ -1085,7 +1089,8 @@ public class SearchGroup extends AbstractActionGroup {
                                                        color, HighlighterTargetArea.EXACT_RANGE);
   }
 
-  private static RangeHighlighter highlightMatch(Editor editor, int start, int end) {
+  @NotNull
+  private static RangeHighlighter highlightMatch(@NotNull Editor editor, int start, int end) {
     TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
     return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.ADDITIONAL_SYNTAX + 1,
                                                        color, HighlighterTargetArea.EXACT_RANGE);
@@ -1096,7 +1101,7 @@ public class SearchGroup extends AbstractActionGroup {
     updateHighlight();
   }
 
-  private static void removeSearchHighlight(Editor editor) {
+  private static void removeSearchHighlight(@NotNull Editor editor) {
     Collection<RangeHighlighter> ehl = EditorData.getLastHighlights(editor);
     if (ehl == null) {
       return;
@@ -1210,7 +1215,7 @@ public class SearchGroup extends AbstractActionGroup {
   }
 
   public static class DocumentSearchListener extends DocumentAdapter {
-    public void documentChanged(DocumentEvent event) {
+    public void documentChanged(@NotNull DocumentEvent event) {
       if (!VimPlugin.isEnabled()) {
         return;
       }
@@ -1253,14 +1258,14 @@ public class SearchGroup extends AbstractActionGroup {
     }
   }
 
-  private String lastSearch;
-  private String lastPattern;
-  private String lastSubstitute;
-  private String lastReplace;
-  private String lastOffset;
+  @Nullable private String lastSearch;
+  @Nullable private String lastPattern;
+  @Nullable private String lastSubstitute;
+  @Nullable private String lastReplace;
+  @Nullable private String lastOffset;
   private int lastDir;
   private JButton[] confirmBtns;
-  private JOptionPane confirmDlg = null;
+  @Nullable private JOptionPane confirmDlg = null;
   private boolean showSearchHighlight = Options.getInstance().isSet("hlsearch");
 
   private boolean do_all = false; /* do multiple substitutions per line */

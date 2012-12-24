@@ -19,6 +19,9 @@ package com.maddyhome.idea.vim.option;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Represents an option with a numeric value
  */
@@ -198,6 +201,7 @@ public class NumberOption extends TextOption {
     }
   }
 
+  @Nullable
   protected Integer asNumber(String val) {
     try {
       return Integer.decode(val);
@@ -216,6 +220,7 @@ public class NumberOption extends TextOption {
    *
    * @return The option as a string
    */
+  @NotNull
   public String toString() {
     StringBuffer res = new StringBuffer();
     res.append("  ");

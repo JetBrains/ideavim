@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.group.CommandGroups;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -37,7 +38,7 @@ public class SelectFirstFileHandler extends CommandHandler {
     }, ARGUMENT_OPTIONAL | DONT_REOPEN);
   }
 
-  public boolean execute(Editor editor, DataContext context, ExCommand cmd) {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, ExCommand cmd) {
     boolean res = CommandGroups.getInstance().getFile().selectFile(0, context);
     if (res) {
       CommandGroups.getInstance().getMark().saveJumpLocation(editor);

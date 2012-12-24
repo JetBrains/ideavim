@@ -25,6 +25,7 @@ import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
+import org.jetbrains.annotations.NotNull;
 
 /**
  */
@@ -34,7 +35,7 @@ public class MotionScrollLastScreenLineAction extends EditorAction {
   }
 
   private static class Handler extends AbstractEditorActionHandler {
-    protected boolean execute(Editor editor, DataContext context, Command cmd) {
+    protected boolean execute(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
       return CommandGroups.getInstance().getMotion().scrollLineToLastScreenLine(editor, cmd.getRawCount(), cmd.getCount(), false);
     }
   }

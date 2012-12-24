@@ -49,5 +49,5 @@ public abstract class ParentNode implements Node {
     return children.get(key);
   }
 
-  protected HashMap<Object, Node> children = new HashMap<Object, Node>();
+  @NotNull protected HashMap<Object, Node> children = new HashMap<Object, Node>();
 }

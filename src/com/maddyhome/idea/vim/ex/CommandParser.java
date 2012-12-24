@@ -124,7 +124,7 @@ public class CommandParser {
    * @return True if the command succeeded, false if it failed or there was no previous command
    * @throws ExException if any part of the command was invalid
    */
-  public boolean processLastCommand(Editor editor, DataContext context, int count) throws ExException {
+  public boolean processLastCommand(@NotNull Editor editor, DataContext context, int count) throws ExException {
     final Register reg = CommandGroups.getInstance().getRegister().getRegister(':');
     if (reg != null) {
       final String text = reg.getText();
@@ -146,7 +146,7 @@ public class CommandParser {
    * @return A bitwise collection of flags, if any, from the result of running the command.
    * @throws ExException if any part of the command is invalid or unknown
    */
-  public int processCommand(Editor editor, DataContext context, @NotNull String cmd, int count) throws ExException {
+  public int processCommand(@NotNull Editor editor, DataContext context, @NotNull String cmd, int count) throws ExException {
     // Nothing entered
     int result = 0;
     if (cmd.length() == 0) {
@@ -216,7 +216,8 @@ public class CommandParser {
    * @return The parse result
    * @throws ExException if the text is syntactically incorrect
    */
-  public ParseResult parse(String cmd) throws ExException {
+  @NotNull
+  public ParseResult parse(@NotNull String cmd) throws ExException {
     // This is a complicated state machine that should probably be rewritten
     if (logger.isDebugEnabled()) {
       logger.debug("processing `" + cmd + "'");
@@ -543,7 +544,7 @@ public class CommandParser {
    *
    * @param handler The new handler to add
    */
-  public void addHandler(CommandHandler handler) {
+  public void addHandler(@NotNull CommandHandler handler) {
     // Iterator through each command name alias
     CommandName[] names = handler.getNames();
     for (CommandName name : names) {
@@ -585,7 +586,7 @@ public class CommandParser {
     }
   }
 
-  private CommandNode root = new CommandNode();
+  @NotNull private CommandNode root = new CommandNode();
   private boolean registered = false;
 
   private static CommandParser ourInstance;

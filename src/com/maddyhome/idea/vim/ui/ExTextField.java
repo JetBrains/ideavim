@@ -28,6 +28,8 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.HistoryGroup;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.text.Document;
@@ -67,7 +69,7 @@ public class ExTextField extends JTextField {
     //blockCaret = new BlockCaret();
   }
 
-  public void setType(String type) {
+  public void setType(@NotNull String type) {
     String hkey = null;
     switch (type.charAt(0)) {
       case '/':
@@ -146,7 +148,7 @@ public class ExTextField extends JTextField {
     return context;
   }
 
-  public void handleKey(KeyStroke stroke) {
+  public void handleKey(@NotNull KeyStroke stroke) {
     if (logger.isDebugEnabled()) logger.debug("stroke=" + stroke);
     KeyEvent event = new KeyEvent(this, stroke.getKeyChar() != KeyEvent.CHAR_UNDEFINED ? KeyEvent.KEY_TYPED :
                                         (stroke.isOnKeyRelease() ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED),
@@ -215,6 +217,7 @@ public class ExTextField extends JTextField {
    *
    * @return the default model implementation
    */
+  @NotNull
   protected Document createDefaultModel() {
     return new ExDocument();
   }
@@ -228,14 +231,14 @@ public class ExTextField extends JTextField {
     }
   }
 
-  public void startDigraph(KeyStroke key) {
+  public void startDigraph(@NotNull KeyStroke key) {
     if (digraph == null) {
       digraph = new DigraphSequence();
       digraph.processKey(key, editor, context);
     }
   }
 
-  public char checkKey(KeyStroke key) {
+  public char checkKey(@NotNull KeyStroke key) {
     if (digraph != null) {
       DigraphSequence.DigraphResult res = digraph.processKey(key, editor, context);
       switch (res.getResult()) {
@@ -398,7 +401,7 @@ public class ExTextField extends JTextField {
   private String lastEntry;
   private List<HistoryGroup.HistoryEntry> history;
   private int histIndex = 0;
-  private DigraphSequence digraph;
+  @Nullable private DigraphSequence digraph;
   // TODO - support block cursor for overwrite mode
   //private Caret origCaret;
   //private Caret blockCaret;

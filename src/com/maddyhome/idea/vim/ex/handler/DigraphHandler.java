@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.CommandGroups;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -35,7 +36,7 @@ public class DigraphHandler extends CommandHandler {
     super("dig", "raphs", ARGUMENT_OPTIONAL | KEEP_FOCUS);
   }
 
-  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, DataContext context, @NotNull ExCommand cmd) throws ExException {
     String arg = cmd.getArgument();
     if (logger.isDebugEnabled()) {
       logger.debug("arg=" + arg);

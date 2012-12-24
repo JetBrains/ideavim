@@ -32,12 +32,13 @@ import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.DelegateCommandListener;
 import com.maddyhome.idea.vim.helper.EditorData;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  *
  */
 public abstract class VisualOperatorActionHandler extends AbstractEditorActionHandler {
-  protected final boolean execute(final Editor editor, DataContext context, Command cmd) {
+  protected final boolean execute(@NotNull final Editor editor, DataContext context, @Nullable Command cmd) {
     if (logger.isDebugEnabled()) logger.debug("execute, cmd=" + cmd);
 
     TextRange range = null;
@@ -77,6 +78,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
       this.res = res;
     }
 
+    @Nullable
     @SuppressWarnings("Since15")
     public TextRange start() {
       logger.debug("start");
@@ -158,7 +160,7 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
     @NotNull private CommandState.SubMode lastMode;
     private boolean wasRepeat;
     private int lastColumn;
-    VisualChange change = null;
+    @Nullable VisualChange change = null;
   }
 
   private static Logger logger = Logger.getInstance(VisualOperatorActionHandler.class.getName());

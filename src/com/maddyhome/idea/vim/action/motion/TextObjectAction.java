@@ -25,6 +25,7 @@ import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.motion.TextObjectActionHandler;
+import org.jetbrains.annotations.Nullable;
 
 /**
  */
@@ -34,6 +35,7 @@ public abstract class TextObjectAction extends EditorAction {
     this.handler = handler;
   }
 
+  @Nullable
   public TextRange getRange(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
     return handler.getRange(editor, context, count, rawCount, argument);
   }

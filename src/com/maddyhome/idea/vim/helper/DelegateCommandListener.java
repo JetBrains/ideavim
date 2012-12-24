@@ -23,9 +23,11 @@ import com.intellij.openapi.command.CommandAdapter;
 import com.intellij.openapi.command.CommandEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.common.TextRange;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class DelegateCommandListener extends CommandAdapter {
+  @NotNull
   public static DelegateCommandListener getInstance() {
     return instance;
   }
@@ -35,7 +37,7 @@ public class DelegateCommandListener extends CommandAdapter {
     inCommand = false;
   }
 
-  public void commandStarted(CommandEvent event) {
+  public void commandStarted(@NotNull CommandEvent event) {
     inCommand = true;
     if (logger.isDebugEnabled()) {
       logger.debug("Command started: " + event);
@@ -48,7 +50,7 @@ public class DelegateCommandListener extends CommandAdapter {
     }
   }
 
-  public void commandFinished(CommandEvent event) {
+  public void commandFinished(@NotNull CommandEvent event) {
     if (logger.isDebugEnabled()) {
       logger.debug("Command finished: " + event);
       logger.debug("Name: " + event.getCommandName());
@@ -67,6 +69,7 @@ public class DelegateCommandListener extends CommandAdapter {
   }
 
   public static interface StartFinishRunnable {
+    @Nullable
     TextRange start();
 
     void finish();
@@ -76,5 +79,5 @@ public class DelegateCommandListener extends CommandAdapter {
   @Nullable private StartFinishRunnable runnable;
 
   private static Logger logger = Logger.getInstance(DelegateCommandListener.class.getName());
-  private static DelegateCommandListener instance = new DelegateCommandListener();
+  @NotNull private static DelegateCommandListener instance = new DelegateCommandListener();
 }

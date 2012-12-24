@@ -19,6 +19,8 @@ package com.maddyhome.idea.vim.ui;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.swing.*;
 import javax.swing.text.JTextComponent.KeyBinding;
 import java.awt.event.KeyEvent;
@@ -27,6 +29,7 @@ import java.awt.event.KeyEvent;
  *
  */
 public class ExKeyBindings {
+  @NotNull
   public static KeyBinding[] getBindings() {
     return bindings;
   }

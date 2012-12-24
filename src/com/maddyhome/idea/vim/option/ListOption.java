@@ -19,6 +19,9 @@ package com.maddyhome.idea.vim.option;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,6 +52,7 @@ public class ListOption extends TextOption {
    *
    * @return The option's value
    */
+  @NotNull
   public String getValue() {
     StringBuffer res = new StringBuffer();
     int cnt = 0;
@@ -69,6 +73,7 @@ public class ListOption extends TextOption {
    *
    * @return The option's values
    */
+  @Nullable
   public List<String> values() {
     return value;
   }
@@ -127,7 +132,7 @@ public class ListOption extends TextOption {
     return remove(parseVals(val));
   }
 
-  protected boolean set(List<String> vals) {
+  protected boolean set(@Nullable List<String> vals) {
     if (vals == null) {
       return false;
     }
@@ -138,7 +143,7 @@ public class ListOption extends TextOption {
     return true;
   }
 
-  protected boolean append(List<String> vals) {
+  protected boolean append(@Nullable List<String> vals) {
     if (vals == null) {
       return false;
     }
@@ -149,7 +154,7 @@ public class ListOption extends TextOption {
     return true;
   }
 
-  protected boolean prepend(List<String> vals) {
+  protected boolean prepend(@Nullable List<String> vals) {
     if (vals == null) {
       return false;
     }
@@ -160,7 +165,7 @@ public class ListOption extends TextOption {
     return true;
   }
 
-  protected boolean remove(List<String> vals) {
+  protected boolean remove(@Nullable List<String> vals) {
     if (vals == null) {
       return false;
     }
@@ -171,6 +176,7 @@ public class ListOption extends TextOption {
     return true;
   }
 
+  @Nullable
   protected List<String> parseVals(String val) {
     List<String> res = new ArrayList<String>();
     StringTokenizer tokenizer = new StringTokenizer(val, ",");
@@ -211,6 +217,7 @@ public class ListOption extends TextOption {
    *
    * @return The option as a string {name}={value list}
    */
+  @NotNull
   public String toString() {
     StringBuffer res = new StringBuffer();
     res.append("  ");
@@ -222,6 +229,6 @@ public class ListOption extends TextOption {
   }
 
   protected List<String> dflt;
-  protected List<String> value;
+  @Nullable protected List<String> value;
   protected String pattern;
 }

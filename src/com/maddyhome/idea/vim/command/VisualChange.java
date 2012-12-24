@@ -41,6 +41,7 @@ public class VisualChange {
     return type;
   }
 
+  @NotNull
   public String toString() {
     StringBuffer res = new StringBuffer();
     res.append("VisualChange[");

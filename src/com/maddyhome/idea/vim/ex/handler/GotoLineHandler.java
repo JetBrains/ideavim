@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * This handles Ex commands that just specify a range which translates to moving the cursor to the line given by the
@@ -48,7 +49,7 @@ public class GotoLineHandler extends CommandHandler {
    * @param cmd     The complete Ex command including range, command, and arguments
    * @return True if able to perform the command, false if not
    */
-  public boolean execute(Editor editor, DataContext context, ExCommand cmd) {
+  public boolean execute(@NotNull Editor editor, DataContext context, @NotNull ExCommand cmd) {
     int count = cmd.getLine(editor, context);
 
     int max = EditorHelper.getLineCount(editor);

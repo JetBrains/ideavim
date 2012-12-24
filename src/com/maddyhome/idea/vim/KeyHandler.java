@@ -505,7 +505,7 @@ public class KeyHandler {
    * @param name    The name of the action to execute
    * @param context The context to run it in
    */
-  public static void executeAction(String name, DataContext context) {
+  public static void executeAction(@NotNull String name, @NotNull DataContext context) {
     logger.debug("executing action " + name);
     ActionManager aMgr = ActionManager.getInstance();
     AnAction action = aMgr.getAction(name);
@@ -523,7 +523,7 @@ public class KeyHandler {
    * @param action  The action to execute
    * @param context The context to run it in
    */
-  public static void executeAction(AnAction action, DataContext context) {
+  public static void executeAction(@NotNull AnAction action, @NotNull DataContext context) {
     if (logger.isDebugEnabled()) {
       logger.debug("executing action " + action);
     }
@@ -648,10 +648,10 @@ public class KeyHandler {
   private int count;
   private List<KeyStroke> keys;
   private State state;
-  private Stack<Command> currentCmd = new Stack<Command>();
+  @NotNull private Stack<Command> currentCmd = new Stack<Command>();
   @NotNull private Argument.Type currentArg;
   private TypedActionHandler origHandler;
-  private DigraphSequence digraph = null;
+  @Nullable private DigraphSequence digraph = null;
   private char lastChar;
   private boolean lastWasBS;
 

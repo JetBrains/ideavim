@@ -24,11 +24,12 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
+import org.jetbrains.annotations.NotNull;
 
 /**
  */
 public abstract class ChangeEditorActionHandler extends AbstractEditorActionHandler {
-  protected final boolean execute(Editor editor, DataContext context, Command cmd) {
+  protected final boolean execute(Editor editor, DataContext context, @NotNull Command cmd) {
     boolean worked = execute(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
     if (worked) {
       CommandState.getInstance(editor).saveLastChangeCommand(cmd);

@@ -52,7 +52,7 @@ public class MarkGroup extends AbstractActionGroup {
    */
   public MarkGroup() {
     EditorFactory.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
-      public void editorReleased(EditorFactoryEvent event) {
+      public void editorReleased(@NotNull EditorFactoryEvent event) {
         // Save off the last caret position of the file before it is closed
         Editor editor = event.getEditor();
         setMark(editor, '"', editor.getCaretModel().getOffset());
@@ -78,7 +78,7 @@ public class MarkGroup extends AbstractActionGroup {
    * @return The requested mark if set, null if not set
    */
   @Nullable
-  public Mark getMark(Editor editor, char ch) {
+  public Mark getMark(@NotNull Editor editor, char ch) {
     Mark mark = null;
     if (ch == '`') ch = '\'';
 
@@ -127,6 +127,7 @@ public class MarkGroup extends AbstractActionGroup {
    * @param count Postive for next jump (Ctrl-I), negative for previous jump (Ctrl-O).
    * @return The jump or null if out of range.
    */
+  @Nullable
   public Jump getJump(int count) {
     int index = jumps.size() - 1 - (jumpSpot - count);
     if (index < 0 || index >= jumps.size()) {
@@ -146,7 +147,7 @@ public class MarkGroup extends AbstractActionGroup {
    * @return The mark in the current file, if set, null if no such mark
    */
   @Nullable
-  public Mark getFileMark(Editor editor, char ch) {
+  public Mark getFileMark(@NotNull Editor editor, char ch) {
     if (ch == '`') ch = '\'';
     final HashMap fmarks = getFileMarks(editor.getDocument());
     if (fmarks == null) {
@@ -168,7 +169,7 @@ public class MarkGroup extends AbstractActionGroup {
    * @param ch      The mark set set
    * @return True if a valid, writable mark, false if not
    */
-  public boolean setMark(Editor editor, char ch) {
+  public boolean setMark(@NotNull Editor editor, char ch) {
     if (VALID_SET_MARKS.indexOf(ch) >= 0) {
       return setMark(editor, ch, editor.getCaretModel().getOffset());
     }
@@ -254,7 +255,7 @@ public class MarkGroup extends AbstractActionGroup {
     }
   }
 
-  private void removeMark(char ch, Mark mark) {
+  private void removeMark(char ch, @NotNull Mark mark) {
     if (FILE_MARKS.indexOf(ch) >= 0) {
       HashMap fmarks = getFileMarks(mark.getFilename());
       fmarks.remove(new Character(ch));
@@ -266,7 +267,8 @@ public class MarkGroup extends AbstractActionGroup {
     mark.clear();
   }
 
-  public List<Mark> getMarks(Editor editor) {
+  @NotNull
+  public List<Mark> getMarks(@NotNull Editor editor) {
     HashSet<Mark> res = new HashSet<Mark>();
 
     final FileMarks<Character, Mark> marks = getFileMarks(editor.getDocument());
@@ -282,6 +284,7 @@ public class MarkGroup extends AbstractActionGroup {
     return list;
   }
 
+  @NotNull
   public List<Jump> getJumps() {
     return jumps;
   }
@@ -298,7 +301,7 @@ public class MarkGroup extends AbstractActionGroup {
    *         <code>Mark</code>s.
    */
   @Nullable
-  private FileMarks<Character, Mark> getFileMarks(final Document doc) {
+  private FileMarks<Character, Mark> getFileMarks(@NotNull final Document doc) {
     VirtualFile vf = FileDocumentManager.getInstance().getFile(doc);
     if (vf == null) {
       return null;
@@ -308,7 +311,7 @@ public class MarkGroup extends AbstractActionGroup {
   }
 
   @Nullable
-  private HashMap<Character, Mark> getAllFileMarks(final Document doc) {
+  private HashMap<Character, Mark> getAllFileMarks(@NotNull final Document doc) {
     VirtualFile vf = FileDocumentManager.getInstance().getFile(doc);
     if (vf == null) {
       return null;
@@ -368,7 +371,7 @@ public class MarkGroup extends AbstractActionGroup {
 
     List<FileMarks<Character, Mark>> files = new ArrayList<FileMarks<Character, Mark>>(fileMarks.values());
     Collections.sort(files, new Comparator<FileMarks<Character, Mark>>() {
-      public int compare(FileMarks<Character, Mark> o1, FileMarks<Character, Mark> o2) {
+      public int compare(@NotNull FileMarks<Character, Mark> o1, @NotNull FileMarks<Character, Mark> o2) {
         return o1.timestamp.compareTo(o2.timestamp);
       }
     });
@@ -506,7 +509,7 @@ public class MarkGroup extends AbstractActionGroup {
    * @param delStartOff The offset within the editor where the deletion occurred
    * @param delLength   The length of the deleted text
    */
-  public static void updateMarkFromDelete(Editor editor, HashMap<Character, Mark> marks, int delStartOff, int delLength) {
+  public static void updateMarkFromDelete(@Nullable Editor editor, @Nullable HashMap<Character, Mark> marks, int delStartOff, int delLength) {
     // Skip all this work if there are no marks
     if (marks != null && marks.size() > 0 && editor != null) {
       // Calculate the logical position of the start and end of the deleted text
@@ -557,7 +560,7 @@ public class MarkGroup extends AbstractActionGroup {
    * @param insStartOff The insertion point
    * @param insLength   The length of the insertion
    */
-  public static void updateMarkFromInsert(Editor editor, HashMap<Character, Mark> marks, int insStartOff, int insLength) {
+  public static void updateMarkFromInsert(@Nullable Editor editor, @Nullable HashMap<Character, Mark> marks, int insStartOff, int insLength) {
     if (marks != null && marks.size() > 0 && editor != null) {
       int insEndOff = insStartOff + insLength;
       LogicalPosition insStart = editor.offsetToLogicalPosition(insStartOff);
@@ -610,7 +613,7 @@ public class MarkGroup extends AbstractActionGroup {
      *
      * @param event The change event
      */
-    public void beforeDocumentChange(DocumentEvent event) {
+    public void beforeDocumentChange(@NotNull DocumentEvent event) {
       if (!VimPlugin.isEnabled()) return;
 
       if (logger.isDebugEnabled()) logger.debug("MarkUpdater before, event = " + event);
@@ -628,7 +631,7 @@ public class MarkGroup extends AbstractActionGroup {
      *
      * @param event The change event
      */
-    public void documentChanged(DocumentEvent event) {
+    public void documentChanged(@NotNull DocumentEvent event) {
       if (!VimPlugin.isEnabled()) return;
 
       if (logger.isDebugEnabled()) logger.debug("MarkUpdater after, event = " + event);
@@ -640,7 +643,8 @@ public class MarkGroup extends AbstractActionGroup {
       // TODO - update jumps
     }
 
-    private Editor getAnEditor(Document doc) {
+    @Nullable
+    private Editor getAnEditor(@NotNull Document doc) {
       Editor[] editors = EditorFactory.getInstance().getEditors(doc);
 
       if (editors.length > 0) {
@@ -652,9 +656,9 @@ public class MarkGroup extends AbstractActionGroup {
     }
   }
 
-  private HashMap<String, FileMarks<Character, Mark>> fileMarks = new HashMap<String, FileMarks<Character, Mark>>();
-  private HashMap<Character, Mark> globalMarks = new HashMap<Character, Mark>();
-  private List<Jump> jumps = new ArrayList<Jump>();
+  @NotNull private HashMap<String, FileMarks<Character, Mark>> fileMarks = new HashMap<String, FileMarks<Character, Mark>>();
+  @NotNull private HashMap<Character, Mark> globalMarks = new HashMap<Character, Mark>();
+  @NotNull private List<Jump> jumps = new ArrayList<Jump>();
   private int jumpSpot = -1;
 
   private static int SAVE_MARK_COUNT = 20;

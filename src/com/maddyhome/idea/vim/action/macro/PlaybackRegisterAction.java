@@ -26,6 +26,7 @@ import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
+import org.jetbrains.annotations.NotNull;
 
 /**
  */
@@ -35,7 +36,7 @@ public class PlaybackRegisterAction extends EditorAction {
   }
 
   private static class Handler extends AbstractEditorActionHandler {
-    protected boolean execute(Editor editor, DataContext context, Command cmd) {
+    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       char reg = cmd.getArgument().getCharacter();
       return CommandGroups.getInstance().getMacro().playbackRegister(editor, context,
                                                                      PlatformDataKeys.PROJECT.getData(context), reg,

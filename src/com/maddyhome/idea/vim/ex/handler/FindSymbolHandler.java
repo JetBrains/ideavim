@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
@@ -36,7 +37,7 @@ public class FindSymbolHandler extends CommandHandler {
     super("sym", "bol", RANGE_FORBIDDEN | ARGUMENT_OPTIONAL | DONT_REOPEN);
   }
 
-  public boolean execute(Editor editor, final DataContext context, ExCommand cmd) throws ExException {
+  public boolean execute(Editor editor, @NotNull final DataContext context, @NotNull ExCommand cmd) throws ExException {
     String arg = cmd.getArgument();
     if (arg != null && arg.length() > 0) {
       // TODO - jump to specific symbol

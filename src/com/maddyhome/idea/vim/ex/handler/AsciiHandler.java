@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.group.CommandGroups;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -33,7 +34,7 @@ public class AsciiHandler extends CommandHandler {
     super("as", "cii", ARGUMENT_FORBIDDEN | RANGE_FORBIDDEN);
   }
 
-  public boolean execute(Editor editor, DataContext context, ExCommand cmd) {
+  public boolean execute(@NotNull Editor editor, DataContext context, ExCommand cmd) {
     CommandGroups.getInstance().getFile().displayAsciiInfo(editor);
 
     return true;

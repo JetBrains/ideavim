@@ -22,6 +22,7 @@ package com.maddyhome.idea.vim.group;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ui.MorePanel;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -47,7 +48,7 @@ public class DigraphGroup extends AbstractActionGroup {
     }
   }
 
-  public boolean parseCommandLine(Editor editor, String args, boolean failOnBad) {
+  public boolean parseCommandLine(@NotNull Editor editor, @NotNull String args, boolean failOnBad) {
     if (args.length() == 0) {
       showDigraphs(editor);
 
@@ -57,7 +58,7 @@ public class DigraphGroup extends AbstractActionGroup {
     return true;
   }
 
-  private void showDigraphs(Editor editor) {
+  private void showDigraphs(@NotNull Editor editor) {
     MorePanel panel = MorePanel.getInstance(editor);
     int width = panel.getDisplayWidth();
     if (width < 10) {
@@ -127,8 +128,8 @@ public class DigraphGroup extends AbstractActionGroup {
     // TODO - load custom digraphs from .vimrc
   }
 
-  private HashMap<String, Character> digraphs = new HashMap<String, Character>(defaultDigraphs.length);
-  private TreeMap<Character, String> keys = new TreeMap<Character, String>();
+  @NotNull private HashMap<String, Character> digraphs = new HashMap<String, Character>(defaultDigraphs.length);
+  @NotNull private TreeMap<Character, String> keys = new TreeMap<Character, String>();
 
   private static final char defaultDigraphs[] = {
     /*

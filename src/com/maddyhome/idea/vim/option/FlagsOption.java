@@ -19,6 +19,8 @@ package com.maddyhome.idea.vim.option;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * This represents a set of one character flags
  */
@@ -40,6 +42,7 @@ public class FlagsOption extends BoundListOption {
    *
    * @return The list of flags
    */
+  @NotNull
   public String getValue() {
     StringBuffer res = new StringBuffer();
     for (String s : value) {

@@ -23,6 +23,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.group.CommandGroups;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents the line specified by a mark
@@ -49,7 +50,7 @@ public class MarkRange extends AbstractRange {
    * @param lastZero True if last line was set to start of file
    * @return The zero based line number, -1 if there is no such mark set in the file
    */
-  public int getRangeLine(Editor editor, DataContext context, boolean lastZero) {
+  public int getRangeLine(@NotNull Editor editor, DataContext context, boolean lastZero) {
     Mark mark = CommandGroups.getInstance().getMark().getFileMark(editor, this.mark);
 
     if (mark != null) {
@@ -60,6 +61,7 @@ public class MarkRange extends AbstractRange {
     }
   }
 
+  @NotNull
   public String toString() {
     StringBuffer res = new StringBuffer();
     res.append("MarkRange[");

@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
 import com.maddyhome.idea.vim.key.KeyParser;
+import org.jetbrains.annotations.NotNull;
 
 /**
  */
@@ -38,7 +39,7 @@ public class RepeatChangeAction extends EditorAction {
   }
 
   private static class Handler extends AbstractEditorActionHandler {
-    public boolean execute(Editor editor, DataContext context, Command command) {
+    public boolean execute(Editor editor, @NotNull DataContext context, @NotNull Command command) {
       CommandState state = CommandState.getInstance(editor);
       Command cmd = state.getLastChangeCommand();
       if (cmd != null) {

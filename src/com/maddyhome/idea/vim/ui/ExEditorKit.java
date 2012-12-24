@@ -24,6 +24,8 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
 import com.maddyhome.idea.vim.helper.SearchHelper;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.text.*;
@@ -48,6 +50,7 @@ public class ExEditorKit extends DefaultEditorKit {
    *
    * @return the type
    */
+  @NotNull
   public String getContentType() {
     return "text/ideavim";
   }
@@ -72,11 +75,13 @@ public class ExEditorKit extends DefaultEditorKit {
    *
    * @return the model
    */
+  @NotNull
   public Document createDefaultDocument() {
     return new ExDocument();
   }
 
-  public static KeyStroke convert(ActionEvent event) {
+  @Nullable
+  public static KeyStroke convert(@NotNull ActionEvent event) {
     String cmd = event.getActionCommand();
     int mods = event.getModifiers();
     if (cmd != null && cmd.length() > 0) {
@@ -112,7 +117,7 @@ public class ExEditorKit extends DefaultEditorKit {
   public static final String HistoryDownFilter = "history-down-filter";
   public static final String StartDigraph = "start-digraph";
 
-  protected Action[] exActions = new Action[]{
+  @NotNull protected Action[] exActions = new Action[]{
     new ExEditorKit.CancelEntryAction(),
     new ExEditorKit.CompleteEntryAction(),
     new ExEditorKit.EscapeCharAction(),
@@ -129,7 +134,7 @@ public class ExEditorKit extends DefaultEditorKit {
   };
 
   public static class DefaultExKeyHandler extends DefaultKeyTypedAction {
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(@NotNull ActionEvent e) {
       ExTextField target = (ExTextField)getTextComponent(e);
       KeyStroke key = convert(e);
       if (key != null) {
@@ -390,7 +395,7 @@ public class ExEditorKit extends DefaultEditorKit {
       super(StartDigraph);
     }
 
-    public void actionPerformed(ActionEvent actionEvent) {
+    public void actionPerformed(@NotNull ActionEvent actionEvent) {
       ExTextField target = (ExTextField)getTextComponent(actionEvent);
       KeyStroke key = convert(actionEvent);
       if (key != null && DigraphSequence.isDigraphStart(key)) {

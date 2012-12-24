@@ -52,6 +52,7 @@ import com.maddyhome.idea.vim.key.RegisterActions;
 import com.maddyhome.idea.vim.option.Options;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -110,6 +111,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     LOG.debug("VimPlugin ctr");
   }
 
+  @NotNull
   public static VimPlugin getInstance() {
     return (VimPlugin)ApplicationManager.getApplication().getComponent(IDEAVIM_COMPONENT_NAME);
   }
@@ -230,7 +232,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     // Since the Vim plugin custom actions aren't available to the call to <code>initComponent()</code>
     // we need to force the generation of the key map when the first project is opened.
     ProjectManager.getInstance().addProjectManagerListener(new ProjectManagerAdapter() {
-      public void projectOpened(final Project project) {
+      public void projectOpened(@NotNull final Project project) {
         project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new MotionGroup.MotionEditorChange());
         project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileGroup.SelectionCheck());
         project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new SearchGroup.EditorSelectionCheck());
@@ -256,7 +258,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   }
 
   @Override
-  public void loadState(final Element element) {
+  public void loadState(@NotNull final Element element) {
     LOG.debug("Loading state");
 
     // Restore whether the plugin is enabled or not
@@ -323,7 +325,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     showMessage(msg);
   }
 
-  public static void showMessage(String msg) {
+  public static void showMessage(@Nullable String msg) {
     ProjectManager pm = ProjectManager.getInstance();
     Project[] projs = pm.getOpenProjects();
     for (Project proj : projs) {

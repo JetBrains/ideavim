@@ -13,6 +13,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import gnu.trove.TIntArrayList;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /*
  * IdeaVim - A Vim emulator plugin for IntelliJ Idea
@@ -34,15 +36,15 @@ import gnu.trove.TIntArrayList;
  */
 
 public class PsiHelper {
-  public static int findMethodStart(Editor editor, int offset, int count) {
+  public static int findMethodStart(@NotNull Editor editor, int offset, int count) {
     return findMethodOrClass(editor, offset, count, true);
   }
 
-  public static int findMethodEnd(Editor editor, int offset, int count) {
+  public static int findMethodEnd(@NotNull Editor editor, int offset, int count) {
     return findMethodOrClass(editor, offset, count, false);
   }
 
-  private static int findMethodOrClass(Editor editor, int offset, int count, boolean isStart) {
+  private static int findMethodOrClass(@NotNull Editor editor, int offset, int count, boolean isStart) {
     PsiFile file = getFile(editor);
 
     StructureViewBuilder structureViewBuilder = LanguageStructureViewBuilder.INSTANCE.getStructureViewBuilder(file);
@@ -77,7 +79,7 @@ public class PsiHelper {
     return navigationOffsets.get(resultIndex);
   }
 
-  private static void addNavigationElements(TreeElement root, TIntArrayList navigationOffsets, boolean start) {
+  private static void addNavigationElements(@NotNull TreeElement root, @NotNull TIntArrayList navigationOffsets, boolean start) {
     if (root instanceof PsiTreeElementBase) {
       PsiElement element = ((PsiTreeElementBase)root).getValue();
       int offset;
@@ -104,7 +106,8 @@ public class PsiHelper {
     }
   }
 
-  private static PsiFile getFile(Editor editor) {
+  @Nullable
+  private static PsiFile getFile(@NotNull Editor editor) {
     VirtualFile vf = EditorData.getVirtualFile(editor);
     Project proj = editor.getProject();
     PsiManager mgr = PsiManager.getInstance(proj);

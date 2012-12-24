@@ -90,7 +90,7 @@ public class VimKeyMapUtil {
     return true;
   }
 
-  private static void installKeymap(Document document) throws InvalidDataException {
+  private static void installKeymap(@Nullable Document document) throws InvalidDataException {
     if (document == null) {
       throw new InvalidDataException();
     }
@@ -123,7 +123,7 @@ public class VimKeyMapUtil {
    *
    * @return true if document was changed successfully
    */
-  private static boolean configureVimParentKeymap(final String path, final Document document, final boolean showNotification) throws IOException {
+  private static boolean configureVimParentKeymap(final String path, @NotNull final Document document, final boolean showNotification) throws IOException {
     final Element rootElement = document.getRootElement();
     final String parentKeymap = rootElement.getAttributeValue("parent");
     final VimKeymapDialog vimKeymapDialog = new VimKeymapDialog(parentKeymap);

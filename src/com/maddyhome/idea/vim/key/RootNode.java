@@ -19,10 +19,13 @@ package com.maddyhome.idea.vim.key;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Represents the root of the key/action tree
  */
 public class RootNode extends ParentNode {
+  @NotNull
   public String toString() {
     StringBuffer res = new StringBuffer();
     res.append("RootNode[");

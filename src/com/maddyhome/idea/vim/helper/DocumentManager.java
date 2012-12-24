@@ -27,10 +27,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vcs.FileStatusManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
 
 public class DocumentManager {
+  @NotNull
   public static DocumentManager getInstance() {
     return instance;
   }
@@ -43,7 +45,7 @@ public class DocumentManager {
     docListeners.add(listener);
   }
 
-  public void reloadDocument(Document doc, Project p) {
+  public void reloadDocument(@NotNull Document doc, Project p) {
     logger.debug("marking as up-to-date");
     VirtualFile vf = FileDocumentManager.getInstance().getFile(doc);
     if (logger.isDebugEnabled()) logger.debug("file=" + vf);
@@ -55,7 +57,7 @@ public class DocumentManager {
     }
   }
 
-  public void addListeners(Document doc) {
+  public void addListeners(@NotNull Document doc) {
     Object marker = doc.getUserData(LISTENER_MARKER);
     if (marker != null) {
       return;
@@ -67,7 +69,7 @@ public class DocumentManager {
     }
   }
 
-  public void removeListeners(Document doc) {
+  public void removeListeners(@NotNull Document doc) {
     Object marker = doc.getUserData(LISTENER_MARKER);
     if (marker == null) {
       return;
@@ -80,9 +82,9 @@ public class DocumentManager {
   }
 
 
-  private HashSet<DocumentListener> docListeners = new HashSet<DocumentListener>();
+  @NotNull private HashSet<DocumentListener> docListeners = new HashSet<DocumentListener>();
 
   private static final Key<String> LISTENER_MARKER = new Key<String>("listenerMarker");
-  private static DocumentManager instance = new DocumentManager();
+  @NotNull private static DocumentManager instance = new DocumentManager();
   private static Logger logger = Logger.getInstance(DocumentManager.class.getName());
 }

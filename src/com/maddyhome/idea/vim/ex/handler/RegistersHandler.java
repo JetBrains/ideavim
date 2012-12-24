@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.ui.MorePanel;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class RegistersHandler extends CommandHandler {
     }, ARGUMENT_OPTIONAL | KEEP_FOCUS);
   }
 
-  public boolean execute(final Editor editor, DataContext context, ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull final Editor editor, DataContext context, ExCommand cmd) throws ExException {
     List<Register> registers = CommandGroups.getInstance().getRegister().getRegisters();
 
     StringBuffer text = new StringBuffer();

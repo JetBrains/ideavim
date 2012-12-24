@@ -23,6 +23,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.common.TextRange;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -34,11 +35,11 @@ public class ExCommand {
     this.command = command;
   }
 
-  public int getLine(Editor editor, DataContext context) {
+  public int getLine(@NotNull Editor editor, DataContext context) {
     return ranges.getLine(editor, context);
   }
 
-  public int getCount(Editor editor, DataContext context, int defaultCount, boolean checkCount) {
+  public int getCount(@NotNull Editor editor, DataContext context, int defaultCount, boolean checkCount) {
     int count = -1;
     if (checkCount) {
       count = getCountArgument();
@@ -52,7 +53,8 @@ public class ExCommand {
     return res;
   }
 
-  public LineRange getLineRange(Editor editor, DataContext context, boolean checkCount) {
+  @NotNull
+  public LineRange getLineRange(@NotNull Editor editor, DataContext context, boolean checkCount) {
     int count = -1;
     if (checkCount) {
       count = getCountArgument();
@@ -61,7 +63,8 @@ public class ExCommand {
     return ranges.getLineRange(editor, context, count);
   }
 
-  public TextRange getTextRange(Editor editor, DataContext context, boolean checkCount) {
+  @NotNull
+  public TextRange getTextRange(@NotNull Editor editor, DataContext context, boolean checkCount) {
     int count = -1;
     if (checkCount) {
       count = getCountArgument();

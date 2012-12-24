@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.handler.key.EditorKeyHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -100,7 +101,7 @@ public class KeyParser {
     return instance;
   }
 
-  public void setupActionHandler(String ideaActName, String vimActName) {
+  public void setupActionHandler(@NotNull String ideaActName, @NotNull String vimActName) {
     if (logger.isDebugEnabled()) logger.debug("vimActName=" + vimActName);
 
     ActionManager amgr = ActionManager.getInstance();
@@ -111,7 +112,7 @@ public class KeyParser {
     setupActionHandler(ideaActName, vaction);
   }
 
-  public void setupActionHandler(String ideaActName, AnAction vaction) {
+  public void setupActionHandler(@NotNull String ideaActName, @NotNull AnAction vaction) {
     if (logger.isDebugEnabled()) logger.debug("ideaActName=" + ideaActName);
 
     ActionManager amgr = ActionManager.getInstance();
@@ -129,11 +130,11 @@ public class KeyParser {
     amgr.registerAction("Orig" + ideaActName, iaction);
   }
 
-  public void setupActionHandler(String ideaActName, String vimActName, KeyStroke stroke) {
+  public void setupActionHandler(@NotNull String ideaActName, String vimActName, @NotNull KeyStroke stroke) {
     setupActionHandler(ideaActName, vimActName, stroke, false);
   }
 
-  public void setupActionHandler(String ideaActName, String vimActName, KeyStroke stroke, boolean special) {
+  public void setupActionHandler(@NotNull String ideaActName, @Nullable String vimActName, @NotNull KeyStroke stroke, boolean special) {
     if (logger.isDebugEnabled()) logger.debug("setupActionHandler for " + ideaActName + " and " + vimActName + " for " + stroke);
     ActionManager amgr = ActionManager.getInstance();
     AnAction action = amgr.getAction(ideaActName);
@@ -184,11 +185,11 @@ public class KeyParser {
    * @param actName The action the shortcut will execute
    * @param cmdType The type of the command
    */
-  public void registerAction(int mapping, String actName, @NotNull Command.Type cmdType) {
+  public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType) {
     registerAction(mapping, actName, cmdType, 0);
   }
 
-  public void registerAction(int mapping, String actName, Command.Type cmdType, int cmdFlags) {
+  public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags) {
     String ideaName = actName.substring(3);
     ActionManager amgr = ActionManager.getInstance();
     if (amgr.getAction(ideaName) == null) {
@@ -241,7 +242,7 @@ public class KeyParser {
    * @param cmdType  The type of the command
    * @param shortcut The shortcut to map to the action
    */
-  public void registerAction(int mapping, String actName, Command.Type cmdType, Shortcut shortcut) {
+  public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, Shortcut shortcut) {
     registerAction(mapping, actName, cmdType, new Shortcut[]{shortcut});
   }
 
@@ -254,7 +255,7 @@ public class KeyParser {
    * @param cmdFlags Any special flags associated with this command
    * @param shortcut The shortcut to map to the action
    */
-  public void registerAction(int mapping, String actName, Command.Type cmdType, int cmdFlags, Shortcut shortcut) {
+  public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, Shortcut shortcut) {
     registerAction(mapping, actName, cmdType, cmdFlags, new Shortcut[]{shortcut});
   }
 
@@ -267,7 +268,7 @@ public class KeyParser {
    * @param shortcut The shortcut to map to the action
    * @param argType  The type of argument required by the actions
    */
-  public void registerAction(int mapping, String actName, Command.Type cmdType, Shortcut shortcut,
+  public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, Shortcut shortcut,
                              @NotNull Argument.Type argType) {
     registerAction(mapping, actName, cmdType, new Shortcut[]{shortcut}, argType);
   }
@@ -282,7 +283,7 @@ public class KeyParser {
    * @param shortcut The shortcut to map to the action
    * @param argType  The type of argument required by the actions
    */
-  public void registerAction(int mapping, String actName, Command.Type cmdType, int cmdFlags, Shortcut shortcut,
+  public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, Shortcut shortcut,
                              @NotNull Argument.Type argType) {
     registerAction(mapping, actName, cmdType, cmdFlags, new Shortcut[]{shortcut}, argType);
   }
@@ -295,7 +296,7 @@ public class KeyParser {
    * @param cmdType   The type of the command
    * @param shortcuts The shortcuts to map to the action
    */
-  public void registerAction(int mapping, String actName, Command.Type cmdType, Shortcut[] shortcuts) {
+  public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, @NotNull Shortcut[] shortcuts) {
     registerAction(mapping, actName, cmdType, 0, shortcuts);
   }
 
@@ -308,7 +309,7 @@ public class KeyParser {
    * @param shortcuts The shortcuts to map to the action
    * @param argType   The type of argument required by the actions
    */
-  public void registerAction(int mapping, String actName, Command.Type cmdType, Shortcut[] shortcuts,
+  public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, @NotNull Shortcut[] shortcuts,
                              @NotNull Argument.Type argType) {
     registerAction(mapping, actName, cmdType, 0, shortcuts, argType);
   }
@@ -322,7 +323,7 @@ public class KeyParser {
    * @param cmdFlags  Any special flags associated with this command
    * @param shortcuts The shortcuts to map to the action
    */
-  public void registerAction(int mapping, String actName, Command.Type cmdType, int cmdFlags, Shortcut[] shortcuts) {
+  public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, @NotNull Shortcut[] shortcuts) {
     registerAction(mapping, actName, cmdType, cmdFlags, shortcuts, Argument.Type.NONE);
   }
 
@@ -336,7 +337,7 @@ public class KeyParser {
    * @param shortcuts The shortcuts to map to the action
    * @param argType   The type of argument required by the actions
    */
-  public void registerAction(int mapping, String actName, Command.Type cmdType, int cmdFlags, Shortcut[] shortcuts,
+  public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, @NotNull Shortcut[] shortcuts,
                              @NotNull Argument.Type argType) {
     for (Shortcut shortcut : shortcuts) {
       registerAction(mapping, actName, cmdType, cmdFlags, shortcut.getKeys(), argType);
@@ -353,7 +354,7 @@ public class KeyParser {
    * @param keys     The keystrokes to map to the action
    * @param argType  The type of argument required by the actions
    */
-  private void registerAction(int mapping, String actName, Command.Type cmdType, int cmdFlags, KeyStroke[] keys,
+  private void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, @NotNull KeyStroke[] keys,
                               @NotNull Argument.Type argType) {
     // Look through all the possible mappings and see which ones apply to this action
     int map = 1;
@@ -385,7 +386,8 @@ public class KeyParser {
    * @param last     True if last
    * @return Node
    */
-  private Node addNode(ParentNode base, String actName, Command.Type cmdType, int cmdFlags, KeyStroke key,
+  @Nullable
+  private Node addNode(@NotNull ParentNode base, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, @NotNull KeyStroke key,
                        @NotNull Argument.Type argType, boolean last) {
     // Lets get the actual action for the supplied action name
     ActionManager aMgr = ActionManager.getInstance();
@@ -421,6 +423,7 @@ public class KeyParser {
     return node;
   }
 
+  @NotNull
   public String toString() {
     StringBuffer res = new StringBuffer();
 
@@ -433,7 +436,7 @@ public class KeyParser {
   }
 
 
-  private HashMap<Integer, RootNode> keyRoots = new HashMap<Integer, RootNode>();
+  @NotNull private HashMap<Integer, RootNode> keyRoots = new HashMap<Integer, RootNode>();
 
   private static KeyParser instance;
 

@@ -25,6 +25,7 @@ import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.group.CommandGroups;
+import org.jetbrains.annotations.NotNull;
 
 /**
  */
@@ -34,7 +35,7 @@ public class InsertSingleCommandAction extends EditorAction {
   }
 
   private static class Handler extends EditorActionHandler {
-    public void execute(Editor editor, DataContext context) {
+    public void execute(@NotNull Editor editor, DataContext context) {
       CommandGroups.getInstance().getChange().processSingleCommand(InjectedLanguageUtil.getTopLevelEditor(editor));
     }
   }

@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
+import org.jetbrains.annotations.NotNull;
 
 /**
  */
@@ -35,7 +36,7 @@ public class ToggleRecordingAction extends EditorAction {
   }
 
   private static class Handler extends AbstractEditorActionHandler {
-    protected boolean execute(Editor editor, DataContext context, Command cmd) {
+    protected boolean execute(Editor editor, DataContext context, @NotNull Command cmd) {
       if (!CommandState.getInstance(editor).isRecording()) {
         char reg = cmd.getArgument().getCharacter();
         return CommandGroups.getInstance().getRegister().startRecording(editor, reg);

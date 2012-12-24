@@ -21,6 +21,8 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
 import com.maddyhome.idea.vim.ui.MorePanel;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -78,6 +80,7 @@ public class Options {
    *
    * @return All options
    */
+  @NotNull
   Collection<Option> allOptions() {
     return options.values();
   }
@@ -87,6 +90,7 @@ public class Options {
    *
    * @return The set of changed options
    */
+  @NotNull
   Collection<Option> changedOptions() {
     ArrayList<Option> res = new ArrayList<Option>();
     for (Option option : options.values()) {
@@ -123,7 +127,7 @@ public class Options {
    *                  skipped and processing continues.
    * @return True if no errors were found, false if there were any errors
    */
-  public boolean parseOptionLine(Editor editor, String args, boolean failOnBad) {
+  public boolean parseOptionLine(@Nullable Editor editor, @NotNull String args, boolean failOnBad) {
     // No arguments so we show changed values
     if (args.length() == 0) {
       showOptions(editor, changedOptions(), true);
@@ -337,7 +341,7 @@ public class Options {
    * @param opts      The list of options to display
    * @param showIntro True if intro is displayed, false if not
    */
-  private void showOptions(Editor editor, Collection<Option> opts, boolean showIntro) {
+  private void showOptions(@Nullable Editor editor, @NotNull Collection<Option> opts, boolean showIntro) {
     if (editor == null) {
       return;
     }
@@ -474,13 +478,13 @@ public class Options {
     addOption(new ToggleOption("wrapscan", "ws", true));
   }
 
-  private void addOption(Option option) {
+  private void addOption(@NotNull Option option) {
     options.put(option.getName(), option);
     abbrevs.put(option.getAbbreviation(), option);
   }
 
-  private HashMap<String, Option> options = new HashMap<String, Option>();
-  private HashMap<String, Option> abbrevs = new HashMap<String, Option>();
+  @NotNull private HashMap<String, Option> options = new HashMap<String, Option>();
+  @NotNull private HashMap<String, Option> abbrevs = new HashMap<String, Option>();
 
   private static Options ourInstance;
 
