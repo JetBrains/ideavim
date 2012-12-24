@@ -37,7 +37,7 @@ public class ChangeCaseUpperVisualAction extends EditorAction {
 
   private static class Handler extends VisualOperatorActionHandler {
     protected boolean execute(Editor editor, DataContext context, Command cmd, TextRange range) {
-      return CommandGroups.getInstance().getChange().changeCaseRange(editor, context, range, CharacterHelper.CASE_UPPER);
+      return CommandGroups.getInstance().getChange().changeCaseRange(editor, range, CharacterHelper.CASE_UPPER);
     }
   }
 }

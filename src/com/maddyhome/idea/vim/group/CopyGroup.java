@@ -31,7 +31,6 @@ import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.StringTokenizer;
 
@@ -57,23 +56,22 @@ public class CopyGroup extends AbstractActionGroup {
    */
   public boolean yankMotion(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
     TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true, false);
-    return yankRange(editor, context, range, SelectionType.fromCommandFlags(argument.getMotion().getFlags()), true);
+    return yankRange(editor, range, SelectionType.fromCommandFlags(argument.getMotion().getFlags()), true);
   }
 
   /**
    * This yanks count lines of text
    *
    * @param editor  The editor to yank from
-   * @param context The data context
    * @param count   The number of lines to yank
    * @return true if able to yank the lines, false if not
    */
-  public boolean yankLine(Editor editor, DataContext context, int count) {
+  public boolean yankLine(Editor editor, int count) {
     int start = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor);
     int offset = Math.min(CommandGroups.getInstance().getMotion().moveCaretToLineEndOffset(
       editor, count - 1, true) + 1, EditorHelper.getFileSize(editor));
     if (offset != -1) {
-      return yankRange(editor, context, new TextRange(start, offset), SelectionType.LINE_WISE, false);
+      return yankRange(editor, new TextRange(start, offset), SelectionType.LINE_WISE, false);
     }
 
     return false;
@@ -83,13 +81,11 @@ public class CopyGroup extends AbstractActionGroup {
    * This yanks a range of text
    *
    * @param editor     The editor to yank from
-   * @param context    The data context
    * @param range      The range of text to yank
    * @param type       The type of yank
-   * @param moveCursor
    * @return true if able to yank the range, false if not
    */
-  public boolean yankRange(Editor editor, DataContext context, TextRange range, @Nullable SelectionType type, boolean moveCursor) {
+  public boolean yankRange(Editor editor, TextRange range, @NotNull SelectionType type, boolean moveCursor) {
     if (range != null) {
       if (logger.isDebugEnabled()) {
         logger.debug("yanking range: " + range);
@@ -111,7 +107,6 @@ public class CopyGroup extends AbstractActionGroup {
    * @param editor      The editor to paste into
    * @param context     The data context
    * @param count       The number of times to perform the paste
-   * @param cursorAfter
    * @return true if able to paste, false if not
    */
   public boolean putTextBeforeCursor(Editor editor, DataContext context, int count, boolean indent,
@@ -146,7 +141,6 @@ public class CopyGroup extends AbstractActionGroup {
    * @param editor      The editor to paste into
    * @param context     The data context
    * @param count       The number of times to perform the paste
-   * @param cursorAfter
    * @return true if able to paste, false if not
    */
   public boolean putTextAfterCursor(Editor editor, DataContext context, int count, boolean indent,
@@ -207,7 +201,7 @@ public class CopyGroup extends AbstractActionGroup {
                               Math.min(range.getEndOffset() + 1, EditorHelper.getFileSize(editor)));
       }
 
-      CommandGroups.getInstance().getChange().deleteRange(editor, context, range, SelectionType.fromSubMode(subMode));
+      CommandGroups.getInstance().getChange().deleteRange(editor, range, SelectionType.fromSubMode(subMode));
 
       editor.getCaretModel().moveToOffset(start);
 
@@ -278,7 +272,7 @@ public class CopyGroup extends AbstractActionGroup {
     int endOffset = offset;
     if (type != SelectionType.BLOCK_WISE) {
       for (int i = 0; i < count; i++) {
-        CommandGroups.getInstance().getChange().insertText(editor, context, offset, text);
+        CommandGroups.getInstance().getChange().insertText(editor, offset, text);
         insertCnt += text.length();
         endOffset += text.length();
       }
@@ -299,7 +293,7 @@ public class CopyGroup extends AbstractActionGroup {
 
       if (line + lines >= EditorHelper.getLineCount(editor)) {
         for (int i = 0; i < line + lines - EditorHelper.getLineCount(editor); i++) {
-          CommandGroups.getInstance().getChange().insertText(editor, context, EditorHelper.getFileSize(editor, true), "\n");
+          CommandGroups.getInstance().getChange().insertText(editor, EditorHelper.getFileSize(editor, true), "\n");
           insertCnt++;
         }
       }
@@ -337,20 +331,20 @@ public class CopyGroup extends AbstractActionGroup {
         }
         for (int i = 0; i < count; i++) {
           String txt = i == 0 ? origSegment : segment;
-          CommandGroups.getInstance().getChange().insertText(editor, context, insoff, txt);
+          CommandGroups.getInstance().getChange().insertText(editor, insoff, txt);
           insertCnt += txt.length();
           endOffset += txt.length();
         }
 
 
         if (mode == CommandState.SubMode.VISUAL_LINE) {
-          CommandGroups.getInstance().getChange().insertText(editor, context, endOffset, "\n");
+          CommandGroups.getInstance().getChange().insertText(editor, endOffset, "\n");
           insertCnt++;
           endOffset++;
         }
         else {
           if (pad.length() > 0) {
-            CommandGroups.getInstance().getChange().insertText(editor, context, insoff, pad);
+            CommandGroups.getInstance().getChange().insertText(editor, insoff, pad);
             insertCnt += pad.length();
             endOffset += pad.length();
           }

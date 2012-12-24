@@ -52,6 +52,6 @@ public class YankLinesHandler extends CommandHandler {
 
     TextRange range = cmd.getTextRange(editor, context, true);
 
-    return CommandGroups.getInstance().getCopy().yankRange(editor, context, range, SelectionType.LINE_WISE, false);
+    return CommandGroups.getInstance().getCopy().yankRange(editor, range, SelectionType.LINE_WISE, false);
   }
 }

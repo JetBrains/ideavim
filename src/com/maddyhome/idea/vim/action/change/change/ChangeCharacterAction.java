@@ -35,7 +35,7 @@ public class ChangeCharacterAction extends EditorAction {
 
   private static class Handler extends ChangeEditorActionHandler {
     public boolean execute(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return CommandGroups.getInstance().getChange().changeCharacter(editor, context, count, argument.getCharacter());
+      return CommandGroups.getInstance().getChange().changeCharacter(editor, count, argument.getCharacter());
     }
   }
 }

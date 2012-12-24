@@ -1,7 +1,6 @@
 package com.maddyhome.idea.vim.command;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * @author vlan
@@ -22,27 +21,25 @@ public enum SelectionType {
     return value;
   }
 
-  @Nullable
+  @NotNull
   public static SelectionType fromValue(int value) {
     for (SelectionType type : SelectionType.values()) {
       if (type.getValue() == value) {
         return type;
       }
     }
-    return null;
+    return CHARACTER_WISE;
   }
 
-  @Nullable
+  @NotNull
   public static SelectionType fromSubMode(@NotNull CommandState.SubMode subMode) {
     switch (subMode) {
       case VISUAL_LINE:
         return LINE_WISE;
-      case VISUAL_CHARACTER:
-        return CHARACTER_WISE;
       case VISUAL_BLOCK:
         return BLOCK_WISE;
       default:
-        return null;
+        return CHARACTER_WISE;
     }
   }
 

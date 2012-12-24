@@ -50,6 +50,6 @@ public class DeleteLinesHandler extends CommandHandler {
 
     TextRange range = cmd.getTextRange(editor, context, true);
 
-    return CommandGroups.getInstance().getChange().deleteRange(editor, context, range, SelectionType.LINE_WISE);
+    return CommandGroups.getInstance().getChange().deleteRange(editor, range, SelectionType.LINE_WISE);
   }
 }

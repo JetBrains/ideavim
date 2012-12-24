@@ -39,7 +39,7 @@ public class DeleteJoinLinesAction extends EditorAction {
         return false;
       }
 
-      return CommandGroups.getInstance().getChange().deleteJoinLines(editor, context, count, false);
+      return CommandGroups.getInstance().getChange().deleteJoinLines(editor, count, false);
     }
   }
 }

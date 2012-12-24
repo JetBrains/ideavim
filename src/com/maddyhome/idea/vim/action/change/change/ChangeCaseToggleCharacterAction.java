@@ -35,7 +35,7 @@ public class ChangeCaseToggleCharacterAction extends EditorAction {
 
   private static class Handler extends ChangeEditorActionHandler {
     public boolean execute(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return CommandGroups.getInstance().getChange().changeCaseToggleCharacter(editor, context, count);
+      return CommandGroups.getInstance().getChange().changeCaseToggleCharacter(editor, count);
     }
   }
 }

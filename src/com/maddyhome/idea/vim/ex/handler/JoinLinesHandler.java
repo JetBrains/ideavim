@@ -46,6 +46,6 @@ public class JoinLinesHandler extends CommandHandler {
     TextRange range = cmd.getTextRange(editor, context, true);
     range = new TextRange(range.getStartOffset(), range.getEndOffset() - 1);
 
-    return CommandGroups.getInstance().getChange().deleteJoinRange(editor, context, range, spaces);
+    return CommandGroups.getInstance().getChange().deleteJoinRange(editor, range, spaces);
   }
 }

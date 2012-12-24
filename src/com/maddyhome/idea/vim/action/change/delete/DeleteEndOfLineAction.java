@@ -35,7 +35,7 @@ public class DeleteEndOfLineAction extends EditorAction {
 
   private static class Handler extends ChangeEditorActionHandler {
     public boolean execute(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return CommandGroups.getInstance().getChange().deleteEndOfLine(editor, context, count);
+      return CommandGroups.getInstance().getChange().deleteEndOfLine(editor, count);
     }
   }
 }

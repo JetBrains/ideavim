@@ -41,14 +41,14 @@ public class YankVisualLinesAction extends EditorAction {
     protected boolean execute(Editor editor, DataContext context, Command cmd, TextRange range) {
       CommandState.SubMode mode = CommandState.getInstance(editor).getSubMode();
       if (mode == CommandState.SubMode.VISUAL_BLOCK) {
-        return CommandGroups.getInstance().getCopy().yankRange(editor, context, range, SelectionType.fromSubMode(mode),
+        return CommandGroups.getInstance().getCopy().yankRange(editor, range, SelectionType.fromSubMode(mode),
                                                                true);
       }
       else {
         range = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
                               EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
 
-        return CommandGroups.getInstance().getCopy().yankRange(editor, context, range, SelectionType.LINE_WISE, true);
+        return CommandGroups.getInstance().getCopy().yankRange(editor, range, SelectionType.LINE_WISE, true);
       }
     }
   }

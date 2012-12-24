@@ -40,7 +40,7 @@ public class DeleteJoinVisualLinesAction extends EditorAction {
         return false;
       }
 
-      return CommandGroups.getInstance().getChange().deleteJoinRange(editor, context, range, false);
+      return CommandGroups.getInstance().getChange().deleteJoinRange(editor, range, false);
     }
   }
 }

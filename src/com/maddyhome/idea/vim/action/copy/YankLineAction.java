@@ -35,7 +35,7 @@ public class YankLineAction extends EditorAction {
 
   private static class Handler extends AbstractEditorActionHandler {
     protected boolean execute(Editor editor, DataContext context, Command cmd) {
-      return CommandGroups.getInstance().getCopy().yankLine(editor, context, cmd.getCount());
+      return CommandGroups.getInstance().getCopy().yankLine(editor, cmd.getCount());
     }
   }
 }

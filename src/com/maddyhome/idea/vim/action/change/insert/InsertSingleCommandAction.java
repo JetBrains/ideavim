@@ -35,7 +35,7 @@ public class InsertSingleCommandAction extends EditorAction {
 
   private static class Handler extends EditorActionHandler {
     public void execute(Editor editor, DataContext context) {
-      CommandGroups.getInstance().getChange().processSingleCommand(InjectedLanguageUtil.getTopLevelEditor(editor), context);
+      CommandGroups.getInstance().getChange().processSingleCommand(InjectedLanguageUtil.getTopLevelEditor(editor));
     }
   }
 }

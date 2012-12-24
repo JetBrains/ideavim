@@ -604,7 +604,7 @@ public class KeyHandler {
       executeAction(cmd.getAction(), context);
       if (editorState.getMode() == CommandState.Mode.INSERT ||
           editorState.getMode() == CommandState.Mode.REPLACE) {
-        CommandGroups.getInstance().getChange().processCommand(editor, context, cmd);
+        CommandGroups.getInstance().getChange().processCommand(editor, cmd);
       }
 
       // Now that the command has been executed let's clean up a few things.

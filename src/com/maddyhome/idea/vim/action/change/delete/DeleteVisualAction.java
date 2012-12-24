@@ -45,7 +45,7 @@ public class DeleteVisualAction extends EditorAction {
                               EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
       }
 
-      return CommandGroups.getInstance().getChange().deleteRange(editor, context, range,
+      return CommandGroups.getInstance().getChange().deleteRange(editor, range,
                                                                  SelectionType.fromSubMode(mode));
     }
   }
