@@ -243,14 +243,16 @@ public class ChangeGroup extends AbstractActionGroup {
    * @return true if able to insert the register contents, false if not
    */
   public boolean insertRegister(Editor editor, DataContext context, char key) {
-    Register register = CommandGroups.getInstance().getRegister().getRegister(key);
+    final Register register = CommandGroups.getInstance().getRegister().getRegister(key);
     if (register != null) {
-      String text = register.getText();
-      for (int i = 0; i < text.length(); i++) {
-        processKey(editor, context, KeyStroke.getKeyStroke(text.charAt(i)));
+      final String text = register.getText();
+      if (text != null) {
+        final int length = text.length();
+        for (int i = 0; i < length; i++) {
+          processKey(editor, context, KeyStroke.getKeyStroke(text.charAt(i)));
+        }
+        return true;
       }
-
-      return true;
     }
 
     return false;
