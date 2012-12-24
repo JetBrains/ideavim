@@ -446,8 +446,9 @@ public class CopyGroup extends AbstractActionGroup {
         break;
     }
 
-    CommandGroups.getInstance().getMark().setMark(editor, '[', offset);
-    CommandGroups.getInstance().getMark().setMark(editor, ']', endOffset);
+    final MarkGroup markGroup = CommandGroups.getInstance().getMark();
+    markGroup.setMark(editor, '[', offset);
+    markGroup.setMark(editor, ']', endOffset);
 
     /*
     // Adjust the cursor position after the paste

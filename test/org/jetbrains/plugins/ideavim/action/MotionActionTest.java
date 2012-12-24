@@ -528,4 +528,25 @@ public class MotionActionTest extends VimTestCase {
                    "\n");
     assertOffset(4);
   }
+
+  // VIM-43 |i| |`.|
+  public void testGotoLastChangePosition() {
+    final List<KeyStroke> keys = stringToKeys("ihello ");
+    keys.add(KeyStroke.getKeyStroke("ESCAPE"));
+    keys.addAll(stringToKeys("gg`."));
+    typeTextInFile(keys,
+                   "one two\n" +
+                   "<caret>hello world\n" +
+                   "three four\n");
+    assertOffset(13);
+  }
+
+  // VIM-43 |p| |`.|
+  public void testGotoLastPutPosition() {
+    typeTextInFile(stringToKeys("yypgg`."),
+                   "one two\n" +
+                   "<caret>three\n" +
+                   "four five\n");
+    assertOffset(14);
+  }
 }

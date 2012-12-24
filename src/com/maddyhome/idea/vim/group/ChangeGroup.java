@@ -459,8 +459,11 @@ public class ChangeGroup extends AbstractActionGroup {
     // If the insert/replace command was preceded by a count, repeat again N - 1 times
     repeatInsert(editor, context, cnt == 0 ? 0 : cnt - 1, true);
 
-    CommandGroups.getInstance().getMark().setMark(editor, '^', editor.getCaretModel().getOffset());
-    CommandGroups.getInstance().getMark().setMark(editor, ']', editor.getCaretModel().getOffset());
+    final MarkGroup markGroup = CommandGroups.getInstance().getMark();
+    final int offset = editor.getCaretModel().getOffset();
+    markGroup.setMark(editor, '^', offset);
+    markGroup.setMark(editor, ']', offset);
+    markGroup.setMark(editor, '.', offset);
     CommandState.getInstance(editor).popState();
 
     if (!CommandState.inInsertMode(editor)) {
