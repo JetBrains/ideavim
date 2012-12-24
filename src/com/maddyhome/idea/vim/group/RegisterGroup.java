@@ -345,7 +345,7 @@ public class RegisterGroup extends AbstractActionGroup {
         if (textElement != null) {
           final String text = StringHelper.getSafeXmlText(textElement);
           if (text != null) {
-            register = new Register(key, type != null ? type : SelectionType.CHARACTER_WISE, text);
+            register = new Register(key, type, text);
           }
           else {
             register = null;
@@ -365,7 +365,7 @@ public class RegisterGroup extends AbstractActionGroup {
                         KeyStroke.getKeyStroke(code, modifiers) :
                         KeyStroke.getKeyStroke(c));
           }
-          register = new Register(key, type != null ? type : SelectionType.CHARACTER_WISE, strokes);
+          register = new Register(key, type, strokes);
         }
         registers.put(key, register);
       }
