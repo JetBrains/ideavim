@@ -83,5 +83,8 @@ public class ExKeyBindings {
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_K, KeyEvent.CTRL_MASK), ExEditorKit.StartDigraph),
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_MASK), ExEditorKit.StartDigraph),
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK), ExEditorKit.StartDigraph),
+
+    new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_MASK), ExEditorKit.pasteAction),
+    new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, KeyEvent.SHIFT_MASK), ExEditorKit.pasteAction),
   };
 }
