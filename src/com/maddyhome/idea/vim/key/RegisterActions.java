@@ -429,9 +429,9 @@ public class RegisterActions {
     // TODO - add zj
     // TODO - add zk
 
-    parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionPreviousTab", Command.Type.MOTION, Command.FLAG_MOT_INCLUSIVE,
-                          new Shortcut("gt"));
     parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionNextTab", Command.Type.MOTION, Command.FLAG_MOT_INCLUSIVE,
+                          new Shortcut("gt"));
+    parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionPreviousTab", Command.Type.MOTION, Command.FLAG_MOT_INCLUSIVE,
                           new Shortcut("gT"));
     parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionCamelEndLeft", Command.Type.MOTION, Command.FLAG_MOT_INCLUSIVE,
                           new Shortcut("]b"));
