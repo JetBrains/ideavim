@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -75,7 +76,7 @@ public class ProcessGroup extends AbstractActionGroup {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         VirtualFile vf = EditorData.getVirtualFile(editor);
-        if (vf != null) {
+        if (!ApplicationManager.getApplication().isUnitTestMode() && vf != null) {
           FileEditorManager.getInstance(project).openFile(EditorData.getVirtualFile(editor), true);
         }
       }
@@ -176,7 +177,7 @@ public class ProcessGroup extends AbstractActionGroup {
           //editor.getContentComponent().requestFocus();
           // Reopening the file was the only way I could solve the focus problem introduced in IDEA at
           // version 1050.
-          if ((flg & CommandParser.RES_DONT_REOPEN) == 0) {
+          if (!ApplicationManager.getApplication().isUnitTestMode() && (flg & CommandParser.RES_DONT_REOPEN) == 0) {
             VirtualFile vf = EditorData.getVirtualFile(editor);
             if (vf != null) {
               FileEditorManager.getInstance(project).openFile(EditorData.getVirtualFile(editor), true);
@@ -219,7 +220,7 @@ public class ProcessGroup extends AbstractActionGroup {
 
   private void record(Editor editor, @NotNull String text) {
     if (CommandState.getInstance(editor).isRecording()) {
-      CommandGroups.getInstance().getRegister().addText(text);
+      CommandGroups.getInstance().getRegister().recordText(text);
     }
   }
 

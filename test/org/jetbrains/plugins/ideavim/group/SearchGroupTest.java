@@ -12,6 +12,11 @@ import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.option.ToggleOption;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
+import javax.swing.*;
+import java.util.List;
+
+import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
+
 /**
  * @author vlan
  */
@@ -54,6 +59,14 @@ public class SearchGroupTest extends VimTestCase {
                            "<caret>one\n" +
                            "two\n");
     assertEquals(1, pos);
+  }
+
+  // |/|
+  public void testSearchMotion() {
+    final List<KeyStroke> keys = stringToKeys("/two");
+    keys.add(KeyStroke.getKeyStroke("ENTER"));
+    typeTextInFile(keys, "<caret>one two\n");
+    assertOffset(4);
   }
 
   private void setHighlightSearch() {

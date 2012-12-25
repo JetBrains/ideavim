@@ -3,6 +3,7 @@ package org.jetbrains.plugins.ideavim.action;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
+import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import org.jetbrains.plugins.ideavim.VimTestCase;
@@ -209,12 +210,12 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-262 |i_CTRL-R|
   public void testInsertFromRegister() {
-    final List<KeyStroke> keys = stringToKeys("\"adwddA, ");
+    CommandGroups.getInstance().getRegister().addKeys('a', stringToKeys("World"));
+    final List<KeyStroke> keys = stringToKeys("A, ");
     keys.add(KeyStroke.getKeyStroke("control R"));
     keys.addAll(stringToKeys("a!"));
     doTest(keys,
-           "<caret>World\n" +
-           "Hello\n",
+           "<caret>Hello\n",
            "Hello, World!\n");
   }
 

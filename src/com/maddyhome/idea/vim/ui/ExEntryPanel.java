@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.ui;
  */
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import org.jetbrains.annotations.NotNull;
@@ -97,19 +98,19 @@ public class ExEntryPanel extends JPanel {
     entry.setText(initText);
     entry.setType(label);
     parent = editor.getContentComponent();
-    JRootPane root = SwingUtilities.getRootPane(parent);
-    oldGlass = (JComponent)root.getGlassPane();
-    oldLayout = oldGlass.getLayout();
-    wasOpaque = oldGlass.isOpaque();
-    oldGlass.setLayout(null);
-    oldGlass.setOpaque(false);
-    oldGlass.add(this);
-    oldGlass.addComponentListener(adapter);
-
-    positionPanel();
-
-    oldGlass.setVisible(true);
-    entry.requestFocus();
+    if (!ApplicationManager.getApplication().isUnitTestMode()) {
+      JRootPane root = SwingUtilities.getRootPane(parent);
+      oldGlass = (JComponent)root.getGlassPane();
+      oldLayout = oldGlass.getLayout();
+      wasOpaque = oldGlass.isOpaque();
+      oldGlass.setLayout(null);
+      oldGlass.setOpaque(false);
+      oldGlass.add(this);
+      oldGlass.addComponentListener(adapter);
+      positionPanel();
+      oldGlass.setVisible(true);
+      entry.requestFocus();
+    }
     active = true;
   }
 
@@ -179,11 +180,13 @@ public class ExEntryPanel extends JPanel {
     logger.info("deactivate");
     if (!active) return;
     active = false;
-    oldGlass.removeComponentListener(adapter);
-    oldGlass.setVisible(false);
-    oldGlass.remove(this);
-    oldGlass.setOpaque(wasOpaque);
-    oldGlass.setLayout(oldLayout);
+    if (!ApplicationManager.getApplication().isUnitTestMode()) {
+      oldGlass.removeComponentListener(adapter);
+      oldGlass.setVisible(false);
+      oldGlass.remove(this);
+      oldGlass.setOpaque(wasOpaque);
+      oldGlass.setLayout(oldLayout);
+    }
     parent = null;
   }
 

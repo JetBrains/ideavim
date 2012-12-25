@@ -214,7 +214,7 @@ public class KeyHandler {
       fullReset(editor);
     }
     else if (isRecording && shouldRecord) {
-      CommandGroups.getInstance().getRegister().addKeyStroke(key);
+      CommandGroups.getInstance().getRegister().recordKeyStroke(key);
     }
   }
 
@@ -627,7 +627,7 @@ public class KeyHandler {
       KeyHandler.getInstance().reset(editor);
 
       if (wasRecording && editorState.isRecording()) {
-        CommandGroups.getInstance().getRegister().addKeyStroke(key);
+        CommandGroups.getInstance().getRegister().recordKeyStroke(key);
       }
     }
 
