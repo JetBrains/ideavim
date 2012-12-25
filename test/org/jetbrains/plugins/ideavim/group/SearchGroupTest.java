@@ -69,6 +69,16 @@ public class SearchGroupTest extends VimTestCase {
     assertOffset(4);
   }
 
+  // |i_CTRL-K|
+  public void testSearchDigraph() {
+    final List<KeyStroke> keys = stringToKeys("/");
+    keys.add(KeyStroke.getKeyStroke("control K"));
+    keys.addAll(stringToKeys("O:"));
+    keys.add(KeyStroke.getKeyStroke("ENTER"));
+    typeTextInFile(keys, "<caret>Hello, Österreich!\n");
+    assertOffset(7);
+  }
+
   private void setHighlightSearch() {
     final Options options = Options.getInstance();
     options.resetAllOptions();

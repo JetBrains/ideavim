@@ -17,6 +17,7 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -59,6 +60,7 @@ public abstract class VimTestCase extends UsefulTestCase {
   protected void tearDown() throws Exception {
     myFixture.tearDown();
     myFixture = null;
+    ExEntryPanel.getInstance().deactivate();
     super.tearDown();
   }
 
@@ -73,7 +75,13 @@ public abstract class VimTestCase extends UsefulTestCase {
       @Override
       public void run() {
         for (KeyStroke key : keys) {
-          keyHandler.handleKey(editor, key, dataContext);
+          final ExEntryPanel exEntryPanel = ExEntryPanel.getInstance();
+          if (exEntryPanel.isActive()) {
+            exEntryPanel.handleKey(key);
+          }
+          else {
+            keyHandler.handleKey(editor, key, dataContext);
+          }
         }
       }
     }, null, null);

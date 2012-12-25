@@ -150,9 +150,19 @@ public class ExTextField extends JTextField {
 
   public void handleKey(@NotNull KeyStroke stroke) {
     if (logger.isDebugEnabled()) logger.debug("stroke=" + stroke);
-    KeyEvent event = new KeyEvent(this, stroke.getKeyChar() != KeyEvent.CHAR_UNDEFINED ? KeyEvent.KEY_TYPED :
+    final char keyChar = stroke.getKeyChar();
+    char c = keyChar;
+    final int modifiers = stroke.getModifiers();
+    final int keyCode = stroke.getKeyCode();
+    if ((modifiers & KeyEvent.CTRL_MASK) != 0) {
+      final int codePoint = keyCode - KeyEvent.VK_A + 1;
+      if (codePoint > 0) {
+        c = Character.toChars(codePoint)[0];
+      }
+    }
+    KeyEvent event = new KeyEvent(this, keyChar != KeyEvent.CHAR_UNDEFINED ? KeyEvent.KEY_TYPED :
                                         (stroke.isOnKeyRelease() ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED),
-                                  (new Date()).getTime(), stroke.getModifiers(), stroke.getKeyCode(), stroke.getKeyChar());
+                                  (new Date()).getTime(), modifiers, keyCode, c);
 
     super.processKeyEvent(event);
   }
