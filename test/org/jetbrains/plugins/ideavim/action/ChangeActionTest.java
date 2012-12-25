@@ -207,6 +207,17 @@ public class ChangeActionTest extends VimTestCase {
            "two\n");
   }
 
+  // VIM-262 |i_CTRL-R|
+  public void testInsertFromRegister() {
+    final List<KeyStroke> keys = stringToKeys("\"adwddA, ");
+    keys.add(KeyStroke.getKeyStroke("control R"));
+    keys.addAll(stringToKeys("a!"));
+    doTest(keys,
+           "<caret>World\n" +
+           "Hello\n",
+           "Hello, World!\n");
+  }
+
   private void doTest(final List<KeyStroke> keys, String before, String after) {
     myFixture.configureByText("a.java", before);
     final Editor editor = myFixture.getEditor();
