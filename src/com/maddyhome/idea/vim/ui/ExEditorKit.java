@@ -130,26 +130,31 @@ public class ExEditorKit extends DefaultEditorKit {
     new ExEditorKit.HistoryUpFilterAction(),
     new ExEditorKit.HistoryDownFilterAction(),
     new ExEditorKit.ToggleInsertReplaceAction(),
-    new ExEditorKit.StartDigraphAction()
+    new ExEditorKit.StartDigraphAction(),
   };
 
   public static class DefaultExKeyHandler extends DefaultKeyTypedAction {
     public void actionPerformed(@NotNull ActionEvent e) {
       ExTextField target = (ExTextField)getTextComponent(e);
-      KeyStroke key = convert(e);
-      if (key != null) {
-        char ch = target.checkKey(convert(e));
-        if (ch > 0) {
-          ActionEvent event = new ActionEvent(e.getSource(), e.getID(), "" + ch, e.getWhen(), e.getModifiers());
-          super.actionPerformed(event);
+      final Action currentAction = target.getCurrentAction();
+      if (currentAction != null) {
+        currentAction.actionPerformed(e);
+      }
+      else {
+        KeyStroke key = convert(e);
+        if (key != null) {
+          final char c = key.getKeyChar();
+          if (c > 0) {
+            ActionEvent event = new ActionEvent(e.getSource(), e.getID(), "" + c, e.getWhen(), e.getModifiers());
+            super.actionPerformed(event);
+            target.saveLastEntry();
+          }
+        }
+        else {
+          super.actionPerformed(e);
 
           target.saveLastEntry();
         }
-      }
-      else {
-        super.actionPerformed(e);
-
-        target.saveLastEntry();
       }
     }
   }
@@ -391,15 +396,36 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class StartDigraphAction extends TextAction {
+    @Nullable private DigraphSequence digraphSequence;
+
     public StartDigraphAction() {
       super(StartDigraph);
     }
 
-    public void actionPerformed(@NotNull ActionEvent actionEvent) {
-      ExTextField target = (ExTextField)getTextComponent(actionEvent);
-      KeyStroke key = convert(actionEvent);
-      if (key != null && DigraphSequence.isDigraphStart(key)) {
-        target.startDigraph(convert(actionEvent));
+    public void actionPerformed(@NotNull ActionEvent e) {
+      final ExTextField target = (ExTextField)getTextComponent(e);
+      final KeyStroke key = convert(e);
+      if (key != null && digraphSequence != null) {
+        DigraphSequence.DigraphResult res = digraphSequence.processKey(key, target.getEditor(), target.getContext());
+        switch (res.getResult()) {
+          case DigraphSequence.DigraphResult.RES_BAD:
+            target.escape();
+            target.handleKey(key);
+            break;
+          case DigraphSequence.DigraphResult.RES_DONE:
+            final KeyStroke digraph = res.getStroke();
+            digraphSequence = null;
+            target.setCurrentAction(null);
+            if (digraph != null) {
+              target.handleKey(digraph);
+            }
+            break;
+        }
+      }
+      else if (key != null && DigraphSequence.isDigraphStart(key)) {
+        target.setCurrentAction(this);
+        digraphSequence = new DigraphSequence();
+        digraphSequence.processKey(key, target.getEditor(), target.getContext());
       }
     }
   }

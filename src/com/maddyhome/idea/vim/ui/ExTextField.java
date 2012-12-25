@@ -27,7 +27,6 @@ import com.intellij.openapi.editor.colors.EditorFontType;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.HistoryGroup;
-import com.maddyhome.idea.vim.helper.DigraphSequence;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -233,41 +232,21 @@ public class ExTextField extends JTextField {
   }
 
   public void escape() {
-    if (digraph != null) {
-      digraph = null;
+    if (currentAction != null) {
+      currentAction = null;
     }
     else {
       CommandGroups.getInstance().getProcess().cancelExEntry(editor, context);
     }
   }
 
-  public void startDigraph(@NotNull KeyStroke key) {
-    if (digraph == null) {
-      digraph = new DigraphSequence();
-      digraph.processKey(key, editor, context);
-    }
+  public void setCurrentAction(@Nullable Action action) {
+    this.currentAction = action;
   }
 
-  public char checkKey(@NotNull KeyStroke key) {
-    if (digraph != null) {
-      DigraphSequence.DigraphResult res = digraph.processKey(key, editor, context);
-      switch (res.getResult()) {
-        case DigraphSequence.DigraphResult.RES_OK:
-          return 0;
-        case DigraphSequence.DigraphResult.RES_BAD:
-          digraph = null;
-          return 0;
-        case DigraphSequence.DigraphResult.RES_DONE:
-          key = res.getStroke();
-          digraph = null;
-      }
-    }
-
-    if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
-      return key.getKeyChar();
-    }
-
-    return 0;
+  @Nullable
+  public Action getCurrentAction() {
+    return currentAction;
   }
 
   public void toggleInsertReplace() {
@@ -411,7 +390,7 @@ public class ExTextField extends JTextField {
   private String lastEntry;
   private List<HistoryGroup.HistoryEntry> history;
   private int histIndex = 0;
-  @Nullable private DigraphSequence digraph;
+  @Nullable private Action currentAction;
   // TODO - support block cursor for overwrite mode
   //private Caret origCaret;
   //private Caret blockCaret;
