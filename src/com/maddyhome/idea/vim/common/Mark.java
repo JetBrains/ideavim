@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.common;
  */
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 
@@ -50,7 +51,7 @@ public class Mark extends FileLocation {
     return key;
   }
 
-  public boolean equals(@NotNull Object object) {
+  public boolean equals(@Nullable Object object) {
     if (object instanceof Mark) {
       if (((Mark)object).key == key) {
         return true;
