@@ -210,7 +210,7 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-262 |i_CTRL-R|
   public void testInsertFromRegister() {
-    CommandGroups.getInstance().getRegister().addKeys('a', stringToKeys("World"));
+    CommandGroups.getInstance().getRegister().setKeys('a', stringToKeys("World"));
     final List<KeyStroke> keys = stringToKeys("A, ");
     keys.add(KeyStroke.getKeyStroke("control R"));
     keys.addAll(stringToKeys("a!"));

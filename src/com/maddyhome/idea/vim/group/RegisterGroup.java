@@ -276,14 +276,8 @@ public class RegisterGroup extends AbstractActionGroup {
     }
   }
 
-  public void addKeys(char register, @NotNull List<KeyStroke> keys) {
-    final Register r = getRegister(register);
-    if (r != null) {
-      r.addKeys(keys);
-    }
-    else {
-      registers.put(register, new Register(register, SelectionType.CHARACTER_WISE, keys));
-    }
+  public void setKeys(char register, @NotNull List<KeyStroke> keys) {
+    registers.put(register, new Register(register, SelectionType.CHARACTER_WISE, keys));
   }
 
   public void finishRecording(Editor editor) {

@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.ui;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.KeyHandler;
+import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
 import com.maddyhome.idea.vim.helper.SearchHelper;
@@ -131,6 +132,7 @@ public class ExEditorKit extends DefaultEditorKit {
     new ExEditorKit.HistoryDownFilterAction(),
     new ExEditorKit.ToggleInsertReplaceAction(),
     new ExEditorKit.StartDigraphAction(),
+    new InsertRegisterAction(),
   };
 
   public static class DefaultExKeyHandler extends DefaultKeyTypedAction {
@@ -203,18 +205,46 @@ public class ExEditorKit extends DefaultEditorKit {
     }
   }
 
-  // TODO - how do I get the argument (register name)?
   public static class InsertRegisterAction extends TextAction {
+    private static enum State {
+      SKIP_CTRL_R,
+      WAIT_REGISTER,
+    }
+
+    private State state = State.SKIP_CTRL_R;
+
     public InsertRegisterAction() {
       super(InsertRegister);
     }
 
-    /**
-     * Invoked when an action occurs.
-     */
     public void actionPerformed(ActionEvent e) {
-      ExTextField target = (ExTextField)getTextComponent(e);
-      target.saveLastEntry();
+      final ExTextField target = (ExTextField)getTextComponent(e);
+      final KeyStroke key = convert(e);
+      if (key != null) {
+        switch (state) {
+          case SKIP_CTRL_R:
+            state = State.WAIT_REGISTER;
+            target.setCurrentAction(this);
+            break;
+          case WAIT_REGISTER:
+            state = State.SKIP_CTRL_R;
+            target.setCurrentAction(null);
+            final char c = key.getKeyChar();
+            if (c != KeyEvent.CHAR_UNDEFINED) {
+              final Register register = CommandGroups.getInstance().getRegister().getRegister(c);
+              if (register != null) {
+                final String oldText = target.getText();
+                final String text = register.getText();
+                if (oldText != null && text != null) {
+                  target.setText(oldText + text);
+                }
+              }
+            }
+            else {
+              target.handleKey(key);
+            }
+        }
+      }
     }
   }
 
@@ -409,7 +439,7 @@ public class ExEditorKit extends DefaultEditorKit {
         DigraphSequence.DigraphResult res = digraphSequence.processKey(key, target.getEditor(), target.getContext());
         switch (res.getResult()) {
           case DigraphSequence.DigraphResult.RES_BAD:
-            target.escape();
+            target.setCurrentAction(null);
             target.handleKey(key);
             break;
           case DigraphSequence.DigraphResult.RES_DONE:

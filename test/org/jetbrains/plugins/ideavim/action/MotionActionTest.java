@@ -2,6 +2,7 @@ package org.jetbrains.plugins.ideavim.action;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.VisualPosition;
+import com.maddyhome.idea.vim.group.CommandGroups;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import javax.swing.*;
@@ -548,5 +549,18 @@ public class MotionActionTest extends VimTestCase {
                    "<caret>three\n" +
                    "four five\n");
     assertOffset(14);
+  }
+
+  // VIM-262 |c_CTRL-R|
+  public void testSearchFromRegister() {
+    CommandGroups.getInstance().getRegister().setKeys('a', stringToKeys("two"));
+    final List<KeyStroke> keys = stringToKeys("/");
+    keys.add(KeyStroke.getKeyStroke("control R"));
+    keys.addAll(stringToKeys("a"));
+    keys.add(KeyStroke.getKeyStroke("ENTER"));
+    typeTextInFile(keys, "<caret>one\n" +
+                         "two\n" +
+                         "three\n");
+    assertOffset(4);
   }
 }

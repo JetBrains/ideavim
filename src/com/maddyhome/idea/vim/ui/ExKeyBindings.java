@@ -35,7 +35,6 @@ public class ExKeyBindings {
   }
 
   // TODO - add the following keys:
-  // Ctrl-R {register}
   // Ctrl-\ Ctrl-N - abort
   static final KeyBinding[] bindings = new KeyBinding[]{
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), ExEditorKit.EscapeChar),
@@ -86,5 +85,7 @@ public class ExKeyBindings {
 
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_MASK), ExEditorKit.pasteAction),
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, KeyEvent.SHIFT_MASK), ExEditorKit.pasteAction),
+
+    new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_MASK), ExEditorKit.InsertRegister),
   };
 }

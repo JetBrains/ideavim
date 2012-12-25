@@ -26,6 +26,8 @@ tag             char            action in Insert mode   ~
                                 enter digraph
 |i_CTRL-O|      CTRL-O          execute a single command and return to insert
                                 mode
+|i_CTRL-R|      CTRL-R {0-9a-z"%#*:=}
+                                insert the contents of a register
 |i_CTRL-W|      CTRL-W          delete word before the cursor
 
 ==============================================================================
@@ -158,6 +160,20 @@ here are those that are different.
 tag             command       note action in Visual mode        ~
 ------------------------------------------------------------------------------
 |v_y|           y                  yank the highlighted area
+
+==============================================================================
+4. Command-line editing                                 *ex-edit-index*
+
+Get to the command-line with the ':', '!', '/' or '?' commands.
+Normal characters are inserted at the current cursor position.
+"Completion" below refers to context-sensitive completion.  It will complete
+file names, tags, commands etc. as appropriate.
+
+tag             command       action in Command-line editing mode       ~
+------------------------------------------------------------------------------
+|c_CTRL-R|      CTRL-R {0-9a-z"%#*:= CTRL-F CTRL-P CTRL-W CTRL-A}
+                                insert the contents of a register or object
+                                under the cursor as if typed
 
 ==============================================================================
 5. EX commands                                  *ex-cmd-index*
