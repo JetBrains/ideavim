@@ -3,24 +3,24 @@ IdeaVim Authors
 
 The original author:
 
-* Rick Maddy <rmaddy@maddyhome.com>
+* [Rick Maddy](mailto:rmaddy@maddyhome.com)
 
 The current maintainer:
 
-* Andrey Vlasovskikh <andrey.vlasovskikh@gmail.com>
+* [Andrey Vlasovskikh](mailto:andrey.vlasovskikh@gmail.com)
 
 Previous maintainers:
 
-* Oleg Shpynov <oleg.shpynov@jetbrains.com>
+* [Oleg Shpynov](mailto:oleg.shpynov@jetbrains.com)
 
 Contributors:
 
-* Dmitry Jemerov <yole@jetbrains.com>
-* Marquis Wang <marquis@marquiswang.com>
-* Julien Hoarau <madgnome@gmail.com>
-* Masanobu Imai <masanobu.imai@gmail.com>
-* poxu <poxvuibr@gmail.com>
-* Alexander Zolotov <alexander.zolotov@jetbrains.com>
+* [Dmitry Jemerov](mailto:yole@jetbrains.com)
+* [Marquis Wang](mailto:marquis@marquiswang.com)
+* [Julien Hoarau](mailto:madgnome@gmail.com)
+* [Masanobu Imai](mailto:masanobu.imai@gmail.com)
+* [poxu](mailto:poxvuibr@gmail.com)
+* [Alexander Zolotov](mailto:alexander.zolotov@jetbrains.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
