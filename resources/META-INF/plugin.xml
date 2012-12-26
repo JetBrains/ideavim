@@ -1,7 +1,22 @@
 <idea-plugin url="http://plugins.intellij.net/plugin/?id=164">
-    <name>IdeaVIM</name>
+    <name>IdeaVim</name>
     <id>IdeaVIM</id>
-    <description><![CDATA[
+    <change-notes>
+      <![CDATA[
+        <p>0.25:</p>
+        <ul>
+          <li>Various bug fixes</li>
+        </ul>
+        <p>0.24:</p>
+        <ul>
+          <li>Added Vim string object selection motions (see help topics <code>v_i"</code>, <code>v_a"</code>)</li>
+          <li>Various bug fixes</li>
+        </ul>
+        <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
+      ]]>
+    </change-notes>
+    <description>
+      <![CDATA[
         <p>Vim emulation plug-in for IDEs based on the IntelliJ platform. IdeaVim can be used with IntelliJ IDEA, RubyMine, PyCharm, PhpStorm, WebStorm and AppCode.</p>
         <p>Supported functionality:</p>
         <ul>
@@ -20,11 +35,11 @@
             <li>Command line and search history</li>
             <li>Vim web help</li>
         </ul>
-    ]]></description>
+      ]]>
+      </description>
     <version>@VERSION@</version>
-    <vendor logo="/icons/vim16x16.png">Rick Maddy, JetBrains</vendor>
+    <vendor logo="/icons/vim16x16.png">JetBrains</vendor>
 
-    <helpset file="help.jar" path="/VimHelp.hs"/>
     <idea-version since-build="@SINCE-VERSION@"/>
 
     <!-- Mark the plugin as compatible with RubyMine and other products based on the IntelliJ platform -->
@@ -47,7 +62,7 @@
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
         <action id="VimReconfigureKeymap" class="com.maddyhome.idea.vim.VimReconfigureKeymapAction" text="Reconfigure VIM Keymap" description="Reconfigure VIM keymap">
-            <add-to-group group-id="ToolsMenu" order="after VimPluginToggle"/>
+            <add-to-group group-id="ToolsMenu" relative-to-action="after VimPluginToggle"/>
         </action>
 
         <!-- Motions -->
