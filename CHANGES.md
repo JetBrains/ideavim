@@ -4,8 +4,28 @@ The Changelog
 History of changes in IdeaVim for the IntelliJ platform.
 
 
+0.26, 2012-12-26
+----------------
+
+Added support for paste in the command mode: from a register using `<C-R>`,
+from the clipboard using `<S-Insert>` or `<M-V>`. Added support for the last
+change position mark (the dot `.` mark). New shortcuts for Go to declaration
+`<C-]>` and Navigate back `<C-T>`. Various bug fixes.
+
+Features:
+
+* VIM-262 Support for paste from register in command mode
+* VIM-214 Key bindings for paste into command line
+* VIM-43 Added support for the last change position mark
+* VIM-177 Added <C-]> and <C-T> to the keymap
+
+Bug fixes:
+
+* VIM-302 Fixed tab switching order for 'gt' and 'gT'
+
+
 0.25, 2012-12-19
-------------------
+----------------
 
 A bugfix release.
 

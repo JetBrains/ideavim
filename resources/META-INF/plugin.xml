@@ -3,6 +3,13 @@
   <id>IdeaVIM</id>
   <change-notes>
     <![CDATA[
+      <p>0.26:</p>
+      <ul>
+        <li>Added support for paste in the command mode: from a register using <code>&lt;C-R&gt;</code>, from the clipboard using <code>&lt;S-Insert&gt;</code> or <code>&lt;M-V&gt;</code></li>
+        <li>Added support for the last change position mark (the dot <code>.</code> mark)</li>
+        <li>New shortcuts for Go to declaration <code>&lt;C-]&gt;</code> and Navigate back <code>&lt;C-T&gt;</code></li>
+        <li>Various bug fixes</li>
+      </ul>
       <p>0.25:</p>
       <ul>
         <li>Various bug fixes</li>
