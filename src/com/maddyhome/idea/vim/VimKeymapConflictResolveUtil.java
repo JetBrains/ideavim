@@ -1,10 +1,14 @@
 package com.maddyhome.idea.vim;
 
+import com.google.common.base.Strings;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.actionSystem.MouseShortcut;
 import com.intellij.openapi.actionSystem.Shortcut;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.keymap.Keymap;
+import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.keymap.impl.KeymapImpl;
+import com.intellij.openapi.util.InvalidDataException;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,11 +40,73 @@ public class VimKeymapConflictResolveUtil {
   private static final String KEYSTROKE_ATTRIBUTE = "keystroke";
   private static final String SECOND_KEYSTROKE_ATTRIBUTE = "second-keystroke";
 
+  private static Logger LOG = Logger.getInstance(VimKeymapConflictResolveUtil.class);
+
   public static void resolveConflicts(Element targetKeymapRoot, Keymap parentKeymap) {
     final Collection<String> vimHandlingShortcuts = getVimHandlingShortcuts(targetKeymapRoot);
     final Map<String, List<Shortcut>> shortcutsToOverride = retrieveShortcutsToOverride(vimHandlingShortcuts, parentKeymap);
-    // todo: support for predefined overrides (e.g. shift+control+n for GoToDeclaration in non-Mac keymaps)
+    final Map<String, List<Shortcut>> extraShortcuts = collectAndRemoveExtraShortcuts(targetKeymapRoot);
+    addExtraShortcuts(shortcutsToOverride, extraShortcuts);
     overrideShortcuts(targetKeymapRoot, shortcutsToOverride);
+  }
+
+  private static void addExtraShortcuts(Map<String, List<Shortcut>> shortcutsToOverride, Map<String, List<Shortcut>> extraShortcuts) {
+    for (Map.Entry<String, List<Shortcut>> extraShortcut : extraShortcuts.entrySet()) {
+      final List<Shortcut> overriddenActionKeystrokes = shortcutsToOverride.get(extraShortcut.getKey());
+      if (overriddenActionKeystrokes != null && overriddenActionKeystrokes.isEmpty()) {
+        overriddenActionKeystrokes.addAll(extraShortcut.getValue());
+      }
+    }
+  }
+
+  /**
+   * Collect manually actions with shortcuts and remove it from keymap.
+   * Collected shortcut may be will be added to target keymap later {@link this#retrieveShortcutsToOverride(java.util.Collection, com.intellij.openapi.keymap.Keymap)}
+   *
+   * @param targetKeymapRoot root element of Vim keymap
+   * @return map of action to shortcuts that had been defined manually by developer
+   */
+  private static Map<String, List<Shortcut>> collectAndRemoveExtraShortcuts(Element targetKeymapRoot) {
+    List<Element> actionsToDelete = newLinkedList();
+    Map<String, List<Shortcut>> result = newHashMap();
+    for (Object action : targetKeymapRoot.getChildren(ACTION_TAG)) {
+      if (action instanceof Element) {
+        List<Shortcut> shortcuts = newLinkedList();
+        Element actionElement = (Element)action;
+        final String actionId = actionElement.getAttributeValue(ID_ATTRIBUTE);
+        if (!Strings.isNullOrEmpty(actionId) && !VIM_KEY_HANDLER_ACTION_ID.equals(actionId)) {
+          for (Object keyboardShortcut : actionElement.getChildren(KEYBOARD_SHORTCUT_TAG)) {
+            if (keyboardShortcut instanceof Element) {
+              Element keyboardShortcutElement = (Element)keyboardShortcut;
+              KeyStroke firstKeystroke = KeyStroke.getKeyStroke(keyboardShortcutElement.getAttributeValue(FIRST_KEYSTROKE_ATTRIBUTE));
+              KeyStroke secondKeystroke = KeyStroke.getKeyStroke(keyboardShortcutElement.getAttributeValue(SECOND_KEYSTROKE_ATTRIBUTE));
+              shortcuts.add(new KeyboardShortcut(firstKeystroke, secondKeystroke));
+            }
+          }
+          for (Object mouseShortcut : actionElement.getChildren(KEYBOARD_SHORTCUT_TAG)) {
+            if (mouseShortcut instanceof Element) {
+              Element mouseShortcutElement = (Element)mouseShortcut;
+              final String keystrokeString = mouseShortcutElement.getAttributeValue(KEYSTROKE_ATTRIBUTE);
+              if (!Strings.isNullOrEmpty(keystrokeString)) {
+                try {
+                  shortcuts.add(KeymapUtil.parseMouseShortcut(keystrokeString));
+                }
+                catch (InvalidDataException e) {
+                  LOG.error("Cannot parse extra mouse shortcut, skipped", keystrokeString);
+                }
+              }
+            }
+          }
+          actionsToDelete.add(actionElement);
+          result.put(actionId, shortcuts);
+        }
+      }
+    }
+
+    for (Element element : actionsToDelete) {
+      targetKeymapRoot.removeContent(element);
+    }
+    return result;
   }
 
   /**
@@ -48,7 +114,7 @@ public class VimKeymapConflictResolveUtil {
    * @return all shortcuts in string representation that should be handled by Vim plugin
    */
   private static Collection<String> getVimHandlingShortcuts(Element targetKeymapRoot) {
-    Element vimKeyHandlerAction = retrieveVimKeyHandlerElement(targetKeymapRoot);
+    Element vimKeyHandlerAction = retrieveActionElement(targetKeymapRoot);
     if (vimKeyHandlerAction != null) {
       Collection<String> result = newLinkedList();
       for (Object childAction : vimKeyHandlerAction.getChildren()) {
@@ -67,7 +133,7 @@ public class VimKeymapConflictResolveUtil {
    * @return Retrieve VimKeyHandler action element
    */
   @Nullable
-  private static Element retrieveVimKeyHandlerElement(Element targetKeymapRoot) {
+  private static Element retrieveActionElement(Element targetKeymapRoot) {
     Element vimKeyHandlerAction = null;
     for (Object child : targetKeymapRoot.getChildren(ACTION_TAG)) {
       if (child instanceof Element) {
@@ -123,6 +189,7 @@ public class VimKeymapConflictResolveUtil {
    * @param targetKeymapRoot    root element of Vim keymap
    * @param shortcutsToOverride overriding mapping: actions -> shortcuts_should_be_saved
    */
+
   private static void overrideShortcuts(Element targetKeymapRoot, Map<String, List<Shortcut>> shortcutsToOverride) {
     for (Map.Entry<String, List<Shortcut>> action : shortcutsToOverride.entrySet()) {
       targetKeymapRoot.addContent(createActionElement(action.getKey(), action.getValue()));
@@ -135,21 +202,16 @@ public class VimKeymapConflictResolveUtil {
     for (Shortcut shortcut : shortcuts) {
       if (shortcut instanceof KeyboardShortcut) {
         KeyboardShortcut keyboardShortcut = (KeyboardShortcut)shortcut;
-        overridesAction.addContent(createShortcutElement(KEYBOARD_SHORTCUT_TAG,
-                                                         FIRST_KEYSTROKE_ATTRIBUTE,
-                                                         KeymapImpl.getKeyShortcutString(keyboardShortcut.getFirstKeyStroke())));
+        overridesAction
+          .addContent(createShortcutElement(KEYBOARD_SHORTCUT_TAG, FIRST_KEYSTROKE_ATTRIBUTE, KeymapImpl.getKeyShortcutString(keyboardShortcut.getFirstKeyStroke())));
 
         final KeyStroke secondKeyStroke = keyboardShortcut.getSecondKeyStroke();
         if (secondKeyStroke != null) {
-          overridesAction.addContent(createShortcutElement(KEYBOARD_SHORTCUT_TAG,
-                                                           SECOND_KEYSTROKE_ATTRIBUTE,
-                                                           KeymapImpl.getKeyShortcutString(secondKeyStroke)));
+          overridesAction.addContent(createShortcutElement(KEYBOARD_SHORTCUT_TAG, SECOND_KEYSTROKE_ATTRIBUTE, KeymapImpl.getKeyShortcutString(secondKeyStroke)));
         }
       }
       else if (shortcut instanceof MouseShortcut) {
-        overridesAction.addContent(createShortcutElement(MOUSE_SHORTCUT_TAG,
-                                                         KEYSTROKE_ATTRIBUTE,
-                                                         getMouseShortcutString((MouseShortcut)shortcut)));
+        overridesAction.addContent(createShortcutElement(MOUSE_SHORTCUT_TAG, KEYSTROKE_ATTRIBUTE, getMouseShortcutString((MouseShortcut)shortcut)));
       }
     }
     return overridesAction;

@@ -2,6 +2,7 @@ package org.jetbrains.plugins.ideavim;
 
 import com.google.common.base.Charsets;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
+import com.intellij.openapi.actionSystem.Shortcut;
 import com.intellij.openapi.components.impl.stores.StorageUtil;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.impl.KeymapImpl;
@@ -11,17 +12,17 @@ import org.jdom.Document;
 import org.jdom.Element;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
 
 /**
  * User: zolotov
  * Date: 1/10/13
  */
 public class KeymapGenerationTest extends VimTestCase {
+
+  private static final String EXTRA_ACTION = "extraAction";
+  private static final String EXTRA_SHORTCUT = "control D";
 
   public void testOverrideSingleConflict() throws Exception {
     final KeymapImpl parentKeymap = new KeymapImpl();
@@ -35,8 +36,9 @@ public class KeymapGenerationTest extends VimTestCase {
     assertContainsElements(allShortcuts, "VimKeyHandler", "action1", "action2");
     assertDoesntContain(allShortcuts, "action3");
 
-    assertEquals(1, resultKeymap.getShortcuts("action1").length);
-    assertEquals(KeyboardShortcut.fromString("control X"), resultKeymap.getShortcuts("action1")[0]);
+    final Shortcut[] action1Shortcuts = resultKeymap.getShortcuts("action1");
+    assertEquals(1, action1Shortcuts.length);
+    assertEquals(KeyboardShortcut.fromString("control X"), action1Shortcuts[0]);
     assertEquals(0, resultKeymap.getShortcuts("action2").length);
   }
 
@@ -57,35 +59,26 @@ public class KeymapGenerationTest extends VimTestCase {
   }
 
   public void testAddExtraShortcutForOverridedMethods() throws Exception {
-    final String actionName = "action";
-    final String extraShortcut = "control D";
-
     KeymapImpl parentKeymap = new KeymapImpl();
-    parentKeymap.addShortcut(actionName, KeyboardShortcut.fromString("control C")); //should be overridden
-
-    final Map<String, List<String>> extraShortcuts = newHashMap();
-    extraShortcuts.put(actionName, newArrayList(extraShortcut));
+    parentKeymap.addShortcut(EXTRA_ACTION, KeyboardShortcut.fromString("control C")); //should be overridden
 
     final KeymapImpl resultKeymap = resolveConflicts(parentKeymap);
-    assertEquals(1, resultKeymap.getShortcuts(actionName).length);
-    assertEquals(KeyboardShortcut.fromString(extraShortcut), resultKeymap.getShortcuts(actionName)[0]);
+    final Shortcut[] shortcuts = resultKeymap.getShortcuts(EXTRA_ACTION);
+    assertEquals(1, shortcuts.length);
+    assertEquals(KeyboardShortcut.fromString(EXTRA_SHORTCUT), shortcuts[0]);
   }
 
   public void testDoNotAddExtraShortcutIfAtLeastOneShortcutHadBeenSaved() throws Exception {
-    final String actionName = "action";
-    final String originalShortcut = "control C";
-    final String extraShortcut = "control D";
+    final String originalShortcut = "control X";
 
     KeymapImpl parentKeymap = new KeymapImpl();
-    parentKeymap.addShortcut(actionName, KeyboardShortcut.fromString(originalShortcut)); //should be overridden
-    parentKeymap.addShortcut(actionName, KeyboardShortcut.fromString("control X"));
-
-    final Map<String, List<String>> extraShortcuts = newHashMap();
-    extraShortcuts.put(actionName, newArrayList(extraShortcut));
+    parentKeymap.addShortcut(EXTRA_ACTION, KeyboardShortcut.fromString("control C")); //should be overridden
+    parentKeymap.addShortcut(EXTRA_ACTION, KeyboardShortcut.fromString(originalShortcut));
 
     final KeymapImpl resultKeymap = resolveConflicts(parentKeymap);
-    assertEquals(1, resultKeymap.getShortcuts(actionName).length);
-    assertEquals(KeyboardShortcut.fromString(originalShortcut), resultKeymap.getShortcuts(actionName)[0]);
+    final Shortcut[] shortcuts = resultKeymap.getShortcuts(EXTRA_ACTION);
+    assertEquals(1, shortcuts.length);
+    assertEquals(KeyboardShortcut.fromString(originalShortcut), shortcuts[0]);
   }
 
   private static KeymapImpl resolveConflicts(KeymapImpl parentKeymap) throws InvalidDataException {
@@ -98,6 +91,7 @@ public class KeymapGenerationTest extends VimTestCase {
 
   /**
    * Create simple keymap with binded Ctrl+V and Ctrl+C shortcuts
+   * and single extra shortcut for action 'action' with keystroke {@link this#EXTRA_SHORTCUT}
    *
    * @return root element of keymap in xml representation
    */
@@ -107,6 +101,10 @@ public class KeymapGenerationTest extends VimTestCase {
                                                 "  <action id=\"VimKeyHandler\">\n" +
                                                 "    <keyboard-shortcut first-keystroke=\"control C\"/>\n" +
                                                 "    <keyboard-shortcut first-keystroke=\"control V\"/>\n" +
+                                                "  </action>\n" +
+                                                "  \n" +
+                                                "  <action id=\"" + EXTRA_ACTION + "\">\n" +
+                                                "    <keyboard-shortcut first-keystroke=\"" + EXTRA_SHORTCUT + "\"/>\n" +
                                                 "  </action>\n" +
                                                 "</keymap>").getBytes(Charsets.UTF_8));
     assert result != null;
