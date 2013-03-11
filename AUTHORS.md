@@ -21,6 +21,7 @@ Contributors:
 * [Masanobu Imai](mailto:masanobu.imai@gmail.com)
 * [poxu](mailto:poxvuibr@gmail.com)
 * [Alexander Zolotov](mailto:alexander.zolotov@jetbrains.com)
+* [John Lindquist](mailto:johnlindquist@gmail.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
