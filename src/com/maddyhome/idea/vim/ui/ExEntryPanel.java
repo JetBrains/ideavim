@@ -23,6 +23,8 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.colors.EditorColorsManager;
+import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,8 +48,9 @@ public class ExEntryPanel extends JPanel {
 
   private ExEntryPanel() {
     setBorder(BorderFactory.createEtchedBorder());
+    EditorColorsScheme scheme = EditorColorsManager.getInstance().getGlobalScheme();
 
-    Font font = new Font("Monospaced", Font.PLAIN, 12);
+    Font font = new Font(scheme.getEditorFontName(), Font.PLAIN, scheme.getEditorFontSize());
     label = new JLabel(" ");
     label.setFont(font);
     entry = new ExTextField();
