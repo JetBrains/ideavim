@@ -3,6 +3,10 @@
   <id>IdeaVIM</id>
   <change-notes>
     <![CDATA[
+      <p>0.27:</p>
+      <ul>
+        <li>Command-line font and size now match your editor font and size</li>
+      </ul>
       <p>0.26:</p>
       <ul>
         <li>Added support for paste in the command mode: from a register using <code>&lt;C-R&gt;</code>, from the clipboard using <code>&lt;S-Insert&gt;</code> or <code>&lt;M-V&gt;</code></li>
