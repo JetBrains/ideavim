@@ -1,129 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <keymap version="1" name="Vim" disable-mnemonics="false" parent="$default">
-  <action id="$Copy">
-    <keyboard-shortcut first-keystroke="control INSERT" />
-    <keyboard-shortcut first-keystroke="meta C" />
-  </action>
-  <action id="$Cut">
-    <keyboard-shortcut first-keystroke="shift DELETE" />
-    <keyboard-shortcut first-keystroke="meta X" />
-  </action>
-  <action id="$Paste">
-    <keyboard-shortcut first-keystroke="shift INSERT" />
-    <keyboard-shortcut first-keystroke="meta V" />
-  </action>
-  <action id="$Redo">
-    <keyboard-shortcut first-keystroke="shift alt BACK_SPACE" />
-  </action>
-  <action id="$SelectAll" />
-  <action id="$Undo">
-    <keyboard-shortcut first-keystroke="alt BACK_SPACE" />
-  </action>
-  <action id="CheckinProject" />
-  <action id="ClassNameCompletion" />
-  <action id="ClearCase.CheckInProject" />
-  <action id="CodeCompletion" />
-  <action id="CommanderSwapPanels" />
-  <action id="ContextHelp" />
-  <action id="EditorBackSpace">
-    <keyboard-shortcut first-keystroke="BACK_SPACE" />
-  </action>
-  <action id="EditorCodeBlockEnd" />
-  <action id="EditorCodeBlockStart" />
-  <action id="EditorCopy">
-    <keyboard-shortcut first-keystroke="control INSERT" />
-    <keyboard-shortcut first-keystroke="meta C" />
-  </action>
-  <action id="EditorCut">
-    <keyboard-shortcut first-keystroke="shift DELETE" />
-    <keyboard-shortcut first-keystroke="meta X" />
-  </action>
-  <action id="EditorDeleteLine" />
-  <action id="EditorDeleteToWordEnd" />
-  <action id="EditorDeleteToWordStart" />
-  <action id="EditorDownWithSelection" />
-  <action id="EditorDuplicate" />
-  <action id="EditorIndentSelection" />
-  <action id="EditorJoinLines" />
-  <action id="EditorLeftWithSelection" />
-  <action id="EditorLineEndWithSelection" />
-  <action id="EditorLineStartWithSelection" />
-  <action id="EditorMoveToPageBottom" />
-  <action id="EditorMoveToPageBottomWithSelection" />
-  <action id="EditorMoveToPageTop" />
-  <action id="EditorMoveToPageTopWithSelection" />
-  <action id="EditorNextWord" />
-  <action id="EditorNextWordWithSelection" />
-  <action id="EditorPageDownWithSelection" />
-  <action id="EditorPageUpWithSelection" />
-  <action id="EditorPaste">
-    <keyboard-shortcut first-keystroke="shift INSERT" />
-    <keyboard-shortcut first-keystroke="meta V" />
-  </action>
-  <action id="EditorPreviousWord" />
-  <action id="EditorPreviousWordWithSelection" />
-  <action id="EditorRedo" />
-  <action id="EditorRightWithSelection" />
-  <action id="EditorScrollDown" />
-  <action id="EditorScrollToCenter" />
-  <action id="EditorScrollUp" />
-  <action id="EditorSelectAll" />
-  <action id="EditorSelectWord" />
-  <action id="EditorSplitLine" />
-  <action id="EditorStartNewLine" />
-  <action id="EditorTextEnd" />
-  <action id="EditorTextEndWithSelection" />
-  <action id="EditorTextStart" />
-  <action id="EditorTextStartWithSelection" />
-  <action id="EditorToggleCase" />
-  <action id="EditorUnSelectWord" />
-  <action id="EditorUndo" />
-  <action id="EditorUnindentSelection" />
-  <action id="EditorUpWithSelection" />
-  <action id="Find" />
-  <action id="FindNext">
-    <keyboard-shortcut first-keystroke="F3" />
-  </action>
-  <action id="FindPrevious">
-    <keyboard-shortcut first-keystroke="shift F3" />
-  </action>
-  <action id="GotoBookmark2" />
-  <action id="GotoClass">
-    <keyboard-shortcut first-keystroke="shift alt N" />
-  </action>
-  <action id="GotoDeclaration">
-    <mouse-shortcut keystroke="control button1" />
-    <mouse-shortcut keystroke="button2" />
-  </action>
-  <action id="GotoLine" />
-  <action id="GotoSuperMethod">
-    <keyboard-shortcut first-keystroke="shift control U" />
-  </action>
-  <action id="ImplementMethods">
-    <keyboard-shortcut first-keystroke="shift control I" />
-  </action>
-  <action id="InsertLiveTemplate" />
-  <action id="MethodHierarchy.ImplementMethodAction" />
-  <action id="MethodHierarchy.OverrideMethodAction" />
-  <action id="OverrideMethods">
-    <keyboard-shortcut first-keystroke="shift control O" />
-  </action>
-  <action id="ParameterInfo">
-    <keyboard-shortcut first-keystroke="shift control P" />
-  </action>
-  <action id="QuickJavaDoc">
-    <mouse-shortcut keystroke="alt button2" />
-  </action>
-  <action id="RecentFiles" />
-  <action id="Replace" />
-  <action id="SaveAll" />
-  <action id="SmartTypeCompletion" />
-  <action id="Starteam.CheckinProject" />
-  <action id="Subversion.CommitProject" />
-  <action id="ToggleBookmark2" />
-  <action id="TypeHierarchy">
-    <keyboard-shortcut first-keystroke="shift control alt H" />
-  </action>
   <action id="VimKeyHandler">
     <keyboard-shortcut first-keystroke="control 2" />
     <keyboard-shortcut first-keystroke="control A" />
@@ -173,6 +49,31 @@
     <keyboard-shortcut first-keystroke="shift LEFT" />
     <keyboard-shortcut first-keystroke="shift RIGHT" />
     <keyboard-shortcut first-keystroke="shift UP" />
+  </action>
+
+
+  <!--
+  Following actions would be added in result keymap if action corresponding will be completely override
+  by VimKeyHandler. This fact will be known after setting parent keymap for vim-keymap.
+  See VimKeymapConflictResolveUtil for details.
+  -->
+  <action id="GotoClass">
+    <keyboard-shortcut first-keystroke="shift alt N" />
+  </action>
+  <action id="OverrideMethods">
+    <keyboard-shortcut first-keystroke="shift control O" />
+  </action>
+  <action id="ParameterInfo">
+    <keyboard-shortcut first-keystroke="shift control P" />
+  </action>
+  <action id="GotoSuperMethod">
+    <keyboard-shortcut first-keystroke="shift control U" />
+  </action>
+  <action id="ImplementMethods">
+    <keyboard-shortcut first-keystroke="shift control I" />
+  </action>
+  <action id="TypeHierarchy">
+    <keyboard-shortcut first-keystroke="shift control alt H" />
   </action>
 </keymap>
 
