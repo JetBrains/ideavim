@@ -56,10 +56,6 @@ public class VimKeyMapUtil {
    */
   public static boolean installKeyBoardBindings() {
     LOG.debug("Check for keyboard bindings");
-    if (isVimKeymapInstalled()) {
-      return true;
-    }
-
     final LocalFileSystem localFileSystem = LocalFileSystem.getInstance();
     if (localFileSystem.refreshAndFindFileByPath(KEYMAPS_PATH) == null) {
       reportError("Failed to install vim keymap. Empty keymaps folder");
