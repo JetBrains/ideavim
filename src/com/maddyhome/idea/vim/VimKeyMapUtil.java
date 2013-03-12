@@ -135,7 +135,7 @@ public class VimKeyMapUtil {
     final Keymap selectedKeymap = vimKeymapDialog.getSelectedKeymap();
     final String keymapName = selectedKeymap.getName();
     rootElement.setAttribute("parent", keymapName);
-
+    VimKeymapConflictResolveUtil.resolveConflicts(rootElement, selectedKeymap);
     // Save modified keymap to the file
     JDOMUtil.writeDocument(document, path, "\n");
     if (showNotification) {
