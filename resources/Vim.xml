@@ -50,30 +50,5 @@
     <keyboard-shortcut first-keystroke="shift RIGHT" />
     <keyboard-shortcut first-keystroke="shift UP" />
   </action>
-
-
-  <!--
-  Following actions would be added in result keymap if action corresponding will be completely override
-  by VimKeyHandler. This fact will be known after setting parent keymap for vim-keymap.
-  See VimKeymapConflictResolveUtil for details.
-  -->
-  <action id="GotoClass">
-    <keyboard-shortcut first-keystroke="shift alt N" />
-  </action>
-  <action id="OverrideMethods">
-    <keyboard-shortcut first-keystroke="shift control O" />
-  </action>
-  <action id="ParameterInfo">
-    <keyboard-shortcut first-keystroke="shift control P" />
-  </action>
-  <action id="GotoSuperMethod">
-    <keyboard-shortcut first-keystroke="shift control U" />
-  </action>
-  <action id="ImplementMethods">
-    <keyboard-shortcut first-keystroke="shift control I" />
-  </action>
-  <action id="TypeHierarchy">
-    <keyboard-shortcut first-keystroke="shift control alt H" />
-  </action>
 </keymap>
 
