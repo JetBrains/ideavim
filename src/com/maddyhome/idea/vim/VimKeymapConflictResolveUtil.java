@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.MouseShortcut;
 import com.intellij.openapi.actionSystem.Shortcut;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.impl.KeymapImpl;
+import com.intellij.openapi.util.SystemInfo;
 import org.jdom.Element;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,6 +47,7 @@ public class VimKeymapConflictResolveUtil {
     InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK,
     InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK,
     InputEvent.ALT_DOWN_MASK | InputEvent.META_DOWN_MASK,
+    InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK,
     InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK);
 
   public static void resolveConflicts(Element targetKeymapRoot, Keymap parentKeymap) {
@@ -122,6 +124,9 @@ public class VimKeymapConflictResolveUtil {
           }
           if (overriddenShortcuts.isEmpty()) {
             for (Integer modifier : ALTERNATIVE_MODIFIERS) {
+              if (!SystemInfo.isMac && (modifier & InputEvent.META_DOWN_MASK) != 0) {
+                continue;
+              }
               final KeyStroke originalStroke = KeyStroke.getKeyStroke(shortcut);
               final int modifiers = originalStroke.getModifiers() | modifier;
               //noinspection MagicConstant
