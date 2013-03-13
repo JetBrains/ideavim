@@ -43,13 +43,13 @@ public class DeleteVisualLinesAction extends EditorAction {
       CommandState.SubMode mode = CommandState.getInstance(editor).getSubMode();
       if (mode == CommandState.SubMode.VISUAL_BLOCK) {
         return CommandGroups.getInstance().getChange().deleteRange(editor, range,
-                                                                   SelectionType.fromSubMode(mode));
+                                                                   SelectionType.fromSubMode(mode), false);
       }
       else {
         range = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
                               EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
 
-        return CommandGroups.getInstance().getChange().deleteRange(editor, range, SelectionType.LINE_WISE);
+        return CommandGroups.getInstance().getChange().deleteRange(editor, range, SelectionType.LINE_WISE, false);
       }
     }
   }

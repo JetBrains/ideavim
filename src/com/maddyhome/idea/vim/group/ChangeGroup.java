@@ -301,7 +301,7 @@ public class ChangeGroup extends AbstractActionGroup {
     }
 
     if (deleteTo != -1) {
-      deleteRange(editor, new TextRange(deleteTo, offset), SelectionType.CHARACTER_WISE);
+      deleteRange(editor, new TextRange(deleteTo, offset), SelectionType.CHARACTER_WISE, false);
 
       return true;
     }
@@ -321,7 +321,7 @@ public class ChangeGroup extends AbstractActionGroup {
       return false;
     }
     final TextRange range = new TextRange(deleteTo, editor.getCaretModel().getOffset());
-    deleteRange(editor, range, SelectionType.CHARACTER_WISE);
+    deleteRange(editor, range, SelectionType.CHARACTER_WISE, false);
     return true;
   }
 
@@ -591,12 +591,12 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param count   The number of characters to delete
    * @return true if able to delete, false if not
    */
-  public boolean deleteCharacter(@NotNull Editor editor, int count) {
+  public boolean deleteCharacter(@NotNull Editor editor, int count, boolean isChange) {
     int offset = CommandGroups.getInstance().getMotion().moveCaretHorizontal(editor, count, true);
     if (offset != -1) {
       boolean res = deleteText(editor, new TextRange(editor.getCaretModel().getOffset(), offset), SelectionType.CHARACTER_WISE);
       int pos = editor.getCaretModel().getOffset();
-      int norm = EditorHelper.normalizeOffset(editor, editor.getCaretModel().getLogicalPosition().line, pos, false);
+      int norm = EditorHelper.normalizeOffset(editor, editor.getCaretModel().getLogicalPosition().line, pos, isChange);
       if (norm != pos) {
         MotionGroup.moveCaret(editor, norm);
       }
@@ -743,23 +743,9 @@ public class ChangeGroup extends AbstractActionGroup {
    * @return true if able to delete the text, false if not
    */
   public boolean deleteMotion(@NotNull Editor editor, DataContext context, int count, int rawCount, @NotNull Argument argument, boolean isChange) {
-    TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true, false);
+    final TextRange range = getDeleteMotionRange(editor, context, count, rawCount, argument);
     if (range == null) {
       return (EditorHelper.getFileSize(editor) == 0);
-    }
-
-    // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is deleted when it shouldn't be.
-    String text = editor.getDocument().getCharsSequence().subSequence(range.getStartOffset(),
-                                                                      range.getEndOffset()).toString();
-    final int lastNewLine = text.lastIndexOf('\n');
-    if (lastNewLine > 0) {
-      final String id = ActionManager.getInstance().getId(argument.getMotion().getAction());
-      if (id.equals("VimMotionWordRight") || id.equals("VimMotionBigWordRight") || id.equals("VimMotionCamelRight")) {
-        if (!SearchHelper.anyNonWhitespace(editor, range.getEndOffset(), -1)) {
-          final int start = range.getStartOffset();
-          range = new TextRange(start, start + lastNewLine);
-        }
-      }
     }
 
     // Delete motion commands that are not linewise become linewise if all the following are true:
@@ -780,7 +766,31 @@ public class ChangeGroup extends AbstractActionGroup {
         }
       }
     }
-    return deleteRange(editor, range, SelectionType.fromCommandFlags(argument.getMotion().getFlags()));
+    return deleteRange(editor, range, SelectionType.fromCommandFlags(argument.getMotion().getFlags()), isChange);
+  }
+
+  public static TextRange getDeleteMotionRange(Editor editor,
+                                               DataContext context,
+                                               int count,
+                                               int rawCount,
+                                               Argument argument) {
+    TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true, false);
+    // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is deleted when it shouldn't be.
+    if (range != null) {
+      String text = editor.getDocument().getCharsSequence().subSequence(range.getStartOffset(),
+                                                                        range.getEndOffset()).toString();
+      final int lastNewLine = text.lastIndexOf('\n');
+      if (lastNewLine > 0) {
+        final String id = ActionManager.getInstance().getId(argument.getMotion().getAction());
+        if (id.equals("VimMotionWordRight") || id.equals("VimMotionBigWordRight") || id.equals("VimMotionCamelRight")) {
+          if (!SearchHelper.anyNonWhitespace(editor, range.getEndOffset(), -1)) {
+            final int start = range.getStartOffset();
+            range = new TextRange(start, start + lastNewLine);
+          }
+        }
+      }
+    }
+    return range;
   }
 
   /**
@@ -789,9 +799,13 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param editor   The editor to delete the text from
    * @param range    The range to delete
    * @param type     The type of deletion
+   * @param isChange is from a change action
    * @return true if able to delete the text, false if not
    */
-  public boolean deleteRange(@NotNull Editor editor, @Nullable TextRange range, @Nullable SelectionType type) {
+  public boolean deleteRange(@NotNull Editor editor,
+                             @Nullable TextRange range,
+                             @Nullable SelectionType type,
+                             boolean isChange) {
     if (range == null) {
       return false;
     }
@@ -804,7 +818,7 @@ public class ChangeGroup extends AbstractActionGroup {
           pos = size - 1;
         }
         else {
-          pos = EditorHelper.normalizeOffset(editor, range.getStartOffset(), false);
+          pos = EditorHelper.normalizeOffset(editor, range.getStartOffset(), isChange);
         }
         MotionGroup.moveCaret(editor, pos);
       }
@@ -914,7 +928,7 @@ public class ChangeGroup extends AbstractActionGroup {
       return changeEndOfLine(editor, context, 1);
     }
 
-    boolean res = deleteCharacter(editor, count);
+    boolean res = deleteCharacter(editor, count, true);
     if (res) {
       initInsert(editor, context, CommandState.Mode.INSERT);
     }
@@ -990,7 +1004,7 @@ public class ChangeGroup extends AbstractActionGroup {
       final ImmutableSet<String> wordMotions = ImmutableSet.of(
         "VimMotionWordRight", "VimMotionBigWordRight", "VimMotionCamelRight");
       if (wordMotions.contains(id) && lastWordChar) {
-        final boolean res = deleteCharacter(editor, 1);
+        final boolean res = deleteCharacter(editor, 1, true);
         if (res) {
           insertBeforeCursor(editor, context);
         }
@@ -1107,7 +1121,7 @@ public class ChangeGroup extends AbstractActionGroup {
       }
     }
     boolean after = range.getEndOffset() >= EditorHelper.getFileSize(editor);
-    boolean res = deleteRange(editor, range, type);
+    boolean res = deleteRange(editor, range, type, true);
     if (res) {
       if (type == SelectionType.LINE_WISE) {
         if (after) {
@@ -1226,7 +1240,7 @@ public class ChangeGroup extends AbstractActionGroup {
         if (stroke instanceof Character) {
           Character key = (Character)stroke;
           if (key == '0') {
-            deleteCharacter(editor, -1);
+            deleteCharacter(editor, -1, false);
             cnt = 99;
           }
         }

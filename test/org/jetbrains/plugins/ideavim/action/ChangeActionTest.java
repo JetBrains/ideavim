@@ -219,6 +219,27 @@ public class ChangeActionTest extends VimTestCase {
            "Hello, World!\n");
   }
 
+  // VIM-421 |c| |w|
+  public void testChangeLastWordInLine() {
+    doTest(stringToKeys("cw"),
+           "ab.<caret>cd\n",
+           "ab.<caret>\n");
+  }
+
+  // VIM-421 |c| |iw|
+  public void testChangeLastInnerWordInLine() {
+    doTest(stringToKeys("ciwbaz"),
+           "foo bar bo<caret>o\n",
+           "foo bar baz\n");
+  }
+
+  // VIM-421 |c| |w|
+  public void testChangeLastCharInLine() {
+    doTest(stringToKeys("cw"),
+           "fo<caret>o\n",
+           "fo<caret>\n");
+  }
+
   private void doTest(final List<KeyStroke> keys, String before, String after) {
     myFixture.configureByText("a.java", before);
     final Editor editor = myFixture.getEditor();

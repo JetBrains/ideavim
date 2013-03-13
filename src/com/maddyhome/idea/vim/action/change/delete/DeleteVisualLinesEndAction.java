@@ -50,14 +50,14 @@ public class DeleteVisualLinesEndAction extends EditorAction {
 
         range = new TextRange(starts, ends);
         return CommandGroups.getInstance().getChange().deleteRange(editor, range,
-                                                                   SelectionType.BLOCK_WISE);
+                                                                   SelectionType.BLOCK_WISE, false);
       }
       else {
         range = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
                               EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
 
         return CommandGroups.getInstance().getChange().deleteRange(editor, range,
-                                                                   SelectionType.LINE_WISE);
+                                                                   SelectionType.LINE_WISE, false);
       }
     }
   }

@@ -36,7 +36,7 @@ public class DeleteCharacterRightAction extends EditorAction {
 
   private static class Handler extends ChangeEditorActionHandler {
     public boolean execute(@NotNull Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return CommandGroups.getInstance().getChange().deleteCharacter(editor, count);
+      return CommandGroups.getInstance().getChange().deleteCharacter(editor, count, false);
     }
   }
 }
