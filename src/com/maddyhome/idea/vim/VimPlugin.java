@@ -171,7 +171,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private void updateState() {
     if (isEnabled()) {
       boolean requiresRestart = false;
-      if (previousStateVersion < 1) {
+      if (previousStateVersion < 1 && VimKeyMapUtil.isVimKeymapInstalled()) {
         if (Messages.showYesNoDialog("Vim keymap generator has been updated to create keymaps more compatible " +
                                      "with base keymaps.\n\nDo you want to reconfigure your Vim keymap?\n\n" +
                                      "(You can do it later using Tools | Reconfigure Vim Keymap).",
