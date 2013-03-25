@@ -15,7 +15,6 @@
  */
 package com.maddyhome.idea.vim;
 
-import com.google.common.io.CharStreams;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
@@ -48,10 +47,7 @@ import com.intellij.openapi.wm.WindowManager;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.group.*;
-import com.maddyhome.idea.vim.helper.DelegateCommandListener;
-import com.maddyhome.idea.vim.helper.DocumentManager;
-import com.maddyhome.idea.vim.helper.EditorData;
-import com.maddyhome.idea.vim.helper.EditorDataContext;
+import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.RegisterActions;
 import com.maddyhome.idea.vim.option.Options;
 import org.jdom.Element;
@@ -60,9 +56,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 /**
  * This plugin attempts to emulate the keybinding and general functionality of Vim and gVim. See the supplied
@@ -169,57 +162,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     getActions();
 
     LOG.debug("done");
-  }
-
-  private static class MacKeyRepeat {
-    public static final String FMT = "defaults %s -globalDomain ApplePressAndHoldEnabled";
-    private static final MacKeyRepeat INSTANCE = new MacKeyRepeat();
-
-    public static MacKeyRepeat getInstance() {
-      return INSTANCE;
-    }
-
-    @Nullable
-    public Boolean isEnabled() {
-      final String command = String.format(FMT, "read");
-      try {
-        final Process process = Runtime.getRuntime().exec(command);
-        final String data = read(process.getInputStream()).trim();
-        try {
-          return Integer.valueOf(data) == 0;
-        } catch (NumberFormatException e) {
-          return null;
-        }
-      }
-      catch (IOException e) {
-        return null;
-      }
-    }
-
-    public void setEnabled(@Nullable Boolean value) {
-      final String command;
-      if (value == null) {
-        command = String.format(FMT, "delete");
-      }
-      else {
-        final String arg = value ? "0" : "1";
-        command = String.format(FMT, "write") + " " + arg;
-      }
-      final Process process;
-      try {
-        process = Runtime.getRuntime().exec(command);
-        process.waitFor();
-      }
-      catch (IOException e) {
-      }
-      catch (InterruptedException e) {
-      }
-    }
-
-    @NotNull
-    private static String read(@NotNull InputStream stream) throws IOException {
-      return CharStreams.toString(new InputStreamReader(stream));
-    }
   }
 
   private void updateState() {
