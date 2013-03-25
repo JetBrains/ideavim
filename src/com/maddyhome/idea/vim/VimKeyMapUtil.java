@@ -69,7 +69,7 @@ public class VimKeyMapUtil {
       final Document document = StorageUtil.loadDocument(bytes);
       if (!ApplicationManager.getApplication().isUnitTestMode()) {
         // Prompt user to select the parent for the Vim keyboard
-        configureVimParentKeymap(INSTALLED_VIM_KEYMAP_PATH, document, false);
+        configureVimParentKeymap(INSTALLED_VIM_KEYMAP_PATH, document, true);
       }
       installKeymap(document);
     } catch (IOException e) {
@@ -131,13 +131,14 @@ public class VimKeyMapUtil {
     final Keymap selectedKeymap = vimKeymapDialog.getSelectedKeymap();
     final String keymapName = selectedKeymap.getName();
     rootElement.setAttribute("parent", keymapName);
+    VimPlugin.getInstance().setPreviousKeyMap(keymapName);
     VimKeymapConflictResolveUtil.resolveConflicts(rootElement, selectedKeymap);
     // Save modified keymap to the file
     JDOMUtil.writeDocument(document, path, "\n");
     if (showNotification) {
       Notifications.Bus.notify(new Notification(VimPlugin.IDEAVIM_NOTIFICATION_ID, VimPlugin.IDEAVIM_NOTIFICATION_TITLE,
                                                 "Successfully configured vim keymap to be based on " +
-                                                  selectedKeymap.getPresentableName(),
+                                                selectedKeymap.getPresentableName(),
                                                 NotificationType.INFORMATION));
     }
 
@@ -188,30 +189,6 @@ public class VimKeyMapUtil {
                                               keyMapPresentableName + " keymap was successfully enabled", NotificationType.INFORMATION));
     LOG.debug(keyMapPresentableName + " keymap was successfully enabled");
     return true;
-  }
-
-
-  public static void reconfigureParentKeymap(final Project project) {
-    final VirtualFile vimKeymapFile = getVimKeymapFile();
-    if (vimKeymapFile == null) {
-      reportError("Failed to find Vim keymap");
-      return;
-    }
-
-    try {
-      final Document document = StorageUtil.loadDocument(new FileInputStream(vimKeymapFile.getPath()));
-      // Prompt user to select the parent for the Vim keyboard
-      if (configureVimParentKeymap(vimKeymapFile.getPath(), document, true)) {
-        installKeymap(document);
-        requestRestartOrShutdown(project);
-      }
-    } catch (FileNotFoundException e) {
-      reportError("Failed to install vim keymap.", e);
-    } catch (IOException e) {
-      reportError("Failed to install vim keymap.", e);
-    } catch (InvalidDataException e) {
-      reportError("Failed to install vim keymap. Vim.xml file is corrupted", e);
-    }
   }
 
   @NotNull
