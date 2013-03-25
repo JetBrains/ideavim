@@ -15,6 +15,7 @@
  */
 package com.maddyhome.idea.vim;
 
+import com.google.common.io.CharStreams;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
@@ -60,6 +61,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * This plugin attempts to emulate the keybinding and general functionality of Vim and gVim. See the supplied
@@ -168,6 +171,57 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     LOG.debug("done");
   }
 
+  private static class MacKeyRepeat {
+    public static final String FMT = "defaults %s -globalDomain ApplePressAndHoldEnabled";
+    private static final MacKeyRepeat INSTANCE = new MacKeyRepeat();
+
+    public static MacKeyRepeat getInstance() {
+      return INSTANCE;
+    }
+
+    @Nullable
+    public Boolean isEnabled() {
+      final String command = String.format(FMT, "read");
+      try {
+        final Process process = Runtime.getRuntime().exec(command);
+        final String data = read(process.getInputStream()).trim();
+        try {
+          return Integer.valueOf(data) == 0;
+        } catch (NumberFormatException e) {
+          return null;
+        }
+      }
+      catch (IOException e) {
+        return null;
+      }
+    }
+
+    public void setEnabled(@Nullable Boolean value) {
+      final String command;
+      if (value == null) {
+        command = String.format(FMT, "delete");
+      }
+      else {
+        final String arg = value ? "0" : "1";
+        command = String.format(FMT, "write") + " " + arg;
+      }
+      final Process process;
+      try {
+        process = Runtime.getRuntime().exec(command);
+        process.waitFor();
+      }
+      catch (IOException e) {
+      }
+      catch (InterruptedException e) {
+      }
+    }
+
+    @NotNull
+    private static String read(@NotNull InputStream stream) throws IOException {
+      return CharStreams.toString(new InputStreamReader(stream));
+    }
+  }
+
   private void updateState() {
     if (isEnabled()) {
       boolean requiresRestart = false;
@@ -181,22 +235,15 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         }
       }
       if (previousStateVersion < 2 && SystemInfo.isMac) {
-        if (Messages.showYesNoDialog("Do you want to enable repeating keys in Mac OS X on press and hold " +
-                                     "(requires restart)?",
-                                     IDEAVIM_NOTIFICATION_TITLE,
-                                     Messages.getQuestionIcon()) == Messages.YES) {
-          try {
-            final String command = "defaults write -globalDomain ApplePressAndHoldEnabled 0";
-            final Process process = Runtime.getRuntime().exec(command);
-            process.waitFor();
+        final MacKeyRepeat keyRepeat = MacKeyRepeat.getInstance();
+        final Boolean enabled = keyRepeat.isEnabled();
+        if (enabled == null || !enabled) {
+          if (Messages.showYesNoDialog("Do you want to enable repeating keys in Mac OS X on press and hold " +
+                                       "(requires restart)?",
+                                       IDEAVIM_NOTIFICATION_TITLE,
+                                       Messages.getQuestionIcon()) == Messages.YES) {
+            keyRepeat.setEnabled(true);
             requiresRestart = true;
-          }
-          catch (IOException ignored) {
-            Notifications.Bus.notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
-                                                      "Cannot enable repeating keys in Mac OS X",
-                                                      NotificationType.ERROR));
-          }
-          catch (InterruptedException ignored) {
           }
         }
       }
