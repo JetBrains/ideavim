@@ -5,7 +5,9 @@
     <![CDATA[
       <p>0.27:</p>
       <ul>
-        <li>Command-line font and size now match your editor font and size</li>
+        <li>Better Vim keymaps for Mac OS X</li>
+        <li>Ask if the plugin should enable repeating keys in Mac OS X</li>
+        <li>Various bug fixes</li>
       </ul>
       <p>0.26:</p>
       <ul>

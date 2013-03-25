@@ -3,6 +3,22 @@ The Changelog
 
 History of changes in IdeaVim for the IntelliJ platform.
 
+0.27, TBD
+---------
+
+New Vim keymap generator creates better keymaps, especially for Mac OS X.
+Restart after reconfiguring the keymap is no longer required.
+
+Features:
+
+* VIM-92 Better Vim keymaps for Mac OS X
+* VIM-286 Ask if the plugin should enable repeating keys in Mac OS X
+
+Bug fixes:
+
+* VIM-421 Fixed `cw` on the last character in line
+* Fixed command window font size to match editor font size
+
 
 0.26, 2012-12-26
 ----------------
