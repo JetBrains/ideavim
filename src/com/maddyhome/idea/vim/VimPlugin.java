@@ -18,6 +18,7 @@ package com.maddyhome.idea.vim;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
+import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ex.ApplicationManagerEx;
@@ -81,6 +82,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private static final String IDEAVIM_COMPONENT_NAME = "VimPlugin";
   public static final String IDEAVIM_NOTIFICATION_ID = "ideavim";
   public static final String IDEAVIM_NOTIFICATION_TITLE = "IdeaVim";
+  public static final int STATE_VERSION = 1;
 
   private static final boolean BLOCK_CURSOR_VIM_VALUE = true;
   private static final boolean ANIMATED_SCROLLING_VIM_VALUE = false;
@@ -93,6 +95,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private boolean isRefrainFromScrolling = false;
   private boolean error = false;
 
+  private int previousStateVersion = 0;
   private String previousKeyMap = "";
 
   // It is enabled by default to avoid any special configuration after plugin installation
@@ -142,6 +145,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
     ApplicationManager.getApplication().invokeLater(new Runnable() {
       public void run() {
+        updateState();
         checkAndInstallKeymap();
       }
     });
@@ -159,6 +163,20 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     getActions();
 
     LOG.debug("done");
+  }
+
+  private void updateState() {
+    if (isEnabled()) {
+      if (previousStateVersion < 1) {
+        if (Messages.showYesNoDialog("Vim keymap generator has been updated to create keymaps more compatible " +
+                                     "with base keymaps.\n\nDo you want to reconfigure your Vim keymap?\n\n" +
+                                     "(You can do it later using Tools | Reconfigure Vim Keymap).",
+                                     IDEAVIM_NOTIFICATION_TITLE,
+                                     Messages.getQuestionIcon()) == Messages.YES) {
+          KeyHandler.executeAction("VimReconfigureKeymap", SimpleDataContext.getProjectContext(null));
+        }
+      }
+    }
   }
 
   private static void checkAndInstallKeymap() {
@@ -264,6 +282,11 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     // Restore whether the plugin is enabled or not
     Element state = element.getChild("state");
     if (state != null) {
+      try {
+        previousStateVersion = Integer.valueOf(state.getAttributeValue("version"));
+      }
+      catch (NumberFormatException ignored) {
+      }
       enabled = Boolean.valueOf(state.getAttributeValue("enabled"));
       previousKeyMap = state.getAttributeValue("keymap");
     }
@@ -278,6 +301,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     final Element element = new Element("ideavim");
     // Save whether the plugin is enabled or not
     final Element state = new Element("state");
+    state.setAttribute("version", Integer.toString(STATE_VERSION));
     state.setAttribute("enabled", Boolean.toString(enabled));
     state.setAttribute("keymap", previousKeyMap);
     element.addContent(state);
