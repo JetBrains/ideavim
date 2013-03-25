@@ -21,6 +21,7 @@ import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ex.ApplicationEx;
 import com.intellij.openapi.application.ex.ApplicationManagerEx;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.components.ApplicationComponent;
@@ -40,6 +41,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerAdapter;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -57,6 +59,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 /**
  * This plugin attempts to emulate the keybinding and general functionality of Vim and gVim. See the supplied
@@ -82,7 +85,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private static final String IDEAVIM_COMPONENT_NAME = "VimPlugin";
   public static final String IDEAVIM_NOTIFICATION_ID = "ideavim";
   public static final String IDEAVIM_NOTIFICATION_TITLE = "IdeaVim";
-  public static final int STATE_VERSION = 1;
+  public static final int STATE_VERSION = 2;
 
   private static final boolean BLOCK_CURSOR_VIM_VALUE = true;
   private static final boolean ANIMATED_SCROLLING_VIM_VALUE = false;
@@ -167,6 +170,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   private void updateState() {
     if (isEnabled()) {
+      boolean requiresRestart = false;
       if (previousStateVersion < 1) {
         if (Messages.showYesNoDialog("Vim keymap generator has been updated to create keymaps more compatible " +
                                      "with base keymaps.\n\nDo you want to reconfigure your Vim keymap?\n\n" +
@@ -175,6 +179,30 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
                                      Messages.getQuestionIcon()) == Messages.YES) {
           KeyHandler.executeAction("VimReconfigureKeymap", SimpleDataContext.getProjectContext(null));
         }
+      }
+      if (previousStateVersion < 2 && SystemInfo.isMac) {
+        if (Messages.showYesNoDialog("Do you want to enable repeating keys in Mac OS X on press and hold " +
+                                     "(requires restart)?",
+                                     IDEAVIM_NOTIFICATION_TITLE,
+                                     Messages.getQuestionIcon()) == Messages.YES) {
+          try {
+            final String command = "defaults write -globalDomain ApplePressAndHoldEnabled 0";
+            final Process process = Runtime.getRuntime().exec(command);
+            process.waitFor();
+            requiresRestart = true;
+          }
+          catch (IOException ignored) {
+            Notifications.Bus.notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+                                                      "Cannot enable repeating keys in Mac OS X",
+                                                      NotificationType.ERROR));
+          }
+          catch (InterruptedException ignored) {
+          }
+        }
+      }
+      if (requiresRestart) {
+        final ApplicationEx app = ApplicationManagerEx.getApplicationEx();
+        app.restart();
       }
     }
   }
