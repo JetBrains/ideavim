@@ -247,6 +247,13 @@ public class ChangeActionTest extends VimTestCase {
            "bar\nfoo\n");
   }
 
+  // VIM-472 |v|
+  public void testVisualSelectionRightMargin() {
+    doTest(stringToKeys("vk$d"),
+           "foo\n<caret>bar\n",
+           "fooar\n");
+  }
+
   private void doTest(final List<KeyStroke> keys, String before, String after) {
     myFixture.configureByText("a.java", before);
     final Editor editor = myFixture.getEditor();

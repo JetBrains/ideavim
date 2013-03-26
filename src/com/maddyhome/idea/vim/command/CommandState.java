@@ -58,7 +58,6 @@ public class CommandState {
   /**
    * Gets the command state singleton
    *
-   * @param editor
    * @return The singleton instance
    */
   @NotNull
@@ -76,9 +75,14 @@ public class CommandState {
     return res;
   }
 
-  public static boolean inInsertMode(Editor editor) {
+  public static boolean inInsertMode(@Nullable Editor editor) {
     final Mode mode = getInstance(editor).getMode();
     return mode == Mode.INSERT || mode == Mode.REPLACE;
+  }
+
+  public static boolean inVisualCharacterMode(@Nullable Editor editor) {
+    final CommandState state = getInstance(editor);
+    return state.getMode() == Mode.VISUAL && state.getSubMode() == SubMode.VISUAL_CHARACTER;
   }
 
   /**
