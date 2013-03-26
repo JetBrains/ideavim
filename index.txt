@@ -65,6 +65,8 @@ tag             char          note action in Normal mode        ~
 |count|         9                       "
 |F|             F{char}         1  cursor to the Nth occurrence of {char} to
                                    the left
+|O|             O               2  begin a new line above the cursor and
+                                   insert text, repeat N times
 |P|             ["x]P           2  put the text [from buffer x] before the
                                    cursor N times
 |T|             T{char}         1  cursor till after Nth occurrence of {char}

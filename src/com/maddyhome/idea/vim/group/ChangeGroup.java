@@ -171,9 +171,7 @@ public class ChangeGroup extends AbstractActionGroup {
         if (state.getMode() != CommandState.Mode.REPEAT) {
           KeyHandler.executeAction("VimEditorEnter", context);
         }
-        else {
-          MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
-        }
+        MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
       }
     }
     else {

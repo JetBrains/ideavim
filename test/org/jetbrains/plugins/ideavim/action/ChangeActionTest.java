@@ -240,6 +240,13 @@ public class ChangeActionTest extends VimTestCase {
            "fo<caret>\n");
   }
 
+  // VIM-404 |O|
+  public void testInsertNewLineAboveFirstLine() {
+    doTest(stringToKeys("Obar"),
+           "fo<caret>o\n",
+           "bar\nfoo\n");
+  }
+
   private void doTest(final List<KeyStroke> keys, String before, String after) {
     myFixture.configureByText("a.java", before);
     final Editor editor = myFixture.getEditor();
