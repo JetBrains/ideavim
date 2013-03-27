@@ -182,7 +182,9 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         final Boolean enabled = keyRepeat.isEnabled();
         if (enabled == null || !enabled) {
           if (Messages.showYesNoDialog("Do you want to enable repeating keys in Mac OS X on press and hold " +
-                                       "(requires restart)?",
+                                       "(requires restart)?\n\n" +
+                                       "(You can do it manually by running 'defaults write -g " +
+                                       "ApplePressAndHoldEnabled 0' in the console).",
                                        IDEAVIM_NOTIFICATION_TITLE,
                                        Messages.getQuestionIcon()) == Messages.YES) {
             keyRepeat.setEnabled(true);
