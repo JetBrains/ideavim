@@ -384,13 +384,6 @@ public class ChangeGroup extends AbstractActionGroup {
         return;
       }
 
-      final Object lastStroke = strokes.isEmpty() ? null : strokes.get(strokes.size() - 1);
-      final Character lastCharStroke = lastStroke instanceof Character ? (Character)lastStroke : null;
-
-      // XXX: Equality is strange here, the change may be unrelated to the last char
-      if (lastCharStroke != null && newFragment.length() == 1 && newFragment.charAt(0) == lastCharStroke) {
-        return;
-      }
       // <Enter> is added to strokes as an action during processing in order to indent code properly in the repeat
       // command
       if (newFragment.startsWith("\n") && newFragment.trim().isEmpty()) {
@@ -588,10 +581,6 @@ public class ChangeGroup extends AbstractActionGroup {
     }
 
     if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
-      // Regular characters are not handled by us, pass them back to Idea. We just keep track of the keystroke
-      // for repeating later.
-      strokes.add(key.getKeyChar());
-
       ApplicationManager.getApplication().runWriteAction(new Runnable() {
         public void run() {
           KeyHandler.getInstance().getOriginalHandler().execute(editor, key.getKeyChar(), context);
