@@ -7,6 +7,7 @@
       <ul>
         <li>Better Vim keymaps for Mac OS X</li>
         <li>Ask if the plugin should enable repeating keys in Mac OS X</li>
+        <li>Fixed a long-standing bug with code completion and repeat last change command ('<code>.</code>')</li>
         <li>Various bug fixes</li>
       </ul>
       <p>0.26:</p>

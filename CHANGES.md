@@ -16,7 +16,11 @@ Features:
 
 Bug fixes:
 
+* VIM-42 Fixed code completion for the `.` command
 * VIM-421 Fixed `cw` on the last character in line
+* VIM-233 Fixed code completion for edits in visual block mode
+* VIM-404 Fixed `O` command at the first line
+* VIM-472 Fixed right selection in visual mode to be one char more
 * Fixed command window font size to match editor font size
 
 
