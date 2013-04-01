@@ -37,11 +37,11 @@ Features:
 * VIM-262 Support for paste from register in command mode
 * VIM-214 Key bindings for paste into command line
 * VIM-43 Added support for the last change position mark
-* VIM-177 Added <C-]> and <C-T> to the keymap
+* VIM-177 Added `<C-]>` and `<C-T>` to the keymap
 
 Bug fixes:
 
-* VIM-302 Fixed tab switching order for 'gt' and 'gT'
+* VIM-302 Fixed tab switching order for `gt` and `gT`
 
 
 0.25, 2012-12-19
