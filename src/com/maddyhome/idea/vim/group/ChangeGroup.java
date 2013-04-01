@@ -364,6 +364,7 @@ public class ChangeGroup extends AbstractActionGroup {
       document = editor.getDocument();
       documentListener = new InsertActionsDocumentListener();
       editor.getDocument().addDocumentListener(documentListener);
+      oldOffset = -1;
       inInsert = true;
       if (mode == CommandState.Mode.REPLACE) {
         processInsert(editor, context);
@@ -380,24 +381,26 @@ public class ChangeGroup extends AbstractActionGroup {
       final String newFragment = e.getNewFragment().toString();
       final String oldFragment = e.getOldFragment().toString();
 
-      if (newFragment.isEmpty()) {
-        return;
-      }
-
       // <Enter> is added to strokes as an action during processing in order to indent code properly in the repeat
       // command
       if (newFragment.startsWith("\n") && newFragment.trim().isEmpty()) {
         return;
       }
 
-      for (int i = oldFragment.length() - 1; i >= 0; i--) {
-        final char c = oldFragment.charAt(i);
-        final int size = strokes.size();
-        if (size > 0) {
-          final Object last = strokes.get(size - 1);
-          if (last instanceof Character && c == (Character)last) {
-            strokes.remove(size - 1);
-          }
+      final int delta = e.getOffset() + oldFragment.length() - oldOffset;
+      if (oldOffset >= 0 && delta != 0) {
+        final String motionName = delta < 0 ? "VimMotionLeft" : "VimMotionRight";
+        final AnAction action = ActionManager.getInstance().getAction(motionName);
+        final int count = Math.abs(delta);
+        for (int i = 0; i < count; i++) {
+          strokes.add(action);
+        }
+      }
+
+      if (oldFragment.length() > 0) {
+        final AnAction editorBackSpace = ActionManager.getInstance().getAction("VimEditorBackSpace");
+        for (int i = 0; i < oldFragment.length(); i++) {
+          strokes.add(editorBackSpace);
         }
       }
 
@@ -405,7 +408,13 @@ public class ChangeGroup extends AbstractActionGroup {
         strokes.add(c);
       }
 
-      // TODO: Add VimMotionLeft actions to the strokes if the cursor position has been changed since the last edit
+      if (newFragment.length() > 0) {
+        // TODO: If newFragment is shorter than oldFragment?
+        oldOffset = e.getOffset() + newFragment.length();
+      }
+      else {
+        oldOffset = e.getOffset() - oldFragment.length();
+      }
     }
   }
 
@@ -1616,6 +1625,7 @@ public class ChangeGroup extends AbstractActionGroup {
   private boolean lastLower = true;
   private Document document;
   private DocumentAdapter documentListener;
+  private int oldOffset = -1;
 
   private static Logger logger = Logger.getInstance(ChangeGroup.class.getName());
 }

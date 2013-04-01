@@ -49,7 +49,7 @@ public class RegisterActions {
 
     // Other insert actions
     parser
-      .registerAction(KeyParser.MAPPING_INSERT, "VimEditorBackSpace", Command.Type.INSERT, Command.FLAG_SAVE_STROKE | Command.FLAG_IS_BACKSPACE,
+      .registerAction(KeyParser.MAPPING_INSERT, "VimEditorBackSpace", Command.Type.INSERT, Command.FLAG_IS_BACKSPACE,
                       new Shortcut[]{
                         new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK)),
                         new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0))
