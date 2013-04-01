@@ -38,13 +38,13 @@ public class RegisterActions {
 
     // ******************* Insert Mode Actions **********************
     // Delegation actions
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimClassNameCompletion", Command.Type.COMPLETION, Command.FLAG_SAVE_STROKE,
+    parser.registerAction(KeyParser.MAPPING_INSERT, "VimClassNameCompletion", Command.Type.COMPLETION,
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_MASK | KeyEvent.ALT_MASK)));
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimCodeCompletion", Command.Type.COMPLETION, Command.FLAG_SAVE_STROKE,
+    parser.registerAction(KeyParser.MAPPING_INSERT, "VimCodeCompletion", Command.Type.COMPLETION,
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_MASK)));
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimSmartTypeCompletion", Command.Type.COMPLETION, Command.FLAG_SAVE_STROKE,
+    parser.registerAction(KeyParser.MAPPING_INSERT, "VimSmartTypeCompletion", Command.Type.COMPLETION,
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK)));
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertLiveTemplate", Command.Type.COMPLETION, Command.FLAG_SAVE_STROKE,
+    parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertLiveTemplate", Command.Type.COMPLETION,
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_J, KeyEvent.CTRL_MASK)));
 
     // Other insert actions
@@ -107,19 +107,19 @@ public class RegisterActions {
     parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertSingleCommand", Command.Type.INSERT,
                           Command.FLAG_CLEAR_STROKES | Command.FLAG_EXPECT_MORE,
                           new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK)));
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionFirstColumn", Command.Type.INSERT, Command.FLAG_CLEAR_STROKES,
+    parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionFirstColumn", Command.Type.INSERT, Command.FLAG_SAVE_STROKE,
                           new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0)));
     parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionGotoLineFirst", Command.Type.INSERT, Command.FLAG_CLEAR_STROKES,
                           new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, KeyEvent.CTRL_MASK)));
     parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionGotoLineLastEnd", Command.Type.INSERT, Command.FLAG_CLEAR_STROKES,
                           new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, KeyEvent.CTRL_MASK)));
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionLastColumn", Command.Type.INSERT, Command.FLAG_CLEAR_STROKES,
+    parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionLastColumn", Command.Type.INSERT, Command.FLAG_SAVE_STROKE,
                           new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, 0)));
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionLeft", Command.Type.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut[]{
+    parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionLeft", Command.Type.INSERT, Command.FLAG_SAVE_STROKE, new Shortcut[]{
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0))
     });
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionRight", Command.Type.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut[]{
+    parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionRight", Command.Type.INSERT, Command.FLAG_SAVE_STROKE, new Shortcut[]{
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0))
     });
@@ -137,13 +137,13 @@ public class RegisterActions {
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.SHIFT_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, KeyEvent.SHIFT_MASK))
     });
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionWordLeft", Command.Type.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut[]{
+    parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionWordLeft", Command.Type.INSERT, Command.FLAG_SAVE_STROKE, new Shortcut[]{
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, KeyEvent.CTRL_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, KeyEvent.SHIFT_MASK))
     });
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionWordRight", Command.Type.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut[]{
+    parser.registerAction(KeyParser.MAPPING_INSERT, "VimMotionWordRight", Command.Type.INSERT, Command.FLAG_SAVE_STROKE, new Shortcut[]{
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, KeyEvent.CTRL_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_MASK)),

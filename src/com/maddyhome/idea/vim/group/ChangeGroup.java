@@ -23,10 +23,7 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
-import com.intellij.openapi.editor.event.EditorFactoryAdapter;
-import com.intellij.openapi.editor.event.EditorFactoryEvent;
-import com.intellij.openapi.editor.event.EditorMouseAdapter;
-import com.intellij.openapi.editor.event.EditorMouseEvent;
+import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
@@ -167,10 +164,7 @@ public class ChangeGroup extends AbstractActionGroup {
       initInsert(editor, context, CommandState.Mode.INSERT);
 
       if (!editor.isOneLineMode()) {
-        CommandState state = CommandState.getInstance(editor);
-        if (state.getMode() != CommandState.Mode.REPEAT) {
-          KeyHandler.executeAction("VimEditorEnter", context);
-        }
+        runEnterAction(editor, context);
         MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretVertical(editor, -1));
       }
     }
@@ -189,10 +183,18 @@ public class ChangeGroup extends AbstractActionGroup {
   public void insertNewLineBelow(@NotNull final Editor editor, @NotNull final DataContext context) {
     MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, true));
     initInsert(editor, context, CommandState.Mode.INSERT);
+    runEnterAction(editor, context);
+  }
 
+  private void runEnterAction(Editor editor, DataContext context) {
     CommandState state = CommandState.getInstance(editor);
     if (state.getMode() != CommandState.Mode.REPEAT) {
-      KeyHandler.executeAction("VimEditorEnter", context);
+      final ActionManager actionManager = ActionManager.getInstance();
+      final AnAction action = actionManager.getAction("VimEditorEnter");
+      if (action != null) {
+        strokes.add(action);
+        KeyHandler.executeAction(action, context);
+      }
     }
   }
 
@@ -356,6 +358,12 @@ public class ChangeGroup extends AbstractActionGroup {
     else {
       lastInsert = state.getCommand();
       strokes.clear();
+      if (document != null && documentListener != null) {
+        document.removeDocumentListener(documentListener);
+      }
+      document = editor.getDocument();
+      documentListener = new InsertActionsDocumentListener();
+      editor.getDocument().addDocumentListener(documentListener);
       inInsert = true;
       if (mode == CommandState.Mode.REPLACE) {
         processInsert(editor, context);
@@ -363,6 +371,48 @@ public class ChangeGroup extends AbstractActionGroup {
       state.pushState(mode, CommandState.SubMode.NONE, KeyParser.MAPPING_INSERT);
 
       resetCursor(editor, true);
+    }
+  }
+
+  private class InsertActionsDocumentListener extends DocumentAdapter {
+    @Override
+    public void documentChanged(DocumentEvent e) {
+      final String newFragment = e.getNewFragment().toString();
+      final String oldFragment = e.getOldFragment().toString();
+
+      if (newFragment.isEmpty()) {
+        return;
+      }
+
+      final Object lastStroke = strokes.isEmpty() ? null : strokes.get(strokes.size() - 1);
+      final Character lastCharStroke = lastStroke instanceof Character ? (Character)lastStroke : null;
+
+      // XXX: Equality is strange here, the change may be unrelated to the last char
+      if (lastCharStroke != null && newFragment.length() == 1 && newFragment.charAt(0) == lastCharStroke) {
+        return;
+      }
+      // <Enter> is added to strokes as an action during processing in order to indent code properly in the repeat
+      // command
+      if (newFragment.startsWith("\n") && newFragment.trim().isEmpty()) {
+        return;
+      }
+
+      for (int i = oldFragment.length() - 1; i >= 0; i--) {
+        final char c = oldFragment.charAt(i);
+        final int size = strokes.size();
+        if (size > 0) {
+          final Object last = strokes.get(size - 1);
+          if (last instanceof Character && c == (Character)last) {
+            strokes.remove(size - 1);
+          }
+        }
+      }
+
+      for (char c : newFragment.toCharArray()) {
+        strokes.add(c);
+      }
+
+      // TODO: Add VimMotionLeft actions to the strokes if the cursor position has been changed since the last edit
     }
   }
 
@@ -452,6 +502,11 @@ public class ChangeGroup extends AbstractActionGroup {
     // If this command doesn't allow repeats, set count to 1
     if (lastInsert != null && (lastInsert.getFlags() & Command.FLAG_NO_REPEAT) != 0) {
       cnt = 1;
+    }
+
+    if (document != null && documentListener != null) {
+      document.removeDocumentListener(documentListener);
+      documentListener = null;
     }
 
     // Save off current list of keystrokes
@@ -560,7 +615,6 @@ public class ChangeGroup extends AbstractActionGroup {
   public boolean processCommand(@NotNull Editor editor, @NotNull Command cmd) {
     if ((cmd.getFlags() & Command.FLAG_SAVE_STROKE) != 0) {
       strokes.add(cmd.getAction());
-
       return true;
     }
     else if ((cmd.getFlags() & Command.FLAG_CLEAR_STROKES) != 0) {
@@ -1571,6 +1625,8 @@ public class ChangeGroup extends AbstractActionGroup {
   private int repeatColumn;
   private boolean repeatAppend;
   private boolean lastLower = true;
+  private Document document;
+  private DocumentAdapter documentListener;
 
   private static Logger logger = Logger.getInstance(ChangeGroup.class.getName());
 }

@@ -43,7 +43,7 @@ public class MotionLastColumnAction extends MotionEditorAction {
   private static class Handler extends MotionEditorActionHandler {
     public int getOffset(@NotNull Editor editor, DataContext context, int count, int rawCount, Argument argument) {
       boolean allow = false;
-      if (CommandState.inInsertMode(editor)) {
+      if (CommandState.inInsertMode(editor) || CommandState.inRepeatMode(editor)) {
         allow = true;
       }
       else if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {

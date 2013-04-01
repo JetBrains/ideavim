@@ -80,6 +80,11 @@ public class CommandState {
     return mode == Mode.INSERT || mode == Mode.REPLACE;
   }
 
+  public static boolean inRepeatMode(@Nullable Editor editor) {
+    final Mode mode = getInstance(editor).getMode();
+    return mode == Mode.REPEAT;
+  }
+
   public static boolean inVisualCharacterMode(@Nullable Editor editor) {
     final CommandState state = getInstance(editor);
     return state.getMode() == Mode.VISUAL && state.getSubMode() == SubMode.VISUAL_CHARACTER;
