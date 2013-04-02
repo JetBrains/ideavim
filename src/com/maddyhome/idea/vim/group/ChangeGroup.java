@@ -387,6 +387,11 @@ public class ChangeGroup extends AbstractActionGroup {
         return;
       }
 
+      // Ignore multi-character indents as they should be inserted automatically while repeating <Enter> actions
+      if (newFragment.length() > 1 && newFragment.trim().isEmpty()) {
+        return;
+      }
+
       final int delta = e.getOffset() + oldFragment.length() - oldOffset;
       if (oldOffset >= 0 && delta != 0) {
         final String motionName = delta < 0 ? "VimMotionLeft" : "VimMotionRight";
