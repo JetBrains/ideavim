@@ -18,7 +18,7 @@ public class MotionPreviousTabAction extends MotionEditorAction {
 
   private static class Handler extends MotionEditorActionHandler {
     public int getOffset(final Editor editor, @NotNull final DataContext context, final int count, final int rawCount, final Argument argument) {
-      return CommandGroups.getInstance().getMotion().moveCaretGotoPreviousTab(context);
+      return CommandGroups.getInstance().getMotion().moveCaretGotoPreviousTab(editor, context);
     }
   }
 }

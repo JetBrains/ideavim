@@ -1272,6 +1272,9 @@ public class MotionGroup extends AbstractActionGroup {
   }
 
   public static void moveCaret(@NotNull Editor editor, int offset) {
+    if (editor.getCaretModel().getOffset() == offset) {
+      return;
+    }
     if (offset >= 0 && offset <= editor.getDocument().getTextLength()) {
       editor.getCaretModel().moveToOffset(offset);
       EditorData.setLastColumn(editor, editor.getCaretModel().getVisualPosition().column);
@@ -1286,30 +1289,19 @@ public class MotionGroup extends AbstractActionGroup {
     }
   }
 
-  public int moveCaretGotoPreviousTab(@NotNull final DataContext context) {
+  public int moveCaretGotoPreviousTab(@NotNull Editor editor, @NotNull DataContext context) {
     final AnAction previousTab = ActionManager.getInstance().getAction("PreviousTab");
-    previousTab.actionPerformed(new AnActionEvent(
-      null,
-      context,
-      "",
-      new Presentation(),
-      ActionManager.getInstance(),
-      0));
-    return 0;
+    final AnActionEvent e = new AnActionEvent(null, context, "", new Presentation(), ActionManager.getInstance(), 0);
+    previousTab.actionPerformed(e);
+    return editor.getCaretModel().getOffset();
   }
 
-  public int moveCaretGotoNextTab(@NotNull final DataContext context) {
-    final AnAction previousTab = ActionManager.getInstance().getAction("NextTab");
-    previousTab.actionPerformed(new AnActionEvent(
-      null,
-      context,
-      "",
-      new Presentation(),
-      ActionManager.getInstance(),
-      0));
-    return 0;
+  public int moveCaretGotoNextTab(@NotNull Editor editor, @NotNull DataContext context) {
+    final AnAction nextTab = ActionManager.getInstance().getAction("NextTab");
+    final AnActionEvent e = new AnActionEvent(null, context, "", new Presentation(), ActionManager.getInstance(), 0);
+    nextTab.actionPerformed(e);
+    return editor.getCaretModel().getOffset();
   }
-
 
   public static void scrollCaretIntoView(@NotNull Editor editor) {
     int cline = editor.getCaretModel().getVisualPosition().line;
