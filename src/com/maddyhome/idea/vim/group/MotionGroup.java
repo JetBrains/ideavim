@@ -1272,13 +1272,12 @@ public class MotionGroup extends AbstractActionGroup {
   }
 
   public static void moveCaret(@NotNull Editor editor, int offset) {
-    if (editor.getCaretModel().getOffset() == offset) {
-      return;
-    }
     if (offset >= 0 && offset <= editor.getDocument().getTextLength()) {
-      editor.getCaretModel().moveToOffset(offset);
-      EditorData.setLastColumn(editor, editor.getCaretModel().getVisualPosition().column);
-      scrollCaretIntoView(editor);
+      if (editor.getCaretModel().getOffset() != offset) {
+        editor.getCaretModel().moveToOffset(offset);
+        EditorData.setLastColumn(editor, editor.getCaretModel().getVisualPosition().column);
+        scrollCaretIntoView(editor);
+      }
 
       if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
         CommandGroups.getInstance().getMotion().updateSelection(editor, offset);
