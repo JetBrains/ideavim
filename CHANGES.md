@@ -3,8 +3,9 @@ The Changelog
 
 History of changes in IdeaVim for the IntelliJ platform.
 
-0.27, TBD
----------
+
+0.27, 2013-04-03
+----------------
 
 New Vim keymap generator creates better keymaps, especially for Mac OS X.
 Restart after reconfiguring the keymap is no longer required.
@@ -18,6 +19,7 @@ Bug fixes:
 
 * VIM-42 Fixed code completion for the `.` command
 * VIM-421 Fixed `cw` on the last character in line
+* VIM-419 Fixed resetting cursor position after 'gt' and 'gT'
 * VIM-233 Fixed code completion for edits in visual block mode
 * VIM-404 Fixed `O` command at the first line
 * VIM-472 Fixed right selection in visual mode to be one char more
