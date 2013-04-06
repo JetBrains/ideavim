@@ -7,23 +7,17 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ApplicationNamesInfo;
 import com.intellij.openapi.application.PathManager;
-import com.intellij.openapi.application.ex.ApplicationEx;
-import com.intellij.openapi.application.ex.ApplicationManagerEx;
 import com.intellij.openapi.components.impl.stores.StorageUtil;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.impl.KeymapImpl;
 import com.intellij.openapi.keymap.impl.KeymapManagerImpl;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.ui.VimKeymapDialog;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -95,23 +89,6 @@ public class VimKeyMapUtil {
     final Keymap[] allKeymaps = keymapManager.getAllKeymaps();
     vimKeyMap.readExternal(document.getRootElement(), allKeymaps);
     keymapManager.addKeymap(vimKeyMap);
-  }
-
-  private static void requestRestartOrShutdown(final Project project) {
-    final ApplicationEx app = ApplicationManagerEx.getApplicationEx();
-    if (app.isRestartCapable()) {
-      if (Messages.showDialog(project, "Restart " + ApplicationNamesInfo.getInstance().getProductName() + " to activate changes?",
-                              VimPlugin.IDEAVIM_NOTIFICATION_TITLE, new String[]{"&Restart", "&Postpone"}, 0,
-                              Messages.getQuestionIcon()) == 0) {
-        app.restart();
-      }
-    } else {
-      if (Messages.showDialog(project, "Shut down " + ApplicationNamesInfo.getInstance().getProductName() + " to activate changes?",
-                              VimPlugin.IDEAVIM_NOTIFICATION_TITLE, new String[]{"&Shut Down", "&Postpone"}, 0,
-                              Messages.getQuestionIcon()) == 0) {
-        app.exit(true);
-      }
-    }
   }
 
   /**
@@ -213,10 +190,5 @@ public class VimKeyMapUtil {
     LOG.error(message, e);
     Notifications.Bus.notify(new Notification(VimPlugin.IDEAVIM_NOTIFICATION_ID, VimPlugin.IDEAVIM_NOTIFICATION_TITLE,
                                               message + String.valueOf(e), NotificationType.ERROR));
-  }
-
-  @Nullable
-  public static VirtualFile getVimKeymapFile() {
-    return LocalFileSystem.getInstance().refreshAndFindFileByPath(INSTALLED_VIM_KEYMAP_PATH);
   }
 }
