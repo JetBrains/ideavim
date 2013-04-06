@@ -160,7 +160,7 @@ public class VimKeymapConflictResolveUtil {
     }
   }
 
-  private static Element createActionElement(String actionName, List<Shortcut> shortcuts) {
+  public static Element createActionElement(String actionName, List<Shortcut> shortcuts) {
     final Element overridesAction = new Element(ACTION_TAG);
     overridesAction.setAttribute(ID_ATTRIBUTE, actionName);
     for (Shortcut shortcut : shortcuts) {

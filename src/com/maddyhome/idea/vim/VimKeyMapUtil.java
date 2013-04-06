@@ -6,6 +6,7 @@ import com.google.common.io.Resources;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
+import com.intellij.openapi.actionSystem.Shortcut;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.components.impl.stores.StorageUtil;
@@ -25,6 +26,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 
 import static com.google.common.io.ByteStreams.toByteArray;
 
@@ -63,7 +67,9 @@ public class VimKeyMapUtil {
       final Document document = StorageUtil.loadDocument(bytes);
       if (document != null && !ApplicationManager.getApplication().isUnitTestMode()) {
         // Prompt user to select the parent for the Vim keyboard
-        configureVimParentKeymap(INSTALLED_VIM_KEYMAP_PATH, document, true);
+        if (!configureVimParentKeymap(INSTALLED_VIM_KEYMAP_PATH, document, true)) {
+          return false;
+        }
       }
       installKeymap(document);
     } catch (IOException e) {
@@ -96,26 +102,48 @@ public class VimKeyMapUtil {
    *
    * @return true if document was changed successfully
    */
-  private static boolean configureVimParentKeymap(final String path, @NotNull final Document document, final boolean showNotification) throws IOException {
+  private static boolean configureVimParentKeymap(final String path, @NotNull final Document document,
+                                                  final boolean showNotification)
+    throws IOException, InvalidDataException {
     final Element rootElement = document.getRootElement();
-    final String parentKeymap = rootElement.getAttributeValue("parent");
-    final VimKeymapDialog vimKeymapDialog = new VimKeymapDialog(parentKeymap);
+    final String parentKeymapName = rootElement.getAttributeValue("parent");
+    final VimKeymapDialog vimKeymapDialog = new VimKeymapDialog(parentKeymapName);
     vimKeymapDialog.show();
     if (vimKeymapDialog.getExitCode() != DialogWrapper.OK_EXIT_CODE) {
       return false;
     }
     rootElement.removeAttribute("parent");
-    final Keymap selectedKeymap = vimKeymapDialog.getSelectedKeymap();
-    final String keymapName = selectedKeymap.getName();
-    rootElement.setAttribute("parent", keymapName);
+    final Keymap parentKeymap = vimKeymapDialog.getSelectedKeymap();
+    final String keymapName = parentKeymap.getName();
+    VimKeymapConflictResolveUtil.resolveConflicts(rootElement, parentKeymap);
+    // We cannot set a user-defined modifiable keymap as the parent of our Vim keymap so we have to copy its shortcuts
+    if (parentKeymap.canModify()) {
+      final KeymapImpl vimKeyMap = new KeymapImpl();
+      final KeymapManager keymapManager = KeymapManager.getInstance();
+      final KeymapManagerImpl keymapManagerImpl = (KeymapManagerImpl)keymapManager;
+      final Keymap[] allKeymaps = keymapManagerImpl.getAllKeymaps();
+      vimKeyMap.readExternal(rootElement, allKeymaps);
+      final HashSet<String> ownActions = new HashSet<String>(Arrays.asList(vimKeyMap.getOwnActionIds()));
+      final KeymapImpl parentKeymapImpl = (KeymapImpl)parentKeymap;
+      for (String parentAction : parentKeymapImpl.getOwnActionIds()) {
+        if (!ownActions.contains(parentAction)) {
+          final List<Shortcut> shortcuts = Arrays.asList(parentKeymap.getShortcuts(parentAction));
+          rootElement.addContent(VimKeymapConflictResolveUtil.createActionElement(parentAction, shortcuts));
+        }
+      }
+      final Keymap grandParentKeymap = parentKeymap.getParent();
+      rootElement.setAttribute("parent", grandParentKeymap.getName());
+    }
+    else {
+      rootElement.setAttribute("parent", keymapName);
+    }
     VimPlugin.getInstance().setPreviousKeyMap(keymapName);
-    VimKeymapConflictResolveUtil.resolveConflicts(rootElement, selectedKeymap);
     // Save modified keymap to the file
     JDOMUtil.writeDocument(document, path, "\n");
     if (showNotification) {
       Notifications.Bus.notify(new Notification(VimPlugin.IDEAVIM_NOTIFICATION_ID, VimPlugin.IDEAVIM_NOTIFICATION_TITLE,
                                                 "Successfully configured vim keymap to be based on " +
-                                                selectedKeymap.getPresentableName(),
+                                                parentKeymap.getPresentableName(),
                                                 NotificationType.INFORMATION));
     }
 
