@@ -3,6 +3,10 @@
   <id>IdeaVIM</id>
   <change-notes>
     <![CDATA[
+      <p>0.28:</p>
+      <ul>
+        <li>Fixed reconfigure Vim keymap for user-defined base keymaps</li>
+      </ul>
       <p>0.27:</p>
       <ul>
         <li>Better Vim keymaps for Mac OS X</li>
