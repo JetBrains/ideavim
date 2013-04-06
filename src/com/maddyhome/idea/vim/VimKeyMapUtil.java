@@ -61,7 +61,7 @@ public class VimKeyMapUtil {
       final byte[] bytes = toByteArray(retrieveSourceKeymapStream());
       Files.write(bytes, new File(INSTALLED_VIM_KEYMAP_PATH));
       final Document document = StorageUtil.loadDocument(bytes);
-      if (!ApplicationManager.getApplication().isUnitTestMode()) {
+      if (document != null && !ApplicationManager.getApplication().isUnitTestMode()) {
         // Prompt user to select the parent for the Vim keyboard
         configureVimParentKeymap(INSTALLED_VIM_KEYMAP_PATH, document, true);
       }
