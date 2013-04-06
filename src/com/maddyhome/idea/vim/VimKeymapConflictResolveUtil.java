@@ -166,8 +166,15 @@ public class VimKeymapConflictResolveUtil {
     for (Shortcut shortcut : shortcuts) {
       if (shortcut instanceof KeyboardShortcut) {
         KeyboardShortcut keyboardShortcut = (KeyboardShortcut)shortcut;
-        overridesAction
-          .addContent(createShortcutElement(KEYBOARD_SHORTCUT_TAG, FIRST_KEYSTROKE_ATTRIBUTE, KeymapImpl.getKeyShortcutString(keyboardShortcut.getFirstKeyStroke())));
+        final String firstShortcutString = KeymapImpl.getKeyShortcutString(keyboardShortcut.getFirstKeyStroke());
+        final Element shortcutElement = createShortcutElement(KEYBOARD_SHORTCUT_TAG, FIRST_KEYSTROKE_ATTRIBUTE,
+                                                              firstShortcutString);
+        overridesAction.addContent(shortcutElement);
+        final KeyStroke secondKeyStroke = keyboardShortcut.getSecondKeyStroke();
+        if (secondKeyStroke != null) {
+          final String secondShortcutString = KeymapImpl.getKeyShortcutString(secondKeyStroke);
+          shortcutElement.setAttribute(SECOND_KEYSTROKE_ATTRIBUTE, secondShortcutString);
+        }
       }
       else if (shortcut instanceof MouseShortcut) {
         overridesAction.addContent(createShortcutElement(MOUSE_SHORTCUT_TAG, KEYSTROKE_ATTRIBUTE, getMouseShortcutString((MouseShortcut)shortcut)));
