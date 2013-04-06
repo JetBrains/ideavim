@@ -4,6 +4,17 @@ The Changelog
 History of changes in IdeaVim for the IntelliJ platform.
 
 
+0.28, 2013-04-06
+----------------
+
+A bugfix release.
+
+Bug fixes:
+
+* VIM-478 Fixed reconfigure Vim keymap for user-defined base keymaps
+* VIM-479 Don't try to activate insert mode for diff view
+
+
 0.27, 2013-04-03
 ----------------
 
