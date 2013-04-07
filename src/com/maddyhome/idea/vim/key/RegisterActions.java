@@ -959,7 +959,7 @@ public class RegisterActions {
     parser.setupActionHandler("GenerateEquals", "VimGenerateEquals");
 
     parser.setupActionHandler("AutoIndentLines", "VimAutoIndentVisual");
-    parser.setupActionHandler("ReformatCode", "VimReformatVisual");
+    //parser.setupActionHandler("ReformatCode", "VimReformatVisual");
 
     // This group allows us to propagate the keystroke if action acts on something other than an editor
     parser.setupActionHandler("EditorBackSpace", "VimEditorBackSpace", KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0));

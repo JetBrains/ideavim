@@ -427,11 +427,17 @@ public class Options {
     // Look in the JVM's idea of the user's home directory for .vimrc or _vimrc
     String home = System.getProperty("user.home");
     if (home != null) {
-      File rc = new File(home, ".vimrc");
+      File rc = new File(home, ".ideavimrc");
       if (!rc.exists()) {
-        rc = new File(home, "_vimrc");
+        rc = new File(home, "_ideavimrc");
         if (!rc.exists()) {
-          return;
+          rc = new File(home, ".vimrc");
+          if (!rc.exists()) {
+            rc = new File(home, "_vimrc");
+            if (!rc.exists()) {
+              return;
+            }
+          }
         }
       }
 
