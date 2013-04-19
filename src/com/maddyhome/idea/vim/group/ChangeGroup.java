@@ -56,6 +56,9 @@ import java.util.List;
  * TODO - change cursor for the different modes
  */
 public class ChangeGroup extends AbstractActionGroup {
+
+  public static final int MAX_REPEAT_CHARS_COUNT = 10000;
+
   /**
    * Creates the group
    */
@@ -358,6 +361,7 @@ public class ChangeGroup extends AbstractActionGroup {
     else {
       lastInsert = state.getCommand();
       strokes.clear();
+      repeatCharsCount = 0;
       if (document != null && documentListener != null) {
         document.removeDocumentListener(documentListener);
       }
@@ -380,6 +384,11 @@ public class ChangeGroup extends AbstractActionGroup {
     public void documentChanged(DocumentEvent e) {
       final String newFragment = e.getNewFragment().toString();
       final String oldFragment = e.getOldFragment().toString();
+
+      // Repeat buffer limits
+      if (repeatCharsCount > MAX_REPEAT_CHARS_COUNT) {
+        return;
+      }
 
       // <Enter> is added to strokes as an action during processing in order to indent code properly in the repeat
       // command
@@ -409,9 +418,8 @@ public class ChangeGroup extends AbstractActionGroup {
         }
       }
 
-      for (char c : newFragment.toCharArray()) {
-        strokes.add(c);
-      }
+      strokes.add(newFragment.toCharArray());
+      repeatCharsCount += newFragment.length();
 
       if (newFragment.length() > 0) {
         // TODO: If newFragment is shorter than oldFragment?
@@ -486,8 +494,11 @@ public class ChangeGroup extends AbstractActionGroup {
           KeyHandler.executeAction((AnAction)lastStroke, context);
           strokes.add(lastStroke);
         }
-        else if (lastStroke instanceof Character) {
-          processKey(editor, context, KeyStroke.getKeyStroke((Character)lastStroke));
+        else if (lastStroke instanceof char[]) {
+          final char[] chars = (char[])lastStroke;
+          for (char c : chars) {
+            processKey(editor, context, KeyStroke.getKeyStroke(c));
+          }
         }
       }
     }
@@ -636,6 +647,7 @@ public class ChangeGroup extends AbstractActionGroup {
    */
   private void clearStrokes(@NotNull Editor editor) {
     strokes.clear();
+    repeatCharsCount = 0;
     insertStart = editor.getCaretModel().getOffset();
   }
 
@@ -1288,24 +1300,9 @@ public class ChangeGroup extends AbstractActionGroup {
   }
 
   public void indentLines(@NotNull Editor editor, @NotNull DataContext context, int lines, int dir) {
-    int cnt = 1;
-    if (CommandState.inInsertMode(editor)) {
-      if (strokes.size() > 0) {
-        Object stroke = strokes.get(strokes.size() - 1);
-        if (stroke instanceof Character) {
-          Character key = (Character)stroke;
-          if (key == '0') {
-            deleteCharacter(editor, -1, false);
-            cnt = 99;
-          }
-        }
-      }
-    }
-
     int start = editor.getCaretModel().getOffset();
     int end = CommandGroups.getInstance().getMotion().moveCaretToLineEndOffset(editor, lines - 1, false);
-
-    indentRange(editor, context, new TextRange(start, end), cnt, dir);
+    indentRange(editor, context, new TextRange(start, end), 1, dir);
   }
 
   public void indentMotion(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @NotNull Argument argument, int dir) {
@@ -1620,6 +1617,7 @@ public class ChangeGroup extends AbstractActionGroup {
   }
 
   private final List<Object> strokes = new ArrayList<Object>();
+  private int repeatCharsCount;
   private List<Object> lastStrokes;
   private int insertStart;
   @Nullable private Command lastInsert;
