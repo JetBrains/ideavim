@@ -47,7 +47,6 @@ import com.maddyhome.idea.vim.ui.MorePanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.io.File;
 
@@ -122,17 +121,13 @@ public class MotionGroup extends AbstractActionGroup {
   private void addEditorListener(@NotNull Editor editor) {
     editor.addEditorMouseListener(mouseHandler);
     editor.addEditorMouseMotionListener(mouseHandler);
-
     editor.getSelectionModel().addSelectionListener(selectionHandler);
-    editor.getScrollingModel().addVisibleAreaListener(scrollHandler);
   }
 
   private void removeEditorListener(@NotNull Editor editor) {
     editor.removeEditorMouseListener(mouseHandler);
     editor.removeEditorMouseMotionListener(mouseHandler);
-
     editor.getSelectionModel().removeSelectionListener(selectionHandler);
-    editor.getScrollingModel().removeVisibleAreaListener(scrollHandler);
   }
 
   /**
@@ -1073,19 +1068,15 @@ public class MotionGroup extends AbstractActionGroup {
   }
 
   private static boolean scrollLineToTopOfScreen(@NotNull Editor editor, int vline) {
-    EditorScrollHandler.ignoreChanges(true);
     int pos = vline * editor.getLineHeight();
     int vpos = editor.getScrollingModel().getVerticalScrollOffset();
     editor.getScrollingModel().scrollVertically(pos);
-    EditorScrollHandler.ignoreChanges(false);
 
     return vpos != editor.getScrollingModel().getVerticalScrollOffset();
   }
 
   private static void scrollColumnToLeftOfScreen(@NotNull Editor editor, int vcol) {
-    EditorScrollHandler.ignoreChanges(true);
     editor.getScrollingModel().scrollHorizontally(vcol * EditorHelper.getColumnWidth(editor));
-    EditorScrollHandler.ignoreChanges(false);
   }
 
   public int moveCaretToMiddleColumn(@NotNull Editor editor) {
@@ -1421,9 +1412,7 @@ public class MotionGroup extends AbstractActionGroup {
     updateSelection(editor, visualEnd);
 
     editor.getCaretModel().moveToOffset(visualOffset);
-    //EditorData.setLastColumn(editor, editor.getCaretModel().getVisualPosition().column);
-    editor.getScrollingModel().scrollToCaret(ScrollType.RELATIVE);
-    //MotionGroup.moveCaret(editor, context, vr.getOffset());
+    editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
 
     return true;
   }
@@ -1446,9 +1435,7 @@ public class MotionGroup extends AbstractActionGroup {
     updateSelection(editor, visualEnd);
 
     editor.getCaretModel().moveToOffset(visualOffset);
-    //EditorData.setLastColumn(editor, editor.getCaretModel().getVisualPosition().column);
-    editor.getScrollingModel().scrollToCaret(ScrollType.RELATIVE);
-    //MotionGroup.moveCaret(editor, context, vr.getOffset());
+    editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
 
     return true;
   }
@@ -1825,39 +1812,6 @@ public class MotionGroup extends AbstractActionGroup {
     private boolean makingChanges = false;
   }
 
-  private static class EditorScrollHandler implements VisibleAreaListener {
-    public static void ignoreChanges(boolean ignore) {
-      EditorScrollHandler.ignore = ignore;
-    }
-
-    public void visibleAreaChanged(@NotNull VisibleAreaEvent visibleAreaEvent) {
-      if (ignore) return;
-
-      Editor editor = visibleAreaEvent.getEditor();
-      if (CommandState.inInsertMode(editor)) {
-        return;
-      }
-
-      if (logger.isDebugEnabled()) {
-        logger.debug("old=" + visibleAreaEvent.getOldRectangle());
-        logger.debug("new=" + visibleAreaEvent.getNewRectangle());
-      }
-
-      if (!visibleAreaEvent.getNewRectangle().equals(visibleAreaEvent.getOldRectangle())) {
-        if (!EditorData.isConsoleOutput(editor) && !isTabSwitchEvent(visibleAreaEvent)) {
-          MotionGroup.moveCaretToView(editor);
-        }
-      }
-    }
-
-    private static boolean isTabSwitchEvent(@NotNull final VisibleAreaEvent visibleAreaEvent) {
-      final Rectangle newRectangle = visibleAreaEvent.getNewRectangle();
-      return newRectangle.width == 0 || newRectangle.height == 0;
-    }
-
-    private static boolean ignore = false;
-  }
-
   private static class EditorMouseHandler implements EditorMouseListener, EditorMouseMotionListener {
     public void mouseMoved(EditorMouseEvent event) {
       // no-op
@@ -1934,7 +1888,6 @@ public class MotionGroup extends AbstractActionGroup {
   private int visualOffset;
   @NotNull private EditorMouseHandler mouseHandler = new EditorMouseHandler();
   @NotNull private EditorSelectionHandler selectionHandler = new EditorSelectionHandler();
-  @NotNull private EditorScrollHandler scrollHandler = new EditorScrollHandler();
 
   private static Logger logger = Logger.getInstance(MotionGroup.class.getName());
 }
