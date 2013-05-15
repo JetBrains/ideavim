@@ -36,12 +36,7 @@ public class InsertEnterAction extends EditorAction {
 
   private static class Handler extends EditorActionHandler {
     public void execute(Editor editor, @NotNull DataContext context) {
-      editor = InjectedLanguageUtil.getTopLevelEditor(editor);
-      if (editor.isOneLineMode()) {
-        return;
-      }
-
-      CommandGroups.getInstance().getChange().processEnter(editor, context);
+      CommandGroups.getInstance().getChange().processEnter(InjectedLanguageUtil.getTopLevelEditor(editor), context);
     }
   }
 }
