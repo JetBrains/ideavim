@@ -3,6 +3,12 @@
   <id>IdeaVIM</id>
   <change-notes>
     <![CDATA[
+      <p>0.29:</p>
+      <ul>
+        <li>Fixed repeat buffer limits</li>
+        <li>Enable normal <code>&lt;Enter&gt;</code> handling for one-line editors</li>
+        <li>Don't move cursor while scrolling</li>
+      </ul>
       <p>0.28:</p>
       <ul>
         <li>Fixed reconfigure Vim keymap for user-defined base keymaps</li>
@@ -19,15 +25,6 @@
         <li>Added support for paste in the command mode: from a register using <code>&lt;C-R&gt;</code>, from the clipboard using <code>&lt;S-Insert&gt;</code> or <code>&lt;M-V&gt;</code></li>
         <li>Added support for the last change position mark (the dot <code>.</code> mark)</li>
         <li>New shortcuts for Go to declaration <code>&lt;C-]&gt;</code> and Navigate back <code>&lt;C-T&gt;</code></li>
-        <li>Various bug fixes</li>
-      </ul>
-      <p>0.25:</p>
-      <ul>
-        <li>Various bug fixes</li>
-      </ul>
-      <p>0.24:</p>
-      <ul>
-        <li>Added Vim string object selection motions (see help topics <code>v_i"</code>, <code>v_a"</code>)</li>
         <li>Various bug fixes</li>
       </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>

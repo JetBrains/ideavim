@@ -4,6 +4,18 @@ The Changelog
 History of changes in IdeaVim for the IntelliJ platform.
 
 
+0.29, TBD
+---------
+
+A bugfix release.
+
+Bug fixes:
+
+* VIM-482 Fixed repeat buffer limits
+* VIM-91 Enable normal `<Enter>` handling for one-line editors
+* VIM-121 Don't move cursor while scrolling
+
+
 0.28, 2013-04-06
 ----------------
 
