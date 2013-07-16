@@ -38,7 +38,7 @@ public class PutLinesHandler extends CommandHandler {
   public PutLinesHandler() {
     super(new CommandName[]{
       new CommandName("pu", "t")
-    }, RANGE_OPTIONAL | ARGUMENT_REQUIRED | WRITABLE);
+    }, RANGE_OPTIONAL | ARGUMENT_OPTIONAL | WRITABLE);
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
