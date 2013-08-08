@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * The key parser creates a tree of key sequences with terminals represnting complete keystroke sequences mapped to
+ * The key parser creates a tree of key sequences with terminals representing complete keystroke sequences mapped to
  * specific actions. Arguments also act as terminals represents a complete command that requires more keystrokes as
  * an argument.
  * <p/>
@@ -103,30 +103,30 @@ public class KeyParser {
   public void setupActionHandler(@NotNull String ideaActName, @NotNull String vimActName) {
     if (logger.isDebugEnabled()) logger.debug("vimActName=" + vimActName);
 
-    ActionManager amgr = ActionManager.getInstance();
-    AnAction vaction = amgr.getAction(vimActName);
-    if (vaction instanceof DelegateAction) {
-      amgr.unregisterAction(vimActName);
+    ActionManager manager = ActionManager.getInstance();
+    AnAction vimAction = manager.getAction(vimActName);
+    if (vimAction instanceof DelegateAction) {
+      manager.unregisterAction(vimActName);
     }
-    setupActionHandler(ideaActName, vaction);
+    setupActionHandler(ideaActName, vimAction);
   }
 
-  public void setupActionHandler(@NotNull String ideaActName, @NotNull AnAction vaction) {
+  public void setupActionHandler(@NotNull String ideaActName, @NotNull AnAction vimAction) {
     if (logger.isDebugEnabled()) logger.debug("ideaActName=" + ideaActName);
 
-    ActionManager amgr = ActionManager.getInstance();
-    AnAction iaction = amgr.getAction(ideaActName);
-    if (iaction == null) return;  // ignore actions which aren't available in RubyMine
-    if (vaction instanceof DelegateAction) {
-      DelegateAction daction = (DelegateAction)vaction;
-      daction.setOrigAction(iaction);
+    ActionManager manager = ActionManager.getInstance();
+    AnAction ideaAction = manager.getAction(ideaActName);
+    if (ideaAction == null) return;  // ignore actions which aren't available in RubyMine
+    if (vimAction instanceof DelegateAction) {
+      DelegateAction delegateAction = (DelegateAction)vimAction;
+      delegateAction.setOrigAction(ideaAction);
 
-      amgr.unregisterAction(ideaActName);
+      manager.unregisterAction(ideaActName);
 
-      amgr.registerAction(ideaActName, vaction);
+      manager.registerAction(ideaActName, vimAction);
     }
 
-    amgr.registerAction("Orig" + ideaActName, iaction);
+    manager.registerAction("Orig" + ideaActName, ideaAction);
   }
 
   public void setupActionHandler(@NotNull String ideaActName, String vimActName, @NotNull KeyStroke stroke) {
@@ -135,18 +135,18 @@ public class KeyParser {
 
   public void setupActionHandler(@NotNull String ideaActName, @Nullable String vimActName, @NotNull KeyStroke stroke, boolean special) {
     if (logger.isDebugEnabled()) logger.debug("setupActionHandler for " + ideaActName + " and " + vimActName + " for " + stroke);
-    ActionManager amgr = ActionManager.getInstance();
-    AnAction action = amgr.getAction(ideaActName);
-    if (action instanceof EditorAction) {
+    ActionManager manager = ActionManager.getInstance();
+    AnAction ideaAction = manager.getAction(ideaActName);
+    if (ideaAction instanceof EditorAction) {
       if (logger.isDebugEnabled()) logger.debug(ideaActName + " is an EditorAction");
-      EditorAction iaction = (EditorAction)action;
-      EditorActionHandler handler = iaction.getHandler();
+      EditorAction ideaEditorAction = (EditorAction)ideaAction;
+      EditorActionHandler handler = ideaEditorAction.getHandler();
       if (vimActName != null) {
-        EditorAction vaction = (EditorAction)amgr.getAction(vimActName);
-        vaction.setupHandler(handler);
+        EditorAction vimAction = (EditorAction)manager.getAction(vimActName);
+        vimAction.setupHandler(handler);
       }
 
-      iaction.setupHandler(new EditorKeyHandler(handler, stroke, special));
+      ideaEditorAction.setupHandler(new EditorKeyHandler(handler, stroke, special));
     }
 
     //removePossibleConflict(stroke);
@@ -179,8 +179,8 @@ public class KeyParser {
 
   public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags) {
     String ideaName = actName.substring(3);
-    ActionManager amgr = ActionManager.getInstance();
-    if (amgr.getAction(ideaName) == null) {
+    ActionManager manager = ActionManager.getInstance();
+    if (manager.getAction(ideaName) == null) {
       logger.info("No registered action " + ideaName);
       return;
     }
@@ -206,15 +206,15 @@ public class KeyParser {
       }
     }
 
-    AnAction iaction = amgr.getAction(ideaName);
-    AnAction vaction = amgr.getAction(actName);
-    if (vaction instanceof DelegateAction) {
-      DelegateAction daction = (DelegateAction)vaction;
-      daction.setOrigAction(iaction);
+    AnAction ideaAction = manager.getAction(ideaName);
+    AnAction vimAction = manager.getAction(actName);
+    if (vimAction instanceof DelegateAction) {
+      DelegateAction delegateAction = (DelegateAction)vimAction;
+      delegateAction.setOrigAction(ideaAction);
     }
 
-    if (iaction instanceof EditorAction) {
-      EditorAction ea = (EditorAction)iaction;
+    if (ideaAction instanceof EditorAction) {
+      EditorAction ea = (EditorAction)ideaAction;
       setupActionHandler(ideaName, new PassThruDelegateEditorAction(firstStroke, ea.getHandler()));
     }
     else {
