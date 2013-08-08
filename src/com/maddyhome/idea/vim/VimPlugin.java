@@ -89,7 +89,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private static final boolean REFRAIN_FROM_SCROLLING_VIM_VALUE = true;
 
   private VimTypedActionHandler vimHandler;
-  private RegisterActions actions;
   private boolean isBlockCursor = false;
   private boolean isAnimatedScrolling = false;
   private boolean isRefrainFromScrolling = false;
@@ -160,7 +159,11 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     // Add some listeners so we can handle special events
     setupListeners();
 
-    getActions();
+    // Register vim actions in command mode
+    RegisterActions.registerActions();
+
+    // Register ex handlers
+    CommandParser.getInstance().registerHandlers();
 
     LOG.debug("done");
   }
@@ -426,17 +429,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     for (Editor editor : editors) {
       editor.getSettings().setRefrainFromScrolling(isOn);
     }
-  }
-
-  private RegisterActions getActions() {
-    if (actions == null) {
-      // Register vim actions in command mode
-      actions = RegisterActions.getInstance();
-      // Register ex handlers
-      CommandParser.getInstance().registerHandlers();
-    }
-
-    return actions;
   }
 
   public boolean isError() {

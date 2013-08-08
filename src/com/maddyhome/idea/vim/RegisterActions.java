@@ -26,19 +26,12 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 
-/**
- * This registers all the key/action mappings for the plugin
- */
 public class RegisterActions {
-  public static RegisterActions getInstance() {
-    if (instance == null) {
-      instance = new RegisterActions();
-    }
 
-    return instance;
-  }
-
-  private RegisterActions() {
+  /**
+   * Register all the key/action mappings for the plugin.
+   */
+  public static void registerActions() {
     final KeyParser parser = KeyParser.getInstance();
 
     registerInsertModeActions(parser);
@@ -53,9 +46,8 @@ public class RegisterActions {
 
   /**
    * Update many of the built-in IDEA actions with our key handlers.
-   *
    */
-  private void updatePlatformActionHandlers(@NotNull KeyParser parser) {
+  private static void updatePlatformActionHandlers(@NotNull KeyParser parser) {
     // Update completion actions
     parser.setupActionHandler("ClassNameCompletion", "VimClassNameCompletion");
     parser.setupActionHandler("CodeCompletion", "VimCodeCompletion");
@@ -134,7 +126,7 @@ public class RegisterActions {
                               KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
   }
 
-  private void registerVariousModesActions(@NotNull KeyParser parser) {
+  private static void registerVariousModesActions(@NotNull KeyParser parser) {
     parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_INSERT | KeyParser.MAPPING_VISUAL,
                           "VimCommentByLineComment", Command.Type.CHANGE,
                           Command.FLAG_MOT_LINEWISE | Command.FLAG_KEEP_VISUAL);
@@ -340,7 +332,7 @@ public class RegisterActions {
     });
   }
 
-  private void registerCommandLineActions(@NotNull KeyParser parser) {
+  private static void registerCommandLineActions(@NotNull KeyParser parser) {
     parser
       .registerAction(KeyParser.MAPPING_CMD_LINE, "VimProcessExEntry", Command.Type.OTHER_READ_WRITE, Command.FLAG_COMPLETE_EX, new Shortcut[]{
         new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)),
@@ -354,7 +346,7 @@ public class RegisterActions {
   /**
    * Register normal, visual, operator pending modes actions.
    */
-  private void registerNVOModesActions(@NotNull KeyParser parser) {
+  private static void registerNVOModesActions(@NotNull KeyParser parser) {
     parser.registerAction(KeyParser.MAPPING_NVO, "VimCopySelectRegister", Command.Type.SELECT_REGISTER, Command.FLAG_EXPECT_MORE,
                           new Shortcut('"'), Argument.Type.CHARACTER);
 
@@ -662,7 +654,7 @@ public class RegisterActions {
                       new Shortcut("g#"));
   }
 
-  private void registerNormalModeActions(@NotNull KeyParser parser) {
+  private static void registerNormalModeActions(@NotNull KeyParser parser) {
     // Copy/Paste Actions
     parser.registerAction(KeyParser.MAPPING_NORMAL, "VimCopyPutTextBeforeCursor", Command.Type.PASTE,
                           new Shortcut('P'));
@@ -845,7 +837,7 @@ public class RegisterActions {
     // TODO - support for :map macros
   }
 
-  private void registerVisualModeActions(@NotNull KeyParser parser) {
+  private static void registerVisualModeActions(@NotNull KeyParser parser) {
     parser.registerAction(KeyParser.MAPPING_VISUAL, "VimAutoIndentVisual", Command.Type.CHANGE,
                           Command.FLAG_MOT_LINEWISE | Command.FLAG_FORCE_LINEWISE,
                           new Shortcut('='));
@@ -931,7 +923,7 @@ public class RegisterActions {
                           new Shortcut("gv"));
   }
 
-  private void registerInsertModeActions(@NotNull KeyParser parser) {
+  private static void registerInsertModeActions(@NotNull KeyParser parser) {
     // Delegation actions
     parser.registerAction(KeyParser.MAPPING_INSERT, "VimClassNameCompletion", Command.Type.COMPLETION,
             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_MASK | KeyEvent.ALT_MASK)));
@@ -1049,6 +1041,4 @@ public class RegisterActions {
     parser.registerAction(KeyParser.MAPPING_INSERT, "VimShiftRightLines", Command.Type.INSERT, Command.FLAG_SAVE_STROKE,
                           new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.CTRL_MASK)));
   }
-
-  private static RegisterActions instance;
 }
