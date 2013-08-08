@@ -798,7 +798,7 @@ public class RegisterActions {
 
     // Shift Actions
     // TODO - add =
-    // TODO - == will ignore count and only autoindent 1 lines
+    // TODO - == will ignore count and only auto-indent 1 lines
     parser.registerAction(KeyParser.MAPPING_NORMAL, "VimAutoIndentLines", Command.Type.CHANGE,
                           new Shortcut("=="));
     parser.registerAction(KeyParser.MAPPING_NORMAL, "VimShiftLeftLines", Command.Type.CHANGE,
