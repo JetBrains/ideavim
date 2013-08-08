@@ -414,16 +414,8 @@ public class KeyParser {
 
   @NotNull
   public String toString() {
-    StringBuffer res = new StringBuffer();
-
-    res.append("KeyParser=[");
-    res.append("roots=[");
-    res.append(keyRoots);
-    res.append("]");
-
-    return res.toString();
+    return "KeyParser=[roots=[" + keyRoots + "]";
   }
-
 
   @NotNull private HashMap<Integer, RootNode> keyRoots = new HashMap<Integer, RootNode>();
 
