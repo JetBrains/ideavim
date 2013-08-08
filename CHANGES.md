@@ -4,8 +4,8 @@ The Changelog
 History of changes in IdeaVim for the IntelliJ platform.
 
 
-0.29, TBD
----------
+0.29, 2013-05-15
+----------------
 
 A bugfix release.
 
