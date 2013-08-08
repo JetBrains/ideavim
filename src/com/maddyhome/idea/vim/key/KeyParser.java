@@ -196,7 +196,7 @@ public class KeyParser {
       }
     }
 
-    registerAction(mapping, actName, cmdType, cmdFlags, shortcuts.toArray(new Shortcut[]{}));
+    registerAction(mapping, actName, cmdType, cmdFlags, shortcuts.toArray(new Shortcut[shortcuts.size()]));
     KeyStroke firstStroke = null;
     for (int i = 0; i < shortcuts.size(); i++) {
       Shortcut cut = shortcuts.get(i);
