@@ -804,10 +804,6 @@ public class RegisterActions {
 
     // Jump Actions
 
-    // Do not override default Forward/Back actions!
-    //parser.registerAction(KeyParser.MAPPING_NORMAL, "VimForward", Command.OTHER_READONLY);
-    //parser.registerAction(KeyParser.MAPPING_NORMAL, "VimBack", Command.OTHER_READONLY);
-
     parser.registerAction(KeyParser.MAPPING_NORMAL, "VimMotionJumpNext", Command.Type.OTHER_READONLY, new Shortcut[]{
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0))

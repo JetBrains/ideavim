@@ -177,17 +177,6 @@ public class KeyParser {
     return res;
   }
 
-  /**
-   * Registers the action
-   *
-   * @param mapping The set of mappings the shortcut is applicable to
-   * @param actName The action the shortcut will execute
-   * @param cmdType The type of the command
-   */
-  public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType) {
-    registerAction(mapping, actName, cmdType, 0);
-  }
-
   public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags) {
     String ideaName = actName.substring(3);
     ActionManager amgr = ActionManager.getInstance();
