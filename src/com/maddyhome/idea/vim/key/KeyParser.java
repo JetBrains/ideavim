@@ -349,12 +349,13 @@ public class KeyParser {
     for (int m = 0; m < MAPPING_CNT; m++) {
       if ((mapping & map) != 0) {
         Node node = getKeyRoot(map);
-        int len = keys.length;
+        final int len = keys.length;
         // Add a child for each keystroke in the shortcut for this action
         for (int i = 0; i < len; i++) {
-          ParentNode base = (ParentNode)node;
-
-          node = addNode(base, actName, cmdType, cmdFlags, keys[i], argType, i == len - 1);
+          if (node instanceof ParentNode) {
+            final ParentNode base = (ParentNode)node;
+            node = addNode(base, actName, cmdType, cmdFlags, keys[i], argType, i == len - 1);
+          }
         }
       }
 
