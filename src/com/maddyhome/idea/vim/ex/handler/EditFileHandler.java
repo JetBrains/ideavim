@@ -28,6 +28,8 @@ import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+
 /**
  *
  */
@@ -39,7 +41,7 @@ public class EditFileHandler extends CommandHandler {
     }, RANGE_FORBIDDEN | ARGUMENT_OPTIONAL | DONT_REOPEN);
   }
 
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull final DataContext context, @NotNull ExCommand cmd) throws ExException {
     String arg = cmd.getArgument();
     if (arg != null) {
       if (arg.equals("#")) {
@@ -58,7 +60,12 @@ public class EditFileHandler extends CommandHandler {
       }
     }
 
-    KeyHandler.executeAction("OpenFile", context);
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        KeyHandler.executeAction("OpenFile", context);
+      }
+    });
 
     return true;
   }
