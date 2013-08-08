@@ -132,7 +132,7 @@ public class MacroGroup extends AbstractActionGroup {
 
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        CommandProcessor.getInstance().executeCommand(project, run, "playback", keys.get(pos));
+        CommandProcessor.getInstance().executeCommand(project, run, "Vim Macro Playback", keys.get(pos));
       }
     });
   }

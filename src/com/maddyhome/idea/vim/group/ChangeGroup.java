@@ -21,6 +21,8 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.CommandProcessor;
+import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.event.*;
@@ -602,11 +604,17 @@ public class ChangeGroup extends AbstractActionGroup {
     }
 
     if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
-      ApplicationManager.getApplication().runWriteAction(new Runnable() {
+      final Document doc = editor.getDocument();
+      CommandProcessor.getInstance().executeCommand(editor.getProject(), new Runnable() {
+        @Override
         public void run() {
-          KeyHandler.getInstance().getOriginalHandler().execute(editor, key.getKeyChar(), context);
+          ApplicationManager.getApplication().runWriteAction(new Runnable() {
+            public void run() {
+              KeyHandler.getInstance().getOriginalHandler().execute(editor, key.getKeyChar(), context);
+            }
+          });
         }
-      });
+      }, "", doc, UndoConfirmationPolicy.DEFAULT, doc);
 
       return true;
     }

@@ -24,6 +24,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
@@ -218,18 +219,21 @@ public class KeyHandler {
     }
   }
 
-  private void handleEditorReset(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context) {
+  private void handleEditorReset(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull final DataContext context) {
     if (state != State.COMMAND && count == 0 && currentArg == Argument.Type.NONE && currentCmd.size() == 0 &&
         CommandGroups.getInstance().getRegister().getCurrentRegister() == RegisterGroup.REGISTER_DEFAULT) {
       if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
-        KeyHandler.executeAction("VimEditorEscape", context);
-        //getOriginalHandler().execute(editor, key.getKeyChar(), context);
+        CommandProcessor.getInstance().executeCommand(editor.getProject(), new Runnable() {
+          @Override
+          public void run() {
+            KeyHandler.executeAction("VimEditorEscape", context);
+          }
+        }, "", null);
       }
       VimPlugin.indicateError();
     }
-
-      reset(editor);
-    }
+    reset(editor);
+  }
 
   private boolean isDeleteCommandCount(@NotNull KeyStroke key, @NotNull CommandState editorState) {
     return (editorState.getMode() == CommandState.Mode.COMMAND ||
@@ -358,11 +362,13 @@ public class KeyHandler {
     if (cmd.getType().isRead() || project == null || EditorHelper.canEdit(project, editor)) {
       if (ApplicationManager.getApplication().isDispatchThread()) {
         Runnable action = new ActionRunner(editor, context, cmd, key);
+        String name = cmd.getAction().getTemplatePresentation().getText();
+        name = name != null ? "Vim " + name : "";
         if (cmd.getType().isWrite()) {
-          RunnableHelper.runWriteCommand(project, action, cmd.getActionId(), null);
+          RunnableHelper.runWriteCommand(project, action, name, action);
         }
         else {
-          RunnableHelper.runReadCommand(project, action, cmd.getActionId(), null);
+          RunnableHelper.runReadCommand(project, action, name, action);
         }
       }
     }
