@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.maddyhome.idea.vim.key;
+package com.maddyhome.idea.vim;
 
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.key.KeyParser;
+import com.maddyhome.idea.vim.key.Shortcut;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
