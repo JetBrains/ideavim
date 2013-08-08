@@ -10,7 +10,7 @@ Resources:
 * [Plugin homepage](http://plugins.intellij.net/plugin/?id=164)
 * [Changelog](https://github.com/JetBrains/ideavim/blob/master/CHANGES.md)
 * [Bug tracker](http://youtrack.jetbrains.com/issues/VIM)
-* [Continuous integration builds](http://teamcity.jetbrains.com/project.html?projectId=project55)
+* [Continuous integration builds](http://teamcity.jetbrains.com/project.html?projectId=IdeaVim)
 * [@IdeaVim](http://twitter.com/ideavim) in Twitter
 
 
