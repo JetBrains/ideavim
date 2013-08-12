@@ -69,6 +69,11 @@ public abstract class VimTestCase extends UsefulTestCase {
   @NotNull
   protected Editor typeTextInFile(@NotNull final List<KeyStroke> keys, @NotNull String fileContents) {
     myFixture.configureByText("a.txt", fileContents);
+    return typeText(keys);
+  }
+
+  @NotNull
+  protected Editor typeText(@NotNull final List<KeyStroke> keys) {
     final Editor editor = myFixture.getEditor();
     final KeyHandler keyHandler = KeyHandler.getInstance();
     final EditorDataContext dataContext = new EditorDataContext(editor);
@@ -90,7 +95,8 @@ public abstract class VimTestCase extends UsefulTestCase {
     return editor;
   }
 
-  protected void runExCommand(@NotNull final String command) {
+  @NotNull
+  protected Editor runExCommand(@NotNull final String command) {
     final Editor editor = myFixture.getEditor();
     final EditorDataContext dataContext = new EditorDataContext(editor);
     final Project project = myFixture.getProject();
@@ -106,6 +112,7 @@ public abstract class VimTestCase extends UsefulTestCase {
         }
       }
     }, null, null);
+    return editor;
   }
 
   public void assertOffset(int expectedOffset) {
