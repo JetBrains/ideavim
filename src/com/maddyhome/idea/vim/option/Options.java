@@ -35,6 +35,8 @@ import java.util.*;
  * Maintains the set of support options
  */
 public class Options {
+  public final String[] VIMRC_FILES = {".vimrc", "_vimrc"};
+
   /**
    * Gets the singleton instance of the options
    *
@@ -422,31 +424,25 @@ public class Options {
    * Attempts to load all :set commands from the user's .vimrc file if found
    */
   private void loadVimrc() {
-    // Look in the JVM's idea of the user's home directory for .vimrc or _vimrc
-    String home = System.getProperty("user.home");
-    if (home != null) {
-      File rc = new File(home, ".vimrc");
-      if (!rc.exists()) {
-        rc = new File(home, "_vimrc");
-        if (!rc.exists()) {
-          return;
-        }
-      }
-
-      if (logger.isDebugEnabled()) logger.debug("found vimrc at " + rc);
-
-      try {
-        BufferedReader br = new BufferedReader(new FileReader(rc));
-        String line;
-        while ((line = br.readLine()) != null) {
-          if (line.startsWith(":set") || line.startsWith("set")) {
-            int pos = line.indexOf(' ');
-            parseOptionLine(null, line.substring(pos).trim(), false);
+    final String homeDirName = System.getProperty("user.home");
+    if (homeDirName != null) {
+      for (String fileName : VIMRC_FILES) {
+        final File file = new File(homeDirName, fileName);
+        if (file.exists()) {
+          try {
+            final BufferedReader reader = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = reader.readLine()) != null) {
+              if (line.startsWith(":set") || line.startsWith("set")) {
+                final int pos = line.indexOf(' ');
+                parseOptionLine(null, line.substring(pos).trim(), false);
+              }
+            }
           }
+          catch (Exception ignored) {
+          }
+          break;
         }
-      }
-      catch (Exception e) {
-        // no-op
       }
     }
   }
