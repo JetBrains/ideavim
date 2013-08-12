@@ -54,12 +54,8 @@ public class Options {
    * @return True if set, false if not set or name is invalid or not a boolean option
    */
   public boolean isSet(String name) {
-    Option opt = getOption(name);
-    if (opt != null && opt instanceof ToggleOption) {
-      return ((ToggleOption)opt).getValue();
-    }
-
-    return false;
+    final Option opt = getOption(name);
+    return opt != null && opt instanceof ToggleOption && ((ToggleOption)opt).getValue();
   }
 
   /**
@@ -379,7 +375,7 @@ public class Options {
       logger.debug("height=" + height);
     }
 
-    StringBuffer res = new StringBuffer();
+    final StringBuilder res = new StringBuilder();
     if (showIntro) {
       res.append("--- Options ---\n");
     }
