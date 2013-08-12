@@ -41,28 +41,26 @@ public class PutLinesHandler extends CommandHandler {
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
-    int line = cmd.getLine(editor, context);
-    String arg = cmd.getArgument();
-    boolean before = false;
-    if (arg.length() > 0 && arg.charAt(0) == '!') {
-      before = true;
-      arg = arg.substring(1).trim();
-    }
+    final CommandGroups groups = CommandGroups.getInstance();
+    final RegisterGroup registerGroup = groups.getRegister();
+    final int line = cmd.getLine(editor, context);
+    final String arg = cmd.getArgument();
+
     if (arg.length() > 0) {
-      if (!CommandGroups.getInstance().getRegister().selectRegister(arg.charAt(0))) {
+      if (!registerGroup.selectRegister(arg.charAt(0))) {
         return false;
       }
     }
     else {
-      CommandGroups.getInstance().getRegister().selectRegister(RegisterGroup.REGISTER_DEFAULT);
+      registerGroup.selectRegister(RegisterGroup.REGISTER_DEFAULT);
     }
 
-    MotionGroup.moveCaret(editor, EditorHelper.getLineStartOffset(editor, line));
-    if (before) {
-      return CommandGroups.getInstance().getCopy().putTextBeforeCursor(editor, context, 1, true, false);
-    }
-    else {
-      return CommandGroups.getInstance().getCopy().putTextAfterCursor(editor, context, 1, true, false);
-    }
+    final int offset = EditorHelper.getLineStartOffset(editor, line + 1);
+    editor.getDocument().insertString(offset, "\n");
+    MotionGroup.moveCaret(editor, offset);
+    final boolean result = groups.getCopy().putTextAfterCursor(editor, context, 1, false, false);
+    final int newOffset = EditorHelper.getLineStartOffset(editor, line + 1);
+    MotionGroup.moveCaret(editor, newOffset);
+    return result;
   }
 }
