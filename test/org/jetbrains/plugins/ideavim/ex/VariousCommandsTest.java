@@ -17,4 +17,13 @@ public class VariousCommandsTest extends VimTestCase {
                           "Hello World!\n" +
                           "<caret>World\n");
   }
+
+  // VIM-551 |:put|
+  public void testPutDefault() {
+    myFixture.configureByText("a.txt", "<caret>Hello World!\n");
+    typeText(StringHelper.stringToKeys("yw"));
+    runExCommand("put");
+    myFixture.checkResult("Hello World!\n" +
+                          "<caret>Hello \n");
+  }
 }
