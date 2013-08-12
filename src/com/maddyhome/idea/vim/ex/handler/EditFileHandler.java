@@ -31,9 +31,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
-/**
- *
- */
 public class EditFileHandler extends CommandHandler {
   public EditFileHandler() {
     super(new CommandName[]{
@@ -44,20 +41,19 @@ public class EditFileHandler extends CommandHandler {
 
   public boolean execute(@NotNull final Editor editor, @NotNull final DataContext context,
                          @NotNull ExCommand cmd) throws ExException {
-    String arg = cmd.getArgument();
+    final String arg = cmd.getArgument();
     if (arg != null) {
+      final CommandGroups commandGroups = CommandGroups.getInstance();
       if (arg.equals("#")) {
-        CommandGroups.getInstance().getMark().saveJumpLocation(editor);
-        CommandGroups.getInstance().getFile().selectPreviousTab(context);
-
+        commandGroups.getMark().saveJumpLocation(editor);
+        commandGroups.getFile().selectPreviousTab(context);
         return true;
       }
       else if (arg.length() > 0) {
-        boolean res = CommandGroups.getInstance().getFile().openFile(arg, context);
+        final boolean res = commandGroups.getFile().openFile(arg, context);
         if (res) {
-          CommandGroups.getInstance().getMark().saveJumpLocation(editor);
+          commandGroups.getMark().saveJumpLocation(editor);
         }
-
         return res;
       }
     }
