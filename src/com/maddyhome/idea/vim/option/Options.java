@@ -35,7 +35,7 @@ import java.util.*;
  * Maintains the set of support options
  */
 public class Options {
-  public final String[] VIMRC_FILES = {".vimrc", "_vimrc"};
+  public final String[] VIMRC_FILES = {".ideavimrc", "_ideavimrc", ".vimrc", "_vimrc"};
 
   /**
    * Gets the singleton instance of the options
