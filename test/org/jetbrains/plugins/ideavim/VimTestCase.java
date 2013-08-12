@@ -14,6 +14,8 @@ import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.ex.CommandParser;
+import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.option.Options;
@@ -86,6 +88,24 @@ public abstract class VimTestCase extends UsefulTestCase {
       }
     }, null, null);
     return editor;
+  }
+
+  protected void runExCommand(@NotNull final String command) {
+    final Editor editor = myFixture.getEditor();
+    final EditorDataContext dataContext = new EditorDataContext(editor);
+    final Project project = myFixture.getProject();
+    final CommandParser commandParser = CommandParser.getInstance();
+    RunnableHelper.runWriteCommand(project, new Runnable() {
+      @Override
+      public void run() {
+        try {
+          commandParser.processCommand(editor, dataContext, command, 1);
+        }
+        catch (ExException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }, null, null);
   }
 
   public void assertOffset(int expectedOffset) {
