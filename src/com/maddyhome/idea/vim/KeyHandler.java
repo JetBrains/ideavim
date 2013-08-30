@@ -280,7 +280,7 @@ public class KeyHandler {
       digraph = new DigraphSequence();
     }
     if (digraph != null) {
-      DigraphSequence.DigraphResult res = digraph.processKey(key, editor, context);
+      DigraphSequence.DigraphResult res = digraph.processKey(key, editor);
       switch (res.getResult()) {
         case DigraphSequence.DigraphResult.RES_OK:
           return true;
