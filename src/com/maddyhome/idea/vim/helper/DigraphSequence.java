@@ -213,7 +213,7 @@ public class DigraphSequence {
       stroke = null;
     }
 
-    DigraphResult(KeyStroke stroke) {
+    DigraphResult(@Nullable KeyStroke stroke) {
       result = RES_DONE;
       this.stroke = stroke;
     }
