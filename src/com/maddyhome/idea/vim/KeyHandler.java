@@ -24,7 +24,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.project.Project;
@@ -105,7 +104,6 @@ public class KeyHandler {
     // All the editor actions should be performed with top level editor!!!
     // Be careful: all the EditorActionHandler implementation should correctly process InjectedEditors
     editor = InjectedLanguageUtil.getTopLevelEditor(editor);
-    logger.debug("handleKey " + key);
     final CommandState editorState = CommandState.getInstance(editor);
     final boolean isRecording = editorState.isRecording();
     boolean shouldRecord = true;
@@ -120,13 +118,11 @@ public class KeyHandler {
     else if (isCommandCount(editorState, chKey)) {
       // Update the count
       count = count * 10 + (chKey - '0');
-      logger.debug("count now " + count);
     }
     // Pressing delete while entering a count "removes" the last digit entered
     else if (isDeleteCommandCount(key, editorState)) {
       // "Remove" the last digit sent to us
       count /= 10;
-      logger.debug("count now " + count);
     }
     // If we got this far the user is entering a command or supplying an argument to an entered command.
     // First let's check to see if we are at the point of expecting a single character argument to a command.
@@ -138,9 +134,6 @@ public class KeyHandler {
     else {
       // For debugging purposes we track the keys entered for this command
       keys.add(key);
-      if (logger.isDebugEnabled()) {
-        logger.debug("keys now " + keys);
-      }
 
       // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
       // return the node matching this keystroke
@@ -164,12 +157,8 @@ public class KeyHandler {
         shouldRecord = handleArgumentNode(editor, key, context, editorState, shouldRecord, (ArgumentNode)node);
       }
       else {
-        logger.debug("checking for digraph");
-        logger.debug("lastWasBS=" + lastWasBS);
-        logger.debug("lastChar=" + lastChar);
         if (lastWasBS && lastChar != 0 && Options.getInstance().isSet("digraph")) {
           char dig = CommandGroups.getInstance().getDigraph().getDigraph(lastChar, key.getKeyChar());
-          logger.debug("dig=" + dig);
           key = KeyStroke.getKeyStroke(dig);
         }
 
@@ -259,7 +248,6 @@ public class KeyHandler {
   }
 
   private void handleCharArgument(@NotNull KeyStroke key, char chKey) {
-    logger.debug("currentArg is Character");
     // We are expecting a character argument - is this a regular character the user typed?
     // Some special keys can be handled as character arguments - let's check for them here.
     if (chKey == 0) {
@@ -307,8 +295,6 @@ public class KeyHandler {
           handleKey(editor, res.getStroke(), context);
           return true;
       }
-
-      logger.debug("digraph done");
     }
     return false;
   }
@@ -326,16 +312,10 @@ public class KeyHandler {
       cmd = top;
     }
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("cmd=" + cmd);
-    }
     // If we have a command and a motion command argument, both could possibly have their own counts. We
     // need to adjust the counts so the motion gets the product of both counts and the count associated with
     // the command gets reset. Example 3c2w (change 2 words, three times) becomes c6w (change 6 words)
     Argument arg = cmd.getArgument();
-    if (logger.isDebugEnabled()) {
-      logger.debug("arg=" + arg);
-    }
     if (arg != null && arg.getType() == Argument.Type.MOTION) {
       Command mot = arg.getMotion();
       // If no count was entered for either command then nothing changes. If either had a count then
@@ -355,7 +335,6 @@ public class KeyHandler {
     editorState.setCommand(cmd);
 
     lastWasBS = ((cmd.getFlags() & Command.FLAG_IS_BACKSPACE) != 0);
-    logger.debug("lastWasBS=" + lastWasBS);
 
     Project project = editor.getProject();
     if (cmd.getType().isRead() || project == null || EditorHelper.canEdit(project, editor)) {
@@ -372,7 +351,6 @@ public class KeyHandler {
       }
     }
     else {
-      logger.info("write command on read-only file");
       VimPlugin.indicateError();
       reset(editor);
     }
@@ -384,7 +362,6 @@ public class KeyHandler {
                                      @NotNull CommandState editorState,
                                      boolean shouldRecord,
                                      @NotNull ArgumentNode node) {
-    logger.debug("argument node");
     // Create a new command based on what the user has typed so far, excluding this keystroke.
     Command cmd = new Command(count, node.getActionId(), node.getAction(), node.getCmdType(), node.getFlags());
     cmd.setKeys(keys);
@@ -426,7 +403,6 @@ public class KeyHandler {
   }
 
   private void handleCommandNode(@NotNull Editor editor, @NotNull DataContext context, @NotNull CommandNode node) {
-    logger.debug("command node");
     // If all does well we are ready to process this command
     state = State.READY;
     // Did we just get the completed sequence for a motion command argument?
@@ -469,7 +445,6 @@ public class KeyHandler {
       // This is a sanity check that the command has a valid action. This should only fail if the
       // programmer made a typo or forgot to add the action to the plugin.xml file
       if (cmd.getAction() == null) {
-        logger.error("NULL action for keys '" + keys + "'");
         state = State.ERROR;
       }
     }
@@ -477,7 +452,6 @@ public class KeyHandler {
 
   private void handleBranchNode(@NotNull Editor editor, @NotNull DataContext context, @NotNull CommandState editorState, char key,
                                 @NotNull BranchNode node) {
-    logger.debug("branch node");
     // Flag that we aren't allowing any more count digits (unless it's OK)
     if ((node.getFlags() & Command.FLAG_ALLOW_MID_COUNT) == 0) {
       state = State.COMMAND;
@@ -511,14 +485,10 @@ public class KeyHandler {
    * @param context The context to run it in
    */
   public static void executeAction(@NotNull String name, @NotNull DataContext context) {
-    logger.debug("executing action " + name);
     ActionManager aMgr = ActionManager.getInstance();
     AnAction action = aMgr.getAction(name);
     if (action != null) {
       executeAction(action, context);
-    }
-    else {
-      logger.debug("Unknown action");
     }
   }
 
@@ -529,10 +499,6 @@ public class KeyHandler {
    * @param context The context to run it in
    */
   public static void executeAction(@NotNull AnAction action, @NotNull DataContext context) {
-    if (logger.isDebugEnabled()) {
-      logger.debug("executing action " + action);
-    }
-
     // Hopefully all the arguments are sufficient. So far they all seem to work OK.
     // We don't have a specific InputEvent so that is null
     // What is "place"? Leave it the empty string for now.
@@ -558,7 +524,6 @@ public class KeyHandler {
     keys = new ArrayList<KeyStroke>();
     CommandState editorState = CommandState.getInstance(editor);
     editorState.setCurrentNode(KeyParser.getInstance().getKeyRoot(editorState.getMappingMode()));
-    logger.debug("partialReset");
   }
 
   /**
@@ -572,7 +537,6 @@ public class KeyHandler {
     currentCmd.clear();
     currentArg = Argument.Type.NONE;
     digraph = null;
-    logger.debug("reset");
   }
 
   /**
@@ -661,5 +625,4 @@ public class KeyHandler {
   private boolean lastWasBS;
 
   private static KeyHandler instance;
-  private static Logger logger = Logger.getInstance(KeyHandler.class.getName());
 }
