@@ -163,8 +163,7 @@ public class KeyHandler {
         }
 
         // If we are in insert/replace mode send this key in for processing
-        if (editorState.getMode() == CommandState.Mode.INSERT ||
-            editorState.getMode() == CommandState.Mode.REPLACE) {
+        if (editorState.getMode() == CommandState.Mode.INSERT || editorState.getMode() == CommandState.Mode.REPLACE) {
           if (!CommandGroups.getInstance().getChange().processKey(editor, context, key)) {
             shouldRecord = false;
           }
@@ -224,27 +223,23 @@ public class KeyHandler {
   }
 
   private boolean isDeleteCommandCount(@NotNull KeyStroke key, @NotNull CommandState editorState) {
-    return (editorState.getMode() == CommandState.Mode.COMMAND ||
-              editorState.getMode() == CommandState.Mode.VISUAL) &&
-             state == State.NEW_COMMAND && currentArg != Argument.Type.CHARACTER && currentArg !=
-                                                                                              Argument.Type.DIGRAPH &&
-             key.getKeyCode() == KeyEvent.VK_DELETE && count != 0;
+    return (editorState.getMode() == CommandState.Mode.COMMAND || editorState.getMode() == CommandState.Mode.VISUAL) &&
+           state == State.NEW_COMMAND && currentArg != Argument.Type.CHARACTER && currentArg != Argument.Type.DIGRAPH &&
+           key.getKeyCode() == KeyEvent.VK_DELETE && count != 0;
   }
 
   private boolean isCommandCount(@NotNull CommandState editorState, char chKey) {
-    return (editorState.getMode() == CommandState.Mode.COMMAND ||
-              editorState.getMode() == CommandState.Mode.VISUAL) &&
-             state == State.NEW_COMMAND && currentArg != Argument.Type.CHARACTER && currentArg !=
-                                                                                              Argument.Type.DIGRAPH &&
-             Character.isDigit(chKey) &&
-             (count != 0 || chKey != '0');
+    return (editorState.getMode() == CommandState.Mode.COMMAND || editorState.getMode() == CommandState.Mode.VISUAL) &&
+           state == State.NEW_COMMAND && currentArg != Argument.Type.CHARACTER && currentArg != Argument.Type.DIGRAPH &&
+           Character.isDigit(chKey) &&
+           (count != 0 || chKey != '0');
   }
 
   private boolean isEditorReset(@NotNull KeyStroke key, @NotNull CommandState editorState) {
     return (editorState.getMode() == CommandState.Mode.COMMAND || state == State.COMMAND) &&
-        (key.getKeyCode() == KeyEvent.VK_ESCAPE ||
-         (key.getKeyCode() == KeyEvent.VK_C && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0) ||
-         (key.getKeyCode() == '[' && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0));
+           (key.getKeyCode() == KeyEvent.VK_ESCAPE ||
+            (key.getKeyCode() == KeyEvent.VK_C && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0) ||
+            (key.getKeyCode() == '[' && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0));
   }
 
   private void handleCharArgument(@NotNull KeyStroke key, char chKey) {
@@ -275,7 +270,8 @@ public class KeyHandler {
     }
   }
 
-  private boolean handleDigraph(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context, @Nullable Node node) {
+  private boolean handleDigraph(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context,
+                                @Nullable Node node) {
     if (digraph == null && !(node instanceof CommandNode) && DigraphSequence.isDigraphStart(key)) {
       digraph = new DigraphSequence();
     }
@@ -362,11 +358,8 @@ public class KeyHandler {
     }
   }
 
-  private boolean handleArgumentNode(@NotNull Editor editor,
-                                     @NotNull KeyStroke key,
-                                     @NotNull DataContext context,
-                                     @NotNull CommandState editorState,
-                                     boolean shouldRecord,
+  private boolean handleArgumentNode(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context,
+                                     @NotNull CommandState editorState, boolean shouldRecord,
                                      @NotNull ArgumentNode node) {
     // Create a new command based on what the user has typed so far, excluding this keystroke.
     Command cmd = new Command(count, node.getActionId(), node.getAction(), node.getCmdType(), node.getFlags());
@@ -386,8 +379,7 @@ public class KeyHandler {
         // commands
         if ((node.getFlags() & Command.FLAG_OP_PEND) != 0) {
           //CommandState.getInstance().setMappingMode(KeyParser.MAPPING_OP_PEND);
-          editorState.pushState(editorState.getMode(), editorState.getSubMode(),
-                                KeyParser.MAPPING_OP_PEND);
+          editorState.pushState(editorState.getMode(), editorState.getSubMode(), KeyParser.MAPPING_OP_PEND);
         }
         break;
       case EX_STRING:
@@ -416,15 +408,13 @@ public class KeyHandler {
       // We have been expecting a motion argument - is this one?
       if (node.getCmdType() == Command.Type.MOTION) {
         // Create the motion command and add it to the stack
-        Command cmd = new Command(count, node.getActionId(), node.getAction(),
-                                  node.getCmdType(), node.getFlags());
+        Command cmd = new Command(count, node.getActionId(), node.getAction(), node.getCmdType(), node.getFlags());
         cmd.setKeys(keys);
         currentCmd.push(cmd);
       }
       else if (node.getCmdType() == Command.Type.RESET) {
         currentCmd.clear();
-        Command cmd = new Command(1, node.getActionId(), node.getAction(),
-                                  node.getCmdType(), node.getFlags());
+        Command cmd = new Command(1, node.getActionId(), node.getAction(), node.getCmdType(), node.getFlags());
         cmd.setKeys(keys);
         currentCmd.push(cmd);
       }
@@ -443,8 +433,7 @@ public class KeyHandler {
     // The user entered a valid command that doesn't take any arguments
     else {
       // Create the command and add it to the stack
-      Command cmd = new Command(count, node.getActionId(), node.getAction(),
-                                node.getCmdType(), node.getFlags());
+      Command cmd = new Command(count, node.getActionId(), node.getAction(), node.getCmdType(), node.getFlags());
       cmd.setKeys(keys);
       currentCmd.push(cmd);
 
@@ -456,8 +445,8 @@ public class KeyHandler {
     }
   }
 
-  private void handleBranchNode(@NotNull Editor editor, @NotNull DataContext context, @NotNull CommandState editorState, char key,
-                                @NotNull BranchNode node) {
+  private void handleBranchNode(@NotNull Editor editor, @NotNull DataContext context, @NotNull CommandState editorState,
+                                char key, @NotNull BranchNode node) {
     // Flag that we aren't allowing any more count digits (unless it's OK)
     if ((node.getFlags() & Command.FLAG_ALLOW_MID_COUNT) == 0) {
       state = State.COMMAND;
@@ -510,13 +499,10 @@ public class KeyHandler {
     // What is "place"? Leave it the empty string for now.
     // Is the template presentation sufficient?
     // What are the modifiers? Is zero OK?
-    action.actionPerformed(new AnActionEvent(
-      null,
-      context,
-      "",
-      action.getTemplatePresentation(),
-      ActionManager.getInstance(), // API change - don't merge
-      0));
+    action.actionPerformed(
+      new AnActionEvent(null, context, "", action.getTemplatePresentation(), ActionManager.getInstance(),
+                        // API change - don't merge
+                        0));
   }
 
   /**
@@ -577,8 +563,7 @@ public class KeyHandler {
       boolean wasRecording = editorState.isRecording();
 
       executeAction(cmd.getAction(), context);
-      if (editorState.getMode() == CommandState.Mode.INSERT ||
-          editorState.getMode() == CommandState.Mode.REPLACE) {
+      if (editorState.getMode() == CommandState.Mode.INSERT || editorState.getMode() == CommandState.Mode.REPLACE) {
         CommandGroups.getInstance().getChange().processCommand(editor, cmd);
       }
 
