@@ -154,7 +154,7 @@ public class KeyHandler {
       // If this is an argument node then the last keystroke was not part of the current command but should
       // be the first keystroke of the argument of the current command
       else if (node instanceof ArgumentNode) {
-        shouldRecord = handleArgumentNode(editor, key, context, editorState, shouldRecord, (ArgumentNode)node);
+        shouldRecord = handleArgumentNode(editor, key, context, editorState, true, (ArgumentNode)node);
       }
       else {
         if (lastWasBS && lastChar != 0 && Options.getInstance().isSet("digraph")) {
