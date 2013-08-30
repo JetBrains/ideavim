@@ -292,7 +292,11 @@ public class KeyHandler {
             currentArg = Argument.Type.CHARACTER;
           }
           digraph = null;
-          handleKey(editor, res.getStroke(), context);
+          final KeyStroke stroke = res.getStroke();
+          if (stroke == null) {
+            return false;
+          }
+          handleKey(editor, stroke, context);
           return true;
       }
     }
@@ -315,14 +319,16 @@ public class KeyHandler {
     // If we have a command and a motion command argument, both could possibly have their own counts. We
     // need to adjust the counts so the motion gets the product of both counts and the count associated with
     // the command gets reset. Example 3c2w (change 2 words, three times) becomes c6w (change 6 words)
-    Argument arg = cmd.getArgument();
+    final Argument arg = cmd.getArgument();
     if (arg != null && arg.getType() == Argument.Type.MOTION) {
-      Command mot = arg.getMotion();
+      cmd.setCount(0);
+      final Command mot = arg.getMotion();
       // If no count was entered for either command then nothing changes. If either had a count then
       // the motion gets the product of both.
-      int cnt = cmd.getRawCount() == 0 && mot.getRawCount() == 0 ? 0 : cmd.getCount() * mot.getCount();
-      cmd.setCount(0);
-      mot.setCount(cnt);
+      if (mot != null) {
+        int cnt = cmd.getRawCount() == 0 && mot.getRawCount() == 0 ? 0 : cmd.getCount() * mot.getCount();
+        mot.setCount(cnt);
+      }
     }
 
     // If we were in "operator pending" mode, reset back to normal mode.
