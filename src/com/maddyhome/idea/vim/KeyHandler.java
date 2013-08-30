@@ -317,7 +317,6 @@ public class KeyHandler {
     // the command gets reset. Example 3c2w (change 2 words, three times) becomes c6w (change 6 words)
     final Argument arg = cmd.getArgument();
     if (arg != null && arg.getType() == Argument.Type.MOTION) {
-      cmd.setCount(0);
       final Command mot = arg.getMotion();
       // If no count was entered for either command then nothing changes. If either had a count then
       // the motion gets the product of both.
@@ -325,6 +324,7 @@ public class KeyHandler {
         int cnt = cmd.getRawCount() == 0 && mot.getRawCount() == 0 ? 0 : cmd.getCount() * mot.getCount();
         mot.setCount(cnt);
       }
+      cmd.setCount(0);
     }
 
     // If we were in "operator pending" mode, reset back to normal mode.
