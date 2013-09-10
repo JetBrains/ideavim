@@ -1,5 +1,7 @@
 package org.jetbrains.plugins.ideavim.cucumber.glue;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
@@ -40,14 +42,19 @@ public class Steps {
     final KeyHandler keyHandler = KeyHandler.getInstance();
     final EditorDataContext dataContext = new EditorDataContext(editor);
     final Project project = myFixture.getProject();
-    RunnableHelper.runWriteCommand(project, new Runnable() {
+    ApplicationManager.getApplication().invokeAndWait(new Runnable() {
       @Override
       public void run() {
-        for (KeyStroke key : keys) {
-          keyHandler.handleKey(editor, key, dataContext);
-        }
+        RunnableHelper.runWriteCommand(project, new Runnable() {
+          @Override
+          public void run() {
+            for (KeyStroke key : keys) {
+              keyHandler.handleKey(editor, key, dataContext);
+            }
+          }
+        }, null, null);
       }
-    }, null, null);
+    }, ModalityState.any());
   }
 
   @Then("^text should be$")

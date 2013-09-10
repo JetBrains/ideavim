@@ -1,6 +1,7 @@
 package org.jetbrains.plugins.ideavim.cucumber.glue;
 
 import com.intellij.testFramework.LightProjectDescriptor;
+import com.intellij.testFramework.PlatformTestCase;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
 import com.intellij.testFramework.fixtures.TestFixtureBuilder;
@@ -18,9 +19,15 @@ import static org.jetbrains.plugins.ideavim.cucumber.glue.IdeaVimWorld.myFixture
  * Date: 3/8/13
  */
 public class Hooks {
+  private static final String ULTIMATE_MARKER_CLASS = "com.intellij.psi.css.CssFile";
 
   @Before
   public void init() throws Exception {
+    // Only in IntelliJ IDEA Ultimate Edition
+    //PlatformTestCase.initPlatformLangPrefix();
+    // XXX: IntelliJ IDEA Community and Ultimate 12+
+    PlatformTestCase.initPlatformPrefix(ULTIMATE_MARKER_CLASS, "PlatformLangXml");
+    
     final IdeaTestFixtureFactory factory = IdeaTestFixtureFactory.getFixtureFactory();
     final LightProjectDescriptor projectDescriptor = LightProjectDescriptor.EMPTY_PROJECT_DESCRIPTOR;
     final TestFixtureBuilder<IdeaProjectTestFixture> fixtureBuilder = factory.createLightFixtureBuilder(projectDescriptor);
