@@ -59,7 +59,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * This plugin attempts to emulate the keybinding and general functionality of Vim and gVim. See the supplied
+ * This plugin attempts to emulate the key binding and general functionality of Vim and gVim. See the supplied
  * documentation for a complete list of supported and unsupported Vim emulation. The code base contains some debugging
  * output that can be enabled in necessary.
  * <p/>
@@ -359,7 +359,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   }
 
   /**
-   * Inidicate to the user that an error has occurred. Just beep.
+   * Indicate to the user that an error has occurred. Just beep.
    */
   public static void indicateError() {
     if (ApplicationManager.getApplication().isUnitTestMode()) {
@@ -376,9 +376,9 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   public static void showMessage(@Nullable String msg) {
     ProjectManager pm = ProjectManager.getInstance();
-    Project[] projs = pm.getOpenProjects();
-    for (Project proj : projs) {
-      StatusBar bar = WindowManager.getInstance().getStatusBar(proj);
+    Project[] projects = pm.getOpenProjects();
+    for (Project project : projects) {
+      StatusBar bar = WindowManager.getInstance().getStatusBar(project);
       if (bar != null) {
         if (msg == null || msg.length() == 0) {
           bar.setInfo("");

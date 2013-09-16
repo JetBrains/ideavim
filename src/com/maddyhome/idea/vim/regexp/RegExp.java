@@ -320,13 +320,13 @@ public class RegExp {
   private int backslash_trans(int c) {
     switch (c) {
       case 'r':
-        return Ascii.CR;
+        return '\r';
       case 't':
-        return Ascii.TAB;
+        return '\t';
       case 'e':
-        return Ascii.ESC;
+        return 0x1b;
       case 'b':
-        return Ascii.BS;
+        return '\b';
     }
     return c;
   }
@@ -4060,7 +4060,7 @@ public class RegExp {
                   if (reg_mmatch.endpos[no].lnum == clnum) {
                     break;
                   }
-                  dst.append(Ascii.CR);
+                  dst.append('\r');
                   s = reg_getline(++clnum);
                   if (reg_mmatch.endpos[no].lnum == clnum) {
                     len = reg_mmatch.endpos[no].col;
@@ -4079,7 +4079,7 @@ public class RegExp {
                 return dst.toString();
               }
               else {
-                if (backslash && (s.charAt() == Ascii.CR || s.charAt() == '\\')) {
+                if (backslash && (s.charAt() == '\r' || s.charAt() == '\\')) {
                   /*
                                      * Insert a backslash in front of a CR, otherwise
                                      * it will be replaced by a line break.

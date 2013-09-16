@@ -347,11 +347,6 @@
     <action id="VimResetMode" class="com.maddyhome.idea.vim.action.ResetModeAction" text="Reset Mode"/>
     <action id="VimRedo" class="com.maddyhome.idea.vim.action.change.RedoAction" text="Redo"/>
     <action id="VimUndo" class="com.maddyhome.idea.vim.action.change.UndoAction" text="Undo"/>
-    <action id="VimGenerateConstructor" class="com.maddyhome.idea.vim.action.TxActionWrapper" text="Generate Constructor"/>
-    <action id="VimGenerateGetter" class="com.maddyhome.idea.vim.action.TxActionWrapper" text="Generate Getter"/>
-    <action id="VimGenerateSetter" class="com.maddyhome.idea.vim.action.TxActionWrapper" text="Generate Setter"/>
-    <action id="VimGenerateGetterAndSetter" class="com.maddyhome.idea.vim.action.TxActionWrapper" text="Generate Getter and Setter"/>
-    <action id="VimGenerateEquals" class="com.maddyhome.idea.vim.action.TxActionWrapper" text="Generate Equals"/>
 
     <action id="VimClassNameCompletion" class="com.maddyhome.idea.vim.action.OriginalDelegateAction" text="Class Name Completion"/>
     <action id="VimCodeCompletion" class="com.maddyhome.idea.vim.action.OriginalDelegateAction" text="Code Completion"/>

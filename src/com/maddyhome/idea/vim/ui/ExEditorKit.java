@@ -435,7 +435,7 @@ public class ExEditorKit extends DefaultEditorKit {
       final ExTextField target = (ExTextField)getTextComponent(e);
       final KeyStroke key = convert(e);
       if (key != null && digraphSequence != null) {
-        DigraphSequence.DigraphResult res = digraphSequence.processKey(key, target.getEditor(), target.getContext());
+        DigraphSequence.DigraphResult res = digraphSequence.processKey(key, target.getEditor());
         switch (res.getResult()) {
           case DigraphSequence.DigraphResult.RES_BAD:
             target.setCurrentAction(null);
@@ -454,7 +454,7 @@ public class ExEditorKit extends DefaultEditorKit {
       else if (key != null && DigraphSequence.isDigraphStart(key)) {
         target.setCurrentAction(this);
         digraphSequence = new DigraphSequence();
-        digraphSequence.processKey(key, target.getEditor(), target.getContext());
+        digraphSequence.processKey(key, target.getEditor());
       }
     }
   }

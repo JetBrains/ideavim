@@ -54,13 +54,6 @@ public class RegisterActions {
     parser.setupActionHandler("SmartTypeCompletion", "VimSmartTypeCompletion");
     parser.setupActionHandler("InsertLiveTemplate", "VimInsertLiveTemplate");
 
-    // Update generate actions
-    parser.setupActionHandler("GenerateConstructor", "VimGenerateConstructor");
-    parser.setupActionHandler("GenerateGetter", "VimGenerateGetter");
-    parser.setupActionHandler("GenerateSetter", "VimGenerateSetter");
-    parser.setupActionHandler("GenerateGetterAndSetter", "VimGenerateGetterAndSetter");
-    parser.setupActionHandler("GenerateEquals", "VimGenerateEquals");
-
     parser.setupActionHandler("AutoIndentLines", "VimAutoIndentVisual");
     parser.setupActionHandler("ReformatCode", "VimReformatVisual");
 

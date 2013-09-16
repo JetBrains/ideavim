@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.helper;
 
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.group.CommandGroups;
@@ -43,7 +42,7 @@ public class DigraphSequence {
   }
 
   @NotNull
-  public DigraphResult processKey(@NotNull KeyStroke key, @NotNull Editor editor, DataContext context) {
+  public DigraphResult processKey(@NotNull KeyStroke key, @NotNull Editor editor) {
     switch (digraphState) {
       case DIG_STATE_START:
         logger.debug("DIG_STATE_START");
@@ -213,7 +212,7 @@ public class DigraphSequence {
       stroke = null;
     }
 
-    DigraphResult(KeyStroke stroke) {
+    DigraphResult(@Nullable KeyStroke stroke) {
       result = RES_DONE;
       this.stroke = stroke;
     }
