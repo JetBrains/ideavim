@@ -33,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.awt.event.KeyEvent;
 
 /**
  *
@@ -48,11 +49,11 @@ public class EditorKeyHandler extends EditorActionHandler {
   public void execute(@Nullable Editor editor, @NotNull DataContext context) {
     logger.debug("execute");
 
-    // Do not launch vim actions in case of lookup enabled
+    // Do not launch vim actions in case of lookup enabled, except <Esc>
     boolean isEnabled = editor != null && VimPlugin.isEnabled();
     if (isEnabled) {
       final Lookup lookup = LookupManager.getActiveLookup(editor);
-      if (lookup != null) {
+      if (lookup != null && stroke.getKeyCode() != KeyEvent.VK_ESCAPE) {
         isEnabled = false;
       }
     }
