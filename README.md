@@ -68,12 +68,6 @@ Vim. Vim compatibility of undo/redo may be improved in the future releases.
 
 ### Escape
 
-In the IDE, the `<Esc>` key is used during editing to cancel code completion
-windows, dialog windows, and parameter tooltips. While in the Vim insert mode,
-`<Esc>` is used to return back to the normal mode. If you are typing in the
-insert mode and a code completion window is popped up, pressing `<Esc>` cancel
-the window without exiting the insert mode.
-
 Using `<Esc>` in dialog windows remains problematic. For most dialog windows
 the Vim emulator is put into the insert mode without the possibility to switch to
 the normal mode. In some dialog windows the normal mode is on by default. The
