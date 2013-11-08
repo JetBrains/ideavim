@@ -762,7 +762,7 @@ public class SearchHelper {
       end = start + 1;
     }
     else {
-      end = findNextWordEnd(chars, start, stop, 1, false, false, false) + 1;
+      end = findNextWordEnd(chars, start, stop, 1, false, false) + 1;
     }
 
     return new TextRange(start, end);
@@ -827,10 +827,10 @@ public class SearchHelper {
                                                (onWordEnd && !hasSelection && (!(startSpace && isOuter) || (startSpace && !isOuter))
                                                 ? 1
                                                 : 0),
-                              isBig, true, !isOuter);
+                              isBig, !isOuter);
       }
       else {
-        end = findNextWordEnd(chars, pos, max, 1, isBig, true, !isOuter);
+        end = findNextWordEnd(chars, pos, max, 1, isBig, !isOuter);
       }
     }
 
@@ -840,7 +840,7 @@ public class SearchHelper {
     if (dir == 1 && isOuter) {
       int firstEnd = end;
       if (count > 1) {
-        firstEnd = findNextWordEnd(chars, pos, max, 1, isBig, true, false);
+        firstEnd = findNextWordEnd(chars, pos, max, 1, isBig, false);
       }
       if (firstEnd < max) {
         if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
@@ -860,7 +860,7 @@ public class SearchHelper {
     if (!goForward && dir == 1 && isOuter) {
       int firstEnd = end;
       if (count > 1) {
-        firstEnd = findNextWordEnd(chars, pos, max, 1, isBig, true, false);
+        firstEnd = findNextWordEnd(chars, pos, max, 1, isBig, false);
       }
       if (firstEnd < max) {
         if (CharacterHelper.charType(chars.charAt(firstEnd + 1), false) != CharacterHelper.CharacterType.WHITESPACE) {
@@ -903,27 +903,27 @@ public class SearchHelper {
   /**
    * This finds the offset to the end of the next/previous word/WORD.
    *
+   *
    * @param editor   The editor to search in
    * @param count    The number of words to skip. Negative for backward searches
    * @param bigWord  If true then find WORD, if false then find word
    * @return The offset of match
    */
-  public static int findNextWordEnd(@NotNull Editor editor, int count, boolean bigWord, boolean stayEnd) {
+  public static int findNextWordEnd(@NotNull Editor editor, int count, boolean bigWord) {
     CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = editor.getCaretModel().getOffset();
     int size = EditorHelper.getFileSize(editor);
 
-    return findNextWordEnd(chars, pos, size, count, bigWord, stayEnd, false);
+    return findNextWordEnd(chars, pos, size, count, bigWord, false);
   }
 
-  public static int findNextWordEnd(@NotNull CharSequence chars, int pos, int size, int count, boolean bigWord, boolean stayEnd,
-                                    boolean spaceWords) {
+  public static int findNextWordEnd(@NotNull CharSequence chars, int pos, int size, int count, boolean bigWord, boolean spaceWords) {
     int step = count >= 0 ? 1 : -1;
     count = Math.abs(count);
 
     int res = pos;
     for (int i = 0; i < count; i++) {
-      res = findNextWordEndOne(chars, res, size, step, bigWord, stayEnd, spaceWords);
+      res = findNextWordEndOne(chars, res, size, step, bigWord, spaceWords);
       if (res == pos || res == 0 || res == size - 1) {
         break;
       }
@@ -932,7 +932,11 @@ public class SearchHelper {
     return res;
   }
 
-  private static int findNextWordEndOne(@NotNull CharSequence chars, int pos, int size, int step, boolean bigWord, boolean stayEnd,
+  private static int findNextWordEndOne(@NotNull CharSequence chars,
+                                        int pos,
+                                        int size,
+                                        int step,
+                                        boolean bigWord,
                                         boolean spaceWords) {
     boolean found = false;
     // For forward searches, skip any current whitespace so we start at the start of a word
