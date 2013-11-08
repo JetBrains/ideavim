@@ -30,7 +30,8 @@ import org.jetbrains.annotations.NotNull;
  *
  */
 public class ReformatVisualHandler extends VisualOperatorActionHandler {
-  protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, Command cmd, @NotNull TextRange range) {
+  protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
+                            @NotNull TextRange range) {
     KeyHandler.executeAction("ReformatCode", context);
 
     return true;

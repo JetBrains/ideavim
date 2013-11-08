@@ -37,7 +37,8 @@ public class YankVisualAction extends EditorAction {
   }
 
   private static class Handler extends VisualOperatorActionHandler {
-    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, Command cmd, @NotNull TextRange range) {
+    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
+                              @NotNull TextRange range) {
       final CommandState.SubMode subMode = CommandState.getInstance(editor).getSubMode();
       return CommandGroups.getInstance().getCopy().yankRange(editor, range,
                                                              SelectionType.fromSubMode(subMode), true);

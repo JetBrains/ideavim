@@ -64,7 +64,9 @@ public class RepeatChangeAction extends EditorAction {
           // oops
         }
         state.popState();
-        state.setCommand(save);
+        if (save != null) {
+          state.setCommand(save);
+        }
         state.saveLastChangeCommand(cmd);
         CommandGroups.getInstance().getRegister().selectRegister(reg);
 

@@ -34,7 +34,7 @@ public class FilePreviousAction extends EditorAction {
   }
 
   private static class FilePreviousHandler extends AbstractEditorActionHandler {
-    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, Command cmd) {
+    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       CommandGroups.getInstance().getFile().selectPreviousTab(context);
 
       return true;

@@ -38,7 +38,8 @@ public class DeleteVisualAction extends EditorAction {
   }
 
   private static class Handler extends VisualOperatorActionHandler {
-    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, Command cmd, @NotNull TextRange range) {
+    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
+                              @NotNull TextRange range) {
       CommandState.SubMode mode = CommandState.getInstance(editor).getSubMode();
       if (mode == CommandState.SubMode.VISUAL_LINE) {
         range = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),

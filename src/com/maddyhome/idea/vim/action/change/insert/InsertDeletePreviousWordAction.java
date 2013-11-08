@@ -34,7 +34,7 @@ public class InsertDeletePreviousWordAction extends EditorAction {
   }
 
   private static class Handler extends AbstractEditorActionHandler {
-    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, Command cmd) {
+    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       return CommandGroups.getInstance().getChange().insertDeletePreviousWord(editor);
     }
   }

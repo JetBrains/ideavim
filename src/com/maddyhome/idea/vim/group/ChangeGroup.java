@@ -346,16 +346,17 @@ public class ChangeGroup extends AbstractActionGroup {
     CommandGroups.getInstance().getMark().setMark(editor, '[', insertStart);
 
     // If we are repeating the last insert/replace
-    if (state.getMode() == CommandState.Mode.REPEAT) {
+    final Command cmd = state.getCommand();
+    if (cmd != null && state.getMode() == CommandState.Mode.REPEAT) {
       if (mode == CommandState.Mode.REPLACE) {
         processInsert(editor, context);
       }
       // If this command doesn't allow repeating, set the count to 1
-      if ((state.getCommand().getFlags() & Command.FLAG_NO_REPEAT) != 0) {
+      if ((cmd.getFlags() & Command.FLAG_NO_REPEAT) != 0) {
         repeatInsert(editor, context, 1, false);
       }
       else {
-        repeatInsert(editor, context, state.getCommand().getCount(), false);
+        repeatInsert(editor, context, cmd.getCount(), false);
       }
       if (mode == CommandState.Mode.REPLACE) {
         processInsert(editor, context);
@@ -363,7 +364,7 @@ public class ChangeGroup extends AbstractActionGroup {
     }
     // Here we begin insert/replace mode
     else {
-      lastInsert = state.getCommand();
+      lastInsert = cmd;
       strokes.clear();
       repeatCharsCount = 0;
       if (document != null && documentListener != null) {

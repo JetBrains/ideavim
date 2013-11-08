@@ -41,9 +41,10 @@ public abstract class AbstractEditorActionHandler extends EditorActionHandler {
       return;
     }
 
-    CommandState state = CommandState.getInstance(editor);
-    Command cmd = state.getCommand();
-    if (!execute(editor, context, cmd)) {
+    final CommandState state = CommandState.getInstance(editor);
+    final Command cmd = state.getCommand();
+
+    if (cmd == null || !execute(editor, context, cmd)) {
       VimPlugin.indicateError();
     }
   }
@@ -52,7 +53,7 @@ public abstract class AbstractEditorActionHandler extends EditorActionHandler {
     // No-op
   }
 
-  protected abstract boolean execute(@NotNull Editor editor, @NotNull DataContext context, Command cmd);
+  protected abstract boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd);
 
   private static Logger logger = Logger.getInstance(AbstractEditorActionHandler.class.getName());
 }
