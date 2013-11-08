@@ -164,7 +164,7 @@ public class MotionGroup extends AbstractActionGroup {
 
         int start = editor.getSelectionModel().getSelectionStart();
         int end = editor.getSelectionModel().getSelectionEnd();
-        editor.getSelectionModel().setSelection(start, end - 1);
+        editor.getSelectionModel().setSelection(start, Math.max(start, end - 1));
 
         break;
     }
@@ -241,7 +241,7 @@ public class MotionGroup extends AbstractActionGroup {
         logger.debug("start=" + start);
         logger.debug("end=" + end);
       }
-      editor.getSelectionModel().setSelection(start, end - 1);
+      editor.getSelectionModel().setSelection(start, Math.max(start, end - 1));
 
       setVisualMode(editor, CommandState.SubMode.VISUAL_LINE);
 
