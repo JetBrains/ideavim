@@ -3,10 +3,11 @@ The Changelog
 
 History of changes in IdeaVim for the IntelliJ platform.
 
+
 0.30, TBD
 ---------
 
-Added support for a separate `.ideavimrc` config file. Fixed long standing
+Added support for a separate `.ideavimrc` config file. Fixed long-standing
 issues with merged undo/redo commands and `<Esc>` during code completion.
 Various bug fixes.
 

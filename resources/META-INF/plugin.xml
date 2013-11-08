@@ -3,6 +3,12 @@
   <id>IdeaVIM</id>
   <change-notes>
     <![CDATA[
+      <p>0.30:</p>
+      <ul>
+        <li>Support for a separate <code>.ideavimrc</code> config file</li>
+        <li>Fixed long-standing issues with merged undo/redo commands and <code>&lt;Esc&gt;</code> during completion</li>
+        <li>Various bug fixes</li>
+      </ul>
       <p>0.29:</p>
       <ul>
         <li>Fixed repeat buffer limits</li>
