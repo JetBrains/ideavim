@@ -34,7 +34,7 @@ public class FilterCountLinesAction extends EditorAction {
   }
 
   private static class Handler extends AbstractEditorActionHandler {
-    protected boolean execute(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
+    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       CommandGroups.getInstance().getProcess().startFilterCommand(editor, context, cmd);
 
       return true;

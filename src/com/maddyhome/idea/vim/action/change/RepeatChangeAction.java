@@ -38,7 +38,7 @@ public class RepeatChangeAction extends EditorAction {
   }
 
   private static class Handler extends AbstractEditorActionHandler {
-    public boolean execute(Editor editor, @NotNull DataContext context, @NotNull Command command) {
+    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command command) {
       CommandState state = CommandState.getInstance(editor);
       Command cmd = state.getLastChangeCommand();
       if (cmd != null) {

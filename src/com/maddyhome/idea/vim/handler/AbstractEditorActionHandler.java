@@ -32,10 +32,10 @@ import org.jetbrains.annotations.NotNull;
 /**
  */
 public abstract class AbstractEditorActionHandler extends EditorActionHandler {
-  public final void execute(Editor editor, @NotNull DataContext context) {
+  public final void execute(@NotNull Editor editor, @NotNull DataContext context) {
     editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     logger.debug("execute");
-    if ((editor == null || !VimPlugin.isEnabled()) && this instanceof DelegateActionHandler) {
+    if (!VimPlugin.isEnabled() && this instanceof DelegateActionHandler) {
       KeyHandler.executeAction(((DelegateActionHandler)this).getOrigAction(), context);
 
       return;
@@ -52,7 +52,7 @@ public abstract class AbstractEditorActionHandler extends EditorActionHandler {
     // No-op
   }
 
-  protected abstract boolean execute(Editor editor, DataContext context, Command cmd);
+  protected abstract boolean execute(@NotNull Editor editor, @NotNull DataContext context, Command cmd);
 
   private static Logger logger = Logger.getInstance(AbstractEditorActionHandler.class.getName());
 }

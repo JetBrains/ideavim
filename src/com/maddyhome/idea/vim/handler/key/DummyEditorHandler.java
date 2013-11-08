@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.handler.key;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -29,7 +30,7 @@ public class DummyEditorHandler extends EditorActionHandler {
   public DummyEditorHandler() {
   }
 
-  public void execute(Editor editor, DataContext context) {
+  public void execute(@NotNull Editor editor, @NotNull DataContext context) {
     // no-op
   }
 }

@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
  *
  */
 public class AutoIndentVisualHandler extends VisualOperatorActionHandler {
-  protected boolean execute(Editor editor, @NotNull DataContext context, Command cmd, TextRange range) {
+  protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, Command cmd, @NotNull TextRange range) {
     KeyHandler.executeAction("OrigAutoIndentLines", context);
 
     return true;

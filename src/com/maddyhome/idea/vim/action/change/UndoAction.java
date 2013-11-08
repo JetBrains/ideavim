@@ -34,7 +34,7 @@ public class UndoAction extends EditorAction {
   }
 
   private static class Handler extends AbstractEditorActionHandler {
-    protected boolean execute(Editor editor, @NotNull DataContext context, Command cmd) {
+    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, Command cmd) {
       return UndoRedoHelper.undo(context);
     }
   }

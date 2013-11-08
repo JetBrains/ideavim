@@ -26,7 +26,6 @@ import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
@@ -43,11 +42,11 @@ public class PassThruDelegateEditorAction extends AbstractDelegateEditorAction {
       this.origHandler = handler;
     }
 
-    public void execute(@Nullable Editor editor, @NotNull DataContext dataContext) {
+    public void execute(@NotNull Editor editor, @NotNull DataContext dataContext) {
       if (logger.isDebugEnabled()) {
         logger.debug("actionPerformed key=" + stroke);
       }
-      if (editor == null || !VimPlugin.isEnabled()) {
+      if (!VimPlugin.isEnabled()) {
         origHandler.execute(editor, dataContext);
       }
       else {

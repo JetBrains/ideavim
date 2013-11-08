@@ -34,7 +34,7 @@ public class InsertDeleteInsertedTextAction extends EditorAction {
   }
 
   private static class Handler extends AbstractEditorActionHandler {
-    public boolean execute(@NotNull Editor editor, DataContext context, Command cmd) {
+    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, Command cmd) {
       return CommandGroups.getInstance().getChange().insertDeleteInsertedText(editor);
     }
   }

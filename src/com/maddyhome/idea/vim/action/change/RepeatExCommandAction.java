@@ -35,7 +35,7 @@ public class RepeatExCommandAction extends EditorAction {
   }
 
   private static class Handler extends AbstractEditorActionHandler {
-    public boolean execute(@NotNull Editor editor, DataContext context, @NotNull Command command) {
+    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command command) {
       int count = command.getCount();
       try {
         return CommandParser.getInstance().processLastCommand(editor, context, count);

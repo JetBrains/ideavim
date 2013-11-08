@@ -35,7 +35,7 @@ public class DeleteJoinVisualLinesSpacesAction extends EditorAction {
   }
 
   private static class Handler extends VisualOperatorActionHandler {
-    protected boolean execute(@NotNull Editor editor, DataContext context, Command cmd, @NotNull TextRange range) {
+    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, Command cmd, @NotNull TextRange range) {
       if (editor.isOneLineMode()) {
         return false;
       }

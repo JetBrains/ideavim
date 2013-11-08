@@ -37,7 +37,7 @@ public class ChangeVisualLinesAction extends EditorAction {
   }
 
   private static class Handler extends VisualOperatorActionHandler {
-    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, Command cmd, TextRange range) {
+    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, Command cmd, @NotNull TextRange range) {
       range = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
                             EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
 

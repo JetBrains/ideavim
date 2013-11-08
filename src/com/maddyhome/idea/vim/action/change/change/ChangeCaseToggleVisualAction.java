@@ -36,7 +36,7 @@ public class ChangeCaseToggleVisualAction extends EditorAction {
   }
 
   private static class Handler extends VisualOperatorActionHandler {
-    protected boolean execute(@NotNull Editor editor, DataContext context, Command cmd, TextRange range) {
+    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, Command cmd, @NotNull TextRange range) {
       return CommandGroups.getInstance().getChange().changeCaseRange(editor, range, CharacterHelper.CASE_TOGGLE);
     }
   }

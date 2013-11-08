@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  */
 public abstract class TextObjectActionHandler extends AbstractEditorActionHandler {
-  protected final boolean execute(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
+  protected final boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
       TextRange range = getRange(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
       if (range == null) {

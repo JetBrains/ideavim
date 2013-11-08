@@ -37,7 +37,7 @@ public class DeleteVisualLinesEndAction extends EditorAction {
   }
 
   private static class Handler extends VisualOperatorActionHandler {
-    protected boolean execute(@NotNull Editor editor, DataContext context, Command cmd, @NotNull TextRange range) {
+    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, Command cmd, @NotNull TextRange range) {
       if (range.isMultiple()) {
         int[] starts = range.getStartOffsets();
         int[] ends = range.getEndOffsets();

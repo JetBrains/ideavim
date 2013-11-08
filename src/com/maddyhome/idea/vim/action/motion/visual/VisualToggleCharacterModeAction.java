@@ -36,7 +36,7 @@ public class VisualToggleCharacterModeAction extends EditorAction {
   }
 
   private static class Handler extends AbstractEditorActionHandler {
-    protected boolean execute(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
+    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       return CommandGroups.getInstance().getMotion()
         .toggleVisual(editor, cmd.getCount(), cmd.getRawCount(), CommandState.SubMode.VISUAL_CHARACTER);
     }

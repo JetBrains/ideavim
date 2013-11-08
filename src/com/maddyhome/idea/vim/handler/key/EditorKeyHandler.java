@@ -46,11 +46,11 @@ public class EditorKeyHandler extends EditorActionHandler {
     this.special = special;
   }
 
-  public void execute(@Nullable Editor editor, @NotNull DataContext context) {
+  public void execute(@NotNull Editor editor, @NotNull DataContext context) {
     logger.debug("execute");
 
     // Do not launch vim actions in case of lookup enabled, except <Esc>
-    boolean isEnabled = editor != null && VimPlugin.isEnabled();
+    boolean isEnabled = VimPlugin.isEnabled();
     if (isEnabled) {
       final Lookup lookup = LookupManager.getActiveLookup(editor);
       if (lookup != null && stroke.getKeyCode() != KeyEvent.VK_ESCAPE) {

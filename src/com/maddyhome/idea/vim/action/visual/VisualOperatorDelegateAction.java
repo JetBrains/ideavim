@@ -41,7 +41,7 @@ public class VisualOperatorDelegateAction extends AbstractDelegateEditorAction {
   }
 
   private static class Handler extends VisualOperatorActionHandler implements DelegateActionHandler {
-    protected boolean execute(Editor editor, @NotNull DataContext context, Command cmd, TextRange range) {
+    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, Command cmd, @NotNull TextRange range) {
       if (logger.isDebugEnabled()) {
         logger.debug("execute, cmd=" + cmd + ", range=" + range);
         logger.debug("origAction=" + origAction);

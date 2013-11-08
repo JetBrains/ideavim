@@ -34,7 +34,7 @@ public class InsertEnterAction extends EditorAction {
   }
 
   private static class Handler extends EditorActionHandler {
-    public void execute(Editor editor, @NotNull DataContext context) {
+    public void execute(@NotNull Editor editor, @NotNull DataContext context) {
       CommandGroups.getInstance().getChange().processEnter(InjectedLanguageUtil.getTopLevelEditor(editor), context);
     }
   }

@@ -876,27 +876,22 @@ public class ChangeGroup extends AbstractActionGroup {
    * @return true if able to delete the text, false if not
    */
   public boolean deleteRange(@NotNull Editor editor,
-                             @Nullable TextRange range,
+                             @NotNull TextRange range,
                              @Nullable SelectionType type,
                              boolean isChange) {
-    if (range == null) {
-      return false;
-    }
-    else {
-      final boolean res = deleteText(editor, range, type);
-      final int size = EditorHelper.getFileSize(editor);
-      if (res) {
-        final int pos;
-        if (editor.getCaretModel().getOffset() > size) {
-          pos = size - 1;
-        }
-        else {
-          pos = EditorHelper.normalizeOffset(editor, range.getStartOffset(), isChange);
-        }
-        MotionGroup.moveCaret(editor, pos);
+    final boolean res = deleteText(editor, range, type);
+    final int size = EditorHelper.getFileSize(editor);
+    if (res) {
+      final int pos;
+      if (editor.getCaretModel().getOffset() > size) {
+        pos = size - 1;
       }
-      return res;
+      else {
+        pos = EditorHelper.normalizeOffset(editor, range.getStartOffset(), isChange);
+      }
+      MotionGroup.moveCaret(editor, pos);
     }
+    return res;
   }
 
   /**
@@ -1244,9 +1239,8 @@ public class ChangeGroup extends AbstractActionGroup {
    * @return true if able to delete the text, false if not
    */
   public boolean changeCaseMotion(@NotNull Editor editor, DataContext context, int count, int rawCount, char type, @NotNull Argument argument) {
-    TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true, false);
-
-    return changeCaseRange(editor, range, type);
+    final TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true, false);
+    return range != null && changeCaseRange(editor, range, type);
   }
 
   /**
@@ -1257,20 +1251,14 @@ public class ChangeGroup extends AbstractActionGroup {
    * @param type    The case change type (TOGGLE, UPPER, LOWER)
    * @return true if able to delete the text, false if not
    */
-  public boolean changeCaseRange(@NotNull Editor editor, @Nullable TextRange range, char type) {
-    if (range == null) {
-      return false;
+  public boolean changeCaseRange(@NotNull Editor editor, @NotNull TextRange range, char type) {
+    int[] starts = range.getStartOffsets();
+    int[] ends = range.getEndOffsets();
+    for (int i = ends.length - 1; i >= 0; i--) {
+      changeCase(editor, starts[i], ends[i], type);
     }
-    else {
-      int[] starts = range.getStartOffsets();
-      int[] ends = range.getEndOffsets();
-      for (int i = ends.length - 1; i >= 0; i--) {
-        changeCase(editor, starts[i], ends[i], type);
-      }
-      MotionGroup.moveCaret(editor, range.getStartOffset());
-
-      return true;
-    }
+    MotionGroup.moveCaret(editor, range.getStartOffset());
+    return true;
   }
 
   /**
@@ -1312,16 +1300,16 @@ public class ChangeGroup extends AbstractActionGroup {
   }
 
   public void indentMotion(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @NotNull Argument argument, int dir) {
-    TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, false, false);
-
-    indentRange(editor, context, range, 1, dir);
+    final TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, false, false);
+    if (range != null) {
+      indentRange(editor, context, range, 1, dir);
+    }
   }
 
-  public void indentRange(@NotNull Editor editor, @NotNull DataContext context, @Nullable TextRange range, int count, int dir) {
+  public void indentRange(@NotNull Editor editor, @NotNull DataContext context, @NotNull TextRange range, int count, int dir) {
     if (logger.isDebugEnabled()) {
       logger.debug("count=" + count);
     }
-    if (range == null) return;
 
     Project proj = PlatformDataKeys.PROJECT.getData(context); // API change - don't merge
     int tabSize = 8;

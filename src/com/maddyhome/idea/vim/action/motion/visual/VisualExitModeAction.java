@@ -35,7 +35,7 @@ public class VisualExitModeAction extends EditorAction {
   }
 
   private static class Handler extends EditorActionHandler {
-    public void execute(@NotNull Editor editor, DataContext context) {
+    public void execute(@NotNull Editor editor, @NotNull DataContext context) {
       CommandGroups.getInstance().getMotion().processEscape(InjectedLanguageUtil.getTopLevelEditor(editor));
     }
   }

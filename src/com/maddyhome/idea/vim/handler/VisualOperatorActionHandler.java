@@ -37,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
  *
  */
 public abstract class VisualOperatorActionHandler extends AbstractEditorActionHandler {
-  protected final boolean execute(@NotNull final Editor editor, DataContext context, @Nullable Command cmd) {
+  protected final boolean execute(@NotNull final Editor editor, @NotNull DataContext context, @Nullable Command cmd) {
     if (logger.isDebugEnabled()) logger.debug("execute, cmd=" + cmd);
 
     TextRange range = null;
@@ -54,7 +54,9 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
       range = runnable.start();
     }
 
-    boolean res = execute(editor, context, cmd, range);
+    assert range != null : "Range must be not null for visual operator action " + getClass();
+
+    final boolean res = execute(editor, context, cmd, range);
 
     if (cmd != null && (cmd.getFlags() & Command.FLAG_DELEGATE) == 0) {
       runnable.setRes(res);
@@ -64,7 +66,8 @@ public abstract class VisualOperatorActionHandler extends AbstractEditorActionHa
     return res;
   }
 
-  protected abstract boolean execute(Editor editor, DataContext context, Command cmd, TextRange range);
+  protected abstract boolean execute(@NotNull Editor editor, @NotNull DataContext context, Command cmd,
+                                     @NotNull TextRange range);
 
   private static class VisualStartFinishRunnable implements DelegateCommandListener.StartFinishRunnable {
     public VisualStartFinishRunnable(Editor editor, Command cmd) {

@@ -35,7 +35,7 @@ public class ShiftRightVisualAction extends EditorAction {
   }
 
   private static class Handler extends VisualOperatorActionHandler {
-    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd, TextRange range) {
+    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd, @NotNull TextRange range) {
       CommandGroups.getInstance().getChange().indentRange(editor, context, range, cmd.getCount(), 1);
 
       return true;

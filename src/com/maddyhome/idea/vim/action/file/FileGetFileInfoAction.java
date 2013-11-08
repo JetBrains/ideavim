@@ -34,7 +34,7 @@ public class FileGetFileInfoAction extends EditorAction {
   }
 
   private static class Handler extends AbstractEditorActionHandler {
-    protected boolean execute(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
+    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       CommandGroups.getInstance().getFile().displayFileInfo(editor, cmd.getRawCount() > 0);
 
       return true;

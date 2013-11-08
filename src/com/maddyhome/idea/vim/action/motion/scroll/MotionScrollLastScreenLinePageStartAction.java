@@ -35,7 +35,7 @@ public class MotionScrollLastScreenLinePageStartAction extends EditorAction {
   }
 
   private static class Handler extends AbstractEditorActionHandler {
-    protected boolean execute(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
+    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       int raw = cmd.getRawCount();
       int cnt = cmd.getCount();
       if (raw == 0) {

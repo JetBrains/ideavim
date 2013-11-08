@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
  *
  */
 public class ResetModeHandler extends EditorActionHandler {
-  public void execute(@NotNull Editor editor, DataContext context) {
+  public void execute(@NotNull Editor editor, @NotNull DataContext context) {
     KeyHandler.getInstance().fullReset(InjectedLanguageUtil.getTopLevelEditor(editor));
   }
 }

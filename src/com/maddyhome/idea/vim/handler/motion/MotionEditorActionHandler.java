@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  */
 public abstract class MotionEditorActionHandler extends AbstractEditorActionHandler {
-  protected final boolean execute(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
+  protected final boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
     preMove(editor, context, cmd);
 
     int offset = getOffset(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());

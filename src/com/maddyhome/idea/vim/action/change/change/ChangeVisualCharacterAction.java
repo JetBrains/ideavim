@@ -35,7 +35,7 @@ public class ChangeVisualCharacterAction extends EditorAction {
   }
 
   private static class Handler extends VisualOperatorActionHandler {
-    protected boolean execute(@NotNull Editor editor, DataContext context, @NotNull Command cmd, @NotNull TextRange range) {
+    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd, @NotNull TextRange range) {
       return CommandGroups.getInstance().getChange().changeCharacterRange(editor, range,
                                                                           cmd.getArgument().getCharacter());
     }
