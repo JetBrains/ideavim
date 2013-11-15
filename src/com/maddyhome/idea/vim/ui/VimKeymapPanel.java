@@ -35,7 +35,7 @@ import static com.maddyhome.idea.vim.VimKeyMapUtil.VIM_KEYMAP_NAME;
  * @author oleg
  */
 public class VimKeymapPanel {
-  private JComboBox<Keymap> myKeymapComboBox;
+  private JComboBox myKeymapComboBox;
   private JPanel myPanel;
 
   public VimKeymapPanel(final String parentKeymap) {
@@ -52,7 +52,7 @@ public class VimKeymapPanel {
         }
     }
 
-    myKeymapComboBox.setModel(new DefaultComboBoxModel<Keymap>(keymaps.toArray(new Keymap[keymaps.size()])));
+    myKeymapComboBox.setModel(new DefaultComboBoxModel(keymaps.toArray(new Keymap[keymaps.size()])));
     final ListCellRendererWrapper<Keymap> renderer = new ListCellRendererWrapper<Keymap>() {
       @Override
       public void customize(final JList list,
