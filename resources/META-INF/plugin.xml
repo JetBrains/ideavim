@@ -32,7 +32,7 @@
   </change-notes>
   <description>
     <![CDATA[
-      <p>Vim emulation plug-in for IDEs based on the IntelliJ platform. IdeaVim can be used with IntelliJ IDEA, RubyMine, PyCharm, PhpStorm, WebStorm and AppCode.</p>
+      <p>Vim emulation plug-in for IDEs based on the IntelliJ platform. IdeaVim can be used with IntelliJ IDEA, RubyMine, PyCharm, PhpStorm, WebStorm, AppCode and Android Studio.</p>
       <p>Supported functionality:</p>
       <ul>
           <li>Motion keys</li>
