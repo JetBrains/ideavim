@@ -2,8 +2,8 @@ IdeaVim
 =======
 
 IdeaVim is a Vim emulation plug-in for IDEs based on the IntelliJ platform.
-IdeaVim can be used with IntelliJ IDEA, RubyMine, PyCharm, PhpStorm, WebStorm
-and AppCode.
+IdeaVim can be used with IntelliJ IDEA, RubyMine, PyCharm, PhpStorm, WebStorm,
+AppCode and Android Studio.
 
 Resources:
 
