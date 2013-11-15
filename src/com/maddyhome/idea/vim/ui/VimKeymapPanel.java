@@ -18,7 +18,7 @@
 
 package com.maddyhome.idea.vim.ui;
 
-import com.intellij.ide.ui.ListCellRendererWrapper;
+import com.intellij.ui.ListCellRendererWrapper;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.impl.KeymapManagerImpl;
@@ -35,7 +35,7 @@ import static com.maddyhome.idea.vim.VimKeyMapUtil.VIM_KEYMAP_NAME;
  * @author oleg
  */
 public class VimKeymapPanel {
-  private JComboBox myKeymapComboBox;
+  private JComboBox<Keymap> myKeymapComboBox;
   private JPanel myPanel;
 
   public VimKeymapPanel(final String parentKeymap) {
@@ -52,17 +52,20 @@ public class VimKeymapPanel {
         }
     }
 
-    myKeymapComboBox.setModel(new DefaultComboBoxModel(keymaps.toArray(new Keymap[keymaps.size()])));
-    myKeymapComboBox.setRenderer(new ListCellRendererWrapper(myKeymapComboBox.getRenderer()) {
+    myKeymapComboBox.setModel(new DefaultComboBoxModel<Keymap>(keymaps.toArray(new Keymap[keymaps.size()])));
+    final ListCellRendererWrapper<Keymap> renderer = new ListCellRendererWrapper<Keymap>() {
       @Override
-      public void customize(final JList list, final Object value, final int index, final boolean selected, final boolean cellHasFocus) {
-        Keymap keymap = (Keymap)value;
-        if (keymap == null) {
-          return;
+      public void customize(final JList list,
+                            final Keymap value,
+                            final int index,
+                            final boolean selected,
+                            final boolean cellHasFocus) {
+        if (value != null) {
+          setText(value.getPresentableName());
         }
-        setText(keymap.getPresentableName());
       }
-    });
+    };
+    myKeymapComboBox.setRenderer(renderer);
 
     final String previousKeyMap = VimPlugin.getInstance().getPreviousKeyMap();
     myKeymapComboBox.getModel().setSelectedItem(preselectedKeymap != null ? preselectedKeymap :
