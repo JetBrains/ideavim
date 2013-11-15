@@ -20,8 +20,6 @@ package com.maddyhome.idea.vim.helper;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.command.undo.UndoManager;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
@@ -30,16 +28,13 @@ import org.jetbrains.annotations.NotNull;
  * @author oleg
  */
 public class UndoRedoHelper {
+
   public static boolean undo(@NotNull final DataContext context) {
     final Project project = PlatformDataKeys.PROJECT.getData(context);
     final FileEditor fileEditor = PlatformDataKeys.FILE_EDITOR.getData(context);
-    final UndoManager undoManager = UndoManager.getInstance(project);
+    final com.intellij.openapi.command.undo.UndoManager undoManager = com.intellij.openapi.command.undo.UndoManager.getInstance(project);
     if (fileEditor != null && undoManager.isUndoAvailable(fileEditor)) {
       undoManager.undo(fileEditor);
-      final Editor editor = PlatformDataKeys.EDITOR.getData(context);
-      if (editor != null) {
-        editor.getSelectionModel().removeSelection();
-      }
       return true;
     }
     return false;
@@ -48,12 +43,11 @@ public class UndoRedoHelper {
   public static boolean redo(@NotNull final DataContext context) {
     final Project project = PlatformDataKeys.PROJECT.getData(context);
     final FileEditor fileEditor = PlatformDataKeys.FILE_EDITOR.getData(context);
-    final UndoManager undoManager = UndoManager.getInstance(project);
+    final com.intellij.openapi.command.undo.UndoManager undoManager = com.intellij.openapi.command.undo.UndoManager.getInstance(project);
     if (fileEditor != null && undoManager.isRedoAvailable(fileEditor)) {
       undoManager.redo(fileEditor);
       return true;
     }
     return false;
   }
-
 }

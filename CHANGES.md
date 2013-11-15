@@ -4,6 +4,16 @@ The Changelog
 History of changes in IdeaVim for the IntelliJ platform.
 
 
+0.31, 2013-11-12
+----------------
+
+A bugfix release.
+
+Bug fixes:
+
+* VIM-582 Fixed line comment and reformat commands with no visual selection
+
+
 0.30, 2013-11-11
 ----------------
 

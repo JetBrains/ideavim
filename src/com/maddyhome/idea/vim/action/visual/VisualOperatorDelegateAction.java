@@ -25,9 +25,8 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.action.AbstractDelegateEditorAction;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
 import com.maddyhome.idea.vim.handler.DelegateActionHandler;
-import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import org.jetbrains.annotations.NotNull;
 
 public class VisualOperatorDelegateAction extends AbstractDelegateEditorAction {
@@ -40,15 +39,9 @@ public class VisualOperatorDelegateAction extends AbstractDelegateEditorAction {
     ((Handler)getHandler()).setOrigAction(origAction);
   }
 
-  private static class Handler extends VisualOperatorActionHandler implements DelegateActionHandler {
-    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
-                              @NotNull TextRange range) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("execute, cmd=" + cmd + ", range=" + range);
-        logger.debug("origAction=" + origAction);
-      }
+  private static class Handler extends AbstractEditorActionHandler implements DelegateActionHandler {
+    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       KeyHandler.executeAction(origAction, context);
-
       return true;
     }
 
