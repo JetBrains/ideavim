@@ -4,6 +4,12 @@ The Changelog
 History of changes in IdeaVim for the IntelliJ platform.
 
 
+0.32, 2013-11-15
+----------------
+
+Fixed API compatibility with IntelliJ platform builds 132.1052+.
+
+
 0.31, 2013-11-12
 ----------------
 
