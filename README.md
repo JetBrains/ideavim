@@ -18,10 +18,10 @@ Installation
 ------------
 
 Use the IDE's plugin manager to install the latest version of the plugin.
-Start the IDE normally and enable the Vim emulation using "Tools | VIM
+Start the IDE normally and enable the Vim emulation using "Tools | Vim
 Emulator" menu item. At this point you must use Vim keystrokes in all editors.
 
-If you wish to disable the plugin, select the "Tools | VIM Emulator" menu so
+If you wish to disable the plugin, select the "Tools | Vim Emulator" menu so
 it is unchecked. At this point IDE will work with it's regular keyboard
 shortcuts.
 
@@ -32,7 +32,7 @@ Summary of Supported Vim Features
 Supported:
 
 * Motion keys
-* Deletion/Changing
+* Deletion/changing
 * Insert mode commands
 * Marks
 * Registers
@@ -49,9 +49,9 @@ Supported:
 Not supported (yet):
 
 * Key mappings
-* Various less used commands
-* Jump lists
 * Window commands
+* Jump lists
+* Various less used commands
 
 Please see the file [index.txt](https://github.com/JetBrains/ideavim/blob/master/index.txt)
 for a list of commands covered with tests.
@@ -130,7 +130,7 @@ Development
 
 1. Fork IdeaVim on GitHub and clone the repository on your local machine.
 
-2. Open the project in IntelliJ IDEA 11+ (Community or Ultimate) using "File |
+2. Open the project in IntelliJ IDEA 12+ (Community or Ultimate) using "File |
    Open... | /path/to/ideavim".
 
 3. Set up a JDK if you haven't got it yet. Use "File | Project Structure | SDKs
