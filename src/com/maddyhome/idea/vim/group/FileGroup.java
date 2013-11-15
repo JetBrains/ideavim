@@ -87,13 +87,13 @@ public class FileGroup extends AbstractActionGroup {
       }
     }
 
-    if (found != null) {
+    if (found != null ) {
       if (logger.isDebugEnabled()) {
         logger.debug("found file: " + found);
       }
       // Can't open a file unless it has a known file type. The next call will return the known type.
       // If unknown, IDEA will prompt the user to pick a type.
-      FileType type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found);
+      FileType type = proj != null ? FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found, proj) : null;
       if (type != null) {
         FileEditorManager fem = FileEditorManager.getInstance(proj);
         fem.openFile(found, true);
