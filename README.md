@@ -123,8 +123,22 @@ keyboard shortcuts, and their new VIM keystrokes.
               Check In Project    Ctrl-K              <None>
 
 
-Development
------------
+Contributing
+------------
+
+### Where to Start
+
+In order to contribute to IdeaVim you should have some understanding of Java.
+
+See also these docs on the IntelliJ API:
+
+* [IntelliJ architectural overview](http://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Architectural+Overview)
+* [IntelliJ plugin development resources](http://confluence.jetbrains.com/display/IDEADEV/PluginDevelopment)
+
+You can start by picking relatively simple tasks that are tagged with
+[#patch_welcome](http://youtrack.jetbrains.com/issues/VIM?q=%23patch_welcome)
+in the issue tracker.
+
 
 ### Development Environment
 
