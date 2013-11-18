@@ -3687,7 +3687,7 @@ public class RegExp {
      * values for when there is no match.
      * Use pointer or position, depending on reg_match == null.
      */
-  private void save_se(@NotNull save_se_T savep, @NotNull lpos_T posp, @NotNull CharPointer pp) {
+  private void save_se(@NotNull save_se_T savep, @NotNull lpos_T posp, CharPointer pp) {
     if (reg_match == null) {
       savep.pos.lnum = posp.lnum;
       savep.pos.col = posp.col;
@@ -3703,7 +3703,7 @@ public class RegExp {
   /*
      * We were wrong, restore the sub-expressions.
      */
-  private void restore_se(@NotNull save_se_T savep, @NotNull lpos_T posp, @NotNull CharPointer pp) {
+  private void restore_se(@NotNull save_se_T savep, @NotNull lpos_T posp, CharPointer pp) {
     if (reg_match == null) {
       posp.col = savep.pos.col;
       posp.lnum = savep.pos.lnum;

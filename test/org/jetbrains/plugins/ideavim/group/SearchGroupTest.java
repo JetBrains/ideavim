@@ -61,6 +61,20 @@ public class SearchGroupTest extends VimTestCase {
     assertEquals(1, pos);
   }
 
+  public void testSearchNotFound() {
+    final int pos = search("(one)",
+                           "<caret>one\n" +
+                           "two\n");
+    assertEquals(-1, pos);
+  }
+  public void testSearchGrouping() {
+    final int pos = search("\\(one\\)",
+                           "<caret>01234one\n" +
+                           "two\n");
+    assertEquals(5, pos);
+  }
+
+
   // |/|
   public void testSearchMotion() {
     final List<KeyStroke> keys = stringToKeys("/two");
@@ -78,7 +92,7 @@ public class SearchGroupTest extends VimTestCase {
     typeTextInFile(keys, "<caret>Hello, Österreich!\n");
     assertOffset(7);
   }
-
+  
   private void setHighlightSearch() {
     final Options options = Options.getInstance();
     options.resetAllOptions();
