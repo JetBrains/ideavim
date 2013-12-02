@@ -61,12 +61,15 @@ public class SearchGroupTest extends VimTestCase {
     assertEquals(1, pos);
   }
 
+  // VIM-528 |/|
   public void testSearchNotFound() {
     final int pos = search("(one)",
                            "<caret>one\n" +
                            "two\n");
     assertEquals(-1, pos);
   }
+  
+  // VIM-528 |/|
   public void testSearchGrouping() {
     final int pos = search("\\(one\\)",
                            "<caret>01234one\n" +

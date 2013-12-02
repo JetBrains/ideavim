@@ -54,6 +54,8 @@ public class SubstituteCommandTest extends VimTestCase {
            "one\u0000two\u0000three\n");
   }
 
+
+  // VIM-528 |s/|
   public void testGroups() {
     doTest("s/\\(a\\|b\\)/z\\1/g",
            "<caret>abcdefg",
