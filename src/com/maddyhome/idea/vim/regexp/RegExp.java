@@ -3687,14 +3687,14 @@ public class RegExp {
      * values for when there is no match.
      * Use pointer or position, depending on reg_match == null.
      */
-  private void save_se(@NotNull save_se_T savep, @NotNull lpos_T posp, @NotNull CharPointer pp) {
+  private void save_se(@NotNull save_se_T savep, @NotNull lpos_T posp, @Nullable CharPointer pp) {
     if (reg_match == null) {
       savep.pos.lnum = posp.lnum;
       savep.pos.col = posp.col;
       posp.lnum = reglnum;
       posp.col = reginput.pointer() - regline.pointer();
     }
-    else {
+    else if (pp != null) {
       savep.ptr = pp.ref(0);
       pp.assign(reginput);
     }
@@ -3703,12 +3703,12 @@ public class RegExp {
   /*
      * We were wrong, restore the sub-expressions.
      */
-  private void restore_se(@NotNull save_se_T savep, @NotNull lpos_T posp, @NotNull CharPointer pp) {
+  private void restore_se(@NotNull save_se_T savep, @NotNull lpos_T posp, @Nullable CharPointer pp) {
     if (reg_match == null) {
       posp.col = savep.pos.col;
       posp.lnum = savep.pos.lnum;
     }
-    else {
+    else if (pp != null) {
       pp.assign(savep.ptr);
     }
   }
