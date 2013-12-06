@@ -22,6 +22,7 @@ Contributors:
 * [poxu](mailto:poxvuibr@gmail.com)
 * [Alexander Zolotov](mailto:alexander.zolotov@jetbrains.com)
 * [John Lindquist](mailto:johnlindquist@gmail.com)
+* [Ira Klotzko](mailto:iklotzko@ltech.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
