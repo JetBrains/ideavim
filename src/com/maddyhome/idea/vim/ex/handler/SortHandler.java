@@ -80,13 +80,15 @@ public class SortHandler extends CommandHandler {
       }
 
       if (ignoreCase) {
-        comparison = o1.compareToIgnoreCase(o2);
+        o1 = o1.toUpperCase();
+        o2 = o2.toUpperCase();
+      }
+
+      if (number) {
+        comparison = StringUtil.naturalCompare(o1, o2);
       }
       else {
         comparison = o1.compareTo(o2);
-      }
-      if (number) {
-        comparison = StringUtil.naturalCompare(o1, o2);
       }
       return comparison;
     }

@@ -81,6 +81,12 @@ public class SortCommandTest extends VimTestCase {
     myFixture.checkResult("hello70000\nhello1001\nhello1000\nhello102");
   }
 
+  public void testNaturalOrderInsensitiveReverseSort() {
+    myFixture.configureByText("a.txt", "Hello1000\nhello102\nhEllo70000\nhello1001");
+    runExCommand("sort ni!");
+    myFixture.checkResult("hEllo70000\nhello1001\nHello1000\nhello102");
+  }
+
   public void testGlobalSort() {
     myFixture.configureByText("a.txt", "zee\nc\na\nb\nwhatever");
     runExCommand("sort");
