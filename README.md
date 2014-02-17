@@ -175,6 +175,13 @@ See [AUTHORS.md](https://github.com/JetBrains/ideavim/blob/master/AUTHORS.md)
 for a list of authors and contributors.
 
 
+Forks for another layout
+------------------------
+
+* [Colemak hjkl->hnel](https://github.com/chadkouse/ideavim)  
+* [Dvorak  hjkl->htns](https://github.com/seniorivn/ideavim)  
+
+
 License
 -------
 
