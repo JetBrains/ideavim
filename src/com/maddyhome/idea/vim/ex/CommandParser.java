@@ -82,6 +82,7 @@ public class CommandParser {
     //new GotoLineHandler(); - not needed here
     new HelpHandler();
     new HistoryHandler();
+    new INoRemapHandler();
     new JoinLinesHandler();
     new JumpsHandler();
     new MarkHandler();
