@@ -22,6 +22,8 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
+import com.maddyhome.idea.vim.key.KeyParser;
+import com.maddyhome.idea.vim.option.iNoRemap.INoRemap;
 import com.maddyhome.idea.vim.ui.MorePanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -432,11 +434,13 @@ public class Options {
           try {
             final BufferedReader reader = new BufferedReader(new FileReader(file));
             String line;
+            INoRemap iNoRemap = new INoRemap(KeyParser.getInstance());
             while ((line = reader.readLine()) != null) {
               if (line.startsWith(":set") || line.startsWith("set")) {
                 final int pos = line.indexOf(' ');
                 parseOptionLine(null, line.substring(pos).trim(), false);
               }
+              iNoRemap.tryToAddCustomEscape(line);
             }
           }
           catch (Exception ignored) {

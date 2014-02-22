@@ -37,6 +37,8 @@ import com.maddyhome.idea.vim.helper.DelegateCommandListener;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
+import com.maddyhome.idea.vim.insert.InsertToCommandStateHandler;
+import com.maddyhome.idea.vim.insert.TimeoutElaspedException;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
@@ -70,6 +72,7 @@ public class KeyHandler {
    * Creates an instance
    */
   private KeyHandler() {
+    this.myInsertToCommandStateHandler = new InsertToCommandStateHandler();
     reset(null);
   }
 
@@ -137,7 +140,14 @@ public class KeyHandler {
 
       // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
       // return the node matching this keystroke
-      final Node node = editorState.getCurrentNode().getChild(key);
+       Node node = editorState.getCurrentNode().getChild(key);
+
+      try {
+        myInsertToCommandStateHandler.outputBufferedKeysFromFailedInsertToCommandStateChange(editor, editorState, context, node);
+      }
+      catch (TimeoutElaspedException e) {
+        node = null;
+      }
 
       if (handleDigraph(editor, key, context, node)) {
         return;
@@ -614,6 +624,7 @@ public class KeyHandler {
   @Nullable private DigraphSequence digraph = null;
   private char lastChar;
   private boolean lastWasBS;
+  private InsertToCommandStateHandler myInsertToCommandStateHandler;
 
   private static KeyHandler instance;
 }
