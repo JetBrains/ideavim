@@ -177,7 +177,7 @@ public class KeyParser {
     return res;
   }
 
-  public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags) {
+  public void registerIdeaAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags) {
     String ideaName = actName.substring(3);
     ActionManager manager = ActionManager.getInstance();
     if (manager.getAction(ideaName) == null) {

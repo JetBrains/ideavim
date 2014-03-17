@@ -114,22 +114,25 @@ public class RegisterActions {
   }
 
   private static void registerVariousModesActions(@NotNull KeyParser parser) {
-    parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_INSERT | KeyParser.MAPPING_VISUAL,
-                          "VimCommentByLineComment", Command.Type.CHANGE,
-                          Command.FLAG_MOT_LINEWISE | Command.FLAG_KEEP_VISUAL);
-    parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimCommentByBlockComment",
-                          Command.Type.CHANGE,
-                          Command.FLAG_MOT_LINEWISE);
-    parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimSurroundWith", Command.Type.CHANGE,
-                          Command.FLAG_DELEGATE | Command.FLAG_MOT_LINEWISE | Command.FLAG_FORCE_LINEWISE | Command.FLAG_FORCE_VISUAL);
-    parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimSurroundWithLiveTemplate",
-                          Command.Type.CHANGE,
-                          Command.FLAG_DELEGATE | Command.FLAG_MOT_LINEWISE | Command.FLAG_FORCE_LINEWISE | Command.FLAG_FORCE_VISUAL);
-    parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimMoveStatementDown",
-                          Command.Type.CHANGE,
-                          Command.FLAG_MOT_LINEWISE | Command.FLAG_FORCE_LINEWISE);
-    parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimMoveStatementUp", Command.Type.CHANGE,
-                          Command.FLAG_MOT_LINEWISE | Command.FLAG_FORCE_LINEWISE);
+    parser.registerIdeaAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_INSERT | KeyParser.MAPPING_VISUAL,
+                              "VimCommentByLineComment", Command.Type.CHANGE,
+                              Command.FLAG_MOT_LINEWISE | Command.FLAG_KEEP_VISUAL);
+    parser.registerIdeaAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimCommentByBlockComment",
+                              Command.Type.CHANGE, Command.FLAG_MOT_LINEWISE);
+    parser.registerIdeaAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimSurroundWith",
+                              Command.Type.CHANGE, Command.FLAG_DELEGATE |
+                                                   Command.FLAG_MOT_LINEWISE |
+                                                   Command.FLAG_FORCE_LINEWISE |
+                                                   Command.FLAG_FORCE_VISUAL);
+    parser.registerIdeaAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimSurroundWithLiveTemplate",
+                              Command.Type.CHANGE, Command.FLAG_DELEGATE |
+                                                   Command.FLAG_MOT_LINEWISE |
+                                                   Command.FLAG_FORCE_LINEWISE |
+                                                   Command.FLAG_FORCE_VISUAL);
+    parser.registerIdeaAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimMoveStatementDown",
+                              Command.Type.CHANGE, Command.FLAG_MOT_LINEWISE | Command.FLAG_FORCE_LINEWISE);
+    parser.registerIdeaAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimMoveStatementUp",
+                              Command.Type.CHANGE, Command.FLAG_MOT_LINEWISE | Command.FLAG_FORCE_LINEWISE);
 
     parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimVisualToggleCharacterMode",
                           Command.Type.OTHER_READONLY,
