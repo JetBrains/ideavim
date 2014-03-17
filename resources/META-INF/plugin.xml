@@ -348,12 +348,6 @@
     <action id="VimRedo" class="com.maddyhome.idea.vim.action.change.RedoAction" text="Redo"/>
     <action id="VimUndo" class="com.maddyhome.idea.vim.action.change.UndoAction" text="Undo"/>
 
-    <action id="VimClassNameCompletion" class="com.maddyhome.idea.vim.action.OriginalDelegateAction" text="Class Name Completion"/>
-    <action id="VimCodeCompletion" class="com.maddyhome.idea.vim.action.OriginalDelegateAction" text="Code Completion"/>
-    <action id="VimSmartTypeCompletion" class="com.maddyhome.idea.vim.action.OriginalDelegateAction" text="Smart Type Completion"/>
-    <action id="VimWordCompletion" class="com.maddyhome.idea.vim.action.OriginalDelegateAction" text="Word Completion"/>
-    <action id="VimInsertLiveTemplate" class="com.maddyhome.idea.vim.action.OriginalDelegateAction" text="Insert Live Template"/>
-
     <!-- Keys -->
     <action id="VimKeyHandler" class="com.maddyhome.idea.vim.action.key.KeyAction" text="Keys"/>
     <action id="VimDummyHandler" class="com.maddyhome.idea.vim.action.key.DummyAction" text="Keys"/>

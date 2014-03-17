@@ -16,7 +16,6 @@
     <keyboard-shortcut first-keystroke="control H" />
     <keyboard-shortcut first-keystroke="control HOME" />
     <keyboard-shortcut first-keystroke="control I" />
-    <keyboard-shortcut first-keystroke="control J" />
     <keyboard-shortcut first-keystroke="control K" />
     <keyboard-shortcut first-keystroke="control L" />
     <keyboard-shortcut first-keystroke="control LEFT" />
@@ -30,7 +29,6 @@
     <keyboard-shortcut first-keystroke="control R" />
     <keyboard-shortcut first-keystroke="control RIGHT" />
     <keyboard-shortcut first-keystroke="control S" />
-    <keyboard-shortcut first-keystroke="control SPACE" />
     <keyboard-shortcut first-keystroke="control T" />
     <keyboard-shortcut first-keystroke="control U" />
     <keyboard-shortcut first-keystroke="control V" />

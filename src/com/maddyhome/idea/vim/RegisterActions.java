@@ -48,12 +48,6 @@ public class RegisterActions {
    * Update many of the built-in IDEA actions with our key handlers.
    */
   private static void updatePlatformActionHandlers(@NotNull KeyParser parser) {
-    // Update completion actions
-    parser.setupActionHandler("ClassNameCompletion", "VimClassNameCompletion");
-    parser.setupActionHandler("CodeCompletion", "VimCodeCompletion");
-    parser.setupActionHandler("SmartTypeCompletion", "VimSmartTypeCompletion");
-    parser.setupActionHandler("InsertLiveTemplate", "VimInsertLiveTemplate");
-
     parser.setupActionHandler("AutoIndentLines", "VimAutoIndentVisual");
     parser.setupActionHandler("ReformatCode", "VimReformatVisual");
 
@@ -329,7 +323,6 @@ public class RegisterActions {
     parser
       .registerAction(KeyParser.MAPPING_CMD_LINE, "VimProcessExEntry", Command.Type.OTHER_READ_WRITE, Command.FLAG_COMPLETE_EX, new Shortcut[]{
         new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)),
-        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_J, KeyEvent.CTRL_MASK)),
         new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.CTRL_MASK)),
         new Shortcut(KeyStroke.getKeyStroke((char)0x0a)),
         new Shortcut(KeyStroke.getKeyStroke((char)0x0d))
@@ -368,7 +361,6 @@ public class RegisterActions {
     parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionDown", Command.Type.MOTION, Command.FLAG_MOT_LINEWISE, new Shortcut[]{
       new Shortcut('j'),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_J, KeyEvent.CTRL_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK)),
     });
     parser.registerAction(KeyParser.MAPPING_NVO, "VimMotionDown", Command.Type.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut[]{
@@ -913,16 +905,6 @@ public class RegisterActions {
   }
 
   private static void registerInsertModeActions(@NotNull KeyParser parser) {
-    // Delegation actions
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimClassNameCompletion", Command.Type.COMPLETION,
-            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_MASK | KeyEvent.ALT_MASK)));
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimCodeCompletion", Command.Type.COMPLETION,
-            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_MASK)));
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimSmartTypeCompletion", Command.Type.COMPLETION,
-            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK)));
-    parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertLiveTemplate", Command.Type.COMPLETION,
-            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_J, KeyEvent.CTRL_MASK)));
-
     // Other insert actions
     parser
       .registerAction(KeyParser.MAPPING_INSERT, "VimEditorBackSpace", Command.Type.INSERT, Command.FLAG_IS_BACKSPACE,
@@ -953,7 +935,6 @@ public class RegisterActions {
     parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertDeletePreviousWord", Command.Type.INSERT, Command.FLAG_CLEAR_STROKES,
                           new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK)));
     parser.registerAction(KeyParser.MAPPING_INSERT, "VimInsertEnter", Command.Type.INSERT, Command.FLAG_SAVE_STROKE, new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_J, KeyEvent.CTRL_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.CTRL_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0))
     });
