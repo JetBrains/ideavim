@@ -36,7 +36,7 @@ import java.util.StringTokenizer;
 /**
  * This group works with command associated with copying and pasting text
  */
-public class CopyGroup extends AbstractActionGroup {
+public class CopyGroup {
   /**
    * Creates the group
    */

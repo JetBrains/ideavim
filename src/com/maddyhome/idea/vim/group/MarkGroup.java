@@ -45,7 +45,7 @@ import java.util.*;
 /**
  * This class contains all the mark related functionality
  */
-public class MarkGroup extends AbstractActionGroup {
+public class MarkGroup {
   /**
    * Creates the class
    */

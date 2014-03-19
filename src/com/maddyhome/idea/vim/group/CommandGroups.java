@@ -152,16 +152,9 @@ public class CommandGroups {
    * @param element The root XML element of the plugin
    */
   public void saveData(@NotNull Element element) {
-    motion.saveData(element);
-    change.saveData(element);
-    copy.saveData(element);
     mark.saveData(element);
     register.saveData(element);
-    file.saveData(element);
     search.saveData(element);
-    process.saveData(element);
-    macro.saveData(element);
-    digraph.saveData(element);
     history.saveData(element);
   }
 
@@ -171,17 +164,9 @@ public class CommandGroups {
    * @param element The root XML element of the plugin
    */
   public void readData(@NotNull Element element) {
-    logger.debug("readData");
-    motion.readData(element);
-    change.readData(element);
-    copy.readData(element);
     mark.readData(element);
     register.readData(element);
-    file.readData(element);
     search.readData(element);
-    process.readData(element);
-    macro.readData(element);
-    digraph.readData(element);
     history.readData(element);
   }
 

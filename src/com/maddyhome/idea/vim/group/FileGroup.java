@@ -49,7 +49,7 @@ import java.util.HashMap;
 /**
  *
  */
-public class FileGroup extends AbstractActionGroup {
+public class FileGroup {
   public FileGroup() {
   }
 

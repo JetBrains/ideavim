@@ -46,7 +46,7 @@ import java.io.*;
 /**
  *
  */
-public class ProcessGroup extends AbstractActionGroup {
+public class ProcessGroup {
   public ProcessGroup() {
   }
 

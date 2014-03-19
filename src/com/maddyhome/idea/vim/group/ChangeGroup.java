@@ -59,7 +59,7 @@ import java.util.List;
  * Provides all the insert/replace related functionality
  * TODO - change cursor for the different modes
  */
-public class ChangeGroup extends AbstractActionGroup {
+public class ChangeGroup {
 
   public static final int MAX_REPEAT_CHARS_COUNT = 10000;
 

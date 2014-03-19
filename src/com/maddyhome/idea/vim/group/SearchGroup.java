@@ -63,7 +63,7 @@ import java.util.Iterator;
 /**
  *
  */
-public class SearchGroup extends AbstractActionGroup {
+public class SearchGroup {
   public static final int KEEP_FLAGS = 1;
   public static final int CONFIRM = 2;
   public static final int IGNORE_ERROR = 4;

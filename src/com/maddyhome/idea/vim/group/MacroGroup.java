@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * Used to handle playback of macros
  */
-public class MacroGroup extends AbstractActionGroup {
+public class MacroGroup {
   public MacroGroup() {
   }
 

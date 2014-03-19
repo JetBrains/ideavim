@@ -55,7 +55,7 @@ import java.io.File;
 /**
  * This handles all motion related commands and marks
  */
-public class MotionGroup extends AbstractActionGroup {
+public class MotionGroup {
   public static final int LAST_F = 1;
   public static final int LAST_f = 2;
   public static final int LAST_T = 3;

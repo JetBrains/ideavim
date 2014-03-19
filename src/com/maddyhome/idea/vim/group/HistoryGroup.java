@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HistoryGroup extends AbstractActionGroup {
+public class HistoryGroup {
   public static final String SEARCH = "search";
   public static final String COMMAND = "cmd";
   public static final String EXPRESSION = "expr";

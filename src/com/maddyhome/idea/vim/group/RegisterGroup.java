@@ -41,7 +41,7 @@ import java.util.List;
 /**
  * This group works with command associated with copying and pasting text
  */
-public class RegisterGroup extends AbstractActionGroup {
+public class RegisterGroup {
   /**
    * The register key for the default register
    */
