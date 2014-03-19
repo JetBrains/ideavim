@@ -69,16 +69,11 @@ import java.awt.*;
  * @version 0.1
  */
 @State(
-    name = "VimSettings",
-    storages = {
-        @Storage(
-            id = "main",
-            file = "$APP_CONFIG$/vim_settings.xml"
-        )}
-)
-public class VimPlugin implements ApplicationComponent, PersistentStateComponent<Element>
-{
-
+  name = "VimSettings",
+  storages = {@Storage(
+    id = "main",
+    file = "$APP_CONFIG$/vim_settings.xml")})
+public class VimPlugin implements ApplicationComponent, PersistentStateComponent<Element> {
   private static final String IDEAVIM_COMPONENT_NAME = "VimPlugin";
   public static final String IDEAVIM_NOTIFICATION_ID = "ideavim";
   public static final String IDEAVIM_NOTIFICATION_TITLE = "IdeaVim";
@@ -103,7 +98,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private static Logger LOG = Logger.getInstance(VimPlugin.class);
 
   private final Application myApp;
-
 
   /**
    * Creates the Vim Plugin
@@ -180,8 +174,8 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
                                      "with base keymaps.\n\nDo you want to reconfigure your Vim keymap?\n\n" +
                                      "Warning: Any custom shortcuts will be lost!\n\n" +
                                      "(You can do it later using Tools | Reconfigure Vim Keymap).",
-                                     IDEAVIM_NOTIFICATION_TITLE,
-                                     Messages.getQuestionIcon()) == Messages.YES) {
+                                     IDEAVIM_NOTIFICATION_TITLE, Messages.getQuestionIcon()
+        ) == Messages.YES) {
           KeyHandler.executeAction("VimReconfigureKeymap", SimpleDataContext.getProjectContext(null));
         }
       }
@@ -192,9 +186,9 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
           if (Messages.showYesNoDialog("Do you want to enable repeating keys in Mac OS X on press and hold " +
                                        "(requires restart)?\n\n" +
                                        "(You can do it manually by running 'defaults write -g " +
-                                       "ApplePressAndHoldEnabled 0' in the console).",
-                                       IDEAVIM_NOTIFICATION_TITLE,
-                                       Messages.getQuestionIcon()) == Messages.YES) {
+                                       "ApplePressAndHoldEnabled 0' in the console).", IDEAVIM_NOTIFICATION_TITLE,
+                                       Messages.getQuestionIcon()
+          ) == Messages.YES) {
             keyRepeat.setEnabled(true);
             requiresRestart = true;
           }
@@ -219,7 +213,8 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
           if (Messages.showYesNoDialog("It is crucial to use Vim keymap for IdeaVim plugin correct work, " +
                                        "however it was not installed correctly.\nDo you want " +
                                        ApplicationManagerEx.getApplicationEx().getName() +
-                                       " to disable Vim emulation?", IDEAVIM_NOTIFICATION_TITLE, Messages.getQuestionIcon()) == Messages.YES) {
+                                       " to disable Vim emulation?", IDEAVIM_NOTIFICATION_TITLE,
+                                       Messages.getQuestionIcon()) == Messages.YES) {
             VimPlugin.getInstance().turnOffPlugin();
             return;
           }
@@ -283,9 +278,12 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     ProjectManager.getInstance().addProjectManagerListener(new ProjectManagerAdapter() {
       @Override
       public void projectOpened(@NotNull final Project project) {
-        project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new MotionGroup.MotionEditorChange());
-        project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileGroup.SelectionCheck());
-        project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new SearchGroup.EditorSelectionCheck());
+        project.getMessageBus().connect()
+          .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new MotionGroup.MotionEditorChange());
+        project.getMessageBus().connect()
+          .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileGroup.SelectionCheck());
+        project.getMessageBus().connect()
+          .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new SearchGroup.EditorSelectionCheck());
       }
 
       @Override
