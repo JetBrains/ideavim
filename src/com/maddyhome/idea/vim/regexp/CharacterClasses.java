@@ -18,7 +18,10 @@
 
 package com.maddyhome.idea.vim.regexp;
 
-public abstract class CharacterClasses {
+public final class CharacterClasses {
+  private CharacterClasses() {
+  }
+
   public static final String[] CLASS_NAMES = new String[]{
     "alnum:]",
     "alpha:]",
