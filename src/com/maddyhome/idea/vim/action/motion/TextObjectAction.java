@@ -23,7 +23,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.handler.motion.TextObjectActionHandler;
+import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import org.jetbrains.annotations.Nullable;
 
 /**

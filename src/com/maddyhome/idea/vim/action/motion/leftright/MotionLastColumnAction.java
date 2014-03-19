@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.handler.motion.MotionEditorActionHandler;
+import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.Options;

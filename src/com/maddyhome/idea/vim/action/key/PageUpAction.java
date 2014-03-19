@@ -19,7 +19,7 @@
 package com.maddyhome.idea.vim.action.key;
 
 import com.intellij.openapi.editor.actionSystem.EditorAction;
-import com.maddyhome.idea.vim.handler.key.DummyEditorHandler;
+import com.maddyhome.idea.vim.handler.DummyEditorHandler;
 
 /**
  *

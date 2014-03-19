@@ -22,7 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.handler.motion.MotionEditorActionHandler;
+import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
 
 /**
  */

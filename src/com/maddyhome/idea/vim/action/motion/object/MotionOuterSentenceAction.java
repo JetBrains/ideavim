@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.action.motion.TextObjectAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
-import com.maddyhome.idea.vim.handler.motion.TextObjectActionHandler;
+import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import org.jetbrains.annotations.NotNull;
 
 /**
