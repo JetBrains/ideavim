@@ -72,11 +72,11 @@
   </extensions>
 
   <actions>
-    <action id="VimPluginToggle" class="com.maddyhome.idea.vim.VimPluginToggleAction" text="Vim Emulator" description="Toggle the Vim Plugin On/Off">
+    <action id="VimPluginToggle" class="com.maddyhome.idea.vim.action.VimPluginToggleAction" text="Vim Emulator" description="Toggle the Vim Plugin On/Off">
       <keyboard-shortcut first-keystroke="control alt V" keymap="$default"/>
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </action>
-    <action id="VimReconfigureKeymap" class="com.maddyhome.idea.vim.VimReconfigureKeymapAction" text="Reconfigure Vim Keymap" description="Reconfigure Vim keymap">
+    <action id="VimReconfigureKeymap" class="com.maddyhome.idea.vim.action.VimReconfigureKeymapAction" text="Reconfigure Vim Keymap" description="Reconfigure Vim keymap">
       <add-to-group group-id="ToolsMenu" relative-to-action="after VimPluginToggle"/>
     </action>
 

@@ -16,11 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim;
+package com.maddyhome.idea.vim.action;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.project.DumbAware;
+import com.maddyhome.idea.vim.VimPlugin;
 
 /**
  * This class is used to handle the Vim Plugin enabled/disabled toggle. This is most likely used as a menu option

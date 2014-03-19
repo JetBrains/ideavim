@@ -16,11 +16,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim;
+package com.maddyhome.idea.vim.action;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAware;
+import com.maddyhome.idea.vim.VimKeyMapUtil;
+import com.maddyhome.idea.vim.VimPlugin;
 import org.jetbrains.annotations.NotNull;
 
 /**
