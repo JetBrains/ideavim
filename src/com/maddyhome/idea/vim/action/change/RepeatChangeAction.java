@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.CommandGroups;
-import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.key.KeyParser;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,7 +37,7 @@ public class RepeatChangeAction extends EditorAction {
     super(new Handler());
   }
 
-  private static class Handler extends AbstractEditorActionHandler {
+  private static class Handler extends EditorActionHandlerBase {
     public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command command) {
       CommandState state = CommandState.getInstance(editor);
       Command cmd = state.getLastChangeCommand();

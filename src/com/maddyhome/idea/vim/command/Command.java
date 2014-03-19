@@ -21,7 +21,7 @@ package com.maddyhome.idea.vim.command;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
-import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -205,8 +205,8 @@ public class Command {
     if (action instanceof EditorAction) {
       EditorAction eaction = (EditorAction)action;
       EditorActionHandler handler = eaction.getHandler();
-      if (handler instanceof AbstractEditorActionHandler) {
-        ((AbstractEditorActionHandler)handler).process(this);
+      if (handler instanceof EditorActionHandlerBase) {
+        ((EditorActionHandlerBase)handler).process(this);
       }
     }
   }

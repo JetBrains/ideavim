@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  */
-public abstract class AbstractEditorActionHandler extends EditorActionHandler {
+public abstract class EditorActionHandlerBase extends EditorActionHandler {
   public final void execute(@NotNull Editor editor, @NotNull DataContext context) {
     editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     logger.debug("execute");
@@ -53,5 +53,5 @@ public abstract class AbstractEditorActionHandler extends EditorActionHandler {
 
   protected abstract boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd);
 
-  private static Logger logger = Logger.getInstance(AbstractEditorActionHandler.class.getName());
+  private static Logger logger = Logger.getInstance(EditorActionHandlerBase.class.getName());
 }

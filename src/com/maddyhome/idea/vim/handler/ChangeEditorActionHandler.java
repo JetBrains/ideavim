@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  */
-public abstract class ChangeEditorActionHandler extends AbstractEditorActionHandler {
+public abstract class ChangeEditorActionHandler extends EditorActionHandlerBase {
   protected final boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
     boolean worked = execute(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
     if (worked) {

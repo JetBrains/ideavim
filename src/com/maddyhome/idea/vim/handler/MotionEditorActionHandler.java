@@ -25,13 +25,12 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 
 /**
  */
-public abstract class MotionEditorActionHandler extends AbstractEditorActionHandler {
+public abstract class MotionEditorActionHandler extends EditorActionHandlerBase {
   protected final boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
     preMove(editor, context, cmd);
 

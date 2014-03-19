@@ -26,13 +26,12 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  */
-public abstract class TextObjectActionHandler extends AbstractEditorActionHandler {
+public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
   protected final boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
       TextRange range = getRange(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());

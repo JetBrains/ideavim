@@ -22,7 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.UndoRedoHelper;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +33,7 @@ public class RedoAction extends EditorAction {
     super(new Handler());
   }
 
-  private static class Handler extends AbstractEditorActionHandler {
+  private static class Handler extends EditorActionHandlerBase {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       return UndoRedoHelper.redo(context);
     }

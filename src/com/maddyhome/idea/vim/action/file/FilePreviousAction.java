@@ -23,7 +23,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.group.CommandGroups;
-import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -33,7 +33,7 @@ public class FilePreviousAction extends EditorAction {
     super(new FilePreviousHandler());
   }
 
-  private static class FilePreviousHandler extends AbstractEditorActionHandler {
+  private static class FilePreviousHandler extends EditorActionHandlerBase {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       CommandGroups.getInstance().getFile().selectPreviousTab(context);
 

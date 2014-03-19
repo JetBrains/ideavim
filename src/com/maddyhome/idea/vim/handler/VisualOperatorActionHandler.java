@@ -36,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  *
  */
-public abstract class VisualOperatorActionHandler extends AbstractEditorActionHandler {
+public abstract class VisualOperatorActionHandler extends EditorActionHandlerBase {
   protected final boolean execute(@NotNull final Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
     if (logger.isDebugEnabled()) logger.debug("execute, cmd=" + cmd);
 

@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.handler.AbstractEditorActionHandler;
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -36,7 +36,7 @@ public class FilterMotionAction extends EditorAction {
     super(new Handler());
   }
 
-  private static class Handler extends AbstractEditorActionHandler {
+  private static class Handler extends EditorActionHandlerBase {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       TextRange range = MotionGroup.getMotionRange(editor, context, cmd.getCount(), cmd.getRawCount(),
                                                    cmd.getArgument(), false, false);
