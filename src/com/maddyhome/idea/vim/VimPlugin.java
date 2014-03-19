@@ -124,14 +124,17 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
    * @return The plugin name
    */
   @NotNull
+  @Override
   public String getComponentName() {
     return IDEAVIM_COMPONENT_NAME;
   }
 
+  @Deprecated
   public String getPreviousKeyMap() {
     return previousKeyMap;
   }
 
+  @Deprecated
   public void setPreviousKeyMap(final String keymap) {
     previousKeyMap = keymap;
   }
@@ -139,6 +142,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   /**
    * Initialize the Vim Plugin. This plugs the vim key handler into the editor action manager.
    */
+  @Override
   public void initComponent() {
     LOG.debug("initComponent");
 
@@ -244,6 +248,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     DocumentManager.getInstance().init();
 
     EditorFactory.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
+      @Override
       public void editorCreated(@NotNull EditorFactoryEvent event) {
         final Editor editor = event.getEditor();
         isBlockCursor = editor.getSettings().isBlockCursor();
@@ -264,6 +269,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         }
       }
 
+      @Override
       public void editorReleased(@NotNull EditorFactoryEvent event) {
         EditorData.uninitializeEditor(event.getEditor());
         event.getEditor().getSettings().setAnimatedScrolling(isAnimatedScrolling);
@@ -275,12 +281,14 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     // Since the Vim plugin custom actions aren't available to the call to <code>initComponent()</code>
     // we need to force the generation of the key map when the first project is opened.
     ProjectManager.getInstance().addProjectManagerListener(new ProjectManagerAdapter() {
+      @Override
       public void projectOpened(@NotNull final Project project) {
         project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new MotionGroup.MotionEditorChange());
         project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileGroup.SelectionCheck());
         project.getMessageBus().connect().subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new SearchGroup.EditorSelectionCheck());
       }
 
+      @Override
       public void projectClosed(final Project project) {
       }
     });
@@ -291,6 +299,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   /**
    * This shuts down the Vim plugin. All we need to do is reinstall the original key handler
    */
+  @Override
   public void disposeComponent() {
     LOG.debug("disposeComponent");
     turnOffPlugin();
