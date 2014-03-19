@@ -37,14 +37,10 @@ import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.command.SelectionType;
+import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.option.BoundListOption;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
@@ -378,7 +374,7 @@ public class ChangeGroup {
       if (mode == CommandState.Mode.REPLACE) {
         processInsert(editor, context);
       }
-      state.pushState(mode, CommandState.SubMode.NONE, KeyParser.MAPPING_INSERT);
+      state.pushState(mode, CommandState.SubMode.NONE, Mapping.INSERT);
 
       resetCursor(editor, true);
     }
@@ -588,7 +584,7 @@ public class ChangeGroup {
    */
   public void processSingleCommand(@NotNull Editor editor) {
     CommandState.getInstance(editor).pushState(CommandState.Mode.COMMAND, CommandState.SubMode.SINGLE_COMMAND,
-                                               KeyParser.MAPPING_NORMAL);
+                                               Mapping.NORMAL);
     clearStrokes(editor);
   }
 

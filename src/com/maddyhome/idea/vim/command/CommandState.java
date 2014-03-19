@@ -116,7 +116,7 @@ public class CommandState {
     return flags;
   }
 
-  public void pushState(@NotNull Mode mode, @NotNull SubMode submode, int mapping) {
+  public void pushState(@NotNull Mode mode, @NotNull SubMode submode, @NotNull Mapping mapping) {
     logger.debug("pushState");
     modes.push(new State(mode, submode, mapping));
     updateStatus();
@@ -259,10 +259,8 @@ public class CommandState {
    *
    * @return The current key mapping mode
    */
-  public int getMappingMode() {
-    if (logger.isDebugEnabled()) {
-      logger.debug("getMappingMode=" + currentState().getMapping());
-    }
+  @NotNull
+  public Mapping getMappingMode() {
     return currentState().getMapping();
   }
 
@@ -339,11 +337,11 @@ public class CommandState {
    * Signleton, no public object creation
    */
   private CommandState() {
-    modes.push(new State(Mode.COMMAND, SubMode.NONE, KeyParser.MAPPING_NORMAL));
+    modes.push(new State(Mode.COMMAND, SubMode.NONE, Mapping.NORMAL));
   }
 
   private class State {
-    public State(@NotNull Mode mode, @NotNull SubMode submode, int mapping) {
+    public State(@NotNull Mode mode, @NotNull SubMode submode, @NotNull Mapping mapping) {
       this.mode = mode;
       this.submode = submode;
       this.mapping = mapping;
@@ -363,7 +361,8 @@ public class CommandState {
       this.submode = submode;
     }
 
-    public int getMapping() {
+    @NotNull
+    public Mapping getMapping() {
       return mapping;
     }
 
@@ -383,11 +382,11 @@ public class CommandState {
 
     @NotNull private Mode mode;
     @NotNull private SubMode submode;
-    private int mapping;
+    @NotNull private Mapping mapping;
   }
 
   @NotNull private Stack<State> modes = new Stack<State>();
-  @NotNull private State defaultState = new State(Mode.COMMAND, SubMode.NONE, KeyParser.MAPPING_NORMAL);
+  @NotNull private State defaultState = new State(Mode.COMMAND, SubMode.NONE, Mapping.NORMAL);
   @Nullable private Command command;
   private int flags;
   private boolean isRecording = false;

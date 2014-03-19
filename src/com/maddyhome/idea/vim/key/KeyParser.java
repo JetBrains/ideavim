@@ -25,12 +25,14 @@ import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.Mapping;
 import com.maddyhome.idea.vim.handler.EditorKeyHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * The key parser creates a tree of key sequences with terminals representing complete keystroke sequences mapped to
@@ -52,34 +54,6 @@ import java.util.HashMap;
  * supplied with the plugin. All the custom Vim Plugin actions are listed in the plugin.xml file.
  */
 public class KeyParser {
-  /**
-   * Indicates this key mapping applies to Normal mode
-   */
-  public static final int MAPPING_NORMAL = 1;
-  /**
-   * Indicates this key mapping applies to Visual mode
-   */
-  public static final int MAPPING_VISUAL = 2;
-  /**
-   * Indicates this key mapping applies to Operator Pending mode
-   */
-  public static final int MAPPING_OP_PEND = 4;
-  /**
-   * Indicates this key mapping applies to Insert mode
-   */
-  public static final int MAPPING_INSERT = 8;
-  /**
-   * Indicates this key mapping applies to Command Line mode
-   */
-  public static final int MAPPING_CMD_LINE = 16;
-  private static final int MAPPING_CNT = 5;
-
-  /**
-   * Helper value for the typical key mapping that works in Normal, Visual, and Operator Pending modes
-   */
-  public static final int MAPPING_NVO = MAPPING_NORMAL | MAPPING_VISUAL | MAPPING_OP_PEND;
-  public static final int MAPPING_ALL = MAPPING_NVO | MAPPING_INSERT | MAPPING_CMD_LINE;
-
   /**
    * Returns the singleton instance of this key parser
    *
@@ -126,15 +100,15 @@ public class KeyParser {
   /**
    * Returns the root of the key mapping for the given mapping mode
    *
-   * @param mode The mapping mode
+   * @param mapping The mapping mode
    * @return The key mapping tree root
    */
-  public RootNode getKeyRoot(int mode) {
-    RootNode res = keyRoots.get(new Integer(mode));
+  public RootNode getKeyRoot(@NotNull Mapping mapping) {
+    RootNode res = keyRoots.get(mapping);
     // Create the root node if one doesn't exist yet for this mode
     if (res == null) {
       res = new RootNode();
-      keyRoots.put(mode, res);
+      keyRoots.put(mapping, res);
     }
 
     return res;
@@ -143,141 +117,135 @@ public class KeyParser {
   /**
    * Registers the action
    *
-   * @param mapping  The set of mappings the shortcut is applicable to
+   * @param mappings  The set of mappings the shortcut is applicable to
    * @param actName  The action the shortcut will execute
    * @param cmdType  The type of the command
    * @param shortcut The shortcut to map to the action
    */
-  public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, Shortcut shortcut) {
-    registerAction(mapping, actName, cmdType, new Shortcut[]{shortcut});
+  public void registerAction(@NotNull Set<Mapping> mappings, @NotNull String actName, @NotNull Command.Type cmdType, Shortcut shortcut) {
+    registerAction(mappings, actName, cmdType, new Shortcut[]{shortcut});
   }
 
   /**
    * Registers the action
    *
-   * @param mapping  The set of mappings the shortcut is applicable to
+   * @param mappings  The set of mappings the shortcut is applicable to
    * @param actName  The action the shortcut will execute
    * @param cmdType  The type of the command
    * @param cmdFlags Any special flags associated with this command
    * @param shortcut The shortcut to map to the action
    */
-  public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, Shortcut shortcut) {
-    registerAction(mapping, actName, cmdType, cmdFlags, new Shortcut[]{shortcut});
+  public void registerAction(@NotNull Set<Mapping> mappings, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, Shortcut shortcut) {
+    registerAction(mappings, actName, cmdType, cmdFlags, new Shortcut[]{shortcut});
   }
 
   /**
    * Registers the action
    *
-   * @param mapping  The set of mappings the shortcut is applicable to
+   * @param mappings  The set of mappings the shortcut is applicable to
    * @param actName  The action the shortcut will execute
    * @param cmdType  The type of the command
    * @param shortcut The shortcut to map to the action
    * @param argType  The type of argument required by the actions
    */
-  public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, Shortcut shortcut,
+  public void registerAction(@NotNull Set<Mapping> mappings, @NotNull String actName, @NotNull Command.Type cmdType, Shortcut shortcut,
                              @NotNull Argument.Type argType) {
-    registerAction(mapping, actName, cmdType, new Shortcut[]{shortcut}, argType);
+    registerAction(mappings, actName, cmdType, new Shortcut[]{shortcut}, argType);
   }
 
   /**
    * Registers the action
    *
-   * @param mapping  The set of mappings the shortcut is applicable to
+   * @param mappings  The set of mappings the shortcut is applicable to
    * @param actName  The action the shortcut will execute
    * @param cmdType  The type of the command
    * @param cmdFlags Any special flags associated with this command
    * @param shortcut The shortcut to map to the action
    * @param argType  The type of argument required by the actions
    */
-  public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, Shortcut shortcut,
+  public void registerAction(@NotNull Set<Mapping> mappings, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, Shortcut shortcut,
                              @NotNull Argument.Type argType) {
-    registerAction(mapping, actName, cmdType, cmdFlags, new Shortcut[]{shortcut}, argType);
+    registerAction(mappings, actName, cmdType, cmdFlags, new Shortcut[]{shortcut}, argType);
   }
 
   /**
    * Registers the action
    *
-   * @param mapping   The set of mappings the shortcuts are applicable to
+   * @param mappings   The set of mappings the shortcuts are applicable to
    * @param actName   The action the shortcuts will execute
    * @param cmdType   The type of the command
    * @param shortcuts The shortcuts to map to the action
    */
-  public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, @NotNull Shortcut[] shortcuts) {
-    registerAction(mapping, actName, cmdType, 0, shortcuts);
+  public void registerAction(@NotNull Set<Mapping> mappings, @NotNull String actName, @NotNull Command.Type cmdType, @NotNull Shortcut[] shortcuts) {
+    registerAction(mappings, actName, cmdType, 0, shortcuts);
   }
 
   /**
    * Registers the action
    *
-   * @param mapping   The set of mappings the shortcuts are applicable to
+   * @param mappings   The set of mappings the shortcuts are applicable to
    * @param actName   The action the shortcuts will execute
    * @param cmdType   The type of the command
    * @param shortcuts The shortcuts to map to the action
    * @param argType   The type of argument required by the actions
    */
-  public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, @NotNull Shortcut[] shortcuts,
+  public void registerAction(@NotNull Set<Mapping> mappings, @NotNull String actName, @NotNull Command.Type cmdType, @NotNull Shortcut[] shortcuts,
                              @NotNull Argument.Type argType) {
-    registerAction(mapping, actName, cmdType, 0, shortcuts, argType);
+    registerAction(mappings, actName, cmdType, 0, shortcuts, argType);
   }
 
   /**
    * Registers the action
    *
-   * @param mapping   The set of mappings the shortcuts are applicable to
+   * @param mappings   The set of mappings the shortcuts are applicable to
    * @param actName   The action the shortcuts will execute
    * @param cmdType   The type of the command
    * @param cmdFlags  Any special flags associated with this command
    * @param shortcuts The shortcuts to map to the action
    */
-  public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, @NotNull Shortcut[] shortcuts) {
-    registerAction(mapping, actName, cmdType, cmdFlags, shortcuts, Argument.Type.NONE);
+  public void registerAction(@NotNull Set<Mapping> mappings, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, @NotNull Shortcut[] shortcuts) {
+    registerAction(mappings, actName, cmdType, cmdFlags, shortcuts, Argument.Type.NONE);
   }
 
   /**
    * Registers the action
    *
-   * @param mapping   The set of mappings the shortcuts are applicable to
+   * @param mappings   The set of mappings the shortcuts are applicable to
    * @param actName   The action the shortcuts will execute
    * @param cmdType   The type of the command
    * @param cmdFlags  Any special flags associated with this command
    * @param shortcuts The shortcuts to map to the action
    * @param argType   The type of argument required by the actions
    */
-  public void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, @NotNull Shortcut[] shortcuts,
+  public void registerAction(@NotNull Set<Mapping> mappings, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, @NotNull Shortcut[] shortcuts,
                              @NotNull Argument.Type argType) {
     for (Shortcut shortcut : shortcuts) {
-      registerAction(mapping, actName, cmdType, cmdFlags, shortcut.getKeys(), argType);
+      registerAction(mappings, actName, cmdType, cmdFlags, shortcut.getKeys(), argType);
     }
   }
 
   /**
    * Registers the action
    *
-   * @param mapping  The set of mappings the keystrokes are applicable to
+   * @param mappings  The set of mappings the keystrokes are applicable to
    * @param actName  The action the keystrokes will execute
    * @param cmdType  The type of the command
    * @param cmdFlags Any special flags associated with this command
    * @param keys     The keystrokes to map to the action
    * @param argType  The type of argument required by the actions
    */
-  private void registerAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, @NotNull KeyStroke[] keys,
+  private void registerAction(@NotNull Set<Mapping> mappings, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, @NotNull KeyStroke[] keys,
                               @NotNull Argument.Type argType) {
-    // Look through all the possible mappings and see which ones apply to this action
-    int map = 1;
-    for (int m = 0; m < MAPPING_CNT; m++) {
-      if ((mapping & map) != 0) {
-        Node node = getKeyRoot(map);
-        final int len = keys.length;
-        // Add a child for each keystroke in the shortcut for this action
-        for (int i = 0; i < len; i++) {
-          if (node instanceof ParentNode) {
-            final ParentNode base = (ParentNode)node;
-            node = addNode(base, actName, cmdType, cmdFlags, keys[i], argType, i == len - 1);
-          }
+    for (Mapping mapping : mappings) {
+      Node node = getKeyRoot(mapping);
+      final int len = keys.length;
+      // Add a child for each keystroke in the shortcut for this action
+      for (int i = 0; i < len; i++) {
+        if (node instanceof ParentNode) {
+          final ParentNode base = (ParentNode)node;
+          node = addNode(base, actName, cmdType, cmdFlags, keys[i], argType, i == len - 1);
         }
       }
-
-      map <<= 1;
     }
   }
 
@@ -335,7 +303,7 @@ public class KeyParser {
     return "KeyParser=[roots=[" + keyRoots + "]";
   }
 
-  @NotNull private HashMap<Integer, RootNode> keyRoots = new HashMap<Integer, RootNode>();
+  @NotNull private HashMap<Mapping, RootNode> keyRoots = new HashMap<Mapping, RootNode>();
 
   private static KeyParser instance;
 

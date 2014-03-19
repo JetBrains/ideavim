@@ -40,7 +40,6 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
-import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.Options;
@@ -1404,7 +1403,7 @@ public class MotionGroup {
     }
 
     if (logger.isDebugEnabled()) logger.debug("vr=" + vr);
-    CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, vr.getType(), KeyParser.MAPPING_VISUAL);
+    CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, vr.getType(), Mapping.VISUAL);
 
     visualStart = vr.getStart();
     visualEnd = vr.getEnd();
@@ -1470,7 +1469,7 @@ public class MotionGroup {
       exitVisual(editor, true);
     }
     else {
-      CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, KeyParser.MAPPING_VISUAL);
+      CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, Mapping.VISUAL);
     }
 
     KeyHandler.getInstance().reset(editor);
@@ -1524,7 +1523,7 @@ public class MotionGroup {
       else {
         start = end = editor.getSelectionModel().getSelectionStart();
       }
-      CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, KeyParser.MAPPING_VISUAL);
+      CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, Mapping.VISUAL);
       visualStart = start;
       updateSelection(editor, end);
       MotionGroup.moveCaret(editor, visualEnd);
