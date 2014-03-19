@@ -196,7 +196,6 @@ public class Command {
    */
   public Command(int count, String actionId, AnAction action, @NotNull Type type, int flags, Argument arg) {
     this.count = count;
-    this.actionId = actionId;
     this.action = action;
     this.type = type;
     this.flags = flags;
@@ -267,14 +266,6 @@ public class Command {
     this.flags = flags;
   }
 
-  public String getActionId() {
-    return actionId;
-  }
-
-  public void setActionId(String actionId) {
-    this.actionId = actionId;
-  }
-
   /**
    * Gets the action to execute when the command is run
    *
@@ -324,7 +315,6 @@ public class Command {
     StringBuffer res = new StringBuffer();
     res.append("Command[");
     res.append("count=").append(count);
-    res.append(", actionId=").append(actionId);
     res.append(", action=").append(action);
     res.append(", type=").append(type);
     res.append(", flags=").append(flags);
@@ -336,7 +326,6 @@ public class Command {
   }
 
   private int count;
-  private String actionId;
   private AnAction action;
   @NotNull private Type type;
   private int flags;
