@@ -18,14 +18,23 @@
 
 package com.maddyhome.idea.vim.action;
 
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
-import com.maddyhome.idea.vim.handler.ResetModeHandler;
+import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
+import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
+import com.maddyhome.idea.vim.KeyHandler;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
  */
 public class ResetModeAction extends EditorAction {
   public ResetModeAction() {
-    super(new ResetModeHandler());
+    super(new EditorActionHandler() {
+      public void execute(@NotNull Editor editor, @NotNull DataContext context) {
+        KeyHandler.getInstance().fullReset(InjectedLanguageUtil.getTopLevelEditor(editor));
+      }
+    });
   }
 }
