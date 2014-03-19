@@ -99,9 +99,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   private final Application myApp;
 
-  /**
-   * Creates the Vim Plugin
-   */
   public VimPlugin(final Application app) {
     myApp = app;
     LOG.debug("VimPlugin ctr");
@@ -112,30 +109,12 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     return (VimPlugin)ApplicationManager.getApplication().getComponent(IDEAVIM_COMPONENT_NAME);
   }
 
-  /**
-   * Supplies the name of the plugin
-   *
-   * @return The plugin name
-   */
   @NotNull
   @Override
   public String getComponentName() {
     return IDEAVIM_COMPONENT_NAME;
   }
 
-  @Deprecated
-  public String getPreviousKeyMap() {
-    return previousKeyMap;
-  }
-
-  @Deprecated
-  public void setPreviousKeyMap(final String keymap) {
-    previousKeyMap = keymap;
-  }
-
-  /**
-   * Initialize the Vim Plugin. This plugs the vim key handler into the editor action manager.
-   */
   @Override
   public void initComponent() {
     LOG.debug("initComponent");
@@ -164,6 +143,139 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     CommandParser.getInstance().registerHandlers();
 
     LOG.debug("done");
+  }
+
+  @Override
+  public void disposeComponent() {
+    LOG.debug("disposeComponent");
+    turnOffPlugin();
+    EditorActionManager manager = EditorActionManager.getInstance();
+    TypedAction action = manager.getTypedAction();
+    action.setupHandler(vimHandler.getOriginalTypedHandler());
+    LOG.debug("done");
+  }
+
+  @Override
+  public Element getState() {
+    LOG.debug("Saving state");
+
+    final Element element = new Element("ideavim");
+    // Save whether the plugin is enabled or not
+    final Element state = new Element("state");
+    state.setAttribute("version", Integer.toString(STATE_VERSION));
+    state.setAttribute("enabled", Boolean.toString(enabled));
+    state.setAttribute("keymap", previousKeyMap);
+    element.addContent(state);
+
+    CommandGroups.getInstance().saveData(element);
+    return element;
+  }
+
+  @Override
+  public void loadState(@NotNull final Element element) {
+    LOG.debug("Loading state");
+
+    // Restore whether the plugin is enabled or not
+    Element state = element.getChild("state");
+    if (state != null) {
+      try {
+        previousStateVersion = Integer.valueOf(state.getAttributeValue("version"));
+      }
+      catch (NumberFormatException ignored) {
+      }
+      enabled = Boolean.valueOf(state.getAttributeValue("enabled"));
+      previousKeyMap = state.getAttributeValue("keymap");
+    }
+
+    CommandGroups.getInstance().readData(element);
+  }
+
+  public static boolean isEnabled() {
+    return getInstance().enabled;
+  }
+
+  public static void setEnabled(final boolean enabled) {
+    if (!enabled) {
+      getInstance().turnOffPlugin();
+    }
+
+    getInstance().enabled = enabled;
+
+    if (enabled) {
+      getInstance().turnOnPlugin();
+    }
+
+    VimKeyMapUtil.switchKeymapBindings(enabled);
+  }
+
+  public boolean isError() {
+    return error;
+  }
+
+  /**
+   * Indicate to the user that an error has occurred. Just beep.
+   */
+  public static void indicateError() {
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      getInstance().error = true;
+    }
+    else if (!Options.getInstance().isSet("visualbell")) {
+      Toolkit.getDefaultToolkit().beep();
+    }
+  }
+
+  public static void clearError() {
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      getInstance().error = false;
+    }
+  }
+
+  public static void showMode(String msg) {
+    showMessage(msg);
+  }
+
+  public static void showMessage(@Nullable String msg) {
+    ProjectManager pm = ProjectManager.getInstance();
+    Project[] projects = pm.getOpenProjects();
+    for (Project project : projects) {
+      StatusBar bar = WindowManager.getInstance().getStatusBar(project);
+      if (bar != null) {
+        if (msg == null || msg.length() == 0) {
+          bar.setInfo("");
+        }
+        else {
+          bar.setInfo("VIM - " + msg);
+        }
+      }
+    }
+  }
+
+  @Deprecated
+  public String getPreviousKeyMap() {
+    return previousKeyMap;
+  }
+
+  @Deprecated
+  public void setPreviousKeyMap(final String keymap) {
+    previousKeyMap = keymap;
+  }
+
+  private void turnOnPlugin() {
+    KeyHandler.getInstance().fullReset(null);
+    setCursors(BLOCK_CURSOR_VIM_VALUE);
+    setAnimatedScrolling(ANIMATED_SCROLLING_VIM_VALUE);
+    setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
+
+    CommandGroups.getInstance().getMotion().turnOn();
+  }
+
+  private void turnOffPlugin() {
+    KeyHandler.getInstance().fullReset(null);
+    setCursors(isBlockCursor);
+    setAnimatedScrolling(isAnimatedScrolling);
+    setRefrainFromScrolling(isRefrainFromScrolling);
+
+    CommandGroups.getInstance().getMotion().turnOff();
   }
 
   private void updateState() {
@@ -294,127 +406,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     CommandProcessor.getInstance().addCommandListener(DelegateCommandListener.getInstance());
   }
 
-  /**
-   * This shuts down the Vim plugin. All we need to do is reinstall the original key handler
-   */
-  @Override
-  public void disposeComponent() {
-    LOG.debug("disposeComponent");
-    turnOffPlugin();
-    EditorActionManager manager = EditorActionManager.getInstance();
-    TypedAction action = manager.getTypedAction();
-    action.setupHandler(vimHandler.getOriginalTypedHandler());
-    LOG.debug("done");
-  }
-
-  @Override
-  public void loadState(@NotNull final Element element) {
-    LOG.debug("Loading state");
-
-    // Restore whether the plugin is enabled or not
-    Element state = element.getChild("state");
-    if (state != null) {
-      try {
-        previousStateVersion = Integer.valueOf(state.getAttributeValue("version"));
-      }
-      catch (NumberFormatException ignored) {
-      }
-      enabled = Boolean.valueOf(state.getAttributeValue("enabled"));
-      previousKeyMap = state.getAttributeValue("keymap");
-    }
-
-    CommandGroups.getInstance().readData(element);
-  }
-
-  @Override
-  public Element getState() {
-    LOG.debug("Saving state");
-
-    final Element element = new Element("ideavim");
-    // Save whether the plugin is enabled or not
-    final Element state = new Element("state");
-    state.setAttribute("version", Integer.toString(STATE_VERSION));
-    state.setAttribute("enabled", Boolean.toString(enabled));
-    state.setAttribute("keymap", previousKeyMap);
-    element.addContent(state);
-
-    CommandGroups.getInstance().saveData(element);
-    return element;
-  }
-
-  /**
-   * Indicates whether the user has enabled or disabled the plugin
-   *
-   * @return true if the Vim plugin is enabled, false if not
-   */
-  public static boolean isEnabled() {
-    return getInstance().enabled;
-  }
-
-  public static void setEnabled(final boolean enabled) {
-    if (!enabled) {
-      getInstance().turnOffPlugin();
-    }
-
-    getInstance().enabled = enabled;
-
-    if (enabled) {
-      getInstance().turnOnPlugin();
-    }
-
-    VimKeyMapUtil.switchKeymapBindings(enabled);
-  }
-
-  /**
-   * Indicate to the user that an error has occurred. Just beep.
-   */
-  public static void indicateError() {
-    if (ApplicationManager.getApplication().isUnitTestMode()) {
-      getInstance().error = true;
-    }
-    else if (!Options.getInstance().isSet("visualbell")) {
-      Toolkit.getDefaultToolkit().beep();
-    }
-  }
-
-  public static void showMode(String msg) {
-    showMessage(msg);
-  }
-
-  public static void showMessage(@Nullable String msg) {
-    ProjectManager pm = ProjectManager.getInstance();
-    Project[] projects = pm.getOpenProjects();
-    for (Project project : projects) {
-      StatusBar bar = WindowManager.getInstance().getStatusBar(project);
-      if (bar != null) {
-        if (msg == null || msg.length() == 0) {
-          bar.setInfo("");
-        }
-        else {
-          bar.setInfo("VIM - " + msg);
-        }
-      }
-    }
-  }
-
-  public void turnOnPlugin() {
-    KeyHandler.getInstance().fullReset(null);
-    setCursors(BLOCK_CURSOR_VIM_VALUE);
-    setAnimatedScrolling(ANIMATED_SCROLLING_VIM_VALUE);
-    setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
-
-    CommandGroups.getInstance().getMotion().turnOn();
-  }
-
-  public void turnOffPlugin() {
-    KeyHandler.getInstance().fullReset(null);
-    setCursors(isBlockCursor);
-    setAnimatedScrolling(isAnimatedScrolling);
-    setRefrainFromScrolling(isRefrainFromScrolling);
-
-    CommandGroups.getInstance().getMotion().turnOff();
-  }
-
   private void setCursors(boolean isBlock) {
     Editor[] editors = EditorFactory.getInstance().getAllEditors();
     for (Editor editor : editors) {
@@ -435,16 +426,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     Editor[] editors = EditorFactory.getInstance().getAllEditors();
     for (Editor editor : editors) {
       editor.getSettings().setRefrainFromScrolling(isOn);
-    }
-  }
-
-  public boolean isError() {
-    return error;
-  }
-
-  public static void clearError() {
-    if (ApplicationManager.getApplication().isUnitTestMode()) {
-      getInstance().error = false;
     }
   }
 }
