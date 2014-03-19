@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
-import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
@@ -371,7 +370,7 @@ public class CopyGroup extends AbstractActionGroup {
       int startOff = editor.getDocument().getLineStartOffset(slp.line);
       int endOff = editor.getDocument().getLineEndOffset(elp.line);
       editor.getSelectionModel().setSelection(startOff, endOff);
-      KeyHandler.executeAction("OrigAutoIndentLines", context);
+      CommandGroups.getInstance().getChange().autoIndentLines(context);
     }
     /*
     boolean indented = false;

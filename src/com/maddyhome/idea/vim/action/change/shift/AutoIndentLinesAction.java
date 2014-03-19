@@ -36,7 +36,6 @@ public class AutoIndentLinesAction extends EditorAction {
   private static class Handler extends ChangeEditorActionHandler {
     public boolean execute(Editor editor, @NotNull DataContext context, int count, int rawCount, Argument argument) {
       CommandGroups.getInstance().getChange().autoIndentLines(context);
-
       return true;
     }
   }

@@ -274,14 +274,8 @@
     <action id="VimFilterMotion" class="com.maddyhome.idea.vim.action.change.change.FilterMotionAction" text="Filter Lines"/>
     <action id="VimFilterCountLines" class="com.maddyhome.idea.vim.action.change.change.FilterCountLinesAction" text="Filter Lines"/>
     <action id="VimFilterVisualLines" class="com.maddyhome.idea.vim.action.change.change.FilterVisualLinesAction" text="Filter Visual Lines"/>
-    <action id="VimAutoIndentVisual" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Auto Indent Selection"/>
-    <action id="VimReformatVisual" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Reformat Selection"/>
-    <action id="VimCommentByBlockComment" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Block Comment"/>
-    <action id="VimCommentByLineComment" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Line Comment"/>
-    <action id="VimSurroundWith" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Surround With"/>
-    <action id="VimSurroundWithLiveTemplate" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Surround With Live Template"/>
-    <action id="VimMoveStatementDown" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Move Statement Down"/>
-    <action id="VimMoveStatementUp" class="com.maddyhome.idea.vim.action.visual.VisualOperatorDelegateAction" text="Move Statement Up"/>
+    <action id="VimAutoIndentVisual" class="com.maddyhome.idea.vim.action.change.change.AutoIndentLinesVisualAction" text="Auto Indent Selection"/>
+    <action id="VimReformatVisual" class="com.maddyhome.idea.vim.action.change.change.ReformatCodeVisualAction" text="Reformat Selection"/>
 
     <!-- Shift -->
     <action id="VimAutoIndentLines" class="com.maddyhome.idea.vim.action.change.shift.AutoIndentLinesAction" text="Auto Indent Lines"/>

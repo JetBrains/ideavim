@@ -48,9 +48,6 @@ public class RegisterActions {
    * Update many of the built-in IDEA actions with our key handlers.
    */
   private static void updatePlatformActionHandlers(@NotNull KeyParser parser) {
-    parser.setupActionHandler("AutoIndentLines", "VimAutoIndentVisual");
-    parser.setupActionHandler("ReformatCode", "VimReformatVisual");
-
     // This group allows us to propagate the keystroke if action acts on something other than an editor
     parser.setupActionHandler("EditorBackSpace", "VimEditorBackSpace", KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0));
     parser.setupActionHandler("EditorDelete", "VimEditorDelete", KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
@@ -114,26 +111,6 @@ public class RegisterActions {
   }
 
   private static void registerVariousModesActions(@NotNull KeyParser parser) {
-    parser.registerIdeaAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_INSERT | KeyParser.MAPPING_VISUAL,
-                              "VimCommentByLineComment", Command.Type.CHANGE,
-                              Command.FLAG_MOT_LINEWISE | Command.FLAG_KEEP_VISUAL);
-    parser.registerIdeaAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimCommentByBlockComment",
-                              Command.Type.CHANGE, Command.FLAG_MOT_LINEWISE);
-    parser.registerIdeaAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimSurroundWith",
-                              Command.Type.CHANGE, Command.FLAG_DELEGATE |
-                                                   Command.FLAG_MOT_LINEWISE |
-                                                   Command.FLAG_FORCE_LINEWISE |
-                                                   Command.FLAG_FORCE_VISUAL);
-    parser.registerIdeaAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimSurroundWithLiveTemplate",
-                              Command.Type.CHANGE, Command.FLAG_DELEGATE |
-                                                   Command.FLAG_MOT_LINEWISE |
-                                                   Command.FLAG_FORCE_LINEWISE |
-                                                   Command.FLAG_FORCE_VISUAL);
-    parser.registerIdeaAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimMoveStatementDown",
-                              Command.Type.CHANGE, Command.FLAG_MOT_LINEWISE | Command.FLAG_FORCE_LINEWISE);
-    parser.registerIdeaAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimMoveStatementUp",
-                              Command.Type.CHANGE, Command.FLAG_MOT_LINEWISE | Command.FLAG_FORCE_LINEWISE);
-
     parser.registerAction(KeyParser.MAPPING_NORMAL | KeyParser.MAPPING_VISUAL, "VimVisualToggleCharacterMode",
                           Command.Type.OTHER_READONLY,
                           Command.FLAG_MOT_CHARACTERWISE,

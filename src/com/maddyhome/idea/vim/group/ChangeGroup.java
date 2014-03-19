@@ -1291,7 +1291,11 @@ public class ChangeGroup extends AbstractActionGroup {
   }
 
   public void autoIndentLines(@NotNull DataContext context) {
-    KeyHandler.executeAction("OrigAutoIndentLines", context);
+    KeyHandler.executeAction("AutoIndentLines", context);
+  }
+
+  public void reformatCode(@NotNull DataContext context) {
+    KeyHandler.executeAction("ReformatCode", context);
   }
 
   public void indentLines(@NotNull Editor editor, @NotNull DataContext context, int lines, int dir) {

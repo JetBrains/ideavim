@@ -20,15 +20,9 @@ package com.maddyhome.idea.vim.key;
 
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
-import com.intellij.openapi.keymap.Keymap;
-import com.intellij.openapi.keymap.KeymapManager;
-import com.maddyhome.idea.vim.action.DelegateAction;
-import com.maddyhome.idea.vim.action.PassThruDelegateAction;
-import com.maddyhome.idea.vim.action.PassThruDelegateEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.handler.key.EditorKeyHandler;
@@ -36,7 +30,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -100,35 +93,6 @@ public class KeyParser {
     return instance;
   }
 
-  public void setupActionHandler(@NotNull String ideaActName, @NotNull String vimActName) {
-    if (logger.isDebugEnabled()) logger.debug("vimActName=" + vimActName);
-
-    ActionManager manager = ActionManager.getInstance();
-    AnAction vimAction = manager.getAction(vimActName);
-    if (vimAction instanceof DelegateAction) {
-      manager.unregisterAction(vimActName);
-    }
-    setupActionHandler(ideaActName, vimAction);
-  }
-
-  public void setupActionHandler(@NotNull String ideaActName, @NotNull AnAction vimAction) {
-    if (logger.isDebugEnabled()) logger.debug("ideaActName=" + ideaActName);
-
-    ActionManager manager = ActionManager.getInstance();
-    AnAction ideaAction = manager.getAction(ideaActName);
-    if (ideaAction == null) return;  // ignore actions which aren't available in RubyMine
-    if (vimAction instanceof DelegateAction) {
-      DelegateAction delegateAction = (DelegateAction)vimAction;
-      delegateAction.setOrigAction(ideaAction);
-
-      manager.unregisterAction(ideaActName);
-
-      manager.registerAction(ideaActName, vimAction);
-    }
-
-    manager.registerAction("Orig" + ideaActName, ideaAction);
-  }
-
   public void setupActionHandler(@NotNull String ideaActName, String vimActName, @NotNull KeyStroke stroke) {
     setupActionHandler(ideaActName, vimActName, stroke, false);
   }
@@ -175,51 +139,6 @@ public class KeyParser {
     }
 
     return res;
-  }
-
-  public void registerIdeaAction(int mapping, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags) {
-    String ideaName = actName.substring(3);
-    ActionManager manager = ActionManager.getInstance();
-    if (manager.getAction(ideaName) == null) {
-      logger.info("No registered action " + ideaName);
-      return;
-    }
-
-    Keymap keymap = KeymapManager.getInstance().getActiveKeymap();
-    com.intellij.openapi.actionSystem.Shortcut[] cuts = keymap.getShortcuts(ideaName);
-    ArrayList<Shortcut> shortcuts = new ArrayList<Shortcut>();
-    for (com.intellij.openapi.actionSystem.Shortcut cut : cuts) {
-      if (cut instanceof KeyboardShortcut) {
-        KeyStroke keyStroke = ((KeyboardShortcut)cut).getFirstKeyStroke();
-        Shortcut shortcut = new Shortcut(keyStroke);
-        shortcuts.add(shortcut);
-      }
-    }
-
-    registerAction(mapping, actName, cmdType, cmdFlags, shortcuts.toArray(new Shortcut[shortcuts.size()]));
-    KeyStroke firstStroke = null;
-    for (int i = 0; i < shortcuts.size(); i++) {
-      Shortcut cut = shortcuts.get(i);
-      //removePossibleConflict(cut.getKeys()[0]);
-      if (i == 0) {
-        firstStroke = cut.getKeys()[0];
-      }
-    }
-
-    AnAction ideaAction = manager.getAction(ideaName);
-    AnAction vimAction = manager.getAction(actName);
-    if (vimAction instanceof DelegateAction) {
-      DelegateAction delegateAction = (DelegateAction)vimAction;
-      delegateAction.setOrigAction(ideaAction);
-    }
-
-    if (ideaAction instanceof EditorAction) {
-      EditorAction ea = (EditorAction)ideaAction;
-      setupActionHandler(ideaName, new PassThruDelegateEditorAction(firstStroke, ea.getHandler()));
-    }
-    else {
-      setupActionHandler(ideaName, new PassThruDelegateAction(firstStroke));
-    }
   }
 
   /**
