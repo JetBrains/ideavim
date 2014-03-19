@@ -21,11 +21,11 @@ package com.maddyhome.idea.vim.action.copy;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,7 +40,7 @@ public class YankVisualAction extends EditorAction {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
                               @NotNull TextRange range) {
       final CommandState.SubMode subMode = CommandState.getInstance(editor).getSubMode();
-      return CommandGroups.getInstance().getCopy().yankRange(editor, range,
+      return VimPlugin.getCopy().yankRange(editor, range,
                                                              SelectionType.fromSubMode(subMode), true);
     }
   }

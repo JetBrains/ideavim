@@ -21,8 +21,8 @@ package com.maddyhome.idea.vim.action.change.insert;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,7 +39,7 @@ public class InsertCharacterBelowCursorAction extends EditorAction {
         return false;
       }
 
-      return CommandGroups.getInstance().getChange().insertCharacterAroundCursor(editor, context, 1);
+      return VimPlugin.getChange().insertCharacterAroundCursor(editor, context, 1);
     }
   }
 }

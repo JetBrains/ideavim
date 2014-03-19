@@ -144,11 +144,11 @@ public class ProcessGroup {
         flags = CommandParser.getInstance().processCommand(editor, context, text, 1);
         if (logger.isDebugEnabled()) logger.debug("flags=" + flags);
         if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-          CommandGroups.getInstance().getMotion().exitVisual(editor, true);
+          VimPlugin.getMotion().exitVisual(editor, true);
         }
       }
       else {
-        int pos = CommandGroups.getInstance().getSearch().search(editor, text, panel.getCount(),
+        int pos = VimPlugin.getSearch().search(editor, text, panel.getCount(),
                                                                  panel.getLabel().equals("/")
                                                                  ? Command.FLAG_SEARCH_FWD
                                                                  : Command.FLAG_SEARCH_REV, true);
@@ -219,7 +219,7 @@ public class ProcessGroup {
 
   private void record(Editor editor, @NotNull String text) {
     if (CommandState.getInstance(editor).isRecording()) {
-      CommandGroups.getInstance().getRegister().recordText(text);
+      VimPlugin.getRegister().recordText(text);
     }
   }
 

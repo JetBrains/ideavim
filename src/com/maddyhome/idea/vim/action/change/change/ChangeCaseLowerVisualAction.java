@@ -22,9 +22,9 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +39,7 @@ public class ChangeCaseLowerVisualAction extends EditorAction {
   private static class Handler extends VisualOperatorActionHandler {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
                               @NotNull TextRange range) {
-      return CommandGroups.getInstance().getChange().changeCaseRange(InjectedLanguageUtil.getTopLevelEditor(editor),
+      return VimPlugin.getChange().changeCaseRange(InjectedLanguageUtil.getTopLevelEditor(editor),
                                                                      range, CharacterHelper.CASE_LOWER);
     }
   }

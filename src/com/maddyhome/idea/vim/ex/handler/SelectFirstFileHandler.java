@@ -20,10 +20,10 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -38,9 +38,9 @@ public class SelectFirstFileHandler extends CommandHandler {
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, ExCommand cmd) {
-    boolean res = CommandGroups.getInstance().getFile().selectFile(0, context);
+    boolean res = VimPlugin.getFile().selectFile(0, context);
     if (res) {
-      CommandGroups.getInstance().getMark().saveJumpLocation(editor);
+      VimPlugin.getMark().saveJumpLocation(editor);
     }
 
     return res;

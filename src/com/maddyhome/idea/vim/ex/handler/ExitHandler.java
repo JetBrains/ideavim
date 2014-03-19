@@ -20,11 +20,11 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -41,7 +41,7 @@ public class ExitHandler extends CommandHandler {
   }
 
   public boolean execute(Editor editor, @NotNull DataContext context, ExCommand cmd) throws ExException {
-    CommandGroups.getInstance().getFile().closeAllFiles(context);
+    VimPlugin.getFile().closeAllFiles(context);
 
     return true;
   }

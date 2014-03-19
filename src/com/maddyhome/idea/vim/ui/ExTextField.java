@@ -24,7 +24,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorFontType;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.HistoryGroup;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -80,7 +79,7 @@ public class ExTextField extends JTextField {
     }
 
     if (hkey != null) {
-      history = CommandGroups.getInstance().getHistory().getEntries(hkey, 0, 0);
+      history = VimPlugin.getHistory().getEntries(hkey, 0, 0);
       histIndex = history.size();
     }
   }
@@ -178,44 +177,6 @@ public class ExTextField extends JTextField {
   protected void processKeyEvent(KeyEvent e) {
     if (logger.isDebugEnabled()) logger.debug("key=" + e);
     super.processKeyEvent(e);
-    /*
-    boolean keep = false;
-    switch (e.getID())
-    {
-        case KeyEvent.KEY_TYPED:
-            keep = true;
-            break;
-        case KeyEvent.KEY_PRESSED:
-            logger.debug("pressed");
-            if (e.getKeyChar() == KeyEvent.CHAR_UNDEFINED)
-            {
-                logger.debug("keeping");
-                keep = true;
-            }
-            break;
-        case KeyEvent.KEY_RELEASED:
-            logger.debug("released");
-            if (e.getKeyChar() != KeyEvent.CHAR_UNDEFINED)
-            {
-                if (e.getModifiers() != 0)
-                {
-                    logger.debug("keeping");
-                    keep = true;
-                }
-            }
-            break;
-    }
-    if (keep)
-    {
-        KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStrokeForEvent(e), context);
-        e.consume();
-    }
-    else
-    {
-        super.processKeyEvent(e);
-    }
-    */
-
   }
 
   /**
@@ -235,7 +196,7 @@ public class ExTextField extends JTextField {
       currentAction = null;
     }
     else {
-      CommandGroups.getInstance().getProcess().cancelExEntry(editor, context);
+      VimPlugin.getProcess().cancelExEntry(editor, context);
     }
   }
 

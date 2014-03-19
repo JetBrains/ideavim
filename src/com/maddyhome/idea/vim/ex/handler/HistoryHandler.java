@@ -21,10 +21,10 @@ package com.maddyhome.idea.vim.ex.handler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.HistoryGroup;
 import com.maddyhome.idea.vim.ui.MorePanel;
 import org.jetbrains.annotations.NotNull;
@@ -165,7 +165,7 @@ public class HistoryHandler extends CommandHandler {
     res.append("      #  ").append(key).append(" ").append("history\n");
 
     String spaces = "       ";
-    List<HistoryGroup.HistoryEntry> entries = CommandGroups.getInstance().getHistory().getEntries(key, start, end);
+    List<HistoryGroup.HistoryEntry> entries = VimPlugin.getHistory().getEntries(key, start, end);
     for (HistoryGroup.HistoryEntry entry : entries) {
       String num = Integer.toString(entry.getNumber());
       res.append(spaces.substring(num.length())).append(num).append("  ").append(entry.getEntry()).append("\n");

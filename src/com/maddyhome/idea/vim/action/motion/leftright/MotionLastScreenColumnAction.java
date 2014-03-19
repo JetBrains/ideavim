@@ -20,11 +20,11 @@ package com.maddyhome.idea.vim.action.motion.leftright;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorData;
@@ -52,7 +52,7 @@ public class MotionLastScreenColumnAction extends MotionEditorAction {
         }
       }
 
-      return CommandGroups.getInstance().getMotion().moveCaretToLineScreenEnd(editor, allow);
+      return VimPlugin.getMotion().moveCaretToLineScreenEnd(editor, allow);
     }
 
     protected void postMove(@NotNull Editor editor, DataContext context, Command cmd) {

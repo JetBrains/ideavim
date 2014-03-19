@@ -20,9 +20,9 @@ package com.maddyhome.idea.vim.action.motion.leftright;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
@@ -36,8 +36,8 @@ public class MotionLeftMatchCharAction extends MotionEditorAction {
 
   private static class Handler extends MotionEditorActionHandler {
     public int getOffset(@NotNull Editor editor, DataContext context, int count, int rawCount, @NotNull Argument argument) {
-      int res = CommandGroups.getInstance().getMotion().moveCaretToNextCharacterOnLine(editor, -count, argument.getCharacter());
-      CommandGroups.getInstance().getMotion().setLastFTCmd(MotionGroup.LAST_F, argument.getCharacter());
+      int res = VimPlugin.getMotion().moveCaretToNextCharacterOnLine(editor, -count, argument.getCharacter());
+      VimPlugin.getMotion().setLastFTCmd(MotionGroup.LAST_F, argument.getCharacter());
       return res;
     }
   }

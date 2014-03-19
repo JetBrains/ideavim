@@ -31,7 +31,6 @@ import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.helper.DelegateCommandListener;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
@@ -158,18 +157,18 @@ public class KeyHandler {
       }
       else {
         if (lastWasBS && lastChar != 0 && Options.getInstance().isSet("digraph")) {
-          char dig = CommandGroups.getInstance().getDigraph().getDigraph(lastChar, key.getKeyChar());
+          char dig = VimPlugin.getDigraph().getDigraph(lastChar, key.getKeyChar());
           key = KeyStroke.getKeyStroke(dig);
         }
 
         // If we are in insert/replace mode send this key in for processing
         if (editorState.getMode() == CommandState.Mode.INSERT || editorState.getMode() == CommandState.Mode.REPLACE) {
-          if (!CommandGroups.getInstance().getChange().processKey(editor, context, key)) {
+          if (!VimPlugin.getChange().processKey(editor, context, key)) {
             shouldRecord = false;
           }
         }
         else if (editorState.getMappingMode() == KeyParser.MAPPING_CMD_LINE) {
-          if (!CommandGroups.getInstance().getProcess().processExKey(editor, key, true)) {
+          if (!VimPlugin.getProcess().processExKey(editor, key, true)) {
             shouldRecord = false;
           }
         }
@@ -202,13 +201,13 @@ public class KeyHandler {
       fullReset(editor);
     }
     else if (isRecording && shouldRecord) {
-      CommandGroups.getInstance().getRegister().recordKeyStroke(key);
+      VimPlugin.getRegister().recordKeyStroke(key);
     }
   }
 
   private void handleEditorReset(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull final DataContext context) {
     if (state != State.COMMAND && count == 0 && currentArg == Argument.Type.NONE && currentCmd.size() == 0 &&
-        CommandGroups.getInstance().getRegister().getCurrentRegister() == RegisterGroup.REGISTER_DEFAULT) {
+        VimPlugin.getRegister().getCurrentRegister() == RegisterGroup.REGISTER_DEFAULT) {
       if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
         CommandProcessor.getInstance().executeCommand(editor.getProject(), new Runnable() {
           @Override
@@ -329,7 +328,6 @@ public class KeyHandler {
 
     // If we were in "operator pending" mode, reset back to normal mode.
     if (editorState.getMappingMode() == KeyParser.MAPPING_OP_PEND) {
-      //CommandState.getInstance().setMappingMode(KeyParser.MAPPING_NORMAL);
       editorState.popState();
     }
 
@@ -378,7 +376,6 @@ public class KeyHandler {
         // Is the current command an operator? If so set the state to only accept "operator pending"
         // commands
         if ((node.getFlags() & Command.FLAG_OP_PEND) != 0) {
-          //CommandState.getInstance().setMappingMode(KeyParser.MAPPING_OP_PEND);
           editorState.pushState(editorState.getMode(), editorState.getSubMode(), KeyParser.MAPPING_OP_PEND);
         }
         break;
@@ -424,7 +421,7 @@ public class KeyHandler {
       }
     }
     else if (currentArg == Argument.Type.EX_STRING && (node.getFlags() & Command.FLAG_COMPLETE_EX) != 0) {
-      String text = CommandGroups.getInstance().getProcess().endSearchCommand(editor, context);
+      String text = VimPlugin.getProcess().endSearchCommand(editor, context);
       Argument arg = new Argument(text);
       Command cmd = currentCmd.peek();
       cmd.setArgument(arg);
@@ -465,7 +462,7 @@ public class KeyHandler {
       }
 
       if (arg.getArgType() == Argument.Type.EX_STRING) {
-        CommandGroups.getInstance().getProcess().startSearchCommand(editor, context, count, key);
+        VimPlugin.getProcess().startSearchCommand(editor, context, count, key);
         state = State.NEW_COMMAND;
         currentArg = Argument.Type.EX_STRING;
         editorState.pushState(CommandState.Mode.EX_ENTRY, CommandState.SubMode.NONE, KeyParser.MAPPING_CMD_LINE);
@@ -543,7 +540,7 @@ public class KeyHandler {
     reset(editor);
     lastChar = 0;
     lastWasBS = false;
-    CommandGroups.getInstance().getRegister().resetRegister();
+    VimPlugin.getRegister().resetRegister();
     DelegateCommandListener.getInstance().setRunnable(null);
   }
 
@@ -564,7 +561,7 @@ public class KeyHandler {
 
       executeAction(cmd.getAction(), context);
       if (editorState.getMode() == CommandState.Mode.INSERT || editorState.getMode() == CommandState.Mode.REPLACE) {
-        CommandGroups.getInstance().getChange().processCommand(editor, cmd);
+        VimPlugin.getChange().processCommand(editor, cmd);
       }
 
       // Now that the command has been executed let's clean up a few things.
@@ -572,7 +569,7 @@ public class KeyHandler {
       // By default the "empty" register is used by all commands so we want to reset whatever the last register
       // selected by the user was to the empty register - unless we just executed the "select register" command.
       if (cmd.getType() != Command.Type.SELECT_REGISTER) {
-        CommandGroups.getInstance().getRegister().resetRegister();
+        VimPlugin.getRegister().resetRegister();
       }
 
       // If, at this point, we are not in insert, replace, or visual modes, we need to restore the previous
@@ -587,7 +584,7 @@ public class KeyHandler {
       KeyHandler.getInstance().reset(editor);
 
       if (wasRecording && editorState.isRecording()) {
-        CommandGroups.getInstance().getRegister().recordKeyStroke(key);
+        VimPlugin.getRegister().recordKeyStroke(key);
       }
     }
 

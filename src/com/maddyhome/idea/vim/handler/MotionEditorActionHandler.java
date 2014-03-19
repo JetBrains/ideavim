@@ -20,10 +20,10 @@ package com.maddyhome.idea.vim.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +40,7 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
     }
     else if (offset >= 0) {
       if ((cmd.getFlags() & Command.FLAG_SAVE_JUMP) != 0) {
-        CommandGroups.getInstance().getMark().saveJumpLocation(editor);
+        VimPlugin.getMark().saveJumpLocation(editor);
       }
       if (!CommandState.inInsertMode(editor) && !CommandState.inRepeatMode(editor) &&
           !CommandState.inVisualCharacterMode(editor)) {

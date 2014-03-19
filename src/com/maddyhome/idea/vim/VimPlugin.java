@@ -99,14 +99,34 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   private final Application myApp;
 
+  private MotionGroup motion;
+  private ChangeGroup change;
+  private CopyGroup copy;
+  private MarkGroup mark;
+  private RegisterGroup register;
+  private FileGroup file;
+  private SearchGroup search;
+  private ProcessGroup process;
+  private MacroGroup macro;
+  private DigraphGroup digraph;
+  private HistoryGroup history;
+
   public VimPlugin(final Application app) {
     myApp = app;
-    LOG.debug("VimPlugin ctr");
-  }
 
-  @NotNull
-  public static VimPlugin getInstance() {
-    return (VimPlugin)ApplicationManager.getApplication().getComponent(IDEAVIM_COMPONENT_NAME);
+    motion = new MotionGroup();
+    change = new ChangeGroup();
+    copy = new CopyGroup();
+    mark = new MarkGroup();
+    register = new RegisterGroup();
+    file = new FileGroup();
+    search = new SearchGroup();
+    process = new ProcessGroup();
+    macro = new MacroGroup();
+    digraph = new DigraphGroup();
+    history = new HistoryGroup();
+
+    LOG.debug("VimPlugin ctr");
   }
 
   @NotNull
@@ -167,7 +187,11 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     state.setAttribute("keymap", previousKeyMap);
     element.addContent(state);
 
-    CommandGroups.getInstance().saveData(element);
+    mark.saveData(element);
+    register.saveData(element);
+    search.saveData(element);
+    history.saveData(element);
+
     return element;
   }
 
@@ -187,7 +211,54 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
       previousKeyMap = state.getAttributeValue("keymap");
     }
 
-    CommandGroups.getInstance().readData(element);
+    mark.readData(element);
+    register.readData(element);
+    search.readData(element);
+    history.readData(element);
+  }
+
+  public static MotionGroup getMotion() {
+    return getInstance().motion;
+  }
+
+  public static ChangeGroup getChange() {
+    return getInstance().change;
+  }
+
+  public static CopyGroup getCopy() {
+    return getInstance().copy;
+  }
+
+  public static MarkGroup getMark() {
+    return getInstance().mark;
+  }
+
+  public static RegisterGroup getRegister() {
+    return getInstance().register;
+  }
+
+  public static FileGroup getFile() {
+    return getInstance().file;
+  }
+
+  public static SearchGroup getSearch() {
+    return getInstance().search;
+  }
+
+  public static ProcessGroup getProcess() {
+    return getInstance().process;
+  }
+
+  public static MacroGroup getMacro() {
+    return getInstance().macro;
+  }
+
+  public static DigraphGroup getDigraph() {
+    return getInstance().digraph;
+  }
+
+  public static HistoryGroup getHistory() {
+    return getInstance().history;
   }
 
   public static boolean isEnabled() {
@@ -208,8 +279,8 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     VimKeyMapUtil.switchKeymapBindings(enabled);
   }
 
-  public boolean isError() {
-    return error;
+  public static boolean isError() {
+    return getInstance().error;
   }
 
   /**
@@ -251,13 +322,18 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   }
 
   @Deprecated
-  public String getPreviousKeyMap() {
-    return previousKeyMap;
+  public static String getPreviousKeyMap() {
+    return getInstance().previousKeyMap;
   }
 
   @Deprecated
-  public void setPreviousKeyMap(final String keymap) {
-    previousKeyMap = keymap;
+  public static void setPreviousKeyMap(final String keymap) {
+    getInstance().previousKeyMap = keymap;
+  }
+
+  @NotNull
+  private static VimPlugin getInstance() {
+    return (VimPlugin)ApplicationManager.getApplication().getComponent(IDEAVIM_COMPONENT_NAME);
   }
 
   private void turnOnPlugin() {
@@ -266,7 +342,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     setAnimatedScrolling(ANIMATED_SCROLLING_VIM_VALUE);
     setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
 
-    CommandGroups.getInstance().getMotion().turnOn();
+    getMotion().turnOn();
   }
 
   private void turnOffPlugin() {
@@ -275,7 +351,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     setAnimatedScrolling(isAnimatedScrolling);
     setRefrainFromScrolling(isRefrainFromScrolling);
 
-    CommandGroups.getInstance().getMotion().turnOff();
+    getMotion().turnOff();
   }
 
   private void updateState() {

@@ -20,10 +20,10 @@ package com.maddyhome.idea.vim.action.motion.updown;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
 import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.Options;
@@ -49,7 +49,7 @@ public class MotionGotoLineLastEndAction extends MotionEditorAction {
         }
       }
 
-      return CommandGroups.getInstance().getMotion().moveCaretGotoLineLastEnd(editor, rawCount, count - 1, allow);
+      return VimPlugin.getMotion().moveCaretGotoLineLastEnd(editor, rawCount, count - 1, allow);
     }
   }
 }

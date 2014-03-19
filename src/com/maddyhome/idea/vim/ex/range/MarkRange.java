@@ -20,8 +20,8 @@ package com.maddyhome.idea.vim.ex.range;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Mark;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -50,7 +50,7 @@ public class MarkRange extends AbstractRange {
    * @return The zero based line number, -1 if there is no such mark set in the file
    */
   public int getRangeLine(@NotNull Editor editor, DataContext context, boolean lastZero) {
-    Mark mark = CommandGroups.getInstance().getMark().getFileMark(editor, this.mark);
+    Mark mark = VimPlugin.getMark().getFileMark(editor, this.mark);
 
     if (mark != null) {
       return mark.getLogicalLine();

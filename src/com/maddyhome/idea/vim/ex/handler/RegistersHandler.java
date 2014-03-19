@@ -20,12 +20,12 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.ui.MorePanel;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +44,7 @@ public class RegistersHandler extends CommandHandler {
   }
 
   public boolean execute(@NotNull final Editor editor, DataContext context, ExCommand cmd) throws ExException {
-    List<Register> registers = CommandGroups.getInstance().getRegister().getRegisters();
+    List<Register> registers = VimPlugin.getRegister().getRegisters();
 
     StringBuffer text = new StringBuffer();
     text.append("--- Registers ---\n");

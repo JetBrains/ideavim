@@ -20,10 +20,10 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -37,7 +37,7 @@ public class ShiftLeftHandler extends CommandHandler {
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
     TextRange range = cmd.getTextRange(editor, context, true);
 
-    CommandGroups.getInstance().getChange().indentRange(editor, context, range, cmd.getCommand().length(), -1);
+    VimPlugin.getChange().indentRange(editor, context, range, cmd.getCommand().length(), -1);
 
     return true;
   }

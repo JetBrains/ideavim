@@ -21,9 +21,9 @@ package com.maddyhome.idea.vim.action.change.shift;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,7 +36,7 @@ public class ShiftLeftVisualAction extends EditorAction {
 
   private static class Handler extends VisualOperatorActionHandler {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd, @NotNull TextRange range) {
-      CommandGroups.getInstance().getChange().indentRange(editor, context, range, cmd.getCount(), -1);
+      VimPlugin.getChange().indentRange(editor, context, range, cmd.getCount(), -1);
 
       return true;
     }

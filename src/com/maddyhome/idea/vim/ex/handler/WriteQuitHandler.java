@@ -20,10 +20,10 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -39,8 +39,8 @@ public class WriteQuitHandler extends CommandHandler {
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, ExCommand cmd) {
-    CommandGroups.getInstance().getFile().saveFile(editor, context);
-    CommandGroups.getInstance().getFile().closeFile(editor, context);
+    VimPlugin.getFile().saveFile(editor, context);
+    VimPlugin.getFile().closeFile(editor, context);
 
     return true;
   }

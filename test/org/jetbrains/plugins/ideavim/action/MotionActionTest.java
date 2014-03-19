@@ -2,7 +2,7 @@ package org.jetbrains.plugins.ideavim.action;
 
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.VisualPosition;
-import com.maddyhome.idea.vim.group.CommandGroups;
+import com.maddyhome.idea.vim.VimPlugin;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import javax.swing.*;
@@ -553,7 +553,7 @@ public class MotionActionTest extends VimTestCase {
 
   // VIM-262 |c_CTRL-R|
   public void testSearchFromRegister() {
-    CommandGroups.getInstance().getRegister().setKeys('a', stringToKeys("two"));
+    VimPlugin.getRegister().setKeys('a', stringToKeys("two"));
     final List<KeyStroke> keys = stringToKeys("/");
     keys.add(KeyStroke.getKeyStroke("control R"));
     keys.addAll(stringToKeys("a"));

@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.command;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.key.KeyParser;
@@ -293,7 +292,7 @@ public class CommandState {
    */
   public void saveLastChangeCommand(Command cmd) {
     lastChange = cmd;
-    lastRegister = CommandGroups.getInstance().getRegister().getCurrentRegister();
+    lastRegister = VimPlugin.getRegister().getCurrentRegister();
   }
 
   public boolean isRecording() {

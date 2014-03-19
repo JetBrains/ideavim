@@ -121,7 +121,6 @@ public class KeyParser {
    */
   private KeyParser() {
     logger.debug("KeyParser ctr");
-    //keymap = KeymapManager.getInstance().getActiveKeymap();
   }
 
   /**

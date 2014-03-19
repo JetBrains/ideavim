@@ -21,8 +21,8 @@ package com.maddyhome.idea.vim.action.change.insert;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,7 +39,7 @@ public class InsertNewLineAboveAction extends EditorAction {
         return false;
       }
 
-      CommandGroups.getInstance().getChange().insertNewLineAbove(editor, context);
+      VimPlugin.getChange().insertNewLineAbove(editor, context);
 
       return true;
     }

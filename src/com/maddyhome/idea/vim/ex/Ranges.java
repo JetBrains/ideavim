@@ -20,9 +20,9 @@ package com.maddyhome.idea.vim.ex;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.range.AbstractRange;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
@@ -208,8 +208,7 @@ public class Ranges {
       startLine = endLine;
       endLine = range.getLine(editor, context, lastZero);
       if (range.isMove()) {
-        MotionGroup.moveCaret(editor,
-                              CommandGroups.getInstance().getMotion().moveCaretToLine(editor, endLine));
+        MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLine(editor, endLine));
       }
       // Did that last range represent the start of the file?
       lastZero = (endLine < 0);

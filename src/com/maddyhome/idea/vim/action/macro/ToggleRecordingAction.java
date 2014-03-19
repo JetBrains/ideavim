@@ -21,9 +21,9 @@ package com.maddyhome.idea.vim.action.macro;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,10 +38,10 @@ public class ToggleRecordingAction extends EditorAction {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       if (!CommandState.getInstance(editor).isRecording()) {
         char reg = cmd.getArgument().getCharacter();
-        return CommandGroups.getInstance().getRegister().startRecording(editor, reg);
+        return VimPlugin.getRegister().startRecording(editor, reg);
       }
       else {
-        CommandGroups.getInstance().getRegister().finishRecording(editor);
+        VimPlugin.getRegister().finishRecording(editor);
 
         return true;
       }

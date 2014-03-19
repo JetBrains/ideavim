@@ -337,7 +337,7 @@ public class FileGroup {
     else {
       msg.append("Selected ");
 
-      TextRange vr = CommandGroups.getInstance().getMotion().getVisualRange(editor);
+      TextRange vr = VimPlugin.getMotion().getVisualRange(editor);
       vr.normalize();
 
       int lines;

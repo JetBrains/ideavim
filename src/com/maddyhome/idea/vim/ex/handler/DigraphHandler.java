@@ -21,10 +21,10 @@ package com.maddyhome.idea.vim.ex.handler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -41,7 +41,7 @@ public class DigraphHandler extends CommandHandler {
       logger.debug("arg=" + arg);
     }
 
-    return CommandGroups.getInstance().getDigraph().parseCommandLine(editor, cmd.getArgument(), true);
+    return VimPlugin.getDigraph().parseCommandLine(editor, cmd.getArgument(), true);
   }
 
   private static Logger logger = Logger.getInstance(DigraphHandler.class.getName());

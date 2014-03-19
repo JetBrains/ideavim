@@ -20,9 +20,9 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -36,8 +36,8 @@ public class NextFileHandler extends CommandHandler {
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
     int count = cmd.getCount(editor, context, 1, true);
 
-    CommandGroups.getInstance().getMark().saveJumpLocation(editor);
-    CommandGroups.getInstance().getFile().selectNextFile(count, context);
+    VimPlugin.getMark().saveJumpLocation(editor);
+    VimPlugin.getFile().selectNextFile(count, context);
 
     return true;
   }

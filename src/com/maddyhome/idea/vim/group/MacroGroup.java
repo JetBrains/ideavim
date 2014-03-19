@@ -24,6 +24,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Register;
 import org.jetbrains.annotations.NotNull;
 
@@ -53,7 +54,7 @@ public class MacroGroup {
     if (logger.isDebugEnabled()) {
       logger.debug("play bakc register " + reg + " " + count + " times");
     }
-    Register register = CommandGroups.getInstance().getRegister().getPlaybackRegister(reg);
+    Register register = VimPlugin.getRegister().getPlaybackRegister(reg);
     if (register == null) {
       return false;
     }

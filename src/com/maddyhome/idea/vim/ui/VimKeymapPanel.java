@@ -67,7 +67,7 @@ public class VimKeymapPanel {
     };
     myKeymapComboBox.setRenderer(renderer);
 
-    final String previousKeyMap = VimPlugin.getInstance().getPreviousKeyMap();
+    final String previousKeyMap = VimPlugin.getPreviousKeyMap();
     myKeymapComboBox.getModel().setSelectedItem(preselectedKeymap != null ? preselectedKeymap :
                                                 previousKeyMap.isEmpty() ? manager.getActiveKeymap() : manager.getKeymap(previousKeyMap));
   }

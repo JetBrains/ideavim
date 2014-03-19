@@ -20,8 +20,8 @@ package com.maddyhome.idea.vim.ui;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.maddyhome.idea.vim.KeyHandler;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Register;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import org.jetbrains.annotations.NotNull;
@@ -230,7 +230,7 @@ public class ExEditorKit extends DefaultEditorKit {
             target.setCurrentAction(null);
             final char c = key.getKeyChar();
             if (c != KeyEvent.CHAR_UNDEFINED) {
-              final Register register = CommandGroups.getInstance().getRegister().getRegister(c);
+              final Register register = VimPlugin.getRegister().getRegister(c);
               if (register != null) {
                 final String oldText = target.getText();
                 final String text = register.getText();
@@ -269,7 +269,7 @@ public class ExEditorKit extends DefaultEditorKit {
     }
 
     public void actionPerformed(ActionEvent e) {
-      CommandGroups.getInstance().getProcess().cancelExEntry(
+      VimPlugin.getProcess().cancelExEntry(
         ExEntryPanel.getInstance().getEntry().getEditor(),
         ExEntryPanel.getInstance().getEntry().getContext());
     }
@@ -323,7 +323,7 @@ public class ExEditorKit extends DefaultEditorKit {
           doc.remove(dot - delChars, delChars);
         }
         else {
-          CommandGroups.getInstance().getProcess().cancelExEntry(
+          VimPlugin.getProcess().cancelExEntry(
             ExEntryPanel.getInstance().getEntry().getEditor(),
             ExEntryPanel.getInstance().getEntry().getContext());
         }

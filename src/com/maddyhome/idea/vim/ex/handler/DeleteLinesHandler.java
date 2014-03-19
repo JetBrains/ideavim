@@ -20,12 +20,12 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,10 +46,10 @@ public class DeleteLinesHandler extends CommandHandler {
       cmd.setArgument(arg.toString());
     }
 
-    CommandGroups.getInstance().getRegister().selectRegister(register);
+    VimPlugin.getRegister().selectRegister(register);
 
     TextRange range = cmd.getTextRange(editor, context, true);
 
-    return CommandGroups.getInstance().getChange().deleteRange(editor, range, SelectionType.LINE_WISE, false);
+    return VimPlugin.getChange().deleteRange(editor, range, SelectionType.LINE_WISE, false);
   }
 }

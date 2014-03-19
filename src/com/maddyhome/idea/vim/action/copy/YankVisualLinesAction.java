@@ -21,11 +21,11 @@ package com.maddyhome.idea.vim.action.copy;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
@@ -42,14 +42,14 @@ public class YankVisualLinesAction extends EditorAction {
                               @NotNull TextRange range) {
       CommandState.SubMode mode = CommandState.getInstance(editor).getSubMode();
       if (mode == CommandState.SubMode.VISUAL_BLOCK) {
-        return CommandGroups.getInstance().getCopy().yankRange(editor, range, SelectionType.fromSubMode(mode),
+        return VimPlugin.getCopy().yankRange(editor, range, SelectionType.fromSubMode(mode),
                                                                true);
       }
       else {
         range = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
                               EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
 
-        return CommandGroups.getInstance().getCopy().yankRange(editor, range, SelectionType.LINE_WISE, true);
+        return VimPlugin.getCopy().yankRange(editor, range, SelectionType.LINE_WISE, true);
       }
     }
   }

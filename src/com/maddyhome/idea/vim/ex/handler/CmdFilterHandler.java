@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.Ranges;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
 import org.jetbrains.annotations.NotNull;
@@ -55,7 +54,7 @@ public class CmdFilterHandler extends CommandHandler {
       TextRange range = cmd.getTextRange(editor, context, false);
       String command = cmd.getArgument();
       if (command.indexOf('!') != -1) {
-        String last = CommandGroups.getInstance().getProcess().getLastCommand();
+        String last = VimPlugin.getProcess().getLastCommand();
         if (last == null || last.length() == 0) {
           VimPlugin.showMessage(MessageHelper.message(Msg.e_noprev));
           return false;
@@ -69,7 +68,7 @@ public class CmdFilterHandler extends CommandHandler {
       }
 
       try {
-        return CommandGroups.getInstance().getProcess().executeFilter(editor, range, command);
+        return VimPlugin.getProcess().executeFilter(editor, range, command);
       }
       catch (IOException e) {
         throw new ExException(e.getMessage());

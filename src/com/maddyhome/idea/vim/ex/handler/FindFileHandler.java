@@ -21,10 +21,10 @@ package com.maddyhome.idea.vim.ex.handler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -40,9 +40,9 @@ public class FindFileHandler extends CommandHandler {
   public boolean execute(@NotNull Editor editor, @NotNull final DataContext context, @NotNull ExCommand cmd) throws ExException {
     String arg = cmd.getArgument();
     if (arg != null && arg.length() > 0) {
-      boolean res = CommandGroups.getInstance().getFile().openFile(arg, context);
+      boolean res = VimPlugin.getFile().openFile(arg, context);
       if (res) {
-        CommandGroups.getInstance().getMark().saveJumpLocation(editor);
+        VimPlugin.getMark().saveJumpLocation(editor);
       }
 
       return res;

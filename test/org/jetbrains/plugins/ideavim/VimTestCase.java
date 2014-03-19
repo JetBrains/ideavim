@@ -131,7 +131,6 @@ public abstract class VimTestCase extends UsefulTestCase {
   }
 
   public void assertPluginError(boolean isError) {
-    final VimPlugin plugin = VimPlugin.getInstance();
-    assertEquals(isError, plugin.isError());
+    assertEquals(isError, VimPlugin.isError());
   }
 }

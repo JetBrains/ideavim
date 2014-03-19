@@ -21,11 +21,11 @@ package com.maddyhome.idea.vim.ex.handler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,16 +43,15 @@ public class EditFileHandler extends CommandHandler {
                          @NotNull ExCommand cmd) throws ExException {
     final String arg = cmd.getArgument();
     if (arg != null) {
-      final CommandGroups commandGroups = CommandGroups.getInstance();
       if (arg.equals("#")) {
-        commandGroups.getMark().saveJumpLocation(editor);
-        commandGroups.getFile().selectPreviousTab(context);
+        VimPlugin.getMark().saveJumpLocation(editor);
+        VimPlugin.getFile().selectPreviousTab(context);
         return true;
       }
       else if (arg.length() > 0) {
-        final boolean res = commandGroups.getFile().openFile(arg, context);
+        final boolean res = VimPlugin.getFile().openFile(arg, context);
         if (res) {
-          commandGroups.getMark().saveJumpLocation(editor);
+          VimPlugin.getMark().saveJumpLocation(editor);
         }
         return res;
       }

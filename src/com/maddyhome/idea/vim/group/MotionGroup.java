@@ -439,7 +439,7 @@ public class MotionGroup {
   }
 
   public int moveCaretToMarkLine(@NotNull Editor editor, char ch) {
-    Mark mark = CommandGroups.getInstance().getMark().getMark(editor, ch);
+    Mark mark = VimPlugin.getMark().getMark(editor, ch);
     if (mark != null) {
       VirtualFile vf = EditorData.getVirtualFile(editor);
       if (vf == null) return -1;
@@ -463,7 +463,7 @@ public class MotionGroup {
   }
 
   public int moveCaretToFileMarkLine(@NotNull Editor editor, char ch) {
-    Mark mark = CommandGroups.getInstance().getMark().getFileMark(editor, ch);
+    Mark mark = VimPlugin.getMark().getFileMark(editor, ch);
     if (mark != null) {
       int line = mark.getLogicalLine();
       return moveCaretToLineStartSkipLeading(editor, line);
@@ -474,7 +474,7 @@ public class MotionGroup {
   }
 
   public int moveCaretToMark(@NotNull Editor editor, char ch) {
-    Mark mark = CommandGroups.getInstance().getMark().getMark(editor, ch);
+    Mark mark = VimPlugin.getMark().getMark(editor, ch);
     if (mark != null) {
       VirtualFile vf = EditorData.getVirtualFile(editor);
       if (vf == null) return -1;
@@ -498,8 +498,8 @@ public class MotionGroup {
   }
 
   public int moveCaretToJump(@NotNull Editor editor, DataContext context, int count) {
-    int spot = CommandGroups.getInstance().getMark().getJumpSpot();
-    Jump jump = CommandGroups.getInstance().getMark().getJump(count);
+    int spot = VimPlugin.getMark().getJumpSpot();
+    Jump jump = VimPlugin.getMark().getJump(count);
     if (jump != null) {
       VirtualFile vf = EditorData.getVirtualFile(editor);
       if (vf == null) return -1;
@@ -512,7 +512,7 @@ public class MotionGroup {
         Editor newEditor = selectEditor(editor, newFile);
         if (newEditor != null) {
           if (spot == -1) {
-            CommandGroups.getInstance().getMark().addJump(editor, false);
+            VimPlugin.getMark().addJump(editor, false);
           }
           moveCaret(newEditor, EditorHelper.normalizeOffset(newEditor, newEditor.logicalPositionToOffset(lp), false));
         }
@@ -521,7 +521,7 @@ public class MotionGroup {
       }
       else {
         if (spot == -1) {
-          CommandGroups.getInstance().getMark().addJump(editor, false);
+          VimPlugin.getMark().addJump(editor, false);
         }
 
         return editor.logicalPositionToOffset(lp);
@@ -533,7 +533,7 @@ public class MotionGroup {
   }
 
   public int moveCaretToFileMark(@NotNull Editor editor, char ch) {
-    Mark mark = CommandGroups.getInstance().getMark().getFileMark(editor, ch);
+    Mark mark = VimPlugin.getMark().getFileMark(editor, ch);
     if (mark != null) {
       LogicalPosition lp = new LogicalPosition(mark.getLogicalLine(), mark.getCol());
 
@@ -548,7 +548,7 @@ public class MotionGroup {
   private Editor selectEditor(@NotNull Editor editor, @NotNull VirtualFile file) {
     Project proj = editor.getProject();
 
-    return CommandGroups.getInstance().getFile().selectEditor(proj, file);
+    return VimPlugin.getFile().selectEditor(proj, file);
   }
 
   public int moveCaretToMatchingPair(@NotNull Editor editor) {
@@ -1272,7 +1272,7 @@ public class MotionGroup {
       }
 
       if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-        CommandGroups.getInstance().getMotion().updateSelection(editor, offset);
+        VimPlugin.getMotion().updateSelection(editor, offset);
       }
       else {
         editor.getSelectionModel().removeSelection();
@@ -1488,8 +1488,8 @@ public class MotionGroup {
     visualOffset = editor.getCaretModel().getOffset();
     if (logger.isDebugEnabled()) logger.debug("visualStart=" + visualStart + ", visualEnd=" + visualEnd);
 
-    CommandGroups.getInstance().getMark().setMark(editor, '<', visualStart);
-    CommandGroups.getInstance().getMark().setMark(editor, '>', visualEnd);
+    VimPlugin.getMark().setMark(editor, '<', visualStart);
+    VimPlugin.getMark().setMark(editor, '>', visualEnd);
   }
 
   public boolean toggleVisual(@NotNull Editor editor, int count, int rawCount, @NotNull CommandState.SubMode mode) {
@@ -1717,8 +1717,8 @@ public class MotionGroup {
       editor.getSelectionModel().setBlockSelection(lstart, lend);
     }
 
-    CommandGroups.getInstance().getMark().setMark(editor, '<', start);
-    CommandGroups.getInstance().getMark().setMark(editor, '>', end);
+    VimPlugin.getMark().setMark(editor, '<', start);
+    VimPlugin.getMark().setMark(editor, '>', end);
   }
 
   public boolean swapVisualEnds(@NotNull Editor editor) {
@@ -1781,8 +1781,7 @@ public class MotionGroup {
       if (fe instanceof TextEditor) {
         Editor editor = ((TextEditor)fe).getEditor();
         if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-          CommandGroups.getInstance().getMotion().exitVisual(
-            EditorHelper.getEditor(event.getManager(), event.getOldFile()), true);
+          VimPlugin.getMotion().exitVisual(EditorHelper.getEditor(event.getManager(), event.getOldFile()), true);
         }
       }
     }
@@ -1847,12 +1846,12 @@ public class MotionGroup {
       if (!VimPlugin.isEnabled()) return;
 
       if (event.getArea() == EditorMouseEventArea.EDITING_AREA) {
-        CommandGroups.getInstance().getMotion().processMouseClick(event.getEditor(), event.getMouseEvent());
+        VimPlugin.getMotion().processMouseClick(event.getEditor(), event.getMouseEvent());
         //event.consume();
       }
       else if (event.getArea() != EditorMouseEventArea.ANNOTATIONS_AREA && event.getArea() != EditorMouseEventArea.FOLDING_OUTLINE_AREA) {
-        CommandGroups.getInstance().getMotion().processLineSelection(
-          event.getEditor(), event.getMouseEvent().getButton() == MouseEvent.BUTTON3);
+        VimPlugin.getMotion()
+          .processLineSelection(event.getEditor(), event.getMouseEvent().getButton() == MouseEvent.BUTTON3);
         //event.consume();
       }
     }
@@ -1861,7 +1860,7 @@ public class MotionGroup {
       if (!VimPlugin.isEnabled()) return;
 
       if (event.getEditor().equals(dragEditor)) {
-        CommandGroups.getInstance().getMotion().processMouseReleased(event.getEditor(), mode, startOff, endOff);
+        VimPlugin.getMotion().processMouseReleased(event.getEditor(), mode, startOff, endOff);
 
         //event.consume();
         dragEditor = null;

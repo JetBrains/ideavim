@@ -94,10 +94,10 @@ public class SearchGroup {
 
   private void setLastPattern(@NotNull Editor editor, @NotNull String lastPattern) {
     this.lastPattern = lastPattern;
-    CommandGroups.getInstance().getRegister().storeTextInternal(editor, new TextRange(-1, -1),
+    VimPlugin.getRegister().storeTextInternal(editor, new TextRange(-1, -1),
                                                                 lastPattern, SelectionType.CHARACTER_WISE, '/', false);
 
-    CommandGroups.getInstance().getHistory().addEntry(HistoryGroup.SEARCH, lastPattern);
+    VimPlugin.getHistory().addEntry(HistoryGroup.SEARCH, lastPattern);
   }
 
   public boolean searchAndReplace(@NotNull Editor editor, DataContext context, @NotNull LineRange range, @NotNull String excmd, String exarg) {
@@ -336,7 +336,7 @@ public class SearchGroup {
       int nmatch = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol);
       if (nmatch > 0) {
         if (firstMatch) {
-          CommandGroups.getInstance().getMark().saveJumpLocation(editor);
+          VimPlugin.getMark().saveJumpLocation(editor);
           firstMatch = false;
         }
 
@@ -416,10 +416,9 @@ public class SearchGroup {
     }
 
     if (lastMatch != -1) {
-      MotionGroup.moveCaret(editor,
-                            CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor,
-                                                                                                    editor.offsetToLogicalPosition(
-                                                                                                      lastMatch).line));
+      MotionGroup.moveCaret(editor, VimPlugin.getMotion()
+        .moveCaretToLineStartSkipLeading(editor, editor.offsetToLogicalPosition(lastMatch).line
+        ));
     }
     else {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));
@@ -523,7 +522,7 @@ public class SearchGroup {
     int res = search(editor, command, editor.getCaretModel().getOffset(), count, flags);
 
     if (res != -1 && moveCursor) {
-      CommandGroups.getInstance().getMark().saveJumpLocation(editor);
+      VimPlugin.getMark().saveJumpLocation(editor);
       MotionGroup.moveCaret(editor, res);
     }
 
@@ -757,7 +756,7 @@ public class SearchGroup {
       int line = editor.offsetToLogicalPosition(range.getStartOffset()).line;
       int newLine = EditorHelper.normalizeLine(editor, line + lineOffset);
 
-      res = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor, newLine);
+      res = VimPlugin.getMotion().moveCaretToLineStart(editor, newLine);
     }
     else if ("ebs".indexOf(lastOffset.charAt(0)) != -1) {
       int charOffset = 0;
@@ -1212,7 +1211,7 @@ public class SearchGroup {
     */
 
     public void selectionChanged(FileEditorManagerEvent event) {
-      CommandGroups.getInstance().getSearch().updateHighlight();
+      VimPlugin.getSearch().updateHighlight();
     }
   }
 
@@ -1249,7 +1248,7 @@ public class SearchGroup {
 
           int sl = editor.offsetToLogicalPosition(soff).line;
           int el = editor.offsetToLogicalPosition(eoff).line;
-          CommandGroups.getInstance().getSearch().highlightSearchLines(editor, false, sl, el);
+          VimPlugin.getSearch().highlightSearchLines(editor, false, sl, el);
           hls = EditorData.getLastHighlights(editor);
           if (logger.isDebugEnabled()) {
             logger.debug("sl=" + sl + ", el=" + el);

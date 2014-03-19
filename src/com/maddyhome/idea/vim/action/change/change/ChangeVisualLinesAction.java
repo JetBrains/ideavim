@@ -21,10 +21,10 @@ package com.maddyhome.idea.vim.action.change.change;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +42,7 @@ public class ChangeVisualLinesAction extends EditorAction {
       range = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
                             EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
 
-      return CommandGroups.getInstance().getChange().changeRange(editor, context, range, SelectionType.LINE_WISE);
+      return VimPlugin.getChange().changeRange(editor, context, range, SelectionType.LINE_WISE);
     }
   }
 }

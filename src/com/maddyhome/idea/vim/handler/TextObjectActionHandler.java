@@ -20,11 +20,11 @@ package com.maddyhome.idea.vim.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,23 +39,23 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
         return false;
       }
 
-      TextRange vr = CommandGroups.getInstance().getMotion().getRawVisualRange();
+      TextRange vr = VimPlugin.getMotion().getRawVisualRange();
 
       boolean block = (cmd.getFlags() & Command.FLAG_TEXT_BLOCK) != 0;
       int newstart = block || vr.getEndOffset() >= vr.getStartOffset() ? range.getStartOffset() : range.getEndOffset();
       int newend = block || vr.getEndOffset() >= vr.getStartOffset() ? range.getEndOffset() : range.getStartOffset();
 
       if (vr.getStartOffset() == vr.getEndOffset() || block) {
-        CommandGroups.getInstance().getMotion().moveVisualStart(newstart);
+        VimPlugin.getMotion().moveVisualStart(newstart);
       }
 
       if (((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) != 0 && (cmd.getFlags() & Command.FLAG_VISUAL_CHARACTERWISE) == 0) &&
           CommandState.getInstance(editor).getSubMode() != CommandState.SubMode.VISUAL_LINE) {
-        CommandGroups.getInstance().getMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE);
+        VimPlugin.getMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE);
       }
       else if (((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) == 0 || (cmd.getFlags() & Command.FLAG_VISUAL_CHARACTERWISE) != 0) &&
                CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_LINE) {
-        CommandGroups.getInstance().getMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER);
+        VimPlugin.getMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER);
       }
 
       MotionGroup.moveCaret(editor, newend);

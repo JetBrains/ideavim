@@ -20,7 +20,7 @@ package com.maddyhome.idea.vim.helper;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.group.CommandGroups;
+import com.maddyhome.idea.vim.VimPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -78,7 +78,7 @@ public class DigraphSequence {
         logger.debug("DIG_STATE_DIG_TWO");
         digraphState = DIG_STATE_START;
         if (key.getKeyChar() != KeyEvent.CHAR_UNDEFINED) {
-          char ch = CommandGroups.getInstance().getDigraph().getDigraph(digraphChar, key.getKeyChar());
+          char ch = VimPlugin.getDigraph().getDigraph(digraphChar, key.getKeyChar());
 
           return new DigraphResult(KeyStroke.getKeyStroke(ch));
         }
@@ -187,7 +187,7 @@ public class DigraphSequence {
           digraphState = DIG_STATE_START;
           KeyStroke code = KeyStroke.getKeyStroke((char)val);
 
-          CommandGroups.getInstance().getMacro().postKey(key, editor);
+          VimPlugin.getMacro().postKey(key, editor);
 
           return new DigraphResult(code);
         }

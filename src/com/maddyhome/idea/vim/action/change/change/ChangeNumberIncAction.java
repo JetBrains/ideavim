@@ -21,8 +21,8 @@ package com.maddyhome.idea.vim.action.change.change;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +35,7 @@ public class ChangeNumberIncAction extends EditorAction {
 
   private static class Handler extends ChangeEditorActionHandler {
     public boolean execute(@NotNull Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return CommandGroups.getInstance().getChange().changeNumber(editor, count);
+      return VimPlugin.getChange().changeNumber(editor, count);
     }
   }
 }

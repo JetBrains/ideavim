@@ -20,11 +20,11 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.*;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,10 +44,10 @@ public class CopyTextHandler extends CommandHandler {
 
     ParseResult pr = CommandParser.getInstance().parse(cmd.getArgument());
     int line = pr.getRanges().getFirstLine(editor, context);
-    int offset = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor, line + 1);
+    int offset = VimPlugin.getMotion().moveCaretToLineStart(editor, line + 1);
 
     String text = EditorHelper.getText(editor, range.getStartOffset(), range.getEndOffset());
-    CommandGroups.getInstance().getCopy().putText(editor, context, offset, text, SelectionType.LINE_WISE, 1, true,
+    VimPlugin.getCopy().putText(editor, context, offset, text, SelectionType.LINE_WISE, 1, true,
                                                   false, CommandState.SubMode.NONE);
 
     return true;

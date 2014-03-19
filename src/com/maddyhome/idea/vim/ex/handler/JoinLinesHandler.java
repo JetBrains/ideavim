@@ -20,11 +20,11 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -46,6 +46,6 @@ public class JoinLinesHandler extends CommandHandler {
     TextRange range = cmd.getTextRange(editor, context, true);
     range = new TextRange(range.getStartOffset(), range.getEndOffset() - 1);
 
-    return CommandGroups.getInstance().getChange().deleteJoinRange(editor, range, spaces);
+    return VimPlugin.getChange().deleteJoinRange(editor, range, spaces);
   }
 }

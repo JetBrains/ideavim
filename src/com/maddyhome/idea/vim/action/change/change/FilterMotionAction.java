@@ -22,9 +22,9 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
@@ -60,7 +60,7 @@ public class FilterMotionAction extends EditorAction {
       }
 
       Command command = new Command(count, null, null, Command.Type.UNDEFINED, 0);
-      CommandGroups.getInstance().getProcess().startFilterCommand(editor, context, command);
+      VimPlugin.getProcess().startFilterCommand(editor, context, command);
 
       return true;
     }

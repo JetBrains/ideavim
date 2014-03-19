@@ -20,11 +20,11 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.helper.EditorHelper;
@@ -39,8 +39,7 @@ public class PutLinesHandler extends CommandHandler {
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context,
                          @NotNull ExCommand cmd) throws ExException {
-    final CommandGroups groups = CommandGroups.getInstance();
-    final RegisterGroup registerGroup = groups.getRegister();
+    final RegisterGroup registerGroup = VimPlugin.getRegister();
     final int line = cmd.getLine(editor, context);
     final String arg = cmd.getArgument();
 
@@ -56,7 +55,7 @@ public class PutLinesHandler extends CommandHandler {
     final int offset = EditorHelper.getLineStartOffset(editor, line + 1);
     editor.getDocument().insertString(offset, "\n");
     MotionGroup.moveCaret(editor, offset);
-    final boolean result = groups.getCopy().putTextAfterCursor(editor, context, 1, false, false);
+    final boolean result = VimPlugin.getCopy().putTextAfterCursor(editor, context, 1, false, false);
     final int newOffset = EditorHelper.getLineStartOffset(editor, line + 1);
     MotionGroup.moveCaret(editor, newOffset);
     return result;

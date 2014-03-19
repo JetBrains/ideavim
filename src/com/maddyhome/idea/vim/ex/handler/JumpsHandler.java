@@ -21,12 +21,12 @@ package com.maddyhome.idea.vim.ex.handler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Jump;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
@@ -46,8 +46,8 @@ public class JumpsHandler extends CommandHandler {
   }
 
   public boolean execute(@NotNull Editor editor, DataContext context, ExCommand cmd) throws ExException {
-    List<Jump> jumps = CommandGroups.getInstance().getMark().getJumps();
-    int spot = CommandGroups.getInstance().getMark().getJumpSpot();
+    List<Jump> jumps = VimPlugin.getMark().getJumps();
+    int spot = VimPlugin.getMark().getJumpSpot();
 
     String spaces = "     ";
     StringBuffer text = new StringBuffer();

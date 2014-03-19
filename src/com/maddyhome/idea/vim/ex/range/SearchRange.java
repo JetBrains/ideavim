@@ -21,8 +21,8 @@ package com.maddyhome.idea.vim.ex.range;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -59,15 +59,15 @@ public class SearchRange extends AbstractRange {
     while (tok.hasMoreTokens()) {
       String pat = tok.nextToken();
       if (pat.equals("\\/")) {
-        patterns.add(CommandGroups.getInstance().getSearch().getLastSearch());
+        patterns.add(VimPlugin.getSearch().getLastSearch());
         flags.add(Command.FLAG_SEARCH_FWD);
       }
       else if (pat.equals("\\?")) {
-        patterns.add(CommandGroups.getInstance().getSearch().getLastSearch());
+        patterns.add(VimPlugin.getSearch().getLastSearch());
         flags.add(Command.FLAG_SEARCH_REV);
       }
       else if (pat.equals("\\&")) {
-        patterns.add(CommandGroups.getInstance().getSearch().getLastPattern());
+        patterns.add(VimPlugin.getSearch().getLastPattern());
         flags.add(Command.FLAG_SEARCH_FWD);
       }
       else {
@@ -103,13 +103,13 @@ public class SearchRange extends AbstractRange {
       String pattern = patterns.get(i);
       int flag = flags.get(i);
       if ((flag & Command.FLAG_SEARCH_FWD) != 0 && !lastZero) {
-        pos = CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, line, true);
+        pos = VimPlugin.getMotion().moveCaretToLineEnd(editor, line, true);
       }
       else {
-        pos = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor, line);
+        pos = VimPlugin.getMotion().moveCaretToLineStart(editor, line);
       }
 
-      pos = CommandGroups.getInstance().getSearch().search(editor, pattern, pos, 1, flag);
+      pos = VimPlugin.getSearch().search(editor, pattern, pos, 1, flag);
       if (pos == -1) {
         break;
       }

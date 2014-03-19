@@ -20,9 +20,9 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.ex.*;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,15 +44,14 @@ public class RepeatHandler extends CommandHandler {
       arg = lastArg;
     }
 
-    MotionGroup.moveCaret(editor, CommandGroups.getInstance().getMotion().moveCaretToLine(editor,
-                                                                                                   line));
+    MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLine(editor, line));
     lastArg = arg;
 
     if (arg == ':') {
       return CommandParser.getInstance().processLastCommand(editor, context, 1);
     }
     else {
-      Register reg = CommandGroups.getInstance().getRegister().getPlaybackRegister(arg);
+      Register reg = VimPlugin.getRegister().getPlaybackRegister(arg);
       if (reg != null) {
         CommandParser.getInstance().processCommand(editor, context, reg.getText(), 1);
         return true;

@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
@@ -66,9 +67,8 @@ public class CopyGroup {
    * @return true if able to yank the lines, false if not
    */
   public boolean yankLine(@NotNull Editor editor, int count) {
-    int start = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor);
-    int offset = Math.min(CommandGroups.getInstance().getMotion().moveCaretToLineEndOffset(
-      editor, count - 1, true) + 1, EditorHelper.getFileSize(editor));
+    int start = VimPlugin.getMotion().moveCaretToLineStart(editor);
+    int offset = Math.min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor, count - 1, true) + 1, EditorHelper.getFileSize(editor));
     if (offset != -1) {
       return yankRange(editor, new TextRange(start, offset), SelectionType.LINE_WISE, false);
     }
@@ -89,7 +89,7 @@ public class CopyGroup {
       if (logger.isDebugEnabled()) {
         logger.debug("yanking range: " + range);
       }
-      boolean res = CommandGroups.getInstance().getRegister().storeText(editor, range, type, false);
+      boolean res = VimPlugin.getRegister().storeText(editor, range, type, false);
       if (moveCursor) {
         MotionGroup.moveCaret(editor, range.normalize().getStartOffset());
       }
@@ -111,7 +111,7 @@ public class CopyGroup {
   public boolean putTextBeforeCursor(@NotNull Editor editor, @NotNull DataContext context, int count, boolean indent,
                                      boolean cursorAfter) {
     // What register are we getting the text from?
-    Register reg = CommandGroups.getInstance().getRegister().getLastRegister();
+    Register reg = VimPlugin.getRegister().getLastRegister();
     if (reg != null) {
       if (reg.getType() == SelectionType.LINE_WISE && editor.isOneLineMode()) {
         return false;
@@ -120,7 +120,7 @@ public class CopyGroup {
       int pos;
       // If a linewise put the text is inserted before the current line.
       if (reg.getType() == SelectionType.LINE_WISE) {
-        pos = CommandGroups.getInstance().getMotion().moveCaretToLineStart(editor);
+        pos = VimPlugin.getMotion().moveCaretToLineStart(editor);
       }
       else {
         pos = editor.getCaretModel().getOffset();
@@ -144,7 +144,7 @@ public class CopyGroup {
    */
   public boolean putTextAfterCursor(@NotNull Editor editor, @NotNull DataContext context, int count, boolean indent,
                                     boolean cursorAfter) {
-    Register reg = CommandGroups.getInstance().getRegister().getLastRegister();
+    Register reg = VimPlugin.getRegister().getLastRegister();
     if (reg != null) {
       if (reg.getType() == SelectionType.LINE_WISE && editor.isOneLineMode()) {
         return false;
@@ -154,7 +154,7 @@ public class CopyGroup {
       // If a linewise paste, the text is inserted after the current line.
       if (reg.getType() == SelectionType.LINE_WISE) {
         pos = Math.min(editor.getDocument().getTextLength(),
-                       CommandGroups.getInstance().getMotion().moveCaretToLineEnd(editor, true) + 1);
+                       VimPlugin.getMotion().moveCaretToLineEnd(editor, true) + 1);
         if (pos > 0 && pos == editor.getDocument().getTextLength() &&
             editor.getDocument().getCharsSequence().charAt(pos - 1) != '\n') {
           editor.getDocument().insertString(pos, "\n");
@@ -179,9 +179,9 @@ public class CopyGroup {
   public boolean putVisualRange(@NotNull Editor editor, @NotNull DataContext context, @NotNull TextRange range, int count, boolean indent,
                                 boolean cursorAfter) {
     CommandState.SubMode subMode = CommandState.getInstance(editor).getSubMode();
-    Register reg = CommandGroups.getInstance().getRegister().getLastRegister();
+    Register reg = VimPlugin.getRegister().getLastRegister();
     // Without this reset, the deleted text goes into the same register we just pasted from.
-    CommandGroups.getInstance().getRegister().resetRegister();
+    VimPlugin.getRegister().resetRegister();
     if (reg != null) {
       if (reg.getType() == SelectionType.LINE_WISE && editor.isOneLineMode()) {
         return false;
@@ -200,7 +200,7 @@ public class CopyGroup {
                               Math.min(range.getEndOffset() + 1, EditorHelper.getFileSize(editor)));
       }
 
-      CommandGroups.getInstance().getChange().deleteRange(editor, range, SelectionType.fromSubMode(subMode), false);
+      VimPlugin.getChange().deleteRange(editor, range, SelectionType.fromSubMode(subMode), false);
 
       editor.getCaretModel().moveToOffset(start);
 
@@ -271,7 +271,7 @@ public class CopyGroup {
     int endOffset = offset;
     if (type != SelectionType.BLOCK_WISE) {
       for (int i = 0; i < count; i++) {
-        CommandGroups.getInstance().getChange().insertText(editor, offset, text);
+        VimPlugin.getChange().insertText(editor, offset, text);
         insertCnt += text.length();
         endOffset += text.length();
       }
@@ -292,7 +292,7 @@ public class CopyGroup {
 
       if (line + lines >= EditorHelper.getLineCount(editor)) {
         for (int i = 0; i < line + lines - EditorHelper.getLineCount(editor); i++) {
-          CommandGroups.getInstance().getChange().insertText(editor, EditorHelper.getFileSize(editor, true), "\n");
+          VimPlugin.getChange().insertText(editor, EditorHelper.getFileSize(editor, true), "\n");
           insertCnt++;
         }
       }
@@ -330,20 +330,20 @@ public class CopyGroup {
         }
         for (int i = 0; i < count; i++) {
           String txt = i == 0 ? origSegment : segment;
-          CommandGroups.getInstance().getChange().insertText(editor, insoff, txt);
+          VimPlugin.getChange().insertText(editor, insoff, txt);
           insertCnt += txt.length();
           endOffset += txt.length();
         }
 
 
         if (mode == CommandState.SubMode.VISUAL_LINE) {
-          CommandGroups.getInstance().getChange().insertText(editor, endOffset, "\n");
+          VimPlugin.getChange().insertText(editor, endOffset, "\n");
           insertCnt++;
           endOffset++;
         }
         else {
           if (pad.length() > 0) {
-            CommandGroups.getInstance().getChange().insertText(editor, insoff, pad);
+            VimPlugin.getChange().insertText(editor, insoff, pad);
             insertCnt += pad.length();
             endOffset += pad.length();
           }
@@ -370,7 +370,7 @@ public class CopyGroup {
       int startOff = editor.getDocument().getLineStartOffset(slp.line);
       int endOff = editor.getDocument().getLineEndOffset(elp.line);
       editor.getSelectionModel().setSelection(startOff, endOff);
-      CommandGroups.getInstance().getChange().autoIndentLines(context);
+      VimPlugin.getChange().autoIndentLines(context);
     }
     /*
     boolean indented = false;
@@ -427,8 +427,7 @@ public class CopyGroup {
         break;
       case 3:
         MotionGroup.moveCaret(editor, offset);
-        MotionGroup.moveCaret(editor,
-                              CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor));
+        MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor));
         break;
       case 4:
         MotionGroup.moveCaret(editor, endOffset + 1);
@@ -439,31 +438,9 @@ public class CopyGroup {
         break;
     }
 
-    final MarkGroup markGroup = CommandGroups.getInstance().getMark();
+    final MarkGroup markGroup = VimPlugin.getMark();
     markGroup.setMark(editor, '[', offset);
     markGroup.setMark(editor, ']', endOffset);
-
-    /*
-    // Adjust the cursor position after the paste
-    if ((type & Command.FLAG_MOT_LINEWISE) != 0)
-    {
-        if (cursorAfter)
-        {
-            int pos = EditorHelper.normalizeOffset(editor, offset + count * text.length(), false);
-            MotionGroup.moveCaret(editor, context, pos);
-        }
-        else
-        {
-            MotionGroup.moveCaret(editor, context, offset);
-            MotionGroup.moveCaret(editor, context,
-                CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor));
-        }
-    }
-    else
-    {
-        MotionGroup.moveCaret(editor, context, offset + count * text.length() - 1);
-    }
-    */
   }
 
   private static Logger logger = Logger.getInstance(CopyGroup.class.getName());

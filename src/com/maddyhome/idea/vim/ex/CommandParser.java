@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.handler.*;
 import com.maddyhome.idea.vim.ex.range.AbstractRange;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.HistoryGroup;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
@@ -127,7 +126,7 @@ public class CommandParser {
    * @throws ExException if any part of the command was invalid
    */
   public boolean processLastCommand(@NotNull Editor editor, DataContext context, int count) throws ExException {
-    final Register reg = CommandGroups.getInstance().getRegister().getRegister(':');
+    final Register reg = VimPlugin.getRegister().getRegister(':');
     if (reg != null) {
       final String text = reg.getText();
       if (text != null) {
@@ -156,7 +155,7 @@ public class CommandParser {
     }
 
     // Save the command history
-    CommandGroups.getInstance().getHistory().addEntry(HistoryGroup.COMMAND, cmd);
+    VimPlugin.getHistory().addEntry(HistoryGroup.COMMAND, cmd);
 
     // Parse the command
     ParseResult res = parse(cmd);
@@ -196,7 +195,7 @@ public class CommandParser {
     // Run the command
     boolean ok = handler.process(editor, context, new ExCommand(res.getRanges(), command, res.getArgument()), count);
     if (ok && (handler.getArgFlags() & CommandHandler.DONT_SAVE_LAST) == 0) {
-      CommandGroups.getInstance().getRegister().storeTextInternal(editor, new TextRange(-1, -1), cmd,
+      VimPlugin.getRegister().storeTextInternal(editor, new TextRange(-1, -1), cmd,
                                                                   SelectionType.CHARACTER_WISE, ':', false);
     }
 

@@ -3,8 +3,8 @@ package org.jetbrains.plugins.ideavim.group;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Ref;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.SearchGroup;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.option.Option;
@@ -109,7 +109,7 @@ public class SearchGroupTest extends VimTestCase {
     myFixture.configureByText("a.java", input);
     final Editor editor = myFixture.getEditor();
     final Project project = myFixture.getProject();
-    final SearchGroup searchGroup = CommandGroups.getInstance().getSearch();
+    final SearchGroup searchGroup = VimPlugin.getSearch();
     final Ref<Integer> ref = Ref.create(-1);
     RunnableHelper.runReadCommand(project, new Runnable() {
       @Override

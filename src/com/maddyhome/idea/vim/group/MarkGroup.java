@@ -535,7 +535,7 @@ public class MarkGroup {
           int markLineEndOff = EditorHelper.getLineEndOffset(editor, mark.getLogicalLine(), true);
           // If the marked line is completely within the deleted text, remove the mark
           if (delStartOff <= markLineStartOff && delEndOff >= markLineEndOff) {
-            CommandGroups.getInstance().getMark().removeMark(ch, mark);
+            VimPlugin.getMark().removeMark(ch, mark);
             logger.debug("Removed mark");
           }
           // The deletion only covers part of the marked line so shift the mark only if the deletion begins
@@ -619,7 +619,7 @@ public class MarkGroup {
       if (event.getOldLength() == 0) return;
 
       Document doc = event.getDocument();
-      updateMarkFromDelete(getAnEditor(doc), CommandGroups.getInstance().getMark().getAllFileMarks(doc), event.getOffset(),
+      updateMarkFromDelete(getAnEditor(doc), VimPlugin.getMark().getAllFileMarks(doc), event.getOffset(),
                            event.getOldLength());
       // TODO - update jumps
     }
@@ -637,7 +637,7 @@ public class MarkGroup {
       if (event.getNewLength() == 0 || (event.getNewLength() == 1 && !event.getNewFragment().equals("\n"))) return;
 
       Document doc = event.getDocument();
-      updateMarkFromInsert(getAnEditor(doc), CommandGroups.getInstance().getMark().getAllFileMarks(doc), event.getOffset(),
+      updateMarkFromInsert(getAnEditor(doc), VimPlugin.getMark().getAllFileMarks(doc), event.getOffset(),
                            event.getNewLength());
       // TODO - update jumps
     }

@@ -21,8 +21,8 @@ package com.maddyhome.idea.vim.action.motion.scroll;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
@@ -41,10 +41,10 @@ public class MotionScrollLastScreenLinePageStartAction extends EditorAction {
       if (raw == 0) {
         int lines = EditorHelper.getScreenHeight(editor);
 
-        return CommandGroups.getInstance().getMotion().scrollLine(editor, -lines);
+        return VimPlugin.getMotion().scrollLine(editor, -lines);
       }
       else {
-        return CommandGroups.getInstance().getMotion().scrollLineToLastScreenLine(editor, raw, cnt, true);
+        return VimPlugin.getMotion().scrollLineToLastScreenLine(editor, raw, cnt, true);
       }
     }
   }

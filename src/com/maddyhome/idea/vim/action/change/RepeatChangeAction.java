@@ -22,10 +22,10 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.KeyHandler;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.key.KeyParser;
 import org.jetbrains.annotations.NotNull;
@@ -55,8 +55,8 @@ public class RepeatChangeAction extends EditorAction {
         Command save = state.getCommand();
         state.setCommand(cmd);
         state.pushState(CommandState.Mode.REPEAT, CommandState.SubMode.NONE, KeyParser.MAPPING_NORMAL);
-        char reg = CommandGroups.getInstance().getRegister().getCurrentRegister();
-        CommandGroups.getInstance().getRegister().selectRegister(state.getLastChangeRegister());
+        char reg = VimPlugin.getRegister().getCurrentRegister();
+        VimPlugin.getRegister().selectRegister(state.getLastChangeRegister());
         try {
           KeyHandler.executeAction(cmd.getAction(), context);
         }
@@ -68,7 +68,7 @@ public class RepeatChangeAction extends EditorAction {
           state.setCommand(save);
         }
         state.saveLastChangeCommand(cmd);
-        CommandGroups.getInstance().getRegister().selectRegister(reg);
+        VimPlugin.getRegister().selectRegister(reg);
 
         return true;
       }

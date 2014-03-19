@@ -20,10 +20,10 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
@@ -57,8 +57,7 @@ public class GotoLineHandler extends CommandHandler {
     }
 
     if (count >= 0) {
-      MotionGroup.moveCaret(editor,
-                            CommandGroups.getInstance().getMotion().moveCaretToLineStartSkipLeading(editor, count));
+      MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, count));
 
       return true;
     }

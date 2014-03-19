@@ -20,12 +20,12 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,12 +46,12 @@ public class YankLinesHandler extends CommandHandler {
       cmd.setArgument(arg.toString());
     }
 
-    if (!CommandGroups.getInstance().getRegister().selectRegister(register)) {
+    if (!VimPlugin.getRegister().selectRegister(register)) {
       return false;
     }
 
     TextRange range = cmd.getTextRange(editor, context, true);
 
-    return CommandGroups.getInstance().getCopy().yankRange(editor, range, SelectionType.LINE_WISE, false);
+    return VimPlugin.getCopy().yankRange(editor, range, SelectionType.LINE_WISE, false);
   }
 }

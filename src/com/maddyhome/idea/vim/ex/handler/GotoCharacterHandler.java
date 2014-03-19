@@ -20,10 +20,10 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.group.CommandGroups;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,7 +39,7 @@ public class GotoCharacterHandler extends CommandHandler {
     int count = cmd.getCount(editor, context, 1, true);
 
     if (count > 0) {
-      int res = CommandGroups.getInstance().getMotion().moveCaretToNthCharacter(editor, count - 1);
+      int res = VimPlugin.getMotion().moveCaretToNthCharacter(editor, count - 1);
       if (res != -1) {
         MotionGroup.moveCaret(editor, res);
 

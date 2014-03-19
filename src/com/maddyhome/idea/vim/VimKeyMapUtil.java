@@ -155,7 +155,7 @@ public class VimKeyMapUtil {
     else {
       rootElement.setAttribute("parent", keymapName);
     }
-    VimPlugin.getInstance().setPreviousKeyMap(keymapName);
+    VimPlugin.setPreviousKeyMap(keymapName);
     // Save modified keymap to the file
     JDOMUtil.writeDocument(document, path, "\n");
     if (showNotification) {
@@ -185,7 +185,7 @@ public class VimKeyMapUtil {
 
     final KeymapManagerImpl manager = (KeymapManagerImpl) KeymapManager.getInstance();
     // Get keymap to enable
-    final String keymapName2Enable = enableVimKeymap ? VIM_KEYMAP_NAME : VimPlugin.getInstance().getPreviousKeyMap();
+    final String keymapName2Enable = enableVimKeymap ? VIM_KEYMAP_NAME : VimPlugin.getPreviousKeyMap();
     if (keymapName2Enable.isEmpty()) {
       return false;
     }
@@ -202,7 +202,7 @@ public class VimKeyMapUtil {
 
     // Save previous keymap to enable after VIM emulation is turned off
     if (enableVimKeymap) {
-      VimPlugin.getInstance().setPreviousKeyMap(manager.getActiveKeymap().getName());
+      VimPlugin.setPreviousKeyMap(manager.getActiveKeymap().getName());
     }
 
     manager.setActiveKeymap(keymap);
