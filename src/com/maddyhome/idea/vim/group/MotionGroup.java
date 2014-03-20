@@ -1403,7 +1403,7 @@ public class MotionGroup {
     }
 
     if (logger.isDebugEnabled()) logger.debug("vr=" + vr);
-    CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, vr.getType(), Mapping.VISUAL);
+    CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, vr.getType(), MappingMode.VISUAL);
 
     visualStart = vr.getStart();
     visualEnd = vr.getEnd();
@@ -1469,7 +1469,7 @@ public class MotionGroup {
       exitVisual(editor, true);
     }
     else {
-      CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, Mapping.VISUAL);
+      CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, MappingMode.VISUAL);
     }
 
     KeyHandler.getInstance().reset(editor);
@@ -1523,7 +1523,7 @@ public class MotionGroup {
       else {
         start = end = editor.getSelectionModel().getSelectionStart();
       }
-      CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, Mapping.VISUAL);
+      CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, MappingMode.VISUAL);
       visualStart = start;
       updateSelection(editor, end);
       MotionGroup.moveCaret(editor, visualEnd);

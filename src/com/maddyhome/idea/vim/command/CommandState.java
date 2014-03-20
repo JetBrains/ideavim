@@ -116,9 +116,9 @@ public class CommandState {
     return flags;
   }
 
-  public void pushState(@NotNull Mode mode, @NotNull SubMode submode, @NotNull Mapping mapping) {
+  public void pushState(@NotNull Mode mode, @NotNull SubMode submode, @NotNull MappingMode mappingMode) {
     logger.debug("pushState");
-    modes.push(new State(mode, submode, mapping));
+    modes.push(new State(mode, submode, mappingMode));
     updateStatus();
     if (logger.isDebugEnabled()) {
       logger.debug("state=" + this);
@@ -241,7 +241,7 @@ public class CommandState {
     if (oldmode != newmode) {
       State state = currentState();
       popState();
-      pushState(newmode, state.getSubmode(), state.getMapping());
+      pushState(newmode, state.getSubmode(), state.getMappingMode());
     }
   }
 
@@ -260,8 +260,8 @@ public class CommandState {
    * @return The current key mapping mode
    */
   @NotNull
-  public Mapping getMappingMode() {
-    return currentState().getMapping();
+  public MappingMode getMappingMode() {
+    return currentState().getMappingMode();
   }
 
   /**
@@ -337,14 +337,14 @@ public class CommandState {
    * Signleton, no public object creation
    */
   private CommandState() {
-    modes.push(new State(Mode.COMMAND, SubMode.NONE, Mapping.NORMAL));
+    modes.push(new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL));
   }
 
   private class State {
-    public State(@NotNull Mode mode, @NotNull SubMode submode, @NotNull Mapping mapping) {
+    public State(@NotNull Mode mode, @NotNull SubMode submode, @NotNull MappingMode mappingMode) {
       this.mode = mode;
       this.submode = submode;
-      this.mapping = mapping;
+      this.myMappingMode = mappingMode;
     }
 
     @NotNull
@@ -362,8 +362,8 @@ public class CommandState {
     }
 
     @NotNull
-    public Mapping getMapping() {
-      return mapping;
+    public MappingMode getMappingMode() {
+      return myMappingMode;
     }
 
     @NotNull
@@ -373,8 +373,8 @@ public class CommandState {
       res.append(mode);
       res.append(", submode=");
       res.append(submode);
-      res.append(", mapping=");
-      res.append(mapping);
+      res.append(", mappingMode=");
+      res.append(myMappingMode);
       res.append("]");
 
       return res.toString();
@@ -382,11 +382,11 @@ public class CommandState {
 
     @NotNull private Mode mode;
     @NotNull private SubMode submode;
-    @NotNull private Mapping mapping;
+    @NotNull private MappingMode myMappingMode;
   }
 
   @NotNull private Stack<State> modes = new Stack<State>();
-  @NotNull private State defaultState = new State(Mode.COMMAND, SubMode.NONE, Mapping.NORMAL);
+  @NotNull private State defaultState = new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL);
   @Nullable private Command command;
   private int flags;
   private boolean isRecording = false;

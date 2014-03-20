@@ -31,7 +31,7 @@ import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.command.Mapping;
+import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.helper.DelegateCommandListener;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
@@ -168,7 +168,7 @@ public class KeyHandler {
             shouldRecord = false;
           }
         }
-        else if (editorState.getMappingMode() == Mapping.CMD_LINE) {
+        else if (editorState.getMappingMode() == MappingMode.CMD_LINE) {
           if (!VimPlugin.getProcess().processExKey(editor, key, true)) {
             shouldRecord = false;
           }
@@ -188,7 +188,7 @@ public class KeyHandler {
       executeCommand(editor, key, context, editorState);
     }
     else if (state == State.BAD_COMMAND) {
-      if (editorState.getMappingMode() == Mapping.OP_PENDING) {
+      if (editorState.getMappingMode() == MappingMode.OP_PENDING) {
         editorState.popState();
       }
       else {
@@ -328,7 +328,7 @@ public class KeyHandler {
     }
 
     // If we were in "operator pending" mode, reset back to normal mode.
-    if (editorState.getMappingMode() == Mapping.OP_PENDING) {
+    if (editorState.getMappingMode() == MappingMode.OP_PENDING) {
       editorState.popState();
     }
 
@@ -377,7 +377,7 @@ public class KeyHandler {
         // Is the current command an operator? If so set the state to only accept "operator pending"
         // commands
         if ((node.getFlags() & Command.FLAG_OP_PEND) != 0) {
-          editorState.pushState(editorState.getMode(), editorState.getSubMode(), Mapping.OP_PENDING);
+          editorState.pushState(editorState.getMode(), editorState.getSubMode(), MappingMode.OP_PENDING);
         }
         break;
       case EX_STRING:
@@ -466,7 +466,7 @@ public class KeyHandler {
         VimPlugin.getProcess().startSearchCommand(editor, context, count, key);
         state = State.NEW_COMMAND;
         currentArg = Argument.Type.EX_STRING;
-        editorState.pushState(CommandState.Mode.EX_ENTRY, CommandState.SubMode.NONE, Mapping.CMD_LINE);
+        editorState.pushState(CommandState.Mode.EX_ENTRY, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
       }
     }
   }

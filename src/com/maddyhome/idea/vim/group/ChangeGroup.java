@@ -374,7 +374,7 @@ public class ChangeGroup {
       if (mode == CommandState.Mode.REPLACE) {
         processInsert(editor, context);
       }
-      state.pushState(mode, CommandState.SubMode.NONE, Mapping.INSERT);
+      state.pushState(mode, CommandState.SubMode.NONE, MappingMode.INSERT);
 
       resetCursor(editor, true);
     }
@@ -584,7 +584,7 @@ public class ChangeGroup {
    */
   public void processSingleCommand(@NotNull Editor editor) {
     CommandState.getInstance(editor).pushState(CommandState.Mode.COMMAND, CommandState.SubMode.SINGLE_COMMAND,
-                                               Mapping.NORMAL);
+                                               MappingMode.NORMAL);
     clearStrokes(editor);
   }
 

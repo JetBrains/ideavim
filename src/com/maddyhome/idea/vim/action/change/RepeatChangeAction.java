@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.command.Mapping;
+import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
@@ -54,7 +54,7 @@ public class RepeatChangeAction extends EditorAction {
         }
         Command save = state.getCommand();
         state.setCommand(cmd);
-        state.pushState(CommandState.Mode.REPEAT, CommandState.SubMode.NONE, Mapping.NORMAL);
+        state.pushState(CommandState.Mode.REPEAT, CommandState.SubMode.NONE, MappingMode.NORMAL);
         char reg = VimPlugin.getRegister().getCurrentRegister();
         VimPlugin.getRegister().selectRegister(state.getLastChangeRegister());
         try {
