@@ -137,9 +137,6 @@ public class RegisterActions {
   }
 
   private static void registerVariousModesActions(@NotNull KeyParser parser) {
-
-    parser.registerAction(MappingMode.NV, "VimVisualToggleCharacterMode", Command.Type.OTHER_READONLY,
-                          Command.FLAG_MOT_CHARACTERWISE, new Shortcut('v'));
     parser.registerAction(MappingMode.NV, "VimVisualToggleLineMode", Command.Type.OTHER_READONLY, Command.FLAG_MOT_LINEWISE,
                           new Shortcut('V'));
     parser.registerAction(MappingMode.NV, "VimVisualToggleBlockMode", Command.Type.OTHER_READONLY,

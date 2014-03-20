@@ -4,12 +4,14 @@
  *
  * 2. Normal mode
  *
- * tag                action
+ * tag                      action
  * ---------------------------------------------------------------------------------------------------------------------
  *
- * |i|                {@link com.maddyhome.idea.vim.action.change.insert.InsertBeforeCursorAction}
+ * |i|                      {@link com.maddyhome.idea.vim.action.change.insert.InsertBeforeCursorAction}
  * |insert|
  * |<Insert>|
+ * |v|                      {@link com.maddyhome.idea.vim.action.motion.visual.VisualToggleCharacterModeAction}
+ * |characterwise-visual|
  *
  * @see :help index.
  *

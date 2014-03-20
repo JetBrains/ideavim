@@ -18,28 +18,53 @@
 
 package com.maddyhome.idea.vim.action.motion.visual;
 
+import com.google.common.collect.ImmutableSet;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
-/**
- *
- */
-public class VisualToggleCharacterModeAction extends EditorAction {
+import javax.swing.*;
+import java.util.List;
+import java.util.Set;
+
+import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
+
+public class VisualToggleCharacterModeAction extends VimCommandAction {
   public VisualToggleCharacterModeAction() {
-    super(new Handler());
+    super(new EditorActionHandlerBase() {
+      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+        return VimPlugin.getMotion().toggleVisual(editor, cmd.getCount(), cmd.getRawCount(),
+                                                  CommandState.SubMode.VISUAL_CHARACTER);
+      }
+    });
   }
 
-  private static class Handler extends EditorActionHandlerBase {
-    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      return VimPlugin.getMotion()
-        .toggleVisual(editor, cmd.getCount(), cmd.getRawCount(), CommandState.SubMode.VISUAL_CHARACTER);
-    }
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.NV;
+  }
+
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return ImmutableSet.of(parseKeys("v"));
+  }
+
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.OTHER_READONLY;
+  }
+
+  @Override
+  public int getFlags() {
+    return Command.FLAG_MOT_CHARACTERWISE;
   }
 }
-
