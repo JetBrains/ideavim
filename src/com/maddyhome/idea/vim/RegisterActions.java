@@ -128,7 +128,6 @@ public class RegisterActions {
         for (List<KeyStroke> keyStrokes : commandAction.getKeyStrokesSet()) {
           shortcuts.add(new Shortcut(keyStrokes.toArray(new KeyStroke[keyStrokes.size()])));
         }
-        // TODO: Check for shortcut conflicts with the current keymap
         parser.registerAction(commandAction.getMappingModes(), actionId, commandAction.getType(),
                               commandAction.getFlags(), shortcuts.toArray(new Shortcut[shortcuts.size()]),
                               commandAction.getArgumentType());

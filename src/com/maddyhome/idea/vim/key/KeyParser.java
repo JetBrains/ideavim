@@ -20,9 +20,12 @@ package com.maddyhome.idea.vim.key;
 
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
+import com.intellij.openapi.keymap.Keymap;
+import com.intellij.openapi.keymap.ex.KeymapManagerEx;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
@@ -31,7 +34,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -220,7 +225,23 @@ public class KeyParser {
   public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, @NotNull Shortcut[] shortcuts,
                              @NotNull Argument.Type argType) {
     for (Shortcut shortcut : shortcuts) {
+      // TODO: Check for shortcut conflicts with the current keymap
       registerAction(mappingModes, actName, cmdType, cmdFlags, shortcut.getKeys(), argType);
+    }
+  }
+
+  private static void checkKeyStrokeForConflicts(KeyStroke keyStroke) {
+    final KeymapManagerEx keymapManager = KeymapManagerEx.getInstanceEx();
+    final Keymap keymap = keymapManager.getActiveKeymap();
+    final KeyboardShortcut shortcut = new KeyboardShortcut(keyStroke, null);
+    final Map<String, ArrayList<KeyboardShortcut>> conflicts = keymap.getConflicts("", shortcut);
+    final ActionManager manager = ActionManager.getInstance();
+    for (Map.Entry<String, ArrayList<KeyboardShortcut>> entry : conflicts.entrySet()) {
+      final AnAction action = manager.getAction(entry.getKey());
+      if (action != null) {
+        // TODO: If preferences for the keystroke not set
+        // TODO: Else if used for Vim commands
+      }
     }
   }
 

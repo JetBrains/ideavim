@@ -53,6 +53,7 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.group.*;
 import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.key.ShortcutOwner;
 import com.maddyhome.idea.vim.option.Options;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -60,6 +61,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * This plugin attempts to emulate the key binding and general functionality of Vim and gVim. See the supplied
@@ -86,6 +89,10 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private static final boolean BLOCK_CURSOR_VIM_VALUE = true;
   private static final boolean ANIMATED_SCROLLING_VIM_VALUE = false;
   private static final boolean REFRAIN_FROM_SCROLLING_VIM_VALUE = true;
+  public static final String SHORTCUT_CONFLICTS_ELEMENT = "shortcut-conflicts";
+  public static final String SHORTCUT_CONFLICT_ELEMENT = "shortcut-conflict";
+  public static final String OWNER_ATTRIBUTE = "owner";
+  public static final String TEXT_ELEMENT = "text";
 
   private VimTypedActionHandler vimHandler;
   private boolean isBlockCursor = false;
@@ -95,6 +102,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   private int previousStateVersion = 0;
   private String previousKeyMap = "";
+  private Map<KeyStroke, ShortcutOwner> shortcutConflicts = new LinkedHashMap<KeyStroke, ShortcutOwner>();
 
   // It is enabled by default to avoid any special configuration after plugin installation
   private boolean enabled = true;
@@ -190,6 +198,8 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     state.setAttribute("enabled", Boolean.toString(enabled));
     element.addContent(state);
 
+    saveShortcutConflicts(element);
+
     mark.saveData(element);
     register.saveData(element);
     search.saveData(element);
@@ -213,6 +223,8 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
       enabled = Boolean.valueOf(state.getAttributeValue("enabled"));
       previousKeyMap = state.getAttributeValue("keymap");
     }
+
+    loadShortcutConflicts(element);
 
     mark.readData(element);
     register.readData(element);
@@ -288,6 +300,11 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     return getInstance().error;
   }
 
+  @NotNull
+  public static Map<KeyStroke, ShortcutOwner> getShortcutConflicts() {
+    return getInstance().shortcutConflicts;
+  }
+
   /**
    * Indicate to the user that an error has occurred. Just beep.
    */
@@ -329,6 +346,47 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   @NotNull
   private static VimPlugin getInstance() {
     return (VimPlugin)ApplicationManager.getApplication().getComponent(IDEAVIM_COMPONENT_NAME);
+  }
+
+  private void saveShortcutConflicts(@NotNull Element element) {
+    final Element conflictsElement = new Element(SHORTCUT_CONFLICTS_ELEMENT);
+    for (Map.Entry<KeyStroke, ShortcutOwner> entry : shortcutConflicts.entrySet()) {
+      final Element conflictElement = new Element(SHORTCUT_CONFLICT_ELEMENT);
+      conflictElement.setAttribute(OWNER_ATTRIBUTE, entry.getValue().getName());
+      final Element textElement = new Element(TEXT_ELEMENT);
+      StringHelper.setSafeXmlText(textElement, entry.getKey().toString());
+      conflictElement.addContent(textElement);
+      conflictsElement.addContent(conflictElement);
+    }
+    element.addContent(conflictsElement);
+  }
+
+  private void loadShortcutConflicts(@NotNull Element element) {
+    final Element conflictsElement = element.getChild(SHORTCUT_CONFLICTS_ELEMENT);
+    if (conflictsElement != null) {
+      final java.util.List<Element> conflictElements = conflictsElement.getChildren(SHORTCUT_CONFLICT_ELEMENT);
+      for (Element conflictElement : conflictElements) {
+        final String ownerValue = conflictElement.getAttributeValue(OWNER_ATTRIBUTE);
+        ShortcutOwner owner = null;
+        try {
+          owner = ShortcutOwner.valueOf(ownerValue);
+        }
+        catch (IllegalArgumentException ignored) {
+        }
+        if (owner != null) {
+          final Element textElement = conflictElement.getChild(TEXT_ELEMENT);
+          if (textElement != null) {
+            final String text = StringHelper.getSafeXmlText(textElement);
+            if (text != null) {
+              final KeyStroke keyStroke = KeyStroke.getKeyStroke(text);
+              if (keyStroke != null) {
+                shortcutConflicts.put(keyStroke, owner);
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   private void turnOnPlugin() {
