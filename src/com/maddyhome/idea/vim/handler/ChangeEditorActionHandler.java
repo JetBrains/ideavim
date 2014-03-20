@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  */
@@ -36,5 +37,6 @@ public abstract class ChangeEditorActionHandler extends EditorActionHandlerBase 
     return worked;
   }
 
-  public abstract boolean execute(Editor editor, DataContext context, int count, int rawCount, Argument argument);
+  public abstract boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
+                                  @Nullable Argument argument);
 }

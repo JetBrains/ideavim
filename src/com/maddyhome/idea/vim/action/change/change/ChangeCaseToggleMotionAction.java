@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  */
@@ -35,9 +36,9 @@ public class ChangeCaseToggleMotionAction extends EditorAction {
   }
 
   private static class Handler extends ChangeEditorActionHandler {
-    public boolean execute(@NotNull Editor editor, DataContext context, int count, int rawCount, @NotNull Argument argument) {
-      return VimPlugin.getChange().changeCaseMotion(editor, context, count, rawCount,
-                                                                      CharacterHelper.CASE_TOGGLE, argument);
+    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
+      return argument != null && VimPlugin.getChange().changeCaseMotion(editor, context, count, rawCount,
+                                                                        CharacterHelper.CASE_TOGGLE, argument);
     }
   }
 }

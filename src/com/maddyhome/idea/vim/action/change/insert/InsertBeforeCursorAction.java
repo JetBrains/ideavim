@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.List;
@@ -38,7 +39,7 @@ public class InsertBeforeCursorAction extends VimCommandAction {
   public InsertBeforeCursorAction() {
     super(new ChangeEditorActionHandler() {
       public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
-                             Argument argument) {
+                             @Nullable Argument argument) {
         VimPlugin.getChange().insertBeforeCursor(editor, context);
         return true;
       }

@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  */
@@ -34,10 +35,14 @@ public class ShiftLeftMotionAction extends EditorAction {
   }
 
   private static class Handler extends ChangeEditorActionHandler {
-    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @NotNull Argument argument) {
-      VimPlugin.getChange().indentMotion(editor, context, count, rawCount, argument, -1);
-
-      return true;
+    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
+      if (argument != null) {
+        VimPlugin.getChange().indentMotion(editor, context, count, rawCount, argument, -1);
+        return true;
+      }
+      else {
+        return false;
+      }
     }
   }
 }
