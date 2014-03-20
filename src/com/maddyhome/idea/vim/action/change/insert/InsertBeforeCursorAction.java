@@ -26,18 +26,14 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
 
-/**
- */
 public class InsertBeforeCursorAction extends EditorAction {
   public InsertBeforeCursorAction() {
-    super(new Handler());
-  }
-
-  private static class Handler extends ChangeEditorActionHandler {
-    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, Argument argument) {
-      VimPlugin.getChange().insertBeforeCursor(editor, context);
-
-      return true;
-    }
+    super(new ChangeEditorActionHandler() {
+      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
+                             Argument argument) {
+        VimPlugin.getChange().insertBeforeCursor(editor, context);
+        return true;
+      }
+    });
   }
 }
