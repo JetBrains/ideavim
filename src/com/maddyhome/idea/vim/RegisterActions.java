@@ -17,6 +17,9 @@
  */
 package com.maddyhome.idea.vim;
 
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
+import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
@@ -26,6 +29,8 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RegisterActions {
 
@@ -34,6 +39,8 @@ public class RegisterActions {
    */
   public static void registerActions() {
     final KeyParser parser = KeyParser.getInstance();
+
+    registerVimCommandActions(parser);
 
     registerInsertModeActions(parser);
     registerVisualModeActions(parser);
@@ -109,6 +116,24 @@ public class RegisterActions {
                               KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
     parser.setupActionHandler("EditorMoveToPageBottomWithSelection", "VimDummyHandler",
                               KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK));
+  }
+
+  private static void registerVimCommandActions(@NotNull KeyParser parser) {
+    final ActionManagerEx manager = ActionManagerEx.getInstanceEx();
+    for (String actionId : manager.getPluginActions(VimPlugin.getPluginId())) {
+      final AnAction action = manager.getAction(actionId);
+      if (action instanceof VimCommandAction) {
+        final VimCommandAction commandAction = (VimCommandAction)action;
+        final List<Shortcut> shortcuts = new ArrayList<Shortcut>();
+        for (List<KeyStroke> keyStrokes : commandAction.getKeyStrokesSet()) {
+          shortcuts.add(new Shortcut(keyStrokes.toArray(new KeyStroke[keyStrokes.size()])));
+        }
+        // TODO: Check for shortcut conflicts with the current keymap
+        parser.registerAction(commandAction.getMappingModes(), actionId, commandAction.getType(),
+                              commandAction.getFlags(), shortcuts.toArray(new Shortcut[shortcuts.size()]),
+                              commandAction.getArgumentType());
+      }
+    }
   }
 
   private static void registerVariousModesActions(@NotNull KeyParser parser) {
@@ -646,10 +671,6 @@ public class RegisterActions {
                           new Shortcut('A'));
     parser.registerAction(MappingMode.N, "VimInsertAtPreviousInsert", Command.Type.INSERT, Command.FLAG_MULTIKEY_UNDO,
                           new Shortcut("gi"));
-    parser.registerAction(MappingMode.N, "VimInsertBeforeCursor", Command.Type.INSERT, Command.FLAG_MULTIKEY_UNDO, new Shortcut[]{
-      new Shortcut('i'),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0))
-    });
     parser.registerAction(MappingMode.N, "VimInsertBeforeFirstNonBlank", Command.Type.INSERT, Command.FLAG_MULTIKEY_UNDO,
                           new Shortcut('I'));
     parser.registerAction(MappingMode.N, "VimInsertLineStart", Command.Type.INSERT, Command.FLAG_MULTIKEY_UNDO,

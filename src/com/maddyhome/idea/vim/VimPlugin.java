@@ -38,6 +38,7 @@ import com.intellij.openapi.editor.actionSystem.TypedAction;
 import com.intellij.openapi.editor.event.EditorFactoryAdapter;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.editor.ex.EditorEx;
+import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
@@ -75,6 +76,7 @@ import java.awt.*;
     file = "$APP_CONFIG$/vim_settings.xml")})
 public class VimPlugin implements ApplicationComponent, PersistentStateComponent<Element> {
   private static final String IDEAVIM_COMPONENT_NAME = "VimPlugin";
+  private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";
   public static final String IDEAVIM_NOTIFICATION_ID = "ideavim";
   public static final String IDEAVIM_NOTIFICATION_TITLE = "IdeaVim";
   public static final int STATE_VERSION = 2;
@@ -259,6 +261,10 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   public static HistoryGroup getHistory() {
     return getInstance().history;
+  }
+
+  public static PluginId getPluginId() {
+    return PluginId.getId(IDEAVIM_PLUGIN_ID);
   }
 
   public static boolean isEnabled() {

@@ -18,15 +18,26 @@
 
 package com.maddyhome.idea.vim.action.change.insert;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
 
-public class InsertBeforeCursorAction extends EditorAction {
+import javax.swing.*;
+import java.awt.event.KeyEvent;
+import java.util.List;
+import java.util.Set;
+
+import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
+
+public class InsertBeforeCursorAction extends VimCommandAction {
   public InsertBeforeCursorAction() {
     super(new ChangeEditorActionHandler() {
       public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
@@ -35,5 +46,35 @@ public class InsertBeforeCursorAction extends EditorAction {
         return true;
       }
     });
+  }
+
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.N;
+  }
+
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return ImmutableSet.of(stringToKeys("i"),
+                           ImmutableList.of(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0)));
+  }
+
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.INSERT;
+  }
+
+  @Override
+  public int getFlags() {
+    return Command.FLAG_MULTIKEY_UNDO;
+  }
+
+  @NotNull
+  @Override
+  public List<String> getHelpTopics() {
+    return ImmutableList.of("i", "insert", "<Insert>");
   }
 }
