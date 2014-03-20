@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.action.motion.visual;
 
-import com.google.common.collect.ImmutableSet;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -33,7 +32,7 @@ import javax.swing.*;
 import java.util.List;
 import java.util.Set;
 
-import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
+import static com.maddyhome.idea.vim.helper.StringHelper.parseKeysSet;
 
 public class VisualToggleCharacterModeAction extends VimCommandAction {
   public VisualToggleCharacterModeAction() {
@@ -54,7 +53,7 @@ public class VisualToggleCharacterModeAction extends VimCommandAction {
   @NotNull
   @Override
   public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return ImmutableSet.of(parseKeys("v"));
+    return parseKeysSet("v");
   }
 
   @NotNull

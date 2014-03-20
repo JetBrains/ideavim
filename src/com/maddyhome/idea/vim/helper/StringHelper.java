@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.helper;
 
+import com.google.common.collect.ImmutableSet;
 import org.apache.commons.codec.binary.Base64;
 import org.jdom.CDATA;
 import org.jdom.Content;
@@ -29,6 +30,7 @@ import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static javax.swing.KeyStroke.getKeyStroke;
 
@@ -203,6 +205,15 @@ public class StringHelper {
       throw new IllegalArgumentException("Unfinished special key");
     }
     return result;
+  }
+
+  @NotNull
+  public static Set<List<KeyStroke>> parseKeysSet(@NotNull String... keyStrings) {
+    final ImmutableSet.Builder<List<KeyStroke>> builder = ImmutableSet.builder();
+    for (String keyString : keyStrings) {
+      builder.add(parseKeys(keyString));
+    }
+    return builder.build();
   }
 
   @NotNull

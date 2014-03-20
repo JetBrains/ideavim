@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.action.change.insert;
 
-import com.google.common.collect.ImmutableSet;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -33,7 +32,7 @@ import javax.swing.*;
 import java.util.List;
 import java.util.Set;
 
-import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
+import static com.maddyhome.idea.vim.helper.StringHelper.parseKeysSet;
 
 public class InsertBeforeCursorAction extends VimCommandAction {
   public InsertBeforeCursorAction() {
@@ -55,7 +54,7 @@ public class InsertBeforeCursorAction extends VimCommandAction {
   @NotNull
   @Override
   public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return ImmutableSet.of(parseKeys("i"), parseKeys("<Insert>"));
+    return parseKeysSet("i", "<Insert>");
   }
 
   @NotNull
