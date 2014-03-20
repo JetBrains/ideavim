@@ -14,7 +14,8 @@ import java.util.Set;
 /**
  * Action that represents a Vim command.
  *
- * Actions should be registered in plugin.xml.
+ * Actions should be registered in resources/META-INF/plugin.xml and in package-info.java
+ * inside {@link com.maddyhome.idea.vim.action}.
  *
  * @author vlan
  */
@@ -47,12 +48,4 @@ public abstract class VimCommandAction extends EditorAction {
   public int getFlags() {
     return 0;
   }
-
-  /**
-   * Returns Vim help topic tags for the command.
-   *
-   * The names of the topic tags should match tags in the Vim help.
-   */
-  @NotNull
-  public abstract List<String> getHelpTopics();
 }

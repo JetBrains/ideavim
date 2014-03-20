@@ -57,8 +57,7 @@ public class InsertBeforeCursorAction extends VimCommandAction {
   @NotNull
   @Override
   public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return ImmutableSet.of(stringToKeys("i"),
-                           ImmutableList.of(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0)));
+    return ImmutableSet.of(stringToKeys("i"), ImmutableList.of(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0)));
   }
 
   @NotNull
@@ -70,11 +69,5 @@ public class InsertBeforeCursorAction extends VimCommandAction {
   @Override
   public int getFlags() {
     return Command.FLAG_MULTIKEY_UNDO;
-  }
-
-  @NotNull
-  @Override
-  public List<String> getHelpTopics() {
-    return ImmutableList.of("i", "insert", "<Insert>");
   }
 }
