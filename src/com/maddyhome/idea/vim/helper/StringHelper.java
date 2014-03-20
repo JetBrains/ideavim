@@ -30,6 +30,8 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.swing.KeyStroke.getKeyStroke;
+
 public class StringHelper {
   private StringHelper() {}
 
@@ -142,10 +144,76 @@ public class StringHelper {
   public static List<KeyStroke> stringToKeys(@NotNull String s) {
     final List<KeyStroke> res = new ArrayList<KeyStroke>();
     for (int i = 0; i < s.length(); i++) {
-      res.add(KeyStroke.getKeyStroke(s.charAt(i)));
+      res.add(getKeyStroke(s.charAt(i)));
     }
     return res;
   }
+
+  private static enum KeyParserState {
+    INIT,
+    ESCAPE,
+    SPECIAL,
+  }
+
+  /**
+   * Parses Vim key notation string.
+   *
+   * @throws IllegalArgumentException if there are any unknown special keys
+   * @see :help <>
+   */
+  @NotNull
+  public static List<KeyStroke> parseKeys(@NotNull String s) {
+    final List<KeyStroke> result = new ArrayList<KeyStroke>();
+    KeyParserState state = KeyParserState.INIT;
+    StringBuilder specialKeyBuilder = new StringBuilder();
+    for (int i = 0; i < s.length(); i++) {
+      final char c = s.charAt(i);
+      switch (state) {
+        case INIT:
+          if (c == '\\') {
+            state = KeyParserState.ESCAPE;
+          }
+          else if (c == '<') {
+            state = KeyParserState.SPECIAL;
+            specialKeyBuilder = new StringBuilder();
+          }
+          else {
+            result.add(getKeyStroke(c));
+          }
+          break;
+        case ESCAPE:
+          state = KeyParserState.INIT;
+          result.add(getKeyStroke(c));
+          break;
+        case SPECIAL:
+          if (c == '>') {
+            state = KeyParserState.INIT;
+            result.add(parseSpecialKey(specialKeyBuilder.toString()));
+          }
+          else {
+            specialKeyBuilder.append(c);
+          }
+          break;
+      }
+    }
+    if (state == KeyParserState.ESCAPE) {
+      throw new IllegalArgumentException("No character after escape");
+    }
+    else if (state == KeyParserState.SPECIAL) {
+      throw new IllegalArgumentException("Unfinished special key");
+    }
+    return result;
+  }
+
+  @NotNull
+  private static KeyStroke parseSpecialKey(@NotNull String s) {
+    final String lower = s.toLowerCase();
+    if ("insert".equals(lower)) {
+      return getKeyStroke(KeyEvent.VK_INSERT, 0);
+    }
+    throw new IllegalArgumentException("Unknown special key: <" + s + ">");
+  }
+
 
   public static boolean containsUpperCase(@NotNull String text) {
     for (int i = 0; i < text.length(); i++) {
