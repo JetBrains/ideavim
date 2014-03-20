@@ -76,9 +76,6 @@
       <keyboard-shortcut first-keystroke="control alt V" keymap="$default"/>
       <add-to-group group-id="ToolsMenu" anchor="last"/>
     </action>
-    <action id="VimReconfigureKeymap" class="com.maddyhome.idea.vim.action.VimReconfigureKeymapAction" text="Reconfigure Vim Keymap" description="Reconfigure Vim keymap">
-      <add-to-group group-id="ToolsMenu" relative-to-action="after VimPluginToggle"/>
-    </action>
 
     <!-- Motions -->
     <action id="VimMotionPreviousTab" class="com.maddyhome.idea.vim.action.motion.tabs.MotionPreviousTabAction" text="Move to Previous Tab"/>

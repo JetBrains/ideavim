@@ -18,9 +18,9 @@
 package com.maddyhome.idea.vim;
 
 import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
-import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ex.ApplicationEx;
@@ -40,6 +40,8 @@ import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
+import com.intellij.openapi.keymap.Keymap;
+import com.intellij.openapi.keymap.ex.KeymapManagerEx;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerAdapter;
@@ -79,7 +81,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";
   public static final String IDEAVIM_NOTIFICATION_ID = "ideavim";
   public static final String IDEAVIM_NOTIFICATION_TITLE = "IdeaVim";
-  public static final int STATE_VERSION = 2;
+  public static final int STATE_VERSION = 3;
 
   private static final boolean BLOCK_CURSOR_VIM_VALUE = true;
   private static final boolean ANIMATED_SCROLLING_VIM_VALUE = false;
@@ -140,11 +142,11 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   @Override
   public void initComponent() {
     LOG.debug("initComponent");
+    Notifications.Bus.register(IDEAVIM_NOTIFICATION_ID, NotificationDisplayType.STICKY_BALLOON);
 
     ApplicationManager.getApplication().invokeLater(new Runnable() {
       public void run() {
         updateState();
-        checkAndInstallKeymap();
       }
     });
 
@@ -186,7 +188,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     final Element state = new Element("state");
     state.setAttribute("version", Integer.toString(STATE_VERSION));
     state.setAttribute("enabled", Boolean.toString(enabled));
-    state.setAttribute("keymap", previousKeyMap);
     element.addContent(state);
 
     mark.saveData(element);
@@ -281,8 +282,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     if (enabled) {
       getInstance().turnOnPlugin();
     }
-
-    VimKeyMapUtil.switchKeymapBindings(enabled);
   }
 
   public static boolean isError() {
@@ -327,16 +326,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     }
   }
 
-  @Deprecated
-  public static String getPreviousKeyMap() {
-    return getInstance().previousKeyMap;
-  }
-
-  @Deprecated
-  public static void setPreviousKeyMap(final String keymap) {
-    getInstance().previousKeyMap = keymap;
-  }
-
   @NotNull
   private static VimPlugin getInstance() {
     return (VimPlugin)ApplicationManager.getApplication().getComponent(IDEAVIM_COMPONENT_NAME);
@@ -363,16 +352,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private void updateState() {
     if (isEnabled() && !ApplicationManager.getApplication().isUnitTestMode()) {
       boolean requiresRestart = false;
-      if (previousStateVersion < 1 && SystemInfo.isMac && VimKeyMapUtil.isVimKeymapInstalled()) {
-        if (Messages.showYesNoDialog("Vim keymap generator has been updated to create keymaps more compatible " +
-                                     "with base keymaps.\n\nDo you want to reconfigure your Vim keymap?\n\n" +
-                                     "Warning: Any custom shortcuts will be lost!\n\n" +
-                                     "(You can do it later using Tools | Reconfigure Vim Keymap).",
-                                     IDEAVIM_NOTIFICATION_TITLE, Messages.getQuestionIcon()
-        ) == Messages.YES) {
-          KeyHandler.executeAction("VimReconfigureKeymap", SimpleDataContext.getProjectContext(null));
-        }
-      }
       if (previousStateVersion < 2 && SystemInfo.isMac) {
         final MacKeyRepeat keyRepeat = MacKeyRepeat.getInstance();
         final Boolean enabled = keyRepeat.isEnabled();
@@ -388,6 +367,26 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
           }
         }
       }
+      if (previousStateVersion < 3) {
+        if (previousKeyMap != null && !"".equals(previousKeyMap)) {
+          notify(String.format("IdeaVim plugin doesn't use the special \"Vim\" keymap any longer. " +
+                               "When you use a conflicting keyboard shortcut for the first time, " +
+                               "it will ask you whether to use it for the IDE or for Vim emulation." +
+                               "<br/><br/>" +
+                               "Switching back to \"%s\" keymap.", previousKeyMap),
+                 NotificationType.INFORMATION);
+          final KeymapManagerEx manager = KeymapManagerEx.getInstanceEx();
+          final Keymap keymap = manager.getKeymap(previousKeyMap);
+          if (keymap != null) {
+            manager.setActiveKeymap(keymap);
+          }
+          else {
+            notify(String.format("Cannot find \"%s\" keymap, please set up a keymap manually.", previousKeyMap),
+                   NotificationType.ERROR);
+
+          }
+        }
+      }
       if (requiresRestart) {
         final ApplicationEx app = ApplicationManagerEx.getApplicationEx();
         app.restart();
@@ -395,37 +394,10 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     }
   }
 
-  private static void checkAndInstallKeymap() {
-    // Ensure that Vim keymap is installed and install if not.
-    // Moreover we can use installed keymap as indicator of the first time installed plugin
-    if (VimPlugin.isEnabled()) {
-      boolean vimKeyMapInstalled = VimKeyMapUtil.isVimKeymapInstalled();
-      // In case if keymap wasn't installed, we assume that this is the first launch after installation
-      if (!vimKeyMapInstalled) {
-        vimKeyMapInstalled = VimKeyMapUtil.installKeyBoardBindings();
-        if (!vimKeyMapInstalled) {
-          if (Messages.showYesNoDialog("It is crucial to use Vim keymap for IdeaVim plugin correct work, " +
-                                       "however it was not installed correctly.\nDo you want " +
-                                       ApplicationManagerEx.getApplicationEx().getName() +
-                                       " to disable Vim emulation?", IDEAVIM_NOTIFICATION_TITLE,
-                                       Messages.getQuestionIcon()) == Messages.YES) {
-            VimPlugin.getInstance().turnOffPlugin();
-            return;
-          }
-
-        }
-        // Enable proper keymap bindings
-        VimKeyMapUtil.switchKeymapBindings(true);
-      }
-      // In this case we should warn if user doesn't use vim keymap
-      else {
-        if (!VimKeyMapUtil.isVimKeymapUsed()) {
-          Notifications.Bus.notify(new Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
-                                                    "Vim keymap is not active, IdeaVim plugin may work incorrectly",
-                                                    NotificationType.WARNING));
-        }
-      }
-    }
+  private void notify(@NotNull String content, @NotNull NotificationType type) {
+    final Notification notification = new Notification(VimPlugin.IDEAVIM_NOTIFICATION_ID,
+                                                       VimPlugin.IDEAVIM_NOTIFICATION_TITLE, content, type);
+    notification.notify(null);
   }
 
   /**
