@@ -18,7 +18,7 @@
 
 package com.maddyhome.idea.vim;
 
-import com.intellij.codeInsight.lookup.LookupEx;
+import com.intellij.codeInsight.lookup.Lookup;
 import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
@@ -34,45 +34,47 @@ import javax.swing.*;
  * IDE shortcut keys used by Vim commands are handled by {@link com.maddyhome.idea.vim.action.VimShortcutKeyAction}.
  */
 public class VimTypedActionHandler implements TypedActionHandler {
+  private static Logger logger = Logger.getInstance(VimTypedActionHandler.class.getName());
+
+  private TypedActionHandler origHandler;
+  private KeyHandler handler;
+
   public VimTypedActionHandler(TypedActionHandler origHandler) {
     this.origHandler = origHandler;
     handler = KeyHandler.getInstance();
     handler.setOriginalHandler(origHandler);
   }
 
+  @Override
+  public void execute(@NotNull final Editor editor, final char charTyped, @NotNull final DataContext context) {
+    if (isEnabled(editor)) {
+      // Run key handler outside of the key typed command for creating our own undoable commands
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          try {
+            handler.handleKey(editor, KeyStroke.getKeyStroke(charTyped), context);
+          }
+          catch (Throwable e) {
+            logger.error(e);
+          }
+        }
+      });
+    }
+    else {
+      origHandler.execute(editor, charTyped, context);
+    }
+  }
+
   public TypedActionHandler getOriginalTypedHandler() {
     return origHandler;
   }
 
-  public void execute(@NotNull final Editor editor, final char charTyped, @NotNull final DataContext context) {
-    // If the plugin is disabled we simply resend the character to the original handler
-    if (!VimPlugin.isEnabled()) {
-      origHandler.execute(editor, charTyped, context);
-      return;
+  private boolean isEnabled(@NotNull Editor editor) {
+    if (VimPlugin.isEnabled()) {
+      final Lookup lookup = LookupManager.getActiveLookup(editor);
+      return lookup == null || !lookup.isFocused();
     }
-    // In case if keystrokes go to lookup, we use original handler
-    final LookupEx lookup = LookupManager.getActiveLookup(editor);
-    if (lookup != null && lookup.isFocused()) {
-      origHandler.execute(editor, charTyped, context);
-      return;
-    }
-
-    // Run key handler outside of the key typed command for creating our own undoable commands
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          handler.handleKey(editor, KeyStroke.getKeyStroke(charTyped), context);
-        }
-        catch (Throwable e) {
-          logger.error(e);
-        }
-      }
-    });
+    return false;
   }
-
-  private TypedActionHandler origHandler;
-  private KeyHandler handler;
-
-  private static Logger logger = Logger.getInstance(VimTypedActionHandler.class.getName());
 }
