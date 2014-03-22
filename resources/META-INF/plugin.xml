@@ -340,23 +340,8 @@
     <action id="VimUndo" class="com.maddyhome.idea.vim.action.change.UndoAction" text="Undo"/>
 
     <!-- Keys -->
-    <action id="VimKeyHandler" class="com.maddyhome.idea.vim.action.key.KeyAction" text="Keys"/>
-    <action id="VimDummyHandler" class="com.maddyhome.idea.vim.action.key.DummyAction" text="Keys"/>
+    <action id="VimKeyAction" class="com.maddyhome.idea.vim.action.key.KeyAction" text="Vim Shortcuts"/>
+
     <action id="VimNotImplementedHandler" class="com.maddyhome.idea.vim.action.key.NotImplementedAction" text="Reserved For Future Use"/>
-    <action id="VimEditorBackSpace" class="com.maddyhome.idea.vim.action.key.BackSpaceAction" text="Backspace"/>
-    <action id="VimEditorDelete" class="com.maddyhome.idea.vim.action.key.DeleteAction" text="Delete"/>
-    <action id="VimEditorDown" class="com.maddyhome.idea.vim.action.key.DownAction" text="Down"/>
-    <action id="VimEditorEnter" class="com.maddyhome.idea.vim.action.key.EnterAction" text="Enter"/>
-    <action id="VimEditorEscape" class="com.maddyhome.idea.vim.action.key.EscapeAction" text="Escape"/>
-    <action id="VimEditorLeft" class="com.maddyhome.idea.vim.action.key.LeftAction" text="Left"/>
-    <action id="VimEditorLineEnd" class="com.maddyhome.idea.vim.action.key.LineEndAction" text="LineEnd"/>
-    <action id="VimEditorLineStart" class="com.maddyhome.idea.vim.action.key.LineStartAction" text="LineStart"/>
-    <action id="VimEditorPageDown" class="com.maddyhome.idea.vim.action.key.PageDownAction" text="PageDown"/>
-    <action id="VimEditorPageUp" class="com.maddyhome.idea.vim.action.key.PageUpAction" text="PageUp"/>
-    <action id="VimEditorRight" class="com.maddyhome.idea.vim.action.key.RightAction" text="Right"/>
-    <action id="VimEditorTab" class="com.maddyhome.idea.vim.action.key.TabAction" text="Tab"/>
-    <action id="VimEditorToggleInsertState" class="com.maddyhome.idea.vim.action.key.ToggleInsertStateAction" text="Insert/Overwrite"/>
-    <action id="VimEditorUp" class="com.maddyhome.idea.vim.action.key.UpAction" text="Up"/>
-    <action id="VimDigraphEntry" class="com.maddyhome.idea.vim.action.key.KeyAction" text="Digraph Entry"/>
   </actions>
 </idea-plugin>

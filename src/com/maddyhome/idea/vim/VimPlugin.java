@@ -21,6 +21,8 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationType;
 import com.intellij.notification.Notifications;
+import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ex.ApplicationEx;
@@ -53,6 +55,7 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.group.*;
 import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
 import com.maddyhome.idea.vim.option.Options;
 import org.jdom.Element;
@@ -61,8 +64,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.List;
 
 /**
  * This plugin attempts to emulate the key binding and general functionality of Vim and gVim. See the supplied
@@ -165,11 +168,11 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     vimHandler = new VimTypedActionHandler(action.getHandler());
     action.setupHandler(vimHandler);
 
-    // Add some listeners so we can handle special events
-    setupListeners();
-
     // Register vim actions in command mode
     RegisterActions.registerActions();
+
+    // Add some listeners so we can handle special events
+    setupListeners();
 
     // Register ex handlers
     CommandParser.getInstance().registerHandlers();
@@ -475,6 +478,8 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         isRefrainFromScrolling = editor.getSettings().isRefrainFromScrolling();
         EditorData.initializeEditor(editor);
         DocumentManager.getInstance().addListeners(editor.getDocument());
+        final Set<KeyStroke> requiredKeys = KeyParser.getInstance().getRequiredKeys();
+        getKeyAction().registerCustomShortcutSet(toShortcutSet(requiredKeys), editor.getComponent());
 
         if (VimPlugin.isEnabled()) {
           // Turn on insert mode if editor doesn't have any file
@@ -490,10 +495,12 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
       @Override
       public void editorReleased(@NotNull EditorFactoryEvent event) {
-        EditorData.uninitializeEditor(event.getEditor());
-        event.getEditor().getSettings().setAnimatedScrolling(isAnimatedScrolling);
-        event.getEditor().getSettings().setRefrainFromScrolling(isRefrainFromScrolling);
-        DocumentManager.getInstance().removeListeners(event.getEditor().getDocument());
+        final Editor editor = event.getEditor();
+        EditorData.uninitializeEditor(editor);
+        getKeyAction().unregisterCustomShortcutSet(editor.getComponent());
+        editor.getSettings().setAnimatedScrolling(isAnimatedScrolling);
+        editor.getSettings().setRefrainFromScrolling(isRefrainFromScrolling);
+        DocumentManager.getInstance().removeListeners(editor.getDocument());
       }
     }, myApp);
 
@@ -516,6 +523,20 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     });
 
     CommandProcessor.getInstance().addCommandListener(DelegateCommandListener.getInstance());
+  }
+
+  @NotNull
+  private AnAction getKeyAction() {
+    return ActionManagerEx.getInstanceEx().getAction("VimKeyAction");
+  }
+
+  @NotNull
+  private ShortcutSet toShortcutSet(@NotNull Collection<KeyStroke> keyStrokes) {
+    final List<Shortcut> shortcuts = new ArrayList<Shortcut>();
+    for (KeyStroke key : keyStrokes) {
+      shortcuts.add(new KeyboardShortcut(key, null));
+    }
+    return new CustomShortcutSet(shortcuts.toArray(new Shortcut[shortcuts.size()]));
   }
 
   private void setCursors(boolean isBlock) {

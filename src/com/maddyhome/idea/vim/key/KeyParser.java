@@ -22,22 +22,17 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
-import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.handler.EditorKeyHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.awt.event.KeyEvent;
+import java.util.*;
 
 /**
  * The key parser creates a tree of key sequences with terminals representing complete keystroke sequences mapped to
@@ -59,6 +54,8 @@ import java.util.Set;
  * supplied with the plugin. All the custom Vim Plugin actions are listed in the plugin.xml file.
  */
 public class KeyParser {
+  private Set<KeyStroke> requiredKeys = new HashSet<KeyStroke>();
+
   /**
    * Returns the singleton instance of this key parser
    *
@@ -72,34 +69,15 @@ public class KeyParser {
     return instance;
   }
 
-  public void setupActionHandler(@NotNull String ideaActName, String vimActName, @NotNull KeyStroke stroke) {
-    setupActionHandler(ideaActName, vimActName, stroke, false);
-  }
-
-  public void setupActionHandler(@NotNull String ideaActName, @Nullable String vimActName, @NotNull KeyStroke stroke, boolean special) {
-    if (logger.isDebugEnabled()) logger.debug("setupActionHandler for " + ideaActName + " and " + vimActName + " for " + stroke);
-    ActionManager manager = ActionManager.getInstance();
-    AnAction ideaAction = manager.getAction(ideaActName);
-    if (ideaAction instanceof EditorAction) {
-      if (logger.isDebugEnabled()) logger.debug(ideaActName + " is an EditorAction");
-      EditorAction ideaEditorAction = (EditorAction)ideaAction;
-      EditorActionHandler handler = ideaEditorAction.getHandler();
-      if (vimActName != null) {
-        EditorAction vimAction = (EditorAction)manager.getAction(vimActName);
-        vimAction.setupHandler(handler);
-      }
-
-      ideaEditorAction.setupHandler(new EditorKeyHandler(handler, stroke, special));
-    }
-
-    //removePossibleConflict(stroke);
-  }
-
   /**
    * Creates the key parser
    */
   private KeyParser() {
     logger.debug("KeyParser ctr");
+  }
+
+  public Set<KeyStroke> getRequiredKeys() {
+    return requiredKeys;
   }
 
   /**
@@ -226,7 +204,13 @@ public class KeyParser {
                              @NotNull Argument.Type argType) {
     for (Shortcut shortcut : shortcuts) {
       // TODO: Check for shortcut conflicts with the current keymap
-      registerAction(mappingModes, actName, cmdType, cmdFlags, shortcut.getKeys(), argType);
+      final KeyStroke[] keys = shortcut.getKeys();
+      for (KeyStroke key : keys) {
+        if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
+          requiredKeys.add(key);
+        }
+      }
+      registerAction(mappingModes, actName, cmdType, cmdFlags, keys, argType);
     }
   }
 

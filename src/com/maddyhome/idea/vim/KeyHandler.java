@@ -213,7 +213,7 @@ public class KeyHandler {
         CommandProcessor.getInstance().executeCommand(editor.getProject(), new Runnable() {
           @Override
           public void run() {
-            KeyHandler.executeAction("VimEditorEscape", context);
+            KeyHandler.executeAction("EditorEscape", context);
           }
         }, "", null);
       }

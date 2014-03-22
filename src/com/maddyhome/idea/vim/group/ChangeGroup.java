@@ -193,7 +193,7 @@ public class ChangeGroup {
     CommandState state = CommandState.getInstance(editor);
     if (state.getMode() != CommandState.Mode.REPEAT) {
       final ActionManager actionManager = ActionManager.getInstance();
-      final AnAction action = actionManager.getAction("VimEditorEnter");
+      final AnAction action = actionManager.getAction("EditorEnter");
       if (action != null) {
         strokes.add(action);
         KeyHandler.executeAction(action, context);
@@ -413,7 +413,7 @@ public class ChangeGroup {
       }
 
       if (oldFragment.length() > 0) {
-        final AnAction editorBackSpace = ActionManager.getInstance().getAction("VimEditorBackSpace");
+        final AnAction editorBackSpace = ActionManager.getInstance().getAction("EditorBackSpace");
         for (int i = 0; i < oldFragment.length(); i++) {
           strokes.add(editorBackSpace);
         }
@@ -554,11 +554,11 @@ public class ChangeGroup {
    */
   public void processEnter(@NotNull Editor editor, @NotNull DataContext context) {
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.REPLACE) {
-      KeyHandler.executeAction("VimEditorToggleInsertState", context);
+      KeyHandler.executeAction("EditorToggleInsertState", context);
     }
-    KeyHandler.executeAction("VimEditorEnter", context);
+    KeyHandler.executeAction("EditorEnter", context);
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.REPLACE) {
-      KeyHandler.executeAction("VimEditorToggleInsertState", context);
+      KeyHandler.executeAction("EditorToggleInsertState", context);
     }
   }
 
@@ -570,7 +570,7 @@ public class ChangeGroup {
    * @param context The data context
    */
   public void processInsert(Editor editor, @NotNull DataContext context) {
-    KeyHandler.executeAction("VimEditorToggleInsertState", context);
+    KeyHandler.executeAction("EditorToggleInsertState", context);
     CommandState.getInstance(editor).toggleInsertOverwrite();
     inInsert = !inInsert;
   }
