@@ -188,14 +188,6 @@ public class RegisterActions {
       KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SLASH, KeyEvent.CTRL_MASK),
       KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK)
     }));
-
-    // "Reserve" these keys so they don't work in IDEA. Eventually these may be valid plugin commands.
-    parser.registerAction(MappingMode.ALL, "VimNotImplementedHandler", Command.Type.OTHER_READONLY,
-                          new Shortcut[]{new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_G, KeyEvent.CTRL_MASK)),
-                            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.CTRL_MASK)),
-                            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_MASK)),
-                            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.CTRL_MASK)),
-                            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_Z, KeyEvent.CTRL_MASK))});
   }
 
   private static void registerCommandLineActions(@NotNull KeyParser parser) {
