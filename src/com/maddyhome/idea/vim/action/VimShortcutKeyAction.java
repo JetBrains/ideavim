@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action.key;
+package com.maddyhome.idea.vim.action;
 
 import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -35,7 +35,7 @@ import javax.swing.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-public class KeyAction extends AnAction implements DumbAware {
+public class VimShortcutKeyAction extends AnAction implements DumbAware {
   // TODO: Always handle these keys if emulation is enabled and they aren't used in a special context
   public static KeyStroke[] VIM_ONLY_EDITOR_KEYS = new KeyStroke[] {
     KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),

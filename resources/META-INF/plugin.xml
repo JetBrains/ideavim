@@ -340,7 +340,7 @@
     <action id="VimUndo" class="com.maddyhome.idea.vim.action.change.UndoAction" text="Undo"/>
 
     <!-- Keys -->
-    <action id="VimKeyAction" class="com.maddyhome.idea.vim.action.key.KeyAction" text="Vim Shortcuts"/>
+    <action id="VimShortcutKeyAction" class="com.maddyhome.idea.vim.action.VimShortcutKeyAction" text="Vim Shortcuts"/>
 
     <action id="VimNotImplementedHandler" class="com.maddyhome.idea.vim.action.key.NotImplementedAction" text="Reserved For Future Use"/>
   </actions>
