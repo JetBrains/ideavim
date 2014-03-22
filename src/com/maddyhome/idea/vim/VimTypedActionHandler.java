@@ -29,38 +29,21 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 
 /**
- * This handler accepts all regular keystrokes and passes them on to the Vim Key handler
+ * Accepts all regular keystrokes and passes them on to the Vim key handler.
+ *
+ * IDE shortcut keys used by Vim commands are handled by {@link com.maddyhome.idea.vim.action.VimShortcutKeyAction}.
  */
 public class VimTypedActionHandler implements TypedActionHandler {
-  /**
-   * Creates an instance of the key handler
-   *
-   * @param origHandler The original key handler
-   */
   public VimTypedActionHandler(TypedActionHandler origHandler) {
     this.origHandler = origHandler;
     handler = KeyHandler.getInstance();
     handler.setOriginalHandler(origHandler);
   }
 
-  /**
-   * Gives the original key handler
-   *
-   * @return The original key handler
-   */
   public TypedActionHandler getOriginalTypedHandler() {
     return origHandler;
   }
 
-  /**
-   * All characters typed into an editor will get sent to this handler. Only letters, numbers, and punctuation
-   * are sent here. Keys like Tab, Enter, Home, Backspace, etc. and all Control-Letter etc. argType keys are not
-   * sent by Idea to this handler.
-   *
-   * @param editor    The editor the character was typed into
-   * @param charTyped The character that was typed
-   * @param context   The data context
-   */
   public void execute(@NotNull final Editor editor, final char charTyped, @NotNull final DataContext context) {
     // If the plugin is disabled we simply resend the character to the original handler
     if (!VimPlugin.isEnabled()) {
