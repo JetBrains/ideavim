@@ -479,7 +479,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         EditorData.initializeEditor(editor);
         DocumentManager.getInstance().addListeners(editor.getDocument());
         final Set<KeyStroke> requiredKeys = KeyParser.getInstance().getRequiredKeys();
-        getShorctuKeyAction().registerCustomShortcutSet(toShortcutSet(requiredKeys), editor.getComponent());
+        getShortcutKeyAction().registerCustomShortcutSet(toShortcutSet(requiredKeys), editor.getComponent());
 
         if (VimPlugin.isEnabled()) {
           // Turn on insert mode if editor doesn't have any file
@@ -497,7 +497,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
       public void editorReleased(@NotNull EditorFactoryEvent event) {
         final Editor editor = event.getEditor();
         EditorData.uninitializeEditor(editor);
-        getShorctuKeyAction().unregisterCustomShortcutSet(editor.getComponent());
+        getShortcutKeyAction().unregisterCustomShortcutSet(editor.getComponent());
         editor.getSettings().setAnimatedScrolling(isAnimatedScrolling);
         editor.getSettings().setRefrainFromScrolling(isRefrainFromScrolling);
         DocumentManager.getInstance().removeListeners(editor.getDocument());
@@ -526,7 +526,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   }
 
   @NotNull
-  private AnAction getShorctuKeyAction() {
+  private AnAction getShortcutKeyAction() {
     return ActionManagerEx.getInstanceEx().getAction("VimShortcutKeyAction");
   }
 
