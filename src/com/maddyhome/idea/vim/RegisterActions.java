@@ -29,11 +29,8 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.List;
 
 public class RegisterActions {
-
   /**
    * Register all the key/action mappings for the plugin.
    */
@@ -55,14 +52,7 @@ public class RegisterActions {
     for (String actionId : manager.getPluginActions(VimPlugin.getPluginId())) {
       final AnAction action = manager.getAction(actionId);
       if (action instanceof VimCommandAction) {
-        final VimCommandAction commandAction = (VimCommandAction)action;
-        final List<Shortcut> shortcuts = new ArrayList<Shortcut>();
-        for (List<KeyStroke> keyStrokes : commandAction.getKeyStrokesSet()) {
-          shortcuts.add(new Shortcut(keyStrokes.toArray(new KeyStroke[keyStrokes.size()])));
-        }
-        parser.registerAction(commandAction.getMappingModes(), actionId, commandAction.getType(),
-                              commandAction.getFlags(), shortcuts.toArray(new Shortcut[shortcuts.size()]),
-                              commandAction.getArgumentType());
+        parser.registerCommandAction((VimCommandAction)action, actionId);
       }
     }
   }

@@ -24,6 +24,7 @@ import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
+import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
@@ -54,28 +55,29 @@ import java.util.*;
  * supplied with the plugin. All the custom Vim Plugin actions are listed in the plugin.xml file.
  */
 public class KeyParser {
-  private Set<KeyStroke> requiredKeys = new HashSet<KeyStroke>();
+  private static KeyParser instance;
+  private static Logger logger = Logger.getInstance(KeyParser.class.getName());
 
-  /**
-   * Returns the singleton instance of this key parser
-   *
-   * @return The singleton instance
-   */
+  @NotNull private Set<KeyStroke> requiredKeys = new HashSet<KeyStroke>();
+  @NotNull private HashMap<MappingMode, RootNode> keyRoots = new HashMap<MappingMode, RootNode>();
+
   public static KeyParser getInstance() {
     if (instance == null) {
       instance = new KeyParser();
     }
-
     return instance;
   }
 
-  /**
-   * Creates the key parser
-   */
   private KeyParser() {
-    logger.debug("KeyParser ctr");
   }
 
+  @NotNull
+  @Override
+  public String toString() {
+    return "KeyParser=[roots=[" + keyRoots + "]";
+  }
+
+  @NotNull
   public Set<KeyStroke> getRequiredKeys() {
     return requiredKeys;
   }
@@ -97,109 +99,78 @@ public class KeyParser {
     return res;
   }
 
+  public void registerCommandAction(@NotNull VimCommandAction commandAction, @NotNull String actionId) {
+    final List<Shortcut> shortcuts = new ArrayList<Shortcut>();
+    for (List<KeyStroke> keyStrokes : commandAction.getKeyStrokesSet()) {
+      shortcuts.add(new Shortcut(keyStrokes.toArray(new KeyStroke[keyStrokes.size()])));
+    }
+    registerAction(commandAction.getMappingModes(), actionId, commandAction.getType(), commandAction.getFlags(),
+                   shortcuts.toArray(new Shortcut[shortcuts.size()]), commandAction.getArgumentType());
+  }
+
   /**
-   * Registers the action
-   *
-   * @param mappingModes  The set of mappings the shortcut is applicable to
-   * @param actName  The action the shortcut will execute
-   * @param cmdType  The type of the command
-   * @param shortcut The shortcut to map to the action
+   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
    */
+  @Deprecated
   public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, Shortcut shortcut) {
     registerAction(mappingModes, actName, cmdType, new Shortcut[]{shortcut});
   }
 
   /**
-   * Registers the action
-   *
-   * @param mappingModes  The set of mappings the shortcut is applicable to
-   * @param actName  The action the shortcut will execute
-   * @param cmdType  The type of the command
-   * @param cmdFlags Any special flags associated with this command
-   * @param shortcut The shortcut to map to the action
+   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
    */
+  @Deprecated
   public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, Shortcut shortcut) {
     registerAction(mappingModes, actName, cmdType, cmdFlags, new Shortcut[]{shortcut});
   }
 
   /**
-   * Registers the action
-   *
-   * @param mappingModes  The set of mappings the shortcut is applicable to
-   * @param actName  The action the shortcut will execute
-   * @param cmdType  The type of the command
-   * @param shortcut The shortcut to map to the action
-   * @param argType  The type of argument required by the actions
+   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
    */
+  @Deprecated
   public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, Shortcut shortcut,
                              @NotNull Argument.Type argType) {
     registerAction(mappingModes, actName, cmdType, new Shortcut[]{shortcut}, argType);
   }
 
   /**
-   * Registers the action
-   *
-   * @param mappingModes  The set of mappings the shortcut is applicable to
-   * @param actName  The action the shortcut will execute
-   * @param cmdType  The type of the command
-   * @param cmdFlags Any special flags associated with this command
-   * @param shortcut The shortcut to map to the action
-   * @param argType  The type of argument required by the actions
+   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
    */
+  @Deprecated
   public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, Shortcut shortcut,
                              @NotNull Argument.Type argType) {
     registerAction(mappingModes, actName, cmdType, cmdFlags, new Shortcut[]{shortcut}, argType);
   }
 
   /**
-   * Registers the action
-   *
-   * @param mappingModes   The set of mappings the shortcuts are applicable to
-   * @param actName   The action the shortcuts will execute
-   * @param cmdType   The type of the command
-   * @param shortcuts The shortcuts to map to the action
+   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
    */
+  @Deprecated
   public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, @NotNull Shortcut[] shortcuts) {
     registerAction(mappingModes, actName, cmdType, 0, shortcuts);
   }
 
   /**
-   * Registers the action
-   *
-   * @param mappingModes   The set of mappings the shortcuts are applicable to
-   * @param actName   The action the shortcuts will execute
-   * @param cmdType   The type of the command
-   * @param shortcuts The shortcuts to map to the action
-   * @param argType   The type of argument required by the actions
+   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
    */
+  @Deprecated
   public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, @NotNull Shortcut[] shortcuts,
                              @NotNull Argument.Type argType) {
     registerAction(mappingModes, actName, cmdType, 0, shortcuts, argType);
   }
 
   /**
-   * Registers the action
-   *
-   * @param mappingModes   The set of mappings the shortcuts are applicable to
-   * @param actName   The action the shortcuts will execute
-   * @param cmdType   The type of the command
-   * @param cmdFlags  Any special flags associated with this command
-   * @param shortcuts The shortcuts to map to the action
+   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
    */
+  @Deprecated
   public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, @NotNull Shortcut[] shortcuts) {
     registerAction(mappingModes, actName, cmdType, cmdFlags, shortcuts, Argument.Type.NONE);
   }
 
   /**
-   * Registers the action
-   *
-   * @param mappingModes   The set of mappings the shortcuts are applicable to
-   * @param actName   The action the shortcuts will execute
-   * @param cmdType   The type of the command
-   * @param cmdFlags  Any special flags associated with this command
-   * @param shortcuts The shortcuts to map to the action
-   * @param argType   The type of argument required by the actions
+   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
    */
+  @Deprecated
   public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, @NotNull Shortcut[] shortcuts,
                              @NotNull Argument.Type argType) {
     for (Shortcut shortcut : shortcuts) {
@@ -230,15 +201,9 @@ public class KeyParser {
   }
 
   /**
-   * Registers the action
-   *
-   * @param mappingModes  The set of mappings the keystrokes are applicable to
-   * @param actName  The action the keystrokes will execute
-   * @param cmdType  The type of the command
-   * @param cmdFlags Any special flags associated with this command
-   * @param keys     The keystrokes to map to the action
-   * @param argType  The type of argument required by the actions
+   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
    */
+  @Deprecated
   private void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, @NotNull KeyStroke[] keys,
                               @NotNull Argument.Type argType) {
     for (MappingMode mappingMode : mappingModes) {
@@ -254,18 +219,6 @@ public class KeyParser {
     }
   }
 
-  /**
-   * Adds a new node to the tree
-   *
-   * @param base     The specific node in the mapping tree this keystroke gets added to
-   * @param actName  The action the keystroke will execute
-   * @param cmdType  The type of the command
-   * @param cmdFlags Any special flags associated with this command
-   * @param key      The keystroke to map to the action
-   * @param argType  The type of argument required by the action
-   * @param last     True if last
-   * @return Node
-   */
   @Nullable
   private Node addNode(@NotNull ParentNode base, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, @NotNull KeyStroke key,
                        @NotNull Argument.Type argType, boolean last) {
@@ -302,15 +255,4 @@ public class KeyParser {
 
     return node;
   }
-
-  @NotNull
-  public String toString() {
-    return "KeyParser=[roots=[" + keyRoots + "]";
-  }
-
-  @NotNull private HashMap<MappingMode, RootNode> keyRoots = new HashMap<MappingMode, RootNode>();
-
-  private static KeyParser instance;
-
-  private static Logger logger = Logger.getInstance(KeyParser.class.getName());
 }
