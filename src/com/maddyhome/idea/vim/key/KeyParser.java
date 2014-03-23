@@ -58,7 +58,7 @@ public class KeyParser {
   private static KeyParser instance;
   private static Logger logger = Logger.getInstance(KeyParser.class.getName());
 
-  @NotNull private Set<KeyStroke> requiredKeys = new HashSet<KeyStroke>();
+  @NotNull private Set<KeyStroke> requiredShortcutKeys = new HashSet<KeyStroke>();
   @NotNull private HashMap<MappingMode, RootNode> keyRoots = new HashMap<MappingMode, RootNode>();
 
   public static KeyParser getInstance() {
@@ -78,8 +78,8 @@ public class KeyParser {
   }
 
   @NotNull
-  public Set<KeyStroke> getRequiredKeys() {
-    return requiredKeys;
+  public Set<KeyStroke> getRequiredShortcutKeys() {
+    return requiredShortcutKeys;
   }
 
   /**
@@ -178,7 +178,7 @@ public class KeyParser {
       final KeyStroke[] keys = shortcut.getKeys();
       for (KeyStroke key : keys) {
         if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
-          requiredKeys.add(key);
+          requiredShortcutKeys.add(key);
         }
       }
       registerAction(mappingModes, actName, cmdType, cmdFlags, keys, argType);

@@ -478,7 +478,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         isRefrainFromScrolling = editor.getSettings().isRefrainFromScrolling();
         EditorData.initializeEditor(editor);
         DocumentManager.getInstance().addListeners(editor.getDocument());
-        final Set<KeyStroke> requiredKeys = KeyParser.getInstance().getRequiredKeys();
+        final Set<KeyStroke> requiredKeys = KeyParser.getInstance().getRequiredShortcutKeys();
         getShortcutKeyAction().registerCustomShortcutSet(toShortcutSet(requiredKeys), editor.getComponent());
 
         if (VimPlugin.isEnabled()) {
