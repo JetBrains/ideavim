@@ -18,22 +18,34 @@
 
 package com.maddyhome.idea.vim.action;
 
+import com.google.common.collect.ImmutableSet;
 import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.keymap.Keymap;
+import com.intellij.openapi.keymap.ex.KeymapManagerEx;
 import com.intellij.openapi.project.DumbAware;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.EditorData;
+import com.maddyhome.idea.vim.key.ShortcutOwner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static java.awt.event.KeyEvent.*;
 
 /**
  * Handles Vim keys that are treated as action shortcuts by the IDE.
@@ -42,22 +54,30 @@ import java.awt.event.KeyEvent;
  */
 public class VimShortcutKeyAction extends AnAction implements DumbAware {
   // TODO: Always handle these keys if emulation is enabled and they aren't used in a special context
-  public static KeyStroke[] VIM_ONLY_EDITOR_KEYS = new KeyStroke[] {
-    KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
-    KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-    KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0),
-    KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0),  // +C
-    KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0),
-    KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0),      // +C
-    KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),          // +C +S
-    KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),        // +C +S
-    KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0),        // +C +S +CS
-    KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0),       // +C +S +CS
-    KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0),        // +C +S +CS
-    KeyStroke.getKeyStroke(KeyEvent.VK_END, 0),         // +C +S +CS
-    KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0),     // +C +S +CS
-    KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0),   // +C +S +CS
-  };
+  @NotNull public static Set<KeyStroke> VIM_ONLY_EDITOR_KEYS = ImmutableSet.<KeyStroke>builder()
+    .addAll(getKeyStrokes(VK_ENTER, 0))
+    .addAll(getKeyStrokes(VK_ESCAPE, 0))
+    .addAll(getKeyStrokes(VK_TAB, 0))
+    .addAll(getKeyStrokes(VK_BACK_SPACE, 0, CTRL_MASK))
+    .addAll(getKeyStrokes(VK_INSERT, 0))
+    .addAll(getKeyStrokes(VK_DELETE, 0, CTRL_MASK))
+    .addAll(getKeyStrokes(VK_UP, 0, CTRL_MASK, SHIFT_MASK))
+    .addAll(getKeyStrokes(VK_DOWN, 0, CTRL_MASK, SHIFT_MASK))
+    .addAll(getKeyStrokes(VK_LEFT, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
+    .addAll(getKeyStrokes(VK_RIGHT, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
+    .addAll(getKeyStrokes(VK_HOME, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
+    .addAll(getKeyStrokes(VK_END, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
+    .addAll(getKeyStrokes(VK_PAGE_UP, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
+    .addAll(getKeyStrokes(VK_PAGE_DOWN, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
+    .build();
+
+  private static List<KeyStroke> getKeyStrokes(int keyCode, int... modifiers) {
+    final List<KeyStroke> keyStrokes = new ArrayList<KeyStroke>();
+    for (int modifier : modifiers) {
+      keyStrokes.add(KeyStroke.getKeyStroke(keyCode, modifier));
+    }
+    return keyStrokes;
+  }
 
   public void actionPerformed(@NotNull AnActionEvent e) {
     final Editor editor = getEditor(e);
@@ -79,17 +99,48 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
       final KeyStroke keyStroke = getKeyStroke(e);
       if (editor != null && keyStroke != null) {
         final int keyCode = keyStroke.getKeyCode();
+        final Map<KeyStroke, ShortcutOwner> shortcutConflicts = VimPlugin.getShortcutConflicts();
         if (LookupManager.getActiveLookup(editor) != null) {
-          return keyCode == KeyEvent.VK_ESCAPE;
+          return keyCode == VK_ESCAPE;
         }
         // Debug watch, Python console, etc.
         else if (!EditorData.isFileEditor(editor) && CommandState.inInsertMode(editor)) {
-          return keyCode != KeyEvent.VK_ENTER && keyCode != KeyEvent.VK_ESCAPE && keyCode != KeyEvent.VK_TAB;
+          return keyCode != VK_ENTER && keyCode != VK_ESCAPE && keyCode != VK_TAB;
         }
-        return true;
+        else if (VIM_ONLY_EDITOR_KEYS.contains(keyStroke)) {
+          return true;
+        }
+        else if (shortcutConflicts.containsKey(keyStroke)) {
+          return shortcutConflicts.get(keyStroke) == ShortcutOwner.VIM;
+        }
+        else {
+          final List<AnAction> actions = getKeymapConflicts(keyStroke);
+          if (!actions.isEmpty()) {
+            // TODO: Show a balloon that allows binding the shortcut to Vim or IDE
+            shortcutConflicts.put(keyStroke, ShortcutOwner.IDE);
+            return false;
+          }
+          return true;
+        }
       }
     }
     return false;
+  }
+
+  @NotNull
+  private List<AnAction> getKeymapConflicts(@NotNull KeyStroke keyStroke) {
+    final KeymapManagerEx keymapManager = KeymapManagerEx.getInstanceEx();
+    final Keymap keymap = keymapManager.getActiveKeymap();
+    final KeyboardShortcut shortcut = new KeyboardShortcut(keyStroke, null);
+    final Map<String, ArrayList<KeyboardShortcut>> conflicts = keymap.getConflicts("", shortcut);
+    final List<AnAction> actions = new ArrayList<AnAction>();
+    for (String actionId : conflicts.keySet()) {
+      final AnAction action = ActionManagerEx.getInstanceEx().getAction(actionId);
+      if (action != null) {
+        actions.add(action);
+      }
+    }
+    return actions;
   }
 
   @Nullable
