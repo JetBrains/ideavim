@@ -372,7 +372,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         final String ownerValue = conflictElement.getAttributeValue(OWNER_ATTRIBUTE);
         ShortcutOwner owner = null;
         try {
-          owner = ShortcutOwner.valueOf(ownerValue);
+          owner = ShortcutOwner.fromString(ownerValue);
         }
         catch (IllegalArgumentException ignored) {
         }
