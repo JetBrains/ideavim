@@ -47,6 +47,7 @@ import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.editor.linenumber.LineNumbers;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.group.*;
 import com.maddyhome.idea.vim.helper.*;
@@ -271,6 +272,8 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         DocumentManager.getInstance().removeListeners(event.getEditor().getDocument());
       }
     }, myApp);
+
+    LineNumbers.getInstance().refresh();
 
     // Since the Vim plugin custom actions aren't available to the call to <code>initComponent()</code>
     // we need to force the generation of the key map when the first project is opened.
