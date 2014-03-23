@@ -53,7 +53,6 @@ import static java.awt.event.KeyEvent.*;
  * These keys are not passed to {@link com.maddyhome.idea.vim.VimTypedActionHandler} and should be handled by actions.
  */
 public class VimShortcutKeyAction extends AnAction implements DumbAware {
-  // TODO: Always handle these keys if emulation is enabled and they aren't used in a special context
   @NotNull public static Set<KeyStroke> VIM_ONLY_EDITOR_KEYS = ImmutableSet.<KeyStroke>builder()
     .addAll(getKeyStrokes(VK_ENTER, 0))
     .addAll(getKeyStrokes(VK_ESCAPE, 0))
