@@ -70,14 +70,6 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     .addAll(getKeyStrokes(VK_PAGE_DOWN, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
     .build();
 
-  private static List<KeyStroke> getKeyStrokes(int keyCode, int... modifiers) {
-    final List<KeyStroke> keyStrokes = new ArrayList<KeyStroke>();
-    for (int modifier : modifiers) {
-      keyStrokes.add(KeyStroke.getKeyStroke(keyCode, modifier));
-    }
-    return keyStrokes;
-  }
-
   public void actionPerformed(@NotNull AnActionEvent e) {
     final Editor editor = getEditor(e);
     final KeyStroke keyStroke = getKeyStroke(e);
@@ -124,6 +116,14 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
       }
     }
     return false;
+  }
+
+  private static List<KeyStroke> getKeyStrokes(int keyCode, int... modifiers) {
+    final List<KeyStroke> keyStrokes = new ArrayList<KeyStroke>();
+    for (int modifier : modifiers) {
+      keyStrokes.add(KeyStroke.getKeyStroke(keyCode, modifier));
+    }
+    return keyStrokes;
   }
 
   @NotNull
