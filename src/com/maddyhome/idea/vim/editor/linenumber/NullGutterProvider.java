@@ -1,4 +1,4 @@
-package com.maddyhome.idea.vim.editor.relativenumber;
+package com.maddyhome.idea.vim.editor.linenumber;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.editor.Editor;
@@ -11,19 +11,12 @@ import java.awt.*;
 import java.util.List;
 
 /**
- * Gutter provider that sets the line number relative to the current caret position.
+ * Null implementation for TextAnnotationGutterProvider.
  */
-public class RelativeLineNumbersGutterProvider implements TextAnnotationGutterProvider {
-
-  private boolean enabled = false;
-
+public class NullGutterProvider implements TextAnnotationGutterProvider {
   @Nullable
   @Override
   public String getLineText(int i, Editor editor) {
-    if (enabled) {
-      int currentLine = editor.getCaretModel().getLogicalPosition().line;
-      return "" + Math.abs(currentLine - i);
-    }
     return null;
   }
 
@@ -59,7 +52,4 @@ public class RelativeLineNumbersGutterProvider implements TextAnnotationGutterPr
   public void gutterClosed() {
 
   }
-
-  public void enabled() { enabled = true; }
-  public void disabled() { enabled = false; }
 }

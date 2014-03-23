@@ -21,4 +21,5 @@ The following `:set` commands can appear in `~/.vimrc` or set manually in the co
     'undolevels'     'ul'    maximum number of changes that can be undone
     'visualbell'     'vb'    use visual bell instead of beeping
     'wrapscan'       'ws'    searches wrap around the end of the file
-    'relativenumber' 'rn'    shows the editor line numbers relative to the current caret position
+    'number'         'nu'    shows the editor line numbers
+    'relativenumber' 'rnu'   shows the editor line numbers relative to the current caret position

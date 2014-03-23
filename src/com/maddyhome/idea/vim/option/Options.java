@@ -470,7 +470,8 @@ public class Options {
     addOption(new NumberOption("undolevels", "ul", 1000, -1, Integer.MAX_VALUE));
     addOption(new ToggleOption("visualbell", "vb", false));
     addOption(new ToggleOption("wrapscan", "ws", true));
-    addOption(new RelativeNumberOption());
+    addOption(new LineNumberOption());
+    addOption(new RelativeLineNumberOption());
   }
 
   private void addOption(@NotNull Option option) {
