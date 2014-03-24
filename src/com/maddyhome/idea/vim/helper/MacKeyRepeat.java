@@ -31,6 +31,7 @@ import java.io.InputStreamReader;
 */
 public class MacKeyRepeat {
   public static final String FMT = "defaults %s -globalDomain ApplePressAndHoldEnabled";
+  public static final String RestartSystemUIServer = "launchctl stop com.apple.SystemUIServer.agent";
   @NotNull private static final MacKeyRepeat INSTANCE = new MacKeyRepeat();
 
   @NotNull
@@ -67,6 +68,13 @@ public class MacKeyRepeat {
     final Process process;
     try {
       process = Runtime.getRuntime().exec(command);
+      process.waitFor();
+    }
+    catch (IOException e) {
+    }
+    final Process process;
+    try {
+      process = Runtime.getRuntime().exec(RestartSystemUIServer);
       process.waitFor();
     }
     catch (IOException e) {

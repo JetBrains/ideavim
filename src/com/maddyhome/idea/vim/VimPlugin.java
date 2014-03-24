@@ -170,7 +170,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   private void updateState() {
     if (isEnabled() && !ApplicationManager.getApplication().isUnitTestMode()) {
-      boolean requiresRestart = false;
       if (previousStateVersion < 1 && SystemInfo.isMac && VimKeyMapUtil.isVimKeymapInstalled()) {
         if (Messages.showYesNoDialog("Vim keymap generator has been updated to create keymaps more compatible " +
                                      "with base keymaps.\n\nDo you want to reconfigure your Vim keymap?\n\n" +
@@ -185,20 +184,16 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         final MacKeyRepeat keyRepeat = MacKeyRepeat.getInstance();
         final Boolean enabled = keyRepeat.isEnabled();
         if (enabled == null || !enabled) {
-          if (Messages.showYesNoDialog("Do you want to enable repeating keys in Mac OS X on press and hold " +
-                                       "(requires restart)?\n\n" +
+          if (Messages.showYesNoDialog("Do you want to enable repeating keys in Mac OS X on press and hold?" +
+                                       "\n\n" +
                                        "(You can do it manually by running 'defaults write -g " +
-                                       "ApplePressAndHoldEnabled 0' in the console).",
+                                       "ApplePressAndHoldEnabled 0 && launchctl stop " +
+                                       "com.apple.SystemUIServer.agent' in the console).",
                                        IDEAVIM_NOTIFICATION_TITLE,
                                        Messages.getQuestionIcon()) == Messages.YES) {
             keyRepeat.setEnabled(true);
-            requiresRestart = true;
           }
         }
-      }
-      if (requiresRestart) {
-        final ApplicationEx app = ApplicationManagerEx.getApplicationEx();
-        app.restart();
       }
     }
   }
