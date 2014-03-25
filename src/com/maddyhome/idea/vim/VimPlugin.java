@@ -18,9 +18,7 @@
 package com.maddyhome.idea.vim;
 
 import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationDisplayType;
 import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.application.Application;
@@ -153,7 +151,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   @Override
   public void initComponent() {
     LOG.debug("initComponent");
-    Notifications.Bus.register(IDEAVIM_NOTIFICATION_ID, NotificationDisplayType.STICKY_BALLOON);
 
     ApplicationManager.getApplication().invokeLater(new Runnable() {
       public void run() {
