@@ -17,8 +17,7 @@
  */
 package com.maddyhome.idea.vim;
 
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
+import com.intellij.notification.*;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.application.Application;
@@ -42,6 +41,7 @@ import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
+import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerAdapter;
@@ -56,11 +56,13 @@ import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
 import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -84,6 +86,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private static final String IDEAVIM_COMPONENT_NAME = "VimPlugin";
   private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";
   public static final String IDEAVIM_NOTIFICATION_ID = "ideavim";
+  public static final String IDEAVIM_STICKY_NOTIFICATION_ID = "ideavim-sticky";
   public static final String IDEAVIM_NOTIFICATION_TITLE = "IdeaVim";
   public static final int STATE_VERSION = 3;
 
@@ -151,6 +154,8 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   @Override
   public void initComponent() {
     LOG.debug("initComponent");
+
+    Notifications.Bus.register(IDEAVIM_STICKY_NOTIFICATION_ID, NotificationDisplayType.STICKY_BALLOON);
 
     ApplicationManager.getApplication().invokeLater(new Runnable() {
       public void run() {
@@ -427,14 +432,22 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         }
       }
       if (previousStateVersion < 3) {
+        final KeymapManagerEx manager = KeymapManagerEx.getInstanceEx();
         if (previousKeyMap != null && !"".equals(previousKeyMap)) {
-          notify(String.format("IdeaVim plugin doesn't use the special \"Vim\" keymap any longer. " +
-                               "When you use a conflicting keyboard shortcut for the first time, " +
-                               "it will ask you whether to use it for the IDE or for Vim emulation." +
-                               "<br/><br/>" +
-                               "Switching back to \"%s\" keymap.", previousKeyMap),
-                 NotificationType.INFORMATION);
-          final KeymapManagerEx manager = KeymapManagerEx.getInstanceEx();
+          new Notification(
+            VimPlugin.IDEAVIM_STICKY_NOTIFICATION_ID,
+            VimPlugin.IDEAVIM_NOTIFICATION_TITLE,
+            String.format("IdeaVim plugin doesn't use the special \"Vim\" keymap any longer. " +
+                          "Switching back to \"%s\" keymap.<br/><br/>" +
+                          "You can set up Vim or IDE handlers for conflicting shortcuts in " +
+                          "<a href='#settings'>Vim Emulation</a> settings.", previousKeyMap),
+            NotificationType.INFORMATION,
+            new NotificationListener.Adapter() {
+              @Override
+              protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent e) {
+                ShowSettingsUtil.getInstance().editConfigurable((Project)null, new VimEmulationConfigurable());
+              }
+            }).notify(null);
           final Keymap keymap = manager.getKeymap(previousKeyMap);
           if (keymap != null) {
             manager.setActiveKeymap(keymap);
@@ -442,8 +455,14 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
           else {
             notify(String.format("Cannot find \"%s\" keymap, please set up a keymap manually.", previousKeyMap),
                    NotificationType.ERROR);
-
+            return;
           }
+        }
+        final Keymap activeKeymap = manager.getActiveKeymap();
+        if (activeKeymap != null && "Vim".equals(activeKeymap.getName())) {
+          notify("Cannot disable the obsolete \"Vim\" keymap, please set up a new keymap manually.",
+                 NotificationType.ERROR);
+          return;
         }
       }
       if (requiresRestart) {
