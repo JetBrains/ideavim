@@ -211,7 +211,6 @@ public class KeyParser {
   public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, int cmdFlags, @NotNull Shortcut[] shortcuts,
                              @NotNull Argument.Type argType) {
     for (Shortcut shortcut : shortcuts) {
-      // TODO: Check for shortcut conflicts with the current keymap
       final KeyStroke[] keys = shortcut.getKeys();
       for (KeyStroke key : keys) {
         if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
@@ -219,21 +218,6 @@ public class KeyParser {
         }
       }
       registerAction(mappingModes, actName, cmdType, cmdFlags, keys, argType);
-    }
-  }
-
-  private static void checkKeyStrokeForConflicts(KeyStroke keyStroke) {
-    final KeymapManagerEx keymapManager = KeymapManagerEx.getInstanceEx();
-    final Keymap keymap = keymapManager.getActiveKeymap();
-    final KeyboardShortcut shortcut = new KeyboardShortcut(keyStroke, null);
-    final Map<String, ArrayList<KeyboardShortcut>> conflicts = keymap.getConflicts("", shortcut);
-    final ActionManager manager = ActionManager.getInstance();
-    for (Map.Entry<String, ArrayList<KeyboardShortcut>> entry : conflicts.entrySet()) {
-      final AnAction action = manager.getAction(entry.getKey());
-      if (action != null) {
-        // TODO: If preferences for the keystroke not set
-        // TODO: Else if used for Vim commands
-      }
     }
   }
 
