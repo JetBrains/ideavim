@@ -87,7 +87,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
       final KeyStroke keyStroke = getKeyStroke(e);
       if (editor != null && keyStroke != null) {
         final int keyCode = keyStroke.getKeyCode();
-        final Map<KeyStroke, ShortcutOwner> shortcutConflicts = VimPlugin.getShortcutConflicts();
+        final Map<KeyStroke, ShortcutOwner> shortcutConflicts = VimPlugin.getSavedShortcutConflicts();
         if (LookupManager.getActiveLookup(editor) != null) {
           return keyCode == VK_ESCAPE;
         }

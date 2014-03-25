@@ -25,7 +25,9 @@ import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
+import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
@@ -86,6 +88,24 @@ public class KeyParser {
       }
     }
     return actions;
+  }
+
+  @NotNull
+  public static Map<KeyStroke, ShortcutOwner> getShortcutConflicts() {
+    final KeyParser keyParser = getInstance();
+    final Set<KeyStroke> requiredShortcutKeys = keyParser.getRequiredShortcutKeys();
+    final Map<KeyStroke, ShortcutOwner> savedConflicts = VimPlugin.getSavedShortcutConflicts();
+    final Map<KeyStroke, ShortcutOwner> results = new HashMap<KeyStroke, ShortcutOwner>();
+    for (KeyStroke keyStroke : requiredShortcutKeys) {
+      if (!VimShortcutKeyAction.VIM_ONLY_EDITOR_KEYS.contains(keyStroke)) {
+        final List<AnAction> conflicts = getKeymapConflicts(keyStroke);
+        if (!conflicts.isEmpty()) {
+          final ShortcutOwner owner = savedConflicts.get(keyStroke);
+          results.put(keyStroke, owner != null ? owner : ShortcutOwner.UNDEFINED);
+        }
+      }
+    }
+    return results;
   }
 
   @NotNull

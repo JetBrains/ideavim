@@ -23,12 +23,12 @@ import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.openapi.ui.StripeTable;
 import com.intellij.ui.IdeBorderFactory;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.UIUtil;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
 import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
 import org.jetbrains.annotations.Nls;
@@ -47,7 +47,8 @@ import java.util.List;
  * @author vlan
  */
 public class VimEmulationConfigurable implements Configurable {
-  @NotNull private final VimSettingsPanel myPanel = new VimSettingsPanel();
+  @NotNull private final VimShortcutConflictsTable.Model myConflictsTableModel = new VimShortcutConflictsTable.Model();
+  @NotNull private final VimSettingsPanel myPanel = new VimSettingsPanel(myConflictsTableModel);
 
   @Nls
   @Override
@@ -69,15 +70,17 @@ public class VimEmulationConfigurable implements Configurable {
 
   @Override
   public boolean isModified() {
-    return false;
+    return myConflictsTableModel.isModified();
   }
 
   @Override
   public void apply() throws ConfigurationException {
+    myConflictsTableModel.apply();
   }
 
   @Override
   public void reset() {
+    myConflictsTableModel.reset();
   }
 
   @Override
@@ -85,9 +88,10 @@ public class VimEmulationConfigurable implements Configurable {
   }
 
   private static final class VimSettingsPanel extends JPanel {
-    @NotNull private final VimShortcutConflictsTable myShortcutConflictsTable = new VimShortcutConflictsTable();
+    @NotNull private final VimShortcutConflictsTable myShortcutConflictsTable;
 
-    public VimSettingsPanel() {
+    public VimSettingsPanel(@NotNull VimShortcutConflictsTable.Model model) {
+      myShortcutConflictsTable = new VimShortcutConflictsTable(model);
       setLayout(new BorderLayout());
       final JScrollPane scrollPane = new JBScrollPane(myShortcutConflictsTable);
       scrollPane.setBorder(new LineBorder(UIUtil.getBorderColor()));
@@ -99,12 +103,15 @@ public class VimEmulationConfigurable implements Configurable {
   }
 
   private static final class VimShortcutConflictsTable extends StripeTable {
-    public VimShortcutConflictsTable() {
-      super(new TableModel());
-
+    public VimShortcutConflictsTable(@NotNull Model model) {
+      super(model);
       getTableColumn(Column.KEYSTROKE).setPreferredWidth(50);
       getTableColumn(Column.IDE_ACTION).setPreferredWidth(300);
-      getTableColumn(Column.OWNER).setPreferredWidth(50);
+      final TableColumn ownerColumn = getTableColumn(Column.OWNER);
+      final ComboBoxTableRenderer<ShortcutOwner> renderer = new ShortcutOwnerRenderer();
+      ownerColumn.setPreferredWidth(50);
+      ownerColumn.setCellRenderer(renderer);
+      ownerColumn.setCellEditor(renderer);
     }
 
     @NotNull
@@ -134,22 +141,30 @@ public class VimEmulationConfigurable implements Configurable {
       return getColumnModel().getColumn(column.getIndex());
     }
 
-    private static final class TableModel extends AbstractTableModel {
+    private static final class ShortcutOwnerRenderer extends ComboBoxTableRenderer<ShortcutOwner> {
+      public ShortcutOwnerRenderer() {
+        super(ShortcutOwner.values());
+      }
+
+      @Override
+      protected void customizeComponent(ShortcutOwner owner, JTable table, boolean isSelected) {
+        super.customizeComponent(owner, table, isSelected);
+        if (owner == ShortcutOwner.UNDEFINED) {
+          setForeground(UIUtil.getComboBoxDisabledForeground());
+        }
+      }
+
+      @Override
+      public boolean isCellEditable(EventObject event) {
+        return true;
+      }
+    }
+
+    private static final class Model extends AbstractTableModel {
       @NotNull private final List<Row> myRows = new ArrayList<Row>();
 
-      public TableModel() {
-        final KeyParser keyParser = KeyParser.getInstance();
-        final Set<KeyStroke> requiredShortcutKeys = keyParser.getRequiredShortcutKeys();
-        final Map<KeyStroke, ShortcutOwner> shortcutConflicts = VimPlugin.getShortcutConflicts();
-        for (KeyStroke keyStroke : requiredShortcutKeys) {
-          if (!VimShortcutKeyAction.VIM_ONLY_EDITOR_KEYS.contains(keyStroke)) {
-            final List<AnAction> conflicts = KeyParser.getKeymapConflicts(keyStroke);
-            if (!conflicts.isEmpty()) {
-              myRows.add(new Row(keyStroke, conflicts.get(0), shortcutConflicts.get(keyStroke)));
-            }
-          }
-        }
-        Collections.sort(myRows);
+      public Model() {
+        reset();
       }
 
       @Override
@@ -166,7 +181,7 @@ public class VimEmulationConfigurable implements Configurable {
       @Override
       public Object getValueAt(int rowIndex, int columnIndex) {
         final Column column = Column.fromIndex(columnIndex);
-        if (column != null && rowIndex < myRows.size()) {
+        if (column != null && rowIndex >= 0 && rowIndex < myRows.size()) {
           final Row row = myRows.get(rowIndex);
           switch (column) {
             case KEYSTROKE:
@@ -180,20 +195,62 @@ public class VimEmulationConfigurable implements Configurable {
         return null;
       }
 
+      @Override
+      public void setValueAt(Object object, int rowIndex, int columnIndex) {
+        final Column column = Column.fromIndex(columnIndex);
+        if (column != null && rowIndex >= 0 && rowIndex < myRows.size() && object instanceof ShortcutOwner) {
+          final Row row = myRows.get(rowIndex);
+          row.setOwner((ShortcutOwner)object);
+        }
+      }
+
+      @Override
+      public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return Column.fromIndex(columnIndex) == Column.OWNER;
+      }
+
       @Nullable
       @Override
       public String getColumnName(int index) {
         final Column column = Column.fromIndex(index);
         return column != null ? column.getTitle() : null;
       }
+
+      public boolean isModified() {
+        return !KeyParser.getShortcutConflicts().equals(getCurrentData());
+      }
+
+      public void apply() {
+        VimPlugin.getSavedShortcutConflicts().putAll(getCurrentData());
+      }
+
+      public void reset() {
+        myRows.clear();
+        for (Map.Entry<KeyStroke, ShortcutOwner> entry : KeyParser.getShortcutConflicts().entrySet()) {
+          final KeyStroke keyStroke = entry.getKey();
+          final List<AnAction> actions = KeyParser.getKeymapConflicts(keyStroke);
+          if (!actions.isEmpty()) {
+            myRows.add(new Row(keyStroke, actions.get(0), entry.getValue()));
+          }
+        }
+        Collections.sort(myRows);
+      }
+
+      private Map<KeyStroke, ShortcutOwner> getCurrentData() {
+        final Map<KeyStroke, ShortcutOwner> result = new HashMap<KeyStroke, ShortcutOwner>();
+        for (Row row : myRows) {
+          result.put(row.getKeyStroke(), row.getOwner());
+        }
+        return result;
+      }
     }
 
     private static final class Row implements Comparable<Row> {
       @NotNull private final KeyStroke myKeyStroke;
       @NotNull private final AnAction myAction;
-      @Nullable private final ShortcutOwner myOwner;
+      @NotNull private ShortcutOwner myOwner;
 
-      private Row(@NotNull KeyStroke keyStroke, @NotNull AnAction action, @Nullable ShortcutOwner owner) {
+      private Row(@NotNull KeyStroke keyStroke, @NotNull AnAction action, @NotNull ShortcutOwner owner) {
         myKeyStroke = keyStroke;
         myAction = action;
         myOwner = owner;
@@ -209,7 +266,7 @@ public class VimEmulationConfigurable implements Configurable {
         return myAction;
       }
 
-      @Nullable
+      @NotNull
       public ShortcutOwner getOwner() {
         return myOwner;
       }
@@ -219,6 +276,10 @@ public class VimEmulationConfigurable implements Configurable {
         final KeyStroke otherKeyStroke = row.getKeyStroke();
         final int keyCodeDiff = myKeyStroke.getKeyCode() - otherKeyStroke.getKeyCode();
         return keyCodeDiff != 0 ? keyCodeDiff : myKeyStroke.getModifiers() - otherKeyStroke.getModifiers();
+      }
+
+      public void setOwner(@NotNull ShortcutOwner owner) {
+        myOwner = owner;
       }
     }
 

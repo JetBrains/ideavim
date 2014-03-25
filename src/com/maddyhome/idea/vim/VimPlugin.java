@@ -304,7 +304,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   }
 
   @NotNull
-  public static Map<KeyStroke, ShortcutOwner> getShortcutConflicts() {
+  public static Map<KeyStroke, ShortcutOwner> getSavedShortcutConflicts() {
     return getInstance().shortcutConflicts;
   }
 
@@ -354,12 +354,15 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private void saveShortcutConflicts(@NotNull Element element) {
     final Element conflictsElement = new Element(SHORTCUT_CONFLICTS_ELEMENT);
     for (Map.Entry<KeyStroke, ShortcutOwner> entry : shortcutConflicts.entrySet()) {
-      final Element conflictElement = new Element(SHORTCUT_CONFLICT_ELEMENT);
-      conflictElement.setAttribute(OWNER_ATTRIBUTE, entry.getValue().getName());
-      final Element textElement = new Element(TEXT_ELEMENT);
-      StringHelper.setSafeXmlText(textElement, entry.getKey().toString());
-      conflictElement.addContent(textElement);
-      conflictsElement.addContent(conflictElement);
+      final ShortcutOwner owner = entry.getValue();
+      if (owner != ShortcutOwner.UNDEFINED) {
+        final Element conflictElement = new Element(SHORTCUT_CONFLICT_ELEMENT);
+        conflictElement.setAttribute(OWNER_ATTRIBUTE, owner.getName());
+        final Element textElement = new Element(TEXT_ELEMENT);
+        StringHelper.setSafeXmlText(textElement, entry.getKey().toString());
+        conflictElement.addContent(textElement);
+        conflictsElement.addContent(conflictElement);
+      }
     }
     element.addContent(conflictsElement);
   }
@@ -370,21 +373,19 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
       final java.util.List<Element> conflictElements = conflictsElement.getChildren(SHORTCUT_CONFLICT_ELEMENT);
       for (Element conflictElement : conflictElements) {
         final String ownerValue = conflictElement.getAttributeValue(OWNER_ATTRIBUTE);
-        ShortcutOwner owner = null;
+        ShortcutOwner owner = ShortcutOwner.UNDEFINED;
         try {
           owner = ShortcutOwner.fromString(ownerValue);
         }
         catch (IllegalArgumentException ignored) {
         }
-        if (owner != null) {
-          final Element textElement = conflictElement.getChild(TEXT_ELEMENT);
-          if (textElement != null) {
-            final String text = StringHelper.getSafeXmlText(textElement);
-            if (text != null) {
-              final KeyStroke keyStroke = KeyStroke.getKeyStroke(text);
-              if (keyStroke != null) {
-                shortcutConflicts.put(keyStroke, owner);
-              }
+        final Element textElement = conflictElement.getChild(TEXT_ELEMENT);
+        if (textElement != null) {
+          final String text = StringHelper.getSafeXmlText(textElement);
+          if (text != null) {
+            final KeyStroke keyStroke = KeyStroke.getKeyStroke(text);
+            if (keyStroke != null) {
+              shortcutConflicts.put(keyStroke, owner);
             }
           }
         }
