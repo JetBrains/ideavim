@@ -96,7 +96,8 @@ public class VimEmulationConfigurable implements Configurable {
       final JScrollPane scrollPane = new JBScrollPane(myShortcutConflictsTable);
       scrollPane.setBorder(new LineBorder(UIUtil.getBorderColor()));
       final JPanel conflictsPanel = new JPanel(new BorderLayout());
-      conflictsPanel.setBorder(IdeBorderFactory.createTitledBorder("Shortcut Conflicts", false));
+      final String title = String.format("Shortcut Conflicts for Active Keymap");
+      conflictsPanel.setBorder(IdeBorderFactory.createTitledBorder(title, false));
       conflictsPanel.add(scrollPane);
       add(conflictsPanel, BorderLayout.CENTER);
     }
