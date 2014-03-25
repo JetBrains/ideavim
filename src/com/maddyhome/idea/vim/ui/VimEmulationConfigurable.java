@@ -105,11 +105,11 @@ public class VimEmulationConfigurable implements Configurable {
   private static final class VimShortcutConflictsTable extends StripeTable {
     public VimShortcutConflictsTable(@NotNull Model model) {
       super(model);
-      getTableColumn(Column.KEYSTROKE).setPreferredWidth(50);
-      getTableColumn(Column.IDE_ACTION).setPreferredWidth(300);
+      getTableColumn(Column.KEYSTROKE).setPreferredWidth(100);
+      getTableColumn(Column.IDE_ACTION).setPreferredWidth(400);
       final TableColumn ownerColumn = getTableColumn(Column.OWNER);
       final ComboBoxTableRenderer<ShortcutOwner> renderer = new ShortcutOwnerRenderer();
-      ownerColumn.setPreferredWidth(50);
+      ownerColumn.setPreferredWidth(150);
       ownerColumn.setCellRenderer(renderer);
       ownerColumn.setCellEditor(renderer);
     }
