@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.key;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
+import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
@@ -69,6 +70,22 @@ public class KeyParser {
   }
 
   private KeyParser() {
+  }
+
+  @NotNull
+  public static List<AnAction> getKeymapConflicts(@NotNull KeyStroke keyStroke) {
+    final KeymapManagerEx keymapManager = KeymapManagerEx.getInstanceEx();
+    final Keymap keymap = keymapManager.getActiveKeymap();
+    final KeyboardShortcut shortcut = new KeyboardShortcut(keyStroke, null);
+    final Map<String, ArrayList<KeyboardShortcut>> conflicts = keymap.getConflicts("", shortcut);
+    final List<AnAction> actions = new ArrayList<AnAction>();
+    for (String actionId : conflicts.keySet()) {
+      final AnAction action = ActionManagerEx.getInstanceEx().getAction(actionId);
+      if (action != null) {
+        actions.add(action);
+      }
+    }
+    return actions;
   }
 
   @NotNull

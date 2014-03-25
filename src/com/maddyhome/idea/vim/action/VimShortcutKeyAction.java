@@ -22,17 +22,14 @@ import com.google.common.collect.ImmutableSet;
 import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.keymap.Keymap;
-import com.intellij.openapi.keymap.ex.KeymapManagerEx;
 import com.intellij.openapi.project.DumbAware;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.EditorData;
+import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -105,7 +102,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
           return shortcutConflicts.get(keyStroke) == ShortcutOwner.VIM;
         }
         else {
-          final List<AnAction> actions = getKeymapConflicts(keyStroke);
+          final List<AnAction> actions = KeyParser.getKeymapConflicts(keyStroke);
           if (!actions.isEmpty()) {
             // TODO: Show a balloon that allows binding the shortcut to Vim or IDE
             shortcutConflicts.put(keyStroke, ShortcutOwner.IDE);
@@ -124,22 +121,6 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
       keyStrokes.add(KeyStroke.getKeyStroke(keyCode, modifier));
     }
     return keyStrokes;
-  }
-
-  @NotNull
-  private List<AnAction> getKeymapConflicts(@NotNull KeyStroke keyStroke) {
-    final KeymapManagerEx keymapManager = KeymapManagerEx.getInstanceEx();
-    final Keymap keymap = keymapManager.getActiveKeymap();
-    final KeyboardShortcut shortcut = new KeyboardShortcut(keyStroke, null);
-    final Map<String, ArrayList<KeyboardShortcut>> conflicts = keymap.getConflicts("", shortcut);
-    final List<AnAction> actions = new ArrayList<AnAction>();
-    for (String actionId : conflicts.keySet()) {
-      final AnAction action = ActionManagerEx.getInstanceEx().getAction(actionId);
-      if (action != null) {
-        actions.add(action);
-      }
-    }
-    return actions;
   }
 
   @Nullable
