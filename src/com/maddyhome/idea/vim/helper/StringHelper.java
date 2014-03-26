@@ -21,8 +21,6 @@ package com.maddyhome.idea.vim.helper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.commons.codec.binary.Base64;
-import org.jdom.CDATA;
-import org.jdom.Content;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -99,62 +97,6 @@ public class StringHelper {
         res.append(c);
       }
     }
-    return res.toString();
-  }
-
-  @NotNull
-  @Deprecated
-  private static String unentities(@NotNull String text) {
-    StringBuilder res = new StringBuilder(text.length());
-
-    for (int i = 0; i < text.length(); i++) {
-      char ch = text.charAt(i);
-      switch (ch) {
-        case '&':
-          int semi = text.indexOf(';', i);
-          if (semi > i) {
-            char newch = ch;
-            String entity = text.substring(i, semi + 1);
-            if (entity.equals("&#32;")) {
-              newch = ' ';
-            }
-            else if (entity.equals("&#33;")) {
-              newch = '!';
-              i = semi;
-            }
-            else if (entity.equals("&#91;")) {
-              newch = '[';
-              i = semi;
-            }
-            else if (entity.equals("&#93;")) {
-              newch = ']';
-              i = semi;
-            }
-            else if (entity.equals("&amp;")) {
-              newch = '&';
-              i = semi;
-            }
-            else if (entity.equals("&#9;")) {
-              newch = '\t';
-            }
-            else if (entity.equals("&#10;")) {
-              newch = '\n';
-            }
-            else if (entity.equals("&#13;")) {
-              newch = '\r';
-            }
-            if (newch != ch) {
-              ch = newch;
-              i = semi;
-            }
-          }
-          res.append(ch);
-          break;
-        default:
-          res.append(ch);
-      }
-    }
-
     return res.toString();
   }
 
@@ -305,14 +247,6 @@ public class StringHelper {
   @Nullable
   public static String getSafeXmlText(@NotNull Element element) {
     final String text = element.getText();
-    //noinspection unchecked
-    final List<Content> contentItems = element.getContent();
-    for (Content content : contentItems) {
-      if (content instanceof CDATA) {
-        // TODO: Remove compatibility with the IdeaVim <= 0.24 settings style in the next versions
-        return unentities(text);
-      }
-    }
     final String encoding = element.getAttributeValue("encoding");
     if (encoding == null) {
       return text;
