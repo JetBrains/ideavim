@@ -3,6 +3,10 @@
   <id>IdeaVIM</id>
   <change-notes>
     <![CDATA[
+      <p>Unreleased:</p>
+      <ul>
+        <li>New keyboard shortcuts handler that doesn't require a separate keymap for Vim emulation</li>
+      </ul>
       <p>0.32:</p>
       <ul>
         <li>Fixed API compatibility with IntelliJ platform builds 132.1052+</li>

@@ -4,6 +4,17 @@ The Changelog
 History of changes in IdeaVim for the IntelliJ platform.
 
 
+Unreleased
+----------
+
+New keyboard shortcuts handler that doesn't require a separate keymap for Vim
+emulation.
+
+Features:
+
+* VIM-543 Allow granular enable/disable of Vim shortcut keys
+
+
 0.32, 2013-11-15
 ----------------
 
