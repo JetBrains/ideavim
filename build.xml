@@ -121,7 +121,7 @@
     </copy>
     <copy file="${basedir}/README.md" tofile="${build}/IdeaVim/README"/>
     <copy file="${basedir}/CHANGES.md" tofile="${build}/IdeaVim/CHANGES"/>
-    <zip basedir="${build}" zipfile="${dist}/${filename}.zip" compress="true" includes="IdeaVim/**"/>
+    <zip basedir="${build}" zipfile="${dist}/${filename}-${build.number}.zip" compress="true" includes="IdeaVim/**"/>
   </target>
 
   <!-- Packs all the sources -->
