@@ -23,9 +23,8 @@ import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.key.KeyParser;
+import com.maddyhome.idea.vim.group.KeyGroup;
 import com.maddyhome.idea.vim.key.Shortcut;
-import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -35,29 +34,28 @@ public class RegisterActions {
    * Register all the key/action mappings for the plugin.
    */
   public static void registerActions() {
-    final KeyParser parser = KeyParser.getInstance();
+    registerVimCommandActions();
 
-    registerVimCommandActions(parser);
-
-    registerInsertModeActions(parser);
-    registerVisualModeActions(parser);
-    registerNormalModeActions(parser);
-    registerNVOModesActions(parser);
-    registerCommandLineActions(parser);
-    registerVariousModesActions(parser);
+    registerInsertModeActions();
+    registerVisualModeActions();
+    registerNormalModeActions();
+    registerNVOModesActions();
+    registerCommandLineActions();
+    registerVariousModesActions();
   }
 
-  private static void registerVimCommandActions(@NotNull KeyParser parser) {
+  private static void registerVimCommandActions() {
     final ActionManagerEx manager = ActionManagerEx.getInstanceEx();
     for (String actionId : manager.getPluginActions(VimPlugin.getPluginId())) {
       final AnAction action = manager.getAction(actionId);
       if (action instanceof VimCommandAction) {
-        parser.registerCommandAction((VimCommandAction)action, actionId);
+        VimPlugin.getKey().registerCommandAction((VimCommandAction)action, actionId);
       }
     }
   }
 
-  private static void registerVariousModesActions(@NotNull KeyParser parser) {
+  private static void registerVariousModesActions() {
+    final KeyGroup parser = VimPlugin.getKey();
     parser.registerAction(MappingMode.NV, "VimVisualToggleLineMode", Command.Type.OTHER_READONLY, Command.FLAG_MOT_LINEWISE,
                           new Shortcut('V'));
     parser.registerAction(MappingMode.NV, "VimVisualToggleBlockMode", Command.Type.OTHER_READONLY,
@@ -180,20 +178,21 @@ public class RegisterActions {
     }));
   }
 
-  private static void registerCommandLineActions(@NotNull KeyParser parser) {
+  private static void registerCommandLineActions() {
+    final KeyGroup parser = VimPlugin.getKey();
     parser
-      .registerAction(MappingMode.C, "VimProcessExEntry", Command.Type.OTHER_READ_WRITE, Command.FLAG_COMPLETE_EX, new Shortcut[]{
-        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)),
-        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.CTRL_MASK)),
-        new Shortcut(KeyStroke.getKeyStroke((char)0x0a)),
-        new Shortcut(KeyStroke.getKeyStroke((char)0x0d))
-      });
+      .registerAction(MappingMode.C, "VimProcessExEntry", Command.Type.OTHER_READ_WRITE, Command.FLAG_COMPLETE_EX,
+                      new Shortcut[]{new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)),
+                        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.CTRL_MASK)),
+                        new Shortcut(KeyStroke.getKeyStroke((char)0x0a)),
+                        new Shortcut(KeyStroke.getKeyStroke((char)0x0d))});
   }
 
   /**
    * Register normal, visual, operator pending modes actions.
    */
-  private static void registerNVOModesActions(@NotNull KeyParser parser) {
+  private static void registerNVOModesActions() {
+    final KeyGroup parser = VimPlugin.getKey();
     parser.registerAction(MappingMode.NVO, "VimCopySelectRegister", Command.Type.SELECT_REGISTER, Command.FLAG_EXPECT_MORE,
                           new Shortcut('"'), Argument.Type.CHARACTER);
 
@@ -500,7 +499,8 @@ public class RegisterActions {
                       new Shortcut("g#"));
   }
 
-  private static void registerNormalModeActions(@NotNull KeyParser parser) {
+  private static void registerNormalModeActions() {
+    final KeyGroup parser = VimPlugin.getKey();
     // Copy/Paste Actions
     parser.registerAction(MappingMode.N, "VimCopyPutTextBeforeCursor", Command.Type.PASTE,
                           new Shortcut('P'));
@@ -675,7 +675,8 @@ public class RegisterActions {
     // TODO - support for :map macros
   }
 
-  private static void registerVisualModeActions(@NotNull KeyParser parser) {
+  private static void registerVisualModeActions() {
+    final KeyGroup parser = VimPlugin.getKey();
     parser.registerAction(MappingMode.V, "VimAutoIndentVisual", Command.Type.CHANGE,
                           Command.FLAG_MOT_LINEWISE | Command.FLAG_FORCE_LINEWISE,
                           new Shortcut('='));
@@ -761,14 +762,14 @@ public class RegisterActions {
                           new Shortcut("gv"));
   }
 
-  private static void registerInsertModeActions(@NotNull KeyParser parser) {
+  private static void registerInsertModeActions() {
+    final KeyGroup parser = VimPlugin.getKey();
     // Other insert actions
     parser
       .registerAction(MappingMode.I, "EditorBackSpace", Command.Type.INSERT, Command.FLAG_IS_BACKSPACE,
-                      new Shortcut[]{
-                        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK)),
-                        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0))
-                      });
+                      new Shortcut[]{new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK)),
+                        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0))}
+      );
     parser.registerAction(MappingMode.I, "EditorDelete", Command.Type.INSERT, Command.FLAG_SAVE_STROKE,
                           new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)));
     parser.registerAction(MappingMode.I, "EditorDown", Command.Type.INSERT, Command.FLAG_CLEAR_STROKES, new Shortcut[]{

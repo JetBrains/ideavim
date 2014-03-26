@@ -53,7 +53,6 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.group.*;
 import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import org.jdom.Element;
@@ -448,7 +447,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         isRefrainFromScrolling = editor.getSettings().isRefrainFromScrolling();
         EditorData.initializeEditor(editor);
         DocumentManager.getInstance().addListeners(editor.getDocument());
-        final Set<KeyStroke> requiredKeys = KeyParser.getInstance().getRequiredShortcutKeys();
+        final Set<KeyStroke> requiredKeys = VimPlugin.getKey().getRequiredShortcutKeys();
         getShortcutKeyAction().registerCustomShortcutSet(toShortcutSet(requiredKeys), editor.getComponent());
 
         if (VimPlugin.isEnabled()) {

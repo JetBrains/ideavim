@@ -513,7 +513,7 @@ public class KeyHandler {
     count = 0;
     keys = new ArrayList<KeyStroke>();
     CommandState editorState = CommandState.getInstance(editor);
-    editorState.setCurrentNode(KeyParser.getInstance().getKeyRoot(editorState.getMappingMode()));
+    editorState.setCurrentNode(VimPlugin.getKey().getKeyRoot(editorState.getMappingMode()));
   }
 
   /**

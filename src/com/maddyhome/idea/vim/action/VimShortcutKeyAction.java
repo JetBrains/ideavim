@@ -36,7 +36,6 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.EditorData;
-import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import org.jetbrains.annotations.NotNull;
@@ -139,7 +138,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
           return false;
         }
         else {
-          final List<AnAction> actions = KeyParser.getKeymapConflicts(keyStroke);
+          final List<AnAction> actions = VimPlugin.getKey().getKeymapConflicts(keyStroke);
           if (!actions.isEmpty()) {
             savedShortcutConflicts.put(keyStroke, ShortcutOwner.UNDEFINED);
           }

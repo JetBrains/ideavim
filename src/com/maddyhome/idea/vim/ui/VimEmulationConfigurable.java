@@ -29,7 +29,6 @@ import com.intellij.ui.IdeBorderFactory;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.UIUtil;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -218,7 +217,7 @@ public class VimEmulationConfigurable implements Configurable {
       }
 
       public boolean isModified() {
-        return !KeyParser.getShortcutConflicts().equals(getCurrentData());
+        return !VimPlugin.getKey().getShortcutConflicts().equals(getCurrentData());
       }
 
       public void apply() {
@@ -227,9 +226,9 @@ public class VimEmulationConfigurable implements Configurable {
 
       public void reset() {
         myRows.clear();
-        for (Map.Entry<KeyStroke, ShortcutOwner> entry : KeyParser.getShortcutConflicts().entrySet()) {
+        for (Map.Entry<KeyStroke, ShortcutOwner> entry : VimPlugin.getKey().getShortcutConflicts().entrySet()) {
           final KeyStroke keyStroke = entry.getKey();
-          final List<AnAction> actions = KeyParser.getKeymapConflicts(keyStroke);
+          final List<AnAction> actions = VimPlugin.getKey().getKeymapConflicts(keyStroke);
           if (!actions.isEmpty()) {
             myRows.add(new Row(keyStroke, actions.get(0), entry.getValue()));
           }

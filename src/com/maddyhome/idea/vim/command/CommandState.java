@@ -23,7 +23,6 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.helper.EditorData;
-import com.maddyhome.idea.vim.key.KeyParser;
 import com.maddyhome.idea.vim.key.ParentNode;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
@@ -391,7 +390,7 @@ public class CommandState {
   private int flags;
   private boolean isRecording = false;
 
-  private ParentNode currentNode = KeyParser.getInstance().getKeyRoot(getMappingMode());
+  private ParentNode currentNode = VimPlugin.getKey().getKeyRoot(getMappingMode());
 
   @Nullable private static Command lastChange = null;
   private static char lastRegister = RegisterGroup.REGISTER_DEFAULT;
