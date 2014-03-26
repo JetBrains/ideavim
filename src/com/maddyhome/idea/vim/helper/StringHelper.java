@@ -56,7 +56,7 @@ public class StringHelper {
   @NotNull
   public static String pad(@NotNull String text, int len, char ch) {
     int l = text.length();
-    StringBuffer res = new StringBuffer(text);
+    StringBuilder res = new StringBuilder(text);
     for (int i = l; i < len; i++) {
       res.insert(0, ch);
     }
@@ -71,7 +71,7 @@ public class StringHelper {
 
   @NotNull
   public static String escape(@NotNull List<KeyStroke> keys) {
-    final StringBuffer res = new StringBuffer();
+    final StringBuilder res = new StringBuilder();
     for (KeyStroke key : keys) {
       final char c = key.getKeyChar();
       final int modifiers = key.getModifiers();
@@ -105,7 +105,7 @@ public class StringHelper {
   @NotNull
   @Deprecated
   private static String unentities(@NotNull String text) {
-    StringBuffer res = new StringBuffer(text.length());
+    StringBuilder res = new StringBuilder(text.length());
 
     for (int i = 0; i < text.length(); i++) {
       char ch = text.charAt(i);
