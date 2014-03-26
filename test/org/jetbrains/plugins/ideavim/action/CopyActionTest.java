@@ -3,11 +3,7 @@ package org.jetbrains.plugins.ideavim.action;
 import com.intellij.openapi.editor.Editor;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
-import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
+import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
 /**
  * @author vlan
@@ -15,14 +11,14 @@ import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
 public class CopyActionTest extends VimTestCase {
   // |y| |p| |count|
   public void testYankPutCharacters() {
-    typeTextInFile(stringToKeys("y2hp"),
+    typeTextInFile(parseKeys("y2h", "p"),
                    "one two<caret> three\n");
     myFixture.checkResult("one twwoo three\n");
   }
 
   // |yy|
   public void testYankLine() {
-    typeTextInFile(stringToKeys("yyp"),
+    typeTextInFile(parseKeys("yy", "p"),
                    "one\n" +
                    "tw<caret>o\n" +
                    "three\n");
@@ -34,7 +30,7 @@ public class CopyActionTest extends VimTestCase {
 
   // VIM-390 |yy| |p|
   public void testYankLinePasteAtLastLine() {
-    typeTextInFile(stringToKeys("yyp"),
+    typeTextInFile(parseKeys("yy", "p"),
                    "one two\n" +
                    "<caret>three four\n");
     myFixture.checkResult("one two\n" +
@@ -44,21 +40,21 @@ public class CopyActionTest extends VimTestCase {
 
   // |register| |y|
   public void testYankRegister() {
-    typeTextInFile(stringToKeys("\"ayll\"byl\"ap\"bp"),
+    typeTextInFile(parseKeys("\"ayl", "l", "\"byl", "\"ap", "\"bp"),
                    "hel<caret>lo world\n");
     myFixture.checkResult("hellolo world\n");
   }
 
   // |P|
   public void testYankPutBefore() {
-    typeTextInFile(stringToKeys("y2lP"),
+    typeTextInFile(parseKeys("y2l", "P"),
                    "<caret>two\n");
     myFixture.checkResult("twtwo\n");
   }
 
   public void testWrongYankQuoteMotion() {
     assertPluginError(false);
-    typeTextInFile(stringToKeys("y\""),
+    typeTextInFile(parseKeys("y\""),
                    "one <caret>two\n" +
                    "three\n" +
                    "four\n");
@@ -67,7 +63,7 @@ public class CopyActionTest extends VimTestCase {
 
   public void testWrongYankQuoteYankLine() {
     assertPluginError(false);
-    typeTextInFile(stringToKeys("y\"yyp"),
+    typeTextInFile(parseKeys("y\"", "yy", "p"),
                    "one <caret>two\n" +
                    "three\n" +
                    "four\n");
@@ -79,7 +75,7 @@ public class CopyActionTest extends VimTestCase {
   }
 
   public void testWrongYankRegisterMotion() {
-    final Editor editor = typeTextInFile(stringToKeys("y\"0"),
+    final Editor editor = typeTextInFile(parseKeys("y\"", "0"),
                                          "one <caret>two\n" +
                                          "three\n" +
                                          "four\n");
@@ -88,10 +84,7 @@ public class CopyActionTest extends VimTestCase {
 
    // |v_y|
   public void testYankVisualBlock() {
-    final List<KeyStroke> keys = new ArrayList<KeyStroke>();
-    keys.add(KeyStroke.getKeyStroke("control V"));
-    keys.addAll(stringToKeys("jlylp"));
-    typeTextInFile(keys,
+    typeTextInFile(parseKeys("<C-V>", "jl", "yl", "p"),
                    "<caret>* one\n" +
                    "* two\n");
 

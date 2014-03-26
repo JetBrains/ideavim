@@ -11,6 +11,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase;
 import javax.swing.*;
 import java.util.List;
 
+import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
 
 /**
@@ -19,7 +20,7 @@ import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
 public class ChangeActionTest extends VimTestCase {
   // |c| |t|
   public void testChangeLinesTillForwards() {
-    doTest(stringToKeys("ct(for "),
+    doTest(parseKeys("ct(", "for "),
            "<caret>if (condition) {\n" +
            "}\n",
            "for (condition) {\n" +
@@ -28,7 +29,7 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-276 |c| |T|
   public void testChangeLinesTillBackwards() {
-    doTest(stringToKeys("cT("),
+    doTest(parseKeys("cT("),
            "if (condition) {<caret>\n" +
            "}\n",
            "if (\n" +
@@ -37,7 +38,7 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-276 |c| |F|
   public void testChangeLinesToBackwards() {
-    doTest(stringToKeys("cFc"),
+    doTest(parseKeys("cFc"),
            "if (condition) {<caret>\n" +
            "}\n",
            "if (\n" +
@@ -46,26 +47,21 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-311 |i_CTRL-O|
   public void testInsertSingleCommand() {
-    final List<KeyStroke> keys = stringToKeys("idef");
-    keys.add(KeyStroke.getKeyStroke("control O"));
-    keys.addAll(stringToKeys("d2hx"));
-    doTest(keys,
+    doTest(parseKeys("i", "def", "<C-O>", "d2h", "x"),
            "abc<caret>.\n",
            "abcdx.\n");
   }
 
   // VIM-321 |d| |count|
   public void testDeleteEmptyRange() {
-    doTest(stringToKeys("d0"),
+    doTest(parseKeys("d0"),
            "<caret>hello\n",
            "hello\n");
   }
 
   // VIM-112 |i| |i_CTRL-W|
   public void testInsertDeletePreviousWord() {
-    final List<KeyStroke> keys = stringToKeys("ione two three");
-    keys.add(KeyStroke.getKeyStroke("control W"));
-    typeTextInFile(keys,
+    typeTextInFile(parseKeys("i", "one two three", "<C-W>"),
                    "hello\n" +
                    "<caret>\n");
     myFixture.checkResult("hello\n" +
@@ -74,24 +70,21 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-157 |~|
   public void testToggleCharCase() {
-    doTest(stringToKeys("~~"),
+    doTest(parseKeys("~~"),
            "<caret>hello world\n",
            "HEllo world\n");
   }
 
   // VIM-157 |~|
   public void testToggleCharCaseLineEnd() {
-    doTest(stringToKeys("~~"),
+    doTest(parseKeys("~~"),
            "hello wor<caret>ld\n",
            "hello worLD\n");
   }
 
   // VIM-85 |i| |gi| |gg|
   public void testInsertAtPreviousAction() {
-    final List<KeyStroke> keys = stringToKeys("ihello");
-    keys.add(KeyStroke.getKeyStroke("ESCAPE"));
-    keys.addAll(stringToKeys("gggi world! "));
-    doTest(keys,
+    doTest(parseKeys("i", "hello", "<Esc>", "gg", "gi", " world! "),
            "one\n" +
            "two <caret>three\n" +
            "four\n",
@@ -102,7 +95,7 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-312 |d| |w|
   public void testDeleteLastWordInFile() {
-    doTest(stringToKeys("dw"),
+    doTest(parseKeys("dw"),
            "one\n" +
            "<caret>two\n",
            "one\n" +
@@ -112,7 +105,7 @@ public class ChangeActionTest extends VimTestCase {
 
   // |d| |w|
   public void testDeleteLastWordBeforeEOL() {
-    doTest(stringToKeys("dw"),
+    doTest(parseKeys("dw"),
            "one <caret>two\n" +
            "three\n",
            "one \n" +
@@ -121,7 +114,7 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-105 |d| |w|
   public void testDeleteLastWordBeforeEOLs() {
-    doTest(stringToKeys("dw"),
+    doTest(parseKeys("dw"),
            "one <caret>two\n" +
            "\n" +
            "three\n",
@@ -132,7 +125,7 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-105 |d| |w|
   public void testDeleteLastWordBeforeEOLAndWhitespace() {
-    doTest(stringToKeys("dw"),
+    doTest(parseKeys("dw"),
            "one <caret>two\n" +
            " three\n",
            "one \n" +
@@ -142,7 +135,7 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-105 |d| |w| |count|
   public void testDeleteTwoWordsOnTwoLines() {
-    doTest(stringToKeys("d2w"),
+    doTest(parseKeys("d2w"),
            "one <caret>two\n" +
            "three four\n",
            "one four\n");
@@ -150,21 +143,21 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-200 |c| |w|
   public void testChangeWordAtLastChar() {
-    doTest(stringToKeys("cw"),
+    doTest(parseKeys("cw"),
            "on<caret>e two three\n",
            "on two three\n");
   }
 
   // VIM-300 |c| |w|
   public void testChangeWordTwoWordsWithoutWhitespace() {
-    doTest(stringToKeys("cw"),
+    doTest(parseKeys("cw"),
            "<caret>$value\n",
            "value\n");
   }
 
   // VIM-296 |cc|
   public void testChangeLineAtLastLine() {
-    doTest(stringToKeys("cc"),
+    doTest(parseKeys("cc"),
            "foo\n" +
            "<caret>bar\n",
            "foo\n" +
@@ -174,7 +167,7 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-394 |d| |v_aw|
   public void testDeleteIndentedWordBeforePunctuation() {
-    doTest(stringToKeys("daw"),
+    doTest(parseKeys("daw"),
            "foo\n" +
            "  <caret>bar, baz\n",
            "foo\n" +
@@ -183,7 +176,7 @@ public class ChangeActionTest extends VimTestCase {
 
   // |d| |v_aw|
   public void testDeleteLastWordAfterPunctuation() {
-    doTest(stringToKeys("daw"),
+    doTest(parseKeys("daw"),
            "foo(<caret>bar\n" +
            "baz\n",
            "foo(\n" +
@@ -192,7 +185,7 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-244 |d| |l|
   public void testDeleteLastCharInLine() {
-    doTest(stringToKeys("dl"),
+    doTest(parseKeys("dl"),
            "fo<caret>o\n" +
            "bar\n",
            "fo\n" +
@@ -202,7 +195,7 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-393 |d|
   public void testDeleteBadArgument() {
-    doTest(stringToKeys("dDdd"),
+    doTest(parseKeys("dD", "dd"),
            "one\n" +
            "two\n",
            "two\n");
@@ -211,45 +204,42 @@ public class ChangeActionTest extends VimTestCase {
   // VIM-262 |i_CTRL-R|
   public void testInsertFromRegister() {
     VimPlugin.getRegister().setKeys('a', stringToKeys("World"));
-    final List<KeyStroke> keys = stringToKeys("A, ");
-    keys.add(KeyStroke.getKeyStroke("control R"));
-    keys.addAll(stringToKeys("a!"));
-    doTest(keys,
+    doTest(parseKeys("A", ", ", "<C-R>", "a", "!"),
            "<caret>Hello\n",
            "Hello, World!\n");
   }
 
   // VIM-421 |c| |w|
   public void testChangeLastWordInLine() {
-    doTest(stringToKeys("cw"),
+    doTest(parseKeys("cw"),
            "ab.<caret>cd\n",
            "ab.<caret>\n");
   }
 
   // VIM-421 |c| |iw|
   public void testChangeLastInnerWordInLine() {
-    doTest(stringToKeys("ciwbaz"),
+    doTest(parseKeys("c", "iw", "baz"),
            "foo bar bo<caret>o\n",
            "foo bar baz\n");
   }
 
   // VIM-421 |c| |w|
   public void testChangeLastCharInLine() {
-    doTest(stringToKeys("cw"),
+    doTest(parseKeys("cw"),
            "fo<caret>o\n",
            "fo<caret>\n");
   }
 
   // VIM-404 |O|
   public void testInsertNewLineAboveFirstLine() {
-    doTest(stringToKeys("Obar"),
+    doTest(parseKeys("O", "bar"),
            "fo<caret>o\n",
            "bar\nfoo\n");
   }
 
   // VIM-472 |v|
   public void testVisualSelectionRightMargin() {
-    doTest(stringToKeys("vk$d"),
+    doTest(parseKeys("v", "k$d"),
            "foo\n<caret>bar\n",
            "fooar\n");
   }

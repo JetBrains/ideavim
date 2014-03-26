@@ -5,11 +5,9 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.group.RegisterGroup;
-import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
-import javax.swing.*;
-import java.util.List;
+import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
 /**
  * @author vlan
@@ -17,8 +15,7 @@ import java.util.List;
 public class MacroActionTest extends VimTestCase {
   // |q|
   public void testRecordMacro() {
-    final List<KeyStroke> keyStrokes = StringHelper.stringToKeys("qa3lq");
-    final Editor editor = typeTextInFile(keyStrokes, "on<caret>e two three\n");
+    final Editor editor = typeTextInFile(parseKeys("qa", "3l", "q"), "on<caret>e two three\n");
     final CommandState commandState = CommandState.getInstance(editor);
     assertFalse(commandState.isRecording());
     final RegisterGroup registerGroup = VimPlugin.getRegister();

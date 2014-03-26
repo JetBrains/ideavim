@@ -12,10 +12,7 @@ import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.option.ToggleOption;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
-import javax.swing.*;
-import java.util.List;
-
-import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
+import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
 /**
  * @author vlan
@@ -80,19 +77,15 @@ public class SearchGroupTest extends VimTestCase {
 
   // |/|
   public void testSearchMotion() {
-    final List<KeyStroke> keys = stringToKeys("/two");
-    keys.add(KeyStroke.getKeyStroke("ENTER"));
-    typeTextInFile(keys, "<caret>one two\n");
+    typeTextInFile(parseKeys("/", "two", "<Enter>"),
+                   "<caret>one two\n");
     assertOffset(4);
   }
 
   // |i_CTRL-K|
   public void testSearchDigraph() {
-    final List<KeyStroke> keys = stringToKeys("/");
-    keys.add(KeyStroke.getKeyStroke("control K"));
-    keys.addAll(stringToKeys("O:"));
-    keys.add(KeyStroke.getKeyStroke("ENTER"));
-    typeTextInFile(keys, "<caret>Hello, Österreich!\n");
+    typeTextInFile(parseKeys("/", "<C-K>O:", "<Enter>"),
+                   "<caret>Hello, Österreich!\n");
     assertOffset(7);
   }
   

@@ -5,10 +5,8 @@ import com.intellij.openapi.editor.VisualPosition;
 import com.maddyhome.idea.vim.VimPlugin;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
-import javax.swing.*;
-import java.util.List;
-
 import static com.maddyhome.idea.vim.command.CommandState.Mode.COMMAND;
+import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
 
 /**
@@ -17,23 +15,20 @@ import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
 public class MotionActionTest extends VimTestCase {
   // VIM-198 |v_iw|
   public void testVisualMotionInnerWordNewLineAtEOF() {
-    typeTextInFile(stringToKeys("viw"),
+    typeTextInFile(parseKeys("viw"),
                    "one tw<caret>o\n");
     assertSelection("two");
   }
 
   // |v_iW|
   public void testVisualMotionInnerBigWord() {
-    typeTextInFile(stringToKeys("viW"),
+    typeTextInFile(parseKeys("viW"),
                    "one tw<caret>o.three four\n");
     assertSelection("two.three");
   }
 
   public void testEscapeInCommand() {
-    final List<KeyStroke> keys = stringToKeys("f");
-    keys.add(KeyStroke.getKeyStroke("ESCAPE"));
-    keys.add(KeyStroke.getKeyStroke("ESCAPE"));
-    typeTextInFile(keys,
+    typeTextInFile(parseKeys("f", "<Esc>", "<Esc>"),
                    "on<caret>e two\n" +
                    "three\n");
     assertPluginError(true);
@@ -43,14 +38,14 @@ public class MotionActionTest extends VimTestCase {
 
   // |h| |l|
   public void testLeftRightMove() {
-    typeTextInFile(stringToKeys("14l2h"),
+    typeTextInFile(parseKeys("14l", "2h"),
                    "on<caret>e two three four five six seven\n");
     assertOffset(14);
   }
 
   // |j| |k|
   public void testUpDownMove() {
-    final Editor editor = typeTextInFile(stringToKeys("2jk"),
+    final Editor editor = typeTextInFile(parseKeys("2j", "k"),
                                          "one\n" +
                                          "tw<caret>o\n" +
                                          "three\n" +
@@ -60,28 +55,21 @@ public class MotionActionTest extends VimTestCase {
   }
 
   public void testDeleteDigitsInCount() {
-    final List<KeyStroke> keys = stringToKeys("42");
-    keys.add(KeyStroke.getKeyStroke("DELETE"));
-    keys.add(KeyStroke.getKeyStroke('l'));
-    typeTextInFile(keys,
+    typeTextInFile(parseKeys("42<Delete>l"),
                    "on<caret>e two three four five six seven\n");
     assertOffset(6);
   }
 
   // |f|
   public void testForwardToTab() {
-    final List<KeyStroke> keys = stringToKeys("f");
-    keys.add(KeyStroke.getKeyStroke("TAB"));
-    typeTextInFile(keys,
+    typeTextInFile(parseKeys("f<Tab>"),
                    "on<caret>e two\tthree\nfour\n");
     assertOffset(7);
     assertMode(COMMAND);
   }
 
   public void testIllegalCharArgument() {
-    final List<KeyStroke> keys = stringToKeys("f");
-    keys.add(KeyStroke.getKeyStroke("INSERT"));
-    typeTextInFile(keys,
+    typeTextInFile(parseKeys("f<Insert>"),
                    "on<caret>e two three four five six seven\n");
     assertOffset(2);
     assertMode(COMMAND);
@@ -89,11 +77,7 @@ public class MotionActionTest extends VimTestCase {
 
   // |F| |i_CTRL-K|
   public void testBackToDigraph() {
-    final List<KeyStroke> keys = stringToKeys("F");
-    keys.add(KeyStroke.getKeyStroke("control K"));
-    keys.add(KeyStroke.getKeyStroke('O'));
-    keys.add(KeyStroke.getKeyStroke(':'));
-    typeTextInFile(keys,
+    typeTextInFile(parseKeys("F<C-K>O:"),
                    "Hallo, Öster<caret>reich!\n");
     assertOffset(7);
     assertMode(COMMAND);
@@ -101,28 +85,28 @@ public class MotionActionTest extends VimTestCase {
 
   // VIM-326 |d| |v_ib|
   public void testDeleteInnerBlock() {
-    typeTextInFile(stringToKeys("di)"),
+    typeTextInFile(parseKeys("di)"),
                    "foo(\"b<caret>ar\")\n");
     myFixture.checkResult("foo()\n");
   }
 
   // VIM-326 |d| |v_ib|
   public void testDeleteInnerBlockCaretBeforeString() {
-    typeTextInFile(stringToKeys("di)"),
+    typeTextInFile(parseKeys("di)"),
                    "foo(<caret>\"bar\")\n");
     myFixture.checkResult("foo()\n");
   }
 
   // VIM-326 |c| |v_ib|
   public void testChangeInnerBlockCaretBeforeString() {
-    typeTextInFile(stringToKeys("ci)"),
+    typeTextInFile(parseKeys("ci)"),
                    "foo(<caret>\"bar\")\n");
     myFixture.checkResult("foo()\n");
   }
 
   // VIM-392 |c| |v_ib|
   public void testChangeInnerBlockCaretBeforeBlock() {
-    typeTextInFile(stringToKeys("ci)"),
+    typeTextInFile(parseKeys("ci)"),
                    "foo<caret>(bar)\n");
     myFixture.checkResult("foo()\n");
     assertOffset(4);
@@ -130,28 +114,28 @@ public class MotionActionTest extends VimTestCase {
 
   // VIM-314 |d| |v_iB|
   public void testDeleteInnerCurlyBraceBlock() {
-    typeTextInFile(stringToKeys("di{"),
+    typeTextInFile(parseKeys("di{"),
                    "{foo, b<caret>ar, baz}\n");
     myFixture.checkResult("{}\n");
   }
 
   // VIM-314 |d| |v_iB|
   public void testDeleteInnerCurlyBraceBlockCaretBeforeString() {
-    typeTextInFile(stringToKeys("di{"),
+    typeTextInFile(parseKeys("di{"),
                    "{foo, <caret>\"bar\", baz}\n");
     myFixture.checkResult("{}\n");
   }
 
   // |d| |v_aB|
   public void testDeleteOuterCurlyBraceBlock() {
-    typeTextInFile(stringToKeys("da{"),
+    typeTextInFile(parseKeys("da{"),
                    "x = {foo, b<caret>ar, baz};\n");
     myFixture.checkResult("x = ;\n");
   }
 
   // VIM-261 |c| |v_iB|
   public void testChangeInnerCurlyBraceBlockMultiLine() {
-    typeTextInFile(stringToKeys("ci{"),
+    typeTextInFile(parseKeys("ci{"),
                    "foo {\n" +
                    "    <caret>bar\n" +
                    "}\n");
@@ -163,7 +147,7 @@ public class MotionActionTest extends VimTestCase {
 
   // VIM-275 |d| |v_ib|
   public void testDeleteInnerParensBlockBeforeOpen() {
-    typeTextInFile(stringToKeys("di)"),
+    typeTextInFile(parseKeys("di)"),
                    "foo<caret>(bar)\n");
     myFixture.checkResult("foo()\n");
     assertOffset(4);
@@ -171,14 +155,14 @@ public class MotionActionTest extends VimTestCase {
 
   // |d| |v_ib|
   public void testDeleteInnerParensBlockBeforeClose() {
-    typeTextInFile(stringToKeys("di)"),
+    typeTextInFile(parseKeys("di)"),
                    "foo(bar<caret>)\n");
     myFixture.checkResult("foo()\n");
   }
 
   // |d| |v_ab|
   public void testDeleteOuterBlock() {
-    typeTextInFile(stringToKeys("da)"),
+    typeTextInFile(parseKeys("da)"),
                    "foo(b<caret>ar, baz);\n");
     myFixture.checkResult("foo;\n");
   }
@@ -187,35 +171,35 @@ public class MotionActionTest extends VimTestCase {
 
   // |d| |v_aw|
   public void testDeleteOuterWord() {
-    typeTextInFile(stringToKeys("daw"),
+    typeTextInFile(parseKeys("daw"),
                    "one t<caret>wo three\n");
     myFixture.checkResult("one three\n");
   }
 
   // |d| |v_aW|
   public void testDeleteOuterBigWord() {
-    typeTextInFile(stringToKeys("daW"),
+    typeTextInFile(parseKeys("daW"),
                    "one \"t<caret>wo\" three\n");
     myFixture.checkResult("one three\n");
   }
 
   // |d| |v_is|
   public void testDeleteInnerSentence() {
-    typeTextInFile(stringToKeys("dis"),
+    typeTextInFile(parseKeys("dis"),
                    "Hello World! How a<caret>re you? Bye.\n");
     myFixture.checkResult("Hello World!  Bye.\n");
   }
 
   // |d| |v_as|
   public void testDeleteOuterSentence() {
-    typeTextInFile(stringToKeys("das"),
+    typeTextInFile(parseKeys("das"),
                    "Hello World! How a<caret>re you? Bye.\n");
     myFixture.checkResult("Hello World! Bye.\n");
   }
 
   // |d| |v_ip|
   public void testDeleteInnerParagraph() {
-    typeTextInFile(stringToKeys("dip"),
+    typeTextInFile(parseKeys("dip"),
                    "Hello World!\n" +
                    "\n" +
                    "How a<caret>re you?\n" +
@@ -230,7 +214,7 @@ public class MotionActionTest extends VimTestCase {
 
   // |d| |v_ap|
   public void testDeleteOuterParagraph() {
-    typeTextInFile(stringToKeys("dap"),
+    typeTextInFile(parseKeys("dap"),
                    "Hello World!\n" +
                    "\n" +
                    "How a<caret>re you?\n" +
@@ -244,7 +228,7 @@ public class MotionActionTest extends VimTestCase {
 
   // |d| |v_a]|
   public void testDeleteOuterBracketBlock() {
-    typeTextInFile(stringToKeys("da]"),
+    typeTextInFile(parseKeys("da]"),
                    "foo = [\n" +
                    "    one,\n" +
                    "    t<caret>wo,\n" +
@@ -255,119 +239,119 @@ public class MotionActionTest extends VimTestCase {
 
   // |d| |v_i]|
   public void testDeleteInnerBracketBlock() {
-    typeTextInFile(stringToKeys("di]"),
+    typeTextInFile(parseKeys("di]"),
                    "foo = [one, t<caret>wo];\n");
     myFixture.checkResult("foo = [];\n");
   }
 
   // |d| |v_i>|
   public void testDeleteInnerAngleBracketBlock() {
-    typeTextInFile(stringToKeys("di>"),
+    typeTextInFile(parseKeys("di>"),
                    "Foo<Foo, B<caret>ar> bar\n");
     myFixture.checkResult("Foo<> bar\n");
   }
 
   // |d| |v_a>|
   public void testDeleteOuterAngleBracketBlock() {
-    typeTextInFile(stringToKeys("da>"),
+    typeTextInFile(parseKeys("da>"),
                    "Foo<Foo, B<caret>ar> bar\n");
     myFixture.checkResult("Foo bar\n");
   }
 
   // VIM-132 |d| |v_i"|
   public void testDeleteInnerDoubleQuoteString() {
-    typeTextInFile(stringToKeys("di\""),
+    typeTextInFile(parseKeys("di\""),
                    "foo = \"bar b<caret>az\";\n");
     myFixture.checkResult("foo = \"\";\n");
   }
 
   // VIM-132 |d| |v_a"|
   public void testDeleteOuterDoubleQuoteString() {
-    typeTextInFile(stringToKeys("da\""),
+    typeTextInFile(parseKeys("da\""),
                    "foo = \"bar b<caret>az\";\n");
     myFixture.checkResult("foo = ;\n");
   }
 
   // VIM-132 |d| |v_i"|
   public void testDeleteDoubleQuotedStringStart() {
-    typeTextInFile(stringToKeys("di\""),
+    typeTextInFile(parseKeys("di\""),
                    "foo = [\"one\", <caret>\"two\", \"three\"];\n");
     myFixture.checkResult("foo = [\"one\", \"\", \"three\"];\n");
   }
 
   // VIM-132 |d| |v_i"|
   public void testDeleteDoubleQuotedStringEnd() {
-    typeTextInFile(stringToKeys("di\""),
+    typeTextInFile(parseKeys("di\""),
                    "foo = [\"one\", \"two<caret>\", \"three\"];\n");
     myFixture.checkResult("foo = [\"one\", \"\", \"three\"];\n");
   }
 
   // VIM-132 |d| |v_i"|
   public void testDeleteDoubleQuotedStringWithEscapes() {
-    typeTextInFile(stringToKeys("di\""),
+    typeTextInFile(parseKeys("di\""),
                    "foo = \"fo\\\"o b<caret>ar\";\n");
     myFixture.checkResult("foo = \"\";\n");
   }
 
   // VIM-132 |d| |v_i"|
   public void testDeleteDoubleQuotedStringBefore() {
-    typeTextInFile(stringToKeys("di\""),
+    typeTextInFile(parseKeys("di\""),
                    "f<caret>oo = [\"one\", \"two\", \"three\"];\n");
     myFixture.checkResult("foo = [\"\", \"two\", \"three\"];\n");
   }
 
   // VIM-132 |v_i"|
   public void testInnerDoubleQuotedStringSelection() {
-    typeTextInFile(stringToKeys("vi\""),
+    typeTextInFile(parseKeys("vi\""),
                    "foo = [\"o<caret>ne\", \"two\"];\n");
     assertSelection("one");
   }
 
   // |c| |v_i"|
   public void testChangeEmptyQuotedString() {
-    typeTextInFile(stringToKeys("ci\""),
+    typeTextInFile(parseKeys("ci\""),
                    "foo = \"<caret>\";\n");
     myFixture.checkResult("foo = \"\";\n");
   }
 
   // VIM-132 |d| |v_i'|
   public void testDeleteInnerSingleQuoteString() {
-    typeTextInFile(stringToKeys("di'"),
+    typeTextInFile(parseKeys("di'"),
                    "foo = 'bar b<caret>az';\n");
     myFixture.checkResult("foo = '';\n");
   }
 
   // VIM-132 |d| |v_i`|
   public void testDeleteInnerBackQuoteString() {
-    typeTextInFile(stringToKeys("di`"),
+    typeTextInFile(parseKeys("di`"),
                    "foo = `bar b<caret>az`;\n");
     myFixture.checkResult("foo = ``;\n");
   }
 
   // VIM-132 |d| |v_a'|
   public void testDeleteOuterSingleQuoteString() {
-    typeTextInFile(stringToKeys("da'"),
+    typeTextInFile(parseKeys("da'"),
                    "foo = 'bar b<caret>az';\n");
     myFixture.checkResult("foo = ;\n");
   }
 
   // VIM-132 |d| |v_a`|
   public void testDeleteOuterBackQuoteString() {
-    typeTextInFile(stringToKeys("da`"),
+    typeTextInFile(parseKeys("da`"),
                    "foo = `bar b<caret>az`;\n");
     myFixture.checkResult("foo = ;\n");
   }
 
   // |%|
   public void testPercentMatchSimple() {
-    typeTextInFile(stringToKeys("%"),
+    typeTextInFile(parseKeys("%"),
                    "foo(b<caret>ar)\n");
     assertOffset(3);
   }
 
   // |%|
   public void testPercentMatchMultiLine() {
-    typeTextInFile(stringToKeys("%"),
+    typeTextInFile(parseKeys("%"),
                    "foo(bar,\n" +
                    "    baz,\n" +
                    "    <caret>quux)\n");
@@ -376,14 +360,14 @@ public class MotionActionTest extends VimTestCase {
 
   // |%|
   public void testPercentMatchParensInString() {
-    typeTextInFile(stringToKeys("%"),
+    typeTextInFile(parseKeys("%"),
                    "foo(bar, \"foo(bar\", <caret>baz)\n");
     assertOffset(3);
   }
 
   // |[(|
   public void testUnmatchedOpenParenthesis() {
-    typeTextInFile(stringToKeys("[("),
+    typeTextInFile(parseKeys("[("),
                    "foo(bar, foo(bar, <caret>baz\n" +
                    "bar(foo)\n");
     assertOffset(12);
@@ -391,7 +375,7 @@ public class MotionActionTest extends VimTestCase {
 
   // |[{|
   public void testUnmatchedOpenBracketMultiLine() {
-    typeTextInFile(stringToKeys("[{"),
+    typeTextInFile(parseKeys("[{"),
                    "foo {\n" +
                    "    bar,\n" +
                    "    b<caret>az\n");
@@ -400,7 +384,7 @@ public class MotionActionTest extends VimTestCase {
 
   // |])|
   public void testUnmatchedCloseParenthesisMultiLine() {
-    typeTextInFile(stringToKeys("])"),
+    typeTextInFile(parseKeys("])"),
                    "foo(bar, <caret>baz,\n" +
                    "   quux)\n");
     assertOffset(21);
@@ -408,91 +392,91 @@ public class MotionActionTest extends VimTestCase {
 
   // |]}|
   public void testUnmatchedCloseBracket() {
-    typeTextInFile(stringToKeys("]}"),
+    typeTextInFile(parseKeys("]}"),
                    "{bar, <caret>baz}\n");
     assertOffset(9);
   }
 
   // VIM-331 |w|
   public void testNonAsciiLettersInWord() {
-    typeTextInFile(stringToKeys("w"),
+    typeTextInFile(parseKeys("w"),
                    "Če<caret>ská republika");
     assertOffset(6);
   }
 
   // VIM-58 |w|
   public void testHiraganaToPunctuation() {
-    typeTextInFile(stringToKeys("w"),
+    typeTextInFile(parseKeys("w"),
                    "は<caret>はは!!!");
     assertOffset(3);
   }
 
   // VIM-58 |w|
   public void testHiraganaToFullWidthPunctuation() {
-    typeTextInFile(stringToKeys("w"),
+    typeTextInFile(parseKeys("w"),
                    "は<caret>はは！！！");
     assertOffset(3);
   }
 
   // VIM-58 |w|
   public void testKatakanaToHiragana() {
-    typeTextInFile(stringToKeys("w"),
+    typeTextInFile(parseKeys("w"),
                    "チ<caret>チチははは");
     assertOffset(3);
   }
 
   // VIM-58 |w|
   public void testKatakanaToHalfWidthKana() {
-    typeTextInFile(stringToKeys("w"),
+    typeTextInFile(parseKeys("w"),
                    "チ<caret>チチｳｳｳ");
     assertOffset(3);
   }
 
   // VIM-58 |w|
   public void testKatakanaToDigits() {
-    typeTextInFile(stringToKeys("w"),
+    typeTextInFile(parseKeys("w"),
                    "チ<caret>チチ123");
     assertOffset(3);
   }
 
   // VIM-58 |w|
   public void testKatakanaToLetters() {
-    typeTextInFile(stringToKeys("w"),
+    typeTextInFile(parseKeys("w"),
                    "チ<caret>チチ123");
     assertOffset(3);
   }
 
   // VIM-58 |w|
   public void testKatakanaToFullWidthLatin() {
-    typeTextInFile(stringToKeys("w"),
+    typeTextInFile(parseKeys("w"),
                    "チ<caret>チチＡＡＡ");
     assertOffset(3);
   }
 
   // VIM-58 |w|
   public void testKatakanaToFullWidthDigits() {
-    typeTextInFile(stringToKeys("w"),
+    typeTextInFile(parseKeys("w"),
                    "チ<caret>チチ３３３");
     assertOffset(3);
   }
 
   // VIM-58 |w|
   public void testHiraganaToKatakana() {
-    typeTextInFile(stringToKeys("w"),
+    typeTextInFile(parseKeys("w"),
                    "は<caret>ははチチチ");
     assertOffset(3);
   }
 
   // VIM-58 |w|
   public void testHalftWidthKanaToLetters() {
-    typeTextInFile(stringToKeys("w"),
+    typeTextInFile(parseKeys("w"),
                    "ｳｳｳAAA");
     assertOffset(3);
   }
 
   // |w|
   public void testEmptyLineIsWord() {
-    typeTextInFile(stringToKeys("w"),
+    typeTextInFile(parseKeys("w"),
                    "<caret>one\n" +
                    "\n" +
                    "two\n");
@@ -501,7 +485,7 @@ public class MotionActionTest extends VimTestCase {
 
   // |w|
   public void testNotEmptyLineIsNotWord() {
-    typeTextInFile(stringToKeys("w"),
+    typeTextInFile(parseKeys("w"),
                    "<caret>one\n" +
                    " \n" +
                    "two\n");
@@ -510,21 +494,19 @@ public class MotionActionTest extends VimTestCase {
 
   // VIM-312 |w|
   public void testLastWord() {
-    typeTextInFile(stringToKeys("w"),
+    typeTextInFile(parseKeys("w"),
                    "<caret>one\n");
     assertOffset(2);
   }
 
   public void testRightToLastChar() {
-    final List<KeyStroke> keys = stringToKeys("i");
-    keys.add(KeyStroke.getKeyStroke("RIGHT"));
-    typeTextInFile(keys,
+    typeTextInFile(parseKeys("i<Right>"),
                    "on<caret>e\n");
     assertOffset(3);
   }
 
   public void testDownToLastEmptyLine() {
-    typeTextInFile(stringToKeys("j"),
+    typeTextInFile(parseKeys("j"),
                    "<caret>one\n" +
                    "\n");
     assertOffset(4);
@@ -532,10 +514,7 @@ public class MotionActionTest extends VimTestCase {
 
   // VIM-43 |i| |`.|
   public void testGotoLastChangePosition() {
-    final List<KeyStroke> keys = stringToKeys("ihello ");
-    keys.add(KeyStroke.getKeyStroke("ESCAPE"));
-    keys.addAll(stringToKeys("gg`."));
-    typeTextInFile(keys,
+    typeTextInFile(parseKeys("i", "hello ", "<Esc>", "gg", "`."),
                    "one two\n" +
                    "<caret>hello world\n" +
                    "three four\n");
@@ -544,7 +523,7 @@ public class MotionActionTest extends VimTestCase {
 
   // VIM-43 |p| |`.|
   public void testGotoLastPutPosition() {
-    typeTextInFile(stringToKeys("yypgg`."),
+    typeTextInFile(parseKeys("yy", "p", "gg", "`."),
                    "one two\n" +
                    "<caret>three\n" +
                    "four five\n");
@@ -554,13 +533,10 @@ public class MotionActionTest extends VimTestCase {
   // VIM-262 |c_CTRL-R|
   public void testSearchFromRegister() {
     VimPlugin.getRegister().setKeys('a', stringToKeys("two"));
-    final List<KeyStroke> keys = stringToKeys("/");
-    keys.add(KeyStroke.getKeyStroke("control R"));
-    keys.addAll(stringToKeys("a"));
-    keys.add(KeyStroke.getKeyStroke("ENTER"));
-    typeTextInFile(keys, "<caret>one\n" +
-                         "two\n" +
-                         "three\n");
+    typeTextInFile(parseKeys("/", "<C-R>a", "<Enter>"),
+                   "<caret>one\n" +
+                   "two\n" +
+                   "three\n");
     assertOffset(4);
   }
 }
