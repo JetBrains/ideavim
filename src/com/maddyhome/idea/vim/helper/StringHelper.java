@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.helper;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.commons.codec.binary.Base64;
 import org.jdom.CDATA;
@@ -27,14 +28,29 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static java.awt.event.KeyEvent.*;
 import static javax.swing.KeyStroke.getKeyStroke;
 
 public class StringHelper {
+  private static final String CTRL_PREFIX = "c-";
+  private static final ImmutableMap<String, Integer> VIM_KEY_NAMES = ImmutableMap.<String, Integer>builder()
+    .put("enter", VK_ENTER)
+    .put("ins", VK_INSERT)
+    .put("insert", VK_INSERT)
+    .put("del", VK_DELETE)
+    .put("delete", VK_DELETE)
+    .put("esc", VK_ESCAPE)
+    .put("tab", VK_TAB)
+    .put("up", VK_UP)
+    .put("down", VK_DOWN)
+    .put("left", VK_LEFT)
+    .put("right", VK_RIGHT)
+    .build();
+
   private StringHelper() {}
 
   @NotNull
@@ -72,7 +88,7 @@ public class StringHelper {
       else if (c == '\u0000') {
         res.append("^@");
       }
-      else if ((modifiers & KeyEvent.CTRL_DOWN_MASK) != 0) {
+      else if ((modifiers & CTRL_DOWN_MASK) != 0) {
         final char[] chars = Character.toChars(code);
         if (chars.length == 1) {
           res.append("^");
@@ -158,51 +174,53 @@ public class StringHelper {
   }
 
   /**
-   * Parses Vim key notation string.
+   * Parses Vim key notation strings.
    *
    * @throws IllegalArgumentException if there are any unknown special keys
    * @see :help <>
    */
   @NotNull
-  public static List<KeyStroke> parseKeys(@NotNull String s) {
+  public static List<KeyStroke> parseKeys(@NotNull String... strings) {
     final List<KeyStroke> result = new ArrayList<KeyStroke>();
     KeyParserState state = KeyParserState.INIT;
     StringBuilder specialKeyBuilder = new StringBuilder();
-    for (int i = 0; i < s.length(); i++) {
-      final char c = s.charAt(i);
-      switch (state) {
-        case INIT:
-          if (c == '\\') {
-            state = KeyParserState.ESCAPE;
-          }
-          else if (c == '<') {
-            state = KeyParserState.SPECIAL;
-            specialKeyBuilder = new StringBuilder();
-          }
-          else {
-            result.add(getKeyStroke(c));
-          }
-          break;
-        case ESCAPE:
-          state = KeyParserState.INIT;
-          result.add(getKeyStroke(c));
-          break;
-        case SPECIAL:
-          if (c == '>') {
+    for (String s : strings) {
+      for (int i = 0; i < s.length(); i++) {
+        final char c = s.charAt(i);
+        switch (state) {
+          case INIT:
+            if (c == '\\') {
+              state = KeyParserState.ESCAPE;
+            }
+            else if (c == '<') {
+              state = KeyParserState.SPECIAL;
+              specialKeyBuilder = new StringBuilder();
+            }
+            else {
+              result.add(getKeyStroke(c));
+            }
+            break;
+          case ESCAPE:
             state = KeyParserState.INIT;
-            result.add(parseSpecialKey(specialKeyBuilder.toString()));
-          }
-          else {
-            specialKeyBuilder.append(c);
-          }
-          break;
+            result.add(getKeyStroke(c));
+            break;
+          case SPECIAL:
+            if (c == '>') {
+              state = KeyParserState.INIT;
+              result.add(parseSpecialKey(specialKeyBuilder.toString()));
+            }
+            else {
+              specialKeyBuilder.append(c);
+            }
+            break;
+        }
       }
-    }
-    if (state == KeyParserState.ESCAPE) {
-      throw new IllegalArgumentException("No character after escape");
-    }
-    else if (state == KeyParserState.SPECIAL) {
-      throw new IllegalArgumentException("Unfinished special key");
+      if (state == KeyParserState.ESCAPE) {
+        throw new IllegalArgumentException("No character after escape");
+      }
+      else if (state == KeyParserState.SPECIAL) {
+        throw new IllegalArgumentException("Unfinished special key");
+      }
     }
     return result;
   }
@@ -218,13 +236,28 @@ public class StringHelper {
 
   @NotNull
   private static KeyStroke parseSpecialKey(@NotNull String s) {
-    final String lower = s.toLowerCase();
-    if ("insert".equals(lower)) {
-      return getKeyStroke(KeyEvent.VK_INSERT, 0);
+    final KeyStroke result = parseSpecialKey(s, 0);
+    if (result != null) {
+      return result;
     }
     throw new IllegalArgumentException("Unknown special key: <" + s + ">");
   }
 
+  @Nullable
+  private static KeyStroke parseSpecialKey(@NotNull String s, int modifiers) {
+    final String lower = s.toLowerCase();
+    final Integer keyCode = VIM_KEY_NAMES.get(lower);
+    if (keyCode != null) {
+      return getKeyStroke(keyCode, modifiers);
+    }
+    else if (lower.startsWith(CTRL_PREFIX)) {
+      return parseSpecialKey(s.substring(CTRL_PREFIX.length()), modifiers | CTRL_MASK);
+    }
+    else if (s.length() == 1) {
+      return getKeyStroke(s.charAt(0), modifiers);
+    }
+    return null;
+  }
 
   public static boolean containsUpperCase(@NotNull String text) {
     for (int i = 0; i < text.length(); i++) {
