@@ -122,11 +122,16 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
         if (LookupManager.getActiveLookup(editor) != null) {
           return keyCode == VK_ESCAPE;
         }
-        // Debug watch, Python console, etc.
-        else if (!EditorData.isFileEditor(editor) && CommandState.inInsertMode(editor)) {
-          return keyCode != VK_ENTER && keyCode != VK_ESCAPE && keyCode != VK_TAB;
+        if (CommandState.inInsertMode(editor)) {
+          // Debug watch, Python console, etc.
+          if ((keyCode == VK_ESCAPE || keyCode == VK_TAB) && !EditorData.isFileEditor(editor)) {
+            return false;
+          }
+          if (keyCode == VK_ENTER) {
+            return false;
+          }
         }
-        else if (VIM_ONLY_EDITOR_KEYS.contains(keyStroke)) {
+        if (VIM_ONLY_EDITOR_KEYS.contains(keyStroke)) {
           return true;
         }
         final Map<KeyStroke, ShortcutOwner> savedShortcutConflicts = VimPlugin.getKey().getSavedShortcutConflicts();
