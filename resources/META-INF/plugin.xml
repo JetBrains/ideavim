@@ -32,6 +32,7 @@
   </change-notes>
   <description>
     <![CDATA[
+      <p>Build @VERSION@-@BUILD-NUMBER@</p>
       <p>Vim emulation plug-in for IDEs based on the IntelliJ platform. IdeaVim can be used with IntelliJ IDEA, RubyMine, PyCharm, PhpStorm, WebStorm, AppCode and Android Studio.</p>
       <p>Supported functionality:</p>
       <ul>

@@ -79,6 +79,7 @@
       <filterset>
         <filter token="VERSION" value="${version}"/>
         <filter token="SINCE-VERSION" value="${platform-version}"/>
+        <filter token="BUILD-NUMBER" value="${build.number}"/>
       </filterset>
     </copy>
     <copy todir="${classes}">
