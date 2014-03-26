@@ -53,7 +53,7 @@
     ]]>
   </description>
   <version>@VERSION@</version>
-  <vendor logo="/icons/vim16x16.png">JetBrains</vendor>
+  <vendor>JetBrains</vendor>
 
   <idea-version since-build="@SINCE-VERSION@"/>
 
