@@ -54,7 +54,6 @@ import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.group.*;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.KeyParser;
-import com.maddyhome.idea.vim.key.ShortcutOwner;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import org.jdom.Element;
@@ -64,8 +63,10 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This plugin attempts to emulate the key binding and general functionality of Vim and gVim. See the supplied
@@ -93,10 +94,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private static final boolean BLOCK_CURSOR_VIM_VALUE = true;
   private static final boolean ANIMATED_SCROLLING_VIM_VALUE = false;
   private static final boolean REFRAIN_FROM_SCROLLING_VIM_VALUE = true;
-  public static final String SHORTCUT_CONFLICTS_ELEMENT = "shortcut-conflicts";
-  public static final String SHORTCUT_CONFLICT_ELEMENT = "shortcut-conflict";
-  public static final String OWNER_ATTRIBUTE = "owner";
-  public static final String TEXT_ELEMENT = "text";
 
   private VimTypedActionHandler vimHandler;
   private boolean isBlockCursor = false;
@@ -106,7 +103,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   private int previousStateVersion = 0;
   private String previousKeyMap = "";
-  private Map<KeyStroke, ShortcutOwner> shortcutConflicts = new LinkedHashMap<KeyStroke, ShortcutOwner>();
 
   // It is enabled by default to avoid any special configuration after plugin installation
   private boolean enabled = true;
@@ -126,6 +122,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private MacroGroup macro;
   private DigraphGroup digraph;
   private HistoryGroup history;
+  private KeyGroup key;
 
   public VimPlugin(final Application app) {
     myApp = app;
@@ -141,6 +138,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     macro = new MacroGroup();
     digraph = new DigraphGroup();
     history = new HistoryGroup();
+    key = new KeyGroup();
 
     LOG.debug("VimPlugin ctr");
   }
@@ -203,12 +201,11 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     state.setAttribute("enabled", Boolean.toString(enabled));
     element.addContent(state);
 
-    saveShortcutConflicts(element);
-
     mark.saveData(element);
     register.saveData(element);
     search.saveData(element);
     history.saveData(element);
+    key.saveData(element);
 
     return element;
   }
@@ -229,12 +226,11 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
       previousKeyMap = state.getAttributeValue("keymap");
     }
 
-    loadShortcutConflicts(element);
-
     mark.readData(element);
     register.readData(element);
     search.readData(element);
     history.readData(element);
+    key.readData(element);
   }
 
   public static MotionGroup getMotion() {
@@ -281,6 +277,10 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     return getInstance().history;
   }
 
+  public static KeyGroup getKey() {
+    return getInstance().key;
+  }
+
   public static PluginId getPluginId() {
     return PluginId.getId(IDEAVIM_PLUGIN_ID);
   }
@@ -303,11 +303,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   public static boolean isError() {
     return getInstance().error;
-  }
-
-  @NotNull
-  public static Map<KeyStroke, ShortcutOwner> getSavedShortcutConflicts() {
-    return getInstance().shortcutConflicts;
   }
 
   /**
@@ -351,48 +346,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   @NotNull
   private static VimPlugin getInstance() {
     return (VimPlugin)ApplicationManager.getApplication().getComponent(IDEAVIM_COMPONENT_NAME);
-  }
-
-  private void saveShortcutConflicts(@NotNull Element element) {
-    final Element conflictsElement = new Element(SHORTCUT_CONFLICTS_ELEMENT);
-    for (Map.Entry<KeyStroke, ShortcutOwner> entry : shortcutConflicts.entrySet()) {
-      final ShortcutOwner owner = entry.getValue();
-      if (owner != ShortcutOwner.UNDEFINED) {
-        final Element conflictElement = new Element(SHORTCUT_CONFLICT_ELEMENT);
-        conflictElement.setAttribute(OWNER_ATTRIBUTE, owner.getName());
-        final Element textElement = new Element(TEXT_ELEMENT);
-        StringHelper.setSafeXmlText(textElement, entry.getKey().toString());
-        conflictElement.addContent(textElement);
-        conflictsElement.addContent(conflictElement);
-      }
-    }
-    element.addContent(conflictsElement);
-  }
-
-  private void loadShortcutConflicts(@NotNull Element element) {
-    final Element conflictsElement = element.getChild(SHORTCUT_CONFLICTS_ELEMENT);
-    if (conflictsElement != null) {
-      final java.util.List<Element> conflictElements = conflictsElement.getChildren(SHORTCUT_CONFLICT_ELEMENT);
-      for (Element conflictElement : conflictElements) {
-        final String ownerValue = conflictElement.getAttributeValue(OWNER_ATTRIBUTE);
-        ShortcutOwner owner = ShortcutOwner.UNDEFINED;
-        try {
-          owner = ShortcutOwner.fromString(ownerValue);
-        }
-        catch (IllegalArgumentException ignored) {
-        }
-        final Element textElement = conflictElement.getChild(TEXT_ELEMENT);
-        if (textElement != null) {
-          final String text = StringHelper.getSafeXmlText(textElement);
-          if (text != null) {
-            final KeyStroke keyStroke = KeyStroke.getKeyStroke(text);
-            if (keyStroke != null) {
-              shortcutConflicts.put(keyStroke, owner);
-            }
-          }
-        }
-      }
-    }
   }
 
   private void turnOnPlugin() {

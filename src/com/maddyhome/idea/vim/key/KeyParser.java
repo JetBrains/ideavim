@@ -94,7 +94,7 @@ public class KeyParser {
   public static Map<KeyStroke, ShortcutOwner> getShortcutConflicts() {
     final KeyParser keyParser = getInstance();
     final Set<KeyStroke> requiredShortcutKeys = keyParser.getRequiredShortcutKeys();
-    final Map<KeyStroke, ShortcutOwner> savedConflicts = VimPlugin.getSavedShortcutConflicts();
+    final Map<KeyStroke, ShortcutOwner> savedConflicts = VimPlugin.getKey().getSavedShortcutConflicts();
     final Map<KeyStroke, ShortcutOwner> results = new HashMap<KeyStroke, ShortcutOwner>();
     for (KeyStroke keyStroke : requiredShortcutKeys) {
       if (!VimShortcutKeyAction.VIM_ONLY_EDITOR_KEYS.contains(keyStroke)) {

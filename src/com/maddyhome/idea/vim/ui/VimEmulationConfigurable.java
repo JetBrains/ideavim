@@ -222,7 +222,7 @@ public class VimEmulationConfigurable implements Configurable {
       }
 
       public void apply() {
-        VimPlugin.getSavedShortcutConflicts().putAll(getCurrentData());
+        VimPlugin.getKey().getSavedShortcutConflicts().putAll(getCurrentData());
       }
 
       public void reset() {

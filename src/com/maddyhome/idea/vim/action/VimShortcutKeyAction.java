@@ -80,7 +80,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     final Editor editor = getEditor(e);
     final KeyStroke keyStroke = getKeyStroke(e);
     if (editor != null && keyStroke != null) {
-      final ShortcutOwner owner = VimPlugin.getSavedShortcutConflicts().get(keyStroke);
+      final ShortcutOwner owner = VimPlugin.getKey().getSavedShortcutConflicts().get(keyStroke);
       if (owner == ShortcutOwner.UNDEFINED) {
         notifyAboutShortcutConflict(keyStroke);
       }
@@ -95,7 +95,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
   }
 
   private void notifyAboutShortcutConflict(@NotNull final KeyStroke keyStroke) {
-    VimPlugin.getSavedShortcutConflicts().put(keyStroke, ShortcutOwner.VIM);
+    VimPlugin.getKey().getSavedShortcutConflicts().put(keyStroke, ShortcutOwner.VIM);
     final String message = String.format(
       "Using the <b>%s</b> shortcut for Vim emulation.<br/>" +
       "You can change its handler in <a href='#settings'>Vim Emulation</a> settings.",
@@ -130,7 +130,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
         else if (VIM_ONLY_EDITOR_KEYS.contains(keyStroke)) {
           return true;
         }
-        final Map<KeyStroke, ShortcutOwner> savedShortcutConflicts = VimPlugin.getSavedShortcutConflicts();
+        final Map<KeyStroke, ShortcutOwner> savedShortcutConflicts = VimPlugin.getKey().getSavedShortcutConflicts();
         final ShortcutOwner owner = savedShortcutConflicts.get(keyStroke);
         if (owner == ShortcutOwner.VIM) {
           return true;
