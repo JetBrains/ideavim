@@ -2,6 +2,7 @@ package org.jetbrains.plugins.ideavim;
 
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.testFramework.LightProjectDescriptor;
 import com.intellij.testFramework.PlatformTestCase;
@@ -68,8 +69,14 @@ public abstract class VimTestCase extends UsefulTestCase {
 
   @NotNull
   protected Editor typeTextInFile(@NotNull final List<KeyStroke> keys, @NotNull String fileContents) {
-    myFixture.configureByText("a.txt", fileContents);
+    configureByText(fileContents);
     return typeText(keys);
+  }
+
+  @NotNull
+  protected Editor configureByText(@NotNull String content) {
+    myFixture.configureByText(PlainTextFileType.INSTANCE, content);
+    return myFixture.getEditor();
   }
 
   @NotNull
