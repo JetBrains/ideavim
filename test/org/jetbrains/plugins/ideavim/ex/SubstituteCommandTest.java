@@ -77,7 +77,7 @@ public class SubstituteCommandTest extends VimTestCase {
 
   private void doTest(final String command, String before, String after) {
     myFixture.configureByText("a.java", before);
-    runExCommand(command);
+    typeText(commandToKeys(command));
     myFixture.checkResult(after);
   }
 }
