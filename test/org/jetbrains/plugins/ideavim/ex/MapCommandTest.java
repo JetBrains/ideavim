@@ -1,5 +1,6 @@
 package org.jetbrains.plugins.ideavim.ex;
 
+import com.maddyhome.idea.vim.command.CommandState;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -12,9 +13,19 @@ public class MapCommandTest extends VimTestCase {
     configureByText("<caret>foo\n" +
                     "bar\n");
     typeText(commandToKeys("nmap k j"));
-    assertOffset(0);
     assertPluginError(false);
+    assertOffset(0);
     typeText(parseKeys("k"));
     assertOffset(4);
+  }
+
+  public void testInsertMapJKtoEsc() {
+    configureByText("<caret>World!\n");
+    typeText(commandToKeys("imap jk <Esc>"));
+    assertPluginError(false);
+    typeText(parseKeys("i", "Hello, ", "jk"));
+    myFixture.checkResult("Hello, World!\n");
+    assertMode(CommandState.Mode.COMMAND);
+    assertOffset(6);
   }
 }

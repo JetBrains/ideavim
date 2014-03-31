@@ -45,14 +45,17 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 public class MapHandler extends CommandHandler {
   public static final Pattern RE_MAP_ARGUMENTS = Pattern.compile("([^ ]+) +(.+)");
 
+  // TODO: Handle  shortcuts for mapping commands as well
   public static Map<String, Set<MappingMode>> MAPPING_MODE_NAMES = ImmutableMap.<String, Set<MappingMode>>builder()
     .put("nmap", MappingMode.N)
+    .put("imap", MappingMode.I)
     .build();
 
   public MapHandler() {
     super(new CommandName[]{
       new CommandName("map", ""),
-      new CommandName("nm", "ap")
+      new CommandName("nm", "ap"),
+      new CommandName("im", "ap")
       // TODO: Add other mapping commands
     }, RANGE_FORBIDDEN | ARGUMENT_OPTIONAL);
   }
