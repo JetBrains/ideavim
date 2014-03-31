@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.command;
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.group.RegisterGroup;
@@ -41,8 +40,6 @@ public class CommandState {
   private boolean isRecording = false;
 
   private ParentNode currentNode = VimPlugin.getKey().getKeyRoot(getMappingMode());
-
-  private static Logger logger = Logger.getInstance(CommandState.class.getName());
 
   private CommandState() {
     modes.push(new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL));
@@ -97,30 +94,18 @@ public class CommandState {
   }
 
   public void pushState(@NotNull Mode mode, @NotNull SubMode submode, @NotNull MappingMode mappingMode) {
-    logger.debug("pushState");
     modes.push(new State(mode, submode, mappingMode));
     updateStatus();
-    if (logger.isDebugEnabled()) {
-      logger.debug("state=" + this);
-    }
   }
 
   public void popState() {
-    logger.debug("popState");
     modes.pop();
     updateStatus();
-    if (logger.isDebugEnabled()) {
-      logger.debug("state=" + this);
-    }
   }
 
   @NotNull
   public Mode getMode() {
-    final Mode mode = currentState().getMode();
-    if (logger.isDebugEnabled()) {
-      logger.debug("getMode=" + mode);
-    }
-    return mode;
+    return currentState().getMode();
   }
 
   @NotNull
@@ -146,7 +131,7 @@ public class CommandState {
       return "";
     }
 
-    StringBuffer msg = new StringBuffer();
+    final StringBuilder msg = new StringBuilder();
     switch (state.getMode()) {
       case COMMAND:
         if (state.getSubmode() == SubMode.SINGLE_COMMAND) {
@@ -269,21 +254,6 @@ public class CommandState {
     this.currentNode = currentNode;
   }
 
-  @NotNull
-  @Override
-  public String toString() {
-    final StringBuffer buf = new StringBuffer();
-    buf.append("CommandState");
-    buf.append("{modes=").append(modes);
-    buf.append(",defaultState=").append(defaultState);
-    buf.append(",command=").append(command);
-    buf.append(",lastChange=").append(lastChange);
-    buf.append(",lastRegister=").append(lastRegister);
-    buf.append(",isRecording=").append(isRecording);
-    buf.append('}');
-    return buf.toString();
-  }
-
   private State currentState() {
     if (modes.size() > 0) {
       return modes.peek();
@@ -294,7 +264,7 @@ public class CommandState {
   }
 
   private void updateStatus() {
-    StringBuffer msg = new StringBuffer();
+    final StringBuilder msg = new StringBuilder();
     if (Options.getInstance().isSet("showmode")) {
       msg.append(getStatusString(modes.size() - 1));
     }
@@ -325,7 +295,6 @@ public class CommandState {
     VISUAL_CHARACTER,
     VISUAL_LINE,
     VISUAL_BLOCK
-
   }
 
   private class State {
@@ -356,20 +325,6 @@ public class CommandState {
     @NotNull
     public MappingMode getMappingMode() {
       return myMappingMode;
-    }
-
-    @NotNull
-    public String toString() {
-      StringBuffer res = new StringBuffer();
-      res.append("State[mode=");
-      res.append(mode);
-      res.append(", submode=");
-      res.append(submode);
-      res.append(", mappingMode=");
-      res.append(myMappingMode);
-      res.append("]");
-
-      return res.toString();
     }
   }
 }
