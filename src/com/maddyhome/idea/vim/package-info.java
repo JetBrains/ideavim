@@ -17,4 +17,4 @@
  *
  * @author vlan
  */
-package com.maddyhome.idea.vim.action;
+package com.maddyhome.idea.vim;
