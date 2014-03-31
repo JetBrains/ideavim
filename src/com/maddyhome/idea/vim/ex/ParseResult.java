@@ -18,29 +18,34 @@
 
 package com.maddyhome.idea.vim.ex;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  *
  */
 public class ParseResult {
-  public ParseResult(Ranges ranges, String command, String argument) {
+  @NotNull private Ranges ranges;
+  @NotNull private String command;
+  @NotNull private String argument;
+
+  public ParseResult(@NotNull Ranges ranges, @NotNull String command, @NotNull String argument) {
     this.ranges = ranges;
     this.argument = argument;
     this.command = command;
   }
 
+  @NotNull
   public String getCommand() {
     return command;
   }
 
+  @NotNull
   public String getArgument() {
     return argument;
   }
 
+  @NotNull
   public Ranges getRanges() {
     return ranges;
   }
-
-  protected Ranges ranges;
-  protected String command;
-  protected String argument;
 }
