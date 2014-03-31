@@ -30,33 +30,24 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Stack;
 
-/**
- * This singleton maintains various state information about commands being run
- */
 public class CommandState {
+  @Nullable private static Command lastChange = null;
+  private static char lastRegister = RegisterGroup.REGISTER_DEFAULT;
 
-  public static enum Mode {
-    COMMAND,
-    INSERT,
-    REPLACE,
-    REPEAT,
-    VISUAL,
-    EX_ENTRY;
+  @NotNull private Stack<State> modes = new Stack<State>();
+  @NotNull private State defaultState = new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL);
+  @Nullable private Command command;
+  private int flags;
+  private boolean isRecording = false;
+
+  private ParentNode currentNode = VimPlugin.getKey().getKeyRoot(getMappingMode());
+
+  private static Logger logger = Logger.getInstance(CommandState.class.getName());
+
+  private CommandState() {
+    modes.push(new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL));
   }
 
-  public static enum SubMode {
-    NONE,
-    SINGLE_COMMAND,
-    VISUAL_CHARACTER,
-    VISUAL_LINE,
-    VISUAL_BLOCK;
-  }
-
-  /**
-   * Gets the command state singleton
-   *
-   * @return The singleton instance
-   */
   @NotNull
   public static CommandState getInstance(@Nullable Editor editor) {
     if (editor == null) {
@@ -87,32 +78,22 @@ public class CommandState {
     return state.getMode() == Mode.VISUAL && state.getSubMode() == SubMode.VISUAL_CHARACTER;
   }
 
-  /**
-   * Gets the currently executing command
-   *
-   * @return The running command
-   */
   @Nullable
   public Command getCommand() {
     return command;
   }
 
-  /**
-   * This maintains the current command that is being executed
-   *
-   * @param cmd The currently executing command
-   */
   public void setCommand(@NotNull Command cmd) {
     command = cmd;
     setFlags(cmd.getFlags());
   }
 
-  public void setFlags(int flags) {
-    this.flags = flags;
-  }
-
   public int getFlags() {
     return flags;
+  }
+
+  public void setFlags(int flags) {
+    this.flags = flags;
   }
 
   public void pushState(@NotNull Mode mode, @NotNull SubMode submode, @NotNull MappingMode mappingMode) {
@@ -133,11 +114,6 @@ public class CommandState {
     }
   }
 
-  /**
-   * Gets the current mode the command is in
-   *
-   * @return The current runtime mode
-   */
   @NotNull
   public Mode getMode() {
     final Mode mode = currentState().getMode();
@@ -155,22 +131,6 @@ public class CommandState {
   public void setSubMode(@NotNull SubMode submode) {
     currentState().setSubmode(submode);
     updateStatus();
-  }
-
-  private void updateStatus() {
-    StringBuffer msg = new StringBuffer();
-    if (Options.getInstance().isSet("showmode")) {
-      msg.append(getStatusString(modes.size() - 1));
-    }
-
-    if (isRecording()) {
-      if (msg.length() > 0) {
-        msg.append(" - ");
-      }
-      msg.append("recording");
-    }
-
-    VimPlugin.showMode(msg.toString());
   }
 
   @NotNull
@@ -309,16 +269,8 @@ public class CommandState {
     this.currentNode = currentNode;
   }
 
-  private State currentState() {
-    if (modes.size() > 0) {
-      return modes.peek();
-    }
-    else {
-      return defaultState;
-    }
-  }
-
   @NotNull
+  @Override
   public String toString() {
     final StringBuffer buf = new StringBuffer();
     buf.append("CommandState");
@@ -332,14 +284,55 @@ public class CommandState {
     return buf.toString();
   }
 
-  /**
-   * Signleton, no public object creation
-   */
-  private CommandState() {
-    modes.push(new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL));
+  private State currentState() {
+    if (modes.size() > 0) {
+      return modes.peek();
+    }
+    else {
+      return defaultState;
+    }
+  }
+
+  private void updateStatus() {
+    StringBuffer msg = new StringBuffer();
+    if (Options.getInstance().isSet("showmode")) {
+      msg.append(getStatusString(modes.size() - 1));
+    }
+
+    if (isRecording()) {
+      if (msg.length() > 0) {
+        msg.append(" - ");
+      }
+      msg.append("recording");
+    }
+
+    VimPlugin.showMode(msg.toString());
+  }
+
+  public static enum Mode {
+    COMMAND,
+    INSERT,
+    REPLACE,
+    REPEAT,
+    VISUAL,
+    EX_ENTRY
+
+  }
+
+  public static enum SubMode {
+    NONE,
+    SINGLE_COMMAND,
+    VISUAL_CHARACTER,
+    VISUAL_LINE,
+    VISUAL_BLOCK
+
   }
 
   private class State {
+    @NotNull private Mode mode;
+    @NotNull private SubMode submode;
+    @NotNull private MappingMode myMappingMode;
+
     public State(@NotNull Mode mode, @NotNull SubMode submode, @NotNull MappingMode mappingMode) {
       this.mode = mode;
       this.submode = submode;
@@ -378,23 +371,6 @@ public class CommandState {
 
       return res.toString();
     }
-
-    @NotNull private Mode mode;
-    @NotNull private SubMode submode;
-    @NotNull private MappingMode myMappingMode;
   }
-
-  @NotNull private Stack<State> modes = new Stack<State>();
-  @NotNull private State defaultState = new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL);
-  @Nullable private Command command;
-  private int flags;
-  private boolean isRecording = false;
-
-  private ParentNode currentNode = VimPlugin.getKey().getKeyRoot(getMappingMode());
-
-  @Nullable private static Command lastChange = null;
-  private static char lastRegister = RegisterGroup.REGISTER_DEFAULT;
-
-  private static Logger logger = Logger.getInstance(CommandState.class.getName());
 }
 
