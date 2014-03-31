@@ -35,7 +35,7 @@ public class SetHandler extends CommandHandler {
     super("se", "t", ARGUMENT_OPTIONAL | KEEP_FOCUS);
   }
 
-  public boolean execute(Editor editor, DataContext context, @NotNull ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     String arg = cmd.getArgument();
     if (logger.isDebugEnabled()) {
       logger.debug("arg=" + arg);

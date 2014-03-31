@@ -36,7 +36,7 @@ public class RepeatHandler extends CommandHandler {
     }, RANGE_OPTIONAL | ARGUMENT_REQUIRED | DONT_SAVE_LAST);
   }
 
-  public boolean execute(@NotNull Editor editor, DataContext context, @NotNull ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     char arg = cmd.getArgument().charAt(0);
     int line = cmd.getLine(editor, context);
 
@@ -51,14 +51,15 @@ public class RepeatHandler extends CommandHandler {
       return CommandParser.getInstance().processLastCommand(editor, context, 1);
     }
     else {
-      Register reg = VimPlugin.getRegister().getPlaybackRegister(arg);
+      final Register reg = VimPlugin.getRegister().getPlaybackRegister(arg);
       if (reg != null) {
-        CommandParser.getInstance().processCommand(editor, context, reg.getText(), 1);
-        return true;
+        final String text = reg.getText();
+        if (text != null) {
+          CommandParser.getInstance().processCommand(editor, context, text, 1);
+          return true;
+        }
       }
-      else {
-        return false;
-      }
+      return false;
     }
   }
 

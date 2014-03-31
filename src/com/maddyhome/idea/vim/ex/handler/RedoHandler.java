@@ -36,7 +36,7 @@ public class RedoHandler extends CommandHandler {
     }, RANGE_FORBIDDEN | ARGUMENT_FORBIDDEN | WRITABLE);
   }
 
-  public boolean execute(Editor editor, @NotNull DataContext context, ExCommand cmd) {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
     return UndoRedoHelper.redo(context);
   }
 }

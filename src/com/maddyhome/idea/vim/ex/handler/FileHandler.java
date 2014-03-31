@@ -33,7 +33,7 @@ public class FileHandler extends CommandHandler {
     super("f", "ile", ARGUMENT_FORBIDDEN | RANGE_FORBIDDEN | RANGE_IS_COUNT);
   }
 
-  public boolean execute(@NotNull Editor editor, DataContext context, @NotNull ExCommand cmd) {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
     int count = cmd.getCount(editor, context, 0, false);
 
     VimPlugin.getFile().displayFileInfo(editor, count > 0);

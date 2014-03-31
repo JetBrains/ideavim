@@ -45,7 +45,7 @@ public class MarksHandler extends CommandHandler {
     }, ARGUMENT_OPTIONAL | KEEP_FOCUS);
   }
 
-  public boolean execute(@NotNull Editor editor, DataContext context, ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     List<Mark> marks = VimPlugin.getMark().getMarks(editor);
 
     String spaces = "     ";

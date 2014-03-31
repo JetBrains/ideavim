@@ -48,7 +48,7 @@ public class GotoLineHandler extends CommandHandler {
    * @param cmd     The complete Ex command including range, command, and arguments
    * @return True if able to perform the command, false if not
    */
-  public boolean execute(@NotNull Editor editor, DataContext context, @NotNull ExCommand cmd) {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
     int count = cmd.getLine(editor, context);
 
     int max = EditorHelper.getLineCount(editor);

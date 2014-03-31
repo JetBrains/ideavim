@@ -45,7 +45,7 @@ public class JumpsHandler extends CommandHandler {
     }, ARGUMENT_FORBIDDEN | KEEP_FOCUS);
   }
 
-  public boolean execute(@NotNull Editor editor, DataContext context, ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     List<Jump> jumps = VimPlugin.getMark().getJumps();
     int spot = VimPlugin.getMark().getJumpSpot();
 

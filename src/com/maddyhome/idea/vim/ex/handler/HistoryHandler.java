@@ -39,7 +39,7 @@ public class HistoryHandler extends CommandHandler {
     super("his", "tory", RANGE_FORBIDDEN | ARGUMENT_OPTIONAL | KEEP_FOCUS);
   }
 
-  public boolean execute(@NotNull Editor editor, final DataContext context, @NotNull ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull final DataContext context, @NotNull ExCommand cmd) throws ExException {
     logger.debug("execute");
 
     String arg = cmd.getArgument().trim();

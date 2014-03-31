@@ -34,7 +34,7 @@ public class PromptFindHandler extends CommandHandler {
     super("pro", "mptfind", 0);
   }
 
-  public boolean execute(Editor editor, @NotNull DataContext context, ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     KeyHandler.executeAction("Find", context);
 
     return true;

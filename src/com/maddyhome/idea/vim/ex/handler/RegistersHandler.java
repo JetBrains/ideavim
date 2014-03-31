@@ -43,7 +43,7 @@ public class RegistersHandler extends CommandHandler {
     }, ARGUMENT_OPTIONAL | KEEP_FOCUS);
   }
 
-  public boolean execute(@NotNull final Editor editor, DataContext context, ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull final Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     List<Register> registers = VimPlugin.getRegister().getRegisters();
 
     StringBuffer text = new StringBuffer();

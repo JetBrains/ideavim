@@ -35,7 +35,7 @@ public class GotoCharacterHandler extends CommandHandler {
     super("go", "to", RANGE_OPTIONAL | ARGUMENT_OPTIONAL | RANGE_IS_COUNT, Command.FLAG_MOT_EXCLUSIVE);
   }
 
-  public boolean execute(@NotNull Editor editor, DataContext context, @NotNull ExCommand cmd) {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
     int count = cmd.getCount(editor, context, 1, true);
 
     if (count > 0) {

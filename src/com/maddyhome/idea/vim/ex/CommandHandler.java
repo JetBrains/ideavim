@@ -211,8 +211,8 @@ public abstract class CommandHandler {
    * @param count   The count entered by the user prior to the command
    * @throws ExException if the range or argument is invalid or unable to run the command
    */
-  public boolean process(final Editor editor, final DataContext context, @NotNull final ExCommand cmd, final int count) throws
-                                                                                                               ExException {
+  public boolean process(@NotNull Editor editor, @NotNull DataContext context,
+                         @NotNull ExCommand cmd, int count) throws ExException {
     // No range allowed
     if ((argFlags & RANGE_FORBIDDEN) != 0 && cmd.getRanges().size() != 0) {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_norange));
@@ -278,7 +278,7 @@ public abstract class CommandHandler {
    * @return True if able to perform the command, false if not
    * @throws ExException if the range or arguments are invalid for the command
    */
-  public abstract boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException;
+  public abstract boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException;
 
   @Nullable protected CommandName[] names;
   protected int argFlags;

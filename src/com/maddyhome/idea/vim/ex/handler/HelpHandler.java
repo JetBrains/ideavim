@@ -42,7 +42,7 @@ public class HelpHandler extends CommandHandler {
     super("h", "elp", ARGUMENT_OPTIONAL);
   }
 
-  public boolean execute(Editor editor, DataContext context, @NotNull ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     final String key = cmd.getArgument();
     BrowserUtil.launchBrowser(helpTopicUrl(key));
     return true;

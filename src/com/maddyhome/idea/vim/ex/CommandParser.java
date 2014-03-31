@@ -125,7 +125,7 @@ public class CommandParser {
    * @return True if the command succeeded, false if it failed or there was no previous command
    * @throws ExException if any part of the command was invalid
    */
-  public boolean processLastCommand(@NotNull Editor editor, DataContext context, int count) throws ExException {
+  public boolean processLastCommand(@NotNull Editor editor, @NotNull DataContext context, int count) throws ExException {
     final Register reg = VimPlugin.getRegister().getRegister(':');
     if (reg != null) {
       final String text = reg.getText();
@@ -147,7 +147,8 @@ public class CommandParser {
    * @return A bitwise collection of flags, if any, from the result of running the command.
    * @throws ExException if any part of the command is invalid or unknown
    */
-  public int processCommand(@NotNull Editor editor, DataContext context, @NotNull String cmd, int count) throws ExException {
+  public int processCommand(@NotNull Editor editor, @NotNull DataContext context, @NotNull String cmd,
+                            int count) throws ExException {
     // Nothing entered
     int result = 0;
     if (cmd.length() == 0) {

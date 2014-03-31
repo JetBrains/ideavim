@@ -35,7 +35,7 @@ public class DigraphHandler extends CommandHandler {
     super("dig", "raphs", ARGUMENT_OPTIONAL | KEEP_FOCUS);
   }
 
-  public boolean execute(@NotNull Editor editor, DataContext context, @NotNull ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     String arg = cmd.getArgument();
     if (logger.isDebugEnabled()) {
       logger.debug("arg=" + arg);
