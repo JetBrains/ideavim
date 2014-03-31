@@ -27,6 +27,10 @@ import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 public class CommandState {
@@ -37,10 +41,14 @@ public class CommandState {
   @NotNull private State myDefaultState = new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL);
   @Nullable private Command myCommand;
   @NotNull private ParentNode myCurrentNode = VimPlugin.getKey().getKeyRoot(getMappingMode());
+  @NotNull private final List<KeyStroke> myMappingKeys = new ArrayList<KeyStroke>();
+  @NotNull private final Timer myMappingTimer;
   private int myFlags;
   private boolean myIsRecording = false;
 
   private CommandState() {
+    myMappingTimer = new Timer(0, null);
+    myMappingTimer.setRepeats(false);
     myStates.push(new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL));
   }
 
@@ -115,6 +123,25 @@ public class CommandState {
   public void setSubMode(@NotNull SubMode submode) {
     currentState().setSubMode(submode);
     updateStatus();
+  }
+
+  @NotNull
+  public List<KeyStroke> getMappingKeys() {
+    return myMappingKeys;
+  }
+
+  public void startMappingTimer(@NotNull ActionListener actionListener) {
+    // TODO: Read the 'timeoutlen' option
+    myMappingTimer.setInitialDelay(3000);
+    for (ActionListener listener : myMappingTimer.getActionListeners()) {
+      myMappingTimer.removeActionListener(listener);
+    }
+    myMappingTimer.addActionListener(actionListener);
+    myMappingTimer.start();
+  }
+
+  public void stopMappingTimer() {
+    myMappingTimer.stop();
   }
 
   @NotNull

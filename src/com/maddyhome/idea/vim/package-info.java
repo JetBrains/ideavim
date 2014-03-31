@@ -13,6 +13,16 @@
  * |v|                      {@link com.maddyhome.idea.vim.action.motion.visual.VisualToggleCharacterModeAction}
  * |characterwise-visual|
  *
+ *
+ * 5. Ex commands
+ *
+ * tag                      handler
+ * ---------------------------------------------------------------------------------------------------------------------
+ *
+ * |:map|                   {@link com.maddyhome.idea.vim.ex.handler.MapHandler}
+ * |:nmap|
+ *
+ *
  * @see :help index.
  *
  * @author vlan

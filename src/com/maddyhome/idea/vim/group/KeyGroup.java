@@ -33,6 +33,7 @@ public class KeyGroup {
   @NotNull private Map<KeyStroke, ShortcutOwner> shortcutConflicts = new LinkedHashMap<KeyStroke, ShortcutOwner>();
   @NotNull private Set<KeyStroke> requiredShortcutKeys = new HashSet<KeyStroke>();
   @NotNull private HashMap<MappingMode, RootNode> keyRoots = new HashMap<MappingMode, RootNode>();
+  @NotNull private Map<MappingMode, KeyMapping> keyMappings = new HashMap<MappingMode, KeyMapping>();
 
   public void saveData(@NotNull Element element) {
     final Element conflictsElement = new Element(SHORTCUT_CONFLICTS_ELEMENT);
@@ -117,6 +118,16 @@ public class KeyGroup {
   @NotNull
   public Set<KeyStroke> getRequiredShortcutKeys() {
     return requiredShortcutKeys;
+  }
+
+  @NotNull
+  public KeyMapping getKeyMapping(@NotNull MappingMode mode) {
+    KeyMapping mapping = keyMappings.get(mode);
+    if (mapping == null) {
+      mapping = new KeyMapping();
+      keyMappings.put(mode, mapping);
+    }
+    return mapping;
   }
 
   /**

@@ -83,6 +83,7 @@ public class CommandParser {
     new HistoryHandler();
     new JoinLinesHandler();
     new JumpsHandler();
+    new MapHandler();
     new MarkHandler();
     new MarksHandler();
     new MoveTextHandler();
