@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.key.ParentNode;
+import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,6 +35,8 @@ import java.util.List;
 import java.util.Stack;
 
 public class CommandState {
+  public static final int DEFAULT_TIMEOUT_LENGTH = 1000;
+
   @Nullable private static Command ourLastChange = null;
   private static char ourLastRegister = RegisterGroup.REGISTER_DEFAULT;
 
@@ -47,7 +50,7 @@ public class CommandState {
   private boolean myIsRecording = false;
 
   private CommandState() {
-    myMappingTimer = new Timer(0, null);
+    myMappingTimer = new Timer(DEFAULT_TIMEOUT_LENGTH, null);
     myMappingTimer.setRepeats(false);
     myStates.push(new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL));
   }
@@ -131,8 +134,10 @@ public class CommandState {
   }
 
   public void startMappingTimer(@NotNull ActionListener actionListener) {
-    // TODO: Read the 'timeoutlen' option
-    myMappingTimer.setInitialDelay(3000);
+    final NumberOption timeoutLength = Options.getInstance().getNumberOption("timeoutlen");
+    if (timeoutLength != null) {
+      myMappingTimer.setInitialDelay(timeoutLength.value());
+    }
     for (ActionListener listener : myMappingTimer.getActionListeners()) {
       myMappingTimer.removeActionListener(listener);
     }

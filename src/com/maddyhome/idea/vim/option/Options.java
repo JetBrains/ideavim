@@ -75,6 +75,15 @@ public class Options {
     return res;
   }
 
+  @Nullable
+  public NumberOption getNumberOption(@NotNull String name) {
+    final Option option = getOption(name);
+    if (option instanceof NumberOption) {
+      return (NumberOption)option;
+    }
+    return null;
+  }
+
   /**
    * Gets all options
    *
@@ -467,6 +476,7 @@ public class Options {
     addOption(new NumberOption("sidescroll", "ss", 0));
     addOption(new NumberOption("sidescrolloff", "siso", 0));
     addOption(new ToggleOption("smartcase", "scs", false));
+    addOption(new NumberOption("timeoutlen", "tm", 1000, -1, Integer.MAX_VALUE));
     addOption(new NumberOption("undolevels", "ul", 1000, -1, Integer.MAX_VALUE));
     addOption(new ToggleOption("visualbell", "vb", false));
     addOption(new ToggleOption("wrapscan", "ws", true));
