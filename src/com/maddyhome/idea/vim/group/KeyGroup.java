@@ -130,6 +130,10 @@ public class KeyGroup {
     return mapping;
   }
 
+  public void resetKeyMappings() {
+    keyMappings.clear();
+  }
+
   /**
    * Returns the root of the key mapping for the given mapping mode
    *

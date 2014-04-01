@@ -53,6 +53,7 @@ public abstract class VimTestCase extends UsefulTestCase {
     myFixture.setTestDataPath(getTestDataPath());
     KeyHandler.getInstance().fullReset(myFixture.getEditor());
     Options.getInstance().resetAllOptions();
+    VimPlugin.getKey().resetKeyMappings();
   }
 
   protected String getTestDataPath() {
