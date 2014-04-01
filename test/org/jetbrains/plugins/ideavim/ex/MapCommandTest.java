@@ -52,4 +52,11 @@ public class MapCommandTest extends VimTestCase {
     typeText(stringToKeys("i<Esc"));
     myFixture.checkResult("foo\n");
   }
+
+  public void testUnknownSpecialKey() {
+    configureByText("\n");
+    typeText(commandToKeys("imap <foo> bar"));
+    typeText(stringToKeys("i<foo>"));
+    myFixture.checkResult("bar\n");
+  }
 }

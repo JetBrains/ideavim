@@ -118,7 +118,6 @@ public class StringHelper {
   /**
    * Parses Vim key notation strings.
    *
-   * @throws IllegalArgumentException if there are any unknown special keys
    * @see :help <>
    */
   @NotNull
@@ -155,7 +154,16 @@ public class StringHelper {
           case SPECIAL:
             if (c == '>') {
               state = KeyParserState.INIT;
-              result.add(parseSpecialKey(specialKeyBuilder.toString()));
+              final String specialKeyName = specialKeyBuilder.toString();
+              final KeyStroke specialKey = parseSpecialKey(specialKeyName, 0);
+              if (specialKey != null) {
+                result.add(specialKey);
+              }
+              else {
+                result.add(getKeyStroke('<'));
+                result.addAll(stringToKeys(specialKeyName));
+                result.add(getKeyStroke('>'));
+              }
             }
             else {
               specialKeyBuilder.append(c);
@@ -181,15 +189,6 @@ public class StringHelper {
       builder.add(parseKeys(keyString));
     }
     return builder.build();
-  }
-
-  @NotNull
-  private static KeyStroke parseSpecialKey(@NotNull String s) {
-    final KeyStroke result = parseSpecialKey(s, 0);
-    if (result != null) {
-      return result;
-    }
-    throw new IllegalArgumentException("Unknown special key: <" + s + ">");
   }
 
   @Nullable
