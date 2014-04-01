@@ -18,6 +18,7 @@ The following `:set` commands can appear in `~/.vimrc` or set manually in the co
     'sidescroll'    'ss'    minimum number of columns to scroll horizontal
     'sidescrolloff' 'siso'  min. nr. of columns to left and right of cursor
     'smartcase'     'scs'   no ignore case when pattern has uppercase
+    'timeoutlen'    'tm'    time that is waited for a mapped key sequence
     'undolevels'    'ul'    maximum number of changes that can be undone
     'visualbell'    'vb'    use visual bell instead of beeping
     'wrapscan'      'ws'    searches wrap around the end of the file
