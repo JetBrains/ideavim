@@ -124,9 +124,9 @@ public class StringHelper {
   @NotNull
   public static List<KeyStroke> parseKeys(@NotNull String... strings) {
     final List<KeyStroke> result = new ArrayList<KeyStroke>();
-    KeyParserState state = KeyParserState.INIT;
-    StringBuilder specialKeyBuilder = new StringBuilder();
     for (String s : strings) {
+      KeyParserState state = KeyParserState.INIT;
+      StringBuilder specialKeyBuilder = new StringBuilder();
       for (int i = 0; i < s.length(); i++) {
         final char c = s.charAt(i);
         switch (state) {
@@ -164,7 +164,7 @@ public class StringHelper {
         }
       }
       if (state == KeyParserState.ESCAPE) {
-        throw new IllegalArgumentException("No character after escape");
+        result.add(getKeyStroke('\\'));
       }
       else if (state == KeyParserState.SPECIAL) {
         throw new IllegalArgumentException("Unfinished special key");

@@ -37,4 +37,12 @@ public class MapCommandTest extends VimTestCase {
     typeText(stringToKeys("i\\,<,\\n"));
     myFixture.checkResult("foo\n");
   }
+
+  public void testBackslashAtEnd() {
+    configureByText("\n");
+    typeText(commandToKeys("imap foo\\ bar"));
+    assertPluginError(false);
+    typeText(stringToKeys("ifoo\\"));
+    myFixture.checkResult("bar\n");
+  }
 }
