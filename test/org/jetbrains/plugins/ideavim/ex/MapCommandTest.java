@@ -45,4 +45,11 @@ public class MapCommandTest extends VimTestCase {
     typeText(stringToKeys("ifoo\\"));
     myFixture.checkResult("bar\n");
   }
+
+  public void testUnfinishedSpecialKey() {
+    configureByText("\n");
+    typeText(commandToKeys("imap <Esc foo"));
+    typeText(stringToKeys("i<Esc"));
+    myFixture.checkResult("foo\n");
+  }
 }

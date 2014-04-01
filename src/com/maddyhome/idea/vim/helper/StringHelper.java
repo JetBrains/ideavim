@@ -167,7 +167,8 @@ public class StringHelper {
         result.add(getKeyStroke('\\'));
       }
       else if (state == KeyParserState.SPECIAL) {
-        throw new IllegalArgumentException("Unfinished special key");
+        result.add(getKeyStroke('<'));
+        result.addAll(stringToKeys(specialKeyBuilder.toString()));
       }
     }
     return result;
