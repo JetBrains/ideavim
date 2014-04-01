@@ -34,10 +34,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.group.RegisterGroup;
-import com.maddyhome.idea.vim.helper.DelegateCommandListener;
-import com.maddyhome.idea.vim.helper.DigraphSequence;
-import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.helper.RunnableHelper;
+import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
@@ -238,7 +235,7 @@ public class KeyHandler {
         public void actionPerformed(ActionEvent actionEvent) {
           mappingKeys.clear();
           for (KeyStroke keyStroke : fromKeys) {
-            handleKey(editor, keyStroke, context, false);
+            handleKey(editor, keyStroke, new EditorDataContext(editor), false);
           }
         }
       });
@@ -252,7 +249,7 @@ public class KeyHandler {
         public void run() {
           for (KeyStroke keyStroke : toKeys) {
             // TODO: Don't allow key mapping for non-recursive mappings
-            handleKey(editor, keyStroke, context, true);
+            handleKey(editor, keyStroke, new EditorDataContext(editor), true);
           }
         }
       };
