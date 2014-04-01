@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.group.HistoryGroup;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Maintains a tree of Ex commands based on the required and optional parts of the command names. Parses and
@@ -160,32 +161,11 @@ public class CommandParser {
     VimPlugin.getHistory().addEntry(HistoryGroup.COMMAND, cmd);
 
     // Parse the command
-    ParseResult res = parse(cmd);
-    String command = res.getCommand();
-
-    // If there is no command, just a range, use the 'goto line' handler
-    CommandHandler handler;
-    if (command.length() == 0) {
-      handler = new GotoLineHandler();
-    }
-    else {
-      // See if the user entered a supported command by checking each character entered
-      CommandNode node = root;
-      for (int i = 0; i < command.length(); i++) {
-        node = node.getChild(command.charAt(i));
-        if (node == null) {
-          VimPlugin.showMessage(MessageHelper.message(Msg.NOT_EX_CMD, command));
-          // No such command
-          throw new InvalidCommandException(cmd);
-        }
-      }
-
-      // We found a valid command
-      handler = node.getCommandHandler();
-    }
+    final ExCommand command = parse(cmd);
+    final CommandHandler handler = getCommandHandler(command);
 
     if (handler == null) {
-      VimPlugin.showMessage(MessageHelper.message(Msg.NOT_EX_CMD, command));
+      VimPlugin.showMessage(MessageHelper.message(Msg.NOT_EX_CMD, command.getCommand()));
       throw new InvalidCommandException(cmd);
     }
 
@@ -195,7 +175,7 @@ public class CommandParser {
     }
 
     // Run the command
-    boolean ok = handler.process(editor, context, new ExCommand(res.getRanges(), command, res.getArgument()), count);
+    boolean ok = handler.process(editor, context, command, count);
     if (ok && (handler.getArgFlags() & CommandHandler.DONT_SAVE_LAST) == 0) {
       VimPlugin.getRegister().storeTextInternal(editor, new TextRange(-1, -1), cmd,
                                                                   SelectionType.CHARACTER_WISE, ':', false);
@@ -212,6 +192,24 @@ public class CommandParser {
     return result;
   }
 
+  @Nullable
+  public CommandHandler getCommandHandler(@NotNull ExCommand command) {
+    final String cmd = command.getCommand();
+    // If there is no command, just a range, use the 'goto line' handler
+    if (cmd.length() == 0) {
+      return new GotoLineHandler();
+    }
+    // See if the user entered a supported command by checking each character entered
+    CommandNode node = root;
+    for (int i = 0; i < cmd.length(); i++) {
+      node = node.getChild(cmd.charAt(i));
+      if (node == null) {
+        return null;
+      }
+    }
+    return node.getCommandHandler();
+  }
+
   /**
    * Parse the text entered by the user. This does not include the leading colon.
    *
@@ -220,7 +218,7 @@ public class CommandParser {
    * @throws ExException if the text is syntactically incorrect
    */
   @NotNull
-  public ParseResult parse(@NotNull String cmd) throws ExException {
+  public ExCommand parse(@NotNull String cmd) throws ExException {
     // This is a complicated state machine that should probably be rewritten
     if (logger.isDebugEnabled()) {
       logger.debug("processing `" + cmd + "'");
@@ -539,7 +537,7 @@ public class CommandParser {
       logger.debug("argument = " + argument);
     }
 
-    return new ParseResult(ranges, command.toString(), argument.toString().trim());
+    return new ExCommand(ranges, command.toString(), argument.toString().trim());
   }
 
   /**

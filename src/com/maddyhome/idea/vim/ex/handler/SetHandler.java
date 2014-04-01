@@ -19,30 +19,33 @@
 package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
+import com.maddyhome.idea.vim.ex.VimrcCommandHandler;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  *
  */
-public class SetHandler extends CommandHandler {
+public class SetHandler extends CommandHandler implements VimrcCommandHandler {
   public SetHandler() {
     super("se", "t", ARGUMENT_OPTIONAL | KEEP_FOCUS);
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
-    String arg = cmd.getArgument();
-    if (logger.isDebugEnabled()) {
-      logger.debug("arg=" + arg);
-    }
-
-    return Options.getInstance().parseOptionLine(editor, cmd.getArgument(), true);
+    return parseOptionLine(editor, cmd, true);
   }
 
-  private static Logger logger = Logger.getInstance(SetHandler.class.getName());
+  @Override
+  public void execute(@NotNull ExCommand cmd) throws ExException {
+    parseOptionLine(null, cmd, false);
+  }
+
+  private boolean parseOptionLine(@Nullable Editor editor, @NotNull ExCommand cmd, boolean failOnBad) {
+    return Options.getInstance().parseOptionLine(editor, cmd.getArgument(), failOnBad);
+  }
 }

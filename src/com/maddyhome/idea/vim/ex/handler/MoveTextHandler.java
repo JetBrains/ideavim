@@ -43,8 +43,8 @@ public class MoveTextHandler extends CommandHandler {
     LineRange lr = cmd.getLineRange(editor, context, false);
     int adj = lr.getEndLine() - lr.getStartLine() + 1;
 
-    ParseResult pr = CommandParser.getInstance().parse(cmd.getArgument());
-    int line = pr.getRanges().getFirstLine(editor, context);
+    final ExCommand argumentCmd = CommandParser.getInstance().parse(cmd.getArgument());
+    int line = argumentCmd.getRanges().getFirstLine(editor, context);
 
     if (line >= lr.getEndLine()) {
       line -= adj;

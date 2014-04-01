@@ -51,6 +51,7 @@ import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
+import com.maddyhome.idea.vim.ex.VimrcParser;
 import com.maddyhome.idea.vim.group.*;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.Options;
@@ -62,6 +63,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -175,6 +177,11 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
     // Register ex handlers
     CommandParser.getInstance().registerHandlers();
+
+    final File vimrc = VimrcParser.findVimrc();
+    if (vimrc != null) {
+      VimrcParser.executeFile(vimrc);
+    }
 
     LOG.debug("done");
   }

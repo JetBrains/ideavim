@@ -26,17 +26,12 @@ import com.maddyhome.idea.vim.ui.MorePanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.util.*;
 
 /**
  * Maintains the set of support options
  */
 public class Options {
-  public final String[] VIMRC_FILES = {".ideavimrc", "_ideavimrc", ".vimrc", "_vimrc"};
-
   /**
    * Gets the singleton instance of the options
    *
@@ -417,34 +412,6 @@ public class Options {
    */
   private Options() {
     createDefaultOptions();
-    loadVimrc();
-  }
-
-  /**
-   * Attempts to load all :set commands from the user's .vimrc file if found
-   */
-  private void loadVimrc() {
-    final String homeDirName = System.getProperty("user.home");
-    if (homeDirName != null) {
-      for (String fileName : VIMRC_FILES) {
-        final File file = new File(homeDirName, fileName);
-        if (file.exists()) {
-          try {
-            final BufferedReader reader = new BufferedReader(new FileReader(file));
-            String line;
-            while ((line = reader.readLine()) != null) {
-              if (line.startsWith(":set") || line.startsWith("set")) {
-                final int pos = line.indexOf(' ');
-                parseOptionLine(null, line.substring(pos).trim(), false);
-              }
-            }
-          }
-          catch (Exception ignored) {
-          }
-          break;
-        }
-      }
-    }
   }
 
   /**
@@ -484,4 +451,3 @@ public class Options {
 
   private static Logger logger = Logger.getInstance(Options.class.getName());
 }
-

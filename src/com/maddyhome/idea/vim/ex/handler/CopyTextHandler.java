@@ -42,8 +42,8 @@ public class CopyTextHandler extends CommandHandler {
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     TextRange range = cmd.getTextRange(editor, context, false);
 
-    ParseResult pr = CommandParser.getInstance().parse(cmd.getArgument());
-    int line = pr.getRanges().getFirstLine(editor, context);
+    final ExCommand argumentCmd = CommandParser.getInstance().parse(cmd.getArgument());
+    int line = argumentCmd.getRanges().getFirstLine(editor, context);
     int offset = VimPlugin.getMotion().moveCaretToLineStart(editor, line + 1);
 
     String text = EditorHelper.getText(editor, range.getStartOffset(), range.getEndOffset());
