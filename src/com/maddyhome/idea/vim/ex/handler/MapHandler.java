@@ -23,10 +23,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.ex.CommandHandler;
-import com.maddyhome.idea.vim.ex.CommandName;
-import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.ex.ExException;
+import com.maddyhome.idea.vim.ex.*;
 import com.maddyhome.idea.vim.key.KeyMapping;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,7 +39,7 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 /**
  * @author vlan
  */
-public class MapHandler extends CommandHandler {
+public class MapHandler extends CommandHandler implements VimrcCommandHandler {
   public static final Pattern RE_MAP_ARGUMENTS = Pattern.compile("([^ ]+) +(.+)");
 
   // TODO: Handle  shortcuts for mapping commands as well
@@ -63,12 +60,21 @@ public class MapHandler extends CommandHandler {
   @Override
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context,
                          @NotNull ExCommand cmd) throws ExException {
+    return executeCommand(cmd);
+  }
+
+  @Override
+  public void execute(@NotNull ExCommand cmd) throws ExException {
+    executeCommand(cmd);
+  }
+
+  private boolean executeCommand(ExCommand cmd) throws ExException {
     final Set<MappingMode> modes = MAPPING_MODE_NAMES.get(cmd.getCommand());
     if (modes != null) {
       final String argument = cmd.getArgument();
       if (argument.isEmpty()) {
         // TODO: Show key mapping table
-        throw new UnsupportedOperationException(String.format("Key mapping table is not implemented yet"));
+        throw new ExException(String.format("Key mapping table is not implemented yet"));
       }
       else {
         final Matcher matcher = RE_MAP_ARGUMENTS.matcher(argument);
