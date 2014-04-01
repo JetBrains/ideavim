@@ -4,6 +4,7 @@ import com.maddyhome.idea.vim.command.CommandState;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
+import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
 
 /**
  * @author vlan
@@ -27,5 +28,13 @@ public class MapCommandTest extends VimTestCase {
     myFixture.checkResult("Hello, World!\n");
     assertMode(CommandState.Mode.COMMAND);
     assertOffset(6);
+  }
+
+  public void testBackslashEscape() {
+    configureByText("\n");
+    typeText(commandToKeys("imap \\\\,\\<,\\n foo"));
+    assertPluginError(false);
+    typeText(stringToKeys("i\\,<,\\n"));
+    myFixture.checkResult("foo\n");
   }
 }

@@ -144,7 +144,13 @@ public class StringHelper {
             break;
           case ESCAPE:
             state = KeyParserState.INIT;
-            result.add(getKeyStroke(c));
+            if (c == '\\' || c == '<') {
+              result.add(getKeyStroke(c));
+            }
+            else {
+              result.add(getKeyStroke('\\'));
+              result.add(getKeyStroke(c));
+            }
             break;
           case SPECIAL:
             if (c == '>') {
