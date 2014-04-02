@@ -60,7 +60,7 @@ public class JumpsHandler extends CommandHandler {
       else {
         text.append("  ");
       }
-      text.append(StringHelper.pad(Integer.toString(Math.abs(i - spot - 1)), 3, ' '));
+      text.append(StringHelper.rightJustify(Integer.toString(Math.abs(i - spot - 1)), 3, ' '));
 
       text.append(" ");
       String num = Integer.toString(jump.getLogicalLine() + 1);

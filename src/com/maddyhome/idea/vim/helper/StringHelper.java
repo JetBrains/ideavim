@@ -52,14 +52,12 @@ public class StringHelper {
   private StringHelper() {}
 
   @NotNull
-  public static String pad(@NotNull String text, int len, char ch) {
-    int l = text.length();
-    StringBuilder res = new StringBuilder(text);
-    for (int i = l; i < len; i++) {
-      res.insert(0, ch);
+  public static String rightJustify(@NotNull String text, int width, char fillChar) {
+    final StringBuilder builder = new StringBuilder(text);
+    for (int i = text.length(); i < width; i++) {
+      builder.insert(0, fillChar);
     }
-
-    return res.toString();
+    return builder.toString();
   }
 
   @NotNull
