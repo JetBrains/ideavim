@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.ex.*;
 import com.maddyhome.idea.vim.key.KeyMapping;
+import com.maddyhome.idea.vim.ui.MorePanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,27 +52,26 @@ public class MapHandler extends CommandHandler implements VimrcCommandHandler {
       new CommandName("map!", ""),
       new CommandName("im", "ap"),
       new CommandName("cm", "ap")
-    }, RANGE_FORBIDDEN | ARGUMENT_OPTIONAL);
+    }, RANGE_FORBIDDEN | ARGUMENT_OPTIONAL | KEEP_FOCUS);
   }
 
   @Override
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context,
                          @NotNull ExCommand cmd) throws ExException {
-    return executeCommand(cmd);
+    return executeCommand(cmd, editor);
   }
 
   @Override
   public void execute(@NotNull ExCommand cmd) throws ExException {
-    executeCommand(cmd);
+    executeCommand(cmd, null);
   }
 
-  private boolean executeCommand(ExCommand cmd) throws ExException {
+  private boolean executeCommand(@NotNull ExCommand cmd, @Nullable Editor editor) throws ExException {
     final Set<MappingMode> modes = getMappingModes(cmd.getCommand());
     if (modes != null) {
       final String argument = cmd.getArgument();
       if (argument.isEmpty()) {
-        // TODO: Show key mapping table
-        throw new ExException(String.format("Key mapping table is not implemented yet"));
+        return editor != null && showMappings(modes, editor);
       }
       else {
         final Matcher matcher = RE_MAP_ARGUMENTS.matcher(argument);
@@ -87,6 +87,12 @@ public class MapHandler extends CommandHandler implements VimrcCommandHandler {
       }
     }
     return false;
+  }
+
+  private boolean showMappings(@NotNull Set<MappingMode> modes, @NotNull Editor editor) {
+    final MorePanel panel = MorePanel.getInstance(editor);
+    panel.setText("Key mapping table is not implemented yet");
+    return true;
   }
 
   @Nullable
