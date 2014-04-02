@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.ex.handler;
 
+import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -29,12 +30,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
+import static com.maddyhome.idea.vim.helper.StringHelper.*;
 
 /**
  * @author vlan
@@ -90,9 +90,55 @@ public class MapHandler extends CommandHandler implements VimrcCommandHandler {
   }
 
   private boolean showMappings(@NotNull Set<MappingMode> modes, @NotNull Editor editor) {
+    final List<MappingRow> rows = getKeyMappingRows(modes);
+    final StringBuilder builder = new StringBuilder();
+    for (MappingRow row : rows) {
+      // TODO: Show mode if not nvo
+      builder.append("  ");
+      builder.append(" ");
+      builder.append(leftJustify(toKeyNotation(row.getFromKeys()), 12, ' '));
+      builder.append(" ");
+      builder.append(toKeyNotation(row.getToKeys()));
+      builder.append("\n");
+    }
     final MorePanel panel = MorePanel.getInstance(editor);
-    panel.setText("Key mapping table is not implemented yet");
+    panel.setText(builder.toString());
     return true;
+  }
+
+  private List<MappingRow> getKeyMappingRows(@NotNull Set<MappingMode> modes) {
+    final Map<ImmutableList<KeyStroke>, Set<MappingMode>> actualModes = new HashMap<ImmutableList<KeyStroke>, Set<MappingMode>>();
+    for (MappingMode mode : modes) {
+      final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mode);
+      for (List<KeyStroke> fromKeys : mapping) {
+        final ImmutableList<KeyStroke> key = ImmutableList.copyOf(fromKeys);
+        final Set<MappingMode> value = actualModes.get(key);
+        final Set<MappingMode> newValue;
+        if (value != null) {
+          newValue = new HashSet<MappingMode>(value);
+          newValue.add(mode);
+        }
+        else {
+          newValue = EnumSet.of(mode);
+        }
+        actualModes.put(key, newValue);
+      }
+    }
+    final List<MappingRow> rows = new ArrayList<MappingRow>();
+    for (Map.Entry<ImmutableList<KeyStroke>, Set<MappingMode>> entry : actualModes.entrySet()) {
+      final ArrayList<KeyStroke> fromKeys = new ArrayList<KeyStroke>(entry.getKey());
+      final Set<MappingMode> mappingModes = entry.getValue();
+      if (!mappingModes.isEmpty()) {
+        final MappingMode mode = mappingModes.iterator().next();
+        final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mode);
+        final List<KeyStroke> toKeys = mapping.get(fromKeys);
+        if (toKeys != null) {
+          rows.add(new MappingRow(mappingModes, fromKeys, toKeys));
+        }
+      }
+    }
+    Collections.sort(rows);
+    return rows;
   }
 
   @Nullable
@@ -119,5 +165,38 @@ public class MapHandler extends CommandHandler implements VimrcCommandHandler {
       return MappingMode.C;
     }
     return null;
+  }
+
+  private static class MappingRow implements Comparable<MappingRow> {
+    @NotNull private final Set<MappingMode> myModes;
+    @NotNull private final List<KeyStroke> myFromKeys;
+    @NotNull private final List<KeyStroke> myToKeys;
+
+    public MappingRow(@NotNull Set<MappingMode> modes, @NotNull List<KeyStroke> fromKeys,
+                      @NotNull List<KeyStroke> toKeys) {
+      myModes = modes;
+      myFromKeys = fromKeys;
+      myToKeys = toKeys;
+    }
+
+    @Override
+    public int compareTo(@NotNull MappingRow row) {
+      return 0;
+    }
+
+    @NotNull
+    public Set<MappingMode> getModes() {
+      return myModes;
+    }
+
+    @NotNull
+    public List<KeyStroke> getFromKeys() {
+      return myFromKeys;
+    }
+
+    @NotNull
+    public List<KeyStroke> getToKeys() {
+      return myToKeys;
+    }
   }
 }

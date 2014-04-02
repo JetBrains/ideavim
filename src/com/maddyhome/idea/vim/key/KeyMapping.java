@@ -23,17 +23,19 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author vlan
  */
-public class KeyMapping {
+public class KeyMapping implements Iterable<List<KeyStroke>> {
   @NotNull private Map<ImmutableList<KeyStroke>, List<KeyStroke>> myKeys = new HashMap<ImmutableList<KeyStroke>, List<KeyStroke>>();
   @NotNull private Map<ImmutableList<KeyStroke>, Integer> myPrefixes = new HashMap<ImmutableList<KeyStroke>, Integer>();
+
+  @Override
+  public Iterator<List<KeyStroke>> iterator() {
+    return new ArrayList<List<KeyStroke>>(myKeys.keySet()).iterator();
+  }
 
   @Nullable
   public List<KeyStroke> get(@NotNull List<KeyStroke> keys) {

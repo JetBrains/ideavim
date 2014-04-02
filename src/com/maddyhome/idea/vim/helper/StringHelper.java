@@ -20,22 +20,25 @@ package com.maddyhome.idea.vim.helper;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.intellij.openapi.util.text.StringUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static java.awt.event.KeyEvent.*;
 import static javax.swing.KeyStroke.getKeyStroke;
 
 public class StringHelper {
+  private static final String META_PREFIX = "m-";
+  private static final String ALT_PREFIX = "a-";
   private static final String CTRL_PREFIX = "c-";
-  private static final ImmutableMap<String, Integer> VIM_KEY_NAMES = ImmutableMap.<String, Integer>builder()
+  private static final String SHIFT_PREFIX = "s-";
+
+  private static final Map<String, Integer> VIM_KEY_NAMES = ImmutableMap.<String, Integer>builder()
     .put("enter", VK_ENTER)
     .put("ins", VK_INSERT)
     .put("insert", VK_INSERT)
@@ -48,8 +51,18 @@ public class StringHelper {
     .put("left", VK_LEFT)
     .put("right", VK_RIGHT)
     .build();
+  private static final Map<Integer, String> VIM_KEY_VALUES = invertMap(VIM_KEY_NAMES);
 
   private StringHelper() {}
+
+  @NotNull
+  public static String leftJustify(@NotNull String text, int width, char fillChar) {
+    final StringBuilder builder = new StringBuilder(text);
+    for (int i = text.length(); i < width; i++) {
+      builder.append(fillChar);
+    }
+    return builder.toString();
+  }
 
   @NotNull
   public static String rightJustify(@NotNull String text, int width, char fillChar) {
@@ -110,9 +123,8 @@ public class StringHelper {
   private static enum KeyParserState {
     INIT,
     ESCAPE,
-    SPECIAL,
+    SPECIAL;
   }
-
   /**
    * Parses Vim key notation strings.
    *
@@ -181,28 +193,63 @@ public class StringHelper {
   }
 
   @NotNull
+  public static String toKeyNotation(@NotNull List<KeyStroke> keys) {
+    final StringBuilder builder = new StringBuilder();
+    for (KeyStroke key : keys) {
+      builder.append(toKeyNotation(key));
+    }
+    return builder.toString();
+  }
+
+  @NotNull
+  public static String toKeyNotation(@NotNull KeyStroke key) {
+    final char c = key.getKeyChar();
+    final int keyCode = key.getKeyCode();
+    final int modifiers = key.getModifiers();
+
+    if (c != CHAR_UNDEFINED) {
+      return String.valueOf(c);
+    }
+
+    String prefix = "";
+    if ((modifiers & META_MASK) != 0) {
+      prefix += "M-";
+    }
+    if ((modifiers & ALT_MASK) != 0) {
+      prefix += "A-";
+    }
+    if ((modifiers & CTRL_MASK) != 0) {
+      prefix += "C-";
+    }
+    if ((modifiers & SHIFT_MASK) != 0) {
+      prefix += "S-";
+    }
+
+    String name = VIM_KEY_VALUES.get(keyCode);
+    if (name != null) {
+      name = StringUtil.capitalize(name);
+    }
+    if (name == null) {
+      try {
+        final char[] chars = Character.toChars(keyCode);
+        if (chars.length == 1) {
+          name = String.valueOf(chars[0]);
+        }
+      }
+      catch (IllegalArgumentException ignored) {
+      }
+    }
+
+    return name != null ? "<" + prefix + name + ">" : "<<" + key.toString() + ">>";
+  }
+
+  @NotNull
   public static Set<List<KeyStroke>> parseKeysSet(@NotNull String... keyStrings) {
     final ImmutableSet.Builder<List<KeyStroke>> builder = ImmutableSet.builder();
     for (String keyString : keyStrings) {
       builder.add(parseKeys(keyString));
     }
     return builder.build();
-  }
-
-  @Nullable
-  private static KeyStroke parseSpecialKey(@NotNull String s, int modifiers) {
-    final String lower = s.toLowerCase();
-    final Integer keyCode = VIM_KEY_NAMES.get(lower);
-    if (keyCode != null) {
-      return getKeyStroke(keyCode, modifiers);
-    }
-    else if (lower.startsWith(CTRL_PREFIX)) {
-      return parseSpecialKey(s.substring(CTRL_PREFIX.length()), modifiers | CTRL_MASK);
-    }
-    else if (s.length() == 1) {
-      return getKeyStroke(s.charAt(0), modifiers);
-    }
-    return null;
   }
 
   public static boolean containsUpperCase(@NotNull String text) {
@@ -235,16 +282,6 @@ public class StringHelper {
     return element;
   }
 
-  @Nullable
-  private static Character lastCharacter(@NotNull String text) {
-    return text.length() > 0 ? text.charAt(text.length() - 1) : null;
-  }
-
-  @Nullable
-  private static Character firstCharacter(@NotNull String text) {
-    return text.length() > 0 ? text.charAt(0) : null;
-  }
-
   /**
    * Get the (potentially safely encoded) text of an XML element.
    */
@@ -273,6 +310,50 @@ public class StringHelper {
       }
     }
     return true;
+  }
+
+  @NotNull
+  private static <K, V> Map<V, K> invertMap(@NotNull Map<K, V> map) {
+    final Map<V, K> inverted = new HashMap<V, K>();
+    for (Map.Entry<K, V> entry : map.entrySet()) {
+      inverted.put(entry.getValue(), entry.getKey());
+    }
+    return inverted;
+  }
+
+  @Nullable
+  private static KeyStroke parseSpecialKey(@NotNull String s, int modifiers) {
+    final String lower = s.toLowerCase();
+    final Integer keyCode = VIM_KEY_NAMES.get(lower);
+    if (keyCode != null) {
+      return getKeyStroke(keyCode, modifiers);
+    }
+    else if (lower.startsWith(META_PREFIX)) {
+      return parseSpecialKey(s.substring(META_PREFIX.length()), modifiers | META_MASK);
+    }
+    else if (lower.startsWith(ALT_PREFIX)) {
+      return parseSpecialKey(s.substring(ALT_PREFIX.length()), modifiers | ALT_MASK);
+    }
+    else if (lower.startsWith(CTRL_PREFIX)) {
+      return parseSpecialKey(s.substring(CTRL_PREFIX.length()), modifiers | CTRL_MASK);
+    }
+    else if (lower.startsWith(SHIFT_PREFIX)) {
+      return parseSpecialKey(s.substring(SHIFT_PREFIX.length()), modifiers | SHIFT_MASK);
+    }
+    else if (s.length() == 1) {
+      return getKeyStroke(s.charAt(0), modifiers);
+    }
+    return null;
+  }
+
+  @Nullable
+  private static Character lastCharacter(@NotNull String text) {
+    return text.length() > 0 ? text.charAt(text.length() - 1) : null;
+  }
+
+  @Nullable
+  private static Character firstCharacter(@NotNull String text) {
+    return text.length() > 0 ? text.charAt(0) : null;
   }
 
   /**
