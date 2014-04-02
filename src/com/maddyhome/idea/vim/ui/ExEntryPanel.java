@@ -74,7 +74,7 @@ public class ExEntryPanel extends JPanel {
     gbc.fill = GridBagConstraints.HORIZONTAL;
     layout.setConstraints(entry, gbc);
     add(entry);
-    setBorder(BorderFactory.createLineBorder(Color.BLACK));
+    setBorder(BorderFactory.createEtchedBorder());
 
     adapter = new ComponentAdapter() {
       public void componentResized(ComponentEvent e) {
