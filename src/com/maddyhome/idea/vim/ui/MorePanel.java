@@ -27,6 +27,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
+import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -76,9 +77,7 @@ public class MorePanel extends JPanel {
     add(scrollPane, BorderLayout.CENTER);
     add(label, BorderLayout.SOUTH);
 
-    Font font = new Font("Monospaced", Font.PLAIN, 12);
-    text.setFont(font);
-    label.setFont(font);
+    setFontForElements();
 
     text.setBorder(null);
     scrollPane.setBorder(null);
@@ -102,6 +101,12 @@ public class MorePanel extends JPanel {
     MoreKeyListener moreKeyListener = new MoreKeyListener(this);
     addKeyListener(moreKeyListener);
     text.addKeyListener(moreKeyListener);
+  }
+
+  private void setFontForElements() {
+    final Font font = UiHelper.getEditorFont();
+    text.setFont(font);
+    label.setFont(font);
   }
 
   /**
@@ -150,6 +155,7 @@ public class MorePanel extends JPanel {
     oldGlass.add(this);
     oldGlass.addComponentListener(adapter);
 
+    setFontForElements();
     positionPanel();
 
     oldGlass.setVisible(true);
