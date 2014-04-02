@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.ex.handler;
 
-import com.google.common.collect.ImmutableMap;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -26,10 +25,10 @@ import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.ex.*;
 import com.maddyhome.idea.vim.key.KeyMapping;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,18 +41,16 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 public class MapHandler extends CommandHandler implements VimrcCommandHandler {
   public static final Pattern RE_MAP_ARGUMENTS = Pattern.compile("([^ ]+) +(.+)");
 
-  // TODO: Handle  shortcuts for mapping commands as well
-  public static Map<String, Set<MappingMode>> MAPPING_MODE_NAMES = ImmutableMap.<String, Set<MappingMode>>builder()
-    .put("nmap", MappingMode.N)
-    .put("imap", MappingMode.I)
-    .build();
-
   public MapHandler() {
     super(new CommandName[]{
+      // TODO: Support xmap, smap, lmap
       new CommandName("map", ""),
       new CommandName("nm", "ap"),
-      new CommandName("im", "ap")
-      // TODO: Add other mapping commands
+      new CommandName("vm", "ap"),
+      new CommandName("om", "ap"),
+      new CommandName("map!", ""),
+      new CommandName("im", "ap"),
+      new CommandName("cm", "ap")
     }, RANGE_FORBIDDEN | ARGUMENT_OPTIONAL);
   }
 
@@ -69,7 +66,7 @@ public class MapHandler extends CommandHandler implements VimrcCommandHandler {
   }
 
   private boolean executeCommand(ExCommand cmd) throws ExException {
-    final Set<MappingMode> modes = MAPPING_MODE_NAMES.get(cmd.getCommand());
+    final Set<MappingMode> modes = getMappingModes(cmd.getCommand());
     if (modes != null) {
       final String argument = cmd.getArgument();
       if (argument.isEmpty()) {
@@ -90,5 +87,31 @@ public class MapHandler extends CommandHandler implements VimrcCommandHandler {
       }
     }
     return false;
+  }
+
+  @Nullable
+  private Set<MappingMode> getMappingModes(@NotNull String command) {
+    if (command.equals("map")) {
+      return MappingMode.NVO;
+    }
+    else if (command.startsWith("nm")) {
+      return MappingMode.N;
+    }
+    else if (command.startsWith("vm")) {
+      return MappingMode.V;
+    }
+    else if (command.startsWith("om")) {
+      return MappingMode.O;
+    }
+    else if (command.equals("map!")) {
+      return MappingMode.IC;
+    }
+    else if (command.startsWith("im")) {
+      return MappingMode.I;
+    }
+    else if (command.startsWith("cm")) {
+      return MappingMode.C;
+    }
+    return null;
   }
 }

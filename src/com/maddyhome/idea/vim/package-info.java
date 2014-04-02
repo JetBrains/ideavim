@@ -21,6 +21,11 @@
  *
  * |:map|                   {@link com.maddyhome.idea.vim.ex.handler.MapHandler}
  * |:nmap|
+ * |:vmap|
+ * |:omap|
+ * |:map!|
+ * |:imap|
+ * |:cmap|
  *
  *
  * @see :help index.
