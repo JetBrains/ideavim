@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.ui;
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
@@ -45,8 +44,6 @@ import java.util.List;
  * This panel displays text in a <code>more</code> like window.
  */
 public class MorePanel extends JPanel {
-  private static Logger ourLogger = Logger.getInstance(MorePanel.class.getName());
-
   @NotNull private final Editor myEditor;
 
   @NotNull private JLabel myLabel = new JLabel("more");
@@ -163,7 +160,6 @@ public class MorePanel extends JPanel {
    * Turns off the ex entry field and puts the focus back to the original component
    */
   public void deactivate() {
-    ourLogger.info("deactivate");
     if (!myActive) return;
     myActive = false;
     myText.setText("");
@@ -242,14 +238,6 @@ public class MorePanel extends JPanel {
     int val = myScrollPane.getVerticalScrollBar().getValue();
     myScrollPane.getVerticalScrollBar().setValue(val + more);
     myScrollPane.getHorizontalScrollBar().setValue(0);
-    if (ourLogger.isDebugEnabled()) {
-      ourLogger.debug("val=" + val);
-      ourLogger.debug("more=" + more);
-      ourLogger
-        .debug("scrollPane.getVerticalScrollBar().getMaximum()=" + myScrollPane.getVerticalScrollBar().getMaximum());
-      ourLogger.debug("scrollPane.getVerticalScrollBar().getVisibleAmount()=" +
-                      myScrollPane.getVerticalScrollBar().getVisibleAmount());
-    }
     if (val + more >=
         myScrollPane.getVerticalScrollBar().getMaximum() - myScrollPane.getVerticalScrollBar().getVisibleAmount()) {
       myAtEnd = true;
@@ -268,12 +256,6 @@ public class MorePanel extends JPanel {
     myLineHeight = myText.getFontMetrics(myText.getFont()).getHeight();
     int count = countLines(myText.getText());
     int visLines = getSize().height / myLineHeight - 1;
-    if (ourLogger.isDebugEnabled()) {
-      ourLogger.debug("size.height=" + getSize().height);
-      ourLogger.debug("lineHeight=" + myLineHeight);
-      ourLogger.debug("count=" + count);
-      ourLogger.debug("visLines=" + visLines);
-    }
     int lines = Math.min(count, visLines);
     setSize(getSize().width, lines * myLineHeight + myLabel.getPreferredSize().height +
                              getBorder().getBorderInsets(this).top * 2);
@@ -364,12 +346,10 @@ public class MorePanel extends JPanel {
                 myMorePanel.close();
                 break;
               default:
-                if (ourLogger.isDebugEnabled()) ourLogger.debug("e.getKeyCode()=" + e.getKeyCode());
                 myMorePanel.badKey();
             }
           }
           default:
-            if (ourLogger.isDebugEnabled()) ourLogger.debug("e.getKeyChar()=" + (int)e.getKeyChar());
             myMorePanel.badKey();
         }
       }
