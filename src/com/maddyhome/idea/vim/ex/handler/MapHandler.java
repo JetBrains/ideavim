@@ -166,7 +166,7 @@ public class MapHandler extends CommandHandler implements VimrcCommandHandler {
   }
 
   private String getModesStringCode(@NotNull Set<MappingMode> modes) {
-    if (modes == MappingMode.NVO) {
+    if (modes.equals(MappingMode.NVO)) {
       return "";
     }
     else if (modes.contains(MappingMode.INSERT)) {

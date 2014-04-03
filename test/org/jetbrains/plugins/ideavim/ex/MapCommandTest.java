@@ -62,12 +62,17 @@ public class MapCommandTest extends VimTestCase {
 
   public void testMapTable() {
     configureByText("\n");
+    typeText(commandToKeys("map <C-Down> gt"));
     typeText(commandToKeys("imap foo bar"));
     typeText(commandToKeys("imap bar <Esc>"));
     typeText(commandToKeys("imap <C-Down> <C-O>gt"));
+
     typeText(commandToKeys("imap"));
     assertExOutput("i  <C-Down>      <C-O>gt\n" +
                    "i  bar           <Esc>\n" +
                    "i  foo           bar\n");
+
+    typeText(commandToKeys("map"));
+    assertExOutput("   <C-Down>      gt\n");
   }
 }
