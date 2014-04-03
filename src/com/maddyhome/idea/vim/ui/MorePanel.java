@@ -48,7 +48,6 @@ public class MorePanel extends JPanel {
   private static Logger ourLogger = Logger.getInstance(MorePanel.class.getName());
 
   @NotNull private final Editor myEditor;
-  @NotNull private final JComponent myParent;
 
   @NotNull private JLabel myLabel = new JLabel("more");
   @NotNull private JTextArea myText = new JTextArea();
@@ -66,7 +65,6 @@ public class MorePanel extends JPanel {
 
   private MorePanel(@NotNull Editor editor) {
     myEditor = editor;
-    myParent = editor.getContentComponent();
 
     // Create a text editor for the text and a label for the prompt
     BorderLayout layout = new BorderLayout(0, 0);
@@ -131,7 +129,7 @@ public class MorePanel extends JPanel {
    * Turns on the more window for the given editor
    */
   public void activate() {
-    JRootPane root = SwingUtilities.getRootPane(myParent);
+    JRootPane root = SwingUtilities.getRootPane(myEditor.getContentComponent());
     myOldGlass = (JComponent)root.getGlassPane();
     if (myOldGlass != null) {
       myOldLayout = myOldGlass.getLayout();
@@ -176,7 +174,7 @@ public class MorePanel extends JPanel {
       myOldGlass.setOpaque(myWasOpaque);
       myOldGlass.setLayout(myOldLayout);
     }
-    myParent.requestFocus();
+    myEditor.getContentComponent().requestFocus();
   }
 
   /**
@@ -263,7 +261,8 @@ public class MorePanel extends JPanel {
   }
 
   private void positionPanel() {
-    Container scroll = SwingUtilities.getAncestorOfClass(JScrollPane.class, myParent);
+    final JComponent contentComponent = myEditor.getContentComponent();
+    Container scroll = SwingUtilities.getAncestorOfClass(JScrollPane.class, contentComponent);
     setSize(scroll.getSize());
 
     myLineHeight = myText.getFontMetrics(myText.getFont()).getHeight();
@@ -285,8 +284,8 @@ public class MorePanel extends JPanel {
     Rectangle bounds = scroll.getBounds();
     bounds.translate(0, scroll.getHeight() - height);
     bounds.height = height;
-    Point pos = SwingUtilities
-      .convertPoint(scroll.getParent(), bounds.getLocation(), SwingUtilities.getRootPane(myParent).getGlassPane());
+    Point pos = SwingUtilities.convertPoint(scroll.getParent(), bounds.getLocation(),
+                                            SwingUtilities.getRootPane(contentComponent).getGlassPane());
     bounds.setLocation(pos);
     setBounds(bounds);
 
