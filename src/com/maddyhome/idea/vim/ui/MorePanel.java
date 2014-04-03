@@ -109,10 +109,6 @@ public class MorePanel extends JPanel {
     return myText.getText().length() > 0;
   }
 
-  public String getText() {
-    return myText.getText();
-  }
-
   public void setText(@NotNull String data) {
     if (data.length() > 0 && data.charAt(data.length() - 1) == '\n') {
       data = data.substring(0, data.length() - 1);
