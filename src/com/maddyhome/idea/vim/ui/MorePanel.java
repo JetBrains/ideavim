@@ -123,9 +123,26 @@ public class MorePanel extends JPanel {
   }
 
   /**
+   * Turns off the ex entry field and puts the focus back to the original component
+   */
+  public void deactivate() {
+    if (!myActive) return;
+    myActive = false;
+    myText.setText("");
+    if (myOldGlass != null) {
+      myOldGlass.removeComponentListener(myAdapter);
+      myOldGlass.setVisible(false);
+      myOldGlass.remove(this);
+      myOldGlass.setOpaque(myWasOpaque);
+      myOldGlass.setLayout(myOldLayout);
+    }
+    myEditor.getContentComponent().requestFocus();
+  }
+
+  /**
    * Turns on the more window for the given editor
    */
-  public void activate() {
+  private void activate() {
     JRootPane root = SwingUtilities.getRootPane(myEditor.getContentComponent());
     myOldGlass = (JComponent)root.getGlassPane();
     if (myOldGlass != null) {
@@ -154,23 +171,6 @@ public class MorePanel extends JPanel {
         });
       }
     });
-  }
-
-  /**
-   * Turns off the ex entry field and puts the focus back to the original component
-   */
-  public void deactivate() {
-    if (!myActive) return;
-    myActive = false;
-    myText.setText("");
-    if (myOldGlass != null) {
-      myOldGlass.removeComponentListener(myAdapter);
-      myOldGlass.setVisible(false);
-      myOldGlass.remove(this);
-      myOldGlass.setOpaque(myWasOpaque);
-      myOldGlass.setLayout(myOldLayout);
-    }
-    myEditor.getContentComponent().requestFocus();
   }
 
   private void setFontForElements() {
