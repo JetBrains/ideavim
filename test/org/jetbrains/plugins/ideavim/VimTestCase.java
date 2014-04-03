@@ -15,6 +15,7 @@ import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
@@ -125,6 +126,12 @@ public abstract class VimTestCase extends UsefulTestCase {
   public void assertSelection(@NotNull String expected) {
     final String selected = myFixture.getEditor().getSelectionModel().getSelectedText();
     assertEquals(expected, selected);
+  }
+
+  public void assertExOutput(@NotNull String expected) {
+    final String actual = ExOutputModel.getInstance(myFixture.getEditor()).getText();
+    assertNotNull("No Ex output", actual);
+    assertEquals(expected, actual);
   }
 
   public void assertPluginError(boolean isError) {

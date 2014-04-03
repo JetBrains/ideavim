@@ -59,4 +59,15 @@ public class MapCommandTest extends VimTestCase {
     typeText(stringToKeys("i<foo>"));
     myFixture.checkResult("bar\n");
   }
+
+  public void testMapTable() {
+    configureByText("\n");
+    typeText(commandToKeys("imap foo bar"));
+    typeText(commandToKeys("imap bar <Esc>"));
+    typeText(commandToKeys("imap <C-Down> <C-O>gt"));
+    typeText(commandToKeys("imap"));
+    assertExOutput("   <C-Down>      <C-O>gt\n" +
+                   "   bar           <Esc>\n" +
+                   "   foo           bar\n");
+  }
 }
