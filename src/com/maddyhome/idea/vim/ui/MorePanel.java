@@ -45,53 +45,47 @@ import java.util.List;
  * This panel displays text in a <code>more</code> like window.
  */
 public class MorePanel extends JPanel {
-  public static MorePanel getInstance() {
-    if (instance == null) {
-      instance = new MorePanel();
-    }
+  private static MorePanel ourInstance;
+  private static Logger ourLogger = Logger.getInstance(MorePanel.class.getName());
 
-    return instance;
-  }
+  @NotNull private JLabel myLabel = new JLabel("more");
+  @NotNull private JTextArea myText = new JTextArea();
+  @NotNull private JScrollPane myScrollPane =
+    new JBScrollPane(myText, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+  private ComponentAdapter myAdapter;
+  @Nullable private Editor myEditor = null;
+  @Nullable private JComponent myParent = null;
+  private boolean myAtEnd = false;
+  private int myLineHeight = 0;
 
-  public static MorePanel getInstance(@NotNull Editor editor) {
-    if (instance == null) {
-      instance = new MorePanel();
-    }
+  @Nullable private JComponent myOldGlass = null;
+  @Nullable private LayoutManager myOldLayout = null;
+  private boolean myWasOpaque = false;
 
-    instance.setEditor(editor);
-    return instance;
-  }
-
-  /**
-   * @param editor The editor that this more panel will be displayed over
-   */
-  public void setEditor(@NotNull Editor editor) {
-    this.editor = editor;
-    this.parent = editor.getContentComponent();
-  }
+  private boolean myActive = false;
 
   private MorePanel() {
     // Create a text editor for the text and a label for the prompt
     BorderLayout layout = new BorderLayout(0, 0);
     setLayout(layout);
-    add(scrollPane, BorderLayout.CENTER);
-    add(label, BorderLayout.SOUTH);
+    add(myScrollPane, BorderLayout.CENTER);
+    add(myLabel, BorderLayout.SOUTH);
 
     setFontForElements();
 
-    text.setBorder(null);
-    scrollPane.setBorder(null);
+    myText.setBorder(null);
+    myScrollPane.setBorder(null);
 
-    label.setForeground(text.getForeground());
-    label.setBackground(text.getBackground());
-    setForeground(text.getForeground());
-    setBackground(text.getBackground());
+    myLabel.setForeground(myText.getForeground());
+    myLabel.setBackground(myText.getBackground());
+    setForeground(myText.getForeground());
+    setBackground(myText.getBackground());
 
-    text.setEditable(false);
+    myText.setEditable(false);
 
     setBorder(BorderFactory.createEtchedBorder());
 
-    adapter = new ComponentAdapter() {
+    myAdapter = new ComponentAdapter() {
       public void componentResized(ComponentEvent e) {
         positionPanel();
       }
@@ -100,13 +94,32 @@ public class MorePanel extends JPanel {
     // Setup some listeners to handle keystrokes
     MoreKeyListener moreKeyListener = new MoreKeyListener(this);
     addKeyListener(moreKeyListener);
-    text.addKeyListener(moreKeyListener);
+    myText.addKeyListener(moreKeyListener);
   }
 
-  private void setFontForElements() {
-    final Font font = UiHelper.getEditorFont();
-    text.setFont(font);
-    label.setFont(font);
+  public static MorePanel getInstance() {
+    if (ourInstance == null) {
+      ourInstance = new MorePanel();
+    }
+
+    return ourInstance;
+  }
+
+  public static MorePanel getInstance(@NotNull Editor editor) {
+    if (ourInstance == null) {
+      ourInstance = new MorePanel();
+    }
+
+    ourInstance.setEditor(editor);
+    return ourInstance;
+  }
+
+  /**
+   * @param editor The editor that this more panel will be displayed over
+   */
+  public void setEditor(@NotNull Editor editor) {
+    this.myEditor = editor;
+    this.myParent = editor.getContentComponent();
   }
 
   /**
@@ -116,21 +129,21 @@ public class MorePanel extends JPanel {
    * @return The column count
    */
   public int getDisplayWidth() {
-    Container scroll = SwingUtilities.getAncestorOfClass(JScrollPane.class, parent);
+    Container scroll = SwingUtilities.getAncestorOfClass(JScrollPane.class, myParent);
     int width = scroll.getSize().width;
 
-    if (logger.isDebugEnabled()) logger.debug("width=" + width);
-    int charWidth = text.getFontMetrics(text.getFont()).charWidth('M');
+    if (ourLogger.isDebugEnabled()) ourLogger.debug("width=" + width);
+    int charWidth = myText.getFontMetrics(myText.getFont()).charWidth('M');
 
     return width / charWidth;
   }
 
   public boolean hasText() {
-    return text.getText().length() > 0;
+    return myText.getText().length() > 0;
   }
 
   public String getText() {
-    return text.getText();
+    return myText.getText();
   }
 
   public void setText(@NotNull String data) {
@@ -138,34 +151,38 @@ public class MorePanel extends JPanel {
       data = data.substring(0, data.length() - 1);
     }
 
-    text.setText(data);
-    text.setCaretPosition(0);
+    myText.setText(data);
+    myText.setCaretPosition(0);
   }
 
   /**
    * Turns on the more window for the given editor
    */
   public void activate() {
-    JRootPane root = SwingUtilities.getRootPane(parent);
-    oldGlass = (JComponent)root.getGlassPane();
-    oldLayout = oldGlass.getLayout();
-    wasOpaque = oldGlass.isOpaque();
-    oldGlass.setLayout(null);
-    oldGlass.setOpaque(false);
-    oldGlass.add(this);
-    oldGlass.addComponentListener(adapter);
+    JRootPane root = SwingUtilities.getRootPane(myParent);
+    myOldGlass = (JComponent)root.getGlassPane();
+    if (myOldGlass != null) {
+      myOldLayout = myOldGlass.getLayout();
+      myWasOpaque = myOldGlass.isOpaque();
+      myOldGlass.setLayout(null);
+      myOldGlass.setOpaque(false);
+      myOldGlass.add(this);
+      myOldGlass.addComponentListener(myAdapter);
+    }
 
     setFontForElements();
     positionPanel();
 
-    oldGlass.setVisible(true);
-    active = true;
+    if (myOldGlass != null) {
+      myOldGlass.setVisible(true);
+    }
+    myActive = true;
 
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         SwingUtilities.invokeLater(new Runnable() {
           public void run() {
-            text.requestFocus();
+            myText.requestFocus();
           }
         });
       }
@@ -175,18 +192,22 @@ public class MorePanel extends JPanel {
   /**
    * Turns off the ex entry field and puts the focus back to the original component
    */
-  public void deactivate(boolean changeFocus) {
-    logger.info("deactivate");
-    if (!active) return;
-    active = false;
-    text.setText("");
-    oldGlass.removeComponentListener(adapter);
-    oldGlass.setVisible(false);
-    oldGlass.remove(this);
-    oldGlass.setOpaque(wasOpaque);
-    oldGlass.setLayout(oldLayout);
-    parent.requestFocus();
-    parent = null;
+  public void deactivate() {
+    ourLogger.info("deactivate");
+    if (!myActive) return;
+    myActive = false;
+    myText.setText("");
+    if (myOldGlass != null) {
+      myOldGlass.removeComponentListener(myAdapter);
+      myOldGlass.setVisible(false);
+      myOldGlass.remove(this);
+      myOldGlass.setOpaque(myWasOpaque);
+      myOldGlass.setLayout(myOldLayout);
+    }
+    if (myParent != null) {
+      myParent.requestFocus();
+    }
+    myParent = null;
   }
 
   /**
@@ -195,7 +216,13 @@ public class MorePanel extends JPanel {
    * @return true if active, false if not
    */
   public boolean isActive() {
-    return active;
+    return myActive;
+  }
+
+  private void setFontForElements() {
+    final Font font = UiHelper.getEditorFont();
+    myText.setFont(font);
+    myLabel.setFont(font);
   }
 
   private static int countLines(@NotNull String text) {
@@ -217,21 +244,21 @@ public class MorePanel extends JPanel {
   }
 
   private void scrollLine() {
-    scrollOffset(lineHeight);
+    scrollOffset(myLineHeight);
   }
 
   private void scrollPage() {
-    scrollOffset(scrollPane.getVerticalScrollBar().getVisibleAmount());
+    scrollOffset(myScrollPane.getVerticalScrollBar().getVisibleAmount());
   }
 
   private void scrollHalfPage() {
-    double sa = scrollPane.getVerticalScrollBar().getVisibleAmount() / 2.0;
-    double offset = Math.ceil(sa / lineHeight) * lineHeight;
+    double sa = myScrollPane.getVerticalScrollBar().getVisibleAmount() / 2.0;
+    double offset = Math.ceil(sa / myLineHeight) * myLineHeight;
     scrollOffset((int)offset);
   }
 
   private void handleEnter() {
-    if (atEnd) {
+    if (myAtEnd) {
       close();
     }
     else {
@@ -240,60 +267,63 @@ public class MorePanel extends JPanel {
   }
 
   private void badKey() {
-    label.setText("-- MORE -- (RET: line, SPACE: page, d: half page, q: quit)");
+    myLabel.setText("-- MORE -- (RET: line, SPACE: page, d: half page, q: quit)");
   }
 
   private void scrollOffset(int more) {
-    atEnd = false;
-    int val = scrollPane.getVerticalScrollBar().getValue();
-    scrollPane.getVerticalScrollBar().setValue(val + more);
-    scrollPane.getHorizontalScrollBar().setValue(0);
-    if (logger.isDebugEnabled()) {
-      logger.debug("val=" + val);
-      logger.debug("more=" + more);
-      logger.debug("scrollPane.getVerticalScrollBar().getMaximum()=" + scrollPane.getVerticalScrollBar().getMaximum());
-      logger.debug("scrollPane.getVerticalScrollBar().getVisibleAmount()=" + scrollPane.getVerticalScrollBar().getVisibleAmount());
+    myAtEnd = false;
+    int val = myScrollPane.getVerticalScrollBar().getValue();
+    myScrollPane.getVerticalScrollBar().setValue(val + more);
+    myScrollPane.getHorizontalScrollBar().setValue(0);
+    if (ourLogger.isDebugEnabled()) {
+      ourLogger.debug("val=" + val);
+      ourLogger.debug("more=" + more);
+      ourLogger
+        .debug("scrollPane.getVerticalScrollBar().getMaximum()=" + myScrollPane.getVerticalScrollBar().getMaximum());
+      ourLogger.debug("scrollPane.getVerticalScrollBar().getVisibleAmount()=" +
+                      myScrollPane.getVerticalScrollBar().getVisibleAmount());
     }
-    if (val + more >= scrollPane.getVerticalScrollBar().getMaximum() - scrollPane.getVerticalScrollBar().getVisibleAmount()) {
-      atEnd = true;
-      label.setText("Hit ENTER or type command to continue");
+    if (val + more >=
+        myScrollPane.getVerticalScrollBar().getMaximum() - myScrollPane.getVerticalScrollBar().getVisibleAmount()) {
+      myAtEnd = true;
+      myLabel.setText("Hit ENTER or type command to continue");
     }
     else {
-      label.setText("-- MORE --");
+      myLabel.setText("-- MORE --");
     }
   }
 
   private void positionPanel() {
-    if (parent == null) return;
+    if (myParent == null) return;
 
-    Container scroll = SwingUtilities.getAncestorOfClass(JScrollPane.class, parent);
+    Container scroll = SwingUtilities.getAncestorOfClass(JScrollPane.class, myParent);
     setSize(scroll.getSize());
 
-    lineHeight = text.getFontMetrics(text.getFont()).getHeight();
-    int count = countLines(text.getText());
-    int visLines = getSize().height / lineHeight - 1;
-    if (logger.isDebugEnabled()) {
-      logger.debug("size.height=" + getSize().height);
-      logger.debug("lineHeight=" + lineHeight);
-      logger.debug("count=" + count);
-      logger.debug("visLines=" + visLines);
+    myLineHeight = myText.getFontMetrics(myText.getFont()).getHeight();
+    int count = countLines(myText.getText());
+    int visLines = getSize().height / myLineHeight - 1;
+    if (ourLogger.isDebugEnabled()) {
+      ourLogger.debug("size.height=" + getSize().height);
+      ourLogger.debug("lineHeight=" + myLineHeight);
+      ourLogger.debug("count=" + count);
+      ourLogger.debug("visLines=" + visLines);
     }
     int lines = Math.min(count, visLines);
-    setSize(getSize().width, lines * lineHeight + label.getPreferredSize().height +
+    setSize(getSize().width, lines * myLineHeight + myLabel.getPreferredSize().height +
                              getBorder().getBorderInsets(this).top * 2);
 
-    scrollPane.getVerticalScrollBar().setValues(0, visLines, 0, count - 1);
+    myScrollPane.getVerticalScrollBar().setValues(0, visLines, 0, count - 1);
 
     int height = getSize().height;
     Rectangle bounds = scroll.getBounds();
     bounds.translate(0, scroll.getHeight() - height);
     bounds.height = height;
-    Point pos = SwingUtilities.convertPoint(scroll.getParent(), bounds.getLocation(),
-                                            SwingUtilities.getRootPane(parent).getGlassPane());
+    Point pos = SwingUtilities
+      .convertPoint(scroll.getParent(), bounds.getLocation(), SwingUtilities.getRootPane(myParent).getGlassPane());
     bounds.setLocation(pos);
     setBounds(bounds);
 
-    scrollPane.getVerticalScrollBar().setValue(0);
+    myScrollPane.getVerticalScrollBar().setValue(0);
     if (!Options.getInstance().isSet("more")) {
       // FIX
       scrollOffset(100000);
@@ -310,95 +340,76 @@ public class MorePanel extends JPanel {
   private void close(@Nullable final KeyEvent e) {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        deactivate(false);
-
-        VirtualFile vf = EditorData.getVirtualFile(editor);
+        deactivate();
+        if (myEditor == null) {
+          return;
+        }
+        final VirtualFile vf = EditorData.getVirtualFile(myEditor);
         if (vf != null) {
-          FileEditorManager.getInstance(editor.getProject()).openFile(vf, true);
+          FileEditorManager.getInstance(myEditor.getProject()).openFile(vf, true);
         }
 
-        if (e != null && e.getKeyChar() != '\n') {
-          KeyStroke key = KeyStroke.getKeyStrokeForEvent(e);
-          Project project = editor.getProject();
-          List<KeyStroke> keys = new ArrayList<KeyStroke>(1);
+        final Project project = myEditor.getProject();
+
+        if (project != null && e != null && e.getKeyChar() != '\n') {
+          final KeyStroke key = KeyStroke.getKeyStrokeForEvent(e);
+          final List<KeyStroke> keys = new ArrayList<KeyStroke>(1);
           keys.add(key);
-          VimPlugin.getMacro().playbackKeys(editor,
-                                                              new EditorDataContext(editor), project, keys, 0, 0, 1);
+          VimPlugin.getMacro().playbackKeys(myEditor, new EditorDataContext(myEditor), project, keys, 0, 0, 1);
         }
       }
     });
   }
 
   private static class MoreKeyListener extends KeyAdapter {
-    public MoreKeyListener(MorePanel parent) {
-      this.parent = parent;
+    private MorePanel myMorePanel;
+
+    public MoreKeyListener(MorePanel panel) {
+      this.myMorePanel = panel;
     }
 
     /**
      * Invoked when a key has been pressed.
      */
     public void keyTyped(@NotNull KeyEvent e) {
-      if (parent.atEnd) {
-        parent.close(e);
+      if (myMorePanel.myAtEnd) {
+        myMorePanel.close(e);
       }
       else {
         switch (e.getKeyChar()) {
           case ' ':
-            parent.scrollPage();
+            myMorePanel.scrollPage();
             break;
           case 'd':
-            parent.scrollHalfPage();
+            myMorePanel.scrollHalfPage();
             break;
           case 'q':
-            parent.close();
+            myMorePanel.close();
             break;
           case '\n':
-            parent.handleEnter();
+            myMorePanel.handleEnter();
             break;
           case '\u001b':
-            parent.close();
+            myMorePanel.close();
             break;
           case KeyEvent.CHAR_UNDEFINED: {
             switch (e.getKeyCode()) {
               case KeyEvent.VK_ENTER:
-                parent.handleEnter();
+                myMorePanel.handleEnter();
                 break;
               case KeyEvent.VK_ESCAPE:
-                parent.close();
+                myMorePanel.close();
                 break;
               default:
-                if (logger.isDebugEnabled()) logger.debug("e.getKeyCode()=" + e.getKeyCode());
-                parent.badKey();
+                if (ourLogger.isDebugEnabled()) ourLogger.debug("e.getKeyCode()=" + e.getKeyCode());
+                myMorePanel.badKey();
             }
           }
           default:
-            if (logger.isDebugEnabled()) logger.debug("e.getKeyChar()=" + (int)e.getKeyChar());
-            parent.badKey();
+            if (ourLogger.isDebugEnabled()) ourLogger.debug("e.getKeyChar()=" + (int)e.getKeyChar());
+            myMorePanel.badKey();
         }
       }
     }
-
-    private MorePanel parent;
   }
-
-  @NotNull private JLabel label = new JLabel("more");
-  @NotNull private JTextArea text = new JTextArea();
-  @NotNull private JScrollPane scrollPane = new JBScrollPane(text, JScrollPane.VERTICAL_SCROLLBAR_NEVER,
-                                                   JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-  private ComponentAdapter adapter;
-  @Nullable private Editor editor = null;
-  @Nullable private JComponent parent = null;
-  private boolean atEnd = false;
-  private int lineHeight = 0;
-
-  @Nullable private JComponent oldGlass = null;
-  @Nullable private LayoutManager oldLayout = null;
-  private boolean wasOpaque = false;
-
-  private boolean active = false;
-
-  private static MorePanel instance;
-
-  private static Logger logger = Logger.getInstance(MorePanel.class.getName());
 }
-

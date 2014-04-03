@@ -143,7 +143,7 @@ public class MotionGroup {
     }
 
     if (MorePanel.getInstance().isActive()) {
-      MorePanel.getInstance().deactivate(false);
+      MorePanel.getInstance().deactivate();
     }
 
     CommandState.SubMode visualMode = CommandState.SubMode.NONE;
@@ -221,7 +221,7 @@ public class MotionGroup {
     }
 
     if (MorePanel.getInstance().isActive()) {
-      MorePanel.getInstance().deactivate(false);
+      MorePanel.getInstance().deactivate();
     }
 
     if (update) {
@@ -258,7 +258,7 @@ public class MotionGroup {
     }
 
     if (MorePanel.getInstance().isActive()) {
-      MorePanel.getInstance().deactivate(false);
+      MorePanel.getInstance().deactivate();
     }
 
     logger.debug("mouse released");
@@ -1773,7 +1773,7 @@ public class MotionGroup {
       }
 
       if (MorePanel.getInstance().isActive()) {
-        MorePanel.getInstance().deactivate(false);
+        MorePanel.getInstance().deactivate();
       }
 
       FileEditor fe = event.getOldEditor();
