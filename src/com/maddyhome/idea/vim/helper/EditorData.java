@@ -28,6 +28,7 @@ import com.intellij.testFramework.LightVirtualFile;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.command.VisualRange;
+import com.maddyhome.idea.vim.ui.MorePanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,6 +60,7 @@ public class EditorData {
     editor.putUserData(LAST_HIGHLIGHTS, null);
     editor.putUserData(VISUAL, null);
     editor.putUserData(VISUAL_OP, null);
+    editor.putUserData(MORE_PANEL, null);
   }
 
   /**
@@ -186,6 +188,14 @@ public class EditorData {
     return res != null;
   }
 
+  public static MorePanel getMorePanel(Editor editor) {
+    return editor.getUserData(MORE_PANEL);
+  }
+
+  public static void setMorePanel(@NotNull Editor editor, @NotNull MorePanel panel) {
+    editor.putUserData(MORE_PANEL, panel);
+  }
+
   /**
    * Gets the virtual file associated with this editor
    *
@@ -211,6 +221,8 @@ public class EditorData {
   private static final Key<CommandState> COMMAND_STATE = new Key<CommandState>("commandState");
   private static final Key<Boolean> CHANGE_GROUP = new Key<Boolean>("changeGroup");
   private static final Key<Boolean> MOTION_GROUP = new Key<Boolean>("motionGroup");
+  private static final Key<MorePanel> MORE_PANEL = new Key<MorePanel>("IdeaVim.morePanel");
+
   private static Key CONSOLE_VIEW_IN_EDITOR_VIEW = Key.create("CONSOLE_VIEW_IN_EDITOR_VIEW");
 
   private static Logger logger = Logger.getInstance(EditorData.class.getName());

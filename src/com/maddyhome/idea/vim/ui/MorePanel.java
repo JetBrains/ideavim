@@ -45,16 +45,16 @@ import java.util.List;
  * This panel displays text in a <code>more</code> like window.
  */
 public class MorePanel extends JPanel {
-  private static MorePanel ourInstance;
   private static Logger ourLogger = Logger.getInstance(MorePanel.class.getName());
+
+  @NotNull private final Editor myEditor;
+  @NotNull private final JComponent myParent;
 
   @NotNull private JLabel myLabel = new JLabel("more");
   @NotNull private JTextArea myText = new JTextArea();
   @NotNull private JScrollPane myScrollPane =
     new JBScrollPane(myText, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
   private ComponentAdapter myAdapter;
-  @Nullable private Editor myEditor = null;
-  @Nullable private JComponent myParent = null;
   private boolean myAtEnd = false;
   private int myLineHeight = 0;
 
@@ -64,7 +64,10 @@ public class MorePanel extends JPanel {
 
   private boolean myActive = false;
 
-  private MorePanel() {
+  private MorePanel(@NotNull Editor editor) {
+    myEditor = editor;
+    myParent = editor.getContentComponent();
+
     // Create a text editor for the text and a label for the prompt
     BorderLayout layout = new BorderLayout(0, 0);
     setLayout(layout);
@@ -97,29 +100,14 @@ public class MorePanel extends JPanel {
     myText.addKeyListener(moreKeyListener);
   }
 
-  public static MorePanel getInstance() {
-    if (ourInstance == null) {
-      ourInstance = new MorePanel();
-    }
-
-    return ourInstance;
-  }
-
+  @NotNull
   public static MorePanel getInstance(@NotNull Editor editor) {
-    if (ourInstance == null) {
-      ourInstance = new MorePanel();
+    MorePanel panel = EditorData.getMorePanel(editor);
+    if (panel == null) {
+      panel = new MorePanel(editor);
+      EditorData.setMorePanel(editor, panel);
     }
-
-    ourInstance.setEditor(editor);
-    return ourInstance;
-  }
-
-  /**
-   * @param editor The editor that this more panel will be displayed over
-   */
-  public void setEditor(@NotNull Editor editor) {
-    this.myEditor = editor;
-    this.myParent = editor.getContentComponent();
+    return panel;
   }
 
   /**
@@ -204,10 +192,7 @@ public class MorePanel extends JPanel {
       myOldGlass.setOpaque(myWasOpaque);
       myOldGlass.setLayout(myOldLayout);
     }
-    if (myParent != null) {
-      myParent.requestFocus();
-    }
-    myParent = null;
+    myParent.requestFocus();
   }
 
   /**
@@ -294,8 +279,6 @@ public class MorePanel extends JPanel {
   }
 
   private void positionPanel() {
-    if (myParent == null) return;
-
     Container scroll = SwingUtilities.getAncestorOfClass(JScrollPane.class, myParent);
     setSize(scroll.getSize());
 
@@ -341,9 +324,6 @@ public class MorePanel extends JPanel {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         deactivate();
-        if (myEditor == null) {
-          return;
-        }
         final VirtualFile vf = EditorData.getVirtualFile(myEditor);
         if (vf != null) {
           FileEditorManager.getInstance(myEditor.getProject()).openFile(vf, true);

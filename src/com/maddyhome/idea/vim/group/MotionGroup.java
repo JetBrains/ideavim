@@ -142,8 +142,8 @@ public class MotionGroup {
       ExEntryPanel.getInstance().deactivate();
     }
 
-    if (MorePanel.getInstance().isActive()) {
-      MorePanel.getInstance().deactivate();
+    if (MorePanel.getInstance(editor).isActive()) {
+      MorePanel.getInstance(editor).deactivate();
     }
 
     CommandState.SubMode visualMode = CommandState.SubMode.NONE;
@@ -220,8 +220,8 @@ public class MotionGroup {
       ExEntryPanel.getInstance().deactivate();
     }
 
-    if (MorePanel.getInstance().isActive()) {
-      MorePanel.getInstance().deactivate();
+    if (MorePanel.getInstance(editor).isActive()) {
+      MorePanel.getInstance(editor).deactivate();
     }
 
     if (update) {
@@ -257,8 +257,8 @@ public class MotionGroup {
       ExEntryPanel.getInstance().deactivate();
     }
 
-    if (MorePanel.getInstance().isActive()) {
-      MorePanel.getInstance().deactivate();
+    if (MorePanel.getInstance(editor).isActive()) {
+      MorePanel.getInstance(editor).deactivate();
     }
 
     logger.debug("mouse released");
@@ -1771,14 +1771,12 @@ public class MotionGroup {
       if (ExEntryPanel.getInstance().isActive()) {
         ExEntryPanel.getInstance().deactivate();
       }
-
-      if (MorePanel.getInstance().isActive()) {
-        MorePanel.getInstance().deactivate();
-      }
-
-      FileEditor fe = event.getOldEditor();
-      if (fe instanceof TextEditor) {
-        Editor editor = ((TextEditor)fe).getEditor();
+      final FileEditor fileEditor = event.getOldEditor();
+      if (fileEditor instanceof TextEditor) {
+        final Editor editor = ((TextEditor)fileEditor).getEditor();
+        if (MorePanel.getInstance(editor).isActive()) {
+          MorePanel.getInstance(editor).deactivate();
+        }
         if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
           VimPlugin.getMotion().exitVisual(EditorHelper.getEditor(event.getManager(), event.getOldFile()), true);
         }
