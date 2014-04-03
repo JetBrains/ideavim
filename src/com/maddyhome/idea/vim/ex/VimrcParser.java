@@ -55,6 +55,10 @@ public class VimrcParser {
       String line;
       while ((line = reader.readLine()) != null) {
         try {
+          line = line.trim();
+          if (line.startsWith(":")) {
+            line = line.substring(1);
+          }
           final CommandParser commandParser = CommandParser.getInstance();
           final ExCommand command = commandParser.parse(line);
           final CommandHandler commandHandler = commandParser.getCommandHandler(command);
