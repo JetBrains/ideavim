@@ -42,7 +42,7 @@ public class MarksHandler extends CommandHandler {
   public MarksHandler() {
     super(new CommandName[]{
       new CommandName("marks", "")
-    }, ARGUMENT_OPTIONAL | KEEP_FOCUS);
+    }, ARGUMENT_OPTIONAL);
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {

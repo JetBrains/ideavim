@@ -35,9 +35,7 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.helper.EditorData;
-import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
-import com.maddyhome.idea.vim.ui.MorePanel;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -181,15 +179,6 @@ public class ProcessGroup {
             if (vf != null) {
               FileEditorManager.getInstance(project).openFile(EditorData.getVirtualFile(editor), true);
             }
-          }
-
-          // If the result of the ex command is to display the "more" panel, show it here.
-          if ((flg & CommandParser.RES_MORE_PANEL) != 0 && MorePanel.getInstance(editor).hasText()) {
-            RunnableHelper.runReadCommand(project, new Runnable() {
-                public void run() {
-                  MorePanel.getInstance(editor).activate();
-                }
-              }, "ShowMorePanel", "ExCommand");
           }
         }
       });

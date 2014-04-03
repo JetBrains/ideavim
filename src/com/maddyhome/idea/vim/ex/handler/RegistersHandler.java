@@ -40,7 +40,7 @@ public class RegistersHandler extends CommandHandler {
     super(new CommandName[]{
       new CommandName("di", "splay"),
       new CommandName("reg", "isters")
-    }, ARGUMENT_OPTIONAL | KEEP_FOCUS);
+    }, ARGUMENT_OPTIONAL);
   }
 
   public boolean execute(@NotNull final Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {

@@ -105,10 +105,6 @@ public class MorePanel extends JPanel {
     return panel;
   }
 
-  public boolean hasText() {
-    return myText.getText().length() > 0;
-  }
-
   public void setText(@NotNull String data) {
     if (data.length() > 0 && data.charAt(data.length() - 1) == '\n') {
       data = data.substring(0, data.length() - 1);
@@ -116,6 +112,14 @@ public class MorePanel extends JPanel {
 
     myText.setText(data);
     myText.setCaretPosition(0);
+    if (data.length() > 0) {
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          activate();
+        }
+      });
+    }
   }
 
   /**

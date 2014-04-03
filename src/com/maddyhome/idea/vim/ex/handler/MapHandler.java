@@ -52,7 +52,7 @@ public class MapHandler extends CommandHandler implements VimrcCommandHandler {
       new CommandName("map!", ""),
       new CommandName("im", "ap"),
       new CommandName("cm", "ap")
-    }, RANGE_FORBIDDEN | ARGUMENT_OPTIONAL | KEEP_FOCUS);
+    }, RANGE_FORBIDDEN | ARGUMENT_OPTIONAL);
   }
 
   @Override

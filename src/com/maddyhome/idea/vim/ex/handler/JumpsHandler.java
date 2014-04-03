@@ -42,7 +42,7 @@ public class JumpsHandler extends CommandHandler {
   public JumpsHandler() {
     super(new CommandName[]{
       new CommandName("ju", "mps")
-    }, ARGUMENT_FORBIDDEN | KEEP_FOCUS);
+    }, ARGUMENT_FORBIDDEN);
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {

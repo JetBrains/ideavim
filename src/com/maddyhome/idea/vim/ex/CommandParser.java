@@ -40,7 +40,6 @@ public class CommandParser {
   public static final int RES_EMPTY = 1;
   public static final int RES_ERROR = 1;
   public static final int RES_READONLY = 1;
-  public static final int RES_MORE_PANEL = 2;
   public static final int RES_DONT_REOPEN = 4;
 
   /**
@@ -179,10 +178,6 @@ public class CommandParser {
     if (ok && (handler.getArgFlags() & CommandHandler.DONT_SAVE_LAST) == 0) {
       VimPlugin.getRegister().storeTextInternal(editor, new TextRange(-1, -1), cmd,
                                                                   SelectionType.CHARACTER_WISE, ':', false);
-    }
-
-    if (ok && (handler.getArgFlags() & CommandHandler.KEEP_FOCUS) != 0) {
-      result |= RES_MORE_PANEL;
     }
 
     if ((handler.getArgFlags() & CommandHandler.DONT_REOPEN) != 0) {

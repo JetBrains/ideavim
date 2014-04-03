@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class DigraphHandler extends CommandHandler {
   public DigraphHandler() {
-    super("dig", "raphs", ARGUMENT_OPTIONAL | KEEP_FOCUS);
+    super("dig", "raphs", ARGUMENT_OPTIONAL);
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {

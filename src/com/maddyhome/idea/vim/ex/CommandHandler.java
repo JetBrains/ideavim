@@ -59,10 +59,7 @@ public abstract class CommandHandler {
    * Indicates that the command takes a count, not a range - effects default
    */
   public static final int RANGE_IS_COUNT = 64;
-  /**
-   * Indicates that the editor should not get focus back after the command
-   */
-  public static final int KEEP_FOCUS = 128;
+
   public static final int DONT_REOPEN = 256;
 
   /**

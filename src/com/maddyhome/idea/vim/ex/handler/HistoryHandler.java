@@ -36,7 +36,7 @@ import java.util.List;
  */
 public class HistoryHandler extends CommandHandler {
   public HistoryHandler() {
-    super("his", "tory", RANGE_FORBIDDEN | ARGUMENT_OPTIONAL | KEEP_FOCUS);
+    super("his", "tory", RANGE_FORBIDDEN | ARGUMENT_OPTIONAL);
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull final DataContext context, @NotNull ExCommand cmd) throws ExException {

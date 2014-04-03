@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class SetHandler extends CommandHandler implements VimrcCommandHandler {
   public SetHandler() {
-    super("se", "t", ARGUMENT_OPTIONAL | KEEP_FOCUS);
+    super("se", "t", ARGUMENT_OPTIONAL);
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
