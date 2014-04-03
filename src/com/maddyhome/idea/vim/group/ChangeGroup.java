@@ -17,7 +17,10 @@
  */
 package com.maddyhome.idea.vim.group;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -28,6 +31,7 @@ import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.event.*;
+import com.intellij.openapi.editor.impl.TextRangeInterval;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
@@ -40,6 +44,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.BoundListOption;
 import com.maddyhome.idea.vim.option.Options;
@@ -49,6 +54,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -1490,6 +1497,52 @@ public class ChangeGroup {
     VimPlugin.getMark().setMark(editor, '[', start);
     VimPlugin.getMark().setMark(editor, ']', start + str.length());
     VimPlugin.getMark().setMark(editor, '.', start + str.length());
+  }
+
+  /**
+   * Sort range of text with a given comparator
+   *
+   * @param editor          The editor to replace text in
+   * @param range           The range to sort
+   * @param lineComparator  The comparator to use to sort
+   * @return true if able to sort the text, false if not
+   */
+  public boolean sortRange(@NotNull Editor editor, LineRange range, Comparator<String> lineComparator) {
+    int startLine = range.getStartLine();
+    int endLine = range.getEndLine();
+    int count = endLine - startLine + 1;
+    if (count < 2)
+      return false;
+
+    int startOffset = editor.getDocument().getLineStartOffset(startLine);
+    int endOffset = editor.getDocument().getLineEndOffset(endLine);
+
+    return sortTextRange(editor, startOffset, endOffset, lineComparator);
+  }
+
+  /**
+   * Sorts a text range with a comparator. Returns true if a replace was performed, false otherwise.
+   *
+   * @param editor          The editor to replace text in
+   * @param start           The starting position for the sort
+   * @param end             The ending position for the sort
+   * @param lineComparator  The comparator to use to sort
+   * @return true if able to sort the text, false if not
+   */
+  private boolean sortTextRange(Editor editor, int start, int end, Comparator<String> lineComparator) {
+    String selectedText = editor.getDocument().getText(new TextRangeInterval(start, end));
+
+    String lineSeparator = CodeStyleSettingsManager.getSettings(editor.getProject()).getLineSeparator();
+
+    List<String> lines = Lists.newArrayList(Splitter.on(lineSeparator).split(selectedText));
+
+    if (lines.size() < 1) {
+      return false;
+    }
+
+    Collections.sort(lines, lineComparator);
+    replaceText(editor, start, end, Joiner.on(lineSeparator).join(lines));
+    return true;
   }
 
   public static void resetCursor(@NotNull Editor editor, boolean insert) {
