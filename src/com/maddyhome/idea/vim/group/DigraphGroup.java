@@ -21,7 +21,7 @@ package com.maddyhome.idea.vim.group;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.ui.MorePanel;
+import com.maddyhome.idea.vim.ui.ExOutputPanel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -59,7 +59,7 @@ public class DigraphGroup {
   }
 
   private void showDigraphs(@NotNull Editor editor) {
-    MorePanel panel = MorePanel.getInstance(editor);
+    ExOutputPanel panel = ExOutputPanel.getInstance(editor);
     int width = EditorHelper.getScreenWidth(editor);
     if (width < 10) {
       width = 80;

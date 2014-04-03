@@ -43,7 +43,7 @@ import java.util.List;
 /**
  * This panel displays text in a <code>more</code> like window.
  */
-public class MorePanel extends JPanel {
+public class ExOutputPanel extends JPanel {
   @NotNull private final Editor myEditor;
 
   @NotNull private JLabel myLabel = new JLabel("more");
@@ -60,7 +60,7 @@ public class MorePanel extends JPanel {
 
   private boolean myActive = false;
 
-  private MorePanel(@NotNull Editor editor) {
+  private ExOutputPanel(@NotNull Editor editor) {
     myEditor = editor;
 
     // Create a text editor for the text and a label for the prompt
@@ -96,10 +96,10 @@ public class MorePanel extends JPanel {
   }
 
   @NotNull
-  public static MorePanel getInstance(@NotNull Editor editor) {
-    MorePanel panel = EditorData.getMorePanel(editor);
+  public static ExOutputPanel getInstance(@NotNull Editor editor) {
+    ExOutputPanel panel = EditorData.getMorePanel(editor);
     if (panel == null) {
-      panel = new MorePanel(editor);
+      panel = new ExOutputPanel(editor);
       EditorData.setMorePanel(editor, panel);
     }
     return panel;
@@ -298,50 +298,50 @@ public class MorePanel extends JPanel {
   }
 
   private static class MoreKeyListener extends KeyAdapter {
-    private MorePanel myMorePanel;
+    private ExOutputPanel myExOutputPanel;
 
-    public MoreKeyListener(MorePanel panel) {
-      this.myMorePanel = panel;
+    public MoreKeyListener(ExOutputPanel panel) {
+      this.myExOutputPanel = panel;
     }
 
     /**
      * Invoked when a key has been pressed.
      */
     public void keyTyped(@NotNull KeyEvent e) {
-      if (myMorePanel.myAtEnd) {
-        myMorePanel.close(e);
+      if (myExOutputPanel.myAtEnd) {
+        myExOutputPanel.close(e);
       }
       else {
         switch (e.getKeyChar()) {
           case ' ':
-            myMorePanel.scrollPage();
+            myExOutputPanel.scrollPage();
             break;
           case 'd':
-            myMorePanel.scrollHalfPage();
+            myExOutputPanel.scrollHalfPage();
             break;
           case 'q':
-            myMorePanel.close();
+            myExOutputPanel.close();
             break;
           case '\n':
-            myMorePanel.handleEnter();
+            myExOutputPanel.handleEnter();
             break;
           case '\u001b':
-            myMorePanel.close();
+            myExOutputPanel.close();
             break;
           case KeyEvent.CHAR_UNDEFINED: {
             switch (e.getKeyCode()) {
               case KeyEvent.VK_ENTER:
-                myMorePanel.handleEnter();
+                myExOutputPanel.handleEnter();
                 break;
               case KeyEvent.VK_ESCAPE:
-                myMorePanel.close();
+                myExOutputPanel.close();
                 break;
               default:
-                myMorePanel.badKey();
+                myExOutputPanel.badKey();
             }
           }
           default:
-            myMorePanel.badKey();
+            myExOutputPanel.badKey();
         }
       }
     }

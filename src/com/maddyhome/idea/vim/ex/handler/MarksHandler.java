@@ -30,7 +30,7 @@ import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
-import com.maddyhome.idea.vim.ui.MorePanel;
+import com.maddyhome.idea.vim.ui.ExOutputPanel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -77,7 +77,7 @@ public class MarksHandler extends CommandHandler {
       text.append("\n");
     }
 
-    MorePanel panel = MorePanel.getInstance(editor);
+    ExOutputPanel panel = ExOutputPanel.getInstance(editor);
     panel.setText(text.toString());
     //panel.setVisible(true);
 

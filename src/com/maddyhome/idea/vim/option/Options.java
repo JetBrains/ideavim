@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
-import com.maddyhome.idea.vim.ui.MorePanel;
+import com.maddyhome.idea.vim.ui.ExOutputPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -366,7 +366,7 @@ public class Options {
     Collections.sort(extra, new Option.NameSorter<Option>());
 
     String pad = "                    ";
-    MorePanel panel = MorePanel.getInstance(editor);
+    ExOutputPanel panel = ExOutputPanel.getInstance(editor);
     int width = EditorHelper.getScreenWidth(editor);
     if (width < 20) {
       width = 80;

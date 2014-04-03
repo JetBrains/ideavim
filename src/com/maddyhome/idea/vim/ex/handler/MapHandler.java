@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.ex.*;
 import com.maddyhome.idea.vim.key.KeyMapping;
-import com.maddyhome.idea.vim.ui.MorePanel;
+import com.maddyhome.idea.vim.ui.ExOutputPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -101,7 +101,7 @@ public class MapHandler extends CommandHandler implements VimrcCommandHandler {
       builder.append(toKeyNotation(row.getToKeys()));
       builder.append("\n");
     }
-    final MorePanel panel = MorePanel.getInstance(editor);
+    final ExOutputPanel panel = ExOutputPanel.getInstance(editor);
     panel.setText(builder.toString());
     return true;
   }
