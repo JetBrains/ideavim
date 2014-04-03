@@ -178,9 +178,11 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     // Register ex handlers
     CommandParser.getInstance().registerHandlers();
 
-    final File vimrc = VimrcParser.findVimrc();
-    if (vimrc != null) {
-      VimrcParser.executeFile(vimrc);
+    if (!ApplicationManager.getApplication().isUnitTestMode()) {
+      final File vimrc = VimrcParser.findVimrc();
+      if (vimrc != null) {
+        VimrcParser.executeFile(vimrc);
+      }
     }
 
     LOG.debug("done");
