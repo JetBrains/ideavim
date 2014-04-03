@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.ui.ExOutputPanel;
 import org.jetbrains.annotations.NotNull;
@@ -112,7 +113,7 @@ public class DigraphGroup {
       }
     }
 
-    panel.setText(res.toString());
+    ExOutputModel.getInstance(editor).output(res.toString());
   }
 
   private void loadDigraphs() {

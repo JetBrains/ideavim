@@ -25,8 +25,8 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
+import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.group.HistoryGroup;
-import com.maddyhome.idea.vim.ui.ExOutputPanel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -148,8 +148,7 @@ public class HistoryHandler extends CommandHandler {
         break;
     }
 
-    ExOutputPanel panel = ExOutputPanel.getInstance(editor);
-    panel.setText(res.toString());
+    ExOutputModel.getInstance(editor).output(res.toString());
 
     return true;
   }

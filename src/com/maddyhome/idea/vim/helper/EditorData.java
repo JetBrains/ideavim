@@ -28,6 +28,7 @@ import com.intellij.testFramework.LightVirtualFile;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.command.VisualRange;
+import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.ui.ExOutputPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -61,6 +62,7 @@ public class EditorData {
     editor.putUserData(VISUAL, null);
     editor.putUserData(VISUAL_OP, null);
     editor.putUserData(MORE_PANEL, null);
+    editor.putUserData(EX_OUTPUT_MODEL, null);
   }
 
   /**
@@ -196,6 +198,15 @@ public class EditorData {
     editor.putUserData(MORE_PANEL, panel);
   }
 
+  public static ExOutputModel getExOutputModel(Editor editor) {
+    return editor.getUserData(EX_OUTPUT_MODEL);
+  }
+
+  public static void setExOutputModel(@NotNull Editor editor, @NotNull ExOutputModel model) {
+    editor.putUserData(EX_OUTPUT_MODEL, model);
+  }
+
+
   /**
    * Gets the virtual file associated with this editor
    *
@@ -222,6 +233,7 @@ public class EditorData {
   private static final Key<Boolean> CHANGE_GROUP = new Key<Boolean>("changeGroup");
   private static final Key<Boolean> MOTION_GROUP = new Key<Boolean>("motionGroup");
   private static final Key<ExOutputPanel> MORE_PANEL = new Key<ExOutputPanel>("IdeaVim.morePanel");
+  private static final Key<ExOutputModel> EX_OUTPUT_MODEL = new Key<ExOutputModel>("IdeaVim.exOutputModel");
 
   private static Key CONSOLE_VIEW_IN_EDITOR_VIEW = Key.create("CONSOLE_VIEW_IN_EDITOR_VIEW");
 

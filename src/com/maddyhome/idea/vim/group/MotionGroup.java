@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.Jump;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
@@ -44,7 +45,6 @@ import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
-import com.maddyhome.idea.vim.ui.ExOutputPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -142,7 +142,7 @@ public class MotionGroup {
       ExEntryPanel.getInstance().deactivate();
     }
 
-    ExOutputPanel.getInstance(editor).deactivate();
+    ExOutputModel.getInstance(editor).clear();
 
     CommandState.SubMode visualMode = CommandState.SubMode.NONE;
     switch (event.getClickCount() % 3) {
@@ -218,7 +218,7 @@ public class MotionGroup {
       ExEntryPanel.getInstance().deactivate();
     }
 
-    ExOutputPanel.getInstance(editor).deactivate();
+    ExOutputModel.getInstance(editor).clear();
 
     if (update) {
       if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
@@ -253,7 +253,7 @@ public class MotionGroup {
       ExEntryPanel.getInstance().deactivate();
     }
 
-    ExOutputPanel.getInstance(editor).deactivate();
+    ExOutputModel.getInstance(editor).clear();
 
     logger.debug("mouse released");
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
@@ -1768,7 +1768,7 @@ public class MotionGroup {
       final FileEditor fileEditor = event.getOldEditor();
       if (fileEditor instanceof TextEditor) {
         final Editor editor = ((TextEditor)fileEditor).getEditor();
-        ExOutputPanel.getInstance(editor).deactivate();
+        ExOutputModel.getInstance(editor).clear();
         if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
           VimPlugin.getMotion().exitVisual(EditorHelper.getEditor(event.getManager(), event.getOldFile()), true);
         }

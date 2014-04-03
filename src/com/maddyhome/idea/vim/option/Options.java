@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.option;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
@@ -414,7 +415,7 @@ public class Options {
       }
     }
 
-    panel.setText(res.toString());
+    ExOutputModel.getInstance(editor).output(res.toString());
   }
 
   /**
