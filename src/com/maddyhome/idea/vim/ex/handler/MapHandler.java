@@ -93,8 +93,7 @@ public class MapHandler extends CommandHandler implements VimrcCommandHandler {
     final List<MappingRow> rows = getKeyMappingRows(modes);
     final StringBuilder builder = new StringBuilder();
     for (MappingRow row : rows) {
-      // TODO: Show mode if not nvo
-      builder.append("  ");
+      builder.append(leftJustify(getModesStringCode(row.getModes()), 2, ' '));
       builder.append(" ");
       builder.append(leftJustify(toKeyNotation(row.getFromKeys()), 13, ' '));
       builder.append(" ");
@@ -164,6 +163,20 @@ public class MapHandler extends CommandHandler implements VimrcCommandHandler {
       return MappingMode.C;
     }
     return null;
+  }
+
+  private String getModesStringCode(@NotNull Set<MappingMode> modes) {
+    if (modes == MappingMode.NVO) {
+      return "";
+    }
+    else if (modes.contains(MappingMode.INSERT)) {
+      return "i";
+    }
+    else if (modes.contains(MappingMode.NORMAL)) {
+      return "n";
+    }
+    // TODO: Add more codes
+    return "";
   }
 
   private static class MappingRow implements Comparable<MappingRow> {
