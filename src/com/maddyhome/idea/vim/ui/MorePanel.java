@@ -110,22 +110,6 @@ public class MorePanel extends JPanel {
     return panel;
   }
 
-  /**
-   * Gets the number of characters that will fit across the 'more' window. This is useful if the text to be
-   * presented in the 'more' window needs to be formatted based on the display width.
-   *
-   * @return The column count
-   */
-  public int getDisplayWidth() {
-    Container scroll = SwingUtilities.getAncestorOfClass(JScrollPane.class, myParent);
-    int width = scroll.getSize().width;
-
-    if (ourLogger.isDebugEnabled()) ourLogger.debug("width=" + width);
-    int charWidth = myText.getFontMetrics(myText.getFont()).charWidth('M');
-
-    return width / charWidth;
-  }
-
   public boolean hasText() {
     return myText.getText().length() > 0;
   }

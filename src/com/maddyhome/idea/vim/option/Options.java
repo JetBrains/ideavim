@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.option;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
 import com.maddyhome.idea.vim.ui.MorePanel;
@@ -366,7 +367,7 @@ public class Options {
 
     String pad = "                    ";
     MorePanel panel = MorePanel.getInstance(editor);
-    int width = panel.getDisplayWidth();
+    int width = EditorHelper.getScreenWidth(editor);
     if (width < 20) {
       width = 80;
     }
