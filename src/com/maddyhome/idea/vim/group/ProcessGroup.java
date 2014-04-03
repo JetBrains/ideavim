@@ -111,20 +111,6 @@ public class ProcessGroup {
       KeyHandler.getInstance().reset(editor);
       return false;
     }
-
-    /*
-    if (!charOnly || stroke.getKeyChar() != KeyEvent.CHAR_UNDEFINED && ExEntryPanel.getInstance().isActive())
-    {
-        ExEntryPanel panel = ExEntryPanel.getInstance();
-        panel.handleKey(stroke);
-
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-    */
   }
 
   public boolean processExEntry(@NotNull final Editor editor, @NotNull final DataContext context) {

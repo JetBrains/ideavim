@@ -173,15 +173,6 @@ public class MorePanel extends JPanel {
     myEditor.getContentComponent().requestFocus();
   }
 
-  /**
-   * Checks if the ex entry panel is currently active
-   *
-   * @return true if active, false if not
-   */
-  public boolean isActive() {
-    return myActive;
-  }
-
   private void setFontForElements() {
     final Font font = UiHelper.getEditorFont();
     myText.setFont(font);
