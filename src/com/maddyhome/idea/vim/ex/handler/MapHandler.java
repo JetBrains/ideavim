@@ -29,6 +29,8 @@ import com.maddyhome.idea.vim.ex.VimrcCommandHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,19 +41,23 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
  * @author vlan
  */
 public class MapHandler extends CommandHandler implements VimrcCommandHandler {
-  public static final Pattern RE_MAP_ARGUMENTS = Pattern.compile("([^ ]+) +(.+)");
+  // TODO: Support xmap, smap, map!, lmap
+  public static final CommandInfo[] COMMAND_INFOS = new CommandInfo[] {
+    new CommandInfo("map", "", MappingMode.NVO, true),
+    new CommandInfo("nm", "ap", MappingMode.N, true),
+    new CommandInfo("vm", "ap", MappingMode.V, true),
+    new CommandInfo("om", "ap", MappingMode.O, true),
+    new CommandInfo("im", "ap", MappingMode.I, true),
+    new CommandInfo("cm", "ap", MappingMode.C, true),
+  };
+  public static final CommandName[] COMMAND_NAMES = createCommandNames();
+
+  private static final Pattern RE_MAP_ARGUMENTS = Pattern.compile("([^ ]+) +(.+)");
 
   public MapHandler() {
-    super(new CommandName[]{
-      // TODO: Support xmap, smap, map!, lmap
-      new CommandName("map", ""),
-      new CommandName("nm", "ap"),
-      new CommandName("vm", "ap"),
-      new CommandName("om", "ap"),
-      new CommandName("im", "ap"),
-      new CommandName("cm", "ap")
-    }, RANGE_FORBIDDEN | ARGUMENT_OPTIONAL);
+    super(COMMAND_NAMES, RANGE_FORBIDDEN | ARGUMENT_OPTIONAL);
   }
+
 
   @Override
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
@@ -64,16 +70,18 @@ public class MapHandler extends CommandHandler implements VimrcCommandHandler {
   }
 
   private boolean executeCommand(@NotNull ExCommand cmd, @Nullable Editor editor) {
-    final Set<MappingMode> modes = getMappingModes(cmd.getCommand());
-    if (modes != null) {
+    final CommandInfo commandInfo = getCommandInfo(cmd.getCommand());
+    if (commandInfo != null) {
       final String argument = cmd.getArgument();
+      final Set<MappingMode> modes = commandInfo.getMappingModes();
       if (argument.isEmpty()) {
         return editor != null && VimPlugin.getKey().showKeyMappings(modes, editor);
       }
       else {
         final Matcher matcher = RE_MAP_ARGUMENTS.matcher(argument);
         if (matcher.matches()) {
-          VimPlugin.getKey().putKeyMapping(modes, parseKeys(matcher.group(1)), parseKeys(matcher.group(2)), true);
+          VimPlugin.getKey().putKeyMapping(modes, parseKeys(matcher.group(1)), parseKeys(matcher.group(2)),
+                                           commandInfo.isRecursive());
           return true;
         }
       }
@@ -82,28 +90,55 @@ public class MapHandler extends CommandHandler implements VimrcCommandHandler {
   }
 
   @Nullable
-  private Set<MappingMode> getMappingModes(@NotNull String command) {
-    if (command.equals("map")) {
-      return MappingMode.NVO;
-    }
-    else if (command.startsWith("nm")) {
-      return MappingMode.N;
-    }
-    else if (command.startsWith("vm")) {
-      return MappingMode.V;
-    }
-    else if (command.startsWith("om")) {
-      return MappingMode.O;
-    }
-    else if (command.equals("map!")) {
-      return MappingMode.IC;
-    }
-    else if (command.startsWith("im")) {
-      return MappingMode.I;
-    }
-    else if (command.startsWith("cm")) {
-      return MappingMode.C;
+  private CommandInfo getCommandInfo(@NotNull String command) {
+    for (CommandInfo commandInfo : COMMAND_INFOS) {
+      if (command.startsWith(commandInfo.getPrefix())) {
+        return commandInfo;
+      }
     }
     return null;
+  }
+
+  private static CommandName[] createCommandNames() {
+    final List<CommandName> commandNames = new ArrayList<CommandName>();
+    for (CommandInfo commandInfo : COMMAND_INFOS) {
+      commandNames.add(new CommandName(commandInfo.getPrefix(), commandInfo.getSuffix()));
+    }
+    return commandNames.toArray(new CommandName[commandNames.size()]);
+  }
+
+  private static class CommandInfo {
+    @NotNull private final String myPrefix;
+    @NotNull private final String mySuffix;
+    @NotNull private final Set<MappingMode> myMappingModes;
+    private final boolean myRecursive;
+
+    public CommandInfo(@NotNull String prefix, @NotNull String suffix, @NotNull Set<MappingMode> mappingModes,
+                       boolean recursive) {
+
+      myPrefix = prefix;
+      mySuffix = suffix;
+      myMappingModes = mappingModes;
+      myRecursive = recursive;
+    }
+
+    @NotNull
+    public String getPrefix() {
+      return myPrefix;
+    }
+
+    @NotNull
+    public String getSuffix() {
+      return mySuffix;
+    }
+
+    @NotNull
+    public Set<MappingMode> getMappingModes() {
+      return myMappingModes;
+    }
+
+    public boolean isRecursive() {
+      return myRecursive;
+    }
   }
 }
