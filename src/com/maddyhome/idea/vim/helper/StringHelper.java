@@ -40,6 +40,8 @@ public class StringHelper {
 
   private static final Map<String, Integer> VIM_KEY_NAMES = ImmutableMap.<String, Integer>builder()
     .put("enter", VK_ENTER)
+    .put("cr", VK_ENTER)
+    .put("return", VK_ENTER)
     .put("ins", VK_INSERT)
     .put("insert", VK_INSERT)
     .put("del", VK_DELETE)
@@ -50,6 +52,19 @@ public class StringHelper {
     .put("down", VK_DOWN)
     .put("left", VK_LEFT)
     .put("right", VK_RIGHT)
+    .put("space", VK_SPACE)
+    .put("f1", VK_F1)
+    .put("f2", VK_F2)
+    .put("f3", VK_F3)
+    .put("f4", VK_F4)
+    .put("f5", VK_F5)
+    .put("f6", VK_F6)
+    .put("f7", VK_F7)
+    .put("f8", VK_F8)
+    .put("f9", VK_F9)
+    .put("f10", VK_F10)
+    .put("f11", VK_F11)
+    .put("f12", VK_F12)
     .build();
   private static final Map<Integer, String> VIM_KEY_VALUES = invertMap(VIM_KEY_NAMES);
 
@@ -123,7 +138,7 @@ public class StringHelper {
   private static enum KeyParserState {
     INIT,
     ESCAPE,
-    SPECIAL;
+    SPECIAL,
   }
   /**
    * Parses Vim key notation strings.
@@ -328,6 +343,9 @@ public class StringHelper {
     final Integer keyCode = VIM_KEY_NAMES.get(lower);
     if (keyCode != null) {
       return getKeyStroke(keyCode, modifiers);
+    }
+    else if (lower.equals("leader")) {
+      return getKeyStroke('\\');
     }
     else if (lower.startsWith(META_PREFIX)) {
       return parseSpecialKey(s.substring(META_PREFIX.length()), modifiers | META_MASK);

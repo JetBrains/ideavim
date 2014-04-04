@@ -35,8 +35,13 @@ public class StringHelperTest extends TestCase {
     assertTypedKeyStroke('<', "<");
     assertTypedKeyStroke('>', ">");
     assertTypedKeyStroke('\\', "\\");
+    assertTypedKeyStroke('\\', "<Leader>");
 
     assertPressedKeyStroke("ESCAPE", "<Esc>");
+    assertPressedKeyStroke("SPACE", "<Space>");
+    assertPressedKeyStroke("ENTER", "<Enter>");
+    assertPressedKeyStroke("ENTER", "<Return>");
+    assertPressedKeyStroke("ENTER", "<CR>");
   }
 
   private void assertPressedKeyStroke(@NotNull String expected, @NotNull String actual) {
