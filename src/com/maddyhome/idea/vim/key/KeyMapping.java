@@ -29,7 +29,7 @@ import java.util.*;
  * @author vlan
  */
 public class KeyMapping implements Iterable<List<KeyStroke>> {
-  @NotNull private Map<ImmutableList<KeyStroke>, List<KeyStroke>> myKeys = new HashMap<ImmutableList<KeyStroke>, List<KeyStroke>>();
+  @NotNull private Map<ImmutableList<KeyStroke>, MappingInfo> myKeys = new HashMap<ImmutableList<KeyStroke>, MappingInfo>();
   @NotNull private Map<ImmutableList<KeyStroke>, Integer> myPrefixes = new HashMap<ImmutableList<KeyStroke>, Integer>();
 
   @Override
@@ -38,12 +38,12 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
   }
 
   @Nullable
-  public List<KeyStroke> get(@NotNull List<KeyStroke> keys) {
+  public MappingInfo get(@NotNull List<KeyStroke> keys) {
     return myKeys.get(ImmutableList.copyOf(keys));
   }
 
-  public void put(@NotNull List<KeyStroke> keys, @NotNull List<KeyStroke> value) {
-    myKeys.put(ImmutableList.copyOf(keys), value);
+  public void put(@NotNull List<KeyStroke> keys, @NotNull List<KeyStroke> value, boolean recursive) {
+    myKeys.put(ImmutableList.copyOf(keys), new MappingInfo(keys, value, recursive));
     List<KeyStroke> prefix = new ArrayList<KeyStroke>();
     final int prefixLength = keys.size() - 1;
     for (int i = 0; i < prefixLength; i++) {

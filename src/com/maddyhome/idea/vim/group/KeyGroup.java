@@ -57,10 +57,10 @@ public class KeyGroup {
   }
 
   public void putKeyMapping(@NotNull Set<MappingMode> modes, @NotNull List<KeyStroke> fromKeys,
-                            @NotNull List<KeyStroke> toKeys) {
+                            @NotNull List<KeyStroke> toKeys, boolean recursive) {
     for (MappingMode mode : modes) {
       final KeyMapping mapping = getKeyMapping(mode);
-      mapping.put(fromKeys, toKeys);
+      mapping.put(fromKeys, toKeys, recursive);
     }
   }
 
@@ -350,9 +350,9 @@ public class KeyGroup {
       if (!mappingModes.isEmpty()) {
         final MappingMode mode = mappingModes.iterator().next();
         final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mode);
-        final List<KeyStroke> toKeys = mapping.get(fromKeys);
-        if (toKeys != null) {
-          rows.add(new MappingRow(mappingModes, fromKeys, toKeys));
+        final MappingInfo mappingInfo = mapping.get(fromKeys);
+        if (mappingInfo != null) {
+          rows.add(new MappingRow(mappingModes, fromKeys, mappingInfo.getToKeys()));
         }
       }
     }

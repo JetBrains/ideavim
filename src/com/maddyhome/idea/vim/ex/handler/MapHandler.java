@@ -74,7 +74,7 @@ public class MapHandler extends CommandHandler implements VimrcCommandHandler {
       else {
         final Matcher matcher = RE_MAP_ARGUMENTS.matcher(argument);
         if (matcher.matches()) {
-          VimPlugin.getKey().putKeyMapping(modes, parseKeys(matcher.group(1)), parseKeys(matcher.group(2)));
+          VimPlugin.getKey().putKeyMapping(modes, parseKeys(matcher.group(1)), parseKeys(matcher.group(2)), true);
           return true;
         }
       }

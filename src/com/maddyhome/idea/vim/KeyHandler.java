@@ -226,7 +226,7 @@ public class KeyHandler {
     fromKeys.add(key);
 
     final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(commandState.getMappingMode());
-    final List<KeyStroke> toKeys = mapping.get(fromKeys);
+    final MappingInfo mappingInfo = mapping.get(fromKeys);
 
     if (mapping.isPrefix(fromKeys)) {
       mappingKeys.add(key);
@@ -241,13 +241,13 @@ public class KeyHandler {
       });
       return true;
     }
-    else if (toKeys != null) {
+    else if (mappingInfo != null) {
       mappingKeys.clear();
       final Application application = ApplicationManager.getApplication();
       final Runnable handleMappedKeys = new Runnable() {
         @Override
         public void run() {
-          for (KeyStroke keyStroke : toKeys) {
+          for (KeyStroke keyStroke : mappingInfo.getToKeys()) {
             // TODO: Don't allow key mapping for non-recursive mappings
             handleKey(editor, keyStroke, new EditorDataContext(editor), true);
           }
