@@ -43,12 +43,11 @@ public class MapHandler extends CommandHandler implements VimrcCommandHandler {
 
   public MapHandler() {
     super(new CommandName[]{
-      // TODO: Support xmap, smap, lmap
+      // TODO: Support xmap, smap, map!, lmap
       new CommandName("map", ""),
       new CommandName("nm", "ap"),
       new CommandName("vm", "ap"),
       new CommandName("om", "ap"),
-      new CommandName("map!", ""),
       new CommandName("im", "ap"),
       new CommandName("cm", "ap")
     }, RANGE_FORBIDDEN | ARGUMENT_OPTIONAL);

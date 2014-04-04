@@ -21,7 +21,6 @@
  * |:nmap|
  * |:vmap|
  * |:omap|
- * |:map!|
  * |:imap|
  * |:cmap|
  * |:noremap|               {@link com.maddyhome.idea.vim.ex.handler.NonRecursiveMapHandler}
