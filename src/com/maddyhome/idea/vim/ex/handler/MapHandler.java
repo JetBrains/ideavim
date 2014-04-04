@@ -41,8 +41,8 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
  * @author vlan
  */
 public class MapHandler extends CommandHandler implements VimrcCommandHandler {
-  // TODO: Support xmap, smap, map!, lmap
   public static final CommandInfo[] COMMAND_INFOS = new CommandInfo[] {
+    // TODO: Support xmap, smap, map!, lmap
     new CommandInfo("map", "", MappingMode.NVO, true),
     new CommandInfo("nm", "ap", MappingMode.N, true),
     new CommandInfo("vm", "ap", MappingMode.V, true),
@@ -64,7 +64,6 @@ public class MapHandler extends CommandHandler implements VimrcCommandHandler {
   public MapHandler() {
     super(COMMAND_NAMES, RANGE_FORBIDDEN | ARGUMENT_OPTIONAL);
   }
-
 
   @Override
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
@@ -106,6 +105,7 @@ public class MapHandler extends CommandHandler implements VimrcCommandHandler {
     return null;
   }
 
+  @NotNull
   private static CommandName[] createCommandNames() {
     final List<CommandName> commandNames = new ArrayList<CommandName>();
     for (CommandInfo commandInfo : COMMAND_INFOS) {
@@ -122,7 +122,6 @@ public class MapHandler extends CommandHandler implements VimrcCommandHandler {
 
     public CommandInfo(@NotNull String prefix, @NotNull String suffix, @NotNull Set<MappingMode> mappingModes,
                        boolean recursive) {
-
       myPrefix = prefix;
       mySuffix = suffix;
       myMappingModes = mappingModes;
