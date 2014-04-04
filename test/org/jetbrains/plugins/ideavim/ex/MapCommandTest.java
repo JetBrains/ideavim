@@ -75,4 +75,13 @@ public class MapCommandTest extends VimTestCase {
     typeText(commandToKeys("map"));
     assertExOutput("   <C-Down>      gt\n");
   }
+
+  public void testRecursiveMapping() {
+    configureByText("\n");
+    typeText(commandToKeys("imap foo bar"));
+    typeText(commandToKeys("imap bar baz"));
+    typeText(commandToKeys("imap baz quux"));
+    typeText(parseKeys("i", "foo"));
+    myFixture.checkResult("quux\n");
+  }
 }
