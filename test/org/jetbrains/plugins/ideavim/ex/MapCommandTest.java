@@ -102,4 +102,18 @@ public class MapCommandTest extends VimTestCase {
     assertExOutput("i  foo           bar\n" +
                    "i  jj          * <Esc>\n");
   }
+
+  public void testNop() {
+    configureByText("<caret>foo\n" +
+                    "bar\n");
+    typeText(commandToKeys("noremap <Right> <nop>"));
+    assertPluginError(false);
+    typeText(parseKeys("l", "<Right>"));
+    assertPluginError(false);
+    myFixture.checkResult("foo\n" +
+                          "bar\n");
+    assertOffset(1);
+    typeText(commandToKeys("nmap"));
+    assertExOutput("n  <Right>     * <Nop>\n");
+  }
 }

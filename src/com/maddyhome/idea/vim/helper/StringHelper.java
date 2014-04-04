@@ -180,14 +180,16 @@ public class StringHelper {
             if (c == '>') {
               state = KeyParserState.INIT;
               final String specialKeyName = specialKeyBuilder.toString();
-              final KeyStroke specialKey = parseSpecialKey(specialKeyName, 0);
-              if (specialKey != null) {
-                result.add(specialKey);
-              }
-              else {
-                result.add(getKeyStroke('<'));
-                result.addAll(stringToKeys(specialKeyName));
-                result.add(getKeyStroke('>'));
+              if (!"nop".equals(specialKeyName.toLowerCase())) {
+                final KeyStroke specialKey = parseSpecialKey(specialKeyName, 0);
+                if (specialKey != null) {
+                  result.add(specialKey);
+                }
+                else {
+                  result.add(getKeyStroke('<'));
+                  result.addAll(stringToKeys(specialKeyName));
+                  result.add(getKeyStroke('>'));
+                }
               }
             }
             else {
@@ -209,6 +211,9 @@ public class StringHelper {
 
   @NotNull
   public static String toKeyNotation(@NotNull List<KeyStroke> keys) {
+    if (keys.isEmpty()) {
+      return "<Nop>";
+    }
     final StringBuilder builder = new StringBuilder();
     for (KeyStroke key : keys) {
       builder.append(toKeyNotation(key));
