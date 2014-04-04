@@ -21,12 +21,13 @@ package com.maddyhome.idea.vim.key;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.awt.event.KeyEvent;
 import java.util.List;
 
 /**
  * @author vlan
  */
-public class MappingInfo {
+public class MappingInfo implements Comparable<MappingInfo> {
   @NotNull private final List<KeyStroke> myFromKeys;
   @NotNull private final List<KeyStroke> myToKeys;
   private final boolean myRecursive;
@@ -35,6 +36,20 @@ public class MappingInfo {
     myFromKeys = fromKeys;
     myToKeys = toKeys;
     myRecursive = recursive;
+  }
+
+  @Override
+  public int compareTo(@NotNull MappingInfo other) {
+    final int size = myFromKeys.size();
+    final int otherSize = other.myFromKeys.size();
+    final int n = Math.min(size, otherSize);
+    for (int i = 0; i < n; i++) {
+      final int diff = compareKeys(myFromKeys.get(i), other.myFromKeys.get(i));
+      if (diff != 0) {
+        return diff;
+      }
+    }
+    return size - otherSize;
   }
 
   @NotNull
@@ -49,5 +64,26 @@ public class MappingInfo {
 
   public boolean isRecursive() {
     return myRecursive;
+  }
+
+  private int compareKeys(@NotNull KeyStroke key1, @NotNull KeyStroke key2) {
+    final char c1 = key1.getKeyChar();
+    final char c2 = key2.getKeyChar();
+    if (c1 == KeyEvent.CHAR_UNDEFINED && c2 == KeyEvent.CHAR_UNDEFINED) {
+      final int keyCodeDiff = key1.getKeyCode() - key2.getKeyCode();
+      if (keyCodeDiff != 0) {
+        return keyCodeDiff;
+      }
+      return key1.getModifiers() - key2.getModifiers();
+    }
+    else if (c1 == KeyEvent.CHAR_UNDEFINED) {
+      return -1;
+    }
+    else if (c2 == KeyEvent.CHAR_UNDEFINED) {
+      return 1;
+    }
+    else {
+      return c1 - c2;
+    }
   }
 }
