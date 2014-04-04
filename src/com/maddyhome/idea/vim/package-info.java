@@ -23,7 +23,7 @@
  * |:omap|
  * |:imap|
  * |:cmap|
- * |:noremap|               {@link com.maddyhome.idea.vim.ex.handler.NonRecursiveMapHandler}
+ * |:noremap|
  * |:nnoremap|
  * |:vnoremap|
  * |:onoremap|

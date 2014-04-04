@@ -49,6 +49,13 @@ public class MapHandler extends CommandHandler implements VimrcCommandHandler {
     new CommandInfo("om", "ap", MappingMode.O, true),
     new CommandInfo("im", "ap", MappingMode.I, true),
     new CommandInfo("cm", "ap", MappingMode.C, true),
+    // TODO: Support xnoremap, snoremap, noremap!, lnoremap
+    new CommandInfo("no", "remap", MappingMode.NVO, false),
+    new CommandInfo("nn", "oremap", MappingMode.N, false),
+    new CommandInfo("vn", "oremap", MappingMode.V, false),
+    new CommandInfo("ono", "remap", MappingMode.O, false),
+    new CommandInfo("ino", "remap", MappingMode.I, false),
+    new CommandInfo("cno", "remap", MappingMode.C, false),
   };
   public static final CommandName[] COMMAND_NAMES = createCommandNames();
 

@@ -89,7 +89,6 @@ public class CommandParser {
     new MoveTextHandler();
     new NextFileHandler();
     new NoHLSearchHandler();
-    new NonRecursiveMapHandler();
     new OnlyHandler();
     new PreviousFileHandler();
     new PromptFindHandler();
