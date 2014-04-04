@@ -47,7 +47,9 @@ public class KeyGroup {
     for (MappingRow row : rows) {
       builder.append(leftJustify(getModesStringCode(row.getModes()), 2, ' '));
       builder.append(" ");
-      builder.append(leftJustify(toKeyNotation(row.getFromKeys()), 13, ' '));
+      builder.append(leftJustify(toKeyNotation(row.getFromKeys()), 11, ' '));
+      builder.append(" ");
+      builder.append(row.isRecursive() ? " " : "*");
       builder.append(" ");
       builder.append(toKeyNotation(row.getToKeys()));
       builder.append("\n");
@@ -352,7 +354,7 @@ public class KeyGroup {
         final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mode);
         final MappingInfo mappingInfo = mapping.get(fromKeys);
         if (mappingInfo != null) {
-          rows.add(new MappingRow(mappingModes, fromKeys, mappingInfo.getToKeys()));
+          rows.add(new MappingRow(mappingModes, fromKeys, mappingInfo.getToKeys(), mappingInfo.isRecursive()));
         }
       }
     }
@@ -378,12 +380,14 @@ public class KeyGroup {
     @NotNull private final Set<MappingMode> myModes;
     @NotNull private final List<KeyStroke> myFromKeys;
     @NotNull private final List<KeyStroke> myToKeys;
+    private final boolean myRecursive;
 
     public MappingRow(@NotNull Set<MappingMode> modes, @NotNull List<KeyStroke> fromKeys,
-                      @NotNull List<KeyStroke> toKeys) {
+                      @NotNull List<KeyStroke> toKeys, boolean recursive) {
       myModes = modes;
       myFromKeys = fromKeys;
       myToKeys = toKeys;
+      myRecursive = recursive;
     }
 
     @Override
@@ -434,6 +438,10 @@ public class KeyGroup {
     @NotNull
     public List<KeyStroke> getToKeys() {
       return myToKeys;
+    }
+
+    public boolean isRecursive() {
+      return myRecursive;
     }
   }
 }

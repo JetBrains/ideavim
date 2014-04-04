@@ -93,4 +93,13 @@ public class MapCommandTest extends VimTestCase {
     typeText(parseKeys("i", "ab"));
     myFixture.checkResult("ba\n");
   }
+
+  public void testNonRecursiveMapTable() {
+    configureByText("\n");
+    typeText(commandToKeys("inoremap jj <Esc>"));
+    typeText(commandToKeys("imap foo bar"));
+    typeText(commandToKeys("imap"));
+    assertExOutput("i  foo           bar\n" +
+                   "i  jj          * <Esc>\n");
+  }
 }
