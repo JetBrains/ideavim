@@ -49,7 +49,7 @@ import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
-import com.maddyhome.idea.vim.ex.VimrcParser;
+import com.maddyhome.idea.vim.ex.VimScriptParser;
 import com.maddyhome.idea.vim.group.*;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.Options;
@@ -173,9 +173,9 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     CommandParser.getInstance().registerHandlers();
 
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      final File vimrc = VimrcParser.findVimrc();
+      final File vimrc = VimScriptParser.findVimrc();
       if (vimrc != null) {
-        VimrcParser.executeFile(vimrc);
+        VimScriptParser.executeFile(vimrc);
       }
     }
 

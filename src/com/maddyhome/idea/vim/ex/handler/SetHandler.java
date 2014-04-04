@@ -23,7 +23,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.ex.VimrcCommandHandler;
+import com.maddyhome.idea.vim.ex.VimScriptCommandHandler;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  *
  */
-public class SetHandler extends CommandHandler implements VimrcCommandHandler {
+public class SetHandler extends CommandHandler implements VimScriptCommandHandler {
   public SetHandler() {
     super("se", "t", ARGUMENT_OPTIONAL);
   }

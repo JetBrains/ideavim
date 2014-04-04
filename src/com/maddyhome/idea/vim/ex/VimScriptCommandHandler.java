@@ -23,6 +23,6 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @author vlan
  */
-public interface VimrcCommandHandler {
+public interface VimScriptCommandHandler {
   void execute(@NotNull ExCommand cmd) throws ExException;
 }

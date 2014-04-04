@@ -29,10 +29,10 @@ import java.io.IOException;
 /**
  * @author vlan
  */
-public class VimrcParser {
+public class VimScriptParser {
   public static final String[] VIMRC_FILES = {".ideavimrc", "_ideavimrc", ".vimrc", "_vimrc"};
 
-  private VimrcParser() {
+  private VimScriptParser() {
   }
 
   @Nullable
@@ -62,8 +62,8 @@ public class VimrcParser {
           final CommandParser commandParser = CommandParser.getInstance();
           final ExCommand command = commandParser.parse(line);
           final CommandHandler commandHandler = commandParser.getCommandHandler(command);
-          if (commandHandler instanceof VimrcCommandHandler) {
-            final VimrcCommandHandler handler = (VimrcCommandHandler)commandHandler;
+          if (commandHandler instanceof VimScriptCommandHandler) {
+            final VimScriptCommandHandler handler = (VimScriptCommandHandler)commandHandler;
             handler.execute(command);
           }
         }

@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.ex.VimrcCommandHandler;
+import com.maddyhome.idea.vim.ex.VimScriptCommandHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,7 +40,7 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 /**
  * @author vlan
  */
-public class MapHandler extends CommandHandler implements VimrcCommandHandler {
+public class MapHandler extends CommandHandler implements VimScriptCommandHandler {
   public static final CommandInfo[] COMMAND_INFOS = new CommandInfo[] {
     // TODO: Support xmap, smap, map!, lmap
     new CommandInfo("map", "", MappingMode.NVO, true),

@@ -28,7 +28,7 @@ import java.io.File;
 /**
  * @author vlan
  */
-public class SourceHandler extends CommandHandler implements VimrcCommandHandler {
+public class SourceHandler extends CommandHandler implements VimScriptCommandHandler {
   public SourceHandler() {
     super("so", "urce", RANGE_FORBIDDEN | ARGUMENT_REQUIRED);
   }
@@ -42,7 +42,7 @@ public class SourceHandler extends CommandHandler implements VimrcCommandHandler
   @Override
   public void execute(@NotNull ExCommand cmd) throws ExException {
     final String path = expandUser(cmd.getArgument().trim());
-    VimrcParser.executeFile(new File(path));
+    VimScriptParser.executeFile(new File(path));
   }
 
   @NotNull
