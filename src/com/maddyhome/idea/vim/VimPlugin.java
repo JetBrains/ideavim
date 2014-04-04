@@ -18,8 +18,6 @@
 package com.maddyhome.idea.vim;
 
 import com.intellij.notification.*;
-import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ex.ApplicationEx;
@@ -64,10 +62,6 @@ import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 /**
  * This plugin attempts to emulate the key binding and general functionality of Vim and gVim. See the supplied
@@ -456,8 +450,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         isRefrainFromScrolling = editor.getSettings().isRefrainFromScrolling();
         EditorData.initializeEditor(editor);
         DocumentManager.getInstance().addListeners(editor.getDocument());
-        final Set<KeyStroke> requiredKeys = VimPlugin.getKey().getRequiredShortcutKeys();
-        getShortcutKeyAction().registerCustomShortcutSet(toShortcutSet(requiredKeys), editor.getComponent());
+        key.registerRequiredShortcutKeys(editor);
 
         if (VimPlugin.isEnabled()) {
           // Turn on insert mode if editor doesn't have any file
@@ -475,7 +468,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
       public void editorReleased(@NotNull EditorFactoryEvent event) {
         final Editor editor = event.getEditor();
         EditorData.uninitializeEditor(editor);
-        getShortcutKeyAction().unregisterCustomShortcutSet(editor.getComponent());
+        key.unregisterShortcutKeys(editor);
         editor.getSettings().setAnimatedScrolling(isAnimatedScrolling);
         editor.getSettings().setRefrainFromScrolling(isRefrainFromScrolling);
         DocumentManager.getInstance().removeListeners(editor.getDocument());
@@ -501,20 +494,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     });
 
     CommandProcessor.getInstance().addCommandListener(DelegateCommandListener.getInstance());
-  }
-
-  @NotNull
-  private AnAction getShortcutKeyAction() {
-    return ActionManagerEx.getInstanceEx().getAction("VimShortcutKeyAction");
-  }
-
-  @NotNull
-  private ShortcutSet toShortcutSet(@NotNull Collection<KeyStroke> keyStrokes) {
-    final List<Shortcut> shortcuts = new ArrayList<Shortcut>();
-    for (KeyStroke key : keyStrokes) {
-      shortcuts.add(new KeyboardShortcut(key, null));
-    }
-    return new CustomShortcutSet(shortcuts.toArray(new Shortcut[shortcuts.size()]));
   }
 
   private void setCursors(boolean isBlock) {
