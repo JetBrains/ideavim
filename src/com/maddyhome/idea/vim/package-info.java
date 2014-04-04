@@ -29,6 +29,7 @@
  * |:onoremap|
  * |:inoremap|
  * |:cnoremap|
+ * |:source|                {@link com.maddyhome.idea.vim.ex.handler.SourceHandler}
  *
  * @see :help index.
  *
