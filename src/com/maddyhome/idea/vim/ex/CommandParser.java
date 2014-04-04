@@ -164,8 +164,8 @@ public class CommandParser {
     final CommandHandler handler = getCommandHandler(command);
 
     if (handler == null) {
-      VimPlugin.showMessage(MessageHelper.message(Msg.NOT_EX_CMD, command.getCommand()));
-      throw new InvalidCommandException(cmd);
+      final String message = MessageHelper.message(Msg.NOT_EX_CMD, command.getCommand());
+      throw new InvalidCommandException(message, cmd);
     }
 
     if ((handler.getArgFlags() & CommandHandler.WRITABLE) > 0 && !editor.getDocument().isWritable()) {
@@ -521,8 +521,7 @@ public class CommandParser {
 
       // Oops - bad command string
       if (state == STATE_ERROR) {
-        VimPlugin.showMessage(error);
-        throw new InvalidCommandException(cmd);
+        throw new InvalidCommandException(error, cmd);
       }
     }
 

@@ -233,37 +233,21 @@ public abstract class CommandHandler {
 
     CommandState.getInstance(editor).setFlags(optFlags);
 
-    boolean res = true;
-    if ((argFlags & WRITABLE) != 0) {
-      try {
-        for (int i = 0; i < count && res; i++) {
-          res = execute(editor, context, cmd);
-        }
+    try {
+      boolean res = true;
+      for (int i = 0; i < count && res; i++) {
+        res = execute(editor, context, cmd);
       }
-      catch (ExException e) {
-        res = false;
-      }
-      finally {
-        if (!res) {
-          VimPlugin.indicateError();
-        }
-      }
-    }
-    else {
-      try {
-        for (int i = 0; i < count; i++) {
-          res = execute(editor, context, cmd);
-        }
-        if (!res) {
-          VimPlugin.indicateError();
-        }
-      }
-      catch (ExException e) {
+      if (!res) {
         VimPlugin.indicateError();
       }
+      return res;
     }
-
-    return res;
+    catch (ExException e) {
+      VimPlugin.showMessage(e.getMessage());
+      VimPlugin.indicateError();
+      return false;
+    }
   }
 
   /**

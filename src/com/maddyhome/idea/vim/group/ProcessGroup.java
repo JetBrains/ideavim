@@ -141,9 +141,8 @@ public class ProcessGroup {
         }
       }
     }
-    catch (ExException ex) {
-      //VimPlugin.showMessage(ex.getMessage());
-      ProcessGroup.logger.info(ex.getMessage());
+    catch (ExException e) {
+      VimPlugin.showMessage(e.getMessage());
       VimPlugin.indicateError();
       res = false;
     }
