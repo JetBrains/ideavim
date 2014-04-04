@@ -24,7 +24,12 @@
  * |:map!|
  * |:imap|
  * |:cmap|
- *
+ * |:noremap|               {@link com.maddyhome.idea.vim.ex.handler.NonRecursiveMapHandler}
+ * |:nnoremap|
+ * |:vnoremap|
+ * |:onoremap|
+ * |:inoremap|
+ * |:cnoremap|
  *
  * @see :help index.
  *

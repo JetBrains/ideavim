@@ -248,8 +248,7 @@ public class KeyHandler {
         @Override
         public void run() {
           for (KeyStroke keyStroke : mappingInfo.getToKeys()) {
-            // TODO: Don't allow key mapping for non-recursive mappings
-            handleKey(editor, keyStroke, new EditorDataContext(editor), true);
+            handleKey(editor, keyStroke, new EditorDataContext(editor), mappingInfo.isRecursive());
           }
         }
       };
