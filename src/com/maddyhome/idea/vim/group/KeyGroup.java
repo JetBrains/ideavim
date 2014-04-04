@@ -42,10 +42,10 @@ public class KeyGroup {
   @NotNull private Map<MappingMode, KeyMapping> keyMappings = new HashMap<MappingMode, KeyMapping>();
 
   public boolean showKeyMappings(@NotNull Set<MappingMode> modes, @NotNull Editor editor) {
-    final List<MappingRow> rows = getKeyMappingRows(modes);
+    final List<MappingInfo> rows = getKeyMappingRows(modes);
     final StringBuilder builder = new StringBuilder();
-    for (MappingRow row : rows) {
-      builder.append(leftJustify(getModesStringCode(row.getModes()), 2, ' '));
+    for (MappingInfo row : rows) {
+      builder.append(leftJustify(getModesStringCode(row.getMappingModes()), 2, ' '));
       builder.append(" ");
       builder.append(leftJustify(toKeyNotation(row.getFromKeys()), 11, ' '));
       builder.append(" ");
@@ -62,7 +62,7 @@ public class KeyGroup {
                             @NotNull List<KeyStroke> toKeys, boolean recursive) {
     for (MappingMode mode : modes) {
       final KeyMapping mapping = getKeyMapping(mode);
-      mapping.put(fromKeys, toKeys, recursive);
+      mapping.put(EnumSet.of(mode), fromKeys, toKeys, recursive);
     }
   }
 
@@ -327,7 +327,7 @@ public class KeyGroup {
     return node;
   }
 
-  private static List<MappingRow> getKeyMappingRows(@NotNull Set<MappingMode> modes) {
+  private static List<MappingInfo> getKeyMappingRows(@NotNull Set<MappingMode> modes) {
     final Map<ImmutableList<KeyStroke>, Set<MappingMode>> actualModes = new HashMap<ImmutableList<KeyStroke>, Set<MappingMode>>();
     for (MappingMode mode : modes) {
       final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mode);
@@ -345,7 +345,7 @@ public class KeyGroup {
         actualModes.put(key, newValue);
       }
     }
-    final List<MappingRow> rows = new ArrayList<MappingRow>();
+    final List<MappingInfo> rows = new ArrayList<MappingInfo>();
     for (Map.Entry<ImmutableList<KeyStroke>, Set<MappingMode>> entry : actualModes.entrySet()) {
       final ArrayList<KeyStroke> fromKeys = new ArrayList<KeyStroke>(entry.getKey());
       final Set<MappingMode> mappingModes = entry.getValue();
@@ -354,7 +354,8 @@ public class KeyGroup {
         final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mode);
         final MappingInfo mappingInfo = mapping.get(fromKeys);
         if (mappingInfo != null) {
-          rows.add(new MappingRow(mappingModes, fromKeys, mappingInfo.getToKeys(), mappingInfo.isRecursive()));
+          rows.add(new MappingInfo(mappingModes, mappingInfo.getFromKeys(), mappingInfo.getToKeys(),
+                                   mappingInfo.isRecursive()));
         }
       }
     }
@@ -374,74 +375,5 @@ public class KeyGroup {
     }
     // TODO: Add more codes
     return "";
-  }
-
-  private static class MappingRow implements Comparable<MappingRow> {
-    @NotNull private final Set<MappingMode> myModes;
-    @NotNull private final List<KeyStroke> myFromKeys;
-    @NotNull private final List<KeyStroke> myToKeys;
-    private final boolean myRecursive;
-
-    public MappingRow(@NotNull Set<MappingMode> modes, @NotNull List<KeyStroke> fromKeys,
-                      @NotNull List<KeyStroke> toKeys, boolean recursive) {
-      myModes = modes;
-      myFromKeys = fromKeys;
-      myToKeys = toKeys;
-      myRecursive = recursive;
-    }
-
-    @Override
-    public int compareTo(@NotNull MappingRow other) {
-      final int size = myFromKeys.size();
-      final int otherSize = other.myFromKeys.size();
-      final int n = Math.min(size, otherSize);
-      for (int i = 0; i < n; i++) {
-        final int diff = compareKeys(myFromKeys.get(i), other.myFromKeys.get(i));
-        if (diff != 0) {
-          return diff;
-        }
-      }
-      return size - otherSize;
-    }
-
-    private int compareKeys(@NotNull KeyStroke key1, @NotNull KeyStroke key2) {
-      final char c1 = key1.getKeyChar();
-      final char c2 = key2.getKeyChar();
-      if (c1 == KeyEvent.CHAR_UNDEFINED && c2 == KeyEvent.CHAR_UNDEFINED) {
-        final int keyCodeDiff = key1.getKeyCode() - key2.getKeyCode();
-        if (keyCodeDiff != 0) {
-          return keyCodeDiff;
-        }
-        return key1.getModifiers() - key2.getModifiers();
-      }
-      else if (c1 == KeyEvent.CHAR_UNDEFINED) {
-        return -1;
-      }
-      else if (c2 == KeyEvent.CHAR_UNDEFINED) {
-        return 1;
-      }
-      else {
-        return c1 - c2;
-      }
-    }
-
-    @NotNull
-    public Set<MappingMode> getModes() {
-      return myModes;
-    }
-
-    @NotNull
-    public List<KeyStroke> getFromKeys() {
-      return myFromKeys;
-    }
-
-    @NotNull
-    public List<KeyStroke> getToKeys() {
-      return myToKeys;
-    }
-
-    public boolean isRecursive() {
-      return myRecursive;
-    }
   }
 }

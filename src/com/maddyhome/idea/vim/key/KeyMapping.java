@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.key;
 
 import com.google.common.collect.ImmutableList;
+import com.maddyhome.idea.vim.command.MappingMode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,12 +43,13 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
     return myKeys.get(ImmutableList.copyOf(keys));
   }
 
-  public void put(@NotNull List<KeyStroke> keys, @NotNull List<KeyStroke> value, boolean recursive) {
-    myKeys.put(ImmutableList.copyOf(keys), new MappingInfo(keys, value, recursive));
+  public void put(@NotNull Set<MappingMode> mappingModes, @NotNull List<KeyStroke> fromKeys,
+                  @NotNull List<KeyStroke> toKeys, boolean recursive) {
+    myKeys.put(ImmutableList.copyOf(fromKeys), new MappingInfo(mappingModes, fromKeys, toKeys, recursive));
     List<KeyStroke> prefix = new ArrayList<KeyStroke>();
-    final int prefixLength = keys.size() - 1;
+    final int prefixLength = fromKeys.size() - 1;
     for (int i = 0; i < prefixLength; i++) {
-      prefix.add(keys.get(i));
+      prefix.add(fromKeys.get(i));
       increment(ImmutableList.copyOf(prefix));
     }
   }

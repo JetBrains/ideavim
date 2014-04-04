@@ -18,21 +18,26 @@
 
 package com.maddyhome.idea.vim.key;
 
+import com.maddyhome.idea.vim.command.MappingMode;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author vlan
  */
 public class MappingInfo implements Comparable<MappingInfo> {
+  @NotNull private final Set<MappingMode> myMappingModes;
   @NotNull private final List<KeyStroke> myFromKeys;
   @NotNull private final List<KeyStroke> myToKeys;
   private final boolean myRecursive;
 
-  public MappingInfo(@NotNull List<KeyStroke> fromKeys, @NotNull List<KeyStroke> toKeys, boolean recursive) {
+  public MappingInfo(@NotNull Set<MappingMode> mappingModes, @NotNull List<KeyStroke> fromKeys,
+                     @NotNull List<KeyStroke> toKeys, boolean recursive) {
+    myMappingModes = mappingModes;
     myFromKeys = fromKeys;
     myToKeys = toKeys;
     myRecursive = recursive;
@@ -50,6 +55,11 @@ public class MappingInfo implements Comparable<MappingInfo> {
       }
     }
     return size - otherSize;
+  }
+
+  @NotNull
+  public Set<MappingMode> getMappingModes() {
+    return myMappingModes;
   }
 
   @NotNull
