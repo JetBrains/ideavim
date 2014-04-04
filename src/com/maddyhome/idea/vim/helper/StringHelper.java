@@ -324,6 +324,7 @@ public class StringHelper {
   @Nullable
   private static KeyStroke parseSpecialKey(@NotNull String s, int modifiers) {
     final String lower = s.toLowerCase();
+    final String upper = s.toUpperCase();
     final Integer keyCode = VIM_KEY_NAMES.get(lower);
     if (keyCode != null) {
       return getKeyStroke(keyCode, modifiers);
@@ -341,7 +342,7 @@ public class StringHelper {
       return parseSpecialKey(s.substring(SHIFT_PREFIX.length()), modifiers | SHIFT_MASK);
     }
     else if (s.length() == 1) {
-      return getKeyStroke(s.charAt(0), modifiers);
+      return modifiers == 0 ? getKeyStroke(s.charAt(0)) : getKeyStroke(upper.charAt(0), modifiers);
     }
     return null;
   }
