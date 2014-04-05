@@ -116,4 +116,23 @@ public class MapCommandTest extends VimTestCase {
     typeText(commandToKeys("nmap"));
     assertExOutput("n  <Right>     * <Nop>\n");
   }
+
+  public void testIgnoreModifiers() {
+    configureByText("\n");
+    typeText(commandToKeys("nmap <buffer> ,a /a<CR>"));
+    typeText(commandToKeys("nmap <nowait> ,b /b<CR>"));
+    typeText(commandToKeys("nmap <silent> ,c /c<CR>"));
+    typeText(commandToKeys("nmap <special> ,d /d<CR>"));
+    typeText(commandToKeys("nmap <script> ,e /e<CR>"));
+    typeText(commandToKeys("nmap <expr> ,f /f<CR>"));
+    typeText(commandToKeys("nmap <unique> ,g /g<CR>"));
+    typeText(commandToKeys("nmap"));
+    assertExOutput("n  ,a            /a<CR>\n" +
+                   "n  ,b            /b<CR>\n" +
+                   "n  ,c            /c<CR>\n" +
+                   "n  ,d            /d<CR>\n" +
+                   "n  ,e            /e<CR>\n" +
+                   "n  ,f            /f<CR>\n" +
+                   "n  ,g            /g<CR>\n");
+  }
 }

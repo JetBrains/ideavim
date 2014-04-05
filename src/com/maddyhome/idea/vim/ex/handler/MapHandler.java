@@ -22,18 +22,12 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.ex.CommandHandler;
-import com.maddyhome.idea.vim.ex.CommandName;
-import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.ex.VimScriptCommandHandler;
+import com.maddyhome.idea.vim.ex.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import javax.swing.*;
+import java.util.*;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
@@ -59,8 +53,6 @@ public class MapHandler extends CommandHandler implements VimScriptCommandHandle
   };
   public static final CommandName[] COMMAND_NAMES = createCommandNames();
 
-  private static final Pattern RE_MAP_ARGUMENTS = Pattern.compile("([^ ]+) +(.+)");
-
   public MapHandler() {
     super(COMMAND_NAMES, RANGE_FORBIDDEN | ARGUMENT_OPTIONAL);
   }
@@ -84,11 +76,12 @@ public class MapHandler extends CommandHandler implements VimScriptCommandHandle
         return editor != null && VimPlugin.getKey().showKeyMappings(modes, editor);
       }
       else {
-        final Matcher matcher = RE_MAP_ARGUMENTS.matcher(argument);
-        if (matcher.matches()) {
-          VimPlugin.getKey().putKeyMapping(modes, parseKeys(matcher.group(1)), parseKeys(matcher.group(2)),
+        final CommandArguments arguments = parseCommandArguments(argument);
+        if (arguments != null) {
+          VimPlugin.getKey().putKeyMapping(modes, arguments.getFromKeys(), arguments.getToKeys(),
                                            commandInfo.isRecursive());
           return true;
+
         }
       }
     }
@@ -96,7 +89,35 @@ public class MapHandler extends CommandHandler implements VimScriptCommandHandle
   }
 
   @Nullable
-  private CommandInfo getCommandInfo(@NotNull String command) {
+  private static CommandArguments parseCommandArguments(@NotNull String input) {
+    final Set<SpecialArgument> specialArguments = new HashSet<SpecialArgument>();
+    final StringBuilder toKeysBuilder = new StringBuilder();
+    List<KeyStroke> fromKeys = null;
+    for (String part : input.split(" ")) {
+      if (fromKeys != null) {
+        toKeysBuilder.append(" ");
+        toKeysBuilder.append(part);
+      }
+      else {
+        final SpecialArgument specialArgument = SpecialArgument.fromString(part);
+        if (specialArgument != null) {
+          specialArguments.add(specialArgument);
+        }
+        else {
+          fromKeys = parseKeys(part);
+        }
+      }
+    }
+    if (fromKeys != null) {
+      final List<KeyStroke> toKeys = parseKeys(toKeysBuilder.toString().trim());
+      return new CommandArguments(specialArguments, fromKeys, toKeys);
+
+    }
+    return null;
+  }
+
+  @Nullable
+  private static CommandInfo getCommandInfo(@NotNull String command) {
     for (CommandInfo commandInfo : COMMAND_INFOS) {
       if (command.startsWith(commandInfo.getPrefix())) {
         return commandInfo;
@@ -112,6 +133,66 @@ public class MapHandler extends CommandHandler implements VimScriptCommandHandle
       commandNames.add(new CommandName(commandInfo.getPrefix(), commandInfo.getSuffix()));
     }
     return commandNames.toArray(new CommandName[commandNames.size()]);
+  }
+
+  private enum SpecialArgument {
+    BUFFER("<buffer>"),
+    NOWAIT("<nowait>"),
+    SILENT("<silent>"),
+    SPECIAL("<special>"),
+    SCRIPT("<script>"),
+    EXPR("<expr>"),
+    UNIQUE("<unique>");
+
+    @NotNull private final String myName;
+
+    SpecialArgument(@NotNull String name) {
+      myName = name;
+    }
+
+    @Nullable
+    public static SpecialArgument fromString(@NotNull String s) {
+      for (SpecialArgument argument : SpecialArgument.values()) {
+        if (s.equals(argument.myName)) {
+          return argument;
+        }
+      }
+      return null;
+    }
+
+    @NotNull
+    public String getName() {
+      return myName;
+    }
+  }
+
+  private static class CommandArguments {
+    @NotNull private final Set<SpecialArgument> mySpecialArguments;
+    @NotNull private final List<KeyStroke> myFromKeys;
+    @NotNull private final List<KeyStroke> myToKeys;
+
+    public CommandArguments(@NotNull Set<SpecialArgument> specialArguments, @NotNull List<KeyStroke> fromKeys,
+                            @NotNull List<KeyStroke> toKeys) {
+
+      mySpecialArguments = specialArguments;
+      myFromKeys = fromKeys;
+      myToKeys = toKeys;
+    }
+
+    @NotNull
+    public Set<SpecialArgument> getSpecialArguments() {
+      return mySpecialArguments;
+    }
+
+    @NotNull
+    public List<KeyStroke> getFromKeys() {
+      return myFromKeys;
+    }
+
+    @NotNull
+    public List<KeyStroke> getToKeys() {
+      return myToKeys;
+    }
   }
 
   private static class CommandInfo {
