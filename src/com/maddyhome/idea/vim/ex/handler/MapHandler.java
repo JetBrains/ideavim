@@ -52,22 +52,26 @@ public class MapHandler extends CommandHandler implements VimScriptCommandHandle
     new CommandInfo("cno", "remap", MappingMode.C, false),
   };
   public static final CommandName[] COMMAND_NAMES = createCommandNames();
+  public static final EnumSet<SpecialArgument> UNSUPPORTED_SPECIAL_ARGUMENTS = EnumSet.of(
+    SpecialArgument.EXPR,
+    SpecialArgument.SCRIPT);
 
   public MapHandler() {
     super(COMMAND_NAMES, RANGE_FORBIDDEN | ARGUMENT_OPTIONAL);
   }
 
   @Override
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context,
+                         @NotNull ExCommand cmd) throws ExException {
     return executeCommand(cmd, editor);
   }
 
   @Override
-  public void execute(@NotNull ExCommand cmd) {
+  public void execute(@NotNull ExCommand cmd) throws ExException {
     executeCommand(cmd, null);
   }
 
-  private boolean executeCommand(@NotNull ExCommand cmd, @Nullable Editor editor) {
+  private boolean executeCommand(@NotNull ExCommand cmd, @Nullable Editor editor) throws ExException {
     final CommandInfo commandInfo = getCommandInfo(cmd.getCommand());
     if (commandInfo != null) {
       final String argument = cmd.getArgument();
@@ -78,6 +82,11 @@ public class MapHandler extends CommandHandler implements VimScriptCommandHandle
       else {
         final CommandArguments arguments = parseCommandArguments(argument);
         if (arguments != null) {
+          for (SpecialArgument unsupportedArgument : UNSUPPORTED_SPECIAL_ARGUMENTS) {
+            if (arguments.getSpecialArguments().contains(unsupportedArgument)) {
+              throw new ExException("Unsupported map argument: " + unsupportedArgument);
+            }
+          }
           VimPlugin.getKey().putKeyMapping(modes, arguments.getFromKeys(), arguments.getToKeys(),
                                            commandInfo.isRecursive());
           return true;
@@ -162,6 +171,12 @@ public class MapHandler extends CommandHandler implements VimScriptCommandHandle
 
     @NotNull
     public String getName() {
+      return myName;
+    }
+
+    @NotNull
+    @Override
+    public String toString() {
       return myName;
     }
   }

@@ -131,8 +131,6 @@ public class MapCommandTest extends VimTestCase {
                    "n  ,b            /b<CR>\n" +
                    "n  ,c            /c<CR>\n" +
                    "n  ,d            /d<CR>\n" +
-                   "n  ,e            /e<CR>\n" +
-                   "n  ,f            /f<CR>\n" +
                    "n  ,g            /g<CR>\n");
   }
 }
