@@ -39,8 +39,8 @@ public class StringHelper {
   private static final String SHIFT_PREFIX = "s-";
 
   private static final Map<String, Integer> VIM_KEY_NAMES = ImmutableMap.<String, Integer>builder()
-    .put("enter", VK_ENTER)
     .put("cr", VK_ENTER)
+    .put("enter", VK_ENTER)
     .put("return", VK_ENTER)
     .put("ins", VK_INSERT)
     .put("insert", VK_INSERT)
@@ -247,7 +247,12 @@ public class StringHelper {
 
     String name = VIM_KEY_VALUES.get(keyCode);
     if (name != null) {
-      name = StringUtil.capitalize(name);
+      if (name.equals("cr")) {
+        name = name.toUpperCase();
+      }
+      else {
+        name = StringUtil.capitalize(name);
+      }
     }
     if (name == null) {
       try {
@@ -336,7 +341,10 @@ public class StringHelper {
   private static <K, V> Map<V, K> invertMap(@NotNull Map<K, V> map) {
     final Map<V, K> inverted = new HashMap<V, K>();
     for (Map.Entry<K, V> entry : map.entrySet()) {
-      inverted.put(entry.getValue(), entry.getKey());
+      final V value = entry.getValue();
+      if (!inverted.containsKey(value)) {
+        inverted.put(value, entry.getKey());
+      }
     }
     return inverted;
   }
