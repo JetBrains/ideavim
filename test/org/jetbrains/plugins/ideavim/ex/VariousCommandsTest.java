@@ -13,7 +13,7 @@ public class VariousCommandsTest extends VimTestCase {
     myFixture.configureByText("a.txt", "Test\n" +
                                        "Hello <caret>World!\n");
     typeText(parseKeys("\"ayw"));
-    runExCommand("put a");
+    typeText(commandToKeys("put a"));
     myFixture.checkResult("Test\n" +
                           "Hello World!\n" +
                           "<caret>World\n");
@@ -23,7 +23,7 @@ public class VariousCommandsTest extends VimTestCase {
   public void testPutDefault() {
     myFixture.configureByText("a.txt", "<caret>Hello World!\n");
     typeText(parseKeys("yw"));
-    runExCommand("put");
+    typeText(commandToKeys("put"));
     myFixture.checkResult("Hello World!\n" +
                           "<caret>Hello \n");
   }

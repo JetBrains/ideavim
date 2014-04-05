@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
  *
  */
 public class ExCommand {
-  public ExCommand(Ranges ranges, String command, String argument) {
+  public ExCommand(@NotNull Ranges ranges, @NotNull String command, @NotNull String argument) {
     this.ranges = ranges;
     this.argument = argument;
     this.command = command;
@@ -81,25 +81,28 @@ public class ExCommand {
     }
   }
 
+  @NotNull
   public String getCommand() {
     return command;
   }
 
+  @NotNull
   public String getArgument() {
     return argument;
   }
 
-  public void setArgument(String argument) {
+  public void setArgument(@NotNull String argument) {
     this.argument = argument;
   }
 
+  @NotNull
   public Ranges getRanges() {
     return ranges;
   }
 
-  protected Ranges ranges;
-  protected String command;
-  protected String argument;
+  @NotNull private Ranges ranges;
+  @NotNull private String command;
+  @NotNull private String argument;
 
   private static Logger logger = Logger.getInstance(ExCommand.class.getName());
 }

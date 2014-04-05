@@ -34,7 +34,7 @@ public class PromptReplaceHandler extends CommandHandler {
     super("promptr", "epl", 0);
   }
 
-  public boolean execute(Editor editor, @NotNull DataContext context, ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     KeyHandler.executeAction("Replace", context);
 
     return true;

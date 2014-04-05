@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2013 The IdeaVim authors
+ * Copyright (C) 2003-2014 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,30 +19,40 @@
 package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.ex.CommandHandler;
-import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.ex.ExException;
+import com.maddyhome.idea.vim.ex.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+
 /**
- *
+ * @author vlan
  */
-public class DigraphHandler extends CommandHandler {
-  public DigraphHandler() {
-    super("dig", "raphs", ARGUMENT_OPTIONAL);
+public class SourceHandler extends CommandHandler implements VimScriptCommandHandler {
+  public SourceHandler() {
+    super("so", "urce", RANGE_FORBIDDEN | ARGUMENT_REQUIRED);
   }
 
+  @Override
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
-    String arg = cmd.getArgument();
-    if (logger.isDebugEnabled()) {
-      logger.debug("arg=" + arg);
-    }
-
-    return VimPlugin.getDigraph().parseCommandLine(editor, cmd.getArgument(), true);
+    execute(cmd);
+    return true;
   }
 
-  private static Logger logger = Logger.getInstance(DigraphHandler.class.getName());
+  @Override
+  public void execute(@NotNull ExCommand cmd) throws ExException {
+    final String path = expandUser(cmd.getArgument().trim());
+    VimScriptParser.executeFile(new File(path));
+  }
+
+  @NotNull
+  private static String expandUser(@NotNull String path) {
+    if (path.startsWith("~")) {
+      final String home = System.getProperty("user.home");
+      if (home != null) {
+        path = home + path.substring(1);
+      }
+    }
+    return path;
+  }
 }

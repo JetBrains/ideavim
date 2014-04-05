@@ -37,7 +37,7 @@ public class YankLinesHandler extends CommandHandler {
     super("y", "ank", RANGE_OPTIONAL | ARGUMENT_OPTIONAL);
   }
 
-  public boolean execute(@NotNull Editor editor, DataContext context, @NotNull ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     StringBuffer arg = new StringBuffer(cmd.getArgument());
     char register = RegisterGroup.REGISTER_DEFAULT;
     if (arg.length() > 0 && (arg.charAt(0) < '0' || arg.charAt(0) > '9')) {

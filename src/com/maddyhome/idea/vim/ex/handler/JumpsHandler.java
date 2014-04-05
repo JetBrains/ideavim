@@ -23,14 +23,10 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Jump;
-import com.maddyhome.idea.vim.ex.CommandHandler;
-import com.maddyhome.idea.vim.ex.CommandName;
-import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.ex.ExException;
+import com.maddyhome.idea.vim.ex.*;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
-import com.maddyhome.idea.vim.ui.MorePanel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -42,10 +38,10 @@ public class JumpsHandler extends CommandHandler {
   public JumpsHandler() {
     super(new CommandName[]{
       new CommandName("ju", "mps")
-    }, ARGUMENT_FORBIDDEN | KEEP_FOCUS);
+    }, ARGUMENT_FORBIDDEN);
   }
 
-  public boolean execute(@NotNull Editor editor, DataContext context, ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     List<Jump> jumps = VimPlugin.getMark().getJumps();
     int spot = VimPlugin.getMark().getJumpSpot();
 
@@ -60,7 +56,7 @@ public class JumpsHandler extends CommandHandler {
       else {
         text.append("  ");
       }
-      text.append(StringHelper.pad(Integer.toString(Math.abs(i - spot - 1)), 3, ' '));
+      text.append(StringHelper.rightJustify(Integer.toString(Math.abs(i - spot - 1)), 3, ' '));
 
       text.append(" ");
       String num = Integer.toString(jump.getLogicalLine() + 1);
@@ -89,8 +85,7 @@ public class JumpsHandler extends CommandHandler {
       text.append(">\n");
     }
 
-    MorePanel panel = MorePanel.getInstance(editor);
-    panel.setText(text.toString());
+    ExOutputModel.getInstance(editor).output(text.toString());
 
     return true;
   }

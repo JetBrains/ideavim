@@ -41,7 +41,7 @@ public class CmdFilterHandler extends CommandHandler {
     super("!", "", RANGE_REQUIRED | ARGUMENT_OPTIONAL | WRITABLE);
   }
 
-  public boolean execute(@NotNull Editor editor, DataContext context, @NotNull ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     logger.info("execute");
 
     Ranges ranges = cmd.getRanges();

@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -35,7 +36,7 @@ public class WriteAllHandler extends CommandHandler {
     }, RANGE_OPTIONAL | ARGUMENT_OPTIONAL);
   }
 
-  public boolean execute(Editor editor, DataContext context, ExCommand cmd) {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
     VimPlugin.getFile().saveFiles(context);
 
     return true;

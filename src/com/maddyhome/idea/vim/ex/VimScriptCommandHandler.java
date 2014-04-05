@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2013 The IdeaVim authors
+ * Copyright (C) 2003-2014 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,28 +16,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.ex.handler;
+package com.maddyhome.idea.vim.ex;
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.ex.CommandHandler;
-import com.maddyhome.idea.vim.ex.ExCommand;
 import org.jetbrains.annotations.NotNull;
 
 /**
- *
+ * @author vlan
  */
-public class FileHandler extends CommandHandler {
-  public FileHandler() {
-    super("f", "ile", ARGUMENT_FORBIDDEN | RANGE_FORBIDDEN | RANGE_IS_COUNT);
-  }
-
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
-    int count = cmd.getCount(editor, context, 0, false);
-
-    VimPlugin.getFile().displayFileInfo(editor, count > 0);
-
-    return true;
-  }
+public interface VimScriptCommandHandler {
+  void execute(@NotNull ExCommand cmd) throws ExException;
 }

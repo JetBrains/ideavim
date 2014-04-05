@@ -38,7 +38,7 @@ public class QuitHandler extends CommandHandler {
     }, ARGUMENT_OPTIONAL | DONT_REOPEN);
   }
 
-  public boolean execute(Editor editor, @NotNull DataContext context, ExCommand cmd) {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
     VimPlugin.getFile().closeFile(editor, context);
 
     return true;

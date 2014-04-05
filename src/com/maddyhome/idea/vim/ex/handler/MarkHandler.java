@@ -41,7 +41,7 @@ public class MarkHandler extends CommandHandler {
     }, RANGE_OPTIONAL | ARGUMENT_REQUIRED);
   }
 
-  public boolean execute(@NotNull Editor editor, DataContext context, @NotNull ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     char mark = cmd.getArgument().charAt(0);
     int line = cmd.getLine(editor, context);
     int offset = EditorHelper.getLineStartOffset(editor, line);

@@ -22,8 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.colors.EditorColorsManager;
-import com.intellij.openapi.editor.colors.EditorColorsScheme;
+import com.maddyhome.idea.vim.helper.UiHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,14 +46,11 @@ public class ExEntryPanel extends JPanel {
 
   private ExEntryPanel() {
     setBorder(BorderFactory.createEtchedBorder());
-    EditorColorsScheme scheme = EditorColorsManager.getInstance().getGlobalScheme();
-
-    Font font = new Font(scheme.getEditorFontName(), Font.PLAIN, scheme.getEditorFontSize());
     label = new JLabel(" ");
-    label.setFont(font);
     entry = new ExTextField();
-    entry.setFont(font);
     entry.setBorder(null);
+
+    setFontForElements();
 
     setForeground(entry.getForeground());
     setBackground(entry.getBackground());
@@ -74,13 +70,19 @@ public class ExEntryPanel extends JPanel {
     gbc.fill = GridBagConstraints.HORIZONTAL;
     layout.setConstraints(entry, gbc);
     add(entry);
-    setBorder(BorderFactory.createLineBorder(Color.BLACK));
+    setBorder(BorderFactory.createEtchedBorder());
 
     adapter = new ComponentAdapter() {
       public void componentResized(ComponentEvent e) {
         positionPanel();
       }
     };
+  }
+
+  private void setFontForElements() {
+    final Font font = UiHelper.getEditorFont();
+    label.setFont(font);
+    entry.setFont(font);
   }
 
   /**
@@ -96,6 +98,7 @@ public class ExEntryPanel extends JPanel {
     entry.setEditor(editor, context);
     this.label.setText(label);
     this.count = count;
+    setFontForElements();
     entry.setDocument(entry.createDefaultModel());
     entry.setText(initText);
     entry.setType(label);

@@ -22,6 +22,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
+import org.jetbrains.annotations.NotNull;
 
 /**
  *
@@ -31,7 +32,7 @@ public class NoHLSearchHandler extends CommandHandler {
     super("noh", "lsearch", 0);
   }
 
-  public boolean execute(Editor editor, DataContext context, ExCommand cmd) {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
     VimPlugin.getSearch().clearSearchHighlight();
 
     return true;

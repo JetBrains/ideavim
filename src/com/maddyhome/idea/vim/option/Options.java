@@ -20,23 +20,20 @@ package com.maddyhome.idea.vim.option;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.ex.ExOutputModel;
+import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
-import com.maddyhome.idea.vim.ui.MorePanel;
+import com.maddyhome.idea.vim.ui.ExOutputPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.util.*;
 
 /**
  * Maintains the set of support options
  */
 public class Options {
-  public final String[] VIMRC_FILES = {".ideavimrc", "_ideavimrc", ".vimrc", "_vimrc"};
-
   /**
    * Gets the singleton instance of the options
    *
@@ -73,6 +70,15 @@ public class Options {
     }
 
     return res;
+  }
+
+  @Nullable
+  public NumberOption getNumberOption(@NotNull String name) {
+    final Option option = getOption(name);
+    if (option instanceof NumberOption) {
+      return (NumberOption)option;
+    }
+    return null;
   }
 
   /**
@@ -361,8 +367,8 @@ public class Options {
     Collections.sort(extra, new Option.NameSorter<Option>());
 
     String pad = "                    ";
-    MorePanel panel = MorePanel.getInstance(editor);
-    int width = panel.getDisplayWidth();
+    ExOutputPanel panel = ExOutputPanel.getInstance(editor);
+    int width = EditorHelper.getScreenWidth(editor);
     if (width < 20) {
       width = 80;
     }
@@ -409,7 +415,7 @@ public class Options {
       }
     }
 
-    panel.setText(res.toString());
+    ExOutputModel.getInstance(editor).output(res.toString());
   }
 
   /**
@@ -417,34 +423,6 @@ public class Options {
    */
   private Options() {
     createDefaultOptions();
-    loadVimrc();
-  }
-
-  /**
-   * Attempts to load all :set commands from the user's .vimrc file if found
-   */
-  private void loadVimrc() {
-    final String homeDirName = System.getProperty("user.home");
-    if (homeDirName != null) {
-      for (String fileName : VIMRC_FILES) {
-        final File file = new File(homeDirName, fileName);
-        if (file.exists()) {
-          try {
-            final BufferedReader reader = new BufferedReader(new FileReader(file));
-            String line;
-            while ((line = reader.readLine()) != null) {
-              if (line.startsWith(":set") || line.startsWith("set")) {
-                final int pos = line.indexOf(' ');
-                parseOptionLine(null, line.substring(pos).trim(), false);
-              }
-            }
-          }
-          catch (Exception ignored) {
-          }
-          break;
-        }
-      }
-    }
   }
 
   /**
@@ -467,6 +445,7 @@ public class Options {
     addOption(new NumberOption("sidescroll", "ss", 0));
     addOption(new NumberOption("sidescrolloff", "siso", 0));
     addOption(new ToggleOption("smartcase", "scs", false));
+    addOption(new NumberOption("timeoutlen", "tm", 1000, -1, Integer.MAX_VALUE));
     addOption(new NumberOption("undolevels", "ul", 1000, -1, Integer.MAX_VALUE));
     addOption(new ToggleOption("visualbell", "vb", false));
     addOption(new ToggleOption("wrapscan", "ws", true));
@@ -484,4 +463,3 @@ public class Options {
 
   private static Logger logger = Logger.getInstance(Options.class.getName());
 }
-

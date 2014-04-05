@@ -1,18 +1,22 @@
 package com.maddyhome.idea.vim.group;
 
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.KeyboardShortcut;
+import com.google.common.collect.ImmutableList;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.key.*;
+import com.maddyhome.idea.vim.key.Shortcut;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,6 +24,9 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.util.*;
+
+import static com.maddyhome.idea.vim.helper.StringHelper.leftJustify;
+import static com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation;
 
 /**
  * @author vlan
@@ -33,6 +40,55 @@ public class KeyGroup {
   @NotNull private Map<KeyStroke, ShortcutOwner> shortcutConflicts = new LinkedHashMap<KeyStroke, ShortcutOwner>();
   @NotNull private Set<KeyStroke> requiredShortcutKeys = new HashSet<KeyStroke>();
   @NotNull private HashMap<MappingMode, RootNode> keyRoots = new HashMap<MappingMode, RootNode>();
+  @NotNull private Map<MappingMode, KeyMapping> keyMappings = new HashMap<MappingMode, KeyMapping>();
+
+  public void registerRequiredShortcutKeys(@NotNull Editor editor) {
+    final Set<KeyStroke> requiredKeys = VimPlugin.getKey().getRequiredShortcutKeys();
+    final JComponent component = editor.getComponent();
+    final AnAction action = getShortcutKeyAction();
+    action.registerCustomShortcutSet(toShortcutSet(requiredKeys), component);
+  }
+
+  public void unregisterShortcutKeys(@NotNull Editor editor) {
+    getShortcutKeyAction().unregisterCustomShortcutSet(editor.getComponent());
+  }
+
+  public boolean showKeyMappings(@NotNull Set<MappingMode> modes, @NotNull Editor editor) {
+    final List<MappingInfo> rows = getKeyMappingRows(modes);
+    final StringBuilder builder = new StringBuilder();
+    for (MappingInfo row : rows) {
+      builder.append(leftJustify(getModesStringCode(row.getMappingModes()), 2, ' '));
+      builder.append(" ");
+      builder.append(leftJustify(toKeyNotation(row.getFromKeys()), 11, ' '));
+      builder.append(" ");
+      builder.append(row.isRecursive() ? " " : "*");
+      builder.append(" ");
+      builder.append(toKeyNotation(row.getToKeys()));
+      builder.append("\n");
+    }
+    ExOutputModel.getInstance(editor).output(builder.toString());
+    return true;
+  }
+
+  public void putKeyMapping(@NotNull Set<MappingMode> modes, @NotNull List<KeyStroke> fromKeys,
+                            @NotNull List<KeyStroke> toKeys, boolean recursive) {
+    for (MappingMode mode : modes) {
+      final KeyMapping mapping = getKeyMapping(mode);
+      mapping.put(EnumSet.of(mode), fromKeys, toKeys, recursive);
+    }
+    final int oldSize = requiredShortcutKeys.size();
+    for (KeyStroke key : fromKeys) {
+      if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
+        requiredShortcutKeys.add(key);
+      }
+    }
+    if (requiredShortcutKeys.size() != oldSize) {
+      for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
+        unregisterShortcutKeys(editor);
+        registerRequiredShortcutKeys(editor);
+      }
+    }
+  }
 
   public void saveData(@NotNull Element element) {
     final Element conflictsElement = new Element(SHORTCUT_CONFLICTS_ELEMENT);
@@ -117,6 +173,20 @@ public class KeyGroup {
   @NotNull
   public Set<KeyStroke> getRequiredShortcutKeys() {
     return requiredShortcutKeys;
+  }
+
+  @NotNull
+  public KeyMapping getKeyMapping(@NotNull MappingMode mode) {
+    KeyMapping mapping = keyMappings.get(mode);
+    if (mapping == null) {
+      mapping = new KeyMapping();
+      keyMappings.put(mode, mapping);
+    }
+    return mapping;
+  }
+
+  public void resetKeyMappings() {
+    keyMappings.clear();
   }
 
   /**
@@ -279,5 +349,69 @@ public class KeyGroup {
     }
 
     return node;
+  }
+
+  @NotNull
+  private static AnAction getShortcutKeyAction() {
+    return ActionManagerEx.getInstanceEx().getAction("VimShortcutKeyAction");
+  }
+
+  @NotNull
+  private static ShortcutSet toShortcutSet(@NotNull Collection<KeyStroke> keyStrokes) {
+    final List<com.intellij.openapi.actionSystem.Shortcut> shortcuts = new ArrayList<com.intellij.openapi.actionSystem.Shortcut>();
+    for (KeyStroke key : keyStrokes) {
+      shortcuts.add(new KeyboardShortcut(key, null));
+    }
+    return new CustomShortcutSet(shortcuts.toArray(new com.intellij.openapi.actionSystem.Shortcut[shortcuts.size()]));
+  }
+
+  private static List<MappingInfo> getKeyMappingRows(@NotNull Set<MappingMode> modes) {
+    final Map<ImmutableList<KeyStroke>, Set<MappingMode>> actualModes = new HashMap<ImmutableList<KeyStroke>, Set<MappingMode>>();
+    for (MappingMode mode : modes) {
+      final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mode);
+      for (List<KeyStroke> fromKeys : mapping) {
+        final ImmutableList<KeyStroke> key = ImmutableList.copyOf(fromKeys);
+        final Set<MappingMode> value = actualModes.get(key);
+        final Set<MappingMode> newValue;
+        if (value != null) {
+          newValue = new HashSet<MappingMode>(value);
+          newValue.add(mode);
+        }
+        else {
+          newValue = EnumSet.of(mode);
+        }
+        actualModes.put(key, newValue);
+      }
+    }
+    final List<MappingInfo> rows = new ArrayList<MappingInfo>();
+    for (Map.Entry<ImmutableList<KeyStroke>, Set<MappingMode>> entry : actualModes.entrySet()) {
+      final ArrayList<KeyStroke> fromKeys = new ArrayList<KeyStroke>(entry.getKey());
+      final Set<MappingMode> mappingModes = entry.getValue();
+      if (!mappingModes.isEmpty()) {
+        final MappingMode mode = mappingModes.iterator().next();
+        final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mode);
+        final MappingInfo mappingInfo = mapping.get(fromKeys);
+        if (mappingInfo != null) {
+          rows.add(new MappingInfo(mappingModes, mappingInfo.getFromKeys(), mappingInfo.getToKeys(),
+                                   mappingInfo.isRecursive()));
+        }
+      }
+    }
+    Collections.sort(rows);
+    return rows;
+  }
+
+  private static String getModesStringCode(@NotNull Set<MappingMode> modes) {
+    if (modes.equals(MappingMode.NVO)) {
+      return "";
+    }
+    else if (modes.contains(MappingMode.INSERT)) {
+      return "i";
+    }
+    else if (modes.contains(MappingMode.NORMAL)) {
+      return "n";
+    }
+    // TODO: Add more codes
+    return "";
   }
 }

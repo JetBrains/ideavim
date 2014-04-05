@@ -34,7 +34,7 @@ public class DumpLineHandler extends CommandHandler {
     }, RANGE_OPTIONAL);
   }
 
-  public boolean execute(@NotNull Editor editor, DataContext context, @NotNull ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     LineRange range = cmd.getLineRange(editor, context, false);
 
     CharSequence chars = editor.getDocument().getCharsSequence();

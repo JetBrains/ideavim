@@ -23,14 +23,10 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Mark;
-import com.maddyhome.idea.vim.ex.CommandHandler;
-import com.maddyhome.idea.vim.ex.CommandName;
-import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.ex.ExException;
+import com.maddyhome.idea.vim.ex.*;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
-import com.maddyhome.idea.vim.ui.MorePanel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -42,10 +38,10 @@ public class MarksHandler extends CommandHandler {
   public MarksHandler() {
     super(new CommandName[]{
       new CommandName("marks", "")
-    }, ARGUMENT_OPTIONAL | KEEP_FOCUS);
+    }, ARGUMENT_OPTIONAL);
   }
 
-  public boolean execute(@NotNull Editor editor, DataContext context, ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     List<Mark> marks = VimPlugin.getMark().getMarks(editor);
 
     String spaces = "     ";
@@ -77,9 +73,7 @@ public class MarksHandler extends CommandHandler {
       text.append("\n");
     }
 
-    MorePanel panel = MorePanel.getInstance(editor);
-    panel.setText(text.toString());
-    //panel.setVisible(true);
+    ExOutputModel.getInstance(editor).output(text.toString());
 
     return true;
   }

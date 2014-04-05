@@ -25,8 +25,8 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
+import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.group.HistoryGroup;
-import com.maddyhome.idea.vim.ui.MorePanel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -36,10 +36,10 @@ import java.util.List;
  */
 public class HistoryHandler extends CommandHandler {
   public HistoryHandler() {
-    super("his", "tory", RANGE_FORBIDDEN | ARGUMENT_OPTIONAL | KEEP_FOCUS);
+    super("his", "tory", RANGE_FORBIDDEN | ARGUMENT_OPTIONAL);
   }
 
-  public boolean execute(@NotNull Editor editor, final DataContext context, @NotNull ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull final DataContext context, @NotNull ExCommand cmd) throws ExException {
     logger.debug("execute");
 
     String arg = cmd.getArgument().trim();
@@ -148,8 +148,7 @@ public class HistoryHandler extends CommandHandler {
         break;
     }
 
-    MorePanel panel = MorePanel.getInstance(editor);
-    panel.setText(res.toString());
+    ExOutputModel.getInstance(editor).output(res.toString());
 
     return true;
   }

@@ -35,7 +35,7 @@ public class JoinLinesHandler extends CommandHandler {
     super("j", "oin", RANGE_OPTIONAL | ARGUMENT_OPTIONAL | WRITABLE);
   }
 
-  public boolean execute(@NotNull Editor editor, DataContext context, @NotNull ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     StringBuffer arg = new StringBuffer(cmd.getArgument());
     boolean spaces = true;
     if (arg.length() > 0 && arg.charAt(0) == '!') {

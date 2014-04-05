@@ -59,10 +59,7 @@ public abstract class CommandHandler {
    * Indicates that the command takes a count, not a range - effects default
    */
   public static final int RANGE_IS_COUNT = 64;
-  /**
-   * Indicates that the editor should not get focus back after the command
-   */
-  public static final int KEEP_FOCUS = 128;
+
   public static final int DONT_REOPEN = 256;
 
   /**
@@ -211,8 +208,8 @@ public abstract class CommandHandler {
    * @param count   The count entered by the user prior to the command
    * @throws ExException if the range or argument is invalid or unable to run the command
    */
-  public boolean process(final Editor editor, final DataContext context, @NotNull final ExCommand cmd, final int count) throws
-                                                                                                               ExException {
+  public boolean process(@NotNull Editor editor, @NotNull DataContext context,
+                         @NotNull ExCommand cmd, int count) throws ExException {
     // No range allowed
     if ((argFlags & RANGE_FORBIDDEN) != 0 && cmd.getRanges().size() != 0) {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_norange));
@@ -236,37 +233,21 @@ public abstract class CommandHandler {
 
     CommandState.getInstance(editor).setFlags(optFlags);
 
-    boolean res = true;
-    if ((argFlags & WRITABLE) != 0) {
-      try {
-        for (int i = 0; i < count && res; i++) {
-          res = execute(editor, context, cmd);
-        }
+    try {
+      boolean res = true;
+      for (int i = 0; i < count && res; i++) {
+        res = execute(editor, context, cmd);
       }
-      catch (ExException e) {
-        res = false;
-      }
-      finally {
-        if (!res) {
-          VimPlugin.indicateError();
-        }
-      }
-    }
-    else {
-      try {
-        for (int i = 0; i < count; i++) {
-          res = execute(editor, context, cmd);
-        }
-        if (!res) {
-          VimPlugin.indicateError();
-        }
-      }
-      catch (ExException e) {
+      if (!res) {
         VimPlugin.indicateError();
       }
+      return res;
     }
-
-    return res;
+    catch (ExException e) {
+      VimPlugin.showMessage(e.getMessage());
+      VimPlugin.indicateError();
+      return false;
+    }
   }
 
   /**
@@ -278,7 +259,7 @@ public abstract class CommandHandler {
    * @return True if able to perform the command, false if not
    * @throws ExException if the range or arguments are invalid for the command
    */
-  public abstract boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException;
+  public abstract boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException;
 
   @Nullable protected CommandName[] names;
   protected int argFlags;

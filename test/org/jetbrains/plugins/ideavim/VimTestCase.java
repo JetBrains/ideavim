@@ -2,6 +2,7 @@ package org.jetbrains.plugins.ideavim;
 
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.testFramework.LightProjectDescriptor;
 import com.intellij.testFramework.PlatformTestCase;
@@ -14,15 +15,16 @@ import com.intellij.testFramework.fixtures.impl.LightTempDirTestFixtureImpl;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.ex.CommandParser;
-import com.maddyhome.idea.vim.ex.ExException;
+import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -52,6 +54,7 @@ public abstract class VimTestCase extends UsefulTestCase {
     myFixture.setTestDataPath(getTestDataPath());
     KeyHandler.getInstance().fullReset(myFixture.getEditor());
     Options.getInstance().resetAllOptions();
+    VimPlugin.getKey().resetKeyMappings();
   }
 
   protected String getTestDataPath() {
@@ -68,8 +71,14 @@ public abstract class VimTestCase extends UsefulTestCase {
 
   @NotNull
   protected Editor typeTextInFile(@NotNull final List<KeyStroke> keys, @NotNull String fileContents) {
-    myFixture.configureByText("a.txt", fileContents);
+    configureByText(fileContents);
     return typeText(keys);
+  }
+
+  @NotNull
+  protected Editor configureByText(@NotNull String content) {
+    myFixture.configureByText(PlainTextFileType.INSTANCE, content);
+    return myFixture.getEditor();
   }
 
   @NotNull
@@ -96,23 +105,12 @@ public abstract class VimTestCase extends UsefulTestCase {
   }
 
   @NotNull
-  protected Editor runExCommand(@NotNull final String command) {
-    final Editor editor = myFixture.getEditor();
-    final EditorDataContext dataContext = new EditorDataContext(editor);
-    final Project project = myFixture.getProject();
-    final CommandParser commandParser = CommandParser.getInstance();
-    RunnableHelper.runWriteCommand(project, new Runnable() {
-      @Override
-      public void run() {
-        try {
-          commandParser.processCommand(editor, dataContext, command, 1);
-        }
-        catch (ExException e) {
-          throw new RuntimeException(e);
-        }
-      }
-    }, null, null);
-    return editor;
+  protected static List<KeyStroke> commandToKeys(@NotNull String command) {
+    List<KeyStroke> keys = new ArrayList<KeyStroke>();
+    keys.addAll(StringHelper.parseKeys(":"));
+    keys.addAll(StringHelper.stringToKeys(command));
+    keys.addAll(StringHelper.parseKeys("<Enter>"));
+    return keys;
   }
 
   public void assertOffset(int expectedOffset) {
@@ -128,6 +126,12 @@ public abstract class VimTestCase extends UsefulTestCase {
   public void assertSelection(@NotNull String expected) {
     final String selected = myFixture.getEditor().getSelectionModel().getSelectedText();
     assertEquals(expected, selected);
+  }
+
+  public void assertExOutput(@NotNull String expected) {
+    final String actual = ExOutputModel.getInstance(myFixture.getEditor()).getText();
+    assertNotNull("No Ex output", actual);
+    assertEquals(expected, actual);
   }
 
   public void assertPluginError(boolean isError) {

@@ -36,7 +36,7 @@ public class SubstituteHandler extends CommandHandler {
     }, RANGE_OPTIONAL | ARGUMENT_OPTIONAL | WRITABLE);
   }
 
-  public boolean execute(@NotNull Editor editor, DataContext context, @NotNull ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     LineRange range = cmd.getLineRange(editor, context, false);
     return VimPlugin.getSearch().searchAndReplace(editor, context, range, cmd.getCommand(),
                                                                     cmd.getArgument());

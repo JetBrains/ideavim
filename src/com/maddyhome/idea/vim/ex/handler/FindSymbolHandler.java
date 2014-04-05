@@ -36,7 +36,7 @@ public class FindSymbolHandler extends CommandHandler {
     super("sym", "bol", RANGE_FORBIDDEN | ARGUMENT_OPTIONAL | DONT_REOPEN);
   }
 
-  public boolean execute(Editor editor, @NotNull final DataContext context, @NotNull ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull final DataContext context, @NotNull ExCommand cmd) throws ExException {
     String arg = cmd.getArgument();
     if (arg != null && arg.length() > 0) {
       // TODO - jump to specific symbol

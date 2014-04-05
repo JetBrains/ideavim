@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.editor.Editor;
@@ -33,16 +34,15 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.group.RegisterGroup;
-import com.maddyhome.idea.vim.helper.DelegateCommandListener;
-import com.maddyhome.idea.vim.helper.DigraphSequence;
-import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.helper.RunnableHelper;
+import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,11 +100,21 @@ public class KeyHandler {
    * @param context The data context
    */
   public void handleKey(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context) {
+    handleKey(editor, key, context, true);
+  }
+
+  public void handleKey(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context,
+                        boolean allowKeyMappings) {
     VimPlugin.clearError();
     // All the editor actions should be performed with top level editor!!!
     // Be careful: all the EditorActionHandler implementation should correctly process InjectedEditors
     editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     final CommandState editorState = CommandState.getInstance(editor);
+
+    if (allowKeyMappings && handleKeyMapping(editor, key, context)) {
+      return;
+    }
+
     final boolean isRecording = editorState.isRecording();
     boolean shouldRecord = true;
     // If this is a "regular" character keystroke, get the character
@@ -203,6 +213,60 @@ public class KeyHandler {
     }
     else if (isRecording && shouldRecord) {
       VimPlugin.getRegister().recordKeyStroke(key);
+    }
+  }
+
+  private boolean handleKeyMapping(@NotNull final Editor editor, @NotNull KeyStroke key,
+                                   @NotNull final DataContext context) {
+    final CommandState commandState = CommandState.getInstance(editor);
+    commandState.stopMappingTimer();
+
+    final List<KeyStroke> mappingKeys = commandState.getMappingKeys();
+    final List<KeyStroke> fromKeys = new ArrayList<KeyStroke>(mappingKeys);
+    fromKeys.add(key);
+
+    final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(commandState.getMappingMode());
+    final MappingInfo mappingInfo = mapping.get(fromKeys);
+
+    if (mapping.isPrefix(fromKeys)) {
+      mappingKeys.add(key);
+      commandState.startMappingTimer(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent actionEvent) {
+          mappingKeys.clear();
+          for (KeyStroke keyStroke : fromKeys) {
+            handleKey(editor, keyStroke, new EditorDataContext(editor), false);
+          }
+        }
+      });
+      return true;
+    }
+    else if (mappingInfo != null) {
+      mappingKeys.clear();
+      final Application application = ApplicationManager.getApplication();
+      final Runnable handleMappedKeys = new Runnable() {
+        @Override
+        public void run() {
+          for (KeyStroke keyStroke : mappingInfo.getToKeys()) {
+            handleKey(editor, keyStroke, new EditorDataContext(editor), mappingInfo.isRecursive());
+          }
+        }
+      };
+      if (application.isUnitTestMode()) {
+        handleMappedKeys.run();
+      }
+      else {
+        application.invokeLater(handleMappedKeys);
+      }
+      return true;
+    }
+    else {
+      final List<KeyStroke> unhandledKeys = new ArrayList<KeyStroke>(mappingKeys);
+      mappingKeys.clear();
+      for (KeyStroke keyStroke : unhandledKeys) {
+        handleKey(editor, keyStroke, context, false);
+      }
+      return false;
     }
   }
 
@@ -513,6 +577,8 @@ public class KeyHandler {
     count = 0;
     keys = new ArrayList<KeyStroke>();
     CommandState editorState = CommandState.getInstance(editor);
+    editorState.stopMappingTimer();
+    editorState.getMappingKeys().clear();
     editorState.setCurrentNode(VimPlugin.getKey().getKeyRoot(editorState.getMappingMode()));
   }
 

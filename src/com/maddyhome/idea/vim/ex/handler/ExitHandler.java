@@ -40,7 +40,7 @@ public class ExitHandler extends CommandHandler {
     }, DONT_REOPEN);
   }
 
-  public boolean execute(Editor editor, @NotNull DataContext context, ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     VimPlugin.getFile().closeAllFiles(context);
 
     return true;
