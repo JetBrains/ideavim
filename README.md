@@ -67,8 +67,11 @@ Not supported (yet):
 * Jump lists
 * Various less used commands
 
-Please see the file [index.txt](https://github.com/JetBrains/ideavim/blob/master/index.txt)
-for a list of commands covered with tests.
+See also:
+
+* [List of recently added commands](https://github.com/JetBrains/ideavim/blob/master/src/com/maddyhome/idea/vim/package-info.java)
+* [List of commands covered with tests](https://github.com/JetBrains/ideavim/blob/master/index.txt) for a list of commands covered with tests
+* Top [#Unresolved sort by: votes](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+sort+by%3A+votes) issues
 
 
 Changes to the IDE
@@ -80,6 +83,8 @@ The IdeaVim plugin uses the undo/redo functionality of the IntelliJ platform,
 so the behaviour of the `u` and `<C-R>` commands may differ from the original
 Vim. Vim compatibility of undo/redo may be improved in the future releases.
 
+See also [#Unresolved Help topic: u](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+u) issues.
+
 ### Escape
 
 Using `<Esc>` in dialog windows remains problematic. For most dialog windows
@@ -87,54 +92,7 @@ the Vim emulator is put into the insert mode without the possibility to switch t
 the normal mode. In some dialog windows the normal mode is on by default. The
 usage of the Vim emulator in dialog windows is an area for improvements.
 
-### Menu Changes
-
-In order to emulate the keystrokes used by Vim, several of the default hotkeys
-used by the IDE had to be changed. Below is a list of IDE menus, their default
-keyboard shortcuts, and their new VIM keystrokes.
-
-    File
-         Save All                 Ctrl-S              :w
-
-    Edit
-         Undo                     Ctrl-Z              u
-         Redo                     Ctrl-Shift-Z        Ctrl-R
-         Cut                      Ctrl-X              "+x
-         Copy                     Ctrl-C              "+y
-         Paste                    Ctrl-V              "+P
-         Select All               Ctrl-A              ggVG
-
-    Search
-         Find                     Ctrl-F              /
-         Replace                  Ctrl-R              :s
-         Find Next                F3                  n
-         Find Previous            Shift-F3            N
-
-    View
-         Quick JavaDoc            Ctrl-Q              K
-         Parameter Info           Ctrl-P              Ctrl-Shift-P
-         Swap Panels              Ctrl-U              <None>
-         Recent Files...          Ctrl-E              <None>
-         Type Hierarchy           Ctrl-H              Ctrl-Alt-Shift-H
-
-    Goto
-         Class...                 Ctrl-N              Alt-Shift-N
-         Line...                  Ctrl-G              G
-         Declaration              Ctrl-B              gd
-         Super Method             Ctrl-U              Ctrl-Shift-U
-
-    Code
-         Override Methods...      Ctrl-O              Ctrl-Shift-O
-         Implement Methods...     Ctrl-I              Ctrl-Shift-I
-         Complete Code                                (Only in Insert mode)
-              Basic               Ctrl-Space          Ctrl-Space or Ctrl-N or Ctrl-P
-              Smart Type          Ctrl-Shift-Space    Ctrl-Shift-Space
-              Class Name          Ctrl-Alt-Space      Ctrl-Alt-Space
-         Insert Live Template     Ctrl-J              Ctrl-]
-
-    Tools
-         Version Control
-              Check In Project    Ctrl-K              <None>
+See also [#Unresolved Help topic: i_Esc](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+i_Esc) issues.
 
 
 Contributing
