@@ -1,13 +1,19 @@
 IdeaVim
 =======
 
-<a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=bt299&guest=1">
-  <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:bt299)/statusIcon"/>
-</a> Build status
+<div>
+  <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=bt299&guest=1">
+    <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:bt299)/statusIcon"/>
+  </a>
+  <span>Build<span>
+</div>
 
-<a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=bt453&guest=1">
-  <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:bt453)/statusIcon"/>
-</a> Tests
+<div>
+  <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=bt453&guest=1">
+    <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:bt453)/statusIcon"/>
+  </a>
+  <span>Tests</span>
+</div>
 
 IdeaVim is a Vim emulation plug-in for IDEs based on the IntelliJ platform.
 IdeaVim can be used with IntelliJ IDEA, RubyMine, PyCharm, PhpStorm, WebStorm,
