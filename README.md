@@ -41,6 +41,7 @@ Supported:
 * Some Ex commands
 * Some [:set options](https://github.com/JetBrains/ideavim/blob/master/doc/set-commands.md)
 * Full Vim regexps for search and search/replace
+* Key mappings
 * Macros
 * Digraphs
 * Command line and search history
@@ -48,7 +49,6 @@ Supported:
 
 Not supported (yet):
 
-* Key mappings
 * Window commands
 * Jump lists
 * Various less used commands

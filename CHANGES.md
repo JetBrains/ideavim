@@ -12,7 +12,13 @@ emulation.
 
 Features:
 
+* VIM-288 Support for `:map` key mapping commands
 * VIM-543 Allow granular enable/disable of Vim shortcut keys
+* VIM-643 Support for `:source` command
+
+Bug fixes:
+
+* VIM-281 Don't disable global reformat code action for Vim emulation
 
 
 0.32, 2013-11-15
