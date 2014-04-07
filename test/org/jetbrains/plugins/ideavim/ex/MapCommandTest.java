@@ -133,4 +133,14 @@ public class MapCommandTest extends VimTestCase {
                    "n  ,d            /d<CR>\n" +
                    "n  ,g            /g<CR>\n");
   }
+
+  // VIM-645 |:nmap|
+  public void testMapSpace() {
+    configureByText("foo\n");
+    typeText(commandToKeys("nmap <space> dw"));
+    typeText(parseKeys(" "));
+    myFixture.checkResult("\n");
+    typeText(parseKeys("i", " ", "<Esc>"));
+    myFixture.checkResult(" \n");
+  }
 }

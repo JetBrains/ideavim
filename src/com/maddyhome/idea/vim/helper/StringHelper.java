@@ -52,7 +52,6 @@ public class StringHelper {
     .put("down", VK_DOWN)
     .put("left", VK_LEFT)
     .put("right", VK_RIGHT)
-    .put("space", VK_SPACE)
     .put("f1", VK_F1)
     .put("f2", VK_F2)
     .put("f3", VK_F3)
@@ -227,7 +226,10 @@ public class StringHelper {
     final int keyCode = key.getKeyCode();
     final int modifiers = key.getModifiers();
 
-    if (c != CHAR_UNDEFINED) {
+    if (c == ' ') {
+      return "<Space>";
+    }
+    else if (c != CHAR_UNDEFINED) {
       return String.valueOf(c);
     }
 
@@ -359,6 +361,9 @@ public class StringHelper {
     }
     else if (lower.equals("leader")) {
       return getKeyStroke('\\');
+    }
+    else if (lower.equals("space")) {
+      return getKeyStroke(' ');
     }
     else if (lower.startsWith(META_PREFIX)) {
       return parseSpecialKey(s.substring(META_PREFIX.length()), modifiers | META_MASK);

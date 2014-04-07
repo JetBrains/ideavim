@@ -38,10 +38,14 @@ public class StringHelperTest extends TestCase {
     assertTypedKeyStroke('\\', "<Leader>");
 
     assertPressedKeyStroke("ESCAPE", "<Esc>");
-    assertPressedKeyStroke("SPACE", "<Space>");
     assertPressedKeyStroke("ENTER", "<Enter>");
     assertPressedKeyStroke("ENTER", "<Return>");
     assertPressedKeyStroke("ENTER", "<CR>");
+  }
+
+  // VIM-645
+  public void testParseSpaceAsTyped() {
+    assertTypedKeyStroke(' ', "<Space>");
   }
 
   private void assertPressedKeyStroke(@NotNull String expected, @NotNull String actual) {
