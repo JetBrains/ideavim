@@ -70,8 +70,8 @@ Not supported (yet):
 See also:
 
 * [List of recently added commands](https://github.com/JetBrains/ideavim/blob/master/src/com/maddyhome/idea/vim/package-info.java)
-* [List of commands covered with tests](https://github.com/JetBrains/ideavim/blob/master/index.txt) for a list of commands covered with tests
-* Top [#Unresolved sort by: votes](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+sort+by%3A+votes) issues
+* [List of commands covered with tests](https://github.com/JetBrains/ideavim/blob/master/index.txt)
+* [Top features and bugs](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+sort+by%3A+votes)
 
 
 Changes to the IDE
@@ -83,7 +83,7 @@ The IdeaVim plugin uses the undo/redo functionality of the IntelliJ platform,
 so the behaviour of the `u` and `<C-R>` commands may differ from the original
 Vim. Vim compatibility of undo/redo may be improved in the future releases.
 
-See also [#Unresolved Help topic: u](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+u) issues.
+See also [unresolved undo issues](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+u).
 
 ### Escape
 
@@ -92,7 +92,7 @@ the Vim emulator is put into the insert mode without the possibility to switch t
 the normal mode. In some dialog windows the normal mode is on by default. The
 usage of the Vim emulator in dialog windows is an area for improvements.
 
-See also [#Unresolved Help topic: i_Esc](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+i_Esc) issues.
+See also [unresolved escape issues](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+i_Esc).
 
 
 Contributing
