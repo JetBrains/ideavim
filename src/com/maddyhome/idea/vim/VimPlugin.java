@@ -424,12 +424,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     }
   }
 
-  private void notify(@NotNull String content, @NotNull NotificationType type) {
-    final Notification notification = new Notification(VimPlugin.IDEAVIM_NOTIFICATION_ID,
-                                                       VimPlugin.IDEAVIM_NOTIFICATION_TITLE, content, type);
-    notification.notify(null);
-  }
-
   /**
    * This sets up some listeners so we can handle various events that occur
    */
