@@ -231,17 +231,6 @@ public class ChangeGroup {
   }
 
   /**
-   * Exits insert mode and brings up the help system
-   *
-   * @param editor  The editor to exit insert mode in
-   * @param context The data context
-   */
-  public void insertHelp(@NotNull Editor editor, @NotNull DataContext context) {
-    processEscape(editor, context);
-    KeyHandler.executeAction("HelpTopics", context);
-  }
-
-  /**
    * Inserts the contents of the specified register
    *
    * @param editor  The editor to insert the text into

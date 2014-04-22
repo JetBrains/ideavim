@@ -231,7 +231,6 @@
     <action id="VimInsertDeletePreviousWord" class="com.maddyhome.idea.vim.action.change.insert.InsertDeletePreviousWordAction" text="Delete Previous Word"/>
     <action id="VimInsertEnter" class="com.maddyhome.idea.vim.action.change.insert.InsertEnterAction" text="Enter"/>
     <action id="VimInsertExitMode" class="com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction" text="Exit Insert Mode"/>
-    <action id="VimInsertHelp" class="com.maddyhome.idea.vim.action.change.insert.InsertHelpAction" text="Help"/>
     <action id="VimInsertLineStart" class="com.maddyhome.idea.vim.action.change.insert.InsertLineStartAction" text="Insert at Line Start"/>
     <action id="VimInsertNewLineAbove" class="com.maddyhome.idea.vim.action.change.insert.InsertNewLineAboveAction" text="Insert New Line Above"/>
     <action id="VimInsertNewLineBelow" class="com.maddyhome.idea.vim.action.change.insert.InsertNewLineBelowAction" text="Insert New Line Below"/>
