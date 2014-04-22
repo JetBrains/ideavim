@@ -39,6 +39,7 @@ import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
+import com.intellij.openapi.keymap.impl.DefaultKeymap;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
@@ -388,37 +389,33 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
       }
       if (previousStateVersion < 3) {
         final KeymapManagerEx manager = KeymapManagerEx.getInstanceEx();
-        if (previousKeyMap != null && !"".equals(previousKeyMap)) {
-          new Notification(
-            VimPlugin.IDEAVIM_STICKY_NOTIFICATION_ID,
-            VimPlugin.IDEAVIM_NOTIFICATION_TITLE,
-            String.format("IdeaVim plugin doesn't use the special \"Vim\" keymap any longer. " +
-                          "Switching back to \"%s\" keymap.<br/><br/>" +
-                          "You can set up Vim or IDE handlers for conflicting shortcuts in " +
-                          "<a href='#settings'>Vim Emulation</a> settings.", previousKeyMap),
-            NotificationType.INFORMATION,
-            new NotificationListener.Adapter() {
-              @Override
-              protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent e) {
-                ShowSettingsUtil.getInstance().editConfigurable((Project)null, new VimEmulationConfigurable());
-              }
-            }).notify(null);
-          final Keymap keymap = manager.getKeymap(previousKeyMap);
-          if (keymap != null) {
-            manager.setActiveKeymap(keymap);
-          }
-          else {
-            notify(String.format("Cannot find \"%s\" keymap, please set up a keymap manually.", previousKeyMap),
-                   NotificationType.ERROR);
-            return;
-          }
+        Keymap keymap = null;
+        if (previousKeyMap != null) {
+          keymap = manager.getKeymap(previousKeyMap);
         }
-        final Keymap activeKeymap = manager.getActiveKeymap();
-        if (activeKeymap != null && "Vim".equals(activeKeymap.getName())) {
-          notify("Cannot disable the obsolete \"Vim\" keymap, please set up a new keymap manually.",
-                 NotificationType.ERROR);
-          return;
+        if (keymap == null) {
+          keymap = manager.getKeymap(DefaultKeymap.getInstance().getDefaultKeymapName());
         }
+        assert keymap != null : "Default keymap not found";
+        new Notification(
+          VimPlugin.IDEAVIM_STICKY_NOTIFICATION_ID,
+          VimPlugin.IDEAVIM_NOTIFICATION_TITLE,
+          String.format("IdeaVim plugin doesn't use the special \"Vim\" keymap any longer. " +
+                        "Switching to \"%s\" keymap.<br/><br/>" +
+                        "Now it is possible to set up:<br/>" +
+                        "<ul>" +
+                        "<li>Vim keys in your .vimrc file using key mapping commands</li>" +
+                        "<li>IDE action shortcuts in \"File | Settings | Keymap\"</li>" +
+                        "<li>Vim or IDE handlers for conflicting shortcuts in <a href='#settings'>Vim Emulation</a> settings</li>" +
+                        "</ul>", keymap.getPresentableName()),
+          NotificationType.INFORMATION,
+          new NotificationListener.Adapter() {
+            @Override
+            protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent e) {
+              ShowSettingsUtil.getInstance().editConfigurable((Project)null, new VimEmulationConfigurable());
+            }
+          }).notify(null);
+        manager.setActiveKeymap(keymap);
       }
       if (requiresRestart) {
         final ApplicationEx app = ApplicationManagerEx.getApplicationEx();
