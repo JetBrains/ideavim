@@ -53,6 +53,11 @@ public class StringHelperTest extends TestCase {
     assertPressedKeyStroke("control SPACE", "<C-Space>");
   }
 
+  // VIM-655
+  public void testParseTypedShiftChar() {
+    assertTypedKeyStroke('H', "<S-h>");
+  }
+
   private void assertPressedKeyStroke(@NotNull String expected, @NotNull String actual) {
     assertEquals(KeyStroke.getKeyStroke(expected), parseKeyStroke(actual));
   }

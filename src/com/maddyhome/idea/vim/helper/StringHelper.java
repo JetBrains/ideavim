@@ -384,7 +384,15 @@ public class StringHelper {
 
   @NotNull
   private static KeyStroke getTypedOrPressedKeyStroke(char c, int modifiers) {
-    return modifiers == 0 ? getKeyStroke(c) : getKeyStroke(Character.toUpperCase(c), modifiers);
+    if (modifiers == 0) {
+      return getKeyStroke(c);
+    }
+    else if (modifiers == SHIFT_MASK) {
+      return getKeyStroke(Character.toUpperCase(c));
+    }
+    else {
+      return getKeyStroke(Character.toUpperCase(c), modifiers);
+    }
   }
 
   @Nullable
