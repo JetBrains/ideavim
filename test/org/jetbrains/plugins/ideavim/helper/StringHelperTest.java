@@ -58,6 +58,12 @@ public class StringHelperTest extends TestCase {
     assertTypedKeyStroke('H', "<S-h>");
   }
 
+  // VIM-651
+  public void testParseBackspace() {
+    assertPressedKeyStroke("BACK_SPACE", "<BS>");
+    assertPressedKeyStroke("BACK_SPACE", "<Backspace>");
+  }
+
   private void assertPressedKeyStroke(@NotNull String expected, @NotNull String actual) {
     assertEquals(KeyStroke.getKeyStroke(expected), parseKeyStroke(actual));
   }

@@ -47,6 +47,8 @@ public class StringHelper {
     .put("del", VK_DELETE)
     .put("delete", VK_DELETE)
     .put("esc", VK_ESCAPE)
+    .put("bs", VK_BACK_SPACE)
+    .put("backspace", VK_BACK_SPACE)
     .put("tab", VK_TAB)
     .put("up", VK_UP)
     .put("down", VK_DOWN)
@@ -66,6 +68,11 @@ public class StringHelper {
     .put("f12", VK_F12)
     .build();
   private static final Map<Integer, String> VIM_KEY_VALUES = invertMap(VIM_KEY_NAMES);
+
+  private static final Set<String> UPPERCASE_DISPLAY_KEY_NAMES = ImmutableSet.<String>builder()
+    .add("cr")
+    .add("bs")
+    .build();
 
   private StringHelper() {}
 
@@ -249,7 +256,7 @@ public class StringHelper {
 
     String name = VIM_KEY_VALUES.get(keyCode);
     if (name != null) {
-      if (name.equals("cr")) {
+      if (UPPERCASE_DISPLAY_KEY_NAMES.contains(name)) {
         name = name.toUpperCase();
       }
       else {
