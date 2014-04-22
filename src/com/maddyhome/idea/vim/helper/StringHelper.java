@@ -354,16 +354,15 @@ public class StringHelper {
   @Nullable
   private static KeyStroke parseSpecialKey(@NotNull String s, int modifiers) {
     final String lower = s.toLowerCase();
-    final String upper = s.toUpperCase();
     final Integer keyCode = VIM_KEY_NAMES.get(lower);
     if (keyCode != null) {
       return getKeyStroke(keyCode, modifiers);
     }
     else if (lower.equals("leader")) {
-      return getKeyStroke('\\');
+      return getTypedOrPressedKeyStroke('\\', modifiers);
     }
     else if (lower.equals("space")) {
-      return getKeyStroke(' ');
+      return getTypedOrPressedKeyStroke(' ', modifiers);
     }
     else if (lower.startsWith(META_PREFIX)) {
       return parseSpecialKey(s.substring(META_PREFIX.length()), modifiers | META_MASK);
@@ -378,9 +377,14 @@ public class StringHelper {
       return parseSpecialKey(s.substring(SHIFT_PREFIX.length()), modifiers | SHIFT_MASK);
     }
     else if (s.length() == 1) {
-      return modifiers == 0 ? getKeyStroke(s.charAt(0)) : getKeyStroke(upper.charAt(0), modifiers);
+      return getTypedOrPressedKeyStroke(s.charAt(0), modifiers);
     }
     return null;
+  }
+
+  @NotNull
+  private static KeyStroke getTypedOrPressedKeyStroke(char c, int modifiers) {
+    return modifiers == 0 ? getKeyStroke(c) : getKeyStroke(Character.toUpperCase(c), modifiers);
   }
 
   @Nullable
