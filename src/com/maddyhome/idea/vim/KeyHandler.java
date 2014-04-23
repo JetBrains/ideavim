@@ -225,7 +225,12 @@ public class KeyHandler {
     final List<KeyStroke> fromKeys = new ArrayList<KeyStroke>(mappingKeys);
     fromKeys.add(key);
 
-    final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(commandState.getMappingMode());
+    final MappingMode mappingMode = commandState.getMappingMode();
+    if (mappingMode == MappingMode.NORMAL && (state != State.NEW_COMMAND || currentArg != Argument.Type.NONE)) {
+      return false;
+    }
+
+    final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mappingMode);
     final MappingInfo mappingInfo = mapping.get(fromKeys);
 
     if (mapping.isPrefix(fromKeys)) {

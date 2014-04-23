@@ -143,4 +143,12 @@ public class MapCommandTest extends VimTestCase {
     typeText(parseKeys("i", " ", "<Esc>"));
     myFixture.checkResult(" \n");
   }
+
+  // VIM-661 |:noremap| |r|
+  public void testNoMappingInReplaceCharacterArgument() {
+    configureByText("<caret>foo\n");
+    typeText(commandToKeys("noremap A Z"));
+    typeText(parseKeys("rA"));
+    myFixture.checkResult("Aoo\n");
+  }
 }
