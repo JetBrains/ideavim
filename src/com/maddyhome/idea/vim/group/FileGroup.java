@@ -59,6 +59,36 @@ public class FileGroup {
     }
     Project proj = PlatformDataKeys.PROJECT.getData(context); // API change - don't merge
 
+    VirtualFile found = findFile(filename, proj);
+
+    if (found != null) {
+      if (logger.isDebugEnabled()) {
+        logger.debug("found file: " + found);
+      }
+      // Can't open a file unless it has a known file type. The next call will return the known type.
+      // If unknown, IDEA will prompt the user to pick a type.
+      FileType type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found);
+      if (type != null) {
+        FileEditorManager fem = FileEditorManager.getInstance(proj);
+        fem.openFile(found, true);
+
+        return true;
+      }
+      else {
+        // There was no type and user didn't pick one. Don't open the file
+        // Return true here because we found the file but the user canceled by not picking a type.
+        return true;
+      }
+    }
+    else {
+      VimPlugin.showMessage("Unable to find " + filename);
+
+      return false;
+    }
+  }
+
+  @Nullable
+  public VirtualFile findFile(@NotNull String filename, @NotNull Project proj) {
     VirtualFile found = null;
     if (filename.length() > 2 && filename.charAt(0) == '~' && filename.charAt(1) == File.separatorChar) {
       String homefile = filename.substring(2);
@@ -87,30 +117,7 @@ public class FileGroup {
       }
     }
 
-    if (found != null) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("found file: " + found);
-      }
-      // Can't open a file unless it has a known file type. The next call will return the known type.
-      // If unknown, IDEA will prompt the user to pick a type.
-      FileType type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found);
-      if (type != null) {
-        FileEditorManager fem = FileEditorManager.getInstance(proj);
-        fem.openFile(found, true);
-
-        return true;
-      }
-      else {
-        // There was no type and user didn't pick one. Don't open the file
-        // Return true here because we found the file but the user canceled by not picking a type.
-        return true;
-      }
-    }
-    else {
-      VimPlugin.showMessage("Unable to find " + filename);
-
-      return false;
-    }
+    return found;
   }
 
   @Nullable
