@@ -119,6 +119,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   @NotNull private final DigraphGroup digraph;
   @NotNull private final HistoryGroup history;
   @NotNull private final KeyGroup key;
+  @NotNull private WindowGroup window;
 
   public VimPlugin(final Application app) {
     myApp = app;
@@ -135,6 +136,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     digraph = new DigraphGroup();
     history = new HistoryGroup();
     key = new KeyGroup();
+    window = new WindowGroup();
 
     LOG.debug("VimPlugin ctr");
   }
@@ -288,6 +290,11 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   @NotNull
   public static KeyGroup getKey() {
     return getInstance().key;
+  }
+
+  @NotNull
+  public static WindowGroup getWindow() {
+    return getInstance().window;
   }
 
   @NotNull

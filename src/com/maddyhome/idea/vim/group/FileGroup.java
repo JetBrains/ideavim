@@ -60,36 +60,7 @@ public class FileGroup {
     }
     Project proj = PlatformDataKeys.PROJECT.getData(context); // API change - don't merge
 
-    VirtualFile found = null;
-    if (filename.length() > 2 && filename.charAt(0) == '~' && filename.charAt(1) == File.separatorChar) {
-      String homefile = filename.substring(2);
-      String dir = System.getProperty("user.home");
-      if (logger.isDebugEnabled()) {
-        logger.debug("home dir file");
-        logger.debug("looking for " + homefile + " in " + dir);
-      }
-      found = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(new File(dir, homefile));
-    }
-    else {
-      if (proj == null) {
-        return false;
-      }
-      ProjectRootManager prm = ProjectRootManager.getInstance(proj);
-      VirtualFile[] roots = prm.getContentRoots();
-      for (int i = 0; i < roots.length; i++) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("root[" + i + "] = " + roots[i].getPath());
-        }
-        found = findFile(roots[i], filename);
-        if (found != null) {
-          break;
-        }
-      }
-
-      if (found == null) {
-        found = LocalFileSystem.getInstance().findFileByIoFile(new File(filename));
-      }
-    }
+    VirtualFile found = findFile(filename, proj);
 
     if (found != null) {
       if (logger.isDebugEnabled()) {
@@ -115,6 +86,42 @@ public class FileGroup {
 
       return false;
     }
+  }
+
+  @Nullable
+  public VirtualFile findFile(@NotNull String filename, @NotNull Project proj) {
+    VirtualFile found = null;
+    if (filename.length() > 2 && filename.charAt(0) == '~' && filename.charAt(1) == File.separatorChar) {
+      String homefile = filename.substring(2);
+      String dir = System.getProperty("user.home");
+      if (logger.isDebugEnabled()) {
+        logger.debug("home dir file");
+        logger.debug("looking for " + homefile + " in " + dir);
+      }
+      found = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(new File(dir, homefile));
+    }
+    else {
+      if (proj == null) {
+        return null;
+      }
+      ProjectRootManager prm = ProjectRootManager.getInstance(proj);
+      VirtualFile[] roots = prm.getContentRoots();
+      for (int i = 0; i < roots.length; i++) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("root[" + i + "] = " + roots[i].getPath());
+        }
+        found = findFile(roots[i], filename);
+        if (found != null) {
+          break;
+        }
+      }
+
+      if (found == null) {
+        found = LocalFileSystem.getInstance().findFileByIoFile(new File(filename));
+      }
+    }
+
+    return found;
   }
 
   @Nullable
