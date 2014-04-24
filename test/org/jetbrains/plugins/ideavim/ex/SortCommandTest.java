@@ -17,7 +17,7 @@ public class SortCommandTest extends VimTestCase {
     final List<KeyStroke> keys = Lists.newArrayList(KeyStroke.getKeyStroke("control V"));
     keys.addAll(stringToKeys("$j"));
     typeText(keys);
-    runExCommand("sort");
+    typeText(commandToKeys("sort"));
     myFixture.checkResult("Hello World!\n" + "Test\n");
   }
 
@@ -26,7 +26,7 @@ public class SortCommandTest extends VimTestCase {
     final List<KeyStroke> keys = Lists.newArrayList(KeyStroke.getKeyStroke("control V"));
     keys.addAll(stringToKeys("$3j"));
     typeText(keys);
-    runExCommand("sort");
+    typeText(commandToKeys("sort"));
     myFixture.checkResult("a\nb\nyee\nzee\n");
   }
 
@@ -35,7 +35,7 @@ public class SortCommandTest extends VimTestCase {
     final List<KeyStroke> keys = Lists.newArrayList(KeyStroke.getKeyStroke("control V"));
     keys.addAll(stringToKeys("$4j"));
     typeText(keys);
-    runExCommand("sort !");
+    typeText(commandToKeys("sort !"));
     myFixture.checkResult("zee\nyee\nkay\nb\na\n");
   }
 
@@ -44,7 +44,7 @@ public class SortCommandTest extends VimTestCase {
     final List<KeyStroke> keys = Lists.newArrayList(KeyStroke.getKeyStroke("control V"));
     keys.addAll(stringToKeys("$3j"));
     typeText(keys);
-    runExCommand("sort");
+    typeText(commandToKeys("sort"));
     myFixture.checkResult("App\nAppetite\napparition\napple\n");
   }
 
@@ -53,43 +53,43 @@ public class SortCommandTest extends VimTestCase {
     final List<KeyStroke> keys = Lists.newArrayList(KeyStroke.getKeyStroke("control V"));
     keys.addAll(stringToKeys("$3j"));
     typeText(keys);
-    runExCommand("sort i");
+    typeText(commandToKeys("sort i"));
     myFixture.checkResult("App\napparition\nAppetite\napple\n");
   }
 
   public void testRangeSort() {
     myFixture.configureByText("a.txt", "zee\nc\na\nb\nwhatever\n");
-    runExCommand("2,4sort");
+    typeText(commandToKeys("2,4sort"));
     myFixture.checkResult("zee\na\nb\nc\nwhatever\n");
   }
 
   public void testNumberSort() {
     myFixture.configureByText("a.txt", "120\n70\n30\n2000");
-    runExCommand("sort n");
+    typeText(commandToKeys("sort n"));
     myFixture.checkResult("30\n70\n120\n2000");
   }
 
   public void testNaturalOrderSort() {
     myFixture.configureByText("a.txt", "hello1000\nhello102\nhello70000\nhello1001");
-    runExCommand("sort n");
+    typeText(commandToKeys("sort n"));
     myFixture.checkResult("hello102\nhello1000\nhello1001\nhello70000");
   }
 
   public void testNaturalOrderReverseSort() {
     myFixture.configureByText("a.txt", "hello1000\nhello102\nhello70000\nhello1001");
-    runExCommand("sort n!");
+    typeText(commandToKeys("sort n!"));
     myFixture.checkResult("hello70000\nhello1001\nhello1000\nhello102");
   }
 
   public void testNaturalOrderInsensitiveReverseSort() {
     myFixture.configureByText("a.txt", "Hello1000\nhello102\nhEllo70000\nhello1001");
-    runExCommand("sort ni!");
+    typeText(commandToKeys("sort ni!"));
     myFixture.checkResult("hEllo70000\nhello1001\nHello1000\nhello102");
   }
 
   public void testGlobalSort() {
     myFixture.configureByText("a.txt", "zee\nc\na\nb\nwhatever");
-    runExCommand("sort");
+    typeText(commandToKeys("sort"));
     myFixture.checkResult("a\nb\nc\nwhatever\nzee");
   }
 }

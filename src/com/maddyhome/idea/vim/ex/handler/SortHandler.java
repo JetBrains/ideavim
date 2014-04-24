@@ -3,11 +3,11 @@ package com.maddyhome.idea.vim.ex.handler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.text.StringUtil;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.LineRange;
-import com.maddyhome.idea.vim.group.CommandGroups;
 
 import java.util.Comparator;
 
@@ -59,7 +59,7 @@ public class SortHandler extends CommandHandler {
 
     Comparator<String> lineComparator = new VimLineComparator(ignoreCase, number, reverse);
 
-    return CommandGroups.getInstance().getChange().sortRange(editor, range, lineComparator);
+    return VimPlugin.getChange().sortRange(editor, range, lineComparator);
   }
 
   private class VimLineComparator implements Comparator<String> {
