@@ -47,6 +47,7 @@
  * |:onoremap|
  * |:inoremap|
  * |:cnoremap|
+ * |:sort|                  {@link com.maddyhome.idea.vim.ex.handler.SortHandler}
  * |:source|                {@link com.maddyhome.idea.vim.ex.handler.SourceHandler}
  *
  * @see :help index.
