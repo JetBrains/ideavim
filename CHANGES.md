@@ -15,6 +15,7 @@ Features:
 * VIM-288 Support for `:map` key mapping commands
 * VIM-543 Allow granular enable/disable of Vim shortcut keys
 * VIM-643 Support for `:source` command
+* VIM-439 Support for `:sort` command
 
 Bug fixes:
 
