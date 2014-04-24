@@ -140,11 +140,10 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
           return true;
         }
         else if (owner == ShortcutOwner.IDE) {
-          return false;
+          return !isShortcutConflict(keyStroke);
         }
         else {
-          final List<AnAction> actions = VimPlugin.getKey().getKeymapConflicts(keyStroke);
-          if (!actions.isEmpty()) {
+          if (isShortcutConflict(keyStroke)) {
             savedShortcutConflicts.put(keyStroke, ShortcutOwner.UNDEFINED);
           }
           return true;
@@ -152,6 +151,10 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
       }
     }
     return false;
+  }
+
+  private boolean isShortcutConflict(@NotNull KeyStroke keyStroke) {
+    return !VimPlugin.getKey().getKeymapConflicts(keyStroke).isEmpty();
   }
 
   private static List<KeyStroke> getKeyStrokes(int keyCode, int... modifiers) {
