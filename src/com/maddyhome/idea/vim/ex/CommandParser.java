@@ -105,6 +105,7 @@ public class CommandParser {
     new ShiftLeftHandler();
     new ShiftRightHandler();
     new SourceHandler();
+    new SortHandler();
     new SubstituteHandler();
     new UndoHandler();
     new WriteAllHandler();
