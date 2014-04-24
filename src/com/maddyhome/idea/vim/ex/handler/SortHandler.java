@@ -43,88 +43,86 @@ public class SortHandler extends CommandHandler {
   @Override
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context,
                          @NotNull ExCommand cmd) throws ExException {
-    String arg = cmd.getArgument();
-    boolean reverse = false;
-    boolean ignoreCase = false;
-    boolean number = false;
-    if (arg.trim().length() > 0) {
-      number = arg.contains("n");
-      reverse = arg.contains("!");
-      ignoreCase = arg.contains("i");
-    }
+    final String arg = cmd.getArgument();
+    final boolean nonEmptyArg = arg.trim().length() > 0;
 
-    LineRange range = cmd.getLineRange(editor, context, false);
+    final boolean reverse = nonEmptyArg && arg.contains("!");
+    final boolean ignoreCase = nonEmptyArg && arg.contains("i");
+    final boolean number = nonEmptyArg && arg.contains("n");
+
+    final LineRange range = getLineRange(editor, context, cmd);
+    final Comparator<String> lineComparator = new VimLineComparator(ignoreCase, number, reverse);
+
+    return VimPlugin.getChange().sortRange(editor, range, lineComparator);
+  }
+
+  @NotNull
+  private LineRange getLineRange(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
+    final LineRange range = cmd.getLineRange(editor, context, false);
+    final LineRange normalizedRange;
 
     // Something like "30,20sort" gets converted to "20,30sort"
     if (range.getEndLine() < range.getStartLine()) {
-      range = new LineRange(range.getEndLine(), range.getStartLine());
+      normalizedRange = new LineRange(range.getEndLine(), range.getStartLine());
+    }
+    else {
+      normalizedRange = range;
     }
 
     // If we don't have a range, we either have "sort", a selection, or a block
-    if (range.getEndLine() - range.getStartLine() == 0) {
+    if (normalizedRange.getEndLine() - normalizedRange.getStartLine() == 0) {
       // If we have a selection.
       final SelectionModel selectionModel = editor.getSelectionModel();
       if (selectionModel.hasSelection()) {
-        int start = selectionModel.getSelectionStart();
-        int end = selectionModel.getSelectionEnd();
+        final int start = selectionModel.getSelectionStart();
+        final int end = selectionModel.getSelectionEnd();
 
-        int startLine = editor.offsetToLogicalPosition(start).line;
-        int endLine = editor.offsetToLogicalPosition(end).line;
+        final int startLine = editor.offsetToLogicalPosition(start).line;
+        final int endLine = editor.offsetToLogicalPosition(end).line;
 
-        range = new LineRange(startLine, endLine);
+        return new LineRange(startLine, endLine);
       }
       // If we have a block selection
       else if (selectionModel.hasBlockSelection()) {
         final LogicalPosition blockStart = selectionModel.getBlockStart();
         final LogicalPosition blockEnd = selectionModel.getBlockEnd();
+
         if (blockStart != null && blockEnd != null) {
-          range = new LineRange(blockStart.line, blockEnd.line);
+          return new LineRange(blockStart.line, blockEnd.line);
         }
       }
       // If we have a generic selection, i.e. "sort" entire document
       else {
-        range = new LineRange(0, editor.getDocument().getLineCount() - 1);
+        return new LineRange(0, editor.getDocument().getLineCount() - 1);
       }
     }
 
-    Comparator<String> lineComparator = new VimLineComparator(ignoreCase, number, reverse);
-
-    return VimPlugin.getChange().sortRange(editor, range, lineComparator);
+    return normalizedRange;
   }
 
-  private class VimLineComparator implements Comparator<String> {
+  private static class VimLineComparator implements Comparator<String> {
+    private final boolean myIgnoreCase;
+    private final boolean myNumber;
+    private final boolean myReverse;
+
     public VimLineComparator(boolean ignoreCase, boolean number, boolean reverse) {
-      this.ignoreCase = ignoreCase;
-      this.number = number;
-      this.reverse = reverse;
+      myIgnoreCase = ignoreCase;
+      myNumber = number;
+      myReverse = reverse;
     }
 
     @Override
     public int compare(String o1, String o2) {
-      int comparison;
-
-      if (reverse) {
-        String tmp = o2;
+      if (myReverse) {
+        final String tmp = o2;
         o2 = o1;
         o1 = tmp;
       }
-
-      if (ignoreCase) {
+      if (myIgnoreCase) {
         o1 = o1.toUpperCase();
         o2 = o2.toUpperCase();
       }
-
-      if (number) {
-        comparison = StringUtil.naturalCompare(o1, o2);
-      }
-      else {
-        comparison = o1.compareTo(o2);
-      }
-      return comparison;
+      return myNumber ? StringUtil.naturalCompare(o1, o2) : o1.compareTo(o2);
     }
-
-    private final boolean ignoreCase;
-    private final boolean number;
-    private final boolean reverse;
   }
 }
