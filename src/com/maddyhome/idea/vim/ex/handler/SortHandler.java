@@ -51,7 +51,7 @@ public class SortHandler extends CommandHandler {
     final boolean number = nonEmptyArg && arg.contains("n");
 
     final LineRange range = getLineRange(editor, context, cmd);
-    final Comparator<String> lineComparator = new VimLineComparator(ignoreCase, number, reverse);
+    final Comparator<String> lineComparator = new LineComparator(ignoreCase, number, reverse);
 
     return VimPlugin.getChange().sortRange(editor, range, lineComparator);
   }
@@ -100,12 +100,12 @@ public class SortHandler extends CommandHandler {
     return normalizedRange;
   }
 
-  private static class VimLineComparator implements Comparator<String> {
+  private static class LineComparator implements Comparator<String> {
     private final boolean myIgnoreCase;
     private final boolean myNumber;
     private final boolean myReverse;
 
-    public VimLineComparator(boolean ignoreCase, boolean number, boolean reverse) {
+    public LineComparator(boolean ignoreCase, boolean number, boolean reverse) {
       myIgnoreCase = ignoreCase;
       myNumber = number;
       myReverse = reverse;
