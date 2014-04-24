@@ -20,12 +20,15 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.LogicalPosition;
+import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.util.text.StringUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.LineRange;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 
@@ -38,12 +41,13 @@ public class SortHandler extends CommandHandler {
   }
 
   @Override
-  public boolean execute(Editor editor, DataContext context, ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context,
+                         @NotNull ExCommand cmd) throws ExException {
     String arg = cmd.getArgument();
     boolean reverse = false;
     boolean ignoreCase = false;
     boolean number = false;
-    if (arg != null && arg.trim().length() > 0) {
+    if (arg.trim().length() > 0) {
       number = arg.contains("n");
       reverse = arg.contains("!");
       ignoreCase = arg.contains("i");
@@ -59,9 +63,10 @@ public class SortHandler extends CommandHandler {
     // If we don't have a range, we either have "sort", a selection, or a block
     if (range.getEndLine() - range.getStartLine() == 0) {
       // If we have a selection.
-      if (editor.getSelectionModel().hasSelection()) {
-        int start = editor.getSelectionModel().getSelectionStart();
-        int end = editor.getSelectionModel().getSelectionEnd();
+      final SelectionModel selectionModel = editor.getSelectionModel();
+      if (selectionModel.hasSelection()) {
+        int start = selectionModel.getSelectionStart();
+        int end = selectionModel.getSelectionEnd();
 
         int startLine = editor.offsetToLogicalPosition(start).line;
         int endLine = editor.offsetToLogicalPosition(end).line;
@@ -69,8 +74,12 @@ public class SortHandler extends CommandHandler {
         range = new LineRange(startLine, endLine);
       }
       // If we have a block selection
-      else if (editor.getSelectionModel().hasBlockSelection()) {
-        range = new LineRange(editor.getSelectionModel().getBlockStart().line, editor.getSelectionModel().getBlockEnd().line);
+      else if (selectionModel.hasBlockSelection()) {
+        final LogicalPosition blockStart = selectionModel.getBlockStart();
+        final LogicalPosition blockEnd = selectionModel.getBlockEnd();
+        if (blockStart != null && blockEnd != null) {
+          range = new LineRange(blockStart.line, blockEnd.line);
+        }
       }
       // If we have a generic selection, i.e. "sort" entire document
       else {
