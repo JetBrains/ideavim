@@ -1496,15 +1496,17 @@ public class ChangeGroup {
    * @param lineComparator  The comparator to use to sort
    * @return true if able to sort the text, false if not
    */
-  public boolean sortRange(@NotNull Editor editor, LineRange range, Comparator<String> lineComparator) {
-    int startLine = range.getStartLine();
-    int endLine = range.getEndLine();
-    int count = endLine - startLine + 1;
-    if (count < 2)
+  public boolean sortRange(@NotNull Editor editor, @NotNull LineRange range,
+                           @NotNull Comparator<String> lineComparator) {
+    final int startLine = range.getStartLine();
+    final int endLine = range.getEndLine();
+    final int count = endLine - startLine + 1;
+    if (count < 2) {
       return false;
+    }
 
-    int startOffset = editor.getDocument().getLineStartOffset(startLine);
-    int endOffset = editor.getDocument().getLineEndOffset(endLine);
+    final int startOffset = editor.getDocument().getLineStartOffset(startLine);
+    final int endOffset = editor.getDocument().getLineEndOffset(endLine);
 
     return sortTextRange(editor, startOffset, endOffset, lineComparator);
   }
@@ -1518,12 +1520,11 @@ public class ChangeGroup {
    * @param lineComparator  The comparator to use to sort
    * @return true if able to sort the text, false if not
    */
-  private boolean sortTextRange(Editor editor, int start, int end, Comparator<String> lineComparator) {
-    String selectedText = editor.getDocument().getText(new TextRangeInterval(start, end));
-
-    String lineSeparator = CodeStyleSettingsManager.getSettings(editor.getProject()).getLineSeparator();
-
-    List<String> lines = Lists.newArrayList(Splitter.on(lineSeparator).split(selectedText));
+  private boolean sortTextRange(@NotNull Editor editor, int start, int end,
+                                @NotNull Comparator<String> lineComparator) {
+    final String selectedText = editor.getDocument().getText(new TextRangeInterval(start, end));
+    final String lineSeparator = CodeStyleSettingsManager.getSettings(editor.getProject()).getLineSeparator();
+    final List<String> lines = Lists.newArrayList(Splitter.on(lineSeparator).split(selectedText));
 
     if (lines.size() < 1) {
       return false;
@@ -1531,6 +1532,7 @@ public class ChangeGroup {
 
     Collections.sort(lines, lineComparator);
     replaceText(editor, start, end, Joiner.on(lineSeparator).join(lines));
+
     return true;
   }
 
