@@ -19,6 +19,7 @@ Features:
 
 Bug fixes:
 
+* VIM-528 Search and replace with grouping no longer works
 * VIM-281 Don't disable global reformat code action for Vim emulation
 
 
