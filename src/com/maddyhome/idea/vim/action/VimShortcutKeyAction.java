@@ -75,6 +75,13 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     .addAll(getKeyStrokes(VK_PAGE_DOWN, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
     .build();
 
+  @NotNull private static Set<KeyStroke> NON_FILE_EDITOR_KEYS = ImmutableSet.<KeyStroke>builder()
+    .addAll(getKeyStrokes(VK_ESCAPE, 0))
+    .addAll(getKeyStrokes(VK_TAB, 0))
+    .addAll(getKeyStrokes(VK_UP, 0))
+    .addAll(getKeyStrokes(VK_DOWN, 0))
+    .build();
+
   public void actionPerformed(@NotNull AnActionEvent e) {
     final Editor editor = getEditor(e);
     final KeyStroke keyStroke = getKeyStroke(e);
@@ -123,11 +130,11 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
           return keyCode == VK_ESCAPE;
         }
         if (CommandState.inInsertMode(editor)) {
-          // Debug watch, Python console, etc.
-          if ((keyCode == VK_ESCAPE || keyCode == VK_TAB) && !EditorData.isFileEditor(editor)) {
+          if (keyCode == VK_ENTER) {
             return false;
           }
-          if (keyCode == VK_ENTER) {
+          // Debug watch, Python console, etc.
+          if (NON_FILE_EDITOR_KEYS.contains(keyStroke) && !EditorData.isFileEditor(editor)) {
             return false;
           }
         }
