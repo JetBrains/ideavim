@@ -49,7 +49,7 @@ public class ExOutputPanel extends JPanel {
   @NotNull private JLabel myLabel = new JLabel("more");
   @NotNull private JTextArea myText = new JTextArea();
   @NotNull private JScrollPane myScrollPane =
-    new JBScrollPane(myText, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    new JBScrollPane(myText, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
   private ComponentAdapter myAdapter;
   private boolean myAtEnd = false;
   private int myLineHeight = 0;
@@ -250,8 +250,6 @@ public class ExOutputPanel extends JPanel {
     int lines = Math.min(count, visLines);
     setSize(getSize().width, lines * myLineHeight + myLabel.getPreferredSize().height +
                              getBorder().getBorderInsets(this).top * 2);
-
-    myScrollPane.getVerticalScrollBar().setValues(0, visLines, 0, count - 1);
 
     int height = getSize().height;
     Rectangle bounds = scroll.getBounds();
