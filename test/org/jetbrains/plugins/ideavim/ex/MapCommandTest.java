@@ -151,4 +151,12 @@ public class MapCommandTest extends VimTestCase {
     typeText(parseKeys("rA"));
     myFixture.checkResult("Aoo\n");
   }
+
+  // VIM-661 |:omap| |d| |t|
+  public void testNoMappingInNonFirstCharOfOperatorPendingMode() {
+    configureByText("<caret>foo, bar\n");
+    typeText(commandToKeys("omap , ?"));
+    typeText(parseKeys("dt,"));
+    myFixture.checkResult(", bar\n");
+  }
 }

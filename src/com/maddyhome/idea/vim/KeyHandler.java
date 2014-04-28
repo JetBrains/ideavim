@@ -226,7 +226,7 @@ public class KeyHandler {
     fromKeys.add(key);
 
     final MappingMode mappingMode = commandState.getMappingMode();
-    if (mappingMode == MappingMode.NORMAL && (state != State.NEW_COMMAND || currentArg != Argument.Type.NONE)) {
+    if (MappingMode.NVO.contains(mappingMode) && (state != State.NEW_COMMAND || currentArg != Argument.Type.NONE)) {
       return false;
     }
 
