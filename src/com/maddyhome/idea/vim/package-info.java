@@ -20,6 +20,17 @@
  * IdeaVim command index.
  *
  *
+ * 1. Insert mode
+ *
+ * tag                      action
+ * ---------------------------------------------------------------------------------------------------------------------
+ *
+ * |i_<Esc>|                {@link com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction}
+ * |i_CTRL-[|
+ * |i_CTRL-C|
+ * |i_CTRL-\_CTRL-N|
+ *
+ *
  * 2. Normal mode
  *
  * tag                      action

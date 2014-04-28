@@ -796,13 +796,6 @@ public class RegisterActions {
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.CTRL_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0))
     });
-    parser.registerAction(MappingMode.I, "VimInsertExitMode", Command.Type.INSERT, new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke('[', KeyEvent.CTRL_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)),
-      new Shortcut(new KeyStroke[]{KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SLASH, KeyEvent.CTRL_MASK),
-        KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK)})
-    });
     parser.registerAction(MappingMode.I, "VimInsertPreviousInsert", Command.Type.INSERT,
                           new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_MASK)));
     parser.registerAction(MappingMode.I, "VimInsertPreviousInsertExit", Command.Type.INSERT, new Shortcut[]{

@@ -18,24 +18,55 @@
 
 package com.maddyhome.idea.vim.action.change.insert;
 
+import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
-import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandAction;
+import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
-/**
- */
-public class InsertExitModeAction extends EditorAction {
+import javax.swing.*;
+import java.util.List;
+import java.util.Set;
+
+import static com.maddyhome.idea.vim.helper.StringHelper.parseKeysSet;
+
+public class InsertExitModeAction extends VimCommandAction {
+  private static final String ACTION_ID = "VimInsertExitMode";
+
   public InsertExitModeAction() {
-    super(new Handler());
+    super(new EditorActionHandlerBase() {
+      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+        VimPlugin.getChange().processEscape(InjectedLanguageUtil.getTopLevelEditor(editor), context);
+        return true;
+      }
+    });
   }
 
-  private static class Handler extends EditorActionHandler {
-    public void execute(@NotNull Editor editor, @NotNull DataContext context) {
-      VimPlugin.getChange().processEscape(InjectedLanguageUtil.getTopLevelEditor(editor), context);
-    }
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.I;
+  }
+
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("<C-[>", "<C-C>", "<Esc>", "<C-\\><C-N>");
+  }
+
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.INSERT;
+  }
+
+  @NotNull
+  public static VimCommandAction getInstance() {
+    return (VimCommandAction)ActionManager.getInstance().getAction(ACTION_ID);
   }
 }

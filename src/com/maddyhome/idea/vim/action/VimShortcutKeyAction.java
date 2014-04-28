@@ -34,6 +34,7 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
@@ -127,7 +128,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
       if (editor != null && keyStroke != null) {
         final int keyCode = keyStroke.getKeyCode();
         if (LookupManager.getActiveLookup(editor) != null) {
-          return keyCode == VK_ESCAPE;
+          return isExitInsertMode(keyStroke);
         }
         if (CommandState.inInsertMode(editor)) {
           if (keyCode == VK_ENTER) {
@@ -155,6 +156,16 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
           }
           return true;
         }
+      }
+    }
+    return false;
+  }
+
+  private boolean isExitInsertMode(@NotNull KeyStroke keyStroke) {
+    for (List<KeyStroke> keys : InsertExitModeAction.getInstance().getKeyStrokesSet()) {
+      // XXX: Currently we cannot handle <C-\><C-N> because of the importance of <C-N> for the IDE on Linux
+      if (keys.size() == 1 && keyStroke.equals(keys.get(0))) {
+        return true;
       }
     }
     return false;
