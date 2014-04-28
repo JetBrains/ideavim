@@ -7,8 +7,9 @@ History of changes in IdeaVim for the IntelliJ platform.
 0.33, 2014-04-28
 ----------------
 
-New keyboard shortcuts handler that doesn't require a separate keymap for Vim
-emulation.
+Added support for `:map` key mapping commands. New keyboard shortcuts handler
+that doesn't require a separate keymap for Vim emulation. Added support for
+`:source` and `:sort` commands.
 
 Features:
 
