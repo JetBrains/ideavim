@@ -4,8 +4,8 @@ The Changelog
 History of changes in IdeaVim for the IntelliJ platform.
 
 
-Unreleased
-----------
+0.33, 2014-04-28
+----------------
 
 New keyboard shortcuts handler that doesn't require a separate keymap for Vim
 emulation.

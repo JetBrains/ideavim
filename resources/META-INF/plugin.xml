@@ -3,7 +3,7 @@
   <id>IdeaVIM</id>
   <change-notes>
     <![CDATA[
-      <p>Unreleased:</p>
+      <p>0.33:</p>
       <ul>
         <li>Support for <code>:map</code> key mapping commands</li>
         <li>New keyboard shortcuts handler that doesn't require a separate keymap for Vim emulation</li>
@@ -30,10 +30,6 @@
         <li>Fixed repeat buffer limits</li>
         <li>Enable normal <code>&lt;Enter&gt;</code> handling for one-line editors</li>
         <li>Don't move cursor while scrolling</li>
-      </ul>
-      <p>0.28:</p>
-      <ul>
-        <li>Fixed reconfigure Vim keymap for user-defined base keymaps</li>
       </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
     ]]>
