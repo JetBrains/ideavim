@@ -105,12 +105,20 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     VimPlugin.getKey().getSavedShortcutConflicts().put(keyStroke, ShortcutOwner.VIM);
     final String message = String.format(
       "Using the <b>%s</b> shortcut for Vim emulation.<br/>" +
-      "You can change its handler in <a href='#settings'>Vim Emulation</a> settings.",
+      "You can redefine it as an <a href='#ide'>IDE shortcut</a> or " +
+      "configure its handler in <a href='#settings'>Vim Emulation</a> settings.",
       KeymapUtil.getShortcutText(new KeyboardShortcut(keyStroke, null)));
     final NotificationListener listener = new NotificationListener.Adapter() {
       @Override
       protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent e) {
-        ShowSettingsUtil.getInstance().editConfigurable((Project)null, new VimEmulationConfigurable());
+        final String description = e.getDescription();
+        if ("#ide".equals(description)) {
+          VimPlugin.getKey().getSavedShortcutConflicts().put(keyStroke, ShortcutOwner.IDE);
+          notification.expire();
+        }
+        else if ("#settings".equals(description)) {
+          ShowSettingsUtil.getInstance().editConfigurable((Project)null, new VimEmulationConfigurable());
+        }
       }
     };
     final Notification notification = new Notification(VimPlugin.IDEAVIM_NOTIFICATION_ID,
