@@ -39,6 +39,10 @@ If you wish to disable the plugin, select the "Tools | Vim Emulator" menu so
 it is unchecked. At this point IDE will work with it's regular keyboard
 shortcuts.
 
+Keyboard shortcut conflicts between the Vim emulation and the IDE can be
+resolved via "File | Settings | Vim Emulation", "File | Settings | Keymap"
+and key mapping commands in your ~/.ideavimrc or ~/.vimrc file.
+
 
 Summary of Supported Vim Features
 ---------------------------------
@@ -72,6 +76,19 @@ See also:
 * [List of recently added commands](https://github.com/JetBrains/ideavim/blob/master/src/com/maddyhome/idea/vim/package-info.java)
 * [List of commands covered with tests](https://github.com/JetBrains/ideavim/blob/master/index.txt)
 * [Top features and bugs](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+sort+by%3A+votes)
+
+
+Files
+-----
+
+* ~/.ideavimrc
+    * Your IdeaVim-specific Vim initialization commands
+* ~/.vimrc
+    * Your Vim initializations
+
+Note, that IdeaVim currently parses .vimrc files via simple pattern matching,
+see [VIM-669](http://youtrack.jetbrains.com/issue/VIM-669) for proper parsing
+of VimL files.
 
 
 Changes to the IDE
