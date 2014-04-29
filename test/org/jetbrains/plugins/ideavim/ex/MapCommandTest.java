@@ -159,4 +159,28 @@ public class MapCommandTest extends VimTestCase {
     typeText(parseKeys("dt,"));
     myFixture.checkResult(", bar\n");
   }
+
+  // VIM-666 |:imap|
+  public void testIgnoreEverythingAfterBar() {
+    configureByText("<caret>foo\n");
+    typeText(commandToKeys("imap a b |c \" Something else"));
+    typeText(parseKeys("ia"));
+    myFixture.checkResult("b foo\n");
+  }
+
+  // VIM-666 |:imap|
+  public void testBarEscaped() {
+    configureByText("<caret>foo\n");
+    typeText(commandToKeys("imap a b \\| c"));
+    typeText(parseKeys("ia"));
+    myFixture.checkResult("b | cfoo\n");
+  }
+
+  // VIM-666 |:imap|
+  public void testBarEscapedSeveralSpaces() {
+    configureByText("<caret>foo\n");
+    typeText(commandToKeys("imap a b \\| c    |"));
+    typeText(parseKeys("ia"));
+    myFixture.checkResult("b | c    foo\n");
+  }
 }

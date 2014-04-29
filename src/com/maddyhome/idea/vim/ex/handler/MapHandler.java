@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.util.text.StringUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.ex.*;
@@ -99,6 +100,8 @@ public class MapHandler extends CommandHandler implements VimScriptCommandHandle
 
   @Nullable
   private static CommandArguments parseCommandArguments(@NotNull String input) {
+    input = getFirstBarSeparatedCommand(input);
+
     final Set<SpecialArgument> specialArguments = new HashSet<SpecialArgument>();
     final StringBuilder toKeysBuilder = new StringBuilder();
     List<KeyStroke> fromKeys = null;
@@ -117,12 +120,50 @@ public class MapHandler extends CommandHandler implements VimScriptCommandHandle
         }
       }
     }
+    for (int i = input.length() - 1; i >= 0; i--) {
+      final char c = input.charAt(i);
+      if (c == ' ') {
+        toKeysBuilder.append(c);
+      }
+      else {
+        break;
+      }
+    }
     if (fromKeys != null) {
-      final List<KeyStroke> toKeys = parseKeys(toKeysBuilder.toString().trim());
+      final List<KeyStroke> toKeys = parseKeys(StringUtil.trimLeading(toKeysBuilder.toString()));
       return new CommandArguments(specialArguments, fromKeys, toKeys);
 
     }
     return null;
+  }
+
+  @NotNull
+  private static String getFirstBarSeparatedCommand(@NotNull String input) {
+    final StringBuilder inputBuilder = new StringBuilder();
+    boolean escape = false;
+    for (int i = 0; i < input.length(); i++) {
+      final char c = input.charAt(i);
+      if (escape) {
+        escape = false;
+        if (c != '|') {
+          inputBuilder.append('\\');
+        }
+        inputBuilder.append(c);
+      }
+      else if (c == '\\') {
+        escape = true;
+      }
+      else if (c == '|') {
+        break;
+      }
+      else {
+        inputBuilder.append(c);
+      }
+    }
+    if (input.endsWith("\\")) {
+      inputBuilder.append("\\");
+    }
+    return inputBuilder.toString();
   }
 
   @Nullable
