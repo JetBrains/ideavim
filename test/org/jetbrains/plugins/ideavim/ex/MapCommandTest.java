@@ -183,4 +183,12 @@ public class MapCommandTest extends VimTestCase {
     typeText(parseKeys("ia"));
     myFixture.checkResult("b | c    foo\n");
   }
+
+  // VIM-670 |:map|
+  public void testFirstCharIsNonRecursive() {
+    configureByText("\n");
+    typeText(commandToKeys("map ab abcd"));
+    typeText(parseKeys("ab"));
+    myFixture.checkResult("bcd\n");
+  }
 }

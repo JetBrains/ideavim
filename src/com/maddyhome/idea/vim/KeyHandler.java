@@ -252,8 +252,12 @@ public class KeyHandler {
       final Runnable handleMappedKeys = new Runnable() {
         @Override
         public void run() {
+          final boolean fromIsPrefix = isPrefix(mappingInfo.getFromKeys(), mappingInfo.getToKeys());
+          boolean first = true;
           for (KeyStroke keyStroke : mappingInfo.getToKeys()) {
-            handleKey(editor, keyStroke, new EditorDataContext(editor), mappingInfo.isRecursive());
+            final boolean recursive = mappingInfo.isRecursive() && !(first && fromIsPrefix);
+            handleKey(editor, keyStroke, new EditorDataContext(editor), recursive);
+            first = false;
           }
         }
       };
@@ -273,6 +277,18 @@ public class KeyHandler {
       }
       return false;
     }
+  }
+
+  private static <T> boolean isPrefix(@NotNull List<T> list1, @NotNull List<T> list2) {
+    if (list1.size() > list2.size()) {
+      return false;
+    }
+    for (int i = 0; i < list1.size(); i++) {
+      if (!list1.get(i).equals(list2.get(i))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private void handleEditorReset(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull final DataContext context) {
