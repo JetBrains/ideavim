@@ -139,7 +139,8 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
           return isExitInsertMode(keyStroke);
         }
         if (CommandState.inInsertMode(editor)) {
-          if (keyCode == VK_ENTER) {
+          // XXX: <Enter> and <Tab> won't be recorded in macros
+          if (keyCode == VK_ENTER || keyCode == VK_TAB) {
             return false;
           }
           // Debug watch, Python console, etc.
