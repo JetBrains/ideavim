@@ -69,6 +69,11 @@ public class StringHelper {
     .build();
   private static final Map<Integer, String> VIM_KEY_VALUES = invertMap(VIM_KEY_NAMES);
 
+  private static final Map<String, Character> VIM_TYPED_KEY_NAMES = ImmutableMap.<String, Character>builder()
+    .put("leader", '\\')
+    .put("space", ' ')
+    .build();
+
   private static final Set<String> UPPERCASE_DISPLAY_KEY_NAMES = ImmutableSet.<String>builder()
     .add("cr")
     .add("bs")
@@ -362,14 +367,12 @@ public class StringHelper {
   private static KeyStroke parseSpecialKey(@NotNull String s, int modifiers) {
     final String lower = s.toLowerCase();
     final Integer keyCode = VIM_KEY_NAMES.get(lower);
+    final Character typedChar = VIM_TYPED_KEY_NAMES.get(lower);
     if (keyCode != null) {
       return getKeyStroke(keyCode, modifiers);
     }
-    else if (lower.equals("leader")) {
-      return getTypedOrPressedKeyStroke('\\', modifiers);
-    }
-    else if (lower.equals("space")) {
-      return getTypedOrPressedKeyStroke(' ', modifiers);
+    else if (typedChar != null) {
+      return getTypedOrPressedKeyStroke(typedChar, modifiers);
     }
     else if (lower.startsWith(META_PREFIX)) {
       return parseSpecialKey(s.substring(META_PREFIX.length()), modifiers | META_MASK);
