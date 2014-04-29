@@ -81,7 +81,13 @@ public class MapHandler extends CommandHandler implements VimScriptCommandHandle
         return editor != null && VimPlugin.getKey().showKeyMappings(modes, editor);
       }
       else {
-        final CommandArguments arguments = parseCommandArguments(argument);
+        final CommandArguments arguments;
+        try {
+          arguments = parseCommandArguments(argument);
+        }
+        catch (IllegalArgumentException ignored) {
+          return false;
+        }
         if (arguments != null) {
           for (SpecialArgument unsupportedArgument : UNSUPPORTED_SPECIAL_ARGUMENTS) {
             if (arguments.getSpecialArguments().contains(unsupportedArgument)) {

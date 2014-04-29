@@ -152,9 +152,11 @@ public class StringHelper {
     ESCAPE,
     SPECIAL,
   }
+
   /**
    * Parses Vim key notation strings.
    *
+   * @throws java.lang.IllegalArgumentException if the mapping doesn't make sence for Vim emulation
    * @see :help <>
    */
   @NotNull
@@ -192,7 +194,11 @@ public class StringHelper {
             if (c == '>') {
               state = KeyParserState.INIT;
               final String specialKeyName = specialKeyBuilder.toString();
-              if (!"nop".equals(specialKeyName.toLowerCase())) {
+              final String lower = specialKeyName.toLowerCase();
+              if ("plug".equals(lower) || "sid".equals(lower)) {
+                throw new IllegalArgumentException("<" + specialKeyName + "> is not supported");
+              }
+              if (!"nop".equals(lower)) {
                 final KeyStroke specialKey = parseSpecialKey(specialKeyName, 0);
                 if (specialKey != null) {
                   result.add(specialKey);
