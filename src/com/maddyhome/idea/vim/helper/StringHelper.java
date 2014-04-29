@@ -72,6 +72,7 @@ public class StringHelper {
   private static final Map<String, Character> VIM_TYPED_KEY_NAMES = ImmutableMap.<String, Character>builder()
     .put("leader", '\\')
     .put("space", ' ')
+    .put("bar", '|')
     .build();
 
   private static final Set<String> UPPERCASE_DISPLAY_KEY_NAMES = ImmutableSet.<String>builder()

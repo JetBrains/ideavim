@@ -64,6 +64,11 @@ public class StringHelperTest extends TestCase {
     assertPressedKeyStroke("BACK_SPACE", "<Backspace>");
   }
 
+  // VIM-666
+  public void testParseBarSpecialKey() {
+    assertTypedKeyStroke('|', "<Bar>");
+  }
+
   private void assertPressedKeyStroke(@NotNull String expected, @NotNull String actual) {
     assertEquals(KeyStroke.getKeyStroke(expected), parseKeyStroke(actual));
   }
