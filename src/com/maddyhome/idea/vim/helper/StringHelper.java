@@ -156,7 +156,7 @@ public class StringHelper {
   /**
    * Parses Vim key notation strings.
    *
-   * @throws java.lang.IllegalArgumentException if the mapping doesn't make sence for Vim emulation
+   * @throws java.lang.IllegalArgumentException if the mapping doesn't make sense for Vim emulation
    * @see :help <>
    */
   @NotNull
