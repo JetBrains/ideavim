@@ -55,7 +55,10 @@ public class VimScriptParser {
       String line;
       while ((line = reader.readLine()) != null) {
         try {
-          line = line.trim();
+          // TODO: Build a proper parse tree for a VimL file instead of ignoring potentially nested lines (VIM-669)
+          if (line.startsWith(" ") || line.startsWith("\t")) {
+            continue;
+          }
           if (line.startsWith(":")) {
             line = line.substring(1);
           }
