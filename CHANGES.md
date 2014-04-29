@@ -3,6 +3,20 @@ The Changelog
 
 History of changes in IdeaVim for the IntelliJ platform.
 
+0.34, 2014-04-29
+----------------
+
+A bugfix release.
+
+Bug fixes:
+
+* VIM-674 Don't handle `<Tab>` in Insert mode in Vim emulation
+* VIM-672 Ignore mappings that contain `<Plug>` and `<SID>`
+* VIM-670 First character of a recursive mapping shouldn't be mapped again
+* VIM-666 Support `<Bar>` in Vim key notation
+* VIM-666 Ignore characters after `|` in `:map` commands
+* VIM-667 Ignore potentially nested lines of .vimrc based on leading whitespace
+
 
 0.33, 2014-04-28
 ----------------
