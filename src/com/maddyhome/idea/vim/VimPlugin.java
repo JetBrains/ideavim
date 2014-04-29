@@ -387,7 +387,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
           }
         }
       }
-      if (previousStateVersion < 3) {
+      if (previousStateVersion > 0 && previousStateVersion < 3) {
         final KeymapManagerEx manager = KeymapManagerEx.getInstanceEx();
         Keymap keymap = null;
         if (previousKeyMap != null) {
