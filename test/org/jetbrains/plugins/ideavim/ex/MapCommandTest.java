@@ -212,4 +212,17 @@ public class MapCommandTest extends VimTestCase {
     typeText(commandToKeys("imap"));
     assertExOutput("i  #           * X<BS>#\n");
   }
+
+  // VIM-679 |:map|
+  public void testCancelCharacterInVimRc() {
+    configureByText("foo\n");
+    VimScriptParser.executeText("map \u0018i dd\n");
+    typeText(parseKeys("i", "#", "<Esc>"));
+    myFixture.checkResult("#foo\n");
+    assertMode(CommandState.Mode.COMMAND);
+    //typeText(commandToKeys("map"));
+    //assertExOutput("   <C-X>i           dd\n");
+    //typeText(parseKeys("<C-X>i"));
+    //myFixture.checkResult("\n");
+  }
 }

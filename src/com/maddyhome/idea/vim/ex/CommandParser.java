@@ -32,6 +32,9 @@ import com.maddyhome.idea.vim.helper.Msg;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * Maintains a tree of Ex commands based on the required and optional parts of the command names. Parses and
  * executes Ex commands entered by the user.
@@ -41,6 +44,7 @@ public class CommandParser {
   public static final int RES_ERROR = 1;
   public static final int RES_READONLY = 1;
   public static final int RES_DONT_REOPEN = 4;
+  public static final Pattern TRIM_WHITESPACE = Pattern.compile("[ \\t]*(.*)[ \\t\\n\\r]");
 
   /**
    * There is only one parser.
@@ -533,7 +537,12 @@ public class CommandParser {
       logger.debug("argument = " + argument);
     }
 
-    return new ExCommand(ranges, command.toString(), argument.toString().trim());
+    String argumentString = argument.toString();
+    final Matcher matcher = TRIM_WHITESPACE.matcher(argumentString);
+    if (matcher.matches()) {
+      argumentString = matcher.group(1);
+    }
+    return new ExCommand(ranges, command.toString(), argumentString);
   }
 
   /**
