@@ -177,7 +177,7 @@ public class StringHelper {
               specialKeyBuilder = new StringBuilder();
             }
             else {
-              result.add(getKeyStroke(c));
+              result.add(isControlCharacter(c) ? getKeyStroke(c, 0) : getKeyStroke(c));
             }
             break;
           case ESCAPE:
@@ -225,6 +225,10 @@ public class StringHelper {
       }
     }
     return result;
+  }
+
+  private static boolean isControlCharacter(char c) {
+    return c < '\u0020';
   }
 
   @NotNull

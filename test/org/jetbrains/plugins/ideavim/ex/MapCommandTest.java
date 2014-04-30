@@ -1,6 +1,7 @@
 package org.jetbrains.plugins.ideavim.ex;
 
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.ex.VimScriptParser;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -199,5 +200,16 @@ public class MapCommandTest extends VimTestCase {
     typeText(parseKeys("w"));
     myFixture.checkResult("foo bar\n");
     assertOffset(4);
+  }
+
+  // VIM-676 |:map|
+  public void testBackspaceCharacterInVimRc() {
+    configureByText("\n");
+    VimScriptParser.executeText("inoremap # X\u0008#\n");
+    typeText(parseKeys("i", "#", "<Esc>"));
+    myFixture.checkResult("#\n");
+    assertMode(CommandState.Mode.COMMAND);
+    typeText(commandToKeys("imap"));
+    assertExOutput("i  #           * X<BS>#\n");
   }
 }
