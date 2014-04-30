@@ -100,41 +100,14 @@ public class StringHelper {
     return builder.toString();
   }
 
-  @NotNull
-  public static String escape(@NotNull String s) {
-    return escape(stringToKeys(s));
-  }
-
-  @NotNull
-  public static String escape(@NotNull List<KeyStroke> keys) {
-    final StringBuilder res = new StringBuilder();
-    for (KeyStroke key : keys) {
-      final String s = toEscapeNotation(key);
-      res.append(s != null ? s : key.getKeyChar());
-    }
-    return res.toString();
-  }
-
   @Nullable
   private static String toEscapeNotation(@NotNull KeyStroke key) {
     final char c = key.getKeyChar();
-    final int modifiers = key.getModifiers();
-    final int code = key.getKeyCode();
-    if (c < ' ') {
+    if (isControlCharacter(c)) {
       return "^" + String.valueOf((char)(c + 'A' - 1));
     }
-    else if (c == '\n') {
-      return "^J";
-    }
-    else if (c == '\t') {
-      return "^I";
-    }
-    else if (c == '\u0000') {
-      return "^@";
-    }
-    else if ((modifiers & CTRL_MASK) != 0) {
-      final char[] chars = Character.toChars(code);
-      return "^" + String.valueOf(chars);
+    else if (isControlKeyCode(key)) {
+      return "^" + String.valueOf((char)(key.getKeyCode() + 'A' - 1));
     }
     return null;
   }
@@ -232,6 +205,10 @@ public class StringHelper {
     return c < '\u0020';
   }
 
+  private static boolean isControlKeyCode(@NotNull KeyStroke key) {
+    return key.getKeyChar() == CHAR_UNDEFINED && key.getKeyCode() < 0x20 && key.getModifiers() == 0;
+  }
+
   @NotNull
   public static String toKeyNotation(@NotNull List<KeyStroke> keys) {
     if (keys.isEmpty()) {
@@ -250,10 +227,7 @@ public class StringHelper {
     final int keyCode = key.getKeyCode();
     final int modifiers = key.getModifiers();
 
-    if (c == ' ') {
-      return "<Space>";
-    }
-    else if (c != CHAR_UNDEFINED) {
+    if (c != CHAR_UNDEFINED && !isControlCharacter(c)) {
       return String.valueOf(c);
     }
 
@@ -281,11 +255,13 @@ public class StringHelper {
       }
     }
     if (name == null) {
+      final String escape = toEscapeNotation(key);
+      if (escape != null) {
+        return escape;
+      }
+
       try {
-        final char[] chars = Character.toChars(keyCode);
-        if (chars.length == 1) {
-          name = String.valueOf(chars[0]);
-        }
+        name = String.valueOf(Character.toChars(keyCode));
       }
       catch (IllegalArgumentException ignored) {
       }

@@ -26,10 +26,12 @@ import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.ex.*;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+
+import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
+import static com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation;
 
 /**
  *
@@ -64,7 +66,7 @@ public class MarksHandler extends CommandHandler {
       text.append(" ");
       VirtualFile vf = EditorData.getVirtualFile(editor);
       if (vf != null && vf.getPath().equals(mark.getFilename())) {
-        text.append(StringHelper.escape(EditorHelper.getLineText(editor, mark.getLogicalLine()).trim()));
+        text.append(toKeyNotation(stringToKeys(EditorHelper.getLineText(editor, mark.getLogicalLine()).trim())));
       }
       else {
         text.append(mark.getFilename());

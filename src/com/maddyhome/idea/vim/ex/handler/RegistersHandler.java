@@ -49,7 +49,7 @@ public class RegistersHandler extends CommandHandler {
       text.append(reg.getName());
 
       text.append("   ");
-      text.append(StringHelper.escape(reg.getKeys()));
+      text.append(StringHelper.toKeyNotation(reg.getKeys()));
       text.append("\n");
     }
 

@@ -43,6 +43,7 @@ import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import java.io.File;
 import java.util.HashMap;
 
@@ -278,7 +279,7 @@ public class FileGroup {
 
     StringBuffer msg = new StringBuffer();
     msg.append('<');
-    msg.append(StringHelper.escape("" + ch));
+    msg.append(StringHelper.toKeyNotation(KeyStroke.getKeyStroke(ch)));
     msg.append(">  ");
     msg.append((int)ch);
     msg.append(",  Hex ");

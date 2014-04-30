@@ -26,10 +26,11 @@ import com.maddyhome.idea.vim.common.Jump;
 import com.maddyhome.idea.vim.ex.*;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+
+import static com.maddyhome.idea.vim.helper.StringHelper.*;
 
 /**
  *
@@ -56,7 +57,7 @@ public class JumpsHandler extends CommandHandler {
       else {
         text.append("  ");
       }
-      text.append(StringHelper.rightJustify(Integer.toString(Math.abs(i - spot - 1)), 3, ' '));
+      text.append(rightJustify(Integer.toString(Math.abs(i - spot - 1)), 3, ' '));
 
       text.append(" ");
       String num = Integer.toString(jump.getLogicalLine() + 1);
@@ -71,7 +72,7 @@ public class JumpsHandler extends CommandHandler {
       text.append(" ");
       VirtualFile vf = EditorData.getVirtualFile(editor);
       if (vf != null && vf.getPath().equals(jump.getFilename())) {
-        text.append(StringHelper.escape(EditorHelper.getLineText(editor, jump.getLogicalLine()).trim()));
+        text.append(toKeyNotation(stringToKeys(EditorHelper.getLineText(editor, jump.getLogicalLine()).trim())));
       }
       else {
         text.append(jump.getFilename());
