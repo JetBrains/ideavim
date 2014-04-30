@@ -109,33 +109,34 @@ public class StringHelper {
   public static String escape(@NotNull List<KeyStroke> keys) {
     final StringBuilder res = new StringBuilder();
     for (KeyStroke key : keys) {
-      final char c = key.getKeyChar();
-      final int modifiers = key.getModifiers();
-      final int code = key.getKeyCode();
-      if (c < ' ') {
-        res.append('^').append((char)(c + 'A' - 1));
-      }
-      else if (c == '\n') {
-        res.append("^J");
-      }
-      else if (c == '\t') {
-        res.append("^I");
-      }
-      else if (c == '\u0000') {
-        res.append("^@");
-      }
-      else if ((modifiers & CTRL_DOWN_MASK) != 0) {
-        final char[] chars = Character.toChars(code);
-        if (chars.length == 1) {
-          res.append("^");
-          res.append(chars);
-        }
-      }
-      else {
-        res.append(c);
-      }
+      final String s = toEscapeNotation(key);
+      res.append(s != null ? s : key.getKeyChar());
     }
     return res.toString();
+  }
+
+  @Nullable
+  private static String toEscapeNotation(@NotNull KeyStroke key) {
+    final char c = key.getKeyChar();
+    final int modifiers = key.getModifiers();
+    final int code = key.getKeyCode();
+    if (c < ' ') {
+      return "^" + String.valueOf((char)(c + 'A' - 1));
+    }
+    else if (c == '\n') {
+      return "^J";
+    }
+    else if (c == '\t') {
+      return "^I";
+    }
+    else if (c == '\u0000') {
+      return "^@";
+    }
+    else if ((modifiers & CTRL_MASK) != 0) {
+      final char[] chars = Character.toChars(code);
+      return "^" + String.valueOf(chars);
+    }
+    return null;
   }
 
   @NotNull
