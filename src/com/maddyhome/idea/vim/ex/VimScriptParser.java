@@ -18,19 +18,19 @@
 
 package com.maddyhome.idea.vim.ex;
 
+import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * @author vlan
  */
 public class VimScriptParser {
   public static final String[] VIMRC_FILES = {".ideavimrc", "_ideavimrc", ".vimrc", "_vimrc"};
+  public static final int BUFSIZE = 4096;
+  public static final String CHARSET = "utf-8";
 
   private VimScriptParser() {
   }
@@ -50,31 +50,47 @@ public class VimScriptParser {
   }
 
   public static void executeFile(@NotNull File file) {
+    final String data;
     try {
-      final BufferedReader reader = new BufferedReader(new FileReader(file));
-      String line;
-      while ((line = reader.readLine()) != null) {
-        try {
-          // TODO: Build a proper parse tree for a VimL file instead of ignoring potentially nested lines (VIM-669)
-          if (line.startsWith(" ") || line.startsWith("\t")) {
-            continue;
-          }
-          if (line.startsWith(":")) {
-            line = line.substring(1);
-          }
-          final CommandParser commandParser = CommandParser.getInstance();
-          final ExCommand command = commandParser.parse(line);
-          final CommandHandler commandHandler = commandParser.getCommandHandler(command);
-          if (commandHandler instanceof VimScriptCommandHandler) {
-            final VimScriptCommandHandler handler = (VimScriptCommandHandler)commandHandler;
-            handler.execute(command);
-          }
-        }
-        catch (ExException ignored) {
-        }
-      }
+      data = readFile(file);
     }
     catch (IOException ignored) {
+      return;
     }
+    executeText(data);
+  }
+
+  public static void executeText(@NotNull String text) {
+    for (String line : StringUtil.splitByLines(text)) {
+      // TODO: Build a proper parse tree for a VimL file instead of ignoring potentially nested lines (VIM-669)
+      if (line.startsWith(" ") || line.startsWith("\t")) {
+        continue;
+      }
+      if (line.startsWith(":")) {
+        line = line.substring(1);
+      }
+      final CommandParser commandParser = CommandParser.getInstance();
+      try {
+        final ExCommand command = commandParser.parse(line);
+        final CommandHandler commandHandler = commandParser.getCommandHandler(command);
+        if (commandHandler instanceof VimScriptCommandHandler) {
+          final VimScriptCommandHandler handler = (VimScriptCommandHandler)commandHandler;
+          handler.execute(command);
+        }
+      }
+      catch (ExException ignored) {
+      }
+    }
+  }
+
+  private static String readFile(@NotNull File file) throws IOException {
+    final BufferedReader reader = new BufferedReader(new FileReader(file));
+    final StringBuilder builder = new StringBuilder();
+    final char[] buffer = new char[BUFSIZE];
+    int n;
+    while ((n = reader.read(buffer)) > 0) {
+      builder.append(buffer, 0, n);
+    }
+    return builder.toString();
   }
 }
