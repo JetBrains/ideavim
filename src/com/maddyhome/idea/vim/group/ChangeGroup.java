@@ -21,6 +21,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -57,6 +58,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Provides all the insert/replace related functionality
@@ -1523,7 +1526,12 @@ public class ChangeGroup {
   private boolean sortTextRange(@NotNull Editor editor, int start, int end,
                                 @NotNull Comparator<String> lineComparator) {
     final String selectedText = editor.getDocument().getText(new TextRangeInterval(start, end));
-    final String lineSeparator = CodeStyleSettingsManager.getSettings(editor.getProject()).getLineSeparator();
+    /* collect all line separators in one set */
+    final Set<String> seps = Sets.newHashSet(
+      Splitter.on(Pattern.compile("^.*$", Pattern.MULTILINE)).omitEmptyStrings().split(selectedText));
+    String[] a = new String[1];
+    a = seps.toArray(a);
+    String lineSeparator = a[0];
     final List<String> lines = Lists.newArrayList(Splitter.on(lineSeparator).split(selectedText));
 
     if (lines.size() < 1) {
