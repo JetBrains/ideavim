@@ -5,6 +5,7 @@ import junit.framework.TestCase;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.awt.event.InputEvent;
 import java.util.List;
 
 /**
@@ -69,8 +70,27 @@ public class StringHelperTest extends TestCase {
     assertTypedKeyStroke('|', "<Bar>");
   }
 
+  // VIM-679
+  public void testControlXCharacter() {
+    assertPressedKeyStroke("control X", "\u0018");
+  }
+
+  public void testControlBoundCharacters() {
+    assertKeyStroke(KeyStroke.getKeyStroke('@', InputEvent.CTRL_MASK), "\u0000");
+    assertKeyStroke(KeyStroke.getKeyStroke('_', InputEvent.CTRL_MASK), "\u001F");
+  }
+
+  public void testControlExceptionCharacters() {
+    assertPressedKeyStroke("TAB", "\t"); // U+0009
+    assertPressedKeyStroke("ENTER", "\n"); // U+000A
+  }
+
   private void assertPressedKeyStroke(@NotNull String expected, @NotNull String actual) {
     assertEquals(KeyStroke.getKeyStroke(expected), parseKeyStroke(actual));
+  }
+
+  private void assertKeyStroke(@NotNull KeyStroke expected, @NotNull String actual) {
+    assertEquals(expected, parseKeyStroke(actual));
   }
 
   private void assertTypedKeyStroke(char expected, @NotNull String actual) {

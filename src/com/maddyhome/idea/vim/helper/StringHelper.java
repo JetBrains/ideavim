@@ -151,7 +151,17 @@ public class StringHelper {
               specialKeyBuilder = new StringBuilder();
             }
             else {
-              result.add(isControlCharacter(c) ? getKeyStroke(c, 0) : getKeyStroke(c));
+              final KeyStroke stroke;
+              if (c == '\t' || c == '\n') {
+                stroke = getKeyStroke(c, 0);
+              }
+              else if (isControlCharacter(c)) {
+                stroke = getKeyStroke(c + 'A' - 1, CTRL_MASK);
+              }
+              else {
+                stroke = getKeyStroke(c);
+              }
+              result.add(stroke);
             }
             break;
           case ESCAPE:
