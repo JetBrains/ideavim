@@ -227,4 +227,12 @@ public class MapCommandTest extends VimTestCase {
     typeText(parseKeys("<C-X>i"));
     myFixture.checkResult("bar\n");
   }
+
+  // VIM-679 |:map|
+  public void testBarCtrlVEscaped() {
+    configureByText("<caret>foo\n");
+    VimScriptParser.executeText("imap a b \u0016|\u0016| c |");
+    typeText(parseKeys("ia"));
+    myFixture.checkResult("b || c foo\n");
+  }
 }

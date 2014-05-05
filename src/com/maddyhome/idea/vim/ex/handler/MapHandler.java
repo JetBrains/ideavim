@@ -36,6 +36,7 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
  * @author vlan
  */
 public class MapHandler extends CommandHandler implements VimScriptCommandHandler {
+  public static final char CTRL_V = '\u0016';
   public static final CommandInfo[] COMMAND_INFOS = new CommandInfo[] {
     // TODO: Support xmap, smap, map!, lmap
     new CommandInfo("map", "", MappingMode.NVO, true),
@@ -156,7 +157,7 @@ public class MapHandler extends CommandHandler implements VimScriptCommandHandle
         }
         inputBuilder.append(c);
       }
-      else if (c == '\\') {
+      else if (c == '\\' || c == CTRL_V) {
         escape = true;
       }
       else if (c == '|') {
