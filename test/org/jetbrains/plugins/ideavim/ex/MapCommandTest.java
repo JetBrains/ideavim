@@ -231,8 +231,16 @@ public class MapCommandTest extends VimTestCase {
   // VIM-679 |:map|
   public void testBarCtrlVEscaped() {
     configureByText("<caret>foo\n");
-    VimScriptParser.executeText("imap a b \u0016|\u0016| c |");
+    VimScriptParser.executeText("imap a b \u0016|\u0016| c |\n");
     typeText(parseKeys("ia"));
     myFixture.checkResult("b || c foo\n");
+  }
+
+  // VIM-679 |:map|
+  public void testCtrlMCtrlLAsNewLine() {
+    configureByText("<caret>foo\n");
+    VimScriptParser.executeText("map A :%s/foo/bar/g\r\u000C\n");
+    typeText(parseKeys("A"));
+    myFixture.checkResult("bar\n");
   }
 }

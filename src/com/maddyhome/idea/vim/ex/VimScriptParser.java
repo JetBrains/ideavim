@@ -18,11 +18,14 @@
 
 package com.maddyhome.idea.vim.ex;
 
-import com.intellij.openapi.util.text.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.regex.Pattern;
 
 /**
  * @author vlan
@@ -30,7 +33,7 @@ import java.io.*;
 public class VimScriptParser {
   public static final String[] VIMRC_FILES = {".ideavimrc", "_ideavimrc", ".vimrc", "_vimrc"};
   public static final int BUFSIZE = 4096;
-  public static final String CHARSET = "utf-8";
+  private static final Pattern EOL_SPLIT_PATTERN = Pattern.compile(" *(\r\n|\n)+ *");
 
   private VimScriptParser() {
   }
@@ -61,7 +64,7 @@ public class VimScriptParser {
   }
 
   public static void executeText(@NotNull String text) {
-    for (String line : StringUtil.splitByLines(text)) {
+    for (String line : EOL_SPLIT_PATTERN.split(text)) {
       // TODO: Build a proper parse tree for a VimL file instead of ignoring potentially nested lines (VIM-669)
       if (line.startsWith(" ") || line.startsWith("\t")) {
         continue;
