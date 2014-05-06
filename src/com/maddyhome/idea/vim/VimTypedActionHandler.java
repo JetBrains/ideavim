@@ -34,10 +34,10 @@ import javax.swing.*;
  * IDE shortcut keys used by Vim commands are handled by {@link com.maddyhome.idea.vim.action.VimShortcutKeyAction}.
  */
 public class VimTypedActionHandler implements TypedActionHandler {
-  private static Logger logger = Logger.getInstance(VimTypedActionHandler.class.getName());
+  private static final Logger logger = Logger.getInstance(VimTypedActionHandler.class.getName());
 
-  private TypedActionHandler origHandler;
-  private KeyHandler handler;
+  private final TypedActionHandler origHandler;
+  private final KeyHandler handler;
 
   public VimTypedActionHandler(TypedActionHandler origHandler) {
     this.origHandler = origHandler;

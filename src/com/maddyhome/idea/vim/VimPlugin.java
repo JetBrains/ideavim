@@ -94,7 +94,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private static final boolean ANIMATED_SCROLLING_VIM_VALUE = false;
   private static final boolean REFRAIN_FROM_SCROLLING_VIM_VALUE = true;
 
-  private VimTypedActionHandler vimHandler;
   private boolean isBlockCursor = false;
   private boolean isAnimatedScrolling = false;
   private boolean isRefrainFromScrolling = false;
@@ -160,10 +159,8 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
       }
     });
 
-    // Replace the default key handler with the Vim key handler
     final TypedAction typedAction = EditorActionManager.getInstance().getTypedAction();
-    vimHandler = new VimTypedActionHandler(typedAction.getHandler());
-    typedAction.setupHandler(vimHandler);
+    EventFacade.getInstance().setupTypedActionHandler(new VimTypedActionHandler(typedAction.getHandler()));
 
     // Register vim actions in command mode
     RegisterActions.registerActions();
@@ -188,8 +185,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   public void disposeComponent() {
     LOG.debug("disposeComponent");
     turnOffPlugin();
-    final TypedAction action = EditorActionManager.getInstance().getTypedAction();
-    action.setupHandler(vimHandler.getOriginalTypedHandler());
+    EventFacade.getInstance().restoreTypedActionHandler();
     LOG.debug("done");
   }
 
