@@ -48,6 +48,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
+import com.intellij.util.messages.MessageBusConnection;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.VimScriptParser;
@@ -157,12 +158,10 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
       }
     });
 
-    EditorActionManager manager = EditorActionManager.getInstance();
-    TypedAction action = manager.getTypedAction();
-
     // Replace the default key handler with the Vim key handler
-    vimHandler = new VimTypedActionHandler(action.getHandler());
-    action.setupHandler(vimHandler);
+    final TypedAction typedAction = EditorActionManager.getInstance().getTypedAction();
+    vimHandler = new VimTypedActionHandler(typedAction.getHandler());
+    typedAction.setupHandler(vimHandler);
 
     // Register vim actions in command mode
     RegisterActions.registerActions();
@@ -187,8 +186,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   public void disposeComponent() {
     LOG.debug("disposeComponent");
     turnOffPlugin();
-    EditorActionManager manager = EditorActionManager.getInstance();
-    TypedAction action = manager.getTypedAction();
+    final TypedAction action = EditorActionManager.getInstance().getTypedAction();
     action.setupHandler(vimHandler.getOriginalTypedHandler());
     LOG.debug("done");
   }
@@ -474,21 +472,13 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
       }
     }, myApp);
 
-    // Since the Vim plugin custom actions aren't available to the call to <code>initComponent()</code>
-    // we need to force the generation of the key map when the first project is opened.
     ProjectManager.getInstance().addProjectManagerListener(new ProjectManagerAdapter() {
       @Override
       public void projectOpened(@NotNull final Project project) {
-        project.getMessageBus().connect()
-          .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new MotionGroup.MotionEditorChange());
-        project.getMessageBus().connect()
-          .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileGroup.SelectionCheck());
-        project.getMessageBus().connect()
-          .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new SearchGroup.EditorSelectionCheck());
-      }
-
-      @Override
-      public void projectClosed(final Project project) {
+        final MessageBusConnection connection = project.getMessageBus().connect();
+        connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new MotionGroup.MotionEditorChange());
+        connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileGroup.SelectionCheck());
+        connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new SearchGroup.EditorSelectionCheck());
       }
     });
 
