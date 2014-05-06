@@ -18,14 +18,9 @@
 
 package com.maddyhome.idea.vim.helper;
 
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.event.DocumentListener;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
-import com.intellij.openapi.vcs.FileStatusManager;
-import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -36,24 +31,8 @@ public class DocumentManager {
     return instance;
   }
 
-  public void init() {
-    logger.debug("opening project");
-  }
-
   public void addDocumentListener(final DocumentListener listener) {
     docListeners.add(listener);
-  }
-
-  public void reloadDocument(@NotNull Document doc, Project p) {
-    logger.debug("marking as up-to-date");
-    VirtualFile vf = FileDocumentManager.getInstance().getFile(doc);
-    if (logger.isDebugEnabled()) logger.debug("file=" + vf);
-    if (vf != null) {
-      removeListeners(doc);
-      FileDocumentManager.getInstance().reloadFromDisk(doc);
-      FileStatusManager.getInstance(p).fileStatusChanged(vf);
-      addListeners(doc);
-    }
   }
 
   public void addListeners(@NotNull Document doc) {
@@ -85,5 +64,4 @@ public class DocumentManager {
 
   private static final Key<String> LISTENER_MARKER = new Key<String>("listenerMarker");
   @NotNull private static DocumentManager instance = new DocumentManager();
-  private static Logger logger = Logger.getInstance(DocumentManager.class.getName());
 }
