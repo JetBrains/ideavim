@@ -49,6 +49,7 @@ public class VimEmulationConfigurable implements Configurable {
   @NotNull private final VimShortcutConflictsTable.Model myConflictsTableModel = new VimShortcutConflictsTable.Model();
   @NotNull private final VimSettingsPanel myPanel = new VimSettingsPanel(myConflictsTableModel);
 
+  @NotNull
   @Nls
   @Override
   public String getDisplayName() {
@@ -236,6 +237,7 @@ public class VimEmulationConfigurable implements Configurable {
         Collections.sort(myRows);
       }
 
+      @NotNull
       private Map<KeyStroke, ShortcutOwner> getCurrentData() {
         final Map<KeyStroke, ShortcutOwner> result = new HashMap<KeyStroke, ShortcutOwner>();
         for (Row row : myRows) {

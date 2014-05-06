@@ -378,6 +378,7 @@ public class KeyGroup {
     return new CustomShortcutSet(shortcuts.toArray(new com.intellij.openapi.actionSystem.Shortcut[shortcuts.size()]));
   }
 
+  @NotNull
   private static List<MappingInfo> getKeyMappingRows(@NotNull Set<MappingMode> modes) {
     final Map<ImmutableList<KeyStroke>, Set<MappingMode>> actualModes = new HashMap<ImmutableList<KeyStroke>, Set<MappingMode>>();
     for (MappingMode mode : modes) {
@@ -414,6 +415,7 @@ public class KeyGroup {
     return rows;
   }
 
+  @NotNull
   private static String getModesStringCode(@NotNull Set<MappingMode> modes) {
     if (modes.equals(MappingMode.NVO)) {
       return "";

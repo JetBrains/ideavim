@@ -196,7 +196,7 @@ public class ChangeGroup {
     runEnterAction(editor, context);
   }
 
-  private void runEnterAction(Editor editor, DataContext context) {
+  private void runEnterAction(Editor editor, @NotNull DataContext context) {
     CommandState state = CommandState.getInstance(editor);
     if (state.getMode() != CommandState.Mode.REPEAT) {
       final ActionManager actionManager = ActionManager.getInstance();
@@ -378,7 +378,7 @@ public class ChangeGroup {
 
   private class InsertActionsDocumentListener extends DocumentAdapter {
     @Override
-    public void documentChanged(DocumentEvent e) {
+    public void documentChanged(@NotNull DocumentEvent e) {
       final String newFragment = e.getNewFragment().toString();
       final String oldFragment = e.getOldFragment().toString();
 
@@ -832,11 +832,12 @@ public class ChangeGroup {
     return deleteRange(editor, range, SelectionType.fromCommandFlags(argument.getMotion().getFlags()), isChange);
   }
 
-  public static TextRange getDeleteMotionRange(Editor editor,
+  @Nullable
+  public static TextRange getDeleteMotionRange(@NotNull Editor editor,
                                                DataContext context,
                                                int count,
                                                int rawCount,
-                                               Argument argument) {
+                                               @NotNull Argument argument) {
     TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true, false);
     // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is deleted when it shouldn't be.
     if (range != null) {
@@ -1660,7 +1661,7 @@ public class ChangeGroup {
   private boolean repeatAppend;
   private boolean lastLower = true;
   private Document document;
-  private DocumentAdapter documentListener;
+  @Nullable private DocumentAdapter documentListener;
   private int oldOffset = -1;
 
   private static Logger logger = Logger.getInstance(ChangeGroup.class.getName());

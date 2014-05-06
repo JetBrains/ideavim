@@ -36,6 +36,7 @@ public enum ShortcutOwner {
     this.title = title;
   }
 
+  @NotNull
   @Override
   public String toString() {
     return title;

@@ -189,7 +189,8 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     return !VimPlugin.getKey().getKeymapConflicts(keyStroke).isEmpty();
   }
 
-  private static List<KeyStroke> getKeyStrokes(int keyCode, int... modifiers) {
+  @NotNull
+  private static List<KeyStroke> getKeyStrokes(int keyCode, @NotNull int... modifiers) {
     final List<KeyStroke> keyStrokes = new ArrayList<KeyStroke>();
     for (int modifier : modifiers) {
       keyStrokes.add(KeyStroke.getKeyStroke(keyCode, modifier));

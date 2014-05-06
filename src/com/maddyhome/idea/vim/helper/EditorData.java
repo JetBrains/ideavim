@@ -190,7 +190,8 @@ public class EditorData {
     return res != null;
   }
 
-  public static ExOutputPanel getMorePanel(Editor editor) {
+  @Nullable
+  public static ExOutputPanel getMorePanel(@NotNull Editor editor) {
     return editor.getUserData(MORE_PANEL);
   }
 
@@ -198,7 +199,8 @@ public class EditorData {
     editor.putUserData(MORE_PANEL, panel);
   }
 
-  public static ExOutputModel getExOutputModel(Editor editor) {
+  @Nullable
+  public static ExOutputModel getExOutputModel(@NotNull Editor editor) {
     return editor.getUserData(EX_OUTPUT_MODEL);
   }
 

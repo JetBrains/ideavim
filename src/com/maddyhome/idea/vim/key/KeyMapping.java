@@ -33,6 +33,7 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
   @NotNull private Map<ImmutableList<KeyStroke>, MappingInfo> myKeys = new HashMap<ImmutableList<KeyStroke>, MappingInfo>();
   @NotNull private Map<ImmutableList<KeyStroke>, Integer> myPrefixes = new HashMap<ImmutableList<KeyStroke>, Integer>();
 
+  @NotNull
   @Override
   public Iterator<List<KeyStroke>> iterator() {
     return new ArrayList<List<KeyStroke>>(myKeys.keySet()).iterator();

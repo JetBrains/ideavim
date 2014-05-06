@@ -284,6 +284,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     return getInstance().key;
   }
 
+  @NotNull
   public static PluginId getPluginId() {
     return PluginId.getId(IDEAVIM_PLUGIN_ID);
   }

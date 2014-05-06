@@ -210,13 +210,13 @@ public class ExEditorKit extends DefaultEditorKit {
       WAIT_REGISTER,
     }
 
-    private State state = State.SKIP_CTRL_R;
+    @NotNull private State state = State.SKIP_CTRL_R;
 
     public InsertRegisterAction() {
       super(InsertRegister);
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(@NotNull ActionEvent e) {
       final ExTextField target = (ExTextField)getTextComponent(e);
       final KeyStroke key = convert(e);
       if (key != null) {

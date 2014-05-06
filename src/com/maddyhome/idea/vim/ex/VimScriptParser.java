@@ -86,6 +86,7 @@ public class VimScriptParser {
     }
   }
 
+  @NotNull
   private static String readFile(@NotNull File file) throws IOException {
     final BufferedReader reader = new BufferedReader(new FileReader(file));
     final StringBuilder builder = new StringBuilder();

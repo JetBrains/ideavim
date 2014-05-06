@@ -35,7 +35,7 @@ public class MotionPreviousTabAction extends MotionEditorAction {
   }
 
   private static class Handler extends MotionEditorActionHandler {
-    public int getOffset(final Editor editor, @NotNull final DataContext context, final int count, final int rawCount, final Argument argument) {
+    public int getOffset(@NotNull final Editor editor, @NotNull final DataContext context, final int count, final int rawCount, final Argument argument) {
       return VimPlugin.getMotion().moveCaretGotoPreviousTab(editor, context);
     }
   }
