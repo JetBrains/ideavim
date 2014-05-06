@@ -22,7 +22,6 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ex.ApplicationEx;
 import com.intellij.openapi.application.ex.ApplicationManagerEx;
-import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
@@ -53,7 +52,10 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.VimScriptParser;
 import com.maddyhome.idea.vim.group.*;
-import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.helper.DocumentManager;
+import com.maddyhome.idea.vim.helper.EditorData;
+import com.maddyhome.idea.vim.helper.EditorDataContext;
+import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import org.jdom.Element;
@@ -481,8 +483,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new SearchGroup.EditorSelectionCheck());
       }
     });
-
-    CommandProcessor.getInstance().addCommandListener(DelegateCommandListener.getInstance());
   }
 
   private void setCursors(boolean isBlock) {

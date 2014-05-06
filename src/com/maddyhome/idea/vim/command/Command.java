@@ -83,7 +83,7 @@ public class Command {
   public static final int FLAG_KEEP_VISUAL = 1 << 20;
   public static final int FLAG_FORCE_VISUAL = 1 << 21;
   public static final int FLAG_FORCE_LINEWISE = 1 << 22;
-  public static final int FLAG_DELEGATE = 1 << 23;
+
   /**
    * Special flag used for any mappings involving operators
    */

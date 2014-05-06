@@ -386,7 +386,6 @@ public class KeyHandler {
 
   private void executeCommand(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context,
                               @NotNull CommandState editorState) {
-    DelegateCommandListener.getInstance().setRunnable(null);
     // Let's go through the command stack and merge it all into one command. At this time there should never
     // be more than two commands on the stack - one is the actual command and the other would be a motion
     // command argument needed by the first command
@@ -629,7 +628,6 @@ public class KeyHandler {
     lastChar = 0;
     lastWasBS = false;
     VimPlugin.getRegister().resetRegister();
-    DelegateCommandListener.getInstance().setRunnable(null);
   }
 
   /**

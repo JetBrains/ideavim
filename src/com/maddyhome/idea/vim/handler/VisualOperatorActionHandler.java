@@ -21,14 +21,12 @@ package com.maddyhome.idea.vim.handler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.helper.DelegateCommandListener;
 import com.maddyhome.idea.vim.helper.EditorData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -40,28 +38,21 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
   protected final boolean execute(@NotNull final Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
     if (logger.isDebugEnabled()) logger.debug("execute, cmd=" + cmd);
 
-    TextRange range = null;
+    TextRange range;
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
       range = VimPlugin.getMotion().getVisualRange(editor);
       if (logger.isDebugEnabled()) logger.debug("range=" + range);
     }
 
     VisualStartFinishRunnable runnable = new VisualStartFinishRunnable(editor, cmd);
-    if ((cmd.getFlags() & Command.FLAG_DELEGATE) != 0) {
-      DelegateCommandListener.getInstance().setRunnable(runnable);
-    }
-    else {
-      range = runnable.start();
-    }
+    range = runnable.start();
 
     assert range != null : "Range must be not null for visual operator action " + getClass();
 
     final boolean res = execute(editor, context, cmd, range);
 
-    if ((cmd.getFlags() & Command.FLAG_DELEGATE) == 0) {
-      runnable.setRes(res);
-      runnable.finish();
-    }
+    runnable.setRes(res);
+    runnable.finish();
 
     return res;
   }
@@ -69,7 +60,7 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
   protected abstract boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
                                      @NotNull TextRange range);
 
-  private static class VisualStartFinishRunnable implements DelegateCommandListener.StartFinishRunnable {
+  private static class VisualStartFinishRunnable {
     public VisualStartFinishRunnable(Editor editor, Command cmd) {
       this.editor = editor;
       this.cmd = cmd;
@@ -81,7 +72,6 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
     }
 
     @Nullable
-    @SuppressWarnings("Since15")
     public TextRange start() {
       logger.debug("start");
       wasRepeat = false;
@@ -149,10 +139,6 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
         if (cmd != null) {
           CommandState.getInstance(editor).saveLastChangeCommand(cmd);
         }
-      }
-
-      if (cmd != null && (cmd.getFlags() & Command.FLAG_DELEGATE) != 0) {
-        KeyHandler.getInstance().reset(editor);
       }
     }
 
