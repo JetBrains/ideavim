@@ -25,6 +25,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
+import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
@@ -62,13 +63,12 @@ public class KeyGroup {
 
   public void registerRequiredShortcutKeys(@NotNull Editor editor) {
     final Set<KeyStroke> requiredKeys = VimPlugin.getKey().getRequiredShortcutKeys();
-    final JComponent component = editor.getComponent();
-    final AnAction action = VimShortcutKeyAction.getInstance();
-    action.registerCustomShortcutSet(toShortcutSet(requiredKeys), component);
+    EventFacade.getInstance().registerCustomShortcutSet(VimShortcutKeyAction.getInstance(),
+                                                        toShortcutSet(requiredKeys), editor.getComponent());
   }
 
   public void unregisterShortcutKeys(@NotNull Editor editor) {
-    VimShortcutKeyAction.getInstance().unregisterCustomShortcutSet(editor.getComponent());
+    EventFacade.getInstance().unregisterCustomShortcutSet(VimShortcutKeyAction.getInstance(), editor.getComponent());
   }
 
   public boolean showKeyMappings(@NotNull Set<MappingMode> modes, @NotNull Editor editor) {
