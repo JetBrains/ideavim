@@ -251,8 +251,7 @@ public class RegisterActions {
     parser
       .registerAction(MappingMode.NVO, "VimMotionFirstScreenLine", Command.Type.MOTION, Command.FLAG_MOT_LINEWISE | Command.FLAG_SAVE_JUMP,
                       new Shortcut[]{
-                        new Shortcut('H'),
-                        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, KeyEvent.CTRL_MASK))
+                        new Shortcut('H')
                       });
     parser
       .registerAction(MappingMode.NVO, "VimMotionGotoLineFirst", Command.Type.MOTION, Command.FLAG_MOT_LINEWISE | Command.FLAG_SAVE_JUMP,
@@ -283,9 +282,6 @@ public class RegisterActions {
     parser
       .registerAction(MappingMode.NVO, "VimMotionLastScreenLine", Command.Type.MOTION, Command.FLAG_MOT_LINEWISE | Command.FLAG_SAVE_JUMP,
                       new Shortcut('L'));
-    parser.registerAction(MappingMode.NVO, "VimMotionLastScreenLineEnd", Command.Type.MOTION,
-                          Command.FLAG_MOT_LINEWISE | Command.FLAG_SAVE_JUMP,
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, KeyEvent.CTRL_MASK)));
     parser.registerAction(MappingMode.NVO, "VimMotionLeft", Command.Type.MOTION, Command.FLAG_MOT_EXCLUSIVE, new Shortcut[]{
       new Shortcut('h'),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0))

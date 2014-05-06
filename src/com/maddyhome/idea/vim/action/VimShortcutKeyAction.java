@@ -72,8 +72,8 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     .addAll(getKeyStrokes(VK_RIGHT, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
     .addAll(getKeyStrokes(VK_HOME, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
     .addAll(getKeyStrokes(VK_END, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
-    .addAll(getKeyStrokes(VK_PAGE_UP, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
-    .addAll(getKeyStrokes(VK_PAGE_DOWN, 0, CTRL_MASK, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
+    .addAll(getKeyStrokes(VK_PAGE_UP, 0, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
+    .addAll(getKeyStrokes(VK_PAGE_DOWN, 0, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
     .build();
 
   @NotNull private static Set<KeyStroke> NON_FILE_EDITOR_KEYS = ImmutableSet.<KeyStroke>builder()

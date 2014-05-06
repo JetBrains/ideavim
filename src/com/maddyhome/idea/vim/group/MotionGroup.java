@@ -880,13 +880,6 @@ public class MotionGroup {
     return moveCaretToScreenLine(editor, EditorHelper.getScreenHeight(editor) - count + 1);
   }
 
-  public int moveCaretToLastScreenLineEnd(@NotNull Editor editor, int count) {
-    int offset = moveCaretToLastScreenLine(editor, count);
-    LogicalPosition lline = editor.offsetToLogicalPosition(offset);
-
-    return moveCaretToLineEnd(editor, lline.line, false);
-  }
-
   public int moveCaretToMiddleScreenLine(@NotNull Editor editor) {
     return moveCaretToScreenLine(editor, EditorHelper.getScreenHeight(editor) / 2 + 1);
   }

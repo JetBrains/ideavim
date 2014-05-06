@@ -183,7 +183,6 @@
     <!-- Screen -->
     <action id="VimMotionFirstScreenLine" class="com.maddyhome.idea.vim.action.motion.screen.MotionFirstScreenLineAction" text="First Screen Line"/>
     <action id="VimMotionLastScreenLine" class="com.maddyhome.idea.vim.action.motion.screen.MotionLastScreenLineAction" text="Last Screen Line"/>
-    <action id="VimMotionLastScreenLineEnd" class="com.maddyhome.idea.vim.action.motion.screen.MotionLastScreenLineEndAction" text="Last Screen Line End"/>
     <action id="VimMotionMiddleScreenLine" class="com.maddyhome.idea.vim.action.motion.screen.MotionMiddleScreenLineAction" text="Middle Screen Line"/>
     <!-- Scroll -->
     <action id="VimMotionScrollFirstScreenLinePageStart" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenLinePageStartAction" text="Scroll Line to Top"/>
