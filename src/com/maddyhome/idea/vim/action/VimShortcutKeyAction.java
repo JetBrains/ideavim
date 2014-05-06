@@ -23,10 +23,7 @@ import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.KeyboardShortcut;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.options.ShowSettingsUtil;
@@ -59,6 +56,8 @@ import static java.awt.event.KeyEvent.*;
  * These keys are not passed to {@link com.maddyhome.idea.vim.VimTypedActionHandler} and should be handled by actions.
  */
 public class VimShortcutKeyAction extends AnAction implements DumbAware {
+  private static final String ACTION_ID = "VimShortcutKeyAction";
+
   @NotNull public static Set<KeyStroke> VIM_ONLY_EDITOR_KEYS = ImmutableSet.<KeyStroke>builder()
     .addAll(getKeyStrokes(VK_ENTER, 0))
     .addAll(getKeyStrokes(VK_ESCAPE, 0))
@@ -83,6 +82,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     .addAll(getKeyStrokes(VK_DOWN, 0))
     .build();
 
+  @Override
   public void actionPerformed(@NotNull AnActionEvent e) {
     final Editor editor = getEditor(e);
     final KeyStroke keyStroke = getKeyStroke(e);
@@ -99,6 +99,11 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
   @Override
   public void update(@NotNull AnActionEvent e) {
     e.getPresentation().setEnabled(isEnabled(e));
+  }
+
+  @NotNull
+  public static AnAction getInstance() {
+    return ActionManager.getInstance().getAction(ACTION_ID);
   }
 
   private void notifyAboutShortcutConflict(@NotNull final KeyStroke keyStroke) {

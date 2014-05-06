@@ -63,12 +63,12 @@ public class KeyGroup {
   public void registerRequiredShortcutKeys(@NotNull Editor editor) {
     final Set<KeyStroke> requiredKeys = VimPlugin.getKey().getRequiredShortcutKeys();
     final JComponent component = editor.getComponent();
-    final AnAction action = getShortcutKeyAction();
+    final AnAction action = VimShortcutKeyAction.getInstance();
     action.registerCustomShortcutSet(toShortcutSet(requiredKeys), component);
   }
 
   public void unregisterShortcutKeys(@NotNull Editor editor) {
-    getShortcutKeyAction().unregisterCustomShortcutSet(editor.getComponent());
+    VimShortcutKeyAction.getInstance().unregisterCustomShortcutSet(editor.getComponent());
   }
 
   public boolean showKeyMappings(@NotNull Set<MappingMode> modes, @NotNull Editor editor) {
@@ -367,11 +367,6 @@ public class KeyGroup {
     }
 
     return node;
-  }
-
-  @NotNull
-  private static AnAction getShortcutKeyAction() {
-    return ActionManagerEx.getInstanceEx().getAction("VimShortcutKeyAction");
   }
 
   @NotNull
