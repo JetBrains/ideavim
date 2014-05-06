@@ -3,6 +3,11 @@
   <id>IdeaVIM</id>
   <change-notes>
     <![CDATA[
+      <p>0.35:</p>
+      <ul>
+        <li><code>~/.vimrc</code> is no longer read by default, use <code>~/.ideavimrc</code> instead</li>
+        <li>Various bug fixes</li>
+      </ul>
       <p>0.34:</p>
       <ul>
         <li>Various bug fixes</li>

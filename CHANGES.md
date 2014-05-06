@@ -3,6 +3,25 @@ The Changelog
 
 History of changes in IdeaVim for the IntelliJ platform.
 
+
+0.35, TBD
+---------
+
+`~/.vimrc` initialization file is no longer read by default, use `~/.ideavimrc`
+instead.
+
+Features:
+
+* VIM-690 Read initialization commands only from `~/.ideavimrc`
+
+Bug fixes:
+
+* VIM-676 Handle control characters in `.ideavimrc` as pressed, not typed
+  keystrokes
+* VIM-679 Parse characters less than U+0020 as `<C-$CHAR>`
+* VIM-683 Allow Ctrl+PgUp/PgDown to be used outside of Vim emulation
+
+
 0.34, 2014-04-29
 ----------------
 
