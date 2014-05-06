@@ -1,10 +1,13 @@
 package com.maddyhome.idea.vim;
 
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.actionSystem.EditorActionManager;
 import com.intellij.openapi.editor.actionSystem.TypedAction;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.editor.event.DocumentListener;
+import com.intellij.openapi.editor.event.EditorFactoryListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,6 +45,10 @@ public class EventFacade {
 
   public void removeDocumentListener(@NotNull Document document, @NotNull DocumentListener listener) {
     document.removeDocumentListener(listener);
+  }
+
+  public void addEditorFactoryListener(@NotNull EditorFactoryListener listener, @NotNull Disposable parentDisposable) {
+    EditorFactory.getInstance().addEditorFactoryListener(listener, parentDisposable);
   }
 
   @NotNull

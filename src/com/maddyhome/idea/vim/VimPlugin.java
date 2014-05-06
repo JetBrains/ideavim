@@ -437,7 +437,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     DocumentManager.getInstance().addDocumentListener(new MarkGroup.MarkUpdater());
     DocumentManager.getInstance().addDocumentListener(new SearchGroup.DocumentSearchListener());
 
-    EditorFactory.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
+    EventFacade.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
       @Override
       public void editorCreated(@NotNull EditorFactoryEvent event) {
         final Editor editor = event.getEditor();

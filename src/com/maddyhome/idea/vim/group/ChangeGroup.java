@@ -73,7 +73,7 @@ public class ChangeGroup {
   public ChangeGroup() {
     // We want to know when a user clicks the mouse somewhere in the editor so we can clear any
     // saved text for the current insert mode.
-    EditorFactory.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
+    EventFacade.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
       public void editorCreated(@NotNull EditorFactoryEvent event) {
         Editor editor = event.getEditor();
         editor.addEditorMouseListener(listener);

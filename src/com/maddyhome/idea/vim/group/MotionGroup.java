@@ -29,6 +29,7 @@ import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
@@ -65,7 +66,7 @@ public class MotionGroup {
    * Create the group
    */
   public MotionGroup() {
-    EditorFactory.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
+    EventFacade.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
       public void editorCreated(@NotNull EditorFactoryEvent event) {
         final Editor editor = event.getEditor();
         // This ridiculous code ensures that a lot of events are processed BEFORE we finally start listening

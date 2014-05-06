@@ -30,6 +30,7 @@ import com.intellij.openapi.editor.event.EditorFactoryAdapter;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Jump;
 import com.maddyhome.idea.vim.common.Mark;
@@ -50,7 +51,7 @@ public class MarkGroup {
    * Creates the class
    */
   public MarkGroup() {
-    EditorFactory.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
+    EventFacade.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
       public void editorReleased(@NotNull EditorFactoryEvent event) {
         // Save off the last caret position of the file before it is closed
         Editor editor = event.getEditor();
