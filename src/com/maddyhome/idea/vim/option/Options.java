@@ -127,7 +127,7 @@ public class Options {
    * <li>:set {option}^={value} - prepend or multiply option value</li>
    * </ul>
    *
-   * @param editor    The editor the command was entered for, null if no editor - reading .vimrc
+   * @param editor    The editor the command was entered for, null if no editor - reading .ideavimrc
    * @param args      The :set command arguments
    * @param failOnBad True if processing should stop when a bad argument is found, false if a bad argument is simply
    *                  skipped and processing continues.

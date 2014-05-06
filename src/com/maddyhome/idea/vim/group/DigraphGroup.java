@@ -126,7 +126,7 @@ public class DigraphGroup {
       }
     }
 
-    // TODO - load custom digraphs from .vimrc
+    // TODO - load custom digraphs from .ideavimrc
   }
 
   @NotNull private HashMap<String, Character> digraphs = new HashMap<String, Character>(defaultDigraphs.length);

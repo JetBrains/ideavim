@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  * @author vlan
  */
 public class VimScriptParser {
-  public static final String[] VIMRC_FILES = {".ideavimrc", "_ideavimrc", ".vimrc", "_vimrc"};
+  public static final String[] VIMRC_FILES = {".ideavimrc", "_ideavimrc"};
   public static final int BUFSIZE = 4096;
   private static final Pattern EOL_SPLIT_PATTERN = Pattern.compile(" *(\r\n|\n)+ *");
 
@@ -39,7 +39,7 @@ public class VimScriptParser {
   }
 
   @Nullable
-  public static File findVimrc() {
+  public static File findIdeaVimRc() {
     final String homeDirName = System.getProperty("user.home");
     if (homeDirName != null) {
       for (String fileName : VIMRC_FILES) {

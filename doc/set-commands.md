@@ -1,7 +1,7 @@
 List of Supported Set Commands
 ==============================
 
-The following `:set` commands can appear in `~/.vimrc` or set manually in the command mode:
+The following `:set` commands can appear in `~/.ideavimrc` or set manually in the command mode:
 
     'digraph'       'dg'    enable the entering of digraphs in Insert mode
     'gdefault'      'gd'    the ":substitute" flag 'g' is default on

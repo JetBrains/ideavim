@@ -85,7 +85,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   public static final String IDEAVIM_NOTIFICATION_ID = "ideavim";
   public static final String IDEAVIM_STICKY_NOTIFICATION_ID = "ideavim-sticky";
   public static final String IDEAVIM_NOTIFICATION_TITLE = "IdeaVim";
-  public static final int STATE_VERSION = 3;
+  public static final int STATE_VERSION = 4;
 
   private static final boolean BLOCK_CURSOR_VIM_VALUE = true;
   private static final boolean ANIMATED_SCROLLING_VIM_VALUE = false;
@@ -174,9 +174,9 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     CommandParser.getInstance().registerHandlers();
 
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      final File vimrc = VimScriptParser.findVimrc();
-      if (vimrc != null) {
-        VimScriptParser.executeFile(vimrc);
+      final File ideaVimRc = VimScriptParser.findIdeaVimRc();
+      if (ideaVimRc != null) {
+        VimScriptParser.executeFile(ideaVimRc);
       }
     }
 
@@ -404,7 +404,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
                         "Switching to \"%s\" keymap.<br/><br/>" +
                         "Now it is possible to set up:<br/>" +
                         "<ul>" +
-                        "<li>Vim keys in your .ideavimrc or .vimrc file using key mapping commands</li>" +
+                        "<li>Vim keys in your ~/.ideavimrc file using key mapping commands</li>" +
                         "<li>IDE action shortcuts in \"File | Settings | Keymap\"</li>" +
                         "<li>Vim or IDE handlers for conflicting shortcuts in <a href='#settings'>Vim Emulation</a> settings</li>" +
                         "</ul>", keymap.getPresentableName()),
@@ -416,6 +416,15 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
             }
           }).notify(null);
         manager.setActiveKeymap(keymap);
+      }
+      if (previousStateVersion > 0 && previousStateVersion < 4) {
+        new Notification(
+          VimPlugin.IDEAVIM_STICKY_NOTIFICATION_ID,
+          VimPlugin.IDEAVIM_NOTIFICATION_TITLE,
+          "The ~/.vimrc file is no longer read by default, use ~/.ideavimrc instead. You can read it from your " +
+          "~/.ideavimrc using this command:<br/><br/>" +
+          "<code>source ~/.vimrc</code>",
+          NotificationType.INFORMATION).notify(null);
       }
       if (requiresRestart) {
         final ApplicationEx app = ApplicationManagerEx.getApplicationEx();
