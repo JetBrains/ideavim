@@ -39,6 +39,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
+import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.*;
@@ -360,11 +361,11 @@ public class ChangeGroup {
       strokes.clear();
       repeatCharsCount = 0;
       if (document != null && documentListener != null) {
-        document.removeDocumentListener(documentListener);
+        EventFacade.getInstance().removeDocumentListener(document, documentListener);
       }
       document = editor.getDocument();
       documentListener = new InsertActionsDocumentListener();
-      editor.getDocument().addDocumentListener(documentListener);
+      EventFacade.getInstance().addDocumentListener(document, documentListener);
       oldOffset = -1;
       inInsert = true;
       if (mode == CommandState.Mode.REPLACE) {
@@ -519,7 +520,7 @@ public class ChangeGroup {
     }
 
     if (document != null && documentListener != null) {
-      document.removeDocumentListener(documentListener);
+      EventFacade.getInstance().removeDocumentListener(document, documentListener);
       documentListener = null;
     }
 

@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.helper;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.util.Key;
+import com.maddyhome.idea.vim.EventFacade;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
@@ -43,7 +44,7 @@ public class DocumentManager {
 
     doc.putUserData(LISTENER_MARKER, "foo");
     for (DocumentListener docListener : docListeners) {
-      doc.addDocumentListener(docListener);
+      EventFacade.getInstance().addDocumentListener(doc, docListener);
     }
   }
 
@@ -55,7 +56,7 @@ public class DocumentManager {
 
     doc.putUserData(LISTENER_MARKER, null);
     for (DocumentListener docListener : docListeners) {
-      doc.removeDocumentListener(docListener);
+      EventFacade.getInstance().removeDocumentListener(doc, docListener);
     }
   }
 
