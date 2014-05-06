@@ -35,7 +35,6 @@ import com.intellij.openapi.editor.event.EditorFactoryAdapter;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.extensions.PluginId;
-import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
 import com.intellij.openapi.keymap.impl.DefaultKeymap;
@@ -47,7 +46,6 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
-import com.intellij.util.messages.MessageBusConnection;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.VimScriptParser;
@@ -434,10 +432,12 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
    * This sets up some listeners so we can handle various events that occur
    */
   private void setupListeners() {
+    final EventFacade eventFacade = EventFacade.getInstance();
+
     DocumentManager.getInstance().addDocumentListener(new MarkGroup.MarkUpdater());
     DocumentManager.getInstance().addDocumentListener(new SearchGroup.DocumentSearchListener());
 
-    EventFacade.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
+    eventFacade.addEditorFactoryListener(new EditorFactoryAdapter() {
       @Override
       public void editorCreated(@NotNull EditorFactoryEvent event) {
         final Editor editor = event.getEditor();
@@ -471,13 +471,12 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
       }
     }, myApp);
 
-    ProjectManager.getInstance().addProjectManagerListener(new ProjectManagerAdapter() {
+    eventFacade.addProjectManagerListener(new ProjectManagerAdapter() {
       @Override
       public void projectOpened(@NotNull final Project project) {
-        final MessageBusConnection connection = project.getMessageBus().connect();
-        connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new MotionGroup.MotionEditorChange());
-        connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileGroup.SelectionCheck());
-        connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new SearchGroup.EditorSelectionCheck());
+        eventFacade.addFileEditorManagerListener(project, new MotionGroup.MotionEditorChange());
+        eventFacade.addFileEditorManagerListener(project, new FileGroup.SelectionCheck());
+        eventFacade.addFileEditorManagerListener(project, new SearchGroup.EditorSelectionCheck());
       }
     });
   }

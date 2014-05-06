@@ -73,17 +73,19 @@ public class ChangeGroup {
   public ChangeGroup() {
     // We want to know when a user clicks the mouse somewhere in the editor so we can clear any
     // saved text for the current insert mode.
-    EventFacade.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
+    final EventFacade eventFacade = EventFacade.getInstance();
+
+    eventFacade.addEditorFactoryListener(new EditorFactoryAdapter() {
       public void editorCreated(@NotNull EditorFactoryEvent event) {
-        Editor editor = event.getEditor();
-        editor.addEditorMouseListener(listener);
+        final Editor editor = event.getEditor();
+        eventFacade.addEditorMouseListener(editor, listener);
         EditorData.setChangeGroup(editor, true);
       }
 
       public void editorReleased(@NotNull EditorFactoryEvent event) {
-        Editor editor = event.getEditor();
+        final Editor editor = event.getEditor();
         if (EditorData.getChangeGroup(editor)) {
-          editor.removeEditorMouseListener(listener);
+          eventFacade.removeEditorMouseListener(editor, listener);
           EditorData.setChangeGroup(editor, false);
         }
       }
@@ -360,12 +362,13 @@ public class ChangeGroup {
       lastInsert = cmd;
       strokes.clear();
       repeatCharsCount = 0;
+      final EventFacade eventFacade = EventFacade.getInstance();
       if (document != null && documentListener != null) {
-        EventFacade.getInstance().removeDocumentListener(document, documentListener);
+        eventFacade.removeDocumentListener(document, documentListener);
       }
       document = editor.getDocument();
       documentListener = new InsertActionsDocumentListener();
-      EventFacade.getInstance().addDocumentListener(document, documentListener);
+      eventFacade.addDocumentListener(document, documentListener);
       oldOffset = -1;
       inInsert = true;
       if (mode == CommandState.Mode.REPLACE) {

@@ -121,15 +121,17 @@ public class MotionGroup {
   }
 
   private void addEditorListener(@NotNull Editor editor) {
-    editor.addEditorMouseListener(mouseHandler);
-    editor.addEditorMouseMotionListener(mouseHandler);
-    editor.getSelectionModel().addSelectionListener(selectionHandler);
+    final EventFacade eventFacade = EventFacade.getInstance();
+    eventFacade.addEditorMouseListener(editor, mouseHandler);
+    eventFacade.addEditorMouseMotionListener(editor, mouseHandler);
+    eventFacade.addEditorSelectionListener(editor, selectionHandler);
   }
 
   private void removeEditorListener(@NotNull Editor editor) {
-    editor.removeEditorMouseListener(mouseHandler);
-    editor.removeEditorMouseMotionListener(mouseHandler);
-    editor.getSelectionModel().removeSelectionListener(selectionHandler);
+    final EventFacade eventFacade = EventFacade.getInstance();
+    eventFacade.removeEditorMouseListener(editor, mouseHandler);
+    eventFacade.removeEditorMouseMotionListener(editor, mouseHandler);
+    eventFacade.removeEditorSelectionListener(editor, selectionHandler);
   }
 
   /**
