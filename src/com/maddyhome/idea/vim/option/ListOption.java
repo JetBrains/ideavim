@@ -222,13 +222,7 @@ public class ListOption extends TextOption {
    */
   @NotNull
   public String toString() {
-    StringBuffer res = new StringBuffer();
-    res.append("  ");
-    res.append(getName());
-    res.append("=");
-    res.append(getValue());
-
-    return res.toString();
+    return "  " + getName() + "=" + getValue();
   }
 
   @NotNull protected final List<String> dflt;
