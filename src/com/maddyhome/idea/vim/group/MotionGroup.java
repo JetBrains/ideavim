@@ -345,7 +345,10 @@ public class MotionGroup {
   @Nullable
   public static TextRange getMotionRange(@NotNull Editor editor, DataContext context, int count, int rawCount,
                                          @NotNull Argument argument, boolean incNewline, boolean moveCursor) {
-    Command cmd = argument.getMotion();
+    final Command cmd = argument.getMotion();
+    if (cmd == null) {
+      return null;
+    }
     // Normalize the counts between the command and the motion argument
     int cnt = cmd.getCount() * count;
     int raw = rawCount == 0 && cmd.getRawCount() == 0 ? 0 : cnt;
@@ -419,19 +422,19 @@ public class MotionGroup {
     return Math.max(0, Math.min(count, EditorHelper.getFileSize(editor) - 1));
   }
 
-  public int moveCaretToMarkLine(@NotNull Editor editor, char ch) {
-    Mark mark = VimPlugin.getMark().getMark(editor, ch);
+  public int moveCaretToMarkLine(final @NotNull Editor editor, char ch) {
+    final Mark mark = VimPlugin.getMark().getMark(editor, ch);
     if (mark != null) {
-      VirtualFile vf = EditorData.getVirtualFile(editor);
-      if (vf == null) return -1;
-
-      int line = mark.getLogicalLine();
-      if (!mark.getFilename().equals(vf.getPath())) {
-        editor = selectEditor(editor, EditorData.getVirtualFile(editor));
-        if (editor != null) {
-          moveCaret(editor, moveCaretToLineStartSkipLeading(editor, line));
+      final VirtualFile vf = EditorData.getVirtualFile(editor);
+      if (vf == null) {
+        return -1;
+      }
+      final int line = mark.getLogicalLine();
+      if (!vf.getPath().equals(mark.getFilename())) {
+        final Editor selectedEditor = selectEditor(editor, vf);
+        if (selectedEditor != null) {
+          moveCaret(selectedEditor, moveCaretToLineStartSkipLeading(selectedEditor, line));
         }
-
         return -2;
       }
       else {
@@ -454,19 +457,19 @@ public class MotionGroup {
     }
   }
 
-  public int moveCaretToMark(@NotNull Editor editor, char ch) {
-    Mark mark = VimPlugin.getMark().getMark(editor, ch);
+  public int moveCaretToMark(@NotNull final Editor editor, char ch) {
+    final Mark mark = VimPlugin.getMark().getMark(editor, ch);
     if (mark != null) {
-      VirtualFile vf = EditorData.getVirtualFile(editor);
-      if (vf == null) return -1;
-
-      LogicalPosition lp = new LogicalPosition(mark.getLogicalLine(), mark.getCol());
+      final VirtualFile vf = EditorData.getVirtualFile(editor);
+      if (vf == null) {
+        return -1;
+      }
+      final LogicalPosition lp = new LogicalPosition(mark.getLogicalLine(), mark.getCol());
       if (!vf.getPath().equals(mark.getFilename())) {
-        editor = selectEditor(editor, EditorData.getVirtualFile(editor));
-        if (editor != null) {
-          moveCaret(editor, editor.logicalPositionToOffset(lp));
+        final Editor selectedEditor = selectEditor(editor, vf);
+        if (selectedEditor != null) {
+          moveCaret(selectedEditor, selectedEditor.logicalPositionToOffset(lp));
         }
-
         return -2;
       }
       else {
@@ -486,8 +489,9 @@ public class MotionGroup {
       if (vf == null) return -1;
 
       LogicalPosition lp = new LogicalPosition(jump.getLogicalLine(), jump.getCol());
-      if (!vf.getPath().equals(jump.getFilename())) {
-        VirtualFile newFile = LocalFileSystem.getInstance().findFileByPath(jump.getFilename().replace(File.separatorChar, '/'));
+      final String filename = jump.getFilename();
+      if (!vf.getPath().equals(filename) && filename != null) {
+        VirtualFile newFile = LocalFileSystem.getInstance().findFileByPath(filename.replace(File.separatorChar, '/'));
         if (newFile == null) return -2;
 
         Editor newEditor = selectEditor(editor, newFile);
@@ -1746,7 +1750,7 @@ public class MotionGroup {
         final Editor editor = ((TextEditor)fileEditor).getEditor();
         ExOutputModel.getInstance(editor).clear();
         if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-          VimPlugin.getMotion().exitVisual(EditorHelper.getEditor(event.getManager(), event.getOldFile()), true);
+          VimPlugin.getMotion().exitVisual(editor, true);
         }
       }
     }
