@@ -1753,28 +1753,28 @@ public class MotionGroup {
   }
 
   private static class EditorSelectionHandler implements SelectionListener {
+    private boolean myMakingChanges = false;
+
     public void selectionChanged(@NotNull SelectionEvent selectionEvent) {
-      if (makingChanges) return;
-
-      makingChanges = true;
-
-      Editor editor = selectionEvent.getEditor();
-      TextRange range = new TextRange(selectionEvent.getNewRange().getStartOffset(), selectionEvent.getNewRange().getEndOffset());
-
-      Editor[] editors = EditorFactory.getInstance().getEditors(editor.getDocument());
-      for (Editor ed : editors) {
-        if (ed.equals(editor)) {
-          continue;
-        }
-
-        ed.getSelectionModel().setSelection(range.getStartOffset(), range.getEndOffset());
-        ed.getCaretModel().moveToOffset(editor.getCaretModel().getOffset());
+      if (myMakingChanges) {
+        return;
       }
 
-      makingChanges = false;
+      myMakingChanges = true;
+      try {
+        final Editor editor = selectionEvent.getEditor();
+        final com.intellij.openapi.util.TextRange newRange = selectionEvent.getNewRange();
+        for (Editor e : EditorFactory.getInstance().getEditors(editor.getDocument())) {
+          if (!e.equals(editor)) {
+            e.getSelectionModel().setSelection(newRange.getStartOffset(), newRange.getEndOffset());
+            e.getCaretModel().moveToOffset(editor.getCaretModel().getOffset());
+          }
+        }
+      }
+      finally {
+        myMakingChanges = false;
+      }
     }
-
-    private boolean makingChanges = false;
   }
 
   private static class EditorMouseHandler implements EditorMouseListener, EditorMouseMotionListener {
