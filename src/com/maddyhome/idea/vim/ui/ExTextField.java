@@ -50,8 +50,7 @@ public class ExTextField extends JTextField {
     final Action[] actions = ExEditorKit.getInstance().getActions();
     final ActionMap actionMap = getActionMap();
     int n = actions.length;
-    for (int i = 0; i < n; i++) {
-      Action a = actions[i];
+    for (Action a : actions) {
       actionMap.put(a.getValue(Action.NAME), a);
       //System.out.println("  " + a.getValue(Action.NAME));
     }
