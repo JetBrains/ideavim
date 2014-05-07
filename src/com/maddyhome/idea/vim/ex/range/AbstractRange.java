@@ -144,6 +144,6 @@ public abstract class AbstractRange implements Range {
    */
   protected abstract int getRangeLine(Editor editor, DataContext context, boolean lastZero);
 
-  protected int offset;
-  protected boolean move;
+  protected final int offset;
+  protected final boolean move;
 }

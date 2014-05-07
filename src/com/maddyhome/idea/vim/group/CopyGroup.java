@@ -445,5 +445,5 @@ public class CopyGroup {
     markGroup.setMark(editor, ']', endOffset);
   }
 
-  private static Logger logger = Logger.getInstance(CopyGroup.class.getName());
+  private static final Logger logger = Logger.getInstance(CopyGroup.class.getName());
 }

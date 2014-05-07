@@ -40,8 +40,8 @@ public class CommandState {
   @Nullable private static Command ourLastChange = null;
   private static char ourLastRegister = RegisterGroup.REGISTER_DEFAULT;
 
-  @NotNull private Stack<State> myStates = new Stack<State>();
-  @NotNull private State myDefaultState = new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL);
+  @NotNull private final Stack<State> myStates = new Stack<State>();
+  @NotNull private final State myDefaultState = new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL);
   @Nullable private Command myCommand;
   @NotNull private ParentNode myCurrentNode = VimPlugin.getKey().getKeyRoot(getMappingMode());
   @NotNull private final List<KeyStroke> myMappingKeys = new ArrayList<KeyStroke>();
@@ -329,9 +329,9 @@ public class CommandState {
   }
 
   private class State {
-    @NotNull private Mode myMode;
+    @NotNull private final Mode myMode;
     @NotNull private SubMode mySubMode;
-    @NotNull private MappingMode myMappingMode;
+    @NotNull private final MappingMode myMappingMode;
 
     public State(@NotNull Mode mode, @NotNull SubMode subMode, @NotNull MappingMode mappingMode) {
       this.myMode = mode;

@@ -1197,7 +1197,7 @@ public class SearchGroup {
       }
     }
 
-    private int index;
+    private final int index;
   }
 
   public static class EditorSelectionCheck extends FileEditorManagerAdapter {
@@ -1282,5 +1282,5 @@ public class SearchGroup {
   private static final int RE_SEARCH = 2;
   private static final int RE_SUBST = 3;
 
-  private static Logger logger = Logger.getInstance(SearchGroup.class.getName());
+  private static final Logger logger = Logger.getInstance(SearchGroup.class.getName());
 }

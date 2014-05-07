@@ -90,7 +90,7 @@ public class ChangeGroup {
         }
       }
 
-      @NotNull private EditorMouseAdapter listener = new EditorMouseAdapter() {
+      @NotNull private final EditorMouseAdapter listener = new EditorMouseAdapter() {
         public void mouseClicked(@NotNull EditorMouseEvent event) {
           Editor editor = event.getEditor();
           if (!VimPlugin.isEnabled()) {
@@ -843,10 +843,10 @@ public class ChangeGroup {
 
   @Nullable
   public static TextRange getDeleteMotionRange(@NotNull Editor editor,
-                                               DataContext context,
-                                               int count,
-                                               int rawCount,
-                                               @NotNull Argument argument) {
+                                                DataContext context,
+                                                int count,
+                                                int rawCount,
+                                                @NotNull Argument argument) {
     TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true);
     // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is deleted when it shouldn't be.
     if (range != null) {
@@ -1680,5 +1680,5 @@ public class ChangeGroup {
   @Nullable private DocumentAdapter documentListener;
   private int oldOffset = -1;
 
-  private static Logger logger = Logger.getInstance(ChangeGroup.class.getName());
+  private static final Logger logger = Logger.getInstance(ChangeGroup.class.getName());
 }

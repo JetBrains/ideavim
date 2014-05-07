@@ -58,7 +58,7 @@ import static java.awt.event.KeyEvent.*;
 public class VimShortcutKeyAction extends AnAction implements DumbAware {
   private static final String ACTION_ID = "VimShortcutKeyAction";
 
-  @NotNull public static Set<KeyStroke> VIM_ONLY_EDITOR_KEYS = ImmutableSet.<KeyStroke>builder()
+  @NotNull public static final Set<KeyStroke> VIM_ONLY_EDITOR_KEYS = ImmutableSet.<KeyStroke>builder()
     .addAll(getKeyStrokes(VK_ENTER, 0))
     .addAll(getKeyStrokes(VK_ESCAPE, 0))
     .addAll(getKeyStrokes(VK_TAB, 0))
@@ -75,7 +75,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     .addAll(getKeyStrokes(VK_PAGE_DOWN, 0, SHIFT_MASK, CTRL_MASK | SHIFT_MASK))
     .build();
 
-  @NotNull private static Set<KeyStroke> NON_FILE_EDITOR_KEYS = ImmutableSet.<KeyStroke>builder()
+  @NotNull private static final Set<KeyStroke> NON_FILE_EDITOR_KEYS = ImmutableSet.<KeyStroke>builder()
     .addAll(getKeyStrokes(VK_ESCAPE, 0))
     .addAll(getKeyStrokes(VK_TAB, 0))
     .addAll(getKeyStrokes(VK_UP, 0))

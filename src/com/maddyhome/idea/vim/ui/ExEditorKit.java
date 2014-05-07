@@ -117,7 +117,7 @@ public class ExEditorKit extends DefaultEditorKit {
   public static final String HistoryDownFilter = "history-down-filter";
   public static final String StartDigraph = "start-digraph";
 
-  @NotNull protected Action[] exActions = new Action[]{
+  @NotNull protected final Action[] exActions = new Action[]{
     new ExEditorKit.CancelEntryAction(),
     new ExEditorKit.CompleteEntryAction(),
     new ExEditorKit.EscapeCharAction(),

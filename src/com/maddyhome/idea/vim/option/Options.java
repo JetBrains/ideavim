@@ -454,10 +454,10 @@ public class Options {
     abbrevs.put(option.getAbbreviation(), option);
   }
 
-  @NotNull private HashMap<String, Option> options = new HashMap<String, Option>();
-  @NotNull private HashMap<String, Option> abbrevs = new HashMap<String, Option>();
+  @NotNull private final HashMap<String, Option> options = new HashMap<String, Option>();
+  @NotNull private final HashMap<String, Option> abbrevs = new HashMap<String, Option>();
 
   private static Options ourInstance;
 
-  private static Logger logger = Logger.getInstance(Options.class.getName());
+  private static final Logger logger = Logger.getInstance(Options.class.getName());
 }

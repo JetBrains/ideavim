@@ -52,7 +52,7 @@ public class VisualChange {
     return res.toString();
   }
 
-  int lines;
-  int columns;
-  @NotNull SelectionType type;
+  final int lines;
+  final int columns;
+  @NotNull final SelectionType type;
 }

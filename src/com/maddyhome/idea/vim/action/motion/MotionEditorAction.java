@@ -36,5 +36,5 @@ public abstract class MotionEditorAction extends EditorAction {
     return handler.getOffset(editor, context, count, rawCount, argument);
   }
 
-  private MotionEditorActionHandler handler;
+  private final MotionEditorActionHandler handler;
 }

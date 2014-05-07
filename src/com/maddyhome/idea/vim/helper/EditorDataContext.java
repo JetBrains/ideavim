@@ -48,5 +48,5 @@ public class EditorDataContext implements DataContext {
     return null;
   }
 
-  private Editor editor;
+  private final Editor editor;
 }

@@ -239,7 +239,7 @@ public class EditorData {
 
   private static Key CONSOLE_VIEW_IN_EDITOR_VIEW = Key.create("CONSOLE_VIEW_IN_EDITOR_VIEW");
 
-  private static Logger logger = Logger.getInstance(EditorData.class.getName());
+  private static final Logger logger = Logger.getInstance(EditorData.class.getName());
 
   static {
     try {

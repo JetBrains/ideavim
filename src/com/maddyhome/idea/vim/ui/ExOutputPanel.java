@@ -46,11 +46,11 @@ import java.util.List;
 public class ExOutputPanel extends JPanel {
   @NotNull private final Editor myEditor;
 
-  @NotNull private JLabel myLabel = new JLabel("more");
-  @NotNull private JTextArea myText = new JTextArea();
-  @NotNull private JScrollPane myScrollPane =
+  @NotNull private final JLabel myLabel = new JLabel("more");
+  @NotNull private final JTextArea myText = new JTextArea();
+  @NotNull private final JScrollPane myScrollPane =
     new JBScrollPane(myText, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-  private ComponentAdapter myAdapter;
+  private final ComponentAdapter myAdapter;
   private boolean myAtEnd = false;
   private int myLineHeight = 0;
 
@@ -296,7 +296,7 @@ public class ExOutputPanel extends JPanel {
   }
 
   private static class MoreKeyListener extends KeyAdapter {
-    private ExOutputPanel myExOutputPanel;
+    private final ExOutputPanel myExOutputPanel;
 
     public MoreKeyListener(ExOutputPanel panel) {
       this.myExOutputPanel = panel;

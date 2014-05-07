@@ -261,5 +261,5 @@ public class ProcessGroup {
 
   private String lastCommand;
 
-  private static Logger logger = Logger.getInstance(ProcessGroup.class.getName());
+  private static final Logger logger = Logger.getInstance(ProcessGroup.class.getName());
 }

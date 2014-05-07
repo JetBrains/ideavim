@@ -109,7 +109,7 @@ public abstract class Option {
     }
   }
 
-  protected String name;
-  protected String abbrev;
-  @NotNull protected List<OptionChangeListener> listeners = new ArrayList<OptionChangeListener>();
+  protected final String name;
+  protected final String abbrev;
+  @NotNull protected final List<OptionChangeListener> listeners = new ArrayList<OptionChangeListener>();
 }

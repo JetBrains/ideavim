@@ -226,8 +226,8 @@ public class DigraphSequence {
       return result;
     }
 
-    private int result;
-    @Nullable private KeyStroke stroke;
+    private final int result;
+    @Nullable private final KeyStroke stroke;
   }
 
   private int digraphState = DIG_STATE_START;
@@ -243,5 +243,5 @@ public class DigraphSequence {
   private static final int DIG_STATE_CODE_START = 10;
   private static final int DIG_STATE_CODE_CHAR = 11;
 
-  private static Logger logger = Logger.getInstance(DigraphSequence.class.getName());
+  private static final Logger logger = Logger.getInstance(DigraphSequence.class.getName());
 }

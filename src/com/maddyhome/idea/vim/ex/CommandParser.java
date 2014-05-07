@@ -595,7 +595,7 @@ public class CommandParser {
     }
   }
 
-  @NotNull private CommandNode root = new CommandNode();
+  @NotNull private final CommandNode root = new CommandNode();
   private boolean registered = false;
 
   private static CommandParser ourInstance;
@@ -622,5 +622,5 @@ public class CommandParser {
   private static final int STATE_RANGE_DONE = 51;
   private static final int STATE_ERROR = 99;
 
-  private static Logger logger = Logger.getInstance(CommandParser.class.getName());
+  private static final Logger logger = Logger.getInstance(CommandParser.class.getName());
 }

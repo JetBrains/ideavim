@@ -95,8 +95,8 @@ public class ExCommand {
     return ranges;
   }
 
-  @NotNull private Ranges ranges;
-  @NotNull private String command;
+  @NotNull private final Ranges ranges;
+  @NotNull private final String command;
   @NotNull private String argument;
 
   private static Logger logger = Logger.getInstance(ExCommand.class.getName());

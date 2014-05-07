@@ -33,8 +33,8 @@ import java.util.List;
  */
 public class Register {
   private char name;
-  @NotNull private SelectionType type;
-  @NotNull private List<KeyStroke> keys;
+  @NotNull private final SelectionType type;
+  @NotNull private final List<KeyStroke> keys;
 
   public Register(char name, @NotNull SelectionType type, @NotNull String text) {
     this.name = name;

@@ -240,5 +240,5 @@ public class Ranges {
   private int count = 0;
   private int defaultLine = -1;
   private boolean done = false;
-  private List<Range> ranges;
+  private final List<Range> ranges;
 }

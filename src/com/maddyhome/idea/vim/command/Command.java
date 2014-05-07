@@ -314,7 +314,7 @@ public class Command {
 
   private int count;
   private AnAction action;
-  @NotNull private Type type;
+  @NotNull private final Type type;
   private int flags;
   private Argument argument;
   private List<KeyStroke> keys;

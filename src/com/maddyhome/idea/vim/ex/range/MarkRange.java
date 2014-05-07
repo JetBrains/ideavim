@@ -72,5 +72,5 @@ public class MarkRange extends AbstractRange {
     return res.toString();
   }
 
-  private char mark;
+  private final char mark;
 }

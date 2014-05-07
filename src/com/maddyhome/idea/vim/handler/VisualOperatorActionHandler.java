@@ -142,8 +142,8 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
       }
     }
 
-    private Command cmd;
-    private Editor editor;
+    private final Command cmd;
+    private final Editor editor;
     private boolean res;
     @NotNull private CommandState.SubMode lastMode;
     private boolean wasRepeat;
@@ -151,5 +151,5 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
     @Nullable VisualChange change = null;
   }
 
-  private static Logger logger = Logger.getInstance(VisualOperatorActionHandler.class.getName());
+  private static final Logger logger = Logger.getInstance(VisualOperatorActionHandler.class.getName());
 }

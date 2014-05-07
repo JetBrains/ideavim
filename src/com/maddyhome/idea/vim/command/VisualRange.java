@@ -58,8 +58,8 @@ public class VisualRange {
     return res.toString();
   }
 
-  int start;
-  int end;
-  @NotNull CommandState.SubMode type;
-  int offset;
+  final int start;
+  final int end;
+  @NotNull final CommandState.SubMode type;
+  final int offset;
 }

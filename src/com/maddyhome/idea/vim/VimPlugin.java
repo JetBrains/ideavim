@@ -103,22 +103,22 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   // It is enabled by default to avoid any special configuration after plugin installation
   private boolean enabled = true;
 
-  private static Logger LOG = Logger.getInstance(VimPlugin.class);
+  private static final Logger LOG = Logger.getInstance(VimPlugin.class);
 
   private final Application myApp;
 
-  private MotionGroup motion;
-  private ChangeGroup change;
-  private CopyGroup copy;
-  private MarkGroup mark;
-  private RegisterGroup register;
-  private FileGroup file;
-  private SearchGroup search;
-  private ProcessGroup process;
-  private MacroGroup macro;
-  private DigraphGroup digraph;
-  private HistoryGroup history;
-  private KeyGroup key;
+  private final MotionGroup motion;
+  private final ChangeGroup change;
+  private final CopyGroup copy;
+  private final MarkGroup mark;
+  private final RegisterGroup register;
+  private final FileGroup file;
+  private final SearchGroup search;
+  private final ProcessGroup process;
+  private final MacroGroup macro;
+  private final DigraphGroup digraph;
+  private final HistoryGroup history;
+  private final KeyGroup key;
 
   public VimPlugin(final Application app) {
     myApp = app;

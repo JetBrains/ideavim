@@ -1809,8 +1809,8 @@ public class MotionGroup {
   private int visualStart;
   private int visualEnd;
   private int visualOffset;
-  @NotNull private EditorMouseHandler mouseHandler = new EditorMouseHandler();
-  @NotNull private EditorSelectionHandler selectionHandler = new EditorSelectionHandler();
+  @NotNull private final EditorMouseHandler mouseHandler = new EditorMouseHandler();
+  @NotNull private final EditorSelectionHandler selectionHandler = new EditorSelectionHandler();
 
-  private static Logger logger = Logger.getInstance(MotionGroup.class.getName());
+  private static final Logger logger = Logger.getInstance(MotionGroup.class.getName());
 }

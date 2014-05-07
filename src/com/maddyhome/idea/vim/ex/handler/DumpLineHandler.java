@@ -55,5 +55,5 @@ public class DumpLineHandler extends CommandHandler {
     return true;
   }
 
-  private static Logger logger = Logger.getInstance(DumpLineHandler.class.getName());
+  private static final Logger logger = Logger.getInstance(DumpLineHandler.class.getName());
 }

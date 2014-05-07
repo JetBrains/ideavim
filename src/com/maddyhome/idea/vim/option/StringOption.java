@@ -138,6 +138,6 @@ public class StringOption extends TextOption {
     return res.toString();
   }
 
-  protected String dflt;
+  protected final String dflt;
   protected String value;
 }

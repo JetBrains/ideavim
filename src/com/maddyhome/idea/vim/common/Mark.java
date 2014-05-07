@@ -86,5 +86,5 @@ public class Mark extends FileLocation {
     }
   }
 
-  private char key;
+  private final char key;
 }

@@ -53,5 +53,5 @@ public abstract class EditorActionHandlerBase extends EditorActionHandler {
 
   protected abstract boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd);
 
-  private static Logger logger = Logger.getInstance(EditorActionHandlerBase.class.getName());
+  private static final Logger logger = Logger.getInstance(EditorActionHandlerBase.class.getName());
 }

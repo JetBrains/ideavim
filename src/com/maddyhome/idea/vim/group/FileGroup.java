@@ -443,7 +443,7 @@ public class FileGroup {
     }
   }
 
-  @NotNull private static HashMap<FileEditorManager, VirtualFile> lastSelections = new HashMap<FileEditorManager, VirtualFile>();
+  @NotNull private static final HashMap<FileEditorManager, VirtualFile> lastSelections = new HashMap<FileEditorManager, VirtualFile>();
 
-  private static Logger logger = Logger.getInstance(FileGroup.class.getName());
+  private static final Logger logger = Logger.getInstance(FileGroup.class.getName());
 }

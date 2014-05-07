@@ -68,5 +68,5 @@ public class BoundListOption extends ListOption {
     return true;
   }
 
-  protected List<String> values;
+  protected final List<String> values;
 }

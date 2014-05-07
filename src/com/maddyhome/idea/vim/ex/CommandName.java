@@ -35,6 +35,6 @@ public class CommandName {
     return optional;
   }
 
-  private String required;
-  private String optional;
+  private final String required;
+  private final String optional;
 }

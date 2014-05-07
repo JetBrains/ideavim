@@ -1772,12 +1772,12 @@ public class SearchHelper {
       return position;
     }
 
-    private int count;
-    private int position;
+    private final int count;
+    private final int position;
   }
 
   @Nullable private static String pairsChars = null;
-  @NotNull private static String blockChars = "{}()[]<>";
+  @NotNull private static final String blockChars = "{}()[]<>";
 
-  private static Logger logger = Logger.getInstance(SearchHelper.class.getName());
+  private static final Logger logger = Logger.getInstance(SearchHelper.class.getName());
 }

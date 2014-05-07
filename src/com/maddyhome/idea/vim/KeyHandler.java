@@ -673,10 +673,10 @@ public class KeyHandler {
       }
     }
 
-    private Editor editor;
-    private DataContext context;
-    private Command cmd;
-    private KeyStroke key;
+    private final Editor editor;
+    private final DataContext context;
+    private final Command cmd;
+    private final KeyStroke key;
   }
 
   private static enum State {
@@ -690,7 +690,7 @@ public class KeyHandler {
   private int count;
   private List<KeyStroke> keys;
   private State state;
-  @NotNull private Stack<Command> currentCmd = new Stack<Command>();
+  @NotNull private final Stack<Command> currentCmd = new Stack<Command>();
   @NotNull private Argument.Type currentArg;
   private TypedActionHandler origHandler;
   @Nullable private DigraphSequence digraph = null;

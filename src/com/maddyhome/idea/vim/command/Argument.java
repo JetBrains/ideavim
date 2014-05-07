@@ -140,5 +140,5 @@ public class Argument {
   private char charArg = 0;
   @Nullable private Command motionArg = null;
   @Nullable private String strArg = null;
-  @NotNull private Type type;
+  @NotNull private final Type type;
 }

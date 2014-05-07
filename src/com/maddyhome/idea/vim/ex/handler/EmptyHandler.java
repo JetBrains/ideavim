@@ -39,5 +39,5 @@ public class EmptyHandler extends CommandHandler {
     return true;
   }
 
-  private static Logger logger = Logger.getInstance(EmptyHandler.class.getName());
+  private static final Logger logger = Logger.getInstance(EmptyHandler.class.getName());
 }

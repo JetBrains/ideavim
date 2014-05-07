@@ -205,17 +205,17 @@ public class ExEntryPanel extends JPanel {
   }
 
   @Nullable private JComponent parent;
-  private JLabel label;
-  private ExTextField entry;
+  private final JLabel label;
+  private final ExTextField entry;
   private JComponent oldGlass;
   private LayoutManager oldLayout;
   private boolean wasOpaque;
-  private ComponentAdapter adapter;
+  private final ComponentAdapter adapter;
   private int count;
 
   private boolean active;
 
   private static ExEntryPanel instance;
 
-  private static Logger logger = Logger.getInstance(ExEntryPanel.class.getName());
+  private static final Logger logger = Logger.getInstance(ExEntryPanel.class.getName());
 }

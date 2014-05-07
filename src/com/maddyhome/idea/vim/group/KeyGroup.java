@@ -56,10 +56,10 @@ public class KeyGroup {
   public static final String OWNER_ATTRIBUTE = "owner";
   public static final String TEXT_ELEMENT = "text";
 
-  @NotNull private Map<KeyStroke, ShortcutOwner> shortcutConflicts = new LinkedHashMap<KeyStroke, ShortcutOwner>();
-  @NotNull private Set<KeyStroke> requiredShortcutKeys = new HashSet<KeyStroke>();
-  @NotNull private HashMap<MappingMode, RootNode> keyRoots = new HashMap<MappingMode, RootNode>();
-  @NotNull private Map<MappingMode, KeyMapping> keyMappings = new HashMap<MappingMode, KeyMapping>();
+  @NotNull private final Map<KeyStroke, ShortcutOwner> shortcutConflicts = new LinkedHashMap<KeyStroke, ShortcutOwner>();
+  @NotNull private final Set<KeyStroke> requiredShortcutKeys = new HashSet<KeyStroke>();
+  @NotNull private final HashMap<MappingMode, RootNode> keyRoots = new HashMap<MappingMode, RootNode>();
+  @NotNull private final Map<MappingMode, KeyMapping> keyMappings = new HashMap<MappingMode, KeyMapping>();
 
   public void registerRequiredShortcutKeys(@NotNull Editor editor) {
     final Set<KeyStroke> requiredKeys = VimPlugin.getKey().getRequiredShortcutKeys();

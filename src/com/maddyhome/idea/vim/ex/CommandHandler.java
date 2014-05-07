@@ -261,7 +261,7 @@ public abstract class CommandHandler {
    */
   public abstract boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException;
 
-  @Nullable protected CommandName[] names;
-  protected int argFlags;
-  protected int optFlags;
+  @Nullable protected final CommandName[] names;
+  protected final int argFlags;
+  protected final int optFlags;
 }

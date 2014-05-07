@@ -114,6 +114,6 @@ public class TextRange {
     return sb.toString();
   }
 
-  private int[] starts;
-  private int[] ends;
+  private final int[] starts;
+  private final int[] ends;
 }

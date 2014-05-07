@@ -102,6 +102,6 @@ public class BranchNode extends ParentNode {
     return res.toString();
   }
 
-  protected KeyStroke key;
-  protected int flags;
+  protected final KeyStroke key;
+  protected final int flags;
 }

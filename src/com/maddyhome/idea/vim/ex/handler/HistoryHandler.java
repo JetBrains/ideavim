@@ -173,5 +173,5 @@ public class HistoryHandler extends CommandHandler {
     return res.toString();
   }
 
-  private static Logger logger = Logger.getInstance(HistoryHandler.class.getName());
+  private static final Logger logger = Logger.getInstance(HistoryHandler.class.getName());
 }

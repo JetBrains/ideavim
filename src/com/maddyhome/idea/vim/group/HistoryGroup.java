@@ -208,11 +208,11 @@ public class HistoryGroup {
       return entry;
     }
 
-    private int number;
-    @NotNull private String entry;
+    private final int number;
+    @NotNull private final String entry;
   }
 
-  @NotNull private Map<String, HistoryBlock> histories = new HashMap<String, HistoryBlock>();
+  @NotNull private final Map<String, HistoryBlock> histories = new HashMap<String, HistoryBlock>();
 
-  private static Logger logger = Logger.getInstance(HistoryGroup.class.getName());
+  private static final Logger logger = Logger.getInstance(HistoryGroup.class.getName());
 }

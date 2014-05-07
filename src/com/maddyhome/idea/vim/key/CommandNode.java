@@ -124,9 +124,9 @@ public class CommandNode implements Node {
     return result;
   }
 
-  protected KeyStroke key;
-  protected AnAction action;
-  protected String actionId;
-  protected Command.Type type;
-  protected int flags;
+  protected final KeyStroke key;
+  protected final AnAction action;
+  protected final String actionId;
+  protected final Command.Type type;
+  protected final int flags;
 }

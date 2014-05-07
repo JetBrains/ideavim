@@ -127,9 +127,9 @@ public class ArgumentNode implements Node {
     return result;
   }
 
-  protected String actionId;
-  protected AnAction action;
-  @NotNull protected Argument.Type argType;
-  protected Command.Type cmdType;
-  protected int flags;
+  protected final String actionId;
+  protected final AnAction action;
+  @NotNull protected final Argument.Type argType;
+  protected final Command.Type cmdType;
+  protected final int flags;
 }

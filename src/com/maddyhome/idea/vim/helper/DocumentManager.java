@@ -61,8 +61,8 @@ public class DocumentManager {
   }
 
 
-  @NotNull private HashSet<DocumentListener> docListeners = new HashSet<DocumentListener>();
+  @NotNull private final HashSet<DocumentListener> docListeners = new HashSet<DocumentListener>();
 
   private static final Key<String> LISTENER_MARKER = new Key<String>("listenerMarker");
-  @NotNull private static DocumentManager instance = new DocumentManager();
+  @NotNull private static final DocumentManager instance = new DocumentManager();
 }

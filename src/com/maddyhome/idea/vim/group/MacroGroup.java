@@ -159,5 +159,5 @@ public class MacroGroup {
   }
 
   private char lastRegister = 0;
-  private static Logger logger = Logger.getInstance(MacroGroup.class.getName());
+  private static final Logger logger = Logger.getInstance(MacroGroup.class.getName());
 }

@@ -57,7 +57,7 @@ public class RegisterGroup {
   private static final Logger logger = Logger.getInstance(RegisterGroup.class.getName());
 
   private char lastRegister = REGISTER_DEFAULT;
-  @NotNull private HashMap<Character, Register> registers = new HashMap<Character, Register>();
+  @NotNull private final HashMap<Character, Register> registers = new HashMap<Character, Register>();
   private char recordRegister = 0;
   @Nullable private List<KeyStroke> recordList = null;
   public RegisterGroup() {}

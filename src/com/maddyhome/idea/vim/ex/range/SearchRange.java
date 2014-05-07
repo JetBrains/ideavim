@@ -139,8 +139,8 @@ public class SearchRange extends AbstractRange {
     return res.toString();
   }
 
-  @NotNull private List<String> patterns = new ArrayList<String>();
-  @NotNull private List<Integer> flags = new ArrayList<Integer>();
+  @NotNull private final List<String> patterns = new ArrayList<String>();
+  @NotNull private final List<Integer> flags = new ArrayList<Integer>();
 
-  private static Logger logger = Logger.getInstance(SearchRange.class.getName());
+  private static final Logger logger = Logger.getInstance(SearchRange.class.getName());
 }

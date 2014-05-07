@@ -75,5 +75,5 @@ public class Shortcut {
     return keys;
   }
 
-  private KeyStroke[] keys;
+  private final KeyStroke[] keys;
 }

@@ -76,5 +76,5 @@ public class CmdFilterHandler extends CommandHandler {
     }
   }
 
-  private static Logger logger = Logger.getInstance(CmdFilterHandler.class.getName());
+  private static final Logger logger = Logger.getInstance(CmdFilterHandler.class.getName());
 }

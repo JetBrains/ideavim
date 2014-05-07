@@ -117,6 +117,6 @@ public class ToggleOption extends Option {
     value = dflt;
   }
 
-  protected boolean dflt;
+  protected final boolean dflt;
   protected boolean value;
 }

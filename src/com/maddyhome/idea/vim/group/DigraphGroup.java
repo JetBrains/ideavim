@@ -127,8 +127,8 @@ public class DigraphGroup {
     // TODO - load custom digraphs from .ideavimrc
   }
 
-  @NotNull private HashMap<String, Character> digraphs = new HashMap<String, Character>(defaultDigraphs.length);
-  @NotNull private TreeMap<Character, String> keys = new TreeMap<Character, String>();
+  @NotNull private final HashMap<String, Character> digraphs = new HashMap<String, Character>(defaultDigraphs.length);
+  @NotNull private final TreeMap<Character, String> keys = new TreeMap<Character, String>();
 
   private static final char defaultDigraphs[] = {
     /*
@@ -1729,5 +1729,5 @@ public class DigraphGroup {
     's', 't', '\ufb06', // LATIN SMALL LIGATURE ST
   };
 
-  private static Logger logger = Logger.getInstance(DigraphGroup.class.getName());
+  private static final Logger logger = Logger.getInstance(DigraphGroup.class.getName());
 }

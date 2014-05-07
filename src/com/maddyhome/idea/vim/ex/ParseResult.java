@@ -24,9 +24,9 @@ import org.jetbrains.annotations.NotNull;
  *
  */
 public class ParseResult {
-  @NotNull private Ranges ranges;
-  @NotNull private String command;
-  @NotNull private String argument;
+  @NotNull private final Ranges ranges;
+  @NotNull private final String command;
+  @NotNull private final String argument;
 
   public ParseResult(@NotNull Ranges ranges, @NotNull String command, @NotNull String argument) {
     this.ranges = ranges;

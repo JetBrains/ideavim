@@ -39,5 +39,5 @@ public abstract class TextObjectAction extends EditorAction {
     return handler.getRange(editor, context, count, rawCount, argument);
   }
 
-  private TextObjectActionHandler handler;
+  private final TextObjectActionHandler handler;
 }

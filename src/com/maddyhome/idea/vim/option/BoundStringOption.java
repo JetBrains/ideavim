@@ -69,5 +69,5 @@ public class BoundStringOption extends StringOption {
     return false;
   }
 
-  protected String[] values;
+  protected final String[] values;
 }

@@ -57,5 +57,5 @@ public class CommandNode {
   }
 
   @Nullable private CommandHandler command;
-  @NotNull private HashMap<Character, CommandNode> nodes = new HashMap<Character, CommandNode>();
+  @NotNull private final HashMap<Character, CommandNode> nodes = new HashMap<Character, CommandNode>();
 }

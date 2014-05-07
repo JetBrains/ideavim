@@ -658,9 +658,9 @@ public class MarkGroup {
     }
   }
 
-  @NotNull private HashMap<String, FileMarks<Character, Mark>> fileMarks = new HashMap<String, FileMarks<Character, Mark>>();
-  @NotNull private HashMap<Character, Mark> globalMarks = new HashMap<Character, Mark>();
-  @NotNull private List<Jump> jumps = new ArrayList<Jump>();
+  @NotNull private final HashMap<String, FileMarks<Character, Mark>> fileMarks = new HashMap<String, FileMarks<Character, Mark>>();
+  @NotNull private final HashMap<Character, Mark> globalMarks = new HashMap<Character, Mark>();
+  @NotNull private final List<Jump> jumps = new ArrayList<Jump>();
   private int jumpSpot = -1;
 
   private static final int SAVE_MARK_COUNT = 20;
@@ -681,5 +681,5 @@ public class MarkGroup {
   private static final String VALID_SET_MARKS = WRITE_MARKS;
   private static final String VALID_GET_MARKS = WRITE_MARKS + READONLY_MARKS;
 
-  private static Logger logger = Logger.getInstance(MarkGroup.class.getName());
+  private static final Logger logger = Logger.getInstance(MarkGroup.class.getName());
 }

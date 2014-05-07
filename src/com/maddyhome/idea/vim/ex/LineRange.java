@@ -41,6 +41,6 @@ public class LineRange {
     return endLine;
   }
 
-  private int startLine;
-  private int endLine;
+  private final int startLine;
+  private final int endLine;
 }

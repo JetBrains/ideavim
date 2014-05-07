@@ -230,8 +230,8 @@ public class NumberOption extends TextOption {
     return res.toString();
   }
 
-  private int dflt;
+  private final int dflt;
   private int value;
-  private int min;
-  private int max;
+  private final int min;
+  private final int max;
 }
