@@ -39,6 +39,7 @@
  * |i|                      {@link com.maddyhome.idea.vim.action.change.insert.InsertBeforeCursorAction}
  * |<Insert>|
  * |v|                      {@link com.maddyhome.idea.vim.action.motion.visual.VisualToggleCharacterModeAction}
+ * |gv|                     {@link com.maddyhome.idea.vim.action.motion.visual.VisualSelectPreviousAction}
  *
  *
  * 5. Ex commands

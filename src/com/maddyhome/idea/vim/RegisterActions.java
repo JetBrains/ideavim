@@ -601,8 +601,6 @@ public class RegisterActions {
                           new Shortcut('&'));
     parser.registerAction(MappingMode.N, "VimLastGlobalSearchReplace", Command.Type.OTHER_WRITABLE,
                           new Shortcut("g&"));
-    parser.registerAction(MappingMode.N, "VimVisualSelectPrevious", Command.Type.OTHER_READONLY,
-                          new Shortcut("gv"));
     parser.registerAction(MappingMode.N, "VimRepeatChange", Command.Type.OTHER_WRITABLE,
                           new Shortcut('.'));
     parser.registerAction(MappingMode.N, "VimRepeatExCommand", Command.Type.OTHER_WRITABLE,
