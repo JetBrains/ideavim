@@ -211,16 +211,13 @@ public class SearchGroup {
       else if (cmd.charAt() == 'r')       /* use last used regexp */ {
         which_pat = RE_LAST;
       }
-      else if (cmd.charAt() == 'p') {
-        //do_print = true;
-      }
       else if (cmd.charAt() == 'i')       /* ignore case */ {
         do_ic = 'i';
       }
       else if (cmd.charAt() == 'I')       /* don't ignore case */ {
         do_ic = 'I';
       }
-      else {
+      else if (cmd.charAt() != 'p') {
         break;
       }
       cmd.inc();

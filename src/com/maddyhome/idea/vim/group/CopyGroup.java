@@ -188,7 +188,8 @@ public class CopyGroup {
     // Without this reset, the deleted text goes into the same register we just pasted from.
     VimPlugin.getRegister().resetRegister();
     if (reg != null) {
-      if (reg.getType() == SelectionType.LINE_WISE && editor.isOneLineMode()) {
+      final SelectionType type = reg.getType();
+      if (type == SelectionType.LINE_WISE && editor.isOneLineMode()) {
         return false;
       }
 
@@ -210,27 +211,23 @@ public class CopyGroup {
       editor.getCaretModel().moveToOffset(start);
 
       int pos = start;
-      if (reg.getType() == SelectionType.LINE_WISE) {
-        if (subMode == CommandState.SubMode.VISUAL_LINE) {
-        }
-        else if (subMode == CommandState.SubMode.VISUAL_BLOCK) {
+      if (type == SelectionType.LINE_WISE) {
+        if (subMode == CommandState.SubMode.VISUAL_BLOCK) {
           pos = editor.getDocument().getLineEndOffset(endLine) + 1;
         }
-        else {
+        else if (subMode != CommandState.SubMode.VISUAL_LINE) {
           editor.getDocument().insertString(start, "\n");
           pos = start + 1;
         }
       }
-      else if (reg.getType() == SelectionType.BLOCK_WISE) {
-      }
-      else /* Characterwise */ {
+      else if (type != SelectionType.CHARACTER_WISE) {
         if (subMode == CommandState.SubMode.VISUAL_LINE) {
           editor.getDocument().insertString(start, "\n");
         }
       }
 
-      putText(editor, context, pos, StringUtil.notNullize(reg.getText()), reg.getType(), count,
-              indent && reg.getType() == SelectionType.LINE_WISE, cursorAfter, subMode);
+      putText(editor, context, pos, StringUtil.notNullize(reg.getText()), type, count,
+              indent && type == SelectionType.LINE_WISE, cursorAfter, subMode);
 
       return true;
     }

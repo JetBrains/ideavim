@@ -37,17 +37,12 @@ public class FindSymbolHandler extends CommandHandler {
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull final DataContext context, @NotNull ExCommand cmd) throws ExException {
-    String arg = cmd.getArgument();
-    if (arg.length() > 0) {
-      // TODO - jump to specific symbol
-    }
-
+    // TODO: Check the command argument and jump to a specific symbol
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         KeyHandler.executeAction("GotoSymbol", context);
       }
     });
-
     return true;
   }
 }
