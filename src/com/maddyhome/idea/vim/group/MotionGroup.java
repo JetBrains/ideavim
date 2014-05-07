@@ -1429,8 +1429,7 @@ public class MotionGroup {
     visualOffset = editor.getCaretModel().getOffset();
     if (logger.isDebugEnabled()) logger.debug("visualStart=" + visualStart + ", visualEnd=" + visualEnd);
 
-    VimPlugin.getMark().setMark(editor, '<', visualStart);
-    VimPlugin.getMark().setMark(editor, '>', visualEnd);
+    VimPlugin.getMark().setVisualSelectionMarks(editor, getRawVisualRange());
   }
 
   public boolean toggleVisual(@NotNull Editor editor, int count, int rawCount, @NotNull CommandState.SubMode mode) {
@@ -1651,8 +1650,7 @@ public class MotionGroup {
       editor.getSelectionModel().setBlockSelection(lineStart, lend);
     }
 
-    VimPlugin.getMark().setMark(editor, '<', start);
-    VimPlugin.getMark().setMark(editor, '>', end);
+    VimPlugin.getMark().setVisualSelectionMarks(editor, new TextRange(start, end));
   }
 
   public boolean swapVisualEnds(@NotNull Editor editor) {

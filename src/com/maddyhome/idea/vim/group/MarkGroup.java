@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Jump;
 import com.maddyhome.idea.vim.common.Mark;
+import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
@@ -48,6 +49,9 @@ import java.util.*;
  * This class contains all the mark related functionality
  */
 public class MarkGroup {
+  public static final char MARK_VISUAL_START = '<';
+  public static final char MARK_VISUAL_END = '>';
+
   /**
    * Creates the class
    */
@@ -214,6 +218,11 @@ public class MarkGroup {
     }
 
     return true;
+  }
+
+  public void setVisualSelectionMarks(@NotNull Editor editor, @NotNull TextRange range) {
+    setMark(editor, MARK_VISUAL_START, range.getStartOffset());
+    setMark(editor, MARK_VISUAL_END, range.getEndOffset());
   }
 
   public void addJump(@NotNull Editor editor, boolean reset) {
