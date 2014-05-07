@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -47,9 +48,7 @@ public class Ranges {
    * @param range The list of ranges to append to the current list
    */
   public void addRange(@NotNull Range[] range) {
-    for (Range aRange : range) {
-      ranges.add(aRange);
-    }
+    Collections.addAll(ranges, range);
   }
 
   /**
