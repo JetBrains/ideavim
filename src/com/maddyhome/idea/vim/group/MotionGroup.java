@@ -293,21 +293,6 @@ public class MotionGroup {
     KeyHandler.getInstance().reset(editor);
   }
 
-  public static int moveCaretToMotion(@NotNull Editor editor, DataContext context, int count, int rawCount, @NotNull Argument argument) {
-    Command cmd = argument.getMotion();
-    // Normalize the counts between the command and the motion argument
-    int cnt = cmd.getCount() * count;
-    int raw = rawCount == 0 && cmd.getRawCount() == 0 ? 0 : cnt;
-    MotionEditorAction action = (MotionEditorAction)cmd.getAction();
-
-    // Execute the motion (without moving the cursor) and get where we end
-    int offset = action.getOffset(editor, context, cnt, raw, cmd.getArgument());
-
-    moveCaret(editor, offset);
-
-    return offset;
-  }
-
   @NotNull
   public TextRange getWordRange(@NotNull Editor editor, int count, boolean isOuter, boolean isBig) {
     int dir = 1;
@@ -493,7 +478,7 @@ public class MotionGroup {
     }
   }
 
-  public int moveCaretToJump(@NotNull Editor editor, DataContext context, int count) {
+  public int moveCaretToJump(@NotNull Editor editor, int count) {
     int spot = VimPlugin.getMark().getJumpSpot();
     Jump jump = VimPlugin.getMark().getJump(count);
     if (jump != null) {
@@ -1095,11 +1080,6 @@ public class MotionGroup {
 
   public int moveCaretToLineStartSkipLeading(@NotNull Editor editor, int lline) {
     return EditorHelper.getLeadingCharacterOffset(editor, lline);
-  }
-
-  public int moveCaretToLineEndSkipLeadingOffset(@NotNull Editor editor, int offset) {
-    int line = EditorHelper.normalizeVisualLine(editor, editor.getCaretModel().getVisualPosition().line + offset);
-    return moveCaretToLineEndSkipLeading(editor, EditorHelper.visualLineToLogicalLine(editor, line));
   }
 
   public int moveCaretToLineEndSkipLeading(@NotNull Editor editor, int lline) {

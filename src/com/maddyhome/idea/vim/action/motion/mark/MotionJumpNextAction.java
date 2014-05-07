@@ -35,7 +35,7 @@ public class MotionJumpNextAction extends MotionEditorAction {
 
   private static class Handler extends MotionEditorActionHandler {
     public int getOffset(@NotNull Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return VimPlugin.getMotion().moveCaretToJump(editor, context, count);
+      return VimPlugin.getMotion().moveCaretToJump(editor, count);
     }
   }
 }
