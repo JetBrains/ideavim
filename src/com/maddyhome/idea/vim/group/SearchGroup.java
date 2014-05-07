@@ -17,7 +17,6 @@
  */
 package com.maddyhome.idea.vim.group;
 
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
@@ -64,15 +63,6 @@ import java.util.Iterator;
  *
  */
 public class SearchGroup {
-  public static final int KEEP_FLAGS = 1;
-  public static final int CONFIRM = 2;
-  public static final int IGNORE_ERROR = 4;
-  public static final int GLOBAL = 8;
-  public static final int IGNORE_CASE = 16;
-  public static final int NO_IGNORE_CASE = 32;
-  public static final int PRINT = 64;
-  public static final int REUSE = 128;
-
   public SearchGroup() {
     Options.getInstance().getOption("hlsearch").addOptionChangeListener(new OptionChangeListener() {
       public void valueChange(OptionChangeEvent event) {
@@ -100,7 +90,7 @@ public class SearchGroup {
     VimPlugin.getHistory().addEntry(HistoryGroup.SEARCH, lastPattern);
   }
 
-  public boolean searchAndReplace(@NotNull Editor editor, DataContext context, @NotNull LineRange range, @NotNull String excmd, String exarg) {
+  public boolean searchAndReplace(@NotNull Editor editor, @NotNull LineRange range, @NotNull String excmd, String exarg) {
     boolean res = true;
 
     CharPointer cmd = new CharPointer(new StringBuffer(exarg));
@@ -449,45 +439,6 @@ public class SearchGroup {
     boolean ic = Options.getInstance().isSet("ignorecase");
 
     return ic && !(sc && StringHelper.containsUpperCase(pattern));
-  }
-
-  public static int argsToFlags(@NotNull String args) {
-    int res = 0;
-    boolean global = Options.getInstance().isSet("gdefault");
-    for (int i = 0; i < args.length(); i++) {
-      switch (args.charAt(i)) {
-        case '&':
-          res |= KEEP_FLAGS;
-          break;
-        case 'c':
-          res |= CONFIRM;
-          break;
-        case 'e':
-          res |= IGNORE_ERROR;
-          break;
-        case 'g':
-          global = !global;
-          break;
-        case 'i':
-          res |= IGNORE_CASE;
-          break;
-        case 'I':
-          res |= NO_IGNORE_CASE;
-          break;
-        case 'p':
-          res |= PRINT;
-          break;
-        case 'r':
-          res |= REUSE;
-          break;
-      }
-    }
-
-    if (global) {
-      res |= GLOBAL;
-    }
-
-    return res;
   }
 
   private Object[] getConfirmButtons() {

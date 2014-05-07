@@ -35,7 +35,7 @@ public class ProcessExKeyAction extends EditorAction {
 
   private static class Handler extends EditorActionHandlerBase {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      return VimPlugin.getProcess().processExKey(editor, cmd.getKeys().get(0), false);
+      return VimPlugin.getProcess().processExKey(editor, cmd.getKeys().get(0));
     }
   }
 }

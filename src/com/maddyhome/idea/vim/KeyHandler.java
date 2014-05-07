@@ -179,7 +179,7 @@ public class KeyHandler {
           }
         }
         else if (editorState.getMappingMode() == MappingMode.CMD_LINE) {
-          if (!VimPlugin.getProcess().processExKey(editor, key, true)) {
+          if (!VimPlugin.getProcess().processExKey(editor, key)) {
             shouldRecord = false;
           }
         }

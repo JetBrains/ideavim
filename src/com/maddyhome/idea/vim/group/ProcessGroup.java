@@ -95,7 +95,7 @@ public class ProcessGroup {
     panel.activate(editor, context, ":", initText, 1);
   }
 
-  public boolean processExKey(Editor editor, @NotNull KeyStroke stroke, boolean charOnly) {
+  public boolean processExKey(Editor editor, @NotNull KeyStroke stroke) {
     // This will only get called if somehow the key focus ended up in the editor while the ex entry window
     // is open. So I'll put focus back in the editor and process the key.
 

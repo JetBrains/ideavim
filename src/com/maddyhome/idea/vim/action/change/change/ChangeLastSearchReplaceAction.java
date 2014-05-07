@@ -39,7 +39,7 @@ public class ChangeLastSearchReplaceAction extends EditorAction {
     public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
       int line = editor.getCaretModel().getLogicalPosition().line;
       LineRange range = new LineRange(line, line);
-      return VimPlugin.getSearch().searchAndReplace(editor, context, range, "s", "//~/");
+      return VimPlugin.getSearch().searchAndReplace(editor, range, "s", "//~/");
     }
   }
 }
