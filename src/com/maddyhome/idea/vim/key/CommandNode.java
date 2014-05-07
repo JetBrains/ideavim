@@ -107,13 +107,11 @@ public class CommandNode implements Node {
 
     final CommandNode node = (CommandNode)o;
 
-    if (flags != node.flags) return false;
-    if (type != node.type) return false;
-    if (!actionId.equals(node.actionId)) return false;
-    if (!action.equals(node.action)) return false;
-    if (!key.equals(node.key)) return false;
-
-    return true;
+    return flags == node.flags &&
+           type == node.type &&
+           actionId.equals(node.actionId) &&
+           action.equals(node.action) &&
+           key.equals(node.key);
   }
 
   public int hashCode() {

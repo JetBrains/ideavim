@@ -110,13 +110,11 @@ public class ArgumentNode implements Node {
 
     final ArgumentNode node = (ArgumentNode)o;
 
-    if (argType != node.argType) return false;
-    if (cmdType != node.cmdType) return false;
-    if (flags != node.flags) return false;
-    if (!actionId.equals(node.actionId)) return false;
-    if (!action.equals(node.action)) return false;
-
-    return true;
+    return argType == node.argType &&
+           cmdType == node.cmdType &&
+           flags == node.flags &&
+           actionId.equals(node.actionId) &&
+           action.equals(node.action);
   }
 
   public int hashCode() {

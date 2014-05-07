@@ -1075,9 +1075,8 @@ public class ChangeGroup {
     final int offset = editor.getCaretModel().getOffset();
     final CharacterHelper.CharacterType charType = CharacterHelper.charType(chars.charAt(offset), false);
     if (EditorHelper.getFileSize(editor) > 0 && charType != CharacterHelper.CharacterType.WHITESPACE) {
-      final boolean lastWordChar = offset <= EditorHelper.getFileSize(editor) ?
-                                   CharacterHelper.charType(chars.charAt(offset + 1), false) != charType :
-                                   true;
+      final boolean lastWordChar = offset > EditorHelper.getFileSize(editor) ||
+                                   CharacterHelper.charType(chars.charAt(offset + 1), false) != charType;
       final ImmutableSet<String> wordMotions = ImmutableSet.of(
         "VimMotionWordRight", "VimMotionBigWordRight", "VimMotionCamelRight");
       if (wordMotions.contains(id) && lastWordChar) {
