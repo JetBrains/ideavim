@@ -663,8 +663,8 @@ public class MarkGroup {
   @NotNull private List<Jump> jumps = new ArrayList<Jump>();
   private int jumpSpot = -1;
 
-  private static int SAVE_MARK_COUNT = 20;
-  private static int SAVE_JUMP_COUNT = 100;
+  private static final int SAVE_MARK_COUNT = 20;
+  private static final int SAVE_JUMP_COUNT = 100;
 
   private static final String WR_GLOBAL_MARKS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   private static final String WR_FILE_MARKS = "abcdefghijklmnopqrstuvwxyz'";
