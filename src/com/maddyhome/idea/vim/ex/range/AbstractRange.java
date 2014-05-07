@@ -126,12 +126,7 @@ public abstract class AbstractRange implements Range {
 
   @NotNull
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append("AbstractRange");
-    sb.append("{offset=").append(offset);
-    sb.append(", move=").append(move);
-    sb.append('}');
-    return sb.toString();
+    return "AbstractRange" + "{offset=" + offset + ", move=" + move + '}';
   }
 
   /**

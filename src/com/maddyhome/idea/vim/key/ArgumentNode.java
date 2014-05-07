@@ -89,19 +89,17 @@ public class ArgumentNode implements Node {
 
   @NotNull
   public String toString() {
-    StringBuilder res = new StringBuilder();
-    res.append("ArgumentNode[");
-    res.append("actionId=");
-    res.append(actionId);
-    res.append(", action=");
-    res.append(action);
-    res.append(", argType=");
-    res.append(argType);
-    res.append(", flags=");
-    res.append(flags);
-    res.append("]");
 
-    return res.toString();
+    return "ArgumentNode[" +
+           "actionId=" +
+           actionId +
+           ", action=" +
+           action +
+           ", argType=" +
+           argType +
+           ", flags=" +
+           flags +
+           "]";
   }
 
   public boolean equals(Object o) {

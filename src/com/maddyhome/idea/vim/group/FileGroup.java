@@ -272,17 +272,14 @@ public class FileGroup {
     int offset = editor.getCaretModel().getOffset();
     char ch = editor.getDocument().getCharsSequence().charAt(offset);
 
-    StringBuilder msg = new StringBuilder();
-    msg.append('<');
-    msg.append(StringHelper.toKeyNotation(KeyStroke.getKeyStroke(ch)));
-    msg.append(">  ");
-    msg.append((int)ch);
-    msg.append(",  Hex ");
-    msg.append(Long.toHexString(ch));
-    msg.append(",  Octal ");
-    msg.append(Long.toOctalString(ch));
-
-    VimPlugin.showMessage(msg.toString());
+    VimPlugin.showMessage("<" +
+                          StringHelper.toKeyNotation(KeyStroke.getKeyStroke(ch)) +
+                          ">  " +
+                          (int)ch +
+                          ",  Hex " +
+                          Long.toHexString(ch) +
+                          ",  Octal " +
+                          Long.toOctalString(ch));
   }
 
   public void displayHexInfo(@NotNull Editor editor) {

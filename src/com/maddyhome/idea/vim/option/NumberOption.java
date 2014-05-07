@@ -221,13 +221,8 @@ public class NumberOption extends TextOption {
    */
   @NotNull
   public String toString() {
-    StringBuilder res = new StringBuilder();
-    res.append("  ");
-    res.append(getName());
-    res.append("=");
-    res.append(value);
 
-    return res.toString();
+    return "  " + getName() + "=" + value;
   }
 
   private final int dflt;

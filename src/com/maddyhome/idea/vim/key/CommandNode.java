@@ -87,18 +87,8 @@ public class CommandNode implements Node {
 
   @NotNull
   public String toString() {
-    StringBuilder res = new StringBuilder();
-    res.append("CommandNode[key=");
-    res.append(key);
-    res.append(", actionId=");
-    res.append(actionId);
-    res.append(", action=");
-    res.append(action);
-    res.append(", argType=");
-    res.append(type);
-    res.append("]");
 
-    return res.toString();
+    return "CommandNode[key=" + key + ", actionId=" + actionId + ", action=" + action + ", argType=" + type + "]";
   }
 
   public boolean equals(Object o) {

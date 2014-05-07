@@ -126,15 +126,17 @@ public class Argument {
 
   @NotNull
   public String toString() {
-    StringBuilder res = new StringBuilder();
-    res.append("Argument [");
-    res.append("charArg=").append(charArg);
-    res.append(", motionArg=").append(motionArg);
-    res.append(", strArg=").append(strArg);
-    res.append(", type=").append(type);
-    res.append("]");
 
-    return res.toString();
+    return "Argument [" +
+           "charArg=" +
+           charArg +
+           ", motionArg=" +
+           motionArg +
+           ", strArg=" +
+           strArg +
+           ", type=" +
+           type +
+           "]";
   }
 
   private char charArg = 0;

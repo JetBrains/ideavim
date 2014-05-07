@@ -42,14 +42,8 @@ public class VisualChange {
 
   @NotNull
   public String toString() {
-    StringBuffer res = new StringBuffer();
-    res.append("VisualChange[");
-    res.append("lines=").append(lines);
-    res.append(", columns=").append(columns);
-    res.append(", type=").append(type);
-    res.append("]");
 
-    return res.toString();
+    return "VisualChange[" + "lines=" + lines + ", columns=" + columns + ", type=" + type + "]";
   }
 
   final int lines;

@@ -47,15 +47,8 @@ public class VisualRange {
 
   @NotNull
   public String toString() {
-    StringBuilder res = new StringBuilder();
-    res.append("VisualRange[");
-    res.append("start=").append(start);
-    res.append(", end=").append(end);
-    res.append(", type=").append(type);
-    res.append(", offset=").append(offset);
-    res.append("]");
 
-    return res.toString();
+    return "VisualRange[" + "start=" + start + ", end=" + end + ", type=" + type + ", offset=" + offset + "]";
   }
 
   final int start;

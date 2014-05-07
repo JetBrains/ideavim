@@ -227,11 +227,8 @@ public class Ranges {
 
   @NotNull
   public String toString() {
-    StringBuilder res = new StringBuilder();
-    res.append("Ranges[ranges=").append(ranges);
-    res.append("]");
 
-    return res.toString();
+    return "Ranges[ranges=" + ranges + "]";
   }
 
   private int startLine = 0;

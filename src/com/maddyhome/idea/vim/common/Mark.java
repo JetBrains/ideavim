@@ -62,12 +62,7 @@ public class Mark extends FileLocation {
 
   @NotNull
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append("Mark{");
-    sb.append(super.toString());
-    sb.append(",key=").append(key);
-    sb.append('}');
-    return sb.toString();
+    return "Mark{" + super.toString() + ",key=" + key + '}';
   }
 
   public static class KeySorter<V> implements Comparator<V> {

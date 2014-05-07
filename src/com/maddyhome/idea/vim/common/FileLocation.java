@@ -90,13 +90,7 @@ public abstract class FileLocation {
 
   @NotNull
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append("FileLocation");
-    sb.append("{col=").append(col);
-    sb.append(", line=").append(line);
-    sb.append(", filename='").append(filename).append('\'');
-    sb.append('}');
-    return sb.toString();
+    return "FileLocation" + "{col=" + col + ", line=" + line + ", filename='" + filename + '\'' + '}';
   }
 
   private int line;

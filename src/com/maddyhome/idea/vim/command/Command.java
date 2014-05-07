@@ -299,17 +299,21 @@ public class Command {
 
   @NotNull
   public String toString() {
-    StringBuilder res = new StringBuilder();
-    res.append("Command[");
-    res.append("count=").append(count);
-    res.append(", action=").append(action);
-    res.append(", type=").append(type);
-    res.append(", flags=").append(flags);
-    res.append(", argument=").append(argument);
-    res.append(", keys=").append(keys);
-    res.append("]");
 
-    return res.toString();
+    return "Command[" +
+           "count=" +
+           count +
+           ", action=" +
+           action +
+           ", type=" +
+           type +
+           ", flags=" +
+           flags +
+           ", argument=" +
+           argument +
+           ", keys=" +
+           keys +
+           "]";
   }
 
   private int count;

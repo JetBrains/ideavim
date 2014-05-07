@@ -128,15 +128,8 @@ public class SearchRange extends AbstractRange {
 
   @NotNull
   public String toString() {
-    StringBuilder res = new StringBuilder();
-    res.append("SearchRange[");
-    res.append("patterns=");
-    res.append(patterns);
-    res.append(", ");
-    res.append(super.toString());
-    res.append("]");
 
-    return res.toString();
+    return "SearchRange[" + "patterns=" + patterns + ", " + super.toString() + "]";
   }
 
   @NotNull private final List<String> patterns = new ArrayList<String>();

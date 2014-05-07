@@ -129,13 +129,8 @@ public class StringOption extends TextOption {
    */
   @NotNull
   public String toString() {
-    StringBuilder res = new StringBuilder();
-    res.append("  ");
-    res.append(getName());
-    res.append("=");
-    res.append(value);
 
-    return res.toString();
+    return "  " + getName() + "=" + value;
   }
 
   protected final String dflt;
