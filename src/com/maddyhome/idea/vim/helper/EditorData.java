@@ -258,8 +258,7 @@ public class EditorData {
       for (Field f : flds) {
         if (f.getType().equals(Key.class)) {
           f.setAccessible(true);
-          Key key = (Key)f.get(null);
-          CONSOLE_VIEW_IN_EDITOR_VIEW = key;
+          CONSOLE_VIEW_IN_EDITOR_VIEW = (Key)f.get(null);
           break;
         }
       }

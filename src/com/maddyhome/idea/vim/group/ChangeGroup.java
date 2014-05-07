@@ -1105,19 +1105,18 @@ public class ChangeGroup {
     }
 
     if (kludge) {
-      int pos = offset;
       int size = EditorHelper.getFileSize(editor);
       int cnt = count * motion.getCount();
-      int pos1 = SearchHelper.findNextWordEnd(chars, pos, size, cnt, bigWord, false);
+      int pos1 = SearchHelper.findNextWordEnd(chars, offset, size, cnt, bigWord, false);
       int pos2 = SearchHelper.findNextWordEnd(chars, pos1, size, -cnt, bigWord, false);
       if (logger.isDebugEnabled()) {
-        logger.debug("pos=" + pos);
+        logger.debug("pos=" + offset);
         logger.debug("pos1=" + pos1);
         logger.debug("pos2=" + pos2);
         logger.debug("count=" + count);
         logger.debug("arg.count=" + motion.getCount());
       }
-      if (pos2 == pos) {
+      if (pos2 == offset) {
         if (count > 1) {
           count--;
           rawCount--;
