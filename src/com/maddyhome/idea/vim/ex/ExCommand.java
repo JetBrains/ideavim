@@ -53,13 +53,8 @@ public class ExCommand {
   }
 
   @NotNull
-  public LineRange getLineRange(@NotNull Editor editor, DataContext context, boolean checkCount) {
-    int count = -1;
-    if (checkCount) {
-      count = getCountArgument();
-    }
-
-    return ranges.getLineRange(editor, context, count);
+  public LineRange getLineRange(@NotNull Editor editor, DataContext context) {
+    return ranges.getLineRange(editor, context, -1);
   }
 
   @NotNull

@@ -58,7 +58,7 @@ public class SortHandler extends CommandHandler {
 
   @NotNull
   private LineRange getLineRange(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
-    final LineRange range = cmd.getLineRange(editor, context, false);
+    final LineRange range = cmd.getLineRange(editor, context);
     final LineRange normalizedRange;
 
     // Something like "30,20sort" gets converted to "20,30sort"

@@ -57,7 +57,7 @@ public class CopyGroup {
    * @return true if able to yank the text, false if not
    */
   public boolean yankMotion(@NotNull Editor editor, DataContext context, int count, int rawCount, @NotNull Argument argument) {
-    TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true, false);
+    TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true);
     final Command motion = argument.getMotion();
     return motion != null && yankRange(editor, range, SelectionType.fromCommandFlags(motion.getFlags()), true);
   }
@@ -158,7 +158,7 @@ public class CopyGroup {
       // If a linewise paste, the text is inserted after the current line.
       if (reg.getType() == SelectionType.LINE_WISE) {
         pos = Math.min(editor.getDocument().getTextLength(),
-                       VimPlugin.getMotion().moveCaretToLineEnd(editor, true) + 1);
+                       VimPlugin.getMotion().moveCaretToLineEnd(editor) + 1);
         if (pos > 0 && pos == editor.getDocument().getTextLength() &&
             editor.getDocument().getCharsSequence().charAt(pos - 1) != '\n') {
           editor.getDocument().insertString(pos, "\n");

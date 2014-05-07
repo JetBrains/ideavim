@@ -330,12 +330,11 @@ public class MotionGroup {
    * @param rawCount   The actual count entered by the user
    * @param argument   Any argument needed by the motion
    * @param incNewline True if to include newline
-   * @param moveCursor True if cursor should be moved just as if motion command were executed by user, false if not
    * @return The motion's range
    */
   @Nullable
   public static TextRange getMotionRange(@NotNull Editor editor, DataContext context, int count, int rawCount,
-                                         @NotNull Argument argument, boolean incNewline, boolean moveCursor) {
+                                         @NotNull Argument argument, boolean incNewline) {
     final Command cmd = argument.getMotion();
     if (cmd == null) {
       return null;
@@ -358,10 +357,6 @@ public class MotionGroup {
       if (end == -1) {
         return null;
       }
-
-      if (moveCursor) {
-        moveCaret(editor, end);
-      }
     }
     else if (cmd.getAction() instanceof TextObjectAction) {
       TextObjectAction action = (TextObjectAction)cmd.getAction();
@@ -374,10 +369,6 @@ public class MotionGroup {
 
       start = range.getStartOffset();
       end = range.getEndOffset();
-
-      if (moveCursor) {
-        moveCaret(editor, start);
-      }
     }
 
     // If we are a linewise motion we need to normalize the start and stop then move the start to the beginning
@@ -1086,8 +1077,8 @@ public class MotionGroup {
     return pos;
   }
 
-  public int moveCaretToLineEnd(@NotNull Editor editor, boolean allowPastEnd) {
-    return moveCaretToLineEnd(editor, editor.getCaretModel().getLogicalPosition().line, allowPastEnd);
+  public int moveCaretToLineEnd(@NotNull Editor editor) {
+    return moveCaretToLineEnd(editor, editor.getCaretModel().getLogicalPosition().line, true);
   }
 
   public int moveCaretToLineEnd(@NotNull Editor editor, int line, boolean allowPastEnd) {
@@ -1118,8 +1109,8 @@ public class MotionGroup {
     return EditorHelper.getLineStartOffset(editor, line);
   }
 
-  public int moveCaretToLineStartOffset(@NotNull Editor editor, int offset) {
-    int line = EditorHelper.normalizeVisualLine(editor, editor.getCaretModel().getVisualPosition().line + offset);
+  public int moveCaretToLineStartOffset(@NotNull Editor editor) {
+    int line = EditorHelper.normalizeVisualLine(editor, editor.getCaretModel().getVisualPosition().line + 1);
     return moveCaretToLineStart(editor, EditorHelper.visualLineToLogicalLine(editor, line));
   }
 
@@ -1417,7 +1408,7 @@ public class MotionGroup {
     }
 
     if (mode == CommandState.SubMode.NONE) {
-      exitVisual(editor, true);
+      exitVisual(editor);
     }
     else {
       CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, MappingMode.VISUAL);
@@ -1480,7 +1471,7 @@ public class MotionGroup {
       MotionGroup.moveCaret(editor, visualEnd);
     }
     else if (mode == currentMode) {
-      exitVisual(editor, true);
+      exitVisual(editor);
     }
     else {
       CommandState.getInstance(editor).setSubMode(mode);
@@ -1523,8 +1514,8 @@ public class MotionGroup {
     return res;
   }
 
-  public void exitVisual(@NotNull final Editor editor, final boolean removeSelection) {
-    resetVisual(editor, removeSelection);
+  public void exitVisual(@NotNull final Editor editor) {
+    resetVisual(editor, true);
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
       CommandState.getInstance(editor).popState();
     }
@@ -1707,7 +1698,7 @@ public class MotionGroup {
   }
 
   public void processEscape(@NotNull Editor editor) {
-    exitVisual(editor, true);
+    exitVisual(editor);
   }
 
   public static class MotionEditorChange extends FileEditorManagerAdapter {
@@ -1720,7 +1711,7 @@ public class MotionGroup {
         final Editor editor = ((TextEditor)fileEditor).getEditor();
         ExOutputModel.getInstance(editor).clear();
         if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-          VimPlugin.getMotion().exitVisual(editor, true);
+          VimPlugin.getMotion().exitVisual(editor);
         }
       }
     }

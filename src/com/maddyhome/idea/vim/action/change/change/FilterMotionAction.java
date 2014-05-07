@@ -39,7 +39,7 @@ public class FilterMotionAction extends EditorAction {
   private static class Handler extends EditorActionHandlerBase {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       TextRange range = MotionGroup.getMotionRange(editor, context, cmd.getCount(), cmd.getRawCount(),
-                                                   cmd.getArgument(), false, false);
+                                                   cmd.getArgument(), false);
       if (range == null) {
         return false;
       }

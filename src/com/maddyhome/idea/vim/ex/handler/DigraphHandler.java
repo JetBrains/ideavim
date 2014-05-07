@@ -41,7 +41,7 @@ public class DigraphHandler extends CommandHandler {
       logger.debug("arg=" + arg);
     }
 
-    return VimPlugin.getDigraph().parseCommandLine(editor, cmd.getArgument(), true);
+    return VimPlugin.getDigraph().parseCommandLine(editor, cmd.getArgument());
   }
 
   private static Logger logger = Logger.getInstance(DigraphHandler.class.getName());

@@ -182,24 +182,11 @@ public class Command {
    * @param flags  Any custom flags specific to this command
    */
   public Command(int count, String actionId, AnAction action, @NotNull Type type, int flags) {
-    this(count, actionId, action, type, flags, null);
-  }
-
-  /**
-   * Creates a command that requires an argument
-   *
-   * @param count  The number entered prior to the command (zero if no specific number)
-   * @param action The action to be executed when the command is run
-   * @param type   The type of the command
-   * @param flags  Any custom flags specific to this command
-   * @param arg    The argument to this command
-   */
-  public Command(int count, String actionId, AnAction action, @NotNull Type type, int flags, Argument arg) {
     this.count = count;
     this.action = action;
     this.type = type;
     this.flags = flags;
-    this.argument = arg;
+    this.argument = null;
 
     if (action instanceof EditorAction) {
       EditorAction eaction = (EditorAction)action;

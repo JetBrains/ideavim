@@ -98,7 +98,7 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
       // If this is a mutli key change then exit visual now
       if (cmd != null && (cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) != 0) {
         logger.debug("multikey undo - exit visual");
-        VimPlugin.getMotion().exitVisual(editor, true);
+        VimPlugin.getMotion().exitVisual(editor);
       }
       else if (cmd != null && (cmd.getFlags() & Command.FLAG_FORCE_LINEWISE) != 0) {
         lastMode = CommandState.getInstance(editor).getSubMode();
@@ -123,7 +123,7 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
                           (cmd.getFlags() & Command.FLAG_EXPECT_MORE) == 0)) {
         logger.debug("not multikey undo - exit visual");
         if (cmd == null || (cmd.getFlags() & Command.FLAG_KEEP_VISUAL) == 0) {
-          VimPlugin.getMotion().exitVisual(editor, true);
+          VimPlugin.getMotion().exitVisual(editor);
         }
         if (wasRepeat) {
           EditorData.setLastColumn(editor, lastColumn);

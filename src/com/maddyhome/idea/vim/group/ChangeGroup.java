@@ -161,7 +161,7 @@ public class ChangeGroup {
    * @param context The data context
    */
   public void insertAfterLineEnd(@NotNull Editor editor, @NotNull DataContext context) {
-    MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLineEnd(editor, true));
+    MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLineEnd(editor));
     initInsert(editor, context, CommandState.Mode.INSERT);
   }
 
@@ -194,7 +194,7 @@ public class ChangeGroup {
    * @param context The data context
    */
   public void insertNewLineBelow(@NotNull final Editor editor, @NotNull final DataContext context) {
-    MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLineEnd(editor, true));
+    MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLineEnd(editor));
     initInsert(editor, context, CommandState.Mode.INSERT);
     runEnterAction(editor, context);
   }
@@ -779,14 +779,14 @@ public class ChangeGroup {
     // start my moving the cursor to the very end of the first line
     MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLineEnd(editor, startLine, true));
     for (int i = 1; i < count; i++) {
-      int start = VimPlugin.getMotion().moveCaretToLineEnd(editor, true);
+      int start = VimPlugin.getMotion().moveCaretToLineEnd(editor);
       MotionGroup.moveCaret(editor, start);
       int offset;
       if (spaces) {
         offset = VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, 1);
       }
       else {
-        offset = VimPlugin.getMotion().moveCaretToLineStartOffset(editor, 1);
+        offset = VimPlugin.getMotion().moveCaretToLineStartOffset(editor);
       }
       deleteText(editor, new TextRange(editor.getCaretModel().getOffset(), offset), null);
       if (spaces) {
@@ -847,7 +847,7 @@ public class ChangeGroup {
                                                int count,
                                                int rawCount,
                                                @NotNull Argument argument) {
-    TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true, false);
+    TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true);
     // This is a kludge for dw, dW, and d[w. Without this kludge, an extra newline is deleted when it shouldn't be.
     if (range != null) {
       String text = editor.getDocument().getCharsSequence().subSequence(range.getStartOffset(),
@@ -1246,7 +1246,7 @@ public class ChangeGroup {
    * @return true if able to delete the text, false if not
    */
   public boolean changeCaseMotion(@NotNull Editor editor, DataContext context, int count, int rawCount, char type, @NotNull Argument argument) {
-    final TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true, false);
+    final TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true);
     return range != null && changeCaseRange(editor, range, type);
   }
 
@@ -1311,7 +1311,7 @@ public class ChangeGroup {
   }
 
   public void indentMotion(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @NotNull Argument argument, int dir) {
-    final TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, false, false);
+    final TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, false);
     if (range != null) {
       indentRange(editor, context, range, 1, dir);
     }

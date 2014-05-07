@@ -48,7 +48,7 @@ public class DigraphGroup {
     }
   }
 
-  public boolean parseCommandLine(@NotNull Editor editor, @NotNull String args, boolean failOnBad) {
+  public boolean parseCommandLine(@NotNull Editor editor, @NotNull String args) {
     if (args.length() == 0) {
       showDigraphs(editor);
 

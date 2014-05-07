@@ -40,7 +40,7 @@ public class MoveTextHandler extends CommandHandler {
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     TextRange range = cmd.getTextRange(editor, context, false);
-    LineRange lr = cmd.getLineRange(editor, context, false);
+    LineRange lr = cmd.getLineRange(editor, context);
     int adj = lr.getEndLine() - lr.getStartLine() + 1;
 
     final ExCommand argumentCmd = CommandParser.getInstance().parse(cmd.getArgument());

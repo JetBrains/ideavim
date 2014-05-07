@@ -128,7 +128,7 @@ public class ProcessGroup {
         flags = CommandParser.getInstance().processCommand(editor, context, text, 1);
         if (logger.isDebugEnabled()) logger.debug("flags=" + flags);
         if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-          VimPlugin.getMotion().exitVisual(editor, true);
+          VimPlugin.getMotion().exitVisual(editor);
         }
       }
       else {

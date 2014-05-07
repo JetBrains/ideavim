@@ -50,7 +50,7 @@ public class NumberOption extends TextOption {
     this.dflt = dflt;
     this.value = dflt;
     this.min = min;
-    this.max = max;
+    this.max = Integer.MAX_VALUE;
   }
 
   /**

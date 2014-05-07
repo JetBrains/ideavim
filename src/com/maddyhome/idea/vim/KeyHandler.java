@@ -164,7 +164,7 @@ public class KeyHandler {
       // If this is an argument node then the last keystroke was not part of the current command but should
       // be the first keystroke of the argument of the current command
       else if (node instanceof ArgumentNode) {
-        shouldRecord = handleArgumentNode(editor, key, context, editorState, true, (ArgumentNode)node);
+        shouldRecord = handleArgumentNode(editor, key, context, editorState, (ArgumentNode)node);
       }
       else {
         if (lastWasBS && lastChar != 0 && Options.getInstance().isSet("digraph")) {
@@ -442,8 +442,7 @@ public class KeyHandler {
   }
 
   private boolean handleArgumentNode(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context,
-                                     @NotNull CommandState editorState, boolean shouldRecord,
-                                     @NotNull ArgumentNode node) {
+                                     @NotNull CommandState editorState, @NotNull ArgumentNode node) {
     // Create a new command based on what the user has typed so far, excluding this keystroke.
     Command cmd = new Command(count, node.getActionId(), node.getAction(), node.getCmdType(), node.getFlags());
     cmd.setKeys(keys);
@@ -477,9 +476,9 @@ public class KeyHandler {
     if (currentArg != Argument.Type.NONE) {
       partialReset(editor);
       handleKey(editor, key, context);
-      shouldRecord = false; // Prevent this from getting recorded twice
+      return false;
     }
-    return shouldRecord;
+    return true;
   }
 
   private void handleCommandNode(@NotNull Editor editor, @NotNull DataContext context, @NotNull CommandNode node) {
