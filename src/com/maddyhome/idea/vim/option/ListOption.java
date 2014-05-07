@@ -231,7 +231,7 @@ public class ListOption extends TextOption {
     return res.toString();
   }
 
-  protected final List<String> dflt;
+  @NotNull protected final List<String> dflt;
   @Nullable protected List<String> value;
   protected final String pattern;
 }

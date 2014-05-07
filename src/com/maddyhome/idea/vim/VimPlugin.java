@@ -107,18 +107,18 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   private final Application myApp;
 
-  private final MotionGroup motion;
-  private final ChangeGroup change;
-  private final CopyGroup copy;
-  private final MarkGroup mark;
-  private final RegisterGroup register;
-  private final FileGroup file;
-  private final SearchGroup search;
-  private final ProcessGroup process;
-  private final MacroGroup macro;
-  private final DigraphGroup digraph;
-  private final HistoryGroup history;
-  private final KeyGroup key;
+  @NotNull private final MotionGroup motion;
+  @NotNull private final ChangeGroup change;
+  @NotNull private final CopyGroup copy;
+  @NotNull private final MarkGroup mark;
+  @NotNull private final RegisterGroup register;
+  @NotNull private final FileGroup file;
+  @NotNull private final SearchGroup search;
+  @NotNull private final ProcessGroup process;
+  @NotNull private final MacroGroup macro;
+  @NotNull private final DigraphGroup digraph;
+  @NotNull private final HistoryGroup history;
+  @NotNull private final KeyGroup key;
 
   public VimPlugin(final Application app) {
     myApp = app;
@@ -230,50 +230,62 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     key.readData(element);
   }
 
+  @NotNull
   public static MotionGroup getMotion() {
     return getInstance().motion;
   }
 
+  @NotNull
   public static ChangeGroup getChange() {
     return getInstance().change;
   }
 
+  @NotNull
   public static CopyGroup getCopy() {
     return getInstance().copy;
   }
 
+  @NotNull
   public static MarkGroup getMark() {
     return getInstance().mark;
   }
 
+  @NotNull
   public static RegisterGroup getRegister() {
     return getInstance().register;
   }
 
+  @NotNull
   public static FileGroup getFile() {
     return getInstance().file;
   }
 
+  @NotNull
   public static SearchGroup getSearch() {
     return getInstance().search;
   }
 
+  @NotNull
   public static ProcessGroup getProcess() {
     return getInstance().process;
   }
 
+  @NotNull
   public static MacroGroup getMacro() {
     return getInstance().macro;
   }
 
+  @NotNull
   public static DigraphGroup getDigraph() {
     return getInstance().digraph;
   }
 
+  @NotNull
   public static HistoryGroup getHistory() {
     return getInstance().history;
   }
 
+  @NotNull
   public static KeyGroup getKey() {
     return getInstance().key;
   }

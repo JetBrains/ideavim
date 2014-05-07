@@ -236,5 +236,5 @@ public class Ranges {
   private int count = 0;
   private int defaultLine = -1;
   private boolean done = false;
-  private final List<Range> ranges;
+  @NotNull private final List<Range> ranges;
 }

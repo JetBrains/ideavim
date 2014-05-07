@@ -74,6 +74,7 @@ public class ArgumentNode implements Node {
    *
    * @return The argument's command type
    */
+  @NotNull
   public Command.Type getCmdType() {
     return cmdType;
   }
@@ -128,6 +129,6 @@ public class ArgumentNode implements Node {
   protected final String actionId;
   protected final AnAction action;
   @NotNull protected final Argument.Type argType;
-  protected final Command.Type cmdType;
+  @NotNull protected final Command.Type cmdType;
   protected final int flags;
 }

@@ -72,6 +72,7 @@ public class CommandNode implements Node {
    *
    * @return The command's type
    */
+  @NotNull
   public Command.Type getCmdType() {
     return type;
   }
@@ -117,6 +118,6 @@ public class CommandNode implements Node {
   protected final KeyStroke key;
   protected final AnAction action;
   protected final String actionId;
-  protected final Command.Type type;
+  @NotNull protected final Command.Type type;
   protected final int flags;
 }

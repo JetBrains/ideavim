@@ -50,7 +50,7 @@ public class ExOutputPanel extends JPanel {
   @NotNull private final JTextArea myText = new JTextArea();
   @NotNull private final JScrollPane myScrollPane =
     new JBScrollPane(myText, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-  private final ComponentAdapter myAdapter;
+  @NotNull private final ComponentAdapter myAdapter;
   private boolean myAtEnd = false;
   private int myLineHeight = 0;
 

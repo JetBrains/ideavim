@@ -145,7 +145,7 @@ public class FileGroup {
    *
    * @param context The data context
    */
-  public void closeFile(Editor editor, @NotNull DataContext context) {
+  public void closeFile(@NotNull Editor editor, @NotNull DataContext context) {
     Project proj = PlatformDataKeys.PROJECT.getData(context);
     FileEditorManager fem = FileEditorManager.getInstance(proj); // API change - don't merge
     VirtualFile vf = EditorData.getVirtualFile(editor);

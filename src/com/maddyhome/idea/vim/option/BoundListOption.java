@@ -18,6 +18,8 @@
 
 package com.maddyhome.idea.vim.option;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -68,5 +70,5 @@ public class BoundListOption extends ListOption {
     return true;
   }
 
-  protected final List<String> values;
+  @NotNull protected final List<String> values;
 }

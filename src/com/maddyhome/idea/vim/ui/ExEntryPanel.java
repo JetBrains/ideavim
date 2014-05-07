@@ -173,6 +173,7 @@ public class ExEntryPanel extends JPanel {
     return entry.getText();
   }
 
+  @NotNull
   public ExTextField getEntry() {
     return entry;
   }
@@ -205,12 +206,12 @@ public class ExEntryPanel extends JPanel {
   }
 
   @Nullable private JComponent parent;
-  private final JLabel label;
-  private final ExTextField entry;
+  @NotNull private final JLabel label;
+  @NotNull private final ExTextField entry;
   private JComponent oldGlass;
   private LayoutManager oldLayout;
   private boolean wasOpaque;
-  private final ComponentAdapter adapter;
+  @NotNull private final ComponentAdapter adapter;
   private int count;
 
   private boolean active;

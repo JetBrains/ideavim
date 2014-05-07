@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.List;
@@ -276,6 +277,7 @@ public class Command {
    *
    * @return The command's argument, null if there isn't one
    */
+  @Nullable
   public Argument getArgument() {
     return argument;
   }
@@ -320,6 +322,6 @@ public class Command {
   private AnAction action;
   @NotNull private final Type type;
   private int flags;
-  private Argument argument;
+  @Nullable private Argument argument;
   private List<KeyStroke> keys;
 }

@@ -37,7 +37,7 @@ public class VimTypedActionHandler implements TypedActionHandler {
   private static final Logger logger = Logger.getInstance(VimTypedActionHandler.class.getName());
 
   private final TypedActionHandler origHandler;
-  private final KeyHandler handler;
+  @NotNull private final KeyHandler handler;
 
   public VimTypedActionHandler(TypedActionHandler origHandler) {
     this.origHandler = origHandler;
