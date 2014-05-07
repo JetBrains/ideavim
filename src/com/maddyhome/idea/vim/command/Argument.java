@@ -32,7 +32,7 @@ public class Argument {
     CHARACTER,
     STRING,
     DIGRAPH,
-    EX_STRING;
+    EX_STRING
   }
 
   /**

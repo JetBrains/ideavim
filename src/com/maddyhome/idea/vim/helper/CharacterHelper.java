@@ -31,7 +31,7 @@ public class CharacterHelper {
     KATAKANA,
     HALF_WIDTH_KATAKANA,
     PUNCTUATION,
-    WHITESPACE;
+    WHITESPACE
   }
 
   public static final char CASE_TOGGLE = '~';
