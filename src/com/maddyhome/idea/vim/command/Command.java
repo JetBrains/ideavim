@@ -287,7 +287,7 @@ public class Command {
    *
    * @param argument The new argument, can be null to clear the argument
    */
-  public void setArgument(Argument argument) {
+  public void setArgument(@Nullable Argument argument) {
     this.argument = argument;
   }
 

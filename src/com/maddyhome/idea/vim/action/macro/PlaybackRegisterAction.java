@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +38,11 @@ public class PlaybackRegisterAction extends EditorAction {
 
   private static class Handler extends EditorActionHandlerBase {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      final char reg = cmd.getArgument().getCharacter();
+      final Argument argument = cmd.getArgument();
+      if (argument == null) {
+        return false;
+      }
+      final char reg = argument.getCharacter();
       final Project project = PlatformDataKeys.PROJECT.getData(context);
       return VimPlugin.getMacro().playbackRegister(editor, context, project, reg, cmd.getCount());
     }

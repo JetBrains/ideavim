@@ -49,7 +49,6 @@ public class ExTextField extends JTextField {
     // Do not override getActions() method, because it is has side effect: propogates these actions to defaults.
     final Action[] actions = ExEditorKit.getInstance().getActions();
     final ActionMap actionMap = getActionMap();
-    int n = actions.length;
     for (Action a : actions) {
       actionMap.put(a.getValue(Action.NAME), a);
       //System.out.println("  " + a.getValue(Action.NAME));

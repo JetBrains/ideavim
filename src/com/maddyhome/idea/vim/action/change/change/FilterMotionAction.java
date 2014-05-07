@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
@@ -38,8 +39,11 @@ public class FilterMotionAction extends EditorAction {
 
   private static class Handler extends EditorActionHandlerBase {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      TextRange range = MotionGroup.getMotionRange(editor, context, cmd.getCount(), cmd.getRawCount(),
-                                                   cmd.getArgument(), false);
+      final Argument argument = cmd.getArgument();
+      if (argument == null) {
+        return false;
+      }
+      TextRange range = MotionGroup.getMotionRange(editor, context, cmd.getCount(), cmd.getRawCount(), argument, false);
       if (range == null) {
         return false;
       }
