@@ -47,7 +47,7 @@ public class MarksHandler extends CommandHandler {
     List<Mark> marks = VimPlugin.getMark().getMarks(editor);
 
     String spaces = "     ";
-    StringBuffer text = new StringBuffer();
+    StringBuilder text = new StringBuilder();
     text.append("mark  line  col file/text\n");
     for (Mark mark : marks) {
       text.append(" ");

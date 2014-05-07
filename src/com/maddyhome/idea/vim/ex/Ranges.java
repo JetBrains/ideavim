@@ -228,7 +228,7 @@ public class Ranges {
 
   @NotNull
   public String toString() {
-    StringBuffer res = new StringBuffer();
+    StringBuilder res = new StringBuilder();
     res.append("Ranges[ranges=").append(ranges);
     res.append("]");
 

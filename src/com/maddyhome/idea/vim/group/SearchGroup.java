@@ -585,7 +585,7 @@ public class SearchGroup {
       return -1;
     }
 
-    StringBuffer pattern = new StringBuffer();
+    StringBuilder pattern = new StringBuilder();
     if (whole) {
       pattern.append("\\<");
     }

@@ -89,7 +89,7 @@ public class ArgumentNode implements Node {
 
   @NotNull
   public String toString() {
-    StringBuffer res = new StringBuffer();
+    StringBuilder res = new StringBuilder();
     res.append("ArgumentNode[");
     res.append("actionId=");
     res.append(actionId);

@@ -72,7 +72,7 @@ public class DigraphGroup {
       logger.debug("height=" + height);
     }
 
-    StringBuffer res = new StringBuffer();
+    StringBuilder res = new StringBuilder();
     int cnt = 0;
     for (Character code : keys.keySet()) {
       String key = keys.get(code);

@@ -126,7 +126,7 @@ public class Argument {
 
   @NotNull
   public String toString() {
-    StringBuffer res = new StringBuffer();
+    StringBuilder res = new StringBuilder();
     res.append("Argument [");
     res.append("charArg=").append(charArg);
     res.append(", motionArg=").append(motionArg);

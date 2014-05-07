@@ -87,7 +87,7 @@ public class CommandNode implements Node {
 
   @NotNull
   public String toString() {
-    StringBuffer res = new StringBuffer();
+    StringBuilder res = new StringBuilder();
     res.append("CommandNode[key=");
     res.append(key);
     res.append(", actionId=");

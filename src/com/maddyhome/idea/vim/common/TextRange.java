@@ -100,7 +100,7 @@ public class TextRange {
 
   @NotNull
   public String toString() {
-    final StringBuffer sb = new StringBuffer();
+    final StringBuilder sb = new StringBuilder();
     sb.append("TextRange");
     sb.append("{starts=").append(starts == null ? "null" : "");
     for (int i = 0; starts != null && i < starts.length; ++i) {

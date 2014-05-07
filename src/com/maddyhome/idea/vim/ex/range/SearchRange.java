@@ -128,7 +128,7 @@ public class SearchRange extends AbstractRange {
 
   @NotNull
   public String toString() {
-    StringBuffer res = new StringBuffer();
+    StringBuilder res = new StringBuilder();
     res.append("SearchRange[");
     res.append("patterns=");
     res.append(patterns);

@@ -62,7 +62,7 @@ public class MarkRange extends AbstractRange {
 
   @NotNull
   public String toString() {
-    StringBuffer res = new StringBuffer();
+    StringBuilder res = new StringBuilder();
     res.append("MarkRange[");
     res.append("mark=").append(mark);
     res.append(", ");

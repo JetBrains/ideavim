@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
 public class RootNode extends ParentNode {
   @NotNull
   public String toString() {
-    StringBuffer res = new StringBuffer();
+    StringBuilder res = new StringBuilder();
     res.append("RootNode[");
     res.append("children=[");
     int cnt = 0;

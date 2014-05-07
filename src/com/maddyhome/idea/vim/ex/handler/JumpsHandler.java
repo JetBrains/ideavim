@@ -47,7 +47,7 @@ public class JumpsHandler extends CommandHandler {
     int spot = VimPlugin.getMark().getJumpSpot();
 
     String spaces = "     ";
-    StringBuffer text = new StringBuffer();
+    StringBuilder text = new StringBuilder();
     text.append("  jump line  col file/text\n");
     int i = jumps.size();
     for (Jump jump : jumps) {

@@ -221,7 +221,7 @@ public class NumberOption extends TextOption {
    */
   @NotNull
   public String toString() {
-    StringBuffer res = new StringBuffer();
+    StringBuilder res = new StringBuilder();
     res.append("  ");
     res.append(getName());
     res.append("=");

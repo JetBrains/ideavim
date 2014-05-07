@@ -43,7 +43,7 @@ public class FlagsOption extends BoundListOption {
    */
   @NotNull
   public String getValue() {
-    StringBuffer res = new StringBuffer();
+    StringBuilder res = new StringBuilder();
     if (value == null) {
       return "";
     }

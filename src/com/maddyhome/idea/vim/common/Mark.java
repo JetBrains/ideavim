@@ -62,7 +62,7 @@ public class Mark extends FileLocation {
 
   @NotNull
   public String toString() {
-    final StringBuffer sb = new StringBuffer();
+    final StringBuilder sb = new StringBuilder();
     sb.append("Mark{");
     sb.append(super.toString());
     sb.append(",key=").append(key);

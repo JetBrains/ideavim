@@ -226,8 +226,8 @@ public class CommandParser {
     }
     int state = STATE_START;
     Ranges ranges = new Ranges(); // The list of ranges
-    StringBuffer command = new StringBuffer(); // The command
-    StringBuffer argument = new StringBuffer(); // The command's argument(s)
+    StringBuilder command = new StringBuilder(); // The command
+    StringBuilder argument = new StringBuilder(); // The command's argument(s)
     StringBuffer location = null; // The current range text
     int offsetSign = 1; // Sign of current range offset
     int offsetNumber = 0; // The value of the current range offset

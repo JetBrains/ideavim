@@ -126,7 +126,7 @@ public class HistoryHandler extends CommandHandler {
       return false;
     }
 
-    StringBuffer res = new StringBuffer();
+    StringBuilder res = new StringBuilder();
     switch (key.charAt(0)) {
       case 'c':
         res.append(processKey(HistoryGroup.COMMAND, f, l));
@@ -159,7 +159,7 @@ public class HistoryHandler extends CommandHandler {
       logger.debug("process " + key + " " + start + "," + end);
     }
 
-    StringBuffer res = new StringBuffer();
+    StringBuilder res = new StringBuilder();
 
     res.append("      #  ").append(key).append(" ").append("history\n");
 

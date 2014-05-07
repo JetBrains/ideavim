@@ -312,7 +312,7 @@ public class CopyGroup {
         String origSegment = segment;
         if (segment.length() < maxlen) {
           logger.debug("short line");
-          StringBuffer extra = new StringBuffer(maxlen - segment.length());
+          StringBuilder extra = new StringBuilder(maxlen - segment.length());
           for (int i = segment.length(); i < maxlen; i++) {
             extra.append(' ');
           }

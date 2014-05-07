@@ -299,7 +299,7 @@ public class Command {
 
   @NotNull
   public String toString() {
-    StringBuffer res = new StringBuffer();
+    StringBuilder res = new StringBuilder();
     res.append("Command[");
     res.append("count=").append(count);
     res.append(", action=").append(action);

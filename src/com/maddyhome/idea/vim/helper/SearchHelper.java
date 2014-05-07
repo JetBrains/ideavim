@@ -1748,7 +1748,7 @@ public class SearchHelper {
     if (vals == null) {
       return "";
     }
-    StringBuffer res = new StringBuffer();
+    StringBuilder res = new StringBuilder();
     for (String s : vals) {
       if (s.length() == 3) {
         res.append(s.charAt(0)).append(s.charAt(2));

@@ -939,7 +939,7 @@ public class ChangeGroup {
       }
     }
 
-    StringBuffer repl = new StringBuffer(count);
+    StringBuilder repl = new StringBuilder(count);
     for (int i = 0; i < num; i++) {
       repl.append(ch);
     }
@@ -1347,7 +1347,7 @@ public class ChangeGroup {
       int size = indentSize * count;
       if (dir == 1) {
         // Right shift blockwise selection
-        StringBuffer space = new StringBuffer();
+        StringBuilder space = new StringBuilder();
         int tabCnt = 0;
         int spcCnt;
         if (useTabs) {
@@ -1404,7 +1404,7 @@ public class ChangeGroup {
         int col = editor.offsetToVisualPosition(woff).column;
         int newCol = Math.max(0, col + dir * indentSize * count);
         if (dir == 1 || col > 0) {
-          StringBuffer space = new StringBuffer();
+          StringBuilder space = new StringBuilder();
           int tabCnt = 0;
           int spcCnt;
           if (useTabs) {

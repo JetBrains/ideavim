@@ -435,7 +435,7 @@ public class EditorHelper {
       return getText(editor, range.getStartOffset(), range.getEndOffset());
     }
     else {
-      StringBuffer res = new StringBuffer();
+      StringBuilder res = new StringBuilder();
       int max = range.getMaxLength();
 
       for (int i = 0; i < len; i++) {
@@ -536,7 +536,7 @@ public class EditorHelper {
 
   @NotNull
   public static String pad(@NotNull final Editor editor, int line, final int to) {
-    StringBuffer res = new StringBuffer();
+    StringBuilder res = new StringBuilder();
 
     int len = getLineLength(editor, line);
     if (logger.isDebugEnabled()) {

@@ -88,7 +88,7 @@ public class ToggleOption extends Option {
    */
   @NotNull
   public String toString() {
-    StringBuffer res = new StringBuffer();
+    StringBuilder res = new StringBuilder();
     if (!value) {
       res.append("no");
     }

@@ -272,7 +272,7 @@ public class FileGroup {
     int offset = editor.getCaretModel().getOffset();
     char ch = editor.getDocument().getCharsSequence().charAt(offset);
 
-    StringBuffer msg = new StringBuffer();
+    StringBuilder msg = new StringBuilder();
     msg.append('<');
     msg.append(StringHelper.toKeyNotation(KeyStroke.getKeyStroke(ch)));
     msg.append(">  ");
@@ -293,7 +293,7 @@ public class FileGroup {
   }
 
   public void displayLocationInfo(@NotNull Editor editor) {
-    StringBuffer msg = new StringBuffer();
+    StringBuilder msg = new StringBuilder();
     Document doc = editor.getDocument();
 
     if (CommandState.getInstance(editor).getMode() != CommandState.Mode.VISUAL) {
@@ -377,7 +377,7 @@ public class FileGroup {
   }
 
   public void displayFileInfo(@NotNull Editor editor, boolean fullPath) {
-    StringBuffer msg = new StringBuffer();
+    StringBuilder msg = new StringBuilder();
     VirtualFile vf = EditorData.getVirtualFile(editor);
     if (vf != null) {
       msg.append('"');

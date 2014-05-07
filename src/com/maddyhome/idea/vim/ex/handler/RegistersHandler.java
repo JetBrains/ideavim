@@ -42,7 +42,7 @@ public class RegistersHandler extends CommandHandler {
   public boolean execute(@NotNull final Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     List<Register> registers = VimPlugin.getRegister().getRegisters();
 
-    StringBuffer text = new StringBuffer();
+    StringBuilder text = new StringBuilder();
     text.append("--- Registers ---\n");
     for (Register reg : registers) {
       text.append("\"");
