@@ -72,11 +72,7 @@ public class CopyGroup {
   public boolean yankLine(@NotNull Editor editor, int count) {
     int start = VimPlugin.getMotion().moveCaretToLineStart(editor);
     int offset = Math.min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor, count - 1, true) + 1, EditorHelper.getFileSize(editor));
-    if (offset != -1) {
-      return yankRange(editor, new TextRange(start, offset), SelectionType.LINE_WISE, false);
-    }
-
-    return false;
+    return offset != -1 && yankRange(editor, new TextRange(start, offset), SelectionType.LINE_WISE, false);
   }
 
   /**

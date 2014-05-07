@@ -171,12 +171,7 @@ public class MarkGroup {
    * @return True if a valid, writable mark, false if not
    */
   public boolean setMark(@NotNull Editor editor, char ch) {
-    if (VALID_SET_MARKS.indexOf(ch) >= 0) {
-      return setMark(editor, ch, editor.getCaretModel().getOffset());
-    }
-    else {
-      return false;
-    }
+    return VALID_SET_MARKS.indexOf(ch) >= 0 && setMark(editor, ch, editor.getCaretModel().getOffset());
   }
 
   /**

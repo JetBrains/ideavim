@@ -78,11 +78,7 @@ public class MacroGroup {
    * @return true if able to play the macro, false in no previous playback
    */
   public boolean playbackLastRegister(@NotNull Editor editor, @NotNull DataContext context, @Nullable Project project, int count) {
-    if (lastRegister != 0) {
-      return playbackRegister(editor, context, project, lastRegister, count);
-    }
-
-    return false;
+    return lastRegister != 0 && playbackRegister(editor, context, project, lastRegister, count);
   }
 
   /**
