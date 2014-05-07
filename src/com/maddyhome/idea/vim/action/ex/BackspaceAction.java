@@ -26,8 +26,6 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-
 /**
  */
 public class BackspaceAction extends EditorAction {
@@ -37,8 +35,7 @@ public class BackspaceAction extends EditorAction {
 
   private static class Handler extends EditorActionHandlerBase {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      return VimPlugin.getProcess().processExKey(editor,
-                                                                   (KeyStroke)cmd.getKeys().get(0), false);
+      return VimPlugin.getProcess().processExKey(editor, cmd.getKeys().get(0), false);
     }
   }
 }
