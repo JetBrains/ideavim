@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
+import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
@@ -36,10 +37,9 @@ public class PlaybackRegisterAction extends EditorAction {
 
   private static class Handler extends EditorActionHandlerBase {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      char reg = cmd.getArgument().getCharacter();
-      return VimPlugin.getMacro().playbackRegister(editor, context,
-                                                                     PlatformDataKeys.PROJECT.getData(context), reg,
-                                                                     cmd.getCount()); // API change - don't merge
+      final char reg = cmd.getArgument().getCharacter();
+      final Project project = PlatformDataKeys.PROJECT.getData(context);
+      return VimPlugin.getMacro().playbackRegister(editor, context, project, reg, cmd.getCount());
     }
   }
 }

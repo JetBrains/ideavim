@@ -184,7 +184,10 @@ public class Ranges {
   @NotNull
   public static TextRange getFileTextRange(@NotNull Editor editor, DataContext context) {
     Ranges ranges = new Ranges();
-    ranges.addRange(AbstractRange.createRange("%", 0, false));
+    final Range[] range = AbstractRange.createRange("%", 0, false);
+    if (range != null) {
+      ranges.addRange(range);
+    }
 
     return ranges.getTextRange(editor, context, -1);
   }

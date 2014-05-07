@@ -29,6 +29,7 @@ import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.EditorFactoryAdapter;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -232,10 +233,11 @@ public class MarkGroup {
 
     LogicalPosition lp = editor.offsetToLogicalPosition(offset);
     Jump jump = new Jump(lp.line, lp.column, vf.getPath());
+    final String filename = jump.getFilename();
 
     for (int i = 0; i < jumps.size(); i++) {
       Jump j = jumps.get(i);
-      if (j.getFilename().equals(jump.getFilename()) && j.getLogicalLine() == jump.getLogicalLine()) {
+      if (filename != null && filename.equals(j.getFilename()) && j.getLogicalLine() == jump.getLogicalLine()) {
         jumps.remove(i);
         break;
       }
@@ -325,7 +327,7 @@ public class MarkGroup {
 
     for (Character ch : globalMarks.keySet()) {
       Mark mark = globalMarks.get(ch);
-      if (mark.getFilename().equals(vf.getPath())) {
+      if (vf.getPath().equals(mark.getFilename())) {
         res.put(ch, mark);
       }
     }
@@ -358,7 +360,7 @@ public class MarkGroup {
         markElem.setAttribute("key", Character.toString(mark.getKey()));
         markElem.setAttribute("line", Integer.toString(mark.getLogicalLine()));
         markElem.setAttribute("column", Integer.toString(mark.getCol()));
-        markElem.setAttribute("filename", mark.getFilename());
+        markElem.setAttribute("filename", StringUtil.notNullize(mark.getFilename()));
         marksElem.addContent(markElem);
         if (logger.isDebugEnabled()) {
           logger.debug("saved mark = " + mark);
@@ -411,7 +413,7 @@ public class MarkGroup {
         Element jumpElem = new Element("jump");
         jumpElem.setAttribute("line", Integer.toString(jump.getLogicalLine()));
         jumpElem.setAttribute("column", Integer.toString(jump.getCol()));
-        jumpElem.setAttribute("filename", jump.getFilename());
+        jumpElem.setAttribute("filename", StringUtil.notNullize(jump.getFilename()));
         jumpsElem.addContent(jumpElem);
         if (logger.isDebugEnabled()) {
           logger.debug("saved jump = " + jump);

@@ -809,7 +809,8 @@ public class ChangeGroup {
    * @param isChange if from a change
    * @return true if able to delete the text, false if not
    */
-  public boolean deleteMotion(@NotNull Editor editor, DataContext context, int count, int rawCount, @NotNull Argument argument, boolean isChange) {
+  public boolean deleteMotion(@NotNull Editor editor, DataContext context, int count, int rawCount,
+                              @NotNull final Argument argument, boolean isChange) {
     final TextRange range = getDeleteMotionRange(editor, context, count, rawCount, argument);
     if (range == null) {
       return (EditorHelper.getFileSize(editor) == 0);
@@ -819,21 +820,25 @@ public class ChangeGroup {
     // 1) The range is across multiple lines
     // 2) There is only whitespace before the start of the range
     // 3) There is only whitespace after the end of the range
-    if (!isChange && (argument.getMotion().getFlags() & Command.FLAG_MOT_LINEWISE) == 0) {
+    final Command motion = argument.getMotion();
+    if (motion == null) {
+      return false;
+    }
+    if (!isChange && (motion.getFlags() & Command.FLAG_MOT_LINEWISE) == 0) {
       LogicalPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
       LogicalPosition end = editor.offsetToLogicalPosition(range.getEndOffset());
       if (start.line != end.line) {
         if (!SearchHelper.anyNonWhitespace(editor, range.getStartOffset(), -1) &&
             !SearchHelper.anyNonWhitespace(editor, range.getEndOffset(), 1)) {
-          int flags = argument.getMotion().getFlags();
+          int flags = motion.getFlags();
           flags &= ~Command.FLAG_MOT_EXCLUSIVE;
           flags &= ~Command.FLAG_MOT_INCLUSIVE;
           flags |= Command.FLAG_MOT_LINEWISE;
-          argument.getMotion().setFlags(flags);
+          motion.setFlags(flags);
         }
       }
     }
-    return deleteRange(editor, range, SelectionType.fromCommandFlags(argument.getMotion().getFlags()), isChange);
+    return deleteRange(editor, range, SelectionType.fromCommandFlags(motion.getFlags()), isChange);
   }
 
   @Nullable
@@ -849,11 +854,16 @@ public class ChangeGroup {
                                                                         range.getEndOffset()).toString();
       final int lastNewLine = text.lastIndexOf('\n');
       if (lastNewLine > 0) {
-        final String id = ActionManager.getInstance().getId(argument.getMotion().getAction());
-        if (id.equals("VimMotionWordRight") || id.equals("VimMotionBigWordRight") || id.equals("VimMotionCamelRight")) {
-          if (!SearchHelper.anyNonWhitespace(editor, range.getEndOffset(), -1)) {
-            final int start = range.getStartOffset();
-            range = new TextRange(start, start + lastNewLine);
+        final Command motion = argument.getMotion();
+        if (motion != null) {
+          final String id = ActionManager.getInstance().getId(motion.getAction());
+          if (id.equals("VimMotionWordRight") ||
+              id.equals("VimMotionBigWordRight") ||
+              id.equals("VimMotionCamelRight")) {
+            if (!SearchHelper.anyNonWhitespace(editor, range.getEndOffset(), -1)) {
+              final int start = range.getStartOffset();
+              range = new TextRange(start, start + lastNewLine);
+            }
           }
         }
       }
@@ -1054,7 +1064,11 @@ public class ChangeGroup {
     // TODO: Hack - find better way to do this exceptional case - at least make constants out of these strings
 
     // Vim treats cw as ce and cW as cE if cursor is on a non-blank character
-    String id = ActionManager.getInstance().getId(argument.getMotion().getAction());
+    final Command motion = argument.getMotion();
+    if (motion == null) {
+      return false;
+    }
+    String id = ActionManager.getInstance().getId(motion.getAction());
     boolean kludge = false;
     boolean bigWord = false;
     final CharSequence chars = editor.getDocument().getCharsSequence();
@@ -1075,26 +1089,26 @@ public class ChangeGroup {
       }
       if (id.equals("VimMotionWordRight")) {
         kludge = true;
-        argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionWordEndRight"));
-        argument.getMotion().setFlags(Command.FLAG_MOT_INCLUSIVE);
+        motion.setAction(ActionManager.getInstance().getAction("VimMotionWordEndRight"));
+        motion.setFlags(Command.FLAG_MOT_INCLUSIVE);
       }
       else if (id.equals("VimMotionBigWordRight")) {
         kludge = true;
         bigWord = true;
-        argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionBigWordEndRight"));
-        argument.getMotion().setFlags(Command.FLAG_MOT_INCLUSIVE);
+        motion.setAction(ActionManager.getInstance().getAction("VimMotionBigWordEndRight"));
+        motion.setFlags(Command.FLAG_MOT_INCLUSIVE);
       }
       else if (id.equals("VimMotionCamelRight")) {
         kludge = true;
-        argument.getMotion().setAction(ActionManager.getInstance().getAction("VimMotionCamelEndRight"));
-        argument.getMotion().setFlags(Command.FLAG_MOT_INCLUSIVE);
+        motion.setAction(ActionManager.getInstance().getAction("VimMotionCamelEndRight"));
+        motion.setFlags(Command.FLAG_MOT_INCLUSIVE);
       }
     }
 
     if (kludge) {
       int pos = offset;
       int size = EditorHelper.getFileSize(editor);
-      int cnt = count * argument.getMotion().getCount();
+      int cnt = count * motion.getCount();
       int pos1 = SearchHelper.findNextWordEnd(chars, pos, size, cnt, bigWord, false);
       int pos2 = SearchHelper.findNextWordEnd(chars, pos1, size, -cnt, bigWord, false);
       if (logger.isDebugEnabled()) {
@@ -1102,18 +1116,18 @@ public class ChangeGroup {
         logger.debug("pos1=" + pos1);
         logger.debug("pos2=" + pos2);
         logger.debug("count=" + count);
-        logger.debug("arg.count=" + argument.getMotion().getCount());
+        logger.debug("arg.count=" + motion.getCount());
       }
       if (pos2 == pos) {
         if (count > 1) {
           count--;
           rawCount--;
         }
-        else if (argument.getMotion().getCount() > 1) {
-          argument.getMotion().setCount(argument.getMotion().getCount() - 1);
+        else if (motion.getCount() > 1) {
+          motion.setCount(motion.getCount() - 1);
         }
         else {
-          argument.getMotion().setFlags(Command.FLAG_MOT_EXCLUSIVE);
+          motion.setFlags(Command.FLAG_MOT_EXCLUSIVE);
         }
       }
     }

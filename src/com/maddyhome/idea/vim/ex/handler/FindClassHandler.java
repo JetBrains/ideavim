@@ -39,7 +39,7 @@ public class FindClassHandler extends CommandHandler {
 
   public boolean execute(@NotNull Editor editor, @NotNull final DataContext context, @NotNull ExCommand cmd) throws ExException {
     String arg = cmd.getArgument();
-    if (arg != null && arg.length() > 0) {
+    if (arg.length() > 0) {
       boolean res = VimPlugin.getFile().openFile(arg + ".java", context);
       if (res) {
         VimPlugin.getMark().saveJumpLocation(editor);

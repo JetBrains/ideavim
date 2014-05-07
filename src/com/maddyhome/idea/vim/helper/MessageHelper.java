@@ -53,7 +53,7 @@ public class MessageHelper {
     return CommonBundle.message(getBundle(), key);
   }
 
-  @Nullable
+  @NotNull
   protected static ResourceBundle getBundle() {
     ResourceBundle bundle = null;
     if (ourBundle != null) bundle = ourBundle.get();

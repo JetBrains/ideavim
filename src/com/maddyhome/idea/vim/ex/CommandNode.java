@@ -31,7 +31,7 @@ public class CommandNode {
     command = null;
   }
 
-  public CommandNode(CommandHandler command) {
+  public CommandNode(@Nullable CommandHandler command) {
     this.command = command;
   }
 

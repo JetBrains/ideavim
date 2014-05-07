@@ -661,7 +661,9 @@ public class SearchGroup {
   }
 
   private void highlightSearchLines(@NotNull Editor editor, boolean noSmartCase, int startLine, int endLine) {
-    highlightSearchLines(editor, startLine, endLine, lastSearch, shouldIgnoreCase(lastSearch, noSmartCase));
+    if (lastSearch != null) {
+      highlightSearchLines(editor, startLine, endLine, lastSearch, shouldIgnoreCase(lastSearch, noSmartCase));
+    }
   }
 
   private static void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine, String text, boolean ic) {
@@ -729,6 +731,10 @@ public class SearchGroup {
 
     ParsePosition pp = new ParsePosition(0);
     int res = range.getStartOffset();
+
+    if (lastOffset == null) {
+      return -1;
+    }
 
     if (lastOffset.length() == 0) {
       return range.getStartOffset();
@@ -1210,7 +1216,7 @@ public class SearchGroup {
     }
     */
 
-    public void selectionChanged(FileEditorManagerEvent event) {
+    public void selectionChanged(@NotNull FileEditorManagerEvent event) {
       VimPlugin.getSearch().updateHighlight();
     }
   }

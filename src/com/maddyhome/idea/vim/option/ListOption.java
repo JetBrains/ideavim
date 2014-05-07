@@ -55,6 +55,9 @@ public class ListOption extends TextOption {
   public String getValue() {
     StringBuffer res = new StringBuffer();
     int cnt = 0;
+    if (value == null) {
+      return "";
+    }
     for (String s : value) {
       if (cnt > 0) {
         res.append(",");
@@ -84,7 +87,8 @@ public class ListOption extends TextOption {
    * @return True if all the supplied values are set in this option, false if not
    */
   public boolean contains(String val) {
-    return value.containsAll(parseVals(val));
+    final List<String> vals = parseVals(val);
+    return value != null && vals != null && value.containsAll(vals);
   }
 
   /**
@@ -143,7 +147,7 @@ public class ListOption extends TextOption {
   }
 
   protected boolean append(@Nullable List<String> vals) {
-    if (vals == null) {
+    if (vals == null || value == null) {
       return false;
     }
 
@@ -154,7 +158,7 @@ public class ListOption extends TextOption {
   }
 
   protected boolean prepend(@Nullable List<String> vals) {
-    if (vals == null) {
+    if (vals == null || value == null) {
       return false;
     }
 
@@ -165,7 +169,7 @@ public class ListOption extends TextOption {
   }
 
   protected boolean remove(@Nullable List<String> vals) {
-    if (vals == null) {
+    if (vals == null || value == null) {
       return false;
     }
 

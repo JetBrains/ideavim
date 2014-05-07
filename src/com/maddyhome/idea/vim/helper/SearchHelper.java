@@ -1726,7 +1726,7 @@ public class SearchHelper {
     return PsiHelper.findMethodEnd(editor, editor.getCaretModel().getOffset(), count);
   }
 
-  @Nullable
+  @NotNull
   private static String getPairChars() {
     if (pairsChars == null) {
       ListOption lo = (ListOption)Options.getInstance().getOption("matchpairs");
@@ -1745,6 +1745,9 @@ public class SearchHelper {
   @NotNull
   private static String parseOption(@NotNull ListOption option) {
     List<String> vals = option.values();
+    if (vals == null) {
+      return "";
+    }
     StringBuffer res = new StringBuffer();
     for (String s : vals) {
       if (s.length() == 3) {

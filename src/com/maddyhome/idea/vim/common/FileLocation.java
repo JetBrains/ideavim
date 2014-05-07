@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class FileLocation {
-  protected FileLocation(int lline, int col, String filename) {
+  protected FileLocation(int lline, int col, @Nullable String filename) {
     this.line = lline;
     this.col = col;
     this.filename = filename;

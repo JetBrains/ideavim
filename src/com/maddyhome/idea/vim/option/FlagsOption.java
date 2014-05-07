@@ -44,6 +44,9 @@ public class FlagsOption extends BoundListOption {
   @NotNull
   public String getValue() {
     StringBuffer res = new StringBuffer();
+    if (value == null) {
+      return "";
+    }
     for (String s : value) {
       res.append(s);
     }

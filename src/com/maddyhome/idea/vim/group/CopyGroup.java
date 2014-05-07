@@ -22,8 +22,10 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
+import com.intellij.openapi.util.text.StringUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
@@ -56,7 +58,8 @@ public class CopyGroup {
    */
   public boolean yankMotion(@NotNull Editor editor, DataContext context, int count, int rawCount, @NotNull Argument argument) {
     TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true, false);
-    return yankRange(editor, range, SelectionType.fromCommandFlags(argument.getMotion().getFlags()), true);
+    final Command motion = argument.getMotion();
+    return motion != null && yankRange(editor, range, SelectionType.fromCommandFlags(motion.getFlags()), true);
   }
 
   /**
@@ -126,7 +129,8 @@ public class CopyGroup {
         pos = editor.getCaretModel().getOffset();
       }
 
-      putText(editor, context, pos, reg.getText(), reg.getType(), count, indent, cursorAfter, CommandState.SubMode.NONE);
+      putText(editor, context, pos, StringUtil.notNullize(reg.getText()), reg.getType(), count, indent, cursorAfter,
+              CommandState.SubMode.NONE);
 
       return true;
     }
@@ -168,7 +172,8 @@ public class CopyGroup {
       if (pos > 0 && pos > editor.getDocument().getTextLength()) {
         pos--;
       }
-      putText(editor, context, pos, reg.getText(), reg.getType(), count, indent, cursorAfter, CommandState.SubMode.NONE);
+      putText(editor, context, pos, StringUtil.notNullize(reg.getText()), reg.getType(), count, indent, cursorAfter,
+              CommandState.SubMode.NONE);
 
       return true;
     }
@@ -224,7 +229,7 @@ public class CopyGroup {
         }
       }
 
-      putText(editor, context, pos, reg.getText(), reg.getType(), count,
+      putText(editor, context, pos, StringUtil.notNullize(reg.getText()), reg.getType(), count,
               indent && reg.getType() == SelectionType.LINE_WISE, cursorAfter, subMode);
 
       return true;

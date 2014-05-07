@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Register;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -50,7 +51,7 @@ public class MacroGroup {
    * @param count   The number of times to execute the macro
    * @return true if able to play the macro, false if invalid or empty register
    */
-  public boolean playbackRegister(@NotNull Editor editor, @NotNull DataContext context, @NotNull Project project, char reg, int count) {
+  public boolean playbackRegister(@NotNull Editor editor, @NotNull DataContext context, @Nullable Project project, char reg, int count) {
     if (logger.isDebugEnabled()) {
       logger.debug("play bakc register " + reg + " " + count + " times");
     }
@@ -76,7 +77,7 @@ public class MacroGroup {
    * @param count   The number of times to execute the macro
    * @return true if able to play the macro, false in no previous playback
    */
-  public boolean playbackLastRegister(@NotNull Editor editor, @NotNull DataContext context, @NotNull Project project, int count) {
+  public boolean playbackLastRegister(@NotNull Editor editor, @NotNull DataContext context, @Nullable Project project, int count) {
     if (lastRegister != 0) {
       return playbackRegister(editor, context, project, lastRegister, count);
     }
@@ -95,7 +96,7 @@ public class MacroGroup {
    * @param cnt     count
    * @param total   total
    */
-  public void playbackKeys(@NotNull final Editor editor, @NotNull final DataContext context, @NotNull final Project project,
+  public void playbackKeys(@NotNull final Editor editor, @NotNull final DataContext context, @Nullable final Project project,
                            @NotNull final List<KeyStroke> keys, final int pos, final int cnt, final int total) {
     if (logger.isDebugEnabled()) {
       logger.debug("playbackKeys " + pos);

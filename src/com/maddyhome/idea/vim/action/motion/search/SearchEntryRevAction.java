@@ -37,8 +37,11 @@ public class SearchEntryRevAction extends MotionEditorAction {
 
   private static class Handler extends MotionEditorActionHandler {
     public int getOffset(@NotNull Editor editor, DataContext context, int count, int rawCount, @NotNull Argument argument) {
-      return VimPlugin.getSearch().search(editor, argument.getString(),
-                                                            count, Command.FLAG_SEARCH_REV, false);
+      final String command = argument.getString();
+      if (command == null) {
+        return -1;
+      }
+      return VimPlugin.getSearch().search(editor, command, count, Command.FLAG_SEARCH_REV, false);
     }
   }
 }

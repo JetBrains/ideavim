@@ -80,7 +80,7 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
         lastColumn = EditorData.getLastColumn(editor);
         VisualChange range = EditorData.getLastVisualOperatorRange(editor);
         VimPlugin.getMotion().toggleVisual(editor, 1, 1, CommandState.SubMode.NONE);
-        if (range.getColumns() == MotionGroup.LAST_COLUMN) {
+        if (range != null && range.getColumns() == MotionGroup.LAST_COLUMN) {
           EditorData.setLastColumn(editor, MotionGroup.LAST_COLUMN);
         }
       }

@@ -42,19 +42,17 @@ public class EditFileHandler extends CommandHandler {
   public boolean execute(@NotNull final Editor editor, @NotNull final DataContext context,
                          @NotNull ExCommand cmd) throws ExException {
     final String arg = cmd.getArgument();
-    if (arg != null) {
-      if (arg.equals("#")) {
+    if (arg.equals("#")) {
+      VimPlugin.getMark().saveJumpLocation(editor);
+      VimPlugin.getFile().selectPreviousTab(context);
+      return true;
+    }
+    else if (arg.length() > 0) {
+      final boolean res = VimPlugin.getFile().openFile(arg, context);
+      if (res) {
         VimPlugin.getMark().saveJumpLocation(editor);
-        VimPlugin.getFile().selectPreviousTab(context);
-        return true;
       }
-      else if (arg.length() > 0) {
-        final boolean res = VimPlugin.getFile().openFile(arg, context);
-        if (res) {
-          VimPlugin.getMark().saveJumpLocation(editor);
-        }
-        return res;
-      }
+      return res;
     }
 
     // Don't open a choose file dialog under a write action

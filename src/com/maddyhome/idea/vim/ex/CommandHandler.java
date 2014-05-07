@@ -89,7 +89,7 @@ public abstract class CommandHandler {
    * @param argFlags Range and Arguments commands
    * @param optFlags Other command specific flags
    */
-  public CommandHandler(CommandName[] names, int argFlags, int optFlags) {
+  public CommandHandler(@Nullable CommandName[] names, int argFlags, int optFlags) {
     this.names = names;
     this.argFlags = argFlags;
     this.optFlags = optFlags;

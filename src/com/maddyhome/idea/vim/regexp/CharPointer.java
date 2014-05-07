@@ -29,17 +29,17 @@ import java.nio.CharBuffer;
 public class CharPointer {
   public static final CharPointer INIT = new CharPointer();
 
-  public CharPointer(String text) {
+  public CharPointer(@Nullable String text) {
     seq = text;
     readonly = true;
   }
 
-  public CharPointer(CharBuffer text) {
+  public CharPointer(@Nullable CharBuffer text) {
     seq = text;
     readonly = true;
   }
 
-  public CharPointer(StringBuffer text) {
+  public CharPointer(@Nullable StringBuffer text) {
     seq = text;
     readonly = false;
   }

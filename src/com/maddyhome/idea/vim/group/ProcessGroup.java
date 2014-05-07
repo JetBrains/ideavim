@@ -74,7 +74,7 @@ public class ProcessGroup {
       public void run() {
         VirtualFile vf = EditorData.getVirtualFile(editor);
         if (!ApplicationManager.getApplication().isUnitTestMode() && vf != null) {
-          FileEditorManager.getInstance(project).openFile(EditorData.getVirtualFile(editor), true);
+          FileEditorManager.getInstance(project).openFile(vf, true);
         }
       }
     });
@@ -162,7 +162,7 @@ public class ProcessGroup {
           if (!ApplicationManager.getApplication().isUnitTestMode() && (flg & CommandParser.RES_DONT_REOPEN) == 0) {
             VirtualFile vf = EditorData.getVirtualFile(editor);
             if (vf != null) {
-              FileEditorManager.getInstance(project).openFile(EditorData.getVirtualFile(editor), true);
+              FileEditorManager.getInstance(project).openFile(vf, true);
             }
           }
         }
@@ -183,7 +183,7 @@ public class ProcessGroup {
         //editor.getContentComponent().requestFocus();
         VirtualFile vf = EditorData.getVirtualFile(editor);
         if (vf != null) {
-          FileEditorManager.getInstance(project).openFile(EditorData.getVirtualFile(editor), true);
+          FileEditorManager.getInstance(project).openFile(vf, true);
         }
       }
     });
@@ -255,7 +255,6 @@ public class ProcessGroup {
     char[] buf = new char[2048];
     int cnt;
     while ((cnt = from.read(buf)) != -1) {
-      if (logger.isDebugEnabled()) logger.debug("buf=" + buf);
       to.write(buf, 0, cnt);
     }
   }

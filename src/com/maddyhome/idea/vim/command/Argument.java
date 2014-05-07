@@ -50,7 +50,7 @@ public class Argument {
    *
    * @param motionArg The motion command
    */
-  public Argument(Command motionArg) {
+  public Argument(@Nullable Command motionArg) {
     this.motionArg = motionArg;
     type = Type.MOTION;
   }
@@ -60,7 +60,7 @@ public class Argument {
    *
    * @param strArg The string
    */
-  public Argument(String strArg) {
+  public Argument(@Nullable String strArg) {
     this.strArg = strArg;
     type = Type.STRING;
   }

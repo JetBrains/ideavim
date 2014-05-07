@@ -71,6 +71,9 @@ public class FileGroup {
       found = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(new File(dir, homefile));
     }
     else {
+      if (proj == null) {
+        return false;
+      }
       ProjectRootManager prm = ProjectRootManager.getInstance(proj);
       VirtualFile[] roots = prm.getContentRoots();
       for (int i = 0; i < roots.length; i++) {
@@ -145,18 +148,10 @@ public class FileGroup {
   public void closeFile(Editor editor, @NotNull DataContext context) {
     Project proj = PlatformDataKeys.PROJECT.getData(context);
     FileEditorManager fem = FileEditorManager.getInstance(proj); // API change - don't merge
-    //fem.closeFile(fem.getSelectedFile());
-    VirtualFile vf = EditorData.getVirtualFile(fem.getSelectedTextEditor());
+    VirtualFile vf = EditorData.getVirtualFile(editor);
     if (vf != null) {
       fem.closeFile(vf);
     }
-
-    /*
-    if (fem.getOpenFiles().length == 0)
-    {
-        exitIdea();
-    }
-    */
   }
 
   /**
@@ -264,7 +259,7 @@ public class FileGroup {
   public Editor selectEditor(Project project, @NotNull VirtualFile file) {
     FileEditorManager fMgr = FileEditorManager.getInstance(project);
     FileEditor[] feditors = fMgr.openFile(file, true);
-    if (feditors != null && feditors.length > 0) {
+    if (feditors.length > 0) {
       if (feditors[0] instanceof TextEditor) {
         return ((TextEditor)feditors[0]).getEditor();
       }
@@ -391,12 +386,14 @@ public class FileGroup {
       }
       else {
         Project project = editor.getProject();
-        VirtualFile root = ProjectRootManager.getInstance(project).getFileIndex().getContentRootForFile(vf);
-        if (root != null) {
-          msg.append(vf.getPath().substring(root.getPath().length() + 1));
-        }
-        else {
-          msg.append(vf.getPath());
+        if (project != null) {
+          VirtualFile root = ProjectRootManager.getInstance(project).getFileIndex().getContentRootForFile(vf);
+          if (root != null) {
+            msg.append(vf.getPath().substring(root.getPath().length() + 1));
+          }
+          else {
+            msg.append(vf.getPath());
+          }
         }
       }
       msg.append("\" ");

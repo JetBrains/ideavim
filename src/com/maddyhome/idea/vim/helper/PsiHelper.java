@@ -46,6 +46,9 @@ public class PsiHelper {
   private static int findMethodOrClass(@NotNull Editor editor, int offset, int count, boolean isStart) {
     PsiFile file = getFile(editor);
 
+    if (file == null) {
+      return -1;
+    }
     StructureViewBuilder structureViewBuilder = LanguageStructureViewBuilder.INSTANCE.getStructureViewBuilder(file);
     if (!(structureViewBuilder instanceof TreeBasedStructureViewBuilder)) return -1;
     TreeBasedStructureViewBuilder builder = (TreeBasedStructureViewBuilder)structureViewBuilder;
@@ -108,9 +111,13 @@ public class PsiHelper {
   @Nullable
   private static PsiFile getFile(@NotNull Editor editor) {
     VirtualFile vf = EditorData.getVirtualFile(editor);
-    Project proj = editor.getProject();
-    PsiManager mgr = PsiManager.getInstance(proj);
-
-    return mgr.findFile(vf);
+    if (vf != null) {
+      Project proj = editor.getProject();
+      if (proj != null) {
+        PsiManager mgr = PsiManager.getInstance(proj);
+        return mgr.findFile(vf);
+      }
+    }
+    return null;
   }
 }

@@ -553,6 +553,9 @@ public class CommandParser {
   public void addHandler(@NotNull CommandHandler handler) {
     // Iterator through each command name alias
     CommandName[] names = handler.getNames();
+    if (names == null) {
+      return;
+    }
     for (CommandName name : names) {
       CommandNode node = root;
       String text = name.getRequired();
