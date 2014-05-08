@@ -1323,7 +1323,7 @@ public class MotionGroup {
       return false;
     }
 
-    CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, vr.getType(), MappingMode.VISUAL);
+    CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, vr.getType().toSubMode(), MappingMode.VISUAL);
 
     visualStart = vr.getStart();
     visualEnd = vr.getEnd();
@@ -1343,14 +1343,14 @@ public class MotionGroup {
       return false;
     }
 
-    EditorData.setLastVisualRange(editor, new VisualRange(visualStart, visualEnd, visualOffset,
-                                                          CommandState.getInstance(editor).getSubMode()));
+    final SelectionType selectionType = SelectionType.fromSubMode(CommandState.getInstance(editor).getSubMode());
+    EditorData.setLastVisualRange(editor, new VisualRange(visualStart, visualEnd, visualOffset, selectionType));
 
     visualStart = vr.getStart();
     visualEnd = vr.getEnd();
     visualOffset = vr.getOffset();
 
-    CommandState.getInstance(editor).setSubMode(vr.getType());
+    CommandState.getInstance(editor).setSubMode(vr.getType().toSubMode());
 
     updateSelection(editor, visualEnd);
 
@@ -1491,13 +1491,11 @@ public class MotionGroup {
   }
 
   public void resetVisual(@NotNull final Editor editor, final boolean removeSelection) {
-    EditorData.setLastVisualRange(editor, new VisualRange(visualStart,
-                                                          visualEnd, visualOffset,
-                                                          CommandState.getInstance(editor).getSubMode()));
+    final SelectionType selectionType = SelectionType.fromSubMode(CommandState.getInstance(editor).getSubMode());
+    EditorData.setLastVisualRange(editor, new VisualRange(visualStart, visualEnd, visualOffset, selectionType));
     if (removeSelection) {
       editor.getSelectionModel().removeSelection();
     }
-
     CommandState.getInstance(editor).setSubMode(CommandState.SubMode.NONE);
   }
 

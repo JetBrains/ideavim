@@ -24,13 +24,13 @@ public class VisualRange {
   final int myStart;
   final int myEnd;
   final int myOffset;
-  @NotNull final CommandState.SubMode myType;
+  @NotNull final SelectionType myType;
 
-  public VisualRange(int start, int end, int offset, @NotNull CommandState.SubMode type) {
-    this.myStart = start;
-    this.myEnd = end;
-    this.myType = type;
-    this.myOffset = offset;
+  public VisualRange(int start, int end, int offset, @NotNull SelectionType type) {
+    myStart = start;
+    myEnd = end;
+    myType = type;
+    myOffset = offset;
   }
 
   public int getStart() {
@@ -42,7 +42,7 @@ public class VisualRange {
   }
 
   @NotNull
-  public CommandState.SubMode getType() {
+  public SelectionType getType() {
     return myType;
   }
 

@@ -62,6 +62,19 @@ public enum SelectionType {
   }
 
   @NotNull
+  public CommandState.SubMode toSubMode() {
+    switch (this) {
+      case LINE_WISE:
+        return CommandState.SubMode.VISUAL_LINE;
+      case CHARACTER_WISE:
+        return CommandState.SubMode.VISUAL_CHARACTER;
+      case BLOCK_WISE:
+        return CommandState.SubMode.VISUAL_BLOCK;
+      default:
+        return CommandState.SubMode.VISUAL_CHARACTER;
+    }
+  }
+
   public static SelectionType fromCommandFlags(int flags) {
     if ((flags & Command.FLAG_MOT_LINEWISE) != 0) {
       return SelectionType.LINE_WISE;
