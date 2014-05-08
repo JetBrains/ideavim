@@ -539,4 +539,18 @@ public class MotionActionTest extends VimTestCase {
                    "three\n");
     assertOffset(4);
   }
+
+  // |v_gv|
+  public void testSwapVisualSelections() {
+    typeTextInFile(parseKeys("viw", "<Esc>", "0", "viw", "gv", "d"),
+                   "foo <caret>bar\n");
+    myFixture.checkResult("foo \n");
+  }
+
+  // |v_o|
+  public void testSwapVisualSelectionEnds() {
+    typeTextInFile(parseKeys("v", "l", "o", "l", "d"),
+                   "<caret>foo\n");
+    myFixture.checkResult("fo\n");
+  }
 }
