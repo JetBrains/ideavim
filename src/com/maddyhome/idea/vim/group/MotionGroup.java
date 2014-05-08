@@ -1343,8 +1343,8 @@ public class MotionGroup {
       return false;
     }
 
-    EditorData.setLastVisualRange(editor, new VisualRange(visualStart, visualEnd,
-                                                          CommandState.getInstance(editor).getSubMode(), visualOffset));
+    EditorData.setLastVisualRange(editor, new VisualRange(visualStart, visualEnd, visualOffset,
+                                                          CommandState.getInstance(editor).getSubMode()));
 
     visualStart = vr.getStart();
     visualEnd = vr.getEnd();
@@ -1492,7 +1492,8 @@ public class MotionGroup {
 
   public void resetVisual(@NotNull final Editor editor, final boolean removeSelection) {
     EditorData.setLastVisualRange(editor, new VisualRange(visualStart,
-                                                          visualEnd, CommandState.getInstance(editor).getSubMode(), visualOffset));
+                                                          visualEnd, visualOffset,
+                                                          CommandState.getInstance(editor).getSubMode()));
     if (removeSelection) {
       editor.getSelectionModel().removeSelection();
     }

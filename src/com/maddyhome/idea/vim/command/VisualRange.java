@@ -21,38 +21,37 @@ package com.maddyhome.idea.vim.command;
 import org.jetbrains.annotations.NotNull;
 
 public class VisualRange {
-  public VisualRange(int start, int end, @NotNull CommandState.SubMode type, int offset) {
-    this.start = start;
-    this.end = end;
-    this.type = type;
-    this.offset = offset;
+  final int myStart;
+  final int myEnd;
+  final int myOffset;
+  @NotNull final CommandState.SubMode myType;
+
+  public VisualRange(int start, int end, int offset, @NotNull CommandState.SubMode type) {
+    this.myStart = start;
+    this.myEnd = end;
+    this.myType = type;
+    this.myOffset = offset;
   }
 
   public int getStart() {
-    return start;
+    return myStart;
   }
 
   public int getEnd() {
-    return end;
+    return myEnd;
   }
 
   @NotNull
   public CommandState.SubMode getType() {
-    return type;
+    return myType;
   }
 
   public int getOffset() {
-    return offset;
+    return myOffset;
   }
 
   @NotNull
   public String toString() {
-
-    return "VisualRange[" + "start=" + start + ", end=" + end + ", type=" + type + ", offset=" + offset + "]";
+    return "VisualRange[" + "start=" + myStart + ", end=" + myEnd + ", type=" + myType + ", offset=" + myOffset + "]";
   }
-
-  final int start;
-  final int end;
-  @NotNull final CommandState.SubMode type;
-  final int offset;
 }
