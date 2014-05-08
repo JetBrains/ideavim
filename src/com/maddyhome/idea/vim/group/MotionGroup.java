@@ -19,7 +19,6 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.fileEditor.FileEditor;
@@ -194,11 +193,6 @@ public class MotionGroup {
     visualOffset = editor.getCaretModel().getOffset();
 
     EditorData.setLastColumn(editor, editor.getCaretModel().getVisualPosition().column);
-    if (logger.isDebugEnabled()) {
-      logger.debug("Mouse click: vp=" + editor.getCaretModel().getVisualPosition() +
-                   "lp=" + editor.getCaretModel().getLogicalPosition() +
-                   "offset=" + editor.getCaretModel().getOffset());
-    }
   }
 
   /**
@@ -226,16 +220,11 @@ public class MotionGroup {
 
       int start = editor.getSelectionModel().getSelectionStart();
       int end = editor.getSelectionModel().getSelectionEnd();
-      if (logger.isDebugEnabled()) {
-        logger.debug("start=" + start);
-        logger.debug("end=" + end);
-      }
       editor.getSelectionModel().setSelection(start, Math.max(start, end - 1));
 
       setVisualMode(editor, CommandState.SubMode.VISUAL_LINE);
 
       VisualChange range = getVisualOperatorRange(editor, Command.FLAG_MOT_LINEWISE);
-      if (logger.isDebugEnabled()) logger.debug("range=" + range);
       if (range.getLines() > 1) {
         MotionGroup.moveCaret(editor, moveCaretVertical(editor, -1));
       }
@@ -249,19 +238,12 @@ public class MotionGroup {
 
     ExOutputModel.getInstance(editor).clear();
 
-    logger.debug("mouse released");
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
       CommandState.getInstance(editor).popState();
     }
 
     int start = editor.getSelectionModel().getSelectionStart();
     int end = editor.getSelectionModel().getSelectionEnd();
-    if (logger.isDebugEnabled()) {
-      logger.debug("startOff=" + startOff);
-      logger.debug("endOff=" + endOff);
-      logger.debug("start=" + start);
-      logger.debug("end=" + end);
-    }
 
     if (mode == CommandState.SubMode.VISUAL_LINE) {
       end--;
@@ -905,7 +887,6 @@ public class MotionGroup {
   }
 
   public boolean scrollLine(@NotNull Editor editor, int lines) {
-    if (logger.isDebugEnabled()) logger.debug("lines=" + lines);
     int visualLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
 
     visualLine = EditorHelper.normalizeVisualLine(editor, visualLine + lines);
@@ -917,7 +898,6 @@ public class MotionGroup {
   }
 
   public static void moveCaretToView(@NotNull Editor editor) {
-    if (logger.isDebugEnabled()) logger.debug("editor=" + editor);
     int scrollOffset = ((NumberOption)Options.getInstance().getOption("scrolloff")).value();
     int sideScrollOffset = ((NumberOption)Options.getInstance().getOption("sidescrolloff")).value();
     int height = EditorHelper.getScreenHeight(editor);
@@ -976,7 +956,6 @@ public class MotionGroup {
   }
 
   public boolean scrollPage(@NotNull Editor editor, int pages, int height, int line, boolean partial) {
-    if (logger.isDebugEnabled()) logger.debug("scrollPage(" + pages + ")");
     int visualTopLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
 
     int newLine = visualTopLine + pages * height;
@@ -1339,13 +1318,11 @@ public class MotionGroup {
   }
 
   public boolean selectPreviousVisualMode(@NotNull Editor editor) {
-    logger.debug("selectPreviousVisualMode");
     VisualRange vr = EditorData.getLastVisualRange(editor);
     if (vr == null) {
       return false;
     }
 
-    if (logger.isDebugEnabled()) logger.debug("vr=" + vr);
     CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, vr.getType(), MappingMode.VISUAL);
 
     visualStart = vr.getStart();
@@ -1384,7 +1361,6 @@ public class MotionGroup {
   }
 
   public void setVisualMode(@NotNull Editor editor, @NotNull CommandState.SubMode mode) {
-    logger.debug("setVisualMode");
     CommandState.SubMode oldMode = CommandState.getInstance(editor).getSubMode();
     if (mode == CommandState.SubMode.NONE) {
       int start = editor.getSelectionModel().getSelectionStart();
@@ -1427,13 +1403,11 @@ public class MotionGroup {
       visualEnd -= adj;
     }
     visualOffset = editor.getCaretModel().getOffset();
-    if (logger.isDebugEnabled()) logger.debug("visualStart=" + visualStart + ", visualEnd=" + visualEnd);
 
     VimPlugin.getMark().setVisualSelectionMarks(editor, getRawVisualRange());
   }
 
   public boolean toggleVisual(@NotNull Editor editor, int count, int rawCount, @NotNull CommandState.SubMode mode) {
-    if (logger.isDebugEnabled()) logger.debug("toggleVisual: mode=" + mode);
     CommandState.SubMode currentMode = CommandState.getInstance(editor).getSubMode();
     if (CommandState.getInstance(editor).getMode() != CommandState.Mode.VISUAL) {
       int start;
@@ -1441,11 +1415,7 @@ public class MotionGroup {
       if (rawCount > 0) {
         VisualChange range = EditorData.getLastVisualOperatorRange(editor);
         if (range == null) {
-          logger.debug("no prior visual range");
           return false;
-        }
-        else {
-          if (logger.isDebugEnabled()) logger.debug("last visual change: " + range);
         }
         switch (range.getType()) {
           case CHARACTER_WISE:
@@ -1521,11 +1491,8 @@ public class MotionGroup {
   }
 
   public void resetVisual(@NotNull final Editor editor, final boolean removeSelection) {
-    logger.debug("resetVisual");
     EditorData.setLastVisualRange(editor, new VisualRange(visualStart,
                                                           visualEnd, CommandState.getInstance(editor).getSubMode(), visualOffset));
-    if (logger.isDebugEnabled()) logger.debug("visualStart=" + visualStart + ", visualEnd=" + visualEnd);
-
     if (removeSelection) {
       editor.getSelectionModel().removeSelection();
     }
@@ -1535,7 +1502,6 @@ public class MotionGroup {
 
   @NotNull
   public VisualChange getVisualOperatorRange(@NotNull Editor editor, int cmdFlags) {
-    logger.debug("vis op range");
     int start = visualStart;
     int end = visualEnd;
     if (start > end) {
@@ -1546,10 +1512,6 @@ public class MotionGroup {
 
     start = EditorHelper.normalizeOffset(editor, start, false);
     end = EditorHelper.normalizeOffset(editor, end, false);
-    if (logger.isDebugEnabled()) {
-      logger.debug("start=" + start);
-      logger.debug("end=" + end);
-    }
     LogicalPosition sp = editor.offsetToLogicalPosition(start);
     LogicalPosition ep = editor.offsetToLogicalPosition(end);
     int lines = ep.line - sp.line + 1;
@@ -1577,11 +1539,6 @@ public class MotionGroup {
       type = SelectionType.BLOCK_WISE;
     }
 
-    if (logger.isDebugEnabled()) {
-      logger.debug("lines=" + lines);
-      logger.debug("chars=" + chars);
-      logger.debug("type=" + type);
-    }
     return new VisualChange(lines, chars, type);
   }
 
@@ -1618,7 +1575,6 @@ public class MotionGroup {
   }
 
   private void updateSelection(@NotNull Editor editor, int offset) {
-    logger.debug("updateSelection");
     visualEnd = offset;
     visualOffset = offset;
     int start = visualStart;
@@ -1758,7 +1714,6 @@ public class MotionGroup {
           }
           startOff = event.getEditor().getSelectionModel().getSelectionStart();
           endOff = event.getEditor().getSelectionModel().getSelectionEnd();
-          if (logger.isDebugEnabled()) logger.debug("startOff=" + startOff);
         }
 
         dragEditor = event.getEditor();
@@ -1809,6 +1764,4 @@ public class MotionGroup {
   private int visualOffset;
   @NotNull private final EditorMouseHandler mouseHandler = new EditorMouseHandler();
   @NotNull private final EditorSelectionHandler selectionHandler = new EditorSelectionHandler();
-
-  private static final Logger logger = Logger.getInstance(MotionGroup.class.getName());
 }
