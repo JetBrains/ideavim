@@ -20,25 +20,60 @@ package com.maddyhome.idea.vim.action.change.change;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+import java.util.List;
+import java.util.Set;
+
 /**
+ * @author vlan
  */
-public class ChangeVisualCharacterAction extends EditorAction {
+public class ChangeVisualCharacterAction extends VimCommandAction {
   public ChangeVisualCharacterAction() {
-    super(new Handler());
+    super(new VisualOperatorActionHandler() {
+      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
+                                @NotNull TextRange range) {
+        final Argument argument = cmd.getArgument();
+        return argument != null && VimPlugin.getChange().changeCharacterRange(editor, range, argument.getCharacter());
+      }
+    });
   }
 
-  private static class Handler extends VisualOperatorActionHandler {
-    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd, @NotNull TextRange range) {
-      final Argument argument = cmd.getArgument();
-      return argument != null && VimPlugin.getChange().changeCharacterRange(editor, range, argument.getCharacter());
-    }
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.V;
+  }
+
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return StringHelper.parseKeysSet("r");
+  }
+
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.CHANGE;
+  }
+
+  @NotNull
+  @Override
+  public Argument.Type getArgumentType() {
+    return Argument.Type.DIGRAPH;
+  }
+
+  @Override
+  public int getFlags() {
+    return Command.FLAG_ALLOW_DIGRAPH;
   }
 }

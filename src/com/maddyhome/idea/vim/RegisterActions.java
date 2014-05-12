@@ -37,7 +37,6 @@ public class RegisterActions {
     registerVimCommandActions();
 
     registerInsertModeActions();
-    registerVisualModeActions();
     registerNormalModeActions();
     registerNVOModesActions();
     registerCommandLineActions();
@@ -667,93 +666,6 @@ public class RegisterActions {
     parser.registerAction(MappingMode.N, "VimPlaybackRegister", Command.Type.OTHER_WRITABLE,
                           new Shortcut('@'), Argument.Type.CHARACTER);
     // TODO - support for :map macros
-  }
-
-  private static void registerVisualModeActions() {
-    final KeyGroup parser = VimPlugin.getKey();
-    parser.registerAction(MappingMode.V, "VimAutoIndentVisual", Command.Type.CHANGE,
-                          Command.FLAG_MOT_LINEWISE | Command.FLAG_FORCE_LINEWISE,
-                          new Shortcut('='));
-    parser.registerAction(MappingMode.V, "VimReformatVisual", Command.Type.CHANGE,
-                          Command.FLAG_MOT_LINEWISE | Command.FLAG_FORCE_LINEWISE,
-                          new Shortcut("gq"));
-    parser.registerAction(MappingMode.V, "VimChangeCaseLowerVisual", Command.Type.CHANGE,
-                          new Shortcut('u'));
-    parser.registerAction(MappingMode.V, "VimChangeCaseToggleVisual", Command.Type.CHANGE,
-                          new Shortcut('~'));
-    parser.registerAction(MappingMode.V, "VimChangeCaseUpperVisual", Command.Type.CHANGE,
-                          new Shortcut('U'));
-    parser.registerAction(MappingMode.V, "VimChangeVisual", Command.Type.CHANGE, Command.FLAG_MULTIKEY_UNDO, new Shortcut[]{
-      new Shortcut('c'),
-      new Shortcut('s')
-    });
-    parser.registerAction(MappingMode.V, "VimChangeVisualCharacter", Command.Type.CHANGE, Command.FLAG_ALLOW_DIGRAPH,
-                          new Shortcut('r'), Argument.Type.DIGRAPH);
-    parser.registerAction(MappingMode.V, "VimChangeVisualLines", Command.Type.CHANGE,
-                          Command.FLAG_MOT_LINEWISE | Command.FLAG_MULTIKEY_UNDO, new Shortcut[]{
-        new Shortcut('R'),
-        new Shortcut('S')
-      });
-    parser.registerAction(MappingMode.V, "VimChangeVisualLinesEnd", Command.Type.CHANGE,
-                          Command.FLAG_MOT_LINEWISE | Command.FLAG_MULTIKEY_UNDO, new Shortcut[]{
-        new Shortcut('C')
-      });
-    parser.registerAction(MappingMode.V, "VimCopyYankVisual", Command.Type.COPY,
-                          new Shortcut('y'));
-    parser.registerAction(MappingMode.V, "VimCopyYankVisualLines", Command.Type.COPY, Command.FLAG_MOT_LINEWISE,
-                          new Shortcut('Y'));
-    parser.registerAction(MappingMode.V, "VimDeleteJoinVisualLines", Command.Type.DELETE,
-                          new Shortcut("gJ"));
-    parser.registerAction(MappingMode.V, "VimDeleteJoinVisualLinesSpaces", Command.Type.DELETE,
-                          new Shortcut('J'));
-    parser.registerAction(MappingMode.V, "VimDeleteVisual", Command.Type.DELETE, new Shortcut[]{
-      new Shortcut('d'),
-      new Shortcut('x'),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0))
-    });
-    parser.registerAction(MappingMode.V, "VimDeleteVisualLinesEnd", Command.Type.DELETE, Command.FLAG_MOT_LINEWISE, new Shortcut[]{
-      new Shortcut('D')
-    });
-    parser.registerAction(MappingMode.V, "VimDeleteVisualLines", Command.Type.DELETE, Command.FLAG_MOT_LINEWISE, new Shortcut[]{
-      new Shortcut('X')
-    });
-    parser.registerAction(MappingMode.V, "VimFilterVisualLines", Command.Type.CHANGE, Command.FLAG_MOT_LINEWISE,
-                          new Shortcut('!'));
-    parser.registerAction(MappingMode.V, "VimShiftLeftVisual", Command.Type.CHANGE,
-                          new Shortcut('<'));
-    parser.registerAction(MappingMode.V, "VimShiftRightVisual", Command.Type.CHANGE,
-                          new Shortcut('>'));
-    parser.registerAction(MappingMode.V, "VimVisualExitMode", Command.Type.OTHER_READONLY, new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke('[', KeyEvent.CTRL_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)),
-      new Shortcut(new KeyStroke[]{KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SLASH, KeyEvent.CTRL_MASK),
-        KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK)})
-    });
-    parser.registerAction(MappingMode.V, "VimVisualPutText", Command.Type.PASTE, new Shortcut[]{
-      new Shortcut('P'),
-      new Shortcut('p')
-    });
-    parser.registerAction(MappingMode.V, "VimVisualPutTextMoveCursor", Command.Type.PASTE, new Shortcut[]{
-      new Shortcut("gp"),
-      new Shortcut("gP")
-    });
-    parser.registerAction(MappingMode.V, "VimVisualPutTextNoIndent", Command.Type.PASTE, new Shortcut[]{
-      new Shortcut("[p"),
-      new Shortcut("]p"),
-      new Shortcut("[P"),
-      new Shortcut("]P")
-    });
-    parser.registerAction(MappingMode.V, "VimVisualBlockInsert", Command.Type.INSERT, Command.FLAG_MULTIKEY_UNDO,
-                          new Shortcut('I'));
-    parser.registerAction(MappingMode.V, "VimVisualBlockAppend", Command.Type.INSERT, Command.FLAG_MULTIKEY_UNDO,
-                          new Shortcut('A'));
-    parser.registerAction(MappingMode.V, "VimVisualSwapEnds", Command.Type.OTHER_READONLY,
-                          new Shortcut('o'));
-    parser.registerAction(MappingMode.V, "VimVisualSwapEndsBlock", Command.Type.OTHER_READONLY,
-                          new Shortcut('O'));
-    parser.registerAction(MappingMode.V, "VimVisualSwapSelections", Command.Type.OTHER_READONLY,
-                          new Shortcut("gv"));
   }
 
   private static void registerInsertModeActions() {

@@ -20,24 +20,47 @@ package com.maddyhome.idea.vim.action.motion.visual;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandAction;
+import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+import java.util.List;
+import java.util.Set;
+
 /**
- *
+ * @author vlan
  */
-public class VisualExitModeAction extends EditorAction {
+public class VisualExitModeAction extends VimCommandAction {
   public VisualExitModeAction() {
-    super(new Handler());
+    super(new EditorActionHandler() {
+      public void execute(@NotNull Editor editor, @NotNull DataContext context) {
+        VimPlugin.getMotion().processEscape(InjectedLanguageUtil.getTopLevelEditor(editor));
+      }
+    });
   }
 
-  private static class Handler extends EditorActionHandler {
-    public void execute(@NotNull Editor editor, @NotNull DataContext context) {
-      VimPlugin.getMotion().processEscape(InjectedLanguageUtil.getTopLevelEditor(editor));
-    }
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.V;
+  }
+
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return StringHelper.parseKeysSet("<Esc>", "<C-[>", "<C-C>", "<C-\\><C-N>");
+  }
+
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.OTHER_READONLY;
   }
 }
 

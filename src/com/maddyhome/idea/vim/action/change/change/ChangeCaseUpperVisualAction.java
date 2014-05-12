@@ -20,25 +20,48 @@ package com.maddyhome.idea.vim.action.change.change;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+import java.util.List;
+import java.util.Set;
+
 /**
+ * @author vlan
  */
-public class ChangeCaseUpperVisualAction extends EditorAction {
+public class ChangeCaseUpperVisualAction extends VimCommandAction {
   public ChangeCaseUpperVisualAction() {
-    super(new Handler());
+    super(new VisualOperatorActionHandler() {
+      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
+                                @NotNull TextRange range) {
+        return VimPlugin.getChange().changeCaseRange(editor, range, CharacterHelper.CASE_UPPER);
+      }
+    });
   }
 
-  private static class Handler extends VisualOperatorActionHandler {
-    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
-                              @NotNull TextRange range) {
-      return VimPlugin.getChange().changeCaseRange(editor, range, CharacterHelper.CASE_UPPER);
-    }
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.V;
+  }
+
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return StringHelper.parseKeysSet("U");
+  }
+
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.CHANGE;
   }
 }

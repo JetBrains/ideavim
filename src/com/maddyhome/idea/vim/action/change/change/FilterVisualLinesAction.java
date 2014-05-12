@@ -20,25 +20,52 @@ package com.maddyhome.idea.vim.action.change.change;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+import java.util.List;
+import java.util.Set;
+
 /**
+ * @author vlan
  */
-public class FilterVisualLinesAction extends EditorAction {
+public class FilterVisualLinesAction extends VimCommandAction {
   public FilterVisualLinesAction() {
-    super(new Handler());
+    super(new EditorActionHandlerBase() {
+      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+        VimPlugin.getProcess().startFilterCommand(editor, context, cmd);
+        VimPlugin.getMotion().resetVisual(editor, true);
+        return true;
+      }
+    });
   }
 
-  private static class Handler extends EditorActionHandlerBase {
-    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      VimPlugin.getProcess().startFilterCommand(editor, context, cmd);
-      VimPlugin.getMotion().resetVisual(editor, true);
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.V;
+  }
 
-      return true;
-    }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return StringHelper.parseKeysSet("!");
+  }
+
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.CHANGE;
+  }
+
+  @Override
+  public int getFlags() {
+    return Command.FLAG_MOT_LINEWISE;
   }
 }

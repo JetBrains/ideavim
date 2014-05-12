@@ -20,34 +20,58 @@ package com.maddyhome.idea.vim.action.change.delete;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+import java.util.List;
+import java.util.Set;
+
 /**
+ * @author vlan
  */
-public class DeleteVisualAction extends EditorAction {
+public class DeleteVisualAction extends VimCommandAction {
   public DeleteVisualAction() {
-    super(new Handler());
+    super(new VisualOperatorActionHandler() {
+      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
+                                @NotNull TextRange range) {
+        final CommandState.SubMode mode = CommandState.getInstance(editor).getSubMode();
+        if (mode == CommandState.SubMode.VISUAL_LINE) {
+          final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
+                                                    EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
+          return VimPlugin.getChange().deleteRange(editor, lineRange, SelectionType.fromSubMode(mode), false);
+        }
+        else {
+          return VimPlugin.getChange().deleteRange(editor, range, SelectionType.fromSubMode(mode), false);
+        }
+      }
+    });
   }
 
-  private static class Handler extends VisualOperatorActionHandler {
-    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
-                              @NotNull TextRange range) {
-      CommandState.SubMode mode = CommandState.getInstance(editor).getSubMode();
-      if (mode == CommandState.SubMode.VISUAL_LINE) {
-        range = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
-                              EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
-      }
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.V;
+  }
 
-      return VimPlugin.getChange().deleteRange(editor, range,
-                                                                 SelectionType.fromSubMode(mode), false);
-    }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return StringHelper.parseKeysSet("d", "x", "<Del>");
+  }
+
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.DELETE;
   }
 }
