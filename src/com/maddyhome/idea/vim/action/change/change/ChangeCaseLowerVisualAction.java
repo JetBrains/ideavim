@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
-import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -58,7 +57,7 @@ public class ChangeCaseLowerVisualAction extends VimCommandAction {
   @NotNull
   @Override
   public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return StringHelper.parseKeysSet("u");
+    return parseKeysSet("u");
   }
 
   @NotNull

@@ -280,15 +280,6 @@ public class StringHelper {
     return name != null ? "<" + prefix + name + ">" : "<<" + key.toString() + ">>";
   }
 
-  @NotNull
-  public static Set<List<KeyStroke>> parseKeysSet(@NotNull String... keyStrings) {
-    final ImmutableSet.Builder<List<KeyStroke>> builder = ImmutableSet.builder();
-    for (String keyString : keyStrings) {
-      builder.add(parseKeys(keyString));
-    }
-    return builder.build();
-  }
-
   public static boolean containsUpperCase(@NotNull String text) {
     for (int i = 0; i < text.length(); i++) {
       if (Character.isUpperCase(text.charAt(i)) && (i == 0 || text.charAt(i - 1) == '\\')) {

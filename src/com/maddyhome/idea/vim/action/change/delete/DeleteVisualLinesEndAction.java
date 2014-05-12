@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -72,7 +71,7 @@ public class DeleteVisualLinesEndAction extends VimCommandAction {
   @NotNull
   @Override
   public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return StringHelper.parseKeysSet("D");
+    return parseKeysSet("D");
   }
 
   @NotNull

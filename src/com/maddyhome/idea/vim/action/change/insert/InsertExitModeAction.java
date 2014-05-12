@@ -33,8 +33,6 @@ import javax.swing.*;
 import java.util.List;
 import java.util.Set;
 
-import static com.maddyhome.idea.vim.helper.StringHelper.parseKeysSet;
-
 public class InsertExitModeAction extends VimCommandAction {
   private static final String ACTION_ID = "VimInsertExitMode";
 

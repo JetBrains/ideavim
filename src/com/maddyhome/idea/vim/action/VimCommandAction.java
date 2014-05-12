@@ -18,11 +18,13 @@
 
 package com.maddyhome.idea.vim.action;
 
+import com.google.common.collect.ImmutableSet;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -65,5 +67,14 @@ public abstract class VimCommandAction extends EditorAction {
    */
   public int getFlags() {
     return 0;
+  }
+
+  @NotNull
+  protected static Set<List<KeyStroke>> parseKeysSet(@NotNull String... keyStrings) {
+    final ImmutableSet.Builder<List<KeyStroke>> builder = ImmutableSet.builder();
+    for (String keyString : keyStrings) {
+      builder.add(StringHelper.parseKeys(keyString));
+    }
+    return builder.build();
   }
 }

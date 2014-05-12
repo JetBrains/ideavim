@@ -32,8 +32,6 @@ import javax.swing.*;
 import java.util.List;
 import java.util.Set;
 
-import static com.maddyhome.idea.vim.helper.StringHelper.parseKeysSet;
-
 public class VisualToggleCharacterModeAction extends VimCommandAction {
   public VisualToggleCharacterModeAction() {
     super(new EditorActionHandlerBase() {

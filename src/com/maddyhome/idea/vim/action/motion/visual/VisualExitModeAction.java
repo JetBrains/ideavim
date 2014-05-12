@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -54,7 +53,7 @@ public class VisualExitModeAction extends VimCommandAction {
   @NotNull
   @Override
   public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return StringHelper.parseKeysSet("<Esc>", "<C-[>", "<C-C>", "<C-\\><C-N>");
+    return parseKeysSet("<Esc>", "<C-[>", "<C-C>", "<C-\\><C-N>");
   }
 
   @NotNull
