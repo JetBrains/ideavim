@@ -122,9 +122,7 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
       if (cmd == null || ((cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) == 0 &&
                           (cmd.getFlags() & Command.FLAG_EXPECT_MORE) == 0)) {
         logger.debug("not multikey undo - exit visual");
-        if (cmd == null || (cmd.getFlags() & Command.FLAG_KEEP_VISUAL) == 0) {
-          VimPlugin.getMotion().exitVisual(editor);
-        }
+        VimPlugin.getMotion().exitVisual(editor);
         if (wasRepeat) {
           EditorData.setLastColumn(editor, lastColumn);
         }
