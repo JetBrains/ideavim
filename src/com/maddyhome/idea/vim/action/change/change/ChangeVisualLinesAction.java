@@ -69,6 +69,6 @@ public class ChangeVisualLinesAction extends VimCommandAction {
 
   @Override
   public int getFlags() {
-    return Command.FLAG_MOT_LINEWISE | Command.FLAG_MULTIKEY_UNDO;
+    return Command.FLAG_MOT_LINEWISE | Command.FLAG_MULTIKEY_UNDO | Command.FLAG_EXIT_VISUAL;
   }
 }

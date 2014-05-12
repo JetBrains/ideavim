@@ -73,6 +73,6 @@ public class ChangeVisualCharacterAction extends VimCommandAction {
 
   @Override
   public int getFlags() {
-    return Command.FLAG_ALLOW_DIGRAPH;
+    return Command.FLAG_ALLOW_DIGRAPH | Command.FLAG_EXIT_VISUAL;
   }
 }

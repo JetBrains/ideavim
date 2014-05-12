@@ -63,4 +63,9 @@ public class ChangeCaseUpperVisualAction extends VimCommandAction {
   public Command.Type getType() {
     return Command.Type.CHANGE;
   }
+
+  @Override
+  public int getFlags() {
+    return Command.FLAG_EXIT_VISUAL;
+  }
 }

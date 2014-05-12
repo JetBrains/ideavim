@@ -67,6 +67,6 @@ public class ReformatCodeVisualAction extends VimCommandAction {
 
   @Override
   public int getFlags() {
-    return Command.FLAG_MOT_LINEWISE | Command.FLAG_FORCE_LINEWISE;
+    return Command.FLAG_MOT_LINEWISE | Command.FLAG_FORCE_LINEWISE | Command.FLAG_EXIT_VISUAL;
   }
 }

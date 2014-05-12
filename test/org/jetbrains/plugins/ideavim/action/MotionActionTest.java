@@ -553,4 +553,15 @@ public class MotionActionTest extends VimTestCase {
                    "<caret>foo\n");
     myFixture.checkResult("fo\n");
   }
+
+  // VIM-646 |gv|
+  public void testRestoreMultiLineSelectionAfterYank() {
+    typeTextInFile(parseKeys("V", "j", "y", "G", "p", "gv", "d"),
+                   "<caret>foo\n" +
+                   "bar\n" +
+                   "baz\n");
+    myFixture.checkResult("baz\n" +
+                          "foo\n" +
+                          "bar\n");
+  }
 }

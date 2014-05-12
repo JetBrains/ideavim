@@ -65,4 +65,9 @@ public class YankVisualAction extends VimCommandAction {
   public Command.Type getType() {
     return Command.Type.COPY;
   }
+
+  @Override
+  public int getFlags() {
+    return Command.FLAG_EXIT_VISUAL;
+  }
 }

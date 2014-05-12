@@ -62,4 +62,9 @@ public class PutVisualTextNoIndentAction extends VimCommandAction {
   public Command.Type getType() {
     return Command.Type.PASTE;
   }
+
+  @Override
+  public int getFlags() {
+    return Command.FLAG_EXIT_VISUAL;
+  }
 }

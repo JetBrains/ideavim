@@ -81,7 +81,10 @@ public class Command {
   public static final int FLAG_SEARCH_FWD = 1 << 16;
   public static final int FLAG_SEARCH_REV = 1 << 17;
 
-  public static final int FLAG_KEEP_VISUAL = 1 << 20;
+  /**
+   * Command exits the visual mode, so caret movement shouldn't update visual selection
+   */
+  public static final int FLAG_EXIT_VISUAL = 1 << 20;
   public static final int FLAG_FORCE_VISUAL = 1 << 21;
   public static final int FLAG_FORCE_LINEWISE = 1 << 22;
 

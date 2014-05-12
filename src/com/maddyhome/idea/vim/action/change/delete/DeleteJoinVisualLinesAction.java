@@ -62,4 +62,9 @@ public class DeleteJoinVisualLinesAction extends VimCommandAction {
   public Command.Type getType() {
     return Command.Type.DELETE;
   }
+
+  @Override
+  public int getFlags() {
+    return Command.FLAG_EXIT_VISUAL;
+  }
 }

@@ -1193,13 +1193,24 @@ public class MotionGroup {
         scrollCaretIntoView(editor);
       }
 
-      if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
+      if (keepVisual(editor)) {
         VimPlugin.getMotion().updateSelection(editor, offset);
       }
       else {
         editor.getSelectionModel().removeSelection();
       }
     }
+  }
+
+  private static boolean keepVisual(Editor editor) {
+    final CommandState commandState = CommandState.getInstance(editor);
+    if (commandState.getMode() == CommandState.Mode.VISUAL) {
+      final Command command = commandState.getCommand();
+      if (command == null || (command.getFlags() & Command.FLAG_EXIT_VISUAL) == 0) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public int moveCaretGotoPreviousTab(@NotNull Editor editor, @NotNull DataContext context) {
