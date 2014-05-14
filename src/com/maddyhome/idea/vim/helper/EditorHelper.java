@@ -218,6 +218,10 @@ public class EditorHelper {
     return editor.logicalToVisualPosition(new LogicalPosition(line, 0)).line;
   }
 
+  public static int getOffset(@NotNull final Editor editor, final int line, final int column) {
+    return editor.logicalPositionToOffset(new LogicalPosition(line, column));
+  }
+
   /**
    * Returns the offset of the start of the requested line.
    *

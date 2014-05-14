@@ -225,6 +225,18 @@ public class MarkGroup {
     setMark(editor, MARK_VISUAL_END, range.getEndOffset());
   }
 
+  @Nullable
+  public TextRange getVisualSelectionMarks(@NotNull Editor editor) {
+    final Mark start = getMark(editor, MARK_VISUAL_START);
+    final Mark end = getMark(editor, MARK_VISUAL_END);
+    if (start != null && end != null) {
+      final int startOffset = EditorHelper.getOffset(editor, start.getLogicalLine(), start.getCol());
+      final int endOffset = EditorHelper.getOffset(editor, end.getLogicalLine(), end.getCol());
+      return new TextRange(startOffset, endOffset);
+    }
+    return null;
+  }
+
   public void addJump(@NotNull Editor editor, boolean reset) {
     addJump(editor, editor.getCaretModel().getOffset(), reset);
   }

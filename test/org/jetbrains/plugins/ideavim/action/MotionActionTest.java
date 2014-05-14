@@ -564,4 +564,33 @@ public class MotionActionTest extends VimTestCase {
                           "foo\n" +
                           "bar\n");
   }
+
+  // |v_>| |gv|
+  public void testRestoreMultiLineSelectionAfterIndent() {
+    typeTextInFile(parseKeys("V", "2j"),
+                   "<caret>foo\n" +
+                   "bar\n" +
+                   "baz\n");
+    assertSelection("foo\n" +
+                    "bar\n" +
+                    "baz");
+    typeText(parseKeys(">"));
+    assertMode(COMMAND);
+    myFixture.checkResult("    foo\n" +
+                          "    bar\n" +
+                          "    baz\n");
+    typeText(parseKeys("gv"));
+    assertSelection("    foo\n" +
+                    "    bar\n" +
+                    "    baz");
+    typeText(parseKeys(">"));
+    assertMode(COMMAND);
+    myFixture.checkResult("        foo\n" +
+                          "        bar\n" +
+                          "        baz\n");
+    typeText(parseKeys("gv"));
+    assertSelection("        foo\n" +
+                    "        bar\n" +
+                    "        baz");
+  }
 }

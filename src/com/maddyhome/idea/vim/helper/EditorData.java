@@ -26,8 +26,9 @@ import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.LightVirtualFile;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.command.VisualChange;
-import com.maddyhome.idea.vim.command.VisualRange;
+import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.ui.ExOutputPanel;
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +42,7 @@ import java.util.Collection;
  * These methods provide convenient methods for working with that Vim Plugin specific data.
  */
 public class EditorData {
+
   /**
    * This is used to initialize each new editor that gets created.
    *
@@ -59,7 +61,8 @@ public class EditorData {
     if (logger.isDebugEnabled()) logger.debug("editor closed: " + editor);
     editor.putUserData(COMMAND_STATE, null);
     editor.putUserData(LAST_HIGHLIGHTS, null);
-    editor.putUserData(VISUAL, null);
+    editor.putUserData(LAST_SELECTION_TYPE, null);
+    editor.putUserData(LAST_VISUAL_RANGE, null);
     editor.putUserData(VISUAL_OP, null);
     editor.putUserData(MORE_PANEL, null);
     editor.putUserData(EX_OUTPUT_MODEL, null);
@@ -111,25 +114,25 @@ public class EditorData {
     editor.putUserData(LAST_HIGHLIGHTS, highlights);
   }
 
-  /**
-   * Gets the previous visual range for the editor.
-   *
-   * @param editor The editor to get the range for
-   * @return The last visual range, null if no previous range
+  /***
+   * @see :help visualmode()
    */
   @Nullable
-  public static VisualRange getLastVisualRange(@NotNull Editor editor) {
-    return editor.getDocument().getUserData(VISUAL);
+  public static SelectionType getLastSelectionType(@NotNull Editor editor) {
+    return editor.getDocument().getUserData(LAST_SELECTION_TYPE);
   }
 
-  /**
-   * Sets the previous visual range for the editor.
-   *
-   * @param editor The editor to set the range for
-   * @param range  The visual range
-   */
-  public static void setLastVisualRange(@NotNull Editor editor, VisualRange range) {
-    editor.getDocument().putUserData(VISUAL, range);
+  public static void setLastSelectionType(@NotNull Editor editor, @NotNull SelectionType selectionType) {
+    editor.getDocument().putUserData(LAST_SELECTION_TYPE, selectionType);
+  }
+
+  @Nullable
+  public static TextRange getLastVisualRange(@NotNull Editor editor) {
+    return editor.getDocument().getUserData(LAST_VISUAL_RANGE);
+  }
+
+  public static void setLastVisualRange(@NotNull Editor editor, @NotNull TextRange textRange) {
+    editor.getDocument().putUserData(LAST_VISUAL_RANGE, textRange);
   }
 
   /**
@@ -227,7 +230,8 @@ public class EditorData {
   }
 
   private static final Key<Integer> LAST_COLUMN = new Key<Integer>("lastColumn");
-  private static final Key<VisualRange> VISUAL = new Key<VisualRange>("lastVisual");
+  private static final Key<SelectionType> LAST_SELECTION_TYPE = new Key<SelectionType>("lastSelectionType");
+  public static final Key<TextRange> LAST_VISUAL_RANGE = new Key<TextRange>("lastVisualRange");
   private static final Key<VisualChange> VISUAL_OP = new Key<VisualChange>("lastVisualOp");
   private static final Key<String> LAST_SEARCH = new Key<String>("lastSearch");
   private static final Key<Collection<RangeHighlighter>> LAST_HIGHLIGHTS = new Key<Collection<RangeHighlighter>>("lastHighlights");
