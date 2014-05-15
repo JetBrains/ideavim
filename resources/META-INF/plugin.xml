@@ -54,6 +54,7 @@
           <li>Some :set options</li>
           <li>Full Vim regexps for search and search/replace</li>
           <li>Key mappings</li>
+          <li>Configuration via ~/.ideavimrc</li>
           <li>Macros</li>
           <li>Digraphs</li>
           <li>Command line and search history</li>
