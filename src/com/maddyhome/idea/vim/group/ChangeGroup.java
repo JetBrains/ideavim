@@ -1338,7 +1338,9 @@ public class ChangeGroup {
     int sline = editor.offsetToLogicalPosition(range.getStartOffset()).line;
     int eline = editor.offsetToLogicalPosition(range.getEndOffset()).line;
     int eoff = EditorHelper.getLineStartForOffset(editor, range.getEndOffset());
-    if (eoff == range.getEndOffset()) {
+    boolean elineIsEmpty = EditorHelper.getLineLength(editor, eline) == 0;
+    // Skip an empty ending line
+    if (eoff == range.getEndOffset() && elineIsEmpty) {
       eline--;
     }
 
