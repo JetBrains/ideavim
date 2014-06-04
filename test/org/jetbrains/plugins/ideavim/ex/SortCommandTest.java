@@ -92,4 +92,18 @@ public class SortCommandTest extends VimTestCase {
     typeText(commandToKeys("sort"));
     myFixture.checkResult("a\nb\nc\nwhatever\nzee");
   }
+
+  public void testSeparatorIndependentSort() {
+    myFixture.configureByText("a.txt", "Unix\nLine\nSeparator");
+    typeText(commandToKeys("sort"));
+    myFixture.checkResult("Line\nSeparator\nUnix");
+
+    myFixture.configureByText("a.txt", "Windows\r\nLine\r\nSeparator");
+    typeText(commandToKeys("sort"));
+    myFixture.checkResult("Line\r\nSeparator\r\nWindows");
+
+    myFixture.configureByText("a.txt", "MacOs\rLine\rSeparator");
+    typeText(commandToKeys("sort"));
+    myFixture.checkResult("Line\rMacOs\rSeparator");
+  }
 }
