@@ -244,6 +244,13 @@ public class ChangeActionTest extends VimTestCase {
            "fooar\n");
   }
 
+  // VIM-569 |i_CTRL-W|
+  public void testCaretLocationAfterDeletingPreviousWordAtEndOfLine() {
+    doTest(parseKeys("i", "<C-W>"),
+           "a word<caret>\n",
+           "a <caret>\n");
+  }
+
   private void doTest(final List<KeyStroke> keys, String before, String after) {
     myFixture.configureByText("a.java", before);
     final Editor editor = myFixture.getEditor();
