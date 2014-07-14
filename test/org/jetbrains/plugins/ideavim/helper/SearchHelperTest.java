@@ -68,7 +68,7 @@ public class SearchHelperTest {
     String text = "<a>b</a>";
     TextRange range = new TextRange(3, 4);
 
-    assertEquals(range, SearchHelper.findTagBlockRange(text, 1, 1, true));
+    assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 1, 1, false).toString());
   }
 
   @Test
@@ -76,7 +76,7 @@ public class SearchHelperTest {
     String text = "<a><b>c</b></a>";
     TextRange range = new TextRange(3, 11);
 
-    assertEquals(range, SearchHelper.findTagBlockRange(text, 1, 1, true));
+    assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 1, 1, false).toString());
   }
 
   @Test
@@ -84,7 +84,7 @@ public class SearchHelperTest {
     String text = "<a><b>c</b></a>";
     TextRange range = new TextRange(6, 7);
 
-    assertEquals(range, SearchHelper.findTagBlockRange(text, 3, 1, true));
+    assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 3, 1, false).toString());
   }
 
   @Test
@@ -92,7 +92,7 @@ public class SearchHelperTest {
     String text = "<a><b>c</b></a>";
     TextRange range = new TextRange(3, 11);
 
-    assertEquals(range, SearchHelper.findTagBlockRange(text, 3, 1, false));
+    assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 3, 1, true).toString());
   }
 
   @Test
@@ -100,7 +100,7 @@ public class SearchHelperTest {
     String text = "<a><b>c</b></a>";
     TextRange range = new TextRange(0, 15);
 
-    assertEquals(range, SearchHelper.findTagBlockRange(text, 0, 1, false));
+    assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 0, 1, true).toString());
   }
 
   @Test
@@ -108,7 +108,7 @@ public class SearchHelperTest {
     String text = "<a><b>c</b></a>";
     TextRange range = new TextRange(3, 11);
 
-    assertEquals(range, SearchHelper.findTagBlockRange(text, 6, 2, true));
+    assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 6, 2, false).toString());
   }
 
   @Test
@@ -116,6 +116,6 @@ public class SearchHelperTest {
     String text = "<a><b>c</b></a>";
     TextRange range = new TextRange(0, 15);
 
-    assertEquals(range, SearchHelper.findTagBlockRange(text, 13, 1, true));
+    assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 13, 1, true).toString());
   }
 }

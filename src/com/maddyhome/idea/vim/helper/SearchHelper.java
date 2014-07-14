@@ -189,7 +189,7 @@ public class SearchHelper {
     Pair<Integer, Integer> blockRange = null;
 
     while(0 < cnt) {
-      blockRange = findTagBlock(chars, pos, !isOuter);
+      blockRange = findTagBlock(chars, pos, isOuter);
 
       if(blockRange == null)
         return null;
@@ -202,7 +202,7 @@ public class SearchHelper {
     return new TextRange(blockRange.getFirst(), blockRange.getSecond());
   }
 
-  private static @Nullable Pair<Integer, Integer> findTagBlock(@NotNull CharSequence chars, int pos, boolean within) {
+  private static @Nullable Pair<Integer, Integer> findTagBlock(@NotNull CharSequence chars, int pos, boolean isOuter) {
     //<b></b> is the minimal tag pair
     if(chars.length() < 7)
       return null;
@@ -228,7 +228,6 @@ public class SearchHelper {
           continue;
         }
       }
-
       else if('<' != c)
         continue;
 
@@ -246,8 +245,8 @@ public class SearchHelper {
       String nameToken = chars.subSequence(tagName[0], tagName[1]).toString();
 
       if (nameToken.startsWith("/")) {
-        //Push tag id onto stack
-        unmatchedTags.push(nameToken.substring(1));
+          //Push tag id onto stack
+          unmatchedTags.push(nameToken.substring(1));
       }
       else if(unmatchedTags.isEmpty()) {
         //We've found our starting tag
@@ -255,7 +254,11 @@ public class SearchHelper {
         break;
       }
       else if(unmatchedTags.peek().equals(nameToken)) {
-          unmatchedTags.pop();
+          String tag = unmatchedTags.pop();
+          if(unmatchedTags.isEmpty()) {
+            unmatchedTags.push(tag);
+            break;
+          }
       }
       //Interleaving is not allowed.
       else {
@@ -264,12 +267,12 @@ public class SearchHelper {
     }
 
     if(unmatchedTags.isEmpty()) {
-      return null;
+        return null;
     }
 
     blockRange[1] = findBlockLocation(chars, '<', '>', 1, blockRange[0], 1) + 1;
 
-    if(within) {
+    if(!isOuter) {
       blockRange[0] = blockRange[1];
     }
 
@@ -341,7 +344,7 @@ public class SearchHelper {
     }
 
     //Adjust block range.
-    if(!within) {
+    if(isOuter) {
       blockRange[1] = endOfLastClosingAngleBracket + 1;
     }
 
