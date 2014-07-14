@@ -66,7 +66,7 @@ public class SearchHelperTest {
   @Test
   public void testFindWithinBlock() {
     String text = "<a>b</a>";
-    TextRange range = new TextRange(3, 4);
+    TextRange range = new TextRange(3, 3);
 
     assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 1, 1, false).toString());
   }
@@ -74,7 +74,7 @@ public class SearchHelperTest {
   @Test
   public void testFindWithinBlockFromLastTag() {
     String text = "<a>b</a>";
-    TextRange range = new TextRange(3, 4);
+    TextRange range = new TextRange(3, 3);
 
     assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 7, 1, false).toString());
   }
@@ -82,7 +82,7 @@ public class SearchHelperTest {
   @Test
   public void testFindWithinBlockNested() {
     String text = "<a><b>c</b></a>";
-    TextRange range = new TextRange(3, 11);
+    TextRange range = new TextRange(3, 10);
 
     assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 1, 1, false).toString());
   }
@@ -90,7 +90,7 @@ public class SearchHelperTest {
   @Test
   public void testFindWithinBlockNestedInner() {
     String text = "<a><b>c</b></a>";
-    TextRange range = new TextRange(6, 7);
+    TextRange range = new TextRange(6, 6);
 
     assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 3, 1, false).toString());
   }
@@ -98,7 +98,7 @@ public class SearchHelperTest {
   @Test
   public void testFindWholeBlockNestedInner() {
     String text = "<a><b>c</b></a>";
-    TextRange range = new TextRange(3, 11);
+    TextRange range = new TextRange(3, 10);
 
     assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 3, 1, true).toString());
   }
@@ -106,7 +106,7 @@ public class SearchHelperTest {
   @Test
   public void testFindWholeBlockNestedOuter() {
     String text = "<a><b>c</b></a>";
-    TextRange range = new TextRange(0, 15);
+    TextRange range = new TextRange(0, 14);
 
     assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 0, 1, true).toString());
   }
@@ -114,7 +114,7 @@ public class SearchHelperTest {
   @Test
   public void testFindInnerBlockNestedTwice() {
     String text = "<a><b>c</b></a>";
-    TextRange range = new TextRange(3, 11);
+    TextRange range = new TextRange(3, 10);
 
     assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 6, 2, false).toString());
   }
@@ -122,7 +122,7 @@ public class SearchHelperTest {
   @Test
   public void testFindOuterBlockFromWithinLastTag() {
     String text = "<a><b>c</b></a>";
-    TextRange range = new TextRange(0, 15);
+    TextRange range = new TextRange(0, 14);
 
     assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 13, 1, true).toString());
   }

@@ -242,7 +242,7 @@ public class SearchHelper {
       int wordScanCount = chars.charAt(tagName[0]) == '/' ? 2 : 1;
       tagName[1] = findNextWord(chars, tagName[0], chars.length(), wordScanCount, false, false);
 
-      String nameToken = chars.subSequence(tagName[0], tagName[1]).toString();
+      String nameToken = chars.subSequence(tagName[0], tagName[1]).toString().trim();
 
       if (nameToken.startsWith("/")) {
           //Push tag id onto stack
@@ -313,7 +313,7 @@ public class SearchHelper {
       tagName[0] = blockRange[1] + 1;
       int wordScanCount = chars.charAt(tagName[0]) == '/' ? 2 : 1;
       tagName[1] = findNextWord(chars, tagName[0], chars.length(), wordScanCount, false, false);
-      String nameToken = chars.subSequence(tagName[0], tagName[1]).toString();
+      String nameToken = chars.subSequence(tagName[0], tagName[1]).toString().trim();
 
       if(nameToken.startsWith("/")) {
         //Attempt to pop the stack
@@ -345,7 +345,10 @@ public class SearchHelper {
 
     //Adjust block range.
     if(isOuter) {
-      blockRange[1] = endOfLastClosingAngleBracket + 1;
+      blockRange[1] = endOfLastClosingAngleBracket;
+    }
+    else {
+      blockRange[1]--;
     }
 
     return new Pair<Integer, Integer>(blockRange[0], blockRange[1]);
