@@ -1,6 +1,6 @@
 package org.jetbrains.plugins.ideavim.helper;
 
-import com.intellij.openapi.util.Pair;
+import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import org.junit.Test;
 
@@ -66,48 +66,56 @@ public class SearchHelperTest {
   @Test
   public void testFindWithinBlock() {
     String text = "<a>b</a>";
-    Pair<Integer, Integer> range = new Pair(3, 4);
+    TextRange range = new TextRange(3, 4);
 
-    assertEquals(range, SearchHelper.findTagBlockLocation(text, 1, 1, true));
+    assertEquals(range, SearchHelper.findTagBlockRange(text, 1, 1, true));
   }
 
   @Test
   public void testFindWithinBlockNested() {
     String text = "<a><b>c</b></a>";
-    Pair<Integer, Integer> range = new Pair(3, 11);
+    TextRange range = new TextRange(3, 11);
 
-    assertEquals(range, SearchHelper.findTagBlockLocation(text, 1, 1, true));
+    assertEquals(range, SearchHelper.findTagBlockRange(text, 1, 1, true));
   }
 
   @Test
   public void testFindWithinBlockNestedInner() {
     String text = "<a><b>c</b></a>";
-    Pair<Integer, Integer> range = new Pair(6, 7);
+    TextRange range = new TextRange(6, 7);
 
-    assertEquals(range, SearchHelper.findTagBlockLocation(text, 3, 1, true));
+    assertEquals(range, SearchHelper.findTagBlockRange(text, 3, 1, true));
   }
 
   @Test
   public void testFindWholeBlockNestedInner() {
     String text = "<a><b>c</b></a>";
-    Pair<Integer, Integer> range = new Pair(3, 11);
+    TextRange range = new TextRange(3, 11);
 
-    assertEquals(range, SearchHelper.findTagBlockLocation(text, 3, 1, false));
+    assertEquals(range, SearchHelper.findTagBlockRange(text, 3, 1, false));
   }
 
   @Test
   public void testFindWholeBlockNestedOuter() {
     String text = "<a><b>c</b></a>";
-    Pair<Integer, Integer> range = new Pair(0, 15);
+    TextRange range = new TextRange(0, 15);
 
-    assertEquals(range, SearchHelper.findTagBlockLocation(text, 0, 1, false));
+    assertEquals(range, SearchHelper.findTagBlockRange(text, 0, 1, false));
   }
 
   @Test
   public void testFindInnerBlockNestedTwice() {
     String text = "<a><b>c</b></a>";
-    Pair<Integer, Integer> range = new Pair(3, 11);
+    TextRange range = new TextRange(3, 11);
 
-    assertEquals(range, SearchHelper.findTagBlockLocation(text, 6, 2, true));
+    assertEquals(range, SearchHelper.findTagBlockRange(text, 6, 2, true));
+  }
+
+  @Test
+  public void testFindOuterBlockFromWithinLastTag() {
+    String text = "<a><b>c</b></a>";
+    TextRange range = new TextRange(0, 15);
+
+    assertEquals(range, SearchHelper.findTagBlockRange(text, 13, 1, true));
   }
 }

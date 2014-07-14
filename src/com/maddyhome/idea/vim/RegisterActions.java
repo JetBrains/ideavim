@@ -115,7 +115,7 @@ public class RegisterActions {
                           Command.FLAG_MOT_INCLUSIVE | Command.FLAG_TEXT_BLOCK, new Shortcut("as"));
     parser.registerAction(MappingMode.VO, "VimMotionInnerBlockAngle", Command.Type.MOTION,
                           Command.FLAG_MOT_CHARACTERWISE | Command.FLAG_MOT_INCLUSIVE | Command.FLAG_TEXT_BLOCK,
-                          new Shortcut[]{new Shortcut("i<"), new Shortcut("i>"), new Shortcut("it")}
+                          new Shortcut[]{new Shortcut("i<"), new Shortcut("i>")}
     );
     parser.registerAction(MappingMode.VO, "VimMotionInnerBlockBrace", Command.Type.MOTION,
                           Command.FLAG_MOT_CHARACTERWISE | Command.FLAG_MOT_INCLUSIVE | Command.FLAG_TEXT_BLOCK,
@@ -141,12 +141,15 @@ public class RegisterActions {
                           Command.FLAG_MOT_CHARACTERWISE | Command.FLAG_MOT_INCLUSIVE | Command.FLAG_TEXT_BLOCK,
                           new Shortcut[]{new Shortcut("i`"),}
     );
+    parser.registerAction(MappingMode.VO, "VimMotionTextOuterTagBlock", Command.Type.MOTION,
+                          Command.FLAG_MOT_CHARACTERWISE | Command.FLAG_MOT_INCLUSIVE | Command.FLAG_TEXT_BLOCK,
+                          new Shortcut[]{new Shortcut("it"),}
+    );
     parser.registerAction(MappingMode.VO, "VimMotionOuterBlockAngle",
                           Command.Type.MOTION,
                           Command.FLAG_MOT_CHARACTERWISE | Command.FLAG_MOT_INCLUSIVE | Command.FLAG_TEXT_BLOCK, new Shortcut[]{
         new Shortcut("a<"),
-        new Shortcut("a>"),
-        new Shortcut("at")
+        new Shortcut("a>")
       });
     parser.registerAction(MappingMode.VO, "VimMotionOuterBlockBrace", Command.Type.MOTION,
                           Command.FLAG_MOT_CHARACTERWISE | Command.FLAG_MOT_INCLUSIVE | Command.FLAG_TEXT_BLOCK,
@@ -172,6 +175,10 @@ public class RegisterActions {
                           Command.FLAG_MOT_CHARACTERWISE | Command.FLAG_MOT_INCLUSIVE | Command.FLAG_TEXT_BLOCK, new Shortcut[]{
       new Shortcut("a`"),
     });
+    parser.registerAction(MappingMode.VO, "VimMotionTextOuterTagBlock", Command.Type.MOTION,
+                          Command.FLAG_MOT_CHARACTERWISE | Command.FLAG_MOT_INCLUSIVE | Command.FLAG_TEXT_BLOCK,
+                          new Shortcut[]{new Shortcut("at"),}
+    );
     parser.registerAction(MappingMode.NO, "VimResetMode", Command.Type.RESET, new Shortcut(new KeyStroke[]{
       KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SLASH, KeyEvent.CTRL_MASK),
       KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK)

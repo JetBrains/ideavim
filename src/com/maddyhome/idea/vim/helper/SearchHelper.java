@@ -181,17 +181,25 @@ public class SearchHelper {
     return res;
   }
 
-  public static @Nullable Pair<Integer, Integer> findTagBlockLocation(@NotNull CharSequence chars, int pos, int cnt, boolean within) {
+  public static @Nullable TextRange findTagBlockRange(@NotNull Editor editor, int cnt, boolean isOuter) {
+    return findTagBlockRange(editor.getDocument().getCharsSequence(), editor.getCaretModel().getOffset(), cnt, isOuter);
+  }
+
+  public static @Nullable TextRange findTagBlockRange(@NotNull CharSequence chars, int pos, int cnt, boolean isOuter) {
     Pair<Integer, Integer> blockRange = null;
 
     while(0 < cnt) {
-      blockRange = findTagBlock(chars, pos, within);
+      blockRange = findTagBlock(chars, pos, !isOuter);
+
+      if(blockRange == null)
+        return null;
+
       pos = blockRange.getFirst() - 1;
-      within = !within;
+      isOuter = !isOuter;
       cnt--;
     }
 
-    return blockRange;
+    return new TextRange(blockRange.getFirst(), blockRange.getSecond());
   }
 
   private static @Nullable Pair<Integer, Integer> findTagBlock(@NotNull CharSequence chars, int pos, boolean within) {
