@@ -1,5 +1,6 @@
 package org.jetbrains.plugins.ideavim.helper;
 
+import com.intellij.openapi.util.Pair;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import org.junit.Test;
 
@@ -60,5 +61,53 @@ public class SearchHelperTest {
     int previousWordPosition = SearchHelper.findNextWord(text, text.length(), text.length(), -1, true, false);
 
     assertEquals(previousWordPosition, text.indexOf("second"));
+  }
+
+  @Test
+  public void testFindWithinBlock() {
+    String text = "<a>b</a>";
+    Pair<Integer, Integer> range = new Pair(3, 4);
+
+    assertEquals(range, SearchHelper.findTagBlockLocation(text, 1, 1, true));
+  }
+
+  @Test
+  public void testFindWithinBlockNested() {
+    String text = "<a><b>c</b></a>";
+    Pair<Integer, Integer> range = new Pair(3, 11);
+
+    assertEquals(range, SearchHelper.findTagBlockLocation(text, 1, 1, true));
+  }
+
+  @Test
+  public void testFindWithinBlockNestedInner() {
+    String text = "<a><b>c</b></a>";
+    Pair<Integer, Integer> range = new Pair(6, 7);
+
+    assertEquals(range, SearchHelper.findTagBlockLocation(text, 3, 1, true));
+  }
+
+  @Test
+  public void testFindWholeBlockNestedInner() {
+    String text = "<a><b>c</b></a>";
+    Pair<Integer, Integer> range = new Pair(3, 11);
+
+    assertEquals(range, SearchHelper.findTagBlockLocation(text, 3, 1, false));
+  }
+
+  @Test
+  public void testFindWholeBlockNestedOuter() {
+    String text = "<a><b>c</b></a>";
+    Pair<Integer, Integer> range = new Pair(0, 15);
+
+    assertEquals(range, SearchHelper.findTagBlockLocation(text, 0, 1, false));
+  }
+
+  @Test
+  public void testFindInnerBlockNestedTwice() {
+    String text = "<a><b>c</b></a>";
+    Pair<Integer, Integer> range = new Pair(3, 11);
+
+    assertEquals(range, SearchHelper.findTagBlockLocation(text, 6, 2, true));
   }
 }
