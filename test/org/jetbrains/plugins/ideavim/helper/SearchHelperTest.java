@@ -72,6 +72,14 @@ public class SearchHelperTest {
   }
 
   @Test
+  public void testFindWithinBlockFromLastTag() {
+    String text = "<a>b</a>";
+    TextRange range = new TextRange(3, 4);
+
+    assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 7, 1, false).toString());
+  }
+
+  @Test
   public void testFindWithinBlockNested() {
     String text = "<a><b>c</b></a>";
     TextRange range = new TextRange(3, 11);

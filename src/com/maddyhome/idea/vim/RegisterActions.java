@@ -141,7 +141,7 @@ public class RegisterActions {
                           Command.FLAG_MOT_CHARACTERWISE | Command.FLAG_MOT_INCLUSIVE | Command.FLAG_TEXT_BLOCK,
                           new Shortcut[]{new Shortcut("i`"),}
     );
-    parser.registerAction(MappingMode.VO, "VimMotionTextOuterTagBlock", Command.Type.MOTION,
+    parser.registerAction(MappingMode.VO, "VimMotionTextInnerTagBlock", Command.Type.MOTION,
                           Command.FLAG_MOT_CHARACTERWISE | Command.FLAG_MOT_INCLUSIVE | Command.FLAG_TEXT_BLOCK,
                           new Shortcut[]{new Shortcut("it"),}
     );
