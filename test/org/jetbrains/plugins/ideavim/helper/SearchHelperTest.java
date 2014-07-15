@@ -68,7 +68,7 @@ public class SearchHelperTest {
     String text = "<a>b</a>";
     TextRange range = new TextRange(3, 3);
 
-    assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 1, 1, false).toString());
+    assertEquals(range, SearchHelper.findTagBlockRange(text, 1, 1, false));
   }
 
   @Test
@@ -76,7 +76,7 @@ public class SearchHelperTest {
     String text = "<a>b</a>";
     TextRange range = new TextRange(3, 3);
 
-    assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 7, 1, false).toString());
+    assertEquals(range, SearchHelper.findTagBlockRange(text, 7, 1, false));
   }
 
   @Test
@@ -84,7 +84,7 @@ public class SearchHelperTest {
     String text = "<a><b>c</b></a>";
     TextRange range = new TextRange(3, 10);
 
-    assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 1, 1, false).toString());
+    assertEquals(range, SearchHelper.findTagBlockRange(text, 1, 1, false));
   }
 
   @Test
@@ -92,7 +92,7 @@ public class SearchHelperTest {
     String text = "<a><b>c</b></a>";
     TextRange range = new TextRange(6, 6);
 
-    assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 3, 1, false).toString());
+    assertEquals(range, SearchHelper.findTagBlockRange(text, 3, 1, false));
   }
 
   @Test
@@ -100,7 +100,7 @@ public class SearchHelperTest {
     String text = "<a><b>c</b></a>";
     TextRange range = new TextRange(3, 10);
 
-    assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 3, 1, true).toString());
+    assertEquals(range, SearchHelper.findTagBlockRange(text, 3, 1, true));
   }
 
   @Test
@@ -108,7 +108,7 @@ public class SearchHelperTest {
     String text = "<a><b>c</b></a>";
     TextRange range = new TextRange(0, 14);
 
-    assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 0, 1, true).toString());
+    assertEquals(range, SearchHelper.findTagBlockRange(text, 0, 1, true));
   }
 
   @Test
@@ -116,7 +116,7 @@ public class SearchHelperTest {
     String text = "<a><b>c</b></a>";
     TextRange range = new TextRange(3, 10);
 
-    assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 6, 2, false).toString());
+    assertEquals(range, SearchHelper.findTagBlockRange(text, 6, 2, false));
   }
 
   @Test
@@ -124,6 +124,22 @@ public class SearchHelperTest {
     String text = "<a><b>c</b></a>";
     TextRange range = new TextRange(0, 14);
 
-    assertEquals(range.toString(), SearchHelper.findTagBlockRange(text, 13, 1, true).toString());
+    assertEquals(range, SearchHelper.findTagBlockRange(text, 13, 1, true));
+  }
+
+  @Test
+  public void testFindInnerBlockWithEmptyTags() {
+    String text = "<a><b/>c<b/></a>";
+    TextRange range = new TextRange(3, 11);
+
+    assertEquals(range, SearchHelper.findTagBlockRange(text, 13, 1, false));
+  }
+
+  @Test
+  public void testFindInnerBlockWithEmptyTagsFromWithinEmptyTag() {
+    String text = "<a><b/>c<b/></a>";
+    TextRange range = new TextRange(3, 11);
+
+    assertEquals(range, SearchHelper.findTagBlockRange(text, 4, 1, false));
   }
 }

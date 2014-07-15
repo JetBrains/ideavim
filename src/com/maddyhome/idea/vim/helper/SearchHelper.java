@@ -207,7 +207,7 @@ public class SearchHelper {
     if(chars.length() < 7)
       return null;
 
-    int[] blockRange = new int[]{pos + 1, pos};
+    int[] blockRange = new int[]{chars.charAt(pos) == '>' ? pos : pos + 1, pos};
     Stack<String> unmatchedTags = new Stack<String>();
 
     //Search backwards for first unmatched opening tag
@@ -218,22 +218,32 @@ public class SearchHelper {
 
       //Closing angle bracket triggers tag search
       if ('>' == c) {
-        int preceedingRAB = blockRange[0] - 1;
+        int precedingRAB = blockRange[0] - 1;
 
         //Grab the matching opening angle bracket
         blockRange[0] = findBlockLocation(chars, '>', '<', -1, blockRange[0], 1);
 
         //'/' followed by a '>' indicates an empty tag, skip it
-        if(0 <= preceedingRAB && '/' == chars.charAt(preceedingRAB)) {
+        if(0 <= precedingRAB && '/' == chars.charAt(precedingRAB)) {
           continue;
         }
       }
-      else if('<' != c)
+      else if('<' == c) {
+        int proceedingLAB = blockRange[0] + 1;
+        int precedingRAB = findBlockLocation(chars, '<', '>', 1, blockRange[0], 1) - 1;
+        if(proceedingLAB < chars.length() && chars.charAt(proceedingLAB) == '/') {
+          continue;
+        }
+
+        if(precedingRAB < chars.length() && 0 < precedingRAB && chars.charAt(precedingRAB) == '/') {
+          continue;
+        }
+      } else
         continue;
 
       //Malformed tags are unacceptable
       if (blockRange[0] == -1) {
-        return null;
+        continue;
       }
 
       //Lookahead in order to grab tag id
@@ -248,21 +258,12 @@ public class SearchHelper {
           //Push tag id onto stack
           unmatchedTags.push(nameToken.substring(1));
       }
-      else if(unmatchedTags.isEmpty()) {
-        //We've found our starting tag
-        unmatchedTags.push(nameToken);
-        break;
-      }
-      else if(unmatchedTags.peek().equals(nameToken)) {
-          String tag = unmatchedTags.pop();
-          if(unmatchedTags.isEmpty()) {
-            unmatchedTags.push(tag);
+      else if(unmatchedTags.isEmpty() || !unmatchedTags.peek().equals(nameToken)) {
+            unmatchedTags.push(nameToken);
             break;
-          }
       }
-      //Interleaving is not allowed.
       else {
-        return null;
+        unmatchedTags.pop();
       }
     }
 
@@ -291,6 +292,12 @@ public class SearchHelper {
       if ('<' == c) {
         //Grab the matching closing angle bracket
         endOfLastClosingAngleBracket = findBlockLocation(chars, '<', '>', 1, blockRange[1], 1);
+
+        //'/' followed by a '>' indicates an empty tag, skip it
+        if(0 < endOfLastClosingAngleBracket && '/' == chars.charAt(endOfLastClosingAngleBracket - 1)) {
+          blockRange[1] = endOfLastClosingAngleBracket;
+          continue;
+        }
       }
       else if('>' == c) {
         //'/' followed by a '>' indicates an empty tag, skip it
@@ -304,7 +311,7 @@ public class SearchHelper {
       } else
         continue;
 
-      if(endOfLastClosingAngleBracket == -1 || blockRange[1] == -1) {
+      if(-1 == endOfLastClosingAngleBracket || -1 == blockRange[1]) {
         return null;
       }
 
