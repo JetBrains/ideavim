@@ -219,32 +219,34 @@ public class SearchHelper {
       //Closing angle bracket triggers tag search
       if ('>' == c) {
         int precedingRAB = blockRange[0] - 1;
+        int leftAngleBracket = findBlockLocation(chars, '>', '<', -1, blockRange[0], 1);
 
-        //Grab the matching opening angle bracket
-        blockRange[0] = findBlockLocation(chars, '>', '<', -1, blockRange[0], 1);
+        if(0 > leftAngleBracket) {
+          continue;
+        }
+
+        blockRange[0] = leftAngleBracket;
 
         //'/' followed by a '>' indicates an empty tag, skip it
-        if(0 <= precedingRAB && '/' == chars.charAt(precedingRAB)) {
+        if(precedingRAB < chars.length() && '/' == chars.charAt(precedingRAB)) {
           continue;
         }
       }
       else if('<' == c) {
         int proceedingLAB = blockRange[0] + 1;
         int precedingRAB = findBlockLocation(chars, '<', '>', 1, blockRange[0], 1) - 1;
-        if(proceedingLAB < chars.length() && chars.charAt(proceedingLAB) == '/') {
+
+        if(0 > precedingRAB) {
           continue;
         }
-
-        if(precedingRAB < chars.length() && 0 < precedingRAB && chars.charAt(precedingRAB) == '/') {
+        else if(proceedingLAB < chars.length() && chars.charAt(proceedingLAB) == '/') {
+          continue;
+        }
+        else if(precedingRAB < chars.length() && chars.charAt(precedingRAB) == '/') {
           continue;
         }
       } else
         continue;
-
-      //Malformed tags are unacceptable
-      if (blockRange[0] == -1) {
-        continue;
-      }
 
       //Lookahead in order to grab tag id
       int[] tagName = new int[2];
@@ -254,7 +256,10 @@ public class SearchHelper {
 
       String nameToken = chars.subSequence(tagName[0], tagName[1]).toString().trim();
 
-      if (nameToken.startsWith("/")) {
+      if(nameToken.isEmpty()) {
+        continue;
+      }
+      else if(nameToken.startsWith("/")) {
           //Push tag id onto stack
           unmatchedTags.push(nameToken.substring(1));
       }
@@ -293,8 +298,12 @@ public class SearchHelper {
         //Grab the matching closing angle bracket
         endOfLastClosingAngleBracket = findBlockLocation(chars, '<', '>', 1, blockRange[1], 1);
 
+        if(0 > endOfLastClosingAngleBracket) {
+          continue;
+        }
+
         //'/' followed by a '>' indicates an empty tag, skip it
-        if(0 < endOfLastClosingAngleBracket && '/' == chars.charAt(endOfLastClosingAngleBracket - 1)) {
+        else if(0 < endOfLastClosingAngleBracket && '/' == chars.charAt(endOfLastClosingAngleBracket - 1)) {
           blockRange[1] = endOfLastClosingAngleBracket;
           continue;
         }
@@ -307,12 +316,16 @@ public class SearchHelper {
 
         //Backtrack to previous opening angle bracket
         endOfLastClosingAngleBracket = blockRange[1];
-        blockRange[1] = findBlockLocation(chars, '>', '<', -1, blockRange[1], 1);
-      } else
-        continue;
+        int leftAngleBracket = findBlockLocation(chars, '>', '<', -1, blockRange[1], 1);
 
-      if(-1 == endOfLastClosingAngleBracket || -1 == blockRange[1]) {
-        return null;
+        if(0 > leftAngleBracket) {
+          continue;
+        }
+
+        blockRange[1] = leftAngleBracket;
+      }
+      else {
+        continue;
       }
 
       //Lookahead in order to grab tag id
@@ -322,7 +335,11 @@ public class SearchHelper {
       tagName[1] = findNextWord(chars, tagName[0], chars.length(), wordScanCount, false, false);
       String nameToken = chars.subSequence(tagName[0], tagName[1]).toString().trim();
 
-      if(nameToken.startsWith("/")) {
+      if(nameToken.isEmpty()) {
+        blockRange[1] = endOfLastClosingAngleBracket;
+        continue;
+      }
+      else if(nameToken.startsWith("/")) {
         //Attempt to pop the stack
         if(unmatchedTags.peek().equals(nameToken.substring(1))) {
           unmatchedTags.pop();
