@@ -30,6 +30,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.jetbrains.python.psi.PyElement;
+import com.jetbrains.python.structureView.PyStructureViewElement;
 import gnu.trove.TIntArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,7 +54,7 @@ public class PsiHelper {
     StructureViewBuilder structureViewBuilder = LanguageStructureViewBuilder.INSTANCE.getStructureViewBuilder(file);
     if (!(structureViewBuilder instanceof TreeBasedStructureViewBuilder)) return -1;
     TreeBasedStructureViewBuilder builder = (TreeBasedStructureViewBuilder)structureViewBuilder;
-    StructureViewModel model = builder.createStructureViewModel();
+    StructureViewModel model = builder.createStructureViewModel(editor);
 
     TIntArrayList navigationOffsets = new TIntArrayList();
     addNavigationElements(model.getRoot(), navigationOffsets, isStart);
@@ -82,23 +84,39 @@ public class PsiHelper {
   }
 
   private static void addNavigationElements(@NotNull TreeElement root, @NotNull TIntArrayList navigationOffsets, boolean start) {
-    if (root instanceof PsiTreeElementBase) {
-      PsiElement element = ((PsiTreeElementBase)root).getValue();
+
+    // hierarchy of classes, looks like this:
+    // TreeElement
+    //   \ PsiTreeElementBase
+    //   \ PyStructureViewElement
+    // both of them implements StrucutreViewTreeElementy but required method getValue() - can returny only Object
+    // so there is double type check and then double casting
+
+    if (root instanceof PsiTreeElementBase || root instanceof PyStructureViewElement) {
       int offset;
-      if (start) {
-        offset = element.getTextRange().getStartOffset();
-        if (element.getLanguage().getID().equals("JAVA")) {
-          // HACK: for Java classes and methods, we want to jump to the opening brace
-          int textOffset = element.getTextOffset();
-          int braceIndex = element.getText().indexOf('{', textOffset - offset);
-          if (braceIndex >= 0) {
-            offset += braceIndex;
+      if (root instanceof PsiTreeElementBase) {
+        // casting of other Psi elements
+        PsiElement element = ((PsiTreeElementBase)root).getValue();
+        if (start) {
+          offset = element.getTextRange().getStartOffset();
+          if (element.getLanguage().getID().equals("JAVA")) {
+            // HACK: for Java classes and methods, we want to jump to the opening brace
+            int textOffset = element.getTextOffset();
+            int braceIndex = element.getText().indexOf('{', textOffset - offset);
+            if (braceIndex >= 0) {
+              offset += braceIndex;
+            }
           }
         }
+        else {
+          offset = element.getTextRange().getEndOffset() - 1;
+        }
+      } else {
+        // casting of Python objects
+        PyElement element = ((PyStructureViewElement)root).getValue();
+        offset = element.getTextRange().getStartOffset();
       }
-      else {
-        offset = element.getTextRange().getEndOffset() - 1;
-      }
+
       if (!navigationOffsets.contains(offset)) {
         navigationOffsets.add(offset);
       }
