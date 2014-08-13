@@ -32,6 +32,8 @@ import javax.swing.*;
 import javax.swing.text.Document;
 import javax.swing.text.Keymap;
 import java.awt.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.util.Date;
 import java.util.List;
@@ -59,6 +61,16 @@ public class ExTextField extends JTextField {
     loadKeymap(map, ExKeyBindings.getBindings(), actions);
     map.setDefaultAction(new ExEditorKit.DefaultExKeyHandler());
     setKeymap(map);
+    addFocusListener(new FocusListener() {
+      @Override
+      public void focusGained(FocusEvent e) {
+        setCaretPosition(getText().length());
+      }
+
+      @Override
+      public void focusLost(FocusEvent e) {
+      }
+    });
 
     //origCaret = getCaret();
     //blockCaret = new BlockCaret();
