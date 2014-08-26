@@ -447,6 +447,8 @@ public class Options {
     addOption(new NumberOption("undolevels", "ul", 1000, -1, Integer.MAX_VALUE));
     addOption(new ToggleOption("visualbell", "vb", false));
     addOption(new ToggleOption("wrapscan", "ws", true));
+    // autoselect,exclude:cons\|linux
+    addOption(new BoundListOption("clipboard", "cb", new String[]{""}, new String[]{"unnamed"}));
   }
 
   private void addOption(@NotNull Option option) {

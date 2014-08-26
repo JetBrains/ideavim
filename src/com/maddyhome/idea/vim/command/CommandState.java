@@ -38,7 +38,7 @@ public class CommandState {
   public static final int DEFAULT_TIMEOUT_LENGTH = 1000;
 
   @Nullable private static Command ourLastChange = null;
-  private static char ourLastRegister = RegisterGroup.REGISTER_DEFAULT;
+  private char ourLastRegister;
 
   @NotNull private final Stack<State> myStates = new Stack<State>();
   @NotNull private final State myDefaultState = new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL);
@@ -53,6 +53,7 @@ public class CommandState {
     myMappingTimer = new Timer(DEFAULT_TIMEOUT_LENGTH, null);
     myMappingTimer.setRepeats(false);
     myStates.push(new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL));
+    ourLastRegister = VimPlugin.getRegister().defaultRegister;
   }
 
   @NotNull

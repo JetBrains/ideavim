@@ -27,6 +27,10 @@ import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
+import com.maddyhome.idea.vim.option.BoundListOption;
+import com.maddyhome.idea.vim.option.OptionChangeEvent;
+import com.maddyhome.idea.vim.option.OptionChangeListener;
+import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.ClipboardHandler;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +50,7 @@ public class RegisterGroup {
   /**
    * The register key for the default register
    */
-  public static final char REGISTER_DEFAULT = '"';
+  public char defaultRegister = '"';
 
   private static final String WRITABLE_REGISTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-*+_/\"";
   private static final String READONLY_REGISTERS = ":.%#=/";
@@ -56,11 +60,21 @@ public class RegisterGroup {
 
   private static final Logger logger = Logger.getInstance(RegisterGroup.class.getName());
 
-  private char lastRegister = REGISTER_DEFAULT;
+  private char lastRegister = defaultRegister;
   @NotNull private final HashMap<Character, Register> registers = new HashMap<Character, Register>();
   private char recordRegister = 0;
   @Nullable private List<KeyStroke> recordList = null;
-  public RegisterGroup() {}
+  public RegisterGroup() {
+    Options.getInstance().getOption("clipboard").addOptionChangeListener(new OptionChangeListener() {
+      public void valueChange(OptionChangeEvent event) {
+        BoundListOption clipboardOption = (BoundListOption)Options.getInstance().getOption("clipboard");
+        if (clipboardOption.contains("unnamed")) {
+          defaultRegister = '*';
+          lastRegister = defaultRegister;
+        }
+      }
+    });
+  }
 
   /**
    * Check to see if the last selected register can be written to.
@@ -91,7 +105,7 @@ public class RegisterGroup {
    * Reset the selected register back to the default register.
    */
   public void resetRegister() {
-    lastRegister = REGISTER_DEFAULT;
+    lastRegister = defaultRegister;
     logger.debug("register reset");
   }
 
@@ -157,8 +171,8 @@ public class RegisterGroup {
     }
 
     // Also add it to the default register if the default wasn't specified
-    if (register != REGISTER_DEFAULT && ".:/".indexOf(register) == -1) {
-      registers.put(REGISTER_DEFAULT, new Register(REGISTER_DEFAULT, type, text));
+    if (register != defaultRegister && ".:/".indexOf(register) == -1) {
+      registers.put(defaultRegister, new Register(defaultRegister, type, text));
       if (logger.isDebugEnabled()) logger.debug("register '" + register + "' contains: \"" + text + "\"");
     }
 
@@ -181,7 +195,7 @@ public class RegisterGroup {
       }
     }
     // Yanks also go to register 0 if the default register was used
-    else if (register == REGISTER_DEFAULT) {
+    else if (register == defaultRegister) {
       registers.put('0', new Register('0', type, text));
       if (logger.isDebugEnabled()) logger.debug("register '" + '0' + "' contains: \"" + text + "\"");
     }

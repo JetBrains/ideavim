@@ -292,17 +292,19 @@ public class KeyHandler {
   }
 
   private void handleEditorReset(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull final DataContext context) {
-    if (state != State.COMMAND && count == 0 && currentArg == Argument.Type.NONE && currentCmd.size() == 0 &&
-        VimPlugin.getRegister().getCurrentRegister() == RegisterGroup.REGISTER_DEFAULT) {
-      if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
-        CommandProcessor.getInstance().executeCommand(editor.getProject(), new Runnable() {
-          @Override
-          public void run() {
-            KeyHandler.executeAction("EditorEscape", context);
-          }
-        }, "", null);
+    if (state != State.COMMAND && count == 0 && currentArg == Argument.Type.NONE && currentCmd.size() == 0) {
+      RegisterGroup register = VimPlugin.getRegister();
+      if (register.getCurrentRegister() == register.defaultRegister) {
+        if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
+          CommandProcessor.getInstance().executeCommand(editor.getProject(), new Runnable() {
+            @Override
+            public void run() {
+              KeyHandler.executeAction("EditorEscape", context);
+            }
+          }, "", null);
+        }
+        VimPlugin.indicateError();
       }
-      VimPlugin.indicateError();
     }
     reset(editor);
   }

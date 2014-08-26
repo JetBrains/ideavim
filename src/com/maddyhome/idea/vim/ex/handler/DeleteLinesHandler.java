@@ -39,7 +39,7 @@ public class DeleteLinesHandler extends CommandHandler {
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     StringBuilder arg = new StringBuilder(cmd.getArgument());
-    char register = RegisterGroup.REGISTER_DEFAULT;
+    char register = VimPlugin.getRegister().defaultRegister;
     if (arg.length() > 0 && (arg.charAt(0) < '0' || arg.charAt(0) > '9')) {
       register = arg.charAt(0);
       arg.deleteCharAt(0);
