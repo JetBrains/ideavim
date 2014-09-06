@@ -323,7 +323,7 @@ public class ChangeGroup {
       return false;
     }
     final TextRange range = new TextRange(deleteTo, editor.getCaretModel().getOffset());
-    deleteRange(editor, range, SelectionType.CHARACTER_WISE, false);
+    deleteRange(editor, range, SelectionType.CHARACTER_WISE, true);
     return true;
   }
 
