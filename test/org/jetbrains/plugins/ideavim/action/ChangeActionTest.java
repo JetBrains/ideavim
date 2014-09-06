@@ -244,6 +244,13 @@ public class ChangeActionTest extends VimTestCase {
            "fooar\n");
   }
 
+  // VIM-569 |i| |i_CTRL-W|
+  public void testDeletePreviousWordRightMargin() {
+    doTest(parseKeys("i", "<C-w>"),
+           "this is a sentence.<caret>",
+           "this is a<caret> ");
+  }
+
   private void doTest(final List<KeyStroke> keys, String before, String after) {
     myFixture.configureByText("a.java", before);
     final Editor editor = myFixture.getEditor();
