@@ -524,7 +524,7 @@ public class SearchHelper {
 
   private static int findNextWordOne(@NotNull CharSequence chars, int pos, int size, int step, boolean bigWord, boolean spaceWords) {
     boolean found = false;
-    pos = pos < size ? pos : size - 1;
+    pos = pos < size ? pos : Math.min(size, chars.length() - 1);
     // For back searches, skip any current whitespace so we start at the end of a word
     if (step < 0 && pos > 0) {
       if (CharacterHelper.charType(chars.charAt(pos - 1), bigWord) == CharacterHelper.CharacterType.WHITESPACE && !spaceWords) {
