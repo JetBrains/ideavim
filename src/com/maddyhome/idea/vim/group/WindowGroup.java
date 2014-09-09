@@ -20,7 +20,6 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.project.Project;
@@ -37,16 +36,8 @@ public class WindowGroup {
   public WindowGroup() {
   }
 
-  public void splitWindowHorizontal(@NotNull DataContext context) {
-    splitWindowHorizontal(context, null);
-  }
-
   public void splitWindowHorizontal(@NotNull DataContext context, String filename) {
     splitWindow(SwingConstants.HORIZONTAL, context, filename);
-  }
-
-  public void splitWindowVertical(@NotNull DataContext context) {
-    splitWindowVertical(context, null);
   }
 
   public void splitWindowVertical(@NotNull DataContext context, String filename) {
@@ -77,6 +68,4 @@ public class WindowGroup {
       editorWindow.split(orientation, true, virtualFile, true);
     }
   }
-
-  private static Logger logger = Logger.getInstance(WindowGroup.class.getName());
 }
