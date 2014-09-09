@@ -45,26 +45,20 @@ public class WindowGroup {
   }
 
   private void splitWindow(int orientation, @NotNull DataContext context, String filename) {
-    Project proj = PlatformDataKeys.PROJECT.getData(context);
-    FileEditorManagerEx fem = FileEditorManagerEx.getInstanceEx(proj);
+    final Project project = PlatformDataKeys.PROJECT.getData(context);
+    final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
 
-    // If a file was passed in as an argument, open it in the newly split window
     VirtualFile virtualFile = null;
-    if (filename != null && filename.length() > 0)
-    {
-      virtualFile = VimPlugin.getFile().findFile(filename, proj);
-
-      // Don't split if the desired file could not be found
+    if (filename != null && filename.length() > 0 && project != null) {
+      virtualFile = VimPlugin.getFile().findFile(filename, project);
       if (virtualFile == null) {
         VimPlugin.showMessage("Could not find file: " + filename);
         return;
       }
     }
 
-    EditorWindow editorWindow = fem.getSplitters().getCurrentWindow();
-
-    if (editorWindow != null ) {
-      // When virtualFile is null, the current file will be split
+    final EditorWindow editorWindow = fileEditorManager.getSplitters().getCurrentWindow();
+    if (editorWindow != null) {
       editorWindow.split(orientation, true, virtualFile, true);
     }
   }
