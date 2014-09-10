@@ -25,6 +25,7 @@ Contributors:
 * [Ira Klotzko](mailto:iklotzko@ltech.com)
 * [Alex Selesse](mailto:alex@selesse.com)
 * [Dathan Bennett](mailto:dbennett@palantir.com)
+* [salaam](mailto:kphayen@gmail.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.

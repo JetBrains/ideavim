@@ -26,6 +26,9 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.fileEditor.*;
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
+import com.intellij.openapi.fileEditor.impl.EditorTabbedContainer;
+import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
@@ -60,36 +63,7 @@ public class FileGroup {
     }
     Project proj = PlatformDataKeys.PROJECT.getData(context); // API change - don't merge
 
-    VirtualFile found = null;
-    if (filename.length() > 2 && filename.charAt(0) == '~' && filename.charAt(1) == File.separatorChar) {
-      String homefile = filename.substring(2);
-      String dir = System.getProperty("user.home");
-      if (logger.isDebugEnabled()) {
-        logger.debug("home dir file");
-        logger.debug("looking for " + homefile + " in " + dir);
-      }
-      found = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(new File(dir, homefile));
-    }
-    else {
-      if (proj == null) {
-        return false;
-      }
-      ProjectRootManager prm = ProjectRootManager.getInstance(proj);
-      VirtualFile[] roots = prm.getContentRoots();
-      for (int i = 0; i < roots.length; i++) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("root[" + i + "] = " + roots[i].getPath());
-        }
-        found = findFile(roots[i], filename);
-        if (found != null) {
-          break;
-        }
-      }
-
-      if (found == null) {
-        found = LocalFileSystem.getInstance().findFileByIoFile(new File(filename));
-      }
-    }
+    VirtualFile found = findFile(filename, proj);
 
     if (found != null) {
       if (logger.isDebugEnabled()) {
@@ -115,6 +89,42 @@ public class FileGroup {
 
       return false;
     }
+  }
+
+  @Nullable
+  public VirtualFile findFile(@NotNull String filename, @NotNull Project proj) {
+    VirtualFile found = null;
+    if (filename.length() > 2 && filename.charAt(0) == '~' && filename.charAt(1) == File.separatorChar) {
+      String homefile = filename.substring(2);
+      String dir = System.getProperty("user.home");
+      if (logger.isDebugEnabled()) {
+        logger.debug("home dir file");
+        logger.debug("looking for " + homefile + " in " + dir);
+      }
+      found = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(new File(dir, homefile));
+    }
+    else {
+      if (proj == null) {
+        return null;
+      }
+      ProjectRootManager prm = ProjectRootManager.getInstance(proj);
+      VirtualFile[] roots = prm.getContentRoots();
+      for (int i = 0; i < roots.length; i++) {
+        if (logger.isDebugEnabled()) {
+          logger.debug("root[" + i + "] = " + roots[i].getPath());
+        }
+        found = findFile(roots[i], filename);
+        if (found != null) {
+          break;
+        }
+      }
+
+      if (found == null) {
+        found = LocalFileSystem.getInstance().findFileByIoFile(new File(filename));
+      }
+    }
+
+    return found;
   }
 
   @Nullable
@@ -146,11 +156,26 @@ public class FileGroup {
    * @param context The data context
    */
   public void closeFile(@NotNull Editor editor, @NotNull DataContext context) {
-    Project proj = PlatformDataKeys.PROJECT.getData(context);
-    FileEditorManager fem = FileEditorManager.getInstance(proj); // API change - don't merge
-    VirtualFile vf = EditorData.getVirtualFile(editor);
-    if (vf != null) {
-      fem.closeFile(vf);
+    final Project project = PlatformDataKeys.PROJECT.getData(context);
+    if (project != null) {
+      final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
+      final EditorWindow window = fileEditorManager.getCurrentWindow();
+      final EditorTabbedContainer tabbedPane = window.getTabbedPane();
+      if (tabbedPane != null) {
+        if (tabbedPane.getTabCount() > 1) {
+          final int index = tabbedPane.getSelectedIndex();
+          tabbedPane.removeTabAt(index, index + 1);
+        }
+        else {
+          tabbedPane.close();
+        }
+      }
+      else {
+        VirtualFile virtualFile = EditorData.getVirtualFile(editor);
+        if (virtualFile != null) {
+          fileEditorManager.closeFile(virtualFile);
+        }
+      }
     }
   }
 
