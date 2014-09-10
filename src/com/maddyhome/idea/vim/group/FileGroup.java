@@ -26,6 +26,9 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.fileEditor.*;
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
+import com.intellij.openapi.fileEditor.impl.EditorTabbedContainer;
+import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
@@ -153,11 +156,26 @@ public class FileGroup {
    * @param context The data context
    */
   public void closeFile(@NotNull Editor editor, @NotNull DataContext context) {
-    Project proj = PlatformDataKeys.PROJECT.getData(context);
-    FileEditorManager fem = FileEditorManager.getInstance(proj); // API change - don't merge
-    VirtualFile vf = EditorData.getVirtualFile(editor);
-    if (vf != null) {
-      fem.closeFile(vf);
+    final Project project = PlatformDataKeys.PROJECT.getData(context);
+    if (project != null) {
+      final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
+      final EditorWindow window = fileEditorManager.getCurrentWindow();
+      final EditorTabbedContainer tabbedPane = window.getTabbedPane();
+      if (tabbedPane != null) {
+        if (tabbedPane.getTabCount() > 1) {
+          final int index = tabbedPane.getSelectedIndex();
+          tabbedPane.removeTabAt(index, index + 1);
+        }
+        else {
+          tabbedPane.close();
+        }
+      }
+      else {
+        VirtualFile virtualFile = EditorData.getVirtualFile(editor);
+        if (virtualFile != null) {
+          fileEditorManager.closeFile(virtualFile);
+        }
+      }
     }
   }
 
