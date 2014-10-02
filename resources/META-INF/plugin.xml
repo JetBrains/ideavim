@@ -316,6 +316,10 @@
     <action id="VimFileGetFileInfo" class="com.maddyhome.idea.vim.action.file.FileGetFileInfoAction" text="Get File Info"/>
     <action id="VimFileGetLocationInfo" class="com.maddyhome.idea.vim.action.file.FileGetLocationInfoAction" text="Get Location Info"/>
 
+    <!-- Window -->
+    <action id="VimWindowSplitVertical" class="com.maddyhome.idea.vim.action.window.VerticalSplitAction" text="Split window vertically"/>
+    <action id="VimWindowSplitHorizontal" class="com.maddyhome.idea.vim.action.window.HorizontalSplitAction" text="Split window vertically"/>
+
     <!-- Search -->
     <action id="VimSearchFwdEntry" class="com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction" text="Search Forward"/>
     <action id="VimSearchRevEntry" class="com.maddyhome.idea.vim.action.motion.search.SearchEntryRevAction" text="Search Backward"/>
