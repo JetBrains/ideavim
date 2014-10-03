@@ -320,6 +320,7 @@
     <action id="VimWindowSplitVertical" class="com.maddyhome.idea.vim.action.window.VerticalSplitAction" text="Split window vertically"/>
     <action id="VimWindowSplitHorizontal" class="com.maddyhome.idea.vim.action.window.HorizontalSplitAction" text="Split window horizontally"/>
     <action id="VimWindowClose" class="com.maddyhome.idea.vim.action.window.CloseWindowAction" text="Close current window"/>
+    <action id="VimWindowOnly" class="com.maddyhome.idea.vim.action.window.WindowOnlyAction" text="Close all windows except current"/>
 
     <!-- Search -->
     <action id="VimSearchFwdEntry" class="com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction" text="Search Forward"/>

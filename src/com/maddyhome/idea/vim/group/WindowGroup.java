@@ -42,6 +42,17 @@ public class WindowGroup {
     fileEditorManager.getSplitters().getCurrentWindow().closeAllExcept(null);
   }
 
+  public void closeAllExceptCurrent(@NotNull DataContext context) {
+    final Project project = PlatformDataKeys.PROJECT.getData(context);
+    final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
+    final EditorWindow current = fileEditorManager.getCurrentWindow();
+    for (EditorWindow window : fileEditorManager.getWindows()) {
+      if (window != current) {
+        window.closeAllExcept(null);
+      }
+    }
+  }
+
   public void splitWindowHorizontal(@NotNull DataContext context, String filename) {
     splitWindow(SwingConstants.HORIZONTAL, context, filename);
   }

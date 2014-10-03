@@ -25,15 +25,15 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
-public class CloseWindowAction extends EditorAction {
-  protected CloseWindowAction() {
+public class WindowOnlyAction extends EditorAction {
+  protected WindowOnlyAction() {
     super(new Handler());
   }
 
   private static class Handler extends EditorActionHandlerBase {
     @Override
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      VimPlugin.getWindow().closeCurrentWindow(context);
+      VimPlugin.getWindow().closeAllExceptCurrent(context);
       return true;
     }
   }
