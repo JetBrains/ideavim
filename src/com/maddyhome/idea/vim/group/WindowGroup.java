@@ -37,16 +37,17 @@ public class WindowGroup {
   }
 
   public void closeCurrentWindow(@NotNull DataContext context) {
-    final Project project = PlatformDataKeys.PROJECT.getData(context);
-    final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
-    fileEditorManager.getSplitters().getCurrentWindow().closeAllExcept(null);
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(context);
+    final EditorWindow window = fileEditorManager.getSplitters().getCurrentWindow();
+    if (window != null) {
+      window.closeAllExcept(null);
+    }
   }
 
   public void closeAllExceptCurrent(@NotNull DataContext context) {
-    final Project project = PlatformDataKeys.PROJECT.getData(context);
-    final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(context);
     final EditorWindow current = fileEditorManager.getCurrentWindow();
-    for (EditorWindow window : fileEditorManager.getWindows()) {
+    for (final EditorWindow window : fileEditorManager.getWindows()) {
       if (window != current) {
         window.closeAllExcept(null);
       }
@@ -54,26 +55,32 @@ public class WindowGroup {
   }
 
   public void selectNextWindow(@NotNull DataContext context) {
-    final Project project = PlatformDataKeys.PROJECT.getData(context);
-    final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(context);
     final EditorWindow current = fileEditorManager.getCurrentWindow();
-    fileEditorManager.getNextWindow(current).setAsCurrentWindow(true);
+    if (current != null) {
+      fileEditorManager.getNextWindow(current).setAsCurrentWindow(true);
+    }
   }
 
   public void selectPreviousWindow(@NotNull DataContext context) {
-    final Project project = PlatformDataKeys.PROJECT.getData(context);
-    final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(context);
     final EditorWindow current = fileEditorManager.getCurrentWindow();
-    fileEditorManager.getPrevWindow(current).setAsCurrentWindow(true);
+    if (current != null) {
+      fileEditorManager.getPrevWindow(current).setAsCurrentWindow(true);
+    }
   }
 
   public void selectWindow(DataContext context, int index) {
-    final Project project = PlatformDataKeys.PROJECT.getData(context);
-    final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
+    final FileEditorManagerEx fileEditorManager = getFileEditorManager(context);
     EditorWindow[] windows = fileEditorManager.getWindows();
     if (index - 1 < windows.length) {
       windows[index - 1].setAsCurrentWindow(true);
     }
+  }
+
+  private FileEditorManagerEx getFileEditorManager(DataContext context) {
+    final Project project = PlatformDataKeys.PROJECT.getData(context);
+    return FileEditorManagerEx.getInstanceEx(project);
   }
 
   public void splitWindowHorizontal(@NotNull DataContext context, String filename) {
