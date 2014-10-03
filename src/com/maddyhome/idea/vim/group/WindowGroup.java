@@ -53,6 +53,29 @@ public class WindowGroup {
     }
   }
 
+  public void selectNextWindow(@NotNull DataContext context) {
+    final Project project = PlatformDataKeys.PROJECT.getData(context);
+    final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
+    final EditorWindow current = fileEditorManager.getCurrentWindow();
+    fileEditorManager.getNextWindow(current).setAsCurrentWindow(true);
+  }
+
+  public void selectPreviousWindow(@NotNull DataContext context) {
+    final Project project = PlatformDataKeys.PROJECT.getData(context);
+    final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
+    final EditorWindow current = fileEditorManager.getCurrentWindow();
+    fileEditorManager.getPrevWindow(current).setAsCurrentWindow(true);
+  }
+
+  public void selectWindow(DataContext context, int index) {
+    final Project project = PlatformDataKeys.PROJECT.getData(context);
+    final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
+    EditorWindow[] windows = fileEditorManager.getWindows();
+    if (index - 1 < windows.length) {
+      windows[index - 1].setAsCurrentWindow(true);
+    }
+  }
+
   public void splitWindowHorizontal(@NotNull DataContext context, String filename) {
     splitWindow(SwingConstants.HORIZONTAL, context, filename);
   }

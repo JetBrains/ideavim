@@ -682,7 +682,16 @@ public class RegisterActions {
                             KeyStroke.getKeyStroke('o') }));
     parser.registerAction(MappingMode.N, "VimWindowOnly", Command.Type.OTHER_READONLY,
                           new Shortcut(new KeyStroke[]{ KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK),
+                            KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK) }));
+    parser.registerAction(MappingMode.N, "VimWindowNext", Command.Type.OTHER_READONLY,
+                          new Shortcut(new KeyStroke[]{ KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK),
+                            KeyStroke.getKeyStroke('w') }));
+    parser.registerAction(MappingMode.N, "VimWindowNext", Command.Type.OTHER_READONLY,
+                          new Shortcut(new KeyStroke[]{ KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK),
                             KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK) }));
+    parser.registerAction(MappingMode.N, "VimWindowPrev", Command.Type.OTHER_READONLY,
+                          new Shortcut(new KeyStroke[]{ KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK),
+                            KeyStroke.getKeyStroke('W') }));
 
     // Macro Actions
     parser.registerAction(MappingMode.N, "VimPlaybackLastRegister", Command.Type.OTHER_WRITABLE,
