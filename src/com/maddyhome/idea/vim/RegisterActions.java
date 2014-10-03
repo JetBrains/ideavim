@@ -674,6 +674,9 @@ public class RegisterActions {
     parser.registerAction(MappingMode.N, "VimWindowSplitHorizontal", Command.Type.OTHER_READONLY,
                           new Shortcut(new KeyStroke[]{ KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK),
                             KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_MASK) }));
+    parser.registerAction(MappingMode.N, "VimWindowClose", Command.Type.OTHER_READONLY,
+                          new Shortcut(new KeyStroke[]{ KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK),
+                          KeyStroke.getKeyStroke('c') }));
 
     // Macro Actions
     parser.registerAction(MappingMode.N, "VimPlaybackLastRegister", Command.Type.OTHER_WRITABLE,

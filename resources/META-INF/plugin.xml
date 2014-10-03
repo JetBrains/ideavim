@@ -318,7 +318,8 @@
 
     <!-- Window -->
     <action id="VimWindowSplitVertical" class="com.maddyhome.idea.vim.action.window.VerticalSplitAction" text="Split window vertically"/>
-    <action id="VimWindowSplitHorizontal" class="com.maddyhome.idea.vim.action.window.HorizontalSplitAction" text="Split window vertically"/>
+    <action id="VimWindowSplitHorizontal" class="com.maddyhome.idea.vim.action.window.HorizontalSplitAction" text="Split window horizontally"/>
+    <action id="VimWindowClose" class="com.maddyhome.idea.vim.action.window.CloseWindowAction" text="Close current window"/>
 
     <!-- Search -->
     <action id="VimSearchFwdEntry" class="com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction" text="Search Forward"/>
