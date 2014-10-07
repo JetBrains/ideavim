@@ -29,9 +29,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
-/**
- *
- */
 public class WindowGroup {
   public WindowGroup() {
   }
@@ -70,33 +67,33 @@ public class WindowGroup {
     }
   }
 
-  public void selectWindow(DataContext context, int index) {
+  public void selectWindow(@NotNull DataContext context, int index) {
     final FileEditorManagerEx fileEditorManager = getFileEditorManager(context);
-    EditorWindow[] windows = fileEditorManager.getWindows();
+    final EditorWindow[] windows = fileEditorManager.getWindows();
     if (index - 1 < windows.length) {
       windows[index - 1].setAsCurrentWindow(true);
     }
   }
 
-  private FileEditorManagerEx getFileEditorManager(DataContext context) {
+  public void splitWindowHorizontal(@NotNull DataContext context, @NotNull String filename) {
+    splitWindow(SwingConstants.HORIZONTAL, context, filename);
+  }
+
+  public void splitWindowVertical(@NotNull DataContext context, @NotNull String filename) {
+    splitWindow(SwingConstants.VERTICAL, context, filename);
+  }
+
+  private FileEditorManagerEx getFileEditorManager(@NotNull DataContext context) {
     final Project project = PlatformDataKeys.PROJECT.getData(context);
     return FileEditorManagerEx.getInstanceEx(project);
   }
 
-  public void splitWindowHorizontal(@NotNull DataContext context, String filename) {
-    splitWindow(SwingConstants.HORIZONTAL, context, filename);
-  }
-
-  public void splitWindowVertical(@NotNull DataContext context, String filename) {
-    splitWindow(SwingConstants.VERTICAL, context, filename);
-  }
-
-  private void splitWindow(int orientation, @NotNull DataContext context, String filename) {
+  private void splitWindow(int orientation, @NotNull DataContext context, @NotNull String filename) {
     final Project project = PlatformDataKeys.PROJECT.getData(context);
     final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
 
     VirtualFile virtualFile = null;
-    if (filename != null && filename.length() > 0 && project != null) {
+    if (filename.length() > 0 && project != null) {
       virtualFile = VimPlugin.getFile().findFile(filename, project);
       if (virtualFile == null) {
         VimPlugin.showMessage("Could not find file: " + filename);
