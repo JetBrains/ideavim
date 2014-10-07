@@ -3,6 +3,20 @@ The Changelog
 
 History of changes in IdeaVim for the IntelliJ platform.
 
+0.36, TBD
+---------
+
+Features:
+
+* TODO: VIM-171 Window `<C-W>` commands: split, close, next/previous windows
+* VIM-265 Window `:split` and `:vsplit` commands
+
+Bug fixes:
+
+* VIM-770 Close the current tab on `:quit` instead of all tabs with the current
+  file
+* VIM-569 Fixed `<C-W>` when the caret is at the end of a line
+
 
 0.35, 2014-05-15
 ----------------
