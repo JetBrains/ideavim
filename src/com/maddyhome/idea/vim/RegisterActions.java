@@ -657,42 +657,6 @@ public class RegisterActions {
     parser.registerAction(MappingMode.N, "VimFileGetFileInfo", Command.Type.OTHER_READONLY,
                           new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_G, KeyEvent.CTRL_MASK)));
 
-    // Window Actions
-    // TODO - CTRL-W commands: +, -, =, _, b, c, n, o, q, t, <up>, <down>
-    parser.registerAction(MappingMode.N, "VimWindowSplitVertical", Command.Type.OTHER_READONLY,
-                          new Shortcut(new KeyStroke[]{ KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK),
-                            KeyStroke.getKeyStroke('v') }));
-    parser.registerAction(MappingMode.N, "VimWindowSplitVertical", Command.Type.OTHER_READONLY,
-                          new Shortcut(new KeyStroke[]{ KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK),
-                            KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_MASK) }));
-    parser.registerAction(MappingMode.N, "VimWindowSplitHorizontal", Command.Type.OTHER_READONLY,
-                          new Shortcut(new KeyStroke[]{ KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK),
-                            KeyStroke.getKeyStroke('s') }));
-    parser.registerAction(MappingMode.N, "VimWindowSplitHorizontal", Command.Type.OTHER_READONLY,
-                          new Shortcut(new KeyStroke[]{ KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK),
-                            KeyStroke.getKeyStroke('S') }));
-    parser.registerAction(MappingMode.N, "VimWindowSplitHorizontal", Command.Type.OTHER_READONLY,
-                          new Shortcut(new KeyStroke[]{ KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK),
-                            KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_MASK) }));
-    parser.registerAction(MappingMode.N, "VimWindowClose", Command.Type.OTHER_READONLY,
-                          new Shortcut(new KeyStroke[]{ KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK),
-                          KeyStroke.getKeyStroke('c') }));
-    parser.registerAction(MappingMode.N, "VimWindowOnly", Command.Type.OTHER_READONLY,
-                          new Shortcut(new KeyStroke[]{ KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK),
-                            KeyStroke.getKeyStroke('o') }));
-    parser.registerAction(MappingMode.N, "VimWindowOnly", Command.Type.OTHER_READONLY,
-                          new Shortcut(new KeyStroke[]{ KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK),
-                            KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK) }));
-    parser.registerAction(MappingMode.N, "VimWindowNext", Command.Type.OTHER_READONLY,
-                          new Shortcut(new KeyStroke[]{ KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK),
-                            KeyStroke.getKeyStroke('w') }));
-    parser.registerAction(MappingMode.N, "VimWindowNext", Command.Type.OTHER_READONLY,
-                          new Shortcut(new KeyStroke[]{ KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK),
-                            KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK) }));
-    parser.registerAction(MappingMode.N, "VimWindowPrev", Command.Type.OTHER_READONLY,
-                          new Shortcut(new KeyStroke[]{ KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK),
-                            KeyStroke.getKeyStroke('W') }));
-
     // Macro Actions
     parser.registerAction(MappingMode.N, "VimPlaybackLastRegister", Command.Type.OTHER_WRITABLE,
                           new Shortcut("@@"));

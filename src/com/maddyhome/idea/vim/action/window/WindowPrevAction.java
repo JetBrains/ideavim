@@ -19,26 +19,47 @@ package com.maddyhome.idea.vim.action.window;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
-public class WindowPrevAction extends EditorAction {
+import javax.swing.*;
+import java.util.List;
+import java.util.Set;
+
+public class WindowPrevAction extends VimCommandAction {
   public WindowPrevAction() {
-    super(new Handler());
+    super(new EditorActionHandlerBase() {
+      @Override
+      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+        if (cmd.getRawCount() == 0) {
+          VimPlugin.getWindow().selectPreviousWindow(context);
+        } else {
+          VimPlugin.getWindow().selectWindow(context, cmd.getCount());
+        }
+        return true;
+      }
+    });
   }
 
-  private static class Handler extends EditorActionHandlerBase {
-    @Override
-    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      if (cmd.getRawCount() == 0) {
-        VimPlugin.getWindow().selectPreviousWindow(context);
-      } else {
-        VimPlugin.getWindow().selectWindow(context, cmd.getCount());
-      }
-      return true;
-    }
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.N;
+  }
+
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("<C-W>W");
+  }
+
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.OTHER_READONLY;
   }
 }
