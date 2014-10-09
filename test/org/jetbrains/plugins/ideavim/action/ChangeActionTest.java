@@ -252,6 +252,30 @@ public class ChangeActionTest extends VimTestCase {
            "$<caret>\n");
   }
 
+  // VIM-632 |CTRL-V| |v_b_I|
+  public void testChangeVisualBlock() {
+    doTest(parseKeys("<C-V>", "j", "I", "quux ", "<Esc>"),
+           "foo bar\n" +
+           "<caret>baz quux\n" +
+           "spam eggs\n",
+           "foo bar\n" +
+           "<caret>quux baz quux\n" +
+           "quux spam eggs\n");
+  }
+
+  // VIM-632 |CTRL-V| |v_d|
+  public void testDeleteVisualBlock() {
+    doTest(parseKeys("<C-V>", "jjl", "d"),
+           "<caret>foo\n" +
+           "bar\n" +
+           "baz\n" +
+           "quux\n",
+           "<caret>oo\n" +
+           "ar\n" +
+           "az\n" +
+           "quux\n");
+  }
+
   private void doTest(final List<KeyStroke> keys, String before, String after) {
     myFixture.configureByText("a.java", before);
     final Editor editor = myFixture.getEditor();

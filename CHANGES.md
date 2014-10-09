@@ -13,6 +13,7 @@ Features:
 
 Bug fixes:
 
+* VIM-632 Restored visual block mode that was broken due to multiple carets support
 * VIM-770 Close the current tab on `:quit` instead of all tabs with the current
   file
 * VIM-569 Fixed `<C-W>` when the caret is at the end of a line

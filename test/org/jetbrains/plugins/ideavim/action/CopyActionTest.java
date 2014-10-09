@@ -1,6 +1,7 @@
 package org.jetbrains.plugins.ideavim.action;
 
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.command.CommandState;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -82,7 +83,7 @@ public class CopyActionTest extends VimTestCase {
     assertEquals(0, editor.getCaretModel().getOffset());
   }
 
-   // |v_y|
+  // VIM-632 |CTRL-V| |v_y| |p|
   public void testYankVisualBlock() {
     typeTextInFile(parseKeys("<C-V>", "jl", "yl", "p"),
                    "<caret>* one\n" +
@@ -98,5 +99,17 @@ public class CopyActionTest extends VimTestCase {
 
     myFixture.checkResult("* *one\n" +
                           "* *two\n");
+    assertSelection(null);
+    assertOffset(2);
+  }
+
+  // VIM-632 |CTRL-V| |v_y|
+  public void testStateAfterYankVisualBlock() {
+    typeTextInFile(parseKeys("<C-V>", "jl", "y"),
+                   "<caret>foo\n" +
+                   "bar\n");
+    assertOffset(0);
+    assertMode(CommandState.Mode.COMMAND);
+    assertSelection(null);
   }
 }

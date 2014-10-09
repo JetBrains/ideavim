@@ -1187,13 +1187,18 @@ public class MotionGroup {
 
   public static void moveCaret(@NotNull Editor editor, int offset) {
     if (offset >= 0 && offset <= editor.getDocument().getTextLength()) {
+      final boolean keepVisual = keepVisual(editor);
       if (editor.getCaretModel().getOffset() != offset) {
+        if (!keepVisual) {
+          // XXX: Hack for preventing the merge multiple carets that results in loosing the primary caret for |v_d|
+          editor.getCaretModel().removeSecondaryCarets();
+        }
         editor.getCaretModel().moveToOffset(offset);
         EditorData.setLastColumn(editor, editor.getCaretModel().getVisualPosition().column);
         scrollCaretIntoView(editor);
       }
 
-      if (keepVisual(editor)) {
+      if (keepVisual) {
         VimPlugin.getMotion().updateSelection(editor, offset);
       }
       else {
@@ -1518,6 +1523,7 @@ public class MotionGroup {
     }
     if (removeSelection) {
       editor.getSelectionModel().removeSelection();
+      editor.getCaretModel().removeSecondaryCarets();
     }
     CommandState.getInstance(editor).setSubMode(CommandState.SubMode.NONE);
   }
@@ -1566,29 +1572,21 @@ public class MotionGroup {
 
   @NotNull
   public TextRange getVisualRange(@NotNull Editor editor) {
-    if (editor.getSelectionModel().hasBlockSelection()) {
-      TextRange res = new TextRange(editor.getSelectionModel().getBlockSelectionStarts(),
-                                    editor.getSelectionModel().getBlockSelectionEnds());
-      // If the last left/right motion was the $ command, simulate each line being selected to end-of-line
-      if (EditorData.getLastColumn(editor) >= MotionGroup.LAST_COLUMN) {
-        int[] starts = res.getStartOffsets();
-        int[] ends = res.getEndOffsets();
-
-        for (int i = 0; i < starts.length; i++) {
-          if (ends[i] > starts[i]) {
-            ends[i] = EditorHelper.getLineEndForOffset(editor, starts[i]);
-          }
+    final TextRange res = new TextRange(editor.getSelectionModel().getBlockSelectionStarts(),
+                                        editor.getSelectionModel().getBlockSelectionEnds());
+    // If the last left/right motion was the $ command, simulate each line being selected to end-of-line
+    final CommandState.SubMode subMode = CommandState.getInstance(editor).getSubMode();
+    if (subMode == CommandState.SubMode.VISUAL_BLOCK && EditorData.getLastColumn(editor) >= MotionGroup.LAST_COLUMN) {
+      final int[] starts = res.getStartOffsets();
+      final int[] ends = res.getEndOffsets();
+      for (int i = 0; i < starts.length; i++) {
+        if (ends[i] > starts[i]) {
+          ends[i] = EditorHelper.getLineEndForOffset(editor, starts[i]);
         }
-
-        res = new TextRange(starts, ends);
       }
-
-      return res;
+      return new TextRange(starts, ends);
     }
-    else {
-      return new TextRange(editor.getSelectionModel().getSelectionStart(),
-                           editor.getSelectionModel().getSelectionEnd());
-    }
+    return res;
   }
 
   @NotNull
@@ -1601,31 +1599,29 @@ public class MotionGroup {
     visualOffset = offset;
     int start = visualStart;
     int end = visualEnd;
-    if (start > end) {
-      int t = start;
-      start = end;
-      end = t;
-    }
+    final CommandState.SubMode subMode = CommandState.getInstance(editor).getSubMode();
 
-    if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_CHARACTER) {
-      BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
-      int lineEnd = EditorHelper.getLineEndForOffset(editor, end);
-      int adj = 1;
-      if (opt.getValue().equals("exclusive") || end == lineEnd) {
-        adj = 0;
+    if (subMode == CommandState.SubMode.VISUAL_CHARACTER) {
+      if (start > end) {
+        int t = start;
+        start = end;
+        end = t;
       }
+      final BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
+      int lineEnd = EditorHelper.getLineEndForOffset(editor, end);
+      final int adj = opt.getValue().equals("exclusive") || end == lineEnd ? 0 : 1;
       end = Math.min(EditorHelper.getFileSize(editor), end + adj);
       editor.getSelectionModel().setSelection(start, end);
     }
-    else if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_LINE) {
+    else if (subMode == CommandState.SubMode.VISUAL_LINE) {
       start = EditorHelper.getLineStartForOffset(editor, start);
       end = EditorHelper.getLineEndForOffset(editor, end);
       editor.getSelectionModel().setSelection(start, end);
     }
-    else {
-      LogicalPosition lineStart = editor.offsetToLogicalPosition(start);
-      LogicalPosition lend = editor.offsetToLogicalPosition(end);
-      editor.getSelectionModel().setBlockSelection(lineStart, lend);
+    else if (subMode == CommandState.SubMode.VISUAL_BLOCK) {
+      final LogicalPosition lineStart = editor.offsetToLogicalPosition(start);
+      final LogicalPosition lineEnd = editor.offsetToLogicalPosition(end);
+      editor.getSelectionModel().setBlockSelection(lineStart, lineEnd);
     }
 
     VimPlugin.getMark().setVisualSelectionMarks(editor, new TextRange(start, end));
