@@ -522,13 +522,18 @@ public class ChangeGroup {
     }
   }
 
+  private static final int LENGTH_OF_FAULTY_BACKSPACE = 3;
+  private static final int LENGTH_OF_MATCHING_PAREN_REMOVAL = 2 + 2 * LENGTH_OF_FAULTY_BACKSPACE;
+
+  // We can collapse L FBS R FBS -> FBS FBS
   private boolean collapseOppositeAdjacentMotion() {
     final int cnt = lastStrokes.size();
-    for (int i = 0; i < cnt - 1; i++) {
-      if (lastStrokes.get(i) instanceof MotionLeftAction && lastStrokes.get(i + 1) instanceof MotionRightAction ||
-          lastStrokes.get(i) instanceof MotionRightAction && lastStrokes.get(i + 1) instanceof MotionLeftAction) {
+    for (int i = 0; i < cnt - LENGTH_OF_MATCHING_PAREN_REMOVAL; i++) {
+      if (lastStrokes.get(i) instanceof MotionLeftAction && isFaultyBackspace(i+1) &&
+          lastStrokes.get(i + 1 + LENGTH_OF_FAULTY_BACKSPACE) instanceof MotionRightAction &&
+          isFaultyBackspace(i + 2 + LENGTH_OF_FAULTY_BACKSPACE)) {
         lastStrokes.remove(i);
-        lastStrokes.remove(i);
+        lastStrokes.remove(i + LENGTH_OF_FAULTY_BACKSPACE);
         return true;
       }
     }
@@ -543,17 +548,19 @@ public class ChangeGroup {
     }
   }
 
+  private boolean isFaultyBackspace(int i) {
+    if(i + 2 >= lastStrokes.size()) return false;
+    return  lastStrokes.get(i) instanceof BackspaceAction &&
+            lastStrokes.get(i + 1) instanceof char[] &&
+            lastStrokes.get(i + 2) instanceof MotionRightAction;
+  }
+
   private boolean removeABackspace() {
     final int cnt = lastStrokes.size();
     for (int i = 0; i < cnt - 3; i++) {
       final Object target = lastStrokes.get(i);
       final boolean isTargetASingleCharacter = target instanceof char[] && ((char[])lastStrokes.get(i)).length == 1;
-      if (!isTargetASingleCharacter) continue;
-      final boolean isSimpleBackspace = lastStrokes.get(i + 1) instanceof BackspaceAction &&
-                                        lastStrokes.get(i + 2) instanceof char[] &&
-                                        lastStrokes.get(i + 3) instanceof MotionRightAction &&
-                                        ((char[])lastStrokes.get(i + 2)).length == 0;
-      if (isSimpleBackspace) {
+      if (isTargetASingleCharacter && isFaultyBackspace(i+1)) {
         lastStrokes.remove(i);
         lastStrokes.remove(i);
         lastStrokes.remove(i);
