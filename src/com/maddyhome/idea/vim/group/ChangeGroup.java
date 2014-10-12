@@ -511,15 +511,19 @@ public class ChangeGroup {
   }
 
   private void filterBackspaces() {
-    removeSimpleBackspaces();
-    collapseOppositeAdjacentMotions();
+    do {
+      removeSimpleBackspaces();
+    } while(collapseOppositeAdjacentMotions());
   }
 
-  private void collapseOppositeAdjacentMotions() {
+  private boolean collapseOppositeAdjacentMotions() {
+    boolean removedAny = false;
     boolean removedOne = collapseOppositeAdjacentMotion();
     while (removedOne) {
       removedOne = collapseOppositeAdjacentMotion();
+      removedAny = true;
     }
+    return removedAny;
   }
 
   private static final int LENGTH_OF_FAULTY_BACKSPACE = 3;
