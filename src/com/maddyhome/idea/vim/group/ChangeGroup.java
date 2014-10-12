@@ -30,6 +30,7 @@ import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
+import com.intellij.openapi.editor.actions.BackspaceAction;
 import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.editor.impl.TextRangeInterval;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -42,6 +43,8 @@ import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.motion.leftright.MotionLeftAction;
+import com.maddyhome.idea.vim.action.motion.leftright.MotionRightAction;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -487,6 +490,9 @@ public class ChangeGroup {
     if (lastStrokes == null) {
       return;
     }
+
+    filterBackspaces();
+
     for (int i = 0; i < count; i++) {
       // Treat other keys special by performing the appropriate action they represent in insert/replace mode
       for (Object lastStroke : lastStrokes) {
@@ -502,6 +508,61 @@ public class ChangeGroup {
         }
       }
     }
+  }
+
+  private void filterBackspaces() {
+    removeSimpleBackspaces();
+    collapseOppositeAdjacentMotions();
+  }
+
+  private void collapseOppositeAdjacentMotions() {
+    boolean removedOne = collapseOppositeAdjacentMotion();
+    while (removedOne) {
+      removedOne = collapseOppositeAdjacentMotion();
+    }
+  }
+
+  private boolean collapseOppositeAdjacentMotion() {
+    final int cnt = lastStrokes.size();
+    for (int i = 0; i < cnt - 1; i++) {
+      if (lastStrokes.get(i) instanceof MotionLeftAction && lastStrokes.get(i + 1) instanceof MotionRightAction ||
+          lastStrokes.get(i) instanceof MotionRightAction && lastStrokes.get(i + 1) instanceof MotionLeftAction) {
+        lastStrokes.remove(i);
+        lastStrokes.remove(i);
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private void removeSimpleBackspaces() {
+    boolean removedOne = removeABackspace();
+    while (removedOne) {
+      removedOne = removeABackspace();
+    }
+  }
+
+  private boolean removeABackspace() {
+    final int cnt = lastStrokes.size();
+    for (int i = 0; i < cnt - 3; i++) {
+      final Object target = lastStrokes.get(i);
+      final boolean isTargetASingleCharacter = target instanceof char[] && ((char[])lastStrokes.get(i)).length == 1;
+      if (!isTargetASingleCharacter) continue;
+      final boolean isSimpleBackspace = lastStrokes.get(i + 1) instanceof BackspaceAction &&
+                                        lastStrokes.get(i + 2) instanceof char[] &&
+                                        lastStrokes.get(i + 3) instanceof MotionRightAction &&
+                                        ((char[])lastStrokes.get(i + 2)).length == 0;
+      if (isSimpleBackspace) {
+        lastStrokes.remove(i);
+        lastStrokes.remove(i);
+        lastStrokes.remove(i);
+        lastStrokes.remove(i);
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**
