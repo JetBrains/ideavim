@@ -77,6 +77,7 @@ public class CommandParser {
     new DigraphHandler();
     new DumpLineHandler();
     new EditFileHandler();
+    new ExecuteActionByNameHandler();
     new ExitHandler();
     new FindClassHandler();
     new FindFileHandler();
