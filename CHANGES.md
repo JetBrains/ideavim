@@ -6,9 +6,13 @@ History of changes in IdeaVim for the IntelliJ platform.
 0.36, TBD
 ---------
 
+Added support for common window splitting and navigation commands. Various bug
+fixes.
+
 Features:
 
-* TODO: VIM-171 Window `<C-W>` commands: split, close, next/previous windows
+* VIM-171 Window `<C-W>` commands: split, close, next/previous windows,
+  left/right/up/down windows
 * VIM-265 Window `:split` and `:vsplit` commands
 
 Bug fixes:

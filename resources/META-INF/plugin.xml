@@ -3,6 +3,13 @@
   <id>IdeaVIM</id>
   <change-notes>
     <![CDATA[
+      <p>To be released:</p>
+      <ul>
+        <li>Window commands from the <code>&lt;C-W&gt;</code> family</li>
+        <li>Support for <code>:split</code>/<code>:vsplit</code> commands</li>
+        <li>Fixed visual block selection mode</li>
+        <li>Various bug fixes</li>
+      </ul>
       <p>0.35:</p>
       <ul>
         <li><code>~/.vimrc</code> is no longer read by default, use <code>~/.ideavimrc</code> instead</li>
@@ -40,11 +47,11 @@
   <description>
     <![CDATA[
       <p>Build @VERSION@-@BUILD-NUMBER@</p>
-      <p>Vim emulation plug-in for IDEs based on the IntelliJ platform. IdeaVim can be used with IntelliJ IDEA, RubyMine, PyCharm, PhpStorm, WebStorm, AppCode and Android Studio.</p>
+      <p>Vim emulation plug-in for IDEs based on the IntelliJ platform. IdeaVim can be used with IntelliJ IDEA, RubyMine, PyCharm, PhpStorm, WebStorm, AppCode, CLion and Android Studio.</p>
       <p>Supported functionality:</p>
       <ul>
           <li>Motion keys</li>
-          <li>Deletion/Changing</li>
+          <li>Deletion/changing</li>
           <li>Insert mode commands</li>
           <li>Marks</li>
           <li>Registers</li>
@@ -58,6 +65,7 @@
           <li>Macros</li>
           <li>Digraphs</li>
           <li>Command line and search history</li>
+          <li>Window commands</li>
           <li>Vim web help</li>
       </ul>
     ]]>
@@ -323,6 +331,10 @@
     <action id="VimWindowOnly" class="com.maddyhome.idea.vim.action.window.WindowOnlyAction" text="Close all windows except current"/>
     <action id="VimWindowNext" class="com.maddyhome.idea.vim.action.window.WindowNextAction" text="Select next window"/>
     <action id="VimWindowPrev" class="com.maddyhome.idea.vim.action.window.WindowPrevAction" text="Select previous window"/>
+    <action id="VimWindowLeft" class="com.maddyhome.idea.vim.action.window.WindowLeftAction" text="Go to left window"/>
+    <action id="VimWindowRight" class="com.maddyhome.idea.vim.action.window.WindowRightAction" text="Go to right window"/>
+    <action id="VimWindowUp" class="com.maddyhome.idea.vim.action.window.WindowUpAction" text="Go to window up"/>
+    <action id="VimWindowDown" class="com.maddyhome.idea.vim.action.window.WindowDownAction" text="Go to window down"/>
 
     <!-- Search -->
     <action id="VimSearchFwdEntry" class="com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction" text="Search Forward"/>

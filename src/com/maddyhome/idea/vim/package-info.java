@@ -63,13 +63,13 @@
  * |CTRL-W__|               TODO
  * |CTRL-W_b|               TODO
  * |CTRL-W_c|               {@link com.maddyhome.idea.vim.action.window.CloseWindowAction}
- * |CTRL-W_h|               TODO: VIM-171
+ * |CTRL-W_h|               {@link com.maddyhome.idea.vim.action.window.WindowLeftAction}
  * |CTRL-W_<Left>|          ...
- * |CTRL-W_j|               TODO: VIM-171
+ * |CTRL-W_j|               {@link com.maddyhome.idea.vim.action.window.WindowDownAction}
  * |CTRL-W_<Down>|          ...
- * |CTRL-W_k|               TODO: VIM-171
+ * |CTRL-W_k|               {@link com.maddyhome.idea.vim.action.window.WindowUpAction}
  * |CTRL-W_<Up>|            ...
- * |CTRL-W_l|               TODO: VIM-171
+ * |CTRL-W_l|               {@link com.maddyhome.idea.vim.action.window.WindowRightAction}
  * |CTRL-W_<Right>|         ...
  * |CTRL-W_n|               TODO
  * |CTRL-W_o|               {@link com.maddyhome.idea.vim.action.window.WindowOnlyAction}
