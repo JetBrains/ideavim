@@ -79,6 +79,7 @@ public class CommandParser {
     new EditFileHandler();
     new ExecuteActionByNameHandler();
     new ExitHandler();
+    new FindActionNameHandler();
     new FindClassHandler();
     new FindFileHandler();
     new FindSymbolHandler();
