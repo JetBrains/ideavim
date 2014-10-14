@@ -4,6 +4,14 @@ The Changelog
 History of changes in IdeaVim for the IntelliJ platform.
 
 
+0.37, TBD
+---------
+
+Bug fixes:
+
+* VIM-407 Fixed `>>` to work if a line contains only one character
+
+
 0.36, 2014-10-14
 ----------------
 
