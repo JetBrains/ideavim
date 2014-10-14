@@ -3,8 +3,9 @@ The Changelog
 
 History of changes in IdeaVim for the IntelliJ platform.
 
-0.36, TBD
----------
+
+0.36, 2014-10-14
+----------------
 
 Added support for common window splitting and navigation commands. Various bug
 fixes.

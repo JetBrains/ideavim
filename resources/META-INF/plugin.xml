@@ -3,7 +3,7 @@
   <id>IdeaVIM</id>
   <change-notes>
     <![CDATA[
-      <p>To be released:</p>
+      <p>0.36:</p>
       <ul>
         <li>Window commands from the <code>&lt;C-W&gt;</code> family</li>
         <li>Support for <code>:split</code>/<code>:vsplit</code> commands</li>
