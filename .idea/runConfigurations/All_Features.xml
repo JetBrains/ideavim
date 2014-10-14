@@ -1,0 +1,25 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="All Features" type="CucumberJavaRunConfigurationType" factoryName="Cucumber java" singleton="true">
+    <option name="myFilePath" value="$PROJECT_DIR$/test" />
+    <option name="GLUE" value="org.jetbrains.plugins.ideavim.cucumber.glue" />
+    <option name="myNameFilter" value="" />
+    <option name="myGeneratedName" value="All Features in: test" />
+    <option name="MAIN_CLASS_NAME" value="cucumber.api.cli.Main" />
+    <option name="VM_PARAMETERS" value="" />
+    <option name="PROGRAM_PARAMETERS" value=" --format org.jetbrains.plugins.cucumber.java.run.CucumberJvmSMFormatter --monochrome" />
+    <option name="WORKING_DIRECTORY" value="" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <option name="ENABLE_SWING_INSPECTOR" value="false" />
+    <option name="ENV_VARIABLES" />
+    <option name="PASS_PARENT_ENVS" value="true" />
+    <module name="ideavim" />
+    <envs />
+    <RunnerSettings RunnerId="Profile ">
+      <option name="myExternalizedOptions" value="&#10;additional-options2=onexit\=snapshot&#10;" />
+    </RunnerSettings>
+    <RunnerSettings RunnerId="Run" />
+    <ConfigurationWrapper RunnerId="Run" />
+    <method />
+  </configuration>
+</component>
