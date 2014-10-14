@@ -27,6 +27,7 @@ Contributors:
 * [Dathan Bennett](mailto:dbennett@palantir.com)
 * [salaam](mailto:kphayen@gmail.com)
 * [Alexey Shmalko](mailto:rasen.dubi@gmail.com)
+* [Andrew Brookins](mailto:a.m.brookins@gmail.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
