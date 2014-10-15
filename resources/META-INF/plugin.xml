@@ -3,6 +3,10 @@
   <id>IdeaVIM</id>
   <change-notes>
     <![CDATA[
+      <p>0.37:</p>
+      <ul>
+        <li>Various bug fixes</li>
+      </ul>
       <p>0.36:</p>
       <ul>
         <li>Window commands from the <code>&lt;C-W&gt;</code> family</li>

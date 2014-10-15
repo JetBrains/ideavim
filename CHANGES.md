@@ -4,11 +4,16 @@ The Changelog
 History of changes in IdeaVim for the IntelliJ platform.
 
 
-0.37, TBD
----------
+0.37, 2014-10-15
+----------------
+
+A bugfix release.
+
 
 Bug fixes:
 
+* VIM-784 Fixed visual line selection where the start of the selection range
+  was greater than its end
 * VIM-407 Fixed `>>` to work if a line contains only one character
 
 
