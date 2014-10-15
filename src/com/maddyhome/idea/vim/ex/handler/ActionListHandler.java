@@ -36,12 +36,14 @@ public class ActionListHandler extends CommandHandler {
 
   public boolean execute(@NotNull Editor editor, @NotNull final DataContext context, @NotNull ExCommand cmd) throws ExException {
     String arg = cmd.getArgument().trim().toLowerCase();
+    String args[] = arg.split("\\*");
     ActionManager aMgr = ActionManager.getInstance();
     String actionNames[] = aMgr.getActionIds("");
 
     StringBuilder builder = new StringBuilder();
     for (String actionName : actionNames) {
-      if (actionName.toLowerCase().contains(arg)) {
+      if(match(actionName, args))
+      {
         builder.append(actionName);
         AnAction action = aMgr.getAction(actionName);
         Shortcut[] shortcuts = action.getShortcutSet().getShortcuts();
@@ -56,6 +58,15 @@ public class ActionListHandler extends CommandHandler {
     }
     ExOutputModel.getInstance(editor).output(builder.toString());
 
+    return true;
+  }
+
+  private boolean match(String actionName, String args[]) {
+    for (String argChunk : args) {
+      if (!actionName.toLowerCase().contains(argChunk)) {
+        return false;
+      }
+    }
     return true;
   }
 }
