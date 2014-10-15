@@ -18,13 +18,18 @@
 
 package com.maddyhome.idea.vim.ex.handler;
 
-import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.ide.DataManager;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import org.jetbrains.annotations.NotNull;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  *
@@ -36,7 +41,33 @@ public class ExecuteActionByNameHandler extends CommandHandler {
 
   public boolean execute(@NotNull Editor editor, @NotNull final DataContext context, @NotNull ExCommand cmd) throws ExException {
     String arg = cmd.getArgument().trim();
-    KeyHandler.executeAction(arg, context);
+    ActionManager aMgr = ActionManager.getInstance();
+    final AnAction action = aMgr.getAction(arg);
+    if (action == null) {
+      return false;
+    }
+
+    if(action.isInInjectedContext()) {
+      DataContext contentContext = DataManager.getInstance().getDataContext(editor.getContentComponent());
+      try {
+        KeyHandler.executeAction(action, contentContext);
+      }
+      catch(IllegalArgumentException ignored){
+      }
+    }
+    else {
+      Timer t = new Timer(50, new ActionListener() {
+        public void actionPerformed(ActionEvent ev) {
+          try {
+            KeyHandler.executeAction(action, context);
+          }
+          catch(IllegalArgumentException ignored){
+          }
+        }
+      });
+      t.setRepeats(false);
+      t.start();
+    }
 
     return true;
   }

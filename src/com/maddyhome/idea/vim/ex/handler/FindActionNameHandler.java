@@ -35,13 +35,13 @@ public class FindActionNameHandler extends CommandHandler {
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull final DataContext context, @NotNull ExCommand cmd) throws ExException {
-    String arg = cmd.getArgument().trim();
+    String arg = cmd.getArgument().trim().toLowerCase();
     ActionManager aMgr = ActionManager.getInstance();
-    String actions[] = aMgr.getActionIds("");
+    String actionNames[] = aMgr.getActionIds("");
 
     StringBuilder builder = new StringBuilder();
-    for (String actionName : actions) {
-      if (actionName.toLowerCase().contains(arg.toLowerCase())) {
+    for (String actionName : actionNames) {
+      if (actionName.toLowerCase().contains(arg)) {
         builder.append(actionName);
         AnAction action = aMgr.getAction(actionName);
         Shortcut[] shortcuts = action.getShortcutSet().getShortcuts();
