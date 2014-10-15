@@ -70,6 +70,7 @@ public class CommandParser {
   public void registerHandlers() {
     if (registered) return;
 
+    new ActionListHandler();
     new AsciiHandler();
     new CmdFilterHandler();
     new CopyTextHandler();
@@ -79,7 +80,6 @@ public class CommandParser {
     new EditFileHandler();
     new ExecuteActionByNameHandler();
     new ExitHandler();
-    new FindActionNameHandler();
     new FindClassHandler();
     new FindFileHandler();
     new FindSymbolHandler();

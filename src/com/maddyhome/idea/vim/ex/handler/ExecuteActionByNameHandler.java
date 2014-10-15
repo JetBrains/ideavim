@@ -22,6 +22,7 @@ import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
@@ -44,6 +45,7 @@ public class ExecuteActionByNameHandler extends CommandHandler {
     ActionManager aMgr = ActionManager.getInstance();
     final AnAction action = aMgr.getAction(arg);
     if (action == null) {
+      VimPlugin.showMessage("Could not find action: " + arg);
       return false;
     }
 
