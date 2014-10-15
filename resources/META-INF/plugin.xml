@@ -35,16 +35,6 @@
       <ul>
         <li>Fixed API compatibility with IntelliJ platform builds 132.1052+</li>
       </ul>
-      <p>0.31:</p>
-      <ul>
-        <li>Various bug fixes</li>
-      </ul>
-      <p>0.30:</p>
-      <ul>
-        <li>Support for a separate <code>.ideavimrc</code> config file</li>
-        <li>Fixed long-standing issues with merged undo/redo commands and <code>&lt;Esc&gt;</code> during completion</li>
-        <li>Various bug fixes</li>
-      </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
     ]]>
   </change-notes>
@@ -52,26 +42,8 @@
     <![CDATA[
       <p>Build @VERSION@-@BUILD-NUMBER@</p>
       <p>Vim emulation plug-in for IDEs based on the IntelliJ platform. IdeaVim can be used with IntelliJ IDEA, RubyMine, PyCharm, PhpStorm, WebStorm, AppCode, CLion and Android Studio.</p>
-      <p>Supported functionality:</p>
-      <ul>
-          <li>Motion keys</li>
-          <li>Deletion/changing</li>
-          <li>Insert mode commands</li>
-          <li>Marks</li>
-          <li>Registers</li>
-          <li>Undo/redo</li>
-          <li>Visual mode commands</li>
-          <li>Some Ex commands</li>
-          <li>Some :set options</li>
-          <li>Full Vim regexps for search and search/replace</li>
-          <li>Key mappings</li>
-          <li>Configuration via ~/.ideavimrc</li>
-          <li>Macros</li>
-          <li>Digraphs</li>
-          <li>Command line and search history</li>
-          <li>Window commands</li>
-          <li>Vim web help</li>
-      </ul>
+      <p>IdeaVim supports many Vim features including normal/insert/visual modes, motion keys, deletion/changing, marks, registers, some Ex commands, Vim regexps, configuration via ~/.ideavimrc, macros, window commands, etc.</p>
+      <p>See the <a href="https://github.com/JetBrains/ideavim">JetBrains/ideavim</a> on GitHub for more details.</p>
     ]]>
   </description>
   <version>@VERSION@</version>
