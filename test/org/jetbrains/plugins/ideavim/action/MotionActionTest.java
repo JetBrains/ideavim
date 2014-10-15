@@ -6,6 +6,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.command.CommandState.Mode.COMMAND;
+import static com.maddyhome.idea.vim.command.CommandState.Mode.VISUAL;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
 
@@ -592,5 +593,30 @@ public class MotionActionTest extends VimTestCase {
     assertSelection("        foo\n" +
                     "        bar\n" +
                     "        baz");
+  }
+
+  public void testVisualLineSelectDown() {
+    typeTextInFile(parseKeys("Vj"),
+                   "foo\n" +
+                   "<caret>bar\n" +
+                   "baz\n" +
+                   "quux\n");
+    assertMode(VISUAL);
+    assertSelection("bar\n" +
+                    "baz");
+    assertOffset(8);
+  }
+
+  // VIM-784
+  public void testVisualLineSelectUp() {
+    typeTextInFile(parseKeys("Vk"),
+                   "foo\n" +
+                   "bar\n" +
+                   "<caret>baz\n" +
+                   "quux\n");
+    assertMode(VISUAL);
+    assertSelection("bar\n" +
+                    "baz");
+    assertOffset(4);
   }
 }

@@ -1614,6 +1614,11 @@ public class MotionGroup {
       editor.getSelectionModel().setSelection(start, end);
     }
     else if (subMode == CommandState.SubMode.VISUAL_LINE) {
+      if (start > end) {
+        int t = start;
+        start = end;
+        end = t;
+      }
       start = EditorHelper.getLineStartForOffset(editor, start);
       end = EditorHelper.getLineEndForOffset(editor, end);
       editor.getSelectionModel().setSelection(start, end);
