@@ -4,6 +4,12 @@ The Changelog
 History of changes in IdeaVim for the IntelliJ platform.
 
 
+0.38, TBD
+---------
+
+* VIM-624 Deselect visual selection range on opening the Ex entry field
+
+
 0.37, 2014-10-15
 ----------------
 
