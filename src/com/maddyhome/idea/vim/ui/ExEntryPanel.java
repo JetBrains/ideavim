@@ -114,7 +114,7 @@ public class ExEntryPanel extends JPanel {
       oldGlass.addComponentListener(adapter);
       positionPanel();
       oldGlass.setVisible(true);
-      entry.requestFocus();
+      entry.requestFocusInWindow();
     }
     active = true;
   }
