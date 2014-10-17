@@ -17,10 +17,7 @@
  */
 package com.maddyhome.idea.vim.group;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -36,6 +33,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
@@ -54,10 +52,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Provides all the insert/replace related functionality
@@ -1542,16 +1537,12 @@ public class ChangeGroup {
   private boolean sortTextRange(@NotNull Editor editor, int start, int end,
                                 @NotNull Comparator<String> lineComparator) {
     final String selectedText = editor.getDocument().getText(new TextRangeInterval(start, end));
-    final String lineSeparator = CodeStyleSettingsManager.getSettings(editor.getProject()).getLineSeparator();
-    final List<String> lines = Lists.newArrayList(Splitter.on(lineSeparator).split(selectedText));
-
+    final List<String> lines = Arrays.asList(StringUtil.splitByLines(selectedText));
     if (lines.size() < 1) {
       return false;
     }
-
     Collections.sort(lines, lineComparator);
-    replaceText(editor, start, end, Joiner.on(lineSeparator).join(lines));
-
+    replaceText(editor, start, end, StringUtil.join(lines, "\n"));
     return true;
   }
 
