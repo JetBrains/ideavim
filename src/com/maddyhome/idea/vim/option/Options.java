@@ -35,6 +35,7 @@ import java.util.*;
 public class Options {
   public static final String RELATIVE_NUMBER = "relativenumber";
   public static final String NUMBER = "number";
+  public static final String CLIPBOARD = "clipboard";
 
   /**
    * Gets the singleton instance of the options
@@ -79,6 +80,15 @@ public class Options {
     final Option option = getOption(name);
     if (option instanceof NumberOption) {
       return (NumberOption)option;
+    }
+    return null;
+  }
+
+  @Nullable
+  public ListOption getListOption(@NotNull String name) {
+    final Option option = getOption(name);
+    if (option instanceof ListOption) {
+      return (ListOption)option;
     }
     return null;
   }
@@ -452,6 +462,7 @@ public class Options {
     addOption(new ToggleOption("wrapscan", "ws", true));
     addOption(new ToggleOption(NUMBER, "nu", false));
     addOption(new ToggleOption(RELATIVE_NUMBER, "rnu", false));
+    addOption(new ListOption(CLIPBOARD, "cb", new String[]{"autoselect,exclude:cons\\|linux"}, null));
   }
 
   private void addOption(@NotNull Option option) {
