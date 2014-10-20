@@ -7,10 +7,12 @@ History of changes in IdeaVim for the IntelliJ platform.
 0.38, TBD
 ---------
 
-Added support for `number` and `relativenumber` options.
+Added support for `number` and `relativenumber` options, `clipboard=unnamed`
+option.
 
-* VIM-410 Added support for 'relativenumber' option
-* VIM-483 Added support for 'number' option
+* VIM-476 Added support for `clipboard=unnamed` option
+* VIM-410 Added support for `relativenumber` option
+* VIM-483 Added support for `number` option
 * VIM-624 Deselect visual selection range on opening the Ex entry field
 
 

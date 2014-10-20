@@ -6,6 +6,7 @@
       <p>Not released:</p>
       <ul>
         <li>Support for <code>number</code> and <code>relativenumber</code> options</li>
+        <li>Support for <code>clipboard=unnamed</code> option</li>
         <li>Various bug fixes</li>
       </ul>
       <p>0.37:</p>
