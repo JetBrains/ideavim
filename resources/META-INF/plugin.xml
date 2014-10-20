@@ -3,6 +3,11 @@
   <id>IdeaVIM</id>
   <change-notes>
     <![CDATA[
+      <p>Not released:</p>
+      <ul>
+        <li>Support for <code>number</code> and <code>relativenumber</code> options</li>
+        <li>Various bug fixes</li>
+      </ul>
       <p>0.37:</p>
       <ul>
         <li>Various bug fixes</li>

@@ -187,6 +187,22 @@ public class EditorData {
     editor.putUserData(MOTION_GROUP, adapter);
   }
 
+  public static boolean getEditorGroup(@NotNull Editor editor) {
+    return editor.getUserData(EDITOR_GROUP) == Boolean.TRUE;
+  }
+
+  public static void setEditorGroup(@NotNull Editor editor, boolean value) {
+    editor.putUserData(EDITOR_GROUP, value);
+  }
+
+  public static boolean isLineNumbersShown(@NotNull Editor editor) {
+    return editor.getUserData(LINE_NUMBERS_SHOWN) == Boolean.TRUE;
+  }
+
+  public static void setLineNumbersShown(@NotNull Editor editor, boolean value) {
+    editor.putUserData(LINE_NUMBERS_SHOWN, value);
+  }
+
   public static boolean isConsoleOutput(@NotNull Editor editor) {
     Object res = editor.getUserData(CONSOLE_VIEW_IN_EDITOR_VIEW);
     logger.debug("isConsoleOutput for editor " + editor + " - " + res);
@@ -238,6 +254,8 @@ public class EditorData {
   private static final Key<CommandState> COMMAND_STATE = new Key<CommandState>("commandState");
   private static final Key<Boolean> CHANGE_GROUP = new Key<Boolean>("changeGroup");
   private static final Key<Boolean> MOTION_GROUP = new Key<Boolean>("motionGroup");
+  public static final Key<Boolean> EDITOR_GROUP = new Key<Boolean>("editorGroup");
+  public static final Key<Boolean> LINE_NUMBERS_SHOWN = new Key<Boolean>("lineNumbersShown");
   private static final Key<ExOutputPanel> MORE_PANEL = new Key<ExOutputPanel>("IdeaVim.morePanel");
   private static final Key<ExOutputModel> EX_OUTPUT_MODEL = new Key<ExOutputModel>("IdeaVim.exOutputModel");
 
