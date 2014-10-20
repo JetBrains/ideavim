@@ -1,6 +1,10 @@
 package org.jetbrains.plugins.ideavim.action;
 
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.common.Register;
+import com.maddyhome.idea.vim.option.ListOption;
+import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -98,5 +102,21 @@ public class CopyActionTest extends VimTestCase {
 
     myFixture.checkResult("* *one\n" +
                           "* *two\n");
+  }
+
+  // VIM-476 |yy| |'clipboard'|
+  public void testClipboardUnnamed() {
+    assertEquals('\"', VimPlugin.getRegister().getDefaultRegister());
+    final ListOption clipboardOption = Options.getInstance().getListOption(Options.CLIPBOARD);
+    assertNotNull(clipboardOption);
+    clipboardOption.set("unnamed");
+    assertEquals('*', VimPlugin.getRegister().getDefaultRegister());
+    typeTextInFile(parseKeys("yy"),
+                   "foo\n" +
+                   "<caret>bar\n" +
+                   "baz\n");
+    final Register starRegister = VimPlugin.getRegister().getRegister('*');
+    assertNotNull(starRegister);
+    assertEquals("bar\n", starRegister.getText());
   }
 }

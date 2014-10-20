@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.group;
 
+import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -27,7 +28,10 @@ import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
-import com.maddyhome.idea.vim.option.*;
+import com.maddyhome.idea.vim.option.ListOption;
+import com.maddyhome.idea.vim.option.OptionChangeEvent;
+import com.maddyhome.idea.vim.option.OptionChangeListener;
+import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.ClipboardHandler;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -45,11 +49,11 @@ import java.util.List;
  */
 public class RegisterGroup {
   private static final String WRITABLE_REGISTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-*+_/\"";
-
   private static final String READONLY_REGISTERS = ":.%#=/";
   private static final String RECORDABLE_REGISTER = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
   private static final String PLAYBACK_REGISTER = RECORDABLE_REGISTER + "\".*+";
   private static final String VALID_REGISTERS = WRITABLE_REGISTERS + READONLY_REGISTERS;
+  private static final List<Character> CLIPBOARD_REGISTERS = ImmutableList.of('*', '+');
   private static final Logger logger = Logger.getInstance(RegisterGroup.class.getName());
 
   private char defaultRegister = '"';
@@ -65,8 +69,14 @@ public class RegisterGroup {
         public void valueChange(OptionChangeEvent event) {
           if (clipboardOption.contains("unnamed")) {
             defaultRegister = '*';
-            lastRegister = defaultRegister;
           }
+          else if (clipboardOption.contains("unnamedplus")) {
+            defaultRegister = '+';
+          }
+          else {
+            defaultRegister = '"';
+          }
+          lastRegister = defaultRegister;
         }
       });
     }
@@ -157,7 +167,7 @@ public class RegisterGroup {
         if (logger.isDebugEnabled()) logger.debug("register '" + register + "' contains: \"" + text + "\"");
       }
     }
-    else if (register == '*' || register == '+') {
+    else if (CLIPBOARD_REGISTERS.contains(register)) {
       ClipboardHandler.setClipboardText(text);
     }
     // Put the text in the specified register
@@ -230,19 +240,7 @@ public class RegisterGroup {
     if (Character.isUpperCase(r)) {
       r = Character.toLowerCase(r);
     }
-
-    Register reg = null;
-    if (r == '*' || r == '+') {
-      String text = ClipboardHandler.getClipboardText();
-      if (text != null) {
-        reg = new Register(r, SelectionType.CHARACTER_WISE, text);
-      }
-    }
-    else {
-      reg = registers.get(new Character(r));
-    }
-
-    return reg;
+    return CLIPBOARD_REGISTERS.contains(r) ? refreshClipboardRegister(r) : registers.get(new Character(r));
   }
 
   /**
@@ -263,9 +261,14 @@ public class RegisterGroup {
 
   @NotNull
   public List<Register> getRegisters() {
-    ArrayList<Register> res = new ArrayList<Register>(registers.values());
+    final List<Register> res = new ArrayList<Register>(registers.values());
+    for (Character r : CLIPBOARD_REGISTERS) {
+      final Register register = refreshClipboardRegister(r);
+      if (register != null) {
+        res.add(register);
+      }
+    }
     Collections.sort(res, new Register.KeySorter<Register>());
-
     return res;
   }
 
@@ -391,5 +394,14 @@ public class RegisterGroup {
         registers.put(key, register);
       }
     }
+  }
+
+  @Nullable
+  private Register refreshClipboardRegister(char r) {
+    final String text = ClipboardHandler.getClipboardText();
+    if (text != null) {
+      return new Register(r, SelectionType.CHARACTER_WISE, text);
+    }
+    return null;
   }
 }
