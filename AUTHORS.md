@@ -29,6 +29,7 @@ Contributors:
 * [Alexey Shmalko](mailto:rasen.dubi@gmail.com)
 * [Andrew Brookins](mailto:a.m.brookins@gmail.com)
 * [Chang Wang](mailto:changwang83@gmail.com)
+* [Jaime Sanchez](mailto:josejaime.sanchez@gmail.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
