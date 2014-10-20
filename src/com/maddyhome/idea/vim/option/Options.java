@@ -33,6 +33,8 @@ import java.util.*;
  * Maintains the set of support options
  */
 public class Options {
+  public static final String CLIPBOARD = "clipboard";
+
   /**
    * Gets the singleton instance of the options
    *
@@ -76,6 +78,15 @@ public class Options {
     final Option option = getOption(name);
     if (option instanceof NumberOption) {
       return (NumberOption)option;
+    }
+    return null;
+  }
+
+  @Nullable
+  public ListOption getListOption(@NotNull String name) {
+    final Option option = getOption(name);
+    if (option instanceof ListOption) {
+      return (ListOption)option;
     }
     return null;
   }
@@ -448,7 +459,7 @@ public class Options {
     addOption(new ToggleOption("visualbell", "vb", false));
     addOption(new ToggleOption("wrapscan", "ws", true));
     // autoselect,exclude:cons\|linux
-    addOption(new BoundListOption("clipboard", "cb", new String[]{""}, new String[]{"unnamed"}));
+    addOption(new BoundListOption(CLIPBOARD, "cb", new String[]{""}, new String[]{"unnamed"}));
   }
 
   private void addOption(@NotNull Option option) {

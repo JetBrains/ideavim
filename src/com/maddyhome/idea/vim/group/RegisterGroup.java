@@ -27,10 +27,7 @@ import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
-import com.maddyhome.idea.vim.option.BoundListOption;
-import com.maddyhome.idea.vim.option.OptionChangeEvent;
-import com.maddyhome.idea.vim.option.OptionChangeListener;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.*;
 import com.maddyhome.idea.vim.ui.ClipboardHandler;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -47,33 +44,32 @@ import java.util.List;
  * This group works with command associated with copying and pasting text
  */
 public class RegisterGroup {
-  /**
-   * The register key for the default register
-   */
-  public char defaultRegister = '"';
-
   private static final String WRITABLE_REGISTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-*+_/\"";
+
   private static final String READONLY_REGISTERS = ":.%#=/";
   private static final String RECORDABLE_REGISTER = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
   private static final String PLAYBACK_REGISTER = RECORDABLE_REGISTER + "\".*+";
   private static final String VALID_REGISTERS = WRITABLE_REGISTERS + READONLY_REGISTERS;
-
   private static final Logger logger = Logger.getInstance(RegisterGroup.class.getName());
 
+  private char defaultRegister = '"';
   private char lastRegister = defaultRegister;
   @NotNull private final HashMap<Character, Register> registers = new HashMap<Character, Register>();
   private char recordRegister = 0;
   @Nullable private List<KeyStroke> recordList = null;
+
   public RegisterGroup() {
-    Options.getInstance().getOption("clipboard").addOptionChangeListener(new OptionChangeListener() {
-      public void valueChange(OptionChangeEvent event) {
-        BoundListOption clipboardOption = (BoundListOption)Options.getInstance().getOption("clipboard");
-        if (clipboardOption.contains("unnamed")) {
-          defaultRegister = '*';
-          lastRegister = defaultRegister;
+    final ListOption clipboardOption = Options.getInstance().getListOption(Options.CLIPBOARD);
+    if (clipboardOption != null) {
+      clipboardOption.addOptionChangeListener(new OptionChangeListener() {
+        public void valueChange(OptionChangeEvent event) {
+          if (clipboardOption.contains("unnamed")) {
+            defaultRegister = '*';
+            lastRegister = defaultRegister;
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   /**
@@ -256,6 +252,13 @@ public class RegisterGroup {
    */
   public char getCurrentRegister() {
     return lastRegister;
+  }
+
+  /**
+   * The register key for the default register.
+   */
+  public char getDefaultRegister() {
+    return defaultRegister;
   }
 
   @NotNull

@@ -294,7 +294,7 @@ public class KeyHandler {
   private void handleEditorReset(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull final DataContext context) {
     if (state != State.COMMAND && count == 0 && currentArg == Argument.Type.NONE && currentCmd.size() == 0) {
       RegisterGroup register = VimPlugin.getRegister();
-      if (register.getCurrentRegister() == register.defaultRegister) {
+      if (register.getCurrentRegister() == register.getDefaultRegister()) {
         if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
           CommandProcessor.getInstance().executeCommand(editor.getProject(), new Runnable() {
             @Override

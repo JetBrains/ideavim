@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.group.RegisterGroup;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -39,7 +38,7 @@ public class YankLinesHandler extends CommandHandler {
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     StringBuilder arg = new StringBuilder(cmd.getArgument());
-    char register = VimPlugin.getRegister().defaultRegister;
+    char register = VimPlugin.getRegister().getDefaultRegister();
     if (arg.length() > 0 && (arg.charAt(0) < '0' || arg.charAt(0) > '9')) {
       register = arg.charAt(0);
       arg.deleteCharAt(0);

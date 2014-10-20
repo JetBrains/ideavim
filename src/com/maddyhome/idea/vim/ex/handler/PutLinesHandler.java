@@ -49,7 +49,7 @@ public class PutLinesHandler extends CommandHandler {
       }
     }
     else {
-      registerGroup.selectRegister(registerGroup.defaultRegister);
+      registerGroup.selectRegister(registerGroup.getDefaultRegister());
     }
 
     final int offset = EditorHelper.getLineStartOffset(editor, line + 1);
