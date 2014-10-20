@@ -47,7 +47,7 @@
   <description>
     <![CDATA[
       <p>Build @VERSION@-@BUILD-NUMBER@</p>
-      <p>Vim emulation plug-in for IDEs based on the IntelliJ platform. IdeaVim can be used with IntelliJ IDEA, RubyMine, PyCharm, PhpStorm, WebStorm, AppCode, CLion and Android Studio.</p>
+      <p>Vim emulation plug-in for IDEs based on the IntelliJ platform.</p>
       <p>IdeaVim supports many Vim features including normal/insert/visual modes, motion keys, deletion/changing, marks, registers, some Ex commands, Vim regexps, configuration via ~/.ideavimrc, macros, window commands, etc.</p>
       <p>See <a href="https://github.com/JetBrains/ideavim">JetBrains/ideavim</a> on GitHub for more details.</p>
     ]]>
