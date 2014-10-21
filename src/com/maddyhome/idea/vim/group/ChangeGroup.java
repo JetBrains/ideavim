@@ -422,7 +422,7 @@ public class ChangeGroup {
         oldOffset = e.getOffset() + newFragment.length();
       }
       else {
-        oldOffset = e.getOffset() - oldFragment.length();
+        oldOffset = e.getOffset();
       }
     }
   }
