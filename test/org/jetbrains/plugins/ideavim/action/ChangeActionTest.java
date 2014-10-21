@@ -269,10 +269,12 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-511 |.|
   public void testDeleteBothParensAndStartAgain() {
-    configureByJavaText("class C <caret>{\n" + "}\n");
-    typeText(parseKeys("o", "void f(", "<BS>", "(String s", "<Right>", " {"));
+    configureByJavaText("class C <caret>{\n" +
+                        "}\n");
+    typeText(parseKeys("o", "C(", "<BS>", "(int i) {}", "<Esc>", "."));
     myFixture.checkResult("class C {\n" +
-                          "    void f(String s) {}\n" +
+                          "    C(int i) {}\n" +
+                          "    C(int i) {}\n" +
                           "}\n");
   }
 
