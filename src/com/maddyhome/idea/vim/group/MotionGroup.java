@@ -1574,17 +1574,25 @@ public class MotionGroup {
   public TextRange getVisualRange(@NotNull Editor editor) {
     final TextRange res = new TextRange(editor.getSelectionModel().getBlockSelectionStarts(),
                                         editor.getSelectionModel().getBlockSelectionEnds());
-    // If the last left/right motion was the $ command, simulate each line being selected to end-of-line
+
     final CommandState.SubMode subMode = CommandState.getInstance(editor).getSubMode();
-    if (subMode == CommandState.SubMode.VISUAL_BLOCK && EditorData.getLastColumn(editor) >= MotionGroup.LAST_COLUMN) {
-      final int[] starts = res.getStartOffsets();
+    if (subMode == CommandState.SubMode.VISUAL_BLOCK) {
       final int[] ends = res.getEndOffsets();
-      for (int i = 0; i < starts.length; i++) {
-        if (ends[i] > starts[i]) {
-          ends[i] = EditorHelper.getLineEndForOffset(editor, starts[i]);
+
+      // If the last left/right motion was the $ command, simulate each line being selected to end-of-line
+      if (EditorData.getLastColumn(editor) >= MotionGroup.LAST_COLUMN) {
+        final int[] starts = res.getStartOffsets();
+        for (int i = 0; i < starts.length; i++) {
+          if (ends[i] > starts[i]) {
+            ends[i] = EditorHelper.getLineEndForOffset(editor, starts[i]);
+          }
         }
       }
-      return new TextRange(starts, ends);
+      else {
+        for (int i = 0; i < ends.length; ++i) {
+          ends[i] += 1;
+        }
+      }
     }
     return res;
   }

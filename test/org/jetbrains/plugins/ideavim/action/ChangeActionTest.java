@@ -270,9 +270,21 @@ public class ChangeActionTest extends VimTestCase {
            "bar\n" +
            "baz\n" +
            "quux\n",
-           "<caret>oo\n" +
-           "ar\n" +
-           "az\n" +
+           "<caret>o\n" +
+           "r\n" +
+           "z\n" +
+           "quux\n");
+  }
+
+  public void testDeleteCharVisualBlock() {
+    doTest(parseKeys("<C-V>", "jjl", "x"),
+           "<caret>foo\n" +
+           "bar\n" +
+           "baz\n" +
+           "quux\n",
+           "<caret>o\n" +
+           "r\n" +
+           "z\n" +
            "quux\n");
   }
 
