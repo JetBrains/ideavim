@@ -1,6 +1,7 @@
 package org.jetbrains.plugins.ideavim.action;
 
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -257,17 +258,26 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-511 |.|
   public void testRepeatWithParensAndQuotesAutoInsertion() {
-    doTest(parseKeys("o", "foo(\"<Right>, \"<Right><Right>;", "<Esc>", "."),
-           "class C <caret>{\n" +
-           "}\n",
-           "class C {\n" +
-           "    foo(\"\", \"\");\n" +
-           "    foo(\"\", \"\");\n" +
-           "}\n");
+    configureByJavaText("class C <caret>{\n" +
+                        "}\n");
+    typeText(parseKeys("o", "foo(\"<Right>, \"<Right><Right>;", "<Esc>", "."));
+    myFixture.checkResult("class C {\n" +
+                          "    foo(\"\", \"\");\n" +
+                          "    foo(\"\", \"\");\n" +
+                          "}\n");
+  }
+
+  // VIM-511 |.|
+  public void testDeleteBothParensAndStartAgain() {
+    configureByJavaText("class C <caret>{\n" + "}\n");
+    typeText(parseKeys("o", "void f(", "<BS>", "(String s", "<Right>", " {"));
+    myFixture.checkResult("class C {\n" +
+                          "    void f(String s) {}\n" +
+                          "}\n");
   }
 
   private void doTest(final List<KeyStroke> keys, String before, String after) {
-    myFixture.configureByText("a.java", before);
+    myFixture.configureByText(PlainTextFileType.INSTANCE, before);
     final Editor editor = myFixture.getEditor();
     final KeyHandler keyHandler = KeyHandler.getInstance();
     final EditorDataContext dataContext = new EditorDataContext(editor);
