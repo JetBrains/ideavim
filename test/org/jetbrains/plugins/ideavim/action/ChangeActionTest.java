@@ -59,9 +59,7 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-157 |~|
   public void testToggleCharCase() {
-    doTest(parseKeys("~~"),
-           "<caret>hello world\n",
-           "HEllo world\n");
+    doTest(parseKeys("~~"), "<caret>hello world\n", "HEllo world\n");
   }
 
   // VIM-157 |~|
@@ -116,10 +114,7 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-105 |d| |w| |count|
   public void testDeleteTwoWordsOnTwoLines() {
-    doTest(parseKeys("d2w"),
-           "one <caret>two\n" +
-           "three four\n",
-           "one four\n");
+    doTest(parseKeys("d2w"), "one <caret>two\n" + "three four\n", "one four\n");
   }
 
   // VIM-200 |c| |w|
@@ -164,10 +159,7 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-393 |d|
   public void testDeleteBadArgument() {
-    doTest(parseKeys("dD", "dd"),
-           "one\n" +
-           "two\n",
-           "two\n");
+    doTest(parseKeys("dD", "dd"), "one\n" + "two\n", "two\n");
   }
 
   // VIM-262 |i_CTRL-R|
@@ -261,6 +253,17 @@ public class ChangeActionTest extends VimTestCase {
            "baz quux\n",
            "foo baz\n" +
            "fo<caret>o quux\n");
+  }
+
+  // VIM-511 |.|
+  public void testRepeatWithParensAndQuotesAutoInsertion() {
+    doTest(parseKeys("o", "foo(\"<Right>, \"<Right><Right>;", "<Esc>", "."),
+           "class C <caret>{\n" +
+           "}\n",
+           "class C {\n" +
+           "    foo(\"\", \"\");\n" +
+           "    foo(\"\", \"\");\n" +
+           "}\n");
   }
 
   private void doTest(final List<KeyStroke> keys, String before, String after) {
