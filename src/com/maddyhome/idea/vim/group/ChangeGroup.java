@@ -380,6 +380,8 @@ public class ChangeGroup {
     public void documentChanged(@NotNull DocumentEvent e) {
       final String newFragment = e.getNewFragment().toString();
       final String oldFragment = e.getOldFragment().toString();
+      final int newFragmentLength = newFragment.length();
+      final int oldFragmentLength = oldFragment.length();
 
       // Repeat buffer limits
       if (repeatCharsCount > MAX_REPEAT_CHARS_COUNT) {
@@ -393,11 +395,11 @@ public class ChangeGroup {
       }
 
       // Ignore multi-character indents as they should be inserted automatically while repeating <Enter> actions
-      if (newFragment.length() > 1 && newFragment.trim().isEmpty()) {
+      if (newFragmentLength > 1 && newFragment.trim().isEmpty()) {
         return;
       }
 
-      final int delta = e.getOffset() + oldFragment.length() - oldOffset;
+      final int delta = e.getOffset() + - oldOffset;
       if (oldOffset >= 0 && delta != 0) {
         final String motionName = delta < 0 ? "VimMotionLeft" : "VimMotionRight";
         final AnAction action = ActionManager.getInstance().getAction(motionName);
@@ -407,19 +409,21 @@ public class ChangeGroup {
         }
       }
 
-      if (oldFragment.length() > 0) {
-        final AnAction editorBackSpace = ActionManager.getInstance().getAction("EditorBackSpace");
-        for (int i = 0; i < oldFragment.length(); i++) {
-          strokes.add(editorBackSpace);
+      if (oldFragmentLength > 0) {
+        final AnAction editorDelete = ActionManager.getInstance().getAction("EditorDelete");
+        for (int i = 0; i < oldFragmentLength; i++) {
+          strokes.add(editorDelete);
         }
       }
 
-      strokes.add(newFragment.toCharArray());
-      repeatCharsCount += newFragment.length();
+      if (newFragmentLength > 0) {
+        strokes.add(newFragment.toCharArray());
+      }
+      repeatCharsCount += newFragmentLength;
 
-      if (newFragment.length() > 0) {
+      if (newFragmentLength > 0) {
         // TODO: If newFragment is shorter than oldFragment?
-        oldOffset = e.getOffset() + newFragment.length();
+        oldOffset = e.getOffset() + newFragmentLength;
       }
       else {
         oldOffset = e.getOffset();
