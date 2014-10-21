@@ -491,9 +491,7 @@ public class ChangeGroup {
         }
         else if (lastStroke instanceof char[]) {
           final char[] chars = (char[])lastStroke;
-          for (char c : chars) {
-            processKey(editor, context, KeyStroke.getKeyStroke(c));
-          }
+          insertText(editor, editor.getCaretModel().getOffset(), new String(chars));
         }
       }
     }
