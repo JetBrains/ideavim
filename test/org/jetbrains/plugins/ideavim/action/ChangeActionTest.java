@@ -278,6 +278,21 @@ public class ChangeActionTest extends VimTestCase {
                           "}\n");
   }
 
+  // VIM-511 |.|
+  public void testAutoCompleteCurlyBraceWithEnterWithinFunctionBody() {
+    configureByJavaText("class C <caret>{\n" +
+                        "}\n");
+    typeText(parseKeys("o", "C(", "<BS>", "(int i) {", "<Enter>", "i = 3;", "<Esc>", "<Down>", "."));
+    myFixture.checkResult("class C {\n" +
+                          "    C(int i) {\n" +
+                          "        i=3;\n" +
+                          "    }\n" +
+                          "    C(int i) {\n" +
+                          "        i=3;\n" +
+                          "    }\n" +
+                          "}\n");
+  }
+
   private void doTest(final List<KeyStroke> keys, String before, String after) {
     myFixture.configureByText(PlainTextFileType.INSTANCE, before);
     final Editor editor = myFixture.getEditor();
