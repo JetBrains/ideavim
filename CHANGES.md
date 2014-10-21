@@ -14,6 +14,7 @@ option.
 * VIM-410 Added support for `relativenumber` option
 * VIM-483 Added support for `number` option
 * VIM-624 Deselect visual selection range on opening the Ex entry field
+* VIM-511 Fixed editing offset after `<BS>` for `.` command
 
 
 0.37, 2014-10-15
