@@ -49,7 +49,7 @@ public class ExecuteActionByNameHandler extends CommandHandler {
       return false;
     }
 
-    if(action.isInInjectedContext()) {
+    if(action.isInInjectedContext() || action.isEnabledInModalContext()) {
       DataContext contentContext = DataManager.getInstance().getDataContext(editor.getContentComponent());
       try {
         KeyHandler.executeAction(action, contentContext);
