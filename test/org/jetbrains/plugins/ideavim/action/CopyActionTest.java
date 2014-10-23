@@ -100,8 +100,8 @@ public class CopyActionTest extends VimTestCase {
     //
     // The problem is that the selection range should be 1-char wide when entering the visual block mode
 
-    myFixture.checkResult("* *one\n" +
-                          "* *two\n");
+    myFixture.checkResult("* * one\n" +
+                          "* * two\n");
     assertSelection(null);
     assertOffset(2);
   }
