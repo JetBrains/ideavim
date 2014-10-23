@@ -17,6 +17,7 @@ option.
 * VIM-511 Fixed editing offset after `<BS>` for `.` command
 * VIM-792 Fixed line-wise and block-wise paste commands for `*` and `+`
   registers
+* VIM-501 Fixed off-by-1 error in visual block-wise selection
 
 
 0.37, 2014-10-15
