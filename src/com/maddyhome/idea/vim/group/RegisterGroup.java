@@ -21,6 +21,9 @@ package com.maddyhome.idea.vim.group;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.util.Function;
+import com.intellij.util.containers.ContainerUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
@@ -39,10 +42,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * This group works with command associated with copying and pasting text
@@ -400,8 +400,28 @@ public class RegisterGroup {
   private Register refreshClipboardRegister(char r) {
     final String text = ClipboardHandler.getClipboardText();
     if (text != null) {
-      return new Register(r, SelectionType.CHARACTER_WISE, text);
+      return new Register(r, guessSelectionType(text), text);
     }
     return null;
+  }
+
+  @NotNull
+  private SelectionType guessSelectionType(@NotNull String text) {
+    final String[] lines = StringUtil.splitByLines(text);
+    final HashSet<Integer> lengths = new HashSet<Integer>(ContainerUtil.map(lines, new Function<String, Integer>() {
+      @Override
+      public Integer fun(String s) {
+        return s.length();
+      }
+    }));
+    if (lines.length > 1 && lengths.size() == 1) {
+      return SelectionType.BLOCK_WISE;
+    }
+    else if (text.endsWith("\n")) {
+      return SelectionType.LINE_WISE;
+    }
+    else {
+      return SelectionType.CHARACTER_WISE;
+    }
   }
 }

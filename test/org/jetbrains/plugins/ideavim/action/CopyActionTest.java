@@ -132,4 +132,32 @@ public class CopyActionTest extends VimTestCase {
       assertEquals("bar\n", starRegister.getText());
     }
   }
+
+  // VIM-792 |"*| |yy| |p|
+  public void testLineWiseClipboardYankPaste() {
+    configureByText("<caret>foo\n");
+    typeText(parseKeys("\"*yy", "\"*p"));
+    final Register register = VimPlugin.getRegister().getRegister('*');
+    if (register != null) {
+      assertEquals("foo\n", register.getText());
+      myFixture.checkResult("foo\n" +
+                            "<caret>foo\n");
+    }
+  }
+
+  // VIM-792 |"*| |CTRL-V| |v_y| |p|
+  public void testBlockWiseClipboardYankPaste() {
+    configureByText("<caret>foo\n" +
+                    "bar\n" +
+                    "baz\n");
+    typeText(parseKeys("<C-V>lj", "\"*y", "\"*p"));
+    final Register register = VimPlugin.getRegister().getRegister('*');
+    if (register != null) {
+      assertEquals("f\n" +
+                   "b", register.getText());
+      myFixture.checkResult("ffoo\n" +
+                            "bbar\n" +
+                            "baz\n");
+    }
+  }
 }
