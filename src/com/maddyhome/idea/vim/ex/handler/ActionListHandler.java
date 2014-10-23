@@ -18,18 +18,18 @@
 
 package com.maddyhome.idea.vim.ex.handler;
 
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.Shortcut;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.text.StringUtil;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -45,24 +45,32 @@ public class ActionListHandler extends CommandHandler {
     final String arg = cmd.getArgument().trim().toLowerCase();
     final List<String> args = StringUtil.split(arg, "*");
     final ActionManager actionManager = ActionManager.getInstance();
-    final String actionNames[] = actionManager.getActionIds("");
+    final List<String> actionNames = Arrays.asList(actionManager.getActionIds(""));
+    Collections.sort(actionNames, String.CASE_INSENSITIVE_ORDER);
+
     final StringBuilder builder = new StringBuilder();
+    builder.append("--- Actions ---\n");
 
     for (String actionName : actionNames) {
       if (match(actionName, args)) {
-        builder.append(actionName);
+        builder.append(StringHelper.leftJustify(actionName, 50, ' '));
         final AnAction action = actionManager.getAction(actionName);
         final Shortcut[] shortcuts = action.getShortcutSet().getShortcuts();
         for (Shortcut shortcut : shortcuts) {
           builder.append(" ");
-          builder.append(shortcut.toString());
+          if (shortcut instanceof KeyboardShortcut) {
+            final KeyboardShortcut keyboardShortcut = (KeyboardShortcut)shortcut;
+            builder.append(StringHelper.toKeyNotation(keyboardShortcut.getFirstKeyStroke()));
+          }
+          else {
+            builder.append(shortcut.toString());
+          }
         }
         builder.append("\n");
       }
     }
 
-    final String result = builder.toString();
-    ExOutputModel.getInstance(editor).output(result.length() != 0 ? result : "No results\n");
+    ExOutputModel.getInstance(editor).output(builder.toString());
     return true;
   }
 
