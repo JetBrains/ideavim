@@ -562,12 +562,10 @@ public class KeyHandler {
    * @param name    The name of the action to execute
    * @param context The context to run it in
    */
-  public static void executeAction(@NotNull String name, @NotNull DataContext context) {
+  public static boolean executeAction(@NotNull String name, @NotNull DataContext context) {
     ActionManager aMgr = ActionManager.getInstance();
     AnAction action = aMgr.getAction(name);
-    if (action != null) {
-      executeAction(action, context);
-    }
+    return action != null && executeAction(action, context);
   }
 
   /**
@@ -576,16 +574,20 @@ public class KeyHandler {
    * @param action  The action to execute
    * @param context The context to run it in
    */
-  public static void executeAction(@NotNull AnAction action, @NotNull DataContext context) {
+  public static boolean executeAction(@NotNull AnAction action, @NotNull DataContext context) {
     // Hopefully all the arguments are sufficient. So far they all seem to work OK.
     // We don't have a specific InputEvent so that is null
     // What is "place"? Leave it the empty string for now.
     // Is the template presentation sufficient?
     // What are the modifiers? Is zero OK?
-    action.actionPerformed(
-      new AnActionEvent(null, context, "", action.getTemplatePresentation(), ActionManager.getInstance(),
-                        // API change - don't merge
-                        0));
+    final AnActionEvent event = new AnActionEvent(null, context, "", action.getTemplatePresentation(),
+                                                  ActionManager.getInstance(), 0);
+    action.update(event);
+    if (event.getPresentation().isEnabled()) {
+      action.actionPerformed(event);
+      return true;
+    }
+    return false;
   }
 
   /**

@@ -391,6 +391,8 @@ public class ChangeGroup {
       // <Enter> is added to strokes as an action during processing in order to indent code properly in the repeat
       // command
       if (newFragment.startsWith("\n") && newFragment.trim().isEmpty()) {
+        strokes.addAll(getAdjustCaretActions(e));
+        oldOffset = -1;
         return;
       }
 
@@ -399,15 +401,7 @@ public class ChangeGroup {
         return;
       }
 
-      final int delta = e.getOffset() + - oldOffset;
-      if (oldOffset >= 0 && delta != 0) {
-        final String motionName = delta < 0 ? "VimMotionLeft" : "VimMotionRight";
-        final AnAction action = ActionManager.getInstance().getAction(motionName);
-        final int count = Math.abs(delta);
-        for (int i = 0; i < count; i++) {
-          strokes.add(action);
-        }
-      }
+      strokes.addAll(getAdjustCaretActions(e));
 
       if (oldFragmentLength > 0) {
         final AnAction editorDelete = ActionManager.getInstance().getAction("EditorDelete");
@@ -420,14 +414,23 @@ public class ChangeGroup {
         strokes.add(newFragment.toCharArray());
       }
       repeatCharsCount += newFragmentLength;
+      oldOffset = e.getOffset() + newFragmentLength;
+    }
 
-      if (newFragmentLength > 0) {
-        // TODO: If newFragment is shorter than oldFragment?
-        oldOffset = e.getOffset() + newFragmentLength;
+    @NotNull
+    private List<AnAction> getAdjustCaretActions(DocumentEvent e) {
+      final int delta = e.getOffset() - oldOffset;
+      if (oldOffset >= 0 && delta != 0) {
+        final List<AnAction> positionCaretActions = new ArrayList<AnAction>();
+        final String motionName = delta < 0 ? "VimMotionLeft" : "VimMotionRight";
+        final AnAction action = ActionManager.getInstance().getAction(motionName);
+        final int count = Math.abs(delta);
+        for (int i = 0; i < count; i++) {
+          positionCaretActions.add(action);
+        }
+        return positionCaretActions;
       }
-      else {
-        oldOffset = e.getOffset();
-      }
+      return Collections.emptyList();
     }
   }
 
@@ -543,8 +546,10 @@ public class ChangeGroup {
   }
 
   /**
-   * Processes the user pressing the Enter key. If this is REPLACE mode we need to turn off OVERWRITE before and
-   * then turn OVERWRITE back on after sending the "Enter" key.
+   * Processes the Enter key by running the first successful action registered for "ENTER" keystroke.
+   *
+   * If this is REPLACE mode we need to turn off OVERWRITE before and then turn OVERWRITE back on after sending the
+   * "ENTER" key.
    *
    * @param editor  The editor to press "Enter" in
    * @param context The data context
@@ -553,7 +558,13 @@ public class ChangeGroup {
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.REPLACE) {
       KeyHandler.executeAction("EditorToggleInsertState", context);
     }
-    KeyHandler.executeAction("EditorEnter", context);
+    final KeyStroke enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+    final List<AnAction> actions = VimPlugin.getKey().getActions(editor.getComponent(), enterKeyStroke);
+    for (AnAction action : actions) {
+      if (KeyHandler.executeAction(action, context)) {
+        break;
+      }
+    }
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.REPLACE) {
       KeyHandler.executeAction("EditorToggleInsertState", context);
     }

@@ -76,6 +76,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     .build();
 
   @NotNull private static final Set<KeyStroke> NON_FILE_EDITOR_KEYS = ImmutableSet.<KeyStroke>builder()
+    .addAll(getKeyStrokes(VK_ENTER, 0))
     .addAll(getKeyStrokes(VK_ESCAPE, 0))
     .addAll(getKeyStrokes(VK_TAB, 0))
     .addAll(getKeyStrokes(VK_UP, 0))
@@ -144,8 +145,8 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
           return isExitInsertMode(keyStroke);
         }
         if (CommandState.inInsertMode(editor)) {
-          // XXX: <Enter> and <Tab> won't be recorded in macros
-          if (keyCode == VK_ENTER || keyCode == VK_TAB) {
+          // XXX: <Tab> won't be recorded in macros
+          if (keyCode == VK_TAB) {
             return false;
           }
           // Debug watch, Python console, etc.

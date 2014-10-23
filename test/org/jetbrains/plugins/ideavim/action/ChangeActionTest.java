@@ -285,10 +285,10 @@ public class ChangeActionTest extends VimTestCase {
     typeText(parseKeys("o", "C(", "<BS>", "(int i) {", "<Enter>", "i = 3;", "<Esc>", "<Down>", "."));
     myFixture.checkResult("class C {\n" +
                           "    C(int i) {\n" +
-                          "        i=3;\n" +
+                          "        i = 3;\n" +
                           "    }\n" +
                           "    C(int i) {\n" +
-                          "        i=3;\n" +
+                          "        i = 3;\n" +
                           "    }\n" +
                           "}\n");
   }
