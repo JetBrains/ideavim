@@ -37,7 +37,7 @@ import java.util.List;
  */
 public class ActionListHandler extends CommandHandler {
   public ActionListHandler() {
-    super("actionl", "ist", RANGE_FORBIDDEN | DONT_REOPEN | ARGUMENT_OPTIONAL);
+    super("actionlist", "", RANGE_FORBIDDEN | DONT_REOPEN | ARGUMENT_OPTIONAL);
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull final DataContext context,

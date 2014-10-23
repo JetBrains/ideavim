@@ -37,7 +37,7 @@ import java.awt.event.ActionListener;
  */
 public class ExecuteActionByNameHandler extends CommandHandler {
   public ExecuteActionByNameHandler() {
-    super("act", "ion", RANGE_FORBIDDEN | DONT_REOPEN);
+    super("action", "", RANGE_FORBIDDEN | DONT_REOPEN);
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull final DataContext context,
