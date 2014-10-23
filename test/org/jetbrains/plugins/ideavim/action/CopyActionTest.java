@@ -150,7 +150,7 @@ public class CopyActionTest extends VimTestCase {
     configureByText("<caret>foo\n" +
                     "bar\n" +
                     "baz\n");
-    typeText(parseKeys("<C-V>lj", "\"*y", "\"*p"));
+    typeText(parseKeys("<C-V>j", "\"*y", "\"*p"));
     final Register register = VimPlugin.getRegister().getRegister('*');
     if (register != null) {
       assertEquals("f\n" +
