@@ -33,28 +33,29 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- *
+ * @author smartbomb
  */
 public class ExecuteActionByNameHandler extends CommandHandler {
   public ExecuteActionByNameHandler() {
     super("act", "ion", RANGE_FORBIDDEN | DONT_REOPEN);
   }
 
-  public boolean execute(@NotNull Editor editor, @NotNull final DataContext context, @NotNull ExCommand cmd) throws ExException {
-    String arg = cmd.getArgument().trim();
-    ActionManager aMgr = ActionManager.getInstance();
+  public boolean execute(@NotNull Editor editor, @NotNull final DataContext context,
+                         @NotNull ExCommand cmd) throws ExException {
+    final String arg = cmd.getArgument().trim();
+    final ActionManager aMgr = ActionManager.getInstance();
     final AnAction action = aMgr.getAction(arg);
     if (action == null) {
       VimPlugin.showMessage("Could not find action: " + arg);
       return false;
     }
 
-    if(action.isInInjectedContext() || action.isEnabledInModalContext()) {
-      DataContext contentContext = DataManager.getInstance().getDataContext(editor.getContentComponent());
+    if (action.isInInjectedContext() || action.isEnabledInModalContext()) {
+      final DataContext contentContext = DataManager.getInstance().getDataContext(editor.getContentComponent());
       try {
         KeyHandler.executeAction(action, contentContext);
       }
-      catch(IllegalArgumentException ignored){
+      catch (IllegalArgumentException ignored) {
       }
     }
     else {
@@ -63,7 +64,7 @@ public class ExecuteActionByNameHandler extends CommandHandler {
           try {
             KeyHandler.executeAction(action, context);
           }
-          catch(IllegalArgumentException ignored){
+          catch (IllegalArgumentException ignored) {
           }
         }
       });
