@@ -1590,7 +1590,7 @@ public class MotionGroup {
       }
       else {
         for (int i = 0; i < ends.length; ++i) {
-          ends[i] += 1;
+          ends[i] = EditorHelper.normalizeOffset(editor, ends[i] + 1, false);
         }
       }
     }
