@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.ex.handler;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
@@ -46,20 +47,28 @@ public class ActionHandler extends CommandHandler {
       VimPlugin.showMessage("Action not found: " + actionName);
       return false;
     }
-
-    ApplicationManager.getApplication().invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          KeyHandler.executeAction(action, context);
+    final Application application = ApplicationManager.getApplication();
+    if (application.isUnitTestMode()) {
+      executeAction(action, context, actionName);
+    }
+    else {
+      application.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          executeAction(action, context, actionName);
         }
-        catch (RuntimeException e) {
-          // TODO: Find out if any runtime exceptions may happen here
-          assert false : "Error while executing :action " + actionName + " (" + action + "): " + e;
-        }
-      }
-    });
-
+      });
+    }
     return true;
+  }
+
+  private void executeAction(@NotNull AnAction action, @NotNull DataContext context, @NotNull String actionName) {
+    try {
+      KeyHandler.executeAction(action, context);
+    }
+    catch (RuntimeException e) {
+      // TODO: Find out if any runtime exceptions may happen here
+      assert false : "Error while executing :action " + actionName + " (" + action + "): " + e;
+    }
   }
 }
