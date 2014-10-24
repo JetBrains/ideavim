@@ -5,6 +5,7 @@
     <![CDATA[
       <p>Not released:</p>
       <ul>
+        <li>Support for <code>:action</code> and <code>:actionlist</code> for executing arbitrary IDE actions</li>
         <li>Support for <code>number</code> and <code>relativenumber</code> options</li>
         <li>Support for <code>clipboard=unnamed</code> option</li>
         <li>Various bug fixes</li>
