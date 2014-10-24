@@ -18,8 +18,10 @@
 
 package com.maddyhome.idea.vim.ex.handler;
 
-import com.intellij.ide.DataManager;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -27,10 +29,6 @@ import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * @author smartbomb
@@ -42,35 +40,25 @@ public class ExecuteActionByNameHandler extends CommandHandler {
 
   public boolean execute(@NotNull Editor editor, @NotNull final DataContext context,
                          @NotNull ExCommand cmd) throws ExException {
-    final String arg = cmd.getArgument().trim();
-    final ActionManager aMgr = ActionManager.getInstance();
-    final AnAction action = aMgr.getAction(arg);
+    final String actionName = cmd.getArgument().trim();
+    final AnAction action = ActionManager.getInstance().getAction(actionName);
     if (action == null) {
-      VimPlugin.showMessage("Could not find action: " + arg);
+      VimPlugin.showMessage("Action not found: " + actionName);
       return false;
     }
 
-    if (action.isInInjectedContext() || action.isEnabledInModalContext()) {
-      final DataContext contentContext = DataManager.getInstance().getDataContext(editor.getContentComponent());
-      try {
-        KeyHandler.executeAction(action, contentContext);
-      }
-      catch (IllegalArgumentException ignored) {
-      }
-    }
-    else {
-      Timer t = new Timer(50, new ActionListener() {
-        public void actionPerformed(ActionEvent ev) {
-          try {
-            KeyHandler.executeAction(action, context);
-          }
-          catch (IllegalArgumentException ignored) {
-          }
+    ApplicationManager.getApplication().invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          KeyHandler.executeAction(action, context);
         }
-      });
-      t.setRepeats(false);
-      t.start();
-    }
+        catch (RuntimeException e) {
+          // TODO: Find out if any runtime exceptions may happen here
+          assert false : "Error while executing :action " + actionName + " (" + action + "): " + e;
+        }
+      }
+    });
 
     return true;
   }
