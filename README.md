@@ -112,6 +112,16 @@ usage of the Vim emulator in dialog windows is an area for improvements.
 
 See also [unresolved escape issues](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+i_Esc).
 
+### Executing IDE Actions
+
+IdeaVim adds two commands for listing and executing arbitrary IDE actions as
+Ex commands or via `:map` command mappings:
+
+* `:actionlist [pattern]`
+    * Find IDE actions by name pattern
+* `:action {name}`
+    * Execute an action named `NAME`
+
 
 Contributing
 ------------

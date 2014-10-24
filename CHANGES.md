@@ -8,11 +8,19 @@ History of changes in IdeaVim for the IntelliJ platform.
 ---------
 
 Added support for `number` and `relativenumber` options, `clipboard=unnamed`
-option.
+option. Added `:action` and `:actionlist` commands for executing arbitrary
+IDE actions.
+
+Features:
 
 * VIM-476 Added support for `clipboard=unnamed` option
 * VIM-410 Added support for `relativenumber` option
 * VIM-483 Added support for `number` option
+* VIM-652 Added `:action` and `:actionslist` commands for executing arbitrary
+  IDE actions
+
+Bug fixes:
+
 * VIM-624 Deselect visual selection range on opening the Ex entry field
 * VIM-511 Fixed editing offset after `<BS>` for `.` command
 * VIM-792 Fixed line-wise and block-wise paste commands for `*` and `+`
