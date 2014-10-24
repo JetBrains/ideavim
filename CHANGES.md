@@ -16,7 +16,7 @@ Features:
 * VIM-476 Added support for `clipboard=unnamed` option
 * VIM-410 Added support for `relativenumber` option
 * VIM-483 Added support for `number` option
-* VIM-652 Added `:action` and `:actionslist` commands for executing arbitrary
+* VIM-652 Added `:action` and `:actionlist` commands for executing arbitrary
   IDE actions
 
 Bug fixes:
