@@ -33,8 +33,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  * @author smartbomb
  */
-public class ExecuteActionByNameHandler extends CommandHandler {
-  public ExecuteActionByNameHandler() {
+public class ActionHandler extends CommandHandler {
+  public ActionHandler() {
     super("action", "", RANGE_FORBIDDEN | DONT_REOPEN);
   }
 
