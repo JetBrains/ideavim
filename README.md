@@ -36,7 +36,7 @@ Start the IDE normally and enable the Vim emulation using "Tools | Vim
 Emulator" menu item. At this point you must use Vim keystrokes in all editors.
 
 If you wish to disable the plugin, select the "Tools | Vim Emulator" menu so
-it is unchecked. At this point IDE will work with it's regular keyboard
+it is unchecked. At this point IDE will work with its regular keyboard
 shortcuts.
 
 Keyboard shortcut conflicts between the Vim emulation and the IDE can be
