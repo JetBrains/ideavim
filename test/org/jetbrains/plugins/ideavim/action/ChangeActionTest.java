@@ -290,6 +290,17 @@ public class ChangeActionTest extends VimTestCase {
                           "}\n");
   }
 
+  // VIM-613 |.|
+  public void testDeleteEndOfLineAndAgain() {
+    configureByText("<caret>- 1\n" +
+                    "- 2\n" +
+                    "- 3\n");
+    typeText(parseKeys("d$", "j", "."));
+    myFixture.checkResult("\n" +
+                          "\n" +
+                          "- 3\n");
+  }
+
   // VIM-511 |.|
   public void testAutoCompleteCurlyBraceWithEnterWithinFunctionBody() {
     configureByJavaText("class C <caret>{\n" +
