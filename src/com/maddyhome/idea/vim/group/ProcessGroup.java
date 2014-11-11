@@ -223,10 +223,16 @@ public class ProcessGroup {
   }
 
   public boolean executeFilter(@NotNull Editor editor, @NotNull TextRange range, String command) throws IOException {
-    if (logger.isDebugEnabled()) logger.debug("command=" + command);
     CharSequence chars = editor.getDocument().getCharsSequence();
     StringReader car = new StringReader(chars.subSequence(range.getStartOffset(),
                                                           range.getEndOffset()).toString());
+    StringWriter sw = executeCommand(command, car);
+    editor.getDocument().replaceString(range.getStartOffset(), range.getEndOffset(), sw.toString());
+    return true;
+  }
+
+  public StringWriter executeCommand(String command, StringReader car) throws IOException {
+    if (logger.isDebugEnabled()) logger.debug("command=" + command);
     StringWriter sw = new StringWriter();
 
     logger.debug("about to create filter");
@@ -244,11 +250,8 @@ public class ProcessGroup {
     sw.close();
     logger.debug("received");
 
-    editor.getDocument().replaceString(range.getStartOffset(), range.getEndOffset(), sw.toString());
-
     lastCommand = command;
-
-    return true;
+    return sw;
   }
 
   private void copy(@NotNull Reader from, @NotNull Writer to) throws IOException {
