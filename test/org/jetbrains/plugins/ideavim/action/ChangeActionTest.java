@@ -70,6 +70,30 @@ public class ChangeActionTest extends VimTestCase {
            "hello worLD\n");
   }
 
+  public void testToggleCaseMotion() {
+    doTest(parseKeys("g~w"), "<caret>FooBar Baz\n", "fOObAR Baz\n");
+  }
+
+  public void testChangeUpperCase() {
+    doTest(parseKeys("gUw"), "<caret>FooBar Baz\n", "FOOBAR Baz\n");
+  }
+
+  public void testChangeLowerCase() {
+    doTest(parseKeys("guw"), "<caret>FooBar Baz\n", "foobar Baz\n");
+  }
+
+  public void testToggleCaseVisual() {
+    doTest(parseKeys("ve~"), "<caret>FooBar Baz\n", "fOObAR Baz\n");
+  }
+
+  public void testChangeUpperCaseVisual() {
+    doTest(parseKeys("veU"), "<caret>FooBar Baz\n", "FOOBAR Baz\n");
+  }
+
+  public void testChangeLowerCaseVisual() {
+    doTest(parseKeys("veu"), "<caret>FooBar Baz\n", "foobar Baz\n");
+  }
+
   // VIM-85 |i| |gi| |gg|
   public void testInsertAtPreviousAction() {
     doTest(parseKeys("i", "hello", "<Esc>", "gg", "gi", " world! "), "one\n" +
