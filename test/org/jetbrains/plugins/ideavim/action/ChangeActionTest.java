@@ -123,6 +123,11 @@ public class ChangeActionTest extends VimTestCase {
     doTest(parseKeys("cw"), "on<caret>e two three\n", "on two three\n");
   }
 
+  // VIM-515 |c| |W|
+  public void testChangeBigWordWithPunctuationAndAlpha() {
+    doTest(parseKeys("cW"), "foo<caret>(bar baz\n", "foo baz\n");
+  }
+
   // VIM-300 |c| |w|
   public void testChangeWordTwoWordsWithoutWhitespace() {
     doTest(parseKeys("cw"), "<caret>$value\n", "value\n");
