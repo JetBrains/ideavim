@@ -236,20 +236,14 @@ public class ProcessGroup {
     if (logger.isDebugEnabled()) logger.debug("command=" + command);
     final StringWriter writer = new StringWriter();
 
-    logger.debug("about to create filter");
     Process filter = Runtime.getRuntime().exec(command);
-    logger.debug("filter created");
     BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(filter.getOutputStream()));
-    logger.debug("sending text");
     copy(car, bufferedWriter);
     bufferedWriter.close();
-    logger.debug("sent");
 
     final BufferedReader reader = new BufferedReader(new InputStreamReader(filter.getInputStream()));
-    logger.debug("getting result");
     copy(reader, writer);
     writer.close();
-    logger.debug("received");
 
     lastCommand = command;
     return writer;
