@@ -75,7 +75,7 @@ public class ProcessGroup {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         VirtualFile vf = EditorData.getVirtualFile(editor);
-        if (!ApplicationManager.getApplication().isUnitTestMode() && vf != null) {
+        if (!ApplicationManager.getApplication().isUnitTestMode() && project != null && vf != null) {
           FileEditorManager.getInstance(project).openFile(vf, true);
         }
       }
@@ -163,7 +163,7 @@ public class ProcessGroup {
           // version 1050.
           if (!ApplicationManager.getApplication().isUnitTestMode() && (flg & CommandParser.RES_DONT_REOPEN) == 0) {
             VirtualFile vf = EditorData.getVirtualFile(editor);
-            if (vf != null) {
+            if (project != null && vf != null) {
               FileEditorManager.getInstance(project).openFile(vf, true);
             }
           }
@@ -184,7 +184,7 @@ public class ProcessGroup {
       public void run() {
         //editor.getContentComponent().requestFocus();
         VirtualFile vf = EditorData.getVirtualFile(editor);
-        if (vf != null) {
+        if (project != null && vf != null) {
           FileEditorManager.getInstance(project).openFile(vf, true);
         }
       }
