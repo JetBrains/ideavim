@@ -32,6 +32,7 @@ Contributors:
 * [Jaime Sanchez](mailto:josejaime.sanchez@gmail.com)
 * [Thomas B Homburg](mailto:thomas@homburg.dk)
 * [smartbomb](mailto:smartbomb@server.fake)
+* [Tuomas Tynkkynen](mailto:tuomas.tynkkynen@iki.fi)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
