@@ -1787,7 +1787,7 @@ public class MotionGroup {
     }
 
     @Nullable private Editor dragEditor = null;
-    @NotNull private CommandState.SubMode mode;
+    @NotNull private CommandState.SubMode mode = CommandState.SubMode.NONE;
     private int startOff;
     private int endOff;
   }
