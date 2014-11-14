@@ -26,6 +26,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.text.CharSequenceReader;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
@@ -37,6 +38,7 @@ import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.io.*;
@@ -73,7 +75,7 @@ public class ProcessGroup {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         VirtualFile vf = EditorData.getVirtualFile(editor);
-        if (!ApplicationManager.getApplication().isUnitTestMode() && vf != null) {
+        if (!ApplicationManager.getApplication().isUnitTestMode() && project != null && vf != null) {
           FileEditorManager.getInstance(project).openFile(vf, true);
         }
       }
@@ -161,7 +163,7 @@ public class ProcessGroup {
           // version 1050.
           if (!ApplicationManager.getApplication().isUnitTestMode() && (flg & CommandParser.RES_DONT_REOPEN) == 0) {
             VirtualFile vf = EditorData.getVirtualFile(editor);
-            if (vf != null) {
+            if (project != null && vf != null) {
               FileEditorManager.getInstance(project).openFile(vf, true);
             }
           }
@@ -182,7 +184,7 @@ public class ProcessGroup {
       public void run() {
         //editor.getContentComponent().requestFocus();
         VirtualFile vf = EditorData.getVirtualFile(editor);
-        if (vf != null) {
+        if (project != null && vf != null) {
           FileEditorManager.getInstance(project).openFile(vf, true);
         }
       }
@@ -222,33 +224,37 @@ public class ProcessGroup {
     return initText;
   }
 
-  public boolean executeFilter(@NotNull Editor editor, @NotNull TextRange range, String command) throws IOException {
-    if (logger.isDebugEnabled()) logger.debug("command=" + command);
-    CharSequence chars = editor.getDocument().getCharsSequence();
-    StringReader car = new StringReader(chars.subSequence(range.getStartOffset(),
-                                                          range.getEndOffset()).toString());
-    StringWriter sw = new StringWriter();
+  public boolean executeFilter(@NotNull Editor editor, @NotNull TextRange range,
+                               @NotNull String command) throws IOException {
+    final CharSequence charsSequence = editor.getDocument().getCharsSequence();
+    final int startOffset = range.getStartOffset();
+    final int endOffset = range.getEndOffset();
+    final String output = executeCommand(command, charsSequence.subSequence(startOffset, endOffset));
+    editor.getDocument().replaceString(startOffset, endOffset, output);
+    return true;
+  }
 
-    logger.debug("about to create filter");
-    Process filter = Runtime.getRuntime().exec(command);
-    logger.debug("filter created");
-    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(filter.getOutputStream()));
-    logger.debug("sending text");
-    copy(car, writer);
+  @NotNull
+  public String executeCommand(@NotNull String command, @Nullable CharSequence input) throws IOException {
+    if (logger.isDebugEnabled()) {
+      logger.debug("command=" + command);
+    }
+
+    final Process process = Runtime.getRuntime().exec(command);
+
+    if (input != null) {
+      final BufferedWriter outputWriter = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+      copy(new CharSequenceReader(input), outputWriter);
+      outputWriter.close();
+    }
+
+    final BufferedReader inputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+    final StringWriter writer = new StringWriter();
+    copy(inputReader, writer);
     writer.close();
-    logger.debug("sent");
-
-    BufferedReader reader = new BufferedReader(new InputStreamReader(filter.getInputStream()));
-    logger.debug("getting result");
-    copy(reader, sw);
-    sw.close();
-    logger.debug("received");
-
-    editor.getDocument().replaceString(range.getStartOffset(), range.getEndOffset(), sw.toString());
 
     lastCommand = command;
-
-    return true;
+    return writer.toString();
   }
 
   private void copy(@NotNull Reader from, @NotNull Writer to) throws IOException {
