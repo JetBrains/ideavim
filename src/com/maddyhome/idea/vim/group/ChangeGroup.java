@@ -1026,12 +1026,12 @@ public class ChangeGroup {
    * @return true if able to delete count lines, false if not
    */
   public boolean changeLine(@NotNull Editor editor, @NotNull DataContext context, int count) {
-    final int lastLineBeforeDelete = EditorHelper.getLineCount(editor);
-    final LogicalPosition posBeforeDelete = editor.offsetToLogicalPosition(editor.getCaretModel().getOffset());
+    final LogicalPosition pos = editor.offsetToLogicalPosition(editor.getCaretModel().getOffset());
+    final boolean insertBelow = pos.line + count >= EditorHelper.getLineCount(editor);
 
     boolean res = deleteLine(editor, count);
     if (res) {
-      if (posBeforeDelete.line + count >= lastLineBeforeDelete) {
+      if (insertBelow) {
         insertNewLineBelow(editor, context);
       }
       else {
