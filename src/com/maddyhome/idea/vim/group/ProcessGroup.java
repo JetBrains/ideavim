@@ -222,36 +222,37 @@ public class ProcessGroup {
     return initText;
   }
 
-  public boolean executeFilter(@NotNull Editor editor, @NotNull TextRange range, String command) throws IOException {
-    CharSequence chars = editor.getDocument().getCharsSequence();
-    StringReader car = new StringReader(chars.subSequence(range.getStartOffset(),
-                                                          range.getEndOffset()).toString());
-    StringWriter sw = executeCommand(command, car);
-    editor.getDocument().replaceString(range.getStartOffset(), range.getEndOffset(), sw.toString());
+  public boolean executeFilter(@NotNull Editor editor, @NotNull TextRange range,
+                               @NotNull String command) throws IOException {
+    final CharSequence chars = editor.getDocument().getCharsSequence();
+    final StringReader reader = new StringReader(chars.subSequence(range.getStartOffset(),
+                                                                   range.getEndOffset()).toString());
+    final StringWriter writer = executeCommand(command, reader);
+    editor.getDocument().replaceString(range.getStartOffset(), range.getEndOffset(), writer.toString());
     return true;
   }
 
-  public StringWriter executeCommand(String command, StringReader car) throws IOException {
+  public StringWriter executeCommand(@NotNull String command, @NotNull StringReader car) throws IOException {
     if (logger.isDebugEnabled()) logger.debug("command=" + command);
-    StringWriter sw = new StringWriter();
+    final StringWriter writer = new StringWriter();
 
     logger.debug("about to create filter");
     Process filter = Runtime.getRuntime().exec(command);
     logger.debug("filter created");
-    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(filter.getOutputStream()));
+    BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(filter.getOutputStream()));
     logger.debug("sending text");
-    copy(car, writer);
-    writer.close();
+    copy(car, bufferedWriter);
+    bufferedWriter.close();
     logger.debug("sent");
 
-    BufferedReader reader = new BufferedReader(new InputStreamReader(filter.getInputStream()));
+    final BufferedReader reader = new BufferedReader(new InputStreamReader(filter.getInputStream()));
     logger.debug("getting result");
-    copy(reader, sw);
-    sw.close();
+    copy(reader, writer);
+    writer.close();
     logger.debug("received");
 
     lastCommand = command;
-    return sw;
+    return writer;
   }
 
   private void copy(@NotNull Reader from, @NotNull Writer to) throws IOException {
