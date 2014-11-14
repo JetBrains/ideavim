@@ -29,8 +29,6 @@ import com.maddyhome.idea.vim.helper.Msg;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 
 /**
  *
@@ -61,8 +59,8 @@ public class CmdFilterHandler extends CommandHandler {
       Ranges ranges = cmd.getRanges();
       if (ranges.size() == 0) {
         // Show command output in a window
-        StringWriter sw = VimPlugin.getProcess().executeCommand(command, new StringReader(""));
-        ExOutputModel.getInstance(editor).output(sw.toString());
+        String commandOutput = VimPlugin.getProcess().executeCommand(command, null);
+        ExOutputModel.getInstance(editor).output(commandOutput);
         return true;
       }
       else {

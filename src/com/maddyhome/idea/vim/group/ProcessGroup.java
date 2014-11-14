@@ -26,6 +26,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.text.CharSequenceReader;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
@@ -37,6 +38,7 @@ import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.io.*;
@@ -224,29 +226,35 @@ public class ProcessGroup {
 
   public boolean executeFilter(@NotNull Editor editor, @NotNull TextRange range,
                                @NotNull String command) throws IOException {
-    final CharSequence chars = editor.getDocument().getCharsSequence();
-    final StringReader reader = new StringReader(chars.subSequence(range.getStartOffset(),
-                                                                   range.getEndOffset()).toString());
-    final StringWriter writer = executeCommand(command, reader);
-    editor.getDocument().replaceString(range.getStartOffset(), range.getEndOffset(), writer.toString());
+    final CharSequence charsSequence = editor.getDocument().getCharsSequence();
+    final int startOffset = range.getStartOffset();
+    final int endOffset = range.getEndOffset();
+    final String output = executeCommand(command, charsSequence.subSequence(startOffset, endOffset));
+    editor.getDocument().replaceString(startOffset, endOffset, output);
     return true;
   }
 
-  public StringWriter executeCommand(@NotNull String command, @NotNull StringReader car) throws IOException {
-    if (logger.isDebugEnabled()) logger.debug("command=" + command);
+  @NotNull
+  public String executeCommand(@NotNull String command, @Nullable CharSequence input) throws IOException {
+    if (logger.isDebugEnabled()) {
+      logger.debug("command=" + command);
+    }
+
+    final Process process = Runtime.getRuntime().exec(command);
+
+    if (input != null) {
+      final BufferedWriter outputWriter = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+      copy(new CharSequenceReader(input), outputWriter);
+      outputWriter.close();
+    }
+
+    final BufferedReader inputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
     final StringWriter writer = new StringWriter();
-
-    Process filter = Runtime.getRuntime().exec(command);
-    BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(filter.getOutputStream()));
-    copy(car, bufferedWriter);
-    bufferedWriter.close();
-
-    final BufferedReader reader = new BufferedReader(new InputStreamReader(filter.getInputStream()));
-    copy(reader, writer);
+    copy(inputReader, writer);
     writer.close();
 
     lastCommand = command;
-    return writer;
+    return writer.toString();
   }
 
   private void copy(@NotNull Reader from, @NotNull Writer to) throws IOException {
