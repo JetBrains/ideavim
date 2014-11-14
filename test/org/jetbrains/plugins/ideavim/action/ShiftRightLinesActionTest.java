@@ -52,4 +52,11 @@ public class ShiftRightLinesActionTest extends VimTestCase {
     typeText(parseKeys("vG$>>"));
     myFixture.checkResult("    Hello,\n    world!\n\n");
   }
+
+  // VIM-705 repeating a multiline indent would only affect last line
+  public void testShiftsMultiLineSelectionRepeat() {
+    myFixture.configureByText("a.txt", "<caret>a\nb\n");
+    typeText(parseKeys("Vj>."));
+    myFixture.checkResult("        a\n        b\n");
+  }
 }

@@ -1186,8 +1186,12 @@ public class MotionGroup {
   }
 
   public static void moveCaret(@NotNull Editor editor, int offset) {
+    moveCaret(editor, offset, false);
+  }
+
+  private static void moveCaret(@NotNull Editor editor, int offset, boolean forceKeepVisual) {
     if (offset >= 0 && offset <= editor.getDocument().getTextLength()) {
-      final boolean keepVisual = keepVisual(editor);
+      final boolean keepVisual = forceKeepVisual || keepVisual(editor);
       if (editor.getCaretModel().getOffset() != offset) {
         if (!keepVisual) {
           // XXX: Hack for preventing the merge multiple carets that results in loosing the primary caret for |v_d|
@@ -1461,7 +1465,7 @@ public class MotionGroup {
       CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, MappingMode.VISUAL);
       visualStart = start;
       updateSelection(editor, end);
-      MotionGroup.moveCaret(editor, visualEnd);
+      MotionGroup.moveCaret(editor, visualEnd, true);
     }
     else if (mode == currentMode) {
       exitVisual(editor);
@@ -1783,7 +1787,7 @@ public class MotionGroup {
     }
 
     @Nullable private Editor dragEditor = null;
-    @NotNull private CommandState.SubMode mode;
+    @NotNull private CommandState.SubMode mode = CommandState.SubMode.NONE;
     private int startOff;
     private int endOff;
   }
