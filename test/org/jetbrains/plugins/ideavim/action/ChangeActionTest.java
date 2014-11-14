@@ -138,6 +138,15 @@ public class ChangeActionTest extends VimTestCase {
     assertOffset(4);
   }
 
+  // VIM-536 |cc|
+  public void testChangeLineAtSecondLastLine() {
+    doTest(parseKeys("ccbaz"),
+           "<caret>foo\n" +
+           "bar\n",
+           "baz\n" +
+           "bar\n");
+  }
+
   // VIM-394 |d| |v_aw|
   public void testDeleteIndentedWordBeforePunctuation() {
     doTest(parseKeys("daw"), "foo\n" + "  <caret>bar, baz\n", "foo\n" + "  , baz\n");
