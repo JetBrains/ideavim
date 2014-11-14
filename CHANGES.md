@@ -30,6 +30,7 @@ Bug fixes:
 * VIM-705 Fixed repeated multiline indent
 * VIM-567 Fixed `:!` to allow running non-filter commands
 * VIM-536 Fixed `cc` on the second-to-last line
+* VIM-515 Fixed `cW` command detecting end-of-word incorrectly
 
 
 0.37, 2014-10-15
