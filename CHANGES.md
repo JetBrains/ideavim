@@ -9,7 +9,7 @@ History of changes in IdeaVim for the IntelliJ platform.
 
 Added support for `number` and `relativenumber` options, `clipboard=unnamed`
 option. Added `:action` and `:actionlist` commands for executing arbitrary
-IDE actions.
+IDE actions. Various bug fixes.
 
 Features:
 
@@ -26,6 +26,10 @@ Bug fixes:
 * VIM-792 Fixed line-wise and block-wise paste commands for `*` and `+`
   registers
 * VIM-501 Fixed off-by-1 error in visual block-wise selection
+* VIM-613 Fixed repeat after `d$`
+* VIM-705 Fixed repeated multiline indent
+* VIM-567 Fixed `:!` to allow running non-filter commands
+* VIM-536 Fixed `cc` on the second-to-last line
 
 
 0.37, 2014-10-15
