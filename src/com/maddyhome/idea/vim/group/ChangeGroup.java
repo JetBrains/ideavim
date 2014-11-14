@@ -1079,13 +1079,13 @@ public class ChangeGroup {
     }
     String id = ActionManager.getInstance().getId(motion.getAction());
     boolean kludge = false;
-    boolean bigWord = false;
+    boolean bigWord = id.equals("VimMotionBigWordRight");
     final CharSequence chars = editor.getDocument().getCharsSequence();
     final int offset = editor.getCaretModel().getOffset();
-    final CharacterHelper.CharacterType charType = CharacterHelper.charType(chars.charAt(offset), false);
+    final CharacterHelper.CharacterType charType = CharacterHelper.charType(chars.charAt(offset), bigWord);
     if (EditorHelper.getFileSize(editor) > 0 && charType != CharacterHelper.CharacterType.WHITESPACE) {
       final boolean lastWordChar = offset > EditorHelper.getFileSize(editor) ||
-                                   CharacterHelper.charType(chars.charAt(offset + 1), false) != charType;
+                                   CharacterHelper.charType(chars.charAt(offset + 1), bigWord) != charType;
       final ImmutableSet<String> wordMotions = ImmutableSet.of(
         "VimMotionWordRight", "VimMotionBigWordRight", "VimMotionCamelRight");
       if (wordMotions.contains(id) && lastWordChar) {
@@ -1102,7 +1102,6 @@ public class ChangeGroup {
       }
       else if (id.equals("VimMotionBigWordRight")) {
         kludge = true;
-        bigWord = true;
         motion.setAction(ActionManager.getInstance().getAction("VimMotionBigWordEndRight"));
         motion.setFlags(Command.FLAG_MOT_INCLUSIVE);
       }
