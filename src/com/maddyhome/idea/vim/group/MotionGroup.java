@@ -1185,7 +1185,11 @@ public class MotionGroup {
     return moveCaretToLineStartSkipLeading(editor, line);
   }
 
-  public static void moveCaret(@NotNull Editor editor, int offset, boolean forceKeepVisual) {
+  public static void moveCaret(@NotNull Editor editor, int offset) {
+    moveCaret(editor, offset, false);
+  }
+
+  private static void moveCaret(@NotNull Editor editor, int offset, boolean forceKeepVisual) {
     if (offset >= 0 && offset <= editor.getDocument().getTextLength()) {
       final boolean keepVisual = forceKeepVisual || keepVisual(editor);
       if (editor.getCaretModel().getOffset() != offset) {
@@ -1205,10 +1209,6 @@ public class MotionGroup {
         editor.getSelectionModel().removeSelection();
       }
     }
-  }
-
-  public static void moveCaret(@NotNull Editor editor, int offset) {
-    moveCaret(editor, offset, false);
   }
 
   private static boolean keepVisual(Editor editor) {
