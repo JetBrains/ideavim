@@ -204,6 +204,12 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("Hello World! Bye.\n");
   }
 
+  // |v_as|
+  public void testSentenceMotionPastStartOfFile() {
+    typeTextInFile(parseKeys("8("), "\n" +
+                                    "P<caret>.\n");
+  }
+
   // |d| |v_ip|
   public void testDeleteInnerParagraph() {
     typeTextInFile(parseKeys("dip"),

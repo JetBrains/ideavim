@@ -1275,7 +1275,7 @@ public class SearchHelper {
         }
       }
       else if (ch == '\n') {
-        int end = offset; // Save where we found the punctuation.
+        int end = offset; // Save where we found the newline.
         if (dir > 0) {
           offset++;
           while (offset < max) {
@@ -1308,15 +1308,17 @@ public class SearchHelper {
           }
         }
         else {
-          offset--;
-          while (offset >= 0) {
-            ch = chars.charAt(offset);
-            if (ch != '\n') {
-              offset++;
-              break;
-            }
-
+          if (offset > 0) {
             offset--;
+            while (offset >= 0) {
+              ch = chars.charAt(offset);
+              if (ch != '\n') {
+                offset++;
+                break;
+              }
+
+              offset--;
+            }
           }
 
           if (offset < end) {
