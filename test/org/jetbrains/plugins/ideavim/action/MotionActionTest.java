@@ -113,6 +113,12 @@ public class MotionActionTest extends VimTestCase {
     assertOffset(4);
   }
 
+  // |v_ib|
+  public void testInnerBlockCrashWhenNoDelimiterFound() {
+    typeTextInFile(parseKeys("di)"), "(x\n");
+    myFixture.checkResult("(x\n");
+  }
+
   // VIM-314 |d| |v_iB|
   public void testDeleteInnerCurlyBraceBlock() {
     typeTextInFile(parseKeys("di{"),
