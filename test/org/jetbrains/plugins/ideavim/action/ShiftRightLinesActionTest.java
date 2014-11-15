@@ -53,6 +53,18 @@ public class ShiftRightLinesActionTest extends VimTestCase {
     myFixture.checkResult("    Hello,\n    world!\n\n");
   }
 
+  public void testShiftsMultiLineSelectionSkipsNewlineWhenCursorNotInFirstColumn() {
+    myFixture.configureByText("a.txt", "<caret>Hello,\n\nworld!\n");
+    typeText(parseKeys("lVG>"));
+    myFixture.checkResult("    Hello,\n\n    world!\n");
+  }
+
+  public void testShiftsMultiLineSelectionAddsTrailingWhitespaceIfTherePreviouslyWas() {
+    myFixture.configureByText("a.txt", "<caret>Hello,\n    \nworld!\n");
+    typeText(parseKeys("lVG>"));
+    myFixture.checkResult("    Hello,\n        \n    world!\n");
+  }
+
   // VIM-705 repeating a multiline indent would only affect last line
   public void testShiftsMultiLineSelectionRepeat() {
     myFixture.configureByText("a.txt", "<caret>a\nb\n");
