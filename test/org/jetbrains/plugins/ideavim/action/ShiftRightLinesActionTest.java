@@ -76,4 +76,10 @@ public class ShiftRightLinesActionTest extends VimTestCase {
     myFixture.configureByText("a.txt", "\n");
     typeText(parseKeys("<I<>", "<I<>"));
   }
+
+  public void testShiftsVisualBlockMode() {
+    myFixture.configureByText("a.txt", "foo<caret>foo\nfoobar\nfoobaz\n");
+    typeText(parseKeys("<C-V>jjl>"));
+    myFixture.checkResult("foo    foo\nfoo    bar\nfoo    baz\n");
+  }
 }
