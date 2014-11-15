@@ -506,6 +506,13 @@ public class MotionActionTest extends VimTestCase {
     assertOffset(2);
   }
 
+  // |b|
+  public void testWordBackwardsAtFirstLineWithWhitespaceInFront() {
+    typeTextInFile(parseKeys("b"),
+                   "    <caret>x\n");
+    assertOffset(0);
+  }
+
   public void testRightToLastChar() {
     typeTextInFile(parseKeys("i<Right>"),
                    "on<caret>e\n");

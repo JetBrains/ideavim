@@ -533,7 +533,7 @@ public class SearchHelper {
       if (CharacterHelper.charType(chars.charAt(pos - 1), bigWord) == CharacterHelper.CharacterType.WHITESPACE && !spaceWords) {
         pos = skipSpace(chars, pos - 1, step, size) + 1;
       }
-      if (CharacterHelper.charType(chars.charAt(pos), bigWord) != CharacterHelper.charType(chars.charAt(pos - 1), bigWord)) {
+      if (pos > 0 && CharacterHelper.charType(chars.charAt(pos), bigWord) != CharacterHelper.charType(chars.charAt(pos - 1), bigWord)) {
         pos += step;
       }
     }
