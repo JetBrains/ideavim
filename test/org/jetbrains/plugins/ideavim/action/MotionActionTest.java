@@ -84,6 +84,54 @@ public class MotionActionTest extends VimTestCase {
     assertMode(COMMAND);
   }
 
+  // VIM-771 |t| |;|
+  public void testTillCharRight() {
+    typeTextInFile(parseKeys("t:;"),
+                   "<caret> 1:a 2:b 3:c \n");
+    myFixture.checkResult(" 1:a <caret>2:b 3:c \n");
+  }
+
+  // VIM-771 |t| |;|
+  public void testTillCharRightRepeated() {
+    typeTextInFile(parseKeys("t:;"),
+                   "<caret> 1:a 2:b 3:c \n");
+    myFixture.checkResult(" 1:a <caret>2:b 3:c \n");
+  }
+
+  // VIM-771 |t| |;|
+  public void testTillCharRightRepeatedWithCount2() {
+    typeTextInFile(parseKeys("t:2;"),
+                   "<caret> 1:a 2:b 3:c \n");
+    myFixture.checkResult(" 1:a <caret>2:b 3:c \n");
+  }
+
+  // VIM-771 |t| |;|
+  public void testTillCharRightRepeatedWithCountHigherThan2() {
+    typeTextInFile(parseKeys("t:3;"), "<caret> 1:a 2:b 3:c \n");
+    myFixture.checkResult(" 1:a 2:b <caret>3:c \n");
+  }
+
+  // VIM-771 |t| |,|
+  public void testTillCharRightReverseRepeated() {
+    typeTextInFile(parseKeys("t:,,"),
+                   " 1:a 2:b<caret> 3:c \n");
+    myFixture.checkResult(" 1:<caret>a 2:b 3:c \n");
+  }
+
+  // VIM-771 |t| |,|
+  public void testTillCharRightReverseRepeatedWithCount2() {
+    typeTextInFile(parseKeys("t:,2,"),
+                   " 1:a 2:b<caret> 3:c \n");
+    myFixture.checkResult(" 1:<caret>a 2:b 3:c \n");
+  }
+
+  // VIM-771 |t| |,|
+  public void testTillCharRightReverseRepeatedWithCountHigherThan3() {
+    typeTextInFile(parseKeys("t:,3,"),
+                   " 0:_ 1:a 2:b<caret> 3:c \n");
+    myFixture.checkResult(" 0:<caret>_ 1:a 2:b 3:c \n");
+  }
+
   // VIM-326 |d| |v_ib|
   public void testDeleteInnerBlock() {
     typeTextInFile(parseKeys("di)"),
