@@ -788,6 +788,9 @@ public class ChangeGroup {
     MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLineEnd(editor, startLine, true));
     for (int i = 1; i < count; i++) {
       int start = VimPlugin.getMotion().moveCaretToLineEnd(editor);
+      int trailingWhitespaceStart = VimPlugin.getMotion().moveCaretToLineEndSkipLeading(editor);
+      boolean hasTrailingWhitespace = start != trailingWhitespaceStart + 1;
+
       MotionGroup.moveCaret(editor, start);
       int offset;
       if (spaces) {
@@ -797,7 +800,7 @@ public class ChangeGroup {
         offset = VimPlugin.getMotion().moveCaretToLineStartOffset(editor);
       }
       deleteText(editor, new TextRange(editor.getCaretModel().getOffset(), offset), null);
-      if (spaces) {
+      if (spaces && !hasTrailingWhitespace) {
         insertText(editor, start, " ");
         MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretHorizontal(editor, -1, false));
       }

@@ -273,6 +273,61 @@ public class ChangeActionTest extends VimTestCase {
            "quux\n");
   }
 
+  public void testDeleteJoinLinesSpaces() {
+    doTest(parseKeys("3J"),
+           "    a<caret> 1\n" +
+           "    b 2\n" +
+           "    c 3\n" +
+           "quux\n",
+           "    a 1 b 2 c 3\n" +
+           "quux\n");
+  }
+
+  public void testDeleteJoinLines() {
+    doTest(parseKeys("3gJ"),
+           "    a<caret> 1\n" +
+           "    b 2\n" +
+           "    c 3\n" +
+           "quux\n",
+           "    a 1    b 2    c 3\n" +
+           "quux\n");
+  }
+
+  public void testDeleteJoinLinesWithTrailingSpaceThenEmptyLine() {
+    doTest(parseKeys("3J"),
+           "foo \n" +
+           "\n" +
+           "bar",
+           "foo bar");
+  }
+
+  public void testDeleteJoinLinesWithTwoTrailingSpaces() {
+    doTest(parseKeys("J"),
+           "foo  \n" +
+           "bar",
+           "foo  bar");
+  }
+
+  public void testDeleteJoinVisualLinesSpaces() {
+    doTest(parseKeys("v2jJ"),
+           "    a<caret> 1\n" +
+           "    b 2\n" +
+           "    c 3\n" +
+           "quux\n",
+           "    a 1 b 2 c 3\n" +
+           "quux\n");
+  }
+
+  public void testDeleteJoinVisualLines() {
+    doTest(parseKeys("v2jgJ"),
+           "    a<caret> 1\n" +
+           "    b 2\n" +
+           "    c 3\n" +
+           "quux\n",
+           "    a 1    b 2    c 3\n" +
+           "quux\n");
+  }
+
   // VIM-511 |.|
   public void testRepeatWithBackspaces() {
     doTest(parseKeys("ce", "foo", "<BS><BS><BS>", "foo", "<Esc>", "j0", "."),
