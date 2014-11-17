@@ -33,6 +33,17 @@ public class CopyActionTest extends VimTestCase {
                           "three\n");
   }
 
+  // VIM-723 |p|
+  public void testYankPasteToEmptyLine() {
+    typeTextInFile(parseKeys("yiw", "j", "p"),
+                   "foo\n" +
+                   "\n" +
+                   "bar\n");
+    myFixture.checkResult("foo\n" +
+                          "foo\n" +
+                          "bar\n");
+  }
+
   // VIM-390 |yy| |p|
   public void testYankLinePasteAtLastLine() {
     typeTextInFile(parseKeys("yy", "p"),
