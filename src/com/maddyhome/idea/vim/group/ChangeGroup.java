@@ -1293,18 +1293,14 @@ public class ChangeGroup {
       end = start;
       start = t;
     }
+    end = EditorHelper.normalizeOffset(editor, end);
 
     CharSequence chars = editor.getDocument().getCharsSequence();
+    StringBuilder sb = new StringBuilder();
     for (int i = start; i < end; i++) {
-      if (i >= chars.length()) {
-        break;
-      }
-
-      char ch = CharacterHelper.changeCase(chars.charAt(i), type);
-      if (ch != chars.charAt(i)) {
-        replaceText(editor, i, i + 1, Character.toString(ch));
-      }
+      sb.append(CharacterHelper.changeCase(chars.charAt(i), type));
     }
+    replaceText(editor, start, end, sb.toString());
   }
 
   public void autoIndentLines(@NotNull DataContext context) {
