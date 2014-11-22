@@ -169,6 +169,7 @@
       <jvmarg value="-Didea.load.plugins.id=IdeaVIM"/>
 
       <formatter type="plain"/>
+      <formatter type="xml" usefile="true" />
 
       <batchtest todir="${test-reports}">
         <fileset dir="${test}">
