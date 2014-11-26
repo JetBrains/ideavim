@@ -186,6 +186,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     search.saveData(element);
     history.saveData(element);
     key.saveData(element);
+    editor.saveData(element);
 
     return element;
   }
@@ -211,6 +212,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     search.readData(element);
     history.readData(element);
     key.readData(element);
+    editor.readData(element);
   }
 
   @NotNull
@@ -368,18 +370,22 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private void updateState() {
     if (isEnabled() && !ApplicationManager.getApplication().isUnitTestMode()) {
       boolean requiresRestart = false;
-      if (previousStateVersion < 2 && SystemInfo.isMac) {
+      if (SystemInfo.isMac) {
         final MacKeyRepeat keyRepeat = MacKeyRepeat.getInstance();
         final Boolean enabled = keyRepeat.isEnabled();
-        if (enabled == null || !enabled) {
+        final Boolean isKeyRepeat = editor.isKeyRepeat();
+        if ((enabled == null || !enabled) && (isKeyRepeat == null || isKeyRepeat)) {
           if (Messages.showYesNoDialog("Do you want to enable repeating keys in Mac OS X on press and hold " +
                                        "(requires restart)?\n\n" +
                                        "(You can do it manually by running 'defaults write -g " +
                                        "ApplePressAndHoldEnabled 0' in the console).", IDEAVIM_NOTIFICATION_TITLE,
-                                       Messages.getQuestionIcon()
-          ) == Messages.YES) {
+                                       Messages.getQuestionIcon()) == Messages.YES) {
+            editor.setKeyRepeat(true);
             keyRepeat.setEnabled(true);
             requiresRestart = true;
+          }
+          else {
+            editor.setKeyRepeat(false);
           }
         }
       }

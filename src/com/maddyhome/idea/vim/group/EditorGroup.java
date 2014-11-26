@@ -16,6 +16,7 @@ import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.OptionChangeEvent;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.Options;
+import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,6 +35,7 @@ public class EditorGroup {
   private boolean isBlockCursor = false;
   private boolean isAnimatedScrolling = false;
   private boolean isRefrainFromScrolling = false;
+  private Boolean isKeyRepeat = null;
 
   private final CaretListener myLineNumbersCaretListener = new CaretAdapter() {
     @Override
@@ -161,6 +163,38 @@ public class EditorGroup {
     for (Editor editor : editors) {
       editor.getSettings().setRefrainFromScrolling(isOn);
     }
+  }
+
+  public void saveData(@NotNull Element element) {
+    if (isKeyRepeat != null) {
+      final Element editor = new Element("editor");
+      element.addContent(editor);
+      final Element keyRepeat = new Element("key-repeat");
+      keyRepeat.setAttribute("enabled", Boolean.toString(isKeyRepeat));
+      editor.addContent(keyRepeat);
+    }
+  }
+
+  public void readData(@NotNull Element element) {
+    final Element editor = element.getChild("editor");
+    if (editor != null) {
+      final Element keyRepeat = editor.getChild("key-repeat");
+      if (keyRepeat != null) {
+        final String enabled = keyRepeat.getAttributeValue("enabled");
+        if (enabled != null) {
+          isKeyRepeat = Boolean.valueOf(enabled);
+        }
+      }
+    }
+  }
+
+  @Nullable
+  public Boolean isKeyRepeat() {
+    return isKeyRepeat;
+  }
+
+  public void setKeyRepeat(@Nullable Boolean value) {
+    this.isKeyRepeat = value;
   }
 
   private static class LineNumbersGutterProvider implements TextAnnotationGutterProvider {
