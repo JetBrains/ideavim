@@ -59,4 +59,9 @@ public class ShiftRightLinesActionTest extends VimTestCase {
     typeText(parseKeys("Vj>."));
     myFixture.checkResult("        a\n        b\n");
   }
+
+  public void testShiftsDontCrashKeyHandler() {
+    myFixture.configureByText("a.txt", "\n");
+    typeText(parseKeys("<I<>", "<I<>"));
+  }
 }

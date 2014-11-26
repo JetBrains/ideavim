@@ -113,6 +113,12 @@ public class MotionActionTest extends VimTestCase {
     assertOffset(4);
   }
 
+  // |v_ib|
+  public void testInnerBlockCrashWhenNoDelimiterFound() {
+    typeTextInFile(parseKeys("di)"), "(x\n");
+    myFixture.checkResult("(x\n");
+  }
+
   // VIM-314 |d| |v_iB|
   public void testDeleteInnerCurlyBraceBlock() {
     typeTextInFile(parseKeys("di{"),
@@ -196,6 +202,12 @@ public class MotionActionTest extends VimTestCase {
     typeTextInFile(parseKeys("das"),
                    "Hello World! How a<caret>re you? Bye.\n");
     myFixture.checkResult("Hello World! Bye.\n");
+  }
+
+  // |v_as|
+  public void testSentenceMotionPastStartOfFile() {
+    typeTextInFile(parseKeys("8("), "\n" +
+                                    "P<caret>.\n");
   }
 
   // |d| |v_ip|
@@ -498,6 +510,13 @@ public class MotionActionTest extends VimTestCase {
     typeTextInFile(parseKeys("w"),
                    "<caret>one\n");
     assertOffset(2);
+  }
+
+  // |b|
+  public void testWordBackwardsAtFirstLineWithWhitespaceInFront() {
+    typeTextInFile(parseKeys("b"),
+                   "    <caret>x\n");
+    assertOffset(0);
   }
 
   public void testRightToLastChar() {

@@ -630,11 +630,11 @@ public class RegisterActions {
                           new Shortcut("=="));
     parser.registerAction(MappingMode.N, "VimShiftLeftLines", Command.Type.CHANGE,
                           new Shortcut("<<"));
-    parser.registerAction(MappingMode.N, "VimShiftLeftMotion", Command.Type.CHANGE,
+    parser.registerAction(MappingMode.N, "VimShiftLeftMotion", Command.Type.CHANGE, Command.FLAG_OP_PEND,
                           new Shortcut('<'), Argument.Type.MOTION);
     parser.registerAction(MappingMode.N, "VimShiftRightLines", Command.Type.CHANGE,
                           new Shortcut(">>"));
-    parser.registerAction(MappingMode.N, "VimShiftRightMotion", Command.Type.CHANGE,
+    parser.registerAction(MappingMode.N, "VimShiftRightMotion", Command.Type.CHANGE, Command.FLAG_OP_PEND,
                           new Shortcut('>'), Argument.Type.MOTION);
 
     // Jump Actions
