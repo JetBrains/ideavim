@@ -51,9 +51,9 @@ public class EditorGroup {
     final OptionChangeListener numbersChangeListener = new OptionChangeListener() {
       @Override
       public void valueChange(OptionChangeEvent event) {
-        final boolean enabled = options.isSet(Options.NUMBER) || options.isSet(Options.RELATIVE_NUMBER);
-        myLineNumbersGutterProvider.setEnabled(VimPlugin.isEnabled() && enabled);
-        EditorFactory.getInstance().refreshAllEditors();
+        for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
+          updateLineNumbers(editor);
+        }
       }
     };
     options.getOption(Options.NUMBER).addOptionChangeListener(numbersChangeListener);
@@ -124,7 +124,6 @@ public class EditorGroup {
 
     final EditorSettings settings = editor.getSettings();
     EditorData.setLineNumbersShown(editor, settings.isLineNumbersShown());
-    settings.setLineNumbersShown(false);
     updateLineNumbers(editor);
   }
 
@@ -137,9 +136,18 @@ public class EditorGroup {
   }
 
   private void updateLineNumbers(@NotNull Editor editor) {
-    final EditorGutter gutter = editor.getGutter();
-    gutter.closeAllAnnotations();
-    gutter.registerTextAnnotation(myLineNumbersGutterProvider);
+    final Options options = Options.getInstance();
+    final boolean relativeLineNumber = options.isSet(Options.RELATIVE_NUMBER);
+    final boolean lineNumber = options.isSet(Options.NUMBER);
+
+    final EditorSettings settings = editor.getSettings();
+    settings.setLineNumbersShown(lineNumber && !relativeLineNumber);
+
+    if (relativeLineNumber) {
+      final EditorGutter gutter = editor.getGutter();
+      gutter.closeAllAnnotations();
+      gutter.registerTextAnnotation(myLineNumbersGutterProvider);
+    }
   }
 
   private void setCursors(boolean isBlock) {
@@ -198,8 +206,6 @@ public class EditorGroup {
   }
 
   private static class LineNumbersGutterProvider implements TextAnnotationGutterProvider {
-    private boolean isEnabled;
-
     @Nullable
     @Override
     public String getLineText(int line, @NotNull Editor editor) {
@@ -212,9 +218,6 @@ public class EditorGroup {
         }
         else if (relativeLineNumber) {
           return lineNumberToString(getRelativeLineNumber(line, editor), editor);
-        }
-        else if (lineNumber) {
-          return lineNumberToString(getLineNumber(line), editor);
         }
       }
       return null;
@@ -271,14 +274,6 @@ public class EditorGroup {
 
     @Override
     public void gutterClosed() {
-    }
-
-    public boolean isEnabled() {
-      return isEnabled;
-    }
-
-    public void setEnabled(boolean isEnabled) {
-      this.isEnabled = isEnabled;
     }
   }
 }
