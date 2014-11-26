@@ -678,6 +678,7 @@ public class MotionGroup {
 
   public int repeatLastMatchChar(@NotNull Editor editor, int count) {
     int res = -1;
+    int startPos = editor.getCaretModel().getOffset();
     switch (lastFTCmd) {
       case LAST_F:
         res = moveCaretToNextCharacterOnLine(editor, -count, lastFTChar);
@@ -687,9 +688,15 @@ public class MotionGroup {
         break;
       case LAST_T:
         res = moveCaretToBeforeNextCharacterOnLine(editor, -count, lastFTChar);
+        if (res == startPos && Math.abs(count) == 1) {
+          res = moveCaretToBeforeNextCharacterOnLine(editor, 2 * count, lastFTChar);
+        }
         break;
       case LAST_t:
         res = moveCaretToBeforeNextCharacterOnLine(editor, count, lastFTChar);
+        if (res == startPos && Math.abs(count) == 1) {
+          res = moveCaretToBeforeNextCharacterOnLine(editor, 2 * count, lastFTChar);
+        }
         break;
     }
 
