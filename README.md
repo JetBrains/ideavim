@@ -164,8 +164,8 @@ in the issue tracker.
 6. Build IdeaVim and run IntelliJ with IdeaVim enabled using the "IdeaVim" run
    configuration (use "Run | Run... | IdeaVim").
 
-7. Build IdeaVim and run the tests using "All tests" run configuration (use
-   "Run | Run... | All Tests").
+7. In order to be able to run tests in your IntelliJ edition uncomment the
+   appropriate lines in the constructor of the `VimTestCase` class.
 
 
 Authors

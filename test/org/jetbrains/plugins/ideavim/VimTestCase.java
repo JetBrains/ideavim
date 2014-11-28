@@ -38,7 +38,10 @@ public abstract class VimTestCase extends UsefulTestCase {
   protected CodeInsightTestFixture myFixture;
 
   public VimTestCase() {
-    PlatformTestCase.initPlatformPrefix(ULTIMATE_MARKER_CLASS, "PlatformLangXml");
+    // Only in IntelliJ IDEA Ultimate Edition
+    PlatformTestCase.initPlatformLangPrefix();
+    // XXX: IntelliJ IDEA Community and Ultimate 12+
+    //PlatformTestCase.initPlatformPrefix(ULTIMATE_MARKER_CLASS, "PlatformLangXml");
   }
 
   @Override
