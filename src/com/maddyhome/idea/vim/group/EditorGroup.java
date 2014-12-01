@@ -136,6 +136,10 @@ public class EditorGroup {
   }
 
   private void updateLineNumbers(@NotNull Editor editor) {
+    if (!EditorData.isFileEditor(editor)) {
+      return;
+    }
+
     final Options options = Options.getInstance();
     final boolean relativeLineNumber = options.isSet(Options.RELATIVE_NUMBER);
     final boolean lineNumber = options.isSet(Options.NUMBER);
