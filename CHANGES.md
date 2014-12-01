@@ -3,6 +3,15 @@ The Changelog
 
 History of changes in IdeaVim for the IntelliJ platform.
 
+0.39, not released
+------------------
+
+A bugfix release.
+
+Bug fixes:
+
+* EA-63022 Don't update line numbers in the caret movement event listener
+
 
 0.38, 2014-12-01
 ----------------

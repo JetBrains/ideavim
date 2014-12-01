@@ -3,6 +3,10 @@
   <id>IdeaVIM</id>
   <change-notes>
     <![CDATA[
+      <p>Not released:</p>
+      <ul>
+        <li>Various bug fixes</li>
+      </ul>
       <p>0.38:</p>
       <ul>
         <li>Support for <code>:action</code> and <code>:actionlist</code> for executing arbitrary IDE actions</li>
