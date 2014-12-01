@@ -21,6 +21,7 @@ Features:
 
 Bug fixes:
 
+* VIM-818 Enable key repeat on Mac OS X every time it gets reset by the OS
 * VIM-624 Deselect visual selection range on opening the Ex entry field
 * VIM-511 Fixed editing offset after `<BS>` for `.` command
 * VIM-792 Fixed line-wise and block-wise paste commands for `*` and `+`
@@ -31,6 +32,9 @@ Bug fixes:
 * VIM-567 Fixed `:!` to allow running non-filter commands
 * VIM-536 Fixed `cc` on the second-to-last line
 * VIM-515 Fixed `cW` command detecting end-of-word incorrectly
+* VIM-794 Fixed NCDFE related to 'number' in IDEs other than IntelliJ
+* VIM-771 Fix semicolon repeat for 'till char' motion
+* VIM-723 Fix pasting to an empty line
 
 
 0.37, 2014-10-15
