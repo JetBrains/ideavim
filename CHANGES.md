@@ -4,8 +4,8 @@ The Changelog
 History of changes in IdeaVim for the IntelliJ platform.
 
 
-0.38, TBD
----------
+0.38, 2014-12-01
+----------------
 
 Added support for `number` and `relativenumber` options, `clipboard=unnamed`
 option. Added `:action` and `:actionlist` commands for executing arbitrary
