@@ -141,7 +141,17 @@ public class EditorGroup {
     final boolean lineNumber = options.isSet(Options.NUMBER);
 
     final EditorSettings settings = editor.getSettings();
-    settings.setLineNumbersShown(lineNumber && !relativeLineNumber);
+    final boolean showEditorLineNumbers = lineNumber && !relativeLineNumber;
+    if (settings.isLineNumbersShown() ^ showEditorLineNumbers) {
+      // Update line numbers later since it may be called from a caret listener
+      // on the caret move and it may move the caret internally
+      ApplicationManager.getApplication().invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          settings.setLineNumbersShown(showEditorLineNumbers);
+        }
+      });
+    }
 
     if (relativeLineNumber) {
       final EditorGutter gutter = editor.getGutter();
