@@ -145,7 +145,8 @@ public class EditorGroup {
     final boolean lineNumber = options.isSet(Options.NUMBER);
 
     final EditorSettings settings = editor.getSettings();
-    final boolean showEditorLineNumbers = lineNumber && !relativeLineNumber;
+    final boolean showEditorLineNumbers = (EditorData.isLineNumbersShown(editor) || lineNumber) && !relativeLineNumber;
+
     if (settings.isLineNumbersShown() ^ showEditorLineNumbers) {
       // Update line numbers later since it may be called from a caret listener
       // on the caret move and it may move the caret internally
