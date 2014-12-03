@@ -3,8 +3,9 @@ The Changelog
 
 History of changes in IdeaVim for the IntelliJ platform.
 
-0.39, not released
-------------------
+
+0.39, 2014-12-03
+----------------
 
 A bugfix release.
 
