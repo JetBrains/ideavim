@@ -10,6 +10,9 @@ A bugfix release.
 
 Bug fixes:
 
+* VIM-848 Show line numbers if they are enabled in the settings and there is
+  no `set number`
+* VIM-702 Fix infinite loop on `s/$/\r/g`
 * EA-63022 Don't update line numbers in the caret movement event listener
 
 
