@@ -375,6 +375,7 @@ public class SearchGroup {
             lastMatch = startoff;
             newpos = EditorHelper.offsetToCharacterPosition(editor, newend);
 
+            lnum += newpos.line - endpos.line;
             line2 += newpos.line - endpos.line;
           }
         }

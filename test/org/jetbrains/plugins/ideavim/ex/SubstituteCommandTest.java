@@ -75,6 +75,20 @@ public class SubstituteCommandTest extends VimTestCase {
            "one\n.two\n.three\n");
   }
 
+  // VIM-702 |:substitute|
+  public void testEndOfLineToNL() {
+    doTest("%s/$/\\r/g",
+           "<caret>one\ntwo\nthree\n",
+           "one\n\ntwo\n\nthree\n\n");
+  }
+
+  // VIM-702 |:substitute|
+  public void testStartOfLineToNL() {
+    doTest("%s/^/\\r/g",
+           "<caret>one\ntwo\nthree\n",
+           "\none\n\ntwo\n\nthree\n");
+  }
+
   private void doTest(final String command, String before, String after) {
     myFixture.configureByText("a.java", before);
     typeText(commandToKeys(command));
