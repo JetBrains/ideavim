@@ -1043,6 +1043,11 @@ public class MotionGroup {
     return EditorHelper.getLeadingCharacterOffset(editor, line);
   }
 
+  public int moveCaretToLineEndSkipLeading(@NotNull Editor editor) {
+    int logicalLine = editor.getCaretModel().getLogicalPosition().line;
+    return moveCaretToLineEndSkipLeading(editor, logicalLine);
+  }
+
   public int moveCaretToLineEndSkipLeading(@NotNull Editor editor, int line) {
     int start = EditorHelper.getLineStartOffset(editor, line);
     int end = EditorHelper.getLineEndOffset(editor, line, true);

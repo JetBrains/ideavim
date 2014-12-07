@@ -788,6 +788,9 @@ public class ChangeGroup {
     MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLineEnd(editor, startLine, true));
     for (int i = 1; i < count; i++) {
       int start = VimPlugin.getMotion().moveCaretToLineEnd(editor);
+      int trailingWhitespaceStart = VimPlugin.getMotion().moveCaretToLineEndSkipLeading(editor);
+      boolean hasTrailingWhitespace = start != trailingWhitespaceStart + 1;
+
       MotionGroup.moveCaret(editor, start);
       int offset;
       if (spaces) {
@@ -797,7 +800,7 @@ public class ChangeGroup {
         offset = VimPlugin.getMotion().moveCaretToLineStartOffset(editor);
       }
       deleteText(editor, new TextRange(editor.getCaretModel().getOffset(), offset), null);
-      if (spaces) {
+      if (spaces && !hasTrailingWhitespace) {
         insertText(editor, start, " ");
         MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretHorizontal(editor, -1, false));
       }
@@ -1290,18 +1293,14 @@ public class ChangeGroup {
       end = start;
       start = t;
     }
+    end = EditorHelper.normalizeOffset(editor, end);
 
     CharSequence chars = editor.getDocument().getCharsSequence();
+    StringBuilder sb = new StringBuilder();
     for (int i = start; i < end; i++) {
-      if (i >= chars.length()) {
-        break;
-      }
-
-      char ch = CharacterHelper.changeCase(chars.charAt(i), type);
-      if (ch != chars.charAt(i)) {
-        replaceText(editor, i, i + 1, Character.toString(ch));
-      }
+      sb.append(CharacterHelper.changeCase(chars.charAt(i), type));
     }
+    replaceText(editor, start, end, sb.toString());
   }
 
   public void autoIndentLines(@NotNull DataContext context) {
@@ -1345,12 +1344,6 @@ public class ChangeGroup {
 
     int sline = editor.offsetToLogicalPosition(range.getStartOffset()).line;
     int eline = editor.offsetToLogicalPosition(range.getEndOffset()).line;
-    int eoff = EditorHelper.getLineStartForOffset(editor, range.getEndOffset());
-    boolean elineIsEmpty = EditorHelper.getLineLength(editor, eline) == 0;
-    // Skip an empty ending line
-    if (eoff == range.getEndOffset() && elineIsEmpty) {
-      eline--;
-    }
 
     if (range.isMultiple()) {
       int col = editor.offsetToLogicalPosition(range.getStartOffset()).column;
@@ -1410,10 +1403,11 @@ public class ChangeGroup {
       // Shift non-blockwise selection
       for (int l = sline; l <= eline; l++) {
         int soff = EditorHelper.getLineStartOffset(editor, l);
+        int eoff = EditorHelper.getLineEndOffset(editor, l, true);
         int woff = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, l);
         int col = editor.offsetToVisualPosition(woff).column;
         int newCol = Math.max(0, col + dir * indentSize * count);
-        if (dir == 1 || col > 0) {
+        if (col > 0 || soff != eoff) {
           StringBuilder space = new StringBuilder();
           int tabCnt = 0;
           int spcCnt;
