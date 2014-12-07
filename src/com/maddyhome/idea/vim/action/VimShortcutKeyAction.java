@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.EditorData;
+import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import org.jetbrains.annotations.NotNull;
@@ -88,7 +89,6 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
 
   @Override
   public void actionPerformed(@NotNull AnActionEvent e) {
-    final DataContext dataContext = e.getDataContext();
     final Editor editor = getEditor(e);
     final KeyStroke keyStroke = getKeyStroke(e);
     if (editor != null && keyStroke != null) {
@@ -102,7 +102,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
         @Override
         public void run() {
           try {
-            KeyHandler.getInstance().handleKey(editor, keyStroke, dataContext);
+            KeyHandler.getInstance().handleKey(editor, keyStroke, new EditorDataContext(editor));
           }
           catch (Throwable throwable) {
             ourLogger.error(throwable);
