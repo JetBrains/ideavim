@@ -4,6 +4,18 @@ The Changelog
 History of changes in IdeaVim for the IntelliJ platform.
 
 
+Not Released
+------------
+
+A bugfix release.
+
+Bug fixes:
+
+* VIM-586 Invoke Vim shortcuts handler later to restore the sequence of input
+  events
+* VIM-838 `J` shouldn't add whitespace if there is a trailing space
+
+
 0.39, 2014-12-03
 ----------------
 
