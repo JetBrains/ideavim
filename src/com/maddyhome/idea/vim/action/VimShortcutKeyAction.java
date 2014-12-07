@@ -24,6 +24,7 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.options.ShowSettingsUtil;
@@ -83,8 +84,11 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     .addAll(getKeyStrokes(VK_DOWN, 0))
     .build();
 
+  private static final Logger ourLogger = Logger.getInstance(VimShortcutKeyAction.class.getName());
+
   @Override
   public void actionPerformed(@NotNull AnActionEvent e) {
+    final DataContext dataContext = e.getDataContext();
     final Editor editor = getEditor(e);
     final KeyStroke keyStroke = getKeyStroke(e);
     if (editor != null && keyStroke != null) {
@@ -93,7 +97,18 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
         notifyAboutShortcutConflict(keyStroke);
       }
       // Should we use InjectedLanguageUtil.getTopLevelEditor(editor) here, as we did in former EditorKeyHandler?
-      KeyHandler.getInstance().handleKey(editor, keyStroke, e.getDataContext());
+      // Run key handler later to restore input events sequence due to VimTypedActionHandler
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          try {
+            KeyHandler.getInstance().handleKey(editor, keyStroke, dataContext);
+          }
+          catch (Throwable throwable) {
+            ourLogger.error(throwable);
+          }
+        }
+      });
     }
   }
 
