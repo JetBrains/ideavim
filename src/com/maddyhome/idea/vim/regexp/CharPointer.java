@@ -279,7 +279,11 @@ public class CharPointer {
 
     int len = seq.length();
     for (int i = pointer; i < len; i++) {
-      if (seq.charAt(i) == c) {
+      char ch = seq.charAt(i);
+      if (ch == '\0') {
+        return null;
+      }
+      if (ch == c) {
         return ref(i - pointer);
       }
     }
@@ -312,6 +316,9 @@ public class CharPointer {
 
     for (int i = pointer; i < len; i++) {
       char ch = seq.charAt(i);
+      if (ch == '\0') {
+        return null;
+      }
       if (ch == c || ch == cc) {
         return ref(i - pointer);
       }

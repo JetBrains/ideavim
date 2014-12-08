@@ -74,6 +74,19 @@ public class SearchGroupTest extends VimTestCase {
     assertEquals(5, pos);
   }
 
+  // VIM-855 |/|
+  public void testCharacterClassRegression() {
+    final int pos = search("[^c]b",
+                           "<caret>bb\n");
+    assertEquals(0, pos);
+  }
+
+  // VIM-855 |/|
+  public void testCharacterClassRegressionCaseInsensitive() {
+    final int pos = search("\\c[ABC]D",
+                           "<caret>dd\n");
+    assertEquals(-1, pos);
+  }
 
   // |/|
   public void testSearchMotion() {
