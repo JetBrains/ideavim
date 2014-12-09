@@ -88,6 +88,13 @@ public class SearchGroupTest extends VimTestCase {
     assertEquals(-1, pos);
   }
 
+  // VIM-856 |/|
+  public void testNegativeLookbehindRegression() {
+    final int pos = search("a\\@<!b",
+                           "<caret>ab\n");
+    assertEquals(-1, pos);
+  }
+
   // |/|
   public void testSearchMotion() {
     typeTextInFile(parseKeys("/", "two", "<Enter>"),
