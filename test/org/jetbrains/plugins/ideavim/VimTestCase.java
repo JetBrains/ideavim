@@ -68,7 +68,7 @@ public abstract class VimTestCase extends UsefulTestCase {
   protected void tearDown() throws Exception {
     myFixture.tearDown();
     myFixture = null;
-    ExEntryPanel.getInstance().deactivate();
+    ExEntryPanel.getInstance().deactivate(false);
     super.tearDown();
   }
 
