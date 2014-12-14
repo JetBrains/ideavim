@@ -18,9 +18,14 @@
 
 package com.maddyhome.idea.vim.helper;
 
+import com.intellij.lang.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.Pair;
+import com.intellij.psi.PsiComment;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.util.*;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionChangeEvent;
@@ -143,6 +148,54 @@ public class SearchHelper {
     return new TextRange(bstart, bend);
   }
 
+  private static int findMatchingBlockCommentPair(@NotNull PsiElement element,
+                                                  int pos,
+                                                  @Nullable String commentPrefix,
+                                                  @Nullable String commentSuffix) {
+    if (commentPrefix == null || commentSuffix == null) {
+      return -1;
+    }
+
+    // Don't act on partial comments
+    if (!element.getText().startsWith(commentPrefix) || !element.getText().endsWith(commentSuffix)) {
+      return -1;
+    }
+
+    final int endOffset = element.getTextOffset() + element.getTextLength();
+    if (pos < element.getTextOffset() + commentPrefix.length()) {
+      return endOffset;
+    }
+    else if (pos >= endOffset - commentSuffix.length()) {
+      return element.getTextOffset();
+    }
+
+    return -1;
+  }
+
+  private static int findMatchingBlockCommentPair(PsiElement element, int pos) {
+    final Language language = PsiUtil.findLanguageFromElement(element);
+    final Commenter commenter = LanguageCommenters.INSTANCE.forLanguage(language);
+
+    element = PsiTreeUtil.getParentOfType(element, PsiComment.class, false);
+    if (element == null) {
+      return -1;
+    }
+
+    int ret = findMatchingBlockCommentPair(element, pos, commenter.getBlockCommentPrefix(),
+                                           commenter.getBlockCommentSuffix());
+    if (ret >= 0) {
+      return ret;
+    }
+
+    if (!(commenter instanceof CodeDocumentationAwareCommenter)) {
+      return -1;
+    }
+    final CodeDocumentationAwareCommenter docCommenter = (CodeDocumentationAwareCommenter)commenter;
+
+    return findMatchingBlockCommentPair(element, pos, docCommenter.getDocumentationCommentPrefix(),
+                                        docCommenter.getDocumentationCommentSuffix());
+  }
+
   /**
    * This looks on the current line, starting at the cursor position for one of {, }, (, ), [, or ]. It then searches
    * forward or backward, as appropriate for the associated match pair. String in double quotes are skipped over.
@@ -153,10 +206,23 @@ public class SearchHelper {
    *         were found on the remainder of the current line.
    */
   public static int findMatchingPairOnCurrentLine(@NotNull Editor editor) {
+    int pos = editor.getCaretModel().getOffset();
+
+    // If on '/*' of a block comment, jump to '*/' of that comment, or vice versa
+    PsiFile psiFile = PsiHelper.getFile(editor);
+    if (psiFile != null) {
+      PsiElement element = psiFile.findElementAt(pos);
+      if (element != null) {
+        int ret = findMatchingBlockCommentPair(element, pos);
+        if (ret >= 0) {
+          return ret;
+        }
+      }
+    }
+
     int line = editor.getCaretModel().getLogicalPosition().line;
     int end = EditorHelper.getLineEndOffset(editor, line, true);
     CharSequence chars = editor.getDocument().getCharsSequence();
-    int pos = editor.getCaretModel().getOffset();
     int loc = -1;
     // Search the remainder of the current line for one of the candidate characters
     while (pos < end) {

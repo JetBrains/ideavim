@@ -426,6 +426,76 @@ public class MotionActionTest extends VimTestCase {
     assertOffset(3);
   }
 
+  // |%|
+  public void testPercentMatchXmlCommentStart() {
+    configureByXmlText("<caret><!-- foo -->");
+    typeText(parseKeys("%"));
+    assertOffset(11);
+  }
+
+  // |%|
+  public void testPercentDoesntMatchPartialXmlComment() {
+    configureByXmlText("<!<caret>-- ");
+    typeText(parseKeys("%"));
+    assertOffset(2);
+  }
+
+  // |%|
+  public void testPercentMatchXmlCommentEnd() {
+    configureByXmlText("<!-- foo --<caret>>");
+    typeText(parseKeys("%"));
+    assertOffset(0);
+  }
+
+  // |%|
+  public void testPercentMatchJavaCommentStart() {
+    configureByJavaText("/<caret>* foo */");
+    typeText(parseKeys("%"));
+    assertOffset(8);
+  }
+
+  // |%|
+  public void testPercentDoesntMatchPartialJavaComment() {
+    configureByJavaText("<caret>/* ");
+    typeText(parseKeys("%"));
+    assertOffset(0);
+  }
+
+  // |%|
+  public void testPercentMatchJavaCommentEnd() {
+    configureByJavaText("/* foo <caret>*/");
+    typeText(parseKeys("%"));
+    assertOffset(0);
+  }
+
+  // |%|
+  public void testPercentMatchJavaDocCommentStart() {
+    configureByJavaText("/*<caret>* foo */");
+    typeText(parseKeys("%"));
+    assertOffset(9);
+  }
+
+  // |%|
+  public void testPercentMatchJavaDocCommentEnd() {
+    configureByJavaText("/** foo *<caret>/");
+    typeText(parseKeys("%"));
+    assertOffset(0);
+  }
+
+  // |%|
+  public void testPercentDoesntMatchAfterCommentStart() {
+    configureByJavaText("/*<caret> foo */");
+    typeText(parseKeys("%"));
+    assertOffset(2);
+  }
+
+  // |%|
+  public void testPercentDoesntMatchBeforeCommentEnd() {
+    configureByJavaText("/* foo <caret> */");
+    typeText(parseKeys("%"));
+    assertOffset(7);
+  }
+
   // |[(|
   public void testUnmatchedOpenParenthesis() {
     typeTextInFile(parseKeys("[("),
