@@ -301,7 +301,7 @@ public class CommandParser {
               state = STATE_RANGE_MARK;
             }
             else if (ch == '+' || ch == '-') {
-              location.append('0');
+              location.append('.');
               state = STATE_RANGE_OFFSET;
             }
             else if (ch == '\\') {
