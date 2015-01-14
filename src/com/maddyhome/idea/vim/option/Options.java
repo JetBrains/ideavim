@@ -471,6 +471,7 @@ public class Options {
     addOption(new ToggleOption(INCREMENTAL_SEARCH, "is", false));
     addOption(new ToggleOption(TIMEOUT, "to", true));
     addOption(new ListOption(VIMINFO, "vi", new String[]{"'100", "<50", "s10", "h"}, null));
+    addOption(new KeywordOption("iskeyword", "isk", new String[]{"@", "48-57", "_"}));
 
     registerExtensionOptions();
   }
