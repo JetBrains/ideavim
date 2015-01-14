@@ -18,7 +18,11 @@
 
 package com.maddyhome.idea.vim.helper;
 
+import com.maddyhome.idea.vim.option.*;
+import org.apache.commons.lang.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
 
 /**
  * This helper class is used when working with various character level operations
@@ -26,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 public class CharacterHelper {
 
   public static enum CharacterType {
-    LETTER_OR_DIGIT,
+    KEYWORD,
     HIRAGANA,
     KATAKANA,
     HALF_WIDTH_KATAKANA,
@@ -38,10 +42,53 @@ public class CharacterHelper {
   public static final char CASE_UPPER = 'u';
   public static final char CASE_LOWER = 'l';
 
+  // Keywords are represented by their ASCII code
+  @NotNull private static HashSet<Integer> keywords = new HashSet<Integer>();
+
+  static {
+
+    KeywordOption lo = (KeywordOption)Options.getInstance().getOption("iskeyword");
+    handleValues(lo);
+
+    lo.addOptionChangeListener(new OptionChangeListener() {
+      public void valueChange(@NotNull OptionChangeEvent event) {
+        handleValues((KeywordOption)event.getOption());
+      }
+    });
+  }
+
+  private static void handleValues(KeywordOption option) {
+
+    keywords.clear();
+
+    List<String> vals = option.values();
+
+    if (vals != null) {
+
+      for (String part : vals) {
+
+        KeywordOption.KeywordSpec spec = new KeywordOption.KeywordSpec(part);
+
+        while (spec.hasMoreElements()){
+          if (spec.negate()) {
+            keywords.remove(spec.nextElement());
+          }
+          else {
+            keywords.add(spec.nextElement());
+          }
+        }
+      }
+    }
+  }
+
+  private static boolean isKeyword(char c) {
+    return keywords.contains((int)c);
+  }
+
   /**
    * This returns the type of the supplied character. The logic is as follows:<br>
    * If the character is whitespace, <code>WHITESPACE</code> is returned.<br>
-   * If the punctuation is being skipped or the character is a letter, digit, or underscore, <code>LETTER_OR_DIGIT</code>
+   * If the punctuation is being skipped or the character is a letter, digit, or underscore, <code>KEYWORD</code>
    * is returned.<br>
    * Otherwise <code>PUNCTUATION</code> is returned.
    *
@@ -64,8 +111,8 @@ public class CharacterHelper {
     else if (isHalfWidthKatakanaLetter(ch)) {
       return CharacterType.HALF_WIDTH_KATAKANA;
     }
-    else if (punctuationAsLetters || Character.isLetterOrDigit(ch) || ch == '_') {
-      return CharacterType.LETTER_OR_DIGIT;
+    else if (punctuationAsLetters || isKeyword(ch)) {
+      return CharacterType.KEYWORD;
     }
     else {
       return CharacterType.PUNCTUATION;

@@ -731,7 +731,7 @@ public class SearchHelper {
     int pos = editor.getCaretModel().getOffset();
     int start = pos;
     CharacterHelper.CharacterType[] types = new CharacterHelper.CharacterType[] {
-      CharacterHelper.CharacterType.LETTER_OR_DIGIT,
+      CharacterHelper.CharacterType.KEYWORD,
       CharacterHelper.CharacterType.PUNCTUATION
     };
     for (int i = 0; i < 2; i++) {
@@ -761,7 +761,7 @@ public class SearchHelper {
 
     int end;
     // Special case 1 character words because 'findNextWordEnd' returns one to many chars
-    if (start < stop && CharacterHelper.charType(chars.charAt(start + 1), false) != CharacterHelper.CharacterType.LETTER_OR_DIGIT) {
+    if (start < stop && CharacterHelper.charType(chars.charAt(start + 1), false) != CharacterHelper.CharacterType.KEYWORD) {
       end = start + 1;
     }
     else {
