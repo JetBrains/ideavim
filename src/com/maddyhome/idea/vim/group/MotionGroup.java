@@ -25,6 +25,8 @@ import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.TextEditor;
+import com.intellij.openapi.fileEditor.impl.EditorTabbedContainer;
+import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.EventFacade;
@@ -1234,17 +1236,31 @@ public class MotionGroup {
     return false;
   }
 
-  public int moveCaretGotoPreviousTab(@NotNull Editor editor, @NotNull DataContext context) {
-    final AnAction previousTab = ActionManager.getInstance().getAction("PreviousTab");
-    final AnActionEvent e = new AnActionEvent(null, context, "", new Presentation(), ActionManager.getInstance(), 0);
-    previousTab.actionPerformed(e);
+  /* If 'absolute' is true, then set tab index to 'value', otherwise add 'value' to tab index with wraparound. */
+  private void switchEditorTab(EditorWindow editorWindow, int value, boolean absolute) {
+    if (editorWindow != null && editorWindow.getTabbedPane() != null) {
+      EditorTabbedContainer tabbedPane = editorWindow.getTabbedPane();
+      if (absolute) {
+        tabbedPane.setSelectedIndex(value);
+      }
+      else {
+        int tabIndex = (value + tabbedPane.getSelectedIndex()) % tabbedPane.getTabCount();
+        tabbedPane.setSelectedIndex(tabIndex < 0 ? tabIndex + tabbedPane.getTabCount() : tabIndex);
+      }
+    }
+  }
+
+  public int moveCaretGotoPreviousTab(@NotNull Editor editor, @NotNull DataContext context, int rawCount) {
+    switchEditorTab(EditorWindow.DATA_KEY.getData(context), rawCount >= 1 ? -rawCount : -1, false);
     return editor.getCaretModel().getOffset();
   }
 
-  public int moveCaretGotoNextTab(@NotNull Editor editor, @NotNull DataContext context) {
-    final AnAction nextTab = ActionManager.getInstance().getAction("NextTab");
-    final AnActionEvent e = new AnActionEvent(null, context, "", new Presentation(), ActionManager.getInstance(), 0);
-    nextTab.actionPerformed(e);
+  public int moveCaretGotoNextTab(@NotNull Editor editor, @NotNull DataContext context, int rawCount) {
+    if (rawCount >= 1) {
+      switchEditorTab(EditorWindow.DATA_KEY.getData(context), rawCount - 1, true);
+    } else {
+      switchEditorTab(EditorWindow.DATA_KEY.getData(context), 1, false);
+    }
     return editor.getCaretModel().getOffset();
   }
 
