@@ -30,7 +30,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.KeyEvent;
 
 /**
  * This is used to enter ex commands such as searches and "colon" commands
@@ -144,10 +143,6 @@ public class ExEntryPanel extends JPanel {
    */
   public void handleKey(@NotNull KeyStroke stroke) {
     entry.handleKey(stroke);
-  }
-
-  public void processKey(KeyEvent event) {
-    entry.processKeyEvent(event);
   }
 
   private void positionPanel() {
