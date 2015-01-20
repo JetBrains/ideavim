@@ -87,7 +87,7 @@ public class ExEntryPanel extends JPanel {
   /**
    * Turns on the ex entry field for the given editor
    *
-   * @param editor   The editor to use for dislay
+   * @param editor   The editor to use for display
    * @param context  The data context
    * @param label    The label for the ex entry (i.e. :, /, or ?)
    * @param initText The initial text for the entry
