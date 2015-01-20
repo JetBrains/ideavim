@@ -69,7 +69,7 @@ public class CharacterHelper {
 
         KeywordOption.KeywordSpec spec = new KeywordOption.KeywordSpec(part);
 
-        while (spec.hasMoreElements()){
+        while (spec.hasMoreElements()) {
           if (spec.negate()) {
             keywords.remove(spec.nextElement());
           }
@@ -82,7 +82,8 @@ public class CharacterHelper {
   }
 
   private static boolean isKeyword(char c) {
-    return keywords.contains((int)c);
+    int code = (int)c;
+    return (code < 256) ? keywords.contains(code) : Character.isLetterOrDigit(c);
   }
 
   /**

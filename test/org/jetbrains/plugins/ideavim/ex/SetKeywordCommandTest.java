@@ -71,4 +71,8 @@ public class SetKeywordCommandTest extends VimTestCase {
     setKeyword("=^");
     assertIsKeyword('^');
   }
+
+  public void testMultibyteCharactersAreKeywords() throws ExException {
+    assertIsKeyword('Ź');
+  }
 }
