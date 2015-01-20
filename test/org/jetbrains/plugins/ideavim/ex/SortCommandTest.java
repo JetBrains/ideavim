@@ -92,4 +92,10 @@ public class SortCommandTest extends VimTestCase {
     typeText(commandToKeys("sort"));
     myFixture.checkResult("a\nb\nc\nwhatever\nzee");
   }
+
+  public void testSortWithPrecedingWhiteSpace() {
+    myFixture.configureByText("a.txt", " zee\n c\n a\n b\n whatever");
+    typeText(commandToKeys("sort"));
+    myFixture.checkResult(" a\n b\n c\n whatever\n zee");
+  }
 }

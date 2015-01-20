@@ -17,7 +17,9 @@
  */
 package com.maddyhome.idea.vim.group;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -1544,7 +1546,7 @@ public class ChangeGroup {
   private boolean sortTextRange(@NotNull Editor editor, int start, int end,
                                 @NotNull Comparator<String> lineComparator) {
     final String selectedText = editor.getDocument().getText(new TextRangeInterval(start, end));
-    final List<String> lines = Arrays.asList(StringUtil.splitByLines(selectedText));
+    final List<String> lines = Lists.newArrayList(Splitter.on("\n").split(selectedText));
     if (lines.size() < 1) {
       return false;
     }
