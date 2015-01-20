@@ -273,14 +273,14 @@ public class CharPointer {
 
   @Nullable
   public CharPointer strchr(char c) {
-    if (end()) {
+    if (seq == null || end()) {
       return null;
     }
 
-    int len = seq.length();
+    final int len = seq.length();
     for (int i = pointer; i < len; i++) {
-      char ch = seq.charAt(i);
-      if (ch == '\0') {
+      final char ch = seq.charAt(i);
+      if (ch == '\u0000') {
         return null;
       }
       if (ch == c) {
@@ -289,34 +289,21 @@ public class CharPointer {
     }
 
     return null;
-
-    /*
-    String str = seq.subSequence(pointer, pointer + strlen()).toString();
-    int pos = str.indexOf(c);
-    if (pos != -1)
-    {
-        return ref(pos);
-    }
-    else
-    {
-        return null;
-    }
-    */
   }
 
   @Nullable
   public CharPointer istrchr(char c) {
-    if (end()) {
+    if (seq == null || end()) {
       return null;
     }
 
-    int len = seq.length();
-    char cc = Character.toUpperCase(c);
+    final int len = seq.length();
+    final char cc = Character.toUpperCase(c);
     c = Character.toLowerCase(c);
 
     for (int i = pointer; i < len; i++) {
-      char ch = seq.charAt(i);
-      if (ch == '\0') {
+      final char ch = seq.charAt(i);
+      if (ch == '\u0000') {
         return null;
       }
       if (ch == c || ch == cc) {
@@ -336,11 +323,7 @@ public class CharPointer {
   }
 
   public boolean end(int offset) {
-    if (seq == null) {
-      return true;
-    }
-
-    return pointer + offset >= seq.length();
+    return seq == null || pointer + offset >= seq.length();
   }
 
   public int OP() {
