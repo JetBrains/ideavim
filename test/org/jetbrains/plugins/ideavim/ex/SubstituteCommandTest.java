@@ -98,6 +98,12 @@ public class SubstituteCommandTest extends VimTestCase {
     myFixture.checkResult("FUU\nBAR\nbaz\n");
   }
 
+  public void testOffsetRange() {
+    doTest(".,+2s/a/b/g",
+           "aaa\naa<caret>a\naaa\naaa\naaa\n",
+           "aaa\nbbb\nbbb\nbbb\naaa\n");
+  }
+
   private void doTest(final String command, String before, String after) {
     myFixture.configureByText("a.java", before);
     typeText(commandToKeys(command));
