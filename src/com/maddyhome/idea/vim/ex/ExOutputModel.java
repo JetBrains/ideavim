@@ -56,7 +56,7 @@ public class ExOutputModel {
   public void clear() {
     myText = null;
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      ExOutputPanel.getInstance(myEditor).deactivate();
+      ExOutputPanel.getInstance(myEditor).deactivate(false);
     }
   }
 

@@ -140,7 +140,7 @@ public class MotionGroup {
    */
   private void processMouseClick(@NotNull Editor editor, @NotNull MouseEvent event) {
     if (ExEntryPanel.getInstance().isActive()) {
-      ExEntryPanel.getInstance().deactivate();
+      ExEntryPanel.getInstance().deactivate(false);
     }
 
     ExOutputModel.getInstance(editor).clear();
@@ -203,7 +203,7 @@ public class MotionGroup {
    */
   private void processLineSelection(@NotNull Editor editor, boolean update) {
     if (ExEntryPanel.getInstance().isActive()) {
-      ExEntryPanel.getInstance().deactivate();
+      ExEntryPanel.getInstance().deactivate(false);
     }
 
     ExOutputModel.getInstance(editor).clear();
@@ -233,7 +233,7 @@ public class MotionGroup {
 
   private void processMouseReleased(@NotNull Editor editor, @NotNull CommandState.SubMode mode, int startOff, int endOff) {
     if (ExEntryPanel.getInstance().isActive()) {
-      ExEntryPanel.getInstance().deactivate();
+      ExEntryPanel.getInstance().deactivate(false);
     }
 
     ExOutputModel.getInstance(editor).clear();
@@ -1705,7 +1705,7 @@ public class MotionGroup {
   public static class MotionEditorChange extends FileEditorManagerAdapter {
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
       if (ExEntryPanel.getInstance().isActive()) {
-        ExEntryPanel.getInstance().deactivate();
+        ExEntryPanel.getInstance().deactivate(false);
       }
       final FileEditor fileEditor = event.getOldEditor();
       if (fileEditor instanceof TextEditor) {
