@@ -14,6 +14,10 @@ Bug fixes:
 * VIM-586 Invoke Vim shortcuts handler later to restore the sequence of input
   events
 * VIM-838 `J` shouldn't add whitespace if there is a trailing space
+* VIM-855 Fixed regexp character class problem
+* VIM-210 Fix focus issues with the Ex panel and splits
+* VIM-575 Don't change cursor position of other splits in visual mode
+* VIM-864 Fixed visual marks getting changed during visual substitute
 
 
 0.39, 2014-12-03
