@@ -2,6 +2,8 @@ package org.jetbrains.plugins.ideavim.ex;
 
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
+import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
+
 /**
  * @author vlan
  */
@@ -87,6 +89,13 @@ public class SubstituteCommandTest extends VimTestCase {
     doTest("%s/^/\\r/g",
            "<caret>one\ntwo\nthree\n",
            "\none\n\ntwo\n\nthree\n");
+  }
+
+  // VIM-864 |:substitute|
+  public void testVisualSubstituteDoesntChangeVisualMarks() {
+    myFixture.configureByText("a.java", "foo\nbar\nbaz\n");
+    typeText(parseKeys("V", "j", ":'<,'>s/foo/fuu/<Enter>", "gv", "~"));
+    myFixture.checkResult("FUU\nBAR\nbaz\n");
   }
 
   private void doTest(final String command, String before, String after) {
