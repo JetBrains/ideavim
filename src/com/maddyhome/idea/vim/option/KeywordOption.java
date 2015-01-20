@@ -102,7 +102,7 @@ public class KeywordOption extends ListOption {
     static {
       // @ represents all letters, including those with umlauts, accents, etc., so we prepopulate
       // a list of list of letters upfront
-      for (int i = 0; i < 257; i++) {
+      for (int i = 0; i < 256; i++) {
         if (Character.isLetter(i)) {
           letters.add(i);
         }
