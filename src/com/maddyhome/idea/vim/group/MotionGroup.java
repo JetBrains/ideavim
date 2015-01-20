@@ -1733,7 +1733,6 @@ public class MotionGroup {
         for (Editor e : EditorFactory.getInstance().getEditors(editor.getDocument())) {
           if (!e.equals(editor)) {
             e.getSelectionModel().setSelection(newRange.getStartOffset(), newRange.getEndOffset());
-            e.getCaretModel().moveToOffset(editor.getCaretModel().getOffset());
           }
         }
       }
