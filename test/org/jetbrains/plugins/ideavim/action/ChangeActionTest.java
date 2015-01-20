@@ -70,6 +70,30 @@ public class ChangeActionTest extends VimTestCase {
            "hello worLD\n");
   }
 
+  public void testToggleCaseMotion() {
+    doTest(parseKeys("g~w"), "<caret>FooBar Baz\n", "fOObAR Baz\n");
+  }
+
+  public void testChangeUpperCase() {
+    doTest(parseKeys("gUw"), "<caret>FooBar Baz\n", "FOOBAR Baz\n");
+  }
+
+  public void testChangeLowerCase() {
+    doTest(parseKeys("guw"), "<caret>FooBar Baz\n", "foobar Baz\n");
+  }
+
+  public void testToggleCaseVisual() {
+    doTest(parseKeys("ve~"), "<caret>FooBar Baz\n", "fOObAR Baz\n");
+  }
+
+  public void testChangeUpperCaseVisual() {
+    doTest(parseKeys("veU"), "<caret>FooBar Baz\n", "FOOBAR Baz\n");
+  }
+
+  public void testChangeLowerCaseVisual() {
+    doTest(parseKeys("veu"), "<caret>FooBar Baz\n", "foobar Baz\n");
+  }
+
   // VIM-85 |i| |gi| |gg|
   public void testInsertAtPreviousAction() {
     doTest(parseKeys("i", "hello", "<Esc>", "gg", "gi", " world! "), "one\n" +
@@ -328,6 +352,100 @@ public class ChangeActionTest extends VimTestCase {
            "quux\n");
   }
 
+  // |r|
+  public void testReplaceOneChar() {
+    doTest(parseKeys("rx"),
+           "b<caret>ar\n",
+           "b<caret>xr\n");
+  }
+
+  // |r|
+  public void testReplaceMultipleCharsWithCount() {
+    doTest(parseKeys("3rX"),
+           "fo<caret>obar\n",
+           "fo<caret>XXXr\n");
+  }
+
+  // |r|
+  public void testReplaceMultipleCharsWithCountPastEndOfLine() {
+    doTest(parseKeys("6rX"),
+           "fo<caret>obar\n",
+           "fo<caret>obar\n");
+  }
+
+  // |r|
+  public void testReplaceMultipleCharsWithVisual() {
+    doTest(parseKeys("v", "ll", "j", "rZ"),
+           "fo<caret>obar\n" +
+           "foobaz\n",
+           "foZZZZ\n" +
+           "ZZZZZz\n");
+  }
+
+  // |r|
+  public void testReplaceOneCharWithNewline() {
+    doTest(parseKeys("r<Enter>"),
+           "    fo<caret>obar\n" +
+           "foobaz\n",
+           "    fo\n" +
+           "    bar\n" +
+           "foobaz\n");
+  }
+
+  // |r|
+  public void testReplaceCharWithNewlineAndCountAddsOnlySingleNewline() {
+    doTest(parseKeys("3r<Enter>"),
+           "    fo<caret>obar\n" +
+           "foobaz\n",
+           "    fo\n" +
+           "    r\n" +
+           "foobaz\n");
+  }
+
+  // |s|
+  public void testReplaceOneCharWithText() {
+    doTest(parseKeys("sxy<Esc>"),
+           "b<caret>ar\n",
+           "bx<caret>yr\n");
+  }
+
+  // |s|
+  public void testReplaceMultipleCharsWithTextWithCount() {
+    doTest(parseKeys("3sxy<Esc>"),
+           "fo<caret>obar\n",
+           "fox<caret>yr\n");
+  }
+
+  // |s|
+  public void testReplaceMultipleCharsWithTextWithCountPastEndOfLine() {
+    doTest(parseKeys("99sxyz<Esc>"),
+           "foo<caret>bar\n" +
+           "biff\n",
+           "fooxy<caret>z\n" +
+           "biff\n");
+  }
+
+  // |R|
+  public void testReplaceMode() {
+    doTest(parseKeys("Rbaz<Esc>"),
+           "foo<caret>bar\n",
+           "fooba<caret>z\n");
+  }
+
+  // |R| |i_<Insert>|
+  public void testReplaceModeSwitchToInsertModeAndBack() {
+    doTest(parseKeys("RXXX<Ins>YYY<Ins>ZZZ<Esc>"),
+           "aaa<caret>bbbcccddd\n",
+           "aaaXXXYYYZZ<caret>Zddd\n");
+  }
+
+  // |i| |i_<Insert>|
+  public void testInsertModeSwitchToReplaceModeAndBack() {
+    doTest(parseKeys("iXXX<Ins>YYY<Ins>ZZZ<Esc>"),
+           "aaa<caret>bbbcccddd\n",
+           "aaaXXXYYYZZ<caret>Zcccddd\n");
+  }
+
   // VIM-511 |.|
   public void testRepeatWithBackspaces() {
     doTest(parseKeys("ce", "foo", "<BS><BS><BS>", "foo", "<Esc>", "j0", "."),
@@ -383,22 +501,5 @@ public class ChangeActionTest extends VimTestCase {
                           "        i = 3;\n" +
                           "    }\n" +
                           "}\n");
-  }
-
-  private void doTest(final List<KeyStroke> keys, String before, String after) {
-    myFixture.configureByText(PlainTextFileType.INSTANCE, before);
-    final Editor editor = myFixture.getEditor();
-    final KeyHandler keyHandler = KeyHandler.getInstance();
-    final EditorDataContext dataContext = new EditorDataContext(editor);
-    final Project project = myFixture.getProject();
-    RunnableHelper.runWriteCommand(project, new Runnable() {
-      @Override
-      public void run() {
-        for (KeyStroke key : keys) {
-          keyHandler.handleKey(editor, key, dataContext);
-        }
-      }
-    }, null, null);
-    myFixture.checkResult(after);
   }
 }

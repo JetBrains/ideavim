@@ -580,24 +580,6 @@ public class MotionActionTest extends VimTestCase {
     assertOffset(4);
   }
 
-  // VIM-43 |i| |`.|
-  public void testGotoLastChangePosition() {
-    typeTextInFile(parseKeys("i", "hello ", "<Esc>", "gg", "`."),
-                   "one two\n" +
-                   "<caret>hello world\n" +
-                   "three four\n");
-    assertOffset(13);
-  }
-
-  // VIM-43 |p| |`.|
-  public void testGotoLastPutPosition() {
-    typeTextInFile(parseKeys("yy", "p", "gg", "`."),
-                   "one two\n" +
-                   "<caret>three\n" +
-                   "four five\n");
-    assertOffset(14);
-  }
-
   // VIM-262 |c_CTRL-R|
   public void testSearchFromRegister() {
     VimPlugin.getRegister().setKeys('a', stringToKeys("two"));
