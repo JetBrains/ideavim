@@ -1236,16 +1236,20 @@ public class MotionGroup {
     return false;
   }
 
-  /* If 'absolute' is true, then set tab index to 'value', otherwise add 'value' to tab index with wraparound. */
-  private void switchEditorTab(EditorWindow editorWindow, int value, boolean absolute) {
-    if (editorWindow != null && editorWindow.getTabbedPane() != null) {
-      EditorTabbedContainer tabbedPane = editorWindow.getTabbedPane();
-      if (absolute) {
-        tabbedPane.setSelectedIndex(value);
-      }
-      else {
-        int tabIndex = (value + tabbedPane.getSelectedIndex()) % tabbedPane.getTabCount();
-        tabbedPane.setSelectedIndex(tabIndex < 0 ? tabIndex + tabbedPane.getTabCount() : tabIndex);
+  /**
+   * If 'absolute' is true, then set tab index to 'value', otherwise add 'value' to tab index with wraparound.
+   */
+   private void switchEditorTab(@Nullable EditorWindow editorWindow, int value, boolean absolute) {
+    if (editorWindow != null) {
+      final EditorTabbedContainer tabbedPane = editorWindow.getTabbedPane();
+      if (tabbedPane != null) {
+        if (absolute) {
+          tabbedPane.setSelectedIndex(value);
+        }
+        else {
+          int tabIndex = (value + tabbedPane.getSelectedIndex()) % tabbedPane.getTabCount();
+          tabbedPane.setSelectedIndex(tabIndex < 0 ? tabIndex + tabbedPane.getTabCount() : tabIndex);
+        }
       }
     }
   }
@@ -1256,11 +1260,8 @@ public class MotionGroup {
   }
 
   public int moveCaretGotoNextTab(@NotNull Editor editor, @NotNull DataContext context, int rawCount) {
-    if (rawCount >= 1) {
-      switchEditorTab(EditorWindow.DATA_KEY.getData(context), rawCount - 1, true);
-    } else {
-      switchEditorTab(EditorWindow.DATA_KEY.getData(context), 1, false);
-    }
+    final boolean absolute = rawCount >= 1;
+    switchEditorTab(EditorWindow.DATA_KEY.getData(context), absolute ? rawCount - 1 : 1, absolute);
     return editor.getCaretModel().getOffset();
   }
 
