@@ -19,6 +19,7 @@ Bug fixes:
 * VIM-575 Don't change cursor position of other splits in visual mode
 * VIM-864 Fixed visual marks getting changed during visual substitute
 * VIM-856 Fixed regex look-behind problem
+* VIM-868 Allow count on `gt` and `gT`
 
 
 0.39, 2014-12-03
