@@ -18,6 +18,7 @@ Bug fixes:
 * VIM-210 Fix focus issues with the Ex panel and splits
 * VIM-575 Don't change cursor position of other splits in visual mode
 * VIM-864 Fixed visual marks getting changed during visual substitute
+* VIM-856 Fixed regex look-behind problem
 
 
 0.39, 2014-12-03
