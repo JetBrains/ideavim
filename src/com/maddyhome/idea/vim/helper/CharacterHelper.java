@@ -42,7 +42,7 @@ public class CharacterHelper {
   public static final char CASE_UPPER = 'u';
   public static final char CASE_LOWER = 'l';
 
-  // Keywords are represented by their ASCII code
+  // Keywords are represented by their Unicode code point
   @NotNull private static HashSet<Integer> keywords = new HashSet<Integer>();
 
   static {

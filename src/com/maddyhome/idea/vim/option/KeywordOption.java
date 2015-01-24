@@ -122,13 +122,13 @@ public class KeywordOption extends ListOption {
       if (keywords.length > 1 || keywords[0].equals("@")){
         isRange = true;
         if (keywords.length > 1) {
-          rangeLow = toAscii(keywords[0]);
-          rangeHigh = toAscii(keywords[1]);
+          rangeLow = toUnicode(keywords[0]);
+          rangeHigh = toUnicode(keywords[1]);
         } else {
           isAllLetters = true;
         }
       } else {
-        int keyword = toAscii(keywords[0]);
+        int keyword = toUnicode(keywords[0]);
         rangeLow = keyword;
         rangeHigh = keyword;
       }
@@ -162,14 +162,14 @@ public class KeywordOption extends ListOption {
 
     @Override
     public Integer nextElement() {
-      int asciiCode = (isAllLetters) ? letters.get(currIndex) : currIndex;
+      int code = (isAllLetters) ? letters.get(currIndex) : currIndex;
       currIndex++;
-      return asciiCode;
+      return code;
     }
 
-    private int toAscii(String str) {
+    private int toUnicode(String str) {
       if (NumberUtils.isNumber(str)) {
-        return Integer.parseInt(str); // If we have a number, it represents the ASCII code of a letter
+        return Integer.parseInt(str); // If we have a number, it represents the Unicode code point of a letter
       }
       else {
         return (int)str.charAt(0); // If it's not a number we should only have strings consisting of one char

@@ -30,7 +30,7 @@ public class SetKeywordCommandTest extends VimTestCase {
     assertIsKeyword('-');
   }
 
-  public void testAddsACharByAsciiCode() throws ExException {
+  public void testAddsACharByUnicodeCodePoint() throws ExException {
     setKeyword("=" + (int)'-');
     assertIsKeyword('-');
   }
