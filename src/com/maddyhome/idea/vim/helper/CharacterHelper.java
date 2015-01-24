@@ -83,7 +83,7 @@ public class CharacterHelper {
 
   private static boolean isKeyword(char c) {
     int code = (int)c;
-    return (code < 256) ? keywords.contains(code) : Character.isLetterOrDigit(c);
+    return (code >= '\u0100') || keywords.contains(code);
   }
 
   /**
