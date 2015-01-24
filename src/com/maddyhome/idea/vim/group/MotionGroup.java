@@ -25,6 +25,8 @@ import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.TextEditor;
+import com.intellij.openapi.fileEditor.impl.EditorTabbedContainer;
+import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.EventFacade;
@@ -140,7 +142,7 @@ public class MotionGroup {
    */
   private void processMouseClick(@NotNull Editor editor, @NotNull MouseEvent event) {
     if (ExEntryPanel.getInstance().isActive()) {
-      ExEntryPanel.getInstance().deactivate();
+      ExEntryPanel.getInstance().deactivate(false);
     }
 
     ExOutputModel.getInstance(editor).clear();
@@ -203,7 +205,7 @@ public class MotionGroup {
    */
   private void processLineSelection(@NotNull Editor editor, boolean update) {
     if (ExEntryPanel.getInstance().isActive()) {
-      ExEntryPanel.getInstance().deactivate();
+      ExEntryPanel.getInstance().deactivate(false);
     }
 
     ExOutputModel.getInstance(editor).clear();
@@ -233,7 +235,7 @@ public class MotionGroup {
 
   private void processMouseReleased(@NotNull Editor editor, @NotNull CommandState.SubMode mode, int startOff, int endOff) {
     if (ExEntryPanel.getInstance().isActive()) {
-      ExEntryPanel.getInstance().deactivate();
+      ExEntryPanel.getInstance().deactivate(false);
     }
 
     ExOutputModel.getInstance(editor).clear();
@@ -1234,17 +1236,32 @@ public class MotionGroup {
     return false;
   }
 
-  public int moveCaretGotoPreviousTab(@NotNull Editor editor, @NotNull DataContext context) {
-    final AnAction previousTab = ActionManager.getInstance().getAction("PreviousTab");
-    final AnActionEvent e = new AnActionEvent(null, context, "", new Presentation(), ActionManager.getInstance(), 0);
-    previousTab.actionPerformed(e);
+  /**
+   * If 'absolute' is true, then set tab index to 'value', otherwise add 'value' to tab index with wraparound.
+   */
+   private void switchEditorTab(@Nullable EditorWindow editorWindow, int value, boolean absolute) {
+    if (editorWindow != null) {
+      final EditorTabbedContainer tabbedPane = editorWindow.getTabbedPane();
+      if (tabbedPane != null) {
+        if (absolute) {
+          tabbedPane.setSelectedIndex(value);
+        }
+        else {
+          int tabIndex = (value + tabbedPane.getSelectedIndex()) % tabbedPane.getTabCount();
+          tabbedPane.setSelectedIndex(tabIndex < 0 ? tabIndex + tabbedPane.getTabCount() : tabIndex);
+        }
+      }
+    }
+  }
+
+  public int moveCaretGotoPreviousTab(@NotNull Editor editor, @NotNull DataContext context, int rawCount) {
+    switchEditorTab(EditorWindow.DATA_KEY.getData(context), rawCount >= 1 ? -rawCount : -1, false);
     return editor.getCaretModel().getOffset();
   }
 
-  public int moveCaretGotoNextTab(@NotNull Editor editor, @NotNull DataContext context) {
-    final AnAction nextTab = ActionManager.getInstance().getAction("NextTab");
-    final AnActionEvent e = new AnActionEvent(null, context, "", new Presentation(), ActionManager.getInstance(), 0);
-    nextTab.actionPerformed(e);
+  public int moveCaretGotoNextTab(@NotNull Editor editor, @NotNull DataContext context, int rawCount) {
+    final boolean absolute = rawCount >= 1;
+    switchEditorTab(EditorWindow.DATA_KEY.getData(context), absolute ? rawCount - 1 : 1, absolute);
     return editor.getCaretModel().getOffset();
   }
 
@@ -1705,7 +1722,7 @@ public class MotionGroup {
   public static class MotionEditorChange extends FileEditorManagerAdapter {
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
       if (ExEntryPanel.getInstance().isActive()) {
-        ExEntryPanel.getInstance().deactivate();
+        ExEntryPanel.getInstance().deactivate(false);
       }
       final FileEditor fileEditor = event.getOldEditor();
       if (fileEditor instanceof TextEditor) {
@@ -1733,7 +1750,6 @@ public class MotionGroup {
         for (Editor e : EditorFactory.getInstance().getEditors(editor.getDocument())) {
           if (!e.equals(editor)) {
             e.getSelectionModel().setSelection(newRange.getStartOffset(), newRange.getEndOffset());
-            e.getCaretModel().moveToOffset(editor.getCaretModel().getOffset());
           }
         }
       }

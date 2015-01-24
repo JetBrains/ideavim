@@ -68,7 +68,7 @@ public abstract class VimTestCase extends UsefulTestCase {
   protected void tearDown() throws Exception {
     myFixture.tearDown();
     myFixture = null;
-    ExEntryPanel.getInstance().deactivate();
+    ExEntryPanel.getInstance().deactivate(false);
     super.tearDown();
   }
 
@@ -148,5 +148,22 @@ public abstract class VimTestCase extends UsefulTestCase {
 
   public void assertPluginError(boolean isError) {
     assertEquals(isError, VimPlugin.isError());
+  }
+
+  public void doTest(final List<KeyStroke> keys, String before, String after) {
+    myFixture.configureByText(PlainTextFileType.INSTANCE, before);
+    final Editor editor = myFixture.getEditor();
+    final KeyHandler keyHandler = KeyHandler.getInstance();
+    final EditorDataContext dataContext = new EditorDataContext(editor);
+    final Project project = myFixture.getProject();
+    RunnableHelper.runWriteCommand(project, new Runnable() {
+      @Override
+      public void run() {
+        for (KeyStroke key : keys) {
+          keyHandler.handleKey(editor, key, dataContext);
+        }
+      }
+    }, null, null);
+    myFixture.checkResult(after);
   }
 }

@@ -30,7 +30,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.KeyEvent;
 
 /**
  * This is used to enter ex commands such as searches and "colon" commands
@@ -88,7 +87,7 @@ public class ExEntryPanel extends JPanel {
   /**
    * Turns on the ex entry field for the given editor
    *
-   * @param editor   The editor to use for dislay
+   * @param editor   The editor to use for display
    * @param context  The data context
    * @param label    The label for the ex entry (i.e. :, /, or ?)
    * @param initText The initial text for the entry
@@ -146,22 +145,20 @@ public class ExEntryPanel extends JPanel {
     entry.handleKey(stroke);
   }
 
-  public void processKey(KeyEvent event) {
-    entry.processKeyEvent(event);
-  }
-
   private void positionPanel() {
     if (parent == null) return;
 
     Container scroll = SwingUtilities.getAncestorOfClass(JScrollPane.class, parent);
     int height = (int)getPreferredSize().getHeight();
-    Rectangle bounds = scroll.getBounds();
-    bounds.translate(0, scroll.getHeight() - height);
-    bounds.height = height;
-    Point pos = SwingUtilities.convertPoint(scroll.getParent(), bounds.getLocation(), oldGlass);
-    bounds.setLocation(pos);
-    setBounds(bounds);
-    repaint();
+    if (scroll != null) {
+      Rectangle bounds = scroll.getBounds();
+      bounds.translate(0, scroll.getHeight() - height);
+      bounds.height = height;
+      Point pos = SwingUtilities.convertPoint(scroll.getParent(), bounds.getLocation(), oldGlass);
+      bounds.setLocation(pos);
+      setBounds(bounds);
+      repaint();
+    }
   }
 
   /**
@@ -179,14 +176,17 @@ public class ExEntryPanel extends JPanel {
   }
 
   /**
-   * Turns off the ex entry field and puts the focus back to the original component
-   *
+   * Turns off the ex entry field and optionally puts the focus back to the original component
    */
-  public void deactivate() {
+  public void deactivate(boolean refocusOwningEditor) {
     logger.info("deactivate");
     if (!active) return;
     active = false;
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
+      if (refocusOwningEditor && parent != null) {
+        parent.requestFocus();
+      }
+
       oldGlass.removeComponentListener(adapter);
       oldGlass.setVisible(false);
       oldGlass.remove(this);

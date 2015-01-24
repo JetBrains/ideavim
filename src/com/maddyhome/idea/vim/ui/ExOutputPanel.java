@@ -19,9 +19,7 @@
 package com.maddyhome.idea.vim.ui;
 
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBScrollPane;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.EditorData;
@@ -113,22 +111,20 @@ public class ExOutputPanel extends JPanel {
     myText.setText(data);
     myText.setCaretPosition(0);
     if (data.length() > 0) {
-      SwingUtilities.invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          activate();
-        }
-      });
+      activate();
     }
   }
 
   /**
-   * Turns off the ex entry field and puts the focus back to the original component
+   * Turns off the ex entry field and optionally puts the focus back to the original component
    */
-  public void deactivate() {
+  public void deactivate(boolean refocusOwningEditor) {
     if (!myActive) return;
     myActive = false;
     myText.setText("");
+    if (refocusOwningEditor) {
+      myEditor.getContentComponent().requestFocus();
+    }
     if (myOldGlass != null) {
       myOldGlass.removeComponentListener(myAdapter);
       myOldGlass.setVisible(false);
@@ -136,7 +132,6 @@ public class ExOutputPanel extends JPanel {
       myOldGlass.setOpaque(myWasOpaque);
       myOldGlass.setLayout(myOldLayout);
     }
-    myEditor.getContentComponent().requestFocus();
   }
 
   /**
@@ -160,17 +155,9 @@ public class ExOutputPanel extends JPanel {
     if (myOldGlass != null) {
       myOldGlass.setVisible(true);
     }
-    myActive = true;
 
-    SwingUtilities.invokeLater(new Runnable() {
-      public void run() {
-        SwingUtilities.invokeLater(new Runnable() {
-          public void run() {
-            myText.requestFocus();
-          }
-        });
-      }
-    });
+    myActive = true;
+    myText.requestFocus();
   }
 
   private void setFontForElements() {
@@ -277,11 +264,7 @@ public class ExOutputPanel extends JPanel {
   private void close(@Nullable final KeyEvent e) {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        deactivate();
-        final VirtualFile vf = EditorData.getVirtualFile(myEditor);
-        if (vf != null) {
-          FileEditorManager.getInstance(myEditor.getProject()).openFile(vf, true);
-        }
+        deactivate(true);
 
         final Project project = myEditor.getProject();
 
