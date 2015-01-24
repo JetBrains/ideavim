@@ -19,10 +19,7 @@
 package com.maddyhome.idea.vim.helper;
 
 import com.maddyhome.idea.vim.option.*;
-import org.apache.commons.lang.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.*;
 
 /**
  * This helper class is used when working with various character level operations
@@ -42,48 +39,10 @@ public class CharacterHelper {
   public static final char CASE_UPPER = 'u';
   public static final char CASE_LOWER = 'l';
 
-  // Keywords are represented by their Unicode code point
-  @NotNull private static HashSet<Integer> keywords = new HashSet<Integer>();
+  private static KeywordOption keywordOption;
 
   static {
-
-    KeywordOption lo = (KeywordOption)Options.getInstance().getOption("iskeyword");
-    handleValues(lo);
-
-    lo.addOptionChangeListener(new OptionChangeListener() {
-      public void valueChange(@NotNull OptionChangeEvent event) {
-        handleValues((KeywordOption)event.getOption());
-      }
-    });
-  }
-
-  private static void handleValues(KeywordOption option) {
-
-    keywords.clear();
-
-    List<String> vals = option.values();
-
-    if (vals != null) {
-
-      for (String part : vals) {
-
-        KeywordOption.KeywordSpec spec = new KeywordOption.KeywordSpec(part);
-
-        while (spec.hasMoreElements()) {
-          if (spec.negate()) {
-            keywords.remove(spec.nextElement());
-          }
-          else {
-            keywords.add(spec.nextElement());
-          }
-        }
-      }
-    }
-  }
-
-  private static boolean isKeyword(char c) {
-    int code = (int)c;
-    return (code >= '\u0100') || keywords.contains(code);
+    keywordOption = (KeywordOption)Options.getInstance().getOption("iskeyword");
   }
 
   /**
@@ -112,7 +71,7 @@ public class CharacterHelper {
     else if (isHalfWidthKatakanaLetter(ch)) {
       return CharacterType.HALF_WIDTH_KATAKANA;
     }
-    else if (punctuationAsLetters || isKeyword(ch)) {
+    else if (punctuationAsLetters || keywordOption.isKeyword(ch)) {
       return CharacterType.KEYWORD;
     }
     else {
