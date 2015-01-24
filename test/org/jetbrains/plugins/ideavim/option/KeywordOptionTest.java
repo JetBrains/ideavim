@@ -7,6 +7,7 @@ import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class KeywordOptionTest extends VimTestCase {
 
@@ -65,6 +66,12 @@ public class KeywordOptionTest extends VimTestCase {
   public void testRangeInWhichLeftValueIsHigherThanRightValueIsInvalid() {
     option.set("b-a");
     assertDoesntContain(option.values(), new ArrayList<String>(){{add("b-a");}});
+  }
+
+  public void testTwoAdjacentLettersAreInvalid() {
+    option.set("ab");
+    List<String> v = option.values();
+    assertDoesntContain(option.values(), new ArrayList<String>(){{add("ab");}});
   }
 
   public void testAddsACharByChar() throws ExException {

@@ -112,14 +112,16 @@ public class KeywordOption extends ListOption {
 
   private List<KeywordSpec> valsToValidatedAndReversedSpecs(List<String> vals) {
     List<KeywordSpec> specs = new ArrayList<KeywordSpec>();
-    for (String val : vals){
-      KeywordSpec spec = new KeywordSpec(val);
-      if (!spec.isValid()){
-        return null;
+    if (vals != null) {
+      for (String val : vals) {
+        KeywordSpec spec = new KeywordSpec(val);
+        if (!spec.isValid()) {
+          return null;
+        }
+        specs.add(spec);
       }
-      specs.add(spec);
+      Collections.reverse(specs);
     }
-    Collections.reverse(specs);
     return specs;
   }
 
