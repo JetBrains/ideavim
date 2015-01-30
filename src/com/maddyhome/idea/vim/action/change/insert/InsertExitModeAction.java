@@ -27,6 +27,8 @@ import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.ToggleOption;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -40,6 +42,14 @@ public class InsertExitModeAction extends VimCommandAction {
     super(new EditorActionHandlerBase() {
       public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         VimPlugin.getChange().processEscape(InjectedLanguageUtil.getTopLevelEditor(editor), context);
+        if (((ToggleOption)Options.getInstance().getOption("imecontrol")).getValue()) {
+          try {
+            // force IME off
+            JComponent component = editor.getComponent();
+            component.enableInputMethods(false);
+            component.getInputContext().setCompositionEnabled(false);
+          } catch (Exception ignore) {}
+        }
         return true;
       }
     });
