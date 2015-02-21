@@ -352,6 +352,38 @@ public class ChangeActionTest extends VimTestCase {
            "quux\n");
   }
 
+  public void testDeleteCharVisualBlockOnLastCharOfLine() {
+    doTest(parseKeys("<C-V>", "x"),
+           "fo<caret>o\n",
+           "fo\n");
+  }
+
+  public void testDeleteCharVisualBlockOnEmptyLinesDoesntDeleteAnything() {
+    doTest(parseKeys("<C-V>", "j", "x"),
+           "\n\n",
+           "\n\n");
+  }
+
+  public void testDeleteCharVisualBlockWithEmptyLineInTheMiddle() {
+    doTest(parseKeys("l", "<C-V>", "jj", "x"),
+           "foo\n" +
+           "\n" +
+           "bar\n",
+           "fo\n" +
+           "\n" +
+           "br\n");
+  }
+
+  public void testDeleteCharVisualBlockWithShorterLineInTheMiddle() {
+    doTest(parseKeys("l", "<C-V>", "jj", "x"),
+           "foo\n" +
+           "x\n" +
+           "bar\n",
+           "fo\n" +
+           "x\n" +
+           "br\n");
+  }
+
   // |r|
   public void testReplaceOneChar() {
     doTest(parseKeys("rx"),

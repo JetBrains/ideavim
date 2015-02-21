@@ -25,11 +25,13 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.LightVirtualFile;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
+import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.ui.ExOutputPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -91,9 +93,17 @@ public class EditorData {
    * @param editor The editor
    */
   public static void setLastColumn(@NotNull Editor editor, int col) {
+    boolean previousWasDollar = getLastColumn(editor) >= MotionGroup.LAST_COLUMN;
+    boolean currentIsDollar = col >= MotionGroup.LAST_COLUMN;
+
     editor.putUserData(LAST_COLUMN, col);
     int t = getLastColumn(editor);
     if (logger.isDebugEnabled()) logger.debug("setLastColumn(" + col + ") is now " + t);
+
+    boolean inVisualBlockMode = CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_BLOCK;
+    if (previousWasDollar != currentIsDollar && inVisualBlockMode) {
+      VimPlugin.getMotion().updateSelection(editor);
+    }
   }
 
   @Nullable
