@@ -273,11 +273,12 @@ public class SearchHelper {
           //Push tag id onto stack
           unmatchedTags.push(nameToken.substring(1));
       }
-      else if(unmatchedTags.isEmpty() || !unmatchedTags.peek().equals(nameToken)) {
+      //As soon as we find an unbalanced unmatched tag, we've found our starting tag
+      else if(unmatchedTags.isEmpty()) {
             unmatchedTags.push(nameToken);
             break;
       }
-      else {
+      else if(unmatchedTags.peek().equals(nameToken)) {
         unmatchedTags.pop();
       }
     }
@@ -391,15 +392,20 @@ public class SearchHelper {
       return null;
     }
 
-    //If there the last closing angle bracket is missing or we've advanced past it, undefined.
+    //If the last closing angle bracket is missing or we've advanced past it, behavior undefined.
     if(endOfLastClosingAngleBracket == -1 || endOfLastClosingAngleBracket < blockRange[1]) {
       return null;
     }
 
-    //Adjust block range.
+    //Adjust block range to outer
     if(isOuter) {
       blockRange[1] = endOfLastClosingAngleBracket;
     }
+    //If inner select in empty block, behavior undefined.
+    else if (blockRange[0] == blockRange[1]) {
+      return null;
+    }
+    //Adjust block range to inner
     else {
       blockRange[1]--;
     }
