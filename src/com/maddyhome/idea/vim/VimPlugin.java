@@ -18,7 +18,6 @@
 package com.maddyhome.idea.vim;
 
 import com.intellij.notification.*;
-import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ex.ApplicationEx;
 import com.intellij.openapi.application.ex.ApplicationManagerEx;
@@ -27,13 +26,8 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.actionSystem.EditorActionManager;
 import com.intellij.openapi.editor.actionSystem.TypedAction;
-import com.intellij.openapi.editor.event.EditorFactoryAdapter;
-import com.intellij.openapi.editor.event.EditorFactoryEvent;
-import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.keymap.Keymap;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
@@ -46,13 +40,10 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.WindowManager;
-import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.VimScriptParser;
 import com.maddyhome.idea.vim.group.*;
 import com.maddyhome.idea.vim.helper.DocumentManager;
-import com.maddyhome.idea.vim.helper.EditorData;
-import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
@@ -60,7 +51,6 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
 import java.io.File;
@@ -88,13 +78,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   public static final String IDEAVIM_NOTIFICATION_TITLE = "IdeaVim";
   public static final int STATE_VERSION = 4;
 
-  private static final boolean BLOCK_CURSOR_VIM_VALUE = true;
-  private static final boolean ANIMATED_SCROLLING_VIM_VALUE = false;
-  private static final boolean REFRAIN_FROM_SCROLLING_VIM_VALUE = true;
-
-  private boolean isBlockCursor = false;
-  private boolean isAnimatedScrolling = false;
-  private boolean isRefrainFromScrolling = false;
   private boolean error = false;
 
   private int previousStateVersion = 0;
@@ -104,8 +87,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   private boolean enabled = true;
 
   private static final Logger LOG = Logger.getInstance(VimPlugin.class);
-
-  private final Application myApp;
 
   @NotNull private final MotionGroup motion;
   @NotNull private final ChangeGroup change;
@@ -119,10 +100,10 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   @NotNull private final DigraphGroup digraph;
   @NotNull private final HistoryGroup history;
   @NotNull private final KeyGroup key;
+  @NotNull private final WindowGroup window;
+  @NotNull private final EditorGroup editor;
 
-  public VimPlugin(final Application app) {
-    myApp = app;
-
+  public VimPlugin() {
     motion = new MotionGroup();
     change = new ChangeGroup();
     copy = new CopyGroup();
@@ -135,6 +116,8 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     digraph = new DigraphGroup();
     history = new HistoryGroup();
     key = new KeyGroup();
+    window = new WindowGroup();
+    editor = new EditorGroup();
 
     LOG.debug("VimPlugin ctr");
   }
@@ -203,6 +186,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     search.saveData(element);
     history.saveData(element);
     key.saveData(element);
+    editor.saveData(element);
 
     return element;
   }
@@ -228,6 +212,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     search.readData(element);
     history.readData(element);
     key.readData(element);
+    editor.readData(element);
   }
 
   @NotNull
@@ -288,6 +273,16 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   @NotNull
   public static KeyGroup getKey() {
     return getInstance().key;
+  }
+
+  @NotNull
+  public static WindowGroup getWindow() {
+    return getInstance().window;
+  }
+
+  @NotNull
+  public static EditorGroup getEditor() {
+    return getInstance().editor;
   }
 
   @NotNull
@@ -360,37 +355,37 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   private void turnOnPlugin() {
     KeyHandler.getInstance().fullReset(null);
-    setCursors(BLOCK_CURSOR_VIM_VALUE);
-    setAnimatedScrolling(ANIMATED_SCROLLING_VIM_VALUE);
-    setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
 
+    getEditor().turnOn();
     getMotion().turnOn();
   }
 
   private void turnOffPlugin() {
     KeyHandler.getInstance().fullReset(null);
-    setCursors(isBlockCursor);
-    setAnimatedScrolling(isAnimatedScrolling);
-    setRefrainFromScrolling(isRefrainFromScrolling);
 
+    getEditor().turnOff();
     getMotion().turnOff();
   }
 
   private void updateState() {
     if (isEnabled() && !ApplicationManager.getApplication().isUnitTestMode()) {
       boolean requiresRestart = false;
-      if (previousStateVersion < 2 && SystemInfo.isMac) {
+      if (SystemInfo.isMac) {
         final MacKeyRepeat keyRepeat = MacKeyRepeat.getInstance();
         final Boolean enabled = keyRepeat.isEnabled();
-        if (enabled == null || !enabled) {
+        final Boolean isKeyRepeat = editor.isKeyRepeat();
+        if ((enabled == null || !enabled) && (isKeyRepeat == null || isKeyRepeat)) {
           if (Messages.showYesNoDialog("Do you want to enable repeating keys in Mac OS X on press and hold " +
                                        "(requires restart)?\n\n" +
                                        "(You can do it manually by running 'defaults write -g " +
                                        "ApplePressAndHoldEnabled 0' in the console).", IDEAVIM_NOTIFICATION_TITLE,
-                                       Messages.getQuestionIcon()
-          ) == Messages.YES) {
+                                       Messages.getQuestionIcon()) == Messages.YES) {
+            editor.setKeyRepeat(true);
             keyRepeat.setEnabled(true);
             requiresRestart = true;
+          }
+          else {
+            editor.setKeyRepeat(false);
           }
         }
       }
@@ -449,40 +444,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     DocumentManager.getInstance().addDocumentListener(new MarkGroup.MarkUpdater());
     DocumentManager.getInstance().addDocumentListener(new SearchGroup.DocumentSearchListener());
 
-    eventFacade.addEditorFactoryListener(new EditorFactoryAdapter() {
-      @Override
-      public void editorCreated(@NotNull EditorFactoryEvent event) {
-        final Editor editor = event.getEditor();
-        isBlockCursor = editor.getSettings().isBlockCursor();
-        isAnimatedScrolling = editor.getSettings().isAnimatedScrolling();
-        isRefrainFromScrolling = editor.getSettings().isRefrainFromScrolling();
-        EditorData.initializeEditor(editor);
-        DocumentManager.getInstance().addListeners(editor.getDocument());
-        key.registerRequiredShortcutKeys(editor);
-
-        if (VimPlugin.isEnabled()) {
-          // Turn on insert mode if editor doesn't have any file
-          if (!EditorData.isFileEditor(editor) && editor.getDocument().isWritable() &&
-              !CommandState.inInsertMode(editor)) {
-            KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke('i'), new EditorDataContext(editor));
-          }
-          editor.getSettings().setBlockCursor(!CommandState.inInsertMode(editor));
-          editor.getSettings().setAnimatedScrolling(ANIMATED_SCROLLING_VIM_VALUE);
-          editor.getSettings().setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
-        }
-      }
-
-      @Override
-      public void editorReleased(@NotNull EditorFactoryEvent event) {
-        final Editor editor = event.getEditor();
-        EditorData.uninitializeEditor(editor);
-        key.unregisterShortcutKeys(editor);
-        editor.getSettings().setAnimatedScrolling(isAnimatedScrolling);
-        editor.getSettings().setRefrainFromScrolling(isRefrainFromScrolling);
-        DocumentManager.getInstance().removeListeners(editor.getDocument());
-      }
-    }, myApp);
-
     eventFacade.addProjectManagerListener(new ProjectManagerAdapter() {
       @Override
       public void projectOpened(@NotNull final Project project) {
@@ -491,28 +452,5 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         eventFacade.addFileEditorManagerListener(project, new SearchGroup.EditorSelectionCheck());
       }
     });
-  }
-
-  private void setCursors(boolean isBlock) {
-    Editor[] editors = EditorFactory.getInstance().getAllEditors();
-    for (Editor editor : editors) {
-      // Vim plugin should be turned on in insert mode
-      ((EditorEx)editor).setInsertMode(true);
-      editor.getSettings().setBlockCursor(isBlock);
-    }
-  }
-
-  private void setAnimatedScrolling(boolean isOn) {
-    Editor[] editors = EditorFactory.getInstance().getAllEditors();
-    for (Editor editor : editors) {
-      editor.getSettings().setAnimatedScrolling(isOn);
-    }
-  }
-
-  private void setRefrainFromScrolling(boolean isOn) {
-    Editor[] editors = EditorFactory.getInstance().getAllEditors();
-    for (Editor editor : editors) {
-      editor.getSettings().setRefrainFromScrolling(isOn);
-    }
   }
 }

@@ -3051,7 +3051,7 @@ public class RegExp {
                 if (--count < minval) {
                   break;
                 }
-                if (reginput == regline) {
+                if (reginput.equals(regline)) {
                   /* backup to last char of previous line */
                   --reglnum;
                   regline = reg_getline(reglnum);
@@ -3132,7 +3132,7 @@ public class RegExp {
           case BEHIND:
           case NOBEHIND: {
             regsave_T save_after = new regsave_T(), save_start = new regsave_T();
-            regsave_T save_behind_pos = new regsave_T();
+            regsave_T save_behind_pos;
             boolean needmatch = (op == BEHIND);
 
             /*
@@ -3153,8 +3153,8 @@ public class RegExp {
                                  * line (for multi-line matching).
                                  * Set behind_pos to where the match should end, BHPOS
                                  * will match it. */
-              save_behind_pos = behind_pos;
-              behind_pos = save_start;
+              save_behind_pos = behind_pos == null ? null : new regsave_T(behind_pos);
+              behind_pos = new regsave_T(save_start);
               while (true) {
                 reg_restore(save_start);
                 if (regmatch(scan.OPERAND()) && reg_save_equal(behind_pos)) {
@@ -3676,9 +3676,9 @@ public class RegExp {
      */
   private boolean reg_save_equal(@NotNull regsave_T save) {
     if (reg_match == null) {
-      return reglnum == save.pos.lnum && reginput == regline.ref(save.pos.col);
+      return reglnum == save.pos.lnum && reginput.equals(regline.ref(save.pos.col));
     }
-    return reginput == save.ptr;
+    return reginput.equals(save.ptr);
   }
 
   /*
@@ -4694,6 +4694,14 @@ public class RegExp {
   private static class regsave_T {
     CharPointer ptr;   /* reginput pointer, for single-line regexp */
     @NotNull lpos_T pos = new lpos_T();    /* reginput pos, for multi-line regexp */
+
+    public regsave_T() {
+    }
+
+    public regsave_T(regsave_T rhs) {
+      ptr = rhs.ptr == null ? null : new CharPointer("").assign(rhs.ptr);
+      pos = new lpos_T(rhs.pos);
+    }
   }
 
   /* struct to save start/end pointer/position in for \(\) */

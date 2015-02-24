@@ -1,6 +1,8 @@
 package org.jetbrains.plugins.ideavim;
 
+import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.application.PathManager;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
@@ -22,6 +24,7 @@ import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -65,7 +68,7 @@ public abstract class VimTestCase extends UsefulTestCase {
   protected void tearDown() throws Exception {
     myFixture.tearDown();
     myFixture = null;
-    ExEntryPanel.getInstance().deactivate();
+    ExEntryPanel.getInstance().deactivate(false);
     super.tearDown();
   }
 
@@ -78,6 +81,12 @@ public abstract class VimTestCase extends UsefulTestCase {
   @NotNull
   protected Editor configureByText(@NotNull String content) {
     myFixture.configureByText(PlainTextFileType.INSTANCE, content);
+    return myFixture.getEditor();
+  }
+
+  @NotNull
+  protected Editor configureByJavaText(@NotNull String content) {
+    myFixture.configureByText(JavaFileType.INSTANCE, content);
     return myFixture.getEditor();
   }
 
@@ -113,9 +122,12 @@ public abstract class VimTestCase extends UsefulTestCase {
     return keys;
   }
 
-  public void assertOffset(int expectedOffset) {
-    final int offset = myFixture.getEditor().getCaretModel().getOffset();
-    assertEquals(expectedOffset, offset);
+  public void assertOffset(int... expectedOffsets) {
+    final List<Caret> carets = myFixture.getEditor().getCaretModel().getAllCarets();
+    assertEquals("Wrong amount of carets", expectedOffsets.length, carets.size());
+    for (int i = 0; i < expectedOffsets.length; i++) {
+      assertEquals(expectedOffsets[i], carets.get(i).getOffset());
+    }
   }
 
   public void assertMode(@NotNull CommandState.Mode expectedMode) {
@@ -123,7 +135,7 @@ public abstract class VimTestCase extends UsefulTestCase {
     assertEquals(expectedMode, mode);
   }
 
-  public void assertSelection(@NotNull String expected) {
+  public void assertSelection(@Nullable String expected) {
     final String selected = myFixture.getEditor().getSelectionModel().getSelectedText();
     assertEquals(expected, selected);
   }
@@ -136,5 +148,22 @@ public abstract class VimTestCase extends UsefulTestCase {
 
   public void assertPluginError(boolean isError) {
     assertEquals(isError, VimPlugin.isError());
+  }
+
+  public void doTest(final List<KeyStroke> keys, String before, String after) {
+    myFixture.configureByText(PlainTextFileType.INSTANCE, before);
+    final Editor editor = myFixture.getEditor();
+    final KeyHandler keyHandler = KeyHandler.getInstance();
+    final EditorDataContext dataContext = new EditorDataContext(editor);
+    final Project project = myFixture.getProject();
+    RunnableHelper.runWriteCommand(project, new Runnable() {
+      @Override
+      public void run() {
+        for (KeyStroke key : keys) {
+          keyHandler.handleKey(editor, key, dataContext);
+        }
+      }
+    }, null, null);
+    myFixture.checkResult(after);
   }
 }

@@ -1,6 +1,11 @@
 package org.jetbrains.plugins.ideavim.action;
 
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.common.Register;
+import com.maddyhome.idea.vim.option.ListOption;
+import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -26,6 +31,17 @@ public class CopyActionTest extends VimTestCase {
                           "two\n" +
                           "two\n" +
                           "three\n");
+  }
+
+  // VIM-723 |p|
+  public void testYankPasteToEmptyLine() {
+    typeTextInFile(parseKeys("yiw", "j", "p"),
+                   "foo\n" +
+                   "\n" +
+                   "bar\n");
+    myFixture.checkResult("foo\n" +
+                          "foo\n" +
+                          "bar\n");
   }
 
   // VIM-390 |yy| |p|
@@ -63,10 +79,9 @@ public class CopyActionTest extends VimTestCase {
 
   public void testWrongYankQuoteYankLine() {
     assertPluginError(false);
-    typeTextInFile(parseKeys("y\"", "yy", "p"),
-                   "one <caret>two\n" +
-                   "three\n" +
-                   "four\n");
+    typeTextInFile(parseKeys("y\"", "yy", "p"), "one <caret>two\n" +
+                                                "three\n" +
+                                                "four\n");
     assertPluginError(false);
     myFixture.checkResult("one two\n" +
                           "one two\n" +
@@ -82,7 +97,7 @@ public class CopyActionTest extends VimTestCase {
     assertEquals(0, editor.getCaretModel().getOffset());
   }
 
-   // |v_y|
+  // VIM-632 |CTRL-V| |v_y| |p|
   public void testYankVisualBlock() {
     typeTextInFile(parseKeys("<C-V>", "jl", "yl", "p"),
                    "<caret>* one\n" +
@@ -96,7 +111,64 @@ public class CopyActionTest extends VimTestCase {
     //
     // The problem is that the selection range should be 1-char wide when entering the visual block mode
 
-    myFixture.checkResult("* *one\n" +
-                          "* *two\n");
+    myFixture.checkResult("* * one\n" +
+                          "* * two\n");
+    assertSelection(null);
+    assertOffset(2);
+  }
+
+  // VIM-632 |CTRL-V| |v_y|
+  public void testStateAfterYankVisualBlock() {
+    typeTextInFile(parseKeys("<C-V>", "jl", "y"),
+                   "<caret>foo\n" +
+                   "bar\n");
+    assertOffset(0);
+    assertMode(CommandState.Mode.COMMAND);
+    assertSelection(null);
+  }
+
+  // VIM-476 |yy| |'clipboard'|
+  public void testClipboardUnnamed() {
+    assertEquals('\"', VimPlugin.getRegister().getDefaultRegister());
+    final ListOption clipboardOption = Options.getInstance().getListOption(Options.CLIPBOARD);
+    assertNotNull(clipboardOption);
+    clipboardOption.set("unnamed");
+    assertEquals('*', VimPlugin.getRegister().getDefaultRegister());
+    typeTextInFile(parseKeys("yy"),
+                   "foo\n" +
+                   "<caret>bar\n" +
+                   "baz\n");
+    final Register starRegister = VimPlugin.getRegister().getRegister('*');
+    if (starRegister != null) {
+      assertEquals("bar\n", starRegister.getText());
+    }
+  }
+
+  // VIM-792 |"*| |yy| |p|
+  public void testLineWiseClipboardYankPaste() {
+    configureByText("<caret>foo\n");
+    typeText(parseKeys("\"*yy", "\"*p"));
+    final Register register = VimPlugin.getRegister().getRegister('*');
+    if (register != null) {
+      assertEquals("foo\n", register.getText());
+      myFixture.checkResult("foo\n" +
+                            "<caret>foo\n");
+    }
+  }
+
+  // VIM-792 |"*| |CTRL-V| |v_y| |p|
+  public void testBlockWiseClipboardYankPaste() {
+    configureByText("<caret>foo\n" +
+                    "bar\n" +
+                    "baz\n");
+    typeText(parseKeys("<C-V>j", "\"*y", "\"*p"));
+    final Register register = VimPlugin.getRegister().getRegister('*');
+    if (register != null) {
+      assertEquals("f\n" +
+                   "b", register.getText());
+      myFixture.checkResult("ffoo\n" +
+                            "bbar\n" +
+                            "baz\n");
+    }
   }
 }

@@ -4,6 +4,102 @@ The Changelog
 History of changes in IdeaVim for the IntelliJ platform.
 
 
+Not Released
+------------
+
+A bugfix release.
+
+Bug fixes:
+
+* VIM-586 Invoke Vim shortcuts handler later to restore the sequence of input
+  events
+* VIM-838 `J` shouldn't add whitespace if there is a trailing space
+* VIM-855 Fixed regexp character class problem
+* VIM-210 Fix focus issues with the Ex panel and splits
+* VIM-575 Don't change cursor position of other splits in visual mode
+* VIM-864 Fixed visual marks getting changed during visual substitute
+* VIM-856 Fixed regex look-behind problem
+* VIM-868 Allow count on `gt` and `gT`
+
+
+0.39, 2014-12-03
+----------------
+
+A bugfix release.
+
+Bug fixes:
+
+* VIM-848 Show line numbers if they are enabled in the settings and there is
+  no `set number`
+* VIM-702 Fix infinite loop on `s/$/\r/g`
+* EA-63022 Don't update line numbers in the caret movement event listener
+
+
+0.38, 2014-12-01
+----------------
+
+Added support for `number` and `relativenumber` options, `clipboard=unnamed`
+option. Added `:action` and `:actionlist` commands for executing arbitrary
+IDE actions. Various bug fixes.
+
+Features:
+
+* VIM-476 Added support for `clipboard=unnamed` option
+* VIM-410 Added support for `relativenumber` option
+* VIM-483 Added support for `number` option
+* VIM-652 Added `:action` and `:actionlist` commands for executing arbitrary
+  IDE actions
+
+Bug fixes:
+
+* VIM-818 Enable key repeat on Mac OS X every time it gets reset by the OS
+* VIM-624 Deselect visual selection range on opening the Ex entry field
+* VIM-511 Fixed editing offset after `<BS>` for `.` command
+* VIM-792 Fixed line-wise and block-wise paste commands for `*` and `+`
+  registers
+* VIM-501 Fixed off-by-1 error in visual block-wise selection
+* VIM-613 Fixed repeat after `d$`
+* VIM-705 Fixed repeated multiline indent
+* VIM-567 Fixed `:!` to allow running non-filter commands
+* VIM-536 Fixed `cc` on the second-to-last line
+* VIM-515 Fixed `cW` command detecting end-of-word incorrectly
+* VIM-794 Fixed NCDFE related to 'number' in IDEs other than IntelliJ
+* VIM-771 Fix semicolon repeat for 'till char' motion
+* VIM-723 Fix pasting to an empty line
+
+
+0.37, 2014-10-15
+----------------
+
+A bugfix release.
+
+Bug fixes:
+
+* VIM-784 Fixed visual line selection where the start of the selection range
+  was greater than its end
+* VIM-407 Fixed `>>` to work if a line contains only one character
+
+
+0.36, 2014-10-14
+----------------
+
+Added support for common window splitting and navigation commands. Various bug
+fixes.
+
+Features:
+
+* VIM-171 Window `<C-W>` commands: split, close, next/previous windows,
+  left/right/up/down windows
+* VIM-265 Window `:split` and `:vsplit` commands
+
+Bug fixes:
+
+* VIM-632 Restored visual block mode that was broken due to multiple carets support
+* VIM-770 Close the current tab on `:quit` instead of all tabs with the current
+  file
+* VIM-569 Fixed `<C-W>` when the caret is at the end of a line
+
+
 0.35, 2014-05-15
 ----------------
 

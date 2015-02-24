@@ -17,7 +17,7 @@ IdeaVim
 
 IdeaVim is a Vim emulation plug-in for IDEs based on the IntelliJ platform.
 IdeaVim can be used with IntelliJ IDEA, RubyMine, PyCharm, PhpStorm, WebStorm,
-AppCode and Android Studio.
+AppCode, CLion and Android Studio.
 
 Resources:
 
@@ -36,7 +36,7 @@ Start the IDE normally and enable the Vim emulation using "Tools | Vim
 Emulator" menu item. At this point you must use Vim keystrokes in all editors.
 
 If you wish to disable the plugin, select the "Tools | Vim Emulator" menu so
-it is unchecked. At this point IDE will work with it's regular keyboard
+it is unchecked. At this point IDE will work with its regular keyboard
 shortcuts.
 
 Keyboard shortcut conflicts between the Vim emulation and the IDE can be
@@ -63,18 +63,17 @@ Supported:
 * Macros
 * Digraphs
 * Command line and search history
+* Window commands
 * Vim web help
 
 Not supported (yet):
 
-* Window commands
 * Jump lists
 * Various less used commands
 
 See also:
 
 * [List of recently added commands](https://github.com/JetBrains/ideavim/blob/master/src/com/maddyhome/idea/vim/package-info.java)
-* [List of commands covered with tests](https://github.com/JetBrains/ideavim/blob/master/index.txt)
 * [Top features and bugs](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+sort+by%3A+votes)
 
 
@@ -113,6 +112,16 @@ usage of the Vim emulator in dialog windows is an area for improvements.
 
 See also [unresolved escape issues](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+i_Esc).
 
+### Executing IDE Actions
+
+IdeaVim adds two commands for listing and executing arbitrary IDE actions as
+Ex commands or via `:map` command mappings:
+
+* `:actionlist [pattern]`
+    * Find IDE actions by name pattern
+* `:action {name}`
+    * Execute an action named `NAME`
+
 
 Contributing
 ------------
@@ -135,7 +144,7 @@ in the issue tracker.
 
 1. Fork IdeaVim on GitHub and clone the repository on your local machine.
 
-2. Open the project in IntelliJ IDEA 12+ (Community or Ultimate) using "File |
+2. Open the project in IntelliJ IDEA 13.1+ (Community or Ultimate) using "File |
    Open... | /path/to/ideavim".
 
 3. Set up a JDK if you haven't got it yet. Use "File | Project Structure | SDKs

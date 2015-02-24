@@ -162,7 +162,10 @@ public class CopyGroup {
         }
       }
       else {
-        pos = editor.getCaretModel().getOffset() + 1;
+        pos = editor.getCaretModel().getOffset();
+        if (!EditorHelper.isLineEmpty(editor, editor.getCaretModel().getLogicalPosition().line, false)) {
+          pos++;
+        }
       }
       // In case when text is empty this can occur
       if (pos > 0 && pos > editor.getDocument().getTextLength()) {

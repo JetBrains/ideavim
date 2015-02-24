@@ -34,6 +34,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -92,6 +93,11 @@ public class SearchGroup {
 
   public boolean searchAndReplace(@NotNull Editor editor, @NotNull LineRange range, @NotNull String excmd, String exarg) {
     boolean res = true;
+
+    // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
+    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
+      VimPlugin.getMotion().exitVisual(editor);
+    }
 
     CharPointer cmd = new CharPointer(new StringBuffer(exarg));
     //sub_nsubs = 0;
@@ -375,6 +381,7 @@ public class SearchGroup {
             lastMatch = startoff;
             newpos = EditorHelper.offsetToCharacterPosition(editor, newend);
 
+            lnum += newpos.line - endpos.line;
             line2 += newpos.line - endpos.line;
           }
         }

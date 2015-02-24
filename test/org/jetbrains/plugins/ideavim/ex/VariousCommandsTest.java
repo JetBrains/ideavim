@@ -1,5 +1,6 @@
 package org.jetbrains.plugins.ideavim.ex;
 
+import com.maddyhome.idea.vim.command.CommandState;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -26,5 +27,15 @@ public class VariousCommandsTest extends VimTestCase {
     typeText(commandToKeys("put"));
     myFixture.checkResult("Hello World!\n" +
                           "<caret>Hello \n");
+  }
+
+  // VIM-652 |:action|
+  public void testEditorRightAction() {
+    configureByText("<caret>foo\n" +
+                    "bar\n");
+    typeText(commandToKeys("action EditorRight"));
+    assertMode(CommandState.Mode.COMMAND);
+    myFixture.checkResult("f<caret>oo\n" +
+                          "bar\n");
   }
 }

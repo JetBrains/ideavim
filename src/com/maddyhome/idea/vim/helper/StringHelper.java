@@ -44,6 +44,10 @@ public class StringHelper {
     .put("return", VK_ENTER)
     .put("ins", VK_INSERT)
     .put("insert", VK_INSERT)
+    .put("home", VK_HOME)
+    .put("end", VK_END)
+    .put("pageup", VK_PAGE_UP)
+    .put("pagedown", VK_PAGE_DOWN)
     .put("del", VK_DELETE)
     .put("delete", VK_DELETE)
     .put("esc", VK_ESCAPE)
@@ -73,6 +77,8 @@ public class StringHelper {
     .put("leader", '\\')
     .put("space", ' ')
     .put("bar", '|')
+    .put("bslash", '\\')
+    .put("lt", '<')
     .build();
 
   private static final Set<String> UPPERCASE_DISPLAY_KEY_NAMES = ImmutableSet.<String>builder()

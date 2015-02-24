@@ -25,6 +25,8 @@ import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.fileEditor.TextEditor;
+import com.intellij.openapi.fileEditor.impl.EditorTabbedContainer;
+import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.EventFacade;
@@ -140,7 +142,7 @@ public class MotionGroup {
    */
   private void processMouseClick(@NotNull Editor editor, @NotNull MouseEvent event) {
     if (ExEntryPanel.getInstance().isActive()) {
-      ExEntryPanel.getInstance().deactivate();
+      ExEntryPanel.getInstance().deactivate(false);
     }
 
     ExOutputModel.getInstance(editor).clear();
@@ -203,7 +205,7 @@ public class MotionGroup {
    */
   private void processLineSelection(@NotNull Editor editor, boolean update) {
     if (ExEntryPanel.getInstance().isActive()) {
-      ExEntryPanel.getInstance().deactivate();
+      ExEntryPanel.getInstance().deactivate(false);
     }
 
     ExOutputModel.getInstance(editor).clear();
@@ -233,7 +235,7 @@ public class MotionGroup {
 
   private void processMouseReleased(@NotNull Editor editor, @NotNull CommandState.SubMode mode, int startOff, int endOff) {
     if (ExEntryPanel.getInstance().isActive()) {
-      ExEntryPanel.getInstance().deactivate();
+      ExEntryPanel.getInstance().deactivate(false);
     }
 
     ExOutputModel.getInstance(editor).clear();
@@ -683,6 +685,7 @@ public class MotionGroup {
 
   public int repeatLastMatchChar(@NotNull Editor editor, int count) {
     int res = -1;
+    int startPos = editor.getCaretModel().getOffset();
     switch (lastFTCmd) {
       case LAST_F:
         res = moveCaretToNextCharacterOnLine(editor, -count, lastFTChar);
@@ -692,9 +695,15 @@ public class MotionGroup {
         break;
       case LAST_T:
         res = moveCaretToBeforeNextCharacterOnLine(editor, -count, lastFTChar);
+        if (res == startPos && Math.abs(count) == 1) {
+          res = moveCaretToBeforeNextCharacterOnLine(editor, 2 * count, lastFTChar);
+        }
         break;
       case LAST_t:
         res = moveCaretToBeforeNextCharacterOnLine(editor, count, lastFTChar);
+        if (res == startPos && Math.abs(count) == 1) {
+          res = moveCaretToBeforeNextCharacterOnLine(editor, 2 * count, lastFTChar);
+        }
         break;
     }
 
@@ -1041,6 +1050,11 @@ public class MotionGroup {
     return EditorHelper.getLeadingCharacterOffset(editor, line);
   }
 
+  public int moveCaretToLineEndSkipLeading(@NotNull Editor editor) {
+    int logicalLine = editor.getCaretModel().getLogicalPosition().line;
+    return moveCaretToLineEndSkipLeading(editor, logicalLine);
+  }
+
   public int moveCaretToLineEndSkipLeading(@NotNull Editor editor, int line) {
     int start = EditorHelper.getLineStartOffset(editor, line);
     int end = EditorHelper.getLineEndOffset(editor, line, true);
@@ -1191,14 +1205,23 @@ public class MotionGroup {
   }
 
   public static void moveCaret(@NotNull Editor editor, int offset) {
+    moveCaret(editor, offset, false);
+  }
+
+  private static void moveCaret(@NotNull Editor editor, int offset, boolean forceKeepVisual) {
     if (offset >= 0 && offset <= editor.getDocument().getTextLength()) {
+      final boolean keepVisual = forceKeepVisual || keepVisual(editor);
       if (editor.getCaretModel().getOffset() != offset) {
+        if (!keepVisual) {
+          // XXX: Hack for preventing the merge multiple carets that results in loosing the primary caret for |v_d|
+          editor.getCaretModel().removeSecondaryCarets();
+        }
         editor.getCaretModel().moveToOffset(offset);
         EditorData.setLastColumn(editor, editor.getCaretModel().getVisualPosition().column);
         scrollCaretIntoView(editor);
       }
 
-      if (keepVisual(editor)) {
+      if (keepVisual) {
         VimPlugin.getMotion().updateSelection(editor, offset);
       }
       else {
@@ -1218,17 +1241,32 @@ public class MotionGroup {
     return false;
   }
 
-  public int moveCaretGotoPreviousTab(@NotNull Editor editor, @NotNull DataContext context) {
-    final AnAction previousTab = ActionManager.getInstance().getAction("PreviousTab");
-    final AnActionEvent e = new AnActionEvent(null, context, "", new Presentation(), ActionManager.getInstance(), 0);
-    previousTab.actionPerformed(e);
+  /**
+   * If 'absolute' is true, then set tab index to 'value', otherwise add 'value' to tab index with wraparound.
+   */
+   private void switchEditorTab(@Nullable EditorWindow editorWindow, int value, boolean absolute) {
+    if (editorWindow != null) {
+      final EditorTabbedContainer tabbedPane = editorWindow.getTabbedPane();
+      if (tabbedPane != null) {
+        if (absolute) {
+          tabbedPane.setSelectedIndex(value);
+        }
+        else {
+          int tabIndex = (value + tabbedPane.getSelectedIndex()) % tabbedPane.getTabCount();
+          tabbedPane.setSelectedIndex(tabIndex < 0 ? tabIndex + tabbedPane.getTabCount() : tabIndex);
+        }
+      }
+    }
+  }
+
+  public int moveCaretGotoPreviousTab(@NotNull Editor editor, @NotNull DataContext context, int rawCount) {
+    switchEditorTab(EditorWindow.DATA_KEY.getData(context), rawCount >= 1 ? -rawCount : -1, false);
     return editor.getCaretModel().getOffset();
   }
 
-  public int moveCaretGotoNextTab(@NotNull Editor editor, @NotNull DataContext context) {
-    final AnAction nextTab = ActionManager.getInstance().getAction("NextTab");
-    final AnActionEvent e = new AnActionEvent(null, context, "", new Presentation(), ActionManager.getInstance(), 0);
-    nextTab.actionPerformed(e);
+  public int moveCaretGotoNextTab(@NotNull Editor editor, @NotNull DataContext context, int rawCount) {
+    final boolean absolute = rawCount >= 1;
+    switchEditorTab(EditorWindow.DATA_KEY.getData(context), absolute ? rawCount - 1 : 1, absolute);
     return editor.getCaretModel().getOffset();
   }
 
@@ -1461,7 +1499,7 @@ public class MotionGroup {
       CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, MappingMode.VISUAL);
       visualStart = start;
       updateSelection(editor, end);
-      MotionGroup.moveCaret(editor, visualEnd);
+      MotionGroup.moveCaret(editor, visualEnd, true);
     }
     else if (mode == currentMode) {
       exitVisual(editor);
@@ -1523,6 +1561,7 @@ public class MotionGroup {
     }
     if (removeSelection) {
       editor.getSelectionModel().removeSelection();
+      editor.getCaretModel().removeSecondaryCarets();
     }
     CommandState.getInstance(editor).setSubMode(CommandState.SubMode.NONE);
   }
@@ -1571,29 +1610,29 @@ public class MotionGroup {
 
   @NotNull
   public TextRange getVisualRange(@NotNull Editor editor) {
-    if (editor.getSelectionModel().hasBlockSelection()) {
-      TextRange res = new TextRange(editor.getSelectionModel().getBlockSelectionStarts(),
-                                    editor.getSelectionModel().getBlockSelectionEnds());
+    final TextRange res = new TextRange(editor.getSelectionModel().getBlockSelectionStarts(),
+                                        editor.getSelectionModel().getBlockSelectionEnds());
+
+    final CommandState.SubMode subMode = CommandState.getInstance(editor).getSubMode();
+    if (subMode == CommandState.SubMode.VISUAL_BLOCK) {
+      final int[] ends = res.getEndOffsets();
+
       // If the last left/right motion was the $ command, simulate each line being selected to end-of-line
       if (EditorData.getLastColumn(editor) >= MotionGroup.LAST_COLUMN) {
-        int[] starts = res.getStartOffsets();
-        int[] ends = res.getEndOffsets();
-
+        final int[] starts = res.getStartOffsets();
         for (int i = 0; i < starts.length; i++) {
           if (ends[i] > starts[i]) {
             ends[i] = EditorHelper.getLineEndForOffset(editor, starts[i]);
           }
         }
-
-        res = new TextRange(starts, ends);
       }
-
-      return res;
+      else {
+        for (int i = 0; i < ends.length; ++i) {
+          ends[i] = EditorHelper.normalizeOffset(editor, ends[i] + 1, false);
+        }
+      }
     }
-    else {
-      return new TextRange(editor.getSelectionModel().getSelectionStart(),
-                           editor.getSelectionModel().getSelectionEnd());
-    }
+    return res;
   }
 
   @NotNull
@@ -1606,31 +1645,34 @@ public class MotionGroup {
     visualOffset = offset;
     int start = visualStart;
     int end = visualEnd;
-    if (start > end) {
-      int t = start;
-      start = end;
-      end = t;
-    }
+    final CommandState.SubMode subMode = CommandState.getInstance(editor).getSubMode();
 
-    if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_CHARACTER) {
-      BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
-      int lineEnd = EditorHelper.getLineEndForOffset(editor, end);
-      int adj = 1;
-      if (opt.getValue().equals("exclusive") || end == lineEnd) {
-        adj = 0;
+    if (subMode == CommandState.SubMode.VISUAL_CHARACTER) {
+      if (start > end) {
+        int t = start;
+        start = end;
+        end = t;
       }
+      final BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
+      int lineEnd = EditorHelper.getLineEndForOffset(editor, end);
+      final int adj = opt.getValue().equals("exclusive") || end == lineEnd ? 0 : 1;
       end = Math.min(EditorHelper.getFileSize(editor), end + adj);
       editor.getSelectionModel().setSelection(start, end);
     }
-    else if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_LINE) {
+    else if (subMode == CommandState.SubMode.VISUAL_LINE) {
+      if (start > end) {
+        int t = start;
+        start = end;
+        end = t;
+      }
       start = EditorHelper.getLineStartForOffset(editor, start);
       end = EditorHelper.getLineEndForOffset(editor, end);
       editor.getSelectionModel().setSelection(start, end);
     }
-    else {
-      LogicalPosition lineStart = editor.offsetToLogicalPosition(start);
-      LogicalPosition lend = editor.offsetToLogicalPosition(end);
-      editor.getSelectionModel().setBlockSelection(lineStart, lend);
+    else if (subMode == CommandState.SubMode.VISUAL_BLOCK) {
+      final LogicalPosition lineStart = editor.offsetToLogicalPosition(start);
+      final LogicalPosition lineEnd = editor.offsetToLogicalPosition(end);
+      editor.getSelectionModel().setBlockSelection(lineStart, lineEnd);
     }
 
     VimPlugin.getMark().setVisualSelectionMarks(editor, new TextRange(start, end));
@@ -1685,7 +1727,7 @@ public class MotionGroup {
   public static class MotionEditorChange extends FileEditorManagerAdapter {
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
       if (ExEntryPanel.getInstance().isActive()) {
-        ExEntryPanel.getInstance().deactivate();
+        ExEntryPanel.getInstance().deactivate(false);
       }
       final FileEditor fileEditor = event.getOldEditor();
       if (fileEditor instanceof TextEditor) {
@@ -1713,7 +1755,6 @@ public class MotionGroup {
         for (Editor e : EditorFactory.getInstance().getEditors(editor.getDocument())) {
           if (!e.equals(editor)) {
             e.getSelectionModel().setSelection(newRange.getStartOffset(), newRange.getEndOffset());
-            e.getCaretModel().moveToOffset(editor.getCaretModel().getOffset());
           }
         }
       }
@@ -1779,7 +1820,7 @@ public class MotionGroup {
     }
 
     @Nullable private Editor dragEditor = null;
-    @NotNull private CommandState.SubMode mode;
+    @NotNull private CommandState.SubMode mode = CommandState.SubMode.NONE;
     private int startOff;
     private int endOff;
   }

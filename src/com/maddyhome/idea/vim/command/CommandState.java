@@ -20,7 +20,6 @@ package com.maddyhome.idea.vim.command;
 
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.key.ParentNode;
 import com.maddyhome.idea.vim.option.NumberOption;
@@ -38,7 +37,7 @@ public class CommandState {
   public static final int DEFAULT_TIMEOUT_LENGTH = 1000;
 
   @Nullable private static Command ourLastChange = null;
-  private static char ourLastRegister = RegisterGroup.REGISTER_DEFAULT;
+  private char myLastChangeRegister;
 
   @NotNull private final Stack<State> myStates = new Stack<State>();
   @NotNull private final State myDefaultState = new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL);
@@ -53,6 +52,7 @@ public class CommandState {
     myMappingTimer = new Timer(DEFAULT_TIMEOUT_LENGTH, null);
     myMappingTimer.setRepeats(false);
     myStates.push(new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL));
+    myLastChangeRegister = VimPlugin.getRegister().getDefaultRegister();
   }
 
   @NotNull
@@ -255,7 +255,7 @@ public class CommandState {
    * @return The register key
    */
   public char getLastChangeRegister() {
-    return ourLastRegister;
+    return myLastChangeRegister;
   }
 
   /**
@@ -265,7 +265,7 @@ public class CommandState {
    */
   public void saveLastChangeCommand(Command cmd) {
     ourLastChange = cmd;
-    ourLastRegister = VimPlugin.getRegister().getCurrentRegister();
+    myLastChangeRegister = VimPlugin.getRegister().getCurrentRegister();
   }
 
   public boolean isRecording() {

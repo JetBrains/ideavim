@@ -23,10 +23,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.ex.CommandHandler;
-import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.ex.Ranges;
+import com.maddyhome.idea.vim.ex.*;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
 import org.jetbrains.annotations.NotNull;
@@ -38,41 +35,42 @@ import java.io.IOException;
  */
 public class CmdFilterHandler extends CommandHandler {
   public CmdFilterHandler() {
-    super("!", "", RANGE_REQUIRED | ARGUMENT_OPTIONAL | WRITABLE);
+    super("!", "", RANGE_OPTIONAL | ARGUMENT_OPTIONAL | WRITABLE);
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
     logger.info("execute");
 
-    Ranges ranges = cmd.getRanges();
-    if (ranges.size() == 0) {
-      // Need some range
+    String command = cmd.getArgument();
+    if (command.length() == 0) {
       return false;
     }
-    else {
-      // Filter
-      TextRange range = cmd.getTextRange(editor, context, false);
-      String command = cmd.getArgument();
-      if (command.indexOf('!') != -1) {
-        String last = VimPlugin.getProcess().getLastCommand();
-        if (last == null || last.length() == 0) {
-          VimPlugin.showMessage(MessageHelper.message(Msg.e_noprev));
-          return false;
-        }
 
-        command = command.replaceAll("!", last);
-      }
-
-      if (command == null || command.length() == 0) {
+    if (command.indexOf('!') != -1) {
+      String last = VimPlugin.getProcess().getLastCommand();
+      if (last == null || last.length() == 0) {
+        VimPlugin.showMessage(MessageHelper.message(Msg.e_noprev));
         return false;
       }
+      command = command.replaceAll("!", last);
+    }
 
-      try {
+    try {
+      Ranges ranges = cmd.getRanges();
+      if (ranges.size() == 0) {
+        // Show command output in a window
+        String commandOutput = VimPlugin.getProcess().executeCommand(command, null);
+        ExOutputModel.getInstance(editor).output(commandOutput);
+        return true;
+      }
+      else {
+        // Filter
+        TextRange range = cmd.getTextRange(editor, context, false);
         return VimPlugin.getProcess().executeFilter(editor, range, command);
       }
-      catch (IOException e) {
-        throw new ExException(e.getMessage());
-      }
+    }
+    catch (IOException e) {
+      throw new ExException(e.getMessage());
     }
   }
 

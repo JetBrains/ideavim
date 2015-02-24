@@ -70,6 +70,7 @@ public class CommandParser {
   public void registerHandlers() {
     if (registered) return;
 
+    new ActionListHandler();
     new AsciiHandler();
     new CmdFilterHandler();
     new CopyTextHandler();
@@ -77,6 +78,7 @@ public class CommandParser {
     new DigraphHandler();
     new DumpLineHandler();
     new EditFileHandler();
+    new ActionHandler();
     new ExitHandler();
     new FindClassHandler();
     new FindFileHandler();
@@ -110,6 +112,7 @@ public class CommandParser {
     new ShiftRightHandler();
     new SourceHandler();
     new SortHandler();
+    new SplitHandler();
     new SubstituteHandler();
     new UndoHandler();
     new WriteAllHandler();
@@ -298,7 +301,7 @@ public class CommandParser {
               state = STATE_RANGE_MARK;
             }
             else if (ch == '+' || ch == '-') {
-              location.append('0');
+              location.append('.');
               state = STATE_RANGE_OFFSET;
             }
             else if (ch == '\\') {

@@ -638,11 +638,11 @@ public class RegisterActions {
                           new Shortcut("=="));
     parser.registerAction(MappingMode.N, "VimShiftLeftLines", Command.Type.CHANGE,
                           new Shortcut("<<"));
-    parser.registerAction(MappingMode.N, "VimShiftLeftMotion", Command.Type.CHANGE,
+    parser.registerAction(MappingMode.N, "VimShiftLeftMotion", Command.Type.CHANGE, Command.FLAG_OP_PEND,
                           new Shortcut('<'), Argument.Type.MOTION);
     parser.registerAction(MappingMode.N, "VimShiftRightLines", Command.Type.CHANGE,
                           new Shortcut(">>"));
-    parser.registerAction(MappingMode.N, "VimShiftRightMotion", Command.Type.CHANGE,
+    parser.registerAction(MappingMode.N, "VimShiftRightMotion", Command.Type.CHANGE, Command.FLAG_OP_PEND,
                           new Shortcut('>'), Argument.Type.MOTION);
 
     // Jump Actions
@@ -664,9 +664,6 @@ public class RegisterActions {
                           new Shortcut("g8"));
     parser.registerAction(MappingMode.N, "VimFileGetFileInfo", Command.Type.OTHER_READONLY,
                           new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_G, KeyEvent.CTRL_MASK)));
-
-    // Window Actions
-    // TODO - CTRL-W commands: +, -, =, S, s, _, b, c, n, o, q, s, t, <up>, <down>
 
     // Macro Actions
     parser.registerAction(MappingMode.N, "VimPlaybackLastRegister", Command.Type.OTHER_WRITABLE,
@@ -733,11 +730,11 @@ public class RegisterActions {
                           new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, KeyEvent.CTRL_MASK)));
     parser.registerAction(MappingMode.I, "VimMotionLastColumn", Command.Type.INSERT, Command.FLAG_SAVE_STROKE,
                           new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, 0)));
-    parser.registerAction(MappingMode.I, "VimMotionLeft", Command.Type.INSERT, Command.FLAG_SAVE_STROKE, new Shortcut[]{
+    parser.registerAction(MappingMode.I, "VimMotionLeft", Command.Type.INSERT, new Shortcut[]{
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0))
     });
-    parser.registerAction(MappingMode.I, "VimMotionRight", Command.Type.INSERT, Command.FLAG_SAVE_STROKE, new Shortcut[]{
+    parser.registerAction(MappingMode.I, "VimMotionRight", Command.Type.INSERT, new Shortcut[]{
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0))
     });

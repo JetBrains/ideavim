@@ -3,6 +3,32 @@
   <id>IdeaVIM</id>
   <change-notes>
     <![CDATA[
+      <p>Not released:</p>
+      <ul>
+        <li>Various bug fixes</li>
+      </ul>
+      <p>0.39:</p>
+      <ul>
+        <li>Various bug fixes</li>
+      </ul>
+      <p>0.38:</p>
+      <ul>
+        <li>Support for <code>:action</code> and <code>:actionlist</code> for executing arbitrary IDE actions</li>
+        <li>Support for <code>number</code> and <code>relativenumber</code> options</li>
+        <li>Support for <code>clipboard=unnamed</code> option</li>
+        <li>Various bug fixes</li>
+      </ul>
+      <p>0.37:</p>
+      <ul>
+        <li>Various bug fixes</li>
+      </ul>
+      <p>0.36:</p>
+      <ul>
+        <li>Window commands from the <code>&lt;C-W&gt;</code> family</li>
+        <li>Support for <code>:split</code>/<code>:vsplit</code> commands</li>
+        <li>Fixed visual block selection mode</li>
+        <li>Various bug fixes</li>
+      </ul>
       <p>0.35:</p>
       <ul>
         <li><code>~/.vimrc</code> is no longer read by default, use <code>~/.ideavimrc</code> instead</li>
@@ -12,53 +38,18 @@
       <ul>
         <li>Various bug fixes</li>
       </ul>
-      <p>0.33:</p>
-      <ul>
-        <li>Support for <code>:map</code> key mapping commands</li>
-        <li>New keyboard shortcuts handler that doesn't require a separate keymap for Vim emulation</li>
-        <li>Support for <code>:source</code> command</li>
-        <li>Support for <code>:sort</code> command</li>
-        <li>Various bug fixes</li>
-      </ul>
-      <p>0.32:</p>
-      <ul>
-        <li>Fixed API compatibility with IntelliJ platform builds 132.1052+</li>
-      </ul>
-      <p>0.31:</p>
-      <ul>
-        <li>Various bug fixes</li>
-      </ul>
-      <p>0.30:</p>
-      <ul>
-        <li>Support for a separate <code>.ideavimrc</code> config file</li>
-        <li>Fixed long-standing issues with merged undo/redo commands and <code>&lt;Esc&gt;</code> during completion</li>
-        <li>Various bug fixes</li>
-      </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
     ]]>
   </change-notes>
   <description>
     <![CDATA[
       <p>Build @VERSION@-@BUILD-NUMBER@</p>
-      <p>Vim emulation plug-in for IDEs based on the IntelliJ platform. IdeaVim can be used with IntelliJ IDEA, RubyMine, PyCharm, PhpStorm, WebStorm, AppCode and Android Studio.</p>
-      <p>Supported functionality:</p>
+      <p>Vim emulation plug-in for IDEs based on the IntelliJ platform.</p>
+      <p>IdeaVim supports many Vim features including normal/insert/visual modes, motion keys, deletion/changing, marks, registers, some Ex commands, Vim regexps, configuration via ~/.ideavimrc, macros, window commands, etc.</p>
+      <p>See also:</p>
       <ul>
-          <li>Motion keys</li>
-          <li>Deletion/Changing</li>
-          <li>Insert mode commands</li>
-          <li>Marks</li>
-          <li>Registers</li>
-          <li>Undo/redo</li>
-          <li>Visual mode commands</li>
-          <li>Some Ex commands</li>
-          <li>Some :set options</li>
-          <li>Full Vim regexps for search and search/replace</li>
-          <li>Key mappings</li>
-          <li>Configuration via ~/.ideavimrc</li>
-          <li>Macros</li>
-          <li>Digraphs</li>
-          <li>Command line and search history</li>
-          <li>Vim web help</li>
+        <li><a href="https://github.com/JetBrains/ideavim">GitHub repository</a> for documentation and contributing</li>
+        <li><a href="http://youtrack.jetbrains.com/issues/VIM">Issue tracker</a> for feature requests and bug reports</li>
       </ul>
     ]]>
   </description>
@@ -319,6 +310,18 @@
     <action id="VimFileGetHex" class="com.maddyhome.idea.vim.action.file.FileGetHexAction" text="Get Hex Info"/>
     <action id="VimFileGetFileInfo" class="com.maddyhome.idea.vim.action.file.FileGetFileInfoAction" text="Get File Info"/>
     <action id="VimFileGetLocationInfo" class="com.maddyhome.idea.vim.action.file.FileGetLocationInfoAction" text="Get Location Info"/>
+
+    <!-- Window -->
+    <action id="VimWindowSplitVertical" class="com.maddyhome.idea.vim.action.window.VerticalSplitAction" text="Split window vertically"/>
+    <action id="VimWindowSplitHorizontal" class="com.maddyhome.idea.vim.action.window.HorizontalSplitAction" text="Split window horizontally"/>
+    <action id="VimWindowClose" class="com.maddyhome.idea.vim.action.window.CloseWindowAction" text="Close current window"/>
+    <action id="VimWindowOnly" class="com.maddyhome.idea.vim.action.window.WindowOnlyAction" text="Close all windows except current"/>
+    <action id="VimWindowNext" class="com.maddyhome.idea.vim.action.window.WindowNextAction" text="Select next window"/>
+    <action id="VimWindowPrev" class="com.maddyhome.idea.vim.action.window.WindowPrevAction" text="Select previous window"/>
+    <action id="VimWindowLeft" class="com.maddyhome.idea.vim.action.window.WindowLeftAction" text="Go to left window"/>
+    <action id="VimWindowRight" class="com.maddyhome.idea.vim.action.window.WindowRightAction" text="Go to right window"/>
+    <action id="VimWindowUp" class="com.maddyhome.idea.vim.action.window.WindowUpAction" text="Go to window up"/>
+    <action id="VimWindowDown" class="com.maddyhome.idea.vim.action.window.WindowDownAction" text="Go to window down"/>
 
     <!-- Search -->
     <action id="VimSearchFwdEntry" class="com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction" text="Search Forward"/>

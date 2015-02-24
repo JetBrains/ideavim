@@ -6,6 +6,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.command.CommandState.Mode.COMMAND;
+import static com.maddyhome.idea.vim.command.CommandState.Mode.VISUAL;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
 
@@ -83,6 +84,54 @@ public class MotionActionTest extends VimTestCase {
     assertMode(COMMAND);
   }
 
+  // VIM-771 |t| |;|
+  public void testTillCharRight() {
+    typeTextInFile(parseKeys("t:;"),
+                   "<caret> 1:a 2:b 3:c \n");
+    myFixture.checkResult(" 1:a <caret>2:b 3:c \n");
+  }
+
+  // VIM-771 |t| |;|
+  public void testTillCharRightRepeated() {
+    typeTextInFile(parseKeys("t:;"),
+                   "<caret> 1:a 2:b 3:c \n");
+    myFixture.checkResult(" 1:a <caret>2:b 3:c \n");
+  }
+
+  // VIM-771 |t| |;|
+  public void testTillCharRightRepeatedWithCount2() {
+    typeTextInFile(parseKeys("t:2;"),
+                   "<caret> 1:a 2:b 3:c \n");
+    myFixture.checkResult(" 1:a <caret>2:b 3:c \n");
+  }
+
+  // VIM-771 |t| |;|
+  public void testTillCharRightRepeatedWithCountHigherThan2() {
+    typeTextInFile(parseKeys("t:3;"), "<caret> 1:a 2:b 3:c \n");
+    myFixture.checkResult(" 1:a 2:b <caret>3:c \n");
+  }
+
+  // VIM-771 |t| |,|
+  public void testTillCharRightReverseRepeated() {
+    typeTextInFile(parseKeys("t:,,"),
+                   " 1:a 2:b<caret> 3:c \n");
+    myFixture.checkResult(" 1:<caret>a 2:b 3:c \n");
+  }
+
+  // VIM-771 |t| |,|
+  public void testTillCharRightReverseRepeatedWithCount2() {
+    typeTextInFile(parseKeys("t:,2,"),
+                   " 1:a 2:b<caret> 3:c \n");
+    myFixture.checkResult(" 1:<caret>a 2:b 3:c \n");
+  }
+
+  // VIM-771 |t| |,|
+  public void testTillCharRightReverseRepeatedWithCountHigherThan3() {
+    typeTextInFile(parseKeys("t:,3,"),
+                   " 0:_ 1:a 2:b<caret> 3:c \n");
+    myFixture.checkResult(" 0:<caret>_ 1:a 2:b 3:c \n");
+  }
+
   // VIM-326 |d| |v_ib|
   public void testDeleteInnerBlock() {
     typeTextInFile(parseKeys("di)"),
@@ -110,6 +159,12 @@ public class MotionActionTest extends VimTestCase {
                    "foo<caret>(bar)\n");
     myFixture.checkResult("foo()\n");
     assertOffset(4);
+  }
+
+  // |v_ib|
+  public void testInnerBlockCrashWhenNoDelimiterFound() {
+    typeTextInFile(parseKeys("di)"), "(x\n");
+    myFixture.checkResult("(x\n");
   }
 
   // VIM-314 |d| |v_iB|
@@ -195,6 +250,12 @@ public class MotionActionTest extends VimTestCase {
     typeTextInFile(parseKeys("das"),
                    "Hello World! How a<caret>re you? Bye.\n");
     myFixture.checkResult("Hello World! Bye.\n");
+  }
+
+  // |v_as|
+  public void testSentenceMotionPastStartOfFile() {
+    typeTextInFile(parseKeys("8("), "\n" +
+                                    "P<caret>.\n");
   }
 
   // |d| |v_ip|
@@ -499,6 +560,13 @@ public class MotionActionTest extends VimTestCase {
     assertOffset(2);
   }
 
+  // |b|
+  public void testWordBackwardsAtFirstLineWithWhitespaceInFront() {
+    typeTextInFile(parseKeys("b"),
+                   "    <caret>x\n");
+    assertOffset(0);
+  }
+
   public void testRightToLastChar() {
     typeTextInFile(parseKeys("i<Right>"),
                    "on<caret>e\n");
@@ -510,24 +578,6 @@ public class MotionActionTest extends VimTestCase {
                    "<caret>one\n" +
                    "\n");
     assertOffset(4);
-  }
-
-  // VIM-43 |i| |`.|
-  public void testGotoLastChangePosition() {
-    typeTextInFile(parseKeys("i", "hello ", "<Esc>", "gg", "`."),
-                   "one two\n" +
-                   "<caret>hello world\n" +
-                   "three four\n");
-    assertOffset(13);
-  }
-
-  // VIM-43 |p| |`.|
-  public void testGotoLastPutPosition() {
-    typeTextInFile(parseKeys("yy", "p", "gg", "`."),
-                   "one two\n" +
-                   "<caret>three\n" +
-                   "four five\n");
-    assertOffset(14);
   }
 
   // VIM-262 |c_CTRL-R|
@@ -592,5 +642,30 @@ public class MotionActionTest extends VimTestCase {
     assertSelection("        foo\n" +
                     "        bar\n" +
                     "        baz");
+  }
+
+  public void testVisualLineSelectDown() {
+    typeTextInFile(parseKeys("Vj"),
+                   "foo\n" +
+                   "<caret>bar\n" +
+                   "baz\n" +
+                   "quux\n");
+    assertMode(VISUAL);
+    assertSelection("bar\n" +
+                    "baz");
+    assertOffset(8);
+  }
+
+  // VIM-784
+  public void testVisualLineSelectUp() {
+    typeTextInFile(parseKeys("Vk"),
+                   "foo\n" +
+                   "bar\n" +
+                   "<caret>baz\n" +
+                   "quux\n");
+    assertMode(VISUAL);
+    assertSelection("bar\n" +
+                    "baz");
+    assertOffset(4);
   }
 }

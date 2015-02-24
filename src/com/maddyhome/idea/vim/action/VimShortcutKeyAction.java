@@ -24,6 +24,7 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.options.ShowSettingsUtil;
@@ -34,6 +35,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.EditorData;
+import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import org.jetbrains.annotations.NotNull;
@@ -76,11 +78,14 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     .build();
 
   @NotNull private static final Set<KeyStroke> NON_FILE_EDITOR_KEYS = ImmutableSet.<KeyStroke>builder()
+    .addAll(getKeyStrokes(VK_ENTER, 0))
     .addAll(getKeyStrokes(VK_ESCAPE, 0))
     .addAll(getKeyStrokes(VK_TAB, 0))
     .addAll(getKeyStrokes(VK_UP, 0))
     .addAll(getKeyStrokes(VK_DOWN, 0))
     .build();
+
+  private static final Logger ourLogger = Logger.getInstance(VimShortcutKeyAction.class.getName());
 
   @Override
   public void actionPerformed(@NotNull AnActionEvent e) {
@@ -92,7 +97,18 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
         notifyAboutShortcutConflict(keyStroke);
       }
       // Should we use InjectedLanguageUtil.getTopLevelEditor(editor) here, as we did in former EditorKeyHandler?
-      KeyHandler.getInstance().handleKey(editor, keyStroke, e.getDataContext());
+      // Run key handler later to restore input events sequence due to VimTypedActionHandler
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run() {
+          try {
+            KeyHandler.getInstance().handleKey(editor, keyStroke, new EditorDataContext(editor));
+          }
+          catch (Throwable throwable) {
+            ourLogger.error(throwable);
+          }
+        }
+      });
     }
   }
 
@@ -144,8 +160,8 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
           return isExitInsertMode(keyStroke);
         }
         if (CommandState.inInsertMode(editor)) {
-          // XXX: <Enter> and <Tab> won't be recorded in macros
-          if (keyCode == VK_ENTER || keyCode == VK_TAB) {
+          // XXX: <Tab> won't be recorded in macros
+          if (keyCode == VK_TAB) {
             return false;
           }
           // Debug watch, Python console, etc.

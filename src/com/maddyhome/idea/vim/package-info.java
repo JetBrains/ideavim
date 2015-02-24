@@ -42,6 +42,53 @@
  * |gv|                     {@link com.maddyhome.idea.vim.action.motion.visual.VisualSelectPreviousAction}
  *
  *
+ * 2.2. Window commands
+ *
+ * tag                      action
+ * ---------------------------------------------------------------------------------------------------------------------
+ *
+ * |CTRL-W_+|               TODO
+ * |CTRL-W_-|               TODO
+ * |CTRL-W_<|               TODO
+ * |CTRL-W_=|               TODO
+ * |CTRL-W_>|               TODO
+ * |CTRL-W_H|               TODO
+ * |CTRL-W_J|               TODO
+ * |CTRL-W_K|               TODO
+ * |CTRL-W_L|               TODO
+ * |CTRL-W_R|               TODO
+ * |CTRL-W_W|               {@link com.maddyhome.idea.vim.action.window.WindowPrevAction}
+ * |CTRL-W_]|               TODO
+ * |CTRL-W_^|               TODO
+ * |CTRL-W__|               TODO
+ * |CTRL-W_b|               TODO
+ * |CTRL-W_c|               {@link com.maddyhome.idea.vim.action.window.CloseWindowAction}
+ * |CTRL-W_h|               {@link com.maddyhome.idea.vim.action.window.WindowLeftAction}
+ * |CTRL-W_<Left>|          ...
+ * |CTRL-W_j|               {@link com.maddyhome.idea.vim.action.window.WindowDownAction}
+ * |CTRL-W_<Down>|          ...
+ * |CTRL-W_k|               {@link com.maddyhome.idea.vim.action.window.WindowUpAction}
+ * |CTRL-W_<Up>|            ...
+ * |CTRL-W_l|               {@link com.maddyhome.idea.vim.action.window.WindowRightAction}
+ * |CTRL-W_<Right>|         ...
+ * |CTRL-W_n|               TODO
+ * |CTRL-W_o|               {@link com.maddyhome.idea.vim.action.window.WindowOnlyAction}
+ * |CTRL-W_CTRL-O|          ...
+ * |CTRL-W_p|               TODO
+ * |CTRL-W_q|               TODO
+ * |CTRL-W_r|               TODO
+ * |CTRL-W_s|               {@link com.maddyhome.idea.vim.action.window.HorizontalSplitAction}
+ * |CTRL-W_S|               ...
+ * |CTRL-W_CTRL-S|          ...
+ * |CTRL-W_t|               TODO
+ * |CTRL-W_v|               {@link com.maddyhome.idea.vim.action.window.VerticalSplitAction}
+ * |CTRL-W_CTRL-V|          ...
+ * |CTRL-W_w|               {@link com.maddyhome.idea.vim.action.window.WindowNextAction}
+ * |CTRL-W_CTRL-W|          ...
+ * |CTRL-W_z|               TODO
+ * |CTRL-W_bar|             TODO
+ *
+ *
  * 3. Visual mode
  *
  * tag                      action

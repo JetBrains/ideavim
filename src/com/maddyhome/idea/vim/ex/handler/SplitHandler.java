@@ -16,27 +16,34 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action.motion.tabs;
+package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
+import com.maddyhome.idea.vim.ex.CommandHandler;
+import com.maddyhome.idea.vim.ex.CommandName;
+import com.maddyhome.idea.vim.ex.ExCommand;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * @author oleg
+ *
  */
-public class MotionNextTabAction extends MotionEditorAction {
-  public MotionNextTabAction() {
-    super(new Handler());
+public class SplitHandler extends CommandHandler {
+  public SplitHandler() {
+    super(new CommandName[]{
+      new CommandName("vs", "plit"),
+      new CommandName("sp", "lit")
+    }, RANGE_FORBIDDEN | ARGUMENT_OPTIONAL | DONT_REOPEN);
   }
 
-  private static class Handler extends MotionEditorActionHandler {
-    public int getOffset(@NotNull final Editor editor, @NotNull final DataContext context, final int count, final int rawCount, final Argument argument) {
-      return VimPlugin.getMotion().moveCaretGotoNextTab(editor, context, rawCount);
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
+    if (cmd.getCommand().startsWith("v")) {
+      VimPlugin.getWindow().splitWindowVertical(context, cmd.getArgument());
+    } else {
+      VimPlugin.getWindow().splitWindowHorizontal(context, cmd.getArgument());
     }
+
+    return true;
   }
 }

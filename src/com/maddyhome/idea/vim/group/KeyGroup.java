@@ -21,9 +21,11 @@ package com.maddyhome.idea.vim.group;
 import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
+import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.keymap.Keymap;
+import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -41,8 +43,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.util.*;
+import java.util.List;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.leftJustify;
 import static com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation;
@@ -428,5 +432,49 @@ public class KeyGroup {
     }
     // TODO: Add more codes
     return "";
+  }
+
+  @NotNull
+  public List<AnAction> getActions(@NotNull Component component, @NotNull KeyStroke keyStroke) {
+    final List<AnAction> results = new ArrayList<AnAction>();
+    results.addAll(getLocalActions(component, keyStroke));
+    results.addAll(getKeymapActions(keyStroke));
+    return results;
+  }
+
+  @NotNull
+  private static List<AnAction> getLocalActions(@NotNull Component component, @NotNull KeyStroke keyStroke) {
+    final List<AnAction> results = new ArrayList<AnAction>();
+    final KeyboardShortcut keyStrokeShortcut = new KeyboardShortcut(keyStroke, null);
+    for (Component c = component; c != null; c = c.getParent()) {
+      if (c instanceof JComponent) {
+        final List<AnAction> actions = ActionUtil.getActions((JComponent)c);
+        for (AnAction action : actions) {
+          if (action instanceof VimShortcutKeyAction) {
+            continue;
+          }
+          final com.intellij.openapi.actionSystem.Shortcut[] shortcuts = action.getShortcutSet().getShortcuts();
+          for (com.intellij.openapi.actionSystem.Shortcut shortcut : shortcuts) {
+            if (shortcut.isKeyboard() && shortcut.startsWith(keyStrokeShortcut) && !results.contains(action)) {
+              results.add(action);
+            }
+          }
+        }
+      }
+    }
+    return results;
+  }
+
+  @NotNull
+  private static List<AnAction> getKeymapActions(@NotNull KeyStroke keyStroke) {
+    final List<AnAction> results = new ArrayList<AnAction>();
+    final Keymap keymap = KeymapManager.getInstance().getActiveKeymap();
+    for (String id : keymap.getActionIds(keyStroke)) {
+      final AnAction action = ActionManager.getInstance().getAction(id);
+      if (action != null) {
+        results.add(action);
+      }
+    }
+    return results;
   }
 }
