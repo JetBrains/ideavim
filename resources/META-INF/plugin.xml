@@ -167,6 +167,10 @@
     <action id="VimMotionOuterParagraph" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterParagraphAction" text="Select Outer Paragraph"/>
     <action id="VimMotionInnerSentence" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerSentenceAction" text="Select Inner Sentence"/>
     <action id="VimMotionOuterSentence" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterSentenceAction" text="Select Outer Sentence"/>
+
+    <action id="VimMotionTextOuterTagBlock" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockTagAction" text="Select Outer Tag"/>
+    <action id="VimMotionTextInnerTagBlock" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockTagAction" text="Select Inner Tag"/>
+
     <!-- Marks -->
     <action id="VimMotionMark" class="com.maddyhome.idea.vim.action.motion.mark.MotionMarkAction" text="Mark"/>
     <action id="VimMotionGotoFileMark" class="com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction" text="Goto Mark"/>

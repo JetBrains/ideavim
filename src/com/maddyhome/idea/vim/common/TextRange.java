@@ -20,6 +20,8 @@ package com.maddyhome.idea.vim.common;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+
 public class TextRange {
   public TextRange(int start, int end) {
     this(new int[]{start}, new int[]{end});
@@ -116,4 +118,17 @@ public class TextRange {
 
   private final int[] starts;
   private final int[] ends;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    TextRange textRange = (TextRange)o;
+
+    if (!Arrays.equals(ends, textRange.ends)) return false;
+    if (!Arrays.equals(starts, textRange.starts)) return false;
+
+    return true;
+  }
 }
