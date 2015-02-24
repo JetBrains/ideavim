@@ -144,10 +144,20 @@ public class SearchHelperTest {
   }
 
   @Test
+  public void testFindInnerBlockWithEmptyTag() {
+    String text = "<a><br></a>";
+    TextRange range = new TextRange(3, 6);
+
+    assertEquals(range, SearchHelper.findTagBlockRange(text, 4, 1, false));
+  }
+
+  @Test
   public void testNonXmlAngleBracket() {
     String text = "<script>if(x>1||x<0)x=0;</script>";
     TextRange range = new TextRange(8, 23);
 
     assertEquals(range, SearchHelper.findTagBlockRange(text, 1, 1, false));
   }
+  
+  
 }

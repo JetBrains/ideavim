@@ -18,8 +18,11 @@
 
 package com.maddyhome.idea.vim.helper;
 
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.SelectionModel;
+import com.intellij.openapi.editor.actions.SelectWordAtCaretAction;
 import com.intellij.openapi.util.Pair;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.option.ListOption;
@@ -185,6 +188,7 @@ public class SearchHelper {
     return findTagBlockRange(editor.getDocument().getCharsSequence(), editor.getCaretModel().getOffset(), cnt, isOuter);
   }
 
+
   public static @Nullable TextRange findTagBlockRange(@NotNull CharSequence chars, int pos, int cnt, boolean isOuter) {
     Pair<Integer, Integer> blockRange = null;
 
@@ -205,6 +209,9 @@ public class SearchHelper {
   private static @Nullable Pair<Integer, Integer> findTagBlock(@NotNull CharSequence chars, int pos, boolean isOuter) {
     //<b></b> is the minimal tag pair
     if(chars.length() < 7)
+      return null;
+    
+    if(chars.length() < pos || pos < 0)
       return null;
 
     int[] blockRange = new int[]{chars.charAt(pos) == '>' ? pos : pos + 1, pos};
@@ -276,19 +283,21 @@ public class SearchHelper {
         return null;
     }
 
-    blockRange[1] = findBlockLocation(chars, '<', '>', 1, blockRange[0], 1) + 1;
-
+    int startOfOpeningTag = blockRange[0];
+    int startOfBlock = findBlockLocation(chars, '<', '>', 1, blockRange[0], 1) + 1;
+    
+    blockRange[1] = startOfBlock;
     if(!isOuter) {
-      blockRange[0] = blockRange[1];
+      blockRange[0] = startOfBlock;
     }
 
     //Always leave at least four characters for the closing tag
-    if(0 > blockRange[0] || blockRange[0] > chars.length() - 5) {
+    if(0 > blockRange[0] || blockRange[0] > chars.length() - 4) {
       return null;
     }
 
     int endOfLastClosingAngleBracket = -1;
-
+    
     //Search forwards for matching closing tag
     while(blockRange[1] < chars.length() - 1) {
       blockRange[1]++;
@@ -340,15 +349,32 @@ public class SearchHelper {
         continue;
       }
       else if(nameToken.startsWith("/")) {
+        String top = unmatchedTags.peek();
+
         //Attempt to pop the stack
-        if(unmatchedTags.peek().equals(nameToken.substring(1))) {
+        if (top.equals(nameToken.substring(1))) {
           unmatchedTags.pop();
-          if(unmatchedTags.isEmpty())
-            break;
+          if (unmatchedTags.isEmpty()) break;
         }
-        //Interleaving is not allowed.
+        //There is no matching opening tag for this closing tag
         else {
-          return null;
+          boolean matchFound = false;
+          //Try discarding some tags
+          while(!unmatchedTags.isEmpty()) {
+            matchFound = unmatchedTags.pop().equals(nameToken.substring(1));
+            if(matchFound)
+              break;
+          }
+          
+          //If there is no match, we need to look even further back
+          if(unmatchedTags.isEmpty()) {
+            //If there is a match we're done
+            if(matchFound) {
+              break;
+            }
+            return findTagBlock(chars, startOfOpeningTag - 1, isOuter);
+          }
+          //If there is a match, but there are tags left, continue
         }
       }
       else {
