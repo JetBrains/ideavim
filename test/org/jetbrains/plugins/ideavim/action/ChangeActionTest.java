@@ -502,4 +502,28 @@ public class ChangeActionTest extends VimTestCase {
                           "    }\n" +
                           "}\n");
   }
+
+  public void testReplaceFirstColumn() {
+    doTest(parseKeys("<C-V>jre"),
+           "<caret>11\n22",
+           "e1\ne2");
+  }
+
+  public void testReplaceLastColumn() {
+    doTest(parseKeys("<C-V>jre"),
+           "1<caret>1\n22",
+           "1e\n2e");
+  }
+
+  public void testDeleteFirstColumn() {
+    doTest(parseKeys("<C-V>jx"),
+           "<caret>11\n22",
+           "1\n2");
+  }
+
+  public void testDeleteLastColumn() {
+    doTest(parseKeys("<C-V>jx"),
+           "1<caret>1\n22",
+           "1\n2");
+  }
 }
