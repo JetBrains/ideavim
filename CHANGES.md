@@ -20,6 +20,7 @@ Bug fixes:
 * VIM-864 Fixed visual marks getting changed during visual substitute
 * VIM-856 Fixed regex look-behind problem
 * VIM-868 Allow count on `gt` and `gT`
+* VIM-700 Remapping `0` should still allow it to be entered in command count
 
 
 0.39, 2014-12-03
