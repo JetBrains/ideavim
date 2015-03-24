@@ -243,4 +243,28 @@ public class MapCommandTest extends VimTestCase {
     typeText(parseKeys("A"));
     myFixture.checkResult("bar\n");
   }
+
+  // VIM-700 |:map|
+  public void testRemappingZero() {
+    configureByText("x<caret>yz\n");
+    VimScriptParser.executeText("map 0 ~");
+    typeText(parseKeys("0"));
+    myFixture.checkResult("xYz\n");
+  }
+
+  // VIM-700 |:map|
+  public void testRemappingZeroStillAllowsZeroToBeUsedInCount() {
+    configureByText("a<caret>bcdefghijklmnop\n");
+    VimScriptParser.executeText("map 0 ^");
+    typeText(parseKeys("10~"));
+    myFixture.checkResult("aBCDEFGHIJKlmnop\n");
+  }
+
+  // VIM-700 |:map|
+  public void testRemappingDeleteOverridesRemovingLastDigitFromCount() {
+    configureByText("a<caret>bcdefghijklmnop\n");
+    VimScriptParser.executeText("map <Del> ~");
+    typeText(parseKeys("10<Del>"));
+    myFixture.checkResult("aBCDEFGHIJKlmnop\n");
+  }
 }
