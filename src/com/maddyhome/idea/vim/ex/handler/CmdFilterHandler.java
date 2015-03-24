@@ -31,6 +31,8 @@ import com.maddyhome.idea.vim.helper.Msg;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -40,7 +42,10 @@ public class CmdFilterHandler extends CommandHandler {
     super("!", "", RANGE_OPTIONAL | ARGUMENT_OPTIONAL | WRITABLE);
   }
 
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
+  public static final Pattern filePlaceholder = Pattern.compile("([\\\\]?)%");
+
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd)
+    throws ExException {
     logger.info("execute");
 
     String command = cmd.getArgument();
@@ -58,8 +63,8 @@ public class CmdFilterHandler extends CommandHandler {
     }
 
     final VirtualFile virtualFile = EditorData.getVirtualFile(editor);
-    if(command.contains("%") && virtualFile != null && virtualFile.isInLocalFileSystem()) {
-      command = command.replace("%", virtualFile.getPath());
+    if (command.contains("%") && virtualFile != null && virtualFile.isInLocalFileSystem()) {
+      command = replaceFilePlaceholder(command, virtualFile);
     }
 
     try {
@@ -79,6 +84,21 @@ public class CmdFilterHandler extends CommandHandler {
     catch (IOException e) {
       throw new ExException(e.getMessage());
     }
+  }
+
+  private String replaceFilePlaceholder(String command, VirtualFile virtualFile) {
+    StringBuffer commandBuffer = new StringBuffer(command.length());
+    Matcher matcher = filePlaceholder.matcher(command);
+    while (matcher.find()) {
+      if (matcher.group(1).length() > 0) {
+        matcher.appendReplacement(commandBuffer, "%");
+      }
+      else {
+        matcher.appendReplacement(commandBuffer, virtualFile.getPath());
+      }
+    }
+    matcher.appendTail(commandBuffer);
+    return commandBuffer.toString();
   }
 
   private static final Logger logger = Logger.getInstance(CmdFilterHandler.class.getName());
