@@ -159,7 +159,7 @@
 
   <target name="test" depends="unzip, clean, prepare-tests">
     <mkdir dir="${test-reports}"/>
-    <junit fork="true" logfailedtests="false" printsummary="true">
+    <junit fork="true" forkmode="once" logfailedtests="false" printsummary="true">
       <classpath refid="test.classpath"/>
 
       <jvmarg value="-Xmx256M"/>
@@ -169,6 +169,7 @@
       <jvmarg value="-Didea.load.plugins.id=IdeaVIM"/>
 
       <formatter type="plain"/>
+      <formatter type="xml" usefile="true" />
 
       <batchtest todir="${test-reports}">
         <fileset dir="${test}">
