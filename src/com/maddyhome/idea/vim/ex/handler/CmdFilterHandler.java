@@ -21,9 +21,11 @@ package com.maddyhome.idea.vim.ex.handler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.*;
+import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
 import org.jetbrains.annotations.NotNull;
@@ -53,6 +55,11 @@ public class CmdFilterHandler extends CommandHandler {
         return false;
       }
       command = command.replaceAll("!", last);
+    }
+
+    final VirtualFile virtualFile = EditorData.getVirtualFile(editor);
+    if(command.contains("%") && virtualFile != null && virtualFile.isInLocalFileSystem()) {
+      command = command.replace("%", virtualFile.getPath());
     }
 
     try {
