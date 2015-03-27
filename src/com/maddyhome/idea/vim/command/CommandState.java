@@ -85,6 +85,11 @@ public class CommandState {
     return state.getMode() == Mode.VISUAL && state.getSubMode() == SubMode.VISUAL_CHARACTER;
   }
 
+  public static boolean inVisualBlockMode(@Nullable Editor editor) {
+    final CommandState state = getInstance(editor);
+    return state.getMode() == Mode.VISUAL && state.getSubMode() == SubMode.VISUAL_BLOCK;
+  }
+
   @Nullable
   public Command getCommand() {
     return myCommand;

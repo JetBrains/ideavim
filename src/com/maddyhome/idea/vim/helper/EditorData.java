@@ -100,8 +100,7 @@ public class EditorData {
     int t = getLastColumn(editor);
     if (logger.isDebugEnabled()) logger.debug("setLastColumn(" + col + ") is now " + t);
 
-    boolean inVisualBlockMode = CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_BLOCK;
-    if (previousWasDollar != currentIsDollar && inVisualBlockMode) {
+    if (previousWasDollar != currentIsDollar && CommandState.inVisualBlockMode(editor)) {
       VimPlugin.getMotion().updateSelection(editor);
     }
   }
