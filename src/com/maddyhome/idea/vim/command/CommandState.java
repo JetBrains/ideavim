@@ -316,7 +316,7 @@ public class CommandState {
     VimPlugin.showMode(msg.toString());
   }
 
-  public static enum Mode {
+  public enum Mode {
     COMMAND,
     INSERT,
     REPLACE,
@@ -325,7 +325,7 @@ public class CommandState {
     EX_ENTRY
   }
 
-  public static enum SubMode {
+  public enum SubMode {
     NONE,
     SINGLE_COMMAND,
     VISUAL_CHARACTER,
