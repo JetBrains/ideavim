@@ -355,6 +355,7 @@ public class ChangeActionTest extends VimTestCase {
            "\n\n");
   }
 
+  // VIM-781 |CTRL-V| |j|
   public void testDeleteCharVisualBlockWithEmptyLineInTheMiddle() {
     doTest(parseKeys("l", "<C-V>", "jj", "x"),
            "foo\n" +
@@ -365,6 +366,7 @@ public class ChangeActionTest extends VimTestCase {
            "br\n");
   }
 
+  // VIM-781 |CTRL-V| |j|
   public void testDeleteCharVisualBlockWithShorterLineInTheMiddle() {
     doTest(parseKeys("l", "<C-V>", "jj", "x"),
            "foo\n" +
@@ -373,6 +375,15 @@ public class ChangeActionTest extends VimTestCase {
            "fo\n" +
            "x\n" +
            "br\n");
+  }
+
+  // VIM-845 |CTRL-V| |x|
+  public void testDeleteVisualBlockOneCharWide() {
+    configureByText("foo\n" +
+                    "bar\n");
+    typeText(parseKeys("<C-V>", "j", "x"));
+    myFixture.checkResult("oo\n" +
+                          "ar\n");
   }
 
   // |r|
