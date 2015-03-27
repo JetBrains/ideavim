@@ -1,16 +1,7 @@
 package org.jetbrains.plugins.ideavim.action;
 
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileTypes.PlainTextFileType;
-import com.intellij.openapi.project.Project;
-import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.helper.EditorDataContext;
-import com.maddyhome.idea.vim.helper.RunnableHelper;
 import org.jetbrains.plugins.ideavim.VimTestCase;
-
-import javax.swing.*;
-import java.util.List;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
