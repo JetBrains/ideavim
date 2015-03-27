@@ -21,6 +21,8 @@ Bug fixes:
 * VIM-856 Fixed regex look-behind problem
 * VIM-868 Allow count on `gt` and `gT`
 * VIM-700 Remapping `0` should still allow it to be entered in command count
+* VIM-781 Fixed expanding visual block selection past empty lines
+* VIM-845 Fixed `c` and `x` functionality for visual block selections
 
 
 0.39, 2014-12-03
