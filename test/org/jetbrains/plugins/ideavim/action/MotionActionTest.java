@@ -597,21 +597,25 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("foo \n");
   }
 
-  // |C-V|
+  // |CTRL-V|
   public void testVisualBlockSelectionsDisplayedCorrectlyMovingRight() {
     typeTextInFile(parseKeys("<C-V>jl"),
-                   "<caret>foo\nbar\n");
-    myFixture.checkResult("<selection>fo</selection>o\n<selection>ba</selection>r\n");
+                   "<caret>foo\n" +
+                   "bar\n");
+    myFixture.checkResult("<selection>fo</selection>o\n" +
+                          "<selection>ba</selection>r\n");
   }
 
-  // |C-V|
+  // |CTRL-V|
   public void testVisualBlockSelectionsDisplayedCorrectlyMovingLeft() {
     typeTextInFile(parseKeys("<C-V>jh"),
-                   "fo<caret>o\nbar\n");
-    myFixture.checkResult("f<selection>oo</selection>\nb<selection>ar</selection>\n");
+                   "fo<caret>o\n" +
+                   "bar\n");
+    myFixture.checkResult("f<selection>oo</selection>\n" +
+                          "b<selection>ar</selection>\n");
   }
 
-  // |C-V|
+  // |CTRL-V|
   public void testVisualBlockSelectionsDisplayedCorrectlyInDollarMode() {
     typeTextInFile(parseKeys("<C-V>jj$"),
                    "a<caret>b\n" +
