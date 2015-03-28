@@ -1,7 +1,7 @@
 package org.jetbrains.plugins.ideavim.ex;
 
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.ex.VimScriptParser;
+import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;

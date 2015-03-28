@@ -16,8 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.ex;
+package com.maddyhome.idea.vim.ex.vimscript;
 
+import com.maddyhome.idea.vim.ex.CommandHandler;
+import com.maddyhome.idea.vim.ex.CommandParser;
+import com.maddyhome.idea.vim.ex.ExCommand;
+import com.maddyhome.idea.vim.ex.ExException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
