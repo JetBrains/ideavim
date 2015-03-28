@@ -122,6 +122,10 @@ Ex commands or via `:map` command mappings:
 * `:action {name}`
     * Execute an action named `NAME`
 
+For example, here `\r` is mapped to the Reformat Code action:
+
+    :map \r :action ReformatCode<CR>
+
 
 Contributing
 ------------
