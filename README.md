@@ -91,6 +91,11 @@ Note, that IdeaVim currently parses ~/.ideavimrc file via simple pattern matchin
 see [VIM-669](http://youtrack.jetbrains.com/issue/VIM-669) for proper parsing
 of VimL files.
 
+Also note that if you have overridden the `user.home` JVM option, this will
+will affect where IdeaVim looks for your .ideavimrc file.  For example, if you
+have `-Duser.home=/my/alternate/home` then IdeaVim will source
+`/my/alternate/home/.ideavimrc` instead of `~/.ideavimrc`.
+
 
 Changes to the IDE
 ------------------
