@@ -21,6 +21,10 @@ package com.maddyhome.idea.vim.helper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.intellij.openapi.util.text.StringUtil;
+import com.maddyhome.idea.vim.var.Variable;
+import com.maddyhome.idea.vim.var.VariableChangeEvent;
+import com.maddyhome.idea.vim.var.VariableChangeListener;
+import com.maddyhome.idea.vim.var.Variables;
 import org.apache.commons.codec.binary.Base64;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -73,18 +77,30 @@ public class StringHelper {
     .build();
   private static final Map<Integer, String> VIM_KEY_VALUES = invertMap(VIM_KEY_NAMES);
 
-  private static final Map<String, Character> VIM_TYPED_KEY_NAMES = ImmutableMap.<String, Character>builder()
-    .put("leader", '\\')
-    .put("space", ' ')
-    .put("bar", '|')
-    .put("bslash", '\\')
-    .put("lt", '<')
-    .build();
+  private static final Map<String, Character> VIM_TYPED_KEY_NAMES = new HashMap<String, Character>();
 
   private static final Set<String> UPPERCASE_DISPLAY_KEY_NAMES = ImmutableSet.<String>builder()
     .add("cr")
     .add("bs")
     .build();
+
+  static {
+    VIM_TYPED_KEY_NAMES.put("leader", Variables.getVariableValue("mapleader", Character.class));
+    VIM_TYPED_KEY_NAMES.put("space", ' ');
+    VIM_TYPED_KEY_NAMES.put("bar", '|');
+    VIM_TYPED_KEY_NAMES.put("bslash", '\\');
+    VIM_TYPED_KEY_NAMES.put("lt", '<');
+
+    Variable var = Variables.getVariable("mapleader");
+    if (var != null) {
+      var.addVariableChangeListener(new VariableChangeListener() {
+        @Override
+        public void variableChange(VariableChangeEvent event) {
+          VIM_TYPED_KEY_NAMES.put("leader", (Character)event.getVariable().getValue());
+        }
+      });
+    }
+  }
 
   private StringHelper() {}
 
