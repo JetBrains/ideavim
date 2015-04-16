@@ -96,8 +96,7 @@ public class MarkTest extends VimTestCase {
                                                  "    efgh\n" +
                                                  "    ij<caret>kl\n" +
                                                  "    mnop\n");
-    myFixture.checkResult("    abcd\n" +
-                          "    mnop\n");
+    myFixture.checkResult("    abcd\n" + "    mnop\n");
   }
 
   // VIM-43 |i| |`.|

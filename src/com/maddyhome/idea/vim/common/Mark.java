@@ -35,10 +35,11 @@ public class Mark extends FileLocation {
    * @param col      The column within the line
    * @param filename The file being marked
    */
-  public Mark(char key, int lline, int col, String filename) {
+  public Mark(char key, int lline, int col, String filename, String protocol) {
     super(lline, col, filename);
 
     this.key = key;
+    this.protocol = protocol;
   }
 
   /**
@@ -48,6 +49,10 @@ public class Mark extends FileLocation {
    */
   public char getKey() {
     return key;
+  }
+
+  public String getProtocol() {
+    return protocol;
   }
 
   public boolean equals(@Nullable Object object) {
@@ -82,4 +87,5 @@ public class Mark extends FileLocation {
   }
 
   private final char key;
+  private final String protocol;
 }

@@ -31,6 +31,7 @@ import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Jump;
@@ -95,13 +96,13 @@ public class MarkGroup {
       int offset = SearchHelper.findNextParagraph(editor, ch == '{' ? -1 : 1, false);
       offset = EditorHelper.normalizeOffset(editor, offset, false);
       LogicalPosition lp = editor.offsetToLogicalPosition(offset);
-      mark = new Mark(ch, lp.line, lp.column, vf.getPath());
+      mark = new Mark(ch, lp.line, lp.column, vf.getPath(), extractProtocol(vf));
     }
     else if ("()".indexOf(ch) >= 0 && vf != null) {
       int offset = SearchHelper.findNextSentenceStart(editor, ch == '(' ? -1 : 1, false, true);
       offset = EditorHelper.normalizeOffset(editor, offset, false);
       LogicalPosition lp = editor.offsetToLogicalPosition(offset);
-      mark = new Mark(ch, lp.line, lp.column, vf.getPath());
+      mark = new Mark(ch, lp.line, lp.column, vf.getPath(), extractProtocol(vf));
     }
     // If this is a file mark, get the mark from this file
     else if (FILE_MARKS.indexOf(ch) >= 0) {
@@ -195,7 +196,7 @@ public class MarkGroup {
       return false;
     }
 
-    Mark mark = new Mark(ch, lp.line, lp.column, vf.getPath());
+    Mark mark = new Mark(ch, lp.line, lp.column, vf.getPath(), extractProtocol(vf));
     // File specific marks get added to the file
     if (FILE_MARKS.indexOf(ch) >= 0) {
       HashMap<Character, Mark> fmarks = getFileMarks(editor.getDocument());
@@ -218,6 +219,10 @@ public class MarkGroup {
     }
 
     return true;
+  }
+
+  private String extractProtocol(VirtualFile vf) {
+    return VirtualFileManager.extractProtocol(vf.getUrl());
   }
 
   public void setVisualSelectionMarks(@NotNull Editor editor, @NotNull TextRange range) {
@@ -377,6 +382,7 @@ public class MarkGroup {
         markElem.setAttribute("line", Integer.toString(mark.getLogicalLine()));
         markElem.setAttribute("column", Integer.toString(mark.getCol()));
         markElem.setAttribute("filename", StringUtil.notNullize(mark.getFilename()));
+        markElem.setAttribute("protocol", StringUtil.notNullize(mark.getProtocol(), "file"));
         marksElem.addContent(markElem);
         if (logger.isDebugEnabled()) {
           logger.debug("saved mark = " + mark);
@@ -453,7 +459,8 @@ public class MarkGroup {
         Mark mark = new Mark(markElem.getAttributeValue("key").charAt(0),
                              Integer.parseInt(markElem.getAttributeValue("line")),
                              Integer.parseInt(markElem.getAttributeValue("column")),
-                             markElem.getAttributeValue("filename"));
+                             markElem.getAttributeValue("filename"),
+                             markElem.getAttributeValue("protocol"));
 
         globalMarks.put(mark.getKey(), mark);
         HashMap<Character, Mark> fmarks = getFileMarks(mark.getFilename());
@@ -486,7 +493,8 @@ public class MarkGroup {
           Mark mark = new Mark(markElem.getAttributeValue("key").charAt(0),
                                Integer.parseInt(markElem.getAttributeValue("line")),
                                Integer.parseInt(markElem.getAttributeValue("column")),
-                               filename);
+                               filename,
+                               markElem.getAttributeValue("protocol"));
 
           fmarks.put(mark.getKey(), mark);
         }
