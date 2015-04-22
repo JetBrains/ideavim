@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExException;
+import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -87,7 +88,7 @@ public class ProcessGroup {
 
     ExEntryPanel panel = ExEntryPanel.getInstance();
     if (panel.isActive()) {
-      panel.requestFocus();
+      UiHelper.requestFocus(panel);
       panel.handleKey(stroke);
 
       return true;

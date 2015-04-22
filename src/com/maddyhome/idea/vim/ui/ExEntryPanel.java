@@ -184,7 +184,7 @@ public class ExEntryPanel extends JPanel {
     active = false;
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
       if (refocusOwningEditor && parent != null) {
-        parent.requestFocus();
+        UiHelper.requestFocus(parent);
       }
 
       oldGlass.removeComponentListener(adapter);
