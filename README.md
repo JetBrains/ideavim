@@ -91,6 +91,11 @@ Note, that IdeaVim currently parses ~/.ideavimrc file via simple pattern matchin
 see [VIM-669](http://youtrack.jetbrains.com/issue/VIM-669) for proper parsing
 of VimL files.
 
+Also note that if you have overridden the `user.home` JVM option, this will
+will affect where IdeaVim looks for your .ideavimrc file.  For example, if you
+have `-Duser.home=/my/alternate/home` then IdeaVim will source
+`/my/alternate/home/.ideavimrc` instead of `~/.ideavimrc`.
+
 
 Changes to the IDE
 ------------------
@@ -121,6 +126,10 @@ Ex commands or via `:map` command mappings:
     * Find IDE actions by name pattern
 * `:action {name}`
     * Execute an action named `NAME`
+
+For example, here `\r` is mapped to the Reformat Code action:
+
+    :map \r :action ReformatCode<CR>
 
 
 Contributing
@@ -162,7 +171,12 @@ in the issue tracker.
    previous step.
 
 6. Build IdeaVim and run IntelliJ with IdeaVim enabled using the "IdeaVim" run
-   configuration (use "Run | Run... | IdeaVim").
+   configuration (use "Run | Run... | IdeaVim"). This will launch a spare
+   instance of IntelliJ running the compiled plugin in a sandboxed enviroment.
+   To actually deploy the plugin the recommended way is executing `ant dist`
+   from command line, which will update versions in plugin.xml among other
+   tasks. Install the generated "ideavim.jar" file from
+   "Settings | Plugins | Install plugin from disk".
 
 7. In order to be able to run tests in your IntelliJ edition uncomment the
    appropriate lines in the constructor of the `VimTestCase` class.
