@@ -148,52 +148,40 @@ public class SearchHelper {
     return new TextRange(bstart, bend);
   }
 
-  private static int findMatchingBlockCommentPair(@NotNull PsiElement element,
-                                                  int pos,
-                                                  @Nullable String commentPrefix,
-                                                  @Nullable String commentSuffix) {
-    if (commentPrefix == null || commentSuffix == null) {
-      return -1;
+  private static int findMatchingBlockCommentPair(@NotNull PsiComment comment, int pos, @Nullable String prefix,
+                                                  @Nullable String suffix) {
+    if (prefix != null && suffix != null) {
+      final String commentText = comment.getText();
+      if (commentText.startsWith(prefix) && commentText.endsWith(suffix)) {
+        final int endOffset = comment.getTextOffset() + comment.getTextLength();
+        if (pos < comment.getTextOffset() + prefix.length()) {
+          return endOffset;
+        }
+        else if (pos >= endOffset - suffix.length()) {
+          return comment.getTextOffset();
+        }
+      }
     }
-
-    // Don't act on partial comments
-    if (!element.getText().startsWith(commentPrefix) || !element.getText().endsWith(commentSuffix)) {
-      return -1;
-    }
-
-    final int endOffset = element.getTextOffset() + element.getTextLength();
-    if (pos < element.getTextOffset() + commentPrefix.length()) {
-      return endOffset;
-    }
-    else if (pos >= endOffset - commentSuffix.length()) {
-      return element.getTextOffset();
-    }
-
     return -1;
   }
 
-  private static int findMatchingBlockCommentPair(PsiElement element, int pos) {
+  private static int findMatchingBlockCommentPair(@NotNull PsiElement element, int pos) {
     final Language language = PsiUtil.findLanguageFromElement(element);
     final Commenter commenter = LanguageCommenters.INSTANCE.forLanguage(language);
-
-    element = PsiTreeUtil.getParentOfType(element, PsiComment.class, false);
-    if (element == null) {
-      return -1;
+    final PsiComment comment = PsiTreeUtil.getParentOfType(element, PsiComment.class, false);
+    if (comment != null) {
+      final int ret = findMatchingBlockCommentPair(comment, pos, commenter.getBlockCommentPrefix(),
+                                                   commenter.getBlockCommentSuffix());
+      if (ret >= 0) {
+        return ret;
+      }
+      if (commenter instanceof CodeDocumentationAwareCommenter) {
+        final CodeDocumentationAwareCommenter docCommenter = (CodeDocumentationAwareCommenter)commenter;
+        return findMatchingBlockCommentPair(comment, pos, docCommenter.getDocumentationCommentPrefix(),
+                                            docCommenter.getDocumentationCommentSuffix());
+      }
     }
-
-    int ret = findMatchingBlockCommentPair(element, pos, commenter.getBlockCommentPrefix(),
-                                           commenter.getBlockCommentSuffix());
-    if (ret >= 0) {
-      return ret;
-    }
-
-    if (!(commenter instanceof CodeDocumentationAwareCommenter)) {
-      return -1;
-    }
-    final CodeDocumentationAwareCommenter docCommenter = (CodeDocumentationAwareCommenter)commenter;
-
-    return findMatchingBlockCommentPair(element, pos, docCommenter.getDocumentationCommentPrefix(),
-                                        docCommenter.getDocumentationCommentSuffix());
+    return -1;
   }
 
   /**
@@ -208,16 +196,9 @@ public class SearchHelper {
   public static int findMatchingPairOnCurrentLine(@NotNull Editor editor) {
     int pos = editor.getCaretModel().getOffset();
 
-    // If on '/*' of a block comment, jump to '*/' of that comment, or vice versa
-    PsiFile psiFile = PsiHelper.getFile(editor);
-    if (psiFile != null) {
-      PsiElement element = psiFile.findElementAt(pos);
-      if (element != null) {
-        int ret = findMatchingBlockCommentPair(element, pos);
-        if (ret >= 0) {
-          return ret;
-        }
-      }
+    final int commentPos = findMatchingComment(editor, pos);
+    if (commentPos >= 0) {
+      return commentPos;
     }
 
     int line = editor.getCaretModel().getLogicalPosition().line;
@@ -246,6 +227,20 @@ public class SearchHelper {
     }
 
     return res;
+  }
+
+  /**
+   * If on the start/end of a block comment, jump to the matching of that comment, or vice versa.
+   */
+  private static int findMatchingComment(@NotNull Editor editor, int pos) {
+    final PsiFile psiFile = PsiHelper.getFile(editor);
+    if (psiFile != null) {
+      final PsiElement element = psiFile.findElementAt(pos);
+      if (element != null) {
+        return findMatchingBlockCommentPair(element, pos);
+      }
+    }
+    return -1;
   }
 
   private static int findBlockLocation(@NotNull CharSequence chars, char found, char match, int dir, int pos, int cnt) {
@@ -301,7 +296,7 @@ public class SearchHelper {
 
     private final int value;
 
-    private Direction(int i) {
+    Direction(int i) {
       value = i;
     }
 
