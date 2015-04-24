@@ -426,6 +426,76 @@ public class MotionActionTest extends VimTestCase {
     assertOffset(3);
   }
 
+  // |%|
+  public void testPercentMatchXmlCommentStart() {
+    configureByXmlText("<caret><!-- foo -->");
+    typeText(parseKeys("%"));
+    myFixture.checkResult("<!-- foo --<caret>>");
+  }
+
+  // |%|
+  public void testPercentDoesntMatchPartialXmlComment() {
+    configureByXmlText("<!<caret>-- ");
+    typeText(parseKeys("%"));
+    myFixture.checkResult("<!<caret>-- ");
+  }
+
+  // |%|
+  public void testPercentMatchXmlCommentEnd() {
+    configureByXmlText("<!-- foo --<caret>>");
+    typeText(parseKeys("%"));
+    myFixture.checkResult("<caret><!-- foo -->");
+  }
+
+  // |%|
+  public void testPercentMatchJavaCommentStart() {
+    configureByJavaText("/<caret>* foo */");
+    typeText(parseKeys("%"));
+    myFixture.checkResult("/* foo *<caret>/");
+  }
+
+  // |%|
+  public void testPercentDoesntMatchPartialJavaComment() {
+    configureByJavaText("<caret>/* ");
+    typeText(parseKeys("%"));
+    myFixture.checkResult("<caret>/* ");
+  }
+
+  // |%|
+  public void testPercentMatchJavaCommentEnd() {
+    configureByJavaText("/* foo <caret>*/");
+    typeText(parseKeys("%"));
+    myFixture.checkResult("<caret>/* foo */");
+  }
+
+  // |%|
+  public void testPercentMatchJavaDocCommentStart() {
+    configureByJavaText("/*<caret>* foo */");
+    typeText(parseKeys("%"));
+    myFixture.checkResult("/** foo *<caret>/");
+  }
+
+  // |%|
+  public void testPercentMatchJavaDocCommentEnd() {
+    configureByJavaText("/** foo *<caret>/");
+    typeText(parseKeys("%"));
+    myFixture.checkResult("<caret>/** foo */");
+  }
+
+  // |%|
+  public void testPercentDoesntMatchAfterCommentStart() {
+    configureByJavaText("/*<caret> foo */");
+    typeText(parseKeys("%"));
+    myFixture.checkResult("/*<caret> foo */");
+  }
+
+  // |%|
+  public void testPercentDoesntMatchBeforeCommentEnd() {
+    configureByJavaText("/* foo <caret> */");
+    typeText(parseKeys("%"));
+    myFixture.checkResult("/* foo <caret> */");
+  }
+
   // |[(|
   public void testUnmatchedOpenParenthesis() {
     typeTextInFile(parseKeys("[("),
