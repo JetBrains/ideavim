@@ -80,7 +80,7 @@ public class MotionActionTest extends VimTestCase {
   public void testBackToDigraph() {
     typeTextInFile(parseKeys("F<C-K>O:"),
                    "Hallo, Öster<caret>reich!\n");
-    assertOffset(7);
+    myFixture.checkResult("Hallo, <caret>Österreich!\n");
     assertMode(COMMAND);
   }
 
