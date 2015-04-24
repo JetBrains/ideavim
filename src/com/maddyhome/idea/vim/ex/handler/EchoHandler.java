@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2014 The IdeaVim authors
+ * Copyright (C) 2003-2015 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,29 +23,32 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.ex.vimscript.VimScriptCommandHandler;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.ex.ExOutputModel;
+import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
+import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import java.util.Map;
 
 /**
- *
+ * @author vlan
  */
-public class SetHandler extends CommandHandler implements VimScriptCommandHandler {
-  public SetHandler() {
-    super("se", "t", ARGUMENT_OPTIONAL);
-  }
+public class EchoHandler extends CommandHandler {
 
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
-    return parseOptionLine(editor, cmd, true);
+  public EchoHandler() {
+    super("ec", "ho", RANGE_FORBIDDEN | ARGUMENT_OPTIONAL);
   }
 
   @Override
-  public void execute(@NotNull ExCommand cmd) throws ExException {
-    parseOptionLine(null, cmd, false);
-  }
-
-  private boolean parseOptionLine(@Nullable Editor editor, @NotNull ExCommand cmd, boolean failOnBad) {
-    return Options.getInstance().parseOptionLine(editor, cmd.getArgument(), failOnBad);
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context,
+                         @NotNull ExCommand cmd) throws ExException {
+    final String argument = cmd.getArgument();
+    final VimScriptGlobalEnvironment env = VimScriptGlobalEnvironment.getInstance();
+    final Map<String, Object> globals = env.getVariables();
+    final Object value = VimScriptParser.evaluate(argument, globals);
+    final String text = VimScriptParser.expressionToString(value) + "\n";
+    ExOutputModel.getInstance(editor).output(text);
+    return true;
   }
 }
+

@@ -79,6 +79,7 @@ public class CommandParser {
     new DumpLineHandler();
     new EditFileHandler();
     new ActionHandler();
+    new EchoHandler();
     new ExitHandler();
     new FindClassHandler();
     new FindFileHandler();
@@ -89,6 +90,7 @@ public class CommandParser {
     new HistoryHandler();
     new JoinLinesHandler();
     new JumpsHandler();
+    new LetHandler();
     new MapHandler();
     new MarkHandler();
     new MarksHandler();

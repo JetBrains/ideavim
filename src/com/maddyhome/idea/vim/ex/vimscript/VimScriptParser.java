@@ -16,8 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.ex;
+package com.maddyhome.idea.vim.ex.vimscript;
 
+import com.maddyhome.idea.vim.ex.CommandHandler;
+import com.maddyhome.idea.vim.ex.CommandParser;
+import com.maddyhome.idea.vim.ex.ExCommand;
+import com.maddyhome.idea.vim.ex.ExException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,6 +29,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -34,6 +40,9 @@ public class VimScriptParser {
   public static final String[] VIMRC_FILES = {".ideavimrc", "_ideavimrc"};
   public static final int BUFSIZE = 4096;
   private static final Pattern EOL_SPLIT_PATTERN = Pattern.compile(" *(\r\n|\n)+ *");
+  private static final Pattern DOUBLE_QUOTED_STRING = Pattern.compile("\"([^\"]*)\"");
+  private static final Pattern SINGLE_QUOTED_STRING = Pattern.compile("'([^']*)'");
+  private static final Pattern REFERENCE_EXPR = Pattern.compile("([A-Za-z_][A-Za-z_0-9]*)");
 
   private VimScriptParser() {
   }
@@ -84,6 +93,42 @@ public class VimScriptParser {
       catch (ExException ignored) {
       }
     }
+  }
+
+  @NotNull
+  public static Object evaluate(@NotNull String expression, @NotNull Map<String, Object> globals) throws ExException {
+    // This evaluator is very basic, no proper parsing whatsoever. It is here as the very first step necessary to
+    // support mapleader, VIM-650. See also VIM-669.
+    Matcher m;
+    m = DOUBLE_QUOTED_STRING.matcher(expression);
+    if (m.matches()) {
+      return m.group(1);
+    }
+    m = SINGLE_QUOTED_STRING.matcher(expression);
+    if (m.matches()) {
+      return m.group(1);
+    }
+    m = REFERENCE_EXPR.matcher(expression);
+    if (m.matches()) {
+      final String name = m.group(1);
+      final Object value = globals.get(name);
+      if (value != null) {
+        return value;
+      }
+      else {
+        throw new ExException(String.format("Undefined variable: %s", name));
+      }
+    }
+    throw new ExException(String.format("Invalid expression: %s", expression));
+  }
+
+  @NotNull
+  public static String expressionToString(@NotNull Object value) throws ExException {
+    // TODO: Return meaningful value representations
+    if (value instanceof String) {
+      return (String)value;
+    }
+    throw new ExException(String.format("Cannot convert '%s' to string", value));
   }
 
   @NotNull

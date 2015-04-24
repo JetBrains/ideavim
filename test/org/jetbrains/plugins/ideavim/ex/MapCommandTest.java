@@ -1,7 +1,7 @@
 package org.jetbrains.plugins.ideavim.ex;
 
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.ex.VimScriptParser;
+import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -266,5 +266,14 @@ public class MapCommandTest extends VimTestCase {
     VimScriptParser.executeText("map <Del> ~");
     typeText(parseKeys("10<Del>"));
     myFixture.checkResult("aBCDEFGHIJKlmnop\n");
+  }
+
+  // VIM-650 |mapleader|
+  public void testMapLeader() {
+    configureByText("\n");
+    typeText(commandToKeys("let mapleader = \",\""));
+    typeText(commandToKeys("nmap <Leader>z izzz<Esc>"));
+    typeText(parseKeys(",z"));
+    myFixture.checkResult("zzz\n");
   }
 }
