@@ -6,6 +6,7 @@
       <p>Not released:</p>
       <ul>
         <li>Support for <code>mapleader</code></li>
+        <li>Support comments in <code>%</code> brace matching</li>
         <li>Various bug fixes</li>
       </ul>
       <p>0.39:</p>

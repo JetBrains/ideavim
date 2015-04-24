@@ -7,11 +7,12 @@ History of changes in IdeaVim for the IntelliJ platform.
 Not Released
 ------------
 
-Added support for `mapleader`.
+Added support for `mapleader`. Support comments in `%` brace matching.
 
 Features:
 
 * VIM-650 Added support for `mapleader`
+* VIM-932 Support comments in `%` brace matching
 
 Bug fixes:
 
