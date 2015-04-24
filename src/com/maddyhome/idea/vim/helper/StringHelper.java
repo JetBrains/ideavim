@@ -127,7 +127,7 @@ public class StringHelper {
     return res;
   }
 
-  private static enum KeyParserState {
+  private enum KeyParserState {
     INIT,
     ESCAPE,
     SPECIAL,
