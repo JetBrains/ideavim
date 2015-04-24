@@ -430,70 +430,70 @@ public class MotionActionTest extends VimTestCase {
   public void testPercentMatchXmlCommentStart() {
     configureByXmlText("<caret><!-- foo -->");
     typeText(parseKeys("%"));
-    assertOffset(11);
+    myFixture.checkResult("<!-- foo --<caret>>");
   }
 
   // |%|
   public void testPercentDoesntMatchPartialXmlComment() {
     configureByXmlText("<!<caret>-- ");
     typeText(parseKeys("%"));
-    assertOffset(2);
+    myFixture.checkResult("<!<caret>-- ");
   }
 
   // |%|
   public void testPercentMatchXmlCommentEnd() {
     configureByXmlText("<!-- foo --<caret>>");
     typeText(parseKeys("%"));
-    assertOffset(0);
+    myFixture.checkResult("<caret><!-- foo -->");
   }
 
   // |%|
   public void testPercentMatchJavaCommentStart() {
     configureByJavaText("/<caret>* foo */");
     typeText(parseKeys("%"));
-    assertOffset(8);
+    myFixture.checkResult("/* foo *<caret>/");
   }
 
   // |%|
   public void testPercentDoesntMatchPartialJavaComment() {
     configureByJavaText("<caret>/* ");
     typeText(parseKeys("%"));
-    assertOffset(0);
+    myFixture.checkResult("<caret>/* ");
   }
 
   // |%|
   public void testPercentMatchJavaCommentEnd() {
     configureByJavaText("/* foo <caret>*/");
     typeText(parseKeys("%"));
-    assertOffset(0);
+    myFixture.checkResult("<caret>/* foo */");
   }
 
   // |%|
   public void testPercentMatchJavaDocCommentStart() {
     configureByJavaText("/*<caret>* foo */");
     typeText(parseKeys("%"));
-    assertOffset(9);
+    myFixture.checkResult("/** foo *<caret>/");
   }
 
   // |%|
   public void testPercentMatchJavaDocCommentEnd() {
     configureByJavaText("/** foo *<caret>/");
     typeText(parseKeys("%"));
-    assertOffset(0);
+    myFixture.checkResult("<caret>/** foo */");
   }
 
   // |%|
   public void testPercentDoesntMatchAfterCommentStart() {
     configureByJavaText("/*<caret> foo */");
     typeText(parseKeys("%"));
-    assertOffset(2);
+    myFixture.checkResult("/*<caret> foo */");
   }
 
   // |%|
   public void testPercentDoesntMatchBeforeCommentEnd() {
     configureByJavaText("/* foo <caret> */");
     typeText(parseKeys("%"));
-    assertOffset(7);
+    myFixture.checkResult("/* foo <caret> */");
   }
 
   // |[(|
