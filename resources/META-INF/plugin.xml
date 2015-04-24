@@ -5,6 +5,7 @@
     <![CDATA[
       <p>Not released:</p>
       <ul>
+        <li>Support for <code>mapleader</code></li>
         <li>Various bug fixes</li>
       </ul>
       <p>0.39:</p>

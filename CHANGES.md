@@ -7,7 +7,11 @@ History of changes in IdeaVim for the IntelliJ platform.
 Not Released
 ------------
 
-A bugfix release.
+Added support for `mapleader`.
+
+Features:
+
+* VIM-650 Added support for `mapleader`
 
 Bug fixes:
 
@@ -23,6 +27,7 @@ Bug fixes:
 * VIM-700 Remapping `0` should still allow it to be entered in command count
 * VIM-781 Fixed expanding visual block selection past empty lines
 * VIM-845 Fixed `c` and `x` functionality for visual block selections
+* VIM-930 Fixed editor focus issues after closing Ex entry box on Oracle Java 6
 
 
 0.39, 2014-12-03
