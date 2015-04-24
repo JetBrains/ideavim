@@ -267,4 +267,13 @@ public class MapCommandTest extends VimTestCase {
     typeText(parseKeys("10<Del>"));
     myFixture.checkResult("aBCDEFGHIJKlmnop\n");
   }
+
+  // VIM-650 |mapleader|
+  public void testMapLeader() {
+    configureByText("\n");
+    typeText(commandToKeys("let mapleader = \",\""));
+    typeText(commandToKeys("nmap <Leader>z izzz<Esc>"));
+    typeText(parseKeys(",z"));
+    myFixture.checkResult("zzz\n");
+  }
 }

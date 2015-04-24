@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.helper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.intellij.openapi.util.text.StringUtil;
+import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
 import org.apache.commons.codec.binary.Base64;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
@@ -74,7 +75,6 @@ public class StringHelper {
   private static final Map<Integer, String> VIM_KEY_VALUES = invertMap(VIM_KEY_NAMES);
 
   private static final Map<String, Character> VIM_TYPED_KEY_NAMES = ImmutableMap.<String, Character>builder()
-    .put("leader", '\\')
     .put("space", ' ')
     .put("bar", '|')
     .put("bslash", '\\')
@@ -189,8 +189,12 @@ public class StringHelper {
                 throw new IllegalArgumentException("<" + specialKeyName + "> is not supported");
               }
               if (!"nop".equals(lower)) {
+                final List<KeyStroke> leader = parseMapLeader(specialKeyName);
                 final KeyStroke specialKey = parseSpecialKey(specialKeyName, 0);
-                if (specialKey != null) {
+                if (leader != null) {
+                  result.addAll(leader);
+                }
+                else if (specialKey != null) {
                   result.add(specialKey);
                 }
                 else {
@@ -215,6 +219,20 @@ public class StringHelper {
       }
     }
     return result;
+  }
+
+  @Nullable
+  private static List<KeyStroke> parseMapLeader(@NotNull String s) {
+    if ("leader".equals(s.toLowerCase())) {
+      final Object mapLeader = VimScriptGlobalEnvironment.getInstance().getVariables().get("mapleader");
+      if (mapLeader instanceof String) {
+        return stringToKeys((String)mapLeader);
+      }
+      else {
+        return stringToKeys("\\");
+      }
+    }
+    return null;
   }
 
   private static boolean isControlCharacter(char c) {
