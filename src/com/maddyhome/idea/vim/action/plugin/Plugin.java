@@ -3,10 +3,9 @@ package com.maddyhome.idea.vim.action.plugin;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.plugin.surround.SurroundPlugin;
 import com.maddyhome.idea.vim.group.KeyGroup;
-import com.maddyhome.idea.vim.option.Options;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author dhleong
@@ -20,34 +19,39 @@ public interface Plugin {
       new SurroundPlugin()
     };
 
-    /** Probably, just registerActions(String) is fine */
-    @Deprecated
-    public static void registerActions() {
-      final KeyGroup parser = VimPlugin.getKey();
+    // store the plugins in a map for easy access
+    static final Map<String, Plugin> idsToPlugins =
+      new HashMap<String, Plugin>();
+    static {
       for (Plugin plugin : plugins) {
-        if (Options.getInstance().isSet(plugin.getOptionName())) {
-          plugin.registerActions(parser);
+        final Plugin conflict = idsToPlugins.put(plugin.getOptionName(), plugin);
+        if (conflict != null) {
+          throw new IllegalArgumentException(
+            "Plugin " + plugin + " has a name that conflicts with " + conflict);
         }
       }
     }
 
+    /**
+     * Get a list of all known plugin names
+     * @return An iterable with the names of set-able plugins
+     */
     public static Iterable<String> getOptionNames() {
-      List<String> optionNames = new ArrayList<String>();
-      for (Plugin plugin : plugins) {
-        optionNames.add(plugin.getOptionName());
-      }
-      return optionNames;
+      return idsToPlugins.keySet();
     }
 
-    public static void registerActions(String name) {
-      // TODO put these in a map
-      final KeyGroup parser = VimPlugin.getKey();
-      for (Plugin plugin : plugins) {
-        if (name.equals(plugin.getOptionName())) {
-          plugin.registerActions(parser);
-          return;
-        }
+    /**
+     * Activate the plugin with the given name
+     * @param name The name of the plugin, as returned by getOptionName()
+     */
+    public static void activate(final String name) {
+      final Plugin plugin = idsToPlugins.get(name);
+      if (plugin == null) {
+        throw new IllegalArgumentException("No such plugin: " + name);
       }
+
+      final KeyGroup parser = VimPlugin.getKey();
+      plugin.registerActions(parser);
     }
   }
 

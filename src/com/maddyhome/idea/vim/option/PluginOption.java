@@ -18,7 +18,7 @@ public class PluginOption extends ToggleOption {
   @Override
   public void set() {
     super.set();
-    Plugin.Registrar.registerActions(getName());
+    Plugin.Registrar.activate(getName());
   }
 
   @Override
