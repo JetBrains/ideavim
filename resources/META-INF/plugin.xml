@@ -364,6 +364,7 @@
     <action id="VimUndo" class="com.maddyhome.idea.vim.action.change.UndoAction" text="Undo"/>
 
     <action id="VimSurroundMotion" class="com.maddyhome.idea.vim.action.plugin.surround.SurroundMotionAction" text="Surround" />
+    <action id="VimChangeSurrounding" class="com.maddyhome.idea.vim.action.plugin.surround.ChangeSurroundingAction" text="Change Surround" />
     <action id="VimDeleteSurrounding" class="com.maddyhome.idea.vim.action.plugin.surround.DeleteSurroundingAction" text="Delete Surround" />
 
     <!-- Keys -->

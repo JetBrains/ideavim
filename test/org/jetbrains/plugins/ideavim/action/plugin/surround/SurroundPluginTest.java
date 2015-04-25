@@ -123,4 +123,29 @@ public class SurroundPluginTest extends VimTestCase {
     doTest(parseKeys("ds<"), before, after);
   }
 
+  // TODO quotes, tags, ...
+
+  /* Change surroundings */
+
+  public void testChangeSurroundingParens() {
+    final String before =
+      "if (<caret>condition) {\n" +
+      "}\n";
+    final String after =
+      "if [condition] {\n" +
+      "}\n";
+
+    doTest(parseKeys("csbr"), before, after);
+  }
+
+  public void testChangeSurroundingBlock() {
+    final String before =
+      "if (condition) {<caret>return;}";
+    final String after =
+      "if (condition) (return;)";
+
+    doTest(parseKeys("csBb"), before, after);
+  }
+
+  // TODO repeating deletes, surrounds, changes
 }

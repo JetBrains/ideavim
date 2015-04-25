@@ -101,7 +101,7 @@ public abstract class SurroundingChanger {
   public abstract void pasteSurrounded(Editor editor);
 
   private static void performChange(
-      final Editor editor, final char chKey, @Nullable final String surround,
+      final Editor editor, final char chKey, @Nullable final SurroundPair surround,
       final SurroundingChanger changer) {
 
     RunnableHelper.runWriteCommand(editor.getProject(), new Runnable() {
@@ -118,9 +118,8 @@ public abstract class SurroundingChanger {
 
         // paste the innerValue
         if (surround != null) {
-          List<KeyStroke> surrounding = parseKeys(surround);
-          innerValue.addAll(0, surrounding);
-          innerValue.addAll(surrounding);
+          innerValue.addAll(0, parseKeys(surround.before));
+          innerValue.addAll(parseKeys(surround.after));
         }
         setContentsOf(REGISTER, innerValue);
         changer.pasteSurrounded(editor);
@@ -166,13 +165,13 @@ public abstract class SurroundingChanger {
    * Attempt to change the surroundings at the cursor
    *
    * @param chKey The type of surroundings to change
-   * @param surround The new surroundings, if any
+   * @param pair The new surroundings, if any
    * @return True if we were able to change, else false
    */
-  public static boolean change(Editor editor, char chKey, @Nullable String surround) {
+  public static boolean change(Editor editor, char chKey, @Nullable SurroundPair pair) {
     for (SurroundingChanger changer : CHANGERS) {
       if (changer.handles(chKey)) {
-        performChange(editor, chKey, surround, changer);
+        performChange(editor, chKey, pair, changer);
         return true;
       }
     }
