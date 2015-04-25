@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.option;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.plugin.Plugin;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.MessageHelper;
@@ -463,6 +464,10 @@ public class Options {
     addOption(new ToggleOption(NUMBER, "nu", false));
     addOption(new ToggleOption(RELATIVE_NUMBER, "rnu", false));
     addOption(new ListOption(CLIPBOARD, "cb", new String[]{"autoselect,exclude:cons\\|linux"}, null));
+
+    for (String option : Plugin.Registrar.getOptionNames()) {
+      addOption(new ToggleOption(option, option, false));
+    }
   }
 
   private void addOption(@NotNull Option option) {

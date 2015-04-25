@@ -363,6 +363,8 @@
     <action id="VimRedo" class="com.maddyhome.idea.vim.action.change.RedoAction" text="Redo"/>
     <action id="VimUndo" class="com.maddyhome.idea.vim.action.change.UndoAction" text="Undo"/>
 
+    <action id="VimSurroundMotion" class="com.maddyhome.idea.vim.action.plugin.surround.SurroundMotionAction" text="Surround" />
+
     <!-- Keys -->
     <action id="VimShortcutKeyAction" class="com.maddyhome.idea.vim.action.VimShortcutKeyAction" text="Vim Shortcuts"/>
   </actions>
