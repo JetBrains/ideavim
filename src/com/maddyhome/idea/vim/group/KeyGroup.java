@@ -349,7 +349,7 @@ public class KeyGroup {
     AnAction action = aMgr.getAction(actName);
     assert action != null;
 
-    Node node = base.getChild(key);
+    Node node = base.getExplicitChild(key);
     // Is this the first time we have seen this character at this point in the tree?
     if (node == null) {
       // If this is the last keystroke in the shortcut, and there is no argument, add a command node

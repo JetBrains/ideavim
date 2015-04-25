@@ -20,7 +20,6 @@ package com.maddyhome.idea.vim;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.maddyhome.idea.vim.action.VimCommandAction;
-import com.maddyhome.idea.vim.action.plugin.Plugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
@@ -36,11 +35,6 @@ public class RegisterActions {
    */
   public static void registerActions() {
 
-    // register plugins first in case they
-    //  override default behavior (this is
-    //  unintuitive coming from vim...)
-    Plugin.Registrar.registerActions();
-
     registerVimCommandActions();
 
     registerInsertModeActions();
@@ -48,6 +42,7 @@ public class RegisterActions {
     registerNVOModesActions();
     registerCommandLineActions();
     registerVariousModesActions();
+
   }
 
   private static void registerVimCommandActions() {

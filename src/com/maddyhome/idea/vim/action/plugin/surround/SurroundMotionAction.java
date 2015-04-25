@@ -12,6 +12,7 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.ChangeGroup;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
+import com.maddyhome.idea.vim.helper.RunnableHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,6 +43,7 @@ public class SurroundMotionAction extends EditorAction {
         return false;
       }
 
+      // TODO make this repeatable by saving the char somewhere?
       KeyHandler.getInstance().getChar(new GetCharListener() {
         @Override
         public void onCharTyped(KeyStroke key, char chKey) {
@@ -81,15 +83,22 @@ public class SurroundMotionAction extends EditorAction {
     }
 
     @Override
-    public void onPair(SurroundPair pair) {
-      final TextRange range = MotionGroup.getMotionRange(
-        myEditor, myContext, myCount, myRawCount, myArgument, true);
-
+    public void onPair(final SurroundPair pair) {
+      final TextRange range = MotionGroup.getMotionRange(myEditor, myContext, myCount, myRawCount, myArgument, true);
       final int before = range.getStartOffset();
       final int after = range.getEndOffset();
-      final ChangeGroup change = VimPlugin.getChange();
-      change.insertText(myEditor, after, pair.after);
-      change.insertText(myEditor, before, pair.before);
+
+      final Runnable action = new Runnable() {
+        @Override
+        public void run() {
+          final ChangeGroup change = VimPlugin.getChange();
+          change.insertText(myEditor, after, pair.after);
+          change.insertText(myEditor, before, pair.before);
+        }
+      };
+
+      RunnableHelper.runWriteCommand(
+        myEditor.getProject(), action, SurroundPlugin.NAME, action);
     }
   }
 }

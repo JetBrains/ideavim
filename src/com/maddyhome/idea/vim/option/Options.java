@@ -466,7 +466,7 @@ public class Options {
     addOption(new ListOption(CLIPBOARD, "cb", new String[]{"autoselect,exclude:cons\\|linux"}, null));
 
     for (String option : Plugin.Registrar.getOptionNames()) {
-      addOption(new ToggleOption(option, option, false));
+      addOption(new PluginOption(option));
     }
   }
 

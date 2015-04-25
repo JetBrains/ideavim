@@ -21,7 +21,6 @@ public class SurroundPlugin implements Plugin {
 
   @Override
   public void registerActions(KeyGroup parser) {
-    System.out.println("REGISTER! ");
     parser.registerAction(MappingMode.N, "VimSurroundMotion", Command.Type.CHANGE, Command.FLAG_OP_PEND,
                           new Shortcut("ys"), Argument.Type.MOTION);
   }

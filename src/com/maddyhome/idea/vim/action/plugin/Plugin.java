@@ -20,10 +20,11 @@ public interface Plugin {
       new SurroundPlugin()
     };
 
+    /** Probably, just registerActions(String) is fine */
+    @Deprecated
     public static void registerActions() {
       final KeyGroup parser = VimPlugin.getKey();
       for (Plugin plugin : plugins) {
-        System.out.println("REGISTER! " + plugin.getOptionName());
         if (Options.getInstance().isSet(plugin.getOptionName())) {
           plugin.registerActions(parser);
         }
@@ -35,8 +36,18 @@ public interface Plugin {
       for (Plugin plugin : plugins) {
         optionNames.add(plugin.getOptionName());
       }
-      System.out.println("CREATE " + optionNames);
       return optionNames;
+    }
+
+    public static void registerActions(String name) {
+      // TODO put these in a map
+      final KeyGroup parser = VimPlugin.getKey();
+      for (Plugin plugin : plugins) {
+        if (name.equals(plugin.getOptionName())) {
+          plugin.registerActions(parser);
+          return;
+        }
+      }
     }
   }
 

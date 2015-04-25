@@ -14,11 +14,12 @@ public class SurroundPluginTest extends VimTestCase {
 
   @Override
   protected void setUp() throws Exception {
+    super.setUp();
+
     ToggleOption option = (ToggleOption) Options.getInstance()
       .getOption(SurroundPlugin.NAME);
     option.set();
 
-    super.setUp();
   }
 
   public void testSurroundWordParens() {
