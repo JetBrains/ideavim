@@ -73,6 +73,10 @@ public class SurroundPluginTest extends VimTestCase {
            "foo = new Bar< Baz >();");
   }
 
+  // TODO quotes, tags, ...
+
+  /* Delete surroundings */
+
   public void testDeleteSurroundingParens() {
     final String before =
       "if (<caret>condition) {\n" +
@@ -85,4 +89,38 @@ public class SurroundPluginTest extends VimTestCase {
     doTest(parseKeys("ds("), before, after);
     doTest(parseKeys("ds)"), before, after);
   }
+
+  public void testDeleteSurroundingBlock() {
+    final String before =
+      "if (condition) {<caret>return;}\n";
+    final String after =
+      "if (condition) return;\n";
+
+    doTest(parseKeys("dsB"), before, after);
+    doTest(parseKeys("ds}"), before, after);
+    doTest(parseKeys("ds{"), before, after);
+  }
+
+  public void testDeleteSurroundingArray() {
+    final String before =
+      "int foo = bar[<caret>index];";
+    final String after =
+      "int foo = barindex;";
+
+    doTest(parseKeys("dsr"), before, after);
+    doTest(parseKeys("ds]"), before, after);
+    doTest(parseKeys("ds["), before, after);
+  }
+
+  public void testDeleteSurroundingAngle() {
+    final String before =
+      "foo = new Bar<<caret>Baz>();";
+    final String after =
+      "foo = new BarBaz();";
+
+    doTest(parseKeys("dsa"), before, after);
+    doTest(parseKeys("ds>"), before, after);
+    doTest(parseKeys("ds<"), before, after);
+  }
+
 }

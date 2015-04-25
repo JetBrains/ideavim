@@ -3,6 +3,7 @@ package com.maddyhome.idea.vim.action.plugin.surround;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
@@ -35,7 +36,8 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
  */
 public abstract class SurroundingChanger {
 
-  static SurroundingChanger[] CHANGERS = {
+  static final SurroundingChanger[] CHANGERS = {
+    // Register Changer instances here
     new PunctualChanger()
   };
 
@@ -51,24 +53,51 @@ public abstract class SurroundingChanger {
 
     @Override
     public List<KeyStroke> extractInner(Editor editor, char chKey) {
-      perform(editor, "\"" + REGISTER + "di" + chKey);
+      perform(editor, "di" + pick(chKey));
       return getContentsOf(REGISTER);
     }
 
     @Override
     public void removeOuter(Editor editor, char chKey) {
-      perform(editor, "\"" + REGISTER + "da" + chKey);
+      perform(editor, "da" + pick(chKey));
     }
 
     @Override
     public void pasteSurrounded(Editor editor) {
-      perform(editor, "\"" + REGISTER + "P");
+      // this logic is direct from vim-surround
+      final int offset = editor.getCaretModel().getOffset();
+      final int line = editor.getDocument().getLineNumber(offset);
+      final int lineEnd = editor.getDocument().getLineEndOffset(line);
+
+      final Mark mark = VimPlugin.getMark().getMark(editor, ']');
+      final int motionEndCol = mark == null ? -1 : mark.getCol();
+      final String pasteCommand;
+      if (motionEndCol == lineEnd && offset + 1 == lineEnd) {
+        pasteCommand = "p";
+      } else {
+        pasteCommand = "P";
+      }
+
+      perform(editor, pasteCommand);
     }
+
+    static char pick(char chKey) {
+      switch (chKey) {
+        case 'a': return '>';
+        case 'r': return ']';
+        default: return chKey;
+      }
+    }
+
   }
 
+  /** @return True if this Changer can handle the given char */
   abstract boolean handles(char chKey);
+  /** Perform step 1 */
   public abstract List<KeyStroke> extractInner(Editor editor, char chKey);
+  /** Perform step 2 */
   public abstract void removeOuter(Editor editor, char chKey);
+  /** Perform step 3 */
   public abstract void pasteSurrounded(Editor editor);
 
   private static void performChange(
@@ -119,10 +148,16 @@ public abstract class SurroundingChanger {
   }
 
   static void perform(final Editor editor, final String sequence) {
+
+    // store everything into our temp register
+    final List<KeyStroke> keys = parseKeys(
+      "\"" + REGISTER + sequence
+    );
+
     final EditorDataContext dataContext =
       new EditorDataContext(editor);
     final KeyHandler keyHandler = KeyHandler.getInstance();
-    for (KeyStroke key : parseKeys(sequence)) {
+    for (KeyStroke key : keys) {
       keyHandler.handleKey(editor, key, dataContext, false);
     }
   }
