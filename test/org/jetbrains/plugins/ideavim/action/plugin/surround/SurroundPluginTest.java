@@ -72,4 +72,17 @@ public class SurroundPluginTest extends VimTestCase {
     doTest(parseKeys("yse<"), before,
            "foo = new Bar< Baz >();");
   }
+
+  public void testDeleteSurroundingParens() {
+    final String before =
+      "if (<caret>condition) {\n" +
+      "}\n";
+    final String after =
+      "if condition {\n" +
+      "}\n";
+
+    doTest(parseKeys("dsb"), before, after);
+    doTest(parseKeys("ds("), before, after);
+    doTest(parseKeys("ds)"), before, after);
+  }
 }

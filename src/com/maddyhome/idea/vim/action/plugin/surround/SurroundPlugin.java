@@ -20,8 +20,11 @@ public class SurroundPlugin implements Plugin {
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void registerActions(KeyGroup parser) {
     parser.registerAction(MappingMode.N, "VimSurroundMotion", Command.Type.CHANGE, Command.FLAG_OP_PEND,
                           new Shortcut("ys"), Argument.Type.MOTION);
+    parser.registerAction(MappingMode.N, "VimDeleteSurrounding", Command.Type.DELETE,
+                          new Shortcut("ds"), Argument.Type.CHARACTER);
   }
 }

@@ -23,8 +23,6 @@ import java.awt.event.KeyEvent;
  * @author dhleong
  */
 public class SurroundMotionAction extends EditorAction {
-
-
   public SurroundMotionAction() {
     super(new Handler());
   }
@@ -51,7 +49,6 @@ public class SurroundMotionAction extends EditorAction {
               || ((key.getModifiers() | KeyEvent.CTRL_DOWN_MASK) == KeyEvent.CTRL_DOWN_MASK
                   && key.getKeyCode() == KeyEvent.VK_C)) {
             // action canceled
-            System.out.println(key);
             return;
           }
 
