@@ -3,6 +3,8 @@ package com.maddyhome.idea.vim.action.plugin.surround;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
@@ -104,6 +106,11 @@ public abstract class SurroundingChanger {
       final Editor editor, final char chKey, @Nullable final SurroundPair surround,
       final SurroundingChanger changer) {
 
+    // save the current command (we don't want to override it)
+    final CommandState state = CommandState.getInstance(editor);
+    final Command currentCommand = state.getCommand();
+    final Command lastChangeCommand = state.getLastChangeCommand();
+
     // reset the KeyHandler state so we can perform our actions
     KeyHandler.getInstance().reset(editor);
 
@@ -131,6 +138,12 @@ public abstract class SurroundingChanger {
         setContentsOf(REGISTER, oldValue);
       }
     }, null, null);
+
+    // restore
+    if (currentCommand != null) {
+      state.setCommand(currentCommand);
+    }
+    state.saveLastChangeCommand(lastChangeCommand);
   }
 
   static List<KeyStroke> getContentsOf(char register) {

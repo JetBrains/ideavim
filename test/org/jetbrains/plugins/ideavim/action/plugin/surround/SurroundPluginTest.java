@@ -188,6 +188,6 @@ public class SurroundPluginTest extends VimTestCase {
     final String after =
       "foo[index][index2] = bar;";
 
-    doTest(parseKeys("csbrw."), before, after);
+    doTest(parseKeys("csbrE."), before, after);
   }
 }

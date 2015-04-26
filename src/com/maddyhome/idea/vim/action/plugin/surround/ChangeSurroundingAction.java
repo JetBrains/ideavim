@@ -3,14 +3,14 @@ package com.maddyhome.idea.vim.action.plugin.surround;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
-import com.intellij.openapi.util.text.StringUtil;
 import com.maddyhome.idea.vim.GetCharListener;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
@@ -22,22 +22,27 @@ public class ChangeSurroundingAction extends EditorAction {
     super(new Handler());
   }
 
-  private static class Handler extends EditorActionHandlerBase {
+  private static class Handler extends ChangeEditorActionHandler {
 
     @Override
-    protected final boolean execute(@NotNull final Editor editor, @NotNull DataContext context, @NotNull final Command cmd) {
-      final Argument argument = cmd.getArgument();
+    public boolean execute(@NotNull final Editor editor,
+                           @NotNull final DataContext context,
+                           final int count,
+                           final int rawCount,
+                           @Nullable final Argument argument) {
+
       if (argument == null) {
         return false;
       }
 
-      if (argument.getType() == Argument.Type.STRING
-          && StringUtil.length(argument.getString()) == 2) {
+      if (CommandState.inRepeatMode(editor)
+          && argument instanceof ChangeSurroundMotionArgument) {
+
         // repeat previous command
-        final String parts = argument.getString();
-        assert parts != null;
-        performChange(editor, parts.charAt(0), parts.charAt(1));
-        CommandState.getInstance(editor).saveLastChangeCommand(cmd);
+        final char charFrom = argument.getCharacter();
+        final SurroundPair pair =
+          ((ChangeSurroundMotionArgument)argument).surroundPair;
+        SurroundingChanger.change(editor, charFrom, pair);
       } else {
 
         KeyHandler.getInstance().getChar(new GetCharListener() {
@@ -47,13 +52,7 @@ public class ChangeSurroundingAction extends EditorAction {
               return;
             }
 
-            performChange(editor, argument.getCharacter(), chKey);
-
-            // make this repeatable by replacing the char arg with a 2-char str
-            // NB: If performChange requests more chars (as in `t`) then
-            //  this will not be sufficient to repeat the command
-            cmd.setArgument(new Argument("" + argument.getCharacter() + chKey));
-            CommandState.getInstance(editor).saveLastChangeCommand(cmd);
+            extractPairAndChange(editor, argument.getCharacter(), chKey);
           }
 
         });
@@ -62,15 +61,34 @@ public class ChangeSurroundingAction extends EditorAction {
       return true;
     }
 
-    private void performChange(
-        final Editor editor, final char charFrom, final char charTo) {
+    static void extractPairAndChange(
+      final Editor editor, final char charFrom, final char charTo) {
       PairExtractor.extract(charTo, new PairExtractor.PairListener() {
         @Override
         public void onPair(SurroundPair pair) {
           // now, perform the change!
           SurroundingChanger.change(editor, charFrom, pair);
+
+          // make this repeatable by subclassing Argument with our extra args
+          final Command current = CommandState.getInstance(editor).getCommand();
+          if (current != null) {
+            // it shouldn't be null...
+            current.setArgument(new ChangeSurroundMotionArgument(
+              charFrom, pair));
+          }
         }
       });
+    }
+  }
+
+  static class ChangeSurroundMotionArgument extends Argument {
+
+    final SurroundPair surroundPair;
+
+    public ChangeSurroundMotionArgument(char charFrom, SurroundPair surroundPair) {
+      super(charFrom);
+
+      this.surroundPair = surroundPair;
     }
   }
 }

@@ -61,8 +61,11 @@ public class SurroundMotionAction extends EditorAction {
             // save the argument so we can be repeated
             // NB: This would not be sufficient if the pair
             //  requests further characters (like `t`)
-            Command current = CommandState.getInstance(editor).getCommand();
-            current.setArgument(new SurroundMotionArgument(motion, chKey));
+            final Command current = CommandState.getInstance(editor).getCommand();
+            if (current != null) {
+              // it shouldn't be null...
+              current.setArgument(new SurroundMotionArgument(motion, chKey));
+            }
           }
         });
 
