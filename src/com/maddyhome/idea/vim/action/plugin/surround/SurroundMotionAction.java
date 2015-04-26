@@ -46,8 +46,9 @@ public class SurroundMotionAction extends EditorAction {
       if (CommandState.inRepeatMode(editor)
           && argument instanceof SurroundMotionArgument) {
         // we're repeating an action
-        final char previousChKey = ((SurroundMotionArgument)argument).chKey;
-        PairExtractor.extract(previousChKey, surrounder);
+        final SurroundPair pair =
+          ((SurroundMotionArgument)argument).surroundPair;
+        surrounder.onPair(pair);
       } else {
         KeyHandler.getInstance().getChar(new GetCharListener() {
           @Override
@@ -57,15 +58,6 @@ public class SurroundMotionAction extends EditorAction {
             }
 
             PairExtractor.extract(chKey, surrounder);
-
-            // save the argument so we can be repeated
-            // NB: This would not be sufficient if the pair
-            //  requests further characters (like `t`)
-            final Command current = CommandState.getInstance(editor).getCommand();
-            if (current != null) {
-              // it shouldn't be null...
-              current.setArgument(new SurroundMotionArgument(motion, chKey));
-            }
           }
         });
 
@@ -77,12 +69,12 @@ public class SurroundMotionAction extends EditorAction {
 
   static class SurroundMotionArgument extends Argument {
 
-    final char chKey;
+    final SurroundPair surroundPair;
 
-    public SurroundMotionArgument(@Nullable Command motionArg, char chKey) {
+    public SurroundMotionArgument(@Nullable Command motionArg, SurroundPair surroundPair) {
       super(motionArg);
 
-      this.chKey = chKey;
+      this.surroundPair = surroundPair;
     }
   }
 
@@ -105,6 +97,11 @@ public class SurroundMotionAction extends EditorAction {
     @Override
     public void onPair(final SurroundPair pair) {
       final TextRange range = MotionGroup.getMotionRange(myEditor, myContext, myCount, myRawCount, myArgument, true);
+      if (range == null) {
+        // illegal range
+        VimPlugin.indicateError();
+        return;
+      }
       final int before = range.getStartOffset();
       final int after = range.getEndOffset();
 
@@ -119,6 +116,17 @@ public class SurroundMotionAction extends EditorAction {
 
       RunnableHelper.runWriteCommand(
         myEditor.getProject(), action, SurroundPlugin.NAME, action);
+
+
+      // save the argument so we can be repeated
+      // NB: This would not be sufficient if the pair
+      //  requests further characters (like `t`)
+      final Command current = CommandState.getInstance(myEditor).getCommand();
+      if (current != null && !(myArgument instanceof SurroundMotionArgument)) {
+        // it shouldn't be null...
+        current.setArgument(new SurroundMotionArgument(
+          myArgument.getMotion(), pair));
+      }
     }
   }
 }
