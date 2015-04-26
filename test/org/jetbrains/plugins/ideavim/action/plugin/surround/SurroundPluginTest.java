@@ -22,6 +22,8 @@ public class SurroundPluginTest extends VimTestCase {
 
   }
 
+  /* surround */
+
   public void testSurroundWordParens() {
     final String before =
       "if <caret>condition {\n" +
@@ -71,6 +73,18 @@ public class SurroundPluginTest extends VimTestCase {
     doTest(parseKeys("yse>"), before, after);
     doTest(parseKeys("yse<"), before,
            "foo = new Bar< Baz >();");
+  }
+
+  public void testRepeatSurroundWord() {
+     final String before =
+      "if <caret>condition {\n" +
+      "}\n";
+    final String after =
+      "if ((condition)) {\n" +
+      "}\n";
+
+    doTest(parseKeys("yseb."), before, after);
+    doTest(parseKeys("ysiwbl."), before, after);
   }
 
   // TODO quotes, tags, ...
@@ -123,6 +137,17 @@ public class SurroundPluginTest extends VimTestCase {
     doTest(parseKeys("ds<"), before, after);
   }
 
+  public void testRepeatDeleteSurroundParens() {
+    final String before =
+      "if ((<caret>condition)) {\n" +
+      "}\n";
+    final String after =
+      "if condition {\n" +
+      "}\n";
+
+    doTest(parseKeys("dsb."), before, after);
+  }
+
   // TODO quotes, tags, ...
 
   /* Change surroundings */
@@ -147,5 +172,12 @@ public class SurroundPluginTest extends VimTestCase {
     doTest(parseKeys("csBb"), before, after);
   }
 
-  // TODO repeating deletes, surrounds, changes
+  public void testRepeatChangeSurroundingParens() {
+    final String before =
+      "foo(<caret>index)(index2) = bar;";
+    final String after =
+      "foo[index][index2] = bar;";
+
+    doTest(parseKeys("csbrw."), before, after);
+  }
 }

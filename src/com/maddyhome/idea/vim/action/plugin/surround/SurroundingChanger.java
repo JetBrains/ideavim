@@ -104,6 +104,9 @@ public abstract class SurroundingChanger {
       final Editor editor, final char chKey, @Nullable final SurroundPair surround,
       final SurroundingChanger changer) {
 
+    // reset the KeyHandler state so we can perform our actions
+    KeyHandler.getInstance().reset(editor);
+
     RunnableHelper.runWriteCommand(editor.getProject(), new Runnable() {
       @Override
       public void run() {

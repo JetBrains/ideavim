@@ -606,6 +606,16 @@ public class KeyHandler {
   }
 
   /**
+   * Check if the given keystroke was a "cancel";
+   *  pressing escape or ctrl-c constitutes a "cancel."
+   */
+  public static boolean isCancelStroke(KeyStroke key) {
+    return key.getKeyCode() == KeyEvent.VK_ESCAPE
+           || ((key.getModifiers() | KeyEvent.CTRL_DOWN_MASK) == KeyEvent.CTRL_DOWN_MASK
+               && key.getKeyCode() == KeyEvent.VK_C);
+  }
+
+  /**
    * Partially resets the state of this handler. Resets the command count, clears the key list, resets the key tree
    * node to the root for the current mode we are in.
    *

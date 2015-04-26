@@ -17,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.event.KeyEvent;
 
 /**
  * @author dhleong
@@ -36,27 +35,35 @@ public class SurroundMotionAction extends EditorAction {
                            final int rawCount,
                            @Nullable final Argument argument) {
 
-      final Command motion = argument.getMotion();
+      final Command motion = argument == null ? null : argument.getMotion();
       if (motion == null) {
         return false;
       }
 
-      // TODO make this repeatable by saving the char somewhere?
-      KeyHandler.getInstance().getChar(new GetCharListener() {
-        @Override
-        public void onCharTyped(KeyStroke key, char chKey) {
-          if (key.getKeyCode() == KeyEvent.VK_ESCAPE
-              || ((key.getModifiers() | KeyEvent.CTRL_DOWN_MASK) == KeyEvent.CTRL_DOWN_MASK
-                  && key.getKeyCode() == KeyEvent.VK_C)) {
-            // action canceled
-            return;
-          }
+      final VimSurrounder surrounder =
+        new VimSurrounder(editor, context, count, rawCount, argument);
 
-          final VimSurrounder surrounder =
-            new VimSurrounder(editor, context, count, rawCount, argument);
-          PairExtractor.extract(chKey, surrounder);
-        }
-      });
+      final Argument existingArg = motion.getArgument();
+      if (existingArg != null && existingArg.getCharacter() != 0) {
+        // we're repeating an action
+        PairExtractor.extract(existingArg.getCharacter(), surrounder);
+      } else {
+        KeyHandler.getInstance().getChar(new GetCharListener() {
+          @Override
+          public void onCharTyped(KeyStroke key, char chKey) {
+            if (KeyHandler.isCancelStroke(key)) {
+              return;
+            }
+
+            // save the argument so we can be repeated
+            // NB: This would not be sufficient if the pair
+            //  requests further characters (like `t`)
+            motion.setArgument(new Argument(chKey));
+            PairExtractor.extract(chKey, surrounder);
+          }
+        });
+
+      }
 
       return true;
     }
