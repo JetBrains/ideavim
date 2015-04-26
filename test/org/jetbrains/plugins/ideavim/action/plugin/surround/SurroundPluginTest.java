@@ -75,6 +75,16 @@ public class SurroundPluginTest extends VimTestCase {
            "foo = new Bar< Baz >();");
   }
 
+  public void testSurroundQuotes() {
+    final String before =
+      "foo = <caret>new Bar.Baz;";
+    final String after =
+      "foo = \"new Bar.Baz\";";
+
+    doTest(parseKeys("yst;\""), before, after);
+    doTest(parseKeys("ys4w\""), before, after);
+  }
+
   public void testRepeatSurroundWord() {
      final String before =
       "if <caret>condition {\n" +
@@ -87,7 +97,7 @@ public class SurroundPluginTest extends VimTestCase {
     doTest(parseKeys("ysiwbl."), before, after);
   }
 
-  // TODO quotes, tags, ...
+  // TODO tags, ...
 
   /* Delete surroundings */
 

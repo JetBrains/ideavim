@@ -47,7 +47,7 @@ public abstract class PairExtractor {
     }
 
     // default:
-    if (Character.isLetter(chKey)) {
+    if (!Character.isLetter(chKey)) {
       listener.onPair(new SurroundPair(chKey, chKey));
     }
 

@@ -8,6 +8,7 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.ChangeGroup;
 import com.maddyhome.idea.vim.group.MotionGroup;
@@ -39,14 +40,14 @@ public class SurroundMotionAction extends EditorAction {
       if (motion == null) {
         return false;
       }
-
       final VimSurrounder surrounder =
         new VimSurrounder(editor, context, count, rawCount, argument);
 
-      final Argument existingArg = motion.getArgument();
-      if (existingArg != null && existingArg.getCharacter() != 0) {
+      if (CommandState.inRepeatMode(editor)
+          && argument instanceof SurroundMotionArgument) {
         // we're repeating an action
-        PairExtractor.extract(existingArg.getCharacter(), surrounder);
+        final char previousChKey = ((SurroundMotionArgument)argument).chKey;
+        PairExtractor.extract(previousChKey, surrounder);
       } else {
         KeyHandler.getInstance().getChar(new GetCharListener() {
           @Override
@@ -55,11 +56,13 @@ public class SurroundMotionAction extends EditorAction {
               return;
             }
 
+            PairExtractor.extract(chKey, surrounder);
+
             // save the argument so we can be repeated
             // NB: This would not be sufficient if the pair
             //  requests further characters (like `t`)
-            motion.setArgument(new Argument(chKey));
-            PairExtractor.extract(chKey, surrounder);
+            Command current = CommandState.getInstance(editor).getCommand();
+            current.setArgument(new SurroundMotionArgument(motion, chKey));
           }
         });
 
@@ -69,6 +72,16 @@ public class SurroundMotionAction extends EditorAction {
     }
   }
 
+  static class SurroundMotionArgument extends Argument {
+
+    final char chKey;
+
+    public SurroundMotionArgument(@Nullable Command motionArg, char chKey) {
+      super(motionArg);
+
+      this.chKey = chKey;
+    }
+  }
 
   static class VimSurrounder implements PairExtractor.PairListener {
 
