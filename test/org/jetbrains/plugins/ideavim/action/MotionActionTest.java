@@ -402,6 +402,18 @@ public class MotionActionTest extends VimTestCase {
                    "foo = `bar b<caret>az`;\n");
     myFixture.checkResult("foo = ;\n");
   }
+  //|d| |v_it|
+  public void testDeleteInnerTagBlockCaretBeforeString() {
+    typeTextInFile(parseKeys("dit"),
+                   "<h1><test>foo, <caret>bar</test></h1>\n");
+    myFixture.checkResult("<h1><test></test></h1>\n");
+  }
+  //|d| |v_it|
+  public void testDeleteOuterTagBlockCaretBeforeString() {
+    typeTextInFile(parseKeys("dat"),
+                   "<h1><test>foo, <caret>bar</test></h1>\n");
+    myFixture.checkResult("<h1></h1>\n");
+  }
 
   // |%|
   public void testPercentMatchSimple() {

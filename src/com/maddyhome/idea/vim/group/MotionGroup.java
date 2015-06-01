@@ -293,7 +293,10 @@ public class MotionGroup {
   public TextRange getBlockRange(@NotNull Editor editor, int count, boolean isOuter, char type) {
     return SearchHelper.findBlockRange(editor, type, count, isOuter);
   }
-
+  @Nullable
+  public TextRange getBlockTagRange(@NotNull Editor editor, boolean isOuter) {
+    return SearchHelper.findBlockTagRange(editor, isOuter);
+  }
   @NotNull
   public TextRange getSentenceRange(@NotNull Editor editor, int count, boolean isOuter) {
     return SearchHelper.findSentenceRange(editor, count, isOuter);

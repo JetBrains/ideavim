@@ -35,6 +35,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Helper methods for searching text
@@ -345,6 +347,81 @@ public class SearchHelper {
     return -1;
   }
 
+  public static int findTagLocation(CharSequence chars, int pos, int dir, String targetPattern, String pairPattern){
+    int res = -1;
+    int stack = 0;
+    int findPos = pos;
+    Pattern pTarget = Pattern.compile(targetPattern);
+    Pattern pPair = Pattern.compile(pairPattern);
+    int tempPos = pos;
+    while (findPos >= 0 && findPos < chars.length()) {
+      CharSequence newString = dir > 0 ? chars.subSequence(tempPos, findPos): chars.subSequence(findPos, tempPos);
+      Matcher matcher = pTarget.matcher(newString);
+      Matcher endMatcher = pPair.matcher(newString);
+      if(endMatcher.find()){
+        tempPos = findPos;
+        stack++;
+      }
+      if(matcher.find()){
+        if(stack == 0){
+          res = findPos;
+          res -= dir;
+          break;
+        }else{
+          tempPos = findPos;
+          stack--;
+        }
+      }
+      findPos += dir;
+    }
+    return res;
+  }
+  @Nullable
+  public static TextRange findBlockTagRange(@NotNull Editor editor, boolean isOuter) {
+    CharSequence chars = editor.getDocument().getCharsSequence();
+    int pos = editor.getCaretModel().getOffset();
+    int start = editor.getSelectionModel().getSelectionStart();
+    int end = editor.getSelectionModel().getSelectionEnd();
+    if (start != end) {
+      pos = Math.min(start, end);
+    }
+
+    String startPattern = "<[^ \t>/!](\"[^\"]*\"|'[^']*'|[^/'\">])*>";
+    String endPattern = "</.*>";
+    int bstart = findTagLocation(chars, pos, -1, startPattern, endPattern);
+    String tagName = "";
+    for(; chars.charAt(bstart) != '>' && chars.charAt(bstart) != ' ' && bstart < chars.length(); bstart++){
+      tagName += chars.charAt(bstart);
+    }
+    while(chars.charAt(bstart) != '>'){
+      bstart++;
+    }
+    if (bstart == -1) {
+      return null;
+    }
+    startPattern = "<"+tagName+"(\"[^\"]*\"|'[^']*'|[^'\">])*?>";
+    endPattern = "</"+tagName+"?>";
+    int bend = findTagLocation(chars, bstart, 1, endPattern, startPattern);
+    if (bend == -1 || bend < pos) {
+      return null;
+    }
+    while(chars.charAt(bend) != '<'){
+        bend--;
+    }
+    if (isOuter) {
+      while(chars.charAt(bstart) != '<'){
+        bstart--;
+      }
+      while(chars.charAt(bend) != '>'){
+        bend++;
+      }
+    } else {
+      bstart++;
+      bend--;
+    }
+
+    return new TextRange(bstart, bend);
+  }
   @Nullable
   public static TextRange findBlockQuoteInLineRange(@NotNull Editor editor, char quote, boolean isOuter) {
     final CharSequence chars = editor.getDocument().getCharsSequence();
