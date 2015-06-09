@@ -4,10 +4,11 @@ The Changelog
 History of changes in IdeaVim for the IntelliJ platform.
 
 
-Not Released
-------------
+0.40, 2015-06-09
+----------------
 
-Added support for `mapleader`. Support comments in `%` brace matching.
+Added support for `mapleader`. Support comments in `%` brace matching. Various
+bug fixes.
 
 Features:
 

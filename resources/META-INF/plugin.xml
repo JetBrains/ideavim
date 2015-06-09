@@ -1,9 +1,8 @@
 <idea-plugin url="http://plugins.jetbrains.com/plugin/164">
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
-  <change-notes>
-    <![CDATA[
-      <p>Not released:</p>
+  <change-notes><![CDATA[
+      <p>0.40:</p>
       <ul>
         <li>Support for <code>mapleader</code></li>
         <li>Support comments in <code>%</code> brace matching</li>
@@ -31,30 +30,18 @@
         <li>Fixed visual block selection mode</li>
         <li>Various bug fixes</li>
       </ul>
-      <p>0.35:</p>
-      <ul>
-        <li><code>~/.vimrc</code> is no longer read by default, use <code>~/.ideavimrc</code> instead</li>
-        <li>Various bug fixes</li>
-      </ul>
-      <p>0.34:</p>
-      <ul>
-        <li>Various bug fixes</li>
-      </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
-    ]]>
-  </change-notes>
-  <description>
-    <![CDATA[
+    ]]></change-notes>
+  <description><![CDATA[
       <p>Build @VERSION@-@BUILD-NUMBER@</p>
       <p>Vim emulation plug-in for IDEs based on the IntelliJ platform.</p>
       <p>IdeaVim supports many Vim features including normal/insert/visual modes, motion keys, deletion/changing, marks, registers, some Ex commands, Vim regexps, configuration via ~/.ideavimrc, macros, window commands, etc.</p>
       <p>See also:</p>
       <ul>
-        <li><a href="https://github.com/JetBrains/ideavim">GitHub repository</a> for documentation and contributing</li>
-        <li><a href="http://youtrack.jetbrains.com/issues/VIM">Issue tracker</a> for feature requests and bug reports</li>
+        <li><a href="https://github.com/JetBrains/ideavim">GitHub repository</a>: documentation and contributing</li>
+        <li><a href="http://youtrack.jetbrains.com/issues/VIM">Issue tracker</a>: feature requests and bug reports</li>
       </ul>
-    ]]>
-  </description>
+    ]]></description>
   <version>@VERSION@</version>
   <vendor>JetBrains</vendor>
 
