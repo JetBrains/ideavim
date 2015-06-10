@@ -2,6 +2,10 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
+      <p>0.41:</p>
+      <ul>
+        <li>Various bug fixes</li>
+      </ul>
       <p>0.40:</p>
       <ul>
         <li>Support for <code>mapleader</code></li>

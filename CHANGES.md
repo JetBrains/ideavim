@@ -4,6 +4,15 @@ The Changelog
 History of changes in IdeaVim for the IntelliJ platform.
 
 
+0.41, 2015-06-10
+----------------
+
+A bugfix release.
+
+* VIM-957 Fixed plugin version 0.40 is not compatible with IDEs other than
+  IntelliJ
+
+
 0.40, 2015-06-09
 ----------------
 
