@@ -25,7 +25,7 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.*;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionChangeEvent;
@@ -166,7 +166,7 @@ public class SearchHelper {
   }
 
   private static int findMatchingBlockCommentPair(@NotNull PsiElement element, int pos) {
-    final Language language = PsiUtil.findLanguageFromElement(element);
+    final Language language = element.getLanguage();
     final Commenter commenter = LanguageCommenters.INSTANCE.forLanguage(language);
     final PsiComment comment = PsiTreeUtil.getParentOfType(element, PsiComment.class, false);
     if (comment != null) {
