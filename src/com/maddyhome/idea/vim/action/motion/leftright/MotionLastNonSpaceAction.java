@@ -35,7 +35,7 @@ public class MotionLastNonSpaceAction extends MotionEditorAction {
 
   private static class Handler extends MotionEditorActionHandler {
     public int getOffset(@NotNull Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return VimPlugin.getMotion().moveCaretToLineEndSkipLeading(editor, count);
+      return VimPlugin.getMotion().moveCaretToLineEndSkipLeadingOffset(editor, count - 1);
     }
   }
 }
