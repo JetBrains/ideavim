@@ -56,6 +56,11 @@ public class PsiHelper {
 
     TIntArrayList navigationOffsets = new TIntArrayList();
     addNavigationElements(model.getRoot(), navigationOffsets, isStart);
+
+    if (navigationOffsets.isEmpty()) {
+      return -1;
+    }
+
     navigationOffsets.sort();
 
     int index = navigationOffsets.size();
