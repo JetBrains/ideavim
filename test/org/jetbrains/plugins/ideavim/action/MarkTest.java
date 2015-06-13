@@ -51,6 +51,15 @@ public class MarkTest extends VimTestCase {
   }
 
   // |m|
+  public void testMarkIsNotDeletedWhenLineIsChanged() {
+    typeTextInFile(parseKeys("ma", "cc"), "    foo\n" +
+                                          "    ba<caret>r\n" +
+                                          "    baz\n");
+    Mark mark = VimPlugin.getMark().getMark(myFixture.getEditor(), 'a');
+    assertNotNull(mark);
+  }
+
+  // |m|
   public void testMarkIsMovedUpWhenLinesArePartiallyDeletedAbove() {
     typeTextInFile(parseKeys("mx", "2k", "dd", "0dw"), "    foo\n" +
                                                        "    bar\n" +

@@ -33,6 +33,8 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Jump;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -552,8 +554,13 @@ public class MarkGroup {
         else if (delStart.line <= mark.getLogicalLine() && delEnd.line >= mark.getLogicalLine()) {
           int markLineStartOff = EditorHelper.getLineStartOffset(editor, mark.getLogicalLine());
           int markLineEndOff = EditorHelper.getLineEndOffset(editor, mark.getLogicalLine(), true);
-          // If the marked line is completely within the deleted text, remove the mark
-          if (delStartOff <= markLineStartOff && delEndOff >= markLineEndOff) {
+
+          Command command = CommandState.getInstance(editor).getCommand();
+          // If text is being changed from the start of the mark line (a special case for mark deletion)
+          boolean changeFromMarkLineStart = command != null && command.getType() == Command.Type.CHANGE
+                                            && delStartOff == markLineStartOff;
+          // If the marked line is completely within the deleted text, remove the mark (except the special case)
+          if (delStartOff <= markLineStartOff && delEndOff >= markLineEndOff && !changeFromMarkLineStart) {
             VimPlugin.getMark().removeMark(ch, mark);
             logger.debug("Removed mark");
           }
