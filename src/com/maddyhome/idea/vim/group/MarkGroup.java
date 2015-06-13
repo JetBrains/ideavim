@@ -531,9 +531,9 @@ public class MarkGroup {
     // Skip all this work if there are no marks
     if (marks != null && marks.size() > 0 && editor != null) {
       // Calculate the logical position of the start and end of the deleted text
-      int delEndOff = delStartOff + delLength;
+      int delEndOff = delStartOff + delLength - 1;
       LogicalPosition delStart = editor.offsetToLogicalPosition(delStartOff);
-      LogicalPosition delEnd = editor.offsetToLogicalPosition(delEndOff);
+      LogicalPosition delEnd = editor.offsetToLogicalPosition(delEndOff + 1);
       if (logger.isDebugEnabled()) logger.debug("mark delete. delStart = " + delStart + ", delEnd = " + delEnd);
 
       // Now analyze each mark to determine if it needs to be updated or removed
