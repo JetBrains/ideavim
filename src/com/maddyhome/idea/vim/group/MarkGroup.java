@@ -660,7 +660,7 @@ public class MarkGroup {
       if (!VimPlugin.isEnabled()) return;
 
       if (logger.isDebugEnabled()) logger.debug("MarkUpdater after, event = " + event);
-      if (event.getNewLength() == 0 || (event.getNewLength() == 1 && !event.getNewFragment().equals("\n"))) return;
+      if (event.getNewLength() == 0 || (event.getNewLength() == 1 && event.getNewFragment().charAt(0) != '\n')) return;
 
       Document doc = event.getDocument();
       updateMarkFromInsert(getAnEditor(doc), VimPlugin.getMark().getAllFileMarks(doc), event.getOffset(),

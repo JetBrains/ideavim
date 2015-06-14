@@ -83,6 +83,17 @@ public class MarkTest extends VimTestCase {
 
   // |m|
   public void testMarkIsMovedDownWhenLinesAreInsertedAbove() {
+    typeTextInFile(parseKeys("mY", "Obiff"), "foo\n" +
+                                             "ba<caret>r\n" +
+                                             "baz\n");
+    Mark mark = VimPlugin.getMark().getMark(myFixture.getEditor(), 'Y');
+    assertNotNull(mark);
+    assertEquals(2, mark.getLogicalLine());
+    assertEquals(2, mark.getCol());
+  }
+
+  // |m|
+  public void testMarkIsMovedDownWhenLinesAreInsertedAboveWithIndentation() {
     typeTextInFile(parseKeys("mY", "Obiff"), "    foo\n" +
                                              "    ba<caret>r\n" +
                                              "    baz\n");
