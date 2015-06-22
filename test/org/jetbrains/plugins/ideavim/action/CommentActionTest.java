@@ -3,18 +3,20 @@ package org.jetbrains.plugins.ideavim.action;
 import org.jetbrains.plugins.ideavim.JavaVimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
+import static com.maddyhome.idea.vim.command.CommandState.Mode.COMMAND;
 
 /**
  * @author dhleong
  */
 public class CommentActionTest extends JavaVimTestCase {
 
-
   // |gc| |iw|
   public void testBlockCommentInnerWord() {
     doTest(parseKeys("gciw"),
            "<caret>if (condition) {\n" + "}\n",
            "/*if*/ (condition) {\n" + "}\n");
+    assertMode(COMMAND);
+    assertSelection(null);
   }
 
   // |gc| |iw|
@@ -67,6 +69,8 @@ public class CommentActionTest extends JavaVimTestCase {
            "<caret>//if (condition) {\n" + "//}\n",
            "if (condition) {\n" +
            "}\n");
+    assertMode(COMMAND);
+    assertSelection(null);
   }
 
   // |gc| |ip|
@@ -84,6 +88,8 @@ public class CommentActionTest extends JavaVimTestCase {
            "<caret>if (condition) {\n" + "}\n",
            "//if (condition) {\n" +
            "}\n");
+    assertMode(COMMAND);
+    assertSelection(null);
   }
 
   // |gcc|
@@ -91,6 +97,8 @@ public class CommentActionTest extends JavaVimTestCase {
     doTest(parseKeys("gcc"),
            "<caret>//if (condition) {\n" + "}\n",
            "if (condition) {\n" + "}\n");
+    assertMode(COMMAND);
+    assertSelection(null);
   }
 
 

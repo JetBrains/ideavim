@@ -1217,6 +1217,9 @@ public class ChangeGroup {
       return true;
     } catch (RuntimeException e) {
       e.printStackTrace(); // ???
+    } finally {
+      // remove the selection
+      editor.getSelectionModel().removeSelection();
     }
     return false;
   }

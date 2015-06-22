@@ -6,11 +6,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.List;
@@ -60,4 +62,15 @@ public class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
     }, null, null);
     myFixture.checkResult(after);
   }
+
+  public void assertMode(@NotNull CommandState.Mode expectedMode) {
+    final CommandState.Mode mode = CommandState.getInstance(myFixture.getEditor()).getMode();
+    assertEquals(expectedMode, mode);
+  }
+
+  public void assertSelection(@Nullable String expected) {
+    final String selected = myFixture.getEditor().getSelectionModel().getSelectedText();
+    assertEquals(expected, selected);
+  }
+
 }
