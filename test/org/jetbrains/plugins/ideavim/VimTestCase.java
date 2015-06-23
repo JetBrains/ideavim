@@ -1,6 +1,7 @@
 package org.jetbrains.plugins.ideavim;
 
 import com.intellij.ide.highlighter.JavaFileType;
+import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
@@ -18,6 +19,7 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
+import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
@@ -69,6 +71,7 @@ public abstract class VimTestCase extends UsefulTestCase {
     myFixture.tearDown();
     myFixture = null;
     ExEntryPanel.getInstance().deactivate(false);
+    VimScriptGlobalEnvironment.getInstance().getVariables().clear();
     super.tearDown();
   }
 
@@ -87,6 +90,12 @@ public abstract class VimTestCase extends UsefulTestCase {
   @NotNull
   protected Editor configureByJavaText(@NotNull String content) {
     myFixture.configureByText(JavaFileType.INSTANCE, content);
+    return myFixture.getEditor();
+  }
+
+  @NotNull
+  protected Editor configureByXmlText(@NotNull String content) {
+    myFixture.configureByText(XmlFileType.INSTANCE, content);
     return myFixture.getEditor();
   }
 

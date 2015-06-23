@@ -1,16 +1,7 @@
 package org.jetbrains.plugins.ideavim.action;
 
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileTypes.PlainTextFileType;
-import com.intellij.openapi.project.Project;
-import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.helper.EditorDataContext;
-import com.maddyhome.idea.vim.helper.RunnableHelper;
 import org.jetbrains.plugins.ideavim.VimTestCase;
-
-import javax.swing.*;
-import java.util.List;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
@@ -350,6 +341,49 @@ public class ChangeActionTest extends VimTestCase {
            "quux\n",
            "    a 1    b 2    c 3\n" +
            "quux\n");
+  }
+
+  public void testDeleteCharVisualBlockOnLastCharOfLine() {
+    doTest(parseKeys("<C-V>", "x"),
+           "fo<caret>o\n",
+           "fo\n");
+  }
+
+  public void testDeleteCharVisualBlockOnEmptyLinesDoesntDeleteAnything() {
+    doTest(parseKeys("<C-V>", "j", "x"),
+           "\n\n",
+           "\n\n");
+  }
+
+  // VIM-781 |CTRL-V| |j|
+  public void testDeleteCharVisualBlockWithEmptyLineInTheMiddle() {
+    doTest(parseKeys("l", "<C-V>", "jj", "x"),
+           "foo\n" +
+           "\n" +
+           "bar\n",
+           "fo\n" +
+           "\n" +
+           "br\n");
+  }
+
+  // VIM-781 |CTRL-V| |j|
+  public void testDeleteCharVisualBlockWithShorterLineInTheMiddle() {
+    doTest(parseKeys("l", "<C-V>", "jj", "x"),
+           "foo\n" +
+           "x\n" +
+           "bar\n",
+           "fo\n" +
+           "x\n" +
+           "br\n");
+  }
+
+  // VIM-845 |CTRL-V| |x|
+  public void testDeleteVisualBlockOneCharWide() {
+    configureByText("foo\n" +
+                    "bar\n");
+    typeText(parseKeys("<C-V>", "j", "x"));
+    myFixture.checkResult("oo\n" +
+                          "ar\n");
   }
 
   // |r|

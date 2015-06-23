@@ -1605,34 +1605,17 @@ public class MotionGroup {
 
   @NotNull
   public TextRange getVisualRange(@NotNull Editor editor) {
-    final TextRange res = new TextRange(editor.getSelectionModel().getBlockSelectionStarts(),
-                                        editor.getSelectionModel().getBlockSelectionEnds());
-
-    final CommandState.SubMode subMode = CommandState.getInstance(editor).getSubMode();
-    if (subMode == CommandState.SubMode.VISUAL_BLOCK) {
-      final int[] ends = res.getEndOffsets();
-
-      // If the last left/right motion was the $ command, simulate each line being selected to end-of-line
-      if (EditorData.getLastColumn(editor) >= MotionGroup.LAST_COLUMN) {
-        final int[] starts = res.getStartOffsets();
-        for (int i = 0; i < starts.length; i++) {
-          if (ends[i] > starts[i]) {
-            ends[i] = EditorHelper.getLineEndForOffset(editor, starts[i]);
-          }
-        }
-      }
-      else {
-        for (int i = 0; i < ends.length; ++i) {
-          ends[i] = EditorHelper.normalizeOffset(editor, ends[i] + 1, false);
-        }
-      }
-    }
-    return res;
+    return new TextRange(editor.getSelectionModel().getBlockSelectionStarts(),
+                         editor.getSelectionModel().getBlockSelectionEnds());
   }
 
   @NotNull
   public TextRange getRawVisualRange() {
     return new TextRange(visualStart, visualEnd);
+  }
+
+  public void updateSelection(@NotNull Editor editor) {
+    updateSelection(editor, visualEnd);
   }
 
   private void updateSelection(@NotNull Editor editor, int offset) {
@@ -1665,9 +1648,28 @@ public class MotionGroup {
       editor.getSelectionModel().setSelection(start, end);
     }
     else if (subMode == CommandState.SubMode.VISUAL_BLOCK) {
-      final LogicalPosition lineStart = editor.offsetToLogicalPosition(start);
-      final LogicalPosition lineEnd = editor.offsetToLogicalPosition(end);
-      editor.getSelectionModel().setBlockSelection(lineStart, lineEnd);
+      LogicalPosition blockStart = editor.offsetToLogicalPosition(start);
+      LogicalPosition blockEnd = editor.offsetToLogicalPosition(end);
+      if (blockStart.column < blockEnd.column) {
+        blockEnd = new LogicalPosition(blockEnd.line, blockEnd.column + 1);
+      }
+      else {
+        blockStart = new LogicalPosition(blockStart.line, blockStart.column + 1);
+      }
+      editor.getSelectionModel().setBlockSelection(blockStart, blockEnd);
+
+      for (Caret caret : editor.getCaretModel().getAllCarets()) {
+        int line = caret.getLogicalPosition().line;
+        int lineEndOffset = EditorHelper.getLineEndOffset(editor, line, true);
+
+        if (EditorData.getLastColumn(editor) >= MotionGroup.LAST_COLUMN) {
+          caret.setSelection(caret.getSelectionStart(), lineEndOffset);
+        }
+        if (!EditorHelper.isLineEmpty(editor, line, false)) {
+          caret.moveToOffset(caret.getSelectionEnd() - 1);
+        }
+      }
+      editor.getCaretModel().moveToOffset(end);
     }
 
     VimPlugin.getMark().setVisualSelectionMarks(editor, new TextRange(start, end));

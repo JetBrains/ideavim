@@ -87,7 +87,7 @@ public class EditorGroup {
       public void editorReleased(@NotNull EditorFactoryEvent event) {
         final Editor editor = event.getEditor();
         deinitLineNumbers(editor);
-        EditorData.uninitializeEditor(editor);
+        EditorData.unInitializeEditor(editor);
         VimPlugin.getKey().unregisterShortcutKeys(editor);
         editor.getSettings().setAnimatedScrolling(isAnimatedScrolling);
         editor.getSettings().setRefrainFromScrolling(isRefrainFromScrolling);

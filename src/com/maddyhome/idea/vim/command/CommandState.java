@@ -85,6 +85,11 @@ public class CommandState {
     return state.getMode() == Mode.VISUAL && state.getSubMode() == SubMode.VISUAL_CHARACTER;
   }
 
+  public static boolean inVisualBlockMode(@Nullable Editor editor) {
+    final CommandState state = getInstance(editor);
+    return state.getMode() == Mode.VISUAL && state.getSubMode() == SubMode.VISUAL_BLOCK;
+  }
+
   @Nullable
   public Command getCommand() {
     return myCommand;
@@ -311,7 +316,7 @@ public class CommandState {
     VimPlugin.showMode(msg.toString());
   }
 
-  public static enum Mode {
+  public enum Mode {
     COMMAND,
     INSERT,
     REPLACE,
@@ -320,7 +325,7 @@ public class CommandState {
     EX_ENTRY
   }
 
-  public static enum SubMode {
+  public enum SubMode {
     NONE,
     SINGLE_COMMAND,
     VISUAL_CHARACTER,

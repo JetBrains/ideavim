@@ -1,7 +1,7 @@
 package org.jetbrains.plugins.ideavim.ex;
 
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.ex.VimScriptParser;
+import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -242,5 +242,38 @@ public class MapCommandTest extends VimTestCase {
     VimScriptParser.executeText("map A :%s/foo/bar/g\r\u000C\n");
     typeText(parseKeys("A"));
     myFixture.checkResult("bar\n");
+  }
+
+  // VIM-700 |:map|
+  public void testRemappingZero() {
+    configureByText("x<caret>yz\n");
+    VimScriptParser.executeText("map 0 ~");
+    typeText(parseKeys("0"));
+    myFixture.checkResult("xYz\n");
+  }
+
+  // VIM-700 |:map|
+  public void testRemappingZeroStillAllowsZeroToBeUsedInCount() {
+    configureByText("a<caret>bcdefghijklmnop\n");
+    VimScriptParser.executeText("map 0 ^");
+    typeText(parseKeys("10~"));
+    myFixture.checkResult("aBCDEFGHIJKlmnop\n");
+  }
+
+  // VIM-700 |:map|
+  public void testRemappingDeleteOverridesRemovingLastDigitFromCount() {
+    configureByText("a<caret>bcdefghijklmnop\n");
+    VimScriptParser.executeText("map <Del> ~");
+    typeText(parseKeys("10<Del>"));
+    myFixture.checkResult("aBCDEFGHIJKlmnop\n");
+  }
+
+  // VIM-650 |mapleader|
+  public void testMapLeader() {
+    configureByText("\n");
+    typeText(commandToKeys("let mapleader = \",\""));
+    typeText(commandToKeys("nmap <Leader>z izzz<Esc>"));
+    typeText(parseKeys(",z"));
+    myFixture.checkResult("zzz\n");
   }
 }

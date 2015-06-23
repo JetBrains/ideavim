@@ -4,10 +4,25 @@ The Changelog
 History of changes in IdeaVim for the IntelliJ platform.
 
 
-Not Released
-------------
+0.41, 2015-06-10
+----------------
 
 A bugfix release.
+
+* VIM-957 Fixed plugin version 0.40 is not compatible with IDEs other than
+  IntelliJ
+
+
+0.40, 2015-06-09
+----------------
+
+Added support for `mapleader`. Support comments in `%` brace matching. Various
+bug fixes.
+
+Features:
+
+* VIM-650 Added support for `mapleader`
+* VIM-932 Support comments in `%` brace matching
 
 Bug fixes:
 
@@ -20,6 +35,10 @@ Bug fixes:
 * VIM-864 Fixed visual marks getting changed during visual substitute
 * VIM-856 Fixed regex look-behind problem
 * VIM-868 Allow count on `gt` and `gT`
+* VIM-700 Remapping `0` should still allow it to be entered in command count
+* VIM-781 Fixed expanding visual block selection past empty lines
+* VIM-845 Fixed `c` and `x` functionality for visual block selections
+* VIM-930 Fixed editor focus issues after closing Ex entry box on Oracle Java 6
 
 
 0.39, 2014-12-03

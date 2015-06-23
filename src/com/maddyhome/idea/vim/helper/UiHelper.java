@@ -18,10 +18,13 @@
 
 package com.maddyhome.idea.vim.helper;
 
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.awt.*;
 
 /**
@@ -31,10 +34,28 @@ public class UiHelper {
   private UiHelper() {
   }
 
-
   @NotNull
   public static Font getEditorFont() {
     final EditorColorsScheme scheme = EditorColorsManager.getInstance().getGlobalScheme();
     return new Font(scheme.getEditorFontName(), Font.PLAIN, scheme.getEditorFontSize());
+  }
+
+  /**
+   * Get focus reliably.
+   */
+  public static void requestFocus(@NotNull final JComponent component) {
+    final Application application = ApplicationManager.getApplication();
+    // XXX: This workaround is required at least for Oracle Java 6
+    application.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        application.invokeLater(new Runnable() {
+          @Override
+          public void run() {
+            component.requestFocus();
+          }
+        });
+      }
+    });
   }
 }

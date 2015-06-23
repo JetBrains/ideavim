@@ -123,7 +123,7 @@ public class ExOutputPanel extends JPanel {
     myActive = false;
     myText.setText("");
     if (refocusOwningEditor) {
-      myEditor.getContentComponent().requestFocus();
+      UiHelper.requestFocus(myEditor.getContentComponent());
     }
     if (myOldGlass != null) {
       myOldGlass.removeComponentListener(myAdapter);
@@ -157,7 +157,7 @@ public class ExOutputPanel extends JPanel {
     }
 
     myActive = true;
-    myText.requestFocus();
+    UiHelper.requestFocus(myText);
   }
 
   private void setFontForElements() {
