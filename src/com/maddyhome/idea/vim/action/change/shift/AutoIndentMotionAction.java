@@ -28,16 +28,23 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ * @author Aleksey Lagoshin
  */
-public class AutoIndentLinesAction extends EditorAction {
-  public AutoIndentLinesAction() {
+public class AutoIndentMotionAction extends EditorAction {
+  public AutoIndentMotionAction() {
     super(new Handler());
   }
 
   private static class Handler extends ChangeEditorActionHandler {
-    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
-      VimPlugin.getChange().autoIndentLines(editor, context, count);
-      return true;
+    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
+                           @Nullable Argument argument) {
+      if (argument != null) {
+        VimPlugin.getChange().autoIndentMotion(editor, context, count, rawCount, argument);
+        return true;
+      }
+      else {
+        return false;
+      }
     }
   }
 }

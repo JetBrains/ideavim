@@ -624,10 +624,10 @@ public class RegisterActions {
     });
 
     // Shift Actions
-    // TODO - add =
-    // TODO - == will ignore count and only auto-indent 1 lines
     parser.registerAction(MappingMode.N, "VimAutoIndentLines", Command.Type.CHANGE,
                           new Shortcut("=="));
+    parser.registerAction(MappingMode.N, "VimAutoIndentMotion", Command.Type.CHANGE, Command.FLAG_OP_PEND,
+                          new Shortcut('='), Argument.Type.MOTION);
     parser.registerAction(MappingMode.N, "VimShiftLeftLines", Command.Type.CHANGE,
                           new Shortcut("<<"));
     parser.registerAction(MappingMode.N, "VimShiftLeftMotion", Command.Type.CHANGE, Command.FLAG_OP_PEND,

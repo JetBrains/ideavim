@@ -1305,8 +1305,35 @@ public class ChangeGroup {
     replaceText(editor, start, end, sb.toString());
   }
 
-  public void autoIndentLines(@NotNull DataContext context) {
+  public void autoIndentLines(@NotNull Editor editor, @NotNull DataContext context, int lines) {
+    CaretModel caretModel = editor.getCaretModel();
+    int startLine = caretModel.getLogicalPosition().line;
+    int endLine = startLine + lines - 1;
+
+    if (endLine <= EditorHelper.getLineCount(editor)) {
+      TextRange textRange = new TextRange(caretModel.getOffset(), editor.getDocument().getLineEndOffset(endLine));
+      autoIndentRange(editor, context, textRange);
+    }
+  }
+
+  public void autoIndentMotion(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
+                               @NotNull Argument argument) {
+    TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, false);
+    if (range != null) {
+      autoIndentRange(editor, context, range);
+    }
+  }
+
+  public void autoIndentRange(@NotNull Editor editor, @NotNull DataContext context, @NotNull TextRange range) {
+    int startLineOffset = EditorHelper.getLineStartForOffset(editor, range.getStartOffset());
+    int endLineOffset = EditorHelper.getLineEndForOffset(editor, range.getEndOffset());
+    editor.getSelectionModel().setSelection(startLineOffset, endLineOffset);
+
     KeyHandler.executeAction("AutoIndentLines", context);
+
+    int firstLine = editor.offsetToLogicalPosition(Math.min(startLineOffset, endLineOffset)).line;
+    int newOffset = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, firstLine);
+    MotionGroup.moveCaret(editor, newOffset);
   }
 
   public void reformatCode(@NotNull DataContext context) {
