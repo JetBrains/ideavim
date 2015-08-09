@@ -347,14 +347,43 @@ public class SearchHelper {
     return -1;
   }
 
-  public static int findTagLocation(CharSequence chars, int pos, int dir, String targetPattern, String pairPattern){
+  private static boolean inHtmlTagPosition(CharSequence chars, boolean end_tag, int pos){
+    while(pos > 0){
+      if (chars.charAt(pos) == '<'){
+        break;
+      }else if (chars.charAt(pos) == '>') {	/* find '>' before cursor */
+        break;
+      }
+      pos--;
+    }
+    if (chars.charAt(pos) != '<'){
+      return false;
+    }
+    pos++;
+    if (end_tag){
+    /* check that there is a '/' after the '<' */
+      return chars.charAt(pos) == '/';
+    }
+    if (chars.charAt(pos) == '/'){
+      return false;
+    }
+    int prevPos = pos;
+    for(;;){
+      if (chars.charAt(pos) == '>')
+        break;
+      prevPos = pos;
+      pos++;
+    }
+    return chars.charAt(prevPos) != '/';
+  }
+  private static int findTagLocation(CharSequence chars, int pos, int dir, String targetPattern, String pairPattern){
     int res = -1;
     int stack = 0;
     int findPos = pos;
     Pattern pTarget = Pattern.compile(targetPattern);
     Pattern pPair = Pattern.compile(pairPattern);
     int tempPos = pos;
-    while (findPos >= 0 && findPos < chars.length()) {
+    while (findPos >= 0 && findPos <= chars.length()) {
       CharSequence newString = dir > 0 ? chars.subSequence(tempPos, findPos): chars.subSequence(findPos, tempPos);
       Matcher matcher = pTarget.matcher(newString);
       Matcher endMatcher = pPair.matcher(newString);
@@ -385,19 +414,24 @@ public class SearchHelper {
     if (start != end) {
       pos = Math.min(start, end);
     }
-
+    if(inHtmlTagPosition(chars, false, pos)){
+      while(chars.charAt(pos) != '>'){
+        pos++;
+      }
+      pos++;
+    }
     String startPattern = "<[^ \t>/!](\"[^\"]*\"|'[^']*'|[^/'\">])*>";
     String endPattern = "</.*>";
     int bstart = findTagLocation(chars, pos, -1, startPattern, endPattern);
+    if (bstart == -1) {
+      return null;
+    }
     String tagName = "";
     for(; chars.charAt(bstart) != '>' && chars.charAt(bstart) != ' ' && bstart < chars.length(); bstart++){
       tagName += chars.charAt(bstart);
     }
     while(chars.charAt(bstart) != '>'){
       bstart++;
-    }
-    if (bstart == -1) {
-      return null;
     }
     startPattern = "<"+tagName+"(\"[^\"]*\"|'[^']*'|[^'\">])*?>";
     endPattern = "</"+tagName+"?>";

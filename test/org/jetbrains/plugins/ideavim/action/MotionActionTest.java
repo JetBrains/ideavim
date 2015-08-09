@@ -409,6 +409,15 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("<h1><test></test></h1>\n");
   }
   //|d| |v_it|
+  public void testDeleteInnerTagBlockCaretInHtml() {
+    typeTextInFile(parseKeys("dit"),
+                   "<template <caret>name=\"hello\">\n" +
+                   "  <button>Click Me</button>\n" +
+                   "  <p>You've pressed the button {{counter}} times.</p>\n" +
+                   "</template>\n");
+    myFixture.checkResult("<template name=\"hello\"></template>\n");
+  }
+  //|d| |v_it|
   public void testDeleteOuterTagBlockCaretBeforeString() {
     typeTextInFile(parseKeys("dat"),
                    "<h1><test>foo, <caret>bar</test></h1>\n");
