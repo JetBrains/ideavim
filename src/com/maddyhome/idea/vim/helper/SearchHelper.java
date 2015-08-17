@@ -35,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -348,6 +349,9 @@ public class SearchHelper {
   }
 
   private static boolean inHtmlTagPosition(CharSequence chars, boolean end_tag, int pos){
+    if (chars.charAt(pos) == '>'){
+      pos--;
+    }
     while(pos > 0){
       if (chars.charAt(pos) == '<'){
         break;
@@ -369,7 +373,7 @@ public class SearchHelper {
     }
     int prevPos = pos;
     for(;;){
-      if (chars.charAt(pos) == '>')
+      if ( pos >= chars.length() || chars.charAt(pos) == '>')
         break;
       prevPos = pos;
       pos++;
@@ -378,27 +382,27 @@ public class SearchHelper {
   }
   private static int findTagLocation(CharSequence chars, int pos, int dir, String targetPattern, String pairPattern){
     int res = -1;
-    int stack = 0;
     int findPos = pos;
+    int tempPos = pos;
     Pattern pTarget = Pattern.compile(targetPattern);
     Pattern pPair = Pattern.compile(pairPattern);
-    int tempPos = pos;
+    Stack<Pattern> patternStack = new Stack();
     while (findPos >= 0 && findPos <= chars.length()) {
       CharSequence newString = dir > 0 ? chars.subSequence(tempPos, findPos): chars.subSequence(findPos, tempPos);
       Matcher matcher = pTarget.matcher(newString);
       Matcher endMatcher = pPair.matcher(newString);
       if(endMatcher.find()){
+        patternStack.push(Pattern.compile(createTagNameRegex(endMatcher.group(), dir > 0)));
         tempPos = findPos;
-        stack++;
       }
       if(matcher.find()){
-        if(stack == 0){
+        if(patternStack.empty() ){
           res = findPos;
           res -= dir;
           break;
-        }else{
+        }else if(patternStack.peek().matcher(newString).find()){
           tempPos = findPos;
-          stack--;
+          patternStack.pop();
         }
       }
       findPos += dir;
@@ -411,33 +415,51 @@ public class SearchHelper {
     int pos = editor.getCaretModel().getOffset();
     int start = editor.getSelectionModel().getSelectionStart();
     int end = editor.getSelectionModel().getSelectionEnd();
+    boolean isInStartTag = inHtmlTagPosition(chars, false, pos);
+    boolean isInEndTag = inHtmlTagPosition(chars, true, pos);
     if (start != end) {
       pos = Math.min(start, end);
     }
-    if(inHtmlTagPosition(chars, false, pos)){
+    if(isInStartTag){
       while(chars.charAt(pos) != '>'){
         pos++;
       }
       pos++;
+    } else if(isInEndTag){
+      pos--;
     }
-    String startPattern = "<[^ \t>/!](\"[^\"]*\"|'[^']*'|[^/'\">])*>";
-    String endPattern = "</.*>";
-    int bstart = findTagLocation(chars, pos, -1, startPattern, endPattern);
-    if (bstart == -1) {
-      return null;
-    }
-    String tagName = "";
-    for(; chars.charAt(bstart) != '>' && chars.charAt(bstart) != ' ' && bstart < chars.length(); bstart++){
-      tagName += chars.charAt(bstart);
-    }
-    while(chars.charAt(bstart) != '>'){
-      bstart++;
-    }
-    startPattern = "<"+tagName+"(\"[^\"]*\"|'[^']*'|[^'\">])*?>";
-    endPattern = "</"+tagName+"?>";
-    int bend = findTagLocation(chars, bstart, 1, endPattern, startPattern);
-    if (bend == -1 || bend < pos) {
-      return null;
+    String startPattern = "";
+    String endPattern = "";
+    int bend = -1;
+    int bstart = -1;
+    int stack = 0;
+    while(bend < 0) {
+      startPattern = "<[^ \t>/!](\"[^\"]*\"|'[^']*'|[^/'\">])*>";
+      endPattern = "</.*>";
+      int startPos = pos;
+      bstart = findTagLocation(chars, startPos, -1, startPattern, endPattern);
+      if (bstart == -1) {
+        return null;
+      }
+      int tempBstart = bstart;
+      startPattern = createTagNameRegex(chars.subSequence(bstart, chars.length()), false);
+      endPattern = createTagNameRegex(chars.subSequence(bstart, chars.length()), true);
+      while (chars.charAt(bstart) != '>') {
+        bstart++;
+      }
+      bend = findTagLocation(chars, bstart, 1, endPattern, startPattern);
+      if (bend == -1) {
+        stack++;
+        pos = tempBstart;
+      }else if(!isInEndTag && bend < pos){
+        return null;
+      }
+      else {
+        if(stack==0){
+          break;
+        }
+        stack--;
+      }
     }
     while(chars.charAt(bend) != '<'){
         bend--;
@@ -1933,6 +1955,27 @@ public class SearchHelper {
     }
 
     return res.toString();
+  }
+  @NotNull
+  private static String createStartTag(@NotNull CharSequence tagName){
+    return "<" + tagName + "(\"[^\"]*\"|'[^']*'|[^'\">])*?>";
+  }
+  @NotNull
+  private static String createEndTag(@NotNull CharSequence tagName){
+    return "</" + tagName + "?>";
+  }
+  @NotNull
+  private static String createTagNameRegex(CharSequence includeTagChars, boolean isEndTag){
+    String tagName = "";
+    int startPos = 0;
+    for (; (includeTagChars.charAt(startPos) == '<' || includeTagChars.charAt(startPos) == '/') && startPos < includeTagChars.length(); startPos++){}
+    for (; includeTagChars.charAt(startPos) != '>' && includeTagChars.charAt(startPos) != ' ' && startPos < includeTagChars.length(); startPos++) {
+      tagName += includeTagChars.charAt(startPos);
+    }
+    if(isEndTag){
+      return createEndTag(tagName);
+    }
+    return createStartTag(tagName);
   }
 
   public static class CountPosition {
