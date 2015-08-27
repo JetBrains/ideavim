@@ -595,6 +595,8 @@ public class RegisterActions {
                           new Shortcut("g`"), Argument.Type.CHARACTER);
     parser.registerAction(MappingMode.N, "VimMotionGotoMarkLine", Command.Type.MOTION, Command.FLAG_MOT_LINEWISE,
                           new Shortcut("g'"), Argument.Type.CHARACTER);
+    parser.registerAction(MappingMode.N, "VimMotionFirstColumn", Command.Type.MOTION, Command.FLAG_MOT_EXCLUSIVE,
+                                new Shortcut[]{ new Shortcut("==") });
     // Misc Actions
     parser.registerAction(MappingMode.N, "VimLastSearchReplace", Command.Type.OTHER_WRITABLE,
                           new Shortcut('&'));
