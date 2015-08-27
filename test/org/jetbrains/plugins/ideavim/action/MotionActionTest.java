@@ -61,6 +61,14 @@ public class MotionActionTest extends VimTestCase {
     assertOffset(6);
   }
 
+  // |==|
+  public void testMoveToFirstColumn() {
+    final Editor editor = typeTextInFile(parseKeys("=="),
+                                         "one tw<caret>o three four");
+    final VisualPosition position = editor.getCaretModel().getVisualPosition();
+    assertEquals(new VisualPosition(0, 0), position);
+  }
+
   // |f|
   public void testForwardToTab() {
     typeTextInFile(parseKeys("f<Tab>"),
