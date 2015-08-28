@@ -73,12 +73,12 @@ public class RegisterActions {
                             new KeyStroke[]{KeyStroke.getKeyStroke('g'),
                               KeyStroke.getKeyStroke(KeyEvent.VK_G, KeyEvent.CTRL_MASK)})
     );
-    // TODO - add zC
-    // TODO - add zO
     parser.registerAction(MappingMode.NV, "CollapseAllRegions", Command.Type.OTHER_READONLY, new Shortcut("zM"));
     parser.registerAction(MappingMode.NV, "CollapseRegion", Command.Type.OTHER_READONLY, new Shortcut("zc"));
+    parser.registerAction(MappingMode.NV, "CollapseRegionRecursively", Command.Type.OTHER_READONLY, new Shortcut("zC"));
     parser.registerAction(MappingMode.NV, "ExpandAllRegions", Command.Type.OTHER_READONLY, new Shortcut("zR"));
     parser.registerAction(MappingMode.NV, "ExpandRegion", Command.Type.OTHER_READONLY, new Shortcut("zo"));
+    parser.registerAction(MappingMode.NV, "ExpandRegionRecursively", Command.Type.OTHER_READONLY, new Shortcut("zO"));
     parser.registerAction(MappingMode.NV, "VimToggleRecording",
                           Command.Type.OTHER_READONLY,
                           Command.FLAG_NO_ARG_RECORDING,
