@@ -1,5 +1,6 @@
 package org.jetbrains.plugins.ideavim.action;
 
+import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
@@ -229,6 +230,13 @@ public class ChangeActionTest extends VimTestCase {
     doTest(parseKeys("v", "k$d"),
            "foo\n<caret>bar\n",
            "fooar\n");
+  }
+
+  // VIM-714 |v| |w| |d| |j|
+  public void testCheckPositionAfterDeleteRange() {
+    final Editor editor = typeTextInFile(parseKeys("vwdj"),
+           "this is a sentence\nthis is a sentence");
+    assertEquals(0, editor.getCaretModel().getLogicalPosition().column);
   }
 
   // VIM-569 |a| |i_CTRL-W|

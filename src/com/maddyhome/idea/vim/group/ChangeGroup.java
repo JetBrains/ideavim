@@ -908,6 +908,9 @@ public class ChangeGroup {
         pos = EditorHelper.normalizeOffset(editor, range.getStartOffset(), isChange);
       }
       MotionGroup.moveCaret(editor, pos);
+      // BUG VIM-714
+      editor.getCaretModel().moveToOffset(pos);
+      EditorData.setLastColumn(editor, editor.getCaretModel().getVisualPosition().column);
     }
     return res;
   }
