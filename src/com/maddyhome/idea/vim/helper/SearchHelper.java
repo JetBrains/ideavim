@@ -25,7 +25,7 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.util.*;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionChangeEvent;
@@ -35,6 +35,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Helper methods for searching text
@@ -166,7 +169,7 @@ public class SearchHelper {
   }
 
   private static int findMatchingBlockCommentPair(@NotNull PsiElement element, int pos) {
-    final Language language = element.getLanguage();
+    final Language language = PsiUtil.findLanguageFromElement(element);
     final Commenter commenter = LanguageCommenters.INSTANCE.forLanguage(language);
     final PsiComment comment = PsiTreeUtil.getParentOfType(element, PsiComment.class, false);
     if (comment != null) {
@@ -345,6 +348,129 @@ public class SearchHelper {
     return -1;
   }
 
+  public static boolean inHtmlTagPosition(CharSequence chars, boolean end_tag, int pos){
+      if (chars.charAt(pos) == '>'){
+            pos--;
+      }
+
+      // find '<' before cursor
+      while(pos > 0 && !(chars.charAt(pos) == '<' || chars.charAt(pos) == '>')){
+          pos--;
+      }
+      if (chars.charAt(pos) != '<'){
+          return false; //if there are no '<' before pos OR if found new tag inside
+      }
+      pos++; //Now we at first symbol of the tag
+
+      //simple test if tag is really closing
+      if (end_tag != (chars.charAt(pos) == '/')){
+          return false;
+      }
+
+      // find '>' after cursor
+      while (pos < chars.length() && (chars.charAt(pos) != '>'))
+          pos++;
+
+      return (chars.charAt(pos) == '>'); //if really found closed bracket
+  }
+
+  private static int findTagLocation(CharSequence chars, int pos, int direction, String targetPattern, String pairPattern){
+    int res = -1;
+    int findPos = pos;
+    int tempPos = pos;
+    Pattern pTarget = Pattern.compile(targetPattern);
+    Pattern pPair = Pattern.compile(pairPattern);
+    Stack<Pattern> patternStack = new Stack();
+    while (findPos >= 0 && findPos <= chars.length()) {
+      CharSequence newString = direction > 0 ? chars.subSequence(tempPos, findPos): chars.subSequence(findPos, tempPos);
+      Matcher matcher = pTarget.matcher(newString);
+      Matcher endMatcher = pPair.matcher(newString);
+      if(endMatcher.find()){
+        patternStack.push(Pattern.compile(createTagNameRegex(endMatcher.group(), direction > 0)));
+        tempPos = findPos;
+      }
+      if(matcher.find()){
+        if(patternStack.empty() ){
+          res = findPos - direction;
+          break;
+        }else if(patternStack.peek().matcher(newString).find()){
+          tempPos = findPos;
+          patternStack.pop();
+        }
+      }
+      findPos += direction;
+    }
+    return res;
+  }
+
+  @Nullable
+  public static TextRange findBlockTagRange(@NotNull Editor editor, boolean isOuter) {
+    CharSequence chars = editor.getDocument().getCharsSequence();
+    int pos = editor.getCaretModel().getOffset();
+    int start = editor.getSelectionModel().getSelectionStart();
+    int end = editor.getSelectionModel().getSelectionEnd();
+    boolean isInStartTag = inHtmlTagPosition(chars, false, pos);
+    boolean isInEndTag = inHtmlTagPosition(chars, true, pos);
+    if (start != end) {
+      pos = Math.min(start, end); //TODO: is it necessary?
+    }
+    if(isInStartTag){
+      while(chars.charAt(pos) != '>'){
+        pos++;
+      }
+      pos++;
+    } else if(isInEndTag){
+      pos--; //TODO: while too?
+    }
+    String startPattern, endPattern;
+    int bend = -1;
+    int bstart = -1;
+    int stack = 0;
+    while(bend < 0) {
+      startPattern = "<[^ \t>/!](\"[^\"]*\"|'[^']*'|[^/'\">])*>";
+      endPattern = "</.*>"; //<str> where str - any string with at least one letter
+      int startPos = pos;
+      bstart = findTagLocation(chars, startPos, -1, startPattern, endPattern);
+      if (bstart == -1) {
+        return null;
+      }
+      int tempBstart = bstart;
+      startPattern = createTagNameRegex(chars.subSequence(bstart, chars.length()), false);
+      endPattern = createTagNameRegex(chars.subSequence(bstart, chars.length()), true);
+      while (chars.charAt(bstart) != '>') {
+        bstart++;
+      }
+      bend = findTagLocation(chars, bstart, 1, endPattern, startPattern);
+      if (bend == -1) {
+        stack++;
+        pos = tempBstart;
+      }else if(!isInEndTag && bend < pos){
+        return null;
+      }
+      else {
+        if(stack==0){
+          break;
+        }
+        stack--;
+      }
+    }
+    while(chars.charAt(bend) != '<'){
+        bend--;
+    }
+    if (isOuter) {
+      while(chars.charAt(bstart) != '<'){
+        bstart--;
+      }
+      while(chars.charAt(bend) != '>'){
+        bend++;
+      }
+    } else {
+      bstart++;
+      bend--;
+    }
+
+    return new TextRange(bstart, bend);
+  }
   @Nullable
   public static TextRange findBlockQuoteInLineRange(@NotNull Editor editor, char quote, boolean isOuter) {
     final CharSequence chars = editor.getDocument().getCharsSequence();
@@ -1822,6 +1948,27 @@ public class SearchHelper {
     }
 
     return res.toString();
+  }
+  @NotNull
+  private static String createStartTag(@NotNull CharSequence tagName){
+    return "<" + tagName + "(\"[^\"]*\"|'[^']*'|[^'\">])*?>";
+  }
+  @NotNull
+  private static String createEndTag(@NotNull CharSequence tagName){
+    return "</" + tagName + "?>";
+  }
+  @NotNull
+  private static String createTagNameRegex(CharSequence includeTagChars, boolean isEndTag){
+    String tagName = "";
+    int startPos = 0;
+    for (; (includeTagChars.charAt(startPos) == '<' || includeTagChars.charAt(startPos) == '/') && startPos < includeTagChars.length(); startPos++){}
+    for (; includeTagChars.charAt(startPos) != '>' && includeTagChars.charAt(startPos) != ' ' && startPos < includeTagChars.length(); startPos++) {
+      tagName += includeTagChars.charAt(startPos);
+    }
+    if(isEndTag){
+      return createEndTag(tagName);
+    }
+    return createStartTag(tagName);
   }
 
   public static class CountPosition {

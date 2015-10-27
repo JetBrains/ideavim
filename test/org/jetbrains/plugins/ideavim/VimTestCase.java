@@ -41,9 +41,9 @@ public abstract class VimTestCase extends UsefulTestCase {
 
   public VimTestCase() {
     // Only in IntelliJ IDEA Ultimate Edition
-    PlatformTestCase.initPlatformLangPrefix();
+    //PlatformTestCase.initPlatformLangPrefix();
     // XXX: IntelliJ IDEA Community and Ultimate 12+
-    //PlatformTestCase.initPlatformPrefix(ULTIMATE_MARKER_CLASS, "PlatformLangXml");
+    PlatformTestCase.initPlatformPrefix(ULTIMATE_MARKER_CLASS, "PlatformLangXml");
   }
 
   @Override

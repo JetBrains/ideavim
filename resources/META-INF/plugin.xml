@@ -1,12 +1,9 @@
 <idea-plugin url="http://plugins.jetbrains.com/plugin/164">
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
-  <change-notes><![CDATA[
-      <p>0.41:</p>
-      <ul>
-        <li>Various bug fixes</li>
-      </ul>
-      <p>0.40:</p>
+  <change-notes>
+    <![CDATA[
+      <p>Not released:</p>
       <ul>
         <li>Support for <code>mapleader</code></li>
         <li>Support comments in <code>%</code> brace matching</li>
@@ -34,18 +31,30 @@
         <li>Fixed visual block selection mode</li>
         <li>Various bug fixes</li>
       </ul>
+      <p>0.35:</p>
+      <ul>
+        <li><code>~/.vimrc</code> is no longer read by default, use <code>~/.ideavimrc</code> instead</li>
+        <li>Various bug fixes</li>
+      </ul>
+      <p>0.34:</p>
+      <ul>
+        <li>Various bug fixes</li>
+      </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
-    ]]></change-notes>
-  <description><![CDATA[
+    ]]>
+  </change-notes>
+  <description>
+    <![CDATA[
       <p>Build @VERSION@-@BUILD-NUMBER@</p>
       <p>Vim emulation plug-in for IDEs based on the IntelliJ platform.</p>
       <p>IdeaVim supports many Vim features including normal/insert/visual modes, motion keys, deletion/changing, marks, registers, some Ex commands, Vim regexps, configuration via ~/.ideavimrc, macros, window commands, etc.</p>
       <p>See also:</p>
       <ul>
-        <li><a href="https://github.com/JetBrains/ideavim">GitHub repository</a>: documentation and contributing</li>
-        <li><a href="http://youtrack.jetbrains.com/issues/VIM">Issue tracker</a>: feature requests and bug reports</li>
+        <li><a href="https://github.com/JetBrains/ideavim">GitHub repository</a> for documentation and contributing</li>
+        <li><a href="http://youtrack.jetbrains.com/issues/VIM">Issue tracker</a> for feature requests and bug reports</li>
       </ul>
-    ]]></description>
+    ]]>
+  </description>
   <version>@VERSION@</version>
   <vendor>JetBrains</vendor>
 
@@ -149,6 +158,7 @@
     <action id="VimMotionInnerBlockDoubleQuote" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockDoubleQuoteAction" text="Select inner double quote block"/>
     <action id="VimMotionInnerBlockSingleQuote" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockSingleQuoteAction" text="Select inner single quote block"/>
     <action id="VimMotionInnerBlockBackQuote" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBackQuoteAction" text="Select inner back quote block"/>
+    <action id="VimMotionInnerBlockTag" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockTagAction" text="Select inner &gt;&lt; block &gt;/&lt;"/>
     <action id="VimMotionOuterBlockAngle" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockAngleAction" text="Select outer &lt; block"/>
     <action id="VimMotionOuterBlockBrace" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBraceAction" text="Select outer { block"/>
     <action id="VimMotionOuterBlockBracket" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBracketAction" text="Select outer [ block"/>
@@ -156,6 +166,7 @@
     <action id="VimMotionOuterBlockDoubleQuote" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockDoubleQuoteAction" text="Select outer double quote block"/>
     <action id="VimMotionOuterBlockSingleQuote" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockSingleQuoteAction" text="Select outer single quote block"/>
     <action id="VimMotionOuterBlockBackQuote" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBackQuoteAction" text="Select outer back quote block"/>
+    <action id="VimMotionOuterBlockTag" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockTagAction" text="Select outer &gt;&lt; block &gt;/&lt;"/>
     <action id="VimMotionInnerParagraph" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerParagraphAction" text="Select Inner Paragraph"/>
     <action id="VimMotionOuterParagraph" class="com.maddyhome.idea.vim.action.motion.object.MotionOuterParagraphAction" text="Select Outer Paragraph"/>
     <action id="VimMotionInnerSentence" class="com.maddyhome.idea.vim.action.motion.object.MotionInnerSentenceAction" text="Select Inner Sentence"/>

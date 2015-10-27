@@ -1,11 +1,14 @@
 package org.jetbrains.plugins.ideavim.helper;
 
+import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.SearchHelper;
+import org.jetbrains.plugins.ideavim.VimTestCase;
 import org.junit.Test;
 
-import static junit.framework.Assert.assertEquals;
+import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
-public class SearchHelperTest {
+public class SearchHelperTest extends VimTestCase {
   @Test
   public void testFindNextWord() throws Exception {
     String text = "first second";
@@ -61,4 +64,59 @@ public class SearchHelperTest {
 
     assertEquals(previousWordPosition, text.indexOf("second"));
   }
+
+  /**
+   * Tests for SearchHelper.inHtmlTagPosition
+   */
+  //There is no difference between open tag and non-pair
+  @Test
+  public void testInsideOpenTag() {
+    String text = "blabla <tag>";
+    assertTrue(SearchHelper.inHtmlTagPosition(text, false, 9));
+  }
+
+  @Test
+  public void testOutsideOpenTag() {
+    String text = "blabla <tag>";
+    assertFalse(SearchHelper.inHtmlTagPosition(text, false, 3));
+  }
+
+  @Test
+  public void testInsideCloseTag() {
+    String text = "blabla </tag>";
+    assertTrue(SearchHelper.inHtmlTagPosition(text, true, 10));
+  }
+
+  @Test
+  public void testOutsideCloseTag() {
+    String text = "blabla </tag>";
+    assertFalse(SearchHelper.inHtmlTagPosition(text, true, 3));
+  }
+
+  /**
+   * Tests for SearchHelper.findBlockTagRange
+   */
+
+  public void testFindBlockTagInnerRangeInside() {
+    String text = "foo<tag>abc<caret>de</tag>bar";
+    Editor e = typeTextInFile(parseKeys(""), text);
+    TextRange textRange = SearchHelper.findBlockTagRange(e, false);
+    assertEquals("abcde",
+                 text.replaceAll("<caret>", "").substring(textRange.getStartOffset(), textRange.getEndOffset() + 1));
+  }
+
+  public void testFindBlockTagRangeOutside() {
+    String text = "fo<caret>o<tag>abcde</tag>bar";
+    Editor e = typeTextInFile(parseKeys(""), text);
+    TextRange textRange = SearchHelper.findBlockTagRange(e, false);
+    assertNull(textRange);
+  }
+  public void testFindBlockTagOuterRangeInside() {
+    String text = "foo<tag>abc<caret>de</tag>bar";
+    Editor e = typeTextInFile(parseKeys(""), text);
+    TextRange textRange = SearchHelper.findBlockTagRange(e, true);
+    assertEquals("<tag>abcde</tag>",
+                 text.replaceAll("<caret>", "").substring(textRange.getStartOffset(), textRange.getEndOffset() + 1));
+  }
+
 }
