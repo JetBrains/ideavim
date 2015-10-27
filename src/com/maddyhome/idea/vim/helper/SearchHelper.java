@@ -363,7 +363,7 @@ public class SearchHelper {
       pos++; //Now we at first symbol of the tag
 
       //simple test if tag is really closing
-      if (end_tag != (chars.charAt(pos) == '/')){
+      if ((pos >= chars.length()) || (end_tag != (chars.charAt(pos) == '/'))){
           return false;
       }
 
@@ -371,7 +371,7 @@ public class SearchHelper {
       while (pos < chars.length() && (chars.charAt(pos) != '>'))
           pos++;
 
-      return (chars.charAt(pos) == '>'); //if really found closed bracket
+      return (pos < chars.length()); //if really found closed bracket
   }
 
   private static int findTagLocation(CharSequence chars, int pos, int direction, String targetPattern, String pairPattern){
