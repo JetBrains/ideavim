@@ -246,6 +246,7 @@ public class MotionGroup {
 
     int start = editor.getSelectionModel().getSelectionStart();
     int end = editor.getSelectionModel().getSelectionEnd();
+    if (start == end) return;
 
     if (mode == CommandState.SubMode.VISUAL_LINE) {
       end--;
