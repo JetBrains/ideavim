@@ -105,9 +105,9 @@
     <delete dir="${idea}/unzip"/>
     <mkdir dir="${idea}/unzip"/>
     <basename property="idea.filename" file="${idea.download.url}"/>
-    <unzip dest="${idea}/unzip">
-      <fileset dir="${idea}" includes="${idea.filename}"/>
-    </unzip>
+    <untar src="${idea}/${idea.filename}" dest="${idea}/unzip" compression="gzip">
+      <cutdirsmapper dirs="1"/>
+    </untar>
   </target>
 
   <target name="dist" depends="dist-src, dist-bin" description="Creates the src and bin distribution files"/>
