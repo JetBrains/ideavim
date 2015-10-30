@@ -42,13 +42,13 @@ public class EventFacade {
 
   public void setupTypedActionHandler(@NotNull TypedActionHandler handler) {
     final TypedAction typedAction = getTypedAction();
-    myOriginalTypedActionHandler = typedAction.getHandler();
-    typedAction.setupHandler(handler);
+    myOriginalTypedActionHandler = typedAction.getRawHandler();
+    typedAction.setupRawHandler(handler);
   }
 
   public void restoreTypedActionHandler() {
     if (myOriginalTypedActionHandler != null) {
-      getTypedAction().setupHandler(myOriginalTypedActionHandler);
+      getTypedAction().setupRawHandler(myOriginalTypedActionHandler);
     }
   }
 
