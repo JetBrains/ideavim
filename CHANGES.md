@@ -3,8 +3,8 @@ The Changelog
 
 History of changes in IdeaVim for the IntelliJ platform.
 
-Not Released
-------------
+0.42, 2015-11-01
+----------------
 
 This release is compatible with IntelliJ 15+ and other IDEs based on the
 IntelliJ platform branch 143+.

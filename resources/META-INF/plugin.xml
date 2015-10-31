@@ -2,7 +2,7 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
-      <p>Not released:</p>
+      <p>0.42:</p>
       <ul>
         <li>Fixed move commands in read-only files</li>
       </ul>
