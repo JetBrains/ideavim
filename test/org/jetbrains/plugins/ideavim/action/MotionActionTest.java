@@ -402,6 +402,46 @@ public class MotionActionTest extends VimTestCase {
                    "foo = `bar b<caret>az`;\n");
     myFixture.checkResult("foo = ;\n");
   }
+  //|d| |v_it|
+  public void testDeleteInnerTagBlockCaretBeforeString() {
+    typeTextInFile(parseKeys("dit"),
+                   "<h1><test>foo, <caret>bar</test></h1>\n");
+    myFixture.checkResult("<h1><test></test></h1>\n");
+  }
+  //|d| |v_it|
+  public void testDeleteInnerTagBlockCaretInHtml() {
+    typeTextInFile(parseKeys("dit"),
+                   "<template <caret>name=\"hello\">\n" +
+                   "  <button>Click Me</button>\n" +
+                   "  <p>You've pressed the button {{counter}} times.</p>\n" +
+                   "</template>\n");
+    myFixture.checkResult("<template name=\"hello\"></template>\n");
+  }
+  //|d| |v_it|
+  public void testDeleteInnerTagBlockCaretInHtmlUncloseTag() {
+    typeTextInFile(parseKeys("dit"),
+                   "<template <caret>name=\"hello\">\n" +
+                   "  <button>Click Me</button>\n" +
+                   "  <br>\n" +
+                   "  <p>You've pressed the button {{counter}} times.</p>\n" +
+                   "</template>\n");
+    myFixture.checkResult("<template name=\"hello\"></template>\n");
+  }
+  public void testDeleteInnerTagBlockCaretEdgeTag() {
+    typeTextInFile(parseKeys("dit"),
+                   "<template name=\"hello\"<caret>>\n" +
+                   "  <button>Click Me</button>\n" +
+                   "  <br>\n" +
+                   "  <p>You've pressed the button {{counter}} times.</p>\n" +
+                   "</template>\n");
+    myFixture.checkResult("<template name=\"hello\"></template>\n");
+  }
+  //|d| |v_it|
+  public void testDeleteOuterTagBlockCaretBeforeString() {
+    typeTextInFile(parseKeys("dat"),
+                   "<h1><test>foo, <caret>bar</test></h1>\n");
+    myFixture.checkResult("<h1></h1>\n");
+  }
 
   // |%|
   public void testPercentMatchSimple() {
