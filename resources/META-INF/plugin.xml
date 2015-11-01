@@ -2,6 +2,10 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
+      <p>0.43:</p>
+      <ul>
+        <li>Fixed running the plugin with Java 6</li>
+      </ul>
       <p>0.42:</p>
       <ul>
         <li>Fixed move commands in read-only files</li>
