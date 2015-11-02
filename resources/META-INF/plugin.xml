@@ -2,6 +2,10 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
+      <p>0.44:</p>
+      <ul>
+        <li>Fixed typing keys in completion menus and typing with the plugin disabled</li>
+      </ul>
       <p>0.43:</p>
       <ul>
         <li>Fixed running the plugin with Java 6</li>

@@ -141,7 +141,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     });
 
     final TypedAction typedAction = EditorActionManager.getInstance().getTypedAction();
-    EventFacade.getInstance().setupTypedActionHandler(new VimTypedActionHandler(typedAction.getHandler()));
+    EventFacade.getInstance().setupTypedActionHandler(new VimTypedActionHandler(typedAction.getRawHandler()));
 
     // Register vim actions in command mode
     RegisterActions.registerActions();
