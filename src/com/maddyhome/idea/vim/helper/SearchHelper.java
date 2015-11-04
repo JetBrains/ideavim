@@ -348,32 +348,39 @@ public class SearchHelper {
     return -1;
   }
 
+
   public static boolean inHtmlTagPosition(CharSequence chars, boolean end_tag, int pos){
-      if (chars.charAt(pos) == '>'){
-            pos--;
+    if (chars.charAt(pos) == '>'){
+      pos--;
+    }
+    while(pos > 0){
+      if (chars.charAt(pos) == '<'){
+        break;
+      }else if (chars.charAt(pos) == '>') {	/* find '>' before cursor */
+        break;
       }
-
-      // find '<' before cursor
-      while(pos > 0 && !(chars.charAt(pos) == '<' || chars.charAt(pos) == '>')){
-          pos--;
-      }
-      if (chars.charAt(pos) != '<'){
-          return false; //if there are no '<' before pos OR if found new tag inside
-      }
-      pos++; //Now we at first symbol of the tag
-
-      //simple test if tag is really closing
-      if ((pos >= chars.length()) || (end_tag != (chars.charAt(pos) == '/'))){
-          return false;
-      }
-
-      // find '>' after cursor
-      while (pos < chars.length() && (chars.charAt(pos) != '>'))
-          pos++;
-
-      return (pos < chars.length()); //if really found closed bracket
+      pos--;
+    }
+    if (chars.charAt(pos) != '<'){
+      return false;
+    }
+    pos++;
+    if (end_tag){
+    /* check that there is a '/' after the '<' */
+      return chars.charAt(pos) == '/';
+    }
+    if (chars.charAt(pos) == '/'){
+      return false;
+    }
+    int prevPos = pos;
+    for(;;){
+      if ( pos >= chars.length() || chars.charAt(pos) == '>')
+        break;
+      prevPos = pos;
+      pos++;
+    }
+    return chars.charAt(prevPos) != '/';
   }
-
   private static int findTagLocation(CharSequence chars, int pos, int direction, String targetPattern, String pairPattern){
     int res = -1;
     int findPos = pos;
@@ -422,7 +429,8 @@ public class SearchHelper {
     } else if(isInEndTag){
       pos--; //TODO: while too?
     }
-    String startPattern, endPattern;
+    String startPattern = "";
+    String endPattern = "";
     int bend = -1;
     int bstart = -1;
     int stack = 0;
