@@ -352,34 +352,28 @@ public class SearchHelper {
     if (chars.charAt(pos) == '>'){
       pos--;
     }
-    while(pos > 0){
-      if (chars.charAt(pos) == '<'){
-        break;
-      }else if (chars.charAt(pos) == '>') {	/* find '>' before cursor */
-        break;
-      }
+
+    // find '<' before cursor
+    while(pos > 0 && !(chars.charAt(pos) == '<' || chars.charAt(pos) == '>')){
       pos--;
     }
     if (chars.charAt(pos) != '<'){
+      return false; //if there are no '<' before pos OR if found new tag inside
+    }
+    pos++; //Now we at first symbol of the tag
+
+    //simple test if tag is really closing
+    if ((pos >= chars.length()) || (end_tag != (chars.charAt(pos) == '/'))){
       return false;
     }
-    pos++;
-    if (end_tag){
-    /* check that there is a '/' after the '<' */
-      return chars.charAt(pos) == '/';
-    }
-    if (chars.charAt(pos) == '/'){
-      return false;
-    }
-    int prevPos = pos;
-    for(;;){
-      if ( pos >= chars.length() || chars.charAt(pos) == '>')
-        break;
-      prevPos = pos;
+
+    // find '>' after cursor
+    while (pos < chars.length() && (chars.charAt(pos) != '>'))
       pos++;
-    }
-    return chars.charAt(prevPos) != '/';
+
+    return (pos < chars.length()); //if really found closed bracket
   }
+
   private static int findTagLocation(CharSequence chars, int pos, int dir, String targetPattern, String pairPattern){
     int res = -1;
     int findPos = pos;
