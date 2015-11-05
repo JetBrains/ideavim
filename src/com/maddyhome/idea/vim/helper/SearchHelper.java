@@ -348,7 +348,7 @@ public class SearchHelper {
     return -1;
   }
 
-  private static boolean inHtmlTagPosition(CharSequence chars, boolean end_tag, int pos){
+  public static boolean inHtmlTagPosition(CharSequence chars, boolean end_tag, int pos){
     if (chars.charAt(pos) == '>'){
       pos--;
     }

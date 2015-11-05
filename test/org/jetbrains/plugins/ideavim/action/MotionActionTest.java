@@ -3,6 +3,8 @@ package org.jetbrains.plugins.ideavim.action;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.VisualPosition;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.helper.SearchHelper;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.command.CommandState.Mode.COMMAND;
@@ -442,6 +444,255 @@ public class MotionActionTest extends VimTestCase {
                    "<h1><test>foo, <caret>bar</test></h1>\n");
     myFixture.checkResult("<h1></h1>\n");
   }
+
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockBefore(){
+    typeTextInFile(parseKeys("dit"),"abc<caret>de<tag>fg</tag>hi");
+    myFixture.checkResult("abcde<tag>fg</tag>hi");
+  }
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockInOpen(){
+    typeTextInFile(parseKeys("dit"),"abcde<ta<caret>g>fg</tag>hi");
+    myFixture.checkResult("abcde<tag></tag>hi");
+  }
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockBetween(){
+    typeTextInFile(parseKeys("dit"),"abcde<tag>f<caret>g</tag>hi");
+    myFixture.checkResult("abcde<tag></tag>hi");
+  }
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockInClose(){
+    typeTextInFile(parseKeys("dit"),"abcde<tag>fg</ta<caret>g>hi");
+    myFixture.checkResult("abcde<tag></tag>hi");
+  }
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockAfter(){
+    typeTextInFile(parseKeys("dit"),"abcde<tag>fg</tag>h<caret>i");
+    myFixture.checkResult("abcde<tag>fg</tag>hi");
+  }
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockInAlone(){
+    typeTextInFile(parseKeys("dit"),"abcde<ta<caret>g>fghi");
+    myFixture.checkResult("abcde<tag>fghi");
+  }
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockWithoutTags(){
+    typeTextInFile(parseKeys("dit"),"abc<caret>de");
+    myFixture.checkResult("abcde");
+  }
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockBeforeWithoutOpenTag(){
+    typeTextInFile(parseKeys("dit"),"abc<caret>defg</tag>hi");
+    myFixture.checkResult("abcdefg</tag>hi");
+  }
+
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockInCloseWithoutOpenTag(){
+    typeTextInFile(parseKeys("dit"),"abcdefg</ta<caret>g>hi");
+    myFixture.checkResult("abcdefg</tag>hi");
+  }
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockAfterWithoutOpenTag(){
+    typeTextInFile(parseKeys("dit"),"abcdefg</tag>h<caret>i");
+    myFixture.checkResult("abcdefg</tag>hi");
+  }
+
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockBeforeWithoutCloseTag(){
+    typeTextInFile(parseKeys("dit"),"abc<caret>defg<tag>hi");
+    myFixture.checkResult("abcdefg<tag>hi");
+  }
+
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockInOpenWithoutCloseTag(){
+    typeTextInFile(parseKeys("dit"),"abcdefg<ta<caret>g>hi");
+    myFixture.checkResult("abcdefg<tag>hi");
+  }
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockAfterWithoutCloseTag(){
+    typeTextInFile(parseKeys("dit"),"abcdefg<tag>h<caret>i");
+    myFixture.checkResult("abcdefg<tag>hi");
+  }
+
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockBeforeWrongOrder(){
+    typeTextInFile(parseKeys("dit"),"abc<caret>de</tag>fg<tag>hi");
+    myFixture.checkResult("abcde</tag>fg<tag>hi");
+  }
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockInOpenWrongOrder(){
+    typeTextInFile(parseKeys("dit"),"abcde</ta<caret>g>fg<tag>hi");
+    myFixture.checkResult("abcde</tag>fg<tag>hi");
+  }
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockBetweenWrongOrder(){
+    typeTextInFile(parseKeys("dit"),"abcde</tag>f<caret>g<tag>hi");
+    myFixture.checkResult("abcde</tag>fg<tag>hi");
+  }
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockInCloseWrongOrder(){
+    typeTextInFile(parseKeys("dit"),"abcde</tag>fg<ta<caret>g>hi");
+    myFixture.checkResult("abcde</tag>fg<tag>hi");
+  }
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockAfterWrongOrder(){
+    typeTextInFile(parseKeys("dit"),"abcde</tag>fg<tag>h<caret>i");
+    myFixture.checkResult("abcde</tag>fg<tag>hi");
+  }
+
+  //|d| |v_at|
+  public void  testDeleteOuterTagBlockBefore(){
+    typeTextInFile(parseKeys("dat"),"abc<caret>de<tag>fg</tag>hi");
+    myFixture.checkResult("abcde<tag>fg</tag>hi");
+  }
+  //|d| |v_at|
+  public void  testDeleteOuterTagBlockInOpen(){
+    typeTextInFile(parseKeys("dat"),"abcde<ta<caret>g>fg</tag>hi");
+    myFixture.checkResult("abcdehi");
+  }
+  //|d| |v_at|
+  public void  testDeleteOuterTagBlockBetween(){
+    typeTextInFile(parseKeys("dat"),"abcde<tag>f<caret>g</tag>hi");
+    myFixture.checkResult("abcdehi");
+  }
+  //|d| |v_at|
+  public void  testDeleteOuterTagBlockInClose(){
+    typeTextInFile(parseKeys("dat"),"abcde<tag>fg</ta<caret>g>hi");
+    myFixture.checkResult("abcdehi");
+  }
+  //|d| |v_at|
+  public void  testDeleteOuterTagBlockAfter(){
+    typeTextInFile(parseKeys("dat"),"abcde<tag>fg</tag>h<caret>i");
+    myFixture.checkResult("abcde<tag>fg</tag>hi");
+  }
+  //|d| |v_at|
+  public void  testDeleteOuterTagBlockInAlone(){
+    typeTextInFile(parseKeys("dat"),"abcde<ta<caret>g>fghi");
+    myFixture.checkResult("abcde<tag>fghi");
+  }
+  //|d| |v_at|
+  public void  testDeleteOuterTagBlockWithoutTags(){
+    typeTextInFile(parseKeys("dat"),"abc<caret>de");
+    myFixture.checkResult("abcde");
+  }
+  //|d| |v_at|
+  public void  testDeleteOuterTagBlockBeforeWithoutOpenTag(){
+    typeTextInFile(parseKeys("dat"),"abc<caret>defg</tag>hi");
+    myFixture.checkResult("abcdefg</tag>hi");
+  }
+
+  //|d| |v_at|
+  public void  testDeleteOuterTagBlockInCloseWithoutOpenTag(){
+    typeTextInFile(parseKeys("dat"),"abcdefg</ta<caret>g>hi");
+    myFixture.checkResult("abcdefg</tag>hi");
+  }
+  //|d| |v_at|
+  public void  testDeleteOuterTagBlockAfterWithoutOpenTag(){
+    typeTextInFile(parseKeys("dat"),"abcdefg</tag>h<caret>i");
+    myFixture.checkResult("abcdefg</tag>hi");
+  }
+
+  //|d| |v_at|
+  public void  testDeleteOuterTagBlockBeforeWithoutCloseTag(){
+    typeTextInFile(parseKeys("dat"),"abc<caret>defg<tag>hi");
+    myFixture.checkResult("abcdefg<tag>hi");
+  }
+
+  //|d| |v_at|
+  public void  testDeleteOuterTagBlockInOpenWithoutCloseTag(){
+    typeTextInFile(parseKeys("dat"),"abcdefg<ta<caret>g>hi");
+    myFixture.checkResult("abcdefg<tag>hi");
+  }
+
+  //|d| |v_at|
+  public void  testDeleteOuterTagBlockAfterWithoutCloseTag(){
+    typeTextInFile(parseKeys("dat"),"abcdefg<tag>h<caret>i");
+    myFixture.checkResult("abcdefg<tag>hi");
+  }
+
+  //|d| |v_at|
+  public void  testDeleteOuterTagBlockBeforeWrongOrder(){
+    typeTextInFile(parseKeys("dat"),"abc<caret>de</tag>fg<tag>hi");
+    myFixture.checkResult("abcde</tag>fg<tag>hi");
+  }
+
+  //|d| |v_at|
+  public void  testDeleteOuterTagBlockInOpenWrongOrder(){
+    typeTextInFile(parseKeys("dat"),"abcde</ta<caret>g>fg<tag>hi");
+    myFixture.checkResult("abcde</tag>fg<tag>hi");
+  }
+
+  //|d| |v_at|
+  public void  testDeleteOuterTagBlockBetweenWrongOrder(){
+    typeTextInFile(parseKeys("dat"),"abcde</tag>f<caret>g<tag>hi");
+    myFixture.checkResult("abcde</tag>fg<tag>hi");
+  }
+
+  //|d| |v_at|
+  public void  testDeleteOuterTagBlockInCloseWrongOrder(){
+    typeTextInFile(parseKeys("dat"),"abcde</tag>fg<ta<caret>g>hi");
+    myFixture.checkResult("abcde</tag>fg<tag>hi");
+  }
+
+  //|d| |v_at|
+  public void  testDeleteOuterTagBlockAfterWrongOrder(){
+    typeTextInFile(parseKeys("dat"),"abcde</tag>fg<tag>h<caret>i");
+    myFixture.checkResult("abcde</tag>fg<tag>hi");
+  }
+
+
+  /**
+   * Tests for SearchHelper.inHtmlTagPosition
+   */
+  //There is no difference between open tag and non-pair
+  public void testInsideOpenTag() {
+    String text = "blabla <tag>";
+    assertTrue(SearchHelper.inHtmlTagPosition(text, false, 9));
+  }
+
+  public void testOutsideOpenTag() {
+    String text = "blabla <tag>";
+    assertFalse(SearchHelper.inHtmlTagPosition(text, false, 3));
+  }
+
+  public void testInsideCloseTag() {
+    String text = "blabla </tag>";
+    assertTrue(SearchHelper.inHtmlTagPosition(text, true, 10));
+  }
+
+  public void testOutsideCloseTag() {
+    String text = "blabla </tag>";
+    assertFalse(SearchHelper.inHtmlTagPosition(text, true, 3));
+  }
+
+  /**
+   * Tests for SearchHelper.findBlockTagRange
+   */
+
+  public void testFindBlockTagInnerRangeInside() {
+    String text = "foo<tag>abc<caret>de</tag>bar";
+    Editor e = typeTextInFile(parseKeys(""), text);
+    TextRange textRange = SearchHelper.findBlockTagRange(e, false);
+    assertEquals("abcde",
+                 text.replaceAll("<caret>", "").substring(textRange.getStartOffset(), textRange.getEndOffset() + 1));
+  }
+
+  public void testFindBlockTagRangeOutside() {
+    String text = "fo<caret>o<tag>abcde</tag>bar";
+    Editor e = typeTextInFile(parseKeys(""), text);
+    TextRange textRange = SearchHelper.findBlockTagRange(e, false);
+    assertNull(textRange);
+  }
+  public void testFindBlockTagOuterRangeInside() {
+    String text = "foo<tag>abc<caret>de</tag>bar";
+    Editor e = typeTextInFile(parseKeys(""), text);
+    TextRange textRange = SearchHelper.findBlockTagRange(e, true);
+    assertEquals("<tag>abcde</tag>",
+                 text.replaceAll("<caret>", "").substring(textRange.getStartOffset(), textRange.getEndOffset() + 1));
+  }
+
+
+
 
   // |%|
   public void testPercentMatchSimple() {
