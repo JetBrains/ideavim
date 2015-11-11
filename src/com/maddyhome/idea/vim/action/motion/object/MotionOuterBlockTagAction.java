@@ -17,8 +17,10 @@ public class MotionOuterBlockTagAction  extends TextObjectAction{
   }
 
   private static class Handler extends TextObjectActionHandler {
+
+    @Override
     @Nullable
-    public TextRange getRange(@NotNull Editor editor, DataContext context, int count, int rawCount, Argument argument) {
+    public TextRange getRange(@NotNull Editor editor, @Nullable DataContext context, int count, int rawCount, @Nullable Argument argument) {
       return VimPlugin.getMotion().getBlockTagRange(editor, true);
     }
   }

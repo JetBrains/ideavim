@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.TestOnly;
 
 import java.util.List;
 import java.util.Stack;
@@ -348,7 +349,8 @@ public class SearchHelper {
     return -1;
   }
 
-  public static boolean inHtmlTagPosition(CharSequence chars, boolean end_tag, int pos){
+  @TestOnly
+  public static boolean inHtmlTagPosition(@NotNull CharSequence chars, boolean end_tag, int pos){
     if (chars.charAt(pos) == '>'){
       pos--;
     }
@@ -374,7 +376,7 @@ public class SearchHelper {
     return (pos < chars.length()); //if really found closed bracket
   }
 
-  private static int findTagLocation(CharSequence chars, int pos, int dir, String targetPattern, String pairPattern){
+  private static int findTagLocation(@NotNull CharSequence chars, int pos, int dir, @NotNull String targetPattern, @NotNull String pairPattern){
     int res = -1;
     int findPos = pos;
     int tempPos = pos;
@@ -403,6 +405,7 @@ public class SearchHelper {
     }
     return res;
   }
+
   @Nullable
   public static TextRange findBlockTagRange(@NotNull Editor editor, boolean isOuter) {
     CharSequence chars = editor.getDocument().getCharsSequence();
@@ -1959,7 +1962,7 @@ public class SearchHelper {
     return "</" + tagName + "?>";
   }
   @NotNull
-  private static String createTagNameRegex(CharSequence includeTagChars, boolean isEndTag){
+  private static String createTagNameRegex(@NotNull CharSequence includeTagChars, boolean isEndTag){
     String tagName = "";
     int startPos = 0;
     for (; (includeTagChars.charAt(startPos) == '<' || includeTagChars.charAt(startPos) == '/') && startPos < includeTagChars.length(); startPos++){}
