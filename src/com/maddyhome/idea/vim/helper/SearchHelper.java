@@ -360,6 +360,10 @@ public class SearchHelper {
 
   @TestOnly
   public static boolean inHtmlTagPosition(@NotNull CharSequence chars, boolean end_tag, int pos) {
+    final int length = chars.length();
+    if (pos < 0 || pos >= length){
+      return false;
+    }
     if (chars.charAt(pos) == '>') {
       pos--;
     }
@@ -374,14 +378,16 @@ public class SearchHelper {
     pos++; //Now we at first symbol of the tag
 
     //simple test if tag is really closing
-    if ((pos >= chars.length()) || (end_tag != (chars.charAt(pos) == '/'))) {
+    if ((pos >= length) || (end_tag != (chars.charAt(pos) == '/'))) {
       return false;
     }
 
     // find '>' after cursor
-    while (pos < chars.length() && (chars.charAt(pos) != '>')) pos++;
+    while (pos < length && (chars.charAt(pos) != '>')) {
+      pos++;
+    }
 
-    return (pos < chars.length()); //if really found closed bracket
+    return (pos < length); //if really found closed bracket
   }
 
   private static int findTagLocation(@NotNull CharSequence chars,
@@ -395,7 +401,9 @@ public class SearchHelper {
     Pattern pTarget = Pattern.compile(targetPattern);
     Pattern pPair = Pattern.compile(pairPattern);
     Stack<Pattern> patternStack = new Stack<Pattern>();
-    while (findPos >= 0 && findPos <= chars.length()) {
+    final int length = chars.length();
+
+    while (findPos >= 0 && findPos < length) {
       CharSequence newString = dir > 0 ? chars.subSequence(tempPos, findPos) : chars.subSequence(findPos, tempPos);
       Matcher matcher = pTarget.matcher(newString);
       Matcher endMatcher = pPair.matcher(newString);
@@ -447,6 +455,8 @@ public class SearchHelper {
     int blockEnd = -1;
     int blockStart = -1;
     int stack = 0;
+    final int length = chars.length();
+
     while (blockEnd < 0) {
       startPattern = "<[^ \t>/!](\"[^\"]*\"|'[^']*'|[^/'\">])*>";
       endPattern = "</.*>";
@@ -456,8 +466,8 @@ public class SearchHelper {
         return null;
       }
       int tempBlockStart = blockStart;
-      startPattern = createTagNameRegex(chars.subSequence(blockStart, chars.length()), false);
-      endPattern = createTagNameRegex(chars.subSequence(blockStart, chars.length()), true);
+      startPattern = createTagNameRegex(chars.subSequence(blockStart, length), false);
+      endPattern = createTagNameRegex(chars.subSequence(blockStart, length), true);
       while (chars.charAt(blockStart) != '>') {
         blockStart++;
       }
@@ -476,14 +486,14 @@ public class SearchHelper {
         stack--;
       }
     }
-    while (chars.charAt(blockEnd) != '<') {
+    while (blockEnd >= 0 && chars.charAt(blockEnd) != '<') {
       blockEnd--;
     }
     if (isOuter) {
-      while (chars.charAt(blockStart) != '<') {
+      while (blockStart >=0 && chars.charAt(blockStart) != '<') {
         blockStart--;
       }
-      while (chars.charAt(blockEnd) != '>') {
+      while (blockEnd < length && chars.charAt(blockEnd) != '>') {
         blockEnd++;
       }
     }
