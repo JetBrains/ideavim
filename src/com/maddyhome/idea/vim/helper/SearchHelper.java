@@ -18,14 +18,18 @@
 
 package com.maddyhome.idea.vim.helper;
 
-import com.intellij.lang.*;
+import com.intellij.lang.CodeDocumentationAwareCommenter;
+import com.intellij.lang.Commenter;
+import com.intellij.lang.Language;
+import com.intellij.lang.LanguageCommenters;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.*;
+import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.util.PsiUtil;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionChangeEvent;
@@ -457,12 +461,20 @@ public class SearchHelper {
     int stack = 0;
     final int length = chars.length();
 
+    String notSpaceOrTabOrCloseTag = "[^ \t>/!]";
+    String anythingInDoubleQuote = "\"[^\"]*\"";
+    String anythingInQuote = "'[^']*'";
+    String anythingWithoutQuotes = "[^/'\">]";
+    String tagBody = "(" + anythingInDoubleQuote + "|" + anythingInQuote + '|' + anythingWithoutQuotes + ")" + "*";
+    String initialStartPattern = "<" + notSpaceOrTabOrCloseTag + tagBody + ">";
+    String initialEndPattern = "</.*>";
+
     while (blockEnd < 0) {
-      startPattern = "<[^ \t>/!](\"[^\"]*\"|'[^']*'|[^/'\">])*>";
-      endPattern = "</.*>";
+      startPattern = initialStartPattern;
+      endPattern = initialEndPattern;
       int startPos = pos;
       blockStart = findTagLocation(chars, startPos, -1, startPattern, endPattern);
-      if (blockStart == -1) {
+      if (blockStart < 0) {
         return null;
       }
       int tempBlockStart = blockStart;
@@ -472,7 +484,7 @@ public class SearchHelper {
         blockStart++;
       }
       blockEnd = findTagLocation(chars, blockStart, 1, endPattern, startPattern);
-      if (blockEnd == -1) {
+      if (blockEnd < 0) {
         stack++;
         pos = tempBlockStart;
       }
@@ -490,7 +502,7 @@ public class SearchHelper {
       blockEnd--;
     }
     if (isOuter) {
-      while (blockStart >=0 && chars.charAt(blockStart) != '<') {
+      while (blockStart >= 0 && chars.charAt(blockStart) != '<') {
         blockStart--;
       }
       while (blockEnd < length && chars.charAt(blockEnd) != '>') {
