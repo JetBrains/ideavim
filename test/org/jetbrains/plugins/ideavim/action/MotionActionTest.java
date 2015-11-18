@@ -404,12 +404,14 @@ public class MotionActionTest extends VimTestCase {
                    "foo = `bar b<caret>az`;\n");
     myFixture.checkResult("foo = ;\n");
   }
+
   //|d| |v_it|
   public void testDeleteInnerTagBlockCaretBeforeString() {
     typeTextInFile(parseKeys("dit"),
                    "<h1><test>foo, <caret>bar</test></h1>\n");
     myFixture.checkResult("<h1><test></test></h1>\n");
   }
+
   //|d| |v_it|
   public void testDeleteInnerTagBlockCaretInHtml() {
     typeTextInFile(parseKeys("dit"),
@@ -419,6 +421,7 @@ public class MotionActionTest extends VimTestCase {
                    "</template>\n");
     myFixture.checkResult("<template name=\"hello\"></template>\n");
   }
+
   //|d| |v_it|
   public void testDeleteInnerTagBlockCaretInHtmlUncloseTag() {
     typeTextInFile(parseKeys("dit"),
@@ -429,6 +432,7 @@ public class MotionActionTest extends VimTestCase {
                    "</template>\n");
     myFixture.checkResult("<template name=\"hello\"></template>\n");
   }
+
   public void testDeleteInnerTagBlockCaretEdgeTag() {
     typeTextInFile(parseKeys("dit"),
                    "<template name=\"hello\"<caret>>\n" +
@@ -438,6 +442,7 @@ public class MotionActionTest extends VimTestCase {
                    "</template>\n");
     myFixture.checkResult("<template name=\"hello\"></template>\n");
   }
+
   //|d| |v_it|
   public void testDeleteOuterTagBlockCaretBeforeString() {
     typeTextInFile(parseKeys("dat"),
@@ -450,6 +455,7 @@ public class MotionActionTest extends VimTestCase {
     typeTextInFile(parseKeys("dit"),"abc<caret>de<tag>fg</tag>hi");
     myFixture.checkResult("abcde<tag>fg</tag>hi");
   }
+
   //|d| |v_it|
   public void  testDeleteInnerTagBlockInOpen(){
     typeTextInFile(parseKeys("dit"),"abcde<ta<caret>g>fg</tag>hi");
@@ -460,26 +466,31 @@ public class MotionActionTest extends VimTestCase {
     typeTextInFile(parseKeys("dit"),"abcde<tag>f<caret>g</tag>hi");
     myFixture.checkResult("abcde<tag></tag>hi");
   }
+
   //|d| |v_it|
   public void  testDeleteInnerTagBlockInClose(){
     typeTextInFile(parseKeys("dit"),"abcde<tag>fg</ta<caret>g>hi");
     myFixture.checkResult("abcde<tag></tag>hi");
   }
+
   //|d| |v_it|
   public void  testDeleteInnerTagBlockAfter(){
     typeTextInFile(parseKeys("dit"),"abcde<tag>fg</tag>h<caret>i");
     myFixture.checkResult("abcde<tag>fg</tag>hi");
   }
+
   //|d| |v_it|
   public void  testDeleteInnerTagBlockInAlone(){
     typeTextInFile(parseKeys("dit"),"abcde<ta<caret>g>fghi");
     myFixture.checkResult("abcde<tag>fghi");
   }
+
   //|d| |v_it|
   public void  testDeleteInnerTagBlockWithoutTags(){
     typeTextInFile(parseKeys("dit"),"abc<caret>de");
     myFixture.checkResult("abcde");
   }
+
   //|d| |v_it|
   public void  testDeleteInnerTagBlockBeforeWithoutOpenTag(){
     typeTextInFile(parseKeys("dit"),"abc<caret>defg</tag>hi");
@@ -491,6 +502,7 @@ public class MotionActionTest extends VimTestCase {
     typeTextInFile(parseKeys("dit"),"abcdefg</ta<caret>g>hi");
     myFixture.checkResult("abcdefg</tag>hi");
   }
+
   //|d| |v_it|
   public void  testDeleteInnerTagBlockAfterWithoutOpenTag(){
     typeTextInFile(parseKeys("dit"),"abcdefg</tag>h<caret>i");
@@ -508,6 +520,7 @@ public class MotionActionTest extends VimTestCase {
     typeTextInFile(parseKeys("dit"),"abcdefg<ta<caret>g>hi");
     myFixture.checkResult("abcdefg<tag>hi");
   }
+
   //|d| |v_it|
   public void  testDeleteInnerTagBlockAfterWithoutCloseTag(){
     typeTextInFile(parseKeys("dit"),"abcdefg<tag>h<caret>i");
@@ -519,21 +532,25 @@ public class MotionActionTest extends VimTestCase {
     typeTextInFile(parseKeys("dit"),"abc<caret>de</tag>fg<tag>hi");
     myFixture.checkResult("abcde</tag>fg<tag>hi");
   }
+
   //|d| |v_it|
   public void  testDeleteInnerTagBlockInOpenWrongOrder(){
     typeTextInFile(parseKeys("dit"),"abcde</ta<caret>g>fg<tag>hi");
     myFixture.checkResult("abcde</tag>fg<tag>hi");
   }
+
   //|d| |v_it|
   public void  testDeleteInnerTagBlockBetweenWrongOrder(){
     typeTextInFile(parseKeys("dit"),"abcde</tag>f<caret>g<tag>hi");
     myFixture.checkResult("abcde</tag>fg<tag>hi");
   }
+
   //|d| |v_it|
   public void  testDeleteInnerTagBlockInCloseWrongOrder(){
     typeTextInFile(parseKeys("dit"),"abcde</tag>fg<ta<caret>g>hi");
     myFixture.checkResult("abcde</tag>fg<tag>hi");
   }
+
   //|d| |v_it|
   public void  testDeleteInnerTagBlockAfterWrongOrder(){
     typeTextInFile(parseKeys("dit"),"abcde</tag>fg<tag>h<caret>i");
@@ -545,36 +562,43 @@ public class MotionActionTest extends VimTestCase {
     typeTextInFile(parseKeys("dat"),"abc<caret>de<tag>fg</tag>hi");
     myFixture.checkResult("abcde<tag>fg</tag>hi");
   }
+
   //|d| |v_at|
   public void  testDeleteOuterTagBlockInOpen(){
     typeTextInFile(parseKeys("dat"),"abcde<ta<caret>g>fg</tag>hi");
     myFixture.checkResult("abcdehi");
   }
+
   //|d| |v_at|
   public void  testDeleteOuterTagBlockBetween(){
     typeTextInFile(parseKeys("dat"),"abcde<tag>f<caret>g</tag>hi");
     myFixture.checkResult("abcdehi");
   }
+
   //|d| |v_at|
   public void  testDeleteOuterTagBlockInClose(){
     typeTextInFile(parseKeys("dat"),"abcde<tag>fg</ta<caret>g>hi");
     myFixture.checkResult("abcdehi");
   }
+
   //|d| |v_at|
   public void  testDeleteOuterTagBlockAfter(){
     typeTextInFile(parseKeys("dat"),"abcde<tag>fg</tag>h<caret>i");
     myFixture.checkResult("abcde<tag>fg</tag>hi");
   }
+
   //|d| |v_at|
   public void  testDeleteOuterTagBlockInAlone(){
     typeTextInFile(parseKeys("dat"),"abcde<ta<caret>g>fghi");
     myFixture.checkResult("abcde<tag>fghi");
   }
+
   //|d| |v_at|
   public void  testDeleteOuterTagBlockWithoutTags(){
     typeTextInFile(parseKeys("dat"),"abc<caret>de");
     myFixture.checkResult("abcde");
   }
+
   //|d| |v_at|
   public void  testDeleteOuterTagBlockBeforeWithoutOpenTag(){
     typeTextInFile(parseKeys("dat"),"abc<caret>defg</tag>hi");
@@ -586,6 +610,7 @@ public class MotionActionTest extends VimTestCase {
     typeTextInFile(parseKeys("dat"),"abcdefg</ta<caret>g>hi");
     myFixture.checkResult("abcdefg</tag>hi");
   }
+
   //|d| |v_at|
   public void  testDeleteOuterTagBlockAfterWithoutOpenTag(){
     typeTextInFile(parseKeys("dat"),"abcdefg</tag>h<caret>i");
@@ -673,6 +698,7 @@ public class MotionActionTest extends VimTestCase {
     String text = "foo<tag>abc<caret>de</tag>bar";
     Editor e = typeTextInFile(parseKeys(""), text);
     TextRange textRange = SearchHelper.findBlockTagRange(e, false);
+    assertNotNull(textRange);
     assertEquals("abcde",
                  text.replaceAll("<caret>", "").substring(textRange.getStartOffset(), textRange.getEndOffset() + 1));
   }
@@ -687,6 +713,7 @@ public class MotionActionTest extends VimTestCase {
     String text = "foo<tag>abc<caret>de</tag>bar";
     Editor e = typeTextInFile(parseKeys(""), text);
     TextRange textRange = SearchHelper.findBlockTagRange(e, true);
+    assertNotNull(textRange);
     assertEquals("<tag>abcde</tag>",
                  text.replaceAll("<caret>", "").substring(textRange.getStartOffset(), textRange.getEndOffset() + 1));
   }
