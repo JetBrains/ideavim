@@ -8,7 +8,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.testFramework.LightProjectDescriptor;
-import com.intellij.testFramework.PlatformTestCase;
 import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
@@ -40,10 +39,6 @@ public abstract class VimTestCase extends UsefulTestCase {
   protected CodeInsightTestFixture myFixture;
 
   public VimTestCase() {
-    // Only in IntelliJ IDEA Ultimate Edition
-    //PlatformTestCase.initPlatformLangPrefix();
-    // XXX: IntelliJ IDEA Community and Ultimate 12+
-    PlatformTestCase.initPlatformPrefix(ULTIMATE_MARKER_CLASS, "PlatformLangXml");
   }
 
   @Override

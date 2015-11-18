@@ -405,12 +405,6 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("foo = ;\n");
   }
 
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockCaretBeforeString() {
-    typeTextInFile(parseKeys("dit"),
-                   "<h1><test>foo, <caret>bar</test></h1>\n");
-    myFixture.checkResult("<h1><test></test></h1>\n");
-  }
 
   //|d| |v_it|
   public void testDeleteInnerTagBlockCaretInHtml() {
@@ -423,7 +417,7 @@ public class MotionActionTest extends VimTestCase {
   }
 
   //|d| |v_it|
-  public void testDeleteInnerTagBlockCaretInHtmlUncloseTag() {
+  public void testDeleteInnerTagBlockCaretInHtmlUnclosedTag() {
     typeTextInFile(parseKeys("dit"),
                    "<template <caret>name=\"hello\">\n" +
                    "  <button>Click Me</button>\n" +
@@ -444,13 +438,6 @@ public class MotionActionTest extends VimTestCase {
   }
 
   //|d| |v_it|
-  public void testDeleteOuterTagBlockCaretBeforeString() {
-    typeTextInFile(parseKeys("dat"),
-                   "<h1><test>foo, <caret>bar</test></h1>\n");
-    myFixture.checkResult("<h1></h1>\n");
-  }
-
-  //|d| |v_it|
   public void  testDeleteInnerTagBlockBefore(){
     typeTextInFile(parseKeys("dit"),"abc<caret>de<tag>fg</tag>hi");
     myFixture.checkResult("abcde<tag>fg</tag>hi");
@@ -461,10 +448,23 @@ public class MotionActionTest extends VimTestCase {
     typeTextInFile(parseKeys("dit"),"abcde<ta<caret>g>fg</tag>hi");
     myFixture.checkResult("abcde<tag></tag>hi");
   }
+
+  //|d| |v_it|
+  public void testDeleteInnerTagBlockInOpenWithArgs() {
+    typeTextInFile(parseKeys("dit"), "abcde<ta<caret>g name = \"name\">fg</tag>hi");
+    myFixture.checkResult("abcde<tag name = \"name\"></tag>hi");
+  }
+
   //|d| |v_it|
   public void  testDeleteInnerTagBlockBetween(){
     typeTextInFile(parseKeys("dit"),"abcde<tag>f<caret>g</tag>hi");
     myFixture.checkResult("abcde<tag></tag>hi");
+  }
+
+  //|d| |v_it|
+  public void testDeleteInnerTagBlockBetweenWithArgs() {
+    typeTextInFile(parseKeys("dit"), "abcde<tag name = \"name\">f<caret>g</tag>hi");
+    myFixture.checkResult("abcde<tag name = \"name\"></tag>hi");
   }
 
   //|d| |v_it|
@@ -570,8 +570,20 @@ public class MotionActionTest extends VimTestCase {
   }
 
   //|d| |v_at|
+  public void testDeleteOuterTagBlockInOpenWithArgs() {
+    typeTextInFile(parseKeys("dat"), "abcde<ta<caret>g name = \"name\">fg</tag>hi");
+    myFixture.checkResult("abcdehi");
+  }
+
+  //|d| |v_at|
   public void  testDeleteOuterTagBlockBetween(){
     typeTextInFile(parseKeys("dat"),"abcde<tag>f<caret>g</tag>hi");
+    myFixture.checkResult("abcdehi");
+  }
+
+  //|d| |v_at|
+  public void testDeleteOuterTagBlockBetweenWithArgs() {
+    typeTextInFile(parseKeys("dat"), "abcde<tag name = \"name\">f<caret>g</tag>hi");
     myFixture.checkResult("abcdehi");
   }
 
