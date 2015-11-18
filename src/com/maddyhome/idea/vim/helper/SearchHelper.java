@@ -360,28 +360,38 @@ public class SearchHelper {
 
   @TestOnly
   public static boolean inHtmlTagPosition(@NotNull CharSequence chars, boolean end_tag, int pos) {
+    int length = chars.length();
+    if (pos < 0 || pos >= length) {
+      return false;
+    }
     if (chars.charAt(pos) == '>') {
       pos--;
+      if (pos < 0) {
+        return false;
+      }
     }
 
     // find '<' before cursor
-    while (pos > 0 && !(chars.charAt(pos) == '<' || chars.charAt(pos) == '>')) {
+    while (pos >= 0 && (chars.charAt(pos) == '<' || chars.charAt(pos) == '>')) {
       pos--;
     }
-    if (chars.charAt(pos) != '<') {
+
+    if (pos < 0) {
       return false; //if there are no '<' before pos OR if found new tag inside
     }
     pos++; //Now we at first symbol of the tag
 
     //simple test if tag is really closing
-    if ((pos >= chars.length()) || (end_tag != (chars.charAt(pos) == '/'))) {
+    if ((pos >= length) || (end_tag != (chars.charAt(pos) == '/'))) {
       return false;
     }
 
     // find '>' after cursor
-    while (pos < chars.length() && (chars.charAt(pos) != '>')) pos++;
+    while (pos < length && (chars.charAt(pos) != '>')) {
+      pos++;
+    }
 
-    return (pos < chars.length()); //if really found closed bracket
+    return (pos < length); //if really found closed bracket
   }
 
   private static int findTagLocation(@NotNull CharSequence chars,
@@ -395,7 +405,9 @@ public class SearchHelper {
     Pattern pTarget = Pattern.compile(targetPattern);
     Pattern pPair = Pattern.compile(pairPattern);
     Stack<Pattern> patternStack = new Stack<Pattern>();
-    while (findPos >= 0 && findPos <= chars.length()) {
+
+    int length = chars.length();
+    while (findPos >= 0 && findPos <= length) {
       CharSequence newString = dir > 0 ? chars.subSequence(tempPos, findPos) : chars.subSequence(findPos, tempPos);
       Matcher matcher = pTarget.matcher(newString);
       Matcher endMatcher = pPair.matcher(newString);
@@ -427,13 +439,14 @@ public class SearchHelper {
     int selectionEnd = editor.getSelectionModel().getSelectionEnd();
     boolean isInStartTag = inHtmlTagPosition(chars, false, pos);
     boolean isInEndTag = inHtmlTagPosition(chars, true, pos);
+    int length = chars.length();
 
     if (selectionStart != selectionEnd) {
       pos = Math.min(selectionStart, selectionEnd);
     }
 
     if (isInStartTag) {
-      while (chars.charAt(pos) != '>') {
+      while ((pos < length) && chars.charAt(pos) != '>') {
         pos++;
       }
       pos++;
@@ -452,17 +465,17 @@ public class SearchHelper {
       endPattern = "</.*>";
       int startPos = pos;
       blockStart = findTagLocation(chars, startPos, -1, startPattern, endPattern);
-      if (blockStart == -1) {
+      if (blockStart < 0) {
         return null;
       }
       int tempBlockStart = blockStart;
-      startPattern = createTagNameRegex(chars.subSequence(blockStart, chars.length()), false);
-      endPattern = createTagNameRegex(chars.subSequence(blockStart, chars.length()), true);
-      while (chars.charAt(blockStart) != '>') {
+      startPattern = createTagNameRegex(chars.subSequence(blockStart, length), false);
+      endPattern = createTagNameRegex(chars.subSequence(blockStart, length), true);
+      while (blockStart < length && chars.charAt(blockStart) != '>') {
         blockStart++;
       }
       blockEnd = findTagLocation(chars, blockStart, 1, endPattern, startPattern);
-      if (blockEnd == -1) {
+      if (blockEnd < 0) {
         stack++;
         pos = tempBlockStart;
       }
@@ -476,14 +489,14 @@ public class SearchHelper {
         stack--;
       }
     }
-    while (chars.charAt(blockEnd) != '<') {
+    while (blockEnd >= 0 && chars.charAt(blockEnd) != '<') {
       blockEnd--;
     }
     if (isOuter) {
-      while (chars.charAt(blockStart) != '<') {
+      while (blockStart >=0 && chars.charAt(blockStart) != '<') {
         blockStart--;
       }
-      while (chars.charAt(blockEnd) != '>') {
+      while (blockEnd < length && chars.charAt(blockEnd) != '>') {
         blockEnd++;
       }
     }
@@ -1069,11 +1082,10 @@ public class SearchHelper {
     int end = pos;
     if (!onWordEnd || hasSelection || (count > 1 && dir == 1) || (startSpace && isOuter)) {
       if (dir == 1) {
-        end = findNextWordEnd(chars, pos, max, count -
-                                               (onWordEnd &&
-                                                !hasSelection &&
-                                                (!(startSpace && isOuter) || (startSpace && !isOuter)) ? 1 : 0), isBig,
-                              !isOuter);
+        end = findNextWordEnd(chars, pos, max, count - (onWordEnd &&
+                                                        !hasSelection &&
+                                                        (!(startSpace && isOuter) || (startSpace && !isOuter)) ? 1 : 0),
+                              isBig, !isOuter);
       }
       else {
         end = findNextWordEnd(chars, pos, max, 1, isBig, !isOuter);
@@ -2059,11 +2071,9 @@ public class SearchHelper {
          startPos < includeTagChars.length();
          startPos++) {
     }
-    for (;
-         includeTagChars.charAt(startPos) != '>' &&
-         includeTagChars.charAt(startPos) != ' ' &&
-         startPos < includeTagChars.length();
-         startPos++) {
+    for (; includeTagChars.charAt(startPos) != '>' &&
+           includeTagChars.charAt(startPos) != ' ' &&
+           startPos < includeTagChars.length(); startPos++) {
       tagName += includeTagChars.charAt(startPos);
     }
     if (isEndTag) {
