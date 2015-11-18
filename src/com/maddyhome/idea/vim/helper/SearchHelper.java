@@ -398,9 +398,9 @@ public class SearchHelper {
     int res = -1;
     int findPos = pos;
     int tempPos = pos;
-    Pattern pTarget = Pattern.compile(targetPattern);
-    Pattern pPair = Pattern.compile(pairPattern);
-    Stack<Pattern> patternStack = new Stack<Pattern>();
+    final Pattern pTarget = Pattern.compile(targetPattern);
+    final Pattern pPair = Pattern.compile(pairPattern);
+    final Stack<Pattern> patternStack = new Stack<Pattern>();
     final int length = chars.length();
 
     while (findPos >= 0 && findPos < length) {
@@ -429,12 +429,12 @@ public class SearchHelper {
 
   @Nullable
   public static TextRange findBlockTagRange(@NotNull Editor editor, boolean isOuter) {
-    CharSequence chars = editor.getDocument().getCharsSequence();
+    final CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = editor.getCaretModel().getOffset();
-    int selectionStart = editor.getSelectionModel().getSelectionStart();
-    int selectionEnd = editor.getSelectionModel().getSelectionEnd();
-    boolean isInStartTag = inHtmlTagPosition(chars, false, pos);
-    boolean isInEndTag = inHtmlTagPosition(chars, true, pos);
+    final int selectionStart = editor.getSelectionModel().getSelectionStart();
+    final int selectionEnd = editor.getSelectionModel().getSelectionEnd();
+    final boolean isInStartTag = inHtmlTagPosition(chars, false, pos);
+    final boolean isInEndTag = inHtmlTagPosition(chars, true, pos);
 
     if (selectionStart != selectionEnd) {
       pos = Math.min(selectionStart, selectionEnd);
