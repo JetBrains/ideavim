@@ -360,7 +360,7 @@ public class SearchHelper {
 
   @TestOnly
   public static boolean inHtmlTagPosition(@NotNull CharSequence chars, boolean end_tag, int pos) {
-    int length = chars.length();
+    final int length = chars.length();
     if (pos < 0 || pos >= length) {
       return false;
     }
@@ -402,11 +402,11 @@ public class SearchHelper {
     int res = -1;
     int findPos = pos;
     int tempPos = pos;
-    Pattern pTarget = Pattern.compile(targetPattern);
-    Pattern pPair = Pattern.compile(pairPattern);
-    Stack<Pattern> patternStack = new Stack<Pattern>();
+    final Pattern pTarget = Pattern.compile(targetPattern);
+    final Pattern pPair = Pattern.compile(pairPattern);
+    final Stack<Pattern> patternStack = new Stack<Pattern>();
 
-    int length = chars.length();
+    final int length = chars.length();
     while (findPos >= 0 && findPos <= length) {
       CharSequence newString = dir > 0 ? chars.subSequence(tempPos, findPos) : chars.subSequence(findPos, tempPos);
       Matcher matcher = pTarget.matcher(newString);
@@ -435,11 +435,11 @@ public class SearchHelper {
   public static TextRange findBlockTagRange(@NotNull Editor editor, boolean isOuter) {
     CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = editor.getCaretModel().getOffset();
-    int selectionStart = editor.getSelectionModel().getSelectionStart();
-    int selectionEnd = editor.getSelectionModel().getSelectionEnd();
-    boolean isInStartTag = inHtmlTagPosition(chars, false, pos);
-    boolean isInEndTag = inHtmlTagPosition(chars, true, pos);
-    int length = chars.length();
+    final int selectionStart = editor.getSelectionModel().getSelectionStart();
+    final int selectionEnd = editor.getSelectionModel().getSelectionEnd();
+    final boolean isInStartTag = inHtmlTagPosition(chars, false, pos);
+    final boolean isInEndTag = inHtmlTagPosition(chars, true, pos);
+    final int length = chars.length();
 
     if (selectionStart != selectionEnd) {
       pos = Math.min(selectionStart, selectionEnd);
