@@ -448,6 +448,16 @@ public class MotionActionTest extends VimTestCase {
     typeTextInFile(parseKeys("dit"),"abcde<ta<caret>g>fg</tag>hi");
     myFixture.checkResult("abcde<tag></tag>hi");
   }
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockInOpenEndOfLine(){
+    typeTextInFile(parseKeys("dit"),"abcde<ta<caret>g>fg</tag>");
+    myFixture.checkResult("abcde<tag></tag>");
+  }
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockInOpenStartOfLine(){
+    typeTextInFile(parseKeys("dit"),"<ta<caret>g>fg</tag>hi");
+    myFixture.checkResult("<tag></tag>hi");
+  }
 
   //|d| |v_it|
   public void testDeleteInnerTagBlockInOpenWithArgs() {
