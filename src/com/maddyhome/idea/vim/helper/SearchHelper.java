@@ -24,17 +24,17 @@ import com.intellij.lang.Language;
 import com.intellij.lang.LanguageCommenters;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileTypes.CharsetUtil;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiUtil;
+import com.intellij.util.text.CharSequenceReader;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.option.ListOption;
-import com.maddyhome.idea.vim.option.OptionChangeEvent;
-import com.maddyhome.idea.vim.option.OptionChangeListener;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
@@ -362,10 +362,75 @@ public class SearchHelper {
     return -1;
   }
 
+  @Nullable
+  public static TextRange findBlockTagRange2(@NotNull Editor editor, boolean isOuter) {
+    final int cursorOffset = editor.getCaretModel().getOffset();
+    int pos = cursorOffset;
+    final CharSequence sequence = editor.getDocument().getCharsSequence();
+    while (true) {
+      final Pair<TextRange, String> closingTagResult = findClosingTag(sequence, pos);
+      if (closingTagResult == null) {
+        return null;
+      }
+      final TextRange closingTagTextRange = closingTagResult.getFirst();
+      final String tagName = closingTagResult.getSecond();
+      final TextRange openingTagTextRange = findOpeningTag(sequence, closingTagTextRange.getStartOffset(), tagName);
+      if (openingTagTextRange != null && openingTagTextRange.getStartOffset() <= cursorOffset) {
+        if (isOuter) {
+          return new TextRange(openingTagTextRange.getStartOffset(), closingTagTextRange.getEndOffset());
+        }
+        else {
+          return new TextRange(openingTagTextRange.getEndOffset(), closingTagTextRange.getStartOffset());
+        }
+      }
+      else {
+        pos = closingTagTextRange.getEndOffset();
+      }
+    }
+  }
+
+  @Nullable
+  private static TextRange findOpeningTag(@NotNull CharSequence sequence, int position, @NotNull String tagName) {
+    String text = String.valueOf(sequence);
+    text.lastIndexOf("<" + tagName, position);
+    //TODO: what does the fox say?
+    return null;
+  }
+
+  @Nullable
+  private static Pair<TextRange, String> findClosingTag(@NotNull CharSequence sequence, int pos) {
+    int closeBracketPos = pos;
+    int openBracketPos;
+    boolean found = false;
+    //TODO: check this cycle
+    while (!found) {
+      closeBracketPos = StringUtil.indexOf(sequence, '>', closeBracketPos);
+      if (closeBracketPos < 0) {
+        return null;
+      }
+      openBracketPos = closeBracketPos - 1;
+      while (!found && openBracketPos >= 0) {
+        openBracketPos = StringUtil.lastIndexOf(sequence, '<', 0, openBracketPos);
+        if (openBracketPos + 1 < sequence.length() && sequence.charAt(openBracketPos + 1) == '/') {
+          String tagName = (String)sequence.subSequence(openBracketPos + 2, closeBracketPos); //TODO: +2?
+          if (tagName.length() > 0 && tagName.charAt(0) != 0){
+            found = true;
+            TextRange textRange = new TextRange(openBracketPos, closeBracketPos + 1);
+            return Pair.create(textRange, tagName);
+          }
+        }
+        openBracketPos--;
+      }
+      closeBracketPos++;
+    }
+    return null;
+  }
+
+
   @TestOnly
   public static boolean inHtmlTagPosition(@NotNull CharSequence chars, boolean end_tag, int pos) {
     final int length = chars.length();
-    if (pos < 0 || pos >= length){
+    if (pos < 0 || pos >= length) {
       return false;
     }
     if (chars.charAt(pos) == '>') {
@@ -394,6 +459,7 @@ public class SearchHelper {
     return (pos < length); //if really found closed bracket
   }
 
+
   private static int findTagLocation(@NotNull CharSequence chars,
                                      int pos,
                                      int dir,
@@ -406,28 +472,52 @@ public class SearchHelper {
     final Pattern pPair = Pattern.compile(pairPattern);
     final Stack<Pattern> patternStack = new Stack<Pattern>();
     final int length = chars.length();
-
+    //int startOfStartTag = 0,endOfStartTag = 0,startOfEndTag = 0,endOfEndTag = 0;
     while (findPos >= 0 && findPos < length) {
       CharSequence newString = dir > 0 ? chars.subSequence(tempPos, findPos) : chars.subSequence(findPos, tempPos);
       Matcher matcher = pTarget.matcher(newString);
       Matcher endMatcher = pPair.matcher(newString);
       if (endMatcher.find()) {
         patternStack.push(Pattern.compile(createTagNameRegex(endMatcher.group(), dir > 0)));
+        //startOfEndTag = findPos;
         tempPos = findPos;
       }
       if (matcher.find()) {
         if (patternStack.empty()) {
           res = findPos;
           res -= dir;
+          if (dir < 0) {
+            /*startOfStartTag = res;
+            if (startOfStartTag < pos) {
+              CharSequence subSequence = chars.subSequence(startOfStartTag, pos+1);
+              System.out.println("start: " + subSequence);
+              endOfStartTag = StringUtil.lastIndexOf(chars,'>',startOfStartTag,pos+1);
+            }*/
+          }
+          else {
+            /*startOfEndTag = res;
+            if (startOfEndTag > pos) {
+              CharSequence subSequence = chars.subSequence(pos,startOfEndTag+1);
+              System.out.println("end: " + subSequence);
+              startOfEndTag = StringUtil.indexOf(chars,'>',pos,startOfEndTag+1);
+            }*/
+          }
           break;
         }
         else if (patternStack.peek().matcher(newString).find()) {
           tempPos = findPos;
+          //startOfStartTag = findPos;
           patternStack.pop();
         }
       }
       findPos += dir;
     }
+    /*System.out.println("positions: " +startOfStartTag+" " + endOfStartTag+" " +startOfEndTag+ " " + endOfEndTag);
+    if (startOfStartTag < endOfStartTag)
+      System.out.println("start tag: " +chars.subSequence(startOfStartTag, endOfStartTag));
+    if (startOfEndTag < endOfEndTag) {
+      System.out.println("end tag: " + chars.subSequence(startOfEndTag, endOfEndTag));
+    }*/
     return res;
   }
 
@@ -516,6 +606,7 @@ public class SearchHelper {
 
     return new TextRange(blockStart, blockEnd);
   }
+
 
   @Nullable
   public static TextRange findBlockQuoteInLineRange(@NotNull Editor editor, char quote, boolean isOuter) {
@@ -728,7 +819,7 @@ public class SearchHelper {
 
   /**
    * Find the offset to the start of the next/previous word/WORD.
-   * <p/>
+   * <p>
    * This function always returns a non-negative position according to the definition of 'next/previous word'
    * in Vim. For example, for the last word the end of file position is returned.
    *
@@ -1091,11 +1182,10 @@ public class SearchHelper {
     int end = pos;
     if (!onWordEnd || hasSelection || (count > 1 && dir == 1) || (startSpace && isOuter)) {
       if (dir == 1) {
-        end = findNextWordEnd(chars, pos, max, count -
-                                               (onWordEnd &&
-                                                !hasSelection &&
-                                                (!(startSpace && isOuter) || (startSpace && !isOuter)) ? 1 : 0), isBig,
-                              !isOuter);
+        end = findNextWordEnd(chars, pos, max, count - (onWordEnd &&
+                                                        !hasSelection &&
+                                                        (!(startSpace && isOuter) || (startSpace && !isOuter)) ? 1 : 0),
+                              isBig, !isOuter);
       }
       else {
         end = findNextWordEnd(chars, pos, max, 1, isBig, !isOuter);
@@ -1286,7 +1376,7 @@ public class SearchHelper {
 
   /**
    * Skip whitespace starting with the supplied position.
-   * <p/>
+   * <p>
    * An empty line is considered a whitespace break.
    *
    * @param chars  The text as a character array
@@ -2081,11 +2171,9 @@ public class SearchHelper {
          startPos < includeTagChars.length();
          startPos++) {
     }
-    for (;
-         includeTagChars.charAt(startPos) != '>' &&
-         includeTagChars.charAt(startPos) != ' ' &&
-         startPos < includeTagChars.length();
-         startPos++) {
+    for (; includeTagChars.charAt(startPos) != '>' &&
+           includeTagChars.charAt(startPos) != ' ' &&
+           startPos < includeTagChars.length(); startPos++) {
       tagName += includeTagChars.charAt(startPos);
     }
     if (isEndTag) {
