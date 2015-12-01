@@ -398,7 +398,8 @@ public class SearchHelper {
   }
 
   @Nullable
-  private static Pair<TextRange, String> findClosingTag(@NotNull CharSequence sequence, int pos) {
+  @TestOnly
+  public static Pair<TextRange, String> findClosingTag(@NotNull CharSequence sequence, int pos) {
     int closeBracketPos = pos;
     int openBracketPos;
     boolean found = false;
