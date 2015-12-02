@@ -24,6 +24,7 @@ import com.intellij.lang.Language;
 import com.intellij.lang.LanguageCommenters;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.ex.LineIterator;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiComment;
@@ -40,7 +41,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Helper methods for searching text
@@ -390,26 +395,27 @@ public class SearchHelper {
 
   @Nullable
   private static TextRange findOpeningTag(@NotNull CharSequence sequence, int position, @NotNull String tagName) {
-    final String text = String.valueOf(sequence).toLowerCase(); //TODO any variants with sequence?
-    tagName = tagName.toLowerCase();
     final String tagBeginning = "<" + tagName;
-    while (true) {
-      final int openingTagPos = text.lastIndexOf(tagBeginning, position);
-      if (openingTagPos < 0) {
-        return null;
-      }
-      final int openingTagEndPos = openingTagPos + tagBeginning.length();
-      final int closeBracketPos = text.indexOf('>', openingTagEndPos);
+    final Matcher matcher =
+      Pattern.compile(Pattern.quote(tagBeginning), Pattern.CASE_INSENSITIVE).matcher(sequence.subSequence(0, position));
+    List<Integer> possibleBeginnings = new ArrayList<>();
+    while (matcher.find()) {
+      possibleBeginnings.add(matcher.start());
+    }
+    final ListIterator<Integer> iterator = possibleBeginnings.listIterator(possibleBeginnings.size());
+
+    int openingTagPos, openingTagEndPos, closeBracketPos;
+    while (iterator.hasPrevious()) {
+      openingTagPos = iterator.previous();
+      openingTagEndPos = openingTagPos + tagBeginning.length();
+      closeBracketPos = StringUtil.indexOf(sequence, '>', openingTagEndPos);
       if (closeBracketPos > 0) {
-        if ((closeBracketPos == openingTagEndPos) || (text.charAt(openingTagEndPos) == ' ')) {
+        if ((closeBracketPos == openingTagEndPos) || (sequence.charAt(openingTagEndPos) == ' ')) {
           return new TextRange(openingTagPos, closeBracketPos + 1);
         }
       }
-      position = openingTagPos - 1;
-      if (position < 0) {
-        return null;
-      }
     }
+    return null;
   }
 
   @Nullable
@@ -426,8 +432,7 @@ public class SearchHelper {
       while (openBracketPos >= 0) {
         openBracketPos = StringUtil.lastIndexOf(sequence, '<', 0, openBracketPos);
         if (openBracketPos + 1 < sequence.length() && sequence.charAt(openBracketPos + 1) == '/') {
-          String tagName =
-            String.valueOf(sequence.subSequence(openBracketPos + 2, closeBracketPos)); //TODO: string->sequence
+          final String tagName = String.valueOf(sequence.subSequence(openBracketPos + 2, closeBracketPos));
           if (tagName.length() > 0 && tagName.charAt(0) != ' ') {
             TextRange textRange = new TextRange(openBracketPos, closeBracketPos + 1);
             return Pair.create(textRange, tagName);

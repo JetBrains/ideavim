@@ -418,6 +418,12 @@ public class MotionActionTest extends VimTestCase {
   }
 
   //|d| |v_it|
+  public void testDeleteInnerTagBlockBetweenTagWithRegex() {
+    typeTextInFile(parseKeys("dit"), "abcde<[abc]*>af<caret>gbc</[abc]*>hi");
+    myFixture.checkResult("abcde<[abc]*></[abc]*>hi");
+  }
+
+  //|d| |v_it|
   public void testDeleteInnerTagBlockBetweenCamelCase() {
     typeTextInFile(parseKeys("dit"), "abcde<tAg>f<caret>g</tag>hi");
     myFixture.checkResult("abcde<tAg></tag>hi");
