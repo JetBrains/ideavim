@@ -64,30 +64,4 @@ public class SearchHelperTest {
     assertEquals(previousWordPosition, text.indexOf("second"));
   }
 
-  @Test
-  public void testFindClosingTagSimple(){
-    String text = "abc</de>fg";
-    int position = 1;
-    TextRange tagRange = new TextRange(3,8);
-    final Pair<TextRange, String> closingTag = SearchHelper.findClosingTag(text, position);
-    assertEquals(closingTag.getSecond(),"de");
-   // assertEquals(closingTag.getFirst(),tagRange);  //TODO: realise equals in TextRange
-    final TextRange closingTagRange = closingTag.getFirst();
-    assertEquals(closingTagRange.getStartOffset(), tagRange.getStartOffset());
-    assertEquals(closingTagRange.getEndOffset(), tagRange.getEndOffset());
-  }
-
-  @Test
-  public void testFindClosingTagInsideClosing(){
-    String text = "abc</de>fg";
-    int position = 5;
-    TextRange tagRange = new TextRange(3,8);
-    final Pair<TextRange, String> closingTag = SearchHelper.findClosingTag(text, position);
-    assertEquals(closingTag.getSecond(),"de");
-    // assertEquals(closingTag.getFirst(),tagRange);  //TODO: realise equals in TextRange
-    final TextRange closingTagRange = closingTag.getFirst();
-    assertEquals(closingTagRange.getStartOffset(), tagRange.getStartOffset());
-    assertEquals(closingTagRange.getEndOffset(), tagRange.getEndOffset());
-  }
-
 }

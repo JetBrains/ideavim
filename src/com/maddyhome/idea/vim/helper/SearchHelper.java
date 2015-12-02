@@ -377,10 +377,11 @@ public class SearchHelper {
       final TextRange openingTagTextRange = findOpeningTag(sequence, closingTagTextRange.getStartOffset(), tagName);
       if (openingTagTextRange != null && openingTagTextRange.getStartOffset() <= cursorOffset) {
         if (isOuter) {
-          return new TextRange(openingTagTextRange.getStartOffset(), closingTagTextRange.getEndOffset() - 1); //TODO check!
+          return new TextRange(openingTagTextRange.getStartOffset(),
+                               closingTagTextRange.getEndOffset() - 1); //TODO should we check?
         }
         else {
-          return new TextRange(openingTagTextRange.getEndOffset(), closingTagTextRange.getStartOffset()-1);
+          return new TextRange(openingTagTextRange.getEndOffset(), closingTagTextRange.getStartOffset() - 1);
         }
       }
       else {
@@ -391,7 +392,7 @@ public class SearchHelper {
 
   @Nullable
   private static TextRange findOpeningTag(@NotNull CharSequence sequence, int position, @NotNull String tagName) {
-    final String text = String.valueOf(sequence).toLowerCase();; //TODO any variants with sequence?
+    final String text = String.valueOf(sequence).toLowerCase(); //TODO any variants with sequence?
     tagName = tagName.toLowerCase();
     final String tagBeginning = "<" + tagName;
     while (true) {
@@ -418,21 +419,18 @@ public class SearchHelper {
   public static Pair<TextRange, String> findClosingTag(@NotNull CharSequence sequence, int pos) {
     int closeBracketPos = pos;
     int openBracketPos;
-    boolean found = false;
-    //TODO: check this cycle
-    while (!found) {
+    while (closeBracketPos < sequence.length()) {
       closeBracketPos = StringUtil.indexOf(sequence, '>', closeBracketPos);
       if (closeBracketPos < 0) {
         return null;
       }
       openBracketPos = closeBracketPos - 1;
-      while (!found && openBracketPos >= 0) {
+      while (openBracketPos >= 0) {
         openBracketPos = StringUtil.lastIndexOf(sequence, '<', 0, openBracketPos);
         if (openBracketPos + 1 < sequence.length() && sequence.charAt(openBracketPos + 1) == '/') {
           String tagName =
-            String.valueOf(sequence.subSequence(openBracketPos + 2, closeBracketPos)); //TODO: +2? string->sequence
+            String.valueOf(sequence.subSequence(openBracketPos + 2, closeBracketPos)); //TODO: string->sequence
           if (tagName.length() > 0 && tagName.charAt(0) != ' ') {
-            found = true;
             TextRange textRange = new TextRange(openBracketPos, closeBracketPos + 1);
             return Pair.create(textRange, tagName);
           }
@@ -442,187 +440,6 @@ public class SearchHelper {
       closeBracketPos++;
     }
     return null;
-  }
-
-
-  @TestOnly
-  public static boolean inHtmlTagPosition(@NotNull CharSequence chars, boolean end_tag, int pos) {
-    final int length = chars.length();
-    if (pos < 0 || pos >= length) {
-      return false;
-    }
-    if (chars.charAt(pos) == '>') {
-      pos--;
-    }
-
-    // find '<' before cursor
-    while (pos > 0 && !(chars.charAt(pos) == '<' || chars.charAt(pos) == '>')) {
-      pos--;
-    }
-    if (chars.charAt(pos) != '<') {
-      return false; //if there are no '<' before pos OR if found new tag inside
-    }
-    pos++; //Now we at first symbol of the tag
-
-    //simple test if tag is really closing
-    if ((pos >= length) || (end_tag != (chars.charAt(pos) == '/'))) {
-      return false;
-    }
-
-    // find '>' after cursor
-    while (pos < length && (chars.charAt(pos) != '>')) {
-      pos++;
-    }
-
-    return (pos < length); //if really found closed bracket
-  }
-
-
-  private static int findTagLocation(@NotNull CharSequence chars,
-                                     int pos,
-                                     int dir,
-                                     @NotNull String targetPattern,
-                                     @NotNull String pairPattern) {
-    int res = -1;
-    int findPos = pos;
-    int tempPos = pos;
-    final Pattern pTarget = Pattern.compile(targetPattern);
-    final Pattern pPair = Pattern.compile(pairPattern);
-    final Stack<Pattern> patternStack = new Stack<Pattern>();
-    final int length = chars.length();
-    //int startOfStartTag = 0,endOfStartTag = 0,startOfEndTag = 0,endOfEndTag = 0;
-    while (findPos >= 0 && findPos < length) {
-      CharSequence newString = dir > 0 ? chars.subSequence(tempPos, findPos) : chars.subSequence(findPos, tempPos);
-      Matcher matcher = pTarget.matcher(newString);
-      Matcher endMatcher = pPair.matcher(newString);
-      if (endMatcher.find()) {
-        patternStack.push(Pattern.compile(createTagNameRegex(endMatcher.group(), dir > 0)));
-        //startOfEndTag = findPos;
-        tempPos = findPos;
-      }
-      if (matcher.find()) {
-        if (patternStack.empty()) {
-          res = findPos;
-          res -= dir;
-          if (dir < 0) {
-            /*startOfStartTag = res;
-            if (startOfStartTag < pos) {
-              CharSequence subSequence = chars.subSequence(startOfStartTag, pos+1);
-              System.out.println("start: " + subSequence);
-              endOfStartTag = StringUtil.lastIndexOf(chars,'>',startOfStartTag,pos+1);
-            }*/
-          }
-          else {
-            /*startOfEndTag = res;
-            if (startOfEndTag > pos) {
-              CharSequence subSequence = chars.subSequence(pos,startOfEndTag+1);
-              System.out.println("end: " + subSequence);
-              startOfEndTag = StringUtil.indexOf(chars,'>',pos,startOfEndTag+1);
-            }*/
-          }
-          break;
-        }
-        else if (patternStack.peek().matcher(newString).find()) {
-          tempPos = findPos;
-          //startOfStartTag = findPos;
-          patternStack.pop();
-        }
-      }
-      findPos += dir;
-    }
-    /*System.out.println("positions: " +startOfStartTag+" " + endOfStartTag+" " +startOfEndTag+ " " + endOfEndTag);
-    if (startOfStartTag < endOfStartTag)
-      System.out.println("start tag: " +chars.subSequence(startOfStartTag, endOfStartTag));
-    if (startOfEndTag < endOfEndTag) {
-      System.out.println("end tag: " + chars.subSequence(startOfEndTag, endOfEndTag));
-    }*/
-    return res;
-  }
-
-  @Nullable
-  public static TextRange findBlockTagRange2(@NotNull Editor editor, boolean isOuter) {
-    final CharSequence chars = editor.getDocument().getCharsSequence();
-    int pos = editor.getCaretModel().getOffset();
-    final int selectionStart = editor.getSelectionModel().getSelectionStart();
-    final int selectionEnd = editor.getSelectionModel().getSelectionEnd();
-    final boolean isInStartTag = inHtmlTagPosition(chars, false, pos);
-    final boolean isInEndTag = inHtmlTagPosition(chars, true, pos);
-
-    if (selectionStart != selectionEnd) {
-      pos = Math.min(selectionStart, selectionEnd);
-    }
-
-    if (isInStartTag) {
-      while (chars.charAt(pos) != '>') {
-        pos++;
-      }
-      pos++;
-    }
-    else if (isInEndTag) {
-      pos--;
-    }
-
-    String startPattern;
-    String endPattern;
-    int blockEnd = -1;
-    int blockStart = -1;
-    int stack = 0;
-    final int length = chars.length();
-
-    String notSpaceOrTabOrCloseTag = "[^ \t>/!]";
-    String anythingInDoubleQuote = "\"[^\"]*\"";
-    String anythingInQuote = "'[^']*'";
-    String anythingWithoutQuotes = "[^/'\">]";
-    String tagBody = "(" + anythingInDoubleQuote + "|" + anythingInQuote + '|' + anythingWithoutQuotes + ")" + "*";
-    String initialStartPattern = "<" + notSpaceOrTabOrCloseTag + tagBody + ">";
-    String initialEndPattern = "</.*>";
-
-    while (blockEnd < 0) {
-      startPattern = initialStartPattern;
-      endPattern = initialEndPattern;
-      int startPos = pos;
-      blockStart = findTagLocation(chars, startPos, -1, startPattern, endPattern);
-      if (blockStart < 0) {
-        return null;
-      }
-      int tempBlockStart = blockStart;
-      startPattern = createTagNameRegex(chars.subSequence(blockStart, length), false);
-      endPattern = createTagNameRegex(chars.subSequence(blockStart, length), true);
-      while (chars.charAt(blockStart) != '>') {
-        blockStart++;
-      }
-      blockEnd = findTagLocation(chars, blockStart, 1, endPattern, startPattern);
-      if (blockEnd < 0) {
-        stack++;
-        pos = tempBlockStart;
-      }
-      else if (!isInEndTag && blockEnd < pos) {
-        return null;
-      }
-      else {
-        if (stack == 0) {
-          break;
-        }
-        stack--;
-      }
-    }
-    while (blockEnd >= 0 && chars.charAt(blockEnd) != '<') {
-      blockEnd--;
-    }
-    if (isOuter) {
-      while (blockStart >= 0 && chars.charAt(blockStart) != '<') {
-        blockStart--;
-      }
-      while (blockEnd < length && chars.charAt(blockEnd) != '>') {
-        blockEnd++;
-      }
-    }
-    else {
-      blockStart++;
-      blockEnd--;
-    }
-
-    return new TextRange(blockStart, blockEnd);
   }
 
 
@@ -2168,36 +1985,6 @@ public class SearchHelper {
     }
 
     return res.toString();
-  }
-
-  @NotNull
-  private static String createStartTag(@NotNull CharSequence tagName) {
-    return "<" + tagName + "(\"[^\"]*\"|'[^']*'|[^'\">])*?>";
-  }
-
-  @NotNull
-  private static String createEndTag(@NotNull CharSequence tagName) {
-    return "</" + tagName + "?>";
-  }
-
-  @NotNull
-  private static String createTagNameRegex(@NotNull CharSequence includeTagChars, boolean isEndTag) {
-    String tagName = "";
-    int startPos = 0;
-    for (;
-         (includeTagChars.charAt(startPos) == '<' || includeTagChars.charAt(startPos) == '/') &&
-         startPos < includeTagChars.length();
-         startPos++) {
-    }
-    for (; includeTagChars.charAt(startPos) != '>' &&
-           includeTagChars.charAt(startPos) != ' ' &&
-           startPos < includeTagChars.length(); startPos++) {
-      tagName += includeTagChars.charAt(startPos);
-    }
-    if (isEndTag) {
-      return createEndTag(tagName);
-    }
-    return createStartTag(tagName);
   }
 
   public static class CountPosition {

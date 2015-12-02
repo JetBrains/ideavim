@@ -735,61 +735,6 @@ public class MotionActionTest extends VimTestCase {
   }
 
 
-  /**
-   * Tests for SearchHelper.inHtmlTagPosition
-   */
-  //There is no difference between open tag and non-pair
-  public void testInsideOpenTag() {
-    String text = "blabla <tag>";
-    assertTrue(SearchHelper.inHtmlTagPosition(text, false, 9));
-  }
-
-  public void testOutsideOpenTag() {
-    String text = "blabla <tag>";
-    assertFalse(SearchHelper.inHtmlTagPosition(text, false, 3));
-  }
-
-  public void testInsideCloseTag() {
-    String text = "blabla </tag>";
-    assertTrue(SearchHelper.inHtmlTagPosition(text, true, 10));
-  }
-
-  public void testOutsideCloseTag() {
-    String text = "blabla </tag>";
-    assertFalse(SearchHelper.inHtmlTagPosition(text, true, 3));
-  }
-
-  /**
-   * Tests for SearchHelper.findBlockTagRange
-   */
-
-  public void testFindBlockTagInnerRangeInside() {
-    String text = "foo<tag>abc<caret>de</tag>bar";
-    Editor e = typeTextInFile(parseKeys(""), text);
-    TextRange textRange = SearchHelper.findBlockTagRange(e, false);
-    assertNotNull(textRange);
-    assertEquals("abcde",
-                 text.replaceAll("<caret>", "").substring(textRange.getStartOffset(), textRange.getEndOffset() + 1));
-  }
-
-  public void testFindBlockTagRangeOutside() {
-    String text = "fo<caret>o<tag>abcde</tag>bar";
-    Editor e = typeTextInFile(parseKeys(""), text);
-    TextRange textRange = SearchHelper.findBlockTagRange(e, false);
-    assertNull(textRange);
-  }
-  public void testFindBlockTagOuterRangeInside() {
-    String text = "foo<tag>abc<caret>de</tag>bar";
-    Editor e = typeTextInFile(parseKeys(""), text);
-    TextRange textRange = SearchHelper.findBlockTagRange(e, true);
-    assertNotNull(textRange);
-    assertEquals("<tag>abcde</tag>",
-                 text.replaceAll("<caret>", "").substring(textRange.getStartOffset(), textRange.getEndOffset() + 1));
-  }
-
-
-
-
   // |%|
   public void testPercentMatchSimple() {
     typeTextInFile(parseKeys("%"),
