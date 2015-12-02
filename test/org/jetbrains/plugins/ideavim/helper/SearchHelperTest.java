@@ -1,7 +1,5 @@
 package org.jetbrains.plugins.ideavim.helper;
 
-import com.intellij.openapi.util.Pair;
-import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import org.junit.Test;
 
