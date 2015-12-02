@@ -472,6 +472,29 @@ public class MotionActionTest extends VimTestCase {
   }
 
   //|d| |v_it|
+  public void  testDeleteInnerTagBlockBetweenCamelCase(){
+    typeTextInFile(parseKeys("dit"),"abcde<tAg>f<caret>g</tag>hi");
+    myFixture.checkResult("abcde<tAg></tag>hi");
+  }
+
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockBetweenCaps(){
+    typeTextInFile(parseKeys("dit"),"abcde<tag>f<caret>g</TAG>hi");
+    myFixture.checkResult("abcde<tag></TAG>hi");
+  }
+
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockBetweenWithSpaceBeforeTag(){
+    typeTextInFile(parseKeys("dit"),"abcde< tag>f<caret>g</ tag>hi");
+    myFixture.checkResult("abcde< tag>fg</ tag>hi");
+  }
+
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockBetweenWithSpaceAfterTag(){
+    typeTextInFile(parseKeys("dit"),"abcde<tag >f<caret>g</tag>hi");
+    myFixture.checkResult("abcde<tag ></tag>hi");
+  }
+  //|d| |v_it|
   public void testDeleteInnerTagBlockBetweenWithArgs() {
     typeTextInFile(parseKeys("dit"), "abcde<tag name = \"name\">f<caret>g</tag>hi");
     myFixture.checkResult("abcde<tag name = \"name\"></tag>hi");
@@ -562,9 +585,33 @@ public class MotionActionTest extends VimTestCase {
   }
 
   //|d| |v_it|
+  public void  testDeleteInnerTagBlockTwoTagsWrongOrder(){
+    typeTextInFile(parseKeys("dit"),"<foo><html>t<caret>ext</foo></html>");
+    myFixture.checkResult("<foo></foo></html>");
+  }
+
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockTwoTagsWrongOrderInClosingTag(){
+    typeTextInFile(parseKeys("dit"),"<foo><html>text</foo></htm<caret>l>");
+    myFixture.checkResult("<foo><html></html>");
+  }
+
+  //|d| |v_it|
   public void  testDeleteInnerTagBlockAfterWrongOrder(){
     typeTextInFile(parseKeys("dit"),"abcde</tag>fg<tag>h<caret>i");
     myFixture.checkResult("abcde</tag>fg<tag>hi");
+  }
+
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockBracketInside(){
+    typeTextInFile(parseKeys("dit"),"abcde<tag>f<caret><>g</tag>hi");
+    myFixture.checkResult("abcde<tag></tag>hi");
+  }
+
+  //|d| |v_it|
+  public void  testDeleteInnerTagBlockBracketInsideString(){
+    typeTextInFile(parseKeys("dit"),"abcde<tag>f<caret>\"<>\"g</tag>hi");
+    myFixture.checkResult("abcde<tag></tag>hi");
   }
 
   //|d| |v_at|

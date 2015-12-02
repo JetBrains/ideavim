@@ -391,7 +391,8 @@ public class SearchHelper {
 
   @Nullable
   private static TextRange findOpeningTag(@NotNull CharSequence sequence, int position, @NotNull String tagName) {
-    final String text = String.valueOf(sequence); //TODO any variants with sequence?
+    final String text = String.valueOf(sequence).toLowerCase();; //TODO any variants with sequence?
+    tagName = tagName.toLowerCase();
     final String tagBeginning = "<" + tagName;
     while (true) {
       final int openingTagPos = text.lastIndexOf(tagBeginning, position);
@@ -430,7 +431,7 @@ public class SearchHelper {
         if (openBracketPos + 1 < sequence.length() && sequence.charAt(openBracketPos + 1) == '/') {
           String tagName =
             String.valueOf(sequence.subSequence(openBracketPos + 2, closeBracketPos)); //TODO: +2? string->sequence
-          if (tagName.length() > 0 && tagName.charAt(0) != 0) {
+          if (tagName.length() > 0 && tagName.charAt(0) != ' ') {
             found = true;
             TextRange textRange = new TextRange(openBracketPos, closeBracketPos + 1);
             return Pair.create(textRange, tagName);
