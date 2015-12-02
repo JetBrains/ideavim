@@ -381,14 +381,14 @@ public class SearchHelper {
       if (openingTagTextRange != null && openingTagTextRange.getStartOffset() <= cursorOffset) {
         if (isOuter) {
           return new TextRange(openingTagTextRange.getStartOffset(),
-                               closingTagTextRange.getEndOffset() - 1); //TODO should we check?
+                               closingTagTextRange.getEndOffset());
         }
         else {
-          return new TextRange(openingTagTextRange.getEndOffset(), closingTagTextRange.getStartOffset() - 1);
+          return new TextRange(openingTagTextRange.getEndOffset()+1, closingTagTextRange.getStartOffset()-1);
         }
       }
       else {
-        pos = closingTagTextRange.getEndOffset();
+        pos = closingTagTextRange.getEndOffset()+1;
       }
     }
   }
@@ -411,7 +411,7 @@ public class SearchHelper {
       closeBracketPos = StringUtil.indexOf(sequence, '>', openingTagEndPos);
       if (closeBracketPos > 0) {
         if ((closeBracketPos == openingTagEndPos) || (sequence.charAt(openingTagEndPos) == ' ')) {
-          return new TextRange(openingTagPos, closeBracketPos + 1);
+          return new TextRange(openingTagPos, closeBracketPos);
         }
       }
     }
@@ -419,8 +419,7 @@ public class SearchHelper {
   }
 
   @Nullable
-  @TestOnly
-  public static Pair<TextRange, String> findClosingTag(@NotNull CharSequence sequence, int pos) {
+  private static Pair<TextRange, String> findClosingTag(@NotNull CharSequence sequence, int pos) {
     int closeBracketPos = pos;
     int openBracketPos;
     while (closeBracketPos < sequence.length()) {
@@ -432,9 +431,9 @@ public class SearchHelper {
       while (openBracketPos >= 0) {
         openBracketPos = StringUtil.lastIndexOf(sequence, '<', 0, openBracketPos);
         if (openBracketPos + 1 < sequence.length() && sequence.charAt(openBracketPos + 1) == '/') {
-          final String tagName = String.valueOf(sequence.subSequence(openBracketPos + 2, closeBracketPos));
+          final String tagName = String.valueOf(sequence.subSequence(openBracketPos + "</".length(), closeBracketPos));
           if (tagName.length() > 0 && tagName.charAt(0) != ' ') {
-            TextRange textRange = new TextRange(openBracketPos, closeBracketPos + 1);
+            TextRange textRange = new TextRange(openBracketPos, closeBracketPos);
             return Pair.create(textRange, tagName);
           }
         }
