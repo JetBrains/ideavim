@@ -363,7 +363,7 @@ public class SearchHelper {
   }
 
   @Nullable
-  public static TextRange findBlockTagRange2(@NotNull Editor editor, boolean isOuter) {
+  public static TextRange findBlockTagRange(@NotNull Editor editor, boolean isOuter) {
     final int cursorOffset = editor.getCaretModel().getOffset();
     int pos = cursorOffset;
     final CharSequence sequence = editor.getDocument().getCharsSequence();
@@ -377,10 +377,10 @@ public class SearchHelper {
       final TextRange openingTagTextRange = findOpeningTag(sequence, closingTagTextRange.getStartOffset(), tagName);
       if (openingTagTextRange != null && openingTagTextRange.getStartOffset() <= cursorOffset) {
         if (isOuter) {
-          return new TextRange(openingTagTextRange.getStartOffset(), closingTagTextRange.getEndOffset());
+          return new TextRange(openingTagTextRange.getStartOffset(), closingTagTextRange.getEndOffset() - 1); //TODO check!
         }
         else {
-          return new TextRange(openingTagTextRange.getEndOffset(), closingTagTextRange.getStartOffset());
+          return new TextRange(openingTagTextRange.getEndOffset(), closingTagTextRange.getStartOffset()-1);
         }
       }
       else {
@@ -391,10 +391,25 @@ public class SearchHelper {
 
   @Nullable
   private static TextRange findOpeningTag(@NotNull CharSequence sequence, int position, @NotNull String tagName) {
-    String text = String.valueOf(sequence);
-    text.lastIndexOf("<" + tagName, position);
-    //TODO: what does the fox say?
-    return null;
+    final String text = String.valueOf(sequence); //TODO any variants with sequence?
+    final String tagBeginning = "<" + tagName;
+    while (true) {
+      final int openingTagPos = text.lastIndexOf(tagBeginning, position);
+      if (openingTagPos < 0) {
+        return null;
+      }
+      final int openingTagEndPos = openingTagPos + tagBeginning.length();
+      final int closeBracketPos = text.indexOf('>', openingTagEndPos);
+      if (closeBracketPos > 0) {
+        if ((closeBracketPos == openingTagEndPos) || (text.charAt(openingTagEndPos) == ' ')) {
+          return new TextRange(openingTagPos, closeBracketPos + 1);
+        }
+      }
+      position = openingTagPos - 1;
+      if (position < 0) {
+        return null;
+      }
+    }
   }
 
   @Nullable
@@ -413,8 +428,9 @@ public class SearchHelper {
       while (!found && openBracketPos >= 0) {
         openBracketPos = StringUtil.lastIndexOf(sequence, '<', 0, openBracketPos);
         if (openBracketPos + 1 < sequence.length() && sequence.charAt(openBracketPos + 1) == '/') {
-          String tagName = (String)sequence.subSequence(openBracketPos + 2, closeBracketPos); //TODO: +2?
-          if (tagName.length() > 0 && tagName.charAt(0) != 0){
+          String tagName =
+            String.valueOf(sequence.subSequence(openBracketPos + 2, closeBracketPos)); //TODO: +2? string->sequence
+          if (tagName.length() > 0 && tagName.charAt(0) != 0) {
             found = true;
             TextRange textRange = new TextRange(openBracketPos, closeBracketPos + 1);
             return Pair.create(textRange, tagName);
@@ -523,7 +539,7 @@ public class SearchHelper {
   }
 
   @Nullable
-  public static TextRange findBlockTagRange(@NotNull Editor editor, boolean isOuter) {
+  public static TextRange findBlockTagRange2(@NotNull Editor editor, boolean isOuter) {
     final CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = editor.getCaretModel().getOffset();
     final int selectionStart = editor.getSelectionModel().getSelectionStart();
