@@ -34,6 +34,8 @@ Contributors:
 * [smartbomb](mailto:smartbomb@server.fake)
 * [Tuomas Tynkkynen](mailto:tuomas.tynkkynen@iki.fi)
 * [Jackson Popkin](mailto:jackson@donorschoose.org)
+* [Teruo Kunihiro](mailto:yuyuyu1999@gmail.com)
+* [Liubov Paina](mailto:lubashka.994@mail.ru)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
