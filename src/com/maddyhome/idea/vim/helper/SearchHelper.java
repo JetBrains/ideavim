@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.helper;
 
+import com.google.common.collect.Lists;
 import com.intellij.lang.CodeDocumentationAwareCommenter;
 import com.intellij.lang.Commenter;
 import com.intellij.lang.Language;
@@ -38,9 +39,7 @@ import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -384,23 +383,18 @@ public class SearchHelper {
   @Nullable
   private static TextRange findOpeningTag(@NotNull CharSequence sequence, int position, @NotNull String tagName) {
     final String tagBeginning = "<" + tagName;
-    final Matcher matcher =
-      Pattern.compile(Pattern.quote(tagBeginning), Pattern.CASE_INSENSITIVE).matcher(sequence.subSequence(0, position));
-    List<Integer> possibleBeginnings = new ArrayList<Integer>();
+    final Pattern pattern = Pattern.compile(Pattern.quote(tagBeginning), Pattern.CASE_INSENSITIVE);
+    final Matcher matcher = pattern.matcher(sequence.subSequence(0, position));
+    final List<Integer> possibleBeginnings = Lists.newArrayList();
     while (matcher.find()) {
       possibleBeginnings.add(matcher.start());
     }
-    final ListIterator<Integer> iterator = possibleBeginnings.listIterator(possibleBeginnings.size());
-
-    int openingTagPos, openingTagEndPos, closeBracketPos;
-    while (iterator.hasPrevious()) {
-      openingTagPos = iterator.previous();
-      openingTagEndPos = openingTagPos + tagBeginning.length();
-      closeBracketPos = StringUtil.indexOf(sequence, '>', openingTagEndPos);
-      if (closeBracketPos > 0) {
-        if ((closeBracketPos == openingTagEndPos) || (sequence.charAt(openingTagEndPos) == ' ')) {
-          return new TextRange(openingTagPos, closeBracketPos);
-        }
+    final List<Integer> reversedBeginnings = Lists.reverse(possibleBeginnings);
+    for (int openingTagPos : reversedBeginnings) {
+      final int openingTagEndPos = openingTagPos + tagBeginning.length();
+      final int closeBracketPos = StringUtil.indexOf(sequence, '>', openingTagEndPos);
+      if (closeBracketPos > 0 && (closeBracketPos == openingTagEndPos || sequence.charAt(openingTagEndPos) == ' ')) {
+        return new TextRange(openingTagPos, closeBracketPos);
       }
     }
     return null;
