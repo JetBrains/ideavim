@@ -3,6 +3,15 @@ The Changelog
 
 History of changes in IdeaVim for the IntelliJ platform.
 
+
+To Be Released
+--------------
+
+Added support for `it` and `at` tag block selection.
+
+* VIM-364 Added tag block selection
+
+
 0.44, 2015-11-02
 ----------------
 

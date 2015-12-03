@@ -2,6 +2,10 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
+      <p>To be released:</p>
+      <ul>
+        <li>Support for <code>it</code> and <code>at</code> tag block selection</li>
+      </ul>
       <p>0.44:</p>
       <ul>
         <li>Fixed typing keys in completion menus and typing with the plugin disabled</li>
