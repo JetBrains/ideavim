@@ -29,7 +29,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -38,10 +37,11 @@ import java.awt.event.ComponentEvent;
  * This is used to enter ex commands such as searches and "colon" commands
  */
 public class ExEntryPanel extends JPanel {
-  private final DocumentListener myDocumentListener = new DocumentListener() {
+  private final DocumentListener searchDocumentListener = new DocumentListener() {
     @Override
     public void insertUpdate(DocumentEvent e) {
       logger.info("insert update");
+      //entry.setCurrentAction(new SearchEntryFwdAction());
     }
 
     @Override
@@ -135,8 +135,9 @@ public class ExEntryPanel extends JPanel {
       oldGlass.setVisible(true);
       entry.requestFocusInWindow();
     }
-    
-    entry.getDocument().addDocumentListener(myDocumentListener);
+    if (label.equals("?") || label.equals("/")) {
+      entry.getDocument().addDocumentListener(searchDocumentListener);
+    }
     active = true;
   }
 
@@ -215,7 +216,7 @@ public class ExEntryPanel extends JPanel {
       oldGlass.setOpaque(wasOpaque);
       oldGlass.setLayout(oldLayout);
     }
-    entry.getDocument().removeDocumentListener(myDocumentListener);
+    entry.getDocument().removeDocumentListener(searchDocumentListener);
     parent = null;
   }
 
