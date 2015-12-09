@@ -41,7 +41,8 @@ public class ExEntryPanel extends JPanel {
     @Override
     public void insertUpdate(DocumentEvent e) {
       logger.info("insert update");
-      //entry.setCurrentAction(new SearchEntryFwdAction());
+
+      CharSequence charSequence = entry.getEditor().getDocument().getCharsSequence();
     }
 
     @Override
