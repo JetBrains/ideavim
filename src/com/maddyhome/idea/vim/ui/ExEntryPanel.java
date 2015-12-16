@@ -23,7 +23,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandFlag;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +35,7 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.EnumSet;
 
 /**
  * This is used to enter ex commands such as searches and "colon" commands
@@ -47,9 +48,14 @@ public class ExEntryPanel extends JPanel {
       Editor editor = entry.getEditor();
       String text = entry.getText();
       ExEntryPanel panel = ExEntryPanel.getInstance();
-      int pos = VimPlugin.getSearch().search(editor, text, panel.getCount(), panel.getLabel().equals("/")
-                                                                             ? Command.FLAG_SEARCH_FWD
-                                                                             : Command.FLAG_SEARCH_REV, true);
+      EnumSet<CommandFlag> flags;
+      if (panel.getLabel().equals("/")) {
+        flags = EnumSet.of(CommandFlag.FLAG_SEARCH_FWD);
+      }
+      else {
+        flags = EnumSet.of(CommandFlag.FLAG_SEARCH_REV);
+      }
+      int pos = VimPlugin.getSearch().search(editor, text, panel.getCount(), flags, true);
 
     }
 

@@ -4,13 +4,15 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandFlag;
 import com.maddyhome.idea.vim.group.SearchGroup;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.option.Option;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.option.ToggleOption;
 import org.jetbrains.plugins.ideavim.VimTestCase;
+
+import java.util.EnumSet;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
@@ -127,7 +129,7 @@ public class SearchGroupTest extends VimTestCase {
     RunnableHelper.runReadCommand(project, new Runnable() {
       @Override
       public void run() {
-        final int n = searchGroup.search(editor, pattern, 1, Command.FLAG_SEARCH_FWD, false);
+        final int n = searchGroup.search(editor, pattern, 1, EnumSet.of(CommandFlag.FLAG_SEARCH_FWD), false);
         ref.set(n);
       }
     }, null, null);

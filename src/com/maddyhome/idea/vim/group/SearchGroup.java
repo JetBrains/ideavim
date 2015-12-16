@@ -33,7 +33,7 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandFlag;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.CharacterPosition;
@@ -58,6 +58,7 @@ import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.Iterator;
 
 /**
@@ -85,13 +86,16 @@ public class SearchGroup {
 
   private void setLastPattern(@NotNull Editor editor, @NotNull String lastPattern) {
     this.lastPattern = lastPattern;
-    VimPlugin.getRegister().storeTextInternal(editor, new TextRange(-1, -1),
-                                                                lastPattern, SelectionType.CHARACTER_WISE, '/', false);
+    VimPlugin.getRegister()
+      .storeTextInternal(editor, new TextRange(-1, -1), lastPattern, SelectionType.CHARACTER_WISE, '/', false);
 
     VimPlugin.getHistory().addEntry(HistoryGroup.SEARCH, lastPattern);
   }
 
-  public boolean searchAndReplace(@NotNull Editor editor, @NotNull LineRange range, @NotNull String excmd, String exarg) {
+  public boolean searchAndReplace(@NotNull Editor editor,
+                                  @NotNull LineRange range,
+                                  @NotNull String excmd,
+                                  String exarg) {
     boolean res = true;
 
     // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
@@ -337,10 +341,8 @@ public class SearchGroup {
         //logger.debug("found match[" + spos + "," + epos + "] - replace " + match);
 
         int line = lnum + regmatch.startpos[0].lnum;
-        CharacterPosition startpos = new CharacterPosition(lnum + regmatch.startpos[0].lnum,
-                                                           regmatch.startpos[0].col);
-        CharacterPosition endpos = new CharacterPosition(lnum + regmatch.endpos[0].lnum,
-                                                         regmatch.endpos[0].col);
+        CharacterPosition startpos = new CharacterPosition(lnum + regmatch.startpos[0].lnum, regmatch.startpos[0].col);
+        CharacterPosition endpos = new CharacterPosition(lnum + regmatch.endpos[0].lnum, regmatch.endpos[0].col);
         int startoff = EditorHelper.characterPositionToOffset(editor, startpos);
         int endoff = EditorHelper.characterPositionToOffset(editor, endpos);
         int newend = startoff + match.length();
@@ -411,8 +413,7 @@ public class SearchGroup {
 
     if (lastMatch != -1) {
       MotionGroup.moveCaret(editor, VimPlugin.getMotion()
-        .moveCaretToLineStartSkipLeading(editor, editor.offsetToLogicalPosition(lastMatch).line
-        ));
+        .moveCaretToLineStartSkipLeading(editor, editor.offsetToLogicalPosition(lastMatch).line));
     }
     else {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));
@@ -423,8 +424,9 @@ public class SearchGroup {
 
   private int getConfirmChoice(String match) {
     Object[] btns = getConfirmButtons();
-    confirmDlg = new JOptionPane("Replace with " + match + " ?", JOptionPane.QUESTION_MESSAGE,
-                                 JOptionPane.DEFAULT_OPTION, null, btns, btns[0]);
+    confirmDlg =
+      new JOptionPane("Replace with " + match + " ?", JOptionPane.QUESTION_MESSAGE, JOptionPane.DEFAULT_OPTION, null,
+                      btns, btns[0]);
     JDialog dlg = confirmDlg.createDialog(null, "Confirm Replace");
     dlg.setVisible(true);
     Object res = confirmDlg.getValue();
@@ -450,13 +452,8 @@ public class SearchGroup {
 
   private Object[] getConfirmButtons() {
     if (confirmBtns == null) {
-      confirmBtns = new JButton[]{
-        new JButton("Yes"),
-        new JButton("No"),
-        new JButton("All"),
-        new JButton("Quit"),
-        new JButton("Last")
-      };
+      confirmBtns = new JButton[]{new JButton("Yes"), new JButton("No"), new JButton("All"), new JButton("Quit"),
+        new JButton("Last")};
 
       confirmBtns[0].setMnemonic('Y');
       confirmBtns[1].setMnemonic('N');
@@ -473,7 +470,11 @@ public class SearchGroup {
     return confirmBtns;
   }
 
-  public int search(@NotNull Editor editor, @NotNull String command, int count, int flags, boolean moveCursor) {
+  public int search(@NotNull Editor editor,
+                    @NotNull String command,
+                    int count,
+                    EnumSet<CommandFlag> flags,
+                    boolean moveCursor) {
     int res = search(editor, command, editor.getCaretModel().getOffset(), count, flags);
 
     if (res != -1 && moveCursor) {
@@ -484,12 +485,16 @@ public class SearchGroup {
     return res;
   }
 
-  public int search(@NotNull Editor editor, @NotNull String command, int startOffset, int count, int flags) {
+  public int search(@NotNull Editor editor,
+                    @NotNull String command,
+                    int startOffset,
+                    int count,
+                    EnumSet<CommandFlag> flags) {
     int dir = 1;
     char type = '/';
     String pattern = lastSearch;
     String offset = lastOffset;
-    if ((flags & Command.FLAG_SEARCH_REV) != 0) {
+    if (flags.contains(CommandFlag.FLAG_SEARCH_REV)) {
       dir = -1;
       type = '?';
     }
@@ -621,7 +626,11 @@ public class SearchGroup {
     }
   }
 
-  private static void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine, String text, boolean ic) {
+  private static void highlightSearchLines(@NotNull Editor editor,
+                                           int startLine,
+                                           int endLine,
+                                           String text,
+                                           boolean ic) {
     TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
     Collection<RangeHighlighter> hls = EditorData.getLastHighlights(editor);
     if (hls == null) {
@@ -646,10 +655,8 @@ public class SearchGroup {
     for (int lnum = startLine; lnum <= line2; ) {
       int nmatch = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol);
       if (nmatch > 0) {
-        CharacterPosition startpos = new CharacterPosition(lnum + regmatch.startpos[0].lnum,
-                                                           regmatch.startpos[0].col);
-        CharacterPosition endpos = new CharacterPosition(lnum + regmatch.endpos[0].lnum,
-                                                         regmatch.endpos[0].col);
+        CharacterPosition startpos = new CharacterPosition(lnum + regmatch.startpos[0].lnum, regmatch.startpos[0].col);
+        CharacterPosition endpos = new CharacterPosition(lnum + regmatch.endpos[0].lnum, regmatch.endpos[0].col);
         int startoff = EditorHelper.characterPositionToOffset(editor, startpos);
         int endoff = EditorHelper.characterPositionToOffset(editor, endpos);
 
@@ -674,8 +681,7 @@ public class SearchGroup {
     }
   }
 
-  private int findItOffset(@NotNull Editor editor, int startOffset, int count, int dir,
-                           boolean noSmartCase) {
+  private int findItOffset(@NotNull Editor editor, int startOffset, int count, int dir, boolean noSmartCase) {
     boolean wrap = Options.getInstance().isSet("wrapscan");
     TextRange range = findIt(editor, startOffset, count, dir, noSmartCase, wrap, true, true);
     if (range == null) {
@@ -743,12 +749,12 @@ public class SearchGroup {
 
     int ppos = pp.getIndex();
     if (ppos < lastOffset.length() - 1 && lastOffset.charAt(ppos) == ';') {
-      int flags;
+      EnumSet<CommandFlag> flags;
       if (lastOffset.charAt(ppos + 1) == '/') {
-        flags = Command.FLAG_SEARCH_FWD;
+        flags = EnumSet.of(CommandFlag.FLAG_SEARCH_FWD);
       }
       else if (lastOffset.charAt(ppos + 1) == '?') {
-        flags = Command.FLAG_SEARCH_REV;
+        flags = EnumSet.of(CommandFlag.FLAG_SEARCH_REV);
       }
       else {
         return res;
@@ -768,8 +774,14 @@ public class SearchGroup {
   }
 
   @Nullable
-  private TextRange findIt(@NotNull Editor editor, int startOffset, int count, int dir,
-                           boolean noSmartCase, boolean wrap, boolean showMessages, boolean wholeFile) {
+  private TextRange findIt(@NotNull Editor editor,
+                           int startOffset,
+                           int count,
+                           int dir,
+                           boolean noSmartCase,
+                           boolean wrap,
+                           boolean showMessages,
+                           boolean wholeFile) {
     TextRange res = null;
 
     if (lastSearch == null || lastSearch.length() == 0) {
@@ -1037,25 +1049,24 @@ public class SearchGroup {
     //return new TextRange(editor.logicalPositionToOffset(new LogicalPosition(pos.lnum, 0)) + pos.col,
     //    editor.logicalPositionToOffset(new LogicalPosition(endpos.lnum, 0)) + endpos.col);
     return new TextRange(EditorHelper.characterPositionToOffset(editor, new CharacterPosition(pos.lnum, pos.col)),
-                         EditorHelper.characterPositionToOffset(editor, new CharacterPosition(endpos.lnum, endpos.col)));
+                         EditorHelper
+                           .characterPositionToOffset(editor, new CharacterPosition(endpos.lnum, endpos.col)));
   }
 
   @NotNull
   private RangeHighlighter highlightConfirm(@NotNull Editor editor, int start, int end) {
-    TextAttributes color = new TextAttributes(
-      editor.getColorsScheme().getColor(EditorColors.SELECTION_FOREGROUND_COLOR),
-      editor.getColorsScheme().getColor(EditorColors.SELECTION_BACKGROUND_COLOR),
-      null, null, 0
-    );
-    return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.ADDITIONAL_SYNTAX + 2,
-                                                       color, HighlighterTargetArea.EXACT_RANGE);
+    TextAttributes color =
+      new TextAttributes(editor.getColorsScheme().getColor(EditorColors.SELECTION_FOREGROUND_COLOR),
+                         editor.getColorsScheme().getColor(EditorColors.SELECTION_BACKGROUND_COLOR), null, null, 0);
+    return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.ADDITIONAL_SYNTAX + 2, color,
+                                                       HighlighterTargetArea.EXACT_RANGE);
   }
 
   @NotNull
   private static RangeHighlighter highlightMatch(@NotNull Editor editor, int start, int end) {
     TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
-    return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.ADDITIONAL_SYNTAX + 1,
-                                                       color, HighlighterTargetArea.EXACT_RANGE);
+    return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.ADDITIONAL_SYNTAX + 1, color,
+                                                       HighlighterTargetArea.EXACT_RANGE);
   }
 
   public void clearSearchHighlight() {

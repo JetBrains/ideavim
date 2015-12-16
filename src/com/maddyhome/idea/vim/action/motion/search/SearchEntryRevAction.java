@@ -23,9 +23,11 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandFlag;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.EnumSet;
 
 /**
  *
@@ -41,7 +43,7 @@ public class SearchEntryRevAction extends MotionEditorAction {
       if (command == null) {
         return -1;
       }
-      return VimPlugin.getSearch().search(editor, command, count, Command.FLAG_SEARCH_REV, false);
+      return VimPlugin.getSearch().search(editor, command, count, EnumSet.of(CommandFlag.FLAG_SEARCH_REV), false);
     }
   }
 }
