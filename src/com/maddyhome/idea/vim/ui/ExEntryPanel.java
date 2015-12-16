@@ -22,7 +22,10 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.helper.UiHelper;
+import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,8 +44,13 @@ public class ExEntryPanel extends JPanel {
     @Override
     public void insertUpdate(DocumentEvent e) {
       logger.info("insert update");
+      Editor editor = entry.getEditor();
+      String text = entry.getText();
+      ExEntryPanel panel = ExEntryPanel.getInstance();
+      int pos = VimPlugin.getSearch().search(editor, text, panel.getCount(), panel.getLabel().equals("/")
+                                                                             ? Command.FLAG_SEARCH_FWD
+                                                                             : Command.FLAG_SEARCH_REV, true);
 
-      CharSequence charSequence = entry.getEditor().getDocument().getCharsSequence();
     }
 
     @Override
@@ -136,7 +144,7 @@ public class ExEntryPanel extends JPanel {
       oldGlass.setVisible(true);
       entry.requestFocusInWindow();
     }
-    if (label.equals("?") || label.equals("/")) {
+    if ((label.equals("?") || label.equals("/")) && (Options.getInstance().isSet("incsearch"))) {
       entry.getDocument().addDocumentListener(searchDocumentListener);
     }
     active = true;
