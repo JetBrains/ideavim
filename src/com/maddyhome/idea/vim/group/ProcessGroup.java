@@ -127,8 +127,8 @@ public class ProcessGroup {
         else {
           flags = EnumSet.of(CommandFlag.FLAG_SEARCH_REV);
         }
-        int pos = VimPlugin.getSearch().search(editor, text, panel.getCount(), flags, true);
-        if (pos == -1) {
+        TextRange range = VimPlugin.getSearch().search(editor, text, panel.getCount(), flags, true);
+        if (range == null) {
           res = false;
         }
       }

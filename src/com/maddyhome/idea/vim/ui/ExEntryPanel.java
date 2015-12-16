@@ -24,6 +24,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandFlag;
+import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
@@ -55,7 +56,7 @@ public class ExEntryPanel extends JPanel {
       else {
         flags = EnumSet.of(CommandFlag.FLAG_SEARCH_REV);
       }
-      int pos = VimPlugin.getSearch().search(editor, text, panel.getCount(), flags, true);
+      TextRange range = VimPlugin.getSearch().search(editor, text, panel.getCount(), flags, true);
 
     }
 

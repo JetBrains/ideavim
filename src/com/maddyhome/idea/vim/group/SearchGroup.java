@@ -470,26 +470,26 @@ public class SearchGroup {
     return confirmBtns;
   }
 
-  public int search(@NotNull Editor editor,
-                    @NotNull String command,
-                    int count,
-                    EnumSet<CommandFlag> flags,
-                    boolean moveCursor) {
-    int res = search(editor, command, editor.getCaretModel().getOffset(), count, flags);
+  public TextRange search(@NotNull Editor editor,
+                          @NotNull String command,
+                          int count,
+                          EnumSet<CommandFlag> flags,
+                          boolean moveCursor) {
+    TextRange res = search(editor, command, editor.getCaretModel().getOffset(), count, flags);
 
-    if (res != -1 && moveCursor) {
+    if (res != null && moveCursor) {
       VimPlugin.getMark().saveJumpLocation(editor);
-      MotionGroup.moveCaret(editor, res);
+      MotionGroup.moveCaret(editor, res.getStartOffset());
     }
 
     return res;
   }
 
-  public int search(@NotNull Editor editor,
-                    @NotNull String command,
-                    int startOffset,
-                    int count,
-                    EnumSet<CommandFlag> flags) {
+  public TextRange search(@NotNull Editor editor,
+                          @NotNull String command,
+                          int startOffset,
+                          int count,
+                          EnumSet<CommandFlag> flags) {
     int dir = 1;
     char type = '/';
     String pattern = lastSearch;
@@ -542,10 +542,10 @@ public class SearchGroup {
     return findItOffset(editor, startOffset, count, lastDir, false);
   }
 
-  public int searchWord(@NotNull Editor editor, int count, boolean whole, int dir) {
+  public TextRange searchWord(@NotNull Editor editor, int count, boolean whole, int dir) {
     TextRange range = SearchHelper.findWordUnderCursor(editor);
     if (range == null) {
-      return -1;
+      return null;
     }
 
     StringBuilder pattern = new StringBuilder();
@@ -569,12 +569,12 @@ public class SearchGroup {
     return findItOffset(editor, editor.getCaretModel().getOffset(), count, lastDir, true);
   }
 
-  public int searchNext(@NotNull Editor editor, int count) {
+  public TextRange searchNext(@NotNull Editor editor, int count) {
     searchHighlight(false);
     return findItOffset(editor, editor.getCaretModel().getOffset(), count, lastDir, false);
   }
 
-  public int searchPrevious(@NotNull Editor editor, int count) {
+  public TextRange searchPrevious(@NotNull Editor editor, int count) {
     searchHighlight(false);
     return findItOffset(editor, editor.getCaretModel().getOffset(), count, -lastDir, false);
   }
@@ -681,24 +681,24 @@ public class SearchGroup {
     }
   }
 
-  private int findItOffset(@NotNull Editor editor, int startOffset, int count, int dir, boolean noSmartCase) {
+  private TextRange findItOffset(@NotNull Editor editor, int startOffset, int count, int dir, boolean noSmartCase) {
     boolean wrap = Options.getInstance().isSet("wrapscan");
     TextRange range = findIt(editor, startOffset, count, dir, noSmartCase, wrap, true, true);
     if (range == null) {
-      return -1;
+      return null;
     }
 
     //highlightMatch(editor, range.getStartOffset(), range.getEndOffset());
 
     ParsePosition pp = new ParsePosition(0);
-    int res = range.getStartOffset();
-
+    int resultOffset = range.getStartOffset();
+    TextRange result = range;
     if (lastOffset == null) {
-      return -1;
+      return null;
     }
 
     if (lastOffset.length() == 0) {
-      return range.getStartOffset();
+      return result;
     }
     else if (Character.isDigit(lastOffset.charAt(0)) || lastOffset.charAt(0) == '+' || lastOffset.charAt(0) == '-') {
       int lineOffset = 0;
@@ -723,7 +723,7 @@ public class SearchGroup {
       int line = editor.offsetToLogicalPosition(range.getStartOffset()).line;
       int newLine = EditorHelper.normalizeLine(editor, line + lineOffset);
 
-      res = VimPlugin.getMotion().moveCaretToLineStart(editor, newLine);
+      resultOffset = VimPlugin.getMotion().moveCaretToLineStart(editor, newLine);
     }
     else if ("ebs".indexOf(lastOffset.charAt(0)) != -1) {
       int charOffset = 0;
@@ -744,7 +744,7 @@ public class SearchGroup {
         base = range.getEndOffset() - 1;
       }
 
-      res = Math.max(0, Math.min(base + charOffset, EditorHelper.getFileSize(editor) - 1));
+      resultOffset = Math.max(0, Math.min(base + charOffset, EditorHelper.getFileSize(editor) - 1));
     }
 
     int ppos = pp.getIndex();
@@ -757,19 +757,19 @@ public class SearchGroup {
         flags = EnumSet.of(CommandFlag.FLAG_SEARCH_REV);
       }
       else {
-        return res;
+        return range;
       }
 
       if (lastOffset.length() - ppos > 2) {
         ppos++;
       }
 
-      res = search(editor, lastOffset.substring(ppos + 1), res, 1, flags);
+      result = search(editor, lastOffset.substring(ppos + 1), resultOffset, 1, flags);
 
-      return res;
+      return result;
     }
     else {
-      return res;
+      return result;
     }
   }
 

@@ -23,6 +23,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandFlag;
+import com.maddyhome.idea.vim.common.TextRange;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -110,11 +111,12 @@ public class SearchRange extends AbstractRange {
         pos = VimPlugin.getMotion().moveCaretToLineStart(editor, line);
       }
 
-      pos = VimPlugin.getSearch().search(editor, pattern, pos, 1, EnumSet.of(flag));
-      if (pos == -1) {
+      TextRange range = VimPlugin.getSearch().search(editor, pattern, pos, 1, EnumSet.of(flag));
+      if (range == null) {
         break;
       }
       else {
+        pos = range.getStartOffset();
         line = editor.offsetToLogicalPosition(pos).line;
       }
     }
