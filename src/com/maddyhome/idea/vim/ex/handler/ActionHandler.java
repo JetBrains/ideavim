@@ -55,7 +55,19 @@ public class ActionHandler extends CommandHandler {
       application.invokeLater(new Runnable() {
         @Override
         public void run() {
-          executeAction(action, context, actionName);
+          /**
+           * XXX: Nested runnable event required to correctly queue
+           * the action exec behind UiHelper::requestFocus events.
+           *
+           * Fixes various issues when executing from mapped keys,
+           * such as popup dialogs closing immediately after show.
+          */
+          application.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+              executeAction(action, context, actionName);
+            }
+          });
         }
       });
     }
