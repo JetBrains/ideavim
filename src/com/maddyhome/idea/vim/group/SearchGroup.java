@@ -1074,7 +1074,7 @@ public class SearchGroup {
     updateHighlight();
   }
 
-  private static void removeSearchHighlight(@NotNull Editor editor) {
+  public static void removeSearchHighlight(@NotNull Editor editor) {
     Collection<RangeHighlighter> ehl = EditorData.getLastHighlights(editor);
     if (ehl == null) {
       return;

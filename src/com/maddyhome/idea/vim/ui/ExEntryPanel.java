@@ -22,6 +22,11 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.colors.EditorColors;
+import com.intellij.openapi.editor.markup.HighlighterLayer;
+import com.intellij.openapi.editor.markup.HighlighterTargetArea;
+import com.intellij.openapi.editor.markup.RangeHighlighter;
+import com.intellij.openapi.editor.markup.TextAttributes;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandFlag;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -42,10 +47,9 @@ import java.util.EnumSet;
  * This is used to enter ex commands such as searches and "colon" commands
  */
 public class ExEntryPanel extends JPanel {
+  private static RangeHighlighter rangeHighlighter = null;
   private final DocumentListener searchDocumentListener = new DocumentListener() {
-    @Override
-    public void insertUpdate(DocumentEvent e) {
-      logger.info("insert update");
+    private void incrementalSearch() {
       Editor editor = entry.getEditor();
       String text = entry.getText();
       ExEntryPanel panel = ExEntryPanel.getInstance();
@@ -56,18 +60,38 @@ public class ExEntryPanel extends JPanel {
       else {
         flags = EnumSet.of(CommandFlag.FLAG_SEARCH_REV);
       }
-      TextRange range = VimPlugin.getSearch().search(editor, text, panel.getCount(), flags, true);
+      TextRange range = VimPlugin.getSearch().search(editor, text, panel.getCount(), flags, false);
+      if (range != null) {
+        //SearchGroup.removeSearchHighlight(editor);
+        TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
+        if (rangeHighlighter != null) {
+          editor.getMarkupModel().removeHighlighter(rangeHighlighter);
+        }
 
+        rangeHighlighter = editor.getMarkupModel()
+          .addRangeHighlighter(range.getStartOffset(), range.getEndOffset(), HighlighterLayer.ADDITIONAL_SYNTAX + 1,
+                               color, HighlighterTargetArea.EXACT_RANGE);
+        rangeHighlighter.setErrorStripeMarkColor(color.getBackgroundColor());
+        rangeHighlighter.setErrorStripeTooltip(text);
+      }
+    }
+
+    @Override
+    public void insertUpdate(DocumentEvent e) {
+      logger.info("insert update");
+      incrementalSearch();
     }
 
     @Override
     public void removeUpdate(DocumentEvent e) {
       logger.info("remove update");
+      incrementalSearch();
     }
 
     @Override
     public void changedUpdate(DocumentEvent e) {
       logger.info("change update");
+      incrementalSearch();
     }
   };
 
@@ -233,6 +257,11 @@ public class ExEntryPanel extends JPanel {
       oldGlass.setLayout(oldLayout);
     }
     entry.getDocument().removeDocumentListener(searchDocumentListener);
+
+    if (rangeHighlighter != null) {
+      entry.getEditor().getMarkupModel().removeHighlighter(rangeHighlighter);
+    }
+
     parent = null;
   }
 
