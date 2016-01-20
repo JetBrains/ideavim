@@ -65,7 +65,7 @@
   <version>@VERSION@</version>
   <vendor>JetBrains</vendor>
 
-  <idea-version since-build="@SINCE-VERSION@"/>
+  <idea-version since-build="143.0"/>
 
   <!-- Mark the plugin as compatible with RubyMine and other products based on the IntelliJ platform -->
   <depends>com.intellij.modules.lang</depends>

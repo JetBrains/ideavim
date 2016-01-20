@@ -78,7 +78,6 @@
     <copy file="resources/META-INF/plugin.xml" todir="${classes}/META-INF">
       <filterset>
         <filter token="VERSION" value="${version}"/>
-        <filter token="SINCE-VERSION" value="${platform-version}"/>
         <filter token="BUILD-NUMBER" value="${build.number}"/>
       </filterset>
     </copy>
@@ -148,7 +147,6 @@
     <copy file="resources/META-INF/plugin.xml" todir="${classes}/META-INF">
       <filterset>
         <filter token="VERSION" value="${version}"/>
-        <filter token="SINCE-VERSION" value="${platform-version}"/>
       </filterset>
     </copy>
     <copy todir="${classes}">
