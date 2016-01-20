@@ -7,9 +7,10 @@ History of changes in IdeaVim for the IntelliJ platform.
 To Be Released
 --------------
 
-Added support for `it` and `at` tag block selection.
+Added support for `it` and `at` tag block selection. Various bug fixes.
 
 * VIM-364 Added tag block selection
+* VIM-796 Fixed focus issues with `:action` command
 
 
 0.44, 2015-11-02
