@@ -58,4 +58,25 @@ public class UiHelper {
       }
     });
   }
+
+  /**
+   * Run code after getting focus on request.
+   *
+   * @see #requestFocus
+   */
+  public static void runAfterGotFocus(@NotNull final Runnable runnable) {
+    final Application application = ApplicationManager.getApplication();
+    // XXX: One more invokeLater than in requestFocus()
+    application.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        application.invokeLater(new Runnable() {
+          @Override
+          public void run() {
+            application.invokeLater(runnable);
+          }
+        });
+      }
+    });
+  }
 }

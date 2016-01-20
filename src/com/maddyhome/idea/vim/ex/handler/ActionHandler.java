@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
+import com.maddyhome.idea.vim.helper.UiHelper;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -52,22 +53,10 @@ public class ActionHandler extends CommandHandler {
       executeAction(action, context, actionName);
     }
     else {
-      application.invokeLater(new Runnable() {
+      UiHelper.runAfterGotFocus(new Runnable() {
         @Override
         public void run() {
-          /**
-           * XXX: Nested runnable event required to correctly queue
-           * the action exec behind UiHelper::requestFocus events.
-           *
-           * Fixes various issues when executing from mapped keys,
-           * such as popup dialogs closing immediately after show.
-          */
-          application.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-              executeAction(action, context, actionName);
-            }
-          });
+          executeAction(action, context, actionName);
         }
       });
     }
