@@ -738,6 +738,15 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("abcde</tag>fg<tag>hi");
   }
 
+  // |v_it|
+  public void testFileStartsWithSlash() {
+    configureByText("/*hello\n" +
+                    "<caret>foo\n" +
+                    "bar>baz\n");
+    typeText(parseKeys("vit"));
+    assertPluginError(true);
+  }
+
 
   // |%|
   public void testPercentMatchSimple() {

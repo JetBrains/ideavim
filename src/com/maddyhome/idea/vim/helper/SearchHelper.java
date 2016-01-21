@@ -412,7 +412,7 @@ public class SearchHelper {
       openBracketPos = closeBracketPos - 1;
       while (openBracketPos >= 0) {
         openBracketPos = StringUtil.lastIndexOf(sequence, '<', 0, openBracketPos);
-        if (openBracketPos + 1 < sequence.length() && sequence.charAt(openBracketPos + 1) == '/') {
+        if (openBracketPos >= 0 && openBracketPos + 1 < sequence.length() && sequence.charAt(openBracketPos + 1) == '/') {
           final String tagName = String.valueOf(sequence.subSequence(openBracketPos + "</".length(), closeBracketPos));
           if (tagName.length() > 0 && tagName.charAt(0) != ' ') {
             TextRange textRange = new TextRange(openBracketPos, closeBracketPos);
