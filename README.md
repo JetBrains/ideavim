@@ -173,9 +173,9 @@ in the issue tracker.
 6. Build IdeaVim and run IntelliJ with IdeaVim enabled using the "IdeaVim" run
    configuration (use "Run | Run... | IdeaVim"). This will launch a spare
    instance of IntelliJ running the compiled plugin in a sandboxed enviroment.
-   To actually deploy the plugin the recommended way is executing `ant dist`
-   from command line, which will update versions in plugin.xml among other
-   tasks. Install the generated "ideavim.jar" file from
+
+   To actually deploy the plugin the recommended way is executing `gradle buildPlugin`
+   from command line. Install the generated "build/distributions/IdeaVim.zip" file from
    "Settings | Plugins | Install plugin from disk".
 
 7. In order to be able to run tests in your IntelliJ edition uncomment the

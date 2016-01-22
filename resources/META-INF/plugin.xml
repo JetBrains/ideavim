@@ -63,7 +63,7 @@
         <li><a href="http://youtrack.jetbrains.com/issues/VIM">Issue tracker</a>: feature requests and bug reports</li>
       </ul>
     ]]></description>
-  <version>@VERSION@</version>
+  <version>SNAPSHOT</version>
   <vendor>JetBrains</vendor>
 
   <idea-version since-build="143.0"/>

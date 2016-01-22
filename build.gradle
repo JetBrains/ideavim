@@ -1,0 +1,35 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+  id "org.jetbrains.intellij" version "0.0.39"
+}
+
+apply plugin: 'java'
+
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
+
+tasks.withType(JavaCompile) { options.encoding = 'UTF-8' }
+
+sourceSets {
+  main {
+    java.srcDir 'src'
+    resources.srcDir 'resources'
+  }
+  test {
+    java.srcDir 'test'
+  }
+}
+
+intellij {
+  version ideaVersion
+  pluginName 'IdeaVim'
+  updateSinceUntilBuild false
+}
+
+processResources {
+  filter ReplaceTokens, tokens: [
+          'VERSION': version.toString(),
+          'BUILD-NUMBER': buildNumber,
+  ]
+}
