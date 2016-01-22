@@ -22,7 +22,7 @@ AppCode, CLion, DataGrip, and Android Studio.
 Resources:
 
 * [Plugin homepage](http://plugins.jetbrains.com/plugin/164)
-* [Changelog](https://github.com/JetBrains/ideavim/blob/master/CHANGES.md)
+* [Changelog](CHANGES.md)
 * [Bug tracker](http://youtrack.jetbrains.com/issues/VIM)
 * [Continuous integration builds](http://teamcity.jetbrains.com/project.html?projectId=IdeaVim&guest=1)
 * [@IdeaVim](http://twitter.com/ideavim) in Twitter
@@ -57,7 +57,7 @@ Supported:
 * Undo/redo
 * Visual mode commands
 * Some Ex commands
-* Some [:set options](https://github.com/JetBrains/ideavim/blob/master/doc/set-commands.md)
+* Some [:set options](doc/set-commands.md)
 * Full Vim regexps for search and search/replace
 * Key mappings
 * Macros
@@ -73,7 +73,7 @@ Not supported (yet):
 
 See also:
 
-* [List of recently added commands](https://github.com/JetBrains/ideavim/blob/master/src/com/maddyhome/idea/vim/package-info.java)
+* [List of recently added commands](src/com/maddyhome/idea/vim/package-info.java)
 * [Top features and bugs](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+sort+by%3A+votes)
 
 
@@ -185,7 +185,7 @@ in the issue tracker.
 Authors
 -------
 
-See [AUTHORS.md](https://github.com/JetBrains/ideavim/blob/master/AUTHORS.md)
+See [AUTHORS.md](AUTHORS.md)
 for a list of authors and contributors.
 
 
