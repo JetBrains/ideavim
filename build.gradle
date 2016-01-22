@@ -33,3 +33,9 @@ processResources {
           'BUILD-NUMBER': buildNumber,
   ]
 }
+
+afterEvaluate {
+  tasks.getByName('buildPlugin') {
+    archiveName = "$intellij.pluginName-$version-${buildNumber}.zip"
+  }
+}
