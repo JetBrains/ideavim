@@ -463,6 +463,7 @@ public class Options {
     addOption(new ToggleOption(NUMBER, "nu", false));
     addOption(new ToggleOption(RELATIVE_NUMBER, "rnu", false));
     addOption(new ListOption(CLIPBOARD, "cb", new String[]{"autoselect,exclude:cons\\|linux"}, null));
+    addOption(new ToggleOption("incsearch", "is", false));
   }
 
   private void addOption(@NotNull Option option) {

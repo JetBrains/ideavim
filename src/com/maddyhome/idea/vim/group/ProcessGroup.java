@@ -25,6 +25,7 @@ import com.intellij.util.text.CharSequenceReader;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandFlag;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -37,6 +38,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.io.*;
+import java.util.EnumSet;
 
 /**
  *
@@ -77,7 +79,8 @@ public class ProcessGroup {
     }
 
     String initText = getRange(editor, cmd);
-    CommandState.getInstance(editor).pushState(CommandState.Mode.EX_ENTRY, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
+    CommandState.getInstance(editor)
+      .pushState(CommandState.Mode.EX_ENTRY, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.activate(editor, context, ":", initText, 1);
   }
@@ -104,7 +107,6 @@ public class ProcessGroup {
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true);
     boolean res = true;
-    int flags = 0;
     try {
       CommandState.getInstance(editor).popState();
       logger.debug("processing command");
@@ -112,18 +114,21 @@ public class ProcessGroup {
       record(editor, text);
       if (logger.isDebugEnabled()) logger.debug("swing=" + SwingUtilities.isEventDispatchThread());
       if (panel.getLabel().equals(":")) {
-        flags = CommandParser.getInstance().processCommand(editor, context, text, 1);
-        if (logger.isDebugEnabled()) logger.debug("flags=" + flags);
+        CommandParser.getInstance().processCommand(editor, context, text, 1);
         if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
           VimPlugin.getMotion().exitVisual(editor);
         }
       }
       else {
-        int pos = VimPlugin.getSearch().search(editor, text, panel.getCount(),
-                                                                 panel.getLabel().equals("/")
-                                                                 ? Command.FLAG_SEARCH_FWD
-                                                                 : Command.FLAG_SEARCH_REV, true);
-        if (pos == -1) {
+        EnumSet<CommandFlag> flags;
+        if (panel.getLabel().equals("/")) {
+          flags = EnumSet.of(CommandFlag.FLAG_SEARCH_FWD);
+        }
+        else {
+          flags = EnumSet.of(CommandFlag.FLAG_SEARCH_REV);
+        }
+        TextRange range = VimPlugin.getSearch().search(editor, text, panel.getCount(), flags, true);
+        if (range == null) {
           res = false;
         }
       }
@@ -159,7 +164,8 @@ public class ProcessGroup {
 
   public void startFilterCommand(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
     String initText = getRange(editor, cmd) + "!";
-    CommandState.getInstance(editor).pushState(CommandState.Mode.EX_ENTRY, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
+    CommandState.getInstance(editor)
+      .pushState(CommandState.Mode.EX_ENTRY, CommandState.SubMode.NONE, MappingMode.CMD_LINE);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.activate(editor, context, ":", initText, 1);
   }
@@ -182,8 +188,8 @@ public class ProcessGroup {
     return initText;
   }
 
-  public boolean executeFilter(@NotNull Editor editor, @NotNull TextRange range,
-                               @NotNull String command) throws IOException {
+  public boolean executeFilter(@NotNull Editor editor, @NotNull TextRange range, @NotNull String command)
+    throws IOException {
     final CharSequence charsSequence = editor.getDocument().getCharsSequence();
     final int startOffset = range.getStartOffset();
     final int endOffset = range.getEndOffset();
