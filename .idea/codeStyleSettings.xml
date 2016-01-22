@@ -256,7 +256,6 @@
         </codeStyleSettings>
         <codeStyleSettings language="Python">
           <option name="KEEP_LINE_BREAKS" value="false" />
-          <option name="ALIGN_MULTILINE_PARAMETERS_IN_CALLS" value="true" />
           <option name="PARENT_SETTINGS_INSTALLED" value="true" />
         </codeStyleSettings>
         <codeStyleSettings language="SQL">
