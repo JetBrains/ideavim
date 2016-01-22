@@ -111,9 +111,10 @@ See also [unresolved undo issues](http://youtrack.jetbrains.com/issues/VIM?q=%23
 ### Escape
 
 Using `<Esc>` in dialog windows remains problematic. For most dialog windows
-the Vim emulator is put into the insert mode without the possibility to switch to
-the normal mode. In some dialog windows the normal mode is on by default. The
-usage of the Vim emulator in dialog windows is an area for improvements.
+the Vim emulator is put into the insert mode with `<Esc>` not working. You
+should use `<C-c>` or `<C-[>` instead. In some dialog windows the normal mode is
+on by default. The usage of the Vim emulator in dialog windows is an area for
+improvements.
 
 See also [unresolved escape issues](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+i_Esc).
 
@@ -153,33 +154,32 @@ in the issue tracker.
 
 1. Fork IdeaVim on GitHub and clone the repository on your local machine.
 
-2. Open the project in IntelliJ IDEA 13.1+ (Community or Ultimate) using "File |
-   Open... | /path/to/ideavim".
+2. Import the project from existing sources in IntelliJ IDEA 15+ (Community or
+   Ultimate) using "File | New | Project from Existing Sources..." or "Import
+   Project" from the start window.
 
-3. Set up a JDK if you haven't got it yet. Use "File | Project Structure | SDKs
-   | Add new JDK".
+    * In the project wizard select "Import project from external model | Gradle"
 
-4. Set up an IntelliJ plugin SDK using "File | Project Structure | SDKs | Add
-   new IntelliJ IDEA Plugin SDK". The correct path to your current installation
-   of IntelliJ will be suggested automatically. You will be prompted to select a
-   JDK for your plugin SDK. Select the JDK from the previous step. You
-   **should** name your plugin SDK `IntelliJ Plugin SDK` in order to match the
-   name in the project settings stored in the Git repository.
+    * Select your Java 6+ JDK as the Gradle JVM, leave other parameters unchanged
 
-5. Select a project SDK for your project using "File | Project Structure |
-   Project | Project SDK". Choose the plugin SDK you have created at the
-   previous step.
+3. Create a new plugin run configuration using "Run | Edit Configurations | New
+   Gradle Configuration" and run it in order to launch IntelliJ with the
+   compiled version of the IdeaVim plugin.
 
-6. Build IdeaVim and run IntelliJ with IdeaVim enabled using the "IdeaVim" run
-   configuration (use "Run | Run... | IdeaVim"). This will launch a spare
-   instance of IntelliJ running the compiled plugin in a sandboxed enviroment.
+    * Select your project as the Gradle project
 
-   To actually deploy the plugin the recommended way is executing `gradle buildPlugin`
-   from command line. Install the generated "build/distributions/IdeaVim.zip" file from
-   "Settings | Plugins | Install plugin from disk".
+    * Enter "runIdea" as the task to run
 
-7. In order to be able to run tests in your IntelliJ edition uncomment the
-   appropriate lines in the constructor of the `VimTestCase` class.
+4. Create and run a new configuration for running tests by right-clicking on the
+   "test" folder in the project structure and selecting "Run All Tests".
+
+5. Build the plugin distribution by running `./gradlew clean buildPlugin` in the
+   terminal in your project root.
+
+    * The resulting distribution file is build/distributions/IdeaVim-VERSION.zip
+
+    * You can install this file file using "Settings | Plugins | Install plugin
+      from disk"
 
 
 Authors
@@ -193,4 +193,3 @@ License
 -------
 
 IdeaVim is licensed under the terms of the GNU Public license version 2.
-
