@@ -1,7 +1,5 @@
 *.swp
 /.gradle/
 /.idea/
-/idea/
-/out/
 /build/
 /tmp/
