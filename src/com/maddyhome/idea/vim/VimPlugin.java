@@ -45,6 +45,7 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.project.ProjectManagerAdapter;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.updateSettings.impl.UpdateChecker;
+import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.vfs.CharsetToolkit;
 import com.intellij.openapi.wm.StatusBar;
@@ -58,6 +59,7 @@ import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -308,11 +310,11 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   public static String getVersion() {
     if (!ApplicationManager.getApplication().isInternal()) {
       final IdeaPluginDescriptor plugin = PluginManager.getPlugin(getPluginId());
-      if (plugin != null) {
-        return plugin.getVersion();
-      }
+      return plugin != null ? plugin.getVersion() : "SNAPSHOT";
     }
-    return "SNAPSHOT";
+    else {
+      return "INTERNAL";
+    }
   }
 
   public static boolean isEnabled() {
@@ -495,7 +497,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         final long lastUpdate = propertiesComponent.getOrInitLong(IDEAVIM_STATISTICS_TIMESTAMP_KEY, 0);
         final boolean outOfDate = lastUpdate == 0 ||
                                   System.currentTimeMillis() - lastUpdate > TimeUnit.DAYS.toMillis(1);
-        if (outOfDate && isEnabled() && !application.isInternal()) {
+        if (outOfDate && isEnabled()) {
           application.executeOnPooledThread(new Runnable() {
             @Override
             public void run() {
@@ -519,6 +521,12 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
                     @Override
                     public Object process(@NotNull HttpRequests.Request request) throws IOException {
                       LOG.info("Sending statistics: " + url);
+                      try {
+                        JDOMUtil.load(request.getInputStream());
+                      }
+                      catch (JDOMException e) {
+                        LOG.warn(e);
+                      }
                       return null;
                     }
                   }
