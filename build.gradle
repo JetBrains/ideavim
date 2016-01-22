@@ -25,6 +25,7 @@ intellij {
   version ideaVersion
   pluginName 'IdeaVim'
   updateSinceUntilBuild false
+  downloadSources Boolean.valueOf(downloadIdeaSources)
 }
 
 processResources {
