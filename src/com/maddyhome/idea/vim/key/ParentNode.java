@@ -48,5 +48,19 @@ public abstract class ParentNode implements Node {
     return children.get(key);
   }
 
+  /**
+   * Returns the child not associated with the supplied key. Unlike
+   *  getChild(Object), this will only ever return a child explicitly
+   *  added with the given key.
+   *
+   * @param key
+   * @return
+   */
+  @Nullable
+  public final Node getExplicitChild(@NotNull Object key) {
+    return children.get(key);
+  }
+
   @NotNull protected final HashMap<Object, Node> children = new HashMap<Object, Node>();
+
 }

@@ -34,6 +34,7 @@ public class RegisterActions {
    * Register all the key/action mappings for the plugin.
    */
   public static void registerActions() {
+
     registerVimCommandActions();
 
     registerInsertModeActions();
@@ -41,6 +42,7 @@ public class RegisterActions {
     registerNVOModesActions();
     registerCommandLineActions();
     registerVariousModesActions();
+
   }
 
   private static void registerVimCommandActions() {

@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  */
 public abstract class ChangeEditorActionHandler extends EditorActionHandlerBase {
+  @Override
   protected final boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
     boolean worked = execute(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
     if (worked) {
