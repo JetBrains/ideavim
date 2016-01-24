@@ -78,9 +78,17 @@
     </component>
   </application-components>
 
+  <extensionPoints>
+    <extensionPoint qualifiedName="IdeaVIM.vimExtension" interface="com.maddyhome.idea.vim.extension.VimExtension"/>
+  </extensionPoints>
+
   <extensions defaultExtensionNs="com.intellij">
     <errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>
     <applicationConfigurable instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"/>
+  </extensions>
+
+  <extensions defaultExtensionNs="IdeaVIM">
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.surround.VimSurroundExtension"/>
   </extensions>
 
   <actions>
