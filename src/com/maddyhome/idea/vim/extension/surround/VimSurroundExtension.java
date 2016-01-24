@@ -18,8 +18,16 @@
 
 package com.maddyhome.idea.vim.extension.surround;
 
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.extension.VimNonDisposableExtension;
 import org.jetbrains.annotations.NotNull;
+
+import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
 /**
  * Port of vim-surround.
@@ -29,6 +37,8 @@ import org.jetbrains.annotations.NotNull;
  * @author vlan
  */
 public class VimSurroundExtension extends VimNonDisposableExtension {
+  private static final Logger ourLogger = Logger.getInstance(VimSurroundExtension.class);
+
   @NotNull
   @Override
   public String getName() {
@@ -37,6 +47,13 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
 
   @Override
   protected void initOnce() {
-    // TODO: Register key mappings via KeyGroup's new API for mapping to functions
+    VimPlugin.getKey().putKeyMapping(MappingMode.N, parseKeys("ys"), null, new YSurroundHandler(), false);
+  }
+
+  private static class YSurroundHandler implements VimExtensionHandler {
+    @Override
+    public void execute(@NotNull Editor editor, @NotNull DataContext context) {
+      ourLogger.info("Executing Ysurround");
+    }
   }
 }

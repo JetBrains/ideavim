@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
+import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.key.*;
 import com.maddyhome.idea.vim.key.Shortcut;
@@ -85,7 +86,18 @@ public class KeyGroup {
       builder.append(" ");
       builder.append(row.isRecursive() ? " " : "*");
       builder.append(" ");
-      builder.append(toKeyNotation(row.getToKeys()));
+      final List<KeyStroke> toKeys = row.getToKeys();
+      final VimExtensionHandler extensionHandler = row.getExtensionHandler();
+      if (toKeys != null) {
+        builder.append(toKeyNotation(toKeys));
+      }
+      else if (extensionHandler != null) {
+        builder.append("call ");
+        builder.append(extensionHandler.getClass().getCanonicalName());
+      }
+      else {
+        builder.append("<Unknown>");
+      }
       builder.append("\n");
     }
     ExOutputModel.getInstance(editor).output(builder.toString());
@@ -93,10 +105,11 @@ public class KeyGroup {
   }
 
   public void putKeyMapping(@NotNull Set<MappingMode> modes, @NotNull List<KeyStroke> fromKeys,
-                            @NotNull List<KeyStroke> toKeys, boolean recursive) {
+                            @Nullable List<KeyStroke> toKeys, @Nullable VimExtensionHandler extensionHandler,
+                            boolean recursive) {
     for (MappingMode mode : modes) {
       final KeyMapping mapping = getKeyMapping(mode);
-      mapping.put(EnumSet.of(mode), fromKeys, toKeys, recursive);
+      mapping.put(EnumSet.of(mode), fromKeys, toKeys, extensionHandler, recursive);
     }
     final int oldSize = requiredShortcutKeys.size();
     for (KeyStroke key : fromKeys) {
@@ -411,7 +424,7 @@ public class KeyGroup {
         final MappingInfo mappingInfo = mapping.get(fromKeys);
         if (mappingInfo != null) {
           rows.add(new MappingInfo(mappingModes, mappingInfo.getFromKeys(), mappingInfo.getToKeys(),
-                                   mappingInfo.isRecursive()));
+                                   mappingInfo.getExtensionHandler(), mappingInfo.isRecursive()));
         }
       }
     }
