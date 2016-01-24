@@ -21,8 +21,8 @@ package com.maddyhome.idea.vim.extension.surround;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.extension.VimExtensionFacade;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.extension.VimNonDisposableExtension;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +47,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
 
   @Override
   protected void initOnce() {
-    VimPlugin.getKey().putKeyMapping(MappingMode.N, parseKeys("ys"), null, new YSurroundHandler(), false);
+    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.N, parseKeys("ys"), new YSurroundHandler(), false);
   }
 
   private static class YSurroundHandler implements VimExtensionHandler {
