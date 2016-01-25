@@ -19,14 +19,15 @@
 package com.maddyhome.idea.vim.extension.surround;
 
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.extension.VimExtensionFacade;
+import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.extension.VimNonDisposableExtension;
+import com.maddyhome.idea.vim.key.OperatorFunction;
 import org.jetbrains.annotations.NotNull;
 
+import static com.maddyhome.idea.vim.extension.VimExtensionFacade.*;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
 /**
@@ -37,8 +38,6 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
  * @author vlan
  */
 public class VimSurroundExtension extends VimNonDisposableExtension {
-  private static final Logger ourLogger = Logger.getInstance(VimSurroundExtension.class);
-
   @NotNull
   @Override
   public String getName() {
@@ -47,13 +46,21 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
 
   @Override
   protected void initOnce() {
-    VimExtensionFacade.putExtensionHandlerMapping(MappingMode.N, parseKeys("ys"), new YSurroundHandler(), false);
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("ys"), new YSurroundHandler(), false);
   }
 
   private static class YSurroundHandler implements VimExtensionHandler {
     @Override
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
-      ourLogger.info("Executing Ysurround");
+      setOperatorFunction(new Operator());
+      executeNormal(parseKeys("g@"), editor, context);
+    }
+  }
+
+  private static class Operator implements OperatorFunction {
+    @Override
+    public void apply(@NotNull Editor editor, @NotNull DataContext context, @NotNull SelectionType selectionType) {
+      // TODO: Implement the surrounding action using the selected fragment
     }
   }
 }

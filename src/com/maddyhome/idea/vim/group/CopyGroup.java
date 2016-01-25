@@ -439,9 +439,7 @@ public class CopyGroup {
         break;
     }
 
-    final MarkGroup markGroup = VimPlugin.getMark();
-    markGroup.setMark(editor, '[', offset);
-    markGroup.setMark(editor, ']', endOffset);
+    VimPlugin.getMark().setChangeMarks(editor, new TextRange(offset, endOffset));
   }
 
   private static final Logger logger = Logger.getInstance(CopyGroup.class.getName());

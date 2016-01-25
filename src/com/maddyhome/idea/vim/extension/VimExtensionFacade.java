@@ -18,8 +18,12 @@
 
 package com.maddyhome.idea.vim.extension;
 
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.key.OperatorFunction;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -50,5 +54,25 @@ public class VimExtensionFacade {
   public static void putKeyMapping(@NotNull Set<MappingMode> modes, @NotNull List<KeyStroke> fromKeys,
                                    @NotNull List<KeyStroke> toKeys, boolean recursive) {
     VimPlugin.getKey().putKeyMapping(modes, fromKeys, toKeys, null, recursive);
+  }
+
+  /**
+   * Sets the value of 'operatorfunc' to be used as the operator function in 'g@'.
+   */
+  public static void setOperatorFunction(@NotNull OperatorFunction function) {
+    VimPlugin.getKey().setOperatorFunction(function);
+  }
+
+  /**
+   * Runs normal mode commands similar to ':normal {commands}'.
+   *
+   * XXX: Currently it doesn't make the editor enter the normal mode, it doesn't recover from incomplete commands, it
+   * leaves the editor in the insert mode if it's been activated.
+   */
+  public static void executeNormal(@NotNull List<KeyStroke> keys, @NotNull Editor editor,
+                                   @NotNull DataContext context) {
+    for (KeyStroke key : keys) {
+      KeyHandler.getInstance().handleKey(editor, key, context);
+    }
   }
 }

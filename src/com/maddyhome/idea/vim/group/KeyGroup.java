@@ -65,6 +65,7 @@ public class KeyGroup {
   @NotNull private final Set<KeyStroke> requiredShortcutKeys = new HashSet<KeyStroke>();
   @NotNull private final HashMap<MappingMode, RootNode> keyRoots = new HashMap<MappingMode, RootNode>();
   @NotNull private final Map<MappingMode, KeyMapping> keyMappings = new HashMap<MappingMode, KeyMapping>();
+  @Nullable private OperatorFunction operatorFunction = null;
 
   public void registerRequiredShortcutKeys(@NotNull Editor editor) {
     final Set<KeyStroke> requiredKeys = VimPlugin.getKey().getRequiredShortcutKeys();
@@ -123,6 +124,15 @@ public class KeyGroup {
         registerRequiredShortcutKeys(editor);
       }
     }
+  }
+
+  @Nullable
+  public OperatorFunction getOperatorFunction() {
+    return operatorFunction;
+  }
+
+  public void setOperatorFunction(@NotNull OperatorFunction function) {
+    operatorFunction = function;
   }
 
   public void saveData(@NotNull Element element) {

@@ -265,7 +265,12 @@ public class KeyHandler {
             }
           }
           else if (extensionHandler != null) {
-            extensionHandler.execute(editor, context);
+            RunnableHelper.runWriteCommand(editor.getProject(), new Runnable() {
+              @Override
+              public void run() {
+                extensionHandler.execute(editor, context);
+              }
+            }, "Vim " + extensionHandler.getClass().getSimpleName(), null);
           }
         }
       };

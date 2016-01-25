@@ -207,8 +207,7 @@ public class RegisterGroup {
     }
 
     if (start != -1) {
-      VimPlugin.getMark().setMark(editor, '[', start);
-      VimPlugin.getMark().setMark(editor, ']', Math.max(end - 1, 0));
+      VimPlugin.getMark().setChangeMarks(editor, new TextRange(start, Math.max(end - 1, 0)));
     }
 
     return true;
