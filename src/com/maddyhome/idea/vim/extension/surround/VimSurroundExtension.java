@@ -90,12 +90,11 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
       if (keyStroke.getKeyCode() == KeyEvent.VK_ESCAPE) {
         return true;
       }
-      // TODO: Handle `<` tags
       final char c = keyStroke.getKeyChar();
       if (c == KeyEvent.CHAR_UNDEFINED) {
         return false;
       }
-      final Pair<String, String> pair = getSurroundPair(c);
+      final Pair<String, String> pair = c == '<' || c == 't' ? inputTagPair(editor) : getSurroundPair(c);
       if (pair == null) {
         return false;
       }
@@ -108,6 +107,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
       final String leftSurround = pair.getFirst();
       change.insertText(editor, range.getStartOffset(), leftSurround);
       change.insertText(editor, range.getEndOffset() + leftSurround.length(), pair.getSecond());
+      // XXX: Should we move the caret to start offset?
       return true;
     }
 
@@ -133,6 +133,18 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
       else if (!Character.isLetter(c)) {
         final String s = String.valueOf(c);
         return Pair.create(s, s);
+      }
+      else {
+        return null;
+      }
+    }
+
+    @Nullable
+    private static Pair<String, String> inputTagPair(@NotNull Editor editor) {
+      final String tagInput = input(editor, "<");
+      if (tagInput.endsWith(">")) {
+        final String tagName = tagInput.substring(0, tagInput.length() - 1);
+        return Pair.create("<" + tagName + ">", "</" + tagName + ">");
       }
       else {
         return null;

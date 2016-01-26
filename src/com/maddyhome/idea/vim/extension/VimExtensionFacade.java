@@ -25,6 +25,7 @@ import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.helper.TestInputModel;
 import com.maddyhome.idea.vim.key.OperatorFunction;
 import com.maddyhome.idea.vim.ui.ModalEntryDialog;
@@ -105,5 +106,41 @@ public class VimExtensionFacade {
       key = ref.get();
     }
     return key != null ? key : KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+  }
+
+  @NotNull
+  public static String input(@NotNull Editor editor, @NotNull String prompt) {
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      final StringBuilder builder = new StringBuilder();
+      final TestInputModel inputModel = TestInputModel.getInstance(editor);
+      for (KeyStroke key = inputModel.nextKeyStroke();
+           key != null && !StringHelper.isCloseKeyStroke(key) && key.getKeyCode() != KeyEvent.VK_ENTER;
+           key = inputModel.nextKeyStroke()) {
+        final char c = key.getKeyChar();
+        if (c != KeyEvent.CHAR_UNDEFINED) {
+          builder.append(c);
+        }
+      }
+      return builder.toString();
+    }
+    else {
+      final Ref<Boolean> canceled = Ref.create(false);
+      final ModalEntryDialog dialog = new ModalEntryDialog(editor, prompt);
+      dialog.setEntryKeyListener(new KeyAdapter() {
+        @Override
+        public void keyReleased(KeyEvent e) {
+          final KeyStroke key = KeyStroke.getKeyStrokeForEvent(e);
+          if (StringHelper.isCloseKeyStroke(key)) {
+            canceled.set(true);
+            dialog.dispose();
+          }
+          else if (key.getKeyCode() == KeyEvent.VK_ENTER) {
+            dialog.dispose();
+          }
+        }
+      });
+      dialog.setVisible(true);
+      return canceled.get() ? "" : dialog.getText();
+    }
   }
 }

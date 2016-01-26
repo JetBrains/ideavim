@@ -314,6 +314,12 @@ public class StringHelper {
     return false;
   }
 
+  public static boolean isCloseKeyStroke(@NotNull KeyStroke key) {
+    return key.getKeyCode() == VK_ESCAPE ||
+           key.getKeyCode() == VK_C && (key.getModifiers() & CTRL_MASK) != 0 ||
+           key.getKeyCode() == '[' && (key.getModifiers() & CTRL_MASK) != 0;
+  }
+
   /**
    * Set the text of an XML element, safely encode it if needed.
    */

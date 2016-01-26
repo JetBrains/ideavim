@@ -74,4 +74,10 @@ public class VimSurroundExtensionTest extends VimTestCase {
     doTest(parseKeys("yst;\""), before, after);
     doTest(parseKeys("ys4w\""), before, after);
   }
+
+  public void testSurroundTag() {
+    configureByText("Hello <caret>World!\n");
+    typeText(parseKeys("ysiw<em><Enter>"));
+    myFixture.checkResult("Hello <em>World</em>!\n");
+  }
 }

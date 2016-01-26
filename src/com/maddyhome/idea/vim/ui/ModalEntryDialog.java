@@ -88,4 +88,9 @@ public class ModalEntryDialog extends JDialog {
   public void setEntryKeyListener(@NotNull KeyListener listener) {
     myEntry.addKeyListener(listener);
   }
+
+  @NotNull
+  public String getText() {
+    return myEntry.getText();
+  }
 }
