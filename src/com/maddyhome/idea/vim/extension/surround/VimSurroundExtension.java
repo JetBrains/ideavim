@@ -99,6 +99,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
       if (pair == null) {
         return false;
       }
+      // XXX: Will it work with line-wise or block-wise selections?
       final TextRange range = getSurroundRange(editor);
       if (range == null) {
         return false;
@@ -117,6 +118,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
         case COMMAND:
           return VimPlugin.getMark().getChangeMarks(editor);
         case VISUAL:
+          // XXX: Untested code
           return VimPlugin.getMark().getVisualSelectionMarks(editor);
         default:
           return null;
