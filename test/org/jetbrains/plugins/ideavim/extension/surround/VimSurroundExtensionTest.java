@@ -76,16 +76,4 @@ public class VimSurroundExtensionTest extends VimTestCase {
     doTest(parseKeys("yst;\""), before, after);
     doTest(parseKeys("ys4w\""), before, after);
   }
-
-  public void testRepeatSurroundWord() {
-     final String before =
-      "if <caret>condition {\n" +
-      "}\n";
-    final String after =
-      "if ((condition)) {\n" +
-      "}\n";
-
-    doTest(parseKeys("yseb."), before, after);
-    doTest(parseKeys("ysiwbl."), before, after);
-  }
 }
