@@ -267,6 +267,7 @@ public class EditorData {
   public static final Key<Boolean> LINE_NUMBERS_SHOWN = new Key<Boolean>("lineNumbersShown");
   private static final Key<ExOutputPanel> MORE_PANEL = new Key<ExOutputPanel>("IdeaVim.morePanel");
   private static final Key<ExOutputModel> EX_OUTPUT_MODEL = new Key<ExOutputModel>("IdeaVim.exOutputModel");
+  private static final Key<TestInputModel> TEST_INPUT_MODEL = new Key<TestInputModel>("IdeaVim.testInputModel");
 
   private static Key CONSOLE_VIEW_IN_EDITOR_VIEW = Key.create("CONSOLE_VIEW_IN_EDITOR_VIEW");
 
@@ -308,5 +309,14 @@ public class EditorData {
   public static boolean isFileEditor(@NotNull Editor editor){
     final VirtualFile virtualFile = EditorData.getVirtualFile(editor);
     return virtualFile != null && !(virtualFile instanceof LightVirtualFile);
+  }
+
+  @Nullable
+  public static TestInputModel getTestInputModel(@NotNull Editor editor) {
+    return editor.getUserData(TEST_INPUT_MODEL);
+  }
+
+  public static void setTestInputModel(@NotNull Editor editor, @NotNull TestInputModel model) {
+    editor.putUserData(TEST_INPUT_MODEL, model);
   }
 }

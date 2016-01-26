@@ -19,11 +19,13 @@
 package com.maddyhome.idea.vim.extension;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.helper.TestInputModel;
 import com.maddyhome.idea.vim.key.OperatorFunction;
 import com.maddyhome.idea.vim.ui.ModalEntryDialog;
 import org.jetbrains.annotations.NotNull;
@@ -85,17 +87,23 @@ public class VimExtensionFacade {
    */
   @NotNull
   public static KeyStroke getKeyStroke(@NotNull Editor editor) {
-    final Ref<KeyStroke> ref = Ref.create();
-    final ModalEntryDialog dialog = new ModalEntryDialog(editor, "");
-    dialog.setEntryKeyListener(new KeyAdapter() {
-      @Override
-      public void keyTyped(KeyEvent e) {
-        ref.set(KeyStroke.getKeyStrokeForEvent(e));
-        dialog.dispose();
-      }
-    });
-    dialog.setVisible(true);
-    final KeyStroke key = ref.get();
+    final KeyStroke key;
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
+      key = TestInputModel.getInstance(editor).nextKeyStroke();
+    }
+    else {
+      final Ref<KeyStroke> ref = Ref.create();
+      final ModalEntryDialog dialog = new ModalEntryDialog(editor, "");
+      dialog.setEntryKeyListener(new KeyAdapter() {
+        @Override
+        public void keyTyped(KeyEvent e) {
+          ref.set(KeyStroke.getKeyStrokeForEvent(e));
+          dialog.dispose();
+        }
+      });
+      dialog.setVisible(true);
+      key = ref.get();
+    }
     return key != null ? key : KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
   }
 }
