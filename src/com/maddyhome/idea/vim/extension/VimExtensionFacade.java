@@ -20,13 +20,17 @@ package com.maddyhome.idea.vim.extension;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.key.OperatorFunction;
+import com.maddyhome.idea.vim.ui.ModalEntryDialog;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.Set;
 
@@ -74,5 +78,24 @@ public class VimExtensionFacade {
     for (KeyStroke key : keys) {
       KeyHandler.getInstance().handleKey(editor, key, context);
     }
+  }
+
+  /**
+   * Returns a single key stroke from the user input similar to 'getchar()'.
+   */
+  @NotNull
+  public static KeyStroke getKeyStroke(@NotNull Editor editor) {
+    final Ref<KeyStroke> ref = Ref.create();
+    final ModalEntryDialog dialog = new ModalEntryDialog(editor, "");
+    dialog.setEntryKeyListener(new KeyAdapter() {
+      @Override
+      public void keyTyped(KeyEvent e) {
+        ref.set(KeyStroke.getKeyStrokeForEvent(e));
+        dialog.dispose();
+      }
+    });
+    dialog.setVisible(true);
+    final KeyStroke key = ref.get();
+    return key != null ? key : KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
   }
 }

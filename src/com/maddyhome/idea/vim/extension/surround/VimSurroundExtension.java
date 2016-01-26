@@ -20,6 +20,8 @@ package com.maddyhome.idea.vim.extension.surround;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
@@ -27,8 +29,11 @@ import com.maddyhome.idea.vim.extension.VimNonDisposableExtension;
 import com.maddyhome.idea.vim.key.OperatorFunction;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.*;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
+import static com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation;
 
 /**
  * Port of vim-surround.
@@ -60,7 +65,19 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
   private static class Operator implements OperatorFunction {
     @Override
     public void apply(@NotNull Editor editor, @NotNull DataContext context, @NotNull SelectionType selectionType) {
+      final KeyStroke keyStroke = getKeyStroke(editor);
       // TODO: Implement the surrounding action using the selected fragment
+      System.out.println(String.format("inputs:\n" +
+                                       "  mode: %s\n" +
+                                       "  selectionType: %s\n" +
+                                       "  changeRange: %s\n" +
+                                       "  visualRange: %s\n" +
+                                       "  keyStroke: %s\n",
+                                       CommandState.getInstance(editor).getMode(),
+                                       selectionType,
+                                       VimPlugin.getMark().getChangeMarks(editor),
+                                       VimPlugin.getMark().getVisualSelectionMarks(editor),
+                                       toKeyNotation(keyStroke)));
     }
   }
 }
