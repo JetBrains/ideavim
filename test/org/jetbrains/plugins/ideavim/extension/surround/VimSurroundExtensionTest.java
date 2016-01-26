@@ -63,8 +63,6 @@ public class VimSurroundExtensionTest extends VimTestCase {
 
     doTest(parseKeys("ysea"), before, after);
     doTest(parseKeys("yse>"), before, after);
-    doTest(parseKeys("yse<"), before,
-           "foo = new Bar< Baz >();");
   }
 
   public void testSurroundQuotes() {
