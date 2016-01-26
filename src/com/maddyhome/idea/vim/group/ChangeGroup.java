@@ -1485,7 +1485,7 @@ public class ChangeGroup {
       if (type != null) {
         int start = range.getStartOffset();
         VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, start);
-        VimPlugin.getMark().setChangeMarks(editor, range);
+        VimPlugin.getMark().setChangeMarks(editor, new TextRange(start, start));
       }
 
       return true;
