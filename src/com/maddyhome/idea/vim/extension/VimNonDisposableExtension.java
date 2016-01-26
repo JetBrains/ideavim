@@ -18,6 +18,8 @@
 
 package com.maddyhome.idea.vim.extension;
 
+import com.intellij.openapi.application.ApplicationManager;
+
 /**
  * @author vlan
  */
@@ -26,9 +28,14 @@ public abstract class VimNonDisposableExtension implements VimExtension {
 
   @Override
   public final void init() {
-    if (!myInitialized) {
-      myInitialized = true;
+    if (ApplicationManager.getApplication().isUnitTestMode()) {
       initOnce();
+    }
+    else {
+      if (!myInitialized) {
+        myInitialized = true;
+        initOnce();
+      }
     }
   }
 

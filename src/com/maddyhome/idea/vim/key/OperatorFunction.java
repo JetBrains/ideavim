@@ -27,5 +27,5 @@ import org.jetbrains.annotations.NotNull;
  * @author vlan
  */
 public interface OperatorFunction {
-  void apply(@NotNull Editor editor, @NotNull DataContext context, @NotNull SelectionType selectionType);
+  boolean apply(@NotNull Editor editor, @NotNull DataContext context, @NotNull SelectionType selectionType);
 }

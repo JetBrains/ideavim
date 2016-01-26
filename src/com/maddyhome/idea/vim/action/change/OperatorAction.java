@@ -55,8 +55,7 @@ public class OperatorAction extends VimCommandAction {
                 VimPlugin.getMark().setChangeMarks(editor, range);
                 final SelectionType selectionType = SelectionType.fromCommandFlags(motion.getFlags());
                 KeyHandler.getInstance().reset(editor);
-                operatorFunction.apply(editor, context, selectionType);
-                return true;
+                return operatorFunction.apply(editor, context, selectionType);
               }
             }
           }

@@ -18,31 +18,52 @@
 
 package com.maddyhome.idea.vim.extension.surround;
 
+import com.google.common.collect.ImmutableMap;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.util.Pair;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
+import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.extension.VimNonDisposableExtension;
+import com.maddyhome.idea.vim.group.ChangeGroup;
 import com.maddyhome.idea.vim.key.OperatorFunction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.awt.event.KeyEvent;
+import java.util.Map;
 
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.*;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
-import static com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation;
 
 /**
  * Port of vim-surround.
  *
  * See https://github.com/tpope/vim-surround
  *
+ * @author dhleong
  * @author vlan
  */
 public class VimSurroundExtension extends VimNonDisposableExtension {
+  private static final Map<Character, Pair<String, String>> SURROUND_PAIRS = ImmutableMap.<Character, Pair<String, String>>builder()
+    .put('b', Pair.create("(", ")"))
+    .put('(', Pair.create("( ", " )"))
+    .put(')', Pair.create("(", ")"))
+    .put('B', Pair.create("{", "}"))
+    .put('{', Pair.create("{ ", " }"))
+    .put('}', Pair.create("{", "}"))
+    .put('r', Pair.create("[", "]"))
+    .put('[', Pair.create("[ ", " ]"))
+    .put(']', Pair.create("[", "]"))
+    .put('a', Pair.create("<", ">"))
+    .put('>', Pair.create("<", ">"))
+    .build();
+
   @NotNull
   @Override
   public String getName() {
@@ -64,20 +85,56 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
 
   private static class Operator implements OperatorFunction {
     @Override
-    public void apply(@NotNull Editor editor, @NotNull DataContext context, @NotNull SelectionType selectionType) {
+    public boolean apply(@NotNull Editor editor, @NotNull DataContext context, @NotNull SelectionType selectionType) {
       final KeyStroke keyStroke = getKeyStroke(editor);
-      // TODO: Implement the surrounding action using the selected fragment
-      System.out.println(String.format("inputs:\n" +
-                                       "  mode: %s\n" +
-                                       "  selectionType: %s\n" +
-                                       "  changeRange: %s\n" +
-                                       "  visualRange: %s\n" +
-                                       "  keyStroke: %s\n",
-                                       CommandState.getInstance(editor).getMode(),
-                                       selectionType,
-                                       VimPlugin.getMark().getChangeMarks(editor),
-                                       VimPlugin.getMark().getVisualSelectionMarks(editor),
-                                       toKeyNotation(keyStroke)));
+      if (keyStroke.getKeyCode() == KeyEvent.VK_ESCAPE) {
+        return true;
+      }
+      // TODO: Handle `<` tags
+      final char c = keyStroke.getKeyChar();
+      if (c == KeyEvent.CHAR_UNDEFINED) {
+        return false;
+      }
+      final Pair<String, String> pair = getSurroundPair(c);
+      if (pair == null) {
+        return false;
+      }
+      final TextRange range = getSurroundRange(editor);
+      if (range == null) {
+        return false;
+      }
+      final ChangeGroup change = VimPlugin.getChange();
+      final String leftSurround = pair.getFirst();
+      change.insertText(editor, range.getStartOffset(), leftSurround);
+      change.insertText(editor, range.getEndOffset() + leftSurround.length(), pair.getSecond());
+      return true;
+    }
+
+    @Nullable
+    private TextRange getSurroundRange(@NotNull Editor editor) {
+      final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
+      switch (mode) {
+        case COMMAND:
+          return VimPlugin.getMark().getChangeMarks(editor);
+        case VISUAL:
+          return VimPlugin.getMark().getVisualSelectionMarks(editor);
+        default:
+          return null;
+      }
+    }
+
+    @Nullable
+    private static Pair<String, String> getSurroundPair(char c) {
+      if (SURROUND_PAIRS.containsKey(c)) {
+        return SURROUND_PAIRS.get(c);
+      }
+      else if (!Character.isLetter(c)) {
+        final String s = String.valueOf(c);
+        return Pair.create(s, s);
+      }
+      else {
+        return null;
+      }
     }
   }
 }
