@@ -17,6 +17,7 @@
  */
 package com.maddyhome.idea.vim.group;
 
+import com.google.common.collect.Lists;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
@@ -56,9 +57,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  *
@@ -441,7 +440,7 @@ public class SearchGroup {
     return JOptionPane.CLOSED_OPTION;
   }
 
-  private boolean shouldIgnoreCase(@NotNull String pattern, boolean noSmartCase) {
+  private static boolean shouldIgnoreCase(@NotNull String pattern, boolean noSmartCase) {
     boolean sc = !noSmartCase && Options.getInstance().isSet("smartcase");
     boolean ic = Options.getInstance().isSet("ignorecase");
 
@@ -608,7 +607,7 @@ public class SearchGroup {
         }
 
         removeSearchHighlight(editor);
-        highlightSearchLines(editor, 0, -1, lastSearch, shouldIgnoreCase(lastSearch, noSmartCase));
+        highlightSearchLines(editor, lastSearch, 0, -1, shouldIgnoreCase(lastSearch, noSmartCase));
 
         EditorData.setLastSearch(editor, lastSearch);
       }
@@ -617,60 +616,108 @@ public class SearchGroup {
 
   private void highlightSearchLines(@NotNull Editor editor, boolean noSmartCase, int startLine, int endLine) {
     if (lastSearch != null) {
-      highlightSearchLines(editor, startLine, endLine, lastSearch, shouldIgnoreCase(lastSearch, noSmartCase));
+      highlightSearchLines(editor, lastSearch, startLine, endLine, shouldIgnoreCase(lastSearch, noSmartCase));
     }
   }
 
-  private static void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine, String text, boolean ic) {
-    TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
-    Collection<RangeHighlighter> hls = EditorData.getLastHighlights(editor);
-    if (hls == null) {
-      hls = new ArrayList<RangeHighlighter>();
-      EditorData.setLastHighlights(editor, hls);
+  @Nullable
+  public static TextRange findNext(@NotNull Editor editor, @NotNull String pattern, final int offset, boolean ignoreCase,
+                                   final boolean forwards) {
+    final List<TextRange> results = findAll(editor, pattern, 0, -1, shouldIgnoreCase(pattern, ignoreCase));
+    if (results.isEmpty()) {
+      return null;
+    }
+    final int size = EditorHelper.getFileSize(editor);
+    final TextRange max = Collections.max(results, new Comparator<TextRange>() {
+      @Override
+      public int compare(TextRange r1, TextRange r2) {
+        final int d1 = distance(r1, offset, forwards, size);
+        final int d2 = distance(r2, offset, forwards, size);
+        if (d1 < 0 && d2 >= 0) {
+          return Integer.MAX_VALUE;
+        }
+        return d2 - d1;
+      }
+    });
+    if (!Options.getInstance().isSet("wrapscan")) {
+      final int start = max.getStartOffset();
+      if (forwards && start < offset || start >= offset) {
+        return null;
+      }
+    }
+    return max;
+  }
+
+  private static int distance(@NotNull TextRange range, int pos, boolean forwards, int size) {
+    final int start = range.getStartOffset();
+    if (start <= pos) {
+      return forwards ? size - pos + start : pos - start;
+    }
+    else {
+      return forwards ? start - pos : pos + size - start;
+    }
+  }
+
+  @NotNull
+  public static List<TextRange> findAll(@NotNull Editor editor, @NotNull String pattern, int startLine, int endLine,
+                                        boolean ignoreCase) {
+    final List<TextRange> results = Lists.newArrayList();
+    final int lineCount = EditorHelper.getLineCount(editor);
+    final int actualEndLine = endLine == -1 ? lineCount : endLine;
+
+    final RegExp.regmmatch_T regMatch = new RegExp.regmmatch_T();
+    final RegExp regExp = new RegExp();
+    regMatch.regprog = regExp.vim_regcomp(pattern, 1);
+    if (regMatch.regprog == null) {
+      return results;
     }
 
-    int line2 = endLine == -1 ? EditorHelper.getLineCount(editor) : endLine;
+    regMatch.rmm_ic = ignoreCase;
 
-    RegExp sp;
-    RegExp.regmmatch_T regmatch = new RegExp.regmmatch_T();
-    sp = new RegExp();
-    regmatch.regprog = sp.vim_regcomp(text, 1);
-    if (regmatch.regprog == null) {
-      return;
-    }
+    int col = 0;
+    for (int line = startLine; line <= actualEndLine; ) {
+      int matchedLines = regExp.vim_regexec_multi(regMatch, editor, lineCount, line, col);
+      if (matchedLines > 0) {
+        final CharacterPosition startPos = new CharacterPosition(line + regMatch.startpos[0].lnum,
+                                                                 regMatch.startpos[0].col);
+        final CharacterPosition endPos = new CharacterPosition(line + regMatch.endpos[0].lnum,
+                                                               regMatch.endpos[0].col);
+        int start = EditorHelper.characterPositionToOffset(editor, startPos);
+        int end = EditorHelper.characterPositionToOffset(editor, endPos);
+        results.add(new TextRange(start, end));
 
-    regmatch.rmm_ic = ic;
-
-    int searchcol = 0;
-    int lcount = EditorHelper.getLineCount(editor);
-    for (int lnum = startLine; lnum <= line2; ) {
-      int nmatch = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol);
-      if (nmatch > 0) {
-        CharacterPosition startpos = new CharacterPosition(lnum + regmatch.startpos[0].lnum,
-                                                           regmatch.startpos[0].col);
-        CharacterPosition endpos = new CharacterPosition(lnum + regmatch.endpos[0].lnum,
-                                                         regmatch.endpos[0].col);
-        int startoff = EditorHelper.characterPositionToOffset(editor, startpos);
-        int endoff = EditorHelper.characterPositionToOffset(editor, endpos);
-
-        RangeHighlighter rh = highlightMatch(editor, startoff, endoff);
-        rh.setErrorStripeMarkColor(color.getBackgroundColor());
-        rh.setErrorStripeTooltip(text);
-        hls.add(rh);
-
-        if (startoff != endoff) {
-          lnum += nmatch - 1;
-          searchcol = endpos.column;
+        if (start != end) {
+          line += matchedLines - 1;
+          col = endPos.column;
         }
         else {
-          lnum += nmatch;
-          searchcol = 0;
+          line += matchedLines;
+          col = 0;
         }
       }
       else {
-        lnum++;
-        searchcol = 0;
+        line++;
+        col = 0;
       }
+    }
+
+    return results;
+  }
+
+  private static void highlightSearchLines(@NotNull Editor editor, @NotNull String pattern, int startLine, int endLine,
+                                           boolean ignoreCase) {
+    final TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
+    Collection<RangeHighlighter> highlighters = EditorData.getLastHighlights(editor);
+    if (highlighters == null) {
+      highlighters = new ArrayList<RangeHighlighter>();
+      EditorData.setLastHighlights(editor, highlighters);
+    }
+
+    for (TextRange range : findAll(editor, pattern, startLine, endLine, ignoreCase)) {
+      final RangeHighlighter highlighter = highlightMatch(editor, range.getStartOffset(), range.getEndOffset());
+      highlighter.setErrorStripeMarkColor(color.getBackgroundColor());
+      highlighter.setErrorStripeTooltip(pattern);
+      highlighters.add(highlighter);
     }
   }
 
@@ -1052,7 +1099,7 @@ public class SearchGroup {
   }
 
   @NotNull
-  private static RangeHighlighter highlightMatch(@NotNull Editor editor, int start, int end) {
+  public static RangeHighlighter highlightMatch(@NotNull Editor editor, int start, int end) {
     TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
     return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.ADDITIONAL_SYNTAX + 1,
                                                        color, HighlighterTargetArea.EXACT_RANGE);

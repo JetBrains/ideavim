@@ -17,7 +17,7 @@
  */
 package com.maddyhome.idea.vim.group;
 
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.event.*;
@@ -1269,65 +1269,70 @@ public class MotionGroup {
   }
 
   public static void scrollCaretIntoView(@NotNull Editor editor) {
-    int cline = editor.getCaretModel().getVisualPosition().line;
-    int visualLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
-    boolean scrollJump = (CommandState.getInstance(editor).getFlags() & Command.FLAG_IGNORE_SCROLL_JUMP) == 0;
+    final boolean scrollJump = (CommandState.getInstance(editor).getFlags() & Command.FLAG_IGNORE_SCROLL_JUMP) == 0;
+    scrollPositionIntoView(editor, editor.getCaretModel().getVisualPosition(), scrollJump);
+  }
+
+  public static void scrollPositionIntoView(@NotNull Editor editor, @NotNull VisualPosition position,
+                                             boolean scrollJump) {
+    final int line = position.line;
+    final int column = position.column;
+    final int topLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
     int scrollOffset = ((NumberOption)Options.getInstance().getOption("scrolloff")).value();
-    int sjSize = 0;
+    int scrollJumpSize = 0;
     if (scrollJump) {
-      sjSize = Math.max(0, ((NumberOption)Options.getInstance().getOption("scrolljump")).value() - 1);
+      scrollJumpSize = Math.max(0, ((NumberOption)Options.getInstance().getOption("scrolljump")).value() - 1);
     }
 
     int height = EditorHelper.getScreenHeight(editor);
-    int visualTop = visualLine + scrollOffset;
-    int visualBottom = visualLine + height - scrollOffset;
+    int visualTop = topLine + scrollOffset;
+    int visualBottom = topLine + height - scrollOffset;
     if (scrollOffset >= height / 2) {
       scrollOffset = height / 2;
-      visualTop = visualLine + scrollOffset;
-      visualBottom = visualLine + height - scrollOffset;
+      visualTop = topLine + scrollOffset;
+      visualBottom = topLine + height - scrollOffset;
       if (visualTop == visualBottom) {
         visualBottom++;
       }
     }
 
     int diff;
-    if (cline < visualTop) {
-      diff = cline - visualTop;
-      sjSize = -sjSize;
+    if (line < visualTop) {
+      diff = line - visualTop;
+      scrollJumpSize = -scrollJumpSize;
     }
     else {
-      diff = cline - visualBottom + 1;
+      diff = line - visualBottom + 1;
       if (diff < 0) {
         diff = 0;
       }
     }
 
     if (diff != 0) {
-      int line;
+      int resLine;
       // If we need to move the top line more than a half screen worth then we just center the cursor line
       if (Math.abs(diff) > height / 2) {
-        line = cline - height / 2 - 1;
+        resLine = line - height / 2 - 1;
       }
       // Otherwise put the new cursor line "scrolljump" lines from the top/bottom
       else {
-        line = visualLine + diff + sjSize;
+        resLine = topLine + diff + scrollJumpSize;
       }
 
-      line = Math.min(line, EditorHelper.getVisualLineCount(editor) - height);
-      line = Math.max(0, line);
-      scrollLineToTopOfScreen(editor, line);
+      resLine = Math.min(resLine, EditorHelper.getVisualLineCount(editor) - height);
+      resLine = Math.max(0, resLine);
+      scrollLineToTopOfScreen(editor, resLine);
     }
 
-    int caretColumn = editor.getCaretModel().getVisualPosition().column;
     int visualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
     int width = EditorHelper.getScreenWidth(editor);
     scrollJump = (CommandState.getInstance(editor).getFlags() & Command.FLAG_IGNORE_SIDE_SCROLL_JUMP) == 0;
     scrollOffset = ((NumberOption)Options.getInstance().getOption("sidescrolloff")).value();
-    sjSize = 0;
+    scrollJumpSize = 0;
     if (scrollJump) {
-      sjSize = Math.max(0, ((NumberOption)Options.getInstance().getOption("sidescroll")).value() - 1);
-      if (sjSize == 0) {
-        sjSize = width / 2;
+      scrollJumpSize = Math.max(0, ((NumberOption)Options.getInstance().getOption("sidescroll")).value() - 1);
+      if (scrollJumpSize == 0) {
+        scrollJumpSize = width / 2;
       }
     }
 
@@ -1342,14 +1347,14 @@ public class MotionGroup {
       }
     }
 
-    sjSize = Math.min(sjSize, width / 2 - scrollOffset);
+    scrollJumpSize = Math.min(scrollJumpSize, width / 2 - scrollOffset);
 
-    if (caretColumn < visualLeft) {
-      diff = caretColumn - visualLeft + 1;
-      sjSize = -sjSize;
+    if (column < visualLeft) {
+      diff = column - visualLeft + 1;
+      scrollJumpSize = -scrollJumpSize;
     }
     else {
-      diff = caretColumn - visualRight + 1;
+      diff = column - visualRight + 1;
       if (diff < 0) {
         diff = 0;
       }
@@ -1358,10 +1363,10 @@ public class MotionGroup {
     if (diff != 0) {
       int col;
       if (Math.abs(diff) > width / 2) {
-        col = caretColumn - width / 2 - 1;
+        col = column - width / 2 - 1;
       }
       else {
-        col = visualColumn + diff + sjSize;
+        col = visualColumn + diff + scrollJumpSize;
       }
 
       col = Math.max(0, col);

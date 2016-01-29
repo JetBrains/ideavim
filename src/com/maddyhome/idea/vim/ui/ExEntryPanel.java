@@ -22,11 +22,21 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.colors.EditorColors;
+import com.intellij.openapi.editor.markup.RangeHighlighter;
+import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.ui.DocumentAdapter;
+import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.group.MotionGroup;
+import com.maddyhome.idea.vim.group.SearchGroup;
 import com.maddyhome.idea.vim.helper.UiHelper;
+import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -113,6 +123,11 @@ public class ExEntryPanel extends JPanel {
       oldGlass.addComponentListener(adapter);
       positionPanel();
       oldGlass.setVisible(true);
+      if (isIncSearchEnabled(label)) {
+        entry.getDocument().addDocumentListener(documentListener);
+        verticalOffset = editor.getScrollingModel().getVerticalScrollOffset();
+        horizontalOffset = editor.getScrollingModel().getHorizontalScrollOffset();
+      }
       entry.requestFocusInWindow();
     }
     active = true;
@@ -192,8 +207,21 @@ public class ExEntryPanel extends JPanel {
       oldGlass.remove(this);
       oldGlass.setOpaque(wasOpaque);
       oldGlass.setLayout(oldLayout);
+      if (isIncSearchEnabled(label.getText())) {
+        entry.getDocument().removeDocumentListener(documentListener);
+        final Editor editor = entry.getEditor();
+        editor.getScrollingModel().scrollVertically(verticalOffset);
+        editor.getScrollingModel().scrollHorizontally(horizontalOffset);
+        if (incHighlighter != null) {
+          editor.getMarkupModel().removeHighlighter(incHighlighter);
+        }
+      }
     }
     parent = null;
+  }
+
+  private boolean isIncSearchEnabled(@NotNull String labelText) {
+    return (labelText.equals("/") || labelText.equals("?")) && Options.getInstance().isSet(Options.INCREMENTAL_SEARCH);
   }
 
   /**
@@ -213,6 +241,29 @@ public class ExEntryPanel extends JPanel {
   private boolean wasOpaque;
   @NotNull private final ComponentAdapter adapter;
   private int count;
+  @Nullable private RangeHighlighter incHighlighter = null;
+  private int verticalOffset;
+  private int horizontalOffset;
+
+  @NotNull private final DocumentListener documentListener = new DocumentAdapter() {
+    @Override
+    protected void textChanged(DocumentEvent e) {
+      final Editor editor = entry.getEditor();
+      final boolean forwards = !label.getText().equals("?");
+      if (incHighlighter != null) {
+        editor.getMarkupModel().removeHighlighter(incHighlighter);
+      }
+      final String pattern = entry.getText();
+      final TextRange range = SearchGroup.findNext(editor, pattern, editor.getCaretModel().getOffset(), true, forwards);
+      if (range != null) {
+        final TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
+        incHighlighter = SearchGroup.highlightMatch(editor, range.getStartOffset(), range.getEndOffset());
+        incHighlighter.setErrorStripeMarkColor(color.getBackgroundColor());
+        incHighlighter.setErrorStripeTooltip(pattern);
+        MotionGroup.scrollPositionIntoView(editor, editor.offsetToVisualPosition(range.getStartOffset()), true);
+      }
+    }
+  };
 
   private boolean active;
 
