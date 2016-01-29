@@ -7,9 +7,11 @@ History of changes in IdeaVim for the IntelliJ platform.
 To Be Released
 --------------
 
-Added support for `it` and `at` tag block selection. Various bug fixes.
+Added `incsearch` option for incremental search. Added support for `it` and
+`at` tag block selection. Various bug fixes.
 
-* VIM-364 Added tag block selection
+* VIM-264 Added tag block selection
+* VIM-271 Added `insearch` option for showing search results while typing
 * VIM-796 Fixed focus issues with `:action` command
 
 

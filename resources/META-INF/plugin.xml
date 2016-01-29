@@ -5,6 +5,7 @@
       <p>To be released:</p>
       <ul>
         <li>Support for <code>it</code> and <code>at</code> tag block selection</li>
+        <li>Support for <code>insearch</code> option for showing search results while typing</li>
         <li>Various bug fixes</li>
       </ul>
       <p>0.44:</p>
