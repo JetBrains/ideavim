@@ -37,9 +37,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.*;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -81,6 +79,8 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
     putExtensionHandlerMapping(MappingMode.N, parseKeys("ys"), new YSurroundHandler(), false);
     putExtensionHandlerMapping(MappingMode.N, parseKeys("cs"), new CSurroundHandler(), false);
     putExtensionHandlerMapping(MappingMode.N, parseKeys("ds"), new DSurroundHandler(), false);
+
+    putExtensionHandlerMapping(MappingMode.VO, parseKeys("S"), new VSurroundHandler(), false);
   }
 
   @Nullable
@@ -119,6 +119,25 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
       setOperatorFunction(new Operator());
       executeNormal(parseKeys("g@"), editor, context);
+    }
+  }
+
+  private static class VSurroundHandler implements VimExtensionHandler {
+    @Override
+    public void execute(@NotNull Editor editor, @NotNull DataContext context) {
+      // NB: Operator ignores SelectionType anyway
+      new Operator().apply(editor, context, SelectionType.CHARACTER_WISE);
+
+      // jump back to visual start
+      executeNormal(parseKeys("`<"), editor);
+
+      // leave visual mode
+      executeNormal(
+        Collections.singletonList(
+          KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)
+        ),
+        editor
+      );
     }
   }
 
@@ -264,7 +283,6 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
         case COMMAND:
           return VimPlugin.getMark().getChangeMarks(editor);
         case VISUAL:
-          // XXX: Untested code
           return VimPlugin.getMark().getVisualSelectionMarks(editor);
         default:
           return null;

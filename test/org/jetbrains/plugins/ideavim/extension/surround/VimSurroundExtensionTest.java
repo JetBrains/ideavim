@@ -1,6 +1,9 @@
 package org.jetbrains.plugins.ideavim.extension.surround;
 
+import com.maddyhome.idea.vim.command.CommandState;
 import org.jetbrains.plugins.ideavim.VimTestCase;
+
+import javax.jws.WebParam;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
@@ -79,6 +82,26 @@ public class VimSurroundExtensionTest extends VimTestCase {
     configureByText("Hello <caret>World!\n");
     typeText(parseKeys("ysiw<em><Enter>"));
     myFixture.checkResult("Hello <em>World</em>!\n");
+  }
+
+  /* visual surround */
+
+  public void testVisualSurroundWordParens() {
+    final String before =
+      "if <caret>condition {\n" +
+      "}\n";
+    final String after =
+      "if <caret>(condition) {\n" +
+      "}\n";
+
+    doTest(parseKeys("veSb"), before, after);
+    assertMode(CommandState.Mode.COMMAND);
+    doTest(parseKeys("veS)"), before, after);
+    assertMode(CommandState.Mode.COMMAND);
+    doTest(parseKeys("veS("), before,
+           "if ( condition ) {\n" +
+           "}\n");
+    assertMode(CommandState.Mode.COMMAND);
   }
 
   /* Delete surroundings */
