@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
+import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.extension.VimNonDisposableExtension;
@@ -36,6 +37,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.*;
@@ -50,6 +53,9 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
  * @author vlan
  */
 public class VimSurroundExtension extends VimNonDisposableExtension {
+
+  private static final char REGISTER = '"';
+
   private static final Map<Character, Pair<String, String>> SURROUND_PAIRS = ImmutableMap.<Character, Pair<String, String>>builder()
     .put('b', Pair.create("(", ")"))
     .put('(', Pair.create("( ", " )"))
@@ -73,6 +79,38 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
   @Override
   protected void initOnce() {
     putExtensionHandlerMapping(MappingMode.N, parseKeys("ys"), new YSurroundHandler(), false);
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("cs"), new CSurroundHandler(), false);
+  }
+
+  @Nullable
+  private static Pair<String, String> getSurroundPair(char c) {
+    if (SURROUND_PAIRS.containsKey(c)) {
+      return SURROUND_PAIRS.get(c);
+    }
+    else if (!Character.isLetter(c)) {
+      final String s = String.valueOf(c);
+      return Pair.create(s, s);
+    }
+    else {
+      return null;
+    }
+  }
+
+  @Nullable
+  private static Pair<String, String> inputTagPair(@NotNull Editor editor) {
+    final String tagInput = input(editor, "<");
+    if (tagInput.endsWith(">")) {
+      final String tagName = tagInput.substring(0, tagInput.length() - 1);
+      return Pair.create("<" + tagName + ">", "</" + tagName + ">");
+    }
+    else {
+      return null;
+    }
+  }
+
+  @Nullable
+  private static Pair<String, String> getOrInputPair(char c, @NotNull Editor editor) {
+    return c == '<' || c == 't' ? inputTagPair(editor) : getSurroundPair(c);
   }
 
   private static class YSurroundHandler implements VimExtensionHandler {
@@ -80,6 +118,95 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
       setOperatorFunction(new Operator());
       executeNormal(parseKeys("g@"), editor, context);
+    }
+  }
+
+  private static class CSurroundHandler implements VimExtensionHandler {
+    @Override
+    public void execute(@NotNull Editor editor, @NotNull DataContext context) {
+      final char charFrom = getchar(editor);
+      if (charFrom == 0) {
+        return;
+      }
+
+      final char charTo = getchar(editor);
+      if (charTo == 0) {
+        return;
+      }
+
+      Pair<String, String> newSurround = getOrInputPair(charTo, editor);
+      if (newSurround == null) {
+        return;
+      }
+
+      change(editor, charFrom, newSurround);
+    }
+
+    static void change(@NotNull Editor editor, char charFrom, @Nullable Pair<String, String> newSurround) {
+
+      if (charFrom == 't') {
+        // ideaVim doesn't currently support `dat` or `dit`,
+        //  so we can't support it here, either
+        return;
+      }
+
+      // we take over the " register, so preserve it
+      final List<KeyStroke> oldValue = getreg(REGISTER);
+
+      // extract the inner value
+      perform("di" + pick(charFrom), editor);
+      List<KeyStroke> innerValue = getreg(REGISTER);
+      if (innerValue == null) {
+        innerValue = new ArrayList<KeyStroke>();
+      }
+
+      // delete the surrounding
+      perform("da" + pick(charFrom), editor);
+
+      // insert the surrounding characters and paste
+      if (newSurround != null) {
+        innerValue.addAll(0, parseKeys(newSurround.first));
+        innerValue.addAll(parseKeys(newSurround.second));
+      }
+      pasteSurround(innerValue, editor);
+
+      // restore the old value
+      setreg(REGISTER, oldValue);
+    }
+
+    /** perform an action, storing the result in our register */
+    private static void perform(String sequence, Editor editor) {
+      final List<KeyStroke> keys = parseKeys(
+        "\"" + REGISTER + sequence
+      );
+      executeNormal(keys, editor);
+    }
+
+    private static void pasteSurround(List<KeyStroke> innerValue, Editor editor) {
+      // this logic is direct from vim-surround
+      final int offset = editor.getCaretModel().getOffset();
+      final int line = editor.getDocument().getLineNumber(offset);
+      final int lineEnd = editor.getDocument().getLineEndOffset(line);
+
+      final Mark mark = VimPlugin.getMark().getMark(editor, ']');
+      final int motionEndCol = mark == null ? -1 : mark.getCol();
+      final String pasteCommand;
+      if (motionEndCol == lineEnd && offset + 1 == lineEnd) {
+        pasteCommand = "p";
+      } else {
+        pasteCommand = "P";
+      }
+
+      setreg(REGISTER, innerValue);
+      perform(pasteCommand, editor);
+    }
+
+    private static char pick(char charFrom) {
+      switch (charFrom) {
+        case 'a': return '>';
+        case 'r': return ']';
+        default: return charFrom;
+      }
     }
   }
 
@@ -94,7 +221,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
       if (c == KeyEvent.CHAR_UNDEFINED) {
         return false;
       }
-      final Pair<String, String> pair = c == '<' || c == 't' ? inputTagPair(editor) : getSurroundPair(c);
+      final Pair<String, String> pair = getOrInputPair(c, editor);
       if (pair == null) {
         return false;
       }
@@ -124,31 +251,6 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
           return null;
       }
     }
-
-    @Nullable
-    private static Pair<String, String> getSurroundPair(char c) {
-      if (SURROUND_PAIRS.containsKey(c)) {
-        return SURROUND_PAIRS.get(c);
-      }
-      else if (!Character.isLetter(c)) {
-        final String s = String.valueOf(c);
-        return Pair.create(s, s);
-      }
-      else {
-        return null;
-      }
-    }
-
-    @Nullable
-    private static Pair<String, String> inputTagPair(@NotNull Editor editor) {
-      final String tagInput = input(editor, "<");
-      if (tagInput.endsWith(">")) {
-        final String tagName = tagInput.substring(0, tagInput.length() - 1);
-        return Pair.create("<" + tagName + ">", "</" + tagName + ">");
-      }
-      else {
-        return null;
-      }
-    }
   }
+
 }

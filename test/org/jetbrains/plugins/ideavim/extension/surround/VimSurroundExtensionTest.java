@@ -80,4 +80,36 @@ public class VimSurroundExtensionTest extends VimTestCase {
     typeText(parseKeys("ysiw<em><Enter>"));
     myFixture.checkResult("Hello <em>World</em>!\n");
   }
+
+  /* Change surroundings */
+
+  public void testChangeSurroundingParens() {
+    final String before =
+      "if (<caret>condition) {\n" +
+      "}\n";
+    final String after =
+      "if [condition] {\n" +
+      "}\n";
+
+    doTest(parseKeys("csbr"), before, after);
+  }
+
+  public void testChangeSurroundingBlock() {
+    final String before =
+      "if (condition) {<caret>return;}";
+    final String after =
+      "if (condition) (return;)";
+
+    doTest(parseKeys("csBb"), before, after);
+  }
+
+  // TODO if/when we add proper repeat support
+  //public void testRepeatChangeSurroundingParens() {
+  //  final String before =
+  //    "foo(<caret>index)(index2) = bar;";
+  //  final String after =
+  //    "foo[index][index2] = bar;";
+  //
+  //  doTest(parseKeys("csbrE."), before, after);
+  //}
 }
