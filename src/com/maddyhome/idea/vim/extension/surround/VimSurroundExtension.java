@@ -80,6 +80,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
   protected void initOnce() {
     putExtensionHandlerMapping(MappingMode.N, parseKeys("ys"), new YSurroundHandler(), false);
     putExtensionHandlerMapping(MappingMode.N, parseKeys("cs"), new CSurroundHandler(), false);
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("ds"), new DSurroundHandler(), false);
   }
 
   @Nullable
@@ -172,6 +173,9 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
 
       // restore the old value
       setreg(REGISTER, oldValue);
+
+      // jump back to start
+      executeNormal(parseKeys("`["), editor);
     }
 
     /** perform an action, storing the result in our register */
@@ -210,6 +214,19 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
     }
   }
 
+  private static class DSurroundHandler implements VimExtensionHandler {
+    @Override
+    public void execute(@NotNull Editor editor, @NotNull DataContext context) {
+      // deleting surround is just changing the surrounding to "nothing"
+      final char charFrom = getchar(editor);
+      if (charFrom == 0) {
+        return;
+      }
+
+      CSurroundHandler.change(editor, charFrom, null);
+    }
+  }
+
   private static class Operator implements OperatorFunction {
     @Override
     public boolean apply(@NotNull Editor editor, @NotNull DataContext context, @NotNull SelectionType selectionType) {
@@ -234,7 +251,9 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
       final String leftSurround = pair.getFirst();
       change.insertText(editor, range.getStartOffset(), leftSurround);
       change.insertText(editor, range.getEndOffset() + leftSurround.length(), pair.getSecond());
-      // XXX: Should we move the caret to start offset?
+
+      // jump back to start
+      executeNormal(parseKeys("`["), editor);
       return true;
     }
 
