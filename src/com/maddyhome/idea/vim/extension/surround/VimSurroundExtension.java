@@ -132,12 +132,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
       executeNormal(parseKeys("`<"), editor);
 
       // leave visual mode
-      executeNormal(
-        Collections.singletonList(
-          KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)
-        ),
-        editor
-      );
+      parseKeys("<Esc>");
     }
   }
 

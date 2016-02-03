@@ -3,8 +3,6 @@ package org.jetbrains.plugins.ideavim.extension.surround;
 import com.maddyhome.idea.vim.command.CommandState;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
-import javax.jws.WebParam;
-
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
 /**
