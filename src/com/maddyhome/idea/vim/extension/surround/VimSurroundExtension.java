@@ -79,7 +79,6 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
     putExtensionHandlerMapping(MappingMode.N, parseKeys("ys"), new YSurroundHandler(), false);
     putExtensionHandlerMapping(MappingMode.N, parseKeys("cs"), new CSurroundHandler(), false);
     putExtensionHandlerMapping(MappingMode.N, parseKeys("ds"), new DSurroundHandler(), false);
-
     putExtensionHandlerMapping(MappingMode.VO, parseKeys("S"), new VSurroundHandler(), false);
   }
 
@@ -132,7 +131,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
       executeNormal(parseKeys("`<"), editor);
 
       // leave visual mode
-      parseKeys("<Esc>");
+      executeNormal(parseKeys("<Esc>"), editor);
     }
   }
 
@@ -159,12 +158,6 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
 
     static void change(@NotNull Editor editor, char charFrom, @Nullable Pair<String, String> newSurround) {
 
-      if (charFrom == 't') {
-        // ideaVim doesn't currently support `dat` or `dit`,
-        //  so we can't support it here, either
-        return;
-      }
-
       // we take over the " register, so preserve it
       final List<KeyStroke> oldValue = getreg(REGISTER);
 
@@ -180,8 +173,8 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
 
       // insert the surrounding characters and paste
       if (newSurround != null) {
-        innerValue.addAll(0, parseKeys(newSurround.first));
-        innerValue.addAll(parseKeys(newSurround.second));
+        innerValue.addAll(0, parseKeys(escape(newSurround.first)));
+        innerValue.addAll(parseKeys(escape(newSurround.second)));
       }
       pasteSurround(innerValue, editor);
 
@@ -190,6 +183,10 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
 
       // jump back to start
       executeNormal(parseKeys("`["), editor);
+    }
+
+    private static String escape(String sequence) {
+      return sequence.replace("<", "\\<");
     }
 
     /** perform an action, storing the result in our register */

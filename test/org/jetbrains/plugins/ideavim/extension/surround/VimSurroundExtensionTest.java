@@ -78,7 +78,7 @@ public class VimSurroundExtensionTest extends VimTestCase {
 
   public void testSurroundTag() {
     configureByText("Hello <caret>World!\n");
-    typeText(parseKeys("ysiw<em><Enter>"));
+    typeText(parseKeys("ysiw\\<em>"));
     myFixture.checkResult("Hello <em>World</em>!\n");
   }
 
@@ -161,6 +161,15 @@ public class VimSurroundExtensionTest extends VimTestCase {
     doTest(parseKeys("ds<"), before, after);
   }
 
+  public void testDeleteSurroundingTag() {
+     final String before =
+      "<div><p><caret>Foo</p></div>";
+    final String after =
+      "<div><caret>Foo</div>";
+
+    doTest(parseKeys("dst"), before, after);
+  }
+
   // TODO if/when we add proper repeat support
   //public void testRepeatDeleteSurroundParens() {
   //  final String before =
@@ -193,6 +202,24 @@ public class VimSurroundExtensionTest extends VimTestCase {
       "if (condition) (return;)";
 
     doTest(parseKeys("csBb"), before, after);
+  }
+
+  public void testChangeSurroundingTagSimple() {
+    final String before =
+      "<div><p><caret>Foo</p></div>";
+    final String after =
+      "<div><caret>(Foo)</div>";
+
+    doTest(parseKeys("cstb"), before, after);
+  }
+
+  public void testChangeSurroundingTagAnotherTag() {
+    final String before =
+      "<div><p><caret>Foo</p></div>";
+    final String after =
+      "<div><caret><b>Foo</b></div>";
+
+    doTest(parseKeys("cst\\<b>"), before, after);
   }
 
   // TODO if/when we add proper repeat support
