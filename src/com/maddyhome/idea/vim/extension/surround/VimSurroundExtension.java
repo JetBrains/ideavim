@@ -124,14 +124,18 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
   private static class VSurroundHandler implements VimExtensionHandler {
     @Override
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
+      final TextRange visualRange = VimPlugin.getMark().getVisualSelectionMarks(editor);
+      if (visualRange == null) {
+        return;
+      }
+
       // NB: Operator ignores SelectionType anyway
       new Operator().apply(editor, context, SelectionType.CHARACTER_WISE);
 
-      // jump back to visual start
-      executeNormal(parseKeys("`<"), editor);
-
       // leave visual mode
       executeNormal(parseKeys("<Esc>"), editor);
+
+      editor.getCaretModel().moveToOffset(visualRange.getStartOffset());
     }
   }
 
