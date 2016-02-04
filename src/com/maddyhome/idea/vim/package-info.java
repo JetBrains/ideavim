@@ -89,6 +89,14 @@
  * |CTRL-W_bar|             TODO
  *
  *
+ * 2.4. Commands starting with 'g'
+ *
+ * tag                      action
+ * ---------------------------------------------------------------------------------------------------------------------
+ *
+ * |g@|                     {@link com.maddyhome.idea.vim.action.change.OperatorAction}
+ *
+ *
  * 3. Visual mode
  *
  * tag                      action

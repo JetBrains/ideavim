@@ -335,7 +335,7 @@ public class ChangeGroup {
     CommandState state = CommandState.getInstance(editor);
 
     insertStart = editor.getCaretModel().getOffset();
-    VimPlugin.getMark().setMark(editor, '[', insertStart);
+    VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_START, insertStart);
 
     // If we are repeating the last insert/replace
     final Command cmd = state.getCommand();
@@ -538,8 +538,8 @@ public class ChangeGroup {
     final MarkGroup markGroup = VimPlugin.getMark();
     final int offset = editor.getCaretModel().getOffset();
     markGroup.setMark(editor, '^', offset);
-    markGroup.setMark(editor, ']', offset);
-    markGroup.setMark(editor, '.', offset);
+    markGroup.setMark(editor, MarkGroup.MARK_CHANGE_END, offset);
+    markGroup.setMark(editor, MarkGroup.MARK_CHANGE_POS, offset);
     CommandState.getInstance(editor).popState();
 
     if (!CommandState.inInsertMode(editor)) {
@@ -1456,7 +1456,7 @@ public class ChangeGroup {
     editor.getDocument().insertString(start, str);
     editor.getCaretModel().moveToOffset(start + str.length());
 
-    VimPlugin.getMark().setMark(editor, '.', start);
+    VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, start);
   }
 
   /**
@@ -1484,9 +1484,8 @@ public class ChangeGroup {
 
       if (type != null) {
         int start = range.getStartOffset();
-        VimPlugin.getMark().setMark(editor, '.', start);
-        VimPlugin.getMark().setMark(editor, '[', start);
-        VimPlugin.getMark().setMark(editor, ']', start);
+        VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, start);
+        VimPlugin.getMark().setChangeMarks(editor, new TextRange(start, start));
       }
 
       return true;
@@ -1506,9 +1505,9 @@ public class ChangeGroup {
   private void replaceText(@NotNull Editor editor, int start, int end, @NotNull String str) {
     editor.getDocument().replaceString(start, end, str);
 
-    VimPlugin.getMark().setMark(editor, '[', start);
-    VimPlugin.getMark().setMark(editor, ']', start + str.length());
-    VimPlugin.getMark().setMark(editor, '.', start + str.length());
+    final int newEnd = start + str.length();
+    VimPlugin.getMark().setChangeMarks(editor, new TextRange(start, newEnd));
+    VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, newEnd);
   }
 
   /**

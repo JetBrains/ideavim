@@ -96,7 +96,7 @@ public class MapHandler extends CommandHandler implements VimScriptCommandHandle
               throw new ExException("Unsupported map argument: " + unsupportedArgument);
             }
           }
-          VimPlugin.getKey().putKeyMapping(modes, arguments.getFromKeys(), arguments.getToKeys(),
+          VimPlugin.getKey().putKeyMapping(modes, arguments.getFromKeys(), arguments.getToKeys(), null,
                                            commandInfo.isRecursive());
           return true;
 

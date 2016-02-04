@@ -4,8 +4,9 @@
   <change-notes><![CDATA[
       <p>To be released:</p>
       <ul>
+        <li>Support for <code>incsearch</code> option for showing search results while typing</li>
         <li>Support for <code>it</code> and <code>at</code> tag block selection</li>
-        <li>Support for <code>insearch</code> option for showing search results while typing</li>
+        <li>Support for vim-surround commands <code>ys</code>, <code>cs</code>, <code>ds</code>, <code>S</code>, enable it with <code>set surround</code> in your ~/.ideavimrc</li>
         <li>Various bug fixes</li>
       </ul>
       <p>0.44:</p>
@@ -79,9 +80,17 @@
     </component>
   </application-components>
 
+  <extensionPoints>
+    <extensionPoint qualifiedName="IdeaVIM.vimExtension" interface="com.maddyhome.idea.vim.extension.VimExtension"/>
+  </extensionPoints>
+
   <extensions defaultExtensionNs="com.intellij">
     <errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>
     <applicationConfigurable instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"/>
+  </extensions>
+
+  <extensions defaultExtensionNs="IdeaVIM">
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.surround.VimSurroundExtension"/>
   </extensions>
 
   <actions>
@@ -365,6 +374,7 @@
     <action id="VimUndo" class="com.maddyhome.idea.vim.action.change.UndoAction" text="Undo"/>
 
     <!-- Keys -->
-    <action id="VimShortcutKeyAction" class="com.maddyhome.idea.vim.action.VimShortcutKeyAction" text="Vim Shortcuts"/>
+    <action id="VimShortcutKeyAction" class="com.maddyhome.idea.vim.action.VimShortcutKeyAction" text="Shortcuts"/>
+    <action id="VimOperatorAction" class="com.maddyhome.idea.vim.action.change.OperatorAction" text="Operator"/>
   </actions>
 </idea-plugin>

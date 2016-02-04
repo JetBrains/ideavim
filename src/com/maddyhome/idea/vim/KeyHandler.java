@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.key.*;
@@ -252,12 +253,24 @@ public class KeyHandler {
       final Runnable handleMappedKeys = new Runnable() {
         @Override
         public void run() {
-          final boolean fromIsPrefix = isPrefix(mappingInfo.getFromKeys(), mappingInfo.getToKeys());
-          boolean first = true;
-          for (KeyStroke keyStroke : mappingInfo.getToKeys()) {
-            final boolean recursive = mappingInfo.isRecursive() && !(first && fromIsPrefix);
-            handleKey(editor, keyStroke, new EditorDataContext(editor), recursive);
-            first = false;
+          final List<KeyStroke> toKeys = mappingInfo.getToKeys();
+          final VimExtensionHandler extensionHandler = mappingInfo.getExtensionHandler();
+          if (toKeys != null) {
+            final boolean fromIsPrefix = isPrefix(mappingInfo.getFromKeys(), toKeys);
+            boolean first = true;
+            for (KeyStroke keyStroke : toKeys) {
+              final boolean recursive = mappingInfo.isRecursive() && !(first && fromIsPrefix);
+              handleKey(editor, keyStroke, new EditorDataContext(editor), recursive);
+              first = false;
+            }
+          }
+          else if (extensionHandler != null) {
+            RunnableHelper.runWriteCommand(editor.getProject(), new Runnable() {
+              @Override
+              public void run() {
+                extensionHandler.execute(editor, context);
+              }
+            }, "Vim " + extensionHandler.getClass().getSimpleName(), null);
           }
         }
       };
@@ -324,9 +337,7 @@ public class KeyHandler {
 
   private boolean isEditorReset(@NotNull KeyStroke key, @NotNull CommandState editorState) {
     return (editorState.getMode() == CommandState.Mode.COMMAND || state == State.COMMAND) &&
-           (key.getKeyCode() == KeyEvent.VK_ESCAPE ||
-            (key.getKeyCode() == KeyEvent.VK_C && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0) ||
-            (key.getKeyCode() == '[' && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0));
+           StringHelper.isCloseKeyStroke(key);
   }
 
   private void handleCharArgument(@NotNull KeyStroke key, char chKey) {

@@ -51,6 +51,9 @@ import java.util.*;
 public class MarkGroup {
   public static final char MARK_VISUAL_START = '<';
   public static final char MARK_VISUAL_END = '>';
+  public static final char MARK_CHANGE_START = '[';
+  public static final char MARK_CHANGE_END = ']';
+  public static final char MARK_CHANGE_POS = '.';
 
   /**
    * Creates the class
@@ -225,10 +228,25 @@ public class MarkGroup {
     setMark(editor, MARK_VISUAL_END, range.getEndOffset());
   }
 
+  public void setChangeMarks(@NotNull Editor editor, @NotNull TextRange range) {
+    setMark(editor, MARK_CHANGE_START, range.getStartOffset());
+    setMark(editor, MARK_CHANGE_END, range.getEndOffset());
+  }
+
+  @Nullable
+  public TextRange getChangeMarks(@NotNull Editor editor) {
+    return getMarksRange(editor, MARK_CHANGE_START, MARK_CHANGE_END);
+  }
+
   @Nullable
   public TextRange getVisualSelectionMarks(@NotNull Editor editor) {
-    final Mark start = getMark(editor, MARK_VISUAL_START);
-    final Mark end = getMark(editor, MARK_VISUAL_END);
+    return getMarksRange(editor, MARK_VISUAL_START, MARK_VISUAL_END);
+  }
+
+  @Nullable
+  private TextRange getMarksRange(@NotNull Editor editor, char startMark, char endMark) {
+    final Mark start = getMark(editor, startMark);
+    final Mark end = getMark(editor, endMark);
     if (start != null && end != null) {
       final int startOffset = EditorHelper.getOffset(editor, start.getLogicalLine(), start.getCol());
       final int endOffset = EditorHelper.getOffset(editor, end.getLogicalLine(), end.getCol());

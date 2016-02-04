@@ -19,10 +19,9 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
-import com.maddyhome.idea.vim.helper.EditorDataContext;
-import com.maddyhome.idea.vim.helper.RunnableHelper;
-import com.maddyhome.idea.vim.helper.StringHelper;
+import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.ToggleOption;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -66,6 +65,13 @@ public abstract class VimTestCase extends UsefulTestCase {
     super.tearDown();
   }
 
+  protected void enableExtensions(@NotNull String... extensionNames) {
+    for (String name : extensionNames) {
+      ToggleOption option = (ToggleOption)Options.getInstance().getOption(name);
+      option.set();
+    }
+  }
+
   @NotNull
   protected Editor typeTextInFile(@NotNull final List<KeyStroke> keys, @NotNull String fileContents) {
     configureByText(fileContents);
@@ -91,15 +97,17 @@ public abstract class VimTestCase extends UsefulTestCase {
   }
 
   @NotNull
-  protected Editor typeText(@NotNull final List<KeyStroke> keys) {
+  protected Editor typeText(@NotNull List<KeyStroke> keys) {
     final Editor editor = myFixture.getEditor();
     final KeyHandler keyHandler = KeyHandler.getInstance();
     final EditorDataContext dataContext = new EditorDataContext(editor);
     final Project project = myFixture.getProject();
+    TestInputModel.getInstance(editor).setKeyStrokes(keys);
     RunnableHelper.runWriteCommand(project, new Runnable() {
       @Override
       public void run() {
-        for (KeyStroke key : keys) {
+        final TestInputModel inputModel = TestInputModel.getInstance(editor);
+        for (KeyStroke key = inputModel.nextKeyStroke(); key != null; key = inputModel.nextKeyStroke()) {
           final ExEntryPanel exEntryPanel = ExEntryPanel.getInstance();
           if (exEntryPanel.isActive()) {
             exEntryPanel.handleKey(key);
@@ -151,19 +159,8 @@ public abstract class VimTestCase extends UsefulTestCase {
   }
 
   public void doTest(final List<KeyStroke> keys, String before, String after) {
-    myFixture.configureByText(PlainTextFileType.INSTANCE, before);
-    final Editor editor = myFixture.getEditor();
-    final KeyHandler keyHandler = KeyHandler.getInstance();
-    final EditorDataContext dataContext = new EditorDataContext(editor);
-    final Project project = myFixture.getProject();
-    RunnableHelper.runWriteCommand(project, new Runnable() {
-      @Override
-      public void run() {
-        for (KeyStroke key : keys) {
-          keyHandler.handleKey(editor, key, dataContext);
-        }
-      }
-    }, null, null);
+    configureByText(before);
+    typeText(keys);
     myFixture.checkResult(after);
   }
 }

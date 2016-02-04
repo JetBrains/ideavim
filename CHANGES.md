@@ -8,10 +8,12 @@ To Be Released
 --------------
 
 Added `incsearch` option for incremental search. Added support for `it` and
-`at` tag block selection. Various bug fixes.
+`at` tag block selection. Added `vim-surround` commands `ys`, `cs`, `ds`,
+`S`. Various bug fixes.
 
+* VIM-769 Added `vim-surround` commands `ys`, `cs`, `ds`, `S`
 * VIM-264 Added tag block selection
-* VIM-271 Added `insearch` option for showing search results while typing
+* VIM-271 Added `incsearch` option for showing search results while typing
 * VIM-796 Fixed focus issues with `:action` command
 
 
