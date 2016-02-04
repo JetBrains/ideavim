@@ -66,6 +66,10 @@ Supported:
 * Window commands
 * Vim web help
 
+Emulated Vim plugins:
+
+* vim-surround
+
 Not supported (yet):
 
 * Jump lists
@@ -95,6 +99,21 @@ Also note that if you have overridden the `user.home` JVM option, this will
 will affect where IdeaVim looks for your .ideavimrc file.  For example, if you
 have `-Duser.home=/my/alternate/home` then IdeaVim will source
 `/my/alternate/home/.ideavimrc` instead of `~/.ideavimrc`.
+
+
+Emulated Vim Plugins
+--------------------
+
+IdeaVim extensions emulate some plugins of the original Vim. In order to use IdeaVim extensions, you have to enable
+them via this command in your ~/.ideavimrc:
+
+    set <extension-name>
+
+Available extensions:
+
+* surround
+    * Emulates [vim-surround](https://github.com/tpope/vim-surround)
+    * Commands: `ys`, `cs`, `ds`, `S`
 
 
 Changes to the IDE

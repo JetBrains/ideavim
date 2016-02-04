@@ -5,6 +5,7 @@
       <p>To be released:</p>
       <ul>
         <li>Support for <code>it</code> and <code>at</code> tag block selection</li>
+        <li>Support for vim-surround commands <code>ys</code>, <code>cs</code>, <code>ds</code>, <code>S</code>, enable it with <code>set surround</code> in your ~/.ideavimrc</li>
         <li>Various bug fixes</li>
       </ul>
       <p>0.44:</p>
