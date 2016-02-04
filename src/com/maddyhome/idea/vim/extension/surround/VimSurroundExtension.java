@@ -98,7 +98,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
 
   @Nullable
   private static Pair<String, String> inputTagPair(@NotNull Editor editor) {
-    final String tagInput = input(editor, "<");
+    final String tagInput = inputString(editor, "<");
     if (tagInput.endsWith(">")) {
       final String tagName = tagInput.substring(0, tagInput.length() - 1);
       return Pair.create("<" + tagName + ">", "</" + tagName + ">");
@@ -113,11 +113,23 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
     return c == '<' || c == 't' ? inputTagPair(editor) : getSurroundPair(c);
   }
 
+  private static char getChar(@NotNull Editor editor) {
+    final KeyStroke key = inputKeyStroke(editor);
+    if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
+      return 0;
+    }
+    final char keyChar = key.getKeyChar();
+    if (keyChar == KeyEvent.CHAR_UNDEFINED) {
+      return 0;
+    }
+    return keyChar;
+  }
+
   private static class YSurroundHandler implements VimExtensionHandler {
     @Override
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
       setOperatorFunction(new Operator());
-      executeNormal(parseKeys("g@"), editor, context);
+      executeNormal(parseKeys("g@"), editor);
     }
   }
 
@@ -132,22 +144,23 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
       // NB: Operator ignores SelectionType anyway
       new Operator().apply(editor, context, SelectionType.CHARACTER_WISE);
 
-      // leave visual mode
+      // Leave visual mode
       executeNormal(parseKeys("<Esc>"), editor);
 
       editor.getCaretModel().moveToOffset(visualRange.getStartOffset());
     }
+
   }
 
   private static class CSurroundHandler implements VimExtensionHandler {
     @Override
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
-      final char charFrom = getchar(editor);
+      final char charFrom = getChar(editor);
       if (charFrom == 0) {
         return;
       }
 
-      final char charTo = getchar(editor);
+      final char charTo = getChar(editor);
       if (charTo == 0) {
         return;
       }
@@ -161,62 +174,53 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
     }
 
     static void change(@NotNull Editor editor, char charFrom, @Nullable Pair<String, String> newSurround) {
+      // We take over the " register, so preserve it
+      final List<KeyStroke> oldValue = getRegister(REGISTER);
 
-      // we take over the " register, so preserve it
-      final List<KeyStroke> oldValue = getreg(REGISTER);
-
-      // extract the inner value
+      // Extract the inner value
       perform("di" + pick(charFrom), editor);
-      List<KeyStroke> innerValue = getreg(REGISTER);
+      List<KeyStroke> innerValue = getRegister(REGISTER);
       if (innerValue == null) {
         innerValue = new ArrayList<KeyStroke>();
       }
 
-      // delete the surrounding
+      // Delete the surrounding
       perform("da" + pick(charFrom), editor);
 
-      // insert the surrounding characters and paste
+      // Insert the surrounding characters and paste
       if (newSurround != null) {
         innerValue.addAll(0, parseKeys(escape(newSurround.first)));
         innerValue.addAll(parseKeys(escape(newSurround.second)));
       }
       pasteSurround(innerValue, editor);
 
-      // restore the old value
-      setreg(REGISTER, oldValue);
+      // Restore the old value
+      setRegister(REGISTER, oldValue);
 
-      // jump back to start
+      // Jump back to start
       executeNormal(parseKeys("`["), editor);
     }
 
-    private static String escape(String sequence) {
+    @NotNull
+    private static String escape(@NotNull String sequence) {
       return sequence.replace("<", "\\<");
     }
 
-    /** perform an action, storing the result in our register */
-    private static void perform(String sequence, Editor editor) {
-      final List<KeyStroke> keys = parseKeys(
-        "\"" + REGISTER + sequence
-      );
-      executeNormal(keys, editor);
+    private static void perform(@NotNull String sequence, @NotNull Editor editor) {
+      executeNormal(parseKeys("\"" + REGISTER + sequence), editor);
     }
 
-    private static void pasteSurround(List<KeyStroke> innerValue, Editor editor) {
-      // this logic is direct from vim-surround
+    private static void pasteSurround(@NotNull List<KeyStroke> innerValue, @NotNull Editor editor) {
+      // This logic is direct from vim-surround
       final int offset = editor.getCaretModel().getOffset();
       final int line = editor.getDocument().getLineNumber(offset);
       final int lineEnd = editor.getDocument().getLineEndOffset(line);
 
       final Mark mark = VimPlugin.getMark().getMark(editor, ']');
       final int motionEndCol = mark == null ? -1 : mark.getCol();
-      final String pasteCommand;
-      if (motionEndCol == lineEnd && offset + 1 == lineEnd) {
-        pasteCommand = "p";
-      } else {
-        pasteCommand = "P";
-      }
+      final String pasteCommand = motionEndCol == lineEnd && offset + 1 == lineEnd ? "p" : "P";
 
-      setreg(REGISTER, innerValue);
+      setRegister(REGISTER, innerValue);
       perform(pasteCommand, editor);
     }
 
@@ -232,12 +236,11 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
   private static class DSurroundHandler implements VimExtensionHandler {
     @Override
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
-      // deleting surround is just changing the surrounding to "nothing"
-      final char charFrom = getchar(editor);
+      // Deleting surround is just changing the surrounding to "nothing"
+      final char charFrom = getChar(editor);
       if (charFrom == 0) {
         return;
       }
-
       CSurroundHandler.change(editor, charFrom, null);
     }
   }
@@ -245,7 +248,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
   private static class Operator implements OperatorFunction {
     @Override
     public boolean apply(@NotNull Editor editor, @NotNull DataContext context, @NotNull SelectionType selectionType) {
-      final KeyStroke keyStroke = getKeyStroke(editor);
+      final KeyStroke keyStroke = inputKeyStroke(editor);
       if (keyStroke.getKeyCode() == KeyEvent.VK_ESCAPE) {
         return true;
       }
@@ -267,7 +270,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
       change.insertText(editor, range.getStartOffset(), leftSurround);
       change.insertText(editor, range.getEndOffset() + leftSurround.length(), pair.getSecond());
 
-      // jump back to start
+      // Jump back to start
       executeNormal(parseKeys("`["), editor);
       return true;
     }
@@ -285,5 +288,4 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
       }
     }
   }
-
 }

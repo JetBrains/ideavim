@@ -18,10 +18,8 @@
 
 package com.maddyhome.idea.vim.extension;
 
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.keymap.impl.KeyState;
 import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -81,28 +79,18 @@ public class VimExtensionFacade {
    * XXX: Currently it doesn't make the editor enter the normal mode, it doesn't recover from incomplete commands, it
    * leaves the editor in the insert mode if it's been activated.
    */
-  public static void executeNormal(@NotNull List<KeyStroke> keys, @NotNull Editor editor,
-                                   @NotNull DataContext context) {
+  public static void executeNormal(@NotNull List<KeyStroke> keys, @NotNull Editor editor) {
+    final EditorDataContext context = new EditorDataContext(editor);
     for (KeyStroke key : keys) {
       KeyHandler.getInstance().handleKey(editor, key, context);
     }
   }
 
   /**
-   * Runs normal mode commands similar to ':normal {commands}'.
-   *
-   * XXX: Currently it doesn't make the editor enter the normal mode, it doesn't recover from incomplete commands, it
-   * leaves the editor in the insert mode if it's been activated.
-   */
-  public static void executeNormal(@NotNull List<KeyStroke> keys, @NotNull Editor editor) {
-    executeNormal(keys, editor, new EditorDataContext(editor));
-  }
-
-  /**
    * Returns a single key stroke from the user input similar to 'getchar()'.
    */
   @NotNull
-  public static KeyStroke getKeyStroke(@NotNull Editor editor) {
+  public static KeyStroke inputKeyStroke(@NotNull Editor editor) {
     final KeyStroke key;
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       key = TestInputModel.getInstance(editor).nextKeyStroke();
@@ -124,28 +112,10 @@ public class VimExtensionFacade {
   }
 
   /**
-   * Convenience to {@link #getKeyStroke(Editor)} when
-   *  you just want a char, and the distinction between
-   *  ESC and any other invalid keypress is doesn't matter.
-   * @return The input char, or 0 if they canceled or
-   *  entered something otherwise invalid.
+   * Returns a string typed in the input box similar to 'input()'.
    */
-  public static char getchar(@NotNull Editor editor) {
-    KeyStroke key = getKeyStroke(editor);
-    if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
-      return 0;
-    }
-
-    char keyChar = key.getKeyChar();
-    if (keyChar == KeyEvent.CHAR_UNDEFINED) {
-      return 0;
-    }
-
-    return keyChar;
-  }
-
   @NotNull
-  public static String input(@NotNull Editor editor, @NotNull String prompt) {
+  public static String inputString(@NotNull Editor editor, @NotNull String prompt) {
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       final StringBuilder builder = new StringBuilder();
       final TestInputModel inputModel = TestInputModel.getInstance(editor);
@@ -181,9 +151,10 @@ public class VimExtensionFacade {
   }
 
   /**
-   * Get the current contents of the given register
+   * Get the current contents of the given register similar to 'getreg()'.
    */
-  public static List<KeyStroke> getreg(char register) {
+  @Nullable
+  public static List<KeyStroke> getRegister(char register) {
     final Register reg = VimPlugin.getRegister().getRegister(register);
     if (reg == null) {
       return null;
@@ -194,11 +165,7 @@ public class VimExtensionFacade {
   /**
    * Set the current contents of the given register
    */
-  public static void setreg(char register, @Nullable List<KeyStroke> keys) {
-    if (keys == null) {
-      VimPlugin.getRegister().setKeys(register, Collections.<KeyStroke>emptyList());
-    } else {
-      VimPlugin.getRegister().setKeys(register, keys);
-    }
+  public static void setRegister(char register, @Nullable List<KeyStroke> keys) {
+    VimPlugin.getRegister().setKeys(register, keys != null ? keys : Collections.<KeyStroke>emptyList());
   }
 }
