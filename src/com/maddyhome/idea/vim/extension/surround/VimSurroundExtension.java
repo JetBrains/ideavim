@@ -214,11 +214,14 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
       // This logic is direct from vim-surround
       final int offset = editor.getCaretModel().getOffset();
       final int line = editor.getDocument().getLineNumber(offset);
+      final int lineStart = editor.getDocument().getLineStartOffset(line);
       final int lineEnd = editor.getDocument().getLineEndOffset(line);
+      final int lineEndCol = lineEnd - lineStart;
 
       final Mark mark = VimPlugin.getMark().getMark(editor, ']');
       final int motionEndCol = mark == null ? -1 : mark.getCol();
-      final String pasteCommand = motionEndCol == lineEnd && offset + 1 == lineEnd ? "p" : "P";
+      final String pasteCommand =
+        motionEndCol == lineEndCol && offset + 1 == lineEnd ? "p" : "P";
 
       setRegister(REGISTER, innerValue);
       perform(pasteCommand, editor);

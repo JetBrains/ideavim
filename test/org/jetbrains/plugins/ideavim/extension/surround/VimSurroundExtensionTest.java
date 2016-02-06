@@ -170,6 +170,16 @@ public class VimSurroundExtensionTest extends VimTestCase {
     doTest(parseKeys("dst"), before, after);
   }
 
+  // VIM-1085
+  public void testDeleteSurroundingParams() {
+    final String before =
+      "\nFoo\nSeq(\"-<caret>Yrangepos\")";
+    final String after =
+      "\nFoo\nSeq\"-Yrangepos\"";
+
+    doTest(parseKeys("dsb"), before, after);
+  }
+
   // TODO if/when we add proper repeat support
   //public void testRepeatDeleteSurroundParens() {
   //  final String before =
