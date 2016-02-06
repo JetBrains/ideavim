@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.helper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.intellij.openapi.util.text.StringUtil;
+import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
 import org.apache.commons.codec.binary.Base64;
 import org.jdom.Element;
@@ -71,6 +72,7 @@ public class StringHelper {
     .put("f10", VK_F10)
     .put("f11", VK_F11)
     .put("f12", VK_F12)
+    .put("plug", (int) KeyHandler.KEY_PLUG)
     .build();
   private static final Map<Integer, String> VIM_KEY_VALUES = invertMap(VIM_KEY_NAMES);
 
@@ -185,7 +187,7 @@ public class StringHelper {
               state = KeyParserState.INIT;
               final String specialKeyName = specialKeyBuilder.toString();
               final String lower = specialKeyName.toLowerCase();
-              if ("plug".equals(lower) || "sid".equals(lower)) {
+              if ("sid".equals(lower)) {
                 throw new IllegalArgumentException("<" + specialKeyName + "> is not supported");
               }
               if (!"nop".equals(lower)) {

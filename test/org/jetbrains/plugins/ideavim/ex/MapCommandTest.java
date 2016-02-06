@@ -193,15 +193,6 @@ public class MapCommandTest extends VimTestCase {
     myFixture.checkResult("bcd\n");
   }
 
-  // VIM-672 |:map|
-  public void testIgnorePlugMappings() {
-    configureByText("<caret>foo bar\n");
-    typeText(commandToKeys("map w <Plug>abc"));
-    typeText(parseKeys("w"));
-    myFixture.checkResult("foo bar\n");
-    assertOffset(4);
-  }
-
   // VIM-676 |:map|
   public void testBackspaceCharacterInVimRc() {
     configureByText("\n");

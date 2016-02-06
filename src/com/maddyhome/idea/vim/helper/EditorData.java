@@ -268,6 +268,7 @@ public class EditorData {
   private static final Key<ExOutputPanel> MORE_PANEL = new Key<ExOutputPanel>("IdeaVim.morePanel");
   private static final Key<ExOutputModel> EX_OUTPUT_MODEL = new Key<ExOutputModel>("IdeaVim.exOutputModel");
   private static final Key<TestInputModel> TEST_INPUT_MODEL = new Key<TestInputModel>("IdeaVim.testInputModel");
+  private static final Key<PlugInputModel> PLUG_INPUT_MODEL = new Key<PlugInputModel>("IdeaVim.plugInputModel");
 
   private static Key CONSOLE_VIEW_IN_EDITOR_VIEW = Key.create("CONSOLE_VIEW_IN_EDITOR_VIEW");
 
@@ -319,4 +320,14 @@ public class EditorData {
   public static void setTestInputModel(@NotNull Editor editor, @NotNull TestInputModel model) {
     editor.putUserData(TEST_INPUT_MODEL, model);
   }
+
+  @Nullable
+  public static PlugInputModel getPlugInputModel(@NotNull Editor editor) {
+    return editor.getUserData(PLUG_INPUT_MODEL);
+  }
+
+  public static void setPlugInputModel(@NotNull Editor editor, @NotNull PlugInputModel model) {
+    editor.putUserData(PLUG_INPUT_MODEL, model);
+  }
+
 }

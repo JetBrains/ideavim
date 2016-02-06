@@ -82,6 +82,10 @@ public class MappingInfo implements Comparable<MappingInfo> {
     return myExtensionHandler;
   }
 
+  public boolean hasExtensionHandler() {
+    return myExtensionHandler != null;
+  }
+
   public boolean isRecursive() {
     return myRecursive;
   }
@@ -106,4 +110,5 @@ public class MappingInfo implements Comparable<MappingInfo> {
       return c1 - c2;
     }
   }
+
 }

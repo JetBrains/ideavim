@@ -45,6 +45,26 @@ public class KeyMapping implements Iterable<List<KeyStroke>> {
     return myKeys.get(ImmutableList.copyOf(keys));
   }
 
+  /**
+   * Attempts to find a &lt;Plug&gt; mapping
+   *  with the longest subsequence of `sequence`
+   */
+  @Nullable
+  public MappingInfo getPlug(@NotNull List<KeyStroke> sequence) {
+    ArrayList<KeyStroke> copy = new ArrayList<KeyStroke>(sequence);
+    int size = copy.size();
+    while (size > 0) {
+      MappingInfo info = get(copy);
+      if (info != null && info.hasExtensionHandler()) {
+        return info;
+      }
+
+      copy.remove(--size);
+    }
+
+    return null;
+  }
+
   public void put(@NotNull Set<MappingMode> mappingModes, @NotNull List<KeyStroke> fromKeys,
                   @Nullable List<KeyStroke> toKeys, @Nullable VimExtensionHandler extensionHandler, boolean recursive) {
     myKeys.put(ImmutableList.copyOf(fromKeys),

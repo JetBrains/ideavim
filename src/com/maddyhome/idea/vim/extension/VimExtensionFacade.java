@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
+import com.maddyhome.idea.vim.helper.PlugInputModel;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.helper.TestInputModel;
 import com.maddyhome.idea.vim.key.OperatorFunction;
@@ -95,7 +96,9 @@ public class VimExtensionFacade {
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       key = TestInputModel.getInstance(editor).nextKeyStroke();
     }
-    else {
+    else if (PlugInputModel.getInstance(editor).hasPendingKeyStroke()) {
+      key = PlugInputModel.getInstance(editor).nextKeyStroke();
+    } else {
       final Ref<KeyStroke> ref = Ref.create();
       final ModalEntryDialog dialog = new ModalEntryDialog(editor, "");
       dialog.setEntryKeyListener(new KeyAdapter() {
@@ -130,6 +133,24 @@ public class VimExtensionFacade {
       return builder.toString();
     }
     else {
+      final StringBuilder builder = new StringBuilder();
+      final PlugInputModel inputModel = PlugInputModel.getInstance(editor);
+      while (inputModel.hasPendingKeyStroke()) {
+        KeyStroke key = inputModel.nextKeyStroke();
+        if (key == null || StringHelper.isCloseKeyStroke(key)) {
+          return ""; // canceled
+        }
+        else if (key.getKeyCode() == KeyEvent.VK_ENTER) {
+          return builder.toString();
+        }
+        else {
+          final char c = key.getKeyChar();
+          if (c != KeyEvent.CHAR_UNDEFINED) {
+            builder.append(c);
+          }
+        }
+      }
+
       final Ref<Boolean> canceled = Ref.create(false);
       final ModalEntryDialog dialog = new ModalEntryDialog(editor, prompt);
       dialog.setEntryKeyListener(new KeyAdapter() {
@@ -146,7 +167,7 @@ public class VimExtensionFacade {
         }
       });
       dialog.setVisible(true);
-      return canceled.get() ? "" : dialog.getText();
+      return canceled.get() ? "" : builder.toString() + dialog.getText();
     }
   }
 
