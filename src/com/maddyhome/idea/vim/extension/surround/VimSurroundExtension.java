@@ -118,11 +118,8 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
 
   private static char getChar(@NotNull Editor editor) {
     final KeyStroke key = inputKeyStroke(editor);
-    if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
-      return 0;
-    }
     final char keyChar = key.getKeyChar();
-    if (keyChar == KeyEvent.CHAR_UNDEFINED) {
+    if (keyChar == KeyEvent.CHAR_UNDEFINED || keyChar == KeyEvent.VK_ESCAPE) {
       return 0;
     }
     return keyChar;
@@ -255,13 +252,9 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
   private static class Operator implements OperatorFunction {
     @Override
     public boolean apply(@NotNull Editor editor, @NotNull DataContext context, @NotNull SelectionType selectionType) {
-      final KeyStroke keyStroke = inputKeyStroke(editor);
-      if (keyStroke.getKeyCode() == KeyEvent.VK_ESCAPE) {
+      final char c = getChar(editor);
+      if (c == 0) {
         return true;
-      }
-      final char c = keyStroke.getKeyChar();
-      if (c == KeyEvent.CHAR_UNDEFINED) {
-        return false;
       }
       final Pair<String, String> pair = getOrInputPair(c, editor);
       if (pair == null) {

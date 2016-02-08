@@ -108,7 +108,7 @@ public class VimExtensionFacade {
       dialog.setVisible(true);
       key = ref.get();
     }
-    return key != null ? key : KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+    return key != null ? key : KeyStroke.getKeyStroke((char)KeyEvent.VK_ESCAPE);
   }
 
   /**
