@@ -31,13 +31,16 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.extension.VimNonDisposableExtension;
 import com.maddyhome.idea.vim.group.ChangeGroup;
+import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.key.OperatorFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.*;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -213,16 +216,17 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
     private static void pasteSurround(@NotNull List<KeyStroke> innerValue, @NotNull Editor editor) {
       // This logic is direct from vim-surround
       final int offset = editor.getCaretModel().getOffset();
-      final int line = editor.getDocument().getLineNumber(offset);
-      final int lineStart = editor.getDocument().getLineStartOffset(line);
-      final int lineEnd = editor.getDocument().getLineEndOffset(line);
-      final int lineEndCol = lineEnd - lineStart;
+      final int lineEndOffset = EditorHelper.getLineEndForOffset(editor, offset);
 
-      final Mark mark = VimPlugin.getMark().getMark(editor, ']');
-      final int motionEndCol = mark == null ? -1 : mark.getCol();
-      final String pasteCommand =
-        motionEndCol == lineEndCol && offset + 1 == lineEnd ? "p" : "P";
-
+      final Mark motionEndMark = VimPlugin.getMark().getMark(editor, ']');
+      final int motionEndOffset;
+      if (motionEndMark != null) {
+        motionEndOffset = EditorHelper.getOffset(editor, motionEndMark.getLogicalLine(), motionEndMark.getCol());
+      }
+      else {
+        motionEndOffset = -1;
+      }
+      final String pasteCommand = motionEndOffset == lineEndOffset && offset + 1 == lineEndOffset ? "p" : "P";
       setRegister(REGISTER, innerValue);
       perform(pasteCommand, editor);
     }
