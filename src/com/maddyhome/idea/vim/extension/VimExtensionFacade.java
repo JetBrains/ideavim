@@ -29,12 +29,12 @@ import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.helper.TestInputModel;
 import com.maddyhome.idea.vim.key.OperatorFunction;
-import com.maddyhome.idea.vim.ui.ModalEntryDialog;
+import com.maddyhome.idea.vim.ui.ExEntryPanel;
+import com.maddyhome.idea.vim.ui.ModalEntry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Collections;
 import java.util.List;
@@ -96,17 +96,7 @@ public class VimExtensionFacade {
       key = TestInputModel.getInstance(editor).nextKeyStroke();
     }
     else {
-      final Ref<KeyStroke> ref = Ref.create();
-      final ModalEntryDialog dialog = new ModalEntryDialog(editor, "");
-      dialog.setEntryKeyListener(new KeyAdapter() {
-        @Override
-        public void keyTyped(KeyEvent e) {
-          ref.set(KeyStroke.getKeyStrokeForEvent(e));
-          dialog.dispose();
-        }
-      });
-      dialog.setVisible(true);
-      key = ref.get();
+      key = ModalEntry.single();
     }
     return key != null ? key : KeyStroke.getKeyStroke((char)KeyEvent.VK_ESCAPE);
   }
@@ -130,23 +120,29 @@ public class VimExtensionFacade {
       return builder.toString();
     }
     else {
-      final Ref<Boolean> canceled = Ref.create(false);
-      final ModalEntryDialog dialog = new ModalEntryDialog(editor, prompt);
-      dialog.setEntryKeyListener(new KeyAdapter() {
+      final Ref<String> text = Ref.create("");
+      final ExEntryPanel exEntryPanel = ExEntryPanel.getInstance();
+      exEntryPanel.activate(
+        editor, new EditorDataContext(editor),
+        prompt.isEmpty() ? " " : prompt, "", 1);
+      ModalEntry.activate(new ModalEntry.OnKeyStrokeHandler() {
         @Override
-        public void keyReleased(KeyEvent e) {
-          final KeyStroke key = KeyStroke.getKeyStrokeForEvent(e);
+        public boolean onKeyStroke(KeyStroke key) {
           if (StringHelper.isCloseKeyStroke(key)) {
-            canceled.set(true);
-            dialog.dispose();
+            exEntryPanel.deactivate(true);
+            return false;
           }
           else if (key.getKeyCode() == KeyEvent.VK_ENTER) {
-            dialog.dispose();
+            text.set(exEntryPanel.getText());
+            exEntryPanel.deactivate(true);
+            return false;
+          } else {
+            exEntryPanel.handleKey(key);
+            return true;
           }
         }
       });
-      dialog.setVisible(true);
-      return canceled.get() ? "" : dialog.getText();
+      return text.get();
     }
   }
 
