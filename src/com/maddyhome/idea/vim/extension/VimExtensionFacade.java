@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.extension;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -102,10 +103,10 @@ public class VimExtensionFacade {
         @Override
         public void keyTyped(KeyEvent e) {
           ref.set(KeyStroke.getKeyStrokeForEvent(e));
-          dialog.dispose();
+          dialog.close(DialogWrapper.OK_EXIT_CODE);
         }
       });
-      dialog.setVisible(true);
+      dialog.show();
       key = ref.get();
     }
     return key != null ? key : KeyStroke.getKeyStroke((char)KeyEvent.VK_ESCAPE);
@@ -138,14 +139,14 @@ public class VimExtensionFacade {
           final KeyStroke key = KeyStroke.getKeyStrokeForEvent(e);
           if (StringHelper.isCloseKeyStroke(key)) {
             canceled.set(true);
-            dialog.dispose();
+            dialog.close(DialogWrapper.OK_EXIT_CODE);
           }
           else if (key.getKeyCode() == KeyEvent.VK_ENTER) {
-            dialog.dispose();
+            dialog.close(DialogWrapper.OK_EXIT_CODE);
           }
         }
       });
-      dialog.setVisible(true);
+      dialog.show();
       return canceled.get() ? "" : dialog.getText();
     }
   }
