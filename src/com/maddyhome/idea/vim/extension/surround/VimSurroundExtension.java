@@ -179,6 +179,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
 
       // Extract the inner value
       perform("di" + pick(charFrom), editor);
+      // TODO: Create a copy, possible UnsupportedOperationException
       List<KeyStroke> innerValue = getRegister(REGISTER);
       if (innerValue == null) {
         innerValue = new ArrayList<KeyStroke>();
