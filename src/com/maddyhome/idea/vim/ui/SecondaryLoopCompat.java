@@ -2,12 +2,8 @@ package com.maddyhome.idea.vim.ui;
 
 import com.intellij.openapi.util.Ref;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.concurrent.CountDownLatch;
+import java.lang.reflect.*;
 
 /**
  * @author dhleong
@@ -26,94 +22,124 @@ public abstract class SecondaryLoopCompat {
   /**
    * Enter a secondary event loop,
    *  blocking the current thread until
-   *  {@link #exit()} is called. KeyEvents
-   *  will be fed to the provided KeyEventDispatcher
-   *  while the secondary event loop is active.
+   *  {@link #exit()} is called.
    */
-  public abstract void enter(KeyEventDispatcher dispatcher);
+  public abstract void enter();
 
   /**
    * Exit the secondary event loop, letting
-   *  the thread that called {@link #enter(KeyEventDispatcher)}
+   *  the thread that called {@link #enter()}
    *  continue execution. This instance will no longer
    *  be usable once you exit, so you should acquire
    *  a new instance each time you need this functionality.
    */
   public abstract void exit();
 
-  static SecondaryLoopCompat getInstance() {
+  static SecondaryLoopCompat newInstance() {
     // NB: If the JDK7 SecondaryLoop class is available,
     //  we HAVE to use it, due to a bug in the JDK:
     // http://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8144759
-    if (jdk7Factory != null) {
-      try {
-        final EventQueue systemQueue = Toolkit.getDefaultToolkit().getSystemEventQueue();
-        return new Jdk7SecondaryLoopCompat(jdk7Factory.invoke(systemQueue));
-      }
-      catch (IllegalAccessException e) {
-        throw new RuntimeException("On JDK7 but couldn't instantiate JDK7 compat", e);
-      }
-      catch (InvocationTargetException e) {
-        throw new RuntimeException("On JDK7 but couldn't instantiate JDK7 compat", e);
-      }
-    } else {
+
+    //if (jdk7Factory != null) {
+    //  try {
+    //    final EventQueue systemQueue = Toolkit.getDefaultToolkit().getSystemEventQueue();
+    //    return new Jdk7SecondaryLoopCompat(jdk7Factory.invoke(systemQueue));
+    //  }
+    //  catch (IllegalAccessException e) {
+    //    throw new RuntimeException("On JDK7 but couldn't instantiate JDK7 compat", e);
+    //  }
+    //  catch (InvocationTargetException e) {
+    //    throw new RuntimeException("On JDK7 but couldn't instantiate JDK7 compat", e);
+    //  }
+    //} else {
       return new Jdk6SecondaryLoopCompat();
-    }
+    //}
   }
 
-
-
   private static class Jdk6SecondaryLoopCompat extends SecondaryLoopCompat {
-    final VimEventQueue secondaryQueue = new VimEventQueue();
-    final CountDownLatch latch = new CountDownLatch(1);
+
+    // The EventDispatchThread class and the Conditional class,
+    //  both of which are at the core of the real SecondaryLoop
+    //  implementation, are package-private in java.awt, which is
+    //  a protected package---we can't just put our own classes
+    //  in there to get access. So, we have to use a Proxy and
+    //  a bunch of reflection.
+    static Field dispatchThreadField;
+    static Class<?> conditionalClass;
+    static Method pumpEventsMethod;
+    static {
+      try {
+        dispatchThreadField = EventQueue.class.getDeclaredField("dispatchThread");
+        dispatchThreadField.setAccessible(true);
+
+        conditionalClass = Class.forName("java.awt.Conditional");
+
+        Class<?> eventDispatchThreadClass = Class.forName("java.awt.EventDispatchThread");
+        pumpEventsMethod = eventDispatchThreadClass.getDeclaredMethod(
+          "pumpEvents", conditionalClass);
+        pumpEventsMethod.setAccessible(true);
+      }
+      catch (NoSuchFieldException e) {
+        throw new IllegalStateException(e);
+      }
+      catch (ClassNotFoundException e) {
+        throw new IllegalStateException(e);
+      }
+      catch (NoSuchMethodException e) {
+        throw new IllegalStateException(e);
+      }
+    }
+
     final Ref<Boolean> active = Ref.create(true);
     final EventQueue systemQueue = Toolkit.getDefaultToolkit().getSystemEventQueue();
 
-    @Override
-    public void enter(final KeyEventDispatcher dispatcher) {
-      System.out.println("Using jdk6 SecondaryLoopCompat");
-
-      // make our secondaryQueue the current one
-      systemQueue.push(secondaryQueue);
-
-      // hop onto a thread to consume events passed to
-      //  our secondary queue
-      new SwingWorker() {
+    final Object conditionalProxy = Proxy.newProxyInstance(
+      EventQueue.class.getClassLoader(),
+      new Class[]{conditionalClass},
+      new InvocationHandler() {
         @Override
-        protected Void doInBackground() throws Exception {
-          while (active.get()) {
-            AWTEvent event = secondaryQueue.getNextEvent();
-            if (event instanceof KeyEvent) {
-              System.out.println(event);
-              dispatcher.dispatchKeyEvent((KeyEvent)event);
-            }
-
-            Thread.yield();
-          }
-
-          System.out.println("Exit dispatch");
-          return null;
+        public Object invoke(Object o,
+                             Method method,
+                             Object[] args) throws Throwable {
+          // NB: Conditional has just a single method,
+          //  evaluate(), which should return `true`
+          //  for as long as we wish to continue
+          //  pumping events
+          return active.get();
         }
-      }.execute();
+      });
 
-      // wait for exit() to be called
+    @Override
+    public void enter() {
+      // The real SecondaryLoop on JDK7 does some other
+      //  fancy stuff, but we will always be called
+      //  from a valid dispatch thread, so this should
+      //  be sufficient: basically, just manually pump
+      //  events from the system EventQueue until exit()
+      //  is called.
       try {
-        latch.await();
+        Object dispatchThread = dispatchThreadField.get(systemQueue);
+        pumpEventsMethod.invoke(dispatchThread, conditionalProxy);
       }
-      catch (InterruptedException e) {
-        // shouldn't happen
-        e.printStackTrace();
+      catch (IllegalAccessException e) {
+        throw new IllegalStateException(e);
+      }
+      catch (InvocationTargetException e) {
+        throw new IllegalStateException(e);
       }
     }
 
     @Override
     public void exit() {
-      secondaryQueue.pop();
       active.set(false);
-      latch.countDown();
     }
   }
 
+  /**
+   * On JDK7 we can use the real SecondaryLoop using reflection
+   *  to ensure that there aren't any edge cases we've missed
+   *  with our hacky Proxy stuff above.
+   */
   private static class Jdk7SecondaryLoopCompat extends SecondaryLoopCompat {
     static Method enter, exit;
     static {
@@ -134,7 +160,6 @@ public abstract class SecondaryLoopCompat {
     }
 
     private Object mySecondaryLoop;
-    private KeyEventDispatcher dispatcher;
 
     public Jdk7SecondaryLoopCompat(Object secondaryLoop) {
       mySecondaryLoop = secondaryLoop;
@@ -146,14 +171,7 @@ public abstract class SecondaryLoopCompat {
     }
 
     @Override
-    public void enter(KeyEventDispatcher dispatcher) {
-      System.out.println("Using jdk7 SecondaryLoopCompat");
-
-      // on JDK7 we can simply add the dispatcher
-      this.dispatcher = dispatcher;
-      KeyboardFocusManager.getCurrentKeyboardFocusManager()
-        .addKeyEventDispatcher(dispatcher);
-
+    public void enter() {
       try {
         enter.invoke(mySecondaryLoop);
       }
@@ -180,10 +198,6 @@ public abstract class SecondaryLoopCompat {
         // NB: Shouldn't happen
         e.printStackTrace();
       }
-
-      // ensure it's gone
-      KeyboardFocusManager.getCurrentKeyboardFocusManager()
-        .removeKeyEventDispatcher(dispatcher);
     }
   }
 }

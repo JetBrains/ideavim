@@ -27,9 +27,10 @@ public class ModalEntry {
    */
   public static void activate(final OnKeyStrokeHandler handler) {
 
-    final SecondaryLoopCompat loop = SecondaryLoopCompat.getInstance();
-    final KeyEventDispatcher dispatcher =
-      new KeyEventDispatcher() {
+    final SecondaryLoopCompat loop = SecondaryLoopCompat.newInstance();
+
+    KeyboardFocusManager.getCurrentKeyboardFocusManager()
+      .addKeyEventDispatcher(new KeyEventDispatcher() {
         @Override
         public boolean dispatchKeyEvent(KeyEvent e) {
           KeyStroke stroke;
@@ -46,21 +47,16 @@ public class ModalEntry {
             return false;
           }
 
-          System.out.println("dispatchKeyEvent" + e);
           if (!handler.onKeyStroke(stroke)) {
-            System.out.println("Pop queue");
             KeyboardFocusManager.getCurrentKeyboardFocusManager()
               .removeKeyEventDispatcher(this);
             loop.exit();
           }
           return true;
         }
-      };
+      });
 
-    System.out.println("Push queue");
-    loop.enter(dispatcher);
-
-    System.out.println("Return");
+    loop.enter();
   }
 
   /**

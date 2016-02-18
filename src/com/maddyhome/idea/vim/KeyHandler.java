@@ -253,7 +253,6 @@ public class KeyHandler {
       final Runnable handleMappedKeys = new Runnable() {
         @Override
         public void run() {
-          System.out.println("Run mapped keys");
           final List<KeyStroke> toKeys = mappingInfo.getToKeys();
           final VimExtensionHandler extensionHandler = mappingInfo.getExtensionHandler();
           if (toKeys != null) {
@@ -279,7 +278,6 @@ public class KeyHandler {
         handleMappedKeys.run();
       }
       else {
-        System.out.println("Invoke mapped keys");
         application.invokeLater(handleMappedKeys);
       }
       return true;
