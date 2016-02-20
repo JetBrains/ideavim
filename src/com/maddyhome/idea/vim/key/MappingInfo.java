@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.key;
 
+import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import org.jetbrains.annotations.NotNull;
@@ -82,8 +83,18 @@ public class MappingInfo implements Comparable<MappingInfo> {
     return myExtensionHandler;
   }
 
+  public boolean hasExtensionHandler() {
+    return myExtensionHandler != null;
+  }
+
   public boolean isRecursive() {
     return myRecursive;
+  }
+
+  public boolean mapsToPlug() {
+    return myToKeys != null
+           && !myToKeys.isEmpty()
+           && myToKeys.get(0).getKeyCode() == KeyHandler.KEY_PLUG;
   }
 
   private int compareKeys(@NotNull KeyStroke key1, @NotNull KeyStroke key2) {
@@ -106,4 +117,5 @@ public class MappingInfo implements Comparable<MappingInfo> {
       return c1 - c2;
     }
   }
+
 }

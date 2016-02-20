@@ -46,6 +46,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
@@ -54,6 +55,12 @@ import java.util.Stack;
  * actions. This is a singleton.
  */
 public class KeyHandler {
+
+  /**
+   * Special "key" for &lt;Plug&gt; mappings.
+   */
+  public static final char KEY_PLUG = KeyEvent.CHAR_UNDEFINED - 1;
+
   /**
    * Returns a reference to the singleton instance of this class
    *
@@ -233,6 +240,7 @@ public class KeyHandler {
 
     final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mappingMode);
     final MappingInfo mappingInfo = mapping.get(fromKeys);
+    final MappingInfo extInfo = mapping.getExtensionMapping(fromKeys);
 
     if (mapping.isPrefix(fromKeys)) {
       mappingKeys.add(key);
@@ -249,46 +257,80 @@ public class KeyHandler {
     }
     else if (mappingInfo != null) {
       mappingKeys.clear();
-      final Application application = ApplicationManager.getApplication();
-      final Runnable handleMappedKeys = new Runnable() {
-        @Override
-        public void run() {
-          final List<KeyStroke> toKeys = mappingInfo.getToKeys();
-          final VimExtensionHandler extensionHandler = mappingInfo.getExtensionHandler();
-          if (toKeys != null) {
-            final boolean fromIsPrefix = isPrefix(mappingInfo.getFromKeys(), toKeys);
-            boolean first = true;
-            for (KeyStroke keyStroke : toKeys) {
-              final boolean recursive = mappingInfo.isRecursive() && !(first && fromIsPrefix);
-              handleKey(editor, keyStroke, new EditorDataContext(editor), recursive);
-              first = false;
-            }
-          }
-          else if (extensionHandler != null) {
-            RunnableHelper.runWriteCommand(editor.getProject(), new Runnable() {
-              @Override
-              public void run() {
-                extensionHandler.execute(editor, context);
-              }
-            }, "Vim " + extensionHandler.getClass().getSimpleName(), null);
-          }
-        }
-      };
-      if (application.isUnitTestMode()) {
-        handleMappedKeys.run();
-      }
-      else {
-        application.invokeLater(handleMappedKeys);
-      }
+      invokeMappingInfo(editor, context, mappingInfo,
+                        Collections.<KeyStroke>emptyList());
+      return true;
+    }
+    else if (extInfo != null) {
+      mappingKeys.clear();
+
+      // NB: Ambiguous Plug/Extension mappings break if we do not add special
+      //  handling, because they cease to be prefixes and so would otherwise be
+      //  executed in the else branch *without* allowing recursion
+      List<KeyStroke> extraKeys =
+        fromKeys.subList(extInfo.getFromKeys().size(), fromKeys.size());
+      invokeMappingInfo(editor, context, extInfo, extraKeys);
       return true;
     }
     else {
       final List<KeyStroke> unhandledKeys = new ArrayList<KeyStroke>(mappingKeys);
       mappingKeys.clear();
+
       for (KeyStroke keyStroke : unhandledKeys) {
         handleKey(editor, keyStroke, context, false);
       }
       return false;
+    }
+  }
+
+  private void invokeMappingInfo(@NotNull final Editor editor,
+                                 @NotNull final DataContext context,
+                                 @NotNull final MappingInfo mappingInfo,
+                                 @NotNull final List<KeyStroke> extraStrokes) {
+    final Application application = ApplicationManager.getApplication();
+    final Runnable handleMappedKeys = new Runnable() {
+      @Override
+      public void run() {
+        final List<KeyStroke> toKeys = mappingInfo.getToKeys();
+        final VimExtensionHandler extensionHandler = mappingInfo.getExtensionHandler();
+        if (toKeys != null) {
+          final boolean fromIsPrefix = isPrefix(mappingInfo.getFromKeys(), toKeys);
+          final boolean hasPlugMapping = mappingInfo.mapsToPlug();
+          boolean first = true;
+          for (KeyStroke keyStroke : toKeys) {
+            final boolean recursive = hasPlugMapping
+                                      || (mappingInfo.isRecursive() && !(first && fromIsPrefix));
+            handleKey(editor, keyStroke, new EditorDataContext(editor), recursive);
+            first = false;
+          }
+
+          for (KeyStroke keyStroke : extraStrokes) {
+            handleKey(editor, keyStroke, new EditorDataContext(editor), hasPlugMapping);
+          }
+        }
+        else if (extensionHandler != null) {
+          final PlugInputModel model = PlugInputModel.getInstance(editor);
+          model.setPendingKeyStrokes(extraStrokes);
+
+          RunnableHelper.runWriteCommand(editor.getProject(), new Runnable() {
+            @Override
+            public void run() {
+              extensionHandler.execute(editor, context);
+            }
+          }, "Vim " + extensionHandler.getClass().getSimpleName(), null);
+
+          final List<KeyStroke> unused = model.removePendingKeyStrokes();
+          for (KeyStroke keyStroke : unused) {
+            handleKey(editor, keyStroke, new EditorDataContext(editor), false);
+          }
+        }
+      }
+    };
+    if (application.isUnitTestMode()) {
+      handleMappedKeys.run();
+    }
+    else {
+      application.invokeLater(handleMappedKeys);
     }
   }
 

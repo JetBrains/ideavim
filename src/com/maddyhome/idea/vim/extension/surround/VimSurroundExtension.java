@@ -79,10 +79,18 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
 
   @Override
   protected void initOnce() {
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("ys"), new YSurroundHandler(), false);
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("cs"), new CSurroundHandler(), false);
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("ds"), new DSurroundHandler(), false);
-    putExtensionHandlerMapping(MappingMode.VO, parseKeys("S"), new VSurroundHandler(), false);
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>YSurround"), new YSurroundHandler(), false);
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>CSurround"), new CSurroundHandler(), false);
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>DSurround"), new DSurroundHandler(), false);
+    putExtensionHandlerMapping(MappingMode.VO, parseKeys("<Plug>VSurround"), new VSurroundHandler(), false);
+
+    putKeyMapping(MappingMode.N, parseKeys("ys"), parseKeys("<Plug>YSurround"), true);
+    putKeyMapping(MappingMode.N, parseKeys("cs"), parseKeys("<Plug>CSurround"), true);
+    putKeyMapping(MappingMode.N, parseKeys("ds"), parseKeys("<Plug>DSurround"), true);
+    putKeyMapping(MappingMode.VO, parseKeys("S"), parseKeys("<Plug>VSurround"), true);
+
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>YSurroundMore"), new YSurroundHandler(), false);
+    putKeyMapping(MappingMode.N, parseKeys("gms"), parseKeys("<Plug>YSurroundMore"), true);
   }
 
   @Nullable
