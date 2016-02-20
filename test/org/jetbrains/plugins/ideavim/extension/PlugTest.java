@@ -82,6 +82,20 @@ public class PlugTest extends VimTestCase {
     doTest(parseKeys("gne"), before, after);
   }
 
+  public void testSuperAmbiguous() {
+    // put it all together now
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>MoreMagic"), new LineHandler(), false);
+    putKeyMapping(MappingMode.N, parseKeys("gmm"), parseKeys("<Plug>MoreMagic"), true);
+
+    final String before =
+      "int foo = bar<caret>index;";
+    final String after =
+      "int foo = bar;";
+
+    doTest(parseKeys("gmm"), before, "");
+    doTest(parseKeys("gme"), before, after);
+  }
+
   static class OperatorHandler implements VimExtensionHandler {
     @Override
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {

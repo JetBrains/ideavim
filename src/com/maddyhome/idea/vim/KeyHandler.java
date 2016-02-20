@@ -240,7 +240,7 @@ public class KeyHandler {
 
     final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mappingMode);
     final MappingInfo mappingInfo = mapping.get(fromKeys);
-    final MappingInfo plugInfo = mapping.getPlug(fromKeys);
+    final MappingInfo extInfo = mapping.getExtensionMapping(fromKeys);
 
     if (mapping.isPrefix(fromKeys)) {
       mappingKeys.add(key);
@@ -261,15 +261,15 @@ public class KeyHandler {
                         Collections.<KeyStroke>emptyList());
       return true;
     }
-    else if (plugInfo != null) {
+    else if (extInfo != null) {
       mappingKeys.clear();
 
-      // NB: Ambiguous Plug mappings break if we do not add special handling,
-      //  because they cease to be prefixes would otherwise be executed in
-      //  the else branch without recursion
+      // NB: Ambiguous Plug/Extension mappings break if we do not add special
+      //  handling, because they cease to be prefixes and so would otherwise be
+      //  executed in the else branch *without* allowing recursion
       List<KeyStroke> extraKeys =
-        fromKeys.subList(plugInfo.getFromKeys().size(), fromKeys.size());
-      invokeMappingInfo(editor, context, plugInfo, extraKeys);
+        fromKeys.subList(extInfo.getFromKeys().size(), fromKeys.size());
+      invokeMappingInfo(editor, context, extInfo, extraKeys);
       return true;
     }
     else {
@@ -295,15 +295,17 @@ public class KeyHandler {
         final VimExtensionHandler extensionHandler = mappingInfo.getExtensionHandler();
         if (toKeys != null) {
           final boolean fromIsPrefix = isPrefix(mappingInfo.getFromKeys(), toKeys);
+          final boolean hasPlugMapping = mappingInfo.mapsToPlug();
           boolean first = true;
           for (KeyStroke keyStroke : toKeys) {
-            final boolean recursive = mappingInfo.isRecursive() && !(first && fromIsPrefix);
+            final boolean recursive = hasPlugMapping
+                                      || (mappingInfo.isRecursive() && !(first && fromIsPrefix));
             handleKey(editor, keyStroke, new EditorDataContext(editor), recursive);
             first = false;
           }
 
           for (KeyStroke keyStroke : extraStrokes) {
-            handleKey(editor, keyStroke, new EditorDataContext(editor), false);
+            handleKey(editor, keyStroke, new EditorDataContext(editor), hasPlugMapping);
           }
         }
         else if (extensionHandler != null) {
