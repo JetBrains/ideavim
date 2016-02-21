@@ -40,20 +40,20 @@ public abstract class SecondaryLoopCompat {
     //  we HAVE to use it, due to a bug in the JDK:
     // http://bugs.java.com/bugdatabase/view_bug.do?bug_id=JDK-8144759
 
-    //if (jdk7Factory != null) {
-    //  try {
-    //    final EventQueue systemQueue = Toolkit.getDefaultToolkit().getSystemEventQueue();
-    //    return new Jdk7SecondaryLoopCompat(jdk7Factory.invoke(systemQueue));
-    //  }
-    //  catch (IllegalAccessException e) {
-    //    throw new RuntimeException("On JDK7 but couldn't instantiate JDK7 compat", e);
-    //  }
-    //  catch (InvocationTargetException e) {
-    //    throw new RuntimeException("On JDK7 but couldn't instantiate JDK7 compat", e);
-    //  }
-    //} else {
+    if (jdk7Factory != null) {
+      try {
+        final EventQueue systemQueue = Toolkit.getDefaultToolkit().getSystemEventQueue();
+        return new Jdk7SecondaryLoopCompat(jdk7Factory.invoke(systemQueue));
+      }
+      catch (IllegalAccessException e) {
+        throw new RuntimeException("On JDK7 but couldn't instantiate JDK7 compat", e);
+      }
+      catch (InvocationTargetException e) {
+        throw new RuntimeException("On JDK7 but couldn't instantiate JDK7 compat", e);
+      }
+    } else {
       return new Jdk6SecondaryLoopCompat();
-    //}
+    }
   }
 
   private static class Jdk6SecondaryLoopCompat extends SecondaryLoopCompat {
