@@ -132,9 +132,7 @@ public class VimExtensionFacade {
       final Ref<String> text = Ref.create("");
       // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for input()
       final ExEntryPanel exEntryPanel = ExEntryPanel.getInstance();
-      exEntryPanel.activate(
-        editor, new EditorDataContext(editor),
-        prompt.isEmpty() ? " " : prompt, "", 1);
+      exEntryPanel.activate(editor, new EditorDataContext(editor), prompt.isEmpty() ? " " : prompt, "", 1);
       ModalEntry.activate(new Processor<KeyStroke>() {
         @Override
         public boolean process(KeyStroke key) {
