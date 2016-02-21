@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.extension;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.Ref;
+import com.intellij.util.Processor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.MappingMode;
@@ -96,7 +97,15 @@ public class VimExtensionFacade {
       key = TestInputModel.getInstance(editor).nextKeyStroke();
     }
     else {
-      key = ModalEntry.single();
+      final Ref<KeyStroke> ref = Ref.create();
+      ModalEntry.activate(new Processor<KeyStroke>() {
+        @Override
+        public boolean process(KeyStroke stroke) {
+          ref.set(stroke);
+          return false;
+        }
+      });
+      key = ref.get();
     }
     return key != null ? key : KeyStroke.getKeyStroke((char)KeyEvent.VK_ESCAPE);
   }
@@ -121,13 +130,14 @@ public class VimExtensionFacade {
     }
     else {
       final Ref<String> text = Ref.create("");
+      // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for input()
       final ExEntryPanel exEntryPanel = ExEntryPanel.getInstance();
       exEntryPanel.activate(
         editor, new EditorDataContext(editor),
         prompt.isEmpty() ? " " : prompt, "", 1);
-      ModalEntry.activate(new ModalEntry.OnKeyStrokeHandler() {
+      ModalEntry.activate(new Processor<KeyStroke>() {
         @Override
-        public boolean onKeyStroke(KeyStroke key) {
+        public boolean process(KeyStroke key) {
           if (StringHelper.isCloseKeyStroke(key)) {
             exEntryPanel.deactivate(true);
             return false;
