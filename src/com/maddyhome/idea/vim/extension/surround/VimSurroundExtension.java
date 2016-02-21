@@ -142,7 +142,9 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
       }
 
       // NB: Operator ignores SelectionType anyway
-      new Operator().apply(editor, context, SelectionType.CHARACTER_WISE);
+      if (!new Operator().apply(editor, context, SelectionType.CHARACTER_WISE)) {
+        return;
+      }
 
       // Leave visual mode
       executeNormal(parseKeys("<Esc>"), editor);

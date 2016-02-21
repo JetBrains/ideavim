@@ -27,12 +27,12 @@ public final class ModalEntry {
         if (e.getID() == KeyEvent.KEY_RELEASED) {
           stroke = KeyStroke.getKeyStrokeForEvent(e);
           if (!StringHelper.isCloseKeyStroke(stroke) && stroke.getKeyCode() != KeyEvent.VK_ENTER) {
-            return false;
+            return true;
           }
         } else if (e.getID() == KeyEvent.KEY_TYPED) {
           stroke = KeyStroke.getKeyStrokeForEvent(e);
         } else {
-          return false;
+          return true;
         }
         if (!processor.process(stroke)) {
           KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(this);

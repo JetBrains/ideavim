@@ -316,6 +316,7 @@ public class StringHelper {
 
   public static boolean isCloseKeyStroke(@NotNull KeyStroke key) {
     return key.getKeyCode() == VK_ESCAPE ||
+           key.getKeyChar() == VK_ESCAPE ||
            key.getKeyCode() == VK_C && (key.getModifiers() & CTRL_MASK) != 0 ||
            key.getKeyCode() == '[' && (key.getModifiers() & CTRL_MASK) != 0;
   }
