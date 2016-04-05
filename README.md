@@ -15,9 +15,9 @@ IdeaVim
   <span>Tests</span>
 </div>
 
-IdeaVim is a Vim emulation plug-in for IDEs based on the IntelliJ platform.
+IdeaVim is a Vim emulation plugin for IDEs based on the IntelliJ platform.
 IdeaVim can be used with IntelliJ IDEA, RubyMine, PyCharm, PhpStorm, WebStorm,
-AppCode, CLion, DataGrip, and Android Studio.
+AppCode, CLion, DataGrip and Android Studio.
 
 Resources:
 
@@ -36,7 +36,7 @@ Start the IDE normally and enable the Vim emulation using "Tools | Vim
 Emulator" menu item. At this point you must use Vim keystrokes in all editors.
 
 If you wish to disable the plugin, select the "Tools | Vim Emulator" menu so
-it is unchecked. At this point IDE will work with its regular keyboard
+it is unchecked. At this point your IDE will work with its regular keyboard
 shortcuts.
 
 Keyboard shortcut conflicts between the Vim emulation and the IDE can be
@@ -95,7 +95,7 @@ Note, that IdeaVim currently parses ~/.ideavimrc file via simple pattern matchin
 see [VIM-669](http://youtrack.jetbrains.com/issue/VIM-669) for proper parsing
 of VimL files.
 
-Also note that if you have overridden the `user.home` JVM option, this will
+Also note that if you have overridden the `user.home` JVM option, this
 will affect where IdeaVim looks for your .ideavimrc file.  For example, if you
 have `-Duser.home=/my/alternate/home` then IdeaVim will source
 `/my/alternate/home/.ideavimrc` instead of `~/.ideavimrc`.
@@ -123,7 +123,7 @@ Changes to the IDE
 
 The IdeaVim plugin uses the undo/redo functionality of the IntelliJ platform,
 so the behaviour of the `u` and `<C-R>` commands may differ from the original
-Vim. Vim compatibility of undo/redo may be improved in the future releases.
+Vim. Vim compatibility of undo/redo may be improved in future releases.
 
 See also [unresolved undo issues](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+u).
 
@@ -197,7 +197,7 @@ in the issue tracker.
 
     * The resulting distribution file is build/distributions/IdeaVim-VERSION.zip
 
-    * You can install this file file using "Settings | Plugins | Install plugin
+    * You can install this file using "Settings | Plugins | Install plugin
       from disk"
 
 
