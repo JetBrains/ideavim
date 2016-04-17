@@ -217,7 +217,7 @@ public class KeyHandler {
     }
   }
 
-  private boolean handleKeyMapping(@NotNull final Editor editor, @NotNull KeyStroke key,
+  private boolean handleKeyMapping(@NotNull final Editor editor, @NotNull final KeyStroke key,
                                    @NotNull final DataContext context) {
     final CommandState commandState = CommandState.getInstance(editor);
     commandState.stopMappingTimer();
@@ -232,19 +232,23 @@ public class KeyHandler {
     }
 
     final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mappingMode);
-    final MappingInfo mappingInfo = mapping.get(fromKeys);
+    final MappingInfo currentMappingInfo = mapping.get(fromKeys);
+    final MappingInfo prevMappingInfo = mapping.get(mappingKeys);
+    final MappingInfo mappingInfo = currentMappingInfo != null ? currentMappingInfo : prevMappingInfo;
 
     if (mapping.isPrefix(fromKeys)) {
       mappingKeys.add(key);
-      commandState.startMappingTimer(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent actionEvent) {
-          mappingKeys.clear();
-          for (KeyStroke keyStroke : fromKeys) {
-            handleKey(editor, keyStroke, new EditorDataContext(editor), false);
+      if (Options.getInstance().isSet(Options.TIMEOUT)) {
+        commandState.startMappingTimer(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent actionEvent) {
+            mappingKeys.clear();
+            for (KeyStroke keyStroke : fromKeys) {
+              handleKey(editor, keyStroke, new EditorDataContext(editor), false);
+            }
           }
-        }
-      });
+        });
+      }
       return true;
     }
     else if (mappingInfo != null) {
@@ -253,14 +257,18 @@ public class KeyHandler {
       final Runnable handleMappedKeys = new Runnable() {
         @Override
         public void run() {
+          if (editor.isDisposed()) {
+            return;
+          }
           final List<KeyStroke> toKeys = mappingInfo.getToKeys();
           final VimExtensionHandler extensionHandler = mappingInfo.getExtensionHandler();
+          final EditorDataContext currentContext = new EditorDataContext(editor);
           if (toKeys != null) {
             final boolean fromIsPrefix = isPrefix(mappingInfo.getFromKeys(), toKeys);
             boolean first = true;
             for (KeyStroke keyStroke : toKeys) {
               final boolean recursive = mappingInfo.isRecursive() && !(first && fromIsPrefix);
-              handleKey(editor, keyStroke, new EditorDataContext(editor), recursive);
+              handleKey(editor, keyStroke, currentContext, recursive);
               first = false;
             }
           }
@@ -271,6 +279,9 @@ public class KeyHandler {
                 extensionHandler.execute(editor, context);
               }
             }, "Vim " + extensionHandler.getClass().getSimpleName(), null);
+          }
+          if (prevMappingInfo != null) {
+            handleKey(editor, key, currentContext);
           }
         }
       };

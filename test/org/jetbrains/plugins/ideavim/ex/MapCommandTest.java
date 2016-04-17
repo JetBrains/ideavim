@@ -276,4 +276,22 @@ public class MapCommandTest extends VimTestCase {
     typeText(parseKeys(",z"));
     myFixture.checkResult("zzz\n");
   }
+
+  public void testAmbiguousMapping() {
+    configureByText("\n");
+    typeText(commandToKeys("set notimeout"));
+    typeText(commandToKeys("nmap ,f iHello<Esc>"));
+    typeText(commandToKeys("nmap ,f2 iBye<Esc>"));
+    typeText(parseKeys(",fh"));
+    myFixture.checkResult("Hello\n");
+  }
+
+  public void testLongAmbiguousMapping() {
+    configureByText("\n");
+    typeText(commandToKeys("set notimeout"));
+    typeText(commandToKeys("nmap ,foo iHello<Esc>"));
+    typeText(commandToKeys("nmap ,foo2 iBye<Esc>"));
+    typeText(parseKeys(",fooh"));
+    myFixture.checkResult("Hello\n");
+  }
 }
