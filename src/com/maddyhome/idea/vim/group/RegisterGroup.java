@@ -19,12 +19,22 @@
 package com.maddyhome.idea.vim.group;
 
 import com.google.common.collect.ImmutableList;
+import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction;
+import com.maddyhome.idea.vim.action.motion.search.SearchAgainNextAction;
+import com.maddyhome.idea.vim.action.motion.search.SearchAgainPreviousAction;
+import com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction;
+import com.maddyhome.idea.vim.action.motion.search.SearchEntryRevAction;
+import com.maddyhome.idea.vim.action.motion.text.*;
+import com.maddyhome.idea.vim.action.motion.updown.MotionPercentOrMatchAction;
+import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
@@ -182,22 +192,26 @@ public class RegisterGroup {
       if (logger.isDebugEnabled()) logger.debug("register '" + register + "' contains: \"" + text + "\"");
     }
 
-    // Deletes go into register 1. Old 1 goes to 2, etc. Old 8 to 9, old 9 is lost
     if (isDelete) {
-      for (char d = '8'; d >= '1'; d--) {
-        Register t = registers.get(new Character(d));
-        if (t != null) {
-          t.rename((char)(d + 1));
-          registers.put((char)(d + 1), t);
-        }
-      }
-      registers.put('1', new Register('1', type, text));
+      boolean smallInlineDeletion = type == SelectionType.CHARACTER_WISE &&
+                       editor.offsetToLogicalPosition(start).line == editor.offsetToLogicalPosition(end).line;
 
-      // Deletes small than one line also go the the - register
-      if (type == SelectionType.CHARACTER_WISE) {
-        if (editor.offsetToLogicalPosition(start).line == editor.offsetToLogicalPosition(end).line) {
-          registers.put('-', new Register('-', type, text));
+      // Deletes go into numbered registers only if text is smaller than a line, register is used or it's a special case
+      if (!smallInlineDeletion || register != defaultRegister || isSmallDeletionSpecialCase(editor)) {
+        // Old 1 goes to 2, etc. Old 8 to 9, old 9 is lost
+        for (char d = '8'; d >= '1'; d--) {
+          Register t = registers.get(d);
+          if (t != null) {
+            t.rename((char)(d + 1));
+            registers.put((char)(d + 1), t);
+          }
         }
+        registers.put('1', new Register('1', type, text));
+      }
+
+      // Deletes smaller than one line and without specified register go the the "-" register
+      if (smallInlineDeletion && register == defaultRegister) {
+        registers.put('-', new Register('-', type, text));
       }
     }
     // Yanks also go to register 0 if the default register was used
@@ -211,6 +225,26 @@ public class RegisterGroup {
     }
 
     return true;
+  }
+
+  private boolean isSmallDeletionSpecialCase(Editor editor) {
+    Command currentCommand = CommandState.getInstance(editor).getCommand();
+    if (currentCommand != null) {
+      Argument argument = currentCommand.getArgument();
+      if (argument != null) {
+        Command motionCommand = argument.getMotion();
+        if (motionCommand != null) {
+          AnAction action = motionCommand.getAction();
+          return action instanceof MotionPercentOrMatchAction || action instanceof MotionSentencePreviousStartAction
+            || action instanceof MotionSentenceNextStartAction || action instanceof MotionGotoFileMarkAction
+            || action instanceof SearchEntryFwdAction || action instanceof SearchEntryRevAction
+            || action instanceof SearchAgainNextAction || action instanceof SearchAgainPreviousAction
+            || action instanceof MotionParagraphNextAction || action instanceof MotionParagraphPreviousAction;
+        }
+      }
+    }
+
+    return false;
   }
 
   /**
