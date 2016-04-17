@@ -11,10 +11,16 @@ Added `incsearch` option for incremental search. Added support for `it` and
 `at` tag block selection. Added `vim-surround` commands `ys`, `cs`, `ds`,
 `S`. Various bug fixes.
 
+Features:
+
 * VIM-769 Added `vim-surround` commands `ys`, `cs`, `ds`, `S`
 * VIM-264 Added tag block selection
 * VIM-271 Added `incsearch` option for showing search results while typing
+
+Bug fixes:
+
 * VIM-796 Fixed focus issues with `:action` command
+* VIM-581 Fixed use of special registers `0`-`9` and `-` in delete commands
 
 
 0.44, 2015-11-02
