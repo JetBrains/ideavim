@@ -42,9 +42,38 @@ public class MarkTest extends VimTestCase {
   }
 
   // |m|
+  public void testMarkIsNotDeletedWhenLineIsOneCharAndReplaced() {
+    typeTextInFile(parseKeys("ma", "r1"), "foo\n" +
+                                          "<caret>0\n" +
+                                          "bar\n");
+    Mark mark = VimPlugin.getMark().getMark(myFixture.getEditor(), 'a');
+    assertNotNull(mark);
+  }
+
+  // |m|
+  public void testMarkIsNotDeletedWhenLineIsChanged() {
+    typeTextInFile(parseKeys("ma", "cc"), "    foo\n" +
+                                          "    ba<caret>r\n" +
+                                          "    baz\n");
+    Mark mark = VimPlugin.getMark().getMark(myFixture.getEditor(), 'a');
+    assertNotNull(mark);
+  }
+
+  // |m|
+  public void testMarkIsMovedUpWhenLinesArePartiallyDeletedAbove() {
+    typeTextInFile(parseKeys("mx", "2k", "dd", "0dw"), "    foo\n" +
+                                                       "    bar\n" +
+                                                       "    ba<caret>z\n");
+    Mark mark = VimPlugin.getMark().getMark(myFixture.getEditor(), 'x');
+    assertNotNull(mark);
+    assertEquals(1, mark.getLogicalLine());
+    assertEquals(6, mark.getCol());
+  }
+
+  // |m|
   public void testMarkIsMovedUpWhenLinesAreDeletedAbove() {
     typeTextInFile(parseKeys("mx", "2k", "2dd"), "    foo\n" +
-                                                 "    ba<r\n" +
+                                                 "    bar\n" +
                                                  "    ba<caret>z\n");
     Mark mark = VimPlugin.getMark().getMark(myFixture.getEditor(), 'x');
     assertNotNull(mark);
@@ -54,6 +83,17 @@ public class MarkTest extends VimTestCase {
 
   // |m|
   public void testMarkIsMovedDownWhenLinesAreInsertedAbove() {
+    typeTextInFile(parseKeys("mY", "Obiff"), "foo\n" +
+                                             "ba<caret>r\n" +
+                                             "baz\n");
+    Mark mark = VimPlugin.getMark().getMark(myFixture.getEditor(), 'Y');
+    assertNotNull(mark);
+    assertEquals(2, mark.getLogicalLine());
+    assertEquals(2, mark.getCol());
+  }
+
+  // |m|
+  public void testMarkIsMovedDownWhenLinesAreInsertedAboveWithIndentation() {
     typeTextInFile(parseKeys("mY", "Obiff"), "    foo\n" +
                                              "    ba<caret>r\n" +
                                              "    baz\n");

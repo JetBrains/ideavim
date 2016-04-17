@@ -33,6 +33,8 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Jump;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -549,9 +551,9 @@ public class MarkGroup {
     // Skip all this work if there are no marks
     if (marks != null && marks.size() > 0 && editor != null) {
       // Calculate the logical position of the start and end of the deleted text
-      int delEndOff = delStartOff + delLength;
+      int delEndOff = delStartOff + delLength - 1;
       LogicalPosition delStart = editor.offsetToLogicalPosition(delStartOff);
-      LogicalPosition delEnd = editor.offsetToLogicalPosition(delEndOff);
+      LogicalPosition delEnd = editor.offsetToLogicalPosition(delEndOff + 1);
       if (logger.isDebugEnabled()) logger.debug("mark delete. delStart = " + delStart + ", delEnd = " + delEnd);
 
       // Now analyze each mark to determine if it needs to be updated or removed
@@ -570,8 +572,13 @@ public class MarkGroup {
         else if (delStart.line <= mark.getLogicalLine() && delEnd.line >= mark.getLogicalLine()) {
           int markLineStartOff = EditorHelper.getLineStartOffset(editor, mark.getLogicalLine());
           int markLineEndOff = EditorHelper.getLineEndOffset(editor, mark.getLogicalLine(), true);
-          // If the marked line is completely within the deleted text, remove the mark
-          if (delStartOff <= markLineStartOff && delEndOff >= markLineEndOff) {
+
+          Command command = CommandState.getInstance(editor).getCommand();
+          // If text is being changed from the start of the mark line (a special case for mark deletion)
+          boolean changeFromMarkLineStart = command != null && command.getType() == Command.Type.CHANGE
+                                            && delStartOff == markLineStartOff;
+          // If the marked line is completely within the deleted text, remove the mark (except the special case)
+          if (delStartOff <= markLineStartOff && delEndOff >= markLineEndOff && !changeFromMarkLineStart) {
             VimPlugin.getMark().removeMark(ch, mark);
             logger.debug("Removed mark");
           }
@@ -671,7 +678,7 @@ public class MarkGroup {
       if (!VimPlugin.isEnabled()) return;
 
       if (logger.isDebugEnabled()) logger.debug("MarkUpdater after, event = " + event);
-      if (event.getNewLength() == 0 || (event.getNewLength() == 1 && !event.getNewFragment().equals("\n"))) return;
+      if (event.getNewLength() == 0 || (event.getNewLength() == 1 && event.getNewFragment().charAt(0) != '\n')) return;
 
       Document doc = event.getDocument();
       updateMarkFromInsert(getAnEditor(doc), VimPlugin.getMark().getAllFileMarks(doc), event.getOffset(),
