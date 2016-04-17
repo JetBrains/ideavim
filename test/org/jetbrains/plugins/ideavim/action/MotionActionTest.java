@@ -1,5 +1,6 @@
 package org.jetbrains.plugins.ideavim.action;
 
+import com.intellij.json.JsonFileType;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.VisualPosition;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -871,6 +872,13 @@ public class MotionActionTest extends VimTestCase {
     typeTextInFile(parseKeys("]}"),
                    "{bar, <caret>baz}\n");
     assertOffset(9);
+  }
+
+  // VIM-965 |[m|
+  public void testMethodMovingInNonJavaFile() {
+    myFixture.configureByText(JsonFileType.INSTANCE, "{\"foo\": \"<caret>bar\"}\n");
+    typeText(parseKeys("[m"));
+    myFixture.checkResult("{\"foo\": \"<caret>bar\"}\n");
   }
 
   // VIM-331 |w|
