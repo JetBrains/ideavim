@@ -1039,8 +1039,8 @@ public class MotionGroup {
     return moveCaretToLineStartSkipLeading(editor, logicalLine);
   }
 
-  public int moveCaretToLineStartSkipLeadingOffset(@NotNull Editor editor, int offset) {
-    int line = EditorHelper.normalizeVisualLine(editor, editor.getCaretModel().getVisualPosition().line + offset);
+  public int moveCaretToLineStartSkipLeadingOffset(@NotNull Editor editor, int linesOffset) {
+    int line = EditorHelper.normalizeVisualLine(editor, editor.getCaretModel().getVisualPosition().line + linesOffset);
     return moveCaretToLineStartSkipLeading(editor, EditorHelper.visualLineToLogicalLine(editor, line));
   }
 
@@ -1051,6 +1051,11 @@ public class MotionGroup {
   public int moveCaretToLineEndSkipLeading(@NotNull Editor editor) {
     int logicalLine = editor.getCaretModel().getLogicalPosition().line;
     return moveCaretToLineEndSkipLeading(editor, logicalLine);
+  }
+
+  public int moveCaretToLineEndSkipLeadingOffset(@NotNull Editor editor, int linesOffset) {
+    int line = EditorHelper.normalizeVisualLine(editor, editor.getCaretModel().getVisualPosition().line + linesOffset);
+    return moveCaretToLineEndSkipLeading(editor, EditorHelper.visualLineToLogicalLine(editor, line));
   }
 
   public int moveCaretToLineEndSkipLeading(@NotNull Editor editor, int line) {
