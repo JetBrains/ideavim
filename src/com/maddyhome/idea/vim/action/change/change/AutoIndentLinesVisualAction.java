@@ -43,7 +43,7 @@ public class AutoIndentLinesVisualAction extends VimCommandAction {
                                 @NotNull DataContext context,
                                 @NotNull Command cmd,
                                 @NotNull TextRange range) {
-        VimPlugin.getChange().autoIndentLines(context);
+        VimPlugin.getChange().autoIndentRange(editor, context, range);
         return true;
       }
     });

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2014 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,16 +28,23 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ * @author Aleksey Lagoshin
  */
-public class AutoIndentLinesAction extends EditorAction {
-  public AutoIndentLinesAction() {
+public class AutoIndentMotionAction extends EditorAction {
+  public AutoIndentMotionAction() {
     super(new Handler());
   }
 
   private static class Handler extends ChangeEditorActionHandler {
-    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
-      VimPlugin.getChange().autoIndentLines(editor, context, count);
-      return true;
+    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
+                           @Nullable Argument argument) {
+      if (argument != null) {
+        VimPlugin.getChange().autoIndentMotion(editor, context, count, rawCount, argument);
+        return true;
+      }
+      else {
+        return false;
+      }
     }
   }
 }

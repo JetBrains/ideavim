@@ -370,8 +370,7 @@ public class CopyGroup {
     if (indent) {
       int startOff = editor.getDocument().getLineStartOffset(slp.line);
       int endOff = editor.getDocument().getLineEndOffset(elp.line);
-      editor.getSelectionModel().setSelection(startOff, endOff);
-      VimPlugin.getChange().autoIndentLines(context);
+      VimPlugin.getChange().autoIndentRange(editor, context, new TextRange(startOff, endOff));
     }
     /*
     boolean indented = false;
