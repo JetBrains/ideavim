@@ -236,9 +236,11 @@ public class KeyHandler {
     final MappingInfo prevMappingInfo = mapping.get(mappingKeys);
     final MappingInfo mappingInfo = currentMappingInfo != null ? currentMappingInfo : prevMappingInfo;
 
+    final Application application = ApplicationManager.getApplication();
+
     if (mapping.isPrefix(fromKeys)) {
       mappingKeys.add(key);
-      if (Options.getInstance().isSet(Options.TIMEOUT)) {
+      if (!application.isUnitTestMode() && Options.getInstance().isSet(Options.TIMEOUT)) {
         commandState.startMappingTimer(new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent actionEvent) {
@@ -253,7 +255,6 @@ public class KeyHandler {
     }
     else if (mappingInfo != null) {
       mappingKeys.clear();
-      final Application application = ApplicationManager.getApplication();
       final Runnable handleMappedKeys = new Runnable() {
         @Override
         public void run() {

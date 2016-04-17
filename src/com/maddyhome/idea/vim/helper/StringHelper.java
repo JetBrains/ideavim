@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.awt.event.KeyEvent;
 import java.util.*;
 
 import static java.awt.event.KeyEvent.*;
@@ -38,6 +39,11 @@ public class StringHelper {
   private static final String ALT_PREFIX = "a-";
   private static final String CTRL_PREFIX = "c-";
   private static final String SHIFT_PREFIX = "s-";
+
+  /**
+   * Fake key for <Plug> mappings
+   */
+  private static final int VK_PLUG = KeyEvent.CHAR_UNDEFINED - 1;
 
   private static final Map<String, Integer> VIM_KEY_NAMES = ImmutableMap.<String, Integer>builder()
     .put("cr", VK_ENTER)
@@ -71,6 +77,7 @@ public class StringHelper {
     .put("f10", VK_F10)
     .put("f11", VK_F11)
     .put("f12", VK_F12)
+    .put("plug", VK_PLUG)
     .build();
   private static final Map<Integer, String> VIM_KEY_VALUES = invertMap(VIM_KEY_NAMES);
 
@@ -185,7 +192,7 @@ public class StringHelper {
               state = KeyParserState.INIT;
               final String specialKeyName = specialKeyBuilder.toString();
               final String lower = specialKeyName.toLowerCase();
-              if ("plug".equals(lower) || "sid".equals(lower)) {
+              if ("sid".equals(lower)) {
                 throw new IllegalArgumentException("<" + specialKeyName + "> is not supported");
               }
               if (!"nop".equals(lower)) {
