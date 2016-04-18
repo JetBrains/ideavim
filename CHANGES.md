@@ -16,11 +16,17 @@ Features:
 * VIM-769 Added `vim-surround` commands `ys`, `cs`, `ds`, `S`
 * VIM-264 Added tag block selection
 * VIM-271 Added `incsearch` option for showing search results while typing
+* VIM-217 Added support for `={motion}` formatting command
 
 Bug fixes:
 
 * VIM-796 Fixed focus issues with `:action` command
 * VIM-581 Fixed use of special registers `0`-`9` and `-` in delete commands
+* VIM-965 Fixed exception in `[m` in some file types
+* VIM-564 Fixed `g_` move to go to the current line
+* VIM-964 Fixed marks behavior when the whole line got deleted
+* VIM-259 Move caret to the line beginning after `==`
+* VIM-246 Fixed `{count}==` formatting
 
 
 0.44, 2015-11-02
