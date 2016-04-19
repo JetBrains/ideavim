@@ -26,6 +26,13 @@ intellij {
   pluginName 'IdeaVim'
   updateSinceUntilBuild false
   downloadSources Boolean.valueOf(downloadIdeaSources)
+
+  publish {
+      pluginId '164'
+      channel 'eap'
+      username publishUsername
+      password publishPassword
+  }
 }
 
 processResources {
