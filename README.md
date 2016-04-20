@@ -44,6 +44,21 @@ resolved via "File | Settings | Vim Emulation", "File | Settings | Keymap"
 and key mapping commands in your ~/.ideavimrc file.
 
 
+Get an Early Access
+-------------------
+
+Would you like to try new features and fixes? Join the Early Access Program and
+receive EAP builds as updates! Add this URL to "Settings | Plugins |
+Browse Repositories | Manage Repositories":
+[https://plugins.jetbrains.com/plugins/eap/ideavim](https://plugins.jetbrains.com/plugins/eap/ideavim)
+
+See [the changelog](CHANGES.md) for the list of hot unreleased features.
+
+It is important to distinguish EAP from traditional pre-release software.
+Please note that the quality of EAP versions may at times be way below even
+usual beta standards.
+
+
 Summary of Supported Vim Features
 ---------------------------------
 

@@ -4,6 +4,19 @@ The Changelog
 History of changes in IdeaVim for the IntelliJ platform.
 
 
+Get an Early Access
+-------------------
+
+Would you like to try new features and fixes? Join the Early Access Program and
+receive EAP builds as updates! Add this URL to "Settings | Plugins |
+Browse Repositories | Manage Repositories":
+[https://plugins.jetbrains.com/plugins/eap/ideavim](https://plugins.jetbrains.com/plugins/eap/ideavim)
+
+It is important to distinguish EAP from traditional pre-release software.
+Please note that the quality of EAP versions may at times be way below even
+usual beta standards.
+
+
 To Be Released
 --------------
 
