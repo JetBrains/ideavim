@@ -20,7 +20,6 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.util.text.StringUtil;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -81,15 +80,6 @@ public class SortHandler extends CommandHandler {
         final int endLine = editor.offsetToLogicalPosition(end).line;
 
         return new LineRange(startLine, endLine);
-      }
-      // If we have a block selection
-      else if (selectionModel.hasBlockSelection()) {
-        final LogicalPosition blockStart = selectionModel.getBlockStart();
-        final LogicalPosition blockEnd = selectionModel.getBlockEnd();
-
-        if (blockStart != null && blockEnd != null) {
-          return new LineRange(blockStart.line, blockEnd.line);
-        }
       }
       // If we have a generic selection, i.e. "sort" entire document
       else {

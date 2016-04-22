@@ -1698,34 +1698,6 @@ public class MotionGroup {
     return true;
   }
 
-  public boolean swapVisualEndsBlock(@NotNull Editor editor) {
-    if (CommandState.getInstance(editor).getSubMode() != CommandState.SubMode.VISUAL_BLOCK) {
-      return swapVisualEnds(editor);
-    }
-
-    LogicalPosition lineStart = editor.getSelectionModel().getBlockStart();
-    LogicalPosition lineEnd = editor.getSelectionModel().getBlockEnd();
-    if (lineStart == null || lineEnd == null) {
-      return false;
-    }
-
-    if (visualStart > visualEnd) {
-      LogicalPosition t = lineEnd;
-      lineEnd = lineStart;
-      lineStart = t;
-    }
-
-    LogicalPosition start = new LogicalPosition(lineStart.line, lineEnd.column);
-    LogicalPosition end = new LogicalPosition(lineEnd.line, lineStart.column);
-
-    visualStart = editor.logicalPositionToOffset(start);
-    visualEnd = editor.logicalPositionToOffset(end);
-
-    moveCaret(editor, visualEnd);
-
-    return true;
-  }
-
   public void moveVisualStart(int startOffset) {
     visualStart = startOffset;
   }

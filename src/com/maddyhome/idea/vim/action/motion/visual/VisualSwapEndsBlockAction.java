@@ -38,7 +38,7 @@ public class VisualSwapEndsBlockAction extends VimCommandAction {
   public VisualSwapEndsBlockAction() {
     super(new EditorActionHandlerBase() {
       protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-        return VimPlugin.getMotion().swapVisualEndsBlock(editor);
+        return VimPlugin.getMotion().swapVisualEnds(editor);
       }
     });
   }
