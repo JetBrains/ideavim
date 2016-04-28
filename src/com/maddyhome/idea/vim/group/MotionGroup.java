@@ -21,14 +21,13 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.event.*;
-import com.intellij.openapi.fileEditor.FileEditor;
-import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
-import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
-import com.intellij.openapi.fileEditor.TextEditor;
+import com.intellij.openapi.fileEditor.*;
 import com.intellij.openapi.fileEditor.impl.EditorTabbedContainer;
 import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -400,7 +399,7 @@ public class MotionGroup {
       }
       final int line = mark.getLogicalLine();
       if (!vf.getPath().equals(mark.getFilename())) {
-        final Editor selectedEditor = selectEditor(editor, vf);
+        final Editor selectedEditor = selectEditor(editor, mark);
         if (selectedEditor != null) {
           moveCaret(selectedEditor, moveCaretToLineStartSkipLeading(selectedEditor, line));
         }
@@ -435,7 +434,7 @@ public class MotionGroup {
       }
       final LogicalPosition lp = new LogicalPosition(mark.getLogicalLine(), mark.getCol());
       if (!vf.getPath().equals(mark.getFilename())) {
-        final Editor selectedEditor = selectEditor(editor, vf);
+        final Editor selectedEditor = selectEditor(editor, mark);
         if (selectedEditor != null) {
           moveCaret(selectedEditor, selectedEditor.logicalPositionToOffset(lp));
         }
@@ -496,6 +495,26 @@ public class MotionGroup {
     else {
       return -1;
     }
+  }
+
+  @Nullable
+  private Editor selectEditor(@NotNull Editor editor, @NotNull Mark mark) {
+    final VirtualFile virtualFile = markToVirtualFile(mark);
+    if (virtualFile != null) {
+      return selectEditor(editor, virtualFile);
+    } else {
+      return null;
+    }
+  }
+
+  @Nullable
+  private VirtualFile markToVirtualFile(@NotNull Mark mark) {
+    String protocol = mark.getProtocol();
+    VirtualFileSystem fileSystem = VirtualFileManager.getInstance().getFileSystem(protocol);
+    if (mark.getFilename() == null) {
+      return null;
+    }
+    return fileSystem.findFileByPath(mark.getFilename());
   }
 
   @Nullable
