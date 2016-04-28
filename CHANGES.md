@@ -40,6 +40,7 @@ Bug fixes:
 * VIM-964 Fixed marks behavior when the whole line got deleted
 * VIM-259 Move caret to the line beginning after `==`
 * VIM-246 Fixed `{count}==` formatting
+* VIM-287 Fixed insert new line before and after folds
 
 
 0.44, 2015-11-02
