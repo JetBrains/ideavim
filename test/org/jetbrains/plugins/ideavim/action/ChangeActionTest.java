@@ -536,4 +536,40 @@ public class ChangeActionTest extends VimTestCase {
                           "    }\n" +
                           "}\n");
   }
+
+  // VIM-287 |zc| |O|
+  public void testInsertAfterFold() {
+    configureByJavaText("<caret>/**\n" +
+                        " * I should be fold\n" +
+                        " * a little more text\n" +
+                        " * and final fold\n" +
+                        " */\n" +
+                        "and some text after\n");
+    typeText(parseKeys("zc", "G", "O"));
+    myFixture.checkResult("/**\n" +
+                          " * I should be fold\n" +
+                          " * a little more text\n" +
+                          " * and final fold\n" +
+                          " */\n" +
+                          "<caret>\n" +
+                          "and some text after\n");
+  }
+
+  // VIM-287 |zc| |o|
+  public void testInsertBeforeFold() {
+    configureByJavaText("<caret>/**\n" +
+                        " * I should be fold\n" +
+                        " * a little more text\n" +
+                        " * and final fold\n" +
+                        " */\n" +
+                        "and some text after\n");
+    typeText(parseKeys("zc", "o"));
+    myFixture.checkResult("/**\n" +
+                          " * I should be fold\n" +
+                          " * a little more text\n" +
+                          " * and final fold\n" +
+                          " */\n" +
+                          "<caret>\n" +
+                          "and some text after\n");
+  }
 }
