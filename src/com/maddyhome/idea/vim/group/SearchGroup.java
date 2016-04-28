@@ -33,6 +33,8 @@ import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.util.Ref;
+import com.intellij.util.Processor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -48,6 +50,8 @@ import com.maddyhome.idea.vim.regexp.CharHelper;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
+import com.maddyhome.idea.vim.ui.ExEntryPanel;
+import com.maddyhome.idea.vim.ui.ModalEntry;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -221,6 +225,10 @@ public class SearchGroup {
     int line1 = range.getStartLine();
     int line2 = range.getEndLine();
 
+    if (line1 < 0 || line2 < 0) {
+      return false;
+    }
+
     /*
     * check for a trailing count
     */
@@ -263,6 +271,7 @@ public class SearchGroup {
     }
 
     lastSubstitute = pattern;
+    lastSearch = pattern;
     if (pattern != null) {
       setLastPattern(editor, pattern);
     }
@@ -347,27 +356,26 @@ public class SearchGroup {
         if (do_all || line != lastLine) {
           boolean doReplace = true;
           if (do_ask) {
-            //editor.getSelectionModel().setSelection(startoff, endoff);
             RangeHighlighter hl = highlightConfirm(editor, startoff, endoff);
-            int choice = getConfirmChoice(match);
-            //editor.getSelectionModel().removeSelection();
+            MotionGroup.scrollPositionIntoView(editor, editor.offsetToVisualPosition(startoff), true);
+            MotionGroup.moveCaret(editor, startoff);
+            final ReplaceConfirmationChoice choice = confirmChoice(editor, match);
             editor.getMarkupModel().removeHighlighter(hl);
             switch (choice) {
-              case 0: // Yes
+              case SUBSTITUTE_THIS:
                 doReplace = true;
                 break;
-              case 1: // No
+              case SKIP:
                 doReplace = false;
                 break;
-              case 2: // All
+              case SUBSTITUTE_ALL:
                 do_ask = false;
                 break;
-              case JOptionPane.CLOSED_OPTION:
-              case 3: // Quit
+              case QUIT:
                 doReplace = false;
                 got_quit = true;
                 break;
-              case 4: // Last
+              case SUBSTITUTE_LAST:
                 do_all = false;
                 line2 = lnum;
                 doReplace = true;
@@ -420,24 +428,41 @@ public class SearchGroup {
     return res;
   }
 
-  private int getConfirmChoice(String match) {
-    Object[] btns = getConfirmButtons();
-    confirmDlg = new JOptionPane("Replace with " + match + " ?", JOptionPane.QUESTION_MESSAGE,
-                                 JOptionPane.DEFAULT_OPTION, null, btns, btns[0]);
-    JDialog dlg = confirmDlg.createDialog(null, "Confirm Replace");
-    dlg.setVisible(true);
-    Object res = confirmDlg.getValue();
-    confirmDlg = null;
-    if (res == null) {
-      return JOptionPane.CLOSED_OPTION;
-    }
-    for (int i = 0; i < btns.length; i++) {
-      if (btns[i].equals(res)) {
-        return i;
+  @NotNull
+  private static ReplaceConfirmationChoice confirmChoice(@NotNull Editor editor, @NotNull String match) {
+    final Ref<ReplaceConfirmationChoice> result = Ref.create(ReplaceConfirmationChoice.QUIT);
+    // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for this method
+    final ExEntryPanel exEntryPanel = ExEntryPanel.getInstance();
+    exEntryPanel.activate(editor, new EditorDataContext(editor), "Replace with " + match + " (y/n/a/q/l)?", "", 1);
+    ModalEntry.activate(new Processor<KeyStroke>() {
+      @Override
+      public boolean process(KeyStroke key) {
+        final ReplaceConfirmationChoice choice;
+        final char c = key.getKeyChar();
+        if (StringHelper.isCloseKeyStroke(key) || c == 'q') {
+          choice = ReplaceConfirmationChoice.QUIT;
+        }
+        else if (c == 'y') {
+          choice = ReplaceConfirmationChoice.SUBSTITUTE_THIS;
+        }
+        else if (c == 'l') {
+          choice = ReplaceConfirmationChoice.SUBSTITUTE_LAST;
+        }
+        else if (c == 'n') {
+          choice = ReplaceConfirmationChoice.SKIP;
+        }
+        else if (c == 'a') {
+          choice = ReplaceConfirmationChoice.SUBSTITUTE_ALL;
+        }
+        else {
+          return true;
+        }
+        result.set(choice);
+        exEntryPanel.deactivate(true);
+        return false;
       }
-    }
-
-    return JOptionPane.CLOSED_OPTION;
+    });
+    return result.get();
   }
 
   private static boolean shouldIgnoreCase(@NotNull String pattern, boolean noSmartCase) {
@@ -445,31 +470,6 @@ public class SearchGroup {
     boolean ic = Options.getInstance().isSet("ignorecase");
 
     return ic && !(sc && StringHelper.containsUpperCase(pattern));
-  }
-
-  private Object[] getConfirmButtons() {
-    if (confirmBtns == null) {
-      confirmBtns = new JButton[]{
-        new JButton("Yes"),
-        new JButton("No"),
-        new JButton("All"),
-        new JButton("Quit"),
-        new JButton("Last")
-      };
-
-      confirmBtns[0].setMnemonic('Y');
-      confirmBtns[1].setMnemonic('N');
-      confirmBtns[2].setMnemonic('A');
-      confirmBtns[3].setMnemonic('Q');
-      confirmBtns[4].setMnemonic('L');
-
-      for (int i = 0; i < confirmBtns.length; i++) {
-        confirmBtns[i].addActionListener(new ButtonActionListener(i));
-      }
-      //confirmBtns = new String[] { "Yes", "No", "All", "Quit", "Last" };
-    }
-
-    return confirmBtns;
   }
 
   public int search(@NotNull Editor editor, @NotNull String command, int count, int flags, boolean moveCursor) {
@@ -1265,6 +1265,14 @@ public class SearchGroup {
         }
       }
     }
+  }
+
+  private enum ReplaceConfirmationChoice {
+    SUBSTITUTE_THIS,
+    SUBSTITUTE_LAST,
+    SKIP,
+    QUIT,
+    SUBSTITUTE_ALL,
   }
 
   @Nullable private String lastSearch;
