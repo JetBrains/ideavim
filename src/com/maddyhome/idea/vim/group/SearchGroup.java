@@ -56,8 +56,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.*;
@@ -1180,20 +1178,6 @@ public class SearchGroup {
     return child != null ? StringHelper.getSafeXmlText(child) : null;
   }
 
-  private class ButtonActionListener implements ActionListener {
-    public ButtonActionListener(int i) {
-      index = i;
-    }
-
-    public void actionPerformed(ActionEvent event) {
-      if (confirmDlg != null) {
-        confirmDlg.setValue(confirmBtns[index]);
-      }
-    }
-
-    private final int index;
-  }
-
   public static class EditorSelectionCheck extends FileEditorManagerAdapter {
     /*
     public void fileOpened(FileEditorManager fileEditorManager, VirtualFile virtualFile)
@@ -1270,8 +1254,6 @@ public class SearchGroup {
   @Nullable private String lastReplace;
   @Nullable private String lastOffset;
   private int lastDir;
-  private JButton[] confirmBtns;
-  @Nullable private JOptionPane confirmDlg = null;
   private boolean showSearchHighlight = Options.getInstance().isSet("hlsearch");
 
   private boolean do_all = false; /* do multiple substitutions per line */
