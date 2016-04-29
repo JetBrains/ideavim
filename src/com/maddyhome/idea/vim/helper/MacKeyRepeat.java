@@ -64,14 +64,16 @@ public class MacKeyRepeat {
       final String arg = value ? "0" : "1";
       command = String.format(FMT, "write") + " " + arg;
     }
-    final Process process;
     try {
-      process = Runtime.getRuntime().exec(command);
-      process.waitFor();
+      final Runtime runtime = Runtime.getRuntime();
+      final Process defaults = runtime.exec(command);
+      defaults.waitFor();
+      final Process restartSystemUI = runtime.exec("launchctl stop com.apple.SystemUIServer.agent");
+      restartSystemUI.waitFor();
     }
-    catch (IOException e) {
+    catch (IOException ignored) {
     }
-    catch (InterruptedException e) {
+    catch (InterruptedException ignored) {
     }
   }
 

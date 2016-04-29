@@ -24,8 +24,6 @@ import com.intellij.notification.*;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.ex.ApplicationEx;
-import com.intellij.openapi.application.ex.ApplicationManagerEx;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
@@ -396,20 +394,17 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   private void updateState() {
     if (isEnabled() && !ApplicationManager.getApplication().isUnitTestMode()) {
-      boolean requiresRestart = false;
       if (SystemInfo.isMac) {
         final MacKeyRepeat keyRepeat = MacKeyRepeat.getInstance();
         final Boolean enabled = keyRepeat.isEnabled();
         final Boolean isKeyRepeat = editor.isKeyRepeat();
         if ((enabled == null || !enabled) && (isKeyRepeat == null || isKeyRepeat)) {
-          if (Messages.showYesNoDialog("Do you want to enable repeating keys in Mac OS X on press and hold " +
-                                       "(requires restart)?\n\n" +
+          if (Messages.showYesNoDialog("Do you want to enable repeating keys in Mac OS X on press and hold?\n\n" +
                                        "(You can do it manually by running 'defaults write -g " +
                                        "ApplePressAndHoldEnabled 0' in the console).", IDEAVIM_NOTIFICATION_TITLE,
                                        Messages.getQuestionIcon()) == Messages.YES) {
             editor.setKeyRepeat(true);
             keyRepeat.setEnabled(true);
-            requiresRestart = true;
           }
           else {
             editor.setKeyRepeat(false);
@@ -454,10 +449,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
           "~/.ideavimrc using this command:<br/><br/>" +
           "<code>source ~/.vimrc</code>",
           NotificationType.INFORMATION).notify(null);
-      }
-      if (requiresRestart) {
-        final ApplicationEx app = ApplicationManagerEx.getApplicationEx();
-        app.restart();
       }
     }
   }
