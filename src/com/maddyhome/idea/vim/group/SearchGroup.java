@@ -80,7 +80,6 @@ public class SearchGroup {
   }
 
   public boolean searchAndReplace(@NotNull Editor editor, @NotNull LineRange range, @NotNull String excmd, String exarg) {
-    boolean res = true;
 
     // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
@@ -327,6 +326,9 @@ public class SearchGroup {
         }
 
         String match = sp.vim_regsub_multi(regmatch, lnum, sub, 1, false);
+        if (match == null) {
+          return false;
+        }
         //logger.debug("found match[" + spos + "," + epos + "] - replace " + match);
 
         int line = lnum + regmatch.startpos[0].lnum;
@@ -410,7 +412,7 @@ public class SearchGroup {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));
     }
 
-    return res;
+    return true;
   }
 
   @NotNull
