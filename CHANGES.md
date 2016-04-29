@@ -42,6 +42,7 @@ Bug fixes:
 * VIM-246 Fixed `{count}==` formatting
 * VIM-287 Fixed insert new line before and after folds
 * VIM-139 Focus on current search and use modal confirmation for `:s///gc`
+* VIM-843 Don't highlight search results after restart
 
 
 0.44, 2015-11-02
