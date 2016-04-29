@@ -560,7 +560,7 @@ public class SearchGroup {
     return findItOffset(editor, editor.getCaretModel().getOffset(), count, -lastDir, false);
   }
 
-  public void updateHighlight() {
+  private void updateHighlight() {
     highlightSearch(false);
   }
 
@@ -646,8 +646,11 @@ public class SearchGroup {
   }
 
   @NotNull
-  public static List<TextRange> findAll(@NotNull Editor editor, @NotNull String pattern, int startLine, int endLine,
-                                        boolean ignoreCase) {
+  private static List<TextRange> findAll(@NotNull Editor editor,
+                                         @NotNull String pattern,
+                                         int startLine,
+                                         int endLine,
+                                         boolean ignoreCase) {
     final List<TextRange> results = Lists.newArrayList();
     final int lineCount = EditorHelper.getLineCount(editor);
     final int actualEndLine = endLine == -1 ? lineCount : endLine;
