@@ -43,8 +43,7 @@ import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.option.OptionChangeEvent;
-import com.maddyhome.idea.vim.option.OptionChangeListener;
+import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.regexp.CharHelper;
 import com.maddyhome.idea.vim.regexp.CharPointer;
@@ -63,19 +62,7 @@ import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.*;
 
-/**
- *
- */
 public class SearchGroup {
-  public SearchGroup() {
-    Options.getInstance().getOption("hlsearch").addOptionChangeListener(new OptionChangeListener() {
-      public void valueChange(OptionChangeEvent event) {
-        showSearchHighlight = Options.getInstance().isSet("hlsearch");
-        updateHighlight();
-      }
-    });
-  }
-
   @Nullable
   public String getLastSearch() {
     return lastSearch;
@@ -1178,7 +1165,9 @@ public class SearchGroup {
     lastDir = Integer.parseInt(dir.getText());
 
     Element show = search.getChild("show-last");
-    showSearchHighlight = Boolean.valueOf(show.getText());
+    final ListOption vimInfo = Options.getInstance().getListOption(Options.VIMINFO);
+    final boolean disableHighlight = vimInfo != null && vimInfo.contains("h");
+    showSearchHighlight = !disableHighlight && Boolean.valueOf(show.getText());
     if (logger.isDebugEnabled()) {
       logger.debug("show=" + show + "(" + show.getText() + ")");
       logger.debug("showSearchHighlight=" + showSearchHighlight);
