@@ -38,6 +38,7 @@ Contributors:
 * [Liubov Paina](mailto:lubashka.994@mail.ru)
 * [Daniel Leong](mailto:falcone88@gmail.com)
 * [Aleksey Lagoshin](mailto:aleksey@pri-num.com)
+* [Paulo Bu](mailto:pbu_98@yahoo.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
