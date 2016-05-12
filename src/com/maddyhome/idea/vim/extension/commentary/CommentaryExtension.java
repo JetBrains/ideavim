@@ -19,9 +19,7 @@ import com.maddyhome.idea.vim.key.OperatorFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormal;
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction;
+import static com.maddyhome.idea.vim.extension.VimExtensionFacade.*;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
 /**
@@ -37,17 +35,17 @@ public class CommentaryExtension extends VimNonDisposableExtension {
 
   @Override
   protected void initOnce() {
-    //putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentMotion)"), new CommentMotionHandler(), false);
-    //putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentLine)"), new CommentLineHandler(), false);
-    //putExtensionHandlerMapping(MappingMode.VO, parseKeys("<Plug>(CommentMotionV)"), new CommentMotionHandler(), false);
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentMotion)"), new CommentMotionHandler(), false);
+    putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentLine)"), new CommentLineHandler(), false);
+    putExtensionHandlerMapping(MappingMode.VO, parseKeys("<Plug>(CommentMotionV)"), new CommentMotionHandler(), false);
 
-    //putKeyMapping(MappingMode.N, parseKeys("gc"), parseKeys("<Plug>(CommentMotion)"), true);
-    //putKeyMapping(MappingMode.N, parseKeys("gcc"), parseKeys("<Plug>(CommentLine)"), true);
-    //putKeyMapping(MappingMode.VO, parseKeys("gc"), parseKeys("<Plug>(CommentMotionV)"), true);
+    putKeyMapping(MappingMode.N, parseKeys("gc"), parseKeys("<Plug>(CommentMotion)"), true);
+    putKeyMapping(MappingMode.N, parseKeys("gcc"), parseKeys("<Plug>(CommentLine)"), true);
+    putKeyMapping(MappingMode.VO, parseKeys("gc"), parseKeys("<Plug>(CommentMotionV)"), true);
 
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("gc"), new CommentMotionHandler(), false);
-    putExtensionHandlerMapping(MappingMode.N, parseKeys("gcc"), new CommentLineHandler(), false);
-    putExtensionHandlerMapping(MappingMode.VO, parseKeys("gc"), new CommentMotionHandler(), false);
+    //putExtensionHandlerMapping(MappingMode.N, parseKeys("gc"), new CommentMotionHandler(), false);
+    //putExtensionHandlerMapping(MappingMode.N, parseKeys("gcc"), new CommentLineHandler(), false);
+    //putExtensionHandlerMapping(MappingMode.VO, parseKeys("gc"), new CommentMotionHandler(), false);
   }
 
   private static class CommentMotionHandler implements VimExtensionHandler {
