@@ -16,11 +16,21 @@ public class CommentaryExtensionTest extends JavaVimTestCase {
     enableExtensions("commentary");
   }
 
+  // |gc| |l|
+  public void testBlockCommentSingle() {
+    doTest(parseKeys("gcll"),
+           "<caret>if (condition) {\n" + "}\n",
+           "/<caret>*i*/f (condition) {\n" + "}\n");
+    assertMode(COMMAND);
+    assertSelection(null);
+  }
+
+
   // |gc| |iw|
   public void testBlockCommentInnerWord() {
     doTest(parseKeys("gciw"),
            "<caret>if (condition) {\n" + "}\n",
-           "/*if*/ (condition) {\n" + "}\n");
+           "<caret>/*if*/ (condition) {\n" + "}\n");
     assertMode(COMMAND);
     assertSelection(null);
   }
@@ -29,7 +39,7 @@ public class CommentaryExtensionTest extends JavaVimTestCase {
   public void testBlockCommentTillForward() {
     doTest(parseKeys("gct{"),
            "<caret>if (condition) {\n" + "}\n",
-           "/*if (condition) */{\n" + "}\n");
+           "<caret>/*if (condition) */{\n" + "}\n");
   }
 
   // |gc| |ab|
@@ -90,10 +100,10 @@ public class CommentaryExtensionTest extends JavaVimTestCase {
 
   // |gcc|
   public void testLineCommentShortcut() {
-    doTest(parseKeys("gcc"),
+    doTest(parseKeys("gccj"),
            "<caret>if (condition) {\n" + "}\n",
            "//if (condition) {\n" +
-           "}\n");
+           "<caret>}\n");
     assertMode(COMMAND);
     assertSelection(null);
   }
@@ -102,7 +112,8 @@ public class CommentaryExtensionTest extends JavaVimTestCase {
   public void testLineUncommentShortcut() {
     doTest(parseKeys("gcc"),
            "<caret>//if (condition) {\n" + "}\n",
-           "if (condition) {\n" + "}\n");
+           "if (condition) {\n" +
+           "<caret>}\n");
     assertMode(COMMAND);
     assertSelection(null);
   }
