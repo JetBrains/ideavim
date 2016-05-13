@@ -112,8 +112,8 @@ public class CommentaryExtensionTest extends JavaVimTestCase {
   public void testLineUncommentShortcut() {
     doTest(parseKeys("gcc"),
            "<caret>//if (condition) {\n" + "}\n",
-           "if (condition) {\n" +
-           "<caret>}\n");
+           "<caret>if (condition) {\n" +
+           "}\n");
     assertMode(COMMAND);
     assertSelection(null);
   }
