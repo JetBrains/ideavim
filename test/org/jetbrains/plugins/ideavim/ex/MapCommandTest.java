@@ -294,8 +294,8 @@ public class MapCommandTest extends VimTestCase {
     configureByText("\n");
     typeText(commandToKeys("nmap ,f iHello<Esc>"));
     typeText(commandToKeys("nmap ,fc iBye<Esc>"));
-    typeText(parseKeys(",fh"));
-    myFixture.checkResult("Hello\n");
+    typeText(parseKeys(",fdh"));
+    myFixture.checkResult("Helo\n");
 
     typeText(parseKeys("diw"));
     myFixture.checkResult("\n");
@@ -308,8 +308,8 @@ public class MapCommandTest extends VimTestCase {
     configureByText("\n");
     typeText(commandToKeys("nmap ,foo iHello<Esc>"));
     typeText(commandToKeys("nmap ,fooc iBye<Esc>"));
-    typeText(parseKeys(",fooh"));
-    myFixture.checkResult("Hello\n");
+    typeText(parseKeys(",foodh"));
+    myFixture.checkResult("Helo\n");
 
     typeText(parseKeys("diw"));
     myFixture.checkResult("\n");

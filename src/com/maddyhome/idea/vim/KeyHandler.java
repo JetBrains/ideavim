@@ -300,7 +300,12 @@ public class KeyHandler {
                                      "Vim " + extensionHandler.getClass().getSimpleName(),
                                      null);
           }
-          if (prevMappingInfo != null) {
+
+          // NB: mappingInfo MUST be non-null here, so if equal
+          //  then prevMappingInfo is also non-null; this also
+          //  means that the prev mapping was a prefix, but the
+          //  next key typed (`key`) was not part of that
+          if (prevMappingInfo == mappingInfo) {
             handleKey(editor, key, currentContext);
           }
         }
