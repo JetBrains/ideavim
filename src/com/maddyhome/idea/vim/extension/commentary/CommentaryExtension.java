@@ -37,7 +37,7 @@ public class CommentaryExtension extends VimNonDisposableExtension {
   protected void initOnce() {
     putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentMotion)"), new CommentMotionHandler(), false);
     putExtensionHandlerMapping(MappingMode.N, parseKeys("<Plug>(CommentLine)"), new CommentLineHandler(), false);
-    putExtensionHandlerMapping(MappingMode.VO, parseKeys("<Plug>(CommentMotionV)"), new CommentMotionHandler(), false);
+    putExtensionHandlerMapping(MappingMode.VO, parseKeys("<Plug>(CommentMotionV)"), new CommentMotionVHandler(), false);
 
     putKeyMapping(MappingMode.N, parseKeys("gc"), parseKeys("<Plug>(CommentMotion)"), true);
     putKeyMapping(MappingMode.N, parseKeys("gcc"), parseKeys("<Plug>(CommentLine)"), true);
@@ -49,6 +49,26 @@ public class CommentaryExtension extends VimNonDisposableExtension {
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
       setOperatorFunction(new Operator());
       executeNormal(parseKeys("g@"), editor);
+    }
+  }
+
+  private static class CommentMotionVHandler implements VimExtensionHandler {
+    @Override
+    public void execute(@NotNull Editor editor, @NotNull DataContext context) {
+      final TextRange visualRange = VimPlugin.getMark().getVisualSelectionMarks(editor);
+      if (visualRange == null) {
+        return;
+      }
+
+      // always use line-wise comments
+      if (!new Operator().apply(editor, context, SelectionType.LINE_WISE)) {
+        return;
+      }
+
+      // Leave visual mode
+      executeNormal(parseKeys("<Esc>"), editor);
+
+      editor.getCaretModel().moveToOffset(visualRange.getStartOffset());
     }
   }
 

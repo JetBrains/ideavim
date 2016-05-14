@@ -96,6 +96,27 @@ public class CommentaryExtensionTest extends JavaVimTestCase {
            "if (condition) {}");
   }
 
+  /* Visual mode */
+
+  // |gc| |ip|
+  public void testLineCommentVisualInnerParagraph() {
+    doTest(parseKeys("vipgc"),
+           "<caret>if (condition) {\n" + "}\n",
+           "//if (condition) {\n" +
+           "//}\n");
+  }
+
+  // |gc| |ip|
+  public void testLineUncommentVisualInnerParagraph() {
+    doTest(parseKeys("vipgc"),
+           "<caret>//if (condition) {\n" + "//}\n",
+           "if (condition) {\n" +
+           "}\n");
+  }
+
+
+
+
   /* Special shortcut gcc is always linewise */
 
   // |gcc|
