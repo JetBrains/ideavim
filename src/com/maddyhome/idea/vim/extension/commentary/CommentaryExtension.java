@@ -80,6 +80,9 @@ public class CommentaryExtension extends VimNonDisposableExtension {
 
         handler.invoke(editor.getProject(), editor, editor.getCaretModel().getCurrentCaret(), file);
         handler.postInvoke();
+
+        // Jump back to start
+        executeNormal(parseKeys("`["), editor);
         return true;
       } catch (RuntimeException e) {
         e.printStackTrace(); // ???
