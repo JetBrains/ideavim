@@ -306,7 +306,22 @@ public class KeyHandler {
           //  means that the prev mapping was a prefix, but the
           //  next key typed (`key`) was not part of that
           if (prevMappingInfo == mappingInfo) {
-            handleKey(editor, key, currentContext);
+            // post to end of queue so it's handled AFTER
+            //  an <Plug> mapping is invoked (since that
+            //  will also get posted)
+            Runnable handleRemainingKey = new Runnable() {
+              @Override
+              public void run() {
+                handleKey(editor, key, currentContext);
+              }
+            };
+
+            if (application.isUnitTestMode()) {
+              handleRemainingKey.run();
+            }
+            else {
+              application.invokeLater(handleRemainingKey);
+            }
           }
         }
       };
