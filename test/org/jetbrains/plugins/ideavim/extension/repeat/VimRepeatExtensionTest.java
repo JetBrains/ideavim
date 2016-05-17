@@ -29,4 +29,43 @@ public class VimRepeatExtensionTest extends JavaVimTestCase {
     myFixture.checkResult("<caret>foo))\n");
   }
 
+  public void testRepeatLineComment() {
+    enableExtensions("commentary", "repeat");
+    configureByJavaText("ffoo\n");
+    typeText(parseKeys("x")); // set some initial repeat-able
+
+    typeText(parseKeys("gcc"));
+    myFixture.checkResult("<caret>//foo\n");
+
+    // repeat the comment
+    typeText(parseKeys("."));
+    myFixture.checkResult("<caret>foo\n");
+
+    typeText(parseKeys("x"));
+    myFixture.checkResult("<caret>oo\n");
+
+    // this repeat should do the default
+    typeText(parseKeys("."));
+    myFixture.checkResult("<caret>o\n");
+  }
+
+  public void testRepeatMotionComment() {
+    enableExtensions("commentary", "repeat");
+    configureByJavaText("ffoo\n");
+    typeText(parseKeys("x")); // set some initial repeat-able
+
+    typeText(parseKeys("gcap"));
+    myFixture.checkResult("<caret>//foo\n");
+
+    // repeat the comment
+    typeText(parseKeys("."));
+    myFixture.checkResult("<caret>foo\n");
+
+    typeText(parseKeys("x"));
+    myFixture.checkResult("<caret>oo\n");
+
+    // this repeat should do the default
+    typeText(parseKeys("."));
+    myFixture.checkResult("<caret>o\n");
+  }
 }

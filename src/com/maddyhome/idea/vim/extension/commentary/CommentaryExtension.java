@@ -17,9 +17,13 @@ import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.extension.VimNonDisposableExtension;
+import com.maddyhome.idea.vim.extension.repeat.VimRepeat;
 import com.maddyhome.idea.vim.key.OperatorFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
+import java.util.List;
 
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.*;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -77,6 +81,8 @@ public class CommentaryExtension extends VimNonDisposableExtension {
   private static class Operator implements OperatorFunction {
     @Override
     public boolean apply(@NotNull Editor editor, @NotNull DataContext context, @NotNull SelectionType selectionType) {
+      final List<KeyStroke> operatorMotion = getMotionKeys(editor);
+
       final TextRange range = getCommentRange(editor);
       if (range == null) return false;
 
@@ -104,10 +110,15 @@ public class CommentaryExtension extends VimNonDisposableExtension {
           if (selectionType == SelectionType.CHARACTER_WISE) {
             executeNormal(parseKeys("`["), editor);
           }
+
+          // enable repeat
+          List<KeyStroke> keys = parseKeys("<Plug>(CommentMotion)");
+          keys.addAll(operatorMotion);
+          VimRepeat.set(editor, keys);
           return true;
         } finally {
-          // remove the selection
-          editor.getSelectionModel().removeSelection();
+            // remove the selection
+            editor.getSelectionModel().removeSelection();
         }
       });
     }
@@ -136,6 +147,8 @@ public class CommentaryExtension extends VimNonDisposableExtension {
       final int lineEnd = editor.getDocument().getLineEndOffset(line);
       VimPlugin.getMark().setChangeMarks(editor, new TextRange(lineStart, lineEnd));
       new Operator().apply(editor, context, SelectionType.LINE_WISE);
+
+      VimRepeat.set(editor, parseKeys("<Plug>(CommentLine)"));
     }
   }
 }
