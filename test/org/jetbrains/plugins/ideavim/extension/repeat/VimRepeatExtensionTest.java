@@ -29,6 +29,70 @@ public class VimRepeatExtensionTest extends JavaVimTestCase {
     myFixture.checkResult("<caret>foo))\n");
   }
 
+  public void testRepeatDeleteSurround() {
+    enableExtensions("surround", "repeat");
+
+    configureByText("(((foo))\n");
+    typeText(parseKeys("x")); // set some initial repeat-able
+
+    typeText(parseKeys("dsb"));
+    myFixture.checkResult("<caret>(foo)\n");
+
+    typeText(parseKeys("."));
+    myFixture.checkResult("<caret>foo\n");
+
+    typeText(parseKeys("x"));
+    myFixture.checkResult("<caret>oo\n");
+
+    // this repeat should do the default
+    typeText(parseKeys("."));
+    myFixture.checkResult("<caret>o\n");
+  }
+
+  public void testRepeatChangeSurround() {
+    enableExtensions("surround", "repeat");
+
+    configureByText("((foo) (bar)\n");
+    typeText(parseKeys("x")); // set some initial repeat-able
+
+    typeText(parseKeys("csb'"));
+    myFixture.checkResult("<caret>'foo' (bar)\n");
+
+    typeText(parseKeys("W."));
+    myFixture.checkResult("'foo' <caret>'bar'\n");
+
+    typeText(parseKeys("x"));
+    myFixture.checkResult("'foo' <caret>bar'\n");
+
+    // this repeat should do the default
+    typeText(parseKeys("."));
+    myFixture.checkResult("'foo' <caret>ar'\n");
+  }
+
+  //public void testRepeatChangeSurroundTag() {
+  //  enableExtensions("surround", "repeat");
+  //
+  //  configureByText("<<a>foo</a> <i>bar</i>\n");
+  //  typeText(parseKeys("x")); // set some initial repeat-able
+  //
+  //  typeText(parseKeys("cst<div>"));
+  //  myFixture.checkResult("<caret><div>foo</div> <i>bar</i>\n");
+  //
+  //  typeText(parseKeys("fb."));
+  //  myFixture.checkResult("<div>foo</div> <caret><div>bar</div>\n");
+  //
+  //  typeText(parseKeys("x"));
+  //  myFixture.checkResult("div>foo</div> <caret><div>bar</div>\n");
+  //
+  //  // this repeat should do the default
+  //  typeText(parseKeys("."));
+  //  myFixture.checkResult("iv>foo</div> <caret><div>bar</div>\n");
+  //}
+
+  /*
+   * Repeating comments
+   */
+
   public void testRepeatLineComment() {
     enableExtensions("commentary", "repeat");
     configureByJavaText("ffoo\n");

@@ -213,6 +213,12 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
 
       // Jump back to start
       executeNormal(parseKeys("`["), editor);
+
+      if (newSurround == null) {
+        VimRepeat.set(editor, parseKeys("<Plug>DSurround" + charFrom));
+      } else {
+        VimRepeat.set(editor, parseKeys("<Plug>CSurround" + charFrom + newSurround.first));
+      }
     }
 
     @NotNull
