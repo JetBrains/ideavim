@@ -20,6 +20,7 @@ package org.jetbrains.plugins.ideavim;
 
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase;
 import com.maddyhome.idea.vim.KeyHandler;
@@ -66,6 +67,12 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
       assert option != null;
       option.set();
     }
+  }
+
+  @NotNull
+  protected Editor configureByText(@NotNull String content) {
+    myFixture.configureByText(PlainTextFileType.INSTANCE, content);
+    return myFixture.getEditor();
   }
 
   @NotNull

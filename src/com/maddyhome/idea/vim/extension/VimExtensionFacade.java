@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.extension;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.Ref;
-import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.Register;
@@ -30,6 +29,7 @@ import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.helper.TestInputModel;
 import com.maddyhome.idea.vim.key.OperatorFunction;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
+import com.maddyhome.idea.vim.ui.InputQueue;
 import com.maddyhome.idea.vim.ui.ModalEntry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -81,9 +81,8 @@ public class VimExtensionFacade {
    */
   public static void executeNormal(@NotNull List<KeyStroke> keys, @NotNull Editor editor) {
     final EditorDataContext context = new EditorDataContext(editor);
-    for (KeyStroke key : keys) {
-      KeyHandler.getInstance().handleKey(editor, key, context);
-    }
+    InputQueue.insert(keys);
+    InputQueue.executeNormal(editor, context);
   }
 
   /**
@@ -91,6 +90,11 @@ public class VimExtensionFacade {
    */
   @NotNull
   public static KeyStroke inputKeyStroke(@NotNull Editor editor) {
+    final KeyStroke enqueued = InputQueue.dequeue();
+    if (enqueued != null) {
+      return enqueued;
+    }
+
     final KeyStroke key;
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       key = TestInputModel.getInstance(editor).nextKeyStroke();
