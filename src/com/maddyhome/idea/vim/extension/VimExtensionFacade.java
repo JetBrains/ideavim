@@ -43,8 +43,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static com.maddyhome.idea.vim.ui.InputQueue.dequeue;
-
 /**
  * Vim API facade that defines functions similar to the built-in functions and statements of the original Vim.
  *
@@ -97,11 +95,6 @@ public class VimExtensionFacade {
    */
   @NotNull
   public static KeyStroke inputKeyStroke(@NotNull Editor editor) {
-    final KeyStroke enqueued = dequeue();
-    if (enqueued != null) {
-      return enqueued;
-    }
-
     final KeyStroke key;
     if (ApplicationManager.getApplication().isUnitTestMode()) {
       key = TestInputModel.getInstance(editor).nextKeyStroke();

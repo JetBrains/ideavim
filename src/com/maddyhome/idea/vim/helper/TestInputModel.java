@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.helper;
 
 import com.google.common.collect.Lists;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.ui.InputQueue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,6 +51,12 @@ public class TestInputModel {
 
   @Nullable
   public KeyStroke nextKeyStroke() {
+
+    KeyStroke enqueued = InputQueue.dequeue();
+    if (enqueued != null) {
+      return enqueued;
+    }
+
     if (!myKeyStrokes.isEmpty()) {
       return myKeyStrokes.remove(0);
     }

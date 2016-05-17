@@ -69,25 +69,25 @@ public class VimRepeatExtensionTest extends JavaVimTestCase {
     myFixture.checkResult("'foo' <caret>ar'\n");
   }
 
-  //public void testRepeatChangeSurroundTag() {
-  //  enableExtensions("surround", "repeat");
-  //
-  //  configureByText("<<a>foo</a> <i>bar</i>\n");
-  //  typeText(parseKeys("x")); // set some initial repeat-able
-  //
-  //  typeText(parseKeys("cst<div>"));
-  //  myFixture.checkResult("<caret><div>foo</div> <i>bar</i>\n");
-  //
-  //  typeText(parseKeys("fb."));
-  //  myFixture.checkResult("<div>foo</div> <caret><div>bar</div>\n");
-  //
-  //  typeText(parseKeys("x"));
-  //  myFixture.checkResult("div>foo</div> <caret><div>bar</div>\n");
-  //
-  //  // this repeat should do the default
-  //  typeText(parseKeys("."));
-  //  myFixture.checkResult("iv>foo</div> <caret><div>bar</div>\n");
-  //}
+  public void testRepeatChangeSurroundTag() {
+    enableExtensions("surround", "repeat");
+
+    configureByText("<<a>foo</a> <i>bar</i>\n");
+    typeText(parseKeys("x")); // set some initial repeat-able
+
+    typeText(parseKeys("cst<div>"));
+    myFixture.checkResult("<caret><div>foo</div> <i>bar</i>\n");
+
+    typeText(parseKeys("fb."));
+    myFixture.checkResult("<div>foo</div> <caret><div>bar</div>\n");
+
+    typeText(parseKeys("x"));
+    myFixture.checkResult("<div>foo</div> <caret>div>bar</div>\n");
+
+    // this repeat should do the default
+    typeText(parseKeys("."));
+    myFixture.checkResult("<div>foo</div> <caret>iv>bar</div>\n");
+  }
 
   /*
    * Repeating comments
