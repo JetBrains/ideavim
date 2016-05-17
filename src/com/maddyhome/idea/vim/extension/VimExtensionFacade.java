@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.extension;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.Ref;
+import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
@@ -32,7 +33,6 @@ import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.helper.TestInputModel;
 import com.maddyhome.idea.vim.key.OperatorFunction;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
-import com.maddyhome.idea.vim.ui.InputQueue;
 import com.maddyhome.idea.vim.ui.ModalEntry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,6 +42,8 @@ import java.awt.event.KeyEvent;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import static com.maddyhome.idea.vim.ui.InputQueue.dequeue;
 
 /**
  * Vim API facade that defines functions similar to the built-in functions and statements of the original Vim.
@@ -84,8 +86,10 @@ public class VimExtensionFacade {
    */
   public static void executeNormal(@NotNull List<KeyStroke> keys, @NotNull Editor editor) {
     final EditorDataContext context = new EditorDataContext(editor);
-    InputQueue.insert(keys);
-    InputQueue.executeNormal(editor, context);
+
+    for (KeyStroke key : keys) {
+      KeyHandler.getInstance().handleKey(editor, key, context);
+    }
   }
 
   /**
@@ -93,7 +97,7 @@ public class VimExtensionFacade {
    */
   @NotNull
   public static KeyStroke inputKeyStroke(@NotNull Editor editor) {
-    final KeyStroke enqueued = InputQueue.dequeue();
+    final KeyStroke enqueued = dequeue();
     if (enqueued != null) {
       return enqueued;
     }

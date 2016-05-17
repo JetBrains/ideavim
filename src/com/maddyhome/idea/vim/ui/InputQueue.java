@@ -5,6 +5,7 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
+import com.maddyhome.idea.vim.helper.EditorDataContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,9 +32,14 @@ public class InputQueue {
   }
 
   /**
-   * Execute every KeyStroke enqueued as if in normal mode
+   * Execute every KeyStroke enqueued as if in normal mode,
+   *  but delaying each submission via the Swing queue
    */
-  public static void executeNormal(@NotNull Editor editor, @NotNull DataContext context) {
+  public static void executeNormal(@NotNull List<KeyStroke> keys, @NotNull Editor editor) {
+    enqueue(keys);
+
+    final EditorDataContext context = new EditorDataContext(editor);
+
     if (ApplicationManager.getApplication().isUnitTestMode()) {
 
       KeyStroke key;
@@ -78,6 +84,9 @@ public class InputQueue {
       if (key != null) {
         KeyHandler.getInstance().handleKey(myEditor, key, myContext);
 
+        // NB: this doesn't always work; take repeating gcip, for example:
+        //  handling the `c` will trigger `execute(g@)`; the `g` will
+        //  execute first, then this, then the `@`.
         final Application application = ApplicationManager.getApplication();
         application.invokeLater(this);
       }

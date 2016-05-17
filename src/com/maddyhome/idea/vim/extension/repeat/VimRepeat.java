@@ -9,12 +9,14 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.extension.VimNonDisposableExtension;
+import com.maddyhome.idea.vim.ui.InputQueue;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.List;
 
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.*;
+import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
+import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
 /**
@@ -47,7 +49,7 @@ public class VimRepeat extends VimNonDisposableExtension {
       final Command newLastChange =
         CommandState.getInstance(editor).getLastChangeCommand();
       if (repeatSequence != null && newLastChange == repeatChangeCommand) {
-        executeNormal(repeatSequence, editor);
+        InputQueue.executeNormal(repeatSequence, editor);
       } else {
         KeyStroke repeatStroke = parseKeys(".").get(0);
         KeyHandler.getInstance().handleKey(editor, repeatStroke, context, false);
