@@ -184,8 +184,8 @@ public class FileGroup {
    *
    * @param context The data context
    */
-  public void closeAllButCurrent(@NotNull DataContext context) {
-    KeyHandler.executeAction("CloseAllEditorsButCurrent", context);
+  public void closeAllButActive(@NotNull DataContext context) {
+    KeyHandler.executeAction("CloseAllEditorsButActive", context);
   }
 
   /**

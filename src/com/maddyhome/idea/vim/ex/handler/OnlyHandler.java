@@ -37,7 +37,7 @@ public class OnlyHandler extends CommandHandler {
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
-    VimPlugin.getFile().closeAllButCurrent(context);
+    VimPlugin.getFile().closeAllButActive(context);
 
     return true;
   }
