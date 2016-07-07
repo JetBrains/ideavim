@@ -2,7 +2,7 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
-      <p>0.45:</p>
+      <p>0.46:</p>
       <ul>
         <li>Support for <code>incsearch</code> option for showing search results while typing</li>
         <li>Support for <code>it</code> and <code>at</code> tag block selection</li>
