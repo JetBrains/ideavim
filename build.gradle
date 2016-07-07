@@ -27,7 +27,7 @@ intellij {
 
   publish {
       pluginId '164'
-      channel 'eap'
+      channel publishChannel
       username publishUsername
       password publishPassword
   }
