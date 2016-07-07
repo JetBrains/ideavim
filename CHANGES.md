@@ -17,8 +17,8 @@ Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
 
-To Be Released
---------------
+0.45, 2016-07-07
+----------------
 
 Added `incsearch` option for incremental search. Added support for `it` and
 `at` tag block selection. Added `vim-surround` commands `ys`, `cs`, `ds`,
