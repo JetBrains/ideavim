@@ -86,6 +86,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     .build();
 
   private static final Logger ourLogger = Logger.getInstance(VimShortcutKeyAction.class.getName());
+  private static AnAction ourInstance = null;
 
   @Override
   public void actionPerformed(@NotNull AnActionEvent e) {
@@ -119,7 +120,11 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
 
   @NotNull
   public static AnAction getInstance() {
-    return ActionManager.getInstance().getAction(ACTION_ID);
+    if (ourInstance == null) {
+      final AnAction originalAction = ActionManager.getInstance().getAction(ACTION_ID);
+      ourInstance = EmptyAction.wrap(originalAction);
+    }
+    return ourInstance;
   }
 
   private void notifyAboutShortcutConflict(@NotNull final KeyStroke keyStroke) {

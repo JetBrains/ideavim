@@ -43,6 +43,7 @@ Bug fixes:
 * VIM-287 Fixed insert new line before and after folds
 * VIM-139 Focus on current search and use modal confirmation for `:s///gc`
 * VIM-843 Don't highlight search results after restart
+* VIM-1126 Fixed warning about modifying shortcuts of global actions for 2016.2
 
 
 0.44, 2015-11-02
