@@ -85,7 +85,6 @@
   </extensionPoints>
 
   <extensions defaultExtensionNs="com.intellij">
-    <errorHandler implementation="com.intellij.diagnostic.ITNReporter"/>
     <applicationConfigurable instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"/>
   </extensions>
 
