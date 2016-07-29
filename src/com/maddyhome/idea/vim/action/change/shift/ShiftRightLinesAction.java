@@ -36,7 +36,7 @@ public class ShiftRightLinesAction extends EditorAction {
 
   private static class Handler extends ChangeEditorActionHandler {
     public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
-      VimPlugin.getChange().indentLines(editor, context, count, 1);
+      VimPlugin.getChange().indentLines(editor, context, count, 1, 1);
 
       return true;
     }

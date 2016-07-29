@@ -67,7 +67,7 @@ public class ExCommand {
     return ranges.getTextRange(editor, context, count);
   }
 
-  protected int getCountArgument() {
+  public int getCountArgument() {
     try {
       return Integer.parseInt(argument);
     }

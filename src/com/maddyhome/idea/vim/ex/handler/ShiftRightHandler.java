@@ -35,10 +35,12 @@ public class ShiftRightHandler extends CommandHandler {
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
-    TextRange range = cmd.getTextRange(editor, context, true);
+    int count = cmd.getCountArgument();
+    if ( count == -1 ) {
+      count = 1;
+    }
 
-    VimPlugin.getChange().indentRange(editor, context, range, cmd.getCommand().length(), 1);
-
+    VimPlugin.getChange().indentLines(editor, context, count, cmd.getCommand().length(), 1);
     return true;
   }
 }

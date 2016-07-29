@@ -1340,10 +1340,10 @@ public class ChangeGroup {
     KeyHandler.executeAction("ReformatCode", context);
   }
 
-  public void indentLines(@NotNull Editor editor, @NotNull DataContext context, int lines, int dir) {
+  public void indentLines(@NotNull Editor editor, @NotNull DataContext context, int lines, int count, int dir) {
     int start = editor.getCaretModel().getOffset();
     int end = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, lines - 1, false);
-    indentRange(editor, context, new TextRange(start, end), 1, dir);
+    indentRange(editor, context, new TextRange(start, end), count, dir);
   }
 
   public void indentMotion(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @NotNull Argument argument, int dir) {
