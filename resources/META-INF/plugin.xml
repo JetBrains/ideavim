@@ -2,6 +2,10 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
+      <p>To Be Released:</p>
+      <ul>
+        <li>Don't start visual selection when mouse click was actually drag over single character</li>
+      </ul>
       <p>0.46:</p>
       <ul>
         <li>Support for <code>incsearch</code> option for showing search results while typing</li>

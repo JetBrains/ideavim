@@ -149,14 +149,11 @@ public class MotionGroup {
     ExOutputModel.getInstance(editor).clear();
 
     CommandState.SubMode visualMode = CommandState.SubMode.NONE;
-    switch (event.getClickCount() % 3) {
-      case 1: // Single click or quad click
-        visualMode = CommandState.SubMode.NONE;
-        break;
-      case 2: // Double click
+    switch (event.getClickCount()) {
+      case 2:
         visualMode = CommandState.SubMode.VISUAL_CHARACTER;
         break;
-      case 0: // Triple click
+      case 3:
         visualMode = CommandState.SubMode.VISUAL_LINE;
         // Pop state of being in Visual Char mode
         if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
@@ -247,6 +244,7 @@ public class MotionGroup {
 
     int start = editor.getSelectionModel().getSelectionStart();
     int end = editor.getSelectionModel().getSelectionEnd();
+    if (start == end) return;
 
     if (mode == CommandState.SubMode.VISUAL_LINE) {
       end--;
