@@ -39,7 +39,7 @@ intellij {
 
   publish {
       pluginId '164'
-      channel publishChannel
+      channels publishChannels
       username publishUsername
       password publishPassword
   }
