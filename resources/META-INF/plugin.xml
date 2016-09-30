@@ -4,6 +4,7 @@
   <change-notes><![CDATA[
       <p>To Be Released:</p>
       <ul>
+        <li>Fixed exception "Write access is allowed from write-safe contexts only"</li>
         <li>Don't start visual selection when mouse click was actually drag over single character</li>
       </ul>
       <p>0.46:</p>

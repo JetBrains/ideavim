@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -28,8 +29,6 @@ import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
 
 public class EditFileHandler extends CommandHandler {
   public EditFileHandler() {
@@ -56,7 +55,7 @@ public class EditFileHandler extends CommandHandler {
     }
 
     // Don't open a choose file dialog under a write action
-    SwingUtilities.invokeLater(new Runnable() {
+    ApplicationManager.getApplication().invokeLater(new Runnable() {
       @Override
       public void run() {
         KeyHandler.executeAction("OpenFile", new EditorDataContext(editor));

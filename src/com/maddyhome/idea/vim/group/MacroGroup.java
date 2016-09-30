@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
@@ -127,7 +128,7 @@ public class MacroGroup {
       }
     };
 
-    SwingUtilities.invokeLater(new Runnable() {
+    ApplicationManager.getApplication().invokeLater(new Runnable() {
       public void run() {
         CommandProcessor.getInstance().executeCommand(project, run, "Vim Macro Playback", keys.get(pos));
       }
@@ -137,7 +138,7 @@ public class MacroGroup {
   public void postKey(@NotNull KeyStroke stroke, @NotNull Editor editor) {
     final Component component = SwingUtilities.getAncestorOfClass(Window.class, editor.getComponent());
     final KeyEvent event = createKeyEvent(stroke, component);
-    SwingUtilities.invokeLater(new Runnable() {
+    ApplicationManager.getApplication().invokeLater(new Runnable() {
       public void run() {
         if (logger.isDebugEnabled()) {
           logger.debug("posting " + event);

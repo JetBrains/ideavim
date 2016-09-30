@@ -22,6 +22,7 @@ To Be Released
 Bug fixes:
 
 * VIM-1098 Don't start visual selection when mouse click was actually drag over single character
+* VIM-1190 Fixed exception "Write access is allowed from write-safe contexts only"
 
 
 0.46, 2016-07-07

@@ -19,14 +19,13 @@
 package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
 
 /**
  *
@@ -38,7 +37,7 @@ public class FindSymbolHandler extends CommandHandler {
 
   public boolean execute(@NotNull Editor editor, @NotNull final DataContext context, @NotNull ExCommand cmd) throws ExException {
     // TODO: Check the command argument and jump to a specific symbol
-    SwingUtilities.invokeLater(new Runnable() {
+    ApplicationManager.getApplication().invokeLater(new Runnable() {
       public void run() {
         KeyHandler.executeAction("GotoSymbol", context);
       }

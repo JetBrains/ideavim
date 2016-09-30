@@ -24,6 +24,7 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.keymap.KeymapUtil;
@@ -99,7 +100,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
       }
       // Should we use InjectedLanguageUtil.getTopLevelEditor(editor) here, as we did in former EditorKeyHandler?
       // Run key handler later to restore input events sequence due to VimTypedActionHandler
-      SwingUtilities.invokeLater(new Runnable() {
+      ApplicationManager.getApplication().invokeLater(new Runnable() {
         @Override
         public void run() {
           try {

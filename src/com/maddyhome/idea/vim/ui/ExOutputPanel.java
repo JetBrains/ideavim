@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.ui;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBScrollPane;
@@ -262,7 +263,7 @@ public class ExOutputPanel extends JPanel {
   }
 
   private void close(@Nullable final KeyEvent e) {
-    SwingUtilities.invokeLater(new Runnable() {
+    ApplicationManager.getApplication().invokeLater(new Runnable() {
       public void run() {
         deactivate(true);
 
