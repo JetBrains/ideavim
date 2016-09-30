@@ -38,7 +38,6 @@ intellij {
   downloadSources Boolean.valueOf(downloadIdeaSources)
 
   publish {
-      pluginId '164'
       channels publishChannels
       username publishUsername
       password publishPassword
