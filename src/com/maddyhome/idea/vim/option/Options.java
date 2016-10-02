@@ -41,6 +41,7 @@ public class Options {
   public static final String INCREMENTAL_SEARCH = "incsearch";
   public static final String TIMEOUT = "timeout";
   public static final String VIMINFO = "viminfo";
+  public static final String GVIM_PATH = "gvimpath";
 
   /**
    * Gets the singleton instance of the options
@@ -471,6 +472,7 @@ public class Options {
     addOption(new ToggleOption(INCREMENTAL_SEARCH, "is", false));
     addOption(new ToggleOption(TIMEOUT, "to", true));
     addOption(new ListOption(VIMINFO, "vi", new String[]{"'100", "<50", "s10", "h"}, null));
+    addOption(new StringOption(GVIM_PATH, "gvpath", ""));
 
     registerExtensionOptions();
   }

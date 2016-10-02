@@ -123,6 +123,7 @@ public class CommandParser {
     new WritePreviousFileHandler();
     new WriteQuitHandler();
     new YankLinesHandler();
+    new OpenVimHandler();
 
     registered = true;
     //logger.debug("root=" + root);
