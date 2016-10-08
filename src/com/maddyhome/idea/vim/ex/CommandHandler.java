@@ -200,7 +200,7 @@ public abstract class CommandHandler {
   }
 
   /**
-   * Executes a command. The range and arugments are validated first.
+   * Executes a command. The range and arguments are validated first.
    *
    * @param editor  The editor to run the command in
    * @param context The data context

@@ -295,4 +295,18 @@ public class MapCommandTest extends VimTestCase {
     typeText(parseKeys(",fa!<Esc>"));
     myFixture.checkResult("Hello!\n");
   }
+
+  public void testMapActionNormalMode() {
+    configureByText("World\n");
+    typeText(commandToKeys("map ,ff :action $Delete<CR>"));
+    typeText(parseKeys(",ff"));
+    myFixture.checkResult("orld\n");
+  }
+
+  public void testMapInVisualMode() {
+    configureByText("World\n");
+    typeText(commandToKeys("map ,ff :action $Delete<CR>"));
+    typeText(parseKeys("0", "v", ",ff"));
+    myFixture.checkResult("orld\n");
+  }
 }
