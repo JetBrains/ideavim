@@ -26,14 +26,9 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.command.SelectionType;
-import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandHandler;
-import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import org.jetbrains.annotations.NotNull;
 
@@ -54,18 +49,6 @@ public class ActionHandler extends CommandHandler {
       VimPlugin.showMessage("Action not found: " + actionName);
       return false;
     }
-
-    //////
-//    TextRange range = cmd.getTextRange(editor, context, false);
-//
-//    final ExCommand argumentCmd = CommandParser.getInstance().parse(cmd.getArgument());
-//    int line = argumentCmd.getRanges().getFirstLine(editor, context);
-//    final int offset = VimPlugin.getMotion().moveCaretToLineStart(editor, line + 1);
-//
-//    final String text = EditorHelper.getText(editor, range.getStartOffset(), range.getEndOffset());
-//    VimPlugin.getCopy().putText(editor, context, offset, text, SelectionType.LINE_WISE, 1, true,
-//        false, CommandState.SubMode.NONE);
-    //////
 
     final Application application = ApplicationManager.getApplication();
     if (application.isUnitTestMode()) {
