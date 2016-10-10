@@ -47,6 +47,7 @@ public class Argument {
 
   /**
    * Creates a motion command argument
+   *
    * @param motionArg The motion command
    */
   public Argument(@Nullable Command motionArg) {
