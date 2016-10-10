@@ -44,12 +44,10 @@ public class ActionHandler extends CommandHandler {
                          @NotNull ExCommand cmd) throws ExException {
     final String actionName = cmd.getArgument().trim();
     final AnAction action = ActionManager.getInstance().getAction(actionName);
-
     if (action == null) {
       VimPlugin.showMessage("Action not found: " + actionName);
       return false;
     }
-
     final Application application = ApplicationManager.getApplication();
     if (application.isUnitTestMode()) {
       executeAction(action, context, actionName);
