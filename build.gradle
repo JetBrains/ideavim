@@ -38,7 +38,7 @@ intellij {
   downloadSources Boolean.valueOf(downloadIdeaSources)
 
   publish {
-      channels publishChannels
+      channels publishChannels.split(',')
       username publishUsername
       password publishPassword
   }
