@@ -19,6 +19,11 @@ usual beta standards.
 To Be Released
 --------------
 
+0.47, 2016-10-19
+----------------
+
+A bugfix release.
+
 Bug fixes:
 
 * VIM-1098 Don't start visual selection when mouse click was actually drag over single character
