@@ -21,6 +21,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.event.*;
+import com.intellij.openapi.editor.ex.DocumentEx;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
@@ -1728,15 +1729,16 @@ public class MotionGroup {
     private boolean myMakingChanges = false;
 
     public void selectionChanged(@NotNull SelectionEvent selectionEvent) {
-      if (myMakingChanges) {
+      final Editor editor = selectionEvent.getEditor();
+      final Document document = editor.getDocument();
+      if (myMakingChanges || (document instanceof DocumentEx && ((DocumentEx)document).isInEventsHandling())) {
         return;
       }
 
       myMakingChanges = true;
       try {
-        final Editor editor = selectionEvent.getEditor();
         final com.intellij.openapi.util.TextRange newRange = selectionEvent.getNewRange();
-        for (Editor e : EditorFactory.getInstance().getEditors(editor.getDocument())) {
+        for (Editor e : EditorFactory.getInstance().getEditors(document)) {
           if (!e.equals(editor)) {
             e.getSelectionModel().setSelection(newRange.getStartOffset(), newRange.getEndOffset());
           }
