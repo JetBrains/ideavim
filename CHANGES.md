@@ -19,6 +19,11 @@ usual beta standards.
 To Be Released
 --------------
 
+Features:
+
+* Support for zero-latency rendering
+
+
 0.47, 2016-10-19
 ----------------
 

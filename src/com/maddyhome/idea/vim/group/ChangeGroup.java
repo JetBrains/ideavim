@@ -29,6 +29,9 @@ import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
+import com.intellij.openapi.editor.actionSystem.ActionPlan;
+import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
+import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx;
 import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.editor.impl.TextRangeInterval;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -596,6 +599,26 @@ public class ChangeGroup {
     CommandState.getInstance(editor).pushState(CommandState.Mode.COMMAND, CommandState.SubMode.SINGLE_COMMAND,
                                                MappingMode.NORMAL);
     clearStrokes(editor);
+  }
+
+  /**
+   * Drafts an {@link ActionPlan} for preemptive rendering before "regular" keystroke processing in insert/replace mode.
+   *
+   * Like {@link #processKey(Editor, DataContext, KeyStroke)}, delegates the task to the original handler.
+   *
+   * @param editor  The editor the character was typed into
+   * @param context The data context
+   * @param key     The user entered keystroke
+   * @param plan    the current action plan draft
+   */
+  public void beforeProcessKey(@NotNull final Editor editor, @NotNull final DataContext context,
+                               @NotNull final KeyStroke key, @NotNull ActionPlan plan) {
+
+    final TypedActionHandler originalHandler = KeyHandler.getInstance().getOriginalHandler();
+
+    if (originalHandler instanceof TypedActionHandlerEx) {
+      ((TypedActionHandlerEx)originalHandler).beforeExecute(editor, key.getKeyChar(), context, plan);
+    }
   }
 
   /**

@@ -23,8 +23,10 @@ import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
+import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,16 +37,34 @@ import javax.swing.*;
  *
  * IDE shortcut keys used by Vim commands are handled by {@link com.maddyhome.idea.vim.action.VimShortcutKeyAction}.
  */
-public class VimTypedActionHandler implements TypedActionHandler {
+public class VimTypedActionHandler implements TypedActionHandlerEx {
   private static final Logger logger = Logger.getInstance(VimTypedActionHandler.class.getName());
 
   private final TypedActionHandler origHandler;
   @NotNull private final KeyHandler handler;
+  // Required because handleKey is called asynchronously from invokeLater
+  private boolean myKeyHandled = true;
 
   public VimTypedActionHandler(TypedActionHandler origHandler) {
     this.origHandler = origHandler;
     handler = KeyHandler.getInstance();
     handler.setOriginalHandler(origHandler);
+  }
+
+  @Override
+  public void beforeExecute(@NotNull Editor editor, char charTyped, @NotNull DataContext context, @NotNull ActionPlan plan) {
+    if (isEnabled(editor)) {
+      if (myKeyHandled) {
+        handler.beforeHandleKey(editor, KeyStroke.getKeyStroke(charTyped), context, plan);
+        myKeyHandled = false;
+      }
+    }
+    else {
+      TypedActionHandler originalHandler = KeyHandler.getInstance().getOriginalHandler();
+      if (originalHandler instanceof TypedActionHandlerEx) {
+        ((TypedActionHandlerEx)originalHandler).beforeExecute(editor, charTyped, context, plan);
+      }
+    }
   }
 
   @Override
@@ -56,6 +76,7 @@ public class VimTypedActionHandler implements TypedActionHandler {
         public void run() {
           try {
             handler.handleKey(editor, KeyStroke.getKeyStroke(charTyped), new EditorDataContext(editor));
+            myKeyHandled = true;
           }
           catch (Throwable e) {
             logger.error(e);

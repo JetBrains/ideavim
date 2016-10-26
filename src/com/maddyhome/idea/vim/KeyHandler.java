@@ -25,6 +25,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
+import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.project.Project;
@@ -90,6 +91,26 @@ public class KeyHandler {
    */
   public TypedActionHandler getOriginalHandler() {
     return origHandler;
+  }
+
+  /**
+   * Invoked before acquiring a write lock and actually handling the keystroke.
+   *
+   * Drafts an optional {@link ActionPlan} that will be used as a base for zero-latency rendering in editor.
+   *
+   * @param editor  The editor the key was typed into
+   * @param key     The keystroke typed by the user
+   * @param context The data context
+   * @param plan    The current action plan
+   */
+  public void beforeHandleKey(@NotNull Editor editor, @NotNull KeyStroke key,
+                              @NotNull DataContext context, @NotNull ActionPlan plan) {
+
+    final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
+
+    if (mode == CommandState.Mode.INSERT || mode == CommandState.Mode.REPLACE) {
+      VimPlugin.getChange().beforeProcessKey(editor, context, key, plan);
+    }
   }
 
   /**
