@@ -1319,7 +1319,7 @@ public class RegExp {
               regtail(lastbranch, br);
               /* connect all branches to the NOTHING
                                  * branch at the end */
-              for (br = ret.ref(0); br != lastnode; ) {
+              for (br = ret.ref(0); !br.equals(lastnode); ) {
                 if (br.OP() == BRANCH) {
                   regtail(br, lastbranch);
                   br = br.OPERAND();
