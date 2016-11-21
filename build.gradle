@@ -10,11 +10,13 @@ buildscript {
   }
   dependencies {
     classpath "org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.2.0-SNAPSHOT"
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
   }
 }
 
 apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'java'
+apply plugin: 'kotlin'
 
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
@@ -42,4 +44,13 @@ intellij {
       username publishUsername
       password publishPassword
   }
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+  compile "org.jetbrains.kotlin:kotlin-runtime:$kotlinVersion"
 }
