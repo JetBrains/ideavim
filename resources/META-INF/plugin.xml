@@ -2,6 +2,10 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
+      <p>To be released:</p>
+      <ul>
+        <li>Possible fix for keyboard input lag since 0.47</li>
+      </ul>
       <p>0.47:</p>
       <ul>
         <li>Various bug fixes</li>

@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim;
 import com.intellij.codeInsight.lookup.Lookup;
 import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
@@ -50,18 +49,12 @@ public class VimTypedActionHandler implements TypedActionHandler {
   @Override
   public void execute(@NotNull final Editor editor, final char charTyped, @NotNull final DataContext context) {
     if (isEnabled(editor)) {
-      // Run key handler outside of the key typed command for creating our own undoable commands
-      ApplicationManager.getApplication().invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          try {
-            handler.handleKey(editor, KeyStroke.getKeyStroke(charTyped), new EditorDataContext(editor));
-          }
-          catch (Throwable e) {
-            logger.error(e);
-          }
-        }
-      });
+      try {
+        handler.handleKey(editor, KeyStroke.getKeyStroke(charTyped), new EditorDataContext(editor));
+      }
+      catch (Throwable e) {
+        logger.error(e);
+      }
     }
     else {
       origHandler.execute(editor, charTyped, context);

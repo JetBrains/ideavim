@@ -19,6 +19,11 @@ usual beta standards.
 To Be Released
 --------------
 
+A bugfix release.
+
+* VIM-1205 Don't move key handling into separate event for raw handlers
+
+
 0.47, 2016-10-19
 ----------------
 
