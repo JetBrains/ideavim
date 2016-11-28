@@ -1811,6 +1811,14 @@ public class MotionGroup {
     private int endOff;
   }
 
+  public int getLastFTCmd() {
+    return lastFTCmd;
+  }
+
+  public char getLastFTChar() {
+    return lastFTChar;
+  }
+
   private int lastFTCmd = 0;
   private char lastFTChar;
   private int visualStart;
