@@ -22,6 +22,7 @@ To Be Released
 A bugfix release.
 
 * VIM-1205 Don't move key handling into separate event for raw handlers
+* VIM-1216 Fixed `.` resetting the last find movement while repeating change that also uses movement
 
 
 0.47, 2016-10-19
