@@ -856,7 +856,7 @@ public class ChangeGroup {
     }
     if (offset != -1) {
       boolean res = deleteText(editor, new TextRange(start, offset), SelectionType.LINE_WISE);
-      if (res && caret.getOffset() >= EditorHelper.getFileSize(editor) && caret.getOffset() != 0) {
+      if (res && caret.getOffset() >= EditorHelper.getFileSize(editor, true) && caret.getOffset() != 0) {
         MotionGroup.moveCaret(editor, caret,
                               VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, -1));
       }
@@ -1187,23 +1187,31 @@ public class ChangeGroup {
    * @return true if able to delete count lines, false if not
    */
   public boolean changeLine(@NotNull Editor editor, @NotNull Caret caret, int count) {
-    final LogicalPosition pos = editor.offsetToLogicalPosition(caret.getOffset());
-    final boolean insertBelow = pos.line + count >= EditorHelper.getLineCount(editor);
+      final LogicalPosition pos = editor.offsetToLogicalPosition(caret.getOffset());
 
-    final LogicalPosition lp = editor.offsetToLogicalPosition(
-      VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, caret));
+      final LogicalPosition lp = editor.offsetToLogicalPosition(
+              VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, caret));
 
-    boolean res = deleteLine(editor, caret, count);
-    if (res) {
-      if (insertBelow) {
-        insertNewLineBelow(editor, caret, lp.column);
+      int linesInFileCount = EditorHelper.getLineCount(editor);
+
+      if (linesInFileCount == 0) {
+          insertNewLineAbove(editor, caret, lp.column);
+          return true;
       }
-      else {
-        insertNewLineAbove(editor, caret, lp.column);
-      }
-    }
 
-    return res;
+      final boolean insertBelow = pos.line + count >= linesInFileCount &&
+              linesInFileCount > 1;
+
+      boolean res = deleteLine(editor, caret, count);
+      if (res) {
+          if (insertBelow) {
+              insertNewLineBelow(editor, caret, lp.column);
+          } else {
+              insertNewLineAbove(editor, caret, lp.column);
+          }
+      }
+
+      return res;
   }
 
   /**

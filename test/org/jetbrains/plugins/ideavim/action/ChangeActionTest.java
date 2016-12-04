@@ -642,8 +642,45 @@ public class ChangeActionTest extends VimTestCase {
                           "and some text after\n");
   }
 
+  // VIM-1216 |f| |.| |;|
   public void testRepeatChangeWordDoesNotBreakNextRepeatFind() {
     doTest(parseKeys("fXcfYPATATA<Esc>fX.;."), "<caret>aaaaXBBBBYaaaaaaaXBBBBYaaaaaaXBBBBYaaaaaaaa\n", "aaaaPATATAaaaaaaaPATATAaaaaaaPATATAaaaaaaaa\n");
+  }
+
+  // VIM-636 |S| |cc|
+  public void testLineSubstitutionEmptyFile() {
+    doTest(parseKeys("S"),
+           "",
+           "\n");
+    assertOffset(0);
+    assertMode(CommandState.Mode.INSERT);
+  }
+
+  // VIM-636 |S| |cc|
+  public void testLineSubstitutionOneLineBlankFile() {
+    doTest(parseKeys("S"),
+           "\n",
+           "\n");
+    assertOffset(0);
+    assertMode(CommandState.Mode.INSERT);
+  }
+
+  // VIM-636 |S| |cc|
+  public void testLineSubstitutionThreeLineBlankFile() {
+    doTest(parseKeys("S"),
+           "\n<caret>\n\n",
+           "\n<caret>\n\n");
+    assertOffset(1);
+    assertMode(CommandState.Mode.INSERT);
+  }
+
+  // VIM-636 |S| |cc|
+  public void testLineSubstitutionFourLineBlankFile() {
+    doTest(parseKeys("S"),
+           "\n<caret>\n\n\n",
+           "\n<caret>\n\n\n");
+    assertOffset(1);
+    assertMode(CommandState.Mode.INSERT);
   }
 
   // VIM-1110 |CTRL-V| |v_b_i| |zc|
