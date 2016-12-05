@@ -21,12 +21,15 @@ package com.maddyhome.idea.vim.action.change.delete;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.LogicalPosition;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
+import com.maddyhome.idea.vim.helper.CaretData;
+import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,7 +54,12 @@ public class DeleteVisualAction extends VimCommandAction {
           return VimPlugin.getChange().deleteRange(editor, caret, lineRange, SelectionType.fromSubMode(mode), false);
         }
         else {
-          return VimPlugin.getChange().deleteRange(editor, caret, range, SelectionType.fromSubMode(mode), false);
+          boolean isDeleted = VimPlugin.getChange().deleteRange(editor, caret, range, SelectionType.fromSubMode(mode), false);
+          if( isDeleted ) {
+            LogicalPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
+            CaretData.setLastColumn(editor, caret, start.column);
+          }
+          return isDeleted;
         }
       }
     });

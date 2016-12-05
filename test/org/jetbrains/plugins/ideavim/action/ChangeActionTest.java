@@ -455,6 +455,25 @@ public class ChangeActionTest extends VimTestCase {
                           "ar\n");
   }
 
+  // VIM-714 |v|
+  public void testDeleteVisualColumnPositionOneLine() {
+    doTest(parseKeys("vwxj"),
+           "<caret>lorem ipsum dolor sit amet\n" +
+           "lorem ipsum dolor sit amet\n",
+           "psum dolor sit amet\n" +
+           "<caret>lorem ipsum dolor sit amet\n");
+  }
+
+  // VIM-714 |v|
+  public void testDeleteVisualColumnPositionMultiLine() {
+    doTest(parseKeys("v3wfixj"),
+           "gaganis <caret>gaganis gaganis\n" +
+           "gaganis gaganis gaganis\n" +
+           "gaganis gaganis gaganis\n",
+           "gaganis s gaganis\n" +
+           "gaganis <caret>gaganis gaganis\n");
+  }
+
   // |r|
   public void testReplaceOneChar() {
     doTest(parseKeys("rx"),
