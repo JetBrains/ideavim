@@ -2,7 +2,7 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
-      <p>To be released:</p>
+      <p>0.48:</p>
       <ul>
         <li>Various bug fixes</li>
       </ul>
@@ -25,20 +25,6 @@
       <p>0.43:</p>
       <ul>
         <li>Fixed running the plugin with Java 6</li>
-      </ul>
-      <p>0.42:</p>
-      <ul>
-        <li>Fixed move commands in read-only files</li>
-      </ul>
-      <p>0.41:</p>
-      <ul>
-        <li>Various bug fixes</li>
-      </ul>
-      <p>0.40:</p>
-      <ul>
-        <li>Support for <code>mapleader</code></li>
-        <li>Support comments in <code>%</code> brace matching</li>
-        <li>Various bug fixes</li>
       </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
     ]]></change-notes>

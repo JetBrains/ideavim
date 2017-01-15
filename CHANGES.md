@@ -16,13 +16,16 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-To Be Released
---------------
+
+0.48, 2017-01-15
+----------------
 
 A bugfix release.
 
-* VIM-1205 Don't move key handling into separate event for raw handlers
-* VIM-1216 Fixed `.` resetting the last find movement while repeating change that also uses movement
+Bug fixes:
+
+* [VIM-1205](https://youtrack.jetbrains.com/issue/VIM-1205) Don't move key handling into separate event for raw handlers
+* [VIM-1216](https://youtrack.jetbrains.com/issue/VIM-1216) Fixed `.` resetting the last find movement while repeating change that also uses movement
 
 
 0.47, 2016-10-19
