@@ -1,19 +1,7 @@
-buildscript {
-  repositories {
-    mavenCentral()
-    maven {
-      url "https://oss.sonatype.org/content/repositories/snapshots/"
-    }
-    maven {
-      url 'http://dl.bintray.com/jetbrains/intellij-plugin-service'
-    }
-  }
-  dependencies {
-    classpath "org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.2.0-SNAPSHOT"
-  }
+plugins {
+  id 'org.jetbrains.intellij' version '0.2.0'
 }
 
-apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'java'
 
 sourceCompatibility = javaVersion
