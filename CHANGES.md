@@ -17,6 +17,14 @@ Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
 
+To Be Released
+--------------
+
+Enabled zero-latency typing for Vim emulation.
+
+
+* [VIM-1254](https://youtrack.jetbrains.com/issue/VIM-1254) Enable zero-latency typing for Vim emulation
+
 0.48, 2017-01-15
 ----------------
 
