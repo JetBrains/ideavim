@@ -3,6 +3,7 @@ plugins {
 }
 
 apply plugin: 'java'
+apply plugin: 'kotlin'
 
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
@@ -30,4 +31,13 @@ intellij {
       username publishUsername
       password publishPassword
   }
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+  compile "org.jetbrains.kotlin:kotlin-runtime:$kotlinVersion"
 }
