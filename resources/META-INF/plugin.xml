@@ -2,6 +2,10 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
+      <p>To be released:</p>
+      <ul>
+        <li>Support for zero-latency rendering</li>
+      </ul>
       <p>0.48:</p>
       <ul>
         <li>Various bug fixes</li>

@@ -22,8 +22,10 @@ import com.intellij.codeInsight.lookup.Lookup;
 import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
+import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,7 +36,7 @@ import javax.swing.*;
  *
  * IDE shortcut keys used by Vim commands are handled by {@link com.maddyhome.idea.vim.action.VimShortcutKeyAction}.
  */
-public class VimTypedActionHandler implements TypedActionHandler {
+public class VimTypedActionHandler implements TypedActionHandlerEx {
   private static final Logger logger = Logger.getInstance(VimTypedActionHandler.class.getName());
 
   private final TypedActionHandler origHandler;
@@ -44,6 +46,19 @@ public class VimTypedActionHandler implements TypedActionHandler {
     this.origHandler = origHandler;
     handler = KeyHandler.getInstance();
     handler.setOriginalHandler(origHandler);
+  }
+
+  @Override
+  public void beforeExecute(@NotNull Editor editor, char charTyped, @NotNull DataContext context, @NotNull ActionPlan plan) {
+    if (isEnabled(editor)) {
+      handler.beforeHandleKey(editor, KeyStroke.getKeyStroke(charTyped), context, plan);
+    }
+    else {
+      TypedActionHandler originalHandler = KeyHandler.getInstance().getOriginalHandler();
+      if (originalHandler instanceof TypedActionHandlerEx) {
+        ((TypedActionHandlerEx)originalHandler).beforeExecute(editor, charTyped, context, plan);
+      }
+    }
   }
 
   @Override

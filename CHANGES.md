@@ -28,6 +28,11 @@ Bug fixes:
 * [VIM-1216](https://youtrack.jetbrains.com/issue/VIM-1216) Fixed `.` resetting the last find movement while repeating change that also uses movement
 
 
+Features:
+
+* Support for zero-latency rendering
+
+
 0.47, 2016-10-19
 ----------------
 
