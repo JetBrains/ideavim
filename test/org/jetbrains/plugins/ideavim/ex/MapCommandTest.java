@@ -295,4 +295,36 @@ public class MapCommandTest extends VimTestCase {
     typeText(parseKeys(",fa!<Esc>"));
     myFixture.checkResult("Hello!\n");
   }
+
+  // VIM-862
+  public void testActionMapWithVisualRangeOneChar() {
+    configureByText("World\n");
+    typeText(commandToKeys("map ,ff :action $Delete<CR>"));
+    typeText(parseKeys("0", "v", ",ff"));
+    myFixture.checkResult("orld\n");
+  }
+
+  // VIM-862
+  public void testActionMapWithVisualRangeSegment() {
+    configureByText("World\n");
+    typeText(commandToKeys("map ,ff :action $Delete<CR>"));
+    typeText(parseKeys("0", "l", "v", "l", ",ff"));
+    myFixture.checkResult("Wld\n");
+  }
+
+  // VIM-862
+  public void testActionMapWithVisualRangeEntireLine() {
+    configureByText("World\n");
+    typeText(commandToKeys("map ,ff :action $Delete<CR>"));
+    typeText(parseKeys("0", "v", "$", ",ff"));
+    myFixture.checkResult("\n");
+  }
+
+  // VIM-862
+  public void testActionMapWithVisualRangeMultiLine() {
+    configureByText("World\nWorld\n");
+    typeText(commandToKeys("map ,ff :action $Delete<CR>"));
+    typeText(parseKeys("0", "v", "j", ",ff"));
+    myFixture.checkResult("orld\n");
+  }
 }

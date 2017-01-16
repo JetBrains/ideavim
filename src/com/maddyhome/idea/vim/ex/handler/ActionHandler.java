@@ -37,7 +37,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ActionHandler extends CommandHandler {
   public ActionHandler() {
-    super("action", "", RANGE_FORBIDDEN | DONT_REOPEN);
+    super("action", "", RANGE_OPTIONAL | DONT_REOPEN);
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull final DataContext context,
