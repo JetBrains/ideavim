@@ -543,8 +543,8 @@ public class RegisterActions {
       .registerAction(MappingMode.N, "VimChangeCharacters", Command.Type.CHANGE, Command.FLAG_NO_REPEAT | Command.FLAG_MULTIKEY_UNDO,
                       new Shortcut('s'));
     parser
-      .registerAction(MappingMode.N, "VimChangeEndOfLine", Command.Type.CHANGE, Command.FLAG_NO_REPEAT | Command.FLAG_MULTIKEY_UNDO,
-                      new Shortcut('C'));
+      .registerAction(MappingMode.N, "VimChangeEndOfLine", Command.Type.CHANGE,
+                      Command.FLAG_NO_REPEAT | Command.FLAG_MULTIKEY_UNDO, new Shortcut('C'));
     parser.registerAction(MappingMode.N, "VimChangeLine", Command.Type.CHANGE,
                           Command.FLAG_NO_REPEAT | Command.FLAG_ALLOW_MID_COUNT | Command.FLAG_MULTIKEY_UNDO, new Shortcut[]{
         new Shortcut("cc"),
@@ -597,8 +597,8 @@ public class RegisterActions {
       .registerAction(MappingMode.N, "VimMotionGotoMark", Command.Type.MOTION, Command.FLAG_MOT_EXCLUSIVE | Command.FLAG_SAVE_JUMP,
                       new Shortcut('`'), Argument.Type.CHARACTER);
     parser
-      .registerAction(MappingMode.N, "VimMotionGotoMarkLine", Command.Type.MOTION, Command.FLAG_MOT_LINEWISE | Command.FLAG_SAVE_JUMP,
-                      new Shortcut('\''), Argument.Type.CHARACTER);
+      .registerAction(MappingMode.N, "VimMotionGotoMarkLine", Command.Type.MOTION,
+                      Command.FLAG_MOT_LINEWISE | Command.FLAG_SAVE_JUMP, new Shortcut('\''), Argument.Type.CHARACTER);
     parser.registerAction(MappingMode.N, "VimMotionGotoMark", Command.Type.MOTION, Command.FLAG_MOT_EXCLUSIVE,
                           new Shortcut("g`"), Argument.Type.CHARACTER);
     parser.registerAction(MappingMode.N, "VimMotionGotoMarkLine", Command.Type.MOTION, Command.FLAG_MOT_LINEWISE,
@@ -620,6 +620,12 @@ public class RegisterActions {
       new Shortcut('u'),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_UNDO, 0))
     });
+
+    // Comment Actions
+    parser.registerAction(MappingMode.N, "VimCommentLine", Command.Type.CHANGE, Command.FLAG_ALLOW_MID_COUNT,
+                          new Shortcut("gcc"));
+    parser.registerAction(MappingMode.N, "VimCommentMotion", Command.Type.CHANGE, Command.FLAG_OP_PEND,
+                          new Shortcut("gc"), Argument.Type.MOTION);
 
     // File Actions
     parser.registerAction(MappingMode.N, "VimFileSaveClose", Command.Type.OTHER_WRITABLE, new Shortcut[]{

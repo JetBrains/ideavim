@@ -349,6 +349,10 @@
     <action id="VimRedo" class="com.maddyhome.idea.vim.action.change.RedoAction" text="Redo"/>
     <action id="VimUndo" class="com.maddyhome.idea.vim.action.change.UndoAction" text="Undo"/>
 
+    <!-- Comments -->
+    <action id="VimCommentLine" class="com.maddyhome.idea.vim.action.change.comment.CommentLineAction" text="Comment Motion"/>
+    <action id="VimCommentMotion" class="com.maddyhome.idea.vim.action.change.comment.CommentMotionAction" text="Comment Motion"/>
+
     <!-- Keys -->
     <action id="VimShortcutKeyAction" class="com.maddyhome.idea.vim.action.VimShortcutKeyAction" text="Shortcuts"/>
     <action id="VimOperatorAction" class="com.maddyhome.idea.vim.action.change.OperatorAction" text="Operator"/>

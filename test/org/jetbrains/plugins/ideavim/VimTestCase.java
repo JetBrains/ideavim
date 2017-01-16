@@ -40,16 +40,25 @@ public abstract class VimTestCase extends UsefulTestCase {
   protected void setUp() throws Exception {
     super.setUp();
     final IdeaTestFixtureFactory factory = IdeaTestFixtureFactory.getFixtureFactory();
-    final LightProjectDescriptor projectDescriptor = LightProjectDescriptor.EMPTY_PROJECT_DESCRIPTOR;
+    final LightProjectDescriptor projectDescriptor = createProjectDescriptor();
     final TestFixtureBuilder<IdeaProjectTestFixture> fixtureBuilder = factory.createLightFixtureBuilder(projectDescriptor);
     final IdeaProjectTestFixture fixture = fixtureBuilder.getFixture();
-    myFixture = IdeaTestFixtureFactory.getFixtureFactory().createCodeInsightFixture(fixture,
-                                                                                    new LightTempDirTestFixtureImpl(true));
+    myFixture = createCodeInsightFixture(fixture, new LightTempDirTestFixtureImpl(true));
     myFixture.setUp();
     myFixture.setTestDataPath(getTestDataPath());
     KeyHandler.getInstance().fullReset(myFixture.getEditor());
     Options.getInstance().resetAllOptions();
     VimPlugin.getKey().resetKeyMappings();
+  }
+
+  protected LightProjectDescriptor createProjectDescriptor() {
+    return LightProjectDescriptor.EMPTY_PROJECT_DESCRIPTOR;
+  }
+
+  protected CodeInsightTestFixture createCodeInsightFixture(IdeaProjectTestFixture fixture,
+                                                            LightTempDirTestFixtureImpl lightTempDirTestFixture) {
+    return IdeaTestFixtureFactory.getFixtureFactory()
+      .createCodeInsightFixture(fixture, lightTempDirTestFixture);
   }
 
   protected String getTestDataPath() {

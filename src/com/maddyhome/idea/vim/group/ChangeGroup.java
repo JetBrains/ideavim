@@ -20,6 +20,9 @@ package com.maddyhome.idea.vim.group;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.intellij.codeInsight.actions.MultiCaretCodeInsightActionHandler;
+import com.intellij.codeInsight.generation.CommentByBlockCommentHandler;
+import com.intellij.codeInsight.generation.CommentByLineCommentHandler;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -40,6 +43,8 @@ import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
 import com.maddyhome.idea.vim.EventFacade;
@@ -57,7 +62,10 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Provides all the insert/replace related functionality
@@ -747,7 +755,8 @@ public class ChangeGroup {
   public boolean deleteEndOfLine(@NotNull Editor editor, int count) {
     int offset = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, count - 1, true);
     if (offset != -1) {
-      boolean res = deleteText(editor, new TextRange(editor.getCaretModel().getOffset(), offset), SelectionType.CHARACTER_WISE);
+      boolean res = deleteText(editor, new TextRange(editor.getCaretModel().getOffset(), offset),
+                               SelectionType.CHARACTER_WISE);
       int pos = VimPlugin.getMotion().moveCaretHorizontal(editor, -1, false);
       if (pos != -1) {
         MotionGroup.moveCaret(editor, pos);
@@ -852,15 +861,24 @@ public class ChangeGroup {
       return (EditorHelper.getFileSize(editor) == 0);
     }
 
-    // Delete motion commands that are not linewise become linewise if all the following are true:
-    // 1) The range is across multiple lines
-    // 2) There is only whitespace before the start of the range
-    // 3) There is only whitespace after the end of the range
     final Command motion = argument.getMotion();
     if (motion == null) {
       return false;
     }
-    if (!isChange && (motion.getFlags() & Command.FLAG_MOT_LINEWISE) == 0) {
+    if (!isChange) {
+      makeMotionLinewiseIfAppropriate(editor, range, motion);
+    }
+    return deleteRange(editor, range, SelectionType.fromCommandFlags(motion.getFlags()), isChange);
+  }
+
+  /**
+   * Delete motion commands that are not linewise become linewise if all the following are true:
+   * 1) The range is across multiple lines
+   * 2) There is only whitespace before the start of the range
+   * 3) There is only whitespace after the end of the range
+   */
+  private static void makeMotionLinewiseIfAppropriate(Editor editor, TextRange range, Command motion) {
+    if ((motion.getFlags() & Command.FLAG_MOT_LINEWISE) == 0) {
       LogicalPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
       LogicalPosition end = editor.offsetToLogicalPosition(range.getEndOffset());
       if (start.line != end.line) {
@@ -874,7 +892,6 @@ public class ChangeGroup {
         }
       }
     }
-    return deleteRange(editor, range, SelectionType.fromCommandFlags(motion.getFlags()), isChange);
   }
 
   @Nullable
@@ -1172,6 +1189,62 @@ public class ChangeGroup {
     }
 
     return res;
+  }
+
+  public boolean commentLine(@NotNull Editor editor, int count) {
+    int start = VimPlugin.getMotion().moveCaretToLineStart(editor);
+    int offset = Math.min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor, count - 1, true) + 1,
+                          EditorHelper.getFileSize(editor, true));
+    if (logger.isDebugEnabled()) {
+      logger.debug("start=" + start);
+      logger.debug("offset=" + offset);
+    }
+    if (offset != -1) {
+      return commentRange(editor, new TextRange(start, offset), SelectionType.LINE_WISE);
+    }
+    return false;
+  }
+
+  public boolean commentMotion(@NotNull Editor editor, final DataContext context, int count, int rawCount,
+                               @NotNull final Argument argument, boolean isChange) {
+
+    final TextRange range = getDeleteMotionRange(editor, context, count, rawCount, argument);
+    if (range == null) {
+      return (EditorHelper.getFileSize(editor) == 0);
+    }
+
+    final Command motion = argument.getMotion();
+    if (motion == null) {
+      return false;
+    }
+    makeMotionLinewiseIfAppropriate(editor, range, motion);
+
+    return commentRange(editor, range, SelectionType.fromCommandFlags(motion.getFlags()));
+  }
+
+  private boolean commentRange(Editor editor, TextRange range, SelectionType selectionType) {
+
+    if (CommandState.getInstance(editor).getMode() != CommandState.Mode.VISUAL) {
+      editor.getSelectionModel().setSelection(range.getStartOffset(), range.getEndOffset());
+    }
+
+    final MultiCaretCodeInsightActionHandler handler =
+      selectionType == SelectionType.CHARACTER_WISE
+        ? new CommentByBlockCommentHandler()
+        : new CommentByLineCommentHandler();
+
+    try {
+      PsiFile file = PsiDocumentManager.getInstance(editor.getProject()).getPsiFile(editor.getDocument());
+      handler.invoke(editor.getProject(), editor, editor.getCaretModel().getCurrentCaret(), file);
+      handler.postInvoke();
+      return true;
+    } catch (RuntimeException e) {
+      e.printStackTrace(); // ???
+    } finally {
+      // remove the selection
+      editor.getSelectionModel().removeSelection();
+    }
+    return false;
   }
 
   public boolean blockInsert(@NotNull Editor editor, @NotNull DataContext context, @NotNull TextRange range, boolean append) {
