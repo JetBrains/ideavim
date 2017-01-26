@@ -17,6 +17,12 @@
  */
 package com.maddyhome.idea.vim.ex;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
@@ -24,16 +30,64 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.ex.handler.*;
+import com.maddyhome.idea.vim.ex.handler.ActionHandler;
+import com.maddyhome.idea.vim.ex.handler.ActionListHandler;
+import com.maddyhome.idea.vim.ex.handler.AsciiHandler;
+import com.maddyhome.idea.vim.ex.handler.CmdFilterHandler;
+import com.maddyhome.idea.vim.ex.handler.CommandCommandHandler;
+import com.maddyhome.idea.vim.ex.handler.CopyTextHandler;
+import com.maddyhome.idea.vim.ex.handler.DeleteLinesHandler;
+import com.maddyhome.idea.vim.ex.handler.DigraphHandler;
+import com.maddyhome.idea.vim.ex.handler.DumpLineHandler;
+import com.maddyhome.idea.vim.ex.handler.EchoHandler;
+import com.maddyhome.idea.vim.ex.handler.EditFileHandler;
+import com.maddyhome.idea.vim.ex.handler.ExitHandler;
+import com.maddyhome.idea.vim.ex.handler.FindClassHandler;
+import com.maddyhome.idea.vim.ex.handler.FindFileHandler;
+import com.maddyhome.idea.vim.ex.handler.FindSymbolHandler;
+import com.maddyhome.idea.vim.ex.handler.GotoCharacterHandler;
+import com.maddyhome.idea.vim.ex.handler.GotoLineHandler;
+import com.maddyhome.idea.vim.ex.handler.HelpHandler;
+import com.maddyhome.idea.vim.ex.handler.HistoryHandler;
+import com.maddyhome.idea.vim.ex.handler.JoinLinesHandler;
+import com.maddyhome.idea.vim.ex.handler.JumpsHandler;
+import com.maddyhome.idea.vim.ex.handler.LetHandler;
+import com.maddyhome.idea.vim.ex.handler.MapHandler;
+import com.maddyhome.idea.vim.ex.handler.MarkHandler;
+import com.maddyhome.idea.vim.ex.handler.MarksHandler;
+import com.maddyhome.idea.vim.ex.handler.MoveTextHandler;
+import com.maddyhome.idea.vim.ex.handler.NextFileHandler;
+import com.maddyhome.idea.vim.ex.handler.NoHLSearchHandler;
+import com.maddyhome.idea.vim.ex.handler.OnlyHandler;
+import com.maddyhome.idea.vim.ex.handler.PreviousFileHandler;
+import com.maddyhome.idea.vim.ex.handler.PromptFindHandler;
+import com.maddyhome.idea.vim.ex.handler.PromptReplaceHandler;
+import com.maddyhome.idea.vim.ex.handler.PutLinesHandler;
+import com.maddyhome.idea.vim.ex.handler.QuitHandler;
+import com.maddyhome.idea.vim.ex.handler.RedoHandler;
+import com.maddyhome.idea.vim.ex.handler.RegistersHandler;
+import com.maddyhome.idea.vim.ex.handler.RepeatHandler;
+import com.maddyhome.idea.vim.ex.handler.SelectFileHandler;
+import com.maddyhome.idea.vim.ex.handler.SelectFirstFileHandler;
+import com.maddyhome.idea.vim.ex.handler.SelectLastFileHandler;
+import com.maddyhome.idea.vim.ex.handler.SetHandler;
+import com.maddyhome.idea.vim.ex.handler.ShiftLeftHandler;
+import com.maddyhome.idea.vim.ex.handler.ShiftRightHandler;
+import com.maddyhome.idea.vim.ex.handler.SortHandler;
+import com.maddyhome.idea.vim.ex.handler.SourceHandler;
+import com.maddyhome.idea.vim.ex.handler.SplitHandler;
+import com.maddyhome.idea.vim.ex.handler.SubstituteHandler;
+import com.maddyhome.idea.vim.ex.handler.UndoHandler;
+import com.maddyhome.idea.vim.ex.handler.WriteAllHandler;
+import com.maddyhome.idea.vim.ex.handler.WriteHandler;
+import com.maddyhome.idea.vim.ex.handler.WriteNextFileHandler;
+import com.maddyhome.idea.vim.ex.handler.WritePreviousFileHandler;
+import com.maddyhome.idea.vim.ex.handler.WriteQuitHandler;
+import com.maddyhome.idea.vim.ex.handler.YankLinesHandler;
 import com.maddyhome.idea.vim.ex.range.AbstractRange;
 import com.maddyhome.idea.vim.group.HistoryGroup;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Maintains a tree of Ex commands based on the required and optional parts of the command names. Parses and
@@ -70,6 +124,7 @@ public class CommandParser {
   public void registerHandlers() {
     if (registered) return;
 
+    new CommandCommandHandler();
     new ActionListHandler();
     new AsciiHandler();
     new CmdFilterHandler();
