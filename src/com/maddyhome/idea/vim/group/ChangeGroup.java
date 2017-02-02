@@ -194,7 +194,7 @@ public class ChangeGroup {
    * @param context The data context
    */
   public void insertNewLineBelow(@NotNull final Editor editor, @NotNull final DataContext context) {
-    MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLineEnd(editor));
+    EditorActionUtil.moveCaretToLineEnd(editor, false);
     initInsert(editor, context, CommandState.Mode.INSERT);
     runEnterAction(editor, context);
   }
