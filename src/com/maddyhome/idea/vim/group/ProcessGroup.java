@@ -112,7 +112,13 @@ public class ProcessGroup {
       record(editor, text);
       if (logger.isDebugEnabled()) logger.debug("swing=" + SwingUtilities.isEventDispatchThread());
       if (panel.getLabel().equals(":")) {
-        flags = CommandParser.getInstance().processCommand(editor, context, text, 1);
+
+        //allow multiple commands to be issued at once that are separated by the pipe
+        String[] commandArray=text.split("\\|");
+
+        for(String splitCommandText: commandArray){
+          flags = CommandParser.getInstance().processCommand(editor, context, splitCommandText, 1);
+        }
         if (logger.isDebugEnabled()) logger.debug("flags=" + flags);
         if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
           VimPlugin.getMotion().exitVisual(editor);
