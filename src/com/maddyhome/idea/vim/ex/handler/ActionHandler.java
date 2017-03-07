@@ -18,19 +18,34 @@
 
 package com.maddyhome.idea.vim.ex.handler;
 
+import com.intellij.ide.DataManager;
+import com.intellij.ide.util.gotoByName.GotoActionModel;
+import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.DataKeys;
+import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.TransactionGuard;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.ui.popup.ListPopup;
+import com.intellij.openapi.wm.IdeFocusManager;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.helper.UiHelper;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.InputEvent;
 
 /**
  * @author smartbomb
@@ -53,14 +68,48 @@ public class ActionHandler extends CommandHandler {
       executeAction(action, context, actionName);
     }
     else {
-      UiHelper.runAfterGotFocus(new Runnable() {
-        @Override
-        public void run() {
-          executeAction(action, context, actionName);
-        }
-      });
+      final Component component = DataKeys.CONTEXT_COMPONENT.getData(context);
+      ApplicationManager.getApplication().invokeLater(() -> IdeFocusManager.getInstance(DataKeys.PROJECT.getData(context)).doWhenFocusSettlesDown(
+              () -> performAction(action, component, null)));
     }
     return true;
+  }
+
+  public static void performAction(Object element, @Nullable final Component component, @Nullable final AnActionEvent e) {
+    performAction(element, component, e, null);
+  }
+
+  public static void performAction(Object element,
+                                   @Nullable final Component component,
+                                   @Nullable final AnActionEvent e,
+                                   @Nullable final Runnable callback) {
+    // element could be AnAction (SearchEverywhere)
+    if (component == null) return;
+    final AnAction action = element instanceof AnAction ? (AnAction)element : ((GotoActionModel.ActionWrapper)element).getAction();
+    TransactionGuard.getInstance().submitTransactionLater(ApplicationManager.getApplication(), () -> {
+      DataManager instance = DataManager.getInstance();
+      DataContext context = instance != null ? instance.getDataContext(component) : DataContext.EMPTY_CONTEXT;
+      InputEvent inputEvent = e == null ? null : e.getInputEvent();
+      AnActionEvent event = AnActionEvent.createFromAnAction(action, inputEvent, ActionPlaces.ACTION_SEARCH, context);
+
+      if (ActionUtil.lastUpdateAndCheckDumb(action, event, false)) {
+        if (action instanceof ActionGroup && ((ActionGroup)action).getChildren(event).length > 0) {
+          ListPopup popup = JBPopupFactory.getInstance().createActionGroupPopup(
+            event.getPresentation().getText(), (ActionGroup)action, context, false, callback, -1);
+          Window window = SwingUtilities.getWindowAncestor(component);
+          if (window != null) {
+            popup.showInCenterOf(window);
+          }
+          else {
+            popup.showInFocusCenter();
+          }
+        }
+        else {
+          ActionUtil.performActionDumbAware(action, event);
+          if (callback != null) callback.run();
+        }
+      }
+    });
   }
 
   private void executeAction(@NotNull AnAction action, @NotNull DataContext context, @NotNull String actionName) {
