@@ -955,7 +955,7 @@ public class SearchHelper {
         start = findNextWord(chars, pos, max, -(count - (onWordStart && !hasSelection ? 1 : 0)), isBig, !isOuter);
       }
 
-      start = EditorHelper.normalizeOffset(editor, start, false);
+      start = EditorHelper.normalizeOffset(editor, start + 1, false);
     }
 
     if (logger.isDebugEnabled()) logger.debug("start=" + start);
