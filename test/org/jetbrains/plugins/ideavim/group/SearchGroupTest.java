@@ -102,6 +102,13 @@ public class SearchGroupTest extends VimTestCase {
     assertOffset(4);
   }
 
+  // |/pattern/e|
+  public void testSearchMotionOffset() {
+    typeTextInFile(parseKeys("/", "two/e-1", "<Enter>"),
+                   "<caret>one two\n");
+    assertOffset(5);
+  }
+
   // |i_CTRL-K|
   public void testSearchDigraph() {
     typeTextInFile(parseKeys("/", "<C-K>O:", "<Enter>"),
