@@ -90,9 +90,9 @@ public class EditorGroup {
 
         if (VimPlugin.isEnabled()) {
           initLineNumbers(editor);
-          // Turn on insert mode if editor doesn't have any file
+          // Turn on insert mode if editor doesn't have any file or not read-only (viewer)
           if (!EditorData.isFileEditor(editor) && editor.getDocument().isWritable() &&
-              !CommandState.inInsertMode(editor)) {
+              !CommandState.inInsertMode(editor) && !editor.isViewer()) {
             KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke('i'), new EditorDataContext(editor));
           }
           editor.getSettings().setBlockCursor(!CommandState.inInsertMode(editor));
