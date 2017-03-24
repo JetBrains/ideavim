@@ -766,6 +766,22 @@ public class MotionActionTest extends VimTestCase {
   }
 
   // |%|
+  public void testPercentVisualModeMatchMultiLineEndOfLine() {
+    typeTextInFile(parseKeys("v$%"),
+            "foo(\n" +
+                    ")");
+    assertOffset(5);
+  }
+
+  // |%|
+  public void testPercentVisualModeMatchFromStartMultiLineEndOfLine() {
+    typeTextInFile(parseKeys("v$%"),
+            "(\n" +
+                    ")");
+    assertOffset(2);
+  }
+
+  // |%|
   public void testPercentMatchParensInString() {
     typeTextInFile(parseKeys("%"),
                    "foo(bar, \"foo(bar\", <caret>baz)\n");

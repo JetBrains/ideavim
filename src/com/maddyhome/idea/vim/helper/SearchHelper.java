@@ -210,6 +210,13 @@ public class SearchHelper {
 
     int line = editor.getCaretModel().getLogicalPosition().line;
     int end = EditorHelper.getLineEndOffset(editor, line, true);
+
+    // To handle the case where visual mode allows the user to go past the end of the line,
+    // which will prevent loc from finding a pairable character below
+    if(pos > 0 && pos == end) {
+      pos = end - 1;
+    }
+
     CharSequence chars = editor.getDocument().getCharsSequence();
     int loc = -1;
     // Search the remainder of the current line for one of the candidate characters
