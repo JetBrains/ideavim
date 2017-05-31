@@ -119,13 +119,42 @@ public class SearchHelper {
     int loc = blockChars.indexOf(type);
     char close = blockChars.charAt(loc + 1);
 
-    int bstart = findBlockLocation(chars, close, type, -1, pos, count);
-    if (bstart == -1) {
-      return null;
+    boolean initialPosIsInString = checkInString(chars, pos, true);
+
+    int bstart = -1;
+    int bend = -1;
+
+    if (initialPosIsInString) {
+      TextRange quoteRange = findBlockQuoteInLineRange(editor, '"', false);
+      if (quoteRange != null) {
+        int startOffset = quoteRange.getStartOffset();
+        int endOffset = quoteRange.getEndOffset();
+        CharSequence subSequence = chars.subSequence(startOffset, endOffset + 1);
+        int inQuotePos = pos - startOffset;
+        int inQuoteStart = findBlockLocation(subSequence, close, type, -1, inQuotePos, count);
+        if (inQuoteStart != -1) {
+          int inQuoteEnd = findBlockLocation(subSequence, type, close, 1, inQuoteStart + 1, 1);
+          if (inQuoteEnd != -1) {
+            bstart = inQuoteStart + startOffset;
+            bend = inQuoteEnd + startOffset;
+          }
+        }
+        else {
+          bstart = findBlockLocation(chars, close, type, -1, pos, count);
+          if (bstart != -1) {
+            bend = findBlockLocation(chars, type, close, 1, bstart + 1, 1);
+          }
+        }
+      }
+    }
+    else {
+      bstart = findBlockLocation(chars, close, type, -1, pos, count);
+      if (bstart != -1) {
+        bend = findBlockLocation(chars, type, close, 1, bstart + 1, 1);
+      }
     }
 
-    int bend = findBlockLocation(chars, type, close, 1, bstart + 1, 1);
-    if (bend == -1) {
+    if (bstart == -1 || bend == -1) {
       return null;
     }
 
@@ -319,7 +348,7 @@ public class SearchHelper {
   private static int findPreviousQuoteInLine(@NotNull CharSequence chars, int pos, char quote) {
     return findQuoteInLine(chars, pos, quote, Direction.BACK);
   }
-  
+
   private static int findFirstQuoteInLine(@NotNull Editor editor, int pos, char quote) {
     final int start = EditorHelper.getLineStartForOffset(editor, pos);
     return findNextQuoteInLine(editor.getDocument().getCharsSequence(), start, quote);
