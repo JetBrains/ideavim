@@ -306,6 +306,12 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("foo = [];\n");
   }
 
+  // VIM-1287 |d| |v_i(|
+  public void testSelectInsideForStringLiteral() {
+    typeTextInFile(parseKeys("di("), "(text \"with quotes(and <caret>braces)\")");
+    myFixture.checkResult("(text \"with quotes()\")");
+  }
+
   // |d| |v_i>|
   public void testDeleteInnerAngleBracketBlock() {
     typeTextInFile(parseKeys("di>"),
