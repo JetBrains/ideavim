@@ -106,13 +106,7 @@ public class EditorHelper {
    * @return The file line count
    */
   public static int getLineCount(@NotNull final Editor editor) {
-    int len = editor.getDocument().getLineCount();
-    if (editor.getDocument().getTextLength() > 0 &&
-        editor.getDocument().getCharsSequence().charAt(editor.getDocument().getTextLength() - 1) == '\n') {
-      len--;
-    }
-
-    return len;
+    return editor.getDocument().getLineCount();
   }
 
   /**
