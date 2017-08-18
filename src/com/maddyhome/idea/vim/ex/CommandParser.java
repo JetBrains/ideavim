@@ -124,6 +124,9 @@ public class CommandParser {
     new WriteQuitHandler();
     new YankLinesHandler();
 
+    new NextTabHandler();
+    new PreviousTabHandler();
+
     registered = true;
     //logger.debug("root=" + root);
   }
