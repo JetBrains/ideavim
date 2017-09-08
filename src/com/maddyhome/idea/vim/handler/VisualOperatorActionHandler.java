@@ -49,7 +49,12 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
 
     assert range != null : "Range must be not null for visual operator action " + getClass();
 
-    final boolean res = execute(editor, context, cmd, range);
+
+
+    boolean res = false;
+    if(range!=null) {
+      res= execute(editor, context, cmd, range);
+    }
 
     runnable.setRes(res);
     runnable.finish();
