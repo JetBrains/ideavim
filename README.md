@@ -2,6 +2,12 @@ IdeaVim
 =======
 
 <div>
+  <a href="https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub">
+    <img src="http://jb.gg/badges/official.svg" alt="official JetBrains project"/>
+  </a>
+</div>
+
+<div>
   <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_Build&guest=1">
     <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_Build)/statusIcon.svg?guest=1"/>
   </a>
