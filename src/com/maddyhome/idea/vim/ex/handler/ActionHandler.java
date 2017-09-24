@@ -37,7 +37,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ActionHandler extends CommandHandler {
   public ActionHandler() {
-    super("action", "", RANGE_FORBIDDEN | DONT_REOPEN);
+    super("action", "", RANGE_OPTIONAL | DONT_REOPEN);
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull final DataContext context,
@@ -50,20 +50,24 @@ public class ActionHandler extends CommandHandler {
     }
     final Application application = ApplicationManager.getApplication();
     if (application.isUnitTestMode()) {
-      executeAction(action, context, actionName);
+      executeAction(editor, cmd,action, context, actionName);
     }
     else {
       UiHelper.runAfterGotFocus(new Runnable() {
         @Override
         public void run() {
-          executeAction(action, context, actionName);
+          executeAction(editor, cmd, action, context, actionName);
         }
       });
     }
     return true;
   }
 
-  private void executeAction(@NotNull AnAction action, @NotNull DataContext context, @NotNull String actionName) {
+  private void executeAction(@NotNull Editor editor, @NotNull ExCommand cmd, @NotNull AnAction action,
+                             @NotNull DataContext context, @NotNull String actionName) {
+    if (cmd.getRanges().size() > 0) {
+        VimPlugin.getMotion().swapVisualSelections(editor);
+    }
     try {
       KeyHandler.executeAction(action, context);
     }
