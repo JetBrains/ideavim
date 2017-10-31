@@ -41,6 +41,7 @@ Contributors:
 * [Paulo Bu](mailto:pbu_98@yahoo.com)
 * [Giorgos Gaganis](mailto:gaganis@yahoo.com)
 * [Pavel Fatin](mailto:pavel.fatin@jetbrains.com)
+* [tieTYT](mailto:tietyt@gmail.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
