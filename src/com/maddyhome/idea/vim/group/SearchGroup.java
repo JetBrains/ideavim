@@ -619,24 +619,41 @@ public class SearchGroup {
     }
   }
 
+  public static Optional<TextRange> findCurrent(@NotNull Editor editor, @NotNull String pattern, final int offset) {
+    return findAll(editor, pattern, 0, -1, shouldIgnoreCase(pattern, false))
+      .stream()
+      .filter(range -> range.contains(offset))
+      .findFirst();
+  }
+
   @Nullable
   public static TextRange findNext(@NotNull Editor editor, @NotNull String pattern, final int offset, boolean ignoreCase,
-                                   final boolean forwards) {
-    final List<TextRange> results = findAll(editor, pattern, 0, -1, shouldIgnoreCase(pattern, ignoreCase));
+          final boolean forwards) {
+    return findNext(editor, pattern, offset, ignoreCase, forwards, 1);
+  }
+
+  @Nullable
+  public static TextRange findNext(@NotNull Editor editor, @NotNull String pattern, final int offset, boolean ignoreCase,
+                                   final boolean forwards, final int count) {
+    if (count <= 0) {
+      return null;
+    }
+    final List<TextRange> results = new ArrayList(findAll(editor, pattern, 0, -1, shouldIgnoreCase(pattern, ignoreCase)));
     if (results.isEmpty()) {
       return null;
     }
     final int size = EditorHelper.getFileSize(editor);
-    final TextRange max = Collections.max(results, (r1, r2) -> {
+    Collections.sort(results, (r1, r2) -> {
       final int d1 = distance(r1, offset, forwards, size);
       final int d2 = distance(r2, offset, forwards, size);
       if (d1 < 0 && d2 >= 0) {
-        return Integer.MAX_VALUE;
+        return Integer.MIN_VALUE;
       }
-      return d2 - d1;
+      return d1 - d2;
     });
+    TextRange nThClosest = results.get((count-1) % results.size());
     if (!Options.getInstance().isSet("wrapscan")) {
-      final int start = max.getStartOffset();
+      final int start = nThClosest.getStartOffset();
       if (forwards && start < offset) {
         return null;
       }
@@ -644,7 +661,54 @@ public class SearchGroup {
         return null;
       }
     }
-    return max;
+    return nThClosest;
+  }
+
+  @Nullable
+  public static TextRange findNextSearch(Editor editor, int count, boolean forwards) {
+    String lastSearch = VimPlugin.getSearch().getLastSearch();
+    if (lastSearch == null) {
+      return null;
+    }
+    int currentPos = editor.getCaretModel().getOffset();
+    TextRange nextRange = new TextRange(currentPos, currentPos);
+    int startOffset = nextRange.getStartOffset();
+    nextRange = findNext(editor, lastSearch, startOffset-1, false, forwards);
+    if (nextRange == null) {
+      return null;
+    }
+    return findNext(editor, lastSearch, nextRange, forwards, count - 1);
+
+  }
+
+  @Nullable
+  public static TextRange findCurrentOrNextSearch(Editor editor, int count, boolean forwards) {
+    String lastSearch = VimPlugin.getSearch().getLastSearch();
+    if (lastSearch == null) {
+      return null;
+    }
+    int currentPos = editor.getCaretModel().getOffset();
+    TextRange nextRange = new TextRange(currentPos, currentPos);
+          int startOffset = nextRange.getStartOffset();
+      nextRange = findCurrent(editor, lastSearch, startOffset)
+        .orElse(findNext(editor, lastSearch, startOffset, false, forwards));
+      if (nextRange == null) {
+        return null;
+      }
+      return findNext(editor, lastSearch, nextRange, forwards, count - 1);
+
+  }
+
+  @Nullable
+  private static TextRange findNext(Editor editor,
+                                    String lastSearch,
+                                    TextRange nextRange,
+                                    boolean forwards,
+                                    int count) {
+    if (count <= 0) {
+      return nextRange;
+    }
+    return findNext(editor, lastSearch, Math.max(nextRange.getStartOffset() - (forwards?0:1),0), false, forwards, count);
   }
 
   private static int distance(@NotNull TextRange range, int pos, boolean forwards, int size) {

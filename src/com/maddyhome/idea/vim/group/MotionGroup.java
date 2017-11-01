@@ -1988,6 +1988,52 @@ public class MotionGroup {
     return lastFTChar;
   }
 
+  public int selectNextSearch(Editor editor, int count, boolean forwards) {
+    TextRange nextRange = SearchGroup.findCurrentOrNextSearch(editor, count, forwards);
+    if (nextRange  == null) {
+      return -1;
+    }
+    final int startOffset = startOffset(nextRange, forwards);
+
+    CommandState.Mode currentMode = CommandState.getInstance(editor).getMode();
+    if (currentMode == CommandState.Mode.VISUAL)
+    {
+      if(atEdgeOfRange(nextRange, editor, forwards)){
+        nextRange = SearchGroup.findNextSearch(editor, count, forwards);
+      };
+    }
+    final int endOffset = endOffset(nextRange, forwards);
+
+    for (Caret caret : editor.getCaretModel().getAllCarets()) {
+      MotionGroup.moveCaret(editor, caret, startOffset);
+      if (currentMode != CommandState.Mode.VISUAL)
+      {
+        setVisualMode(editor, CommandState.SubMode.VISUAL_CHARACTER);
+      }
+      MotionGroup.moveCaret(editor, caret, endOffset);
+    }
+    return endOffset;
+  }
+
+  private boolean atEdgeOfRange(TextRange nextRange, Editor editor, boolean forwards) {
+    int currentPosition = editor.getCaretModel().getOffset();
+    if (forwards) {
+      return nextRange.getEndOffset() -1 == currentPosition;
+    }
+    else {
+      return nextRange.getStartOffset() == currentPosition;
+    }
+  }
+
+
+  private int startOffset(TextRange nextRange, boolean forwards) {
+    return forwards ? nextRange.getStartOffset() : Math.max(nextRange.getEndOffset() - 1, 0);
+  }
+
+  private int endOffset(TextRange nextRange, boolean forwards) {
+    return forwards ? Math.max(nextRange.getEndOffset() - 1, 0) : nextRange.getStartOffset();
+  }
+
   private int lastFTCmd = 0;
   private char lastFTChar;
   @NotNull

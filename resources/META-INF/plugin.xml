@@ -372,5 +372,9 @@
     <!-- Keys -->
     <action id="VimShortcutKeyAction" class="com.maddyhome.idea.vim.action.VimShortcutKeyAction" text="Shortcuts"/>
     <action id="VimOperatorAction" class="com.maddyhome.idea.vim.action.change.OperatorAction" text="Operator"/>
+
+    <!-- Visual Selection of last Search Pattern (gn) -->
+    <action id="VimVisualSelectNextSearch" class="com.maddyhome.idea.vim.gn.VisualSelectNextSearch" text="Visual Select Next Search"/>
+    <action id="VimVisualSelectPreviousSearch" class="com.maddyhome.idea.vim.gn.VisualSelectPreviousSearch" text="Visual Select Previous Search"/>
   </actions>
 </idea-plugin>
