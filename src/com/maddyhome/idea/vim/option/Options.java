@@ -505,8 +505,8 @@ public class Options {
     abbrevs.put(option.getAbbreviation(), option);
   }
 
-  @NotNull private final HashMap<String, Option> options = new HashMap<String, Option>();
-  @NotNull private final HashMap<String, Option> abbrevs = new HashMap<String, Option>();
+  @NotNull private final HashMap<String, Option> options = new LinkedHashMap<>();
+  @NotNull private final HashMap<String, Option> abbrevs = new LinkedHashMap<>();
 
   private static Options ourInstance;
 
