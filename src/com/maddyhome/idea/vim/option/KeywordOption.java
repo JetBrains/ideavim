@@ -2,116 +2,82 @@ package com.maddyhome.idea.vim.option;
 
 import org.apache.commons.lang.math.NumberUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class KeywordOption extends ListOption {
-
-  private Pattern validationPattern;
+public final class KeywordOption extends ListOption {
+  @NotNull private final Pattern validationPattern;
 
   // KeywordSpecs are the option values in reverse order
-  @NotNull private List<KeywordSpec> keywordSpecs = new ArrayList<KeywordSpec>();
+  @NotNull private List<KeywordSpec> keywordSpecs = new ArrayList<>();
 
-  /**
-   * Creates the option
-   *
-   * @param name   The name of the option
-   * @param abbrev The short name
-   * @param dflt   The option's default values
-   */
-  public KeywordOption(String name, String abbrev, String[] dflt) {
-    super(name, abbrev, dflt,
+  public KeywordOption(@NotNull String name, @NotNull String abbrev, @NotNull String[] defaultValue) {
+    super(name, abbrev, defaultValue,
           "(\\^?(([^0-9^]|[0-9]{1,3})-([^0-9]|[0-9]{1,3})|([^0-9^]|[0-9]{1,3})),)*\\^?(([^0-9^]|[0-9]{1,3})-([^0-9]|[0-9]{1,3})|([^0-9]|[0-9]{1,3})),?$");
     validationPattern = Pattern.compile(pattern);
     set(getValue());
   }
 
   @Override
-  public boolean append(String val) {
-
-    List<String> vals = parseVals(val);
-    List<KeywordSpec> specs = valsToValidatedAndReversedSpecs(vals);
-
-    // a null vals or specs indicates a validation error
-    if (vals == null || specs == null || value == null){
+  public boolean append(@NotNull String val) {
+    final List<String> vals = parseVals(val);
+    final List<KeywordSpec> specs = valsToValidatedAndReversedSpecs(vals);
+    if (vals == null || specs == null || value == null) {
       return false;
     }
-
     value.addAll(vals);
-
     keywordSpecs.addAll(0, specs);
-
     fireOptionChangeEvent();
-
     return true;
   }
 
   @Override
-  public boolean prepend(String val) {
-
-    List<String> vals = parseVals(val);
-    List<KeywordSpec> specs = valsToValidatedAndReversedSpecs(vals);
-
-    // a null vals or specs indicates a validation error
-    if (vals == null || specs == null || value == null){
+  public boolean prepend(@NotNull String val) {
+    final List<String> vals = parseVals(val);
+    final List<KeywordSpec> specs = valsToValidatedAndReversedSpecs(vals);
+    if (vals == null || specs == null || value == null) {
       return false;
     }
-
     value.addAll(0, vals);
-
     keywordSpecs.addAll(specs);
-
     fireOptionChangeEvent();
-
     return true;
   }
 
 
   @Override
-  public boolean remove(String val) {
-
-    List<String> vals = parseVals(val);
-    List<KeywordSpec> specs = valsToValidatedAndReversedSpecs(vals);
-
-    // a null vals or specs indicates a validation error
-    if (vals == null || specs == null || value == null){
+  public boolean remove(@NotNull String val) {
+    final List<String> vals = parseVals(val);
+    final List<KeywordSpec> specs = valsToValidatedAndReversedSpecs(vals);
+    if (vals == null || specs == null || value == null) {
       return false;
     }
-
     value.removeAll(vals);
-
     keywordSpecs.removeAll(specs);
-
     fireOptionChangeEvent();
-
     return true;
   }
 
   @Override
-  public boolean set(String val){
-
-    List<String> vals = parseVals(val);
-    List<KeywordSpec> specs = valsToValidatedAndReversedSpecs(vals);
-
-    // a null vals or specs indicates a validation error
-    if (vals == null || specs == null || value == null){
+  public boolean set(@NotNull String val) {
+    final List<String> vals = parseVals(val);
+    final List<KeywordSpec> specs = valsToValidatedAndReversedSpecs(vals);
+    if (vals == null || specs == null || value == null) {
       return false;
     }
-
     value = vals;
-
     keywordSpecs = specs;
-
     fireOptionChangeEvent();
-
     return true;
   }
 
-  private List<KeywordSpec> valsToValidatedAndReversedSpecs(List<String> vals) {
-    List<KeywordSpec> specs = new ArrayList<KeywordSpec>();
+  @Nullable
+  private List<KeywordSpec> valsToValidatedAndReversedSpecs(@Nullable List<String> vals) {
+    final List<KeywordSpec> specs = new ArrayList<>();
     if (vals != null) {
       for (String val : vals) {
         KeywordSpec spec = new KeywordSpec(val);
@@ -125,10 +91,9 @@ public class KeywordOption extends ListOption {
     return specs;
   }
 
+  @Nullable
   @Override
-  protected List<String> parseVals(String content) {
-
-    // We have two stages to validation. This is the first stage, which makes sure the input string has the right format.
+  protected List<String> parseVals(@NotNull String content) {
     if (!validationPattern.matcher(content).matches()) {
       return null;
     }
@@ -137,13 +102,12 @@ public class KeywordOption extends ListOption {
     boolean firstCharNumOfPart = true;
     boolean inRange = false;
 
-    List<String> vals = new ArrayList<String>();
+    final List<String> vals = new ArrayList<>();
     StringBuilder option = new StringBuilder();
 
     // We need to split the input string into parts. However, we can't just split on a comma
     // since a comma can either be a keyword or a separator depending on its location in the string.
     while (index <= content.length()) {
-
       char curChar = 0;
       if (index < content.length()) {
         curChar = content.charAt(index);
@@ -183,31 +147,27 @@ public class KeywordOption extends ListOption {
   }
 
   public boolean isKeyword(char c) {
-    int code = (int)c;
-
-    if (code >= '\u0100'){
+    final int code = (int)c;
+    if (code >= '\u0100') {
       return true;
     }
-
-    for (KeywordSpec spec : keywordSpecs){
-      if (spec.contains(code)){
+    for (KeywordSpec spec : keywordSpecs) {
+      if (spec.contains(code)) {
         return !spec.negate();
       }
     }
-
     return false;
   }
 
-  public static class KeywordSpec {
-
+  private static final class KeywordSpec {
     private String part;
-    private boolean negate = false;
+    private boolean negate;
     private boolean isRange = false;
     private boolean isAllLetters = false;
     private Integer rangeLow;
     private Integer rangeHigh;
 
-    public KeywordSpec(String part) {
+    public KeywordSpec(@NotNull String part) {
 
       this.part = part;
 
@@ -217,7 +177,7 @@ public class KeywordOption extends ListOption {
         part = part.substring(1);
       }
 
-      String[] keywords = part.split("(?<=.)-(?=.+)");
+      final String[] keywords = part.split("(?<=.)-(?=.+)");
 
       if (keywords.length > 1 || keywords[0].equals("@")) {
         isRange = true;
@@ -236,7 +196,7 @@ public class KeywordOption extends ListOption {
       }
     }
 
-    private int toUnicode(String str) {
+    private int toUnicode(@NotNull String str) {
       if (NumberUtils.isNumber(str)) {
         return Integer.parseInt(str); // If we have a number, it represents the Unicode code point of a letter
       }
@@ -246,7 +206,7 @@ public class KeywordOption extends ListOption {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
       if (this == o) return true;
       if (o == null || getClass() != o.getClass()) return false;
 
@@ -269,14 +229,12 @@ public class KeywordOption extends ListOption {
     }
 
     public boolean contains(int code) {
-      if (isAllLetters){
-       return Character.isLetter(code);
+      if (isAllLetters) {
+        return Character.isLetter(code);
       }
-
-      if (isRange){
+      if (isRange) {
         return (code >= rangeLow && code <= rangeHigh);
       }
-
       return code == rangeLow;
     }
   }

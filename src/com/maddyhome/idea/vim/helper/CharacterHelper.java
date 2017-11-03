@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class CharacterHelper {
 
-  public static enum CharacterType {
+  public enum CharacterType {
     KEYWORD,
     HIRAGANA,
     KATAKANA,
@@ -39,12 +39,6 @@ public class CharacterHelper {
   public static final char CASE_TOGGLE = '~';
   public static final char CASE_UPPER = 'u';
   public static final char CASE_LOWER = 'l';
-
-  private static KeywordOption keywordOption;
-
-  static {
-    keywordOption = (KeywordOption)Options.getInstance().getOption("iskeyword");
-  }
 
   /**
    * This returns the type of the supplied character. The logic is as follows:<br>
@@ -72,7 +66,7 @@ public class CharacterHelper {
     else if (isHalfWidthKatakanaLetter(ch)) {
       return CharacterType.HALF_WIDTH_KATAKANA;
     }
-    else if (punctuationAsLetters || keywordOption.isKeyword(ch)) {
+    else if (punctuationAsLetters || ((KeywordOption)Options.getInstance().getOption("iskeyword")).isKeyword(ch)) {
       return CharacterType.KEYWORD;
     }
     else {
