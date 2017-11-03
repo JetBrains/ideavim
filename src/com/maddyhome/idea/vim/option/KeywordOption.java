@@ -217,7 +217,7 @@ public class KeywordOption extends ListOption {
         part = part.substring(1);
       }
 
-      String[] keywords = part.split("(?<=.+)-(?=.+)");
+      String[] keywords = part.split("(?<=.)-(?=.+)");
 
       if (keywords.length > 1 || keywords[0].equals("@")) {
         isRange = true;
