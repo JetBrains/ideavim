@@ -78,6 +78,7 @@ public final class KeywordOption extends ListOption {
   @Override
   public void resetDefault() {
     if (!dflt.equals(value)) {
+      value = dflt;
       set(getValue());
     }
   }
