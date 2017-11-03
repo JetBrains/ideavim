@@ -75,6 +75,13 @@ public final class KeywordOption extends ListOption {
     return true;
   }
 
+  @Override
+  public void resetDefault() {
+    if (!dflt.equals(value)) {
+      set(getValue());
+    }
+  }
+
   @Nullable
   private List<KeywordSpec> valsToValidatedAndReversedSpecs(@Nullable List<String> vals) {
     final List<KeywordSpec> specs = new ArrayList<>();
