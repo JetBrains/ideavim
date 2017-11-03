@@ -20,10 +20,11 @@ usual beta standards.
 To Be Released
 --------------
 
-Enabled zero-latency typing for Vim emulation. Various bug fixes.
+Enabled zero-latency typing for Vim emulation. Added support for `iskeyword` option. Various bug fixes.
 
 
 * [VIM-1254](https://youtrack.jetbrains.com/issue/VIM-1254) Enable zero-latency typing for Vim emulation
+* [VIM-1367](https://youtrack.jetbrains.com/issue/VIM-1367) Support `iskeyword` option
 * [VIM-523](https://youtrack.jetbrains.com/issue/VIM-523) Fixed global mark remembering only the line number
 
 0.48, 2017-01-15

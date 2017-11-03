@@ -5,6 +5,7 @@
       <p>To be released:</p>
       <ul>
         <li>Enabled zero-latency typing for Vim emulation</li>
+        <li>Support for <code>iskeyword</code> option</li>
         <li>Various bug fixes</li>
       </ul>
       <p>0.48:</p>
