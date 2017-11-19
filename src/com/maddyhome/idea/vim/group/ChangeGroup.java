@@ -1175,8 +1175,8 @@ public class ChangeGroup {
   }
 
   public boolean blockInsert(@NotNull Editor editor, @NotNull DataContext context, @NotNull TextRange range, boolean append) {
+    int lines = getLinesCountInVisualBlock(editor, range);
     LogicalPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
-    int lines = range.size();
     int line = start.line;
     int col = start.column;
     if (!range.isMultiple()) {
@@ -1225,7 +1225,7 @@ public class ChangeGroup {
     int col = 0;
     int lines = 0;
     if (type == SelectionType.BLOCK_WISE) {
-      lines = range.size();
+      lines = getLinesCountInVisualBlock(editor, range);
       col = editor.offsetToLogicalPosition(range.getStartOffset()).column;
       if (EditorData.getLastColumn(editor) == MotionGroup.LAST_COLUMN) {
         col = MotionGroup.LAST_COLUMN;
@@ -1251,6 +1251,22 @@ public class ChangeGroup {
     }
 
     return res;
+  }
+
+  /**
+   * Counts number of lines in the visual block.
+   * <p>
+   * The result includes empty and short lines
+   * which does not have explicit start position (caret).
+   *
+   * @param editor  The editor the block was selected in
+   * @param range   The range corresponding to the selected block
+   * @return total number of lines
+   */
+  private static int getLinesCountInVisualBlock(@NotNull Editor editor, @NotNull TextRange range) {
+    LogicalPosition firstStart = editor.offsetToLogicalPosition(range.getStartOffsets()[0]);
+    LogicalPosition lastStart = editor.offsetToLogicalPosition(range.getStartOffsets()[range.size() - 1]);
+    return lastStart.line - firstStart.line + 1;
   }
 
   /**
