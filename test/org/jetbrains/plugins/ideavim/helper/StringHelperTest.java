@@ -1,8 +1,8 @@
 package org.jetbrains.plugins.ideavim.helper;
 
 import com.maddyhome.idea.vim.helper.StringHelper;
-import junit.framework.TestCase;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import javax.swing.*;
 import java.awt.event.InputEvent;
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @author vlan
  */
-public class StringHelperTest extends TestCase {
+public class StringHelperTest extends VimTestCase {
   public void testParseKeyModifiers() {
     assertTypedKeyStroke('C', "C");
     assertTypedKeyStroke('c', "c");
