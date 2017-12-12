@@ -22,6 +22,8 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
+import com.intellij.openapi.wm.IdeFocusManager;
+import com.intellij.openapi.wm.impl.WindowManagerImpl;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -65,17 +67,28 @@ public class UiHelper {
    * @see #requestFocus
    */
   public static void runAfterGotFocus(@NotNull final Runnable runnable) {
+    Window window = WindowManagerImpl.getInstanceEx().getMostRecentFocusedWindow();
+    runAfterGotFocus(window, runnable);
+  }
+
+  /**
+   * Run code after getting focus on request.
+   *
+   * @see #requestFocus
+   */
+  public static void runAfterGotFocus(@NotNull final Window window, @NotNull final Runnable runnable) {
+    if (!IdeFocusManager.findInstanceByComponent(window).isFocusBeingTransferred()) {
+      // we've got focus; run it now
+      runnable.run();
+      return;
+    }
+
+    // try again later
     final Application application = ApplicationManager.getApplication();
-    // XXX: One more invokeLater than in requestFocus()
     application.invokeLater(new Runnable() {
       @Override
       public void run() {
-        application.invokeLater(new Runnable() {
-          @Override
-          public void run() {
-            application.invokeLater(runnable);
-          }
-        });
+        runAfterGotFocus(window, runnable);
       }
     });
   }
