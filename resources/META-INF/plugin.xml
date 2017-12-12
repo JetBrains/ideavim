@@ -2,7 +2,7 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
-      <p>To be released:</p>
+      <p>0.49:</p>
       <ul>
         <li>Enabled zero-latency typing for Vim emulation</li>
         <li>Support for <code>iskeyword</code> option</li>

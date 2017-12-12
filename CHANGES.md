@@ -17,8 +17,8 @@ Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
 
-To Be Released
---------------
+0.49, 2017-12-12
+----------------
 
 Enabled zero-latency typing for Vim emulation. Added support for `iskeyword` option. Various bug fixes.
 
