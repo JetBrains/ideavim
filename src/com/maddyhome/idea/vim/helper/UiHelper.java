@@ -22,6 +22,7 @@ import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
+import com.intellij.openapi.wm.IdeFocusManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -65,18 +66,6 @@ public class UiHelper {
    * @see #requestFocus
    */
   public static void runAfterGotFocus(@NotNull final Runnable runnable) {
-    final Application application = ApplicationManager.getApplication();
-    // XXX: One more invokeLater than in requestFocus()
-    application.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        application.invokeLater(new Runnable() {
-          @Override
-          public void run() {
-            application.invokeLater(runnable);
-          }
-        });
-      }
-    });
+    IdeFocusManager.findInstance().doWhenFocusSettlesDown(runnable);
   }
 }
