@@ -8,6 +8,7 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 /**
  * @author vlan
  */
+
 public class VariousCommandsTest extends VimTestCase {
   // VIM-550 |:put|
   public void testPutCreatesNewLine() {
@@ -37,5 +38,50 @@ public class VariousCommandsTest extends VimTestCase {
     assertMode(CommandState.Mode.COMMAND);
     myFixture.checkResult("f<caret>oo\n" +
                           "bar\n");
+  }
+
+  // VIM-862 |:action| in visual character mode
+  public void testExCommandInVisualCharacterMode() {
+    configureByJavaText("-----\n" +
+                        "1<caret>2345\n" +
+                        "abcde\n" +
+                        "-----");
+    typeText(parseKeys("vjl"));
+    typeText(commandToKeys("'<,'>action CommentByBlockComment"));
+    assertMode(CommandState.Mode.COMMAND);
+    myFixture.checkResult("-----\n" +
+                          "1/*2345\n" +
+                          "abc*/de\n" +
+                          "-----");
+  }
+
+  // VIM-862 |:action| in visual line mode
+  public void testExCommandInVisualLineMode() {
+    configureByJavaText("-----\n" +
+                        "1<caret>2345\n" +
+                        "abcde\n" +
+                        "-----");
+    typeText(parseKeys("Vj"));
+    typeText(commandToKeys("'<,'>action CommentByBlockComment"));
+    assertMode(CommandState.Mode.COMMAND);
+    myFixture.checkResult("-----\n" +
+                          "/*12345\n" +
+                          "abcde*/\n" +
+                          "-----");
+  }
+
+  // VIM-862 |:action| in visual block mode
+  public void testExCommandInVisualBlockMode() {
+    configureByJavaText("-----\n" +
+                        "1<caret>2345\n" +
+                        "abcde\n" +
+                        "-----");
+    typeText(parseKeys("<C-V>lj"));
+    typeText(commandToKeys("'<,'>action CommentByBlockComment"));
+    assertMode(CommandState.Mode.COMMAND);
+    myFixture.checkResult("-----\n" +
+                          "1/*23*/45\n" +
+                          "a/*bc*/de\n" +
+                          "-----");
   }
 }
