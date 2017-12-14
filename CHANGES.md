@@ -17,6 +17,15 @@ Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
 
+To Be Released
+--------------
+
+A bugfix release.
+
+* [VIM-1329](https://youtrack.jetbrains.com/issue/VIM-1329) Request focus reliably for Ex entry and output panels
+* [VIM-1368](https://youtrack.jetbrains.com/issue/VIM-1368) Wait for focus reliably before running an `:action`
+
+
 0.49, 2017-12-12
 ----------------
 
