@@ -43,6 +43,7 @@ Contributors:
 * [Pavel Fatin](mailto:pavel.fatin@jetbrains.com)
 * [tieTYT](mailto:tietyt@gmail.com)
 * [Nick Gieschen](mailto:nickgieschen@gmail.com)
+* [Naoto Ikeno](mailto:ikenox@gmail.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
