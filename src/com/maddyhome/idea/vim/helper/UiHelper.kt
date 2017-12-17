@@ -20,6 +20,7 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.editor.colors.EditorColorsManager
 import com.intellij.openapi.wm.IdeFocusManager
 import java.awt.Font
@@ -38,7 +39,7 @@ fun requestFocus(component: JComponent) {
  * @see [requestFocus]
  */
 fun runAfterGotFocus(runnable: Runnable) {
-  IdeFocusManager.findInstance().doWhenFocusSettlesDown(runnable)
+  IdeFocusManager.findInstance().doWhenFocusSettlesDown(runnable, ModalityState.defaultModalityState())
 }
 
 val editorFont: Font
