@@ -1122,6 +1122,15 @@ public class MotionActionTest extends VimTestCase {
                     "        baz");
   }
 
+  // VIM-862 |gv|
+  public void testRestoreSelectionRange() {
+    configureByText("<caret>foo\n" +
+                    "bar\n");
+    typeText(parseKeys("vl", "<Esc>", "gv"));
+    assertMode(VISUAL);
+    assertSelection("fo");
+  }
+
   public void testVisualLineSelectDown() {
     typeTextInFile(parseKeys("Vj"),
                    "foo\n" +

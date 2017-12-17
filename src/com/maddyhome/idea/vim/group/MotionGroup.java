@@ -1669,8 +1669,8 @@ public class MotionGroup {
       final BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
       int lineEnd = EditorHelper.getLineEndForOffset(editor, end);
       final int adj = opt.getValue().equals("exclusive") || end == lineEnd ? 0 : 1;
-      end = Math.min(EditorHelper.getFileSize(editor), end + adj);
-      editor.getSelectionModel().setSelection(start, end);
+      final int adjEnd = Math.min(EditorHelper.getFileSize(editor), end + adj);
+      editor.getSelectionModel().setSelection(start, adjEnd);
     }
     else if (subMode == CommandState.SubMode.VISUAL_LINE) {
       if (start > end) {
