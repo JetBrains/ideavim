@@ -8,7 +8,6 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 /**
  * @author vlan
  */
-
 public class VariousCommandsTest extends VimTestCase {
   // VIM-550 |:put|
   public void testPutCreatesNewLine() {
@@ -53,6 +52,17 @@ public class VariousCommandsTest extends VimTestCase {
                           "1/*2345\n" +
                           "abc*/de\n" +
                           "-----");
+  }
+
+  // VIM-862 |:action|
+  public void testExCommandInVisualCharacterModeSameLine() {
+    configureByJavaText("1<caret>2345\n" +
+                        "abcde\n");
+    typeText(parseKeys("vl"));
+    typeText(commandToKeys("'<,'>action CommentByBlockComment"));
+    assertMode(CommandState.Mode.COMMAND);
+    myFixture.checkResult("1/*23*/45\n" +
+                          "abcde\n");
   }
 
   // VIM-862 |:action| in visual line mode

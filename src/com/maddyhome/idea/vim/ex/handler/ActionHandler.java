@@ -50,30 +50,30 @@ public class ActionHandler extends CommandHandler {
     }
     final Application application = ApplicationManager.getApplication();
     if (application.isUnitTestMode()) {
-      executeAction(editor, cmd,action, context, actionName);
+      executeAction(editor, cmd, action, context, actionName);
     }
     else {
-      UiHelper.runAfterGotFocus(new Runnable() {
-        @Override
-        public void run() {
-          executeAction(editor, cmd, action, context, actionName);
-        }
-      });
+      UiHelper.runAfterGotFocus(() -> executeAction(editor, cmd, action, context, actionName));
     }
     return true;
   }
 
   private void executeAction(@NotNull Editor editor, @NotNull ExCommand cmd, @NotNull AnAction action,
                              @NotNull DataContext context, @NotNull String actionName) {
-    if (cmd.getRanges().size() > 0) {
-        VimPlugin.getMotion().swapVisualSelections(editor);
+    final boolean visualAction = cmd.getRanges().size() > 0;
+    if (visualAction) {
+      VimPlugin.getMotion().selectPreviousVisualMode(editor);
     }
     try {
       KeyHandler.executeAction(action, context);
     }
     catch (RuntimeException e) {
-      // TODO: Find out if any runtime exceptions may happen here
       assert false : "Error while executing :action " + actionName + " (" + action + "): " + e;
+    }
+    finally {
+      if (visualAction) {
+        VimPlugin.getMotion().processEscape(editor);
+      }
     }
   }
 }
