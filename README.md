@@ -46,8 +46,10 @@ it is unchecked. At this point your IDE will work with its regular keyboard
 shortcuts.
 
 Keyboard shortcut conflicts between the Vim emulation and the IDE can be
-resolved via "File | Settings | Vim Emulation", "File | Settings | Keymap"
-and key mapping commands in your ~/.ideavimrc file.
+resolved via "File | Settings | Vim Emulation", "File | Settings | Keymap" on
+Linux & Windows, and by
+"Preferences | Other Settings | Vim Emulation", "Preferences | Keymap" on macOS.
+They can also be resolved by key mapping commands in your ~/.ideavimrc file.
 
 
 Get an Early Access
