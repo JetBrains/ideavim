@@ -40,6 +40,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.function.BinaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -119,12 +120,12 @@ public class SearchHelper {
     int loc = blockChars.indexOf(type);
     char close = blockChars.charAt(loc + 1);
 
-    int bstart = findBlockLocation(chars, close, type, -1, pos, count);
+    int bstart = findBlockLocation(chars, close, type, -1, pos, count, checkMatchForChar);
     if (bstart == -1) {
       return null;
     }
 
-    int bend = findBlockLocation(chars, type, close, 1, bstart + 1, 1);
+    int bend = findBlockLocation(chars, type, close, 1, bstart + 1, 1, checkMatchForChar);
     if (bend == -1) {
       return null;
     }
@@ -251,6 +252,15 @@ public class SearchHelper {
   }
 
   private static int findBlockLocation(@NotNull CharSequence chars, char found, char match, int dir, int pos, int cnt) {
+    return findBlockLocation(chars, found, match, dir, pos, cnt, checkMatchForStringAndChar);
+  }
+
+  private static BinaryOperator<Boolean> checkMatchForStringAndChar = (inString, inChar) -> inString && inChar;
+
+  private static BinaryOperator<Boolean> checkMatchForChar = (inString, inChar) -> inChar;
+
+  private static int findBlockLocation(@NotNull CharSequence chars, char found, char match, int dir, int pos, int cnt,
+                                       BinaryOperator<Boolean> checker) {
     int res = -1;
     final int inCheckPos = dir < 0 && pos > 0 ? pos - 1 : pos;
     boolean inString = checkInString(chars, inCheckPos, true);
@@ -260,7 +270,7 @@ public class SearchHelper {
     // Search to start or end of file, as appropriate
     while (pos >= 0 && pos < chars.length() && cnt > 0) {
       // If we found a match and we're not in a string...
-      if (chars.charAt(pos) == match && !inString && !inChar) {
+      if (chars.charAt(pos) == match && checker.apply(!inString, !inChar)) {
         // We found our match
         if (stack == 0) {
           res = pos;
@@ -319,7 +329,7 @@ public class SearchHelper {
   private static int findPreviousQuoteInLine(@NotNull CharSequence chars, int pos, char quote) {
     return findQuoteInLine(chars, pos, quote, Direction.BACK);
   }
-  
+
   private static int findFirstQuoteInLine(@NotNull Editor editor, int pos, char quote) {
     final int start = EditorHelper.getLineStartForOffset(editor, pos);
     return findNextQuoteInLine(editor.getDocument().getCharsSequence(), start, quote);
@@ -1928,4 +1938,5 @@ public class SearchHelper {
   @NotNull private static final String blockChars = "{}()[]<>";
 
   private static final Logger logger = Logger.getInstance(SearchHelper.class.getName());
+
 }
