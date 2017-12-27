@@ -26,6 +26,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
@@ -72,7 +73,8 @@ public class ActionHandler extends CommandHandler {
     }
     finally {
       if (visualAction) {
-        VimPlugin.getMotion().processEscape(editor);
+        // Exit visual mode selected above, but do it without resetting the selected text
+        CommandState.getInstance(editor).popState();
       }
     }
   }
