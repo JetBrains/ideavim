@@ -576,4 +576,19 @@ public class ChangeActionTest extends VimTestCase {
   public void testRepeatChangeWordDoesNotBreakNextRepeatFind() {
     doTest(parseKeys("fXcfYPATATA<Esc>fX.;."), "<caret>aaaaXBBBBYaaaaaaaXBBBBYaaaaaaXBBBBYaaaaaaaa\n", "aaaaPATATAaaaaaaaPATATAaaaaaaPATATAaaaaaaaa\n");
   }
+
+  // VIM-1110 |CTRL-V| |v_b_i| |zc|
+  public void testBlockInsertAfterFolds() {
+    configureByJavaText("<caret>/**\n" +
+                        " * Something to fold.\n" +
+                        " */\n" +
+                        "foo\n" +
+                        "bar\n");
+    typeText(parseKeys("zc", "j", "<C-V>", "j", "I", "X", "<Esc>"));
+    myFixture.checkResult("/**\n" +
+                          " * Something to fold.\n" +
+                          " */\n" +
+                          "<caret>Xfoo\n" +
+                          "Xbar\n");
+  }
 }
