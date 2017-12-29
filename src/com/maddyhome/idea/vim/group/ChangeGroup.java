@@ -1256,16 +1256,17 @@ public class ChangeGroup {
   /**
    * Counts number of lines in the visual block.
    * <p>
-   * The result includes empty and short lines
-   * which does not have explicit start position (caret).
+   * The result includes empty and short lines which does not have explicit start position (caret).
    *
    * @param editor  The editor the block was selected in
    * @param range   The range corresponding to the selected block
    * @return total number of lines
    */
   private static int getLinesCountInVisualBlock(@NotNull Editor editor, @NotNull TextRange range) {
-    LogicalPosition firstStart = editor.offsetToLogicalPosition(range.getStartOffsets()[0]);
-    LogicalPosition lastStart = editor.offsetToLogicalPosition(range.getStartOffsets()[range.size() - 1]);
+    final int[] startOffsets = range.getStartOffsets();
+    if (startOffsets.length == 0) return 0;
+    final LogicalPosition firstStart = editor.offsetToLogicalPosition(startOffsets[0]);
+    final LogicalPosition lastStart = editor.offsetToLogicalPosition(startOffsets[range.size() - 1]);
     return lastStart.line - firstStart.line + 1;
   }
 
