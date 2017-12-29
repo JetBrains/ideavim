@@ -26,6 +26,7 @@ import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.editor.colors.EditorFontType;
 import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.editor.ex.EditorEx;
+import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -150,6 +151,10 @@ public class EditorGroup {
     EditorData.setEditorGroup(editor, false);
 
     editor.getGutter().closeAllAnnotations();
+
+    final Project project = editor.getProject();
+    if (project == null || project.isDisposed()) return;
+
     editor.getSettings().setLineNumbersShown(EditorData.isLineNumbersShown(editor));
   }
 
