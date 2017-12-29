@@ -35,6 +35,7 @@ intellij {
   pluginName 'IdeaVim'
   updateSinceUntilBuild false
   downloadSources Boolean.valueOf(downloadIdeaSources)
+  instrumentCode Boolean.valueOf(instrumentPluginCode)
 
   publishPlugin {
     channels publishChannels.split(',')
