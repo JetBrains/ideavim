@@ -377,6 +377,50 @@ public class ChangeActionTest extends VimTestCase {
            "br\n");
   }
 
+  // VIM-1379 |CTRL-V| |j| |v_b_I|
+  public void testInsertVisualBlockWithEmptyLineInTheMiddle() {
+    doTest(parseKeys("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
+            "foo\n" +
+            "\n" +
+            "bar\n",
+            "fo_quux_o\n" +
+            "\n" +
+            "ba_quux_r\n");
+  }
+
+  // VIM-1379 |CTRL-V| |j| |v_b_I|
+  public void testInsertVisualBlockWithShorterLineInTheMiddle() {
+    doTest(parseKeys("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
+            "foo\n" +
+            "x\n" +
+            "bar\n",
+            "fo_quux_o\n" +
+            "x\n" +
+            "ba_quux_r\n");
+  }
+
+  // VIM-1379 |CTRL-V| |j| |v_b_c|
+  public void testChangeVisualBlockWithEmptyLineInTheMiddle() {
+    doTest(parseKeys("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
+            "foo foo\n" +
+            "\n" +
+            "bar bar\n",
+            "fo_quux_foo\n" +
+            "\n" +
+            "ba_quux_bar\n");
+  }
+
+  // VIM-1379 |CTRL-V| |j| |v_b_c|
+  public void testChangeVisualBlockWithShorterLineInTheMiddle() {
+    doTest(parseKeys("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
+            "foo foo\n" +
+            "x\n" +
+            "bar bar\n",
+            "fo_quux_foo\n" +
+            "x\n" +
+            "ba_quux_bar\n");
+  }
+
   // VIM-845 |CTRL-V| |x|
   public void testDeleteVisualBlockOneCharWide() {
     configureByText("foo\n" +
