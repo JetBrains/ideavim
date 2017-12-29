@@ -1116,7 +1116,7 @@ public class ChangeGroup {
                                    CharacterHelper.charType(chars.charAt(offset + 1), bigWord) != charType;
       final ImmutableSet<String> wordMotions = ImmutableSet.of(
         "VimMotionWordRight", "VimMotionBigWordRight", "VimMotionCamelRight");
-      if (wordMotions.contains(id) && lastWordChar) {
+      if (wordMotions.contains(id) && lastWordChar && motion.getCount() == 1) {
         final boolean res = deleteCharacter(editor, 1, true);
         if (res) {
           insertBeforeCursor(editor, context);

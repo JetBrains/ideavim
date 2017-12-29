@@ -135,7 +135,17 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-200 |c| |w|
   public void testChangeWordAtLastChar() {
-    doTest(parseKeys("cw"), "on<caret>e two three\n", "on two three\n");
+    doTest(parseKeys("cw"), "on<caret>e two three\n", "on<caret> two three\n");
+  }
+
+  // VIM-1380 |c| |w| |count|
+  public void testChangeTwoWordsAtLastChar() {
+    doTest(parseKeys("c2w"), "on<caret>e two three\n", "on<caret> three\n");
+  }
+
+  // VIM-1380 |d| |w| |count|
+  public void testDeleteTwoWordsAtLastChar() {
+    doTest(parseKeys("d2w"), "on<caret>e two three\n", "on<caret>three\n");
   }
 
   // VIM-515 |c| |W|
