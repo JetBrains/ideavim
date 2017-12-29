@@ -18,6 +18,8 @@
 
 package com.maddyhome.idea.vim.helper;
 
+import com.maddyhome.idea.vim.option.KeywordOption;
+import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -25,8 +27,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public class CharacterHelper {
 
-  public static enum CharacterType {
-    LETTER_OR_DIGIT,
+  public enum CharacterType {
+    KEYWORD,
     HIRAGANA,
     KATAKANA,
     HALF_WIDTH_KATAKANA,
@@ -41,7 +43,7 @@ public class CharacterHelper {
   /**
    * This returns the type of the supplied character. The logic is as follows:<br>
    * If the character is whitespace, <code>WHITESPACE</code> is returned.<br>
-   * If the punctuation is being skipped or the character is a letter, digit, or underscore, <code>LETTER_OR_DIGIT</code>
+   * If the punctuation is being skipped or the character is a letter, digit, or underscore, <code>KEYWORD</code>
    * is returned.<br>
    * Otherwise <code>PUNCTUATION</code> is returned.
    *
@@ -64,8 +66,8 @@ public class CharacterHelper {
     else if (isHalfWidthKatakanaLetter(ch)) {
       return CharacterType.HALF_WIDTH_KATAKANA;
     }
-    else if (punctuationAsLetters || Character.isLetterOrDigit(ch) || ch == '_') {
-      return CharacterType.LETTER_OR_DIGIT;
+    else if (punctuationAsLetters || ((KeywordOption)Options.getInstance().getOption("iskeyword")).isKeyword(ch)) {
+      return CharacterType.KEYWORD;
     }
     else {
       return CharacterType.PUNCTUATION;

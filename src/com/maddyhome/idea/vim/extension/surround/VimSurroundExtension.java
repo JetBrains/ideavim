@@ -289,7 +289,10 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
         case COMMAND:
           return VimPlugin.getMark().getChangeMarks(editor);
         case VISUAL:
-          return VimPlugin.getMark().getVisualSelectionMarks(editor);
+          final TextRange visualRange = VimPlugin.getMark().getVisualSelectionMarks(editor);
+          if (visualRange == null) return null;
+          final int exclusiveEnd = EditorHelper.normalizeOffset(editor, visualRange.getEndOffset() + 1);
+          return new TextRange(visualRange.getStartOffset(), exclusiveEnd);
         default:
           return null;
       }

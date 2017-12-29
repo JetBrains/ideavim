@@ -572,4 +572,8 @@ public class ChangeActionTest extends VimTestCase {
                           "<caret>\n" +
                           "and some text after\n");
   }
+
+  public void testRepeatChangeWordDoesNotBreakNextRepeatFind() {
+    doTest(parseKeys("fXcfYPATATA<Esc>fX.;."), "<caret>aaaaXBBBBYaaaaaaaXBBBBYaaaaaaXBBBBYaaaaaaaa\n", "aaaaPATATAaaaaaaaPATATAaaaaaaPATATAaaaaaaaa\n");
+  }
 }

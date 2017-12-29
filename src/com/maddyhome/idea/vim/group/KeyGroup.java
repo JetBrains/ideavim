@@ -182,7 +182,7 @@ public class KeyGroup {
     final KeymapManagerEx keymapManager = KeymapManagerEx.getInstanceEx();
     final Keymap keymap = keymapManager.getActiveKeymap();
     final KeyboardShortcut shortcut = new KeyboardShortcut(keyStroke, null);
-    final Map<String, ArrayList<KeyboardShortcut>> conflicts = keymap.getConflicts("", shortcut);
+    final Map<String, ? extends List<KeyboardShortcut>> conflicts = keymap.getConflicts("", shortcut);
     final List<AnAction> actions = new ArrayList<AnAction>();
     for (String actionId : conflicts.keySet()) {
       final AnAction action = ActionManagerEx.getInstanceEx().getAction(actionId);

@@ -9,6 +9,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or set manually in th
     'history'        'hi'    number of command-lines that are remembered
     'hlsearch'       'hls'   highlight matches with last search pattern
     'ignorecase'     'ic'    ignore case in search patterns
+    'iskeyword'      'isk'   defines keywords for commands like 'w', '*', etc.
     'incsearch'      'is'    show where search pattern typed so far matches
     'matchpairs'     'mps'   pairs of characters that "%" can match
     'nrformats'      'nf'    number formats recognized for CTRL-A command

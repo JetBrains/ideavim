@@ -16,8 +16,47 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+
 To Be Released
 --------------
+
+A bugfix release.
+
+* [VIM-862](https://youtrack.jetbrains.com/issue/VIM-862) Allow `:action` to work in visual mode
+* [VIM-1329](https://youtrack.jetbrains.com/issue/VIM-1329) Request focus reliably for Ex entry and output panels
+* [VIM-1368](https://youtrack.jetbrains.com/issue/VIM-1368) Wait for focus reliably before running an `:action`
+
+
+0.49, 2017-12-12
+----------------
+
+Enabled zero-latency typing for Vim emulation. Added support for `iskeyword` option. Various bug fixes.
+
+
+* [VIM-1254](https://youtrack.jetbrains.com/issue/VIM-1254) Enable zero-latency typing for Vim emulation
+* [VIM-1367](https://youtrack.jetbrains.com/issue/VIM-1367) Support `iskeyword` option
+* [VIM-523](https://youtrack.jetbrains.com/issue/VIM-523) Fixed global mark remembering only the line number
+
+0.48, 2017-01-15
+----------------
+
+A bugfix release.
+
+Bug fixes:
+
+* [VIM-1205](https://youtrack.jetbrains.com/issue/VIM-1205) Don't move key handling into separate event for raw handlers
+* [VIM-1216](https://youtrack.jetbrains.com/issue/VIM-1216) Fixed `.` resetting the last find movement while repeating change that also uses movement
+
+
+Features:
+
+* Support for zero-latency rendering
+
+
+0.47, 2016-10-19
+----------------
+
+A bugfix release.
 
 Bug fixes:
 

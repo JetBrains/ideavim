@@ -1,20 +1,19 @@
 buildscript {
   repositories {
     mavenCentral()
-    maven {
-      url "https://oss.sonatype.org/content/repositories/snapshots/"
-    }
-    maven {
-      url 'http://dl.bintray.com/jetbrains/intellij-plugin-service'
-    }
   }
+
   dependencies {
-    classpath "org.jetbrains.intellij.plugins:gradle-intellij-plugin:0.2.0-SNAPSHOT"
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
   }
 }
 
-apply plugin: 'org.jetbrains.intellij'
+plugins {
+  id 'org.jetbrains.intellij' version '0.2.17'
+}
+
 apply plugin: 'java'
+apply plugin: 'kotlin'
 
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
@@ -37,9 +36,18 @@ intellij {
   updateSinceUntilBuild false
   downloadSources Boolean.valueOf(downloadIdeaSources)
 
-  publish {
-      channels publishChannels
-      username publishUsername
-      password publishPassword
+  publishPlugin {
+    channels publishChannels.split(',')
+    username publishUsername
+    password publishPassword
   }
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+  compile "org.jetbrains.kotlin:kotlin-runtime:$kotlinVersion"
 }

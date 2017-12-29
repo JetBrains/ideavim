@@ -41,6 +41,7 @@ public class RepeatChangeAction extends EditorAction {
     public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command command) {
       CommandState state = CommandState.getInstance(editor);
       Command cmd = state.getLastChangeCommand();
+
       if (cmd != null) {
         if (command.getRawCount() > 0) {
           cmd.setCount(command.getCount());
@@ -53,6 +54,9 @@ public class RepeatChangeAction extends EditorAction {
           }
         }
         Command save = state.getCommand();
+        int lastFTCmd = VimPlugin.getMotion().getLastFTCmd();
+        char lastFTChar = VimPlugin.getMotion().getLastFTChar();
+
         state.setCommand(cmd);
         state.pushState(CommandState.Mode.REPEAT, CommandState.SubMode.NONE, MappingMode.NORMAL);
         char reg = VimPlugin.getRegister().getCurrentRegister();
@@ -67,6 +71,7 @@ public class RepeatChangeAction extends EditorAction {
         if (save != null) {
           state.setCommand(save);
         }
+        VimPlugin.getMotion().setLastFTCmd(lastFTCmd, lastFTChar);
         state.saveLastChangeCommand(cmd);
         VimPlugin.getRegister().selectRegister(reg);
 

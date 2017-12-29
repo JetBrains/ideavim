@@ -2,10 +2,23 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
-      <p>To Be Released:</p>
+      <p>To be released:</p>
       <ul>
-        <li>Fixed exception "Write access is allowed from write-safe contexts only"</li>
-        <li>Don't start visual selection when mouse click was actually drag over single character</li>
+        <li>Various bug fixes</li>
+      </ul>
+      <p>0.49:</p>
+      <ul>
+        <li>Enabled zero-latency typing for Vim emulation</li>
+        <li>Support for <code>iskeyword</code> option</li>
+        <li>Various bug fixes</li>
+      </ul>
+      <p>0.48:</p>
+      <ul>
+        <li>Various bug fixes</li>
+      </ul>
+      <p>0.47:</p>
+      <ul>
+        <li>Various bug fixes</li>
       </ul>
       <p>0.46:</p>
       <ul>
@@ -23,42 +36,6 @@
       <ul>
         <li>Fixed running the plugin with Java 6</li>
       </ul>
-      <p>0.42:</p>
-      <ul>
-        <li>Fixed move commands in read-only files</li>
-      </ul>
-      <p>0.41:</p>
-      <ul>
-        <li>Various bug fixes</li>
-      </ul>
-      <p>0.40:</p>
-      <ul>
-        <li>Support for <code>mapleader</code></li>
-        <li>Support comments in <code>%</code> brace matching</li>
-        <li>Various bug fixes</li>
-      </ul>
-      <p>0.39:</p>
-      <ul>
-        <li>Various bug fixes</li>
-      </ul>
-      <p>0.38:</p>
-      <ul>
-        <li>Support for <code>:action</code> and <code>:actionlist</code> for executing arbitrary IDE actions</li>
-        <li>Support for <code>number</code> and <code>relativenumber</code> options</li>
-        <li>Support for <code>clipboard=unnamed</code> option</li>
-        <li>Various bug fixes</li>
-      </ul>
-      <p>0.37:</p>
-      <ul>
-        <li>Various bug fixes</li>
-      </ul>
-      <p>0.36:</p>
-      <ul>
-        <li>Window commands from the <code>&lt;C-W&gt;</code> family</li>
-        <li>Support for <code>:split</code>/<code>:vsplit</code> commands</li>
-        <li>Fixed visual block selection mode</li>
-        <li>Various bug fixes</li>
-      </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
     ]]></change-notes>
   <description><![CDATA[
@@ -73,7 +50,7 @@
   <version>SNAPSHOT</version>
   <vendor>JetBrains</vendor>
 
-  <idea-version since-build="143.0"/>
+  <idea-version since-build="171.0"/>
 
   <!-- Mark the plugin as compatible with RubyMine and other products based on the IntelliJ platform -->
   <depends>com.intellij.modules.lang</depends>
