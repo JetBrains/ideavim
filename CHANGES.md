@@ -26,6 +26,8 @@ A bugfix release.
 * [VIM-1110](https://youtrack.jetbrains.com/issue/VIM-1110) Put the caret in correct place after `I` in visual block mode
 * [VIM-1329](https://youtrack.jetbrains.com/issue/VIM-1329) Request focus reliably for Ex entry and output panels
 * [VIM-1368](https://youtrack.jetbrains.com/issue/VIM-1368) Wait for focus reliably before running an `:action`
+* [VIM-1379](https://youtrack.jetbrains.com/issue/VIM-1379) Fixed `I` for short lines in visual block mode
+* [VIM-1380](https://youtrack.jetbrains.com/issue/VIM-1380) Fixed `cw` with count at the end of a word
 
 
 0.49, 2017-12-12
@@ -37,7 +39,6 @@ Enabled zero-latency typing for Vim emulation. Added support for `iskeyword` opt
 * [VIM-1254](https://youtrack.jetbrains.com/issue/VIM-1254) Enable zero-latency typing for Vim emulation
 * [VIM-1367](https://youtrack.jetbrains.com/issue/VIM-1367) Support `iskeyword` option
 * [VIM-523](https://youtrack.jetbrains.com/issue/VIM-523) Fixed global mark remembering only the line number
-* [VIM-1379](https://youtrack.jetbrains.com/issue/VIM-1379) Fixed `I` for short lines in visual block mode
 
 0.48, 2017-01-15
 ----------------
