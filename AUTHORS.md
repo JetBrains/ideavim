@@ -45,6 +45,7 @@ Contributors:
 * [Nick Gieschen](mailto:nickgieschen@gmail.com)
 * [Naoto Ikeno](mailto:ikenox@gmail.com)
 * [Maximilian Luz](mailto:qzed@users.noreply.github.com)
+* [Vladimir Parfinenko](mailto:vparfinenko@excelsior-usa.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
