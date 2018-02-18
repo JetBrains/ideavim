@@ -308,7 +308,7 @@ public class EditorData {
    */
   public static boolean isFileEditor(@NotNull Editor editor){
     final VirtualFile virtualFile = EditorData.getVirtualFile(editor);
-    return virtualFile != null && !(virtualFile instanceof LightVirtualFile);
+    return virtualFile != null;
   }
 
   @Nullable
