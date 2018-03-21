@@ -1164,10 +1164,25 @@ public class MotionGroup {
     }
   }
 
+  /**
+   * @deprecated To move the caret, use {@link #moveCaret(Editor, Caret, int)}
+   */
   public int moveCaretHorizontal(@NotNull Editor editor, int count, boolean allowPastEnd) {
     int oldOffset = editor.getCaretModel().getOffset();
     int offset = EditorHelper.normalizeOffset(editor, editor.getCaretModel().getLogicalPosition().line,
                                               oldOffset + count, allowPastEnd);
+    if (offset == oldOffset) {
+      return -1;
+    }
+    else {
+      return offset;
+    }
+  }
+
+  public int moveCaretHorizontal(@NotNull Editor editor, @Nullable Caret caret, int count, boolean allowPastEnd) {
+    int oldOffset = caret.getOffset();
+    int offset = EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, oldOffset + count, allowPastEnd);
+
     if (offset == oldOffset) {
       return -1;
     }
@@ -1229,29 +1244,43 @@ public class MotionGroup {
     return moveCaretToLineStartSkipLeading(editor, line);
   }
 
-  public static void moveCaret(@NotNull Editor editor, int offset) {
-    moveCaret(editor, offset, false);
+  public static void moveCaret(@NotNull Editor editor, @NotNull Caret caret, int offset) {
+    moveCaret(editor, caret, offset, false);
   }
 
+  /**
+   * @deprecated Use the {@link #moveCaret(Editor, Caret, int) multi-caret version} of this function.
+   */
+  public static void moveCaret(@NotNull Editor editor, int offset) {
+    moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
+  }
+
+  /**
+   * @deprecated Use the {@link #moveCaret(Editor, int, boolean) multi-caret version} of this function.
+   */
   private static void moveCaret(@NotNull Editor editor, int offset, boolean forceKeepVisual) {
+    moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset, forceKeepVisual);
+  }
+
+  private static void moveCaret(@NotNull Editor editor, @NotNull Caret caret, int offset, boolean forceKeepVisual) {
     if (offset >= 0 && offset <= editor.getDocument().getTextLength()) {
       final boolean keepVisual = forceKeepVisual || keepVisual(editor);
-      if (editor.getCaretModel().getOffset() != offset) {
-        if (!keepVisual) {
-          // XXX: Hack for preventing the merge multiple carets that results in loosing the primary caret for |v_d|
-          editor.getCaretModel().removeSecondaryCarets();
-        }
-        editor.getCaretModel().moveToOffset(offset);
-        EditorData.setLastColumn(editor, editor.getCaretModel().getVisualPosition().column);
-        scrollCaretIntoView(editor);
-      }
+       if (caret.getOffset() != offset) {
+         caret.moveToOffset(offset);
+         if (caret == editor.getCaretModel().getPrimaryCaret()) {
+           // TODO: set the EditorData for each caret
+           EditorData.setLastColumn(editor, caret.getVisualPosition().column);
+           scrollCaretIntoView(editor);
+         }
+       }
 
-      if (keepVisual) {
-        VimPlugin.getMotion().updateSelection(editor, offset);
-      }
-      else {
-        editor.getSelectionModel().removeSelection();
-      }
+       if (keepVisual) {
+         // TODO: update the selections for each caret
+         VimPlugin.getMotion().updateSelection(editor, offset);
+       }
+       else {
+         editor.getSelectionModel().removeSelection();
+       }
     }
   }
 
