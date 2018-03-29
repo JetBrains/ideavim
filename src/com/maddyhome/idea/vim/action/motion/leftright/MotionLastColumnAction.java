@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.action.motion.leftright;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
@@ -40,7 +41,13 @@ public class MotionLastColumnAction extends MotionEditorAction {
   }
 
   private static class Handler extends MotionEditorActionHandler {
-    public int getOffset(@NotNull Editor editor, DataContext context, int count, int rawCount, Argument argument) {
+    public Handler() {
+      super(true);
+    }
+
+    @Override
+    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                         int count, int rawCount, Argument argument) {
       boolean allow = false;
       if (CommandState.inInsertMode(editor)) {
         allow = true;
@@ -52,7 +59,7 @@ public class MotionLastColumnAction extends MotionEditorAction {
         }
       }
 
-      return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, count - 1, allow);
+      return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret,count - 1, allow);
     }
 
     protected void postMove(@NotNull Editor editor, DataContext context, Command cmd) {

@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
@@ -27,14 +28,31 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  */
 public abstract class MotionEditorActionHandler extends EditorActionHandlerBase {
-  protected final boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+  public MotionEditorActionHandler() {
+    this(false);
+  }
+
+  public MotionEditorActionHandler(boolean runForEachCaret) {
+    super(runForEachCaret);
+  }
+
+  @Override
+  protected final boolean execute(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context,
+                                  @NotNull Command cmd) {
     preMove(editor, context, cmd);
 
-    int offset = getOffset(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+    int offset;
+    if (myRunForEachCaret) {
+      offset = getOffset(editor, caret, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+    }
+    else {
+      offset = getOffset(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+    }
     if (offset == -1) {
       return false;
     }
@@ -46,7 +64,12 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
           !CommandState.inVisualCharacterMode(editor)) {
         offset = EditorHelper.normalizeOffset(editor, offset, false);
       }
-      MotionGroup.moveCaret(editor, offset);
+      if (myRunForEachCaret) {
+        MotionGroup.moveCaret(editor, caret, offset);
+      }
+      else {
+        MotionGroup.moveCaret(editor, offset);
+      }
       postMove(editor, context, cmd);
 
       return true;
@@ -56,7 +79,15 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
     }
   }
 
-  public abstract int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument);
+  public int getOffset(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
+                       @Nullable Argument argument) {
+    return getOffset(editor, editor.getCaretModel().getPrimaryCaret(), context, count, rawCount, argument);
+  }
+
+  public int getOffset(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context, int count,
+                       int rawCount, @Nullable Argument argument) {
+    return getOffset(editor, context, count, rawCount, argument);
+  }
 
   protected void preMove(Editor editor, DataContext context, Command cmd) {
   }

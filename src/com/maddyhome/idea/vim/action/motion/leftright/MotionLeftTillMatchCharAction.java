@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.action.motion.leftright;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
@@ -35,8 +36,14 @@ public class MotionLeftTillMatchCharAction extends MotionEditorAction {
   }
 
   private static class Handler extends MotionEditorActionHandler {
-    public int getOffset(@NotNull Editor editor, DataContext context, int count, int rawCount, @NotNull Argument argument) {
-      int res = VimPlugin.getMotion().moveCaretToBeforeNextCharacterOnLine(editor, -count, argument.getCharacter());
+    public Handler() {
+      super(true);
+    }
+
+    @Override
+    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                         int count, int rawCount, @NotNull Argument argument) {
+      int res = VimPlugin.getMotion().moveCaretToBeforeNextCharacterOnLine(editor, caret, -count, argument.getCharacter());
       VimPlugin.getMotion().setLastFTCmd(MotionGroup.LAST_T, argument.getCharacter());
       return res;
     }

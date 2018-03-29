@@ -19,12 +19,15 @@
 package com.maddyhome.idea.vim.action.motion.leftright;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  */
@@ -34,8 +37,22 @@ public class MotionRightAction extends MotionEditorAction {
   }
 
   private static class Handler extends MotionEditorActionHandler {
-    public int getOffset(@NotNull Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return VimPlugin.getMotion().moveCaretHorizontal(editor, count, true);
+    public Handler() {
+      super(true);
+    }
+
+    @Override
+    public int getOffset(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context, int count,
+                         int rawCount, @Nullable Argument argument) {
+      if (CommandState.inVisualBlockMode(editor)) {
+        // In visual block mode, ideavim creates multiple carets to make a selection on each line.
+        // Only the primary caret of the selection should be moved though. This temporary hack
+        // prevents the additional carets from being moved.
+        if (caret != editor.getCaretModel().getPrimaryCaret()) {
+          count = 0;
+        }
+      }
+      return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, count, true);
     }
   }
 }
