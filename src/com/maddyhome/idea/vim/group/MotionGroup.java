@@ -700,26 +700,26 @@ public class MotionGroup {
     this.lastFTChar = lastChar;
   }
 
-  public int repeatLastMatchChar(@NotNull Editor editor, int count) {
+  public int repeatLastMatchChar(@NotNull Editor editor, @NotNull Caret caret, int count) {
     int res = -1;
     int startPos = editor.getCaretModel().getOffset();
     switch (lastFTCmd) {
       case LAST_F:
-        res = moveCaretToNextCharacterOnLine(editor, -count, lastFTChar);
+        res = moveCaretToNextCharacterOnLine(editor, caret, -count, lastFTChar);
         break;
       case LAST_f:
-        res = moveCaretToNextCharacterOnLine(editor, count, lastFTChar);
+        res = moveCaretToNextCharacterOnLine(editor, caret, count, lastFTChar);
         break;
       case LAST_T:
-        res = moveCaretToBeforeNextCharacterOnLine(editor, -count, lastFTChar);
+        res = moveCaretToBeforeNextCharacterOnLine(editor, caret, -count, lastFTChar);
         if (res == startPos && Math.abs(count) == 1) {
-          res = moveCaretToBeforeNextCharacterOnLine(editor, 2 * count, lastFTChar);
+          res = moveCaretToBeforeNextCharacterOnLine(editor, caret, 2 * count, lastFTChar);
         }
         break;
       case LAST_t:
-        res = moveCaretToBeforeNextCharacterOnLine(editor, count, lastFTChar);
+        res = moveCaretToBeforeNextCharacterOnLine(editor, caret, count, lastFTChar);
         if (res == startPos && Math.abs(count) == 1) {
-          res = moveCaretToBeforeNextCharacterOnLine(editor, 2 * count, lastFTChar);
+          res = moveCaretToBeforeNextCharacterOnLine(editor, caret, 2 * count, lastFTChar);
         }
         break;
     }
@@ -730,13 +730,14 @@ public class MotionGroup {
   /**
    * This moves the caret to the next/previous matching character on the current line
    *
+   * @param caret  The caret to be moved
    * @param count  The number of occurrences to move to
    * @param ch     The character to search for
    * @param editor The editor to search in
    * @return True if [count] character matches were found, false if not
    */
-  public int moveCaretToNextCharacterOnLine(@NotNull Editor editor, int count, char ch) {
-    int pos = SearchHelper.findNextCharacterOnLine(editor, count, ch);
+  public int moveCaretToNextCharacterOnLine(@NotNull Editor editor, @NotNull Caret caret, int count, char ch) {
+    int pos = SearchHelper.findNextCharacterOnLine(editor, caret, count, ch);
 
     if (pos >= 0) {
       return pos;
@@ -749,13 +750,14 @@ public class MotionGroup {
   /**
    * This moves the caret next to the next/previous matching character on the current line
    *
+   * @param caret  The caret to be moved
    * @param count  The number of occurrences to move to
    * @param ch     The character to search for
    * @param editor The editor to search in
    * @return True if [count] character matches were found, false if not
    */
-  public int moveCaretToBeforeNextCharacterOnLine(@NotNull Editor editor, int count, char ch) {
-    int pos = SearchHelper.findNextCharacterOnLine(editor, count, ch);
+  public int moveCaretToBeforeNextCharacterOnLine(@NotNull Editor editor, @NotNull Caret caret, int count, char ch) {
+    int pos = SearchHelper.findNextCharacterOnLine(editor, caret, count, ch);
 
     if (pos >= 0) {
       int step = count >= 0 ? 1 : -1;
@@ -1046,16 +1048,30 @@ public class MotionGroup {
     return moveCaretToColumn(editor, Math.max(0, Math.min(len - 1, width)), false);
   }
 
-  public int moveCaretToColumn(@NotNull Editor editor, int count, boolean allowEnd) {
-    int line = editor.getCaretModel().getLogicalPosition().line;
+  public int moveCaretToColumn(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowEnd) {
+    int line = caret.getLogicalPosition().line;
     int pos = EditorHelper.normalizeColumn(editor, line, count, allowEnd);
 
     return editor.logicalPositionToOffset(new LogicalPosition(line, pos));
   }
 
-  public int moveCaretToLineStartSkipLeading(@NotNull Editor editor) {
-    int logicalLine = editor.getCaretModel().getLogicalPosition().line;
+  /**
+   * @deprecated To move the caret, use {@link #moveCaretToColumn(Editor, Caret, int, boolean)}
+   */
+  public int moveCaretToColumn(@NotNull Editor editor, int count, boolean allowEnd) {
+    return moveCaretToColumn(editor, editor.getCaretModel().getPrimaryCaret(), count, allowEnd);
+  }
+
+  public int moveCaretToLineStartSkipLeading(@NotNull Editor editor, @NotNull Caret caret) {
+    int logicalLine = caret.getLogicalPosition().line;
     return moveCaretToLineStartSkipLeading(editor, logicalLine);
+  }
+
+  /**
+   * @deprecated To move the caret, use {@link #moveCaretToLineStartSkipLeading(Editor, Caret)}
+   */
+  public int moveCaretToLineStartSkipLeading(@NotNull Editor editor) {
+    return moveCaretToLineStartSkipLeading(editor, editor.getCaretModel().getPrimaryCaret());
   }
 
   public int moveCaretToLineStartSkipLeadingOffset(@NotNull Editor editor, int linesOffset) {
@@ -1072,8 +1088,8 @@ public class MotionGroup {
     return moveCaretToLineEndSkipLeading(editor, logicalLine);
   }
 
-  public int moveCaretToLineEndSkipLeadingOffset(@NotNull Editor editor, int linesOffset) {
-    int line = EditorHelper.normalizeVisualLine(editor, editor.getCaretModel().getVisualPosition().line + linesOffset);
+  public int moveCaretToLineEndSkipLeadingOffset(@NotNull Editor editor, @NotNull Caret caret, int linesOffset) {
+    int line = EditorHelper.normalizeVisualLine(editor, caret.getVisualPosition().line + linesOffset);
     return moveCaretToLineEndSkipLeading(editor, EditorHelper.visualLineToLogicalLine(editor, line));
   }
 
@@ -1108,20 +1124,34 @@ public class MotionGroup {
                                         allowPastEnd);
   }
 
-  public int moveCaretToLineEndOffset(@NotNull Editor editor, int cntForward, boolean allowPastEnd) {
-    int line = EditorHelper.normalizeVisualLine(editor, editor.getCaretModel().getVisualPosition().line + cntForward);
+  public int moveCaretToLineEndOffset(@NotNull Editor editor, @NotNull Caret caret, int cntForward, boolean allowPastEnd) {
+    int line = EditorHelper.normalizeVisualLine(editor, caret.getVisualPosition().line + cntForward);
 
     if (line < 0) {
       return 0;
     }
     else {
-      return moveCaretToLineEnd(editor, EditorHelper.visualLineToLogicalLine(editor, line), allowPastEnd);
+      return  moveCaretToLineEnd(editor, EditorHelper.visualLineToLogicalLine(editor, line), allowPastEnd);
     }
   }
 
-  public int moveCaretToLineStart(@NotNull Editor editor) {
-    int logicalLine = editor.getCaretModel().getLogicalPosition().line;
+  /**
+   * @deprecated To move the caret, use {@link #moveCaretToLineEndOffset(Editor, Caret, int, boolean)}
+   */
+  public int moveCaretToLineEndOffset(@NotNull Editor editor, int cntForward, boolean allowPastEnd) {
+    return moveCaretToLineEndOffset(editor, editor.getCaretModel().getPrimaryCaret(), cntForward, allowPastEnd);
+  }
+
+  public int moveCaretToLineStart(@NotNull Editor editor, @NotNull Caret caret) {
+    int logicalLine = caret.getLogicalPosition().line;
     return moveCaretToLineStart(editor, logicalLine);
+  }
+
+  /**
+   * @deprecated To move the caret, use {@link #moveCaretToLineStart(Editor, Caret)}
+   */
+  public int moveCaretToLineStart(@NotNull Editor editor) {
+    return moveCaretToLineStart(editor, editor.getCaretModel().getPrimaryCaret());
   }
 
   public int moveCaretToLineStart(@NotNull Editor editor, int line) {

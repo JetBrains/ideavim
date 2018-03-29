@@ -24,6 +24,7 @@ import com.intellij.lang.Commenter;
 import com.intellij.lang.Language;
 import com.intellij.lang.LanguageCommenters;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.text.StringUtil;
@@ -1183,18 +1184,19 @@ public class SearchHelper {
    * This locates the position with the document of the count-th occurrence of ch on the current line
    *
    * @param editor The editor to search in
+   * @param caret  The caret to be searched starting from
    * @param count  The number of occurrences of ch to locate. Negative for backward searches
    * @param ch     The character on the line to find
    * @return The document offset of the matching character match, -1
    */
-  public static int findNextCharacterOnLine(@NotNull Editor editor, int count, char ch) {
-    int line = editor.getCaretModel().getLogicalPosition().line;
+  public static int findNextCharacterOnLine(@NotNull Editor editor, @NotNull Caret caret, int count, char ch) {
+    int line = caret.getLogicalPosition().line;
     int start = EditorHelper.getLineStartOffset(editor, line);
     int end = EditorHelper.getLineEndOffset(editor, line, true);
     CharSequence chars = editor.getDocument().getCharsSequence();
     int found = 0;
     int step = count >= 0 ? 1 : -1;
-    int pos = editor.getCaretModel().getOffset() + step;
+    int pos =  caret.getOffset() + step;
     while (pos >= start && pos < end && pos >= 0 && pos < chars.length()) {
       if (chars.charAt(pos) == ch) {
         found++;
