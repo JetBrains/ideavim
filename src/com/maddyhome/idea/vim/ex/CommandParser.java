@@ -123,6 +123,8 @@ public class CommandParser {
     new WritePreviousFileHandler();
     new WriteQuitHandler();
     new YankLinesHandler();
+    new GitHandler();
+    new AdbHandler();
 
     registered = true;
     //logger.debug("root=" + root);
