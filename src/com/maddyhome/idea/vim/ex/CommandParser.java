@@ -124,6 +124,7 @@ public class CommandParser {
     new WriteQuitHandler();
     new YankLinesHandler();
     new GitHandler();
+    new AdbHandler();
 
     registered = true;
     //logger.debug("root=" + root);
