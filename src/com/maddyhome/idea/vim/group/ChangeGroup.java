@@ -178,11 +178,11 @@ public class ChangeGroup {
 
       if (!editor.isOneLineMode()) {
         runEnterAction(editor, context);
-        MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretVertical(editor, -1));
+        MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretVertical(editor, editor.getCaretModel().getPrimaryCaret(), -1));
       }
     }
     else {
-      MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretVertical(editor, -1));
+      MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretVertical(editor, editor.getCaretModel().getPrimaryCaret(), -1));
       insertNewLineBelow(editor, context);
     }
   }

@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
-import com.maddyhome.idea.vim.helper.EditorData;
+import com.maddyhome.idea.vim.helper.CaretData;
 import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
@@ -62,8 +62,9 @@ public class MotionLastColumnAction extends MotionEditorAction {
       return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret,count - 1, allow);
     }
 
-    protected void postMove(@NotNull Editor editor, DataContext context, Command cmd) {
-      EditorData.setLastColumn(editor, MotionGroup.LAST_COLUMN);
+    protected void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, @NotNull Command cmd) {
+      CaretData.setLastColumn(editor, caret, MotionGroup.LAST_COLUMN);
     }
   }
 }
+

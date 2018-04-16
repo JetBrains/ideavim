@@ -40,6 +40,7 @@ import com.maddyhome.idea.vim.common.Jump;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
+import com.maddyhome.idea.vim.helper.CaretData;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
@@ -226,7 +227,7 @@ public class MotionGroup {
 
       VisualChange range = getVisualOperatorRange(editor, Command.FLAG_MOT_LINEWISE);
       if (range.getLines() > 1) {
-        MotionGroup.moveCaret(editor, moveCaretVertical(editor, -1));
+        MotionGroup.moveCaret(editor, moveCaretVertical(editor, editor.getCaretModel().getPrimaryCaret(), -1));
       }
     }
   }
@@ -850,7 +851,7 @@ public class MotionGroup {
         offset = moveCaretToLineStartSkipLeading(editor, EditorHelper.visualLineToLogicalLine(editor, visualLine));
       }
       else {
-        offset = moveCaretVertical(editor,
+        offset = moveCaretVertical(editor, editor.getCaretModel().getPrimaryCaret(),
                                    EditorHelper.visualLineToLogicalLine(editor, visualLine) - editor.getCaretModel().getLogicalPosition().line);
       }
 
@@ -1182,10 +1183,10 @@ public class MotionGroup {
     return moveCaretToColumn(editor, col, allowEnd);
   }
 
-  public int moveCaretHorizontalWrap(@NotNull Editor editor, int count) {
+  public int moveCaretHorizontalWrap(@NotNull Editor editor, @NotNull Caret caret, int count) {
     // FIX - allows cursor over newlines
-    int oldOffset = editor.getCaretModel().getOffset();
-    int offset = Math.min(Math.max(0, editor.getCaretModel().getOffset() + count), EditorHelper.getFileSize(editor));
+    int oldOffset = caret.getOffset();
+    int offset = Math.min(Math.max(0, caret.getOffset() + count), EditorHelper.getFileSize(editor));
     if (offset == oldOffset) {
       return -1;
     }
@@ -1221,13 +1222,13 @@ public class MotionGroup {
     }
   }
 
-  public int moveCaretVertical(@NotNull Editor editor, int count) {
-    VisualPosition pos = editor.getCaretModel().getVisualPosition();
+  public int moveCaretVertical(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    VisualPosition pos = caret.getVisualPosition();
     if ((pos.line == 0 && count < 0) || (pos.line >= EditorHelper.getVisualLineCount(editor) - 1 && count > 0)) {
       return -1;
     }
     else {
-      int col = EditorData.getLastColumn(editor);
+      int col = CaretData.getLastColumn(caret);
       int line = EditorHelper.normalizeVisualLine(editor, pos.line + count);
       VisualPosition newPos = new VisualPosition(line, EditorHelper.normalizeVisualColumn(editor, line, col, CommandState.inInsertMode(editor)));
 

@@ -44,7 +44,15 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
   @Override
   protected final boolean execute(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context,
                                   @NotNull Command cmd) {
-    preMove(editor, context, cmd);
+    if (myRunForEachCaret) {
+      if (caret == null) {
+        return false;
+      }
+      preMove(editor, caret, context, cmd);
+    }
+    else {
+      preMove(editor, context, cmd);
+    }
 
     int offset;
     if (myRunForEachCaret) {
@@ -65,12 +73,16 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
         offset = EditorHelper.normalizeOffset(editor, offset, false);
       }
       if (myRunForEachCaret) {
+        if (caret == null) {
+          return false;
+        }
         MotionGroup.moveCaret(editor, caret, offset);
+        postMove(editor, caret, context, cmd);
       }
       else {
         MotionGroup.moveCaret(editor, offset);
+        postMove(editor, context, cmd);
       }
-      postMove(editor, context, cmd);
 
       return true;
     }
@@ -84,14 +96,20 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
     return getOffset(editor, editor.getCaretModel().getPrimaryCaret(), context, count, rawCount, argument);
   }
 
-  public int getOffset(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context, int count,
+  public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                        int rawCount, @Nullable Argument argument) {
     return getOffset(editor, context, count, rawCount, argument);
   }
 
-  protected void preMove(Editor editor, DataContext context, Command cmd) {
+  protected void preMove(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
   }
 
-  protected void postMove(Editor editor, DataContext context, Command cmd) {
+  protected void postMove(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+  }
+
+  protected void preMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, @NotNull Command cmd) {
+  }
+
+  protected void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, @NotNull Command cmd) {
   }
 }

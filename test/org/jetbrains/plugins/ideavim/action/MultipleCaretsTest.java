@@ -139,4 +139,32 @@ public class MultipleCaretsTest extends VimTestCase {
                    "abaab<caret>a<caret>baaa<caret>abaaba");
     myFixture.checkResult("abaab<caret>abaaa<caret>abaaba");
   }
+
+  public void testMotionLeftWrap() {
+    typeTextInFile(parseKeys("5<BS>"),
+                   "one\n" +
+                   "t<caret>wo three\n" +
+                   "fo<caret>ur\n");
+    myFixture.checkResult("<caret>one\ntwo thr<caret>ee\nfour\n");
+  }
+
+  public void testMotionRightWrap() {
+    typeTextInFile(parseKeys("5<Space>"),
+                   "<caret>one\n" +
+                   "two thr<caret>ee\n" +
+                   "four\n");
+    myFixture.checkResult("one\nt<caret>wo three\nfo<caret>ur\n");
+  }
+
+  // com.maddyhome.idea.vim.action.motion.updown
+
+  public void testMotionUpAction() {
+    typeTextInFile(parseKeys("k"),
+                   "o<caret>ne\n" +
+                   "t<caret>wo<caret> \n" +
+                   "t<caret>hree<caret> ");
+    myFixture.checkResult("o<caret>n<caret>e\n" +
+                          "t<caret>wo<caret> \n" +
+                          "three ");
+  }
 }
