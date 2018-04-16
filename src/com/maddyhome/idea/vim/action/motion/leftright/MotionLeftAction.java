@@ -42,8 +42,12 @@ public class MotionLeftAction extends MotionEditorAction {
     }
 
     @Override
-    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                         int rawCount, @Nullable Argument argument) {
+    public int getOffset(@NotNull Editor editor,
+                         @NotNull Caret caret,
+                         @NotNull DataContext context,
+                         int count,
+                         int rawCount,
+                         @Nullable Argument argument) {
       if (CommandState.inVisualBlockMode(editor)) {
         // In visual block mode, ideavim creates multiple carets to make a selection on each line.
         // Only the primary caret of the selection should be moved though. This temporary hack

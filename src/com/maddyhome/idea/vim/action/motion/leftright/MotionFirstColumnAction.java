@@ -40,8 +40,12 @@ public class MotionFirstColumnAction extends MotionEditorAction {
     }
 
     @Override
-    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                         int count, int rawCount, Argument argument) {
+    public int getOffset(@NotNull Editor editor,
+                         @NotNull Caret caret,
+                         @NotNull DataContext context,
+                         int count,
+                         int rawCount,
+                         Argument argument) {
       return VimPlugin.getMotion().moveCaretToLineStart(editor, caret);
     }
   }

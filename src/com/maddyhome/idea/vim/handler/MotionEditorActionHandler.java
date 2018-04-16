@@ -42,7 +42,9 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
   }
 
   @Override
-  protected final boolean execute(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context,
+  protected final boolean execute(@NotNull Editor editor,
+                                  @Nullable Caret caret,
+                                  @NotNull DataContext context,
                                   @NotNull Command cmd) {
     if (myRunForEachCaret) {
       if (caret == null) {
@@ -56,6 +58,9 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
 
     int offset;
     if (myRunForEachCaret) {
+      if (caret == null) {
+        return false;
+      }
       offset = getOffset(editor, caret, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
     }
     else {
@@ -68,7 +73,8 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
       if ((cmd.getFlags() & Command.FLAG_SAVE_JUMP) != 0) {
         VimPlugin.getMark().saveJumpLocation(editor);
       }
-      if (!CommandState.inInsertMode(editor) && !CommandState.inRepeatMode(editor) &&
+      if (!CommandState.inInsertMode(editor) &&
+          !CommandState.inRepeatMode(editor) &&
           !CommandState.inVisualCharacterMode(editor)) {
         offset = EditorHelper.normalizeOffset(editor, offset, false);
       }
@@ -91,13 +97,20 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
     }
   }
 
-  public int getOffset(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
+  public int getOffset(@NotNull Editor editor,
+                       @NotNull DataContext context,
+                       int count,
+                       int rawCount,
                        @Nullable Argument argument) {
     return getOffset(editor, editor.getCaretModel().getPrimaryCaret(), context, count, rawCount, argument);
   }
 
-  public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                       int rawCount, @Nullable Argument argument) {
+  public int getOffset(@NotNull Editor editor,
+                       @NotNull Caret caret,
+                       @NotNull DataContext context,
+                       int count,
+                       int rawCount,
+                       @Nullable Argument argument) {
     return getOffset(editor, context, count, rawCount, argument);
   }
 
@@ -107,9 +120,15 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
   protected void postMove(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
   }
 
-  protected void preMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, @NotNull Command cmd) {
+  protected void preMove(@NotNull Editor editor,
+                         @NotNull Caret caret,
+                         @NotNull DataContext context,
+                         @NotNull Command cmd) {
   }
 
-  protected void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, @NotNull Command cmd) {
+  protected void postMove(@NotNull Editor editor,
+                          @NotNull Caret caret,
+                          @NotNull DataContext context,
+                          @NotNull Command cmd) {
   }
 }

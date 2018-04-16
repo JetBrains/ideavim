@@ -43,18 +43,28 @@ public class MotionDownAction extends MotionEditorAction {
     }
 
     @Override
-    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                         int count, int rawCount, Argument argument) {
+    public int getOffset(@NotNull Editor editor,
+                         @NotNull Caret caret,
+                         @NotNull DataContext context,
+                         int count,
+                         int rawCount,
+                         Argument argument) {
       return VimPlugin.getMotion().moveCaretVertical(editor, caret, count);
     }
 
     @Override
-    protected void preMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, @NotNull Command cmd) {
+    protected void preMove(@NotNull Editor editor,
+                           @NotNull Caret caret,
+                           @NotNull DataContext context,
+                           @NotNull Command cmd) {
       col = CaretData.getLastColumn(caret);
     }
 
     @Override
-    protected void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, @NotNull Command cmd) {
+    protected void postMove(@NotNull Editor editor,
+                            @NotNull Caret caret,
+                            @NotNull DataContext context,
+                            @NotNull Command cmd) {
       CaretData.setLastColumn(editor, caret, col);
     }
 

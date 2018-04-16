@@ -46,8 +46,12 @@ public class MotionLastColumnAction extends MotionEditorAction {
     }
 
     @Override
-    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                         int count, int rawCount, Argument argument) {
+    public int getOffset(@NotNull Editor editor,
+                         @NotNull Caret caret,
+                         @NotNull DataContext context,
+                         int count,
+                         int rawCount,
+                         Argument argument) {
       boolean allow = false;
       if (CommandState.inInsertMode(editor)) {
         allow = true;
@@ -59,10 +63,13 @@ public class MotionLastColumnAction extends MotionEditorAction {
         }
       }
 
-      return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret,count - 1, allow);
+      return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow);
     }
 
-    protected void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, @NotNull Command cmd) {
+    protected void postMove(@NotNull Editor editor,
+                            @NotNull Caret caret,
+                            @NotNull DataContext context,
+                            @NotNull Command cmd) {
       CaretData.setLastColumn(editor, caret, MotionGroup.LAST_COLUMN);
     }
   }
