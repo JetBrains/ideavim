@@ -1197,7 +1197,8 @@ public class ChangeGroup {
     }
 
     if (range.isMultiple() || !append) {
-      editor.getCaretModel().moveToOffset(editor.logicalPositionToOffset(new LogicalPosition(line, col)));
+      //editor.getCaretModel().moveToOffset(editor.logicalPositionToOffset(new LogicalPosition(line, col)));
+      editor.getCaretModel().getPrimaryCaret().moveToOffset(editor.logicalPositionToOffset(new LogicalPosition(line, col)));
     }
     if (range.isMultiple()) {
       setInsertRepeat(lines, col, append);
@@ -1521,7 +1522,8 @@ public class ChangeGroup {
    */
   public void insertText(@NotNull Editor editor, int start, @NotNull String str) {
     editor.getDocument().insertString(start, str);
-    editor.getCaretModel().moveToOffset(start + str.length());
+    //editor.getCaretModel().moveToOffset(start + str.length());
+    editor.getCaretModel().getPrimaryCaret().moveToOffset(start + str.length());
 
     VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, start);
   }

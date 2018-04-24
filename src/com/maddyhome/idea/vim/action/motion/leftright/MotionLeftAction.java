@@ -48,14 +48,6 @@ public class MotionLeftAction extends MotionEditorAction {
                          int count,
                          int rawCount,
                          @Nullable Argument argument) {
-      if (CommandState.inVisualBlockMode(editor)) {
-        // In visual block mode, ideavim creates multiple carets to make a selection on each line.
-        // Only the primary caret of the selection should be moved though. This temporary hack
-        // prevents the additional carets from being moved.
-        if (caret != editor.getCaretModel().getPrimaryCaret()) {
-          count = 0;
-        }
-      }
       return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -count, false);
     }
   }

@@ -50,6 +50,12 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
       if (caret == null) {
         return false;
       }
+      if (CommandState.inVisualBlockMode(editor) && caret != editor.getCaretModel().getPrimaryCaret()) {
+        // In visual block mode, ideavim creates multiple carets to make a selection on each line.
+        // Only the primary caret of the selection should be moved though. This temporary hack
+        // prevents the additional carets from being moved.
+        return true;
+      }
       preMove(editor, caret, context, cmd);
     }
     else {

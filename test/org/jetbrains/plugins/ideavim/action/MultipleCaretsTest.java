@@ -167,4 +167,58 @@ public class MultipleCaretsTest extends VimTestCase {
                           "t<caret>wo<caret> \n" +
                           "three ");
   }
+
+  public void testMotionDownAction() {
+    typeTextInFile(parseKeys("2j"),
+                   "o<caret>n<caret>e\n" +
+                   "<caret>tw<caret>o          <caret> \n" +
+                   "three\n" +
+                   "four");
+    myFixture.checkResult("one\n" +
+                          "two           \n" +
+                          "t<caret>h<caret>ree\n" +
+                          "<caret>fo<caret>u<caret>r");
+  }
+
+  public void testMotionDownFirstNonSpaceAction() {
+    typeTextInFile(parseKeys("+"),
+                   " <caret> on<caret>e<caret> two\n" +
+                   "<caret>   three<caret> four\n" +
+                   " five six\n");
+    myFixture.checkResult("  one two\n" +
+                          "   <caret>three four\n" +
+                          " <caret>five six\n");
+  }
+
+  public void testMotionDownLess1FirstNonSpaceActionWithNoCount() {
+    typeTextInFile(parseKeys("_"),
+                   "     one<caret> two\n" +
+                   "three<caret> four\n" +
+                   "  five<caret> six\n" +
+                   " <caret>  seven eight");
+    myFixture.checkResult("     <caret>one two\n" +
+                          "<caret>three four\n" +
+                          "  <caret>five six\n" +
+                          "   <caret>seven eight");
+  }
+
+  public void testMotionDownLess1FirstNonSpaceActionWithCount() {
+    typeTextInFile(parseKeys("3_"),
+                   "x<caret>y<caret>z\n" +
+                   "  skip this <caret>line\n" +
+                   "   don't skip this line\n" +
+                   "    stop there\n");
+    myFixture.checkResult("xyz\n" +
+                          "  skip this line\n" +
+                          "   <caret>don't skip this line\n" +
+                          "    <caret>stop there\n");
+  }
+
+  public void testMotionUpFirstNonSpaceAction() {
+    typeTextInFile(parseKeys("-"),
+                   " one\n" +
+                   "<caret>  tw<caret>o\n");
+    myFixture.checkResult(" <caret>one\n" +
+                          "  two\n");
+  }
 }

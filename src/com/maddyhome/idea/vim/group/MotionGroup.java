@@ -1084,9 +1084,16 @@ public class MotionGroup {
     return moveCaretToLineStartSkipLeading(editor, editor.getCaretModel().getPrimaryCaret());
   }
 
-  public int moveCaretToLineStartSkipLeadingOffset(@NotNull Editor editor, int linesOffset) {
-    int line = EditorHelper.normalizeVisualLine(editor, editor.getCaretModel().getVisualPosition().line + linesOffset);
+  public int moveCaretToLineStartSkipLeadingOffset(@NotNull Editor editor, @NotNull Caret caret, int linesOffset) {
+    int line = EditorHelper.normalizeVisualLine(editor, caret.getVisualPosition().line + linesOffset);
     return moveCaretToLineStartSkipLeading(editor, EditorHelper.visualLineToLogicalLine(editor, line));
+  }
+
+  /**
+   * @deprecated To move the caret, use {@link #moveCaretToLineStartSkipLeadingOffset(Editor, Caret, int)}
+   */
+  public int moveCaretToLineStartSkipLeadingOffset(@NotNull Editor editor, int linesOffset) {
+    return moveCaretToLineStartSkipLeadingOffset(editor, editor.getCaretModel().getPrimaryCaret(), linesOffset);
   }
 
   public int moveCaretToLineStartSkipLeading(@NotNull Editor editor, int line) {
@@ -1313,7 +1320,8 @@ public class MotionGroup {
         caret.moveToOffset(offset);
         if (caret == editor.getCaretModel().getPrimaryCaret()) {
           // TODO: set the EditorData for each caret
-          EditorData.setLastColumn(editor, caret.getVisualPosition().column);
+          CaretData.setLastColumn(editor, caret, caret.getVisualPosition().column);
+          //EditorData.setLastColumn(editor, caret.getVisualPosition().column);
           scrollCaretIntoView(editor);
         }
       }
@@ -1778,7 +1786,7 @@ public class MotionGroup {
           caret.moveToOffset(caret.getSelectionEnd() - 1);
         }
       }
-      editor.getCaretModel().moveToOffset(end);
+      editor.getCaretModel().getPrimaryCaret().moveToOffset(end);
     }
 
     VimPlugin.getMark().setVisualSelectionMarks(editor, new TextRange(start, end));
