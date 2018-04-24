@@ -221,4 +221,98 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult(" <caret>one\n" +
                           "  two\n");
   }
+
+  // com.maddyhome.idea.vim.action.motion.object
+
+  public void testMotionInnerBigWordAction() {
+    typeTextInFile(parseKeys("v", "iW"),
+                   "a,<caret>bc<caret>d,e f,g<caret>hi,j");
+    myFixture.checkResult("<selection>a,bcd,e</selection> <selection>f,ghi,j</selection>");
+  }
+
+  public void testMotionInnerWordAction() {
+    typeTextInFile(parseKeys("v", "iw"),
+                   "a,<caret>bc<caret>d,e f,g<caret>hi,j");
+    myFixture.checkResult("a,<selection>bcd</selection>,e f,<selection>ghi</selection>,j");
+  }
+
+  public void testMotionInnerBlockAngleAction() {
+    typeTextInFile(parseKeys("v", "2i<"),
+                   "<asdf<asdf<a<caret>sdf>a<caret>sdf>asdf> <asdf<as<caret>df>asdf>");
+    myFixture.checkResult("<selection><asdf<asdf<asdf>asdf>asdf></selection> <selection><asdf<asdf>asdf></selection>");
+  }
+
+  public void testMotionInnerBlockBackQuoteActionWithNoCount() {
+    typeTextInFile(parseKeys("v", "i`"),
+                   "`as<caret>d<caret>f`asdf `a<caret>sdf`a<caret>sdf`a<caret>sdf`");
+    myFixture.checkResult("`<selection>asdf</selection>`asdf `<selection>asdf</selection>`<selection>asdf</selection>`<selection>asdf</selection>`");
+  }
+
+  public void testMotionInnerBlockBackQuoteActionWithCount() {
+    typeTextInFile(parseKeys("v", "2i`"),
+                   "`as<caret>d<caret>f`asdf `a<caret>sdf`a<caret>sdf`a<caret>sdf`");
+    myFixture.checkResult("<selection>`asdf</selection>`asdf <selection>`asdf`asdf`asdf`</selection>");
+  }
+
+  public void testMotionInnerBlockBraceAction() {
+    typeTextInFile(parseKeys("v", "2i{"),
+                   "{asdf{asdf{a<caret>sdf}a<caret>sdf}asdf} {asdf{as<caret>df}asdf}");
+    myFixture.checkResult("<selection>{asdf{asdf{asdf}asdf}asdf}</selection> <selection>{asdf{asdf}asdf}</selection>");
+  }
+
+  public void testMotionInnerBlockBracketAction() {
+    typeTextInFile(parseKeys("v", "2i["),
+                   "[asdf[asdf[a<caret>sdf]a<caret>sdf]asdf] [asdf[as<caret>df]asdf]");
+    myFixture.checkResult("<selection>[asdf[asdf[asdf]asdf]asdf]</selection> <selection>[asdf[asdf]asdf]</selection>");
+  }
+
+  public void testMotionInnerBlockDoubleQuoteActionWithNoCount() {
+    typeTextInFile(parseKeys("v", "i\""),
+                   "\"as<caret>d<caret>f\"asdf \"a<caret>sdf\"a<caret>sdf\"a<caret>sdf\"");
+    myFixture.checkResult("\"<selection>asdf</selection>\"asdf \"<selection>asdf</selection>\"<selection>asdf</selection>\"<selection>asdf</selection>\"");
+  }
+
+  public void testMotionInnerBlockDoubleQuoteActionWithCount() {
+    typeTextInFile(parseKeys("v", "2i\""),
+                   "\"as<caret>d<caret>f\"asdf \"a<caret>sdf\"a<caret>sdf\"a<caret>sdf\"");
+    myFixture.checkResult("<selection>\"asdf</selection>\"asdf <selection>\"asdf\"asdf\"asdf\"</selection>");
+  }
+
+  public void testMotionInnerBlockParenAction() {
+    typeTextInFile(parseKeys("v", "2i("),
+                   "(asdf(asdf(a<caret>sdf)a<caret>sdf)asdf) (asdf(as<caret>df)asdf)");
+    myFixture.checkResult("<selection>(asdf(asdf(asdf)asdf)asdf)</selection> <selection>(asdf(asdf)asdf)</selection>");
+  }
+
+  public void testMotionInnerBlockSingleQuoteActionWithNoCount() {
+    typeTextInFile(parseKeys("v", "i'"),
+                   "'as<caret>d<caret>f'asdf 'a<caret>sdf'a<caret>sdf'a<caret>sdf'");
+    myFixture.checkResult("'<selection>asdf</selection>'asdf '<selection>asdf</selection>'<selection>asdf</selection>'<selection>asdf</selection>'");
+  }
+
+  public void testMotionInnerBlockSingleQuoteActionWithCount() {
+    typeTextInFile(parseKeys("v", "2i'"),
+                   "'as<caret>d<caret>f'asdf 'a<caret>sdf'a<caret>sdf'a<caret>sdf'");
+    myFixture.checkResult("<selection>'asdf</selection>'asdf <selection>'asdf'asdf'asdf'</selection>");
+  }
+
+  public void testMotionInnerBlockTagAction() {
+    typeTextInFile(parseKeys("v", "2it"),
+                   "<asdf>qwer<asdf>qwer<asdf>qw<caret>er</asdf>qw<caret>er</asdf>qwer</asdf>\n" +
+                   "<asdf>qwer<asdf>qwer</asdf>qwer</asdf>");
+    myFixture.checkResult("<selection><asdf>qwer<asdf>qwer<asdf>qwer</asdf>qwer</asdf>qwer</asdf></selection>\n" +
+                          "<selection><asdf>qwer<asdf>qwer</asdf>qwer</asdf></selection>");
+  }
+
+  public void testMotionInnerParagraphAction() {
+    typeTextInFile(parseKeys("v", "3ip"),
+                   "a<caret>bcd\na<caret>bcd\n\nabcd\nabcd\n\na<caret>bcd\nabcd\n");
+    myFixture.checkResult("<selection>abcd\nabcd\n\nabcd\nabcd</selection>\n\n<selection>abcd\nabcd\n</selection>");
+  }
+
+  public void testMotionInnerSentenseAction() {
+    typeTextInFile(parseKeys("v", "3is"),
+                   "a<caret>bcd a<caret>bcd. abcd abcd. a<caret>bcd abcd.");
+    myFixture.checkResult("<selection>abcd abcd. abcd abcd</selection>. <selection>abcd abcd.</selection>");
+  }
 }
