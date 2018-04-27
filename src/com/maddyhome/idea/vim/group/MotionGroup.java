@@ -272,7 +272,7 @@ public class MotionGroup {
   }
 
   @NotNull
-  public TextRange getWordRange(@NotNull Editor editor, int count, boolean isOuter, boolean isBig) {
+  public TextRange getWordRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter, boolean isBig) {
     int dir = 1;
     boolean selection = false;
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
@@ -284,7 +284,7 @@ public class MotionGroup {
       }
     }
 
-    return SearchHelper.findWordUnderCursor(editor, count, dir, isOuter, isBig, selection);
+    return SearchHelper.findWordUnderCursor(editor, caret, count, dir, isOuter, isBig, selection);
   }
 
   @Nullable
@@ -547,16 +547,17 @@ public class MotionGroup {
    * This moves the caret to the start of the next/previous camel word.
    *
    * @param editor The editor to move in
+   * @param caret  The caret to be moved
    * @param count  The number of words to skip
    * @return position
    */
-  public int moveCaretToNextCamel(@NotNull Editor editor, int count) {
-    if ((editor.getCaretModel().getOffset() == 0 && count < 0) ||
-        (editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
+  public int moveCaretToNextCamel(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    if ((caret.getOffset() == 0 && count < 0) ||
+        (caret.getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
       return -1;
     }
     else {
-      return SearchHelper.findNextCamelStart(editor, count);
+      return SearchHelper.findNextCamelStart(editor, caret, count);
     }
   }
 
@@ -564,16 +565,17 @@ public class MotionGroup {
    * This moves the caret to the start of the next/previous camel word.
    *
    * @param editor The editor to move in
+   * @param caret  The caret to be moved
    * @param count  The number of words to skip
    * @return position
    */
-  public int moveCaretToNextCamelEnd(@NotNull Editor editor, int count) {
-    if ((editor.getCaretModel().getOffset() == 0 && count < 0) ||
-        (editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
+  public int moveCaretToNextCamelEnd(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    if ((caret.getOffset() == 0 && count < 0) ||
+        (caret.getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
       return -1;
     }
     else {
-      return SearchHelper.findNextCamelEnd(editor, count);
+      return SearchHelper.findNextCamelEnd(editor, caret, count);
     }
   }
 
@@ -581,11 +583,12 @@ public class MotionGroup {
    * This moves the caret to the start of the next/previous word/WORD.
    *
    * @param editor  The editor to move in
+   * @param caret   The caret to be moved
    * @param count   The number of words to skip
    * @param bigWord If true then find WORD, if false then find word
    * @return position
    */
-  public int moveCaretToNextWord(@NotNull Editor editor, int count, boolean bigWord) {
+  public int moveCaretToNextWord(@NotNull Editor editor, @NotNull Caret caret, int count, boolean bigWord) {
     final int offset = editor.getCaretModel().getOffset();
     final int size = EditorHelper.getFileSize(editor);
     if ((offset == 0 && count < 0) || (offset >= size - 1 && count > 0)) {
@@ -598,20 +601,21 @@ public class MotionGroup {
    * This moves the caret to the end of the next/previous word/WORD.
    *
    * @param editor  The editor to move in
+   * @param caret   The caret to be moved
    * @param count   The number of words to skip
    * @param bigWord If true then find WORD, if false then find word
    * @return position
    */
-  public int moveCaretToNextWordEnd(@NotNull Editor editor, int count, boolean bigWord) {
-    if ((editor.getCaretModel().getOffset() == 0 && count < 0) ||
-        (editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
+  public int moveCaretToNextWordEnd(@NotNull Editor editor, @NotNull Caret caret, int count, boolean bigWord) {
+    if ((caret.getOffset() == 0 && count < 0) ||
+        (caret.getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
       return -1;
     }
 
     // If we are doing this move as part of a change command (e.q. cw), we need to count the current end of
     // word if the cursor happens to be on the end of a word already. If this is a normal move, we don't count
     // the current word.
-    int pos = SearchHelper.findNextWordEnd(editor, count, bigWord);
+    int pos = SearchHelper.findNextWordEnd(editor, caret, count, bigWord);
     if (pos == -1) {
       if (count < 0) {
         return moveCaretToLineStart(editor, 0);
@@ -629,11 +633,12 @@ public class MotionGroup {
    * This moves the caret to the start of the next/previous paragraph.
    *
    * @param editor The editor to move in
+   * @param caret  The caret to be moved
    * @param count  The number of paragraphs to skip
    * @return position
    */
-  public int moveCaretToNextParagraph(@NotNull Editor editor, int count) {
-    int res = SearchHelper.findNextParagraph(editor, count, false);
+  public int moveCaretToNextParagraph(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    int res = SearchHelper.findNextParagraph(editor, caret, count, false);
     if (res >= 0) {
       res = EditorHelper.normalizeOffset(editor, res, true);
     }
@@ -644,8 +649,8 @@ public class MotionGroup {
     return res;
   }
 
-  public int moveCaretToNextSentenceStart(@NotNull Editor editor, int count) {
-    int res = SearchHelper.findNextSentenceStart(editor, count, false, true);
+  public int moveCaretToNextSentenceStart(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    int res = SearchHelper.findNextSentenceStart(editor, caret, count, false, true);
     if (res >= 0) {
       res = EditorHelper.normalizeOffset(editor, res, true);
     }
@@ -656,8 +661,8 @@ public class MotionGroup {
     return res;
   }
 
-  public int moveCaretToNextSentenceEnd(@NotNull Editor editor, int count) {
-    int res = SearchHelper.findNextSentenceEnd(editor, count, false, true);
+  public int moveCaretToNextSentenceEnd(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    int res = SearchHelper.findNextSentenceEnd(editor, caret, count, false, true);
     if (res >= 0) {
       res = EditorHelper.normalizeOffset(editor, res, false);
     }
@@ -668,13 +673,13 @@ public class MotionGroup {
     return res;
   }
 
-  public int moveCaretToUnmatchedBlock(@NotNull Editor editor, int count, char type) {
+  public int moveCaretToUnmatchedBlock(@NotNull Editor editor, @NotNull Caret caret, int count, char type) {
     if ((editor.getCaretModel().getOffset() == 0 && count < 0) ||
         (editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
       return -1;
     }
     else {
-      int res = SearchHelper.findUnmatchedBlock(editor, type, count);
+      int res = SearchHelper.findUnmatchedBlock(editor, caret, type, count);
       if (res != -1) {
         res = EditorHelper.normalizeOffset(editor, res, false);
       }
@@ -683,13 +688,13 @@ public class MotionGroup {
     }
   }
 
-  public int moveCaretToSection(@NotNull Editor editor, char type, int dir, int count) {
-    if ((editor.getCaretModel().getOffset() == 0 && count < 0) ||
-        (editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
+  public int moveCaretToSection(@NotNull Editor editor, @NotNull Caret caret, char type, int dir, int count) {
+    if ((caret.getOffset() == 0 && count < 0) ||
+        (caret.getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
       return -1;
     }
     else {
-      int res = SearchHelper.findSection(editor, type, dir, count);
+      int res = SearchHelper.findSection(editor, caret, type, dir, count);
       if (res != -1) {
         res = EditorHelper.normalizeOffset(editor, res, false);
       }
@@ -698,12 +703,12 @@ public class MotionGroup {
     }
   }
 
-  public int moveCaretToMethodStart(@NotNull Editor editor, int count) {
-    return SearchHelper.findMethodStart(editor, count);
+  public int moveCaretToMethodStart(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    return SearchHelper.findMethodStart(editor, caret, count);
   }
 
-  public int moveCaretToMethodEnd(@NotNull Editor editor, int count) {
-    return SearchHelper.findMethodEnd(editor, count);
+  public int moveCaretToMethodEnd(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    return SearchHelper.findMethodEnd(editor, caret, count);
   }
 
   public void setLastFTCmd(int lastFTCmd, char lastChar) {

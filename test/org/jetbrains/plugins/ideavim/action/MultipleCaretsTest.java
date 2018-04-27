@@ -1,5 +1,6 @@
 package org.jetbrains.plugins.ideavim.action;
 
+import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.editor.Editor;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
@@ -314,5 +315,387 @@ public class MultipleCaretsTest extends VimTestCase {
     typeTextInFile(parseKeys("v", "3is"),
                    "a<caret>bcd a<caret>bcd. abcd abcd. a<caret>bcd abcd.");
     myFixture.checkResult("<selection>abcd abcd. abcd abcd</selection>. <selection>abcd abcd.</selection>");
+  }
+
+  public void testMotionOuterBigWordAction() {
+    typeTextInFile(parseKeys("v", "aW"),
+                   " a<caret>bcd<caret>e.abcde.a<caret>bcde  a<caret>bcde.abcde\n");
+    myFixture.checkResult("<selection> abcde.abcde.abcde  abcde.abcde</selection>\n");
+  }
+
+  public void testMotionOuterWordAction() {
+    typeTextInFile(parseKeys("v", "aw"),
+                  " a<caret>bcd<caret>e.abcde.a<caret>bcde  a<caret>bcde.abcde");
+    myFixture.checkResult("<selection> abcde</selection>.abcde.<selection>abcde  abcde</selection>.abcde");
+  }
+
+  public void testMotionOuterBlockAngleAction() {
+    typeTextInFile(parseKeys("v", "2a["),
+                   "<asdf<asdf<a<caret>sdf>a<caret>sdf>asdf> <asdf<a<caret>sdf>asdf>");
+    myFixture.checkResult("<selection><asdf<asdf<asdf>asdf>asdf></selection> <selection><asdf<asdf>asdf></selection>");
+  }
+
+  public void testMotionOuterBlockBackQuoteAction() {
+    typeTextInFile(parseKeys("v", "a`"),
+                   "`asdf`asdf`a<caret>sdf`a<caret>sdf`asdf` `asdf`a<caret>sdf`asdf`");
+    myFixture.checkResult("`asdf`asdf<selection>`asdf`asdf`</selection>asdf` `asdf<selection>`asdf`</selection>asdf`");
+  }
+
+  public void testMotionOuterBraceAction() {
+    typeTextInFile(parseKeys("v", "2a{"),
+                   "{asdf{asdf{a<caret>sdf}a<caret>sdf}asdf} {asdf{a<caret>sdf}asdf}");
+    myFixture.checkResult("<selection>{asdf{asdf{asdf}asdf}asdf}</selection> <selection>{asdf{asdf}asdf}</selection>");
+  }
+
+  public void testMotionOuterBlockBracketAction() {
+    typeTextInFile(parseKeys("v", "2a["),
+                   "[asdf[asdf[a<caret>sdf]a<caret>sdf]asdf] [asdf[a<caret>sdf]asdf]");
+    myFixture.checkResult("<selection>[asdf[asdf[asdf]asdf]asdf]</selection> <selection>[asdf[asdf]asdf]</selection>");
+  }
+
+  public void testMotionOuterBlockDoubleQuoteAction() {
+    typeTextInFile(parseKeys("v", "a\""),
+                   "\"asdf\"asdf\"a<caret>sdf\"a<caret>sdf\"asdf\" \"asdf\"a<caret>sdf\"asdf\"");
+    myFixture.checkResult("\"asdf\"asdf<selection>\"asdf\"asdf\"</selection>asdf\" \"asdf<selection>\"asdf\"</selection>asdf\"");
+  }
+
+  public void testMotionOuterBlockParenAction() {
+    typeTextInFile(parseKeys("v", "2a("), "(asdf(asdf(a<caret>sdf)a<caret>sdf)asdf) (asdf(a<caret>sdf)asdf)");
+    myFixture.checkResult("<selection>(asdf(asdf(asdf)asdf)asdf)</selection> <selection>(asdf(asdf)asdf)</selection>");
+  }
+
+  public void testMotionOuterBlockSingleQuoteAction() {
+    typeTextInFile(parseKeys("v", "a'"),
+                   "'asdf'asdf'a<caret>sdf'a<caret>sdf'asdf' 'asdf'a<caret>sdf'asdf'");
+    myFixture.checkResult("'asdf'asdf<selection>'asdf'asdf'</selection>asdf' 'asdf<selection>'asdf'</selection>asdf'");
+  }
+
+  public void testMotionOuterBlockTagAction() {
+    typeTextInFile(parseKeys("v", "2at"),
+                   "<asdf>qwer<asdf>qwer<asdf>q<caret>wer</asdf>q<caret>wer</asdf>qwer</asdf>\n" +
+                   "<asdf>qwer<asdf>q<caret>wer</asdf>qwer</asdf>");
+    myFixture.checkResult("<selection><asdf>qwer<asdf>qwer<asdf>qwer</asdf>qwer</asdf>qwer</asdf></selection>\n" +
+                          "<selection><asdf>qwer<asdf>qwer</asdf>qwer</asdf></selection>");
+  }
+
+  public void testMotionOuterParagraphAction() {
+    typeTextInFile(parseKeys("v", "2ap"),
+                   "a<caret>sdf\n\na<caret>sdf\n\nasdf");
+    myFixture.checkResult("<selection>asdf\n\nasdf\n\nasdf</selection>");
+  }
+
+  public void testMotionOuterSentenceAction() {
+    typeTextInFile(parseKeys("v", "2as"),
+                   "a<caret>sdf. a<caret>sdf. asdf.");
+    myFixture.checkResult("<selection>asdf. asdf. asdf.</selection>");
+  }
+
+  // com.maddyhime.idea.vim.action.motion.text
+
+  public void testMotionBigWordEndLeftAction() {
+    typeTextInFile(parseKeys("gE"), "a.asdf. a<caret>sdf<caret>.a a; as<caret>df\n a<caret>sdf");
+    myFixture.checkResult("a.asdf<caret>. asdf.a a<caret>; asd<caret>f\n asdf");
+  }
+
+  public void testMotionBigWordEndRightAction() {
+    typeTextInFile(parseKeys("E"), "a<caret>.as<caret>df. a<caret>s<caret>df.a <caret> a; as<caret>df");
+    myFixture.checkResult("a.asdf<caret>. asdf.<caret>a  a<caret>; asd<caret>f");
+  }
+
+  public void testMotionBigWordLeftAction() {
+    typeTextInFile(parseKeys("B"), "a<caret>.as<caret>df. a<caret>sdf.a <caret> a; as<caret>df");
+    myFixture.checkResult("<caret>a.asdf. <caret>asdf.a  a; <caret>asdf");
+  }
+
+  public void testMotionBigWordRightAction() {
+    typeTextInFile(parseKeys("W"), "a<caret>.as<caret>df. a<caret>sdf.a <caret> a; as<caret>df");
+    myFixture.checkResult("a.asdf. <caret>asdf.a  <caret>a; asd<caret>f");
+  }
+
+  public void testMotionWordEndLeftAction() {
+    typeTextInFile(parseKeys("ge"), "a.asdf. a<caret>sdf<caret>.a a; as<caret>df\n a<caret>sdf");
+    myFixture.checkResult("a.asdf<caret>. asd<caret>f.a a<caret>; asd<caret>f\n asdf");
+  }
+
+  public void testMotionWordEndRightAction() {
+    typeTextInFile(parseKeys("e"), "a<caret>.as<caret>df. a<caret>s<caret>df.a <caret> a; as<caret>df");
+    myFixture.checkResult("a.asd<caret>f. asd<caret>f.a  <caret>a; asd<caret>f");
+  }
+
+  public void testMotionWordLeftAction() {
+    typeTextInFile(parseKeys("b"), "a<caret>.as<caret>df. a<caret>sdf.a <caret> a; as<caret>df");
+    myFixture.checkResult("<caret>a.<caret>asdf. <caret>asdf.<caret>a  a; <caret>asdf");
+  }
+
+  public void testMotionWordRightAction() {
+    typeTextInFile(parseKeys("w"), "a<caret>.as<caret>df. a<caret>sdf.a <caret> a; as<caret>df");
+    myFixture.checkResult("a.<caret>asdf<caret>. asdf<caret>.a  <caret>a; asd<caret>f");
+  }
+
+  public void testMotionCamelEndLeftAction() {
+    typeTextInFile(parseKeys("2]b"), "ClassName.M<caret>ethodN<caret>ame(<caret>Arg1Type arg1Na<caret>me, Arg2Type arg2<caret>Name) <caret>{");
+    myFixture.checkResult("Clas<caret>sNam<caret>e.Metho<caret>dName(Arg1Type ar<caret>g1Name, Arg2Type ar<caret>g<caret>2Name) {");
+  }
+
+  public void testMotionCamelEndRightAction() {
+    typeTextInFile(parseKeys("]w"), "Cl<caret>assName.M<caret>ethodN<caret>ame(<caret>Arg1Type arg1Na<caret>me, Arg2Type ar<caret>g2<caret>Name) {");
+    myFixture.checkResult("Clas<caret>sName.Metho<caret>dNam<caret>e(Ar<caret>g1Type arg1Nam<caret>e, Arg2Type arg<caret>2Nam<caret>e) {");
+  }
+
+  public void testMotionCamelLeftAction() {
+    typeTextInFile(parseKeys("2[b"), "ClassName.M<caret>ethodN<caret>ame(<caret>Arg1Type arg1Na<caret>me, Arg2Type arg2<caret>Name) <caret>{");
+    myFixture.checkResult("Class<caret>Name.<caret>MethodName(Arg1Type arg<caret>1Name, Arg2Type <caret>arg<caret>2Name) {");
+  }
+
+  public void testMotionCamelRightAction() {
+    typeTextInFile(parseKeys("[w"),
+                   "Cl<caret>assName.M<caret>ethodN<caret>ame(<caret>Arg1Type arg1Na<caret>me, Arg2Type ar<caret>g2Name) {");
+    myFixture.checkResult("Class<caret>Name.Method<caret>Name(<caret>Arg<caret>1Type arg1Name, <caret>Arg2Type arg<caret>2Name) {");
+  }
+
+  public void testMotionMethodNextEndAction() {
+    myFixture.configureByText(JavaFileType.INSTANCE,
+                              "public class Foo {\n" +
+                              "    private static void firstMethod(int argument) {\n" +
+                              "        // Do som<caret>ething...\n" +
+                              "    }\n" +
+                              "    <caret>private static int x<caret>;" +
+                              "    private static void secondMethod(String argument) {\n" +
+                              "        // Do something.<caret>..\n" +
+                              "    }\n" +
+                              "}");
+    typeText(parseKeys("]M"));
+    myFixture.checkResult("public class Foo {\n" +
+                          "    private static void firstMethod(int argument) {\n" +
+                          "        // Do something...\n" +
+                          "    <caret>}\n" +
+                          "    private static int x<caret>;" +
+                          "    private static void secondMethod(String argument) {\n" +
+                          "        // Do something...\n" +
+                          "    <caret>}\n" +
+                          "}");
+  }
+
+  public void testMotionMethodNextStartAction() {
+    myFixture.configureByText(JavaFileType.INSTANCE,
+                              "public class Foo {\n" +
+                              " <caret>   private static void firstMethod(int argument) {\n" +
+                              "        // Do som<caret>ething...\n" +
+                              "    }\n" +
+                              "    <caret>private static int x<caret>;" +
+                              "    private static void secondMethod(String argument) {\n" +
+                              "        // Do something.<caret>..\n" +
+                              "    }\n" +
+                              "}");
+    typeText(parseKeys("]m"));
+    myFixture.checkResult("public class Foo {\n" +
+                          "    private static void firstMethod(int argument) <caret>{\n" +
+                          "        // Do something...\n" +
+                          "    }\n" +
+                          "    <caret>private static int x;" +
+                          "    private static void secondMethod(String argument) <caret>{\n" +
+                          "        // Do something...\n" +
+                          "    }\n" +
+                          "}");
+  }
+
+  public void testMotionMethodPreviousEndAction() {
+    myFixture.configureByText(JavaFileType.INSTANCE,
+                              "public class Foo {\n" +
+                              " <caret>   private static void firstMethod(int argument) {\n" +
+                              "        // Do som<caret>ething...\n" +
+                              "    }\n" +
+                              "    <caret>private static int x<caret>;" +
+                              "    private static void secondMethod(String argument) {\n" +
+                              "        // Do something.<caret>..\n" +
+                              "    }\n" +
+                              "}");
+    typeText(parseKeys("[M"));
+    myFixture.checkResult("public class Foo {\n" +
+                          "    private static void firstMethod(int argument) {\n" +
+                          "        // Do something...\n" +
+                          "    <caret>}\n" +
+                          "    private static int x<caret>;" +
+                          "    private static void secondMethod(String argument) {\n" +
+                          "        // Do something...\n" +
+                          "    }\n" +
+                          "}");
+  }
+
+  public void testMotionMethodPreviousStartAction() {
+    myFixture.configureByText(JavaFileType.INSTANCE,
+                              "public class Foo {\n" +
+                              " <caret>   private static void firstMethod(int argument) {\n" +
+                              "        // Do som<caret>ething...\n" +
+                              "    }\n" +
+                              "    <caret>private static int x<caret>;" +
+                              "    private static void secondMethod(String argument) {\n" +
+                              "        // Do something.<caret>..\n" +
+                              "    }\n" +
+                              "}");
+    typeText(parseKeys("[m"));
+    myFixture.checkResult("public class Foo <caret>{\n" +
+                          "    private static void firstMethod(int argument) <caret>{\n" +
+                          "        // Do something...\n" +
+                          "    }\n" +
+                          "    <caret>private static int x;" +
+                          "    private static void secondMethod(String argument) <caret>{\n" +
+                          "        // Do something...\n" +
+                          "    }\n" +
+                          "}");
+  }
+
+  public void testMotionNthCharacterAction() {
+    typeTextInFile(parseKeys("5", "go"),
+                   "<caret>on<caret>e two thr<caret>ee four fiv<caret>e six seven eigh<caret>t ni<caret>ne ten");
+    myFixture.checkResult("one <caret>two three four five six seven eight nine ten");
+  }
+
+  public void testMotionParagraphNextAction() {
+    typeTextInFile(parseKeys("2}"),
+                   "o<caret>ne\n\n<caret>two\n\nthree\nthree\n\nfour\n\nfive");
+    myFixture.checkResult("one\n\ntwo\n<caret>\nthree\nthree\n<caret>\nfour\n\nfive");
+  }
+
+  public void testMotionParagraphPreviousAction() {
+    typeTextInFile(parseKeys("2{"),
+                   "one\n\ntwo\n\nthree\nthree\n\nfou<caret>r\n\nfi<caret>ve");
+    myFixture.checkResult("one\n\ntwo\n<caret>\nthree\nthree\n<caret>\nfour\n\nfive");
+  }
+
+  public void testMotionSectionBackwardEndAction() {
+    typeTextInFile(parseKeys("[]"),
+                   "no<caret>t_a_brace\n" +
+                   "{\n" +
+                   "<caret>not_a_brace\n" +
+                   "}\n" +
+                   "{\n" +
+                   "n<caret>ot_a_brace\n" +
+                   "}\n" +
+                   "not_a_<caret>brace");
+    myFixture.checkResult("<caret>not_a_brace\n" +
+                          "{\n" +
+                          "not_a_brace\n" +
+                          "<caret>}\n" +
+                          "{\n" +
+                          "not_a_brace\n" +
+                          "<caret>}\n" +
+                          "not_a_brace");
+  }
+
+  public void testMotionSectionBackwardStartAction() {
+    typeTextInFile(parseKeys("[["),
+                   "n<caret>ot_a_brace\n" +
+                   "{\n" +
+                   "not_a_<caret>brace\n" +
+                   "<caret>}\n" +
+                   "{\n" +
+                   "not_a_b<caret>race\n" +
+                   "<caret>}\n" +
+                   "not_a_brace");
+    myFixture.checkResult("<caret>not_a_brace\n" +
+                          "<caret>{\n" +
+                          "not_a_brace\n" +
+                          "}\n" +
+                          "<caret>{\n" +
+                          "not_a_brace\n" +
+                          "}\n" +
+                          "not_a_brace");
+  }
+
+  public void testMotionSectionForwardEndAction() {
+    typeTextInFile(parseKeys("]]"),
+                   "n<caret>ot_a_brace\n" +
+                   "{\n" +
+                   "n<caret>ot_a_brace\n" +
+                   "<caret>}\n" +
+                   "{\n" +
+                   "not_<caret>a_brace\n" +
+                   "}\n" +
+                   "not_a_brace");
+    myFixture.checkResult("not_a_brace\n" +
+                          "{\n" +
+                          "not_a_brace\n" +
+                          "<caret>}\n" +
+                          "{\n" +
+                          "not_a_brace\n" +
+                          "<caret>}\n" +
+                          "not_a_brace");
+  }
+
+  public void testMotionSectionForwardStartAction() {
+    typeTextInFile(parseKeys("]["),
+                   "n<caret>ot_a_brace\n" +
+                   "{\n" +
+                   "n<caret>ot_a_brace\n" +
+                   "<caret>}\n" +
+                   "{\n" +
+                   "not_a_brace\n" +
+                   "}\n" +
+                   "not_a_brace");
+    myFixture.checkResult("not_a_brace\n" +
+                          "<caret>{\n" +
+                          "not_a_brace\n" +
+                          "}\n" +
+                          "<caret>{\n" +
+                          "not_a_brace\n" +
+                          "}\n" +
+                          "not_a_brace");
+  }
+
+  public void testMotionSentenceNextEndAction() {
+    typeTextInFile(parseKeys("g)"),
+                   "a<caret>sdf<caret>. a<caret>sdf. a<caret>sdf.<caret> asdf.<caret> asdf.");
+    myFixture.checkResult("asdf<caret>. asdf<caret>. asdf<caret>. asdf<caret>. asdf<caret>.");
+  }
+
+  public void testMotionSentenceNextStartAction() {
+    typeTextInFile(parseKeys(")"),
+                   "a<caret>sdf. <caret>asdf.<caret> asdf. <caret>asdf. asdf.");
+    myFixture.checkResult("asdf. <caret>asdf. <caret>asdf. asdf. <caret>asdf.");
+  }
+
+  public void testMotionSentencePreviousEndAction() {
+    typeTextInFile(parseKeys("g("),
+                   "asdf.<caret> a<caret>sdf<caret>. as<caret>df. asd<caret>f. <caret>asdf.");
+    myFixture.checkResult("asdf<caret>. asdf<caret>. asdf<caret>. asdf<caret>. asdf.");
+  }
+
+  public void testMotionSentencePreviousStartAction() {
+    typeTextInFile(parseKeys("("),
+                   "asd<caret>f. <caret>as<caret>df. asdf<caret>. asdf<caret>. as<caret>df.");
+    myFixture.checkResult("<caret>asdf. <caret>asdf. <caret>asdf. <caret>asdf. <caret>asdf.");
+  }
+
+  public void testMotionUnmatchedBraceCloseAction() {
+    typeTextInFile(parseKeys("]}"),
+                   "{{}<caret> }<caret> }<caret> {}}<caret>{}}");
+    myFixture.checkResult("{{} <caret>} <caret>} {}<caret>}{<caret>}}");
+  }
+
+  public void testMotionUnmatchedBraceOpenAction() {
+    typeTextInFile(parseKeys("[{"),
+                   "{<caret> {{}<caret> }{<caret>}{<caret>} ");
+    myFixture.checkResult("<caret>{ <caret>{{} }<caret>{}<caret>{} ");
+  }
+
+
+  public void testMotionUnmatchedParenCloseAction() {
+    typeTextInFile(parseKeys("])"),
+                   "(()<caret> )<caret> )<caret> ())<caret>())");
+    myFixture.checkResult("(() <caret>) <caret>) ()<caret>)(<caret>))");
+  }
+
+  public void testMotionUnmatchedParenOpenAction() {
+    typeTextInFile(parseKeys("[("),
+                   "(<caret> (()<caret> )(<caret>)(<caret>) ");
+    myFixture.checkResult("<caret>( <caret>(() )<caret>()<caret>() ");
+  }
+
+  // com.maddyhome.idea.vim.action.motion.visual
+
+  public void testVisualExitModeAction() {
+    typeTextInFile(parseKeys("<ESC>"), "<selection>abcd</selection>  <selection>efgh</selection>");
+    myFixture.checkResult("abc<caret>d  efg<caret>h");
   }
 }

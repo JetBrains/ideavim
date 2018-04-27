@@ -70,9 +70,9 @@ public class SearchHelper {
     return false;
   }
 
-  public static int findSection(@NotNull Editor editor, char type, int dir, int count) {
+  public static int findSection(@NotNull Editor editor, @NotNull Caret caret, char type, int dir, int count) {
     CharSequence chars = editor.getDocument().getCharsSequence();
-    int line = editor.getCaretModel().getLogicalPosition().line + dir;
+    int line = caret.getLogicalPosition().line + dir;
     int maxline = EditorHelper.getLineCount(editor);
     int res = -1;
 
@@ -94,9 +94,9 @@ public class SearchHelper {
     return res;
   }
 
-  public static int findUnmatchedBlock(@NotNull Editor editor, char type, int count) {
+  public static int findUnmatchedBlock(@NotNull Editor editor, @NotNull Caret caret, char type, int count) {
     CharSequence chars = editor.getDocument().getCharsSequence();
-    int pos = editor.getCaretModel().getOffset();
+    int pos = caret.getOffset();
     int loc = blockChars.indexOf(type);
     // What direction should we go now (-1 is backward, 1 is forward)
     int dir = loc % 2 == 0 ? -1 : 1;
@@ -490,9 +490,9 @@ public class SearchHelper {
     return str ? inString : inChar;
   }
 
-  public static int findNextCamelStart(@NotNull Editor editor, int count) {
+  public static int findNextCamelStart(@NotNull Editor editor, @NotNull Caret caret, int count) {
     CharSequence chars = editor.getDocument().getCharsSequence();
-    int pos = editor.getCaretModel().getOffset();
+    int pos = caret.getOffset();
     int size = EditorHelper.getFileSize(editor);
 
     int found = 0;
@@ -534,9 +534,9 @@ public class SearchHelper {
     return res;
   }
 
-  public static int findNextCamelEnd(@NotNull Editor editor, int count) {
+  public static int findNextCamelEnd(@NotNull Editor editor, @NotNull Caret caret, int count) {
     CharSequence chars = editor.getDocument().getCharsSequence();
-    int pos = editor.getCaretModel().getOffset();
+    int pos = caret.getOffset();
     int size = EditorHelper.getFileSize(editor);
 
     int found = 0;
@@ -916,7 +916,7 @@ public class SearchHelper {
   }
 
   @NotNull
-  public static TextRange findWordUnderCursor(@NotNull Editor editor, int count, int dir, boolean isOuter, boolean isBig, boolean hasSelection) {
+  public static TextRange findWordUnderCursor(@NotNull Editor editor, @NotNull Caret caret, int count, int dir, boolean isOuter, boolean isBig, boolean hasSelection) {
     if (logger.isDebugEnabled()) {
       logger.debug("count=" + count);
       logger.debug("dir=" + dir);
@@ -936,7 +936,7 @@ public class SearchHelper {
       logger.debug("max=" + max);
     }
 
-    int pos = editor.getCaretModel().getOffset();
+    int pos = caret.getOffset();
     boolean startSpace = CharacterHelper.charType(chars.charAt(pos), isBig) == CharacterHelper.CharacterType.WHITESPACE;
     // Find word start
     boolean onWordStart = pos == min ||
@@ -1052,13 +1052,14 @@ public class SearchHelper {
    *
    *
    * @param editor   The editor to search in
+   * @param caret    The caret to start search from
    * @param count    The number of words to skip. Negative for backward searches
    * @param bigWord  If true then find WORD, if false then find word
    * @return The offset of match
    */
-  public static int findNextWordEnd(@NotNull Editor editor, int count, boolean bigWord) {
+  public static int findNextWordEnd(@NotNull Editor editor, @NotNull Caret caret, int count, boolean bigWord) {
     CharSequence chars = editor.getDocument().getCharsSequence();
-    int pos = editor.getCaretModel().getOffset();
+    int pos = caret.getOffset();
     int size = EditorHelper.getFileSize(editor);
 
     return findNextWordEnd(chars, pos, size, count, bigWord, false);
@@ -1215,12 +1216,12 @@ public class SearchHelper {
     }
   }
 
-  public static int findNextSentenceStart(@NotNull Editor editor, int count, boolean countCurrent, boolean requireAll) {
+  public static int findNextSentenceStart(@NotNull Editor editor, @NotNull Caret caret, int count, boolean countCurrent, boolean requireAll) {
     int dir = count > 0 ? 1 : -1;
     count = Math.abs(count);
     int total = count;
     CharSequence chars = editor.getDocument().getCharsSequence();
-    int start = editor.getCaretModel().getOffset();
+    int start = caret.getOffset();
     int max = EditorHelper.getFileSize(editor);
 
     int res = start;
@@ -1245,12 +1246,19 @@ public class SearchHelper {
     return res;
   }
 
-  public static int findNextSentenceEnd(@NotNull Editor editor, int count, boolean countCurrent, boolean requireAll) {
+  /**
+   * @deprecated Use {@link #findNextParagraphLine(Editor, Caret, int, boolean)}
+   */
+  public static int findNextSentenceStart(@NotNull Editor editor, int count, boolean countCurrent, boolean requireAll) {
+    return findNextSentenceStart(editor, editor.getCaretModel().getPrimaryCaret(), count, countCurrent, requireAll);
+  }
+
+  public static int findNextSentenceEnd(@NotNull Editor editor, @NotNull Caret caret, int count, boolean countCurrent, boolean requireAll) {
     int dir = count > 0 ? 1 : -1;
     count = Math.abs(count);
     int total = count;
     CharSequence chars = editor.getDocument().getCharsSequence();
-    int start = editor.getCaretModel().getOffset();
+    int start = caret.getOffset();
     int max = EditorHelper.getFileSize(editor);
 
     int res = start;
@@ -1677,8 +1685,8 @@ public class SearchHelper {
     }
   }
 
-  public static int findNextParagraph(@NotNull Editor editor, int count, boolean allowBlanks) {
-    int line = findNextParagraphLine(editor, count, allowBlanks);
+  public static int findNextParagraph(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowBlanks) {
+    int line = findNextParagraphLine(editor, caret, count, allowBlanks);
 
     int maxline = EditorHelper.getLineCount(editor);
     if (line >= 0 && line < maxline) {
@@ -1692,6 +1700,13 @@ public class SearchHelper {
     }
   }
 
+  /**
+   * @deprecated To find the next paragraph, use {@link #findNextParagraph(Editor, Caret, int, boolean)}
+   */
+  public static int findNextParagraph(@NotNull Editor editor, int count, boolean allowBlanks) {
+    return findNextParagraph(editor, editor.getCaretModel().getPrimaryCaret(), count, allowBlanks);
+  }
+
   private static int findNextParagraph(@NotNull Editor editor, int lline, int dir, boolean allowBlanks, boolean skipLines) {
     int line = findNextParagraphLine(editor, lline, dir, allowBlanks, skipLines);
 
@@ -1703,8 +1718,9 @@ public class SearchHelper {
     }
   }
 
-  private static int findNextParagraphLine(@NotNull Editor editor, int count, boolean allowBlanks) {
-    int line = editor.getCaretModel().getLogicalPosition().line;
+  private static int findNextParagraphLine(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowBlanks) {
+    int line = caret.getLogicalPosition().line;
+
     int maxline = EditorHelper.getLineCount(editor);
     int dir = count > 0 ? 1 : -1;
     boolean skipLines = count > 1;
@@ -1723,6 +1739,13 @@ public class SearchHelper {
     }
 
     return line;
+  }
+
+  /**
+   * @deprecated Use {@link #findNextParagraphLine(Editor, Caret, int, boolean)}
+   */
+  private static int findNextParagraphLine(@NotNull Editor editor, int count, boolean allowBlanks) {
+    return findNextParagraphLine(editor, editor.getCaretModel().getPrimaryCaret(), count, allowBlanks);
   }
 
   private static int findNextParagraphLine(@NotNull Editor editor, int line, int dir, boolean allowBlanks, boolean skipLines) {
@@ -1868,12 +1891,12 @@ public class SearchHelper {
     return new TextRange(start, end);
   }
 
-  public static int findMethodStart(@NotNull Editor editor, int count) {
-    return PsiHelper.findMethodStart(editor, editor.getCaretModel().getOffset(), count);
+  public static int findMethodStart(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    return PsiHelper.findMethodStart(editor, caret.getOffset(), count);
   }
 
-  public static int findMethodEnd(@NotNull Editor editor, int count) {
-    return PsiHelper.findMethodEnd(editor, editor.getCaretModel().getOffset(), count);
+  public static int findMethodEnd(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    return PsiHelper.findMethodEnd(editor, caret.getOffset(), count);
   }
 
   @NotNull

@@ -318,7 +318,7 @@ public class ChangeGroup {
    * @return true if able to delete text, false if not
    */
   public boolean insertDeletePreviousWord(@NotNull Editor editor) {
-    final int deleteTo = VimPlugin.getMotion().moveCaretToNextWord(editor, -1, false);
+    final int deleteTo = VimPlugin.getMotion().moveCaretToNextWord(editor, editor.getCaretModel().getPrimaryCaret(), -1, false);
     if (deleteTo == -1) {
       return false;
     }

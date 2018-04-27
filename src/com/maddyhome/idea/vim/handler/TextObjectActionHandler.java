@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
@@ -32,9 +33,26 @@ import org.jetbrains.annotations.Nullable;
 /**
  */
 public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
-  protected final boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+  public TextObjectActionHandler() {
+    this(false);
+  }
+
+  public TextObjectActionHandler(boolean runForEachCaret) {
+    super(runForEachCaret);
+  }
+
+  @Override
+  protected final boolean execute(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context, @NotNull Command cmd) {
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-      TextRange range = getRange(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+      TextRange range;
+      if (myRunForEachCaret) {
+        if (caret == null) {
+          return false;
+        }
+        range = getRange(editor, caret, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+      } else {
+        range = getRange(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+      }
       if (range == null) {
         return false;
       }
@@ -58,12 +76,32 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
         VimPlugin.getMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER);
       }
 
-      MotionGroup.moveCaret(editor, newend);
+      if (myRunForEachCaret) {
+        if (caret == null) {
+          return false;
+        }
+        MotionGroup.moveCaret(editor, caret, newend);
+      } else {
+        MotionGroup.moveCaret(editor, newend);
+      }
     }
 
     return true;
   }
 
+  /**
+   * Version for single-caret commands.
+   */
   @Nullable
-  public abstract TextRange getRange(Editor editor, DataContext context, int count, int rawCount, Argument argument);
+  public TextRange getRange(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
+    return getRange(editor, editor.getCaretModel().getPrimaryCaret(), context, count, rawCount, argument);
+  }
+
+  /**
+   * Version for multi-caret commands.
+   */
+  @Nullable
+  public TextRange getRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
+    return getRange(editor, context, count, rawCount, argument);
+  }
 }
