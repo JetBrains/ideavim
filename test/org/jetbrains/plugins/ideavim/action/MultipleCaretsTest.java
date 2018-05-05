@@ -225,6 +225,7 @@ public class MultipleCaretsTest extends VimTestCase {
 
   // com.maddyhome.idea.vim.action.motion.object
 
+  /*
   public void testMotionInnerBigWordAction() {
     typeTextInFile(parseKeys("v", "iW"),
                    "a,<caret>bc<caret>d,e f,g<caret>hi,j");
@@ -389,7 +390,7 @@ public class MultipleCaretsTest extends VimTestCase {
                    "a<caret>sdf. a<caret>sdf. asdf.");
     myFixture.checkResult("<selection>asdf. asdf. asdf.</selection>");
   }
-
+  */
   // com.maddyhime.idea.vim.action.motion.text
 
   public void testMotionBigWordEndLeftAction() {
@@ -694,8 +695,10 @@ public class MultipleCaretsTest extends VimTestCase {
 
   // com.maddyhome.idea.vim.action.motion.visual
 
+  /*
   public void testVisualExitModeAction() {
     typeTextInFile(parseKeys("<ESC>"), "<selection>abcd</selection>  <selection>efgh</selection>");
     myFixture.checkResult("abc<caret>d  efg<caret>h");
   }
+  */
 }
