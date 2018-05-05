@@ -701,4 +701,12 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult("abc<caret>d  efg<caret>h");
   }
   */
+
+  // com.maddyhome.idea.vim.action.change.insert
+
+  public void testInsertEscape() {
+    typeTextInFile(parseKeys("i", "<ESC>", "i", "<ESC>"),
+                   "on<caret>e tw<caret>o th<caret>ree");
+    myFixture.checkResult("<caret>one <caret>two <caret>three");
+  }
 }

@@ -470,17 +470,20 @@ public class ChangeGroup {
           repeatInsertText(editor, context, started ? (i == 0 ? count : count + 1) : count);
         }
       }
+
+      MotionGroup.moveCaret(editor, cpos);
     }
     else {
       repeatInsertText(editor, context, count);
-      cpos = VimPlugin.getMotion().moveCaretHorizontal(editor, -1, false);
+      for (Caret caret : editor.getCaretModel().getAllCarets()) {
+        cpos = VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -1, false);
+        MotionGroup.moveCaret(editor, caret, cpos);
+      }
     }
 
     repeatLines = 0;
     repeatColumn = 0;
     repeatAppend = false;
-
-    MotionGroup.moveCaret(editor, cpos);
   }
 
   /**
