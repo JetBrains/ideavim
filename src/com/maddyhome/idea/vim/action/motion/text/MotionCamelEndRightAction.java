@@ -40,12 +40,8 @@ public class MotionCamelEndRightAction extends MotionEditorAction {
       super(true);
     }
 
-    public int getOffset(@NotNull Editor editor,
-                         @NotNull Caret caret,
-                         @NotNull DataContext context,
-                         int count,
-                         int rawCount,
-                         @Nullable Argument argument) {
+    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                         int rawCount, @Nullable Argument argument) {
       return VimPlugin.getMotion().moveCaretToNextCamelEnd(editor, caret, count);
     }
   }

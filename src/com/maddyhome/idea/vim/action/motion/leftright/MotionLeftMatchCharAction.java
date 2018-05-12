@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  */
@@ -41,12 +42,12 @@ public class MotionLeftMatchCharAction extends MotionEditorAction {
     }
 
     @Override
-    public int getOffset(@NotNull Editor editor,
-                         @NotNull Caret caret,
-                         @NotNull DataContext context,
-                         int count,
-                         int rawCount,
-                         @NotNull Argument argument) {
+    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                         int rawCount, @Nullable Argument argument) {
+      if (argument == null) {
+        VimPlugin.indicateError();
+        return caret.getOffset();
+      }
       int res = VimPlugin.getMotion().moveCaretToNextCharacterOnLine(editor, caret, -count, argument.getCharacter());
       VimPlugin.getMotion().setLastFTCmd(MotionGroup.LAST_F, argument.getCharacter());
       return res;

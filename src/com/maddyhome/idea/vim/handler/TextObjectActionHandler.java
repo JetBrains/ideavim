@@ -42,7 +42,8 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
   }
 
   @Override
-  protected final boolean execute(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context, @NotNull Command cmd) {
+  protected final boolean execute(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context,
+                                  @NotNull Command cmd) {
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
       TextRange range;
       if (myRunForEachCaret) {
@@ -50,7 +51,8 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
           return false;
         }
         range = getRange(editor, caret, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
-      } else {
+      }
+      else {
         range = getRange(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
       }
       if (range == null) {
@@ -84,11 +86,13 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
         }
       }
 
-      if (((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) != 0 && (cmd.getFlags() & Command.FLAG_VISUAL_CHARACTERWISE) == 0) &&
+      if (((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) != 0 &&
+           (cmd.getFlags() & Command.FLAG_VISUAL_CHARACTERWISE) == 0) &&
           CommandState.getInstance(editor).getSubMode() != CommandState.SubMode.VISUAL_LINE) {
         VimPlugin.getMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE);
       }
-      else if (((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) == 0 || (cmd.getFlags() & Command.FLAG_VISUAL_CHARACTERWISE) != 0) &&
+      else if (((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) == 0 ||
+                (cmd.getFlags() & Command.FLAG_VISUAL_CHARACTERWISE) != 0) &&
                CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_LINE) {
         VimPlugin.getMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER);
       }
@@ -98,7 +102,8 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
           return false;
         }
         MotionGroup.moveCaret(editor, caret, newend);
-      } else {
+      }
+      else {
         MotionGroup.moveCaret(editor, newend);
       }
     }
@@ -110,7 +115,8 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
    * Version for single-caret commands.
    */
   @Nullable
-  public TextRange getRange(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
+  public TextRange getRange(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
+                            @Nullable Argument argument) {
     return getRange(editor, editor.getCaretModel().getPrimaryCaret(), context, count, rawCount, argument);
   }
 
@@ -118,7 +124,8 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
    * Version for multi-caret commands.
    */
   @Nullable
-  public TextRange getRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
+  public TextRange getRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                            int rawCount, @Nullable Argument argument) {
     return getRange(editor, context, count, rawCount, argument);
   }
 }

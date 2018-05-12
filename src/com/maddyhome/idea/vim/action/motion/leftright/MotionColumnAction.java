@@ -27,8 +27,8 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
 import com.maddyhome.idea.vim.helper.CaretData;
-import com.maddyhome.idea.vim.helper.EditorData;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  */
@@ -43,17 +43,14 @@ public class MotionColumnAction extends MotionEditorAction {
     }
 
     @Override
-    public int getOffset(@NotNull Editor editor,
-                         @NotNull Caret caret,
-                         @NotNull DataContext context,
-                         int count,
-                         int rawCount,
-                         Argument argument) {
+    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                         int rawCount, @Nullable Argument argument) {
       return VimPlugin.getMotion().moveCaretToColumn(editor, caret, count - 1, false);
     }
 
     @Override
-    protected void postMove(@NotNull Editor editor, @NotNull Caret caret, DataContext context, @NotNull Command cmd) {
+    protected void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                            @NotNull Command cmd) {
       CaretData.setLastColumn(editor, caret, cmd.getCount() - 1);
     }
   }

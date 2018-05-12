@@ -43,9 +43,7 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
   }
 
   @Override
-  protected final boolean execute(@NotNull Editor editor,
-                                  @Nullable Caret caret,
-                                  @NotNull DataContext context,
+  protected final boolean execute(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context,
                                   @NotNull Command cmd) {
     if (!CommandState.inVisualBlockMode(editor)) {
       // It comes out that merging of the overlapping selections is done by IDE. In ideavim we should be
@@ -158,20 +156,13 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
     }
   }
 
-  public int getOffset(@NotNull Editor editor,
-                       @NotNull DataContext context,
-                       int count,
-                       int rawCount,
+  public int getOffset(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
                        @Nullable Argument argument) {
     return getOffset(editor, editor.getCaretModel().getPrimaryCaret(), context, count, rawCount, argument);
   }
 
-  public int getOffset(@NotNull Editor editor,
-                       @NotNull Caret caret,
-                       @NotNull DataContext context,
-                       int count,
-                       int rawCount,
-                       @Nullable Argument argument) {
+  public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                       int rawCount, @Nullable Argument argument) {
     return getOffset(editor, context, count, rawCount, argument);
   }
 
@@ -181,15 +172,11 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
   protected void postMove(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
   }
 
-  protected void preMove(@NotNull Editor editor,
-                         @NotNull Caret caret,
-                         @NotNull DataContext context,
+  protected void preMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                          @NotNull Command cmd) {
   }
 
-  protected void postMove(@NotNull Editor editor,
-                          @NotNull Caret caret,
-                          @NotNull DataContext context,
+  protected void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                           @NotNull Command cmd) {
   }
 }

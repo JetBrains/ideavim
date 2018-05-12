@@ -41,12 +41,8 @@ public class MotionInnerBlockDoubleQuoteAction extends TextObjectAction {
 
     @Override
     @Nullable
-    public TextRange getRange(@NotNull Editor editor,
-                              @NotNull Caret caret,
-                              @NotNull DataContext context,
-                              int count,
-                              int rawCount,
-                              @Nullable Argument argument) {
+    public TextRange getRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                              int rawCount, @Nullable Argument argument) {
       return VimPlugin.getMotion().getBlockQuoteRange(editor, caret, '"', false);
     }
   }

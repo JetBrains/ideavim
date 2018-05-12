@@ -41,12 +41,8 @@ public class MotionParagraphNextAction extends MotionEditorAction {
     }
 
     @Override
-    public int getOffset(@NotNull Editor editor,
-                         @NotNull Caret caret,
-                         @NotNull DataContext context,
-                         int count,
-                         int rawCount,
-                         @Nullable Argument argument) {
+    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                         int rawCount, @Nullable Argument argument) {
       return VimPlugin.getMotion().moveCaretToNextParagraph(editor, caret, count);
     }
   }

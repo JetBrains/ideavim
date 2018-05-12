@@ -226,6 +226,7 @@ public class EditorData {
 
   /**
    * Sets the visual block start for the editor.
+   *
    * @param editor The editor
    */
   public static void setVisualBlockStart(@NotNull Editor editor, int visualBlockStart) {
@@ -234,6 +235,7 @@ public class EditorData {
 
   /**
    * Gets the visual block start for the editor.
+   *
    * @param editor The editor
    */
   public static int getVisualBlockStart(@NotNull Editor editor) {
@@ -249,6 +251,7 @@ public class EditorData {
 
   /**
    * Sets the visual block end for the editor.
+   *
    * @param editor The editor
    */
   public static void setVisualBlockEnd(@NotNull Editor editor, int visualBlockEnd) {
@@ -257,6 +260,7 @@ public class EditorData {
 
   /**
    * Gets the visual block offset for the editor.
+   *
    * @param editor The editor
    */
   public static int getVisualBlockOffset(@NotNull Editor editor) {
@@ -272,6 +276,7 @@ public class EditorData {
 
   /**
    * Sets the visual block offset for the editor.
+   *
    * @param editor The editor
    */
   public static void setVisualBlockOffset(@NotNull Editor editor, int visualBlockOffset) {
@@ -280,6 +285,7 @@ public class EditorData {
 
   /**
    * Gets the visual block end for the editor.
+   *
    * @param editor The editor
    */
   public static int getVisualBlockEnd(@NotNull Editor editor) {
@@ -341,7 +347,8 @@ public class EditorData {
   public static final Key<TextRange> LAST_VISUAL_RANGE = new Key<TextRange>("lastVisualRange");
   private static final Key<VisualChange> VISUAL_OP = new Key<VisualChange>("lastVisualOp");
   private static final Key<String> LAST_SEARCH = new Key<String>("lastSearch");
-  private static final Key<Collection<RangeHighlighter>> LAST_HIGHLIGHTS = new Key<Collection<RangeHighlighter>>("lastHighlights");
+  private static final Key<Collection<RangeHighlighter>> LAST_HIGHLIGHTS =
+    new Key<Collection<RangeHighlighter>>("lastHighlights");
   private static final Key<CommandState> COMMAND_STATE = new Key<CommandState>("commandState");
   private static final Key<Boolean> CHANGE_GROUP = new Key<Boolean>("changeGroup");
   private static final Key<Boolean> MOTION_GROUP = new Key<Boolean>("motionGroup");
@@ -392,7 +399,7 @@ public class EditorData {
   /**
    * Checks if editor is file editor, also it takes into account that editor can be placed in editors hierarchy
    */
-  public static boolean isFileEditor(@NotNull Editor editor){
+  public static boolean isFileEditor(@NotNull Editor editor) {
     final VirtualFile virtualFile = EditorData.getVirtualFile(editor);
     return virtualFile != null && !(virtualFile instanceof LightVirtualFile);
   }

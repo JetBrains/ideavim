@@ -48,7 +48,7 @@ public abstract class EditorActionHandlerBase extends EditorActionHandler {
   public final void execute(@NotNull Editor editor, @NotNull DataContext context) {
     editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     doExecute(editor, editor.getCaretModel().getPrimaryCaret(), context);
- }
+  }
 
   @Override
   public final void doExecute(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context) {

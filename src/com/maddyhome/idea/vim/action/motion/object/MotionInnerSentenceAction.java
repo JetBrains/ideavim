@@ -42,12 +42,8 @@ public class MotionInnerSentenceAction extends TextObjectAction {
     }
 
     @Override
-    public TextRange getRange(@NotNull Editor editor,
-                              @NotNull Caret caret,
-                              @NotNull DataContext context,
-                              int count,
-                              int rawCount,
-                              @Nullable Argument argument) {
+    public TextRange getRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                              int rawCount, @Nullable Argument argument) {
       return VimPlugin.getMotion().getSentenceRange(editor, caret, count, false);
     }
   }

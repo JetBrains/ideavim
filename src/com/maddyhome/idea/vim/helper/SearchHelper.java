@@ -108,7 +108,8 @@ public class SearchHelper {
   }
 
   @Nullable
-  public static TextRange findBlockRange(@NotNull Editor editor, @NotNull Caret caret, char type, int count, boolean isOuter) {
+  public static TextRange findBlockRange(@NotNull Editor editor, @NotNull Caret caret, char type, int count,
+                                         boolean isOuter) {
     CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = caret.getOffset();
     int start = caret.getSelectionStart();
@@ -199,7 +200,7 @@ public class SearchHelper {
    *
    * @param editor The editor to search in
    * @return The offset within the editor of the found character or -1 if no match was found or none of the characters
-   *         were found on the remainder of the current line.
+   * were found on the remainder of the current line.
    */
   public static int findMatchingPairOnCurrentLine(@NotNull Editor editor) {
     int pos = editor.getCaretModel().getOffset();
@@ -299,8 +300,7 @@ public class SearchHelper {
   }
 
   private enum Direction {
-    BACK(-1),
-    FORWARD(1);
+    BACK(-1), FORWARD(1);
 
     private final int value;
 
@@ -320,7 +320,7 @@ public class SearchHelper {
   private static int findPreviousQuoteInLine(@NotNull CharSequence chars, int pos, char quote) {
     return findQuoteInLine(chars, pos, quote, Direction.BACK);
   }
-  
+
   private static int findFirstQuoteInLine(@NotNull Editor editor, int pos, char quote) {
     final int start = EditorHelper.getLineStartForOffset(editor, pos);
     return findNextQuoteInLine(editor.getDocument().getCharsSequence(), start, quote);
@@ -342,8 +342,8 @@ public class SearchHelper {
     return cnt;
   }
 
-  private static int findCharacterPosition(@NotNull CharSequence chars, int pos, final char c, boolean currentLineOnly, boolean searchEscaped,
-                                           @NotNull Direction direction) {
+  private static int findCharacterPosition(@NotNull CharSequence chars, int pos, final char c, boolean currentLineOnly,
+                                           boolean searchEscaped, @NotNull Direction direction) {
     while (pos >= 0 && pos < chars.length() && (!currentLineOnly || chars.charAt(pos) != '\n')) {
       if (chars.charAt(pos) == c && (pos == 0 || searchEscaped || chars.charAt(pos - 1) != '\\')) {
         return pos;
@@ -368,15 +368,14 @@ public class SearchHelper {
       final TextRange openingTagTextRange = findOpeningTag(sequence, closingTagTextRange.getStartOffset(), tagName);
       if (openingTagTextRange != null && openingTagTextRange.getStartOffset() <= cursorOffset) {
         if (isOuter) {
-          return new TextRange(openingTagTextRange.getStartOffset(),
-                               closingTagTextRange.getEndOffset());
+          return new TextRange(openingTagTextRange.getStartOffset(), closingTagTextRange.getEndOffset());
         }
         else {
-          return new TextRange(openingTagTextRange.getEndOffset()+1, closingTagTextRange.getStartOffset()-1);
+          return new TextRange(openingTagTextRange.getEndOffset() + 1, closingTagTextRange.getStartOffset() - 1);
         }
       }
       else {
-        pos = closingTagTextRange.getEndOffset()+1;
+        pos = closingTagTextRange.getEndOffset() + 1;
       }
     }
   }
@@ -413,7 +412,9 @@ public class SearchHelper {
       openBracketPos = closeBracketPos - 1;
       while (openBracketPos >= 0) {
         openBracketPos = StringUtil.lastIndexOf(sequence, '<', 0, openBracketPos);
-        if (openBracketPos >= 0 && openBracketPos + 1 < sequence.length() && sequence.charAt(openBracketPos + 1) == '/') {
+        if (openBracketPos >= 0 &&
+            openBracketPos + 1 < sequence.length() &&
+            sequence.charAt(openBracketPos + 1) == '/') {
           final String tagName = String.valueOf(sequence.subSequence(openBracketPos + "</".length(), closeBracketPos));
           if (tagName.length() > 0 && tagName.charAt(0) != ' ') {
             TextRange textRange = new TextRange(openBracketPos, closeBracketPos);
@@ -429,7 +430,8 @@ public class SearchHelper {
 
 
   @Nullable
-  public static TextRange findBlockQuoteInLineRange(@NotNull Editor editor, @NotNull Caret caret, char quote, boolean isOuter) {
+  public static TextRange findBlockQuoteInLineRange(@NotNull Editor editor, @NotNull Caret caret, char quote,
+                                                    boolean isOuter) {
     final CharSequence chars = editor.getDocument().getCharsSequence();
     final int pos = caret.getOffset();
     if (chars.charAt(pos) == '\n') {
@@ -549,8 +551,11 @@ public class SearchHelper {
     pos += step;
     while (pos >= 0 && pos < size && found < Math.abs(count)) {
       if (Character.isUpperCase(chars.charAt(pos))) {
-        if (pos == size - 1 || !Character.isLetter(chars.charAt(pos + 1)) ||
-            (Character.isUpperCase(chars.charAt(pos + 1)) && pos <= size - 2 && Character.isLowerCase(chars.charAt(pos + 2)))) {
+        if (pos == size - 1 ||
+            !Character.isLetter(chars.charAt(pos + 1)) ||
+            (Character.isUpperCase(chars.charAt(pos + 1)) &&
+             pos <= size - 2 &&
+             Character.isLowerCase(chars.charAt(pos + 2)))) {
           res = pos;
           found++;
         }
@@ -637,13 +642,13 @@ public class SearchHelper {
 
   /**
    * Find the offset to the start of the next/previous word/WORD.
-   *
+   * <p>
    * This function always returns a non-negative position according to the definition of 'next/previous word'
    * in Vim. For example, for the last word the end of file position is returned.
    *
-   * @param editor   The editor to find the words in
-   * @param count    The number of words to skip. Negative for backward searches
-   * @param bigWord  Find WORD, as opposed to word
+   * @param editor  The editor to find the words in
+   * @param count   The number of words to skip. Negative for backward searches
+   * @param bigWord Find WORD, as opposed to word
    * @return The offset of the match
    */
   public static int findNextWord(@NotNull Editor editor, int count, boolean bigWord) {
@@ -654,7 +659,8 @@ public class SearchHelper {
     return findNextWord(chars, pos, size, count, bigWord, false);
   }
 
-  public static int findNextWord(@NotNull CharSequence chars, int pos, int size, int count, boolean bigWord, boolean spaceWords) {
+  public static int findNextWord(@NotNull CharSequence chars, int pos, int size, int count, boolean bigWord,
+                                 boolean spaceWords) {
     int step = count >= 0 ? 1 : -1;
     count = Math.abs(count);
 
@@ -669,15 +675,19 @@ public class SearchHelper {
     return res;
   }
 
-  private static int findNextWordOne(@NotNull CharSequence chars, int pos, int size, int step, boolean bigWord, boolean spaceWords) {
+  private static int findNextWordOne(@NotNull CharSequence chars, int pos, int size, int step, boolean bigWord,
+                                     boolean spaceWords) {
     boolean found = false;
     pos = pos < size ? pos : Math.min(size, chars.length() - 1);
     // For back searches, skip any current whitespace so we start at the end of a word
     if (step < 0 && pos > 0) {
-      if (CharacterHelper.charType(chars.charAt(pos - 1), bigWord) == CharacterHelper.CharacterType.WHITESPACE && !spaceWords) {
+      if (CharacterHelper.charType(chars.charAt(pos - 1), bigWord) == CharacterHelper.CharacterType.WHITESPACE &&
+          !spaceWords) {
         pos = skipSpace(chars, pos - 1, step, size) + 1;
       }
-      if (pos > 0 && CharacterHelper.charType(chars.charAt(pos), bigWord) != CharacterHelper.charType(chars.charAt(pos - 1), bigWord)) {
+      if (pos > 0 &&
+          CharacterHelper.charType(chars.charAt(pos), bigWord) !=
+          CharacterHelper.charType(chars.charAt(pos - 1), bigWord)) {
         pos += step;
       }
     }
@@ -734,7 +744,8 @@ public class SearchHelper {
   }
 
   @Nullable
-  public static TextRange findNumberUnderCursor(@NotNull final Editor editor, final boolean alpha, final boolean hex, final boolean octal) {
+  public static TextRange findNumberUnderCursor(@NotNull final Editor editor, final boolean alpha, final boolean hex,
+                                                final boolean octal) {
     int lline = editor.getCaretModel().getLogicalPosition().line;
     String text = EditorHelper.getLineText(editor, lline).toLowerCase();
     int offset = EditorHelper.getLineStartOffset(editor, lline);
@@ -799,7 +810,9 @@ public class SearchHelper {
       int start = range.first;
       int end = range.second;
 
-      if (text.charAt(start) == '0' && end > start && !(start > 0 && isNumberChar(text.charAt(start - 1), false, false, false, true))) {
+      if (text.charAt(start) == '0' &&
+          end > start &&
+          !(start > 0 && isNumberChar(text.charAt(start - 1), false, false, false, true))) {
         logger.debug("found octal");
         return new TextRange(start + offset, end + offset);
       }
@@ -827,8 +840,8 @@ public class SearchHelper {
    * Searches for digits block that matches parameters
    */
   @NotNull
-  private static Pair<Integer, Integer> findRange(@NotNull final String text, final int pos,
-                                                  final boolean alpha, final boolean hex, final boolean octal, final boolean decimal) {
+  private static Pair<Integer, Integer> findRange(@NotNull final String text, final int pos, final boolean alpha,
+                                                  final boolean hex, final boolean octal, final boolean decimal) {
     int end = pos;
     while (end < text.length() && isNumberChar(text.charAt(end), alpha, hex, octal, decimal)) {
       end++;
@@ -838,7 +851,8 @@ public class SearchHelper {
       start--;
     }
     if (start < end &&
-        (start == -1 || 0 <= start && start < text.length() && !isNumberChar(text.charAt(start), alpha, hex, octal, decimal))) {
+        (start == -1 ||
+         0 <= start && start < text.length() && !isNumberChar(text.charAt(start), alpha, hex, octal, decimal))) {
       start++;
     }
     return Pair.create(start, end);
@@ -874,10 +888,8 @@ public class SearchHelper {
 
     int pos = editor.getCaretModel().getOffset();
     int start = pos;
-    CharacterHelper.CharacterType[] types = new CharacterHelper.CharacterType[] {
-      CharacterHelper.CharacterType.KEYWORD,
-      CharacterHelper.CharacterType.PUNCTUATION
-    };
+    CharacterHelper.CharacterType[] types = new CharacterHelper.CharacterType[]{CharacterHelper.CharacterType.KEYWORD,
+      CharacterHelper.CharacterType.PUNCTUATION};
     for (int i = 0; i < 2; i++) {
       start = pos;
       CharacterHelper.CharacterType type = CharacterHelper.charType(chars.charAt(start), false);
@@ -905,7 +917,8 @@ public class SearchHelper {
 
     int end;
     // Special case 1 character words because 'findNextWordEnd' returns one to many chars
-    if (start < stop && CharacterHelper.charType(chars.charAt(start + 1), false) != CharacterHelper.CharacterType.KEYWORD) {
+    if (start < stop &&
+        CharacterHelper.charType(chars.charAt(start + 1), false) != CharacterHelper.CharacterType.KEYWORD) {
       end = start + 1;
     }
     else {
@@ -916,7 +929,8 @@ public class SearchHelper {
   }
 
   @NotNull
-  public static TextRange findWordUnderCursor(@NotNull Editor editor, @NotNull Caret caret, int count, int dir, boolean isOuter, boolean isBig, boolean hasSelection) {
+  public static TextRange findWordUnderCursor(@NotNull Editor editor, @NotNull Caret caret, int count, int dir,
+                                              boolean isOuter, boolean isBig, boolean hasSelection) {
     if (logger.isDebugEnabled()) {
       logger.debug("count=" + count);
       logger.debug("dir=" + dir);
@@ -940,7 +954,8 @@ public class SearchHelper {
     boolean startSpace = CharacterHelper.charType(chars.charAt(pos), isBig) == CharacterHelper.CharacterType.WHITESPACE;
     // Find word start
     boolean onWordStart = pos == min ||
-                          CharacterHelper.charType(chars.charAt(pos - 1), isBig) != CharacterHelper.charType(chars.charAt(pos), isBig);
+                          CharacterHelper.charType(chars.charAt(pos - 1), isBig) !=
+                          CharacterHelper.charType(chars.charAt(pos), isBig);
     int start = pos;
 
     if (logger.isDebugEnabled()) {
@@ -963,7 +978,8 @@ public class SearchHelper {
 
     // Find word end
     boolean onWordEnd = pos == max ||
-                        CharacterHelper.charType(chars.charAt(pos + 1), isBig) != CharacterHelper.charType(chars.charAt(pos), isBig);
+                        CharacterHelper.charType(chars.charAt(pos + 1), isBig) !=
+                        CharacterHelper.charType(chars.charAt(pos), isBig);
 
     if (logger.isDebugEnabled()) logger.debug("onWordEnd=" + onWordEnd);
 
@@ -971,10 +987,10 @@ public class SearchHelper {
     if (!onWordEnd || hasSelection || (count > 1 && dir == 1) || (startSpace && isOuter)) {
       if (dir == 1) {
         end = findNextWordEnd(chars, pos, max, count -
-                                               (onWordEnd && !hasSelection && (!(startSpace && isOuter) || (startSpace && !isOuter))
-                                                ? 1
-                                                : 0),
-                              isBig, !isOuter);
+                                               (onWordEnd &&
+                                                !hasSelection &&
+                                                (!(startSpace && isOuter) || (startSpace && !isOuter)) ? 1 : 0), isBig,
+                              !isOuter);
       }
       else {
         end = findNextWordEnd(chars, pos, max, 1, isBig, !isOuter);
@@ -1003,7 +1019,8 @@ public class SearchHelper {
       }
     }
 
-    boolean goForward = (dir == 1 && isOuter && ((!startSpace && !onWordEnd) || (startSpace && onWordEnd && hasSelection)));
+    boolean goForward =
+      (dir == 1 && isOuter && ((!startSpace && !onWordEnd) || (startSpace && onWordEnd && hasSelection)));
     if (!goForward && dir == 1 && isOuter) {
       int firstEnd = end;
       if (count > 1) {
@@ -1017,7 +1034,8 @@ public class SearchHelper {
     }
     if (!goForward && dir == 1 && isOuter && !startSpace && !hasSelection) {
       if (end < max) {
-        if (CharacterHelper.charType(chars.charAt(end + 1), !isBig) != CharacterHelper.charType(chars.charAt(end), !isBig)) {
+        if (CharacterHelper.charType(chars.charAt(end + 1), !isBig) !=
+            CharacterHelper.charType(chars.charAt(end), !isBig)) {
           goForward = true;
         }
       }
@@ -1029,12 +1047,14 @@ public class SearchHelper {
     }
 
     if (goForward && anyNonWhitespace(editor, end, 1)) {
-      while (end < max && CharacterHelper.charType(chars.charAt(end + 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
+      while (end < max &&
+             CharacterHelper.charType(chars.charAt(end + 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
         end++;
       }
     }
     if (goBack && anyNonWhitespace(editor, start, -1)) {
-      while (start > min && CharacterHelper.charType(chars.charAt(start - 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
+      while (start > min &&
+             CharacterHelper.charType(chars.charAt(start - 1), false) == CharacterHelper.CharacterType.WHITESPACE) {
         start--;
       }
     }
@@ -1050,11 +1070,10 @@ public class SearchHelper {
   /**
    * This finds the offset to the end of the next/previous word/WORD.
    *
-   *
-   * @param editor   The editor to search in
-   * @param caret    The caret to start search from
-   * @param count    The number of words to skip. Negative for backward searches
-   * @param bigWord  If true then find WORD, if false then find word
+   * @param editor  The editor to search in
+   * @param caret   The caret to start search from
+   * @param count   The number of words to skip. Negative for backward searches
+   * @param bigWord If true then find WORD, if false then find word
    * @return The offset of match
    */
   public static int findNextWordEnd(@NotNull Editor editor, @NotNull Caret caret, int count, boolean bigWord) {
@@ -1065,7 +1084,8 @@ public class SearchHelper {
     return findNextWordEnd(chars, pos, size, count, bigWord, false);
   }
 
-  public static int findNextWordEnd(@NotNull CharSequence chars, int pos, int size, int count, boolean bigWord, boolean spaceWords) {
+  public static int findNextWordEnd(@NotNull CharSequence chars, int pos, int size, int count, boolean bigWord,
+                                    boolean spaceWords) {
     int step = count >= 0 ? 1 : -1;
     count = Math.abs(count);
 
@@ -1080,11 +1100,7 @@ public class SearchHelper {
     return res;
   }
 
-  private static int findNextWordEndOne(@NotNull CharSequence chars,
-                                        int pos,
-                                        int size,
-                                        int step,
-                                        boolean bigWord,
+  private static int findNextWordEndOne(@NotNull CharSequence chars, int pos, int size, int step, boolean bigWord,
                                         boolean spaceWords) {
     boolean found = false;
     // For forward searches, skip any current whitespace so we start at the start of a word
@@ -1099,10 +1115,13 @@ public class SearchHelper {
           pos = skipSpace(chars, pos, step, size);
       }
       */
-      if (CharacterHelper.charType(chars.charAt(pos + 1), bigWord) == CharacterHelper.CharacterType.WHITESPACE && !spaceWords) {
+      if (CharacterHelper.charType(chars.charAt(pos + 1), bigWord) == CharacterHelper.CharacterType.WHITESPACE &&
+          !spaceWords) {
         pos = skipSpace(chars, pos + 1, step, size) - 1;
       }
-      if (pos < size - 1 && CharacterHelper.charType(chars.charAt(pos), bigWord) != CharacterHelper.charType(chars.charAt(pos + 1), bigWord)) {
+      if (pos < size - 1 &&
+          CharacterHelper.charType(chars.charAt(pos), bigWord) !=
+          CharacterHelper.charType(chars.charAt(pos + 1), bigWord)) {
         pos += step;
       }
     }
@@ -1155,7 +1174,7 @@ public class SearchHelper {
 
   /**
    * Skip whitespace starting with the supplied position.
-   *
+   * <p>
    * An empty line is considered a whitespace break.
    *
    * @param chars  The text as a character array
@@ -1197,7 +1216,7 @@ public class SearchHelper {
     CharSequence chars = editor.getDocument().getCharsSequence();
     int found = 0;
     int step = count >= 0 ? 1 : -1;
-    int pos =  caret.getOffset() + step;
+    int pos = caret.getOffset() + step;
     while (pos >= start && pos < end && pos >= 0 && pos < chars.length()) {
       if (chars.charAt(pos) == ch) {
         found++;
@@ -1216,7 +1235,8 @@ public class SearchHelper {
     }
   }
 
-  public static int findNextSentenceStart(@NotNull Editor editor, @NotNull Caret caret, int count, boolean countCurrent, boolean requireAll) {
+  public static int findNextSentenceStart(@NotNull Editor editor, @NotNull Caret caret, int count, boolean countCurrent,
+                                          boolean requireAll) {
     int dir = count > 0 ? 1 : -1;
     count = Math.abs(count);
     int total = count;
@@ -1253,7 +1273,8 @@ public class SearchHelper {
     return findNextSentenceStart(editor, editor.getCaretModel().getPrimaryCaret(), count, countCurrent, requireAll);
   }
 
-  public static int findNextSentenceEnd(@NotNull Editor editor, @NotNull Caret caret, int count, boolean countCurrent, boolean requireAll) {
+  public static int findNextSentenceEnd(@NotNull Editor editor, @NotNull Caret caret, int count, boolean countCurrent,
+                                        boolean requireAll) {
     int dir = count > 0 ? 1 : -1;
     count = Math.abs(count);
     int total = count;
@@ -1521,8 +1542,8 @@ public class SearchHelper {
     return res;
   }
 
-  private static int findSentenceRangeEnd(@NotNull Editor editor, @NotNull CharSequence chars, int start, int max, int count,
-                                          boolean isOuter, boolean oneway) {
+  private static int findSentenceRangeEnd(@NotNull Editor editor, @NotNull CharSequence chars, int start, int max,
+                                          int count, boolean isOuter, boolean oneway) {
     int dir = count > 0 ? 1 : -1;
     count = Math.abs(count);
     int total = count;
@@ -1707,7 +1728,8 @@ public class SearchHelper {
     return findNextParagraph(editor, editor.getCaretModel().getPrimaryCaret(), count, allowBlanks);
   }
 
-  private static int findNextParagraph(@NotNull Editor editor, int lline, int dir, boolean allowBlanks, boolean skipLines) {
+  private static int findNextParagraph(@NotNull Editor editor, int lline, int dir, boolean allowBlanks,
+                                       boolean skipLines) {
     int line = findNextParagraphLine(editor, lline, dir, allowBlanks, skipLines);
 
     if (line >= 0) {
@@ -1718,7 +1740,8 @@ public class SearchHelper {
     }
   }
 
-  private static int findNextParagraphLine(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowBlanks) {
+  private static int findNextParagraphLine(@NotNull Editor editor, @NotNull Caret caret, int count,
+                                           boolean allowBlanks) {
     int line = caret.getLogicalPosition().line;
 
     int maxline = EditorHelper.getLineCount(editor);
@@ -1748,7 +1771,8 @@ public class SearchHelper {
     return findNextParagraphLine(editor, editor.getCaretModel().getPrimaryCaret(), count, allowBlanks);
   }
 
-  private static int findNextParagraphLine(@NotNull Editor editor, int line, int dir, boolean allowBlanks, boolean skipLines) {
+  private static int findNextParagraphLine(@NotNull Editor editor, int line, int dir, boolean allowBlanks,
+                                           boolean skipLines) {
     int maxline = EditorHelper.getLineCount(editor);
     int res = -1;
 
@@ -1812,7 +1836,8 @@ public class SearchHelper {
           fixend = true;
         }
       }
-      else if (!EditorHelper.isLineEmpty(editor, eline, true) && !EditorHelper.isLineEmpty(editor, sline, true) &&
+      else if (!EditorHelper.isLineEmpty(editor, eline, true) &&
+               !EditorHelper.isLineEmpty(editor, sline, true) &&
                sline > 0) {
         sline--;
         fixstart = true;
@@ -1827,7 +1852,7 @@ public class SearchHelper {
     else {
       sline = line;
       if (!EditorHelper.isLineEmpty(editor, sline, true)) {
-        sline = findNextParagraphLine(editor, caret,-1, true);
+        sline = findNextParagraphLine(editor, caret, -1, true);
         if (EditorHelper.isLineEmpty(editor, sline, true)) {
           sline++;
         }
