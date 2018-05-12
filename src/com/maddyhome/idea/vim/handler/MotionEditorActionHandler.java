@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.MotionGroup;
+import com.maddyhome.idea.vim.helper.CaretData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,6 +47,60 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
                                   @Nullable Caret caret,
                                   @NotNull DataContext context,
                                   @NotNull Command cmd) {
+    if (!CommandState.inVisualBlockMode(editor)) {
+      // It comes out that merging of the overlapping selections is done by IDE. In ideavim we should be
+      // able to handle such events for keeping the caret data (used by visual model) updated. There we
+      // set up the caret data to the actual values.
+      @NotNull Caret currentCaret;
+      if (myRunForEachCaret) {
+        if (caret == null) {
+          return false;
+        }
+        currentCaret = caret;
+      }
+      else {
+        currentCaret = editor.getCaretModel().getPrimaryCaret();
+      }
+      if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
+        int selectionStart = currentCaret.getSelectionStart();
+        int selectionEnd = currentCaret.getSelectionEnd();
+        int caretOffset = currentCaret.getOffset();
+        if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_CHARACTER) {
+          if (selectionStart == caretOffset) {
+            CaretData.setVisualStart(currentCaret, selectionEnd - 1);
+            CaretData.setVisualEnd(currentCaret, selectionStart);
+          }
+          else {
+            CaretData.setVisualStart(currentCaret, selectionStart);
+            CaretData.setVisualEnd(currentCaret, selectionEnd);
+          }
+        }
+        else if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_LINE) {
+          int selectionStartLine = editor.offsetToLogicalPosition(selectionStart).line;
+          int selectionEndLine = editor.offsetToLogicalPosition(selectionEnd).line;
+          int caretLine = editor.offsetToLogicalPosition(caretOffset).line;
+          int currentVisualStartLine = editor.offsetToLogicalPosition(CaretData.getVisualStart(currentCaret)).line;
+          int currentVisualEndLine = editor.offsetToLogicalPosition(CaretData.getVisualEnd(currentCaret)).line;
+          if (selectionStartLine == caretLine) {
+            if (currentVisualStartLine != selectionEndLine) {
+              CaretData.setVisualStart(currentCaret, EditorHelper.getLineEndOffset(editor, selectionEndLine, false));
+            }
+            if (currentVisualEndLine != caretLine) {
+              CaretData.setVisualEnd(currentCaret, caretOffset);
+            }
+          }
+          else {
+            if (currentVisualStartLine != selectionStartLine) {
+              CaretData.setVisualStart(currentCaret, EditorHelper.getLineStartOffset(editor, selectionStartLine));
+            }
+            if (currentVisualEndLine != caretLine) {
+              CaretData.setVisualEnd(currentCaret, caretOffset);
+            }
+          }
+        }
+      }
+    }
+
     if (myRunForEachCaret) {
       if (caret == null) {
         return false;

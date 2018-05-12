@@ -7,6 +7,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This class is used to manipulate caret specific data. Each caret has a user defined map associated with it.
@@ -48,9 +49,81 @@ public class CaretData {
     }
 
     if (previousWasDollar != currentIsDollar && CommandState.inVisualBlockMode(editor)) {
-      VimPlugin.getMotion().updateSelection(editor);
+      VimPlugin.getMotion().updateBlockSelection(editor);
     }
   }
 
-  public static final Key<Integer> LAST_COLUMN = new Key<>("lastColumn");
+  /**
+   * Gets the visual block start for the caret.
+   */
+  public static int getVisualStart(@NotNull Caret caret) {
+    Integer visualStart = caret.getUserData(VISUAL_START);
+
+    if (visualStart == null) {
+      return caret.getOffset();
+    }
+    else {
+      return visualStart;
+    }
+  }
+
+  /**
+   * Sets the visual block start for the caret.
+   */
+  public static void setVisualStart(@NotNull Caret caret, int visualStart) {
+    caret.putUserData(VISUAL_START, visualStart);
+  }
+
+  /**
+   * Gets the visual block end for the caret.
+   */
+  public static int getVisualEnd(@NotNull Caret caret) {
+    Integer visualEnd = caret.getUserData(VISUAL_END);
+
+    if (visualEnd == null) {
+      return caret.getOffset();
+    }
+    else {
+      return visualEnd;
+    }
+  }
+
+  /**
+   * Sets the visual block end for the caret.
+   */
+  public static void setVisualEnd(@NotNull Caret caret, int visualEnd) {
+    caret.putUserData(VISUAL_END, visualEnd);
+  }
+
+  /**
+   * Gets the visual offset for the caret.
+   */
+  public static int getVisualOffset(@NotNull Caret caret) {
+    Integer visualOffset = caret.getUserData(VISUAL_OFFSET);
+
+    if (visualOffset == null) {
+      return caret.getOffset();
+    }
+    else {
+      return visualOffset;
+    }
+  }
+
+  /**
+   * Sets the visual offset for the caret.
+   */
+  public static void setVisualOffset(@NotNull Caret caret, int visualOffset) {
+    caret.putUserData(VISUAL_OFFSET, visualOffset);
+  }
+
+  /**
+   * This class is completely static, no instances needed.
+   */
+  private CaretData() {
+  }
+
+  private static final Key<Integer> LAST_COLUMN = new Key<>("lastColumn");
+  private static final Key<Integer> VISUAL_START = new Key<>("visualStart");
+  private static final Key<Integer> VISUAL_END = new Key<>("visualEnd");
+  private static final Key<Integer> VISUAL_OFFSET = new Key<>("visualOffset");
 }

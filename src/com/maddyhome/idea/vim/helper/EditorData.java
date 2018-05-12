@@ -224,6 +224,74 @@ public class EditorData {
     editor.putUserData(EX_OUTPUT_MODEL, model);
   }
 
+  /**
+   * Sets the visual block start for the editor.
+   * @param editor The editor
+   */
+  public static void setVisualBlockStart(@NotNull Editor editor, int visualBlockStart) {
+    editor.putUserData(VISUAL_BLOCK_START, visualBlockStart);
+  }
+
+  /**
+   * Gets the visual block start for the editor.
+   * @param editor The editor
+   */
+  public static int getVisualBlockStart(@NotNull Editor editor) {
+    Integer visualBlockStart = editor.getUserData(VISUAL_BLOCK_START);
+
+    if (visualBlockStart == null) {
+      return editor.getCaretModel().getPrimaryCaret().getOffset();
+    }
+    else {
+      return visualBlockStart;
+    }
+  }
+
+  /**
+   * Sets the visual block end for the editor.
+   * @param editor The editor
+   */
+  public static void setVisualBlockEnd(@NotNull Editor editor, int visualBlockEnd) {
+    editor.putUserData(VISUAL_BLOCK_END, visualBlockEnd);
+  }
+
+  /**
+   * Gets the visual block offset for the editor.
+   * @param editor The editor
+   */
+  public static int getVisualBlockOffset(@NotNull Editor editor) {
+    Integer visualBlockOffset = editor.getUserData(VISUAL_BLOCK_OFFSET);
+
+    if (visualBlockOffset == null) {
+      return editor.getCaretModel().getPrimaryCaret().getOffset();
+    }
+    else {
+      return visualBlockOffset;
+    }
+  }
+
+  /**
+   * Sets the visual block offset for the editor.
+   * @param editor The editor
+   */
+  public static void setVisualBlockOffset(@NotNull Editor editor, int visualBlockOffset) {
+    editor.putUserData(VISUAL_BLOCK_OFFSET, visualBlockOffset);
+  }
+
+  /**
+   * Gets the visual block end for the editor.
+   * @param editor The editor
+   */
+  public static int getVisualBlockEnd(@NotNull Editor editor) {
+    Integer visualBlockEnd = editor.getUserData(VISUAL_BLOCK_END);
+
+    if (visualBlockEnd == null) {
+      return editor.getCaretModel().getPrimaryCaret().getOffset();
+    }
+    else {
+      return visualBlockEnd;
+    }
+  }
 
   /**
    * Gets the virtual file associated with this editor
@@ -234,6 +302,33 @@ public class EditorData {
   @Nullable
   public static VirtualFile getVirtualFile(@NotNull Editor editor) {
     return FileDocumentManager.getInstance().getFile(editor.getDocument());
+  }
+
+  /**
+   * Asks whether next down move should be ignored.
+   */
+  public static boolean shouldIgnoreNextMove(@NotNull Editor editor) {
+    Boolean ret = editor.getUserData(IGNORE_NEXT_MOVE);
+    if (ret == null) {
+      return false;
+    }
+    else {
+      return ret;
+    }
+  }
+
+  /**
+   * Indicate that the next down move should be ignored.
+   */
+  public static void ignoreNextMove(@NotNull Editor editor) {
+    editor.putUserData(IGNORE_NEXT_MOVE, true);
+  }
+
+  /**
+   * Indicate that the next down move should not be ignored.
+   */
+  public static void dontIgnoreNextMove(@NotNull Editor editor) {
+    editor.putUserData(IGNORE_NEXT_MOVE, false);
   }
 
   /**
@@ -255,6 +350,10 @@ public class EditorData {
   private static final Key<ExOutputPanel> MORE_PANEL = new Key<ExOutputPanel>("IdeaVim.morePanel");
   private static final Key<ExOutputModel> EX_OUTPUT_MODEL = new Key<ExOutputModel>("IdeaVim.exOutputModel");
   private static final Key<TestInputModel> TEST_INPUT_MODEL = new Key<TestInputModel>("IdeaVim.testInputModel");
+  private static final Key<Integer> VISUAL_BLOCK_START = new Key<>("visuaBlockStart");
+  private static final Key<Integer> VISUAL_BLOCK_END = new Key<>("visualBlockEnd");
+  private static final Key<Integer> VISUAL_BLOCK_OFFSET = new Key<>("visualBlockOffset");
+  private static final Key<Boolean> IGNORE_NEXT_MOVE = new Key<>("shouldIgnoreNextMove");
 
   private static Key CONSOLE_VIEW_IN_EDITOR_VIEW = Key.create("CONSOLE_VIEW_IN_EDITOR_VIEW");
 

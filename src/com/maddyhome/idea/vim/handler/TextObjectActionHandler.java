@@ -57,14 +57,31 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
         return false;
       }
 
-      TextRange vr = VimPlugin.getMotion().getRawVisualRange();
+      TextRange vr;
+      if (myRunForEachCaret) {
+        if (caret == null) {
+          return false;
+        }
+        vr = VimPlugin.getMotion().getRawVisualRange(caret);
+      }
+      else {
+        vr = VimPlugin.getMotion().getRawVisualRange(editor);
+      }
 
       boolean block = (cmd.getFlags() & Command.FLAG_TEXT_BLOCK) != 0;
       int newstart = block || vr.getEndOffset() >= vr.getStartOffset() ? range.getStartOffset() : range.getEndOffset();
       int newend = block || vr.getEndOffset() >= vr.getStartOffset() ? range.getEndOffset() : range.getStartOffset();
 
       if (vr.getStartOffset() == vr.getEndOffset() || block) {
-        VimPlugin.getMotion().moveVisualStart(newstart);
+        if (myRunForEachCaret) {
+          if (caret == null) {
+            return false;
+          }
+          VimPlugin.getMotion().moveVisualStart(caret, newstart);
+        }
+        else {
+          VimPlugin.getMotion().moveVisualStart(editor.getCaretModel().getPrimaryCaret(), newstart);
+        }
       }
 
       if (((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) != 0 && (cmd.getFlags() & Command.FLAG_VISUAL_CHARACTERWISE) == 0) &&

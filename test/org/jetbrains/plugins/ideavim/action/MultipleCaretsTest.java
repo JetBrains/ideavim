@@ -2,6 +2,7 @@ package org.jetbrains.plugins.ideavim.action;
 
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.command.CommandState;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -225,7 +226,6 @@ public class MultipleCaretsTest extends VimTestCase {
 
   // com.maddyhome.idea.vim.action.motion.object
 
-  /*
   public void testMotionInnerBigWordAction() {
     typeTextInFile(parseKeys("v", "iW"),
                    "a,<caret>bc<caret>d,e f,g<caret>hi,j");
@@ -241,7 +241,7 @@ public class MultipleCaretsTest extends VimTestCase {
   public void testMotionInnerBlockAngleAction() {
     typeTextInFile(parseKeys("v", "2i<"),
                    "<asdf<asdf<a<caret>sdf>a<caret>sdf>asdf> <asdf<as<caret>df>asdf>");
-    myFixture.checkResult("<selection><asdf<asdf<asdf>asdf>asdf></selection> <selection><asdf<asdf>asdf></selection>");
+    myFixture.checkResult("<<selection>asdf<asdf<asdf>asdf>asdf</selection>> <<selection>asdf<asdf>asdf</selection>>");
   }
 
   public void testMotionInnerBlockBackQuoteActionWithNoCount() {
@@ -250,22 +250,16 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult("`<selection>asdf</selection>`asdf `<selection>asdf</selection>`<selection>asdf</selection>`<selection>asdf</selection>`");
   }
 
-  public void testMotionInnerBlockBackQuoteActionWithCount() {
-    typeTextInFile(parseKeys("v", "2i`"),
-                   "`as<caret>d<caret>f`asdf `a<caret>sdf`a<caret>sdf`a<caret>sdf`");
-    myFixture.checkResult("<selection>`asdf</selection>`asdf <selection>`asdf`asdf`asdf`</selection>");
-  }
-
   public void testMotionInnerBlockBraceAction() {
     typeTextInFile(parseKeys("v", "2i{"),
                    "{asdf{asdf{a<caret>sdf}a<caret>sdf}asdf} {asdf{as<caret>df}asdf}");
-    myFixture.checkResult("<selection>{asdf{asdf{asdf}asdf}asdf}</selection> <selection>{asdf{asdf}asdf}</selection>");
+    myFixture.checkResult("{<selection>asdf{asdf{asdf}asdf}asdf</selection>} {<selection>asdf{asdf}asdf</selection>}");
   }
 
   public void testMotionInnerBlockBracketAction() {
     typeTextInFile(parseKeys("v", "2i["),
                    "[asdf[asdf[a<caret>sdf]a<caret>sdf]asdf] [asdf[as<caret>df]asdf]");
-    myFixture.checkResult("<selection>[asdf[asdf[asdf]asdf]asdf]</selection> <selection>[asdf[asdf]asdf]</selection>");
+    myFixture.checkResult("[<selection>asdf[asdf[asdf]asdf]asdf</selection>] [<selection>asdf[asdf]asdf</selection>]");
   }
 
   public void testMotionInnerBlockDoubleQuoteActionWithNoCount() {
@@ -274,16 +268,10 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult("\"<selection>asdf</selection>\"asdf \"<selection>asdf</selection>\"<selection>asdf</selection>\"<selection>asdf</selection>\"");
   }
 
-  public void testMotionInnerBlockDoubleQuoteActionWithCount() {
-    typeTextInFile(parseKeys("v", "2i\""),
-                   "\"as<caret>d<caret>f\"asdf \"a<caret>sdf\"a<caret>sdf\"a<caret>sdf\"");
-    myFixture.checkResult("<selection>\"asdf</selection>\"asdf <selection>\"asdf\"asdf\"asdf\"</selection>");
-  }
-
   public void testMotionInnerBlockParenAction() {
     typeTextInFile(parseKeys("v", "2i("),
                    "(asdf(asdf(a<caret>sdf)a<caret>sdf)asdf) (asdf(as<caret>df)asdf)");
-    myFixture.checkResult("<selection>(asdf(asdf(asdf)asdf)asdf)</selection> <selection>(asdf(asdf)asdf)</selection>");
+    myFixture.checkResult("(<selection>asdf(asdf(asdf)asdf)asdf</selection>) (<selection>asdf(asdf)asdf</selection>)");
   }
 
   public void testMotionInnerBlockSingleQuoteActionWithNoCount() {
@@ -292,46 +280,40 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult("'<selection>asdf</selection>'asdf '<selection>asdf</selection>'<selection>asdf</selection>'<selection>asdf</selection>'");
   }
 
-  public void testMotionInnerBlockSingleQuoteActionWithCount() {
-    typeTextInFile(parseKeys("v", "2i'"),
-                   "'as<caret>d<caret>f'asdf 'a<caret>sdf'a<caret>sdf'a<caret>sdf'");
-    myFixture.checkResult("<selection>'asdf</selection>'asdf <selection>'asdf'asdf'asdf'</selection>");
-  }
-
   public void testMotionInnerBlockTagAction() {
-    typeTextInFile(parseKeys("v", "2it"),
-                   "<asdf>qwer<asdf>qwer<asdf>qw<caret>er</asdf>qw<caret>er</asdf>qwer</asdf>\n" +
-                   "<asdf>qwer<asdf>qwer</asdf>qwer</asdf>");
-    myFixture.checkResult("<selection><asdf>qwer<asdf>qwer<asdf>qwer</asdf>qwer</asdf>qwer</asdf></selection>\n" +
-                          "<selection><asdf>qwer<asdf>qwer</asdf>qwer</asdf></selection>");
+    typeTextInFile(parseKeys("v", "it"),
+                   "<asdf1>qwer<asdf2>qwer<asdf3>qw<caret>er</asdf3>qw<caret>er</asdf2>qwer</asdf1>\n" +
+                   "<asdf1>qwer<asdf2>qw<caret>er</asdf2>qwer</asdf1>");
+    myFixture.checkResult("<asdf1>qwer<asdf2><selection>qwer<asdf3>qwer</asdf3>qwer</selection></asdf2>qwer</asdf1>\n" +
+                          "<asdf1>qwer<asdf2><selection>qwer</selection></asdf2>qwer</asdf1>");
   }
 
   public void testMotionInnerParagraphAction() {
     typeTextInFile(parseKeys("v", "3ip"),
-                   "a<caret>bcd\na<caret>bcd\n\nabcd\nabcd\n\na<caret>bcd\nabcd\n");
-    myFixture.checkResult("<selection>abcd\nabcd\n\nabcd\nabcd</selection>\n\n<selection>abcd\nabcd\n</selection>");
+                   "a<caret>bcd\na<caret>bcd\n\nabcd\nabcd\n\na<caret>bcd\nabcd\n\nabcd\nabcd\n");
+    myFixture.checkResult("<selection>abcd\nabcd\n\nabcd\nabcd</selection>\n\n<selection>abcd\nabcd\n\nabcd\nabcd</selection>\n");
   }
 
-  public void testMotionInnerSentenseAction() {
+  public void testMotionInnerSentenceAction() {
     typeTextInFile(parseKeys("v", "3is"),
                    "a<caret>bcd a<caret>bcd. abcd abcd. a<caret>bcd abcd.");
-    myFixture.checkResult("<selection>abcd abcd. abcd abcd</selection>. <selection>abcd abcd.</selection>");
+    myFixture.checkResult("<selection>abcd abcd. abcd abcd.</selection><selection> abcd abcd.</selection>");
   }
 
   public void testMotionOuterBigWordAction() {
     typeTextInFile(parseKeys("v", "aW"),
                    " a<caret>bcd<caret>e.abcde.a<caret>bcde  a<caret>bcde.abcde\n");
-    myFixture.checkResult("<selection> abcde.abcde.abcde  abcde.abcde</selection>\n");
+    myFixture.checkResult(" <selection>abcde.abcde.abcde  </selection><selection>abcde.abcde</selection>\n");
   }
 
   public void testMotionOuterWordAction() {
     typeTextInFile(parseKeys("v", "aw"),
                   " a<caret>bcd<caret>e.abcde.a<caret>bcde  a<caret>bcde.abcde");
-    myFixture.checkResult("<selection> abcde</selection>.abcde.<selection>abcde  abcde</selection>.abcde");
+    myFixture.checkResult(" <selection>abcde</selection>.abcde.<selection>abcde  abcde</selection>.abcde");
   }
 
   public void testMotionOuterBlockAngleAction() {
-    typeTextInFile(parseKeys("v", "2a["),
+    typeTextInFile(parseKeys("v", "2a<"),
                    "<asdf<asdf<a<caret>sdf>a<caret>sdf>asdf> <asdf<a<caret>sdf>asdf>");
     myFixture.checkResult("<selection><asdf<asdf<asdf>asdf>asdf></selection> <selection><asdf<asdf>asdf></selection>");
   }
@@ -372,17 +354,17 @@ public class MultipleCaretsTest extends VimTestCase {
   }
 
   public void testMotionOuterBlockTagAction() {
-    typeTextInFile(parseKeys("v", "2at"),
-                   "<asdf>qwer<asdf>qwer<asdf>q<caret>wer</asdf>q<caret>wer</asdf>qwer</asdf>\n" +
-                   "<asdf>qwer<asdf>q<caret>wer</asdf>qwer</asdf>");
-    myFixture.checkResult("<selection><asdf>qwer<asdf>qwer<asdf>qwer</asdf>qwer</asdf>qwer</asdf></selection>\n" +
-                          "<selection><asdf>qwer<asdf>qwer</asdf>qwer</asdf></selection>");
+    typeTextInFile(parseKeys("v", "at"),
+                   "<asdf1>qwer<asdf2>qwer<asdf3>qw<caret>er</asdf3>qw<caret>er</asdf2>qwer</asdf1>\n" +
+                   "<asdf1>qwer<asdf2>qw<caret>er</asdf2>qwer</asdf1>");
+    myFixture.checkResult("<asdf1>qwer<selection><asdf2>qwer<asdf3>qwer</asdf3>qwer</asdf2></selection>qwer</asdf1>\n" +
+                          "<asdf1>qwer<selection><asdf2>qwer</asdf2></selection>qwer</asdf1>");
   }
 
   public void testMotionOuterParagraphAction() {
     typeTextInFile(parseKeys("v", "2ap"),
-                   "a<caret>sdf\n\na<caret>sdf\n\nasdf");
-    myFixture.checkResult("<selection>asdf\n\nasdf\n\nasdf</selection>");
+                   "a<caret>sdf\n\na<caret>sdf\n\nasdf\n\n");
+    myFixture.checkResult("<selection>asdf\n\nasdf\n\nasdf\n</selection>\n");
   }
 
   public void testMotionOuterSentenceAction() {
@@ -390,7 +372,7 @@ public class MultipleCaretsTest extends VimTestCase {
                    "a<caret>sdf. a<caret>sdf. asdf.");
     myFixture.checkResult("<selection>asdf. asdf. asdf.</selection>");
   }
-  */
+
   // com.maddyhime.idea.vim.action.motion.text
 
   public void testMotionBigWordEndLeftAction() {
@@ -695,12 +677,158 @@ public class MultipleCaretsTest extends VimTestCase {
 
   // com.maddyhome.idea.vim.action.motion.visual
 
-  /*
-  public void testVisualExitModeAction() {
-    typeTextInFile(parseKeys("<ESC>"), "<selection>abcd</selection>  <selection>efgh</selection>");
-    myFixture.checkResult("abc<caret>d  efg<caret>h");
+  public void testVisualSwapEndsAction() {
+    typeTextInFile(parseKeys("v", "iw", "o"), "o<caret>ne <caret>two th<caret>ree\n");
+    myFixture.checkResult("<selection><caret>one</selection> <selection><caret>two</selection> <selection><caret>three</selection>\n");
   }
-  */
+
+  public void testVisualToggleCharacterMode() {
+    typeTextInFile(parseKeys("v", "e"), "o<caret>ne <caret>two th<caret>ree");
+    myFixture.checkResult("o<selection>ne</selection> <selection>two</selection> th<selection>ree</selection>");
+  }
+
+  public void testVisualToggleLineMode() {
+    typeTextInFile(parseKeys("V", "2k"),
+                   "one two\n" +
+                   "three four\n" +
+                   "fi<caret>ve six\n" +
+                   "seven eight\n" +
+                   "nine ten\n" +
+                   "eleven twelve\n" +
+                   "th<caret>irteen fourteen\n");
+    myFixture.checkResult("<selection>one two\n" +
+                          "three four\n" +
+                          "five six</selection>\n" +
+                          "seven eight\n" +
+                          "<selection>nine ten\n" +
+                          "eleven twelve\n" +
+                          "thirteen fourteen</selection>\n");
+  }
+
+  public void testVisualModeMerging() {
+    typeTextInFile(parseKeys("V", "j"),
+                   "one<caret> two\n" +
+                   "thr<caret>ee four\n" +
+                   "five six\n");
+    myFixture.checkResult("<selection>one two\n" +
+                          "three four\n" +
+                          "five six</selection>\n");
+  }
+
+  public void testVisualCharacterToVisualLineModeSwitch() {
+    typeTextInFile(parseKeys("v", "k", "V"),
+                   "one two\n" +
+                   "three fo<caret>ur\n" +
+                   "five six\n" +
+                   "seven eight\n" +
+                   "nine t<caret>en\n");
+    myFixture.checkResult("<selection>one two\n" +
+                          "three four</selection>\n" +
+                          "five six\n" +
+                          "<selection>seven eight\n" +
+                          "nine ten</selection>\n");
+  }
+
+  public void testVisualLineToVisualCharacterModeSwitch() {
+    typeTextInFile(parseKeys("V", "k", "v"),
+                   "one two\n" +
+                   "thre<caret>e four\n" +
+                   "five six\n" +
+                   "seven eight\n" +
+                   "n<caret>ine ten\n");
+    myFixture.checkResult("one <selection>two\n" +
+                          "three</selection> four\n" +
+                          "five six\n" +
+                          "s<selection>even eight\n" +
+                          "ni</selection>ne ten\n");
+  }
+
+  public void testVisualBlockDownAfterLineEndMovement() {
+    typeTextInFile(parseKeys("<C-V>$j"),
+                   "abc\ndef\n");
+    myFixture.checkResult("<selection>abc</selection>\n" +
+                          "<selection>def</selection>\n");
+  }
+
+  public void testVisualSwapEndsBlockActionInBlockMode() {
+    typeTextInFile(parseKeys("<C-V>", "2l", "j", "O"),
+                   "a<caret>abcc\n" +
+                   "ddeff\n");
+    myFixture.checkResult("a<selection><caret>abc</selection>c\n" +
+                          "d<selection>de<caret>f</selection>f\n");
+  }
+
+  public void testVisualBlockMovementAfterSwapEndsBlockAction() {
+    typeTextInFile(parseKeys("<C-V>", "2l", "j", "O", "k", "h", "j"),
+                   "aabcc\n" +
+                   "d<caret>deff\n" +
+                   "gghii\n" +
+                   "jjkll\n");
+    myFixture.checkResult("aabcc\n" +
+                          "<selection><caret>ddef</selection>f\n" +
+                          "<selection>ggh<caret>i</selection>i\n" +
+                          "jjkll\n");
+    typeText(parseKeys("j"));
+    myFixture.checkResult("aabcc\n" +
+                          "ddeff\n" +
+                          "<selection><caret>gghi</selection>i\n" +
+                          "jjkll\n");
+  }
+
+  public void testMergingSelections() {
+    typeTextInFile(parseKeys("v", "aW", "l", "h"),
+      "a<caret>bcde.abcde.abcde  ab<caret>cde.abcde\n");
+    myFixture.checkResult("<selection>abcde.abcde.abcde  abcde.abcde</selection>\n");
+
+  }
+
+  public void testVisualMotionUp() {
+    typeTextInFile(parseKeys("v", "k", "k"),
+                   "abcde\nabcde\nab<caret>cde\n");
+    myFixture.checkResult("ab<selection>cde\nabcde\nabc</selection>de\n");
+  }
+
+  public void testVisualMotionDown() {
+    typeTextInFile(parseKeys("v", "2j", "j"),
+                   "ab<caret>cde\nabcde\n\nabcde\n");
+    myFixture.checkResult("ab<selection>cde\nabcde\n\nabc</selection>de\n");
+  }
+
+  public void testVisualLineMotionUp() {
+    typeTextInFile(parseKeys("V", "2k", "k"),
+                   "abcde\nabcde\n\nab<caret>cde\nabcde\n");
+    myFixture.checkResult("<selection>ab<caret>cde\nabcde\n\nabcde</selection>\nabcde\n");
+  }
+
+  public void testVisualLineMotionDown() {
+    typeTextInFile(parseKeys("V", "2j", "j"),
+                   "ab<caret>cde\nabcde\n\nabcde\nabcde\n");
+    myFixture.checkResult("<selection>abcde\nabcde\n\nab<caret>cde</selection>\nabcde\n");
+  }
+
+  public void testVisualCharacterUpMerging() {
+    typeTextInFile(parseKeys("v", "2k", "k"),
+                   "abcde\nabcde\n\nabc<caret>de\nab<caret>cde\n");
+    myFixture.checkResult("abc<selection><caret>de\nabcde\n\nabcde\nabc</selection>de\n");
+  }
+
+  public void testVisualCharacterDownMerging() {
+    typeTextInFile(parseKeys("v", "2j", "j"),
+                   "abc<caret>de\nab<caret>cde\n\nabcde\nabcde\n");
+    myFixture.checkResult("abc<selection>de\nabcde\n\nabcde\nab<caret>c</selection>de\n");
+  }
+
+  public void testVisualLineUpMerging() {
+    typeTextInFile(parseKeys("V", "2k", "k"),
+                   "abcde\nabcde\n\nabc<caret>de\nab<caret>cde\n");
+    myFixture.checkResult("<selection>abc<caret>de\nabcde\n\nabcde\nabcde</selection>\n");
+  }
+
+  public void testVisualLineDownMerging() {
+    typeTextInFile(parseKeys("V", "2j", "j"),
+                   "abc<caret>de\nab<caret>cde\n\nabcde\nabcde\n");
+    myFixture.checkResult("<selection>abcde\nabcde\n\nabcde\nab<caret>cde</selection>\n");
+  }
 
   // com.maddyhome.idea.vim.action.change.insert
 
