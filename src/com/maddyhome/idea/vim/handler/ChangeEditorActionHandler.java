@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
@@ -29,14 +30,50 @@ import org.jetbrains.annotations.Nullable;
 /**
  */
 public abstract class ChangeEditorActionHandler extends EditorActionHandlerBase {
+  private boolean myIsMulticaretChangeAction = false;
+
+  public ChangeEditorActionHandler(boolean runForEachCaret) {
+    super(false);
+    myIsMulticaretChangeAction = runForEachCaret;
+  }
+
+  public ChangeEditorActionHandler() {
+    this(false);
+  }
+
+  @Override
   protected final boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-    boolean worked = execute(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+    // Here we have to save the last changed command. This should be done separately for each
+    // call of the task, not for each caret. Currently there is no way to schedule any action
+    // to be worked after each task. So here we override the deprecated execute function which
+    // is called for each task and call the handlers for each caret, if implemented.
+
+    boolean worked;
+    if (myIsMulticaretChangeAction) {
+      worked = true;
+      for (Caret caret : editor.getCaretModel().getAllCarets()) {
+        if (!execute(editor, caret, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument())) {
+          worked = false;
+          break;
+        }
+      }
+    }
+    else {
+      worked = execute(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+    }
     if (worked) {
       CommandState.getInstance(editor).saveLastChangeCommand(cmd);
     }
     return worked;
   }
 
-  public abstract boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
-                                  @Nullable Argument argument);
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
+                         @Nullable Argument argument) {
+    return execute(editor, editor.getCaretModel().getPrimaryCaret(), context, count, rawCount, argument);
+  }
+
+  public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                         int rawCount, @Nullable Argument argument) {
+    return execute(editor, context, count, rawCount, argument);
+  }
 }
