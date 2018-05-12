@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.action.motion.object;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.TextObjectAction;
@@ -34,11 +35,19 @@ public class MotionOuterBlockTagAction extends TextObjectAction {
   }
 
   private static class Handler extends TextObjectActionHandler {
+    public Handler() {
+      super(true);
+    }
+
     @Override
     @Nullable
-    public TextRange getRange(@NotNull Editor editor, @Nullable DataContext context, int count, int rawCount,
+    public TextRange getRange(@NotNull Editor editor,
+                              @NotNull Caret caret,
+                              @NotNull DataContext context,
+                              int count,
+                              int rawCount,
                               @Nullable Argument argument) {
-      return VimPlugin.getMotion().getBlockTagRange(editor, true);
+      return VimPlugin.getMotion().getBlockTagRange(editor, caret, true);
     }
   }
 }

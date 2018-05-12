@@ -108,11 +108,11 @@ public class SearchHelper {
   }
 
   @Nullable
-  public static TextRange findBlockRange(@NotNull Editor editor, char type, int count, boolean isOuter) {
+  public static TextRange findBlockRange(@NotNull Editor editor, @NotNull Caret caret, char type, int count, boolean isOuter) {
     CharSequence chars = editor.getDocument().getCharsSequence();
-    int pos = editor.getCaretModel().getOffset();
-    int start = editor.getSelectionModel().getSelectionStart();
-    int end = editor.getSelectionModel().getSelectionEnd();
+    int pos = caret.getOffset();
+    int start = caret.getSelectionStart();
+    int end = caret.getSelectionEnd();
     if (start != end) {
       pos = Math.min(start, end);
     }
@@ -354,8 +354,8 @@ public class SearchHelper {
   }
 
   @Nullable
-  public static TextRange findBlockTagRange(@NotNull Editor editor, boolean isOuter) {
-    final int cursorOffset = editor.getCaretModel().getOffset();
+  public static TextRange findBlockTagRange(@NotNull Editor editor, @NotNull Caret caret, boolean isOuter) {
+    final int cursorOffset = caret.getOffset();
     int pos = cursorOffset;
     final CharSequence sequence = editor.getDocument().getCharsSequence();
     while (true) {
@@ -429,9 +429,9 @@ public class SearchHelper {
 
 
   @Nullable
-  public static TextRange findBlockQuoteInLineRange(@NotNull Editor editor, char quote, boolean isOuter) {
+  public static TextRange findBlockQuoteInLineRange(@NotNull Editor editor, @NotNull Caret caret, char quote, boolean isOuter) {
     final CharSequence chars = editor.getDocument().getCharsSequence();
-    final int pos = editor.getCaretModel().getOffset();
+    final int pos = caret.getOffset();
     if (chars.charAt(pos) == '\n') {
       return null;
     }
@@ -1647,12 +1647,12 @@ public class SearchHelper {
   }
 
   @NotNull
-  public static TextRange findSentenceRange(@NotNull Editor editor, int count, boolean isOuter) {
+  public static TextRange findSentenceRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter) {
     CharSequence chars = editor.getDocument().getCharsSequence();
     int max = EditorHelper.getFileSize(editor);
-    int offset = editor.getCaretModel().getOffset();
-    int ssel = editor.getSelectionModel().getSelectionStart();
-    int esel = editor.getSelectionModel().getSelectionEnd();
+    int offset = caret.getOffset();
+    int ssel = caret.getSelectionStart();
+    int esel = caret.getSelectionEnd();
     if (Math.abs(esel - ssel) > 1) {
       int start;
       int end;
@@ -1781,8 +1781,8 @@ public class SearchHelper {
   }
 
   @Nullable
-  public static TextRange findParagraphRange(@NotNull Editor editor, int count, boolean isOuter) {
-    int line = editor.getCaretModel().getLogicalPosition().line;
+  public static TextRange findParagraphRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter) {
+    int line = caret.getLogicalPosition().line;
     int maxline = EditorHelper.getLineCount(editor);
     if (logger.isDebugEnabled()) logger.debug("starting on line " + line);
     int sline;
@@ -1794,10 +1794,10 @@ public class SearchHelper {
         sline = line;
       }
       else {
-        sline = findNextParagraphLine(editor, -1, true);
+        sline = findNextParagraphLine(editor, caret, -1, true);
       }
 
-      eline = findNextParagraphLine(editor, count, true);
+      eline = findNextParagraphLine(editor, caret, count, true);
       if (eline < 0) {
         return null;
       }
@@ -1827,7 +1827,7 @@ public class SearchHelper {
     else {
       sline = line;
       if (!EditorHelper.isLineEmpty(editor, sline, true)) {
-        sline = findNextParagraphLine(editor, -1, true);
+        sline = findNextParagraphLine(editor, caret,-1, true);
         if (EditorHelper.isLineEmpty(editor, sline, true)) {
           sline++;
         }
