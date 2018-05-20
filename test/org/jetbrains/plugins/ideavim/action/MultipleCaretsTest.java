@@ -836,9 +836,15 @@ public class MultipleCaretsTest extends VimTestCase {
                    "a<caret>bcde\n" +
                    "<caret>abcde\n" +
                    "abcd<caret>e\n");
-    myFixture.checkResult("acde\n" +
-                          "bcde\n" +
+    myFixture.checkResult("a<caret>cde\n" +
+                          "<caret>bcde\n" +
                           "abc<caret>d\n");
+  }
+
+  public void testDeleteCharacterActionOrder() {
+    typeTextInFile(parseKeys("<Del>"),
+                   "ab<caret>c<caret>d<caret>e abcde\n");
+    myFixture.checkResult("ab<caret> abcde\n");
   }
 
   public void testDeleteCharacterLeftAction() {
@@ -851,14 +857,26 @@ public class MultipleCaretsTest extends VimTestCase {
                           "a<caret>e\n");
   }
 
+  public void testDeleteCharacterLeftCaretMerging() {
+    typeTextInFile(parseKeys("3X"),
+                   "a<caret>bc<caret>def<caret>ghij<caret>klmn<caret>op<caret>q");
+    myFixture.checkResult("gq");
+  }
+
   public void testDeleteCharacterRightAction() {
     typeTextInFile(parseKeys("3x"),
                    "a<caret>bcde\n" +
                    "<caret>abcde\n" +
                    "abcd<caret>e\n");
-    myFixture.checkResult("ae\n" +
-                          "de\n" +
+    myFixture.checkResult("a<caret>e\n" +
+                          "<caret>de\n" +
                           "abc<caret>d\n");
+  }
+
+  public void testDeleteCharacterRightCaretMerging() {
+    typeTextInFile(parseKeys("4x"),
+                   "o<caret>ne <caret>two <caret>three four");
+    myFixture.checkResult("o<caret> four");
   }
 
   public void testDeleteEndOfLineAction() {
@@ -867,17 +885,31 @@ public class MultipleCaretsTest extends VimTestCase {
                    "abcde\n" +
                    "abc<caret>de\n" +
                    "<caret>abcde\n" +
-                   "ab<caret>cde");
+                   "ab<caret>cde\n" +
+                   "ab<caret>cd<caret>e\n");
     myFixture.checkResult("abc<caret>d\n" +
                           "abcde\n" +
                           "ab<caret>c\n" +
                           "<caret>\n" +
-                          "a<caret>b");
+                          "a<caret>b\n" +
+                          "a<caret>b\n");
+  }
+
+  public void testDeleteEndOfLineActionWithCount() {
+    typeTextInFile(parseKeys("3D"),
+                   "ab<caret>cde\n" +
+                   "abcde\n" +
+                   "abcde\n" +
+                   "abcd<caret>e\n" +
+                   "a<caret>bcd<caret>e\n" +
+                   "abc<caret>de\n");
+    myFixture.checkResult("ab\n" +
+                          "abcd\n");
   }
 
   public void testDeleteJoinLinesAction() {
     typeTextInFile(parseKeys("gJ"),
-                   "ab<caret>cd<caret>e\n" +
+                   "ab<caret>cde\n" +
                    "abcde\n" +
                    "ab<caret>cde\n" +
                    "abcd<caret>e\n" +
@@ -889,9 +921,16 @@ public class MultipleCaretsTest extends VimTestCase {
                           "abcde<caret>  abcde\n");
   }
 
-  public void testDeleteJoinLinesSpacesAction() {
+  public void testDeleteJoinLinesSimpleAction() {
     typeTextInFile(parseKeys("gJ"),
-                   "ab<caret>cd<caret>e\n" +
+                   "a<caret>bcde\n" +
+                   "abcde\n");
+    myFixture.checkResult("abcde<caret>abcde\n");
+  }
+
+  public void testDeleteJoinLinesSpacesAction() {
+    typeTextInFile(parseKeys("J"),
+                   "ab<caret>cde\n" +
                    "abcde\n" +
                    "ab<caret>cde\n" +
                    "abcd<caret>e\n" +
@@ -925,7 +964,7 @@ public class MultipleCaretsTest extends VimTestCase {
 
   public void testDeleteLineAction() {
     typeTextInFile(parseKeys("d3d"),
-                   "ab<caret>c<caret>de\n" +
+                   "abc<caret>de\n" +
                    "abcde\n" +
                    "abcde\n" +
                    "abcde\n" +
@@ -943,22 +982,22 @@ public class MultipleCaretsTest extends VimTestCase {
                    "    if (bar<caret> || b != 0) {\n" +
                    "      return a;\n" +
                    "    }\n" +
-                   "    else {" +
-                   "      return b;" +
-                   "    }" +
-                   "  }" +
-                   "}");
+                   "    else {\n" +
+                   "      return b;\n" +
+                   "    }\n" +
+                   "  }\n" +
+                   "}\n");
     myFixture.checkResult("public class Foo {\n" +
                    "  int foo(int a, int b) {\n" +
                    "    boolean bar = (a < 0 && (b < 0 || a > 0)<caret>);\n" +
                    "    if (bar<caret>) {\n" +
                    "      return a;\n" +
                    "    }\n" +
-                   "    else {" +
-                   "      return b;" +
-                   "    }" +
-                   "  }" +
-                   "}");
+                   "    else {\n" +
+                   "      return b;\n" +
+                   "    }\n" +
+                   "  }\n" +
+                   "}\n");
   }
 
   public void testDeleteVisualAction() {
@@ -973,6 +1012,18 @@ public class MultipleCaretsTest extends VimTestCase {
                           "abcd<caret>e</selection>\n");
     typeText(parseKeys("d"));
     myFixture.checkResult("abc<caret>c\n");
+  }
+
+  public void testDeleteVisualActionWithMultipleCaretsLeft() {
+    typeTextInFile(parseKeys("v", "fd", "d"),
+                   "a<caret>bcde\n" +
+                   "abcde\n" +
+                   "<caret>abcde\n" +
+                   "ab<caret>cde\n");
+    myFixture.checkResult("a<caret>e\n" +
+                          "abcde\n" +
+                          "<caret>e\n" +
+                          "ab<caret>e\n");
   }
 
   public void testDeleteVisualLinesAction() {

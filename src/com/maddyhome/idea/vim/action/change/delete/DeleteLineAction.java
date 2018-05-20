@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.action.change.delete;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -35,8 +36,14 @@ public class DeleteLineAction extends EditorAction {
   }
 
   private static class Handler extends ChangeEditorActionHandler {
-    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
-      return VimPlugin.getChange().deleteLine(editor, count);
+    public Handler() {
+      super(true, CaretOrder.DECREASING_OFFSET);
+    }
+
+    @Override
+    public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                           int rawCount, @Nullable Argument argument) {
+      return VimPlugin.getChange().deleteLine(editor, caret, count);
     }
   }
 }

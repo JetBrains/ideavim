@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
@@ -27,18 +28,44 @@ import com.maddyhome.idea.vim.command.CommandState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 /**
  */
 public abstract class ChangeEditorActionHandler extends EditorActionHandlerBase {
-  private boolean myIsMulticaretChangeAction = false;
+  /**
+   * This represents the order in which carets are given to the handlers.
+   */
+  public enum CaretOrder {
+    /**
+     * Native order in which carets are given in {@link CaretModel#getAllCarets()}
+     */
+    NATIVE,
 
-  public ChangeEditorActionHandler(boolean runForEachCaret) {
+    /**
+     * Carets are ordered by offset, increasing
+     */
+    INCREASING_OFFSET,
+
+    /**
+     * Carets are ordered by offset, decreasing
+     */
+    DECREASING_OFFSET
+  }
+
+  private boolean myIsMulticaretChangeAction = false;
+  private CaretOrder myCaretOrder;
+
+  public ChangeEditorActionHandler(boolean runForEachCaret, CaretOrder caretOrder) {
     super(false);
     myIsMulticaretChangeAction = runForEachCaret;
+    myCaretOrder = caretOrder;
   }
 
   public ChangeEditorActionHandler() {
-    this(false);
+    this(false, CaretOrder.NATIVE);
   }
 
   @Override
@@ -51,10 +78,17 @@ public abstract class ChangeEditorActionHandler extends EditorActionHandlerBase 
     boolean worked;
     if (myIsMulticaretChangeAction) {
       worked = true;
-      for (Caret caret : editor.getCaretModel().getAllCarets()) {
+      List<Caret> carets = editor.getCaretModel().getAllCarets();
+      if (myCaretOrder == CaretOrder.INCREASING_OFFSET) {
+        carets.sort(Comparator.comparingInt(Caret::getOffset));
+      }
+      else if (myCaretOrder == CaretOrder.DECREASING_OFFSET) {
+        carets.sort(Comparator.comparingInt(Caret::getOffset));
+        Collections.reverse(carets);
+      }
+      for (Caret caret : carets) {
         if (!execute(editor, caret, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument())) {
           worked = false;
-          break;
         }
       }
     }

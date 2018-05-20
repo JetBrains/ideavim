@@ -334,6 +334,26 @@ public class MotionGroup {
   @Nullable
   public static TextRange getMotionRange(@NotNull Editor editor, DataContext context, int count, int rawCount,
                                          @NotNull Argument argument, boolean incNewline) {
+    return getMotionRange(editor, editor.getCaretModel().getPrimaryCaret(), context, count, rawCount, argument,
+                          incNewline);
+  }
+
+  /**
+   * This helper method calculates the complete range a motion will move over taking into account whether
+   * the motion is FLAG_MOT_LINEWISE or FLAG_MOT_CHARACTERWISE (FLAG_MOT_INCLUSIVE or FLAG_MOT_EXCLUSIVE).
+   *
+   * @param editor     The editor the motion takes place in
+   * @param caret      The caret the motion takes place on
+   * @param context    The data context
+   * @param count      The count applied to the motion
+   * @param rawCount   The actual count entered by the user
+   * @param argument   Any argument needed by the motion
+   * @param incNewline True if to include newline
+   * @return The motion's range
+   */
+  @Nullable
+  public static TextRange getMotionRange(@NotNull Editor editor, @NotNull Caret caret, DataContext context, int count,
+                                         int rawCount, @NotNull Argument argument, boolean incNewline) {
     final Command cmd = argument.getMotion();
     if (cmd == null) {
       return null;
@@ -347,10 +367,10 @@ public class MotionGroup {
       MotionEditorAction action = (MotionEditorAction)cmd.getAction();
 
       // This is where we are now
-      start = editor.getCaretModel().getOffset();
+      start = caret.getOffset();
 
       // Execute the motion (without moving the cursor) and get where we end
-      end = action.getOffset(editor, context, cnt, raw, cmd.getArgument());
+      end = action.getOffset(editor, caret, context, cnt, raw, cmd.getArgument());
 
       // Invalid motion
       if (end == -1) {
@@ -360,7 +380,7 @@ public class MotionGroup {
     else if (cmd.getAction() instanceof TextObjectAction) {
       TextObjectAction action = (TextObjectAction)cmd.getAction();
 
-      TextRange range = action.getRange(editor, context, cnt, raw, cmd.getArgument());
+      TextRange range = action.getRange(editor, caret, context, cnt, raw, cmd.getArgument());
 
       if (range == null) {
         return null;
@@ -1142,6 +1162,10 @@ public class MotionGroup {
     final int lastVisualLineColumn = EditorUtil.getLastVisualLineColumnNumber(editor, visualPosition.line);
     final VisualPosition visualEndOfLine = new VisualPosition(visualPosition.line, lastVisualLineColumn, true);
     return moveCaretToLineEnd(editor, editor.visualToLogicalPosition(visualEndOfLine).line, true);
+  }
+
+  public int moveCaretToLineEnd(@NotNull Editor editor, @NotNull Caret caret) {
+    return moveCaretToLineEnd(editor, caret.getLogicalPosition().line, true);
   }
 
   public int moveCaretToLineEnd(@NotNull Editor editor, int line, boolean allowPastEnd) {
