@@ -88,6 +88,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
     putKeyMapping(MappingMode.N, parseKeys("cs"), parseKeys("<Plug>CSurround"), true);
     putKeyMapping(MappingMode.N, parseKeys("ds"), parseKeys("<Plug>DSurround"), true);
     putKeyMapping(MappingMode.VO, parseKeys("S"), parseKeys("<Plug>VSurround"), true);
+    setOperatorFunction(new Operator());
   }
 
   @Nullable
@@ -133,7 +134,6 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
   private static class YSurroundHandler implements VimExtensionHandler {
     @Override
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
-      setOperatorFunction(new Operator());
       executeNormal(parseKeys("g@"), editor);
     }
   }
