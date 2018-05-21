@@ -36,7 +36,7 @@ public class InsertAfterLineEndAction extends EditorAction {
 
   private static class Handler extends ChangeEditorActionHandler {
     public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
-      VimPlugin.getChange().insertAfterLineEnd(editor, context);
+      VimPlugin.getChange().insertAfterLineEnd(editor, editor.getCaretModel().getPrimaryCaret(), context);
 
       return true;
     }

@@ -58,6 +58,9 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
 
     if (logger.isDebugEnabled()) logger.debug("execute, cmd=" + cmd);
 
+    EditorData.setChangeSwitchMode(editor, null);
+    EditorData.setWasVisualBlockMode(editor, CommandState.inVisualBlockMode(editor));
+
     boolean willRunForEachCaret = myRunForEachCaret && !CommandState.inVisualBlockMode(editor);
 
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
@@ -91,6 +94,11 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
 
     runnable.setRes(res);
     runnable.finish();
+
+    CommandState.Mode toSwitch = EditorData.getChangeSwitchMode(editor);
+    if (toSwitch != null) {
+      VimPlugin.getChange().processPostChangeModeSwitch(editor, context, toSwitch);
+    }
 
     return res;
   }
@@ -130,7 +138,7 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
       VisualChange change = null;
       TextRange res = null;
       if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-        if (CommandState.inVisualBlockMode(editor)) {
+        if (!myRunForEachCaret) {
           res = VimPlugin.getMotion().getVisualRange(editor);
         }
         else {
