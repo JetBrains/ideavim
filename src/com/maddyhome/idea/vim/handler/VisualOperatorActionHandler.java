@@ -29,6 +29,8 @@ import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.CaretData;
+import com.maddyhome.idea.vim.helper.EditorData;
+import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,14 +39,16 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class VisualOperatorActionHandler extends EditorActionHandlerBase {
   private final boolean myRunForEachCaret;
+  private final CaretOrder myCaretOrder;
 
-  public VisualOperatorActionHandler(boolean runForEachCaret) {
+  public VisualOperatorActionHandler(boolean runForEachCaret, CaretOrder caretOrder) {
     super(false);
     myRunForEachCaret = runForEachCaret;
+    myCaretOrder = caretOrder;
   }
 
   public VisualOperatorActionHandler() {
-    this(false);
+    this(false, CaretOrder.NATIVE);
   }
 
   @Override
@@ -67,7 +71,7 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
     boolean res;
     if (willRunForEachCaret) {
       res = true;
-      for (Caret caret : editor.getCaretModel().getAllCarets()) {
+      for (Caret caret : EditorHelper.getOrderedCaretsList(editor, myCaretOrder)) {
         TextRange range = CaretData.getVisualTextRange(caret);
         if (range == null) {
           return false;
@@ -144,8 +148,8 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
 
     public void start() {
       logger.debug("start");
-
       wasRepeat = CommandState.getInstance(editor).getMode() == CommandState.Mode.REPEAT;
+      EditorData.setKeepingVisualOperatorAction(editor, (cmd.getFlags() & Command.FLAG_EXIT_VISUAL) == 0);
 
       if (myRunForEachCaret) {
         for (Caret caret : editor.getCaretModel().getAllCarets()) {
@@ -216,6 +220,8 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
       else {
         finishForCaret(editor.getCaretModel().getPrimaryCaret());
       }
+
+      EditorData.setKeepingVisualOperatorAction(editor, false);
     }
 
     private final Command cmd;

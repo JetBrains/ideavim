@@ -23,7 +23,6 @@ import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.editor.ex.DocumentEx;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
-import com.intellij.openapi.editor.impl.view.IterationState;
 import com.intellij.openapi.fileEditor.*;
 import com.intellij.openapi.fileEditor.impl.EditorTabbedContainer;
 import com.intellij.openapi.fileEditor.impl.EditorWindow;
@@ -49,7 +48,6 @@ import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
-import com.sun.jna.platform.unix.X11;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -1343,7 +1341,7 @@ public class MotionGroup {
     moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset, forceKeepVisual);
   }
 
-  private static void moveCaret(@NotNull Editor editor, @NotNull Caret caret, int offset, boolean forceKeepVisual) {
+  public static void moveCaret(@NotNull Editor editor, @NotNull Caret caret, int offset, boolean forceKeepVisual) {
     if (offset >= 0 && offset <= editor.getDocument().getTextLength()) {
       final boolean keepVisual = forceKeepVisual || keepVisual(editor);
       if (caret.getOffset() != offset) {
@@ -1721,6 +1719,7 @@ public class MotionGroup {
   }
 
   public void resetVisual(@NotNull final Editor editor, final boolean removeSelection) {
+    final boolean wasVisualBlock = CommandState.inVisualBlockMode(editor);
     final SelectionType selectionType = SelectionType.fromSubMode(CommandState.getInstance(editor).getSubMode());
     EditorData.setLastSelectionType(editor, selectionType);
     final TextRange visualMarks = VimPlugin.getMark().getVisualSelectionMarks(editor);
@@ -1728,8 +1727,14 @@ public class MotionGroup {
       EditorData.setLastVisualRange(editor, visualMarks);
     }
     if (removeSelection) {
-      editor.getSelectionModel().removeSelection();
-      editor.getCaretModel().removeSecondaryCarets();
+      if (!EditorData.isKeepingVisualOperatorAction(editor)) {
+        for (Caret caret : editor.getCaretModel().getAllCarets()) {
+          caret.removeSelection();
+        }
+      }
+      if (wasVisualBlock) {
+        editor.getCaretModel().removeSecondaryCarets();
+      }
     }
     CommandState.getInstance(editor).setSubMode(CommandState.SubMode.NONE);
   }

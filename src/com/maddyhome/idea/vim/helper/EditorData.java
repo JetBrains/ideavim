@@ -26,13 +26,10 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.LightVirtualFile;
-import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
-import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
-import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.ui.ExOutputPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -316,6 +313,27 @@ public class EditorData {
   }
 
   /**
+   * Checks whether a keeping visual mode visual operator action is performed on editor.
+   */
+  public static boolean isKeepingVisualOperatorAction(@NotNull Editor editor) {
+    Boolean res = editor.getUserData(IS_KEEPING_VISUAL_OPERATOR_ACTION);
+
+    if (res == null) {
+      return false;
+    }
+    else {
+      return res;
+    }
+  }
+
+  /**
+   * Sets the keeping visual mode visual operator action flag for the editor.
+   */
+  public static void setKeepingVisualOperatorAction(@NotNull Editor editor, boolean value) {
+    editor.putUserData(IS_KEEPING_VISUAL_OPERATOR_ACTION, value);
+  }
+
+  /**
    * This is a static helper - no instances needed
    */
   private EditorData() {
@@ -338,6 +356,7 @@ public class EditorData {
   private static final Key<Integer> VISUAL_BLOCK_END = new Key<>("visualBlockEnd");
   private static final Key<Integer> VISUAL_BLOCK_OFFSET = new Key<>("visualBlockOffset");
   private static final Key<Boolean> IGNORE_NEXT_MOVE = new Key<>("shouldIgnoreNextMove");
+  private static final Key<Boolean> IS_KEEPING_VISUAL_OPERATOR_ACTION = new Key<>("isKeepingVisualOperatorAction");
 
   private static Key CONSOLE_VIEW_IN_EDITOR_VIEW = Key.create("CONSOLE_VIEW_IN_EDITOR_VIEW");
 

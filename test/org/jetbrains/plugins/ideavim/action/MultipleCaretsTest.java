@@ -1045,8 +1045,21 @@ public class MultipleCaretsTest extends VimTestCase {
                    "abcd<caret>e\n" +
                    "abcde\n" +
                    "abcde\n");
-    myFixture.checkResult("<caret>a\n" +
-                          "abc<caret>d\n");
+    myFixture.checkResult("<caret>abcd<caret>e\n");
+  }
+
+  public void testDeleteVisualBlockLineEndAction() {
+    typeTextInFile(parseKeys("<C-V>", "2j", "2l", "D"),
+                   "abcde\n" +
+                   "a<caret>bcde\n" +
+                   "abcde\n" +
+                   "abcde\n" +
+                   "abcde\n");
+    myFixture.checkResult("abcde\n" +
+                          "<caret>a\n" +
+                          "a\n" +
+                          "a\n" +
+                          "abcde\n");
   }
 
   // com.maddyhome.idea.vim.action.change.insert

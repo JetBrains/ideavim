@@ -20,11 +20,11 @@ package com.maddyhome.idea.vim.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,26 +35,6 @@ import java.util.List;
 /**
  */
 public abstract class ChangeEditorActionHandler extends EditorActionHandlerBase {
-  /**
-   * This represents the order in which carets are given to the handlers.
-   */
-  public enum CaretOrder {
-    /**
-     * Native order in which carets are given in {@link CaretModel#getAllCarets()}
-     */
-    NATIVE,
-
-    /**
-     * Carets are ordered by offset, increasing
-     */
-    INCREASING_OFFSET,
-
-    /**
-     * Carets are ordered by offset, decreasing
-     */
-    DECREASING_OFFSET
-  }
-
   private boolean myIsMulticaretChangeAction = false;
   private CaretOrder myCaretOrder;
 
@@ -78,14 +58,7 @@ public abstract class ChangeEditorActionHandler extends EditorActionHandlerBase 
     boolean worked;
     if (myIsMulticaretChangeAction) {
       worked = true;
-      List<Caret> carets = editor.getCaretModel().getAllCarets();
-      if (myCaretOrder == CaretOrder.INCREASING_OFFSET) {
-        carets.sort(Comparator.comparingInt(Caret::getOffset));
-      }
-      else if (myCaretOrder == CaretOrder.DECREASING_OFFSET) {
-        carets.sort(Comparator.comparingInt(Caret::getOffset));
-        Collections.reverse(carets);
-      }
+      @NotNull List<Caret> carets = EditorHelper.getOrderedCaretsList(editor, myCaretOrder);
       for (Caret caret : carets) {
         if (!execute(editor, caret, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument())) {
           worked = false;

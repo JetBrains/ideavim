@@ -807,18 +807,20 @@ public class ChangeGroup {
    * Joins all the lines selected by the current visual selection.
    *
    * @param editor The editor to join the lines in
+   * @param caret  The caret to be moved after joining
    * @param range  The range of the visual selection
    * @param spaces If true the joined lines will have one space between them and any leading space on the second line
    *               will be removed. If false, only the newline is removed to join the lines.
    * @return true if able to join the lines, false if not
    */
-  public boolean deleteJoinRange(@NotNull Editor editor, @NotNull TextRange range, boolean spaces) {
+  public boolean deleteJoinRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull TextRange range,
+                                 boolean spaces) {
     int startLine = editor.offsetToLogicalPosition(range.getStartOffset()).line;
     int endLine = editor.offsetToLogicalPosition(range.getEndOffset()).line;
     int count = endLine - startLine + 1;
     if (count < 2) count = 2;
 
-    return deleteJoinNLines(editor, editor.getCaretModel().getPrimaryCaret(), startLine, count, spaces);
+    return deleteJoinNLines(editor, caret, startLine, count, spaces);
   }
 
   /**
@@ -835,13 +837,13 @@ public class ChangeGroup {
   private boolean deleteJoinNLines(@NotNull Editor editor, @NotNull Caret caret, int startLine, int count,
                                    boolean spaces) {
     // start my moving the cursor to the very end of the first line
-    MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, startLine, true));
+    MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, startLine, true), true);
     for (int i = 1; i < count; i++) {
       int start = VimPlugin.getMotion().moveCaretToLineEnd(editor, caret);
       int trailingWhitespaceStart = VimPlugin.getMotion().moveCaretToLineEndSkipLeadingOffset(editor, caret, 0);
       boolean hasTrailingWhitespace = start != trailingWhitespaceStart + 1;
 
-      MotionGroup.moveCaret(editor, caret, start);
+      MotionGroup.moveCaret(editor, caret, start, true);
       int offset;
       if (spaces) {
         offset = VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, 1);
@@ -852,7 +854,7 @@ public class ChangeGroup {
       deleteText(editor, new TextRange(caret.getOffset(), offset), null);
       if (spaces && !hasTrailingWhitespace) {
         insertText(editor, caret, " ");
-        MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -1, true));
+        MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -1, true), true);
       }
     }
 
@@ -969,7 +971,7 @@ public class ChangeGroup {
       else {
         pos = EditorHelper.normalizeOffset(editor, range.getStartOffset(), isChange);
       }
-      MotionGroup.moveCaret(editor, caret, pos);
+      MotionGroup.moveCaret(editor, caret, pos, true);
     }
     return res;
   }
