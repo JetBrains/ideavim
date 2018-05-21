@@ -21,9 +21,11 @@ package com.maddyhome.idea.vim.handler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -55,6 +57,8 @@ public abstract class ChangeEditorActionHandler extends EditorActionHandlerBase 
     // to be worked after each task. So here we override the deprecated execute function which
     // is called for each task and call the handlers for each caret, if implemented.
 
+    EditorData.setChangeSwitchMode(editor, null);
+
     boolean worked;
     if (myIsMulticaretChangeAction) {
       worked = true;
@@ -71,6 +75,12 @@ public abstract class ChangeEditorActionHandler extends EditorActionHandlerBase 
     if (worked) {
       CommandState.getInstance(editor).saveLastChangeCommand(cmd);
     }
+
+    CommandState.Mode toSwitch = EditorData.getChangeSwitchMode(editor);
+    if (toSwitch != null) {
+      VimPlugin.getChange().processPostChangeModeSwitch(editor, context, toSwitch);
+    }
+
     return worked;
   }
 

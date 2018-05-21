@@ -19,10 +19,12 @@
 package com.maddyhome.idea.vim.action.change.change;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
 import org.jetbrains.annotations.NotNull;
@@ -36,9 +38,16 @@ public class ChangeCaseToggleMotionAction extends EditorAction {
   }
 
   private static class Handler extends ChangeEditorActionHandler {
-    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
-      return argument != null && VimPlugin.getChange().changeCaseMotion(editor, context, count, rawCount,
-                                                                        CharacterHelper.CASE_TOGGLE, argument);
+    public Handler() {
+      super(true, CaretOrder.DECREASING_OFFSET);
+    }
+
+    @Override
+    public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                           int rawCount, @Nullable Argument argument) {
+      return argument != null &&
+             VimPlugin.getChange()
+               .changeCaseMotion(editor, caret, context, count, rawCount, CharacterHelper.CASE_TOGGLE, argument);
     }
   }
 }

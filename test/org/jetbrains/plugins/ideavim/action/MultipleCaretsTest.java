@@ -2,6 +2,7 @@ package org.jetbrains.plugins.ideavim.action;
 
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.command.CommandState;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -827,6 +828,178 @@ public class MultipleCaretsTest extends VimTestCase {
     typeTextInFile(parseKeys("V", "2j", "j"),
                    "abc<caret>de\nab<caret>cde\n\nabcde\nabcde\n");
     myFixture.checkResult("<selection>abcde\nabcde\n\nabcde\nab<caret>cde</selection>\n");
+  }
+
+  // com.maddyhome.idea.vim.action.change.change
+
+  public void testAutoIndentLinesVisualAction() {
+    configureByJavaText("<caret>public class Foo {\n" +
+                        "private boolean x;\n" +
+                        "                         private boolean y;\n" +
+                        "private boolean z;\n" +
+                        "<caret>public void foo() {\n" +
+                        "x = true; // This will be indented\n" +
+                        "}\n" +
+                        "public void bar() {\n" +
+                        "y = true; // And this will not\n" +
+                        "}\n" +
+                        "}\n");
+    typeText(parseKeys("V2j="));
+    myFixture.checkResult("<caret>public class Foo {\n" +
+                          "    private boolean x;\n" +
+                          "    private boolean y;\n" +
+                          "private boolean z;\n" +
+                          "    public void foo() {\n" +
+                          "        x = true; // This will be indented\n" +
+                          "    }\n" +
+                          "public void bar() {\n" +
+                          "y = true; // And this will not\n" +
+                          "}\n" +
+                          "}\n");
+  }
+
+  public void testChangeCaseLowerMotionAction() {
+    typeTextInFile(parseKeys("gu2w"),
+                   "O<caret>NcE thIs <caret>TEXt wIlL n<caret>Ot lOoK s<caret>O rIdIcuLoUs\n");
+    myFixture.checkResult("O<caret>nce this <caret>text will n<caret>ot look s<caret>o ridiculous\n");
+  }
+
+  public void testChangeCaseLowerVisualAction() {
+    typeTextInFile(parseKeys("v2wu"),
+                   "O<caret>NcE thIs <caret>TEXt wIlL n<caret>Ot lOoK s<caret>O rIdIcuLoUs\n");
+    myFixture.checkResult("O<caret>nce this text will n<caret>ot look s<caret>o ridiculous\n");
+  }
+
+  public void testChangeCaseToggleCharacterAction() {
+    typeTextInFile(parseKeys("5~"),
+                   "OnE t<caret>Wo <caret>ThReE<caret> fOuR fIvE\n");
+    myFixture.checkResult("OnE twO Th<caret>rEe<caret> FoUr<caret> fIvE\n");
+  }
+
+  public void testChangeCaseToggleMotionAction() {
+    typeTextInFile(parseKeys("g~e"),
+                   "<caret>capitalize <caret>UNCAPITALIZE<caret> <caret>sTaY\n");
+    myFixture.checkResult("<caret>CAPITALIZE <caret>uncapitalize<caret> <caret>sTaY\n");
+  }
+
+  public void testChangeCaseToggleVisualAction() {
+    typeTextInFile(parseKeys("ve~"),
+                   "<caret>capitalize <caret>UNCAPITALIZE\n");
+    myFixture.checkResult("<caret>CAPITALIZE <caret>uncapitalize\n");
+  }
+
+  public void testChangeCaseUpperMotionAction() {
+    typeTextInFile(parseKeys("gU2w"),
+                   "O<caret>NcE thIs <caret>TEXt wIlL n<caret>Ot lOoK s<caret>O rIdIcuLoUs\n");
+    myFixture.checkResult("O<caret>NCE THIS <caret>TEXT WILL N<caret>OT LOOK S<caret>O RIDICULOUS\n");
+  }
+
+  public void testChangeCaseUpperVisualAction() {
+    typeTextInFile(parseKeys("v2wU"),
+                   "O<caret>NcE thIs <caret>TEXt wIlL N<caret>Ot lOoK S<caret>O rIdIcuLoUs\n");
+    myFixture.checkResult("O<caret>NCE THIS TEXT WILL N<caret>OT LOOK S<caret>O RIDICULOUS\n");
+  }
+
+  public void testChangeCharacterAction() {
+    typeTextInFile(parseKeys("rz"), "on<caret>e <caret>t<caret>w<caret>o th<caret>r<caret>ee");
+    myFixture.checkResult("on<caret>z <caret>z<caret>z<caret>z th<caret>z<caret>ze");
+  }
+
+  public void testChangeCharacterActionWithCount() {
+    typeTextInFile(parseKeys("2rz"), "on<caret>e <caret>t<caret>w<caret>o th<caret>r<caret>ee");
+    myFixture.checkResult("on<caret>zz<caret>z<caret>z<caret>zzth<caret>z<caret>zz");
+  }
+
+  public void testChangeCharactersAction() {
+    typeTextInFile(parseKeys("4s", "<ESC>"), "on<caret>e two <caret>th<caret>ee four five\n");
+    myFixture.checkResult("o<caret>no<caret> r five\n");
+  }
+
+  public void testChangeEndOfLineAction() {
+    typeTextInFile(parseKeys("Cabc", "<ESC>"),
+                   "a<caret>bcde\n" +
+                   "abcde\n" +
+                   "a<caret>bcde\n" +
+                   "a<caret>bcd<caret>e\n" +
+                   "abcde\n");
+    myFixture.checkResult("aab<caret>c\n" +
+                          "abcde\n" +
+                          "aab<caret>c\n" +
+                          "aab<caret>c\n" +
+                          "abcde\n");
+  }
+
+  public void testChangeLineAction() {
+    typeTextInFile(parseKeys("c2ca", "<ESC>"),
+                   "ab<caret>cde\n" +
+                   "abcde\n" +
+                   "abcde\n" +
+                   "abc<caret>de\n" +
+                   "abcde\n");
+    myFixture.checkResult("<caret>a\n" +
+                          "abcde\n" +
+                          "<caret>a\n");
+  }
+
+  public void testChangeMotionAction() {
+    typeTextInFile(parseKeys("ciw", "correct", "<ESC>"),
+                   "correct correct wron<caret>g wr<caret>ong correct\n");
+    myFixture.checkResult("correct correct correc<caret>t correc<caret>t correct\n");
+
+  }
+
+  public void testChangeNumberIncAction() {
+    typeTextInFile(parseKeys("<C-A>"),
+                   "1<caret>7<caret>7 2<caret>38 <caret>999\n");
+    myFixture.checkResult("17<caret>9 23<caret>9 100<caret>0\n");
+  }
+
+  public void testChangeNumberDecAction() {
+    typeTextInFile(parseKeys("<C-X>"),
+                   "1<caret>8<caret>1 2<caret>40 <caret>1001\n");
+    myFixture.checkResult("17<caret>9 23<caret>9 100<caret>0\n");
+  }
+
+  public void testChangeReplaceAction() {
+    typeTextInFile(parseKeys("Rz", "<ESC>"), "on<caret>e <caret>t<caret>w<caret>o th<caret>r<caret>ee");
+    myFixture.checkResult("on<caret>z <caret>z<caret>z<caret>z th<caret>z<caret>ze");
+  }
+
+  public void testChangeVisualAction() {
+    typeTextInFile(parseKeys("v2lc", "aaa", "<ESC>"),
+                   "abcd<caret>ffffff<caret>abcde<caret>aaaa\n");
+    assertMode(CommandState.Mode.COMMAND);
+    myFixture.checkResult("abcdaa<caret>afffaa<caret>adeaa<caret>aa\n");
+  }
+
+  public void testChangeVisualCharacterAction() {
+    typeTextInFile(parseKeys("v2lra"),
+                   "abcd<caret>ffffff<caret>abcde<caret>aaaa\n");
+    myFixture.checkResult("abcdaa<caret>afffaa<caret>adeaa<caret>aa\n");
+  }
+
+  public void testChangeVisualLinesAction() {
+    typeTextInFile(parseKeys("VjS", "abcde", "<ESC>"),
+                   "gh<caret>ijk\n" +
+                   "ghijk\n" +
+                   "abcde\n" +
+                   "ghi<caret>jk\n" +
+                   "ghijk\n");
+    myFixture.checkResult("abcd<caret>e\n" +
+                          "abcde\n" +
+                          "abcd<caret>e\n");
+  }
+
+  public void testChangeVisualLinesEndAction() {
+    typeTextInFile(parseKeys("vjC", "abcde", "<ESC>"),
+                   "gh<caret>ijk\n" +
+                   "ghijk\n" +
+                   "abcde\n" +
+                   "ghi<caret>jk\n" +
+                   "ghijk\n");
+    myFixture.checkResult("abcd<caret>e\n" +
+                          "abcde\n" +
+                          "abcd<caret>e\n");
   }
 
   // com.maddyhome.idea.vim.action.change.delete

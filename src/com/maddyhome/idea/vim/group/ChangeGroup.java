@@ -56,6 +56,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.xml.crypto.Data;
 import java.awt.event.KeyEvent;
 import java.util.*;
 
@@ -158,10 +159,11 @@ public class ChangeGroup {
    * Begin insert after the end of the current line
    *
    * @param editor  The editor to insert into
+   * @param caret   The caret to insert after
    * @param context The data context
    */
-  public void insertAfterLineEnd(@NotNull Editor editor, @NotNull DataContext context) {
-    MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLineEnd(editor));
+  public void insertAfterLineEnd(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {
+    MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, caret));
     initInsert(editor, context, CommandState.Mode.INSERT);
   }
 
@@ -210,6 +212,34 @@ public class ChangeGroup {
         strokes.add(action);
         KeyHandler.executeAction(action, context);
       }
+    }
+  }
+
+  /**
+   * Inserts a new line above the caret position
+   */
+  public void insertNewLineAbove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {
+    MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStart(editor, caret));
+    EditorData.setChangeSwitchMode(editor, CommandState.Mode.INSERT);
+    if (CommandState.getInstance(editor).getMode() != CommandState.Mode.REPEAT) {
+      editor.getDocument().insertString(caret.getOffset(), "\n");
+      MotionGroup.moveCaret(editor, caret, caret.getOffset() - 1);
+    }
+  }
+
+  /**
+   * Inserts a new line below the caret position
+   *
+   * @param editor  The editor to insert into
+   * @param caret   The caret to insert after
+   * @param context The data context
+   */
+  public void insertNewLineBelow(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {
+    MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, caret));
+    EditorData.setChangeSwitchMode(editor, CommandState.Mode.INSERT);
+    if (CommandState.getInstance(editor).getMode() != CommandState.Mode.REPEAT) {
+      editor.getDocument().insertString(caret.getOffset(), "\n");
+      MotionGroup.moveCaret(editor, caret, caret.getOffset() + 1);
     }
   }
 
@@ -380,6 +410,20 @@ public class ChangeGroup {
       state.pushState(mode, CommandState.SubMode.NONE, MappingMode.INSERT);
 
       resetCursor(editor, true);
+    }
+  }
+
+  /**
+   * Performs a mode switch after change action
+   *
+   * @param editor   The editor to switch mode in
+   * @param context  The data context
+   * @param toSwitch The mode to switch to
+   */
+  public void processPostChangeModeSwitch(@NotNull Editor editor, @NotNull DataContext context,
+                                          @NotNull CommandState.Mode toSwitch) {
+    if (toSwitch == CommandState.Mode.INSERT) {
+      initInsert(editor, context, toSwitch);
     }
   }
 
@@ -993,14 +1037,15 @@ public class ChangeGroup {
    * Replace each of the next count characters with the character ch
    *
    * @param editor The editor to change
+   * @param caret  The caret to perform action on
    * @param count  The number of characters to change
    * @param ch     The character to change to
    * @return true if able to change count characters, false if not
    */
-  public boolean changeCharacter(@NotNull Editor editor, int count, char ch) {
-    int col = editor.getCaretModel().getLogicalPosition().column;
+  public boolean changeCharacter(@NotNull Editor editor, @NotNull Caret caret, int count, char ch) {
+    int col = caret.getLogicalPosition().column;
     int len = EditorHelper.getLineLength(editor);
-    int offset = editor.getCaretModel().getOffset();
+    int offset = caret.getOffset();
     if (len - col < count) {
       return false;
     }
@@ -1030,7 +1075,7 @@ public class ChangeGroup {
       if (slen == 0) {
         slen++;
       }
-      editor.getCaretModel().moveToOffset(offset + slen);
+      caret.moveToOffset(offset + slen);
     }
 
     return true;
@@ -1067,20 +1112,22 @@ public class ChangeGroup {
    * Delete count characters and then enter insert mode
    *
    * @param editor  The editor to change
+   * @param caret   The caret to be moved
    * @param context The data context
    * @param count   The number of characters to change
    * @return true if able to delete count characters, false if not
    */
-  public boolean changeCharacters(@NotNull Editor editor, @NotNull DataContext context, int count) {
+  public boolean changeCharacters(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                                  int count) {
     int len = EditorHelper.getLineLength(editor);
-    int col = editor.getCaretModel().getLogicalPosition().column;
+    int col = caret.getLogicalPosition().column;
     if (col + count >= len) {
-      return changeEndOfLine(editor, context, 1);
+      return changeEndOfLine(editor, caret, context, 1);
     }
 
-    boolean res = deleteCharacter(editor, count, true);
+    boolean res = deleteCharacter(editor, caret, count, true);
     if (res) {
-      initInsert(editor, context, CommandState.Mode.INSERT);
+      EditorData.setChangeSwitchMode(editor, CommandState.Mode.INSERT);
     }
 
     return res;
@@ -1090,21 +1137,22 @@ public class ChangeGroup {
    * Delete count lines and then enter insert mode
    *
    * @param editor  The editor to change
+   * @param caret   The caret on the line to be changed
    * @param context The data context
    * @param count   The number of lines to change
    * @return true if able to delete count lines, false if not
    */
-  public boolean changeLine(@NotNull Editor editor, @NotNull DataContext context, int count) {
-    final LogicalPosition pos = editor.offsetToLogicalPosition(editor.getCaretModel().getOffset());
+  public boolean changeLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count) {
+    final LogicalPosition pos = editor.offsetToLogicalPosition(caret.getOffset());
     final boolean insertBelow = pos.line + count >= EditorHelper.getLineCount(editor);
 
-    boolean res = deleteLine(editor, editor.getCaretModel().getPrimaryCaret(), count);
+    boolean res = deleteLine(editor, caret, count);
     if (res) {
       if (insertBelow) {
-        insertNewLineBelow(editor, context);
+        insertNewLineBelow(editor, caret, context);
       }
       else {
-        insertNewLineAbove(editor, context);
+        insertNewLineAbove(editor, caret, context);
       }
     }
 
@@ -1115,14 +1163,17 @@ public class ChangeGroup {
    * Delete from the cursor to the end of count - 1 lines down and enter insert mode
    *
    * @param editor  The editor to change
+   * @param caret   The caret to perform action on
    * @param context The data context
    * @param count   The number of lines to change
    * @return true if able to delete count lines, false if not
    */
-  public boolean changeEndOfLine(@NotNull Editor editor, @NotNull DataContext context, int count) {
-    boolean res = deleteEndOfLine(editor, editor.getCaretModel().getPrimaryCaret(), count);
+  public boolean changeEndOfLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                                 int count) {
+    boolean res = deleteEndOfLine(editor, caret, count);
     if (res) {
-      insertAfterLineEnd(editor, context);
+      MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, caret));
+      EditorData.setChangeSwitchMode(editor, CommandState.Mode.INSERT);
     }
 
     return res;
@@ -1132,14 +1183,15 @@ public class ChangeGroup {
    * Delete the text covered by the motion command argument and enter insert mode
    *
    * @param editor   The editor to change
+   * @param caret    The caret on which the motion is supposed to be performed
    * @param context  The data context
    * @param count    The number of time to repeat the change
    * @param rawCount The actual count entered by the user
    * @param argument The motion command
    * @return true if able to delete the text, false if not
    */
-  public boolean changeMotion(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
-                              @NotNull Argument argument) {
+  public boolean changeMotion(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                              int rawCount, @NotNull Argument argument) {
     // TODO: Hack - find better way to do this exceptional case - at least make constants out of these strings
 
     // Vim treats cw as ce and cW as cE if cursor is on a non-blank character
@@ -1151,7 +1203,7 @@ public class ChangeGroup {
     boolean kludge = false;
     boolean bigWord = id.equals("VimMotionBigWordRight");
     final CharSequence chars = editor.getDocument().getCharsSequence();
-    final int offset = editor.getCaretModel().getOffset();
+    final int offset = caret.getOffset();
     final CharacterHelper.CharacterType charType = CharacterHelper.charType(chars.charAt(offset), bigWord);
     if (EditorHelper.getFileSize(editor) > 0 && charType != CharacterHelper.CharacterType.WHITESPACE) {
       final boolean lastWordChar = offset > EditorHelper.getFileSize(editor) ||
@@ -1161,7 +1213,7 @@ public class ChangeGroup {
       if (wordMotions.contains(id) && lastWordChar && motion.getCount() == 1) {
         final boolean res = deleteCharacter(editor, 1, true);
         if (res) {
-          insertBeforeCursor(editor, context);
+          EditorData.setChangeSwitchMode(editor, CommandState.Mode.INSERT);
         }
         return res;
       }
@@ -1208,10 +1260,9 @@ public class ChangeGroup {
       }
     }
 
-    boolean res =
-      deleteMotion(editor, editor.getCaretModel().getPrimaryCaret(), context, count, rawCount, argument, true);
+    boolean res = deleteMotion(editor, caret, context, count, rawCount, argument, true);
     if (res) {
-      insertBeforeCursor(editor, context);
+      EditorData.setChangeSwitchMode(editor, CommandState.Mode.INSERT);
     }
 
     return res;
@@ -1262,13 +1313,14 @@ public class ChangeGroup {
    * Deletes the range of text and enters insert mode
    *
    * @param editor  The editor to change
+   * @param caret   The caret to be moved after range deletion
    * @param context The data context
    * @param range   The range to change
    * @param type    The type of the range
    * @return true if able to delete the range, false if not
    */
-  public boolean changeRange(@NotNull Editor editor, @NotNull DataContext context, @NotNull TextRange range,
-                             @NotNull SelectionType type) {
+  public boolean changeRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                             @NotNull TextRange range, @NotNull SelectionType type) {
     int col = 0;
     int lines = 0;
     if (type == SelectionType.BLOCK_WISE) {
@@ -1279,21 +1331,21 @@ public class ChangeGroup {
       }
     }
     boolean after = range.getEndOffset() >= EditorHelper.getFileSize(editor);
-    boolean res = deleteRange(editor, range, type, true);
+    boolean res = deleteRange(editor, caret, range, type, true);
     if (res) {
       if (type == SelectionType.LINE_WISE) {
         if (after) {
-          insertNewLineBelow(editor, context);
+          insertNewLineBelow(editor, caret, context);
         }
         else {
-          insertNewLineAbove(editor, context);
+          insertNewLineAbove(editor, caret, context);
         }
       }
       else {
         if (type == SelectionType.BLOCK_WISE) {
           setInsertRepeat(lines, col, false);
         }
-        insertBeforeCursor(editor, context);
+        EditorData.setChangeSwitchMode(editor, CommandState.Mode.INSERT);
       }
     }
 
@@ -1321,16 +1373,17 @@ public class ChangeGroup {
    * Toggles the case of count characters
    *
    * @param editor The editor to change
+   * @param caret  The caret on which the operation is performed
    * @param count  The number of characters to change
    * @return true if able to change count characters
    */
-  public boolean changeCaseToggleCharacter(@NotNull Editor editor, int count) {
-    final int offset = VimPlugin.getMotion().moveCaretHorizontal(editor, count, true);
+  public boolean changeCaseToggleCharacter(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    final int offset = VimPlugin.getMotion().moveCaretHorizontal(editor, caret, count, true);
     if (offset == -1) {
       return false;
     }
-    changeCase(editor, editor.getCaretModel().getOffset(), offset, CharacterHelper.CASE_TOGGLE);
-    MotionGroup.moveCaret(editor, EditorHelper.normalizeOffset(editor, offset, false));
+    changeCase(editor, caret.getOffset(), offset, CharacterHelper.CASE_TOGGLE);
+    MotionGroup.moveCaret(editor, caret, EditorHelper.normalizeOffset(editor, offset, false));
     return true;
   }
 
@@ -1338,6 +1391,7 @@ public class ChangeGroup {
    * Changes the case of all the character moved over by the motion argument.
    *
    * @param editor   The editor to change
+   * @param caret    The caret on which motion pretends to be performed
    * @param context  The data context
    * @param count    The number of times to repeat the change
    * @param rawCount The actual count entered by the user
@@ -1345,27 +1399,28 @@ public class ChangeGroup {
    * @param argument The motion command
    * @return true if able to delete the text, false if not
    */
-  public boolean changeCaseMotion(@NotNull Editor editor, DataContext context, int count, int rawCount, char type,
-                                  @NotNull Argument argument) {
-    final TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, true);
-    return range != null && changeCaseRange(editor, range, type);
+  public boolean changeCaseMotion(@NotNull Editor editor, @NotNull Caret caret, DataContext context, int count,
+                                  int rawCount, char type, @NotNull Argument argument) {
+    final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument, true);
+    return range != null && changeCaseRange(editor, caret, range, type);
   }
 
   /**
    * Changes the case of all the characters in the range
    *
    * @param editor The editor to change
+   * @param caret  The caret to be moved
    * @param range  The range to change
    * @param type   The case change type (TOGGLE, UPPER, LOWER)
    * @return true if able to delete the text, false if not
    */
-  public boolean changeCaseRange(@NotNull Editor editor, @NotNull TextRange range, char type) {
+  public boolean changeCaseRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull TextRange range, char type) {
     int[] starts = range.getStartOffsets();
     int[] ends = range.getEndOffsets();
     for (int i = ends.length - 1; i >= 0; i--) {
       changeCase(editor, starts[i], ends[i], type);
     }
-    MotionGroup.moveCaret(editor, range.getStartOffset());
+    MotionGroup.moveCaret(editor, caret, range.getStartOffset());
     return true;
   }
 
@@ -1415,13 +1470,13 @@ public class ChangeGroup {
   public void autoIndentRange(@NotNull Editor editor, @NotNull DataContext context, @NotNull TextRange range) {
     int startLineOffset = EditorHelper.getLineStartForOffset(editor, range.getStartOffset());
     int endLineOffset = EditorHelper.getLineEndForOffset(editor, range.getEndOffset());
-    editor.getSelectionModel().setSelection(startLineOffset, endLineOffset);
+    editor.getCaretModel().getPrimaryCaret().setSelection(startLineOffset, endLineOffset);
 
     KeyHandler.executeAction("AutoIndentLines", context);
 
     int firstLine = editor.offsetToLogicalPosition(Math.min(startLineOffset, endLineOffset)).line;
     int newOffset = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, firstLine);
-    MotionGroup.moveCaret(editor, newOffset);
+    MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), newOffset);
   }
 
   public void reformatCode(@NotNull DataContext context) {
@@ -1712,13 +1767,13 @@ public class ChangeGroup {
     }
   }
 
-  public boolean changeNumber(@NotNull final Editor editor, final int count) {
+  public boolean changeNumber(@NotNull final Editor editor, @NotNull Caret caret, final int count) {
     final BoundListOption nf = (BoundListOption)Options.getInstance().getOption("nrformats");
     final boolean alpha = nf.contains("alpha");
     final boolean hex = nf.contains("hex");
     final boolean octal = nf.contains("octal");
 
-    final TextRange range = SearchHelper.findNumberUnderCursor(editor, alpha, hex, octal);
+    final TextRange range = SearchHelper.findNumberUnderCursor(editor, caret, alpha, hex, octal);
     if (range == null) {
       logger.debug("no number on line");
       return false;
@@ -1794,7 +1849,7 @@ public class ChangeGroup {
 
       if (!text.equals(number)) {
         replaceText(editor, range.getStartOffset(), range.getEndOffset(), number);
-        editor.getCaretModel().moveToOffset(range.getStartOffset() + number.length() - 1);
+        caret.moveToOffset(range.getStartOffset() + number.length() - 1);
       }
 
       return true;

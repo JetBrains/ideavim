@@ -744,12 +744,12 @@ public class SearchHelper {
   }
 
   @Nullable
-  public static TextRange findNumberUnderCursor(@NotNull final Editor editor, final boolean alpha, final boolean hex,
-                                                final boolean octal) {
-    int lline = editor.getCaretModel().getLogicalPosition().line;
+  public static TextRange findNumberUnderCursor(@NotNull final Editor editor, @NotNull Caret caret, final boolean alpha,
+                                                final boolean hex, final boolean octal) {
+    int lline = caret.getLogicalPosition().line;
     String text = EditorHelper.getLineText(editor, lline).toLowerCase();
     int offset = EditorHelper.getLineStartOffset(editor, lline);
-    int pos = editor.getCaretModel().getOffset() - offset;
+    int pos = caret.getOffset() - offset;
 
     if (logger.isDebugEnabled()) {
       logger.debug("lline=" + lline);

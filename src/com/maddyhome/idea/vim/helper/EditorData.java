@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.ui.ExOutputPanel;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -334,6 +335,36 @@ public class EditorData {
   }
 
   /**
+   * Gets the mode to which the editor should switch after a change/visual action.
+   */
+  @Nullable
+  public static CommandState.Mode getChangeSwitchMode(@NotNull Editor editor) {
+    return editor.getUserData(CHANGE_ACTION_SWITCH_MODE);
+  }
+
+  /**
+   * Sets the mode to which the editor should switch after a change/visual action.
+   */
+  public static void setChangeSwitchMode(@NotNull Editor editor, @Nullable CommandState.Mode mode) {
+    editor.putUserData(CHANGE_ACTION_SWITCH_MODE, mode);
+  }
+
+  /**
+   * Sets the visual block mode flag in the beginning of handling visual operator actions
+   */
+  public static boolean wasVisualBlockMode(@NotNull Editor editor) {
+    Boolean res = editor.getUserData(WAS_VISUAL_BLOCK_MODE);
+    return res != null && res;
+  }
+
+  /**
+   * Sets the visual block mode flag in the beginning of handling visual operator actions
+   */
+  public static void setWasVisualBlockMode(@NotNull Editor editor, boolean value) {
+    editor.putUserData(WAS_VISUAL_BLOCK_MODE, value);
+  }
+
+  /**
    * This is a static helper - no instances needed
    */
   private EditorData() {
@@ -357,6 +388,8 @@ public class EditorData {
   private static final Key<Integer> VISUAL_BLOCK_OFFSET = new Key<>("visualBlockOffset");
   private static final Key<Boolean> IGNORE_NEXT_MOVE = new Key<>("shouldIgnoreNextMove");
   private static final Key<Boolean> IS_KEEPING_VISUAL_OPERATOR_ACTION = new Key<>("isKeepingVisualOperatorAction");
+  private static final Key<CommandState.Mode> CHANGE_ACTION_SWITCH_MODE = new Key<>("changeActionSwitchMode");
+  private static final Key<Boolean> WAS_VISUAL_BLOCK_MODE = new Key<>("wasVisualBlockMode");
 
   private static Key CONSOLE_VIEW_IN_EDITOR_VIEW = Key.create("CONSOLE_VIEW_IN_EDITOR_VIEW");
 
