@@ -2,7 +2,6 @@ package org.jetbrains.plugins.ideavim.action;
 
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.command.CommandState;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -828,6 +827,239 @@ public class MultipleCaretsTest extends VimTestCase {
     typeTextInFile(parseKeys("V", "2j", "j"),
                    "abc<caret>de\nab<caret>cde\n\nabcde\nabcde\n");
     myFixture.checkResult("<selection>abcde\nabcde\n\nabcde\nab<caret>cde</selection>\n");
+  }
+
+  // com.maddyhome.idea.vim.action.change.delete
+
+  public void testDeleteCharacterAction() {
+    typeTextInFile(parseKeys( "<Del>"),
+                   "a<caret>bcde\n" +
+                   "<caret>abcde\n" +
+                   "abcd<caret>e\n");
+    myFixture.checkResult("a<caret>cde\n" +
+                          "<caret>bcde\n" +
+                          "abc<caret>d\n");
+  }
+
+  public void testDeleteCharacterActionOrder() {
+    typeTextInFile(parseKeys("<Del>"),
+                   "ab<caret>c<caret>d<caret>e abcde\n");
+    myFixture.checkResult("ab<caret> abcde\n");
+  }
+
+  public void testDeleteCharacterLeftAction() {
+    typeTextInFile(parseKeys("3X"),
+                   "a<caret>bcde\n" +
+                   "<caret>abcde\n" +
+                   "abcd<caret>e\n");
+    myFixture.checkResult("<caret>bcde\n" +
+                          "<caret>abcde\n" +
+                          "a<caret>e\n");
+  }
+
+  public void testDeleteCharacterLeftCaretMerging() {
+    typeTextInFile(parseKeys("3X"),
+                   "a<caret>bc<caret>def<caret>ghij<caret>klmn<caret>op<caret>q");
+    myFixture.checkResult("gq");
+  }
+
+  public void testDeleteCharacterRightAction() {
+    typeTextInFile(parseKeys("3x"),
+                   "a<caret>bcde\n" +
+                   "<caret>abcde\n" +
+                   "abcd<caret>e\n");
+    myFixture.checkResult("a<caret>e\n" +
+                          "<caret>de\n" +
+                          "abc<caret>d\n");
+  }
+
+  public void testDeleteCharacterRightCaretMerging() {
+    typeTextInFile(parseKeys("4x"),
+                   "o<caret>ne <caret>two <caret>three four");
+    myFixture.checkResult("o<caret> four");
+  }
+
+  public void testDeleteEndOfLineAction() {
+    typeTextInFile(parseKeys("D"),
+                   "abcd<caret>e\n" +
+                   "abcde\n" +
+                   "abc<caret>de\n" +
+                   "<caret>abcde\n" +
+                   "ab<caret>cde\n" +
+                   "ab<caret>cd<caret>e\n");
+    myFixture.checkResult("abc<caret>d\n" +
+                          "abcde\n" +
+                          "ab<caret>c\n" +
+                          "<caret>\n" +
+                          "a<caret>b\n" +
+                          "a<caret>b\n");
+  }
+
+  public void testDeleteEndOfLineActionWithCount() {
+    typeTextInFile(parseKeys("3D"),
+                   "ab<caret>cde\n" +
+                   "abcde\n" +
+                   "abcde\n" +
+                   "abcd<caret>e\n" +
+                   "a<caret>bcd<caret>e\n" +
+                   "abc<caret>de\n");
+    myFixture.checkResult("ab\n" +
+                          "abcd\n");
+  }
+
+  public void testDeleteJoinLinesAction() {
+    typeTextInFile(parseKeys("gJ"),
+                   "ab<caret>cde\n" +
+                   "abcde\n" +
+                   "ab<caret>cde\n" +
+                   "abcd<caret>e\n" +
+                   "abcde\n" +
+                   "abc<caret>de\n" +
+                   "  abcde\n");
+    myFixture.checkResult("abcde<caret>abcde\n" +
+                          "abcde<caret>abcde<caret>abcde\n" +
+                          "abcde<caret>  abcde\n");
+  }
+
+  public void testDeleteJoinLinesSimpleAction() {
+    typeTextInFile(parseKeys("gJ"),
+                   "a<caret>bcde\n" +
+                   "abcde\n");
+    myFixture.checkResult("abcde<caret>abcde\n");
+  }
+
+  public void testDeleteJoinLinesSpacesAction() {
+    typeTextInFile(parseKeys("J"),
+                   "ab<caret>cde\n" +
+                   "abcde\n" +
+                   "ab<caret>cde\n" +
+                   "abcd<caret>e\n" +
+                   "abcde\n" +
+                   "abc<caret>de\n" +
+                   "  abcde\n");
+    myFixture.checkResult("abcde<caret> abcde\n" +
+                          "abcde<caret> abcde<caret> abcde\n" +
+                          "abcde<caret> abcde\n");
+  }
+
+  public void testDeleteJoinVisualLinesAction() {
+    typeTextInFile(parseKeys("VkgJ"),
+                   "abcde\n" +
+                   "abcd<caret>e\n" +
+                   "abcde\n" +
+                   "ab<caret>cde\n");
+    myFixture.checkResult("<selection>abcdeabcde</selection>\n" +
+                          "<selection>abcdeabcde</selection>\n");
+  }
+
+  public void testDeleteJoinVisualLinesSpacesAction() {
+    typeTextInFile(parseKeys("VkJ"),
+                   "abcde\n" +
+                   "abcd<caret>e\n" +
+                   "abcde\n" +
+                   "ab<caret>cde\n");
+    myFixture.checkResult("<selection>abcde abcde</selection>\n" +
+                          "<selection>abcde abcde</selection>\n");
+  }
+
+  public void testDeleteLineAction() {
+    typeTextInFile(parseKeys("d3d"),
+                   "abc<caret>de\n" +
+                   "abcde\n" +
+                   "abcde\n" +
+                   "abcde\n" +
+                   "ab<caret>cde\n" +
+                   "abcde\n" +
+                   "abcde\n");
+    myFixture.checkResult("<caret>abcde\n");
+  }
+
+  public void testDeleteMotionAction() {
+    typeTextInFile(parseKeys("dt)"),
+                   "public class Foo {\n" +
+                   "  int foo(int a, int b) {\n" +
+                   "    boolean bar = (a < 0 && (b < 0 || a > 0)<caret> || b != 0);\n" +
+                   "    if (bar<caret> || b != 0) {\n" +
+                   "      return a;\n" +
+                   "    }\n" +
+                   "    else {\n" +
+                   "      return b;\n" +
+                   "    }\n" +
+                   "  }\n" +
+                   "}\n");
+    myFixture.checkResult("public class Foo {\n" +
+                   "  int foo(int a, int b) {\n" +
+                   "    boolean bar = (a < 0 && (b < 0 || a > 0)<caret>);\n" +
+                   "    if (bar<caret>) {\n" +
+                   "      return a;\n" +
+                   "    }\n" +
+                   "    else {\n" +
+                   "      return b;\n" +
+                   "    }\n" +
+                   "  }\n" +
+                   "}\n");
+  }
+
+  public void testDeleteVisualAction() {
+    typeTextInFile(parseKeys("vlj"),
+                   "abc<caret>de\n" +
+                   "<caret>abcde\n" +
+                   "abc<caret>de\n" +
+                   "abcde\n");
+    myFixture.checkResult("abc<selection>de\n" +
+                          "abcde\n" +
+                          "a<caret>b</selection>c<selection>de\n" +
+                          "abcd<caret>e</selection>\n");
+    typeText(parseKeys("d"));
+    myFixture.checkResult("abc<caret>c\n");
+  }
+
+  public void testDeleteVisualActionWithMultipleCaretsLeft() {
+    typeTextInFile(parseKeys("v", "fd", "d"),
+                   "a<caret>bcde\n" +
+                   "abcde\n" +
+                   "<caret>abcde\n" +
+                   "ab<caret>cde\n");
+    myFixture.checkResult("a<caret>e\n" +
+                          "abcde\n" +
+                          "<caret>e\n" +
+                          "ab<caret>e\n");
+  }
+
+  public void testDeleteVisualLinesAction() {
+    typeTextInFile(parseKeys("Vjd"),
+                   "abc<caret>de\n" +
+                   "abcde\n" +
+                   "abcde\n" +
+                   "a<caret>bcde\n" +
+                   "abcde\n");
+    myFixture.checkResult("<caret>abcde\n");
+  }
+
+  public void testDeleteVisualLinesEndAction() {
+    typeTextInFile(parseKeys("v", "2j", "D"),
+                   "a<caret>bcde\n" +
+                   "abcde\n" +
+                   "abcde\n" +
+                   "abcde\n" +
+                   "abcd<caret>e\n" +
+                   "abcde\n" +
+                   "abcde\n");
+    myFixture.checkResult("<caret>abcd<caret>e\n");
+  }
+
+  public void testDeleteVisualBlockLineEndAction() {
+    typeTextInFile(parseKeys("<C-V>", "2j", "2l", "D"),
+                   "abcde\n" +
+                   "a<caret>bcde\n" +
+                   "abcde\n" +
+                   "abcde\n" +
+                   "abcde\n");
+    myFixture.checkResult("abcde\n" +
+                          "<caret>a\n" +
+                          "a\n" +
+                          "a\n" +
+                          "abcde\n");
   }
 
   // com.maddyhome.idea.vim.action.change.insert
