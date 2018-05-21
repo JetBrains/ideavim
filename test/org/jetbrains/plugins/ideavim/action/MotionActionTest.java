@@ -182,12 +182,41 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("{}\n");
   }
 
-  // |d| |v_iB|
+  //VIM-1287 |d| |v_iB|
   public void testDeleteInnerCyrlyBraceBlockWithCarretInsideString() {
     typeTextInFile(parseKeys("di{"),
                    "{\"{foo, \"<caret>bar\", baz}\"}\n");
     myFixture.checkResult("{\"{}\"}\n");
   }
+
+  //VIM-1287 |d| |v_iB|
+  public void testDeleteInnerCyrlyBraceBlockWithCarretInsideStringAndBracesUnbalanced() {
+    typeTextInFile(parseKeys("di{"),
+                   "{\"{foo, <caret>bar\", baz}}\n");
+    myFixture.checkResult("{\"{foo, bar\", baz}}\n");
+  }
+
+  //VIM-1287 |d| |v_iB|
+  public void testDeleteInnerCyrlyBraceBlockWithCarretInsideCharAndBracesUnbalanced() {
+    typeTextInFile(parseKeys("di{"),
+                   "{'{foo, <caret>bar', baz}}\n");
+    myFixture.checkResult("{'{}}\n");
+  }
+
+  //VIM-1287 |d| |v_iB|
+  public void testDeleteInnerCyrlyBraceBlockNestedScenario() {
+    typeTextInFile(parseKeys("di{"),
+                   "{'{foo, '{'{<caret>bar'}', baz}'}");
+    myFixture.checkResult("{'{foo, '{'{}'}");
+  }
+
+  //VIM-1287 |d| |v_iB|
+  public void testDeleteInnerCyrlyBraceBlockWithCarretInsideChar() {
+    typeTextInFile(parseKeys("di{"),
+                   "{'{foo, '<caret>bar', baz}'}\n");
+    myFixture.checkResult("{'{}'}\n");
+  }
+
 
   // |d| |v_aB|
   public void testDeleteOuterCurlyBraceBlock() {

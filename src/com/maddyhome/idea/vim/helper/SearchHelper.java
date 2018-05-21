@@ -120,12 +120,12 @@ public class SearchHelper {
     int loc = blockChars.indexOf(type);
     char close = blockChars.charAt(loc + 1);
 
-    int bstart = findBlockLocation(chars, close, type, -1, pos, count, checkMatchForChar);
+    int bstart = findBlockLocation(chars, close, type, -1, pos, count, (a, b) -> true);
     if (bstart == -1) {
       return null;
     }
 
-    int bend = findBlockLocation(chars, type, close, 1, bstart + 1, 1, checkMatchForChar);
+    int bend = findBlockLocation(chars, type, close, 1, bstart + 1, 1, (a, b) -> true);
     if (bend == -1) {
       return null;
     }
@@ -259,12 +259,34 @@ public class SearchHelper {
 
   private static BinaryOperator<Boolean> checkMatchForChar = (inString, inChar) -> inChar;
 
+  private static BinaryOperator<Boolean> checkMatchForString = (inString, inChar) -> inString;
+
+
+  /**
+   * Taken from vim help specification:
+   *
+   *  When the '%' character is not present in 'cpoptions'
+   * |cpo-%|,
+   * 1. parens and braces inside double quotes are
+   * ignored, unless the number of parens/braces in a line
+   * is uneven and this line and the previous one does not
+   * end in a backslash.
+   * 2. '(', '{', '[', ']', '}' and ')'
+   * are also ignored (parens and braces inside single
+   * quotes).  Note that this works fine for C, but not for
+   * Perl, where single quotes are used for strings.
+   *
+   */
+
   private static int findBlockLocation(@NotNull CharSequence chars, char found, char match, int dir, int pos, int cnt,
                                        BinaryOperator<Boolean> checker) {
     int res = -1;
     final int inCheckPos = dir < 0 && pos > 0 ? pos - 1 : pos;
+    //check if position is inside string sequence i.e "abc"
     boolean inString = checkInString(chars, inCheckPos, true);
+    //check if position is inside char sequence i.e 'a'
     boolean inChar = checkInString(chars, inCheckPos, false);
+    //'initial run' flag used to separate 'our' block pair from different ones
     boolean initial = true;
     int stack = 0;
     // Search to start or end of file, as appropriate
@@ -274,10 +296,12 @@ public class SearchHelper {
         // We found our match
         if (stack == 0) {
           res = pos;
+          System.out.println("cnt = " + cnt);
           cnt--;
         }
         // Found the character but it "closes" a different pair
         else {
+          System.out.println("stack = " + stack);
           stack--;
         }
       }
@@ -295,6 +319,7 @@ public class SearchHelper {
         else if (!inChar && chars.charAt(pos) == '"' && (pos == 0 || chars.charAt(pos - 1) != '\\')) {
           inString = !inString;
         }
+        // We found the start/end of a char
         else if (!inString && chars.charAt(pos) == '\'' && (pos == 0 || chars.charAt(pos - 1) != '\\')) {
           inChar = !inChar;
         }
@@ -479,7 +504,7 @@ public class SearchHelper {
     return new TextRange(start, end);
   }
 
-  private static boolean checkInString(@NotNull CharSequence chars, int pos, boolean str) {
+  static boolean checkInString(@NotNull CharSequence chars, int pos, boolean str) {
     int offset = pos;
     while (offset > 0 && chars.charAt(offset) != '\n') {
       offset--;
