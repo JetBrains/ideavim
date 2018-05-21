@@ -3,8 +3,10 @@ package com.maddyhome.idea.vim.helper;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.Key;
+import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -117,6 +119,73 @@ public class CaretData {
   }
 
   /**
+   * Gets the previous visual operator range on the caret.
+   */
+  @Nullable
+  public static VisualChange getLastVisualOperatorRange(@NotNull Caret caret) {
+    return caret.getUserData(VISUAL_OP);
+  }
+
+  /**
+   * Sets the previous visual operator range on the caret.
+   */
+  public static void setLastVisualOperatorRange(@NotNull Caret caret, @NotNull VisualChange range) {
+    caret.putUserData(VISUAL_OP, range);
+  }
+
+  /**
+   * Gets the previous last column (set by {@link com.maddyhome.idea.vim.handler.VisualOperatorActionHandler.VisualStartFinishRunnable}).
+   */
+  public static int getPreviousLastColumn(@NotNull Caret caret) {
+    @Nullable Integer ret = caret.getUserData(PREV_LAST_COLUMN);
+
+
+    if (ret == null) {
+      return caret.getLogicalPosition().column;
+    }
+    else {
+      return ret;
+    }
+  }
+
+  /**
+   * Sets the previous last column.
+   */
+  public static void setPreviousLastColumn(@NotNull Caret caret, int prevLastColumn) {
+    caret.putUserData(PREV_LAST_COLUMN, prevLastColumn);
+  }
+
+  /**
+   * Gets the visual change for current visual operator action.
+   */
+  @Nullable
+  public static VisualChange getVisualChange(@NotNull Caret caret) {
+    return caret.getUserData(VISUAL_CHANGE);
+  }
+
+  /**
+   * Sets the visual change for current visual operator action.
+   */
+  public static void setVisualChange(@NotNull Caret caret, @Nullable VisualChange visualChange) {
+    caret.putUserData(VISUAL_CHANGE, visualChange);
+  }
+
+  /**
+   * Gets the text range for current visual operator action.
+   */
+  @Nullable
+  public static TextRange getVisualTextRange(@NotNull Caret caret) {
+    return caret.getUserData(VISUAL_TEXT_RANGE);
+  }
+
+  /**
+   * Sets the text range for current visual operator action.
+   */
+  public static void setVisualTextRange(@NotNull Caret caret, @Nullable TextRange range) {
+    caret.putUserData(VISUAL_TEXT_RANGE, range);
+  }
+
+  /**
    * This class is completely static, no instances needed.
    */
   private CaretData() {
@@ -126,4 +195,8 @@ public class CaretData {
   private static final Key<Integer> VISUAL_START = new Key<>("visualStart");
   private static final Key<Integer> VISUAL_END = new Key<>("visualEnd");
   private static final Key<Integer> VISUAL_OFFSET = new Key<>("visualOffset");
+  private static final Key<Integer> PREV_LAST_COLUMN = new Key<>("previousLastColumn");
+  private static final Key<VisualChange> VISUAL_CHANGE = new Key<>("visualChange");
+  private static final Key<VisualChange> VISUAL_OP = new Key<>("visualOp");
+  private static final Key<TextRange> VISUAL_TEXT_RANGE = new Key<>("visualTextRange");
 }

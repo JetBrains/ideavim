@@ -66,7 +66,6 @@ public class EditorData {
     editor.putUserData(LAST_HIGHLIGHTS, null);
     editor.putUserData(LAST_SELECTION_TYPE, null);
     editor.putUserData(LAST_VISUAL_RANGE, null);
-    editor.putUserData(VISUAL_OP, null);
     editor.putUserData(MORE_PANEL, null);
     editor.putUserData(EX_OUTPUT_MODEL, null);
   }
@@ -130,27 +129,6 @@ public class EditorData {
 
   public static void setLastVisualRange(@NotNull Editor editor, @NotNull TextRange textRange) {
     editor.getDocument().putUserData(LAST_VISUAL_RANGE, textRange);
-  }
-
-  /**
-   * Gets the previous visual operator range for the editor.
-   *
-   * @param editor The editor to get the range for
-   * @return The last visual range, null if no previous range
-   */
-  @Nullable
-  public static VisualChange getLastVisualOperatorRange(@NotNull Editor editor) {
-    return editor.getDocument().getUserData(VISUAL_OP);
-  }
-
-  /**
-   * Sets the previous visual operator range for the editor.
-   *
-   * @param editor The editor to set the range for
-   * @param range  The visual range
-   */
-  public static void setLastVisualOperatorRange(@NotNull Editor editor, VisualChange range) {
-    editor.getDocument().putUserData(VISUAL_OP, range);
   }
 
   @Nullable
@@ -345,7 +323,6 @@ public class EditorData {
 
   private static final Key<SelectionType> LAST_SELECTION_TYPE = new Key<SelectionType>("lastSelectionType");
   public static final Key<TextRange> LAST_VISUAL_RANGE = new Key<TextRange>("lastVisualRange");
-  private static final Key<VisualChange> VISUAL_OP = new Key<VisualChange>("lastVisualOp");
   private static final Key<String> LAST_SEARCH = new Key<String>("lastSearch");
   private static final Key<Collection<RangeHighlighter>> LAST_HIGHLIGHTS =
     new Key<Collection<RangeHighlighter>>("lastHighlights");

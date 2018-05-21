@@ -1623,7 +1623,7 @@ public class MotionGroup {
         if (editor.getCaretModel().getCaretCount() > 1) {
           return false;
         }
-        VisualChange range = EditorData.getLastVisualOperatorRange(editor);
+        VisualChange range = CaretData.getLastVisualOperatorRange(editor.getCaretModel().getPrimaryCaret());
         if (range == null) {
           return false;
         }
@@ -1739,6 +1739,11 @@ public class MotionGroup {
     int start = CaretData.getVisualStart(caret);
     int end = CaretData.getVisualEnd(caret);
 
+    if (CommandState.inVisualBlockMode(editor)) {
+      start = EditorData.getVisualBlockStart(editor);
+      end = EditorData.getVisualBlockEnd(editor);
+    }
+
     if (start > end) {
       int t = start;
       start = end;
@@ -1786,6 +1791,11 @@ public class MotionGroup {
   public TextRange getVisualRange(@NotNull Editor editor) {
     return new TextRange(editor.getSelectionModel().getBlockSelectionStarts(),
                          editor.getSelectionModel().getBlockSelectionEnds());
+  }
+
+  @NotNull
+  public TextRange getVisualRange(@NotNull Caret caret) {
+    return new TextRange(caret.getSelectionStart(), caret.getSelectionEnd());
   }
 
   @NotNull
