@@ -220,7 +220,7 @@ public class ChangeGroup {
    */
   public void insertNewLineBelow(@NotNull final Editor editor, @NotNull final DataContext context) {
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
-      MotionGroup.moveCaret(editor,caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, caret));
+      MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, caret));
     }
     initInsert(editor, context, CommandState.Mode.INSERT);
     runEnterAction(editor, context);
@@ -1516,22 +1516,23 @@ public class ChangeGroup {
     KeyHandler.executeAction("ReformatCode", context);
   }
 
-  public void indentLines(@NotNull Editor editor, @NotNull DataContext context, int lines, int dir) {
-    int start = editor.getCaretModel().getOffset();
-    int end = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, lines - 1, false);
-    indentRange(editor, context, new TextRange(start, end), 1, dir);
+  public void indentLines(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int lines,
+                          int dir) {
+    int start = caret.getOffset();
+    int end = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, lines - 1, false);
+    indentRange(editor, caret, context, new TextRange(start, end), 1, dir);
   }
 
-  public void indentMotion(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
-                           @NotNull Argument argument, int dir) {
-    final TextRange range = MotionGroup.getMotionRange(editor, context, count, rawCount, argument, false);
+  public void indentMotion(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                           int rawCount, @NotNull Argument argument, int dir) {
+    final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument, false);
     if (range != null) {
-      indentRange(editor, context, range, 1, dir);
+      indentRange(editor, caret, context, range, 1, dir);
     }
   }
 
-  public void indentRange(@NotNull Editor editor, @NotNull DataContext context, @NotNull TextRange range, int count,
-                          int dir) {
+  public void indentRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                          @NotNull TextRange range, int count, int dir) {
     if (logger.isDebugEnabled()) {
       logger.debug("count=" + count);
     }
@@ -1640,14 +1641,14 @@ public class ChangeGroup {
 
     if (!CommandState.inInsertMode(editor)) {
       if (!range.isMultiple()) {
-        MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, sline));
+        MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, sline));
       }
       else {
-        MotionGroup.moveCaret(editor, range.getStartOffset());
+        MotionGroup.moveCaret(editor, caret, range.getStartOffset());
       }
     }
 
-    EditorData.setLastColumn(editor, editor.getCaretModel().getVisualPosition().column);
+    CaretData.setLastColumn(editor, caret, caret.getVisualPosition().column);
   }
 
   /**

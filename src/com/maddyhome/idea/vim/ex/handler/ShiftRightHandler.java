@@ -37,7 +37,8 @@ public class ShiftRightHandler extends CommandHandler {
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
     TextRange range = cmd.getTextRange(editor, context, true);
 
-    VimPlugin.getChange().indentRange(editor, context, range, cmd.getCommand().length(), 1);
+    VimPlugin.getChange()
+      .indentRange(editor, editor.getCaretModel().getPrimaryCaret(), context, range, cmd.getCommand().length(), 1);
 
     return true;
   }

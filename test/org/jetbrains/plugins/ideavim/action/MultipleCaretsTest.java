@@ -1377,4 +1377,90 @@ public class MultipleCaretsTest extends VimTestCase {
                    "one <caret>two <caret>three <caret>four\n");
     myFixture.checkResult("o<caret>ne t<caret>wo thr<caret>ee four\n");
   }
+
+  // com.maddyhome.idea.vim.action.change.shift
+
+  public void testShiftLeftLinesAction() {
+    typeTextInFile(parseKeys("2<<"),
+                   "        <caret>abcde\n" +
+                   "        abcde\n" +
+                   "    abcde\n" +
+                   "    <caret>abcde\n" +
+                   "    abcde\n");
+    myFixture.checkResult("    <caret>abcde\n" +
+                          "    abcde\n" +
+                          "    abcde\n" +
+                          "<caret>abcde\n" +
+                          "abcde\n");
+  }
+
+  public void testShiftLeftMotionAction() {
+    typeTextInFile(parseKeys("<j"),
+                   "        <caret>abcde\n" +
+                   "        abcde\n" +
+                   "    abcde\n" +
+                   "    <caret>abcde\n" +
+                   "    abcde\n");
+    myFixture.checkResult("    <caret>abcde\n" +
+                          "    abcde\n" +
+                          "    abcde\n" +
+                          "<caret>abcde\n" +
+                          "abcde\n");
+  }
+
+  public void testShiftLeftVisualAction() {
+    typeTextInFile(parseKeys("Vj<"),
+                   "        <caret>abcde\n" +
+                   "        abcde\n" +
+                   "    abcde\n" +
+                   "    <caret>abcde\n" +
+                   "    abcde\n");
+    myFixture.checkResult("    <caret>abcde\n" +
+                          "    abcde\n" +
+                          "    abcde\n" +
+                          "<caret>abcde\n" +
+                          "abcde\n");
+  }
+
+  public void testShiftRightLinesAction() {
+    typeTextInFile(parseKeys("2>>"),
+                   "    <caret>abcde\n" +
+                   "    abcde\n" +
+                   "    abcde\n" +
+                   "<caret>abcde\n" +
+                   "abcde\n");
+    myFixture.checkResult("        <caret>abcde\n" +
+                          "        abcde\n" +
+                          "    abcde\n" +
+                          "    <caret>abcde\n" +
+                          "    abcde\n");
+  }
+
+  public void testShiftRightMotionAction() {
+    typeTextInFile(parseKeys(">j"),
+                   "    <caret>abcde\n" +
+                   "    abcde\n" +
+                   "    abcde\n" +
+                   "<caret>abcde\n" +
+                   "abcde\n");
+    myFixture.checkResult("        <caret>abcde\n" +
+                          "        abcde\n" +
+                          "    abcde\n" +
+                          "    <caret>abcde\n" +
+                          "    abcde\n");
+  }
+
+  public void testShiftRightVisualAction() {
+    typeTextInFile(parseKeys("Vj>"),
+                   "    <caret>abcde\n" +
+                   "    abcde\n" +
+                   "    abcde\n" +
+                   "<caret>abcde\n" +
+                   "abcde\n");
+    myFixture.checkResult("        <caret>abcde\n" +
+                          "        abcde\n" +
+                          "    abcde\n" +
+                          "    <caret>abcde\n" +
+                          "    abcde\n");
+  }
 }
