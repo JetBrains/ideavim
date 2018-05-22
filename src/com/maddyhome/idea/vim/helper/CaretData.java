@@ -186,6 +186,42 @@ public class CaretData {
   }
 
   /**
+   * Gets the insertion start for the caret
+   */
+  public static int getInsertStart(@NotNull Caret caret) {
+    Integer ret = caret.getUserData(INSERT_START);
+
+    if (ret == null) {
+      return caret.getOffset();
+    }
+    else {
+      return ret;
+    }
+  }
+
+  /**
+   * Set the insertion start for the caret
+   */
+  public static void setInsertStart(@NotNull Caret caret, int insertStart) {
+    caret.putUserData(INSERT_START, insertStart);
+  }
+
+  /**
+   * Determines whether a caret was in the first line before inserting a new line above.
+   */
+  public static boolean wasInFirstLine(@NotNull Caret caret) {
+    Boolean res = caret.getUserData(WAS_IN_FIRST_LINE);
+    return (res != null) && res;
+  }
+
+  /**
+   * Sets the flag determining that a caret was in the first line before inserting a new line above.
+   */
+  public static void setWasInFirstLine(@NotNull Caret caret, boolean value) {
+    caret.putUserData(WAS_IN_FIRST_LINE, value);
+  }
+
+  /**
    * This class is completely static, no instances needed.
    */
   private CaretData() {
@@ -196,6 +232,8 @@ public class CaretData {
   private static final Key<Integer> VISUAL_END = new Key<>("visualEnd");
   private static final Key<Integer> VISUAL_OFFSET = new Key<>("visualOffset");
   private static final Key<Integer> PREV_LAST_COLUMN = new Key<>("previousLastColumn");
+  private static final Key<Integer> INSERT_START = new Key<>("insertStart");
+  private static final Key<Boolean> WAS_IN_FIRST_LINE = new Key<>("wasInFirstLine");
   private static final Key<VisualChange> VISUAL_CHANGE = new Key<>("visualChange");
   private static final Key<VisualChange> VISUAL_OP = new Key<>("visualOp");
   private static final Key<TextRange> VISUAL_TEXT_RANGE = new Key<>("visualTextRange");

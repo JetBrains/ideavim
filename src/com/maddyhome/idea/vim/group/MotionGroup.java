@@ -1155,15 +1155,18 @@ public class MotionGroup {
     return pos;
   }
 
+  /**
+   * @deprecated Use {@link #moveCaretToLineEnd(Editor, Caret)}
+   */
   public int moveCaretToLineEnd(@NotNull Editor editor) {
-    final VisualPosition visualPosition = editor.getCaretModel().getVisualPosition();
-    final int lastVisualLineColumn = EditorUtil.getLastVisualLineColumnNumber(editor, visualPosition.line);
-    final VisualPosition visualEndOfLine = new VisualPosition(visualPosition.line, lastVisualLineColumn, true);
-    return moveCaretToLineEnd(editor, editor.visualToLogicalPosition(visualEndOfLine).line, true);
+    return moveCaretToLineEnd(editor, editor.getCaretModel().getPrimaryCaret());
   }
 
   public int moveCaretToLineEnd(@NotNull Editor editor, @NotNull Caret caret) {
-    return moveCaretToLineEnd(editor, caret.getLogicalPosition().line, true);
+    final VisualPosition visualPosition = caret.getVisualPosition();
+    final int lastVisualLineColumn = EditorUtil.getLastVisualLineColumnNumber(editor, visualPosition.line);
+    final VisualPosition visualEndOfLine = new VisualPosition(visualPosition.line, lastVisualLineColumn, true);
+    return moveCaretToLineEnd(editor, editor.visualToLogicalPosition(visualEndOfLine).line, true);
   }
 
   public int moveCaretToLineEnd(@NotNull Editor editor, int line, boolean allowPastEnd) {

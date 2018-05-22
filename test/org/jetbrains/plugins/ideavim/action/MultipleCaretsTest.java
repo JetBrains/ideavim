@@ -1242,4 +1242,139 @@ public class MultipleCaretsTest extends VimTestCase {
                    "on<caret>e tw<caret>o th<caret>ree");
     myFixture.checkResult("<caret>one <caret>two <caret>three");
   }
+
+  public void testInsertAfterCursorActionMovement() {
+    typeTextInFile(parseKeys("a", "<ESC>"),
+                   "on<caret>e two th<caret>ree");
+    myFixture.checkResult("on<caret>e two th<caret>ree");
+  }
+
+  public void testInsertAfterCursorAction() {
+    typeTextInFile(parseKeys("a", "abcd", "<ESC>"),
+                   "on<caret>e two th<caret>ree");
+    myFixture.checkResult("oneabc<caret>d two thrabc<caret>dee");
+  }
+
+  public void testInsertAfterLineEndAction() {
+    typeTextInFile(parseKeys("A", "four", "<ESC>"),
+                   "one two <caret>three \n" +
+                   "sev<caret>en si<caret>x five \n");
+    myFixture.checkResult("one two three fou<caret>r\n" +
+                          "seven six five fou<caret>r\n");
+  }
+
+  public void testInsertBeforeCursorAction() {
+    typeTextInFile(parseKeys("i", "four", "<ESC>"),
+                   "one two three <caret> \n" +
+                   "seven six five <caret> \n");
+    myFixture.checkResult("one two three fou<caret>r \n" +
+                          "seven six five fou<caret>r \n");
+  }
+
+  public void testInsertBeforeFirstNonBlankAction() {
+    typeTextInFile(parseKeys("I", "four ", "<ESC>"),
+                   "  three t<caret>wo on<caret>e\n" +
+                   "<caret> five six se<caret>ven eight\n");
+    myFixture.checkResult("  four<caret> three two one\n" +
+                          " four<caret> five six seven eight\n");
+  }
+
+  public void testInsertCharacterAboveCursorAction() {
+    typeTextInFile(parseKeys("a", "<C-Y>", "<C-Y>", "<C-Y>", "<ESC>"),
+                   " one two three four\n" +
+                   "<caret>  two three four\n" +
+                   "four three two one\n" +
+                   "four three two<caret> \n");
+    myFixture.checkResult(" one two three four\n" +
+                          " on<caret>e two three four\n" +
+                          "four three two one\n" +
+                          "four three two on<caret>e\n");
+  }
+
+  public void testInsertCharacterBelowCursorAction() {
+    typeTextInFile(parseKeys("a", "<C-E>", "<C-E>", "<C-E>", "<ESC>"),
+                   "<caret>  two three four\n" +
+                   " one two three four\n" +
+                   "four three two<caret> \n" +
+                   "four three two one\n");
+    myFixture.checkResult(" on<caret>e two three four\n" +
+                          " one two three four\n" +
+                          "four three two on<caret>e\n" +
+                          "four three two one\n");
+  }
+
+  public void testInsertDeleteInsertedTextAction() {
+    typeTextInFile(parseKeys("a", "asdf", "<C-U>", "<ESC>"),
+                   "on<caret>e two th<caret>ree");
+    myFixture.checkResult("on<caret>e two th<caret>ree");
+  }
+
+  public void testInsertDeletePreviousWordAction() {
+    typeTextInFile(parseKeys("i", "<C-W>", "<ESC>"),
+                   "one tw<caret>o three<caret> four   <caret>\n");
+    myFixture.checkResult("one<caret> o<caret> <caret> \n");
+  }
+
+  public void testInsertEnterAction() {
+    typeTextInFile(parseKeys("i", "<C-M>", "<ESC>"),
+                   "one<caret>two<caret>three<caret>four\n");
+    myFixture.checkResult("one\n" +
+                          "<caret>two\n" +
+                          "<caret>three\n" +
+                          "<caret>four\n");
+  }
+
+  public void testInsertLineStartAction() {
+    typeTextInFile(parseKeys("I", "four ", "<ESC>"),
+                   "  three t<caret>wo on<caret>e\n" +
+                   "<caret> five six se<caret>ven eight\n");
+    myFixture.checkResult("  four<caret> three two one\n" +
+                          " four<caret> five six seven eight\n");
+  }
+
+  public void testInsertNewLineAboveAction() {
+    typeTextInFile(parseKeys("O", "abcde", "<ESC>"),
+                   "ab<caret>cde\n" +
+                   "ab<caret>cde\n" +
+                   "abcde\n" +
+                   "abc<caret>de\n");
+    myFixture.checkResult("abcd<caret>e\n" +
+                          "abcde\n" +
+                          "abcd<caret>e\n" +
+                          "abcde\n" +
+                          "abcde\n" +
+                          "abcd<caret>e\n" +
+                          "abcde\n");
+  }
+
+  public void testInsertNewLineAboveActionWithMultipleCaretsInLine() {
+    typeTextInFile(parseKeys("O", "<ESC>"),
+                   "a<caret>bcd<caret>e\n" +
+                   "abc<caret>d<caret>e\n");
+    myFixture.checkResult("<caret>\n" +
+                          "abcde\n" +
+                          "<caret>\n" +
+                          "abcde\n");
+  }
+
+  public void testInsertNewLineBelowAction() {
+    typeTextInFile(parseKeys("o", "abcde", "<ESC>"),
+                   "ab<caret>cde\n" +
+                   "ab<caret>cde\n" +
+                   "abcde\n" +
+                   "abc<caret>de\n");
+    myFixture.checkResult("abcde\n" +
+                          "abcd<caret>e\n" +
+                          "abcde\n" +
+                          "abcd<caret>e\n" +
+                          "abcde\n" +
+                          "abcde\n" +
+                          "abcd<caret>e\n");
+  }
+
+  public void testInsertSingleCommandAction() {
+    typeTextInFile(parseKeys("i", "<C-O>", "2h", "<ESC>"),
+                   "one <caret>two <caret>three <caret>four\n");
+    myFixture.checkResult("o<caret>ne t<caret>wo thr<caret>ee four\n");
+  }
 }
