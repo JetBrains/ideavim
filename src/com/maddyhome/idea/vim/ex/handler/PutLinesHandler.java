@@ -39,6 +39,7 @@ public class PutLinesHandler extends CommandHandler {
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context,
                          @NotNull ExCommand cmd) throws ExException {
+    // TODO: Add multiple carets support
     final RegisterGroup registerGroup = VimPlugin.getRegister();
     final int line = cmd.getLine(editor, context);
     final String arg = cmd.getArgument();
@@ -54,10 +55,10 @@ public class PutLinesHandler extends CommandHandler {
 
     final int offset = EditorHelper.getLineStartOffset(editor, line + 1);
     editor.getDocument().insertString(offset, "\n");
-    MotionGroup.moveCaret(editor, offset);
+    MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
     final boolean result = VimPlugin.getCopy().putTextAfterCursor(editor, context, 1, false, false);
     final int newOffset = EditorHelper.getLineStartOffset(editor, line + 1);
-    MotionGroup.moveCaret(editor, newOffset);
+    MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), newOffset);
     return result;
   }
 }

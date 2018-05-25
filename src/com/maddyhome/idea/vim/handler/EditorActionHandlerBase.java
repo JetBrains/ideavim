@@ -62,7 +62,19 @@ public abstract class EditorActionHandlerBase extends EditorActionHandler {
     final CommandState state = CommandState.getInstance(editor);
     final Command cmd = state.getCommand();
 
-    if (cmd == null || !execute(editor, caret, context, cmd)) {
+    try {
+      if (myRunForEachCaret) {
+        if (cmd == null || !execute(editor, caret, context, cmd)) {
+          VimPlugin.indicateError();
+        }
+      }
+      else {
+        if (cmd == null || !execute(editor, context, cmd)) {
+          VimPlugin.indicateError();
+        }
+      }
+    }
+    catch (ExecuteMethodNotOverriddenException e) {
       VimPlugin.indicateError();
     }
   }
@@ -74,12 +86,19 @@ public abstract class EditorActionHandlerBase extends EditorActionHandler {
   /**
    * @deprecated To implement the action logic, override {@link #execute(Editor, Caret, DataContext, Command)}.
    */
-  protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+  protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd)
+    throws ExecuteMethodNotOverriddenException {
+    if (!myRunForEachCaret) {
+      throw new ExecuteMethodNotOverriddenException(this.getClass());
+    }
     return execute(editor, editor.getCaretModel().getPrimaryCaret(), context, cmd);
   }
 
   protected boolean execute(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context,
-                            @NotNull Command cmd) {
+                            @NotNull Command cmd) throws ExecuteMethodNotOverriddenException {
+    if (myRunForEachCaret) {
+      throw new ExecuteMethodNotOverriddenException(this.getClass());
+    }
     return execute(editor, context, cmd);
   }
 

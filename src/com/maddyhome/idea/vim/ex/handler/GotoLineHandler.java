@@ -49,6 +49,7 @@ public class GotoLineHandler extends CommandHandler {
    * @return True if able to perform the command, false if not
    */
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
+    // TODO: Add multiple carets support
     int count = cmd.getLine(editor, context);
 
     int max = EditorHelper.getLineCount(editor);
@@ -57,12 +58,13 @@ public class GotoLineHandler extends CommandHandler {
     }
 
     if (count >= 0) {
-      MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, count));
+      MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(),
+                            VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, count));
 
       return true;
     }
     else {
-      MotionGroup.moveCaret(editor, 0);
+      MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), 0);
     }
 
     return false;

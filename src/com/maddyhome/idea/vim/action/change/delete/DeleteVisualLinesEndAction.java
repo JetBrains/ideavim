@@ -46,7 +46,7 @@ public class DeleteVisualLinesEndAction extends VimCommandAction {
       @Override
       protected boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                                 @NotNull Command cmd, @NotNull TextRange range) {
-        if (CommandState.inVisualBlockMode(editor)/*range.isMultiple()*/) {
+        if (CommandState.inVisualBlockMode(editor)) {
           final int[] starts = range.getStartOffsets();
           final int[] ends = range.getEndOffsets();
           for (int i = 0; i < starts.length; i++) {
@@ -55,7 +55,8 @@ public class DeleteVisualLinesEndAction extends VimCommandAction {
             }
           }
           final TextRange blockRange = new TextRange(starts, ends);
-          return VimPlugin.getChange().deleteRange(editor, blockRange, SelectionType.BLOCK_WISE, false);
+          return VimPlugin.getChange()
+            .deleteRange(editor, editor.getCaretModel().getPrimaryCaret(), blockRange, SelectionType.BLOCK_WISE, false);
         }
         else {
           final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),

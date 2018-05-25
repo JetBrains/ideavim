@@ -36,7 +36,8 @@ public class DeleteLinesHandler extends CommandHandler {
     super("d", "elete", RANGE_OPTIONAL | ARGUMENT_OPTIONAL | WRITABLE);
   }
 
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd)
+    throws ExException {
     StringBuilder arg = new StringBuilder(cmd.getArgument());
     char register = VimPlugin.getRegister().getDefaultRegister();
     if (arg.length() > 0 && (arg.charAt(0) < '0' || arg.charAt(0) > '9')) {
@@ -49,6 +50,7 @@ public class DeleteLinesHandler extends CommandHandler {
 
     TextRange range = cmd.getTextRange(editor, context, true);
 
-    return VimPlugin.getChange().deleteRange(editor, range, SelectionType.LINE_WISE, false);
+    return VimPlugin.getChange()
+      .deleteRange(editor, editor.getCaretModel().getPrimaryCaret(), range, SelectionType.LINE_WISE, false);
   }
 }

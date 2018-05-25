@@ -30,8 +30,6 @@ import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -64,13 +62,23 @@ public abstract class ChangeEditorActionHandler extends EditorActionHandlerBase 
       worked = true;
       @NotNull List<Caret> carets = EditorHelper.getOrderedCaretsList(editor, myCaretOrder);
       for (Caret caret : carets) {
-        if (!execute(editor, caret, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument())) {
-          worked = false;
+        try {
+          if (!execute(editor, caret, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument())) {
+            worked = false;
+          }
+        }
+        catch (ExecuteMethodNotOverriddenException e) {
+          return false;
         }
       }
     }
     else {
-      worked = execute(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+      try {
+        worked = execute(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+      }
+      catch (ExecuteMethodNotOverriddenException e) {
+        return false;
+      }
     }
     if (worked) {
       CommandState.getInstance(editor).saveLastChangeCommand(cmd);
@@ -85,12 +93,18 @@ public abstract class ChangeEditorActionHandler extends EditorActionHandlerBase 
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
-                         @Nullable Argument argument) {
+                         @Nullable Argument argument) throws ExecuteMethodNotOverriddenException {
+    if (!myIsMulticaretChangeAction) {
+      throw new ExecuteMethodNotOverriddenException(this.getClass());
+    }
     return execute(editor, editor.getCaretModel().getPrimaryCaret(), context, count, rawCount, argument);
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                         int rawCount, @Nullable Argument argument) {
+                         int rawCount, @Nullable Argument argument) throws ExecuteMethodNotOverriddenException {
+    if (myIsMulticaretChangeAction) {
+      throw new ExecuteMethodNotOverriddenException(this.getClass());
+    }
     return execute(editor, context, count, rawCount, argument);
   }
 }

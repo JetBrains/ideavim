@@ -31,12 +31,12 @@ import org.jetbrains.annotations.NotNull;
  */
 public class RepeatHandler extends CommandHandler {
   public RepeatHandler() {
-    super(new CommandName[]{
-      new CommandName("@", "")
-    }, RANGE_OPTIONAL | ARGUMENT_REQUIRED | DONT_SAVE_LAST);
+    super(new CommandName[]{new CommandName("@", "")}, RANGE_OPTIONAL | ARGUMENT_REQUIRED | DONT_SAVE_LAST);
   }
 
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd)
+    throws ExException {
+    // TODO: Add multiple carets support
     char arg = cmd.getArgument().charAt(0);
     int line = cmd.getLine(editor, context);
 
@@ -44,7 +44,8 @@ public class RepeatHandler extends CommandHandler {
       arg = lastArg;
     }
 
-    MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLine(editor, line));
+    MotionGroup
+      .moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), VimPlugin.getMotion().moveCaretToLine(editor, line));
     lastArg = arg;
 
     if (arg == ':') {

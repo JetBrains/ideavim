@@ -47,7 +47,7 @@ public class MotionUpFirstNonSpaceAction extends MotionEditorAction {
                          int count,
                          int rawCount,
                          @Nullable Argument argument) {
-      return VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, -count);
+      return VimPlugin.getMotion().moveCaretToLineStartSkipLeadingOffset(editor, caret, -count);
     }
   }
 }

@@ -79,8 +79,13 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
         if (range == null) {
           return false;
         }
-        if (!execute(editor, caret, context, cmd, range)) {
-          res = false;
+        try {
+          if (!execute(editor, caret, context, cmd, range)) {
+            res = false;
+          }
+        }
+        catch (ExecuteMethodNotOverriddenException e) {
+          return false;
         }
       }
     }
@@ -89,7 +94,12 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
       if (range == null) {
         return false;
       }
-      res = execute(editor, context, cmd, range);
+      try {
+        res = execute(editor, context, cmd, range);
+      }
+      catch (ExecuteMethodNotOverriddenException e) {
+        return false;
+      }
     }
 
     runnable.setRes(res);
@@ -104,12 +114,18 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
   }
 
   protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
-                            @NotNull TextRange range) {
+                            @NotNull TextRange range) throws ExecuteMethodNotOverriddenException {
+    if (!myRunForEachCaret) {
+      throw new ExecuteMethodNotOverriddenException(this.getClass());
+    }
     return execute(editor, editor.getCaretModel().getPrimaryCaret(), context, cmd, range);
   }
 
   protected boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                            @NotNull Command cmd, @NotNull TextRange range) {
+                            @NotNull Command cmd, @NotNull TextRange range) throws ExecuteMethodNotOverriddenException {
+    if (myRunForEachCaret) {
+      throw new ExecuteMethodNotOverriddenException(this.getClass());
+    }
     return execute(editor, context, cmd, range);
   }
 
@@ -171,8 +187,6 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
       // If this is a mutli key change then exit visual now
       if (cmd != null && (cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) != 0) {
         logger.debug("multikey undo - exit visual");
-        wasVisual = true;
-        wasVisualBlock = CommandState.inVisualBlockMode(editor);
         VimPlugin.getMotion().exitVisual(editor);
       }
       else if (cmd != null && (cmd.getFlags() & Command.FLAG_FORCE_LINEWISE) != 0) {
@@ -237,8 +251,6 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
     private boolean res;
     @NotNull private CommandState.SubMode lastMode;
     private boolean wasRepeat;
-    private boolean wasVisual = false;
-    private boolean wasVisualBlock = false;
     private boolean myRunForEachCaret;
   }
 

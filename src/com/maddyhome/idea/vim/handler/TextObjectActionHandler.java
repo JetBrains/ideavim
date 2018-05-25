@@ -46,44 +46,24 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
                                   @NotNull Command cmd) {
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
       TextRange range;
-      if (myRunForEachCaret) {
-        if (caret == null) {
-          return false;
-        }
-        range = getRange(editor, caret, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+      if (caret == null) {
+        return false;
       }
-      else {
-        range = getRange(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
-      }
+      range = getRange(editor, caret, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+
       if (range == null) {
         return false;
       }
 
       TextRange vr;
-      if (myRunForEachCaret) {
-        if (caret == null) {
-          return false;
-        }
-        vr = VimPlugin.getMotion().getRawVisualRange(caret);
-      }
-      else {
-        vr = VimPlugin.getMotion().getRawVisualRange(editor);
-      }
+      vr = VimPlugin.getMotion().getRawVisualRange(caret);
 
       boolean block = (cmd.getFlags() & Command.FLAG_TEXT_BLOCK) != 0;
       int newstart = block || vr.getEndOffset() >= vr.getStartOffset() ? range.getStartOffset() : range.getEndOffset();
       int newend = block || vr.getEndOffset() >= vr.getStartOffset() ? range.getEndOffset() : range.getStartOffset();
 
       if (vr.getStartOffset() == vr.getEndOffset() || block) {
-        if (myRunForEachCaret) {
-          if (caret == null) {
-            return false;
-          }
-          VimPlugin.getMotion().moveVisualStart(caret, newstart);
-        }
-        else {
-          VimPlugin.getMotion().moveVisualStart(editor.getCaretModel().getPrimaryCaret(), newstart);
-        }
+        VimPlugin.getMotion().moveVisualStart(caret, newstart);
       }
 
       if (((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) != 0 &&
@@ -97,35 +77,13 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
         VimPlugin.getMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER);
       }
 
-      if (myRunForEachCaret) {
-        if (caret == null) {
-          return false;
-        }
-        MotionGroup.moveCaret(editor, caret, newend);
-      }
-      else {
-        MotionGroup.moveCaret(editor, newend);
-      }
+      MotionGroup.moveCaret(editor, caret, newend);
     }
 
     return true;
   }
 
-  /**
-   * Version for single-caret commands.
-   */
   @Nullable
-  public TextRange getRange(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
-                            @Nullable Argument argument) {
-    return getRange(editor, editor.getCaretModel().getPrimaryCaret(), context, count, rawCount, argument);
-  }
-
-  /**
-   * Version for multi-caret commands.
-   */
-  @Nullable
-  public TextRange getRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                            int rawCount, @Nullable Argument argument) {
-    return getRange(editor, context, count, rawCount, argument);
-  }
+  public abstract TextRange getRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                                     int count, int rawCount, @Nullable Argument argument);
 }

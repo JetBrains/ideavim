@@ -40,6 +40,7 @@ import com.maddyhome.idea.vim.common.Jump;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
+import com.maddyhome.idea.vim.handler.ExecuteMethodNotOverriddenException;
 import com.maddyhome.idea.vim.helper.CaretData;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
@@ -233,7 +234,8 @@ public class MotionGroup {
 
       VisualChange range = getVisualOperatorRange(editor, Command.FLAG_MOT_LINEWISE);
       if (range.getLines() > 1) {
-        MotionGroup.moveCaret(editor, moveCaretVertical(editor, editor.getCaretModel().getPrimaryCaret(), -1));
+        MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(),
+                              moveCaretVertical(editor, editor.getCaretModel().getPrimaryCaret(), -1));
       }
     }
   }
@@ -269,9 +271,9 @@ public class MotionGroup {
       }
     }
 
-    MotionGroup.moveCaret(editor, start);
+    MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), start);
     toggleVisual(editor, 1, 0, mode);
-    MotionGroup.moveCaret(editor, end);
+    MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), end);
     KeyHandler.getInstance().reset(editor);
   }
 
@@ -322,25 +324,6 @@ public class MotionGroup {
    * the motion is FLAG_MOT_LINEWISE or FLAG_MOT_CHARACTERWISE (FLAG_MOT_INCLUSIVE or FLAG_MOT_EXCLUSIVE).
    *
    * @param editor     The editor the motion takes place in
-   * @param context    The data context
-   * @param count      The count applied to the motion
-   * @param rawCount   The actual count entered by the user
-   * @param argument   Any argument needed by the motion
-   * @param incNewline True if to include newline
-   * @return The motion's range
-   */
-  @Nullable
-  public static TextRange getMotionRange(@NotNull Editor editor, DataContext context, int count, int rawCount,
-                                         @NotNull Argument argument, boolean incNewline) {
-    return getMotionRange(editor, editor.getCaretModel().getPrimaryCaret(), context, count, rawCount, argument,
-                          incNewline);
-  }
-
-  /**
-   * This helper method calculates the complete range a motion will move over taking into account whether
-   * the motion is FLAG_MOT_LINEWISE or FLAG_MOT_CHARACTERWISE (FLAG_MOT_INCLUSIVE or FLAG_MOT_EXCLUSIVE).
-   *
-   * @param editor     The editor the motion takes place in
    * @param caret      The caret the motion takes place on
    * @param context    The data context
    * @param count      The count applied to the motion
@@ -368,7 +351,14 @@ public class MotionGroup {
       start = caret.getOffset();
 
       // Execute the motion (without moving the cursor) and get where we end
-      end = action.getOffset(editor, caret, context, cnt, raw, cmd.getArgument());
+      try {
+        end = action.getOffset(editor, caret, context, cnt, raw, cmd.getArgument());
+      }
+      catch (ExecuteMethodNotOverriddenException e) {
+        // This actually should have fallen even earlier.
+        end = -1;
+        VimPlugin.indicateError();
+      }
 
       // Invalid motion
       if (end == -1) {
@@ -432,7 +422,8 @@ public class MotionGroup {
       if (!vf.getPath().equals(mark.getFilename())) {
         final Editor selectedEditor = selectEditor(editor, mark);
         if (selectedEditor != null) {
-          moveCaret(selectedEditor, moveCaretToLineStartSkipLeading(selectedEditor, line));
+          moveCaret(selectedEditor, editor.getCaretModel().getPrimaryCaret(),
+                    moveCaretToLineStartSkipLeading(selectedEditor, line));
         }
         return -2;
       }
@@ -467,7 +458,8 @@ public class MotionGroup {
       if (!vf.getPath().equals(mark.getFilename())) {
         final Editor selectedEditor = selectEditor(editor, mark);
         if (selectedEditor != null) {
-          moveCaret(selectedEditor, selectedEditor.logicalPositionToOffset(lp));
+          moveCaret(selectedEditor, editor.getCaretModel().getPrimaryCaret(),
+                    selectedEditor.logicalPositionToOffset(lp));
         }
         return -2;
       }
@@ -498,7 +490,8 @@ public class MotionGroup {
           if (spot == -1) {
             VimPlugin.getMark().addJump(editor, false);
           }
-          moveCaret(newEditor, EditorHelper.normalizeOffset(newEditor, newEditor.logicalPositionToOffset(lp), false));
+          moveCaret(newEditor, newEditor.getCaretModel().getPrimaryCaret(),
+                    EditorHelper.normalizeOffset(newEditor, newEditor.logicalPositionToOffset(lp), false));
         }
 
         return -2;
@@ -890,7 +883,7 @@ public class MotionGroup {
                                    editor.getCaretModel().getLogicalPosition().line);
       }
 
-      moveCaret(editor, offset);
+      moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
     }
   }
 
@@ -990,7 +983,7 @@ public class MotionGroup {
     int col = editor.getCaretModel().getVisualPosition().column;
     int oldColumn = col;
     if (col >= EditorHelper.getLineLength(editor) - 1) {
-      col = EditorData.getLastColumn(editor);
+      col = CaretData.getLastColumn(editor.getCaretModel().getPrimaryCaret());
     }
     int visualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
     int caretColumn = col;
@@ -1010,9 +1003,9 @@ public class MotionGroup {
 
     if (newline != cline || newColumn != oldColumn) {
       int offset = EditorHelper.visualPositionToOffset(editor, new VisualPosition(newline, newColumn));
-      moveCaret(editor, offset);
+      moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
 
-      EditorData.setLastColumn(editor, col);
+      CaretData.setLastColumn(editor, editor.getCaretModel().getPrimaryCaret(), col);
     }
   }
 
@@ -1033,7 +1026,7 @@ public class MotionGroup {
     visualTopLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
 
     if (moved && topLine == newLine && topLine == visualTopLine) {
-      moveCaret(editor, moveCaretToScreenLine(editor, line));
+      moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), moveCaretToScreenLine(editor, line));
 
       return true;
     }
@@ -1042,7 +1035,7 @@ public class MotionGroup {
       if (pages < 0) {
         visualLine = height - visualLine + 3;
       }
-      moveCaret(editor, moveCaretToScreenLine(editor, visualLine));
+      moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), moveCaretToScreenLine(editor, visualLine));
 
       return true;
     }
@@ -1055,12 +1048,13 @@ public class MotionGroup {
       }
 
       int logicalLine = editor.visualToLogicalPosition(new VisualPosition(visualLine, 0)).line;
-      moveCaret(editor, moveCaretToLineStartSkipLeading(editor, logicalLine));
+      moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), moveCaretToLineStartSkipLeading(editor, logicalLine));
 
       return true;
     }
     else {
-      moveCaret(editor, moveCaretToLineStartSkipLeading(editor));
+      moveCaret(editor, editor.getCaretModel().getPrimaryCaret(),
+                moveCaretToLineStartSkipLeading(editor, editor.getCaretModel().getPrimaryCaret()));
       return false;
     }
   }
@@ -1078,10 +1072,13 @@ public class MotionGroup {
   }
 
   public int moveCaretToMiddleColumn(@NotNull Editor editor) {
+    // TODO: add multiple carets support
+
     int width = EditorHelper.getScreenWidth(editor) / 2;
     int len = EditorHelper.getLineLength(editor);
 
-    return moveCaretToColumn(editor, Math.max(0, Math.min(len - 1, width)), false);
+    return moveCaretToColumn(editor, editor.getCaretModel().getPrimaryCaret(), Math.max(0, Math.min(len - 1, width)),
+                             false);
   }
 
   public int moveCaretToColumn(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowEnd) {
@@ -1215,8 +1212,9 @@ public class MotionGroup {
   }
 
   public int moveCaretToLineScreenStart(@NotNull Editor editor) {
+    // TODO: Add multiple carets support
     int col = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
-    return moveCaretToColumn(editor, col, false);
+    return moveCaretToColumn(editor, editor.getCaretModel().getPrimaryCaret(), col, false);
   }
 
   public int moveCaretToLineScreenStartSkipLeading(@NotNull Editor editor) {
@@ -1226,8 +1224,9 @@ public class MotionGroup {
   }
 
   public int moveCaretToLineScreenEnd(@NotNull Editor editor, boolean allowEnd) {
+    // TODO: Add multiple carets support
     int col = EditorHelper.getVisualColumnAtLeftOfScreen(editor) + EditorHelper.getScreenWidth(editor) - 1;
-    return moveCaretToColumn(editor, col, allowEnd);
+    return moveCaretToColumn(editor, editor.getCaretModel().getPrimaryCaret(), col, allowEnd);
   }
 
   public int moveCaretHorizontalWrap(@NotNull Editor editor, @NotNull Caret caret, int count) {
@@ -1346,8 +1345,8 @@ public class MotionGroup {
       final boolean keepVisual = forceKeepVisual || keepVisual(editor);
       if (caret.getOffset() != offset) {
         caret.moveToOffset(offset);
+        CaretData.setLastColumn(editor, caret, caret.getVisualPosition().column);
         if (caret == editor.getCaretModel().getPrimaryCaret()) {
-          CaretData.setLastColumn(editor, caret, caret.getVisualPosition().column);
           scrollCaretIntoView(editor);
         }
       }

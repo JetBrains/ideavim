@@ -43,7 +43,9 @@ public class FilterMotionAction extends EditorAction {
       if (argument == null) {
         return false;
       }
-      TextRange range = MotionGroup.getMotionRange(editor, context, cmd.getCount(), cmd.getRawCount(), argument, false);
+      TextRange range = MotionGroup
+        .getMotionRange(editor, editor.getCaretModel().getPrimaryCaret(), context, cmd.getCount(), cmd.getRawCount(),
+                        argument, false);
       if (range == null) {
         return false;
       }
@@ -52,7 +54,7 @@ public class FilterMotionAction extends EditorAction {
       LogicalPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
       LogicalPosition end = editor.offsetToLogicalPosition(range.getEndOffset());
       if (current.line != start.line) {
-        MotionGroup.moveCaret(editor, range.getStartOffset());
+        MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), range.getStartOffset());
       }
 
       int count;

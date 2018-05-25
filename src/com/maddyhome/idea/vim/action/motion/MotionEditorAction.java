@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.handler.ExecuteMethodNotOverriddenException;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,12 +36,8 @@ public abstract class MotionEditorAction extends EditorAction {
     this.handler = handler;
   }
 
-  public int getOffset(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-    return handler.getOffset(editor, context, count, rawCount, argument);
-  }
-
   public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                       int rawCount, @Nullable Argument argument) {
+                       int rawCount, @Nullable Argument argument) throws ExecuteMethodNotOverriddenException {
     return handler.getOffset(editor, caret, context, count, rawCount, argument);
   }
 

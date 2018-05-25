@@ -69,6 +69,6 @@ public class DeleteJoinVisualLinesAction extends VimCommandAction {
 
   @Override
   public int getFlags() {
-    return 0;
+    return Command.FLAG_EXIT_VISUAL;
   }
 }

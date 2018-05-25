@@ -42,6 +42,47 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
     super(runForEachCaret);
   }
 
+  private void updateVisualCaretData(@NotNull Editor editor, @NotNull Caret caret) {
+    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
+      int selectionStart = caret.getSelectionStart();
+      int selectionEnd = caret.getSelectionEnd();
+      int caretOffset = caret.getOffset();
+      if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_CHARACTER) {
+        if (selectionStart == caretOffset) {
+          CaretData.setVisualStart(caret, selectionEnd - 1);
+          CaretData.setVisualEnd(caret, selectionStart);
+        }
+        else {
+          CaretData.setVisualStart(caret, selectionStart);
+          CaretData.setVisualEnd(caret, selectionEnd);
+        }
+      }
+      else if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_LINE) {
+        int selectionStartLine = editor.offsetToLogicalPosition(selectionStart).line;
+        int selectionEndLine = editor.offsetToLogicalPosition(selectionEnd).line;
+        int caretLine = editor.offsetToLogicalPosition(caretOffset).line;
+        int currentVisualStartLine = editor.offsetToLogicalPosition(CaretData.getVisualStart(caret)).line;
+        int currentVisualEndLine = editor.offsetToLogicalPosition(CaretData.getVisualEnd(caret)).line;
+        if (selectionStartLine == caretLine) {
+          if (currentVisualStartLine != selectionEndLine) {
+            CaretData.setVisualStart(caret, EditorHelper.getLineEndOffset(editor, selectionEndLine, false));
+          }
+          if (currentVisualEndLine != caretLine) {
+            CaretData.setVisualEnd(caret, caretOffset);
+          }
+        }
+        else {
+          if (currentVisualStartLine != selectionStartLine) {
+            CaretData.setVisualStart(caret, EditorHelper.getLineStartOffset(editor, selectionStartLine));
+          }
+          if (currentVisualEndLine != caretLine) {
+            CaretData.setVisualEnd(caret, caretOffset);
+          }
+        }
+      }
+    }
+  }
+
   @Override
   protected final boolean execute(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context,
                                   @NotNull Command cmd) {
@@ -59,44 +100,7 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
       else {
         currentCaret = editor.getCaretModel().getPrimaryCaret();
       }
-      if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-        int selectionStart = currentCaret.getSelectionStart();
-        int selectionEnd = currentCaret.getSelectionEnd();
-        int caretOffset = currentCaret.getOffset();
-        if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_CHARACTER) {
-          if (selectionStart == caretOffset) {
-            CaretData.setVisualStart(currentCaret, selectionEnd - 1);
-            CaretData.setVisualEnd(currentCaret, selectionStart);
-          }
-          else {
-            CaretData.setVisualStart(currentCaret, selectionStart);
-            CaretData.setVisualEnd(currentCaret, selectionEnd);
-          }
-        }
-        else if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_LINE) {
-          int selectionStartLine = editor.offsetToLogicalPosition(selectionStart).line;
-          int selectionEndLine = editor.offsetToLogicalPosition(selectionEnd).line;
-          int caretLine = editor.offsetToLogicalPosition(caretOffset).line;
-          int currentVisualStartLine = editor.offsetToLogicalPosition(CaretData.getVisualStart(currentCaret)).line;
-          int currentVisualEndLine = editor.offsetToLogicalPosition(CaretData.getVisualEnd(currentCaret)).line;
-          if (selectionStartLine == caretLine) {
-            if (currentVisualStartLine != selectionEndLine) {
-              CaretData.setVisualStart(currentCaret, EditorHelper.getLineEndOffset(editor, selectionEndLine, false));
-            }
-            if (currentVisualEndLine != caretLine) {
-              CaretData.setVisualEnd(currentCaret, caretOffset);
-            }
-          }
-          else {
-            if (currentVisualStartLine != selectionStartLine) {
-              CaretData.setVisualStart(currentCaret, EditorHelper.getLineStartOffset(editor, selectionStartLine));
-            }
-            if (currentVisualEndLine != caretLine) {
-              CaretData.setVisualEnd(currentCaret, caretOffset);
-            }
-          }
-        }
-      }
+      updateVisualCaretData(editor, currentCaret);
     }
 
     if (myRunForEachCaret) {
@@ -120,10 +124,20 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
       if (caret == null) {
         return false;
       }
-      offset = getOffset(editor, caret, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+      try {
+        offset = getOffset(editor, caret, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+      }
+      catch (ExecuteMethodNotOverriddenException e) {
+        return false;
+      }
     }
     else {
-      offset = getOffset(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+      try {
+        offset = getOffset(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+      }
+      catch (ExecuteMethodNotOverriddenException e) {
+        return false;
+      }
     }
     if (offset == -1) {
       return false;
@@ -145,7 +159,7 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
         postMove(editor, caret, context, cmd);
       }
       else {
-        MotionGroup.moveCaret(editor, offset);
+        MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
         postMove(editor, context, cmd);
       }
 
@@ -156,13 +170,26 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
     }
   }
 
+  @Override
+  protected final boolean execute(@NotNull Editor editor, @NotNull DataContext dataContext, @NotNull Command cmd) {
+    // EditorActionHandlerBase inheritors should override the 3-arg execute if they do not run for each caret and
+    // the 4-arg execute if they do. This is the 3-arg version for the "one-off" actions.
+    return execute(editor, editor.getCaretModel().getPrimaryCaret(), dataContext, cmd);
+  }
+
   public int getOffset(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
-                       @Nullable Argument argument) {
+                       @Nullable Argument argument) throws ExecuteMethodNotOverriddenException {
+    if (!myRunForEachCaret) {
+      throw new ExecuteMethodNotOverriddenException(this.getClass());
+    }
     return getOffset(editor, editor.getCaretModel().getPrimaryCaret(), context, count, rawCount, argument);
   }
 
   public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                       int rawCount, @Nullable Argument argument) {
+                       int rawCount, @Nullable Argument argument) throws ExecuteMethodNotOverriddenException {
+    if (myRunForEachCaret) {
+      throw new ExecuteMethodNotOverriddenException(this.getClass());
+    }
     return getOffset(editor, context, count, rawCount, argument);
   }
 

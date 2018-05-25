@@ -37,11 +37,6 @@ public abstract class TextObjectAction extends EditorAction {
   }
 
   @Nullable
-  public TextRange getRange(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-    return handler.getRange(editor, context, count, rawCount, argument);
-  }
-
-  @Nullable
   public TextRange getRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                             int rawCount, @Nullable Argument argument) {
     return handler.getRange(editor, caret, context, count, rawCount, argument);

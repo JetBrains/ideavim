@@ -198,6 +198,8 @@ public class Ranges {
    * @param context The data context
    */
   private void processRange(@NotNull Editor editor, DataContext context) {
+    // TODO: Add multiple carets support
+
     // Already done
     if (done) return;
 
@@ -210,7 +212,8 @@ public class Ranges {
       startLine = endLine;
       endLine = range.getLine(editor, context, lastZero);
       if (range.isMove()) {
-        MotionGroup.moveCaret(editor, VimPlugin.getMotion().moveCaretToLine(editor, endLine));
+        MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(),
+                              VimPlugin.getMotion().moveCaretToLine(editor, endLine));
       }
       // Did that last range represent the start of the file?
       lastZero = (endLine < 0);

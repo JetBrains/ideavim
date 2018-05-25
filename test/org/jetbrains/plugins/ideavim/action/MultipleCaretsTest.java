@@ -182,6 +182,18 @@ public class MultipleCaretsTest extends VimTestCase {
                           "<caret>fo<caret>u<caret>r");
   }
 
+  public void testLeftRightAndUpDownMovements() {
+    typeTextInFile(parseKeys("khj"),
+                   "abcde\n" +
+                   "ab<caret>cde\n" +
+                   "abc<caret>de\n" +
+                   "abcd<caret>e\n");
+    myFixture.checkResult("abcde\n" +
+                          "a<caret>bcde\n" +
+                          "ab<caret>cde\n" +
+                          "abc<caret>de\n");
+  }
+
   public void testMotionDownFirstNonSpaceAction() {
     typeTextInFile(parseKeys("+"),
                    " <caret> on<caret>e<caret> two\n" +
@@ -941,6 +953,34 @@ public class MultipleCaretsTest extends VimTestCase {
                           "<caret>a\n");
   }
 
+  public void testOneCaretPostionAfterChangeLineAction() {
+    typeTextInFile(parseKeys("c2c", "<ESC>"),
+                   "abcde\n" +
+                   "ab<caret>cde\n" +
+                   "abcde\n" +
+                   "abcde\n");
+    myFixture.checkResult("abcde\n" +
+                          "<caret>\n" +
+                          "abcde\n");
+  }
+
+  public void testCaretPositionAfterChangeLineAction() {
+    typeTextInFile(parseKeys("c2c", "<ESC>"),
+                   "abcd<caret>e\n" +
+                   "abcde\n" +
+                   "abcde\n" +
+                   "ab<caret>cde\n" +
+                   "abcde\n" +
+                   "abcde\n" +
+                   "<caret>abcde\n" +
+                   "abcde\n");
+    myFixture.checkResult("<caret>\n" +
+                          "abcde\n" +
+                          "<caret>\n" +
+                          "abcde\n" +
+                          "<caret>\n");
+  }
+
   public void testChangeMotionAction() {
     typeTextInFile(parseKeys("ciw", "correct", "<ESC>"),
                    "correct correct wron<caret>g wr<caret>ong correct\n");
@@ -1121,8 +1161,8 @@ public class MultipleCaretsTest extends VimTestCase {
                    "abcd<caret>e\n" +
                    "abcde\n" +
                    "ab<caret>cde\n");
-    myFixture.checkResult("<selection>abcdeabcde</selection>\n" +
-                          "<selection>abcdeabcde</selection>\n");
+    myFixture.checkResult("abcde<caret>abcde\n" +
+                          "abcde<caret>abcde\n");
   }
 
   public void testDeleteJoinVisualLinesSpacesAction() {
@@ -1131,8 +1171,8 @@ public class MultipleCaretsTest extends VimTestCase {
                    "abcd<caret>e\n" +
                    "abcde\n" +
                    "ab<caret>cde\n");
-    myFixture.checkResult("<selection>abcde abcde</selection>\n" +
-                          "<selection>abcde abcde</selection>\n");
+    myFixture.checkResult("abcde<caret> abcde\n" +
+                          "abcde<caret> abcde\n");
   }
 
   public void testDeleteLineAction() {
