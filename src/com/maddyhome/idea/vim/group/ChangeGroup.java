@@ -1314,7 +1314,7 @@ public class ChangeGroup {
     }
     else if (append) {
       col += range.getMaxLength();
-      if (EditorData.getLastColumn(editor) == MotionGroup.LAST_COLUMN) {
+      if (CaretData.getLastColumn(editor.getCaretModel().getPrimaryCaret()) == MotionGroup.LAST_COLUMN) {
         col = MotionGroup.LAST_COLUMN;
       }
     }

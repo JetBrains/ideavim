@@ -48,9 +48,13 @@ public class MotionDownAction extends MotionEditorAction {
     @Override
     public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                          int rawCount, @Nullable Argument argument) {
+      Caret lastDownCaret = EditorData.getLastDownCaret(editor);
+      EditorData.setLastDownCaret(editor, caret);
       if (CommandState.inVisualBlockMode(editor) && EditorData.shouldIgnoreNextMove(editor)) {
         EditorData.dontIgnoreNextMove(editor);
-        return caret.getOffset();
+        if (lastDownCaret != caret) {
+          return caret.getOffset();
+        }
       }
       if (CommandState.inVisualBlockMode(editor)) {
         int blockEndOffset = EditorData.getVisualBlockEnd(editor);

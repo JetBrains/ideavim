@@ -787,6 +787,44 @@ public class MultipleCaretsTest extends VimTestCase {
                           "jjkll\n");
   }
 
+  public void testVisualBlockDownMovementAfterShorterLineAction() {
+    typeTextInFile(parseKeys("<C-V>", "kkjj"),
+                   "one\n" +
+                   "\n" +
+                   "two three\n" +
+                   "four fi<caret>ve\n");
+    myFixture.checkResult("one\n" +
+                          "\n" +
+                          "two three\n" +
+                          "four fi<selection><caret>v</selection>e\n");
+  }
+
+  public void testVisualBlockDownMovementWithEmptyLineInMiddle() {
+    typeTextInFile(parseKeys("<C-V>", "3k", "j"),
+                   "one\n" +
+                   "\n" +
+                   "two three\n" +
+                   "four fi<caret>ve\n");
+    myFixture.checkResult("one\n" +
+                          "\n" +
+                          "<selection>two thre</selection>e\n" +
+                          "<selection>four fiv</selection>e\n");
+  }
+
+  public void testVisualBlockDownMovementWithManyEmptyLinesInMiddle() {
+    typeTextInFile(parseKeys("<C-V>", "4kjjj"),
+                   "one\n" +
+                   "\n" +
+                   "\n" +
+                   "two three\n" +
+                   "four fi<caret>ve\n");
+    myFixture.checkResult("one\n" +
+                          "\n" +
+                          "\n" +
+                          "two thr<selection>e</selection>e\n" +
+                          "four fi<selection>v</selection>e\n");
+  }
+
   public void testMergingSelections() {
     typeTextInFile(parseKeys("v", "aW", "l", "h"),
       "a<caret>bcde.abcde.abcde  ab<caret>cde.abcde\n");
