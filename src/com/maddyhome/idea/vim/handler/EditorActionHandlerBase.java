@@ -45,12 +45,6 @@ public abstract class EditorActionHandlerBase extends EditorActionHandler {
   }
 
   @Override
-  public final void execute(@NotNull Editor editor, @NotNull DataContext context) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
-    doExecute(editor, editor.getCaretModel().getPrimaryCaret(), context);
-  }
-
-  @Override
   public final void doExecute(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context) {
     editor = InjectedLanguageUtil.getTopLevelEditor(editor);
     logger.debug("doExecute");
@@ -83,9 +77,6 @@ public abstract class EditorActionHandlerBase extends EditorActionHandler {
     // No-op
   }
 
-  /**
-   * @deprecated To implement the action logic, override {@link #execute(Editor, Caret, DataContext, Command)}.
-   */
   protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd)
     throws ExecuteMethodNotOverriddenException {
     if (!myRunForEachCaret) {
