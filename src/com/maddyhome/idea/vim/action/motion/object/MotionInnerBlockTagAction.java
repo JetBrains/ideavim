@@ -38,7 +38,7 @@ public class MotionInnerBlockTagAction extends TextObjectAction {
     @Nullable
     public TextRange getRange(@NotNull Editor editor, @Nullable DataContext context, int count, int rawCount,
                               @Nullable Argument argument) {
-      return VimPlugin.getMotion().getBlockTagRange(editor, false);
+      return VimPlugin.getMotion().getBlockTagRange(editor, count, false);
     }
   }
 }
