@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  *
  */
+// TODO: Cannot find the corresponding Vim command. Remove it?
 public class ResetModeAction extends EditorAction {
   public ResetModeAction() {
     super(new EditorActionHandler() {

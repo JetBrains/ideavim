@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  */
+// TODO: Unused action. Delete it?
 public class FileSaveAction extends EditorAction {
   public FileSaveAction() {
     super(new Handler());
