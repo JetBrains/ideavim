@@ -80,9 +80,7 @@ import java.util.concurrent.TimeUnit;
  */
 @State(
   name = "VimSettings",
-  storages = {@Storage(
-    id = "main",
-    file = "$APP_CONFIG$/vim_settings.xml")})
+  storages = {@Storage(file = "$APP_CONFIG$/vim_settings.xml")})
 public class VimPlugin implements ApplicationComponent, PersistentStateComponent<Element> {
   private static final String IDEAVIM_COMPONENT_NAME = "VimPlugin";
   private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";
