@@ -28,6 +28,7 @@ A bugfix release.
 * [VIM-1368](https://youtrack.jetbrains.com/issue/VIM-1368) Wait for focus reliably before running an `:action`
 * [VIM-1379](https://youtrack.jetbrains.com/issue/VIM-1379) Fixed `I` for short lines in visual block mode
 * [VIM-1380](https://youtrack.jetbrains.com/issue/VIM-1380) Fixed `cw` with count at the end of a word
+* [VIM-1404](https://youtrack.jetbrains.com/issue/VIM-1404) Fixed the ability to use `:e#` when editor tabs are hidden
 
 
 0.49, 2017-12-12
