@@ -72,7 +72,7 @@ public class FileGroup {
       }
       // Can't open a file unless it has a known file type. The next call will return the known type.
       // If unknown, IDEA will prompt the user to pick a type.
-      FileType type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found);
+      FileType type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found, project);
       if (type != null) {
         FileEditorManager fem = FileEditorManager.getInstance(project);
         fem.openFile(found, true);
@@ -454,7 +454,7 @@ public class FileGroup {
   /**
    * This class listens for editor tab changes so any insert/replace modes that need to be reset can be
    */
-  public static class SelectionCheck extends FileEditorManagerAdapter {
+  public static class SelectionCheck implements FileEditorManagerListener {
     /**
      * The user has changed the editor they are working with - exit insert/replace mode, and complete any
      * appropriate repeat.
