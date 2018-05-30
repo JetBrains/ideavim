@@ -461,8 +461,9 @@ public class FileGroup {
      * @param event
      */
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
-        if(event.getOldFile() != null)
-            lastSelections.put(event.getManager(), event.getOldFile());
+      if (event.getOldFile() != null) {
+        lastSelections.put(event.getManager(), event.getOldFile());
+      }
     }
   }
 
