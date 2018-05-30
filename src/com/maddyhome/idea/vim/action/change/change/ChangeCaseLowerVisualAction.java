@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.action.change.change;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -26,6 +27,7 @@ import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
 import org.jetbrains.annotations.NotNull;
@@ -39,11 +41,12 @@ import java.util.Set;
  */
 public class ChangeCaseLowerVisualAction extends VimCommandAction {
   public ChangeCaseLowerVisualAction() {
-    super(new VisualOperatorActionHandler() {
-      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
-                                @NotNull TextRange range) {
+    super(new VisualOperatorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
+      @Override
+      protected boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                                @NotNull Command cmd, @NotNull TextRange range) {
         final Editor topLevelEditor = InjectedLanguageUtil.getTopLevelEditor(editor);
-        return VimPlugin.getChange().changeCaseRange(topLevelEditor, range, CharacterHelper.CASE_LOWER);
+        return VimPlugin.getChange().changeCaseRange(topLevelEditor, caret, range, CharacterHelper.CASE_LOWER);
       }
     });
   }

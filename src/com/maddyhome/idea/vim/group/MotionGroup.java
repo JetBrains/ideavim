@@ -40,6 +40,8 @@ import com.maddyhome.idea.vim.common.Jump;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
+import com.maddyhome.idea.vim.handler.ExecuteMethodNotOverriddenException;
+import com.maddyhome.idea.vim.helper.CaretData;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
@@ -104,7 +106,7 @@ public class MotionGroup {
   public void turnOn() {
     Editor[] editors = EditorFactory.getInstance().getAllEditors();
     for (Editor editor : editors) {
-      if (!EditorData.getMotionGroup(editor)){
+      if (!EditorData.getMotionGroup(editor)) {
         addEditorListener(editor);
         EditorData.setMotionGroup(editor, true);
       }
@@ -114,7 +116,7 @@ public class MotionGroup {
   public void turnOff() {
     Editor[] editors = EditorFactory.getInstance().getAllEditors();
     for (Editor editor : editors) {
-      if (EditorData.getMotionGroup(editor)){
+      if (EditorData.getMotionGroup(editor)) {
         removeEditorListener(editor);
         EditorData.setMotionGroup(editor, false);
       }
@@ -169,6 +171,10 @@ public class MotionGroup {
 
     setVisualMode(editor, visualMode);
 
+    if (CommandState.getInstance(editor).getSubMode() != CommandState.SubMode.NONE) {
+      editor.getCaretModel().removeSecondaryCarets();
+    }
+
     switch (CommandState.getInstance(editor).getSubMode()) {
       case NONE:
         VisualPosition vp = editor.getCaretModel().getVisualPosition();
@@ -183,14 +189,14 @@ public class MotionGroup {
         MotionGroup.scrollCaretIntoView(editor);
         break;
       case VISUAL_CHARACTER:
-        editor.getCaretModel().moveToOffset(visualEnd);
+        editor.getCaretModel().moveToOffset(CaretData.getVisualEnd(editor.getCaretModel().getPrimaryCaret()));
         break;
       case VISUAL_LINE:
         editor.getCaretModel().moveToLogicalPosition(editor.xyToLogicalPosition(event.getPoint()));
         break;
     }
 
-    visualOffset = editor.getCaretModel().getOffset();
+    CaretData.setVisualOffset(editor.getCaretModel().getPrimaryCaret(), editor.getCaretModel().getOffset());
 
     EditorData.setLastColumn(editor, editor.getCaretModel().getVisualPosition().column);
   }
@@ -210,7 +216,9 @@ public class MotionGroup {
 
     if (update) {
       if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-        updateSelection(editor, editor.getCaretModel().getOffset());
+        for (@NotNull Caret caret : editor.getCaretModel().getAllCarets()) {
+          updateSelection(editor, caret, caret.getOffset());
+        }
       }
     }
     else {
@@ -226,12 +234,14 @@ public class MotionGroup {
 
       VisualChange range = getVisualOperatorRange(editor, Command.FLAG_MOT_LINEWISE);
       if (range.getLines() > 1) {
-        MotionGroup.moveCaret(editor, moveCaretVertical(editor, -1));
+        MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(),
+                              moveCaretVertical(editor, editor.getCaretModel().getPrimaryCaret(), -1));
       }
     }
   }
 
-  private void processMouseReleased(@NotNull Editor editor, @NotNull CommandState.SubMode mode, int startOff, int endOff) {
+  private void processMouseReleased(@NotNull Editor editor, @NotNull CommandState.SubMode mode, int startOff,
+                                    int endOff) {
     if (ExEntryPanel.getInstance().isActive()) {
       ExEntryPanel.getInstance().deactivate(false);
     }
@@ -261,49 +271,52 @@ public class MotionGroup {
       }
     }
 
-    MotionGroup.moveCaret(editor, start);
+    MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), start);
     toggleVisual(editor, 1, 0, mode);
-    MotionGroup.moveCaret(editor, end);
+    MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), end);
     KeyHandler.getInstance().reset(editor);
   }
 
   @NotNull
-  public TextRange getWordRange(@NotNull Editor editor, int count, boolean isOuter, boolean isBig) {
+  public TextRange getWordRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter,
+                                boolean isBig) {
     int dir = 1;
     boolean selection = false;
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-      if (visualEnd < visualStart) {
+      if (CaretData.getVisualEnd(caret) < CaretData.getVisualStart(caret)) {
         dir = -1;
       }
-      if (visualStart != visualEnd) {
+      if (CaretData.getVisualStart(caret) != CaretData.getVisualEnd(caret)) {
         selection = true;
       }
     }
 
-    return SearchHelper.findWordUnderCursor(editor, count, dir, isOuter, isBig, selection);
+    return SearchHelper.findWordUnderCursor(editor, caret, count, dir, isOuter, isBig, selection);
   }
 
   @Nullable
-  public TextRange getBlockQuoteRange(@NotNull Editor editor, char quote, boolean isOuter) {
-    return SearchHelper.findBlockQuoteInLineRange(editor, quote, isOuter);
+  public TextRange getBlockQuoteRange(@NotNull Editor editor, @NotNull Caret caret, char quote, boolean isOuter) {
+    return SearchHelper.findBlockQuoteInLineRange(editor, caret, quote, isOuter);
   }
 
   @Nullable
-  public TextRange getBlockRange(@NotNull Editor editor, int count, boolean isOuter, char type) {
-    return SearchHelper.findBlockRange(editor, type, count, isOuter);
+  public TextRange getBlockRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter, char type) {
+    return SearchHelper.findBlockRange(editor, caret, type, count, isOuter);
   }
+
   @Nullable
-  public TextRange getBlockTagRange(@NotNull Editor editor, boolean isOuter) {
-    return SearchHelper.findBlockTagRange(editor, isOuter);
+  public TextRange getBlockTagRange(@NotNull Editor editor, @NotNull Caret caret, boolean isOuter) {
+    return SearchHelper.findBlockTagRange(editor, caret, isOuter);
   }
+
   @NotNull
-  public TextRange getSentenceRange(@NotNull Editor editor, int count, boolean isOuter) {
-    return SearchHelper.findSentenceRange(editor, count, isOuter);
+  public TextRange getSentenceRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter) {
+    return SearchHelper.findSentenceRange(editor, caret, count, isOuter);
   }
 
   @Nullable
-  public TextRange getParagraphRange(@NotNull Editor editor, int count, boolean isOuter) {
-    return SearchHelper.findParagraphRange(editor, count, isOuter);
+  public TextRange getParagraphRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter) {
+    return SearchHelper.findParagraphRange(editor, caret, count, isOuter);
   }
 
   /**
@@ -311,6 +324,7 @@ public class MotionGroup {
    * the motion is FLAG_MOT_LINEWISE or FLAG_MOT_CHARACTERWISE (FLAG_MOT_INCLUSIVE or FLAG_MOT_EXCLUSIVE).
    *
    * @param editor     The editor the motion takes place in
+   * @param caret      The caret the motion takes place on
    * @param context    The data context
    * @param count      The count applied to the motion
    * @param rawCount   The actual count entered by the user
@@ -319,8 +333,8 @@ public class MotionGroup {
    * @return The motion's range
    */
   @Nullable
-  public static TextRange getMotionRange(@NotNull Editor editor, DataContext context, int count, int rawCount,
-                                         @NotNull Argument argument, boolean incNewline) {
+  public static TextRange getMotionRange(@NotNull Editor editor, @NotNull Caret caret, DataContext context, int count,
+                                         int rawCount, @NotNull Argument argument, boolean incNewline) {
     final Command cmd = argument.getMotion();
     if (cmd == null) {
       return null;
@@ -334,10 +348,17 @@ public class MotionGroup {
       MotionEditorAction action = (MotionEditorAction)cmd.getAction();
 
       // This is where we are now
-      start = editor.getCaretModel().getOffset();
+      start = caret.getOffset();
 
       // Execute the motion (without moving the cursor) and get where we end
-      end = action.getOffset(editor, context, cnt, raw, cmd.getArgument());
+      try {
+        end = action.getOffset(editor, caret, context, cnt, raw, cmd.getArgument());
+      }
+      catch (ExecuteMethodNotOverriddenException e) {
+        // This actually should have fallen even earlier.
+        end = -1;
+        VimPlugin.indicateError();
+      }
 
       // Invalid motion
       if (end == -1) {
@@ -347,7 +368,7 @@ public class MotionGroup {
     else if (cmd.getAction() instanceof TextObjectAction) {
       TextObjectAction action = (TextObjectAction)cmd.getAction();
 
-      TextRange range = action.getRange(editor, context, cnt, raw, cmd.getArgument());
+      TextRange range = action.getRange(editor, caret, context, cnt, raw, cmd.getArgument());
 
       if (range == null) {
         return null;
@@ -368,8 +389,8 @@ public class MotionGroup {
       }
 
       start = EditorHelper.getLineStartForOffset(editor, start);
-      end = Math.min(EditorHelper.getLineEndForOffset(editor, end) + (incNewline ? 1 : 0),
-                     EditorHelper.getFileSize(editor));
+      end = Math
+        .min(EditorHelper.getLineEndForOffset(editor, end) + (incNewline ? 1 : 0), EditorHelper.getFileSize(editor));
     }
     // If characterwise and inclusive, add the last character to the range
     else if ((flags & Command.FLAG_MOT_INCLUSIVE) != 0) {
@@ -401,7 +422,8 @@ public class MotionGroup {
       if (!vf.getPath().equals(mark.getFilename())) {
         final Editor selectedEditor = selectEditor(editor, mark);
         if (selectedEditor != null) {
-          moveCaret(selectedEditor, moveCaretToLineStartSkipLeading(selectedEditor, line));
+          moveCaret(selectedEditor, editor.getCaretModel().getPrimaryCaret(),
+                    moveCaretToLineStartSkipLeading(selectedEditor, line));
         }
         return -2;
       }
@@ -436,7 +458,8 @@ public class MotionGroup {
       if (!vf.getPath().equals(mark.getFilename())) {
         final Editor selectedEditor = selectEditor(editor, mark);
         if (selectedEditor != null) {
-          moveCaret(selectedEditor, selectedEditor.logicalPositionToOffset(lp));
+          moveCaret(selectedEditor, editor.getCaretModel().getPrimaryCaret(),
+                    selectedEditor.logicalPositionToOffset(lp));
         }
         return -2;
       }
@@ -467,7 +490,8 @@ public class MotionGroup {
           if (spot == -1) {
             VimPlugin.getMark().addJump(editor, false);
           }
-          moveCaret(newEditor, EditorHelper.normalizeOffset(newEditor, newEditor.logicalPositionToOffset(lp), false));
+          moveCaret(newEditor, newEditor.getCaretModel().getPrimaryCaret(),
+                    EditorHelper.normalizeOffset(newEditor, newEditor.logicalPositionToOffset(lp), false));
         }
 
         return -2;
@@ -502,7 +526,8 @@ public class MotionGroup {
     final VirtualFile virtualFile = markToVirtualFile(mark);
     if (virtualFile != null) {
       return selectEditor(editor, virtualFile);
-    } else {
+    }
+    else {
       return null;
     }
   }
@@ -536,16 +561,17 @@ public class MotionGroup {
    * This moves the caret to the start of the next/previous camel word.
    *
    * @param editor The editor to move in
+   * @param caret  The caret to be moved
    * @param count  The number of words to skip
    * @return position
    */
-  public int moveCaretToNextCamel(@NotNull Editor editor, int count) {
-    if ((editor.getCaretModel().getOffset() == 0 && count < 0) ||
-        (editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
+  public int moveCaretToNextCamel(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    if ((caret.getOffset() == 0 && count < 0) ||
+        (caret.getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
       return -1;
     }
     else {
-      return SearchHelper.findNextCamelStart(editor, count);
+      return SearchHelper.findNextCamelStart(editor, caret, count);
     }
   }
 
@@ -553,28 +579,30 @@ public class MotionGroup {
    * This moves the caret to the start of the next/previous camel word.
    *
    * @param editor The editor to move in
+   * @param caret  The caret to be moved
    * @param count  The number of words to skip
    * @return position
    */
-  public int moveCaretToNextCamelEnd(@NotNull Editor editor, int count) {
-    if ((editor.getCaretModel().getOffset() == 0 && count < 0) ||
-        (editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
+  public int moveCaretToNextCamelEnd(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    if ((caret.getOffset() == 0 && count < 0) ||
+        (caret.getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
       return -1;
     }
     else {
-      return SearchHelper.findNextCamelEnd(editor, count);
+      return SearchHelper.findNextCamelEnd(editor, caret, count);
     }
   }
 
   /**
    * This moves the caret to the start of the next/previous word/WORD.
    *
-   * @param editor   The editor to move in
-   * @param count    The number of words to skip
-   * @param bigWord  If true then find WORD, if false then find word
+   * @param editor  The editor to move in
+   * @param caret   The caret to be moved
+   * @param count   The number of words to skip
+   * @param bigWord If true then find WORD, if false then find word
    * @return position
    */
-  public int moveCaretToNextWord(@NotNull Editor editor, int count, boolean bigWord) {
+  public int moveCaretToNextWord(@NotNull Editor editor, @NotNull Caret caret, int count, boolean bigWord) {
     final int offset = editor.getCaretModel().getOffset();
     final int size = EditorHelper.getFileSize(editor);
     if ((offset == 0 && count < 0) || (offset >= size - 1 && count > 0)) {
@@ -586,21 +614,22 @@ public class MotionGroup {
   /**
    * This moves the caret to the end of the next/previous word/WORD.
    *
-   * @param editor   The editor to move in
-   * @param count    The number of words to skip
-   * @param bigWord  If true then find WORD, if false then find word
+   * @param editor  The editor to move in
+   * @param caret   The caret to be moved
+   * @param count   The number of words to skip
+   * @param bigWord If true then find WORD, if false then find word
    * @return position
    */
-  public int moveCaretToNextWordEnd(@NotNull Editor editor, int count, boolean bigWord) {
-    if ((editor.getCaretModel().getOffset() == 0 && count < 0) ||
-        (editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
+  public int moveCaretToNextWordEnd(@NotNull Editor editor, @NotNull Caret caret, int count, boolean bigWord) {
+    if ((caret.getOffset() == 0 && count < 0) ||
+        (caret.getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
       return -1;
     }
 
     // If we are doing this move as part of a change command (e.q. cw), we need to count the current end of
     // word if the cursor happens to be on the end of a word already. If this is a normal move, we don't count
     // the current word.
-    int pos = SearchHelper.findNextWordEnd(editor, count, bigWord);
+    int pos = SearchHelper.findNextWordEnd(editor, caret, count, bigWord);
     if (pos == -1) {
       if (count < 0) {
         return moveCaretToLineStart(editor, 0);
@@ -618,11 +647,12 @@ public class MotionGroup {
    * This moves the caret to the start of the next/previous paragraph.
    *
    * @param editor The editor to move in
+   * @param caret  The caret to be moved
    * @param count  The number of paragraphs to skip
    * @return position
    */
-  public int moveCaretToNextParagraph(@NotNull Editor editor, int count) {
-    int res = SearchHelper.findNextParagraph(editor, count, false);
+  public int moveCaretToNextParagraph(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    int res = SearchHelper.findNextParagraph(editor, caret, count, false);
     if (res >= 0) {
       res = EditorHelper.normalizeOffset(editor, res, true);
     }
@@ -633,8 +663,8 @@ public class MotionGroup {
     return res;
   }
 
-  public int moveCaretToNextSentenceStart(@NotNull Editor editor, int count) {
-    int res = SearchHelper.findNextSentenceStart(editor, count, false, true);
+  public int moveCaretToNextSentenceStart(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    int res = SearchHelper.findNextSentenceStart(editor, caret, count, false, true);
     if (res >= 0) {
       res = EditorHelper.normalizeOffset(editor, res, true);
     }
@@ -645,8 +675,8 @@ public class MotionGroup {
     return res;
   }
 
-  public int moveCaretToNextSentenceEnd(@NotNull Editor editor, int count) {
-    int res = SearchHelper.findNextSentenceEnd(editor, count, false, true);
+  public int moveCaretToNextSentenceEnd(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    int res = SearchHelper.findNextSentenceEnd(editor, caret, count, false, true);
     if (res >= 0) {
       res = EditorHelper.normalizeOffset(editor, res, false);
     }
@@ -657,13 +687,13 @@ public class MotionGroup {
     return res;
   }
 
-  public int moveCaretToUnmatchedBlock(@NotNull Editor editor, int count, char type) {
+  public int moveCaretToUnmatchedBlock(@NotNull Editor editor, @NotNull Caret caret, int count, char type) {
     if ((editor.getCaretModel().getOffset() == 0 && count < 0) ||
         (editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
       return -1;
     }
     else {
-      int res = SearchHelper.findUnmatchedBlock(editor, type, count);
+      int res = SearchHelper.findUnmatchedBlock(editor, caret, type, count);
       if (res != -1) {
         res = EditorHelper.normalizeOffset(editor, res, false);
       }
@@ -672,13 +702,13 @@ public class MotionGroup {
     }
   }
 
-  public int moveCaretToSection(@NotNull Editor editor, char type, int dir, int count) {
-    if ((editor.getCaretModel().getOffset() == 0 && count < 0) ||
-        (editor.getCaretModel().getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
+  public int moveCaretToSection(@NotNull Editor editor, @NotNull Caret caret, char type, int dir, int count) {
+    if ((caret.getOffset() == 0 && count < 0) ||
+        (caret.getOffset() >= EditorHelper.getFileSize(editor) - 1 && count > 0)) {
       return -1;
     }
     else {
-      int res = SearchHelper.findSection(editor, type, dir, count);
+      int res = SearchHelper.findSection(editor, caret, type, dir, count);
       if (res != -1) {
         res = EditorHelper.normalizeOffset(editor, res, false);
       }
@@ -687,12 +717,12 @@ public class MotionGroup {
     }
   }
 
-  public int moveCaretToMethodStart(@NotNull Editor editor, int count) {
-    return SearchHelper.findMethodStart(editor, count);
+  public int moveCaretToMethodStart(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    return SearchHelper.findMethodStart(editor, caret, count);
   }
 
-  public int moveCaretToMethodEnd(@NotNull Editor editor, int count) {
-    return SearchHelper.findMethodEnd(editor, count);
+  public int moveCaretToMethodEnd(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    return SearchHelper.findMethodEnd(editor, caret, count);
   }
 
   public void setLastFTCmd(int lastFTCmd, char lastChar) {
@@ -700,26 +730,26 @@ public class MotionGroup {
     this.lastFTChar = lastChar;
   }
 
-  public int repeatLastMatchChar(@NotNull Editor editor, int count) {
+  public int repeatLastMatchChar(@NotNull Editor editor, @NotNull Caret caret, int count) {
     int res = -1;
     int startPos = editor.getCaretModel().getOffset();
     switch (lastFTCmd) {
       case LAST_F:
-        res = moveCaretToNextCharacterOnLine(editor, -count, lastFTChar);
+        res = moveCaretToNextCharacterOnLine(editor, caret, -count, lastFTChar);
         break;
       case LAST_f:
-        res = moveCaretToNextCharacterOnLine(editor, count, lastFTChar);
+        res = moveCaretToNextCharacterOnLine(editor, caret, count, lastFTChar);
         break;
       case LAST_T:
-        res = moveCaretToBeforeNextCharacterOnLine(editor, -count, lastFTChar);
+        res = moveCaretToBeforeNextCharacterOnLine(editor, caret, -count, lastFTChar);
         if (res == startPos && Math.abs(count) == 1) {
-          res = moveCaretToBeforeNextCharacterOnLine(editor, 2 * count, lastFTChar);
+          res = moveCaretToBeforeNextCharacterOnLine(editor, caret, 2 * count, lastFTChar);
         }
         break;
       case LAST_t:
-        res = moveCaretToBeforeNextCharacterOnLine(editor, count, lastFTChar);
+        res = moveCaretToBeforeNextCharacterOnLine(editor, caret, count, lastFTChar);
         if (res == startPos && Math.abs(count) == 1) {
-          res = moveCaretToBeforeNextCharacterOnLine(editor, 2 * count, lastFTChar);
+          res = moveCaretToBeforeNextCharacterOnLine(editor, caret, 2 * count, lastFTChar);
         }
         break;
     }
@@ -730,13 +760,14 @@ public class MotionGroup {
   /**
    * This moves the caret to the next/previous matching character on the current line
    *
+   * @param caret  The caret to be moved
    * @param count  The number of occurrences to move to
    * @param ch     The character to search for
    * @param editor The editor to search in
    * @return True if [count] character matches were found, false if not
    */
-  public int moveCaretToNextCharacterOnLine(@NotNull Editor editor, int count, char ch) {
-    int pos = SearchHelper.findNextCharacterOnLine(editor, count, ch);
+  public int moveCaretToNextCharacterOnLine(@NotNull Editor editor, @NotNull Caret caret, int count, char ch) {
+    int pos = SearchHelper.findNextCharacterOnLine(editor, caret, count, ch);
 
     if (pos >= 0) {
       return pos;
@@ -749,13 +780,14 @@ public class MotionGroup {
   /**
    * This moves the caret next to the next/previous matching character on the current line
    *
+   * @param caret  The caret to be moved
    * @param count  The number of occurrences to move to
    * @param ch     The character to search for
    * @param editor The editor to search in
    * @return True if [count] character matches were found, false if not
    */
-  public int moveCaretToBeforeNextCharacterOnLine(@NotNull Editor editor, int count, char ch) {
-    int pos = SearchHelper.findNextCharacterOnLine(editor, count, ch);
+  public int moveCaretToBeforeNextCharacterOnLine(@NotNull Editor editor, @NotNull Caret caret, int count, char ch) {
+    int pos = SearchHelper.findNextCharacterOnLine(editor, caret, count, ch);
 
     if (pos >= 0) {
       int step = count >= 0 ? 1 : -1;
@@ -766,22 +798,19 @@ public class MotionGroup {
     }
   }
 
-  public boolean scrollLineToFirstScreenLine(@NotNull Editor editor, int rawCount, int count,
-                                             boolean start) {
+  public boolean scrollLineToFirstScreenLine(@NotNull Editor editor, int rawCount, int count, boolean start) {
     scrollLineToScreenLine(editor, 1, rawCount, count, start);
 
     return true;
   }
 
-  public boolean scrollLineToMiddleScreenLine(@NotNull Editor editor, int rawCount, int count,
-                                              boolean start) {
+  public boolean scrollLineToMiddleScreenLine(@NotNull Editor editor, int rawCount, int count, boolean start) {
     scrollLineToScreenLine(editor, EditorHelper.getScreenHeight(editor) / 2 + 1, rawCount, count, start);
 
     return true;
   }
 
-  public boolean scrollLineToLastScreenLine(@NotNull Editor editor, int rawCount, int count,
-                                            boolean start) {
+  public boolean scrollLineToLastScreenLine(@NotNull Editor editor, int rawCount, int count, boolean start) {
     scrollLineToScreenLine(editor, EditorHelper.getScreenHeight(editor), rawCount, count, start);
 
     return true;
@@ -818,11 +847,11 @@ public class MotionGroup {
 
     int visualColumn = editor.getCaretModel().getVisualPosition().column;
     scrollColumnToLeftOfScreen(editor, EditorHelper
-      .normalizeVisualColumn(editor, editor.getCaretModel().getVisualPosition().line, visualColumn - column + 1, false));
+      .normalizeVisualColumn(editor, editor.getCaretModel().getVisualPosition().line, visualColumn - column + 1,
+                             false));
   }
 
-  private void scrollLineToScreenLine(@NotNull Editor editor, int line, int rawCount, int count,
-                                      boolean start) {
+  private void scrollLineToScreenLine(@NotNull Editor editor, int line, int rawCount, int count, boolean start) {
     int scrollOffset = ((NumberOption)Options.getInstance().getOption("scrolloff")).value();
     int height = EditorHelper.getScreenHeight(editor);
     if (scrollOffset > height / 2) {
@@ -839,8 +868,9 @@ public class MotionGroup {
       }
     }
 
-    int visualLine = rawCount == 0 ?
-                editor.getCaretModel().getVisualPosition().line : EditorHelper.logicalLineToVisualLine(editor, count - 1);
+    int visualLine = rawCount == 0
+                     ? editor.getCaretModel().getVisualPosition().line
+                     : EditorHelper.logicalLineToVisualLine(editor, count - 1);
     scrollLineToTopOfScreen(editor, EditorHelper.normalizeVisualLine(editor, visualLine - line + 1));
     if (visualLine != editor.getCaretModel().getVisualPosition().line || start) {
       int offset;
@@ -848,11 +878,12 @@ public class MotionGroup {
         offset = moveCaretToLineStartSkipLeading(editor, EditorHelper.visualLineToLogicalLine(editor, visualLine));
       }
       else {
-        offset = moveCaretVertical(editor,
-                                   EditorHelper.visualLineToLogicalLine(editor, visualLine) - editor.getCaretModel().getLogicalPosition().line);
+        offset = moveCaretVertical(editor, editor.getCaretModel().getPrimaryCaret(),
+                                   EditorHelper.visualLineToLogicalLine(editor, visualLine) -
+                                   editor.getCaretModel().getLogicalPosition().line);
       }
 
-      moveCaret(editor, offset);
+      moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
     }
   }
 
@@ -906,8 +937,8 @@ public class MotionGroup {
 
   public boolean scrollColumn(@NotNull Editor editor, int columns) {
     int visualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
-    visualColumn = EditorHelper.normalizeVisualColumn(editor, editor.getCaretModel().getVisualPosition().line,
-                                                      visualColumn + columns, false);
+    visualColumn = EditorHelper
+      .normalizeVisualColumn(editor, editor.getCaretModel().getVisualPosition().line, visualColumn + columns, false);
 
     scrollColumnToLeftOfScreen(editor, visualColumn);
 
@@ -952,7 +983,7 @@ public class MotionGroup {
     int col = editor.getCaretModel().getVisualPosition().column;
     int oldColumn = col;
     if (col >= EditorHelper.getLineLength(editor) - 1) {
-      col = EditorData.getLastColumn(editor);
+      col = CaretData.getLastColumn(editor.getCaretModel().getPrimaryCaret());
     }
     int visualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
     int caretColumn = col;
@@ -972,9 +1003,9 @@ public class MotionGroup {
 
     if (newline != cline || newColumn != oldColumn) {
       int offset = EditorHelper.visualPositionToOffset(editor, new VisualPosition(newline, newColumn));
-      moveCaret(editor, offset);
+      moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
 
-      EditorData.setLastColumn(editor, col);
+      CaretData.setLastColumn(editor, editor.getCaretModel().getPrimaryCaret(), col);
     }
   }
 
@@ -995,7 +1026,7 @@ public class MotionGroup {
     visualTopLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
 
     if (moved && topLine == newLine && topLine == visualTopLine) {
-      moveCaret(editor, moveCaretToScreenLine(editor, line));
+      moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), moveCaretToScreenLine(editor, line));
 
       return true;
     }
@@ -1004,7 +1035,7 @@ public class MotionGroup {
       if (pages < 0) {
         visualLine = height - visualLine + 3;
       }
-      moveCaret(editor, moveCaretToScreenLine(editor, visualLine));
+      moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), moveCaretToScreenLine(editor, visualLine));
 
       return true;
     }
@@ -1017,12 +1048,13 @@ public class MotionGroup {
       }
 
       int logicalLine = editor.visualToLogicalPosition(new VisualPosition(visualLine, 0)).line;
-      moveCaret(editor, moveCaretToLineStartSkipLeading(editor, logicalLine));
+      moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), moveCaretToLineStartSkipLeading(editor, logicalLine));
 
       return true;
     }
     else {
-      moveCaret(editor, moveCaretToLineStartSkipLeading(editor));
+      moveCaret(editor, editor.getCaretModel().getPrimaryCaret(),
+                moveCaretToLineStartSkipLeading(editor, editor.getCaretModel().getPrimaryCaret()));
       return false;
     }
   }
@@ -1040,27 +1072,51 @@ public class MotionGroup {
   }
 
   public int moveCaretToMiddleColumn(@NotNull Editor editor) {
+    // TODO: add multiple carets support
+
     int width = EditorHelper.getScreenWidth(editor) / 2;
     int len = EditorHelper.getLineLength(editor);
 
-    return moveCaretToColumn(editor, Math.max(0, Math.min(len - 1, width)), false);
+    return moveCaretToColumn(editor, editor.getCaretModel().getPrimaryCaret(), Math.max(0, Math.min(len - 1, width)),
+                             false);
   }
 
-  public int moveCaretToColumn(@NotNull Editor editor, int count, boolean allowEnd) {
-    int line = editor.getCaretModel().getLogicalPosition().line;
+  public int moveCaretToColumn(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowEnd) {
+    int line = caret.getLogicalPosition().line;
     int pos = EditorHelper.normalizeColumn(editor, line, count, allowEnd);
 
     return editor.logicalPositionToOffset(new LogicalPosition(line, pos));
   }
 
-  public int moveCaretToLineStartSkipLeading(@NotNull Editor editor) {
-    int logicalLine = editor.getCaretModel().getLogicalPosition().line;
+  /**
+   * @deprecated To move the caret, use {@link #moveCaretToColumn(Editor, Caret, int, boolean)}
+   */
+  public int moveCaretToColumn(@NotNull Editor editor, int count, boolean allowEnd) {
+    return moveCaretToColumn(editor, editor.getCaretModel().getPrimaryCaret(), count, allowEnd);
+  }
+
+  public int moveCaretToLineStartSkipLeading(@NotNull Editor editor, @NotNull Caret caret) {
+    int logicalLine = caret.getLogicalPosition().line;
     return moveCaretToLineStartSkipLeading(editor, logicalLine);
   }
 
-  public int moveCaretToLineStartSkipLeadingOffset(@NotNull Editor editor, int linesOffset) {
-    int line = EditorHelper.normalizeVisualLine(editor, editor.getCaretModel().getVisualPosition().line + linesOffset);
+  /**
+   * @deprecated To move the caret, use {@link #moveCaretToLineStartSkipLeading(Editor, Caret)}
+   */
+  public int moveCaretToLineStartSkipLeading(@NotNull Editor editor) {
+    return moveCaretToLineStartSkipLeading(editor, editor.getCaretModel().getPrimaryCaret());
+  }
+
+  public int moveCaretToLineStartSkipLeadingOffset(@NotNull Editor editor, @NotNull Caret caret, int linesOffset) {
+    int line = EditorHelper.normalizeVisualLine(editor, caret.getVisualPosition().line + linesOffset);
     return moveCaretToLineStartSkipLeading(editor, EditorHelper.visualLineToLogicalLine(editor, line));
+  }
+
+  /**
+   * @deprecated To move the caret, use {@link #moveCaretToLineStartSkipLeadingOffset(Editor, Caret, int)}
+   */
+  public int moveCaretToLineStartSkipLeadingOffset(@NotNull Editor editor, int linesOffset) {
+    return moveCaretToLineStartSkipLeadingOffset(editor, editor.getCaretModel().getPrimaryCaret(), linesOffset);
   }
 
   public int moveCaretToLineStartSkipLeading(@NotNull Editor editor, int line) {
@@ -1072,8 +1128,8 @@ public class MotionGroup {
     return moveCaretToLineEndSkipLeading(editor, logicalLine);
   }
 
-  public int moveCaretToLineEndSkipLeadingOffset(@NotNull Editor editor, int linesOffset) {
-    int line = EditorHelper.normalizeVisualLine(editor, editor.getCaretModel().getVisualPosition().line + linesOffset);
+  public int moveCaretToLineEndSkipLeadingOffset(@NotNull Editor editor, @NotNull Caret caret, int linesOffset) {
+    int line = EditorHelper.normalizeVisualLine(editor, caret.getVisualPosition().line + linesOffset);
     return moveCaretToLineEndSkipLeading(editor, EditorHelper.visualLineToLogicalLine(editor, line));
   }
 
@@ -1096,20 +1152,28 @@ public class MotionGroup {
     return pos;
   }
 
+  /**
+   * @deprecated Use {@link #moveCaretToLineEnd(Editor, Caret)}
+   */
   public int moveCaretToLineEnd(@NotNull Editor editor) {
-    final VisualPosition visualPosition = editor.getCaretModel().getVisualPosition();
+    return moveCaretToLineEnd(editor, editor.getCaretModel().getPrimaryCaret());
+  }
+
+  public int moveCaretToLineEnd(@NotNull Editor editor, @NotNull Caret caret) {
+    final VisualPosition visualPosition = caret.getVisualPosition();
     final int lastVisualLineColumn = EditorUtil.getLastVisualLineColumnNumber(editor, visualPosition.line);
     final VisualPosition visualEndOfLine = new VisualPosition(visualPosition.line, lastVisualLineColumn, true);
     return moveCaretToLineEnd(editor, editor.visualToLogicalPosition(visualEndOfLine).line, true);
   }
 
   public int moveCaretToLineEnd(@NotNull Editor editor, int line, boolean allowPastEnd) {
-    return EditorHelper.normalizeOffset(editor, line, EditorHelper.getLineEndOffset(editor, line, allowPastEnd),
-                                        allowPastEnd);
+    return EditorHelper
+      .normalizeOffset(editor, line, EditorHelper.getLineEndOffset(editor, line, allowPastEnd), allowPastEnd);
   }
 
-  public int moveCaretToLineEndOffset(@NotNull Editor editor, int cntForward, boolean allowPastEnd) {
-    int line = EditorHelper.normalizeVisualLine(editor, editor.getCaretModel().getVisualPosition().line + cntForward);
+  public int moveCaretToLineEndOffset(@NotNull Editor editor, @NotNull Caret caret, int cntForward,
+                                      boolean allowPastEnd) {
+    int line = EditorHelper.normalizeVisualLine(editor, caret.getVisualPosition().line + cntForward);
 
     if (line < 0) {
       return 0;
@@ -1119,9 +1183,23 @@ public class MotionGroup {
     }
   }
 
-  public int moveCaretToLineStart(@NotNull Editor editor) {
-    int logicalLine = editor.getCaretModel().getLogicalPosition().line;
+  /**
+   * @deprecated To move the caret, use {@link #moveCaretToLineEndOffset(Editor, Caret, int, boolean)}
+   */
+  public int moveCaretToLineEndOffset(@NotNull Editor editor, int cntForward, boolean allowPastEnd) {
+    return moveCaretToLineEndOffset(editor, editor.getCaretModel().getPrimaryCaret(), cntForward, allowPastEnd);
+  }
+
+  public int moveCaretToLineStart(@NotNull Editor editor, @NotNull Caret caret) {
+    int logicalLine = caret.getLogicalPosition().line;
     return moveCaretToLineStart(editor, logicalLine);
+  }
+
+  /**
+   * @deprecated To move the caret, use {@link #moveCaretToLineStart(Editor, Caret)}
+   */
+  public int moveCaretToLineStart(@NotNull Editor editor) {
+    return moveCaretToLineStart(editor, editor.getCaretModel().getPrimaryCaret());
   }
 
   public int moveCaretToLineStart(@NotNull Editor editor, int line) {
@@ -1137,8 +1215,9 @@ public class MotionGroup {
   }
 
   public int moveCaretToLineScreenStart(@NotNull Editor editor) {
+    // TODO: Add multiple carets support
     int col = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
-    return moveCaretToColumn(editor, col, false);
+    return moveCaretToColumn(editor, editor.getCaretModel().getPrimaryCaret(), col, false);
   }
 
   public int moveCaretToLineScreenStartSkipLeading(@NotNull Editor editor) {
@@ -1148,14 +1227,15 @@ public class MotionGroup {
   }
 
   public int moveCaretToLineScreenEnd(@NotNull Editor editor, boolean allowEnd) {
+    // TODO: Add multiple carets support
     int col = EditorHelper.getVisualColumnAtLeftOfScreen(editor) + EditorHelper.getScreenWidth(editor) - 1;
-    return moveCaretToColumn(editor, col, allowEnd);
+    return moveCaretToColumn(editor, editor.getCaretModel().getPrimaryCaret(), col, allowEnd);
   }
 
-  public int moveCaretHorizontalWrap(@NotNull Editor editor, int count) {
+  public int moveCaretHorizontalWrap(@NotNull Editor editor, @NotNull Caret caret, int count) {
     // FIX - allows cursor over newlines
-    int oldOffset = editor.getCaretModel().getOffset();
-    int offset = Math.min(Math.max(0, editor.getCaretModel().getOffset() + count), EditorHelper.getFileSize(editor));
+    int oldOffset = caret.getOffset();
+    int offset = Math.min(Math.max(0, caret.getOffset() + count), EditorHelper.getFileSize(editor));
     if (offset == oldOffset) {
       return -1;
     }
@@ -1164,10 +1244,13 @@ public class MotionGroup {
     }
   }
 
+  /**
+   * @deprecated To move the caret, use {@link #moveCaret(Editor, Caret, int)}
+   */
   public int moveCaretHorizontal(@NotNull Editor editor, int count, boolean allowPastEnd) {
     int oldOffset = editor.getCaretModel().getOffset();
-    int offset = EditorHelper.normalizeOffset(editor, editor.getCaretModel().getLogicalPosition().line,
-                                              oldOffset + count, allowPastEnd);
+    int offset = EditorHelper
+      .normalizeOffset(editor, editor.getCaretModel().getLogicalPosition().line, oldOffset + count, allowPastEnd);
     if (offset == oldOffset) {
       return -1;
     }
@@ -1176,15 +1259,28 @@ public class MotionGroup {
     }
   }
 
-  public int moveCaretVertical(@NotNull Editor editor, int count) {
-    VisualPosition pos = editor.getCaretModel().getVisualPosition();
+  public int moveCaretHorizontal(@NotNull Editor editor, @Nullable Caret caret, int count, boolean allowPastEnd) {
+    int oldOffset = caret.getOffset();
+    int offset = EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, oldOffset + count, allowPastEnd);
+
+    if (offset == oldOffset) {
+      return -1;
+    }
+    else {
+      return offset;
+    }
+  }
+
+  public int moveCaretVertical(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    VisualPosition pos = caret.getVisualPosition();
     if ((pos.line == 0 && count < 0) || (pos.line >= EditorHelper.getVisualLineCount(editor) - 1 && count > 0)) {
       return -1;
     }
     else {
-      int col = EditorData.getLastColumn(editor);
+      int col = CaretData.getLastColumn(caret);
       int line = EditorHelper.normalizeVisualLine(editor, pos.line + count);
-      VisualPosition newPos = new VisualPosition(line, EditorHelper.normalizeVisualColumn(editor, line, col, CommandState.inInsertMode(editor)));
+      VisualPosition newPos = new VisualPosition(line, EditorHelper
+        .normalizeVisualColumn(editor, line, col, CommandState.inInsertMode(editor)));
 
       return EditorHelper.visualPositionToOffset(editor, newPos);
     }
@@ -1210,8 +1306,8 @@ public class MotionGroup {
   public int moveCaretToLinePercent(@NotNull Editor editor, int count) {
     if (count > 100) count = 100;
 
-    return moveCaretToLineStartSkipLeading(editor, EditorHelper.normalizeLine(
-      editor, (EditorHelper.getLineCount(editor) * count + 99) / 100 - 1));
+    return moveCaretToLineStartSkipLeading(editor, EditorHelper
+      .normalizeLine(editor, (EditorHelper.getLineCount(editor) * count + 99) / 100 - 1));
   }
 
   public int moveCaretGotoLineLast(@NotNull Editor editor, int rawCount, int line) {
@@ -1229,25 +1325,37 @@ public class MotionGroup {
     return moveCaretToLineStartSkipLeading(editor, line);
   }
 
-  public static void moveCaret(@NotNull Editor editor, int offset) {
-    moveCaret(editor, offset, false);
+  public static void moveCaret(@NotNull Editor editor, @NotNull Caret caret, int offset) {
+    moveCaret(editor, caret, offset, false);
   }
 
+  /**
+   * @deprecated Use the {@link #moveCaret(Editor, Caret, int) multi-caret version} of this function.
+   */
+  public static void moveCaret(@NotNull Editor editor, int offset) {
+    moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
+  }
+
+  /**
+   * @deprecated Use the {@link #moveCaret(Editor, int, boolean) multi-caret version} of this function.
+   */
   private static void moveCaret(@NotNull Editor editor, int offset, boolean forceKeepVisual) {
+    moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset, forceKeepVisual);
+  }
+
+  public static void moveCaret(@NotNull Editor editor, @NotNull Caret caret, int offset, boolean forceKeepVisual) {
     if (offset >= 0 && offset <= editor.getDocument().getTextLength()) {
       final boolean keepVisual = forceKeepVisual || keepVisual(editor);
-      if (editor.getCaretModel().getOffset() != offset) {
-        if (!keepVisual) {
-          // XXX: Hack for preventing the merge multiple carets that results in loosing the primary caret for |v_d|
-          editor.getCaretModel().removeSecondaryCarets();
+      if (caret.getOffset() != offset) {
+        caret.moveToOffset(offset);
+        CaretData.setLastColumn(editor, caret, caret.getVisualPosition().column);
+        if (caret == editor.getCaretModel().getPrimaryCaret()) {
+          scrollCaretIntoView(editor);
         }
-        editor.getCaretModel().moveToOffset(offset);
-        EditorData.setLastColumn(editor, editor.getCaretModel().getVisualPosition().column);
-        scrollCaretIntoView(editor);
       }
 
       if (keepVisual) {
-        VimPlugin.getMotion().updateSelection(editor, offset);
+        VimPlugin.getMotion().updateSelection(editor, caret, offset);
       }
       else {
         editor.getSelectionModel().removeSelection();
@@ -1269,7 +1377,7 @@ public class MotionGroup {
   /**
    * If 'absolute' is true, then set tab index to 'value', otherwise add 'value' to tab index with wraparound.
    */
-   private void switchEditorTab(@Nullable EditorWindow editorWindow, int value, boolean absolute) {
+  private void switchEditorTab(@Nullable EditorWindow editorWindow, int value, boolean absolute) {
     if (editorWindow != null) {
       final EditorTabbedContainer tabbedPane = editorWindow.getTabbedPane();
       if (tabbedPane != null) {
@@ -1301,7 +1409,7 @@ public class MotionGroup {
   }
 
   public static void scrollPositionIntoView(@NotNull Editor editor, @NotNull VisualPosition position,
-                                             boolean scrollJump) {
+                                            boolean scrollJump) {
     final int line = position.line;
     final int column = position.column;
     final int topLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
@@ -1412,17 +1520,20 @@ public class MotionGroup {
       return false;
     }
 
-    CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, lastSelectionType.toSubMode(),
-                                               MappingMode.VISUAL);
+    editor.getCaretModel().removeSecondaryCarets();
 
+    CommandState.getInstance(editor)
+      .pushState(CommandState.Mode.VISUAL, lastSelectionType.toSubMode(), MappingMode.VISUAL);
 
-    visualStart = visualMarks.getStartOffset();
-    visualEnd = visualMarks.getEndOffset();
-    visualOffset = visualEnd;
+    Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
 
-    updateSelection(editor, visualEnd);
+    CaretData.setVisualStart(primaryCaret, visualMarks.getStartOffset());
+    CaretData.setVisualEnd(primaryCaret, visualMarks.getEndOffset());
+    CaretData.setVisualOffset(primaryCaret, visualMarks.getEndOffset());
 
-    editor.getCaretModel().moveToOffset(visualOffset);
+    updateSelection(editor, primaryCaret, visualMarks.getEndOffset());
+
+    primaryCaret.moveToOffset(visualMarks.getEndOffset());
     editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
 
     return true;
@@ -1438,15 +1549,18 @@ public class MotionGroup {
     final SelectionType selectionType = SelectionType.fromSubMode(CommandState.getInstance(editor).getSubMode());
     EditorData.setLastSelectionType(editor, selectionType);
 
-    visualStart = lastVisualRange.getStartOffset();
-    visualEnd = lastVisualRange.getEndOffset();
-    visualOffset = visualEnd;
+    editor.getCaretModel().removeSecondaryCarets();
+
+    Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+    CaretData.setVisualStart(primaryCaret, lastVisualRange.getStartOffset());
+    CaretData.setVisualEnd(primaryCaret, lastVisualRange.getEndOffset());
+    CaretData.setVisualOffset(primaryCaret, lastVisualRange.getEndOffset());
 
     CommandState.getInstance(editor).setSubMode(lastSelectionType.toSubMode());
 
-    updateSelection(editor, visualEnd);
+    updateSelection(editor, primaryCaret, lastVisualRange.getEndOffset());
 
-    editor.getCaretModel().moveToOffset(visualOffset);
+    primaryCaret.moveToOffset(lastVisualRange.getEndOffset());
     editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
 
     return true;
@@ -1484,28 +1598,32 @@ public class MotionGroup {
 
     KeyHandler.getInstance().reset(editor);
 
-    visualStart = editor.getSelectionModel().getSelectionStart();
-    visualEnd = editor.getSelectionModel().getSelectionEnd();
-    if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_CHARACTER) {
-      BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
-      int adj = 1;
-      if (opt.getValue().equals("exclusive")) {
-        adj = 0;
+    for (Caret caret : editor.getCaretModel().getAllCarets()) {
+      CaretData.setVisualStart(caret, caret.getSelectionStart());
+      int visualEnd = caret.getSelectionEnd();
+      if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_CHARACTER) {
+        BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
+        int adj = 1;
+        if (opt.getValue().equals("exclusive")) {
+          adj = 0;
+        }
+        visualEnd -= adj;
       }
-      visualEnd -= adj;
+      CaretData.setVisualEnd(caret, visualEnd);
+      CaretData.setVisualOffset(caret, caret.getOffset());
     }
-    visualOffset = editor.getCaretModel().getOffset();
 
-    VimPlugin.getMark().setVisualSelectionMarks(editor, getRawVisualRange());
+    VimPlugin.getMark().setVisualSelectionMarks(editor, getRawVisualRange(editor));
   }
 
   public boolean toggleVisual(@NotNull Editor editor, int count, int rawCount, @NotNull CommandState.SubMode mode) {
     CommandState.SubMode currentMode = CommandState.getInstance(editor).getSubMode();
     if (CommandState.getInstance(editor).getMode() != CommandState.Mode.VISUAL) {
-      int start;
-      int end;
       if (rawCount > 0) {
-        VisualChange range = EditorData.getLastVisualOperatorRange(editor);
+        if (editor.getCaretModel().getCaretCount() > 1) {
+          return false;
+        }
+        VisualChange range = CaretData.getLastVisualOperatorRange(editor.getCaretModel().getPrimaryCaret());
         if (range == null) {
           return false;
         }
@@ -1520,23 +1638,43 @@ public class MotionGroup {
             mode = CommandState.SubMode.VISUAL_BLOCK;
             break;
         }
-        start = editor.getCaretModel().getOffset();
-        end = calculateVisualRange(editor, range, count);
+        int start = editor.getCaretModel().getOffset();
+        int end = calculateVisualRange(editor, range, count);
+        Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+        CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, MappingMode.VISUAL);
+        CaretData.setVisualStart(primaryCaret, start);
+        updateSelection(editor, editor.getCaretModel().getPrimaryCaret(), end);
+        MotionGroup.moveCaret(editor, CaretData.getVisualEnd(primaryCaret), true);
       }
       else {
-        start = end = editor.getSelectionModel().getSelectionStart();
+        CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, MappingMode.VISUAL);
+        if (mode == CommandState.SubMode.VISUAL_BLOCK) {
+          EditorData.setVisualBlockStart(editor, editor.getSelectionModel().getSelectionStart());
+          updateBlockSelection(editor, editor.getSelectionModel().getSelectionEnd());
+          MotionGroup
+            .moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), EditorData.getVisualBlockEnd(editor), true);
+        }
+        else {
+          for (Caret caret : editor.getCaretModel().getAllCarets()) {
+            CaretData.setVisualStart(caret, caret.getSelectionStart());
+            updateSelection(editor, caret, caret.getSelectionEnd());
+            MotionGroup.moveCaret(editor, caret, CaretData.getVisualEnd(caret), true);
+          }
+        }
       }
-      CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, MappingMode.VISUAL);
-      visualStart = start;
-      updateSelection(editor, end);
-      MotionGroup.moveCaret(editor, visualEnd, true);
     }
     else if (mode == currentMode) {
       exitVisual(editor);
     }
+    else if (mode == CommandState.SubMode.VISUAL_BLOCK) {
+      CommandState.getInstance(editor).setSubMode(mode);
+      updateBlockSelection(editor, EditorData.getVisualBlockEnd(editor));
+    }
     else {
       CommandState.getInstance(editor).setSubMode(mode);
-      updateSelection(editor, visualEnd);
+      for (Caret caret : editor.getCaretModel().getAllCarets()) {
+        updateSelection(editor, caret, CaretData.getVisualEnd(caret));
+      }
     }
 
     return true;
@@ -1548,7 +1686,8 @@ public class MotionGroup {
     if (range.getType() == SelectionType.LINE_WISE || range.getType() == SelectionType.BLOCK_WISE || lines > 1) {
       lines *= count;
     }
-    if ((range.getType() == SelectionType.CHARACTER_WISE && lines == 1) || range.getType() == SelectionType.BLOCK_WISE) {
+    if ((range.getType() == SelectionType.CHARACTER_WISE && lines == 1) ||
+        range.getType() == SelectionType.BLOCK_WISE) {
       chars *= count;
     }
     int start = editor.getCaretModel().getOffset();
@@ -1560,8 +1699,7 @@ public class MotionGroup {
     }
     else if (range.getType() == SelectionType.CHARACTER_WISE) {
       if (lines > 1) {
-        res = moveCaretToLineStart(editor, endLine) +
-              Math.min(EditorHelper.getLineLength(editor, endLine), chars);
+        res = moveCaretToLineStart(editor, endLine) + Math.min(EditorHelper.getLineLength(editor, endLine), chars);
       }
       else {
         res = EditorHelper.normalizeOffset(editor, sp.line, start + chars - 1, false);
@@ -1583,6 +1721,7 @@ public class MotionGroup {
   }
 
   public void resetVisual(@NotNull final Editor editor, final boolean removeSelection) {
+    final boolean wasVisualBlock = CommandState.inVisualBlockMode(editor);
     final SelectionType selectionType = SelectionType.fromSubMode(CommandState.getInstance(editor).getSubMode());
     EditorData.setLastSelectionType(editor, selectionType);
     final TextRange visualMarks = VimPlugin.getMark().getVisualSelectionMarks(editor);
@@ -1590,16 +1729,28 @@ public class MotionGroup {
       EditorData.setLastVisualRange(editor, visualMarks);
     }
     if (removeSelection) {
-      editor.getSelectionModel().removeSelection();
-      editor.getCaretModel().removeSecondaryCarets();
+      if (!EditorData.isKeepingVisualOperatorAction(editor)) {
+        for (Caret caret : editor.getCaretModel().getAllCarets()) {
+          caret.removeSelection();
+        }
+      }
+      if (wasVisualBlock) {
+        editor.getCaretModel().removeSecondaryCarets();
+      }
     }
     CommandState.getInstance(editor).setSubMode(CommandState.SubMode.NONE);
   }
 
   @NotNull
-  public VisualChange getVisualOperatorRange(@NotNull Editor editor, int cmdFlags) {
-    int start = visualStart;
-    int end = visualEnd;
+  public VisualChange getVisualOperatorRange(@NotNull Editor editor, @NotNull Caret caret, int cmdFlags) {
+    int start = CaretData.getVisualStart(caret);
+    int end = CaretData.getVisualEnd(caret);
+
+    if (CommandState.inVisualBlockMode(editor)) {
+      start = EditorData.getVisualBlockStart(editor);
+      end = EditorData.getVisualBlockEnd(editor);
+    }
+
     if (start > end) {
       int t = start;
       start = end;
@@ -1639,89 +1790,132 @@ public class MotionGroup {
   }
 
   @NotNull
+  public VisualChange getVisualOperatorRange(@NotNull Editor editor, int cmdFlags) {
+    return getVisualOperatorRange(editor, editor.getCaretModel().getPrimaryCaret(), cmdFlags);
+  }
+
+  @NotNull
   public TextRange getVisualRange(@NotNull Editor editor) {
     return new TextRange(editor.getSelectionModel().getBlockSelectionStarts(),
                          editor.getSelectionModel().getBlockSelectionEnds());
   }
 
   @NotNull
-  public TextRange getRawVisualRange() {
-    return new TextRange(visualStart, visualEnd);
+  public TextRange getVisualRange(@NotNull Caret caret) {
+    return new TextRange(caret.getSelectionStart(), caret.getSelectionEnd());
   }
 
-  public void updateSelection(@NotNull Editor editor) {
-    updateSelection(editor, visualEnd);
+  @NotNull
+  public TextRange getRawVisualRange(@NotNull Editor editor) {
+    return getRawVisualRange(editor.getCaretModel().getPrimaryCaret());
   }
 
-  private void updateSelection(@NotNull Editor editor, int offset) {
-    visualEnd = offset;
-    visualOffset = offset;
-    int start = visualStart;
-    int end = visualEnd;
-    final CommandState.SubMode subMode = CommandState.getInstance(editor).getSubMode();
+  @NotNull
+  public TextRange getRawVisualRange(@NotNull Caret caret) {
+    return new TextRange(CaretData.getVisualStart(caret), CaretData.getVisualEnd(caret));
+  }
 
-    if (subMode == CommandState.SubMode.VISUAL_CHARACTER) {
-      if (start > end) {
-        int t = start;
-        start = end;
-        end = t;
-      }
-      final BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
-      int lineEnd = EditorHelper.getLineEndForOffset(editor, end);
-      final int adj = opt.getValue().equals("exclusive") || end == lineEnd ? 0 : 1;
-      final int adjEnd = Math.min(EditorHelper.getFileSize(editor), end + adj);
-      editor.getSelectionModel().setSelection(start, adjEnd);
-    }
-    else if (subMode == CommandState.SubMode.VISUAL_LINE) {
-      if (start > end) {
-        int t = start;
-        start = end;
-        end = t;
-      }
-      start = EditorHelper.getLineStartForOffset(editor, start);
-      end = EditorHelper.getLineEndForOffset(editor, end);
-      editor.getSelectionModel().setSelection(start, end);
-    }
-    else if (subMode == CommandState.SubMode.VISUAL_BLOCK) {
-      LogicalPosition blockStart = editor.offsetToLogicalPosition(start);
-      LogicalPosition blockEnd = editor.offsetToLogicalPosition(end);
-      if (blockStart.column < blockEnd.column) {
-        blockEnd = new LogicalPosition(blockEnd.line, blockEnd.column + 1);
-      }
-      else {
-        blockStart = new LogicalPosition(blockStart.line, blockStart.column + 1);
-      }
-      editor.getSelectionModel().setBlockSelection(blockStart, blockEnd);
+  public void updateSelection(@NotNull Editor editor, @NotNull Caret caret) {
+    updateSelection(editor, caret, CaretData.getVisualEnd(caret));
+  }
 
-      for (Caret caret : editor.getCaretModel().getAllCarets()) {
-        int line = caret.getLogicalPosition().line;
-        int lineEndOffset = EditorHelper.getLineEndOffset(editor, line, true);
+  public void updateBlockSelection(@NotNull Editor editor) {
+    updateBlockSelection(editor, EditorData.getVisualBlockEnd(editor));
+  }
 
-        if (EditorData.getLastColumn(editor) >= MotionGroup.LAST_COLUMN) {
-          caret.setSelection(caret.getSelectionStart(), lineEndOffset);
-        }
-        if (!EditorHelper.isLineEmpty(editor, line, false)) {
-          caret.moveToOffset(caret.getSelectionEnd() - 1);
-        }
-      }
-      editor.getCaretModel().moveToOffset(end);
+  private void updateBlockSelection(@NotNull Editor editor, int offset) {
+    EditorData.setVisualBlockEnd(editor, offset);
+    EditorData.setVisualBlockOffset(editor, offset);
+    int start = EditorData.getVisualBlockStart(editor);
+    int end = EditorData.getVisualBlockEnd(editor);
+
+    LogicalPosition blockStart = editor.offsetToLogicalPosition(start);
+    LogicalPosition blockEnd = editor.offsetToLogicalPosition(end);
+    if (blockStart.column < blockEnd.column) {
+      blockEnd = new LogicalPosition(blockEnd.line, blockEnd.column + 1);
     }
+    else {
+      blockStart = new LogicalPosition(blockStart.line, blockStart.column + 1);
+    }
+    editor.getSelectionModel().setBlockSelection(blockStart, blockEnd);
+
+    for (Caret caret : editor.getCaretModel().getAllCarets()) {
+      int line = caret.getLogicalPosition().line;
+      int lineEndOffset = EditorHelper.getLineEndOffset(editor, line, true);
+
+      if (EditorData.getLastColumn(editor) >= MotionGroup.LAST_COLUMN) {
+        caret.setSelection(caret.getSelectionStart(), lineEndOffset);
+      }
+      if (!EditorHelper.isLineEmpty(editor, line, false)) {
+        caret.moveToOffset(caret.getSelectionEnd() - 1);
+      }
+    }
+    editor.getCaretModel().getPrimaryCaret().moveToOffset(end);
 
     VimPlugin.getMark().setVisualSelectionMarks(editor, new TextRange(start, end));
   }
 
-  public boolean swapVisualEnds(@NotNull Editor editor) {
-    int t = visualEnd;
-    visualEnd = visualStart;
-    visualStart = t;
+  private void updateSelection(@NotNull Editor editor, @NotNull Caret caret, int offset) {
+    if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_BLOCK) {
+      updateBlockSelection(editor, offset);
+    }
+    else {
+      CaretData.setVisualEnd(caret, offset);
+      CaretData.setVisualOffset(caret, offset);
+      int start = CaretData.getVisualStart(caret);
+      int end = offset;
+      final CommandState.SubMode subMode = CommandState.getInstance(editor).getSubMode();
 
-    moveCaret(editor, visualEnd);
+      if (subMode == CommandState.SubMode.VISUAL_CHARACTER) {
+        if (start > end) {
+          int t = start;
+          start = end;
+          end = t;
+        }
+        final BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
+        int lineEnd = EditorHelper.getLineEndForOffset(editor, end);
+        final int adj = opt.getValue().equals("exclusive") || end == lineEnd ? 0 : 1;
+        final int adjEnd = Math.min(EditorHelper.getFileSize(editor), end + adj);
+        caret.setSelection(start, adjEnd);
+      }
+      else if (subMode == CommandState.SubMode.VISUAL_LINE) {
+        if (start > end) {
+          int t = start;
+          start = end;
+          end = t;
+        }
+        start = EditorHelper.getLineStartForOffset(editor, start);
+        end = EditorHelper.getLineEndForOffset(editor, end);
+        caret.setSelection(start, end);
+      }
+
+      VimPlugin.getMark().setVisualSelectionMarks(editor, new TextRange(start, end));
+    }
+  }
+
+  public boolean swapVisualBlockEnds(@NotNull Editor editor) {
+    if (!CommandState.inVisualBlockMode(editor)) return false;
+    int t = EditorData.getVisualBlockEnd(editor);
+    EditorData.setVisualBlockEnd(editor, EditorData.getVisualBlockStart(editor));
+    EditorData.setVisualBlockStart(editor, t);
+
+    moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), EditorData.getVisualBlockEnd(editor));
 
     return true;
   }
 
-  public void moveVisualStart(int startOffset) {
-    visualStart = startOffset;
+  public boolean swapVisualEnds(@NotNull Editor editor, @NotNull Caret caret) {
+    int t = CaretData.getVisualEnd(caret);
+    CaretData.setVisualEnd(caret, CaretData.getVisualStart(caret));
+    CaretData.setVisualStart(caret, t);
+
+    moveCaret(editor, caret, CaretData.getVisualEnd(caret));
+
+    return true;
+  }
+
+  public void moveVisualStart(@NotNull Caret caret, int startOffset) {
+    CaretData.setVisualStart(caret, startOffset);
   }
 
   public void processEscape(@NotNull Editor editor) {
@@ -1802,7 +1996,8 @@ public class MotionGroup {
       if (event.getArea() == EditorMouseEventArea.EDITING_AREA) {
         VimPlugin.getMotion().processMouseClick(event.getEditor(), event.getMouseEvent());
       }
-      else if (event.getArea() != EditorMouseEventArea.ANNOTATIONS_AREA && event.getArea() != EditorMouseEventArea.FOLDING_OUTLINE_AREA) {
+      else if (event.getArea() != EditorMouseEventArea.ANNOTATIONS_AREA &&
+               event.getArea() != EditorMouseEventArea.FOLDING_OUTLINE_AREA) {
         VimPlugin.getMotion()
           .processLineSelection(event.getEditor(), event.getMouseEvent().getButton() == MouseEvent.BUTTON3);
       }
@@ -1840,9 +2035,6 @@ public class MotionGroup {
 
   private int lastFTCmd = 0;
   private char lastFTChar;
-  private int visualStart;
-  private int visualEnd;
-  private int visualOffset;
   @NotNull private final EditorMouseHandler mouseHandler = new EditorMouseHandler();
   @NotNull private final EditorSelectionHandler selectionHandler = new EditorSelectionHandler();
 }

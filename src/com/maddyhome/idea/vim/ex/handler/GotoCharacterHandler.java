@@ -36,12 +36,13 @@ public class GotoCharacterHandler extends CommandHandler {
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
+    // TODO: Add multiple carets support
     int count = cmd.getCount(editor, context, 1, true);
 
     if (count > 0) {
       int res = VimPlugin.getMotion().moveCaretToNthCharacter(editor, count - 1);
       if (res != -1) {
-        MotionGroup.moveCaret(editor, res);
+        MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), res);
 
         return true;
       }

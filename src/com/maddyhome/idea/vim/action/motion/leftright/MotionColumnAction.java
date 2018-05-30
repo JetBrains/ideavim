@@ -19,14 +19,16 @@
 package com.maddyhome.idea.vim.action.motion.leftright;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
-import com.maddyhome.idea.vim.helper.EditorData;
+import com.maddyhome.idea.vim.helper.CaretData;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  */
@@ -36,12 +38,20 @@ public class MotionColumnAction extends MotionEditorAction {
   }
 
   private static class Handler extends MotionEditorActionHandler {
-    public int getOffset(@NotNull Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return VimPlugin.getMotion().moveCaretToColumn(editor, count - 1, false);
+    public Handler() {
+      super(true);
     }
 
-    protected void postMove(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
-      EditorData.setLastColumn(editor, cmd.getCount() - 1);
+    @Override
+    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                         int rawCount, @Nullable Argument argument) {
+      return VimPlugin.getMotion().moveCaretToColumn(editor, caret, count - 1, false);
+    }
+
+    @Override
+    protected void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                            @NotNull Command cmd) {
+      CaretData.setLastColumn(editor, caret, cmd.getCount() - 1);
     }
   }
 }

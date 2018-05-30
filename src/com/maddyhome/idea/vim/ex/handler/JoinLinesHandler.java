@@ -46,6 +46,7 @@ public class JoinLinesHandler extends CommandHandler {
     TextRange range = cmd.getTextRange(editor, context, true);
     range = new TextRange(range.getStartOffset(), range.getEndOffset() - 1);
 
-    return VimPlugin.getChange().deleteJoinRange(editor, range, spaces);
+    // TODO: Add multiple carets support
+    return VimPlugin.getChange().deleteJoinRange(editor, editor.getCaretModel().getPrimaryCaret(), range, spaces);
   }
 }

@@ -26,11 +26,15 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.handler.CaretOrder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.nio.CharBuffer;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * This is a set of helper methods for working with editors. All line and column values are zero based.
@@ -562,5 +566,26 @@ public class EditorHelper {
     return (editor.getDocument().isWritable() ||
             FileDocumentManager.fileForDocumentCheckedOutSuccessfully(editor.getDocument(), project)) &&
            !EditorData.isConsoleOutput(editor);
+  }
+
+  /**
+   * Get list of all carets from the editor.
+   *
+   * @param editor The editor from which the carets are taken
+   * @param order  Order in which the carets are given.
+   */
+  @NotNull
+  public static List<Caret> getOrderedCaretsList(@NotNull Editor editor, @NotNull CaretOrder order) {
+    @NotNull List<Caret> carets = editor.getCaretModel().getAllCarets();
+
+    if (order == CaretOrder.INCREASING_OFFSET) {
+      carets.sort(Comparator.comparingInt(Caret::getOffset));
+    }
+    else if (order == CaretOrder.DECREASING_OFFSET) {
+      carets.sort(Comparator.comparingInt(Caret::getOffset));
+      Collections.reverse(carets);
+    }
+
+    return carets;
   }
 }

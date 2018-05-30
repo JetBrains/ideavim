@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
@@ -27,13 +28,26 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  */
 public abstract class EditorActionHandlerBase extends EditorActionHandler {
-  public final void execute(@NotNull Editor editor, @NotNull DataContext context) {
+  protected boolean myRunForEachCaret;
+
+  public EditorActionHandlerBase() {
+    this(false);
+  }
+
+  public EditorActionHandlerBase(boolean runForEachCaret) {
+    super(runForEachCaret);
+    myRunForEachCaret = runForEachCaret;
+  }
+
+  @Override
+  public final void doExecute(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context) {
     editor = InjectedLanguageUtil.getTopLevelEditor(editor);
-    logger.debug("execute");
+    logger.debug("doExecute");
 
     if (!VimPlugin.isEnabled()) {
       return;
@@ -42,7 +56,19 @@ public abstract class EditorActionHandlerBase extends EditorActionHandler {
     final CommandState state = CommandState.getInstance(editor);
     final Command cmd = state.getCommand();
 
-    if (cmd == null || !execute(editor, context, cmd)) {
+    try {
+      if (myRunForEachCaret) {
+        if (cmd == null || !execute(editor, caret, context, cmd)) {
+          VimPlugin.indicateError();
+        }
+      }
+      else {
+        if (cmd == null || !execute(editor, context, cmd)) {
+          VimPlugin.indicateError();
+        }
+      }
+    }
+    catch (ExecuteMethodNotOverriddenException e) {
       VimPlugin.indicateError();
     }
   }
@@ -51,7 +77,21 @@ public abstract class EditorActionHandlerBase extends EditorActionHandler {
     // No-op
   }
 
-  protected abstract boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd);
+  protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd)
+    throws ExecuteMethodNotOverriddenException {
+    if (!myRunForEachCaret) {
+      throw new ExecuteMethodNotOverriddenException(this.getClass());
+    }
+    return execute(editor, editor.getCaretModel().getPrimaryCaret(), context, cmd);
+  }
+
+  protected boolean execute(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context,
+                            @NotNull Command cmd) throws ExecuteMethodNotOverriddenException {
+    if (myRunForEachCaret) {
+      throw new ExecuteMethodNotOverriddenException(this.getClass());
+    }
+    return execute(editor, context, cmd);
+  }
 
   private static final Logger logger = Logger.getInstance(EditorActionHandlerBase.class.getName());
 }

@@ -19,14 +19,19 @@
 package com.maddyhome.idea.vim.action.motion.updown;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.VisualPosition;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
+import com.maddyhome.idea.vim.helper.CaretData;
 import com.maddyhome.idea.vim.helper.EditorData;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  */
@@ -36,16 +41,44 @@ public class MotionDownAction extends MotionEditorAction {
   }
 
   private static class Handler extends MotionEditorActionHandler {
-    public int getOffset(@NotNull Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return VimPlugin.getMotion().moveCaretVertical(editor, count);
+    public Handler() {
+      super(true);
     }
 
-    protected void preMove(@NotNull Editor editor, DataContext context, Command cmd) {
-      col = EditorData.getLastColumn(editor);
+    @Override
+    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                         int rawCount, @Nullable Argument argument) {
+      Caret lastDownCaret = EditorData.getLastDownCaret(editor);
+      EditorData.setLastDownCaret(editor, caret);
+      if (CommandState.inVisualBlockMode(editor) && EditorData.shouldIgnoreNextMove(editor)) {
+        EditorData.dontIgnoreNextMove(editor);
+        if (lastDownCaret != caret) {
+          return caret.getOffset();
+        }
+      }
+      if (CommandState.inVisualBlockMode(editor)) {
+        int blockEndOffset = EditorData.getVisualBlockEnd(editor);
+        int blockStartOffset = EditorData.getVisualBlockStart(editor);
+        VisualPosition blockEndPosition = editor.offsetToVisualPosition(blockEndOffset);
+        VisualPosition blockStartPosition = editor.offsetToVisualPosition(blockStartOffset);
+        if (blockEndPosition.getLine() < blockStartPosition.getLine()) {
+          EditorData.ignoreNextMove(editor);
+        }
+      }
+
+      return VimPlugin.getMotion().moveCaretVertical(editor, caret, count);
     }
 
-    protected void postMove(@NotNull Editor editor, DataContext context, Command cmd) {
-      EditorData.setLastColumn(editor, col);
+    @Override
+    protected void preMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                           @NotNull Command cmd) {
+      col = CaretData.getLastColumn(caret);
+    }
+
+    @Override
+    protected void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                            @NotNull Command cmd) {
+      CaretData.setLastColumn(editor, caret, col);
     }
 
     private int col;

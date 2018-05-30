@@ -19,19 +19,17 @@
 package com.maddyhome.idea.vim.helper;
 
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.LightVirtualFile;
-import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
-import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
-import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.ui.ExOutputPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -65,44 +63,30 @@ public class EditorData {
     editor.putUserData(LAST_HIGHLIGHTS, null);
     editor.putUserData(LAST_SELECTION_TYPE, null);
     editor.putUserData(LAST_VISUAL_RANGE, null);
-    editor.putUserData(VISUAL_OP, null);
     editor.putUserData(MORE_PANEL, null);
     editor.putUserData(EX_OUTPUT_MODEL, null);
   }
 
   /**
-   * This gets the last column the cursor was in for the editor.
+   * This gets the last column the primary cursor was in for the editor.
    *
    * @param editor The editor to get the last column from
-   * @return Returns the last column as set by {@link #setLastColumn} or the current cursor column
+   * @return Returns the last column as set by {@link #setLastColumn} or the current primary cursor column
+   * @deprecated Use {@link CaretData#getLastColumn(Caret)} to get the primary cursor last column
    */
   public static int getLastColumn(@NotNull Editor editor) {
-    Integer col = editor.getUserData(LAST_COLUMN);
-    if (col == null) {
-      return editor.getCaretModel().getVisualPosition().column;
-    }
-    else {
-      return col;
-    }
+    return CaretData.getLastColumn(editor.getCaretModel().getPrimaryCaret());
   }
 
   /**
-   * Sets the last column for this editor
+   * Sets the last column for the primary caret of this editor
    *
    * @param col    The column
    * @param editor The editor
+   * @deprecated Use {@link CaretData#setLastColumn(Editor, Caret, int)} to set the caret last column
    */
   public static void setLastColumn(@NotNull Editor editor, int col) {
-    boolean previousWasDollar = getLastColumn(editor) >= MotionGroup.LAST_COLUMN;
-    boolean currentIsDollar = col >= MotionGroup.LAST_COLUMN;
-
-    editor.putUserData(LAST_COLUMN, col);
-    int t = getLastColumn(editor);
-    if (logger.isDebugEnabled()) logger.debug("setLastColumn(" + col + ") is now " + t);
-
-    if (previousWasDollar != currentIsDollar && CommandState.inVisualBlockMode(editor)) {
-      VimPlugin.getMotion().updateSelection(editor);
-    }
+    CaretData.setLastColumn(editor, editor.getCaretModel().getPrimaryCaret(), col);
   }
 
   @Nullable
@@ -142,27 +126,6 @@ public class EditorData {
 
   public static void setLastVisualRange(@NotNull Editor editor, @NotNull TextRange textRange) {
     editor.getDocument().putUserData(LAST_VISUAL_RANGE, textRange);
-  }
-
-  /**
-   * Gets the previous visual operator range for the editor.
-   *
-   * @param editor The editor to get the range for
-   * @return The last visual range, null if no previous range
-   */
-  @Nullable
-  public static VisualChange getLastVisualOperatorRange(@NotNull Editor editor) {
-    return editor.getDocument().getUserData(VISUAL_OP);
-  }
-
-  /**
-   * Sets the previous visual operator range for the editor.
-   *
-   * @param editor The editor to set the range for
-   * @param range  The visual range
-   */
-  public static void setLastVisualOperatorRange(@NotNull Editor editor, VisualChange range) {
-    editor.getDocument().putUserData(VISUAL_OP, range);
   }
 
   @Nullable
@@ -236,6 +199,80 @@ public class EditorData {
     editor.putUserData(EX_OUTPUT_MODEL, model);
   }
 
+  /**
+   * Sets the visual block start for the editor.
+   *
+   * @param editor The editor
+   */
+  public static void setVisualBlockStart(@NotNull Editor editor, int visualBlockStart) {
+    editor.putUserData(VISUAL_BLOCK_START, visualBlockStart);
+  }
+
+  /**
+   * Gets the visual block start for the editor.
+   *
+   * @param editor The editor
+   */
+  public static int getVisualBlockStart(@NotNull Editor editor) {
+    Integer visualBlockStart = editor.getUserData(VISUAL_BLOCK_START);
+
+    if (visualBlockStart == null) {
+      return editor.getCaretModel().getPrimaryCaret().getOffset();
+    }
+    else {
+      return visualBlockStart;
+    }
+  }
+
+  /**
+   * Sets the visual block end for the editor.
+   *
+   * @param editor The editor
+   */
+  public static void setVisualBlockEnd(@NotNull Editor editor, int visualBlockEnd) {
+    editor.putUserData(VISUAL_BLOCK_END, visualBlockEnd);
+  }
+
+  /**
+   * Gets the visual block offset for the editor.
+   *
+   * @param editor The editor
+   */
+  public static int getVisualBlockOffset(@NotNull Editor editor) {
+    Integer visualBlockOffset = editor.getUserData(VISUAL_BLOCK_OFFSET);
+
+    if (visualBlockOffset == null) {
+      return editor.getCaretModel().getPrimaryCaret().getOffset();
+    }
+    else {
+      return visualBlockOffset;
+    }
+  }
+
+  /**
+   * Sets the visual block offset for the editor.
+   *
+   * @param editor The editor
+   */
+  public static void setVisualBlockOffset(@NotNull Editor editor, int visualBlockOffset) {
+    editor.putUserData(VISUAL_BLOCK_OFFSET, visualBlockOffset);
+  }
+
+  /**
+   * Gets the visual block end for the editor.
+   *
+   * @param editor The editor
+   */
+  public static int getVisualBlockEnd(@NotNull Editor editor) {
+    Integer visualBlockEnd = editor.getUserData(VISUAL_BLOCK_END);
+
+    if (visualBlockEnd == null) {
+      return editor.getCaretModel().getPrimaryCaret().getOffset();
+    }
+    else {
+      return visualBlockEnd;
+    }
+  }
 
   /**
    * Gets the virtual file associated with this editor
@@ -249,17 +286,109 @@ public class EditorData {
   }
 
   /**
+   * Asks whether next down move should be ignored.
+   */
+  public static boolean shouldIgnoreNextMove(@NotNull Editor editor) {
+    Boolean ret = editor.getUserData(IGNORE_NEXT_MOVE);
+    if (ret == null) {
+      return false;
+    }
+    else {
+      return ret;
+    }
+  }
+
+  /**
+   * Indicate that the next down move should be ignored.
+   */
+  public static void ignoreNextMove(@NotNull Editor editor) {
+    editor.putUserData(IGNORE_NEXT_MOVE, true);
+  }
+
+  /**
+   * Indicate that the next down move should not be ignored.
+   */
+  public static void dontIgnoreNextMove(@NotNull Editor editor) {
+    editor.putUserData(IGNORE_NEXT_MOVE, false);
+  }
+
+  /**
+   * Checks whether a keeping visual mode visual operator action is performed on editor.
+   */
+  public static boolean isKeepingVisualOperatorAction(@NotNull Editor editor) {
+    Boolean res = editor.getUserData(IS_KEEPING_VISUAL_OPERATOR_ACTION);
+
+    if (res == null) {
+      return false;
+    }
+    else {
+      return res;
+    }
+  }
+
+  /**
+   * Sets the keeping visual mode visual operator action flag for the editor.
+   */
+  public static void setKeepingVisualOperatorAction(@NotNull Editor editor, boolean value) {
+    editor.putUserData(IS_KEEPING_VISUAL_OPERATOR_ACTION, value);
+  }
+
+  /**
+   * Gets the mode to which the editor should switch after a change/visual action.
+   */
+  @Nullable
+  public static CommandState.Mode getChangeSwitchMode(@NotNull Editor editor) {
+    return editor.getUserData(CHANGE_ACTION_SWITCH_MODE);
+  }
+
+  /**
+   * Sets the mode to which the editor should switch after a change/visual action.
+   */
+  public static void setChangeSwitchMode(@NotNull Editor editor, @Nullable CommandState.Mode mode) {
+    editor.putUserData(CHANGE_ACTION_SWITCH_MODE, mode);
+  }
+
+  /**
+   * Sets the visual block mode flag in the beginning of handling visual operator actions
+   */
+  public static boolean wasVisualBlockMode(@NotNull Editor editor) {
+    Boolean res = editor.getUserData(WAS_VISUAL_BLOCK_MODE);
+    return res != null && res;
+  }
+
+  /**
+   * Sets the visual block mode flag in the beginning of handling visual operator actions
+   */
+  public static void setWasVisualBlockMode(@NotNull Editor editor, boolean value) {
+    editor.putUserData(WAS_VISUAL_BLOCK_MODE, value);
+  }
+
+  /**
+   * Gets the last caret used in down movement.
+   */
+  @Nullable
+  public static Caret getLastDownCaret(@NotNull Editor editor) {
+    return editor.getUserData(LAST_DOWN_CARET);
+  }
+
+  /**
+   * Sets the last caret used in down movement.
+   */
+  public static void setLastDownCaret(@NotNull Editor editor, @NotNull Caret caret) {
+    editor.putUserData(LAST_DOWN_CARET, caret);
+  }
+
+  /**
    * This is a static helper - no instances needed
    */
   private EditorData() {
   }
 
-  private static final Key<Integer> LAST_COLUMN = new Key<Integer>("lastColumn");
   private static final Key<SelectionType> LAST_SELECTION_TYPE = new Key<SelectionType>("lastSelectionType");
   public static final Key<TextRange> LAST_VISUAL_RANGE = new Key<TextRange>("lastVisualRange");
-  private static final Key<VisualChange> VISUAL_OP = new Key<VisualChange>("lastVisualOp");
   private static final Key<String> LAST_SEARCH = new Key<String>("lastSearch");
-  private static final Key<Collection<RangeHighlighter>> LAST_HIGHLIGHTS = new Key<Collection<RangeHighlighter>>("lastHighlights");
+  private static final Key<Collection<RangeHighlighter>> LAST_HIGHLIGHTS =
+    new Key<Collection<RangeHighlighter>>("lastHighlights");
   private static final Key<CommandState> COMMAND_STATE = new Key<CommandState>("commandState");
   private static final Key<Boolean> CHANGE_GROUP = new Key<Boolean>("changeGroup");
   private static final Key<Boolean> MOTION_GROUP = new Key<Boolean>("motionGroup");
@@ -268,6 +397,14 @@ public class EditorData {
   private static final Key<ExOutputPanel> MORE_PANEL = new Key<ExOutputPanel>("IdeaVim.morePanel");
   private static final Key<ExOutputModel> EX_OUTPUT_MODEL = new Key<ExOutputModel>("IdeaVim.exOutputModel");
   private static final Key<TestInputModel> TEST_INPUT_MODEL = new Key<TestInputModel>("IdeaVim.testInputModel");
+  private static final Key<Integer> VISUAL_BLOCK_START = new Key<>("visuaBlockStart");
+  private static final Key<Integer> VISUAL_BLOCK_END = new Key<>("visualBlockEnd");
+  private static final Key<Integer> VISUAL_BLOCK_OFFSET = new Key<>("visualBlockOffset");
+  private static final Key<Boolean> IGNORE_NEXT_MOVE = new Key<>("shouldIgnoreNextMove");
+  private static final Key<Boolean> IS_KEEPING_VISUAL_OPERATOR_ACTION = new Key<>("isKeepingVisualOperatorAction");
+  private static final Key<CommandState.Mode> CHANGE_ACTION_SWITCH_MODE = new Key<>("changeActionSwitchMode");
+  private static final Key<Boolean> WAS_VISUAL_BLOCK_MODE = new Key<>("wasVisualBlockMode");
+  private static final  Key<Caret> LAST_DOWN_CARET = new Key<>("lastDownCaret");
 
   private static Key CONSOLE_VIEW_IN_EDITOR_VIEW = Key.create("CONSOLE_VIEW_IN_EDITOR_VIEW");
 
@@ -306,7 +443,7 @@ public class EditorData {
   /**
    * Checks if editor is file editor, also it takes into account that editor can be placed in editors hierarchy
    */
-  public static boolean isFileEditor(@NotNull Editor editor){
+  public static boolean isFileEditor(@NotNull Editor editor) {
     final VirtualFile virtualFile = EditorData.getVirtualFile(editor);
     return virtualFile != null && !(virtualFile instanceof LightVirtualFile);
   }

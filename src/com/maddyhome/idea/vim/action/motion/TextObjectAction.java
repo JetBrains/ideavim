@@ -19,11 +19,13 @@
 package com.maddyhome.idea.vim.action.motion;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -35,8 +37,9 @@ public abstract class TextObjectAction extends EditorAction {
   }
 
   @Nullable
-  public TextRange getRange(Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-    return handler.getRange(editor, context, count, rawCount, argument);
+  public TextRange getRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                            int rawCount, @Nullable Argument argument) {
+    return handler.getRange(editor, caret, context, count, rawCount, argument);
   }
 
   private final TextObjectActionHandler handler;

@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
@@ -27,7 +28,9 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
+import com.maddyhome.idea.vim.helper.CaretData;
 import com.maddyhome.idea.vim.helper.EditorData;
+import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,64 +38,150 @@ import org.jetbrains.annotations.Nullable;
  *
  */
 public abstract class VisualOperatorActionHandler extends EditorActionHandlerBase {
+  private final boolean myRunForEachCaret;
+  private final CaretOrder myCaretOrder;
+
+  public VisualOperatorActionHandler(boolean runForEachCaret, CaretOrder caretOrder) {
+    super(false);
+    myRunForEachCaret = runForEachCaret;
+    myCaretOrder = caretOrder;
+  }
+
+  public VisualOperatorActionHandler() {
+    this(false, CaretOrder.NATIVE);
+  }
+
+  @Override
   protected final boolean execute(@NotNull final Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+    // As in ChangeEditorActionHandler, some actions there should also be done before and after each action (such as
+    // exiting/entering/toggling visual mode, so this also overrides single-caret version.
+
     if (logger.isDebugEnabled()) logger.debug("execute, cmd=" + cmd);
 
-    TextRange range;
+    EditorData.setChangeSwitchMode(editor, null);
+    EditorData.setWasVisualBlockMode(editor, CommandState.inVisualBlockMode(editor));
+
+    boolean willRunForEachCaret = myRunForEachCaret && !CommandState.inVisualBlockMode(editor);
+
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-      range = VimPlugin.getMotion().getVisualRange(editor);
+      TextRange range = VimPlugin.getMotion().getVisualRange(editor);
       if (logger.isDebugEnabled()) logger.debug("range=" + range);
     }
 
-    VisualStartFinishRunnable runnable = new VisualStartFinishRunnable(editor, cmd);
-    range = runnable.start();
+    VisualStartFinishRunnable runnable = new VisualStartFinishRunnable(editor, cmd, willRunForEachCaret);
+    runnable.start();
 
-    assert range != null : "Range must be not null for visual operator action " + getClass();
-
-    final boolean res = execute(editor, context, cmd, range);
+    boolean res;
+    if (willRunForEachCaret) {
+      res = true;
+      for (Caret caret : EditorHelper.getOrderedCaretsList(editor, myCaretOrder)) {
+        TextRange range = CaretData.getVisualTextRange(caret);
+        if (range == null) {
+          return false;
+        }
+        try {
+          if (!execute(editor, caret, context, cmd, range)) {
+            res = false;
+          }
+        }
+        catch (ExecuteMethodNotOverriddenException e) {
+          return false;
+        }
+      }
+    }
+    else {
+      TextRange range = CaretData.getVisualTextRange(editor.getCaretModel().getPrimaryCaret());
+      if (range == null) {
+        return false;
+      }
+      try {
+        res = execute(editor, context, cmd, range);
+      }
+      catch (ExecuteMethodNotOverriddenException e) {
+        return false;
+      }
+    }
 
     runnable.setRes(res);
     runnable.finish();
 
+    CommandState.Mode toSwitch = EditorData.getChangeSwitchMode(editor);
+    if (toSwitch != null) {
+      VimPlugin.getChange().processPostChangeModeSwitch(editor, context, toSwitch);
+    }
+
     return res;
   }
 
-  protected abstract boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
-                                     @NotNull TextRange range);
+  protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
+                            @NotNull TextRange range) throws ExecuteMethodNotOverriddenException {
+    if (!myRunForEachCaret) {
+      throw new ExecuteMethodNotOverriddenException(this.getClass());
+    }
+    return execute(editor, editor.getCaretModel().getPrimaryCaret(), context, cmd, range);
+  }
+
+  protected boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                            @NotNull Command cmd, @NotNull TextRange range) throws ExecuteMethodNotOverriddenException {
+    if (myRunForEachCaret) {
+      throw new ExecuteMethodNotOverriddenException(this.getClass());
+    }
+    return execute(editor, context, cmd, range);
+  }
 
   private static class VisualStartFinishRunnable {
-    public VisualStartFinishRunnable(Editor editor, Command cmd) {
+    public VisualStartFinishRunnable(@NotNull Editor editor, Command cmd, boolean runForEachCaret) {
       this.editor = editor;
       this.cmd = cmd;
       this.res = true;
+      this.myRunForEachCaret = runForEachCaret;
     }
 
     public void setRes(boolean res) {
       this.res = res;
     }
 
-    @Nullable
-    public TextRange start() {
-      logger.debug("start");
-      wasRepeat = false;
+    void startForCaret(Caret caret) {
       if (CommandState.getInstance(editor).getMode() == CommandState.Mode.REPEAT) {
-        wasRepeat = true;
-        lastColumn = EditorData.getLastColumn(editor);
-        VisualChange range = EditorData.getLastVisualOperatorRange(editor);
+        CaretData.setPreviousLastColumn(caret, CaretData.getLastColumn(caret));
+        VisualChange range = CaretData.getLastVisualOperatorRange(caret);
         VimPlugin.getMotion().toggleVisual(editor, 1, 1, CommandState.SubMode.NONE);
         if (range != null && range.getColumns() == MotionGroup.LAST_COLUMN) {
-          EditorData.setLastColumn(editor, MotionGroup.LAST_COLUMN);
+          CaretData.setLastColumn(editor, caret, MotionGroup.LAST_COLUMN);
         }
       }
 
+      VisualChange change = null;
       TextRange res = null;
       if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-        res = VimPlugin.getMotion().getVisualRange(editor);
+        if (!myRunForEachCaret) {
+          res = VimPlugin.getMotion().getVisualRange(editor);
+        }
+        else {
+          res = VimPlugin.getMotion().getVisualRange(caret);
+        }
         if (!wasRepeat) {
           change = VimPlugin.getMotion()
-            .getVisualOperatorRange(editor, cmd == null ? Command.FLAG_MOT_LINEWISE : cmd.getFlags());
+            .getVisualOperatorRange(editor, caret, cmd == null ? Command.FLAG_MOT_LINEWISE : cmd.getFlags());
         }
         if (logger.isDebugEnabled()) logger.debug("change=" + change);
+      }
+      CaretData.setVisualChange(caret, change);
+      CaretData.setVisualTextRange(caret, res);
+    }
+
+    public void start() {
+      logger.debug("start");
+      wasRepeat = CommandState.getInstance(editor).getMode() == CommandState.Mode.REPEAT;
+      EditorData.setKeepingVisualOperatorAction(editor, (cmd.getFlags() & Command.FLAG_EXIT_VISUAL) == 0);
+
+      if (myRunForEachCaret) {
+        for (Caret caret : editor.getCaretModel().getAllCarets()) {
+          startForCaret(caret);
+        }
+      }
+      else {
+        startForCaret(editor.getCaretModel().getPrimaryCaret());
       }
 
       // If this is a mutli key change then exit visual now
@@ -106,8 +195,22 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
           VimPlugin.getMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE);
         }
       }
+    }
 
-      return res;
+    private void finishForCaret(Caret caret) {
+      if (cmd == null ||
+          ((cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) == 0 && (cmd.getFlags() & Command.FLAG_EXPECT_MORE) == 0)) {
+        if (wasRepeat) {
+          CaretData.setLastColumn(editor, caret, CaretData.getPreviousLastColumn(caret));
+        }
+      }
+
+      if (res) {
+        @Nullable VisualChange change = CaretData.getVisualChange(caret);
+        if (change != null) {
+          CaretData.setLastVisualOperatorRange(caret, change);
+        }
+      }
     }
 
     public void finish() {
@@ -119,25 +222,28 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
         }
       }
 
-      if (cmd == null || ((cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) == 0 &&
-                          (cmd.getFlags() & Command.FLAG_EXPECT_MORE) == 0)) {
+      if (cmd == null ||
+          ((cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) == 0 && (cmd.getFlags() & Command.FLAG_EXPECT_MORE) == 0)) {
         logger.debug("not multikey undo - exit visual");
         VimPlugin.getMotion().exitVisual(editor);
-        if (wasRepeat) {
-          EditorData.setLastColumn(editor, lastColumn);
-        }
       }
 
       if (res) {
-        logger.debug("res");
-        if (change != null) {
-          EditorData.setLastVisualOperatorRange(editor, change);
-        }
-
         if (cmd != null) {
           CommandState.getInstance(editor).saveLastChangeCommand(cmd);
         }
       }
+
+      if (myRunForEachCaret) {
+        for (Caret caret : editor.getCaretModel().getAllCarets()) {
+          finishForCaret(caret);
+        }
+      }
+      else {
+        finishForCaret(editor.getCaretModel().getPrimaryCaret());
+      }
+
+      EditorData.setKeepingVisualOperatorAction(editor, false);
     }
 
     private final Command cmd;
@@ -145,8 +251,7 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
     private boolean res;
     @NotNull private CommandState.SubMode lastMode;
     private boolean wasRepeat;
-    private int lastColumn;
-    @Nullable VisualChange change = null;
+    private boolean myRunForEachCaret;
   }
 
   private static final Logger logger = Logger.getInstance(VisualOperatorActionHandler.class.getName());

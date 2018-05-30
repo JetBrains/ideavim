@@ -80,6 +80,7 @@ public class SearchGroup {
   }
 
   public boolean searchAndReplace(@NotNull Editor editor, @NotNull LineRange range, @NotNull String excmd, String exarg) {
+    // TODO: Add multiple carets support
 
     // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
@@ -345,7 +346,7 @@ public class SearchGroup {
           if (do_ask) {
             RangeHighlighter hl = highlightConfirm(editor, startoff, endoff);
             MotionGroup.scrollPositionIntoView(editor, editor.offsetToVisualPosition(startoff), true);
-            MotionGroup.moveCaret(editor, startoff);
+            MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), startoff);
             final ReplaceConfirmationChoice choice = confirmChoice(editor, match);
             editor.getMarkupModel().removeHighlighter(hl);
             switch (choice) {
@@ -404,7 +405,7 @@ public class SearchGroup {
     }
 
     if (lastMatch != -1) {
-      MotionGroup.moveCaret(editor, VimPlugin.getMotion()
+      MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), VimPlugin.getMotion()
         .moveCaretToLineStartSkipLeading(editor, editor.offsetToLogicalPosition(lastMatch).line
         ));
     }
@@ -460,11 +461,12 @@ public class SearchGroup {
   }
 
   public int search(@NotNull Editor editor, @NotNull String command, int count, int flags, boolean moveCursor) {
+    // TODO: Add multiple carets support
     int res = search(editor, command, editor.getCaretModel().getOffset(), count, flags);
 
     if (res != -1 && moveCursor) {
       VimPlugin.getMark().saveJumpLocation(editor);
-      MotionGroup.moveCaret(editor, res);
+      MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), res);
     }
 
     return res;
@@ -538,7 +540,7 @@ public class SearchGroup {
       pattern.append("\\>");
     }
 
-    MotionGroup.moveCaret(editor, range.getStartOffset());
+    MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), range.getStartOffset());
 
     lastSearch = pattern.toString();
     setLastPattern(editor, lastSearch);
