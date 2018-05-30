@@ -61,9 +61,10 @@ public class FileGroup {
     if (logger.isDebugEnabled()) {
       logger.debug("openFile(" + filename + ")");
     }
-    Project proj = PlatformDataKeys.PROJECT.getData(context); // API change - don't merge
+    final Project project = PlatformDataKeys.PROJECT.getData(context); // API change - don't merge
+    if (project == null) return false;
 
-    VirtualFile found = findFile(filename, proj);
+    VirtualFile found = findFile(filename, project);
 
     if (found != null) {
       if (logger.isDebugEnabled()) {
@@ -73,7 +74,7 @@ public class FileGroup {
       // If unknown, IDEA will prompt the user to pick a type.
       FileType type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found);
       if (type != null) {
-        FileEditorManager fem = FileEditorManager.getInstance(proj);
+        FileEditorManager fem = FileEditorManager.getInstance(project);
         fem.openFile(found, true);
 
         return true;
@@ -104,9 +105,6 @@ public class FileGroup {
       found = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(new File(dir, homefile));
     }
     else {
-      if (proj == null) {
-        return null;
-      }
       ProjectRootManager prm = ProjectRootManager.getInstance(proj);
       VirtualFile[] roots = prm.getContentRoots();
       for (int i = 0; i < roots.length; i++) {
@@ -230,8 +228,9 @@ public class FileGroup {
    * @param context
    */
   public boolean selectFile(int count, @NotNull DataContext context) {
-    Project proj = PlatformDataKeys.PROJECT.getData(context);
-    FileEditorManager fem = FileEditorManager.getInstance(proj); // API change - don't merge
+    final Project project = PlatformDataKeys.PROJECT.getData(context);
+    if (project == null) return false;
+    FileEditorManager fem = FileEditorManager.getInstance(project); // API change - don't merge
     VirtualFile[] editors = fem.getOpenFiles();
     if (count == 99) {
       count = editors.length - 1;
@@ -252,8 +251,9 @@ public class FileGroup {
    * @param context
    */
   public void selectNextFile(int count, @NotNull DataContext context) {
-    Project proj = PlatformDataKeys.PROJECT.getData(context);
-    FileEditorManager fem = FileEditorManager.getInstance(proj); // API change - don't merge
+    Project project = PlatformDataKeys.PROJECT.getData(context);
+    if (project == null) return;
+    FileEditorManager fem = FileEditorManager.getInstance(project); // API change - don't merge
     VirtualFile[] editors = fem.getOpenFiles();
     VirtualFile current = fem.getSelectedFiles()[0];
     for (int i = 0; i < editors.length; i++) {
@@ -269,8 +269,9 @@ public class FileGroup {
    * Selects previous editor tab
    */
   public void selectPreviousTab(@NotNull DataContext context) {
-    Project proj = PlatformDataKeys.PROJECT.getData(context);
-    FileEditorManager fem = FileEditorManager.getInstance(proj); // API change - don't merge
+    Project project = PlatformDataKeys.PROJECT.getData(context);
+    if (project == null) return;
+    FileEditorManager fem = FileEditorManager.getInstance(project); // API change - don't merge
     VirtualFile vf = lastSelections.get(fem);
     if (vf != null) {
       fem.openFile(vf, true);
