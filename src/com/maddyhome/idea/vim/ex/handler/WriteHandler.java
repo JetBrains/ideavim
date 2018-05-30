@@ -37,7 +37,7 @@ public class WriteHandler extends CommandHandler {
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
-    VimPlugin.getFile().saveFile(editor, context);
+    VimPlugin.getFile().saveFile(editor);
 
     return true;
   }

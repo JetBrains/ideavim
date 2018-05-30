@@ -40,7 +40,7 @@ public class WritePreviousFileHandler extends CommandHandler {
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
     int count = cmd.getCount(editor, context, 1, true);
 
-    VimPlugin.getFile().saveFile(editor, context);
+    VimPlugin.getFile().saveFile(editor);
     VimPlugin.getMark().saveJumpLocation(editor);
     VimPlugin.getFile().selectNextFile(-count, context);
 
