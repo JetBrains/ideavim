@@ -748,6 +748,12 @@ public class MotionActionTest extends VimTestCase {
     assertPluginError(true);
   }
 
+  // VIM-1427
+  public void testDeleteOuterTagWithCount() {
+    typeTextInFile(parseKeys("d2at"),"<a><b><c><caret></c></b></a>");
+    myFixture.checkResult("<a></a>");
+  }
+
 
   // |%|
   public void testPercentMatchSimple() {
