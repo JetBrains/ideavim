@@ -171,4 +171,11 @@ public class CopyActionTest extends VimTestCase {
                             "baz\n");
     }
   }
+
+  // VIM-1431
+  public void testPutInEmptyFile() {
+    VimPlugin.getRegister().setKeys('a', parseKeys("test"));
+    typeTextInFile(parseKeys("\"ap"), "");
+    myFixture.checkResult("test");
+  }
 }
