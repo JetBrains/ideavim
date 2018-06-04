@@ -47,6 +47,7 @@ Contributors:
 * [Maximilian Luz](mailto:qzed@users.noreply.github.com)
 * [Vladimir Parfinenko](mailto:vparfinenko@excelsior-usa.com)
 * [Florian Hassmann](mailto:hassmann@hwdev.de)
+* [Jan Palus](mailto:jpalus@fastmail.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
