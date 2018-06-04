@@ -353,9 +353,10 @@ public class SearchHelper {
   }
 
   @Nullable
-  public static TextRange findBlockTagRange(@NotNull Editor editor, boolean isOuter) {
+  public static TextRange findBlockTagRange(@NotNull Editor editor, int count, boolean isOuter) {
     final int cursorOffset = editor.getCaretModel().getOffset();
     int pos = cursorOffset;
+    int currentCount = count;
     final CharSequence sequence = editor.getDocument().getCharsSequence();
     while (true) {
       final Pair<TextRange, String> closingTagResult = findClosingTag(sequence, pos);
@@ -365,7 +366,7 @@ public class SearchHelper {
       final TextRange closingTagTextRange = closingTagResult.getFirst();
       final String tagName = closingTagResult.getSecond();
       final TextRange openingTagTextRange = findOpeningTag(sequence, closingTagTextRange.getStartOffset(), tagName);
-      if (openingTagTextRange != null && openingTagTextRange.getStartOffset() <= cursorOffset) {
+      if (openingTagTextRange != null && openingTagTextRange.getStartOffset() <= cursorOffset && --currentCount == 0) {
         if (isOuter) {
           return new TextRange(openingTagTextRange.getStartOffset(),
                                closingTagTextRange.getEndOffset());
