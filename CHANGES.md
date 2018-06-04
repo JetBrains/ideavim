@@ -29,6 +29,8 @@ A bugfix release.
 * [VIM-1379](https://youtrack.jetbrains.com/issue/VIM-1379) Fixed `I` for short lines in visual block mode
 * [VIM-1380](https://youtrack.jetbrains.com/issue/VIM-1380) Fixed `cw` with count at the end of a word
 * [VIM-1404](https://youtrack.jetbrains.com/issue/VIM-1404) Fixed the ability to use `:e#` when editor tabs are hidden
+* [VIM-1431](https://youtrack.jetbrains.com/issue/VIM-1431) Fixed pasting text into the empty document
+* [VIM-1427](https://youtrack.jetbrains.com/issue/VIM-1427) Added the support for count to the `it` and `at` motions
 
 
 0.49, 2017-12-12
