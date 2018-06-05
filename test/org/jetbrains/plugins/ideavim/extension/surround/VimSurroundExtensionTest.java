@@ -235,6 +235,15 @@ public class VimSurroundExtensionTest extends VimTestCase {
     doTest(parseKeys("csBb"), before, after);
   }
 
+  public void testChangeSurroundingBlockInString() {
+    final String before =
+      "if (condition) {return \"<caret>foo\";}";
+    final String after =
+      "if (condition) (return \"foo\";)";
+
+    doTest(parseKeys("csBb"), before, after);
+  }
+
   public void testChangeSurroundingTagSimple() {
     final String before =
       "<div><p><caret>Foo</p></div>";
