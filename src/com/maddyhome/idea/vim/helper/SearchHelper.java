@@ -124,6 +124,8 @@ public class SearchHelper {
     int bstart = -1;
     int bend = -1;
 
+    boolean startPosInStringFound = false;
+
     if (initialPosIsInString) {
       TextRange quoteRange = findBlockQuoteInLineRange(editor, '"', false);
       if (quoteRange != null) {
@@ -133,21 +135,17 @@ public class SearchHelper {
         int inQuotePos = pos - startOffset;
         int inQuoteStart = findBlockLocation(subSequence, close, type, -1, inQuotePos, count);
         if (inQuoteStart != -1) {
+          startPosInStringFound = true;
           int inQuoteEnd = findBlockLocation(subSequence, type, close, 1, inQuoteStart + 1, 1);
           if (inQuoteEnd != -1) {
             bstart = inQuoteStart + startOffset;
             bend = inQuoteEnd + startOffset;
           }
         }
-        else {
-          bstart = findBlockLocation(chars, close, type, -1, pos, count);
-          if (bstart != -1) {
-            bend = findBlockLocation(chars, type, close, 1, bstart + 1, 1);
-          }
-        }
       }
     }
-    else {
+
+    if (!startPosInStringFound) {
       bstart = findBlockLocation(chars, close, type, -1, pos, count);
       if (bstart != -1) {
         bend = findBlockLocation(chars, type, close, 1, bstart + 1, 1);
