@@ -357,6 +357,7 @@ public class CharPointer {
     return seq.charAt(pointer + 7);
   }
 
+  @Override
   public boolean equals(Object obj) {
     if (obj instanceof CharPointer) {
       CharPointer ptr = (CharPointer)obj;
