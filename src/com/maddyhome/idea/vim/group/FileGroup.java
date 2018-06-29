@@ -20,7 +20,6 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -33,8 +32,11 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -50,9 +52,6 @@ import javax.swing.*;
 import java.io.File;
 import java.util.HashMap;
 
-/**
- *
- */
 public class FileGroup {
   public FileGroup() {
   }
@@ -61,9 +60,10 @@ public class FileGroup {
     if (logger.isDebugEnabled()) {
       logger.debug("openFile(" + filename + ")");
     }
-    Project proj = PlatformDataKeys.PROJECT.getData(context); // API change - don't merge
+    final Project project = PlatformDataKeys.PROJECT.getData(context); // API change - don't merge
+    if (project == null) return false;
 
-    VirtualFile found = findFile(filename, proj);
+    VirtualFile found = findFile(filename, project);
 
     if (found != null) {
       if (logger.isDebugEnabled()) {
@@ -71,9 +71,9 @@ public class FileGroup {
       }
       // Can't open a file unless it has a known file type. The next call will return the known type.
       // If unknown, IDEA will prompt the user to pick a type.
-      FileType type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found);
+      FileType type = FileTypeManager.getInstance().getKnownFileTypeOrAssociate(found, project);
       if (type != null) {
-        FileEditorManager fem = FileEditorManager.getInstance(proj);
+        FileEditorManager fem = FileEditorManager.getInstance(project);
         fem.openFile(found, true);
 
         return true;
@@ -92,7 +92,7 @@ public class FileGroup {
   }
 
   @Nullable
-  public VirtualFile findFile(@NotNull String filename, @NotNull Project proj) {
+  VirtualFile findFile(@NotNull String filename, @NotNull Project project) {
     VirtualFile found = null;
     if (filename.length() > 2 && filename.charAt(0) == '~' && filename.charAt(1) == File.separatorChar) {
       String homefile = filename.substring(2);
@@ -104,10 +104,7 @@ public class FileGroup {
       found = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(new File(dir, homefile));
     }
     else {
-      if (proj == null) {
-        return null;
-      }
-      ProjectRootManager prm = ProjectRootManager.getInstance(proj);
+      ProjectRootManager prm = ProjectRootManager.getInstance(project);
       VirtualFile[] roots = prm.getContentRoots();
       for (int i = 0; i < roots.length; i++) {
         if (logger.isDebugEnabled()) {
@@ -133,27 +130,23 @@ public class FileGroup {
     if (res != null) {
       return res;
     }
-
-    VirtualFile[] children = root.getChildren();
-    for (VirtualFile child : children) {
-      if (child.isDirectory()) {
-        res = findFile(child, filename);
-        if (res != null) {
-          return res;
+    final Ref<VirtualFile> result = Ref.create();
+    final VirtualFileVisitor<Object> visitor = new VirtualFileVisitor<Object>() {
+      @Override
+      public boolean visitFile(@NotNull VirtualFile file) {
+        if (file.getName().equals(filename)) {
+          result.set(file);
+          return false;
         }
+        return true;
       }
-      else if (child.getName().equals(filename)) {
-        return child;
-      }
-    }
-
-    return null;
+    };
+    VfsUtilCore.visitChildrenRecursively(root, visitor);
+    return result.get();
   }
 
   /**
-   * Close the current editor
-   *
-   * @param context The data context
+   * Closes the current editor.
    */
   public void closeFile(@NotNull Editor editor, @NotNull DataContext context) {
     final Project project = PlatformDataKeys.PROJECT.getData(context);
@@ -180,58 +173,40 @@ public class FileGroup {
   }
 
   /**
-   * Close all editors except for the current editor
-   *
-   * @param context The data context
+   * Closes all editors except for the current editor.
    */
   public void closeAllButCurrent(@NotNull DataContext context) {
     KeyHandler.executeAction("CloseAllEditorsButCurrent", context);
   }
 
   /**
-   * Close all editors
-   *
-   * @param context The data context
+   * Closes all editors.
    */
   public void closeAllFiles(@NotNull DataContext context) {
     KeyHandler.executeAction("CloseAllEditors", context);
   }
 
   /**
-   * Saves specific file in the project
-   *
-   * @param context The data context
+   * Saves specific file in the project.
    */
-  public void saveFile(@NotNull Editor editor, DataContext context) {
+  public void saveFile(@NotNull Editor editor) {
     FileDocumentManager.getInstance().saveDocument(editor.getDocument());
   }
 
   /**
-   * Saves all files in the project
-   *
-   * @param context The data context
+   * Saves all files in the project.
    */
-  public void saveFiles(DataContext context) {
+  public void saveFiles() {
     FileDocumentManager.getInstance().saveAllDocuments();
   }
 
-  public void closeProject(@NotNull DataContext context) {
-    KeyHandler.executeAction("CloseProject", context);
-  }
-
-  public void exitIdea() {
-    ApplicationManager.getApplication().exit();
-  }
-
   /**
-   * Selects then next or previous editor
-   *
-   * @param count
-   * @param context
+   * Selects then next or previous editor.
    */
   public boolean selectFile(int count, @NotNull DataContext context) {
-    Project proj = PlatformDataKeys.PROJECT.getData(context);
-    FileEditorManager fem = FileEditorManager.getInstance(proj); // API change - don't merge
+    final Project project = PlatformDataKeys.PROJECT.getData(context);
+    if (project == null) return false;
+    FileEditorManager fem = FileEditorManager.getInstance(project); // API change - don't merge
     VirtualFile[] editors = fem.getOpenFiles();
     if (count == 99) {
       count = editors.length - 1;
@@ -246,14 +221,12 @@ public class FileGroup {
   }
 
   /**
-   * Selects then next or previous editor
-   *
-   * @param count
-   * @param context
+   * Selects then next or previous editor.
    */
   public void selectNextFile(int count, @NotNull DataContext context) {
-    Project proj = PlatformDataKeys.PROJECT.getData(context);
-    FileEditorManager fem = FileEditorManager.getInstance(proj); // API change - don't merge
+    Project project = PlatformDataKeys.PROJECT.getData(context);
+    if (project == null) return;
+    FileEditorManager fem = FileEditorManager.getInstance(project); // API change - don't merge
     VirtualFile[] editors = fem.getOpenFiles();
     VirtualFile current = fem.getSelectedFiles()[0];
     for (int i = 0; i < editors.length; i++) {
@@ -266,11 +239,12 @@ public class FileGroup {
   }
 
   /**
-   * Selects previous editor tab
+   * Selects previous editor tab.
    */
   public void selectPreviousTab(@NotNull DataContext context) {
-    Project proj = PlatformDataKeys.PROJECT.getData(context);
-    FileEditorManager fem = FileEditorManager.getInstance(proj); // API change - don't merge
+    Project project = PlatformDataKeys.PROJECT.getData(context);
+    if (project == null) return;
+    FileEditorManager fem = FileEditorManager.getInstance(project); // API change - don't merge
     VirtualFile vf = lastSelections.get(fem);
     if (vf != null) {
       fem.openFile(vf, true);
@@ -281,7 +255,7 @@ public class FileGroup {
   }
 
   @Nullable
-  public Editor selectEditor(Project project, @NotNull VirtualFile file) {
+  Editor selectEditor(Project project, @NotNull VirtualFile file) {
     FileEditorManager fMgr = FileEditorManager.getInstance(project);
     FileEditor[] feditors = fMgr.openFile(file, true);
     if (feditors.length > 0) {
@@ -451,21 +425,18 @@ public class FileGroup {
   }
 
   /**
-   * This class listens for editor tab changes so any insert/replace modes that need to be reset can be
+   * This class listens for editor tab changes so any insert/replace modes that need to be reset can be.
    */
-  public static class SelectionCheck extends FileEditorManagerAdapter {
-    /**
-     * The user has changed the editor they are working with - exit insert/replace mode, and complete any
-     * appropriate repeat.
-     *
-     * @param event
-     */
+  public static class SelectionCheck implements FileEditorManagerListener {
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
-      lastSelections.put(event.getManager(), event.getOldFile());
+      // The user has changed the editor they are working with - exit insert/replace mode, and complete any
+      // appropriate repeat
+      if (event.getOldFile() != null) {
+        lastSelections.put(event.getManager(), event.getOldFile());
+      }
     }
   }
 
-  @NotNull private static final HashMap<FileEditorManager, VirtualFile> lastSelections = new HashMap<FileEditorManager, VirtualFile>();
-
-  private static final Logger logger = Logger.getInstance(FileGroup.class.getName());
+  @NotNull private static final HashMap<FileEditorManager, VirtualFile> lastSelections = new HashMap<>();
+  @NotNull private static final Logger logger = Logger.getInstance(FileGroup.class.getName());
 }

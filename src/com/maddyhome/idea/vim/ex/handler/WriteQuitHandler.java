@@ -39,7 +39,7 @@ public class WriteQuitHandler extends CommandHandler {
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
-    VimPlugin.getFile().saveFile(editor, context);
+    VimPlugin.getFile().saveFile(editor);
     VimPlugin.getFile().closeFile(editor, context);
 
     return true;

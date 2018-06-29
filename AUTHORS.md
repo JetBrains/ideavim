@@ -46,6 +46,9 @@ Contributors:
 * [Naoto Ikeno](mailto:ikenox@gmail.com)
 * [Maximilian Luz](mailto:qzed@users.noreply.github.com)
 * [Vladimir Parfinenko](mailto:vparfinenko@excelsior-usa.com)
+* [Florian Hassmann](mailto:hassmann@hwdev.de)
+* [Jan Palus](mailto:jpalus@fastmail.com)
+* [Konstantin Petrov](mailto:kpetrov@ripe.net)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.

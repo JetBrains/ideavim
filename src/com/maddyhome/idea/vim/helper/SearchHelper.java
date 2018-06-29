@@ -121,13 +121,40 @@ public class SearchHelper {
     int loc = blockChars.indexOf(type);
     char close = blockChars.charAt(loc + 1);
 
-    int bstart = findBlockLocation(chars, close, type, -1, pos, count);
-    if (bstart == -1) {
-      return null;
+    boolean initialPosIsInString = checkInString(chars, pos, true);
+
+    int bstart = -1;
+    int bend = -1;
+
+    boolean startPosInStringFound = false;
+
+    if (initialPosIsInString) {
+      TextRange quoteRange = findBlockQuoteInLineRange(editor, caret, '"', false);
+      if (quoteRange != null) {
+        int startOffset = quoteRange.getStartOffset();
+        int endOffset = quoteRange.getEndOffset();
+        CharSequence subSequence = chars.subSequence(startOffset, endOffset + 1);
+        int inQuotePos = pos - startOffset;
+        int inQuoteStart = findBlockLocation(subSequence, close, type, -1, inQuotePos, count);
+        if (inQuoteStart != -1) {
+          startPosInStringFound = true;
+          int inQuoteEnd = findBlockLocation(subSequence, type, close, 1, inQuoteStart + 1, 1);
+          if (inQuoteEnd != -1) {
+            bstart = inQuoteStart + startOffset;
+            bend = inQuoteEnd + startOffset;
+          }
+        }
+      }
     }
 
-    int bend = findBlockLocation(chars, type, close, 1, bstart + 1, 1);
-    if (bend == -1) {
+    if (!startPosInStringFound) {
+      bstart = findBlockLocation(chars, close, type, -1, pos, count);
+      if (bstart != -1) {
+        bend = findBlockLocation(chars, type, close, 1, bstart + 1, 1);
+      }
+    }
+
+    if (bstart == -1 || bend == -1) {
       return null;
     }
 
@@ -354,9 +381,10 @@ public class SearchHelper {
   }
 
   @Nullable
-  public static TextRange findBlockTagRange(@NotNull Editor editor, @NotNull Caret caret, boolean isOuter) {
+  public static TextRange findBlockTagRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter) {
     final int cursorOffset = caret.getOffset();
     int pos = cursorOffset;
+    int currentCount = count;
     final CharSequence sequence = editor.getDocument().getCharsSequence();
     while (true) {
       final Pair<TextRange, String> closingTagResult = findClosingTag(sequence, pos);
@@ -366,7 +394,7 @@ public class SearchHelper {
       final TextRange closingTagTextRange = closingTagResult.getFirst();
       final String tagName = closingTagResult.getSecond();
       final TextRange openingTagTextRange = findOpeningTag(sequence, closingTagTextRange.getStartOffset(), tagName);
-      if (openingTagTextRange != null && openingTagTextRange.getStartOffset() <= cursorOffset) {
+      if (openingTagTextRange != null && openingTagTextRange.getStartOffset() <= cursorOffset && --currentCount == 0) {
         if (isOuter) {
           return new TextRange(openingTagTextRange.getStartOffset(), closingTagTextRange.getEndOffset());
         }

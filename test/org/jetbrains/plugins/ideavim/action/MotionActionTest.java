@@ -306,6 +306,26 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("foo = [];\n");
   }
 
+  // VIM-1287 |d| |v_i(|
+  public void testSelectInsideForStringLiteral() {
+    typeTextInFile(parseKeys("di("), "(text \"with quotes(and <caret>braces)\")");
+    myFixture.checkResult("(text \"with quotes()\")");
+  }
+
+  // VIM-1287 |d| |v_i{|
+  public void testBadlyNestedBlockInsideString() {
+    configureByText("{\"{foo, <caret>bar\", baz}}");
+    typeText(parseKeys("di{"));
+    myFixture.checkResult("{\"{foo, <caret>bar\", baz}}");
+  }
+
+  // VIM-1287 |d| |v_i{|
+  public void testDeleteInsideBadlyNestedBlock() {
+    configureByText("a{\"{foo}, <caret>bar\", baz}b}");
+    typeText(parseKeys("di{"));
+    myFixture.checkResult("a{<caret>}b}");
+  }
+
   // |d| |v_i>|
   public void testDeleteInnerAngleBracketBlock() {
     typeTextInFile(parseKeys("di>"),
@@ -746,6 +766,12 @@ public class MotionActionTest extends VimTestCase {
                     "bar>baz\n");
     typeText(parseKeys("vit"));
     assertPluginError(true);
+  }
+
+  // VIM-1427
+  public void testDeleteOuterTagWithCount() {
+    typeTextInFile(parseKeys("d2at"),"<a><b><c><caret></c></b></a>");
+    myFixture.checkResult("<a></a>");
   }
 
 
