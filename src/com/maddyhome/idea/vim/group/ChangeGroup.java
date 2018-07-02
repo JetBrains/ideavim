@@ -299,6 +299,22 @@ public class ChangeGroup {
   }
 
   /**
+   * Inserts previously inserted text
+   *
+   * @param editor  The editor to insert into
+   * @param caret   The caret to insert text
+   * @param context The data context
+   * @param exit    True if insert mode should be exited after the insert, false otherwise
+   * */
+  public void insertPreviousInsert(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                                   boolean exit) {
+    repeatInsertText(editor, caret, context, 1);
+    if (exit) {
+      processEscape(editor, context);
+    }
+  }
+
+  /**
    * Inserts the contents of the specified register
    *
    * @param editor  The editor to insert the text into
@@ -588,6 +604,33 @@ public class ChangeGroup {
         else if (lastStroke instanceof char[]) {
           final char[] chars = (char[])lastStroke;
           insertText(editor, editor.getCaretModel().getOffset(), new String(chars));
+        }
+      }
+    }
+  }
+
+  /**
+   * Repeats previous insert count times
+   *
+   * @param editor  The editor to insert into
+   * @param caret   The caret to insert text
+   * @param context The data context
+   * @param count   the number of times to repeat previous text
+   */
+  private void repeatInsertText(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count) {
+    if (lastStrokes == null) {
+      return;
+    }
+
+    for (int i = 0; i < count; i++) {
+      for (Object lastStroke : lastStrokes) {
+        if (lastStroke instanceof AnAction) {
+          KeyHandler.executeAction((AnAction)lastStroke, context);
+          strokes.add(lastStroke);
+        }
+        else if (lastStroke instanceof char[]) {
+          final char[] chars = (char[]) lastStroke;
+          insertText(editor, caret, new String(chars));
         }
       }
     }
