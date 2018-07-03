@@ -308,7 +308,34 @@ public class ChangeGroup {
    * */
   public void insertPreviousInsert(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                                    boolean exit) {
-    repeatInsertText(editor, caret, context, 1);
+    final StringBuilder multiCaret = new StringBuilder();
+    final StringBuilder singleCaret = new StringBuilder();
+    int inserted = 0;
+    boolean isMultiCaret = false;
+    for (Object lastStroke : lastStrokes) {
+      if (lastStroke instanceof char[]) {
+        singleCaret.append(((char[]) lastStroke));
+        if (inserted++ == 0) {
+          multiCaret.append(((char[]) lastStroke));
+        }
+      }
+      else {
+        if (inserted == editor.getCaretModel().getCaretCount()) {
+          inserted = 0;
+        }
+        if (lastStroke instanceof AnAction) {
+          isMultiCaret = true;
+        }
+      }
+    }
+
+    if (isMultiCaret) {
+      insertText(editor, caret, multiCaret.toString());
+    }
+    else {
+      insertText(editor, caret, singleCaret.toString());
+    }
+
     if (exit) {
       processEscape(editor, context);
     }
