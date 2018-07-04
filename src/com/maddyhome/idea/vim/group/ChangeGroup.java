@@ -292,7 +292,12 @@ public class ChangeGroup {
    * @param exit    true if insert mode should be exited after the insert, false should stay in insert mode
    */
   public void insertPreviousInsert(@NotNull Editor editor, @NotNull DataContext context, boolean exit) {
-    repeatInsertText(editor, context, 1);
+    final StringBuilder toInsert = getInsertedText(editor);
+
+    for (Caret caret : editor.getCaretModel().getAllCarets()) {
+       insertText(editor, caret, toInsert.toString());
+    }
+
     if (exit) {
       processEscape(editor, context);
     }
@@ -308,6 +313,16 @@ public class ChangeGroup {
    * */
   public void insertPreviousInsert(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                                    boolean exit) {
+    final StringBuilder toInsert = getInsertedText(editor);
+
+    insertText(editor, caret, toInsert.toString());
+
+    if (exit) {
+      processEscape(editor, context);
+    }
+  }
+
+  private StringBuilder getInsertedText(@NotNull Editor editor) {
     final StringBuilder multiCaret = new StringBuilder();
     final StringBuilder singleCaret = new StringBuilder();
     int inserted = 0;
@@ -330,15 +345,9 @@ public class ChangeGroup {
     }
 
     if (isMultiCaret) {
-      insertText(editor, caret, multiCaret.toString());
+      return multiCaret;
     }
-    else {
-      insertText(editor, caret, singleCaret.toString());
-    }
-
-    if (exit) {
-      processEscape(editor, context);
-    }
+    return singleCaret;
   }
 
   /**
