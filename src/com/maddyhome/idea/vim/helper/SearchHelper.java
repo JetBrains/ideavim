@@ -229,15 +229,15 @@ public class SearchHelper {
    * @return The offset within the editor of the found character or -1 if no match was found or none of the characters
    * were found on the remainder of the current line.
    */
-  public static int findMatchingPairOnCurrentLine(@NotNull Editor editor) {
-    int pos = editor.getCaretModel().getOffset();
+  public static int findMatchingPairOnCurrentLine(@NotNull Editor editor, @NotNull Caret caret) {
+    int pos = caret.getOffset();
 
     final int commentPos = findMatchingComment(editor, pos);
     if (commentPos >= 0) {
       return commentPos;
     }
 
-    int line = editor.getCaretModel().getLogicalPosition().line;
+    int line = caret.getLogicalPosition().line;
     int end = EditorHelper.getLineEndOffset(editor, line, true);
     CharSequence chars = editor.getDocument().getCharsSequence();
     int loc = -1;

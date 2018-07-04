@@ -547,8 +547,8 @@ public class MotionGroup {
     return VimPlugin.getFile().selectEditor(editor.getProject(), file);
   }
 
-  public int moveCaretToMatchingPair(@NotNull Editor editor) {
-    int pos = SearchHelper.findMatchingPairOnCurrentLine(editor);
+  public int moveCaretToMatchingPair(@NotNull Editor editor, @NotNull Caret caret) {
+    int pos = SearchHelper.findMatchingPairOnCurrentLine(editor, caret);
     if (pos >= 0) {
       return pos;
     }
