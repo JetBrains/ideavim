@@ -687,6 +687,14 @@ public class SearchHelper {
     return findNextWord(chars, pos, size, count, bigWord, false);
   }
 
+  public static int findNextWord(@NotNull Editor editor, @NotNull Caret caret, int count, boolean bigWord) {
+    CharSequence chars = editor.getDocument().getCharsSequence();
+    final int pos = caret.getOffset();
+    final int size = EditorHelper.getFileSize(editor);
+
+    return findNextWord(chars, pos, size, count, bigWord, false);
+  }
+
   public static int findNextWord(@NotNull CharSequence chars, int pos, int size, int count, boolean bigWord,
                                  boolean spaceWords) {
     int step = count >= 0 ? 1 : -1;

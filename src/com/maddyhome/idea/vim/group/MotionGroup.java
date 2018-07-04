@@ -603,12 +603,12 @@ public class MotionGroup {
    * @return position
    */
   public int moveCaretToNextWord(@NotNull Editor editor, @NotNull Caret caret, int count, boolean bigWord) {
-    final int offset = editor.getCaretModel().getOffset();
+    final int offset = caret.getOffset();
     final int size = EditorHelper.getFileSize(editor);
     if ((offset == 0 && count < 0) || (offset >= size - 1 && count > 0)) {
       return -1;
     }
-    return SearchHelper.findNextWord(editor, count, bigWord);
+    return SearchHelper.findNextWord(editor, caret, count, bigWord);
   }
 
   /**
