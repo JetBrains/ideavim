@@ -1596,4 +1596,16 @@ public class MultipleCaretsTest extends VimTestCase {
                     " dflgj dfdsfg\n" +
                     " hdfsgj sdfklgj<caret>\n");
   }
+
+  public void testSearchWholeWordForwardAction() {
+    typeTextInFile(parseKeys("2*"),
+            "q<caret>we as<caret>d zxc qwe asd zxc qwe asd zxc qwe asd zxc qwe asd zxc ");
+    myFixture.checkResult("qwe asd zxc qwe asd zxc <caret>qwe <caret>asd zxc qwe asd zxc qwe asd zxc ");
+  }
+
+  public void testSearchWholeWordBackwardAction() {
+    typeTextInFile(parseKeys("2#"),
+            "qwe asd zxc qwe asd zxc <caret>qwe <caret>asd zxc qwe asd zxc qwe asd zxc ");
+    myFixture.checkResult("<caret>qwe <caret>asd zxc qwe asd zxc qwe asd zxc qwe asd zxc qwe asd zxc ");
+  }
 }
