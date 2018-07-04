@@ -1552,4 +1552,14 @@ public class MultipleCaretsTest extends VimTestCase {
               "kekkek<caret>baz");
       assertMode(CommandState.Mode.INSERT);
   }
+
+  public void testInsertPreviousInsertExitAction() {
+      typeTextInFile(parseKeys("i", "qwe", "<ESC>", "a", "<C-2>"),
+              "foo\n" +
+                      "<caret>bar\n" +
+                      "<caret>baz");
+      myFixture.checkResult("foo\n" +
+              "qweqw<caret>ebar\n" +
+              "qweqw<caret>ebaz");
+  }
 }
