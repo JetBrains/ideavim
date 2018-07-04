@@ -1562,4 +1562,14 @@ public class MultipleCaretsTest extends VimTestCase {
               "qweqw<caret>ebar\n" +
               "qweqw<caret>ebaz");
   }
+
+  public void testMotionGoToLineFirst() {
+      typeTextInFile(parseKeys("i", "<C-HOME>"),
+                      "    sdf" +
+                      "dsfa<caret>dsf fg dsfg sd<caret>fjgkfdgl jsdf" +
+                      "nflgj sd\n dflgj dfdsfg\n dfsgj sdf<caret>klgj");
+      myFixture.checkResult("    <caret>sdf" +
+                      "dsfadsf fg dsfg sdfjgkfdgl jsdf" +
+                      "nflgj sd\n dflgj dfdsfg\n dfsgj sdfklgj");
+  }
 }
