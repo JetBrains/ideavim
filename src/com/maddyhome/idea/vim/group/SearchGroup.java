@@ -19,6 +19,7 @@ package com.maddyhome.idea.vim.group;
 
 import com.google.common.collect.Lists;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.colors.EditorColors;
@@ -526,7 +527,11 @@ public class SearchGroup {
   }
 
   public int searchWord(@NotNull Editor editor, int count, boolean whole, int dir) {
-    TextRange range = SearchHelper.findWordUnderCursor(editor);
+    return searchWord(editor, editor.getCaretModel().getPrimaryCaret(), count, whole, dir);
+  }
+
+  public int searchWord(@NotNull Editor editor, @NotNull Caret caret, int count, boolean whole, int dir) {
+    TextRange range = SearchHelper.findWordUnderCursor(editor, caret);
     if (range == null) {
       return -1;
     }
@@ -540,7 +545,7 @@ public class SearchGroup {
       pattern.append("\\>");
     }
 
-    MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), range.getStartOffset());
+    MotionGroup.moveCaret(editor, caret, range.getStartOffset());
 
     lastSearch = pattern.toString();
     setLastPattern(editor, lastSearch);
@@ -549,7 +554,7 @@ public class SearchGroup {
 
     searchHighlight(true);
 
-    return findItOffset(editor, editor.getCaretModel().getOffset(), count, lastDir, true);
+    return findItOffset(editor, caret.getOffset(), count, lastDir, true);
   }
 
   public int searchNext(@NotNull Editor editor, int count) {

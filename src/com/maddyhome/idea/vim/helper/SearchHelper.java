@@ -915,14 +915,15 @@ public class SearchHelper {
    * Find the word under the cursor or the next word to the right of the cursor on the current line.
    *
    * @param editor The editor to find the word in
+   * @param caret The caret to find word under
    * @return The text range of the found word or null if there is no word under/after the cursor on the line
    */
   @Nullable
-  public static TextRange findWordUnderCursor(@NotNull Editor editor) {
+  public static TextRange findWordUnderCursor(@NotNull Editor editor, @NotNull Caret caret) {
     CharSequence chars = editor.getDocument().getCharsSequence();
-    int stop = EditorHelper.getLineEndOffset(editor, editor.getCaretModel().getLogicalPosition().line, true);
+    int stop = EditorHelper.getLineEndOffset(editor, caret.getLogicalPosition().line, true);
 
-    int pos = editor.getCaretModel().getOffset();
+    int pos = caret.getOffset();
     int start = pos;
     CharacterHelper.CharacterType[] types = new CharacterHelper.CharacterType[]{CharacterHelper.CharacterType.KEYWORD,
       CharacterHelper.CharacterType.PUNCTUATION};
