@@ -940,8 +940,8 @@ public class MultipleCaretsTest extends VimTestCase {
 
   public void testChangeCaseUpperMotionAction() {
     typeTextInFile(parseKeys("gU2w"),
-                   "O<caret>NcE thIs <caret>TEXt wIlL n<caret>Ot lOoK s<caret>O rIdIcuLoUs\n");
-    myFixture.checkResult("O<caret>NCE THIS <caret>TEXT WILL N<caret>OT LOOK S<caret>O RIDICULOUS\n");
+                   "O<caret>NcE thIs <caret>TEXt wIlL <caret>nOt lOoK <caret>sO rIdIcuLoUs\n");
+    myFixture.checkResult("O<caret>NCE THIS <caret>TEXT WILL <caret>NOT LOOK <caret>SO RIDICULOUS\n");
   }
 
   public void testChangeCaseUpperVisualAction() {
