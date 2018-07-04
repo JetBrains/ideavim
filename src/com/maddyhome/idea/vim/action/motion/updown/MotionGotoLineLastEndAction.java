@@ -19,15 +19,18 @@
 package com.maddyhome.idea.vim.action.motion.updown;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
+import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  */
@@ -37,7 +40,13 @@ public class MotionGotoLineLastEndAction extends MotionEditorAction {
   }
 
   private static class Handler extends MotionEditorActionHandler {
-    public int getOffset(@NotNull Editor editor, DataContext context, int count, int rawCount, Argument argument) {
+    Handler() {
+      super(true);
+    }
+
+    @Override
+    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                         int rawCount, @Nullable Argument argument) {
       boolean allow = false;
       if (CommandState.inInsertMode(editor)) {
         allow = true;
@@ -49,7 +58,8 @@ public class MotionGotoLineLastEndAction extends MotionEditorAction {
         }
       }
 
-      return VimPlugin.getMotion().moveCaretGotoLineLastEnd(editor, rawCount, count - 1, allow);
+      return VimPlugin.getMotion().moveCaretGotoLineLastEnd(editor, rawCount, EditorHelper.getLineCount(editor),
+              allow);
     }
   }
 }
