@@ -19,12 +19,14 @@
 package com.maddyhome.idea.vim.action.motion.mark;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  */
@@ -33,9 +35,26 @@ public class MotionGotoMarkLineAction extends MotionEditorAction {
     super(new Handler());
   }
 
+
   private static class Handler extends MotionEditorActionHandler {
-    public int getOffset(@NotNull Editor editor, DataContext context, int count, int rawCount, @NotNull Argument argument) {
-      return VimPlugin.getMotion().moveCaretToMarkLine(editor, argument.getCharacter());
+    Handler() {
+      super(true);
+    }
+
+    @Override
+    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                         int rawCount, @Nullable Argument argument) {
+      if (argument == null) {
+        return -1;
+      }
+
+      final char mark = argument.getCharacter();
+
+      if (Character.isUpperCase(mark) || Character.isDigit(mark)) {
+          return VimPlugin.getMotion().moveCaretToMarkLine(editor, caret, mark);
+      }
+
+      return VimPlugin.getMotion().moveCaretToFileMarkLine(editor, mark);
     }
   }
 }

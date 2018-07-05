@@ -412,28 +412,32 @@ public class MotionGroup {
   }
 
   public int moveCaretToMarkLine(final @NotNull Editor editor, char ch) {
-    final Mark mark = VimPlugin.getMark().getMark(editor, ch);
-    if (mark != null) {
+    return moveCaretToMarkLine(editor, editor.getCaretModel().getPrimaryCaret(), ch);
+  }
+
+  public int moveCaretToMarkLine(@NotNull Editor editor, @NotNull Caret caret, char ch) {
+      final Mark mark = VimPlugin.getMark().getMark(editor, ch);
+      if (mark == null) {
+          return -1;
+      }
+
       final VirtualFile vf = EditorData.getVirtualFile(editor);
       if (vf == null) {
         return -1;
       }
+
       final int line = mark.getLogicalLine();
       if (!vf.getPath().equals(mark.getFilename())) {
         final Editor selectedEditor = selectEditor(editor, mark);
         if (selectedEditor != null) {
-          moveCaret(selectedEditor, editor.getCaretModel().getPrimaryCaret(),
-                    moveCaretToLineStartSkipLeading(selectedEditor, line));
+          moveCaret(selectedEditor, caret, moveCaretToLineStartSkipLeading(selectedEditor, line));
         }
+
         return -2;
       }
       else {
         return moveCaretToLineStartSkipLeading(editor, line);
       }
-    }
-    else {
-      return -1;
-    }
   }
 
   public int moveCaretToFileMarkLine(@NotNull Editor editor, char ch) {
@@ -445,6 +449,10 @@ public class MotionGroup {
     else {
       return -1;
     }
+  }
+
+  public int moveCaretToMark(@NotNull final Editor editor, char ch) {
+    return moveCaretToMark(editor, editor.getCaretModel().getPrimaryCaret(), ch);
   }
 
   public int moveCaretToMark(@NotNull Editor editor, @NotNull Caret caret, char ch) {
@@ -471,8 +479,16 @@ public class MotionGroup {
     }
   }
 
-  public int moveCaretToMark(@NotNull final Editor editor, char ch) {
-    return moveCaretToMark(editor, editor.getCaretModel().getPrimaryCaret(), ch);
+  public int moveCaretToFileMark(@NotNull Editor editor, char ch) {
+    Mark mark = VimPlugin.getMark().getFileMark(editor, ch);
+    if (mark != null) {
+      LogicalPosition lp = new LogicalPosition(mark.getLogicalLine(), mark.getCol());
+
+      return editor.logicalPositionToOffset(lp);
+    }
+    else {
+      return -1;
+    }
   }
 
   public int moveCaretToJump(@NotNull Editor editor, int count) {
@@ -506,18 +522,6 @@ public class MotionGroup {
 
         return editor.logicalPositionToOffset(lp);
       }
-    }
-    else {
-      return -1;
-    }
-  }
-
-  public int moveCaretToFileMark(@NotNull Editor editor, char ch) {
-    Mark mark = VimPlugin.getMark().getFileMark(editor, ch);
-    if (mark != null) {
-      LogicalPosition lp = new LogicalPosition(mark.getLogicalLine(), mark.getCol());
-
-      return editor.logicalPositionToOffset(lp);
     }
     else {
       return -1;
