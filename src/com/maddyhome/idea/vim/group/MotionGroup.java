@@ -447,29 +447,32 @@ public class MotionGroup {
     }
   }
 
-  public int moveCaretToMark(@NotNull final Editor editor, char ch) {
+  public int moveCaretToMark(@NotNull Editor editor, @NotNull Caret caret, char ch) {
     final Mark mark = VimPlugin.getMark().getMark(editor, ch);
-    if (mark != null) {
-      final VirtualFile vf = EditorData.getVirtualFile(editor);
-      if (vf == null) {
-        return -1;
-      }
-      final LogicalPosition lp = new LogicalPosition(mark.getLogicalLine(), mark.getCol());
-      if (!vf.getPath().equals(mark.getFilename())) {
-        final Editor selectedEditor = selectEditor(editor, mark);
-        if (selectedEditor != null) {
-          moveCaret(selectedEditor, editor.getCaretModel().getPrimaryCaret(),
-                    selectedEditor.logicalPositionToOffset(lp));
-        }
-        return -2;
-      }
-      else {
-        return editor.logicalPositionToOffset(lp);
-      }
-    }
-    else {
+    if (mark == null) {
       return -1;
     }
+
+    final VirtualFile vf = EditorData.getVirtualFile(editor);
+    if (vf == null) {
+      return -1;
+    }
+
+    final LogicalPosition lp = new LogicalPosition(mark.getLogicalLine(), mark.getCol());
+    if (!vf.getPath().equals(mark.getFilename())) {
+      final Editor selectedEditor = selectEditor(editor, mark);
+      if (selectedEditor != null) {
+        moveCaret(selectedEditor, caret, selectedEditor.logicalPositionToOffset(lp));
+      }
+      return -2;
+    }
+    else {
+      return editor.logicalPositionToOffset(lp);
+    }
+  }
+
+  public int moveCaretToMark(@NotNull final Editor editor, char ch) {
+    return moveCaretToMark(editor, editor.getCaretModel().getPrimaryCaret(), ch);
   }
 
   public int moveCaretToJump(@NotNull Editor editor, int count) {
