@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.action.motion.search;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
@@ -26,6 +27,7 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  *
@@ -36,12 +38,22 @@ public class SearchEntryRevAction extends MotionEditorAction {
   }
 
   private static class Handler extends MotionEditorActionHandler {
-    public int getOffset(@NotNull Editor editor, DataContext context, int count, int rawCount, @NotNull Argument argument) {
+    Handler() {
+      super(true);
+    }
+
+    @Override
+    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                         int rawCount, @Nullable Argument argument) {
+      if (argument == null) {
+        return -1;
+      }
       final String command = argument.getString();
       if (command == null) {
         return -1;
       }
-      return VimPlugin.getSearch().search(editor, command, count, Command.FLAG_SEARCH_REV, false);
+
+      return VimPlugin.getSearch().search(editor, caret, command, count, Command.FLAG_SEARCH_REV, false);
     }
   }
 }
