@@ -1608,4 +1608,10 @@ public class MultipleCaretsTest extends VimTestCase {
             "qwe asd zxc qwe asd zxc <caret>qwe <caret>asd zxc qwe asd zxc qwe asd zxc ");
     myFixture.checkResult("<caret>qwe <caret>asd zxc qwe asd zxc qwe asd zxc qwe asd zxc qwe asd zxc ");
   }
+
+  public void testMotionPercentOrMatchAction() {
+    typeTextInFile(parseKeys("%"),
+            "fdgkh<caret>sjh thsth[ sd<caret>k er{}gha re<caret>ghrjae (ghoefgh kjfgh)sdgfh dgfh]");
+    myFixture.checkResult("fdgkhsjh thsth[ sdk er{<caret>}gha reghrjae (ghoefgh kjfgh<caret>)sdgfh dgfh<caret>]");
+  }
 }
