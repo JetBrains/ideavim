@@ -462,12 +462,16 @@ public class SearchGroup {
   }
 
   public int search(@NotNull Editor editor, @NotNull String command, int count, int flags, boolean moveCursor) {
-    // TODO: Add multiple carets support
-    int res = search(editor, command, editor.getCaretModel().getOffset(), count, flags);
+    return search(editor, editor.getCaretModel().getPrimaryCaret(), command, count, flags, moveCursor);
+  }
+
+  public int search(@NotNull Editor editor, @NotNull Caret caret, @NotNull String command, int count, int flags,
+                    boolean moveCursor) {
+    final int res = search(editor, command, caret.getOffset(), count, flags);
 
     if (res != -1 && moveCursor) {
       VimPlugin.getMark().saveJumpLocation(editor);
-      MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), res);
+      MotionGroup.moveCaret(editor, caret, res);
     }
 
     return res;
