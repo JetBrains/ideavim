@@ -562,13 +562,24 @@ public class SearchGroup {
   }
 
   public int searchNext(@NotNull Editor editor, int count) {
-    searchHighlight(false);
-    return findItOffset(editor, editor.getCaretModel().getOffset(), count, lastDir, false);
+    return searchNext(editor, editor.getCaretModel().getPrimaryCaret(), count);
+  }
+
+  public int searchNext(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    return searchNextWithDirection(editor, caret, count, lastDir);
   }
 
   public int searchPrevious(@NotNull Editor editor, int count) {
+    return searchPrevious(editor, editor.getCaretModel().getPrimaryCaret(), count);
+  }
+
+  public int searchPrevious(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    return searchNextWithDirection(editor, caret, count, -lastDir);
+  }
+
+  private int searchNextWithDirection(@NotNull Editor editor, @NotNull Caret caret, int count, int dir) {
     searchHighlight(false);
-    return findItOffset(editor, editor.getCaretModel().getOffset(), count, -lastDir, false);
+    return findItOffset(editor, caret.getOffset(), count, dir, false);
   }
 
   private void updateHighlight() {
