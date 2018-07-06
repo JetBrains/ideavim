@@ -492,39 +492,46 @@ public class MotionGroup {
   }
 
   public int moveCaretToJump(@NotNull Editor editor, int count) {
-    int spot = VimPlugin.getMark().getJumpSpot();
-    Jump jump = VimPlugin.getMark().getJump(count);
-    if (jump != null) {
-      VirtualFile vf = EditorData.getVirtualFile(editor);
-      if (vf == null) return -1;
+    return moveCaretToJump(editor, editor.getCaretModel().getPrimaryCaret(), count);
+  }
 
-      LogicalPosition lp = new LogicalPosition(jump.getLogicalLine(), jump.getCol());
-      final String filename = jump.getFilename();
-      if (!vf.getPath().equals(filename) && filename != null) {
-        VirtualFile newFile = LocalFileSystem.getInstance().findFileByPath(filename.replace(File.separatorChar, '/'));
-        if (newFile == null) return -2;
+  public int moveCaretToJump(@NotNull Editor editor, @NotNull Caret caret, int count) {
+    final int spot = VimPlugin.getMark().getJumpSpot();
+    final Jump jump = VimPlugin.getMark().getJump(count);
 
-        Editor newEditor = selectEditor(editor, newFile);
-        if (newEditor != null) {
-          if (spot == -1) {
-            VimPlugin.getMark().addJump(editor, false);
-          }
-          moveCaret(newEditor, newEditor.getCaretModel().getPrimaryCaret(),
-                    EditorHelper.normalizeOffset(newEditor, newEditor.logicalPositionToOffset(lp), false));
-        }
+    if (jump == null) {
+      return -1;
+    }
 
+    final VirtualFile vf = EditorData.getVirtualFile(editor);
+    if (vf == null) {
+      return -1;
+    }
+
+    final LogicalPosition lp = new LogicalPosition(jump.getLogicalLine(), jump.getCol());
+    final String fileName = jump.getFilename();
+    if (!vf.getPath().equals(fileName) && fileName != null) {
+      final VirtualFile newFile = LocalFileSystem.getInstance().findFileByPath(fileName.replace(File.separatorChar, '/'));
+      if (newFile == null) {
         return -2;
       }
-      else {
-        if (spot == -1) {
+
+      final Editor newEditor = selectEditor(editor, newFile);
+      if (newEditor != null) {
+        if (spot != -1) {
           VimPlugin.getMark().addJump(editor, false);
         }
-
-        return editor.logicalPositionToOffset(lp);
+        moveCaret(newEditor, caret, EditorHelper.normalizeOffset(newEditor, newEditor.logicalPositionToOffset(lp), false));
       }
+
+      return -2;
     }
     else {
-      return -1;
+      if (spot == -1) {
+        VimPlugin.getMark().addJump(editor, false);
+      }
+
+      return editor.logicalPositionToOffset(lp);
     }
   }
 
