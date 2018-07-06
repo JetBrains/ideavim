@@ -1614,4 +1614,24 @@ public class MultipleCaretsTest extends VimTestCase {
             "fdgkh<caret>sjh thsth[ sd<caret>k er{}gha re<caret>ghrjae (ghoefgh kjfgh)sdgfh dgfh]");
     myFixture.checkResult("fdgkhsjh thsth[ sdk er{<caret>}gha reghrjae (ghoefgh kjfgh<caret>)sdgfh dgfh<caret>]");
   }
+
+  public void testMotionGotoLineLastAction() {
+    typeTextInFile(parseKeys("G"),
+            "dfgdfsg<caret>gfdfgdfs dasgdfsk dfghsdfkj gh\n" +
+                    "lsdjf lsj<caret> flk gjdlsadlsfj <caret>lksdgfj \n" +
+                    "dflgjdfsgk<caret>d<caret>flgjdfsklg\n\n");
+    myFixture.checkResult("dfgdfsggfdfgdfs dasgdfsk dfghsdfkj gh\n" +
+                    "lsdjf lsj flk gjdlsadlsfj lksdgfj \n" +
+                    "dflgjdfsgkdflgjdfsklg\n<caret>\n");
+  }
+
+  public void testMotionGotoLineLastWithArgumentAction() {
+    typeTextInFile(parseKeys("1G"),
+            "dfgdfsg<caret>gfdfgdfs dasgdfsk dfghsdfkj gh\n" +
+                    "lsdjf lsj<caret> flk gjdlsadlsfj <caret>lksdgfj \n" +
+                    "dflgjdfsgk<caret>d<caret>flgjdfsklg\n\n");
+    myFixture.checkResult("<caret>dfgdfsggfdfgdfs dasgdfsk dfghsdfkj gh\n" +
+                    "lsdjf lsj flk gjdlsadlsfj lksdgfj \n" +
+                    "dflgjdfsgkdflgjdfsklg\n\n");
+  }
 }

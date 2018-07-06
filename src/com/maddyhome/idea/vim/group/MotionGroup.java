@@ -1107,6 +1107,10 @@ public class MotionGroup {
     return moveCaretToLineStartSkipLeading(editor, logicalLine);
   }
 
+  public int moveCaretToLineStartSkipLeading(@NotNull Editor editor, int line) {
+    return EditorHelper.getLeadingCharacterOffset(editor, line);
+  }
+
   /**
    * @deprecated To move the caret, use {@link #moveCaretToLineStartSkipLeading(Editor, Caret)}
    */
@@ -1124,10 +1128,6 @@ public class MotionGroup {
    */
   public int moveCaretToLineStartSkipLeadingOffset(@NotNull Editor editor, int linesOffset) {
     return moveCaretToLineStartSkipLeadingOffset(editor, editor.getCaretModel().getPrimaryCaret(), linesOffset);
-  }
-
-  public int moveCaretToLineStartSkipLeading(@NotNull Editor editor, int line) {
-    return EditorHelper.getLeadingCharacterOffset(editor, line);
   }
 
   public int moveCaretToLineEndSkipLeading(@NotNull Editor editor) {
@@ -1320,6 +1320,14 @@ public class MotionGroup {
   public int moveCaretGotoLineLast(@NotNull Editor editor, int rawCount, int line) {
     return moveCaretToLineStartSkipLeading(editor, rawCount == 0 ? EditorHelper
       .normalizeLine(editor, EditorHelper.getLineCount(editor) - 1) : line);
+  }
+
+  public int moveCaretGotoLineLast(@NotNull Editor editor, int rawCount) {
+    final int line = rawCount == 0 ?
+            EditorHelper.normalizeLine(editor, EditorHelper.getLineCount(editor) - 1) :
+            rawCount - 1;
+
+    return moveCaretToLineStartSkipLeading(editor, line);
   }
 
   public int moveCaretGotoLineLastEnd(@NotNull Editor editor, int rawCount, int line, boolean pastEnd) {
