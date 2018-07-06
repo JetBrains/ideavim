@@ -1079,13 +1079,14 @@ public class MotionGroup {
   }
 
   public int moveCaretToMiddleColumn(@NotNull Editor editor) {
-    // TODO: add multiple carets support
+    return moveCaretToMiddleColumn(editor, editor.getCaretModel().getPrimaryCaret());
+  }
 
-    int width = EditorHelper.getScreenWidth(editor) / 2;
-    int len = EditorHelper.getLineLength(editor);
+  public int moveCaretToMiddleColumn(@NotNull Editor editor, @NotNull Caret caret) {
+    final int width = EditorHelper.getScreenWidth(editor) / 2;
+    final int len = EditorHelper.getLineLength(editor);
 
-    return moveCaretToColumn(editor, editor.getCaretModel().getPrimaryCaret(), Math.max(0, Math.min(len - 1, width)),
-                             false);
+    return moveCaretToColumn(editor, caret, Math.max(0, Math.min(len - 1, width)), false);
   }
 
   public int moveCaretToColumn(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowEnd) {
