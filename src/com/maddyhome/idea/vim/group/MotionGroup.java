@@ -1226,16 +1226,24 @@ public class MotionGroup {
   }
 
   public int moveCaretToLineScreenStart(@NotNull Editor editor, @NotNull Caret caret) {
-    final int leftmost = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
-    final int col = leftmost == 0 ?
-            leftmost :
-            leftmost - 1;
+    final int col = getLeftmostScreenColumn(editor);
     return moveCaretToColumn(editor, caret, col, false);
   }
 
+  private int getLeftmostScreenColumn(@NotNull Editor editor) {
+    final int leftmost = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
+    return leftmost == 0 ?
+            leftmost :
+            leftmost - 1;
+  }
+
   public int moveCaretToLineScreenStartSkipLeading(@NotNull Editor editor) {
-    int col = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
-    int logicalLine = editor.getCaretModel().getLogicalPosition().line;
+    return moveCaretToLineScreenStartSkipLeading(editor, editor.getCaretModel().getCurrentCaret());
+  }
+
+  public int moveCaretToLineScreenStartSkipLeading(@NotNull Editor editor, @NotNull Caret caret) {
+    final int col = getLeftmostScreenColumn(editor);
+    final int logicalLine = caret.getLogicalPosition().line;
     return EditorHelper.getLeadingCharacterOffset(editor, logicalLine, col);
   }
 
