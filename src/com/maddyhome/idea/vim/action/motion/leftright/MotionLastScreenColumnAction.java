@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.action.motion.leftright;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
@@ -27,7 +28,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
-import com.maddyhome.idea.vim.helper.EditorData;
+import com.maddyhome.idea.vim.helper.CaretData;
 import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +41,13 @@ public class MotionLastScreenColumnAction extends MotionEditorAction {
   }
 
   private static class Handler extends MotionEditorActionHandler {
-    public int getOffset(@NotNull Editor editor, DataContext context, int count, int rawCount, Argument argument) {
+    Handler() {
+      super(true);
+    }
+
+    @Override
+    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                         int rawCount, Argument argument) {
       boolean allow = false;
       if (CommandState.inInsertMode(editor)) {
         allow = true;
@@ -52,11 +59,13 @@ public class MotionLastScreenColumnAction extends MotionEditorAction {
         }
       }
 
-      return VimPlugin.getMotion().moveCaretToLineScreenEnd(editor, allow);
+      return VimPlugin.getMotion().moveCaretToLineScreenEnd(editor, caret, allow);
     }
 
-    protected void postMove(@NotNull Editor editor, DataContext context, Command cmd) {
-      EditorData.setLastColumn(editor, MotionGroup.LAST_COLUMN);
+    @Override
+    protected void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                            @NotNull Command cmd) {
+      CaretData.setLastColumn(editor, caret, MotionGroup.LAST_COLUMN);
     }
   }
 }

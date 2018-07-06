@@ -1222,9 +1222,15 @@ public class MotionGroup {
   }
 
   public int moveCaretToLineScreenStart(@NotNull Editor editor) {
-    // TODO: Add multiple carets support
-    int col = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
-    return moveCaretToColumn(editor, editor.getCaretModel().getPrimaryCaret(), col, false);
+    return moveCaretToLineScreenStart(editor, editor.getCaretModel().getPrimaryCaret());
+  }
+
+  public int moveCaretToLineScreenStart(@NotNull Editor editor, @NotNull Caret caret) {
+    final int leftmost = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
+    final int col = leftmost == 0 ?
+            leftmost :
+            leftmost - 1;
+    return moveCaretToColumn(editor, caret, col, false);
   }
 
   public int moveCaretToLineScreenStartSkipLeading(@NotNull Editor editor) {
@@ -1234,9 +1240,12 @@ public class MotionGroup {
   }
 
   public int moveCaretToLineScreenEnd(@NotNull Editor editor, boolean allowEnd) {
-    // TODO: Add multiple carets support
-    int col = EditorHelper.getVisualColumnAtLeftOfScreen(editor) + EditorHelper.getScreenWidth(editor) - 1;
-    return moveCaretToColumn(editor, editor.getCaretModel().getPrimaryCaret(), col, allowEnd);
+    return moveCaretToLineScreenEnd(editor, editor.getCaretModel().getPrimaryCaret(), allowEnd);
+  }
+
+  public int moveCaretToLineScreenEnd(@NotNull Editor editor, @NotNull Caret caret, boolean allowEnd) {
+    final int col = EditorHelper.getVisualColumnAtLeftOfScreen(editor) + EditorHelper.getScreenWidth(editor) - 1;
+    return moveCaretToColumn(editor, caret, col, allowEnd);
   }
 
   public int moveCaretHorizontalWrap(@NotNull Editor editor, @NotNull Caret caret, int count) {

@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.action.motion.leftright;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
@@ -34,8 +35,14 @@ public class MotionFirstScreenColumnAction extends MotionEditorAction {
   }
 
   private static class Handler extends MotionEditorActionHandler {
-    public int getOffset(@NotNull Editor editor, DataContext context, int count, int rawCount, Argument argument) {
-      return VimPlugin.getMotion().moveCaretToLineScreenStart(editor);
+    Handler() {
+      super(true);
+    }
+
+    @Override
+    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                         int rawCount, Argument argument) {
+      return VimPlugin.getMotion().moveCaretToLineScreenStart(editor, caret);
     }
   }
 }
