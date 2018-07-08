@@ -360,7 +360,7 @@ public class SearchHelper {
                                            @NotNull Direction direction) {
     int cnt = 0;
     while (pos != -1 && (chars.charAt(pos + direction.toInt()) != '\n')) {
-      pos = findCharacterPosition(chars, pos + direction.toInt(), c, searchEscaped, true, direction);
+      pos = findCharacterPosition(chars, pos + direction.toInt(), c, true, searchEscaped, direction);
       if (pos != -1) {
         cnt++;
       }
