@@ -45,6 +45,9 @@ import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
+import com.maddyhome.idea.vim.action.motion.leftright.MotionLeftAction;
+import com.maddyhome.idea.vim.action.motion.leftright.MotionRightAction;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -292,10 +295,10 @@ public class ChangeGroup {
    * @param exit    true if insert mode should be exited after the insert, false should stay in insert mode
    */
   public void insertPreviousInsert(@NotNull Editor editor, @NotNull DataContext context, boolean exit) {
-    final StringBuilder toInsert = getInsertedText(editor);
+    final String toInsert = getInsertedText();
 
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
-       insertText(editor, caret, toInsert.toString());
+       insertText(editor, caret, toInsert);
     }
 
     if (exit) {
@@ -313,41 +316,49 @@ public class ChangeGroup {
    * */
   public void insertPreviousInsert(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                                    boolean exit) {
-    final StringBuilder toInsert = getInsertedText(editor);
+    final String toInsert = getInsertedText();
 
-    insertText(editor, caret, toInsert.toString());
+    insertText(editor, caret, toInsert);
 
     if (exit) {
       processEscape(editor, context);
     }
   }
 
-  private StringBuilder getInsertedText(@NotNull Editor editor) {
+  private String getInsertedText() {
     final StringBuilder multiCaret = new StringBuilder();
     final StringBuilder singleCaret = new StringBuilder();
-    int inserted = 0;
-    boolean isMultiCaret = false;
+
+    boolean isMultiCaretInsertion = false;
+
+    char[] lastInserted = {};
+    MotionEditorAction lastMotion = null;
+
     for (Object lastStroke : lastStrokes) {
       if (lastStroke instanceof char[]) {
-        singleCaret.append(((char[]) lastStroke));
-        if (inserted++ == 0) {
-          multiCaret.append(((char[]) lastStroke));
+        final char[] inserted = (char[]) lastStroke;
+
+        if (inserted.length > 1) {
+          return new String(inserted);
         }
+
+        singleCaret.append(inserted);
+        lastInserted = inserted;
       }
-      else {
-        if (inserted == editor.getCaretModel().getCaretCount()) {
-          inserted = 0;
+      else if (lastStroke instanceof MotionEditorAction) {
+        if (lastStroke instanceof MotionRightAction && (lastMotion instanceof MotionLeftAction || lastMotion == null)) {
+          multiCaret.append(lastInserted);
+          isMultiCaretInsertion = true;
         }
-        if (lastStroke instanceof AnAction) {
-          isMultiCaret = true;
-        }
+
+        lastMotion = (MotionEditorAction) lastStroke;
       }
     }
 
-    if (isMultiCaret) {
-      return multiCaret;
+    if (isMultiCaretInsertion) {
+      return multiCaret.toString();
     }
-    return singleCaret;
+    return singleCaret.toString();
   }
 
   /**
