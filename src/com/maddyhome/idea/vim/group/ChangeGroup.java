@@ -124,6 +124,10 @@ public class ChangeGroup {
     initInsert(editor, context, CommandState.Mode.INSERT);
   }
 
+  public void insertBeforeCursor(@NotNull Editor editor) {
+    EditorData.setChangeSwitchMode(editor, CommandState.Mode.INSERT);
+  }
+
   /**
    * Begin insert before the first non-blank on the current line
    *
@@ -1163,7 +1167,6 @@ public class ChangeGroup {
    */
   public boolean changeReplace(@NotNull Editor editor, @NotNull DataContext context) {
     initInsert(editor, context, CommandState.Mode.REPLACE);
-
     return true;
   }
 
@@ -1437,6 +1440,44 @@ public class ChangeGroup {
     }
     else {
       insertAfterCursor(editor, context);
+    }
+
+    return true;
+  }
+
+  public boolean blockInsert(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                             @NotNull TextRange range, boolean append) {
+    final int lines = getLinesCountInVisualBlock(editor, range);
+    final LogicalPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
+    int line = start.line;
+    int col = start.column;
+    if (!range.isMultiple()) {
+      col = 0;
+    }
+    else if (append) {
+      col += range.getMaxLength();
+      if (CaretData.getLastColumn(caret) == MotionGroup.LAST_COLUMN) {
+        col = MotionGroup.LAST_COLUMN;
+      }
+    }
+
+    final int len = EditorHelper.getLineLength(editor, line);
+    if (col < MotionGroup.LAST_COLUMN && len < col) {
+      final String pad = EditorHelper.pad(editor, line, col);
+      insertText(editor, caret, pad);
+    }
+
+    if (range.isMultiple() || !append) {
+      caret.moveToOffset(editor.logicalPositionToOffset(new LogicalPosition(line, col)));
+    }
+    if (range.isMultiple()) {
+      setInsertRepeat(lines, col, append);
+    }
+    if (range.isMultiple() || !append) {
+      insertBeforeCursor(editor);
+    }
+    else {
+      insertAfterCursor(editor, caret);
     }
 
     return true;
