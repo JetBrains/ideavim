@@ -329,12 +329,13 @@ public class ChangeGroup {
       processEscape(editor, context);
     }
   }
-//TODO: insert like in vim or not?
+
   private String getInsertedText() {
     final StringBuilder multiCaret = new StringBuilder();
     final StringBuilder singleCaret = new StringBuilder();
 
     boolean isMultiCaretInsertion = false;
+    boolean isSingleCaretInsertion = false;
 
     char[] lastInserted = {};
     MotionEditorAction lastMotion = null;
@@ -344,7 +345,7 @@ public class ChangeGroup {
         final char[] inserted = (char[]) lastStroke;
 
         if (inserted.length > 1) {
-          return new String(inserted);
+          isSingleCaretInsertion = true;
         }
 
         singleCaret.append(inserted);
@@ -360,6 +361,9 @@ public class ChangeGroup {
       }
     }
 
+    if (isSingleCaretInsertion) {
+      return singleCaret.toString();
+    }
     if (isMultiCaretInsertion) {
       return multiCaret.toString();
     }
