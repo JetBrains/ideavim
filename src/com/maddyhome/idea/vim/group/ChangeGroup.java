@@ -183,6 +183,11 @@ public class ChangeGroup {
     initInsert(editor, context, CommandState.Mode.INSERT);
   }
 
+  public void insertAfterLineEnd(@NotNull Editor editor, @NotNull Caret caret) {
+    MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, caret));
+    EditorData.setChangeSwitchMode(editor, CommandState.Mode.INSERT);
+  }
+
   /**
    * Begin insert before the current line by creating a new blank line above the current line
    *
@@ -324,7 +329,7 @@ public class ChangeGroup {
       processEscape(editor, context);
     }
   }
-
+//TODO: insert like in vim or not?
   private String getInsertedText() {
     final StringBuilder multiCaret = new StringBuilder();
     final StringBuilder singleCaret = new StringBuilder();

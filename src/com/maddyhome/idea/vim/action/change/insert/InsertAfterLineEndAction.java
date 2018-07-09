@@ -24,7 +24,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,19 +37,14 @@ public class InsertAfterLineEndAction extends EditorAction {
   }
 
   private static class Handler extends ChangeEditorActionHandler {
+    Handler() {
+      super(true, CaretOrder.DECREASING_OFFSET);
+    }
+
     @Override
-    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
-                           @Nullable Argument argument) {
-      final CommandState save = CommandState.getInstance(editor);
-
-      for (Caret caret : editor.getCaretModel().getAllCarets()) {
-        if (!caret.equals(editor.getCaretModel().getPrimaryCaret())) {
-          VimPlugin.getChange().insertAfterLineEnd(editor, caret, context);
-          save.popState();
-        }
-      }
-
-      VimPlugin.getChange().insertAfterLineEnd(editor, editor.getCaretModel().getPrimaryCaret(), context);
+    public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                           int rawCount, @Nullable Argument argument) {
+      VimPlugin.getChange().insertAfterLineEnd(editor, caret);
 
       return true;
     }
