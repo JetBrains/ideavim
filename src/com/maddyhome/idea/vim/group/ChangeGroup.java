@@ -217,17 +217,15 @@ public class ChangeGroup {
    * @param editor  The editor to insert into
    * @param caret   The caret to insert above
    */
-  private void insertNewLineAbove(@NotNull Editor editor, @NotNull Caret caret) {
+  private void insertNewLineAbove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {
     if (editor.isOneLineMode()) {
       return;
     }
 
     moveCaretAbove(editor, caret);
 
-    if (CommandState.getInstance(editor).getMode() != CommandState.Mode.REPEAT) {
-      insertText(editor, caret, "\n");
-      EditorData.setChangeSwitchMode(editor, CommandState.Mode.INSERT);
-    }
+    initInsert(editor, caret, context, CommandState.Mode.INSERT);
+    runEnterAction(editor, context);
 
     handleFirstLineCaret(editor, caret);
   }
@@ -276,17 +274,14 @@ public class ChangeGroup {
    * @param editor  The editor to insert into
    * @param caret   The caret to insert after
    */
-  private void insertNewLineBelow(@NotNull Editor editor, @NotNull Caret caret) {
+  private void insertNewLineBelow(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {
     if (editor.isOneLineMode()) {
       return;
     }
 
     MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, caret));
-    EditorData.setChangeSwitchMode(editor, CommandState.Mode.INSERT);
-
-    if (CommandState.getInstance(editor).getMode() != CommandState.Mode.REPEAT) {
-      insertText(editor, caret, "\n");
-    }
+    initInsert(editor, caret, context, CommandState.Mode.INSERT);
+    runEnterAction(editor, context);
   }
 
   private void runEnterAction(Editor editor, @NotNull DataContext context) {
@@ -315,14 +310,6 @@ public class ChangeGroup {
     }
 
     insertAfterCursor(editor, editor.getCaretModel().getPrimaryCaret());
-  }
-
-  public void insertAtPreviousInsert(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {
-    final int offset = VimPlugin.getMotion().moveCaretToMark(editor, caret, '^');
-    if (offset != -1) {
-      MotionGroup.moveCaret(editor, caret, offset);
-    }
-    insertAfterCursor(editor, caret);
   }
 
   /**
@@ -1353,17 +1340,17 @@ public class ChangeGroup {
    * @param count   The number of lines to change
    * @return true if able to delete count lines, false if not
    */
-  public boolean changeLine(@NotNull Editor editor, @NotNull Caret caret, int count) {
+  public boolean changeLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count) {
     final LogicalPosition pos = editor.offsetToLogicalPosition(caret.getOffset());
     final boolean insertBelow = pos.line + count >= EditorHelper.getLineCount(editor);
 
     boolean res = deleteLine(editor, caret, count);
     if (res) {
       if (insertBelow) {
-        insertNewLineBelow(editor, caret);
+        insertNewLineBelow(editor, caret, context);
       }
       else {
-        insertNewLineAbove(editor, caret);
+        insertNewLineAbove(editor, caret, context);
       }
     }
 
@@ -1564,10 +1551,11 @@ public class ChangeGroup {
    * @param caret   The caret to be moved after range deletion
    * @param range   The range to change
    * @param type    The type of the range
+   * @param context
    * @return true if able to delete the range, false if not
    */
-  public boolean changeRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull TextRange range,
-                             @NotNull SelectionType type) {
+  public boolean changeRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                             @NotNull TextRange range, @NotNull SelectionType type) {
     int col = 0;
     int lines = 0;
     if (type == SelectionType.BLOCK_WISE) {
@@ -1582,10 +1570,10 @@ public class ChangeGroup {
     if (res) {
       if (type == SelectionType.LINE_WISE) {
         if (after) {
-          insertNewLineBelow(editor, caret);
+          insertNewLineBelow(editor, caret, context);
         }
         else {
-          insertNewLineAbove(editor, caret);
+          insertNewLineAbove(editor, caret, context);
         }
       }
       else {

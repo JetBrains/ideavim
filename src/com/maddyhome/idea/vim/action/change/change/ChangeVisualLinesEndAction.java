@@ -24,7 +24,6 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -55,12 +54,12 @@ public class ChangeVisualLinesEndAction extends VimCommandAction {
             }
           }
           final TextRange blockRange = new TextRange(starts, ends);
-          return VimPlugin.getChange().changeRange(editor, caret, blockRange, SelectionType.BLOCK_WISE);
+          return VimPlugin.getChange().changeRange(editor, caret, context, blockRange, SelectionType.BLOCK_WISE);
         }
         else {
           final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
                                                     EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
-          return VimPlugin.getChange().changeRange(editor, caret, lineRange, SelectionType.LINE_WISE);
+          return VimPlugin.getChange().changeRange(editor, caret, context, lineRange, SelectionType.LINE_WISE);
         }
       }
     });
