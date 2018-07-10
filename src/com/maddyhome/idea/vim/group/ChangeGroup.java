@@ -216,16 +216,17 @@ public class ChangeGroup {
    *
    * @param editor  The editor to insert into
    * @param caret   The caret to insert above
+   * @param col     The column to indent to
    */
-  private void insertNewLineAbove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {
+  private void insertNewLineAbove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int col) {
     if (editor.isOneLineMode()) {
       return;
     }
 
     moveCaretAbove(editor, caret);
 
-    initInsert(editor, caret, context, CommandState.Mode.INSERT);
-    runEnterAction(editor, context);
+    EditorData.setChangeSwitchMode(editor, CommandState.Mode.INSERT);
+    insertText(editor, caret, "\n" + padding(col));
 
     handleFirstLineCaret(editor, caret);
   }
@@ -273,15 +274,24 @@ public class ChangeGroup {
    *
    * @param editor  The editor to insert into
    * @param caret   The caret to insert after
+   * @param col     The column to indent to
    */
-  private void insertNewLineBelow(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {
+  private void insertNewLineBelow(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int col) {
     if (editor.isOneLineMode()) {
       return;
     }
 
     MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, caret));
-    initInsert(editor, caret, context, CommandState.Mode.INSERT);
-    runEnterAction(editor, context);
+    EditorData.setChangeSwitchMode(editor, CommandState.Mode.INSERT);
+    insertText(editor, caret, "\n" + padding(col));
+  }
+
+  private String padding(int to) {
+    StringBuilder sb = new StringBuilder(to);
+    for (int i = 0; i < to; i++) {
+      sb.append(' ');
+    }
+    return sb.toString();
   }
 
   private void runEnterAction(Editor editor, @NotNull DataContext context) {
@@ -1344,13 +1354,16 @@ public class ChangeGroup {
     final LogicalPosition pos = editor.offsetToLogicalPosition(caret.getOffset());
     final boolean insertBelow = pos.line + count >= EditorHelper.getLineCount(editor);
 
+    final LogicalPosition lp = editor.offsetToLogicalPosition(
+            VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, caret));
+
     boolean res = deleteLine(editor, caret, count);
     if (res) {
       if (insertBelow) {
-        insertNewLineBelow(editor, caret, context);
+        insertNewLineBelow(editor, caret, context, lp.column);
       }
       else {
-        insertNewLineAbove(editor, caret, context);
+        insertNewLineAbove(editor, caret, context, lp.column);
       }
     }
 
@@ -1551,7 +1564,6 @@ public class ChangeGroup {
    * @param caret   The caret to be moved after range deletion
    * @param range   The range to change
    * @param type    The type of the range
-   * @param context
    * @return true if able to delete the range, false if not
    */
   public boolean changeRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
@@ -1561,19 +1573,23 @@ public class ChangeGroup {
     if (type == SelectionType.BLOCK_WISE) {
       lines = getLinesCountInVisualBlock(editor, range);
       col = editor.offsetToLogicalPosition(range.getStartOffset()).column;
-      if (EditorData.getLastColumn(editor) == MotionGroup.LAST_COLUMN) {
+      if (CaretData.getLastColumn(caret) == MotionGroup.LAST_COLUMN) {
         col = MotionGroup.LAST_COLUMN;
       }
     }
     boolean after = range.getEndOffset() >= EditorHelper.getFileSize(editor);
+
+    final LogicalPosition lp = editor.offsetToLogicalPosition(
+            VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, caret));
+
     boolean res = deleteRange(editor, caret, range, type, true);
     if (res) {
       if (type == SelectionType.LINE_WISE) {
         if (after) {
-          insertNewLineBelow(editor, caret, context);
+          insertNewLineBelow(editor, caret, context, lp.column);
         }
         else {
-          insertNewLineAbove(editor, caret, context);
+          insertNewLineAbove(editor, caret, context, lp.column);
         }
       }
       else {
