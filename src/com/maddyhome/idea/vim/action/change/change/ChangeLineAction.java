@@ -44,7 +44,7 @@ public class ChangeLineAction extends EditorAction {
     @Override
     public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                            int rawCount, @Nullable Argument argument) {
-      return VimPlugin.getChange().changeLine(editor, caret, context, count);
+      return VimPlugin.getChange().changeLine(editor, caret, count);
     }
   }
 }

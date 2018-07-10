@@ -49,7 +49,7 @@ public class ChangeVisualAction extends VimCommandAction {
         final SelectionType type = EditorData.wasVisualBlockMode(editor) && range.isMultiple()
                                    ? SelectionType.BLOCK_WISE
                                    : SelectionType.CHARACTER_WISE;
-        return VimPlugin.getChange().changeRange(editor, caret, context, range, type);
+        return VimPlugin.getChange().changeRange(editor, caret, range, type);
       }
     });
   }

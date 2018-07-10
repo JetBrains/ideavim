@@ -36,7 +36,7 @@ public class InsertAtPreviousInsertAction extends EditorAction {
 
   private static class Handler extends ChangeEditorActionHandler {
     public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
-      VimPlugin.getChange().insertAtPreviousInsert(editor, context);
+      VimPlugin.getChange().insertAtPreviousInsert(editor);
 
       return true;
     }
