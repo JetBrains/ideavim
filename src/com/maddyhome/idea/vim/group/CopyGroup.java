@@ -131,19 +131,12 @@ public class CopyGroup {
             VimPlugin.getMotion().moveCaretToLineStart(editor, caret) :
             caret.getOffset();
 
-    final String text = StringUtil.notNullize(register.getText());
+    final String text = indent ?
+        StringUtil.notNullize(register.getText()) :
+        removeLeadingSpaces(StringUtil.notNullize(register.getText()));
     final int endOffset = selectionType == SelectionType.BLOCK_WISE ?
             putTextBlockwise(editor, caret, text, count, startOffset) :
             putText(editor, caret, text, count, startOffset);
-
-    /*if (indent) {
-      LogicalPosition slp = editor.offsetToLogicalPosition(startOffset);
-      LogicalPosition elp = editor.offsetToLogicalPosition(endOffset - 1);
-      final int startOff = editor.getDocument().getLineStartOffset(slp.line);
-      final int endOff = editor.getDocument().getLineEndOffset(elp.line);
-      VimPlugin.getChange().autoIndentRange(editor, context, new TextRange(startOff, endOff));
-      endOffset = EditorHelper.getLineEndOffset(editor, elp.line, true);
-    }*/
 
     moveCursorToOffset(editor, caret, selectionType, startOffset, endOffset, cursorAfter);
 
@@ -193,19 +186,12 @@ public class CopyGroup {
       startOffset--;
     }
 
-    final String text = StringUtil.notNullize(register.getText());
+    final String text = indent ?
+        StringUtil.notNullize(register.getText()) :
+        removeLeadingSpaces(StringUtil.notNullize(register.getText()));
     final int endOffset = selectionType == SelectionType.BLOCK_WISE ?
             putTextBlockwise(editor, caret, text, count, startOffset) :
             putText(editor, caret, text, count, startOffset);
-
-    /*if (indent) {
-      LogicalPosition slp = editor.offsetToLogicalPosition(startOffset);
-      LogicalPosition elp = editor.offsetToLogicalPosition(endOffset - 1);
-      final int startOff = editor.getDocument().getLineStartOffset(slp.line);
-      final int endOff = editor.getDocument().getLineEndOffset(elp.line);
-      VimPlugin.getChange().autoIndentRange(editor, context, new TextRange(startOff, endOff));
-      endOffset = EditorHelper.getLineEndOffset(editor, elp.line, true);
-    }*/
 
     moveCursorToOffset(editor, caret, selectionType, startOffset, endOffset, cursorAfter);
 
@@ -267,6 +253,21 @@ public class CopyGroup {
 
     return false;
   }
+
+
+  @NotNull
+  private String removeLeadingSpaces(@NotNull String s) {
+    final StringBuilder ret = new StringBuilder(s.length());
+    int idx = 0;
+    while (idx < s.length() && Character.isWhitespace(s.charAt(idx))) {
+      if (s.charAt(idx) != ' ') {
+        ret.append(s.charAt(idx));
+      }
+      ++idx;
+    }
+    return ret.append(s.substring(idx)).toString();
+  }
+
 
   private int putText(@NotNull Editor editor, @NotNull Caret caret, @NotNull String text, int count, int startOffset) {
     MotionGroup.moveCaret(editor, caret, startOffset);
@@ -518,7 +519,7 @@ public class CopyGroup {
     if (indent) {
       int startOff = editor.getDocument().getLineStartOffset(slp.line);
       int endOff = editor.getDocument().getLineEndOffset(elp.line);
-      VimPlugin.getChange().autoIndentRange(editor, context, new TextRange(startOff, endOff));
+      VimPlugin.getChange().autoIndentRange(editor, editor.getCaretModel().getPrimaryCaret(), context, new TextRange(startOff, endOff));
     }
     /*
     boolean indented = false;
