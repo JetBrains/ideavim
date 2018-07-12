@@ -19,10 +19,12 @@
 package com.maddyhome.idea.vim.action.change.shift;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,20 +33,19 @@ import org.jetbrains.annotations.Nullable;
  * @author Aleksey Lagoshin
  */
 public class AutoIndentMotionAction extends EditorAction {
-  public AutoIndentMotionAction() {
-    super(new Handler());
-  }
+  protected AutoIndentMotionAction() {
+    super(new ChangeEditorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
+      @Override
+      public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                             int rawCount, @Nullable Argument argument) {
+        return argument != null && doIndent(editor, caret, context, count, rawCount, argument);
+      }
 
-  private static class Handler extends ChangeEditorActionHandler {
-    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
-                           @Nullable Argument argument) {
-      if (argument != null) {
-        VimPlugin.getChange().autoIndentMotion(editor, context, count, rawCount, argument);
+      private boolean doIndent(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                               int rawCount, @NotNull Argument argument) {
+        VimPlugin.getChange().autoIndentMotion(editor, caret, context, count, rawCount, argument);
         return true;
       }
-      else {
-        return false;
-      }
-    }
+    });
   }
 }
