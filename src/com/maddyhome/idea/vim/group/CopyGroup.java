@@ -60,7 +60,7 @@ public class CopyGroup {
   public boolean yankMotion(@NotNull Editor editor, DataContext context, int count, int rawCount,
                             @NotNull Argument argument) {
     TextRange range = MotionGroup
-      .getMotionRange(editor, editor.getCaretModel().getPrimaryCaret(), context, count, rawCount, argument, true);
+        .getMotionRange(editor, editor.getCaretModel().getPrimaryCaret(), context, count, rawCount, argument, true);
     final Command motion = argument.getMotion();
     return motion != null && yankRange(editor, range, SelectionType.fromCommandFlags(motion.getFlags()), true);
   }
@@ -75,7 +75,7 @@ public class CopyGroup {
   public boolean yankLine(@NotNull Editor editor, int count) {
     int start = VimPlugin.getMotion().moveCaretToLineStart(editor);
     int offset = Math.min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor, count - 1, true) + 1,
-                          EditorHelper.getFileSize(editor));
+        EditorHelper.getFileSize(editor));
     return offset != -1 && yankRange(editor, new TextRange(start, offset), SelectionType.LINE_WISE, false);
   }
 
@@ -128,15 +128,15 @@ public class CopyGroup {
       return false;
 
     final int startOffset = selectionType == SelectionType.LINE_WISE ?
-            VimPlugin.getMotion().moveCaretToLineStart(editor, caret) :
-            caret.getOffset();
+        VimPlugin.getMotion().moveCaretToLineStart(editor, caret) :
+        caret.getOffset();
 
     final String text = indent ?
         StringUtil.notNullize(register.getText()) :
         removeLeadingSpaces(StringUtil.notNullize(register.getText()));
     final int endOffset = selectionType == SelectionType.BLOCK_WISE ?
-            putTextBlockwise(editor, caret, text, count, startOffset) :
-            putText(editor, caret, text, count, startOffset);
+        putTextBlockwise(editor, caret, text, count, startOffset) :
+        putText(editor, caret, text, count, startOffset);
 
     moveCursorToOffset(editor, caret, selectionType, startOffset, endOffset, cursorAfter);
 
@@ -169,8 +169,8 @@ public class CopyGroup {
     if (selectionType == SelectionType.LINE_WISE) {
       startOffset = Math.min(editor.getDocument().getTextLength(), VimPlugin.getMotion().moveCaretToLineEnd(editor, caret) + 1);
       if (startOffset > 0 &&
-              startOffset == editor.getDocument().getTextLength() &&
-              editor.getDocument().getCharsSequence().charAt(startOffset - 1) != '\n') {
+          startOffset == editor.getDocument().getTextLength() &&
+          editor.getDocument().getCharsSequence().charAt(startOffset - 1) != '\n') {
         editor.getDocument().insertString(startOffset, "\n");
         startOffset++;
       }
@@ -190,8 +190,8 @@ public class CopyGroup {
         StringUtil.notNullize(register.getText()) :
         removeLeadingSpaces(StringUtil.notNullize(register.getText()));
     final int endOffset = selectionType == SelectionType.BLOCK_WISE ?
-            putTextBlockwise(editor, caret, text, count, startOffset) :
-            putText(editor, caret, text, count, startOffset);
+        putTextBlockwise(editor, caret, text, count, startOffset) :
+        putText(editor, caret, text, count, startOffset);
 
     moveCursorToOffset(editor, caret, selectionType, startOffset, endOffset, cursorAfter);
 
@@ -220,12 +220,12 @@ public class CopyGroup {
 
       if (subMode == CommandState.SubMode.VISUAL_LINE) {
         range =
-          new TextRange(range.getStartOffset(), Math.min(range.getEndOffset() + 1, EditorHelper.getFileSize(editor)));
+            new TextRange(range.getStartOffset(), Math.min(range.getEndOffset() + 1, EditorHelper.getFileSize(editor)));
       }
 
       VimPlugin.getChange()
-        .deleteRange(editor, editor.getCaretModel().getPrimaryCaret(), range, SelectionType.fromSubMode(subMode),
-                     false);
+          .deleteRange(editor, editor.getCaretModel().getPrimaryCaret(), range, SelectionType.fromSubMode(subMode),
+              false);
 
       editor.getCaretModel().moveToOffset(start);
 
@@ -246,7 +246,7 @@ public class CopyGroup {
       }
 
       putText(editor, context, pos, StringUtil.notNullize(reg.getText()), type, count,
-              indent && type == SelectionType.LINE_WISE, cursorAfter, subMode);
+          indent && type == SelectionType.LINE_WISE, cursorAfter, subMode);
 
       return true;
     }
@@ -343,9 +343,9 @@ public class CopyGroup {
       }
 
       if (pad.length() > 0) {
-          VimPlugin.getChange().insertText(editor, insertingOffset, pad);
-          endOffset += pad.length();
-        }
+        VimPlugin.getChange().insertText(editor, insertingOffset, pad);
+        endOffset += pad.length();
+      }
 
       line++;
     }
@@ -359,7 +359,8 @@ public class CopyGroup {
       case LINE_WISE:
         if (cursorAfter) {
           MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStart(editor, caret));
-        } else {
+        }
+        else {
           MotionGroup.moveCaret(editor, caret, startOffset);
           MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, caret));
         }
@@ -367,7 +368,8 @@ public class CopyGroup {
       case CHARACTER_WISE:
         if (cursorAfter) {
           MotionGroup.moveCaret(editor, caret, endOffset);
-        } else {
+        }
+        else {
           MotionGroup.moveCaret(editor, caret, endOffset - 1);
         }
         break;
@@ -577,7 +579,7 @@ public class CopyGroup {
       case 3:
         MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
         MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), VimPlugin.getMotion()
-          .moveCaretToLineStartSkipLeading(editor, editor.getCaretModel().getPrimaryCaret()));
+            .moveCaretToLineStartSkipLeading(editor, editor.getCaretModel().getPrimaryCaret()));
         break;
       case 4:
         MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), endOffset + 1);
