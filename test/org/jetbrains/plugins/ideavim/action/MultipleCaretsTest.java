@@ -899,7 +899,7 @@ public class MultipleCaretsTest extends VimTestCase {
                           "    private boolean x;\n" +
                           "    private boolean y;\n" +
                           "private boolean z;\n" +
-                          "    public void foo() {\n" +
+                          "    <caret>public void foo() {\n" +
                           "        x = true; // This will be indented\n" +
                           "    }\n" +
                           "public void bar() {\n" +
