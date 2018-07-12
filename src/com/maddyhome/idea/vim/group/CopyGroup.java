@@ -198,62 +198,59 @@ public class CopyGroup {
     return true;
   }
 
-  public boolean putVisualRange(@NotNull Editor editor, @NotNull DataContext context, @NotNull TextRange range,
-                                int count, boolean indent, boolean cursorAfter) {
-    CommandState.SubMode subMode = CommandState.getInstance(editor).getSubMode();
-    Register reg = VimPlugin.getRegister().getLastRegister();
-    // Without this reset, the deleted text goes into the same register we just pasted from.
-    VimPlugin.getRegister().resetRegister();
-    if (reg != null) {
-      final SelectionType type = reg.getType();
-      if (type == SelectionType.LINE_WISE && editor.isOneLineMode()) {
-        return false;
-      }
-
-      int start = range.getStartOffset();
-      int end = range.getEndOffset();
-      int endLine = editor.offsetToLogicalPosition(end).line;
-      if (logger.isDebugEnabled()) {
-        logger.debug("start=" + start);
-        logger.debug("end=" + end);
-      }
-
-      if (subMode == CommandState.SubMode.VISUAL_LINE) {
-        range =
-            new TextRange(range.getStartOffset(), Math.min(range.getEndOffset() + 1, EditorHelper.getFileSize(editor)));
-      }
-
-      VimPlugin.getChange()
-          .deleteRange(editor, editor.getCaretModel().getPrimaryCaret(), range, SelectionType.fromSubMode(subMode),
-              false);
-
-      editor.getCaretModel().moveToOffset(start);
-
-      int pos = start;
-      if (type == SelectionType.LINE_WISE) {
-        if (subMode == CommandState.SubMode.VISUAL_BLOCK) {
-          pos = editor.getDocument().getLineEndOffset(endLine) + 1;
-        }
-        else if (subMode != CommandState.SubMode.VISUAL_LINE) {
-          editor.getDocument().insertString(start, "\n");
-          pos = start + 1;
-        }
-      }
-      else if (type != SelectionType.CHARACTER_WISE) {
-        if (subMode == CommandState.SubMode.VISUAL_LINE) {
-          editor.getDocument().insertString(start, "\n");
-        }
-      }
-
-      putText(editor, context, pos, StringUtil.notNullize(reg.getText()), type, count,
-          indent && type == SelectionType.LINE_WISE, cursorAfter, subMode);
-
-      return true;
+  public boolean putVisualRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                                @NotNull TextRange range, int count, boolean indent, boolean cursorAfter) {
+    final Register register = VimPlugin.getRegister().getLastRegister();
+    if (register == null) {
+      return false;
+    }
+    final SelectionType selectionType = register.getType();
+    if (selectionType == SelectionType.LINE_WISE && editor.isOneLineMode()) {
+      return false;
     }
 
-    return false;
+    final CommandState.SubMode subMode = CommandState.getInstance(editor).getSubMode();
+    if (subMode == CommandState.SubMode.VISUAL_LINE) {
+      range = new TextRange(range.getStartOffset(), Math.min(range.getEndOffset() + 1, EditorHelper.getFileSize(editor)));
+    }
+
+    VimPlugin.getChange().deleteRange(editor, caret, range, SelectionType.fromSubMode(subMode), false);
+
+    int startOffset = range.getStartOffset();
+    if (selectionType == SelectionType.LINE_WISE) {
+      if (subMode == CommandState.SubMode.VISUAL_BLOCK) {
+        startOffset = editor.getDocument().getLineEndOffset(range.getEndOffset()) + 1;
+      }
+      else if (subMode != CommandState.SubMode.VISUAL_LINE) {
+        editor.getDocument().insertString(startOffset, "\n");
+        ++startOffset;
+      }
+    }
+    else if (selectionType != SelectionType.CHARACTER_WISE) {
+      if (subMode == CommandState.SubMode.VISUAL_LINE) {
+        editor.getDocument().insertString(startOffset, "\n");
+      }
+    }
+
+    final String text = indent ?
+        StringUtil.notNullize(register.getText()) :
+        removeLeadingSpaces(StringUtil.notNullize(register.getText()));
+    final int endOffset = selectionType == SelectionType.BLOCK_WISE ?
+        putTextBlockwise(editor, caret, text, count, startOffset) :
+        putText(editor, caret, text, count, startOffset);
+
+    VimPlugin.getRegister().storeText(editor, new TextRange(startOffset, startOffset + (endOffset - startOffset) / count),
+        selectionType, false);
+
+    moveCursorToOffset(editor, caret, selectionType, startOffset, endOffset, cursorAfter);
+
+    return true;
   }
 
+  public boolean putVisualRange(@NotNull Editor editor, @NotNull DataContext context, @NotNull TextRange range,
+                                int count, boolean indent, boolean cursorAfter) {
+    return putVisualRange(editor, editor.getCaretModel().getPrimaryCaret(), context, range, count, indent, cursorAfter);
+  }
 
   @NotNull
   private String removeLeadingSpaces(@NotNull String s) {
@@ -400,7 +397,6 @@ public class CopyGroup {
   public void putText(@NotNull Editor editor, @NotNull DataContext context, int offset, @NotNull String text,
                       @NotNull SelectionType type, int count, boolean indent, boolean cursorAfter,
                       @NotNull CommandState.SubMode mode) {
-    // TODO: Add multiple carets support
     if (logger.isDebugEnabled()) {
       logger.debug("offset=" + offset);
       logger.debug("type=" + type);

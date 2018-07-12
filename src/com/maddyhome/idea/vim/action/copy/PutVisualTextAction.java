@@ -19,12 +19,14 @@
 package com.maddyhome.idea.vim.action.copy;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,10 +39,11 @@ import java.util.Set;
  */
 public class PutVisualTextAction extends VimCommandAction {
   public PutVisualTextAction() {
-    super(new VisualOperatorActionHandler() {
-      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
-                                @NotNull TextRange range) {
-        return VimPlugin.getCopy().putVisualRange(editor, context, range, cmd.getCount(), true, false);
+    super(new VisualOperatorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
+      @Override
+      protected boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                                @NotNull Command cmd, @NotNull TextRange range) {
+        return VimPlugin.getCopy().putVisualRange(editor, caret, context, range, cmd.getCount(), true, false);
       }
     });
   }

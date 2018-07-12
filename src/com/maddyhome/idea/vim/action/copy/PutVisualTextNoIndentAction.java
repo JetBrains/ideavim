@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.action.copy;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
@@ -38,9 +39,10 @@ import java.util.Set;
 public class PutVisualTextNoIndentAction extends VimCommandAction {
   public PutVisualTextNoIndentAction() {
     super(new VisualOperatorActionHandler() {
-      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
-                                @NotNull TextRange range) {
-        return VimPlugin.getCopy().putVisualRange(editor, context, range, cmd.getCount(), false, false);
+      @Override
+      protected boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                                @NotNull Command cmd, @NotNull TextRange range) {
+        return VimPlugin.getCopy().putVisualRange(editor, caret, context, range, cmd.getCount(), false, false);
       }
     });
   }
