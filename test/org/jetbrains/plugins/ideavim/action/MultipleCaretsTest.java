@@ -1634,4 +1634,44 @@ public class MultipleCaretsTest extends VimTestCase {
                     "lsdjf lsj flk gjdlsadlsfj lksdgfj \n" +
                     "dflgjdfsgkdflgjdfsklg\n\n");
   }
+
+  public void testPutAfterCursorAction() {
+    typeTextInFile(parseKeys("ye", "j", "2p"),
+            "<caret>qwe asd\n" +
+                    "zxc <caret>asd\n" +
+                    "asd qwe\n");
+    myFixture.checkResult("qwe asd\n" +
+            "zasdas<caret>dxc asd\n" +
+            "asd qasdas<caret>dwe\n");
+  }
+
+  public void testPutAfterCursorMoveCursorAction() {
+    typeTextInFile(parseKeys("ye", "j", "2gp"),
+            "<caret>qwe asd\n" +
+                    "zxc <caret>asd\n" +
+                    "asd qwe\n");
+    myFixture.checkResult("qwe asd\n" +
+            "zasdasd<caret>xc asd\n" +
+            "asd qasdasd<caret>we\n");
+  }
+
+  public void testPutBeforeCursorAction() {
+    typeTextInFile(parseKeys("ye", "j", "2P"),
+            "<caret>qwe asd\n" +
+                    "zxc <caret>asd\n" +
+                    "asd qwe\n");
+    myFixture.checkResult("qwe asd\n" +
+            "asdas<caret>dzxc asd\n" +
+            "asd asdas<caret>dqwe\n");
+  }
+
+  public void testPutBeforeCursorMoveCursorAction() {
+    typeTextInFile(parseKeys("ye", "j", "2gP"),
+            "<caret>qwe asd\n" +
+                    "zxc <caret>asd\n" +
+                    "asd qwe\n");
+    myFixture.checkResult("qwe asd\n" +
+            "asdasd<caret>zxc asd\n" +
+            "asd asdasd<caret>qwe\n");
+  }
 }
