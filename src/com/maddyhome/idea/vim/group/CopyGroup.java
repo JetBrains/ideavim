@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.util.text.StringUtil;
@@ -114,29 +115,39 @@ public class CopyGroup {
    */
   public boolean putTextBeforeCursor(@NotNull Editor editor, @NotNull DataContext context, int count, boolean indent,
                                      boolean cursorAfter) {
-    // What register are we getting the text from?
-    Register reg = VimPlugin.getRegister().getLastRegister();
-    if (reg != null) {
-      if (reg.getType() == SelectionType.LINE_WISE && editor.isOneLineMode()) {
-        return false;
-      }
+    return putTextBeforeCursor(editor, editor.getCaretModel().getPrimaryCaret(), context, count, indent, cursorAfter);
+  }
 
-      int pos;
-      // If a linewise put the text is inserted before the current line.
-      if (reg.getType() == SelectionType.LINE_WISE) {
-        pos = VimPlugin.getMotion().moveCaretToLineStart(editor);
-      }
-      else {
-        pos = editor.getCaretModel().getOffset();
-      }
+  public boolean putTextBeforeCursor(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                                     int count, boolean indent, boolean cursorAfter) {
+    final Register register = VimPlugin.getRegister().getLastRegister();
+    if (register == null)
+      return false;
+    final SelectionType selectionType = register.getType();
+    if (selectionType == SelectionType.LINE_WISE && editor.isOneLineMode())
+      return false;
 
-      putText(editor, context, pos, StringUtil.notNullize(reg.getText()), reg.getType(), count, indent, cursorAfter,
-              CommandState.SubMode.NONE);
+    final int startOffset = selectionType == SelectionType.LINE_WISE ?
+            VimPlugin.getMotion().moveCaretToLineStart(editor, caret) :
+            caret.getOffset();
 
-      return true;
-    }
+    final String text = StringUtil.notNullize(register.getText());
+    final int endOffset = selectionType == SelectionType.BLOCK_WISE ?
+            putTextBlockwise(editor, caret, text, count, startOffset) :
+            putText(editor, caret, text, count, startOffset);
 
-    return false;
+    /*if (indent) {
+      LogicalPosition slp = editor.offsetToLogicalPosition(startOffset);
+      LogicalPosition elp = editor.offsetToLogicalPosition(endOffset - 1);
+      final int startOff = editor.getDocument().getLineStartOffset(slp.line);
+      final int endOff = editor.getDocument().getLineEndOffset(elp.line);
+      VimPlugin.getChange().autoIndentRange(editor, context, new TextRange(startOff, endOff));
+      endOffset = EditorHelper.getLineEndOffset(editor, elp.line, true);
+    }*/
+
+    moveCursorToOffset(editor, caret, selectionType, startOffset, endOffset, cursorAfter);
+
+    return true;
   }
 
   /**
@@ -149,40 +160,56 @@ public class CopyGroup {
    */
   public boolean putTextAfterCursor(@NotNull Editor editor, @NotNull DataContext context, int count, boolean indent,
                                     boolean cursorAfter) {
-    Register reg = VimPlugin.getRegister().getLastRegister();
-    if (reg != null) {
-      if (reg.getType() == SelectionType.LINE_WISE && editor.isOneLineMode()) {
-        return false;
-      }
+    return putTextAfterCursor(editor, editor.getCaretModel().getPrimaryCaret(), context, count, indent, cursorAfter);
+  }
 
-      int pos;
-      // If a linewise paste, the text is inserted after the current line.
-      if (reg.getType() == SelectionType.LINE_WISE) {
-        pos = Math.min(editor.getDocument().getTextLength(), VimPlugin.getMotion().moveCaretToLineEnd(editor) + 1);
-        if (pos > 0 &&
-            pos == editor.getDocument().getTextLength() &&
-            editor.getDocument().getCharsSequence().charAt(pos - 1) != '\n') {
-          editor.getDocument().insertString(pos, "\n");
-          pos++;
-        }
-      }
-      else {
-        pos = editor.getCaretModel().getOffset();
-        if (!EditorHelper.isLineEmpty(editor, editor.getCaretModel().getLogicalPosition().line, false)) {
-          pos++;
-        }
-      }
-      // In case when text is empty this can occur
-      if (pos > 0 && pos > editor.getDocument().getTextLength()) {
-        pos--;
-      }
-      putText(editor, context, pos, StringUtil.notNullize(reg.getText()), reg.getType(), count, indent, cursorAfter,
-              CommandState.SubMode.NONE);
+  public boolean putTextAfterCursor(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                                    int count, boolean indent, boolean cursorAfter) {
+    final Register register = VimPlugin.getRegister().getLastRegister();
+    if (register == null)
+      return false;
+    final SelectionType selectionType = register.getType();
+    if (selectionType == SelectionType.LINE_WISE && editor.isOneLineMode())
+      return false;
 
-      return true;
+    int startOffset;
+    if (selectionType == SelectionType.LINE_WISE) {
+      startOffset = Math.min(editor.getDocument().getTextLength(), VimPlugin.getMotion().moveCaretToLineEnd(editor, caret) + 1);
+      if (startOffset > 0 &&
+              startOffset == editor.getDocument().getTextLength() &&
+              editor.getDocument().getCharsSequence().charAt(startOffset - 1) != '\n') {
+        editor.getDocument().insertString(startOffset, "\n");
+        startOffset++;
+      }
+    }
+    else {
+      startOffset = caret.getOffset();
+      if (!EditorHelper.isLineEmpty(editor, caret.getLogicalPosition().line, false)) {
+        startOffset++;
+      }
+    }
+    // In case when text is empty this can occur
+    if (startOffset > 0 && startOffset > editor.getDocument().getTextLength()) {
+      startOffset--;
     }
 
-    return false;
+    final String text = StringUtil.notNullize(register.getText());
+    final int endOffset = selectionType == SelectionType.BLOCK_WISE ?
+            putTextBlockwise(editor, caret, text, count, startOffset) :
+            putText(editor, caret, text, count, startOffset);
+
+    /*if (indent) {
+      LogicalPosition slp = editor.offsetToLogicalPosition(startOffset);
+      LogicalPosition elp = editor.offsetToLogicalPosition(endOffset - 1);
+      final int startOff = editor.getDocument().getLineStartOffset(slp.line);
+      final int endOff = editor.getDocument().getLineEndOffset(elp.line);
+      VimPlugin.getChange().autoIndentRange(editor, context, new TextRange(startOff, endOff));
+      endOffset = EditorHelper.getLineEndOffset(editor, elp.line, true);
+    }*/
+
+    moveCursorToOffset(editor, caret, selectionType, startOffset, endOffset, cursorAfter);
+
+    return true;
   }
 
   public boolean putVisualRange(@NotNull Editor editor, @NotNull DataContext context, @NotNull TextRange range,
@@ -239,6 +266,119 @@ public class CopyGroup {
     }
 
     return false;
+  }
+
+  private int putText(@NotNull Editor editor, @NotNull Caret caret, @NotNull String text, int count, int startOffset) {
+    MotionGroup.moveCaret(editor, caret, startOffset);
+
+    final int textLength = text.length() * count;
+    StringBuilder sb = new StringBuilder(textLength);
+    for (int i = 0; i < count; i++) {
+      sb.append(text);
+    }
+
+    VimPlugin.getChange().insertText(editor, caret, sb.toString());
+    final int endOffset = startOffset + textLength;
+    VimPlugin.getMark().setChangeMarks(editor, new TextRange(startOffset, endOffset));
+
+    return endOffset;
+  }
+
+  private int putTextBlockwise(@NotNull Editor editor, @NotNull Caret caret, @NotNull String text, int count,
+                               int startOffset) {
+    final LogicalPosition start = editor.offsetToLogicalPosition(startOffset);
+    final int col = start.column;
+    int line = start.line;
+
+    int lines = 1;
+    for (int i = 0; i < text.length(); i++) {
+      if (text.charAt(i) == '\n') {
+        lines++;
+      }
+    }
+
+    if (line + lines >= EditorHelper.getLineCount(editor)) {
+      for (int i = 0; i < line + lines - EditorHelper.getLineCount(editor); i++) {
+        VimPlugin.getChange().insertText(editor, EditorHelper.getFileSize(editor, true), "\n");
+      }
+    }
+
+    StringTokenizer tokenizer = new StringTokenizer(text, "\n");
+    int maxlen = 0;
+    while (tokenizer.hasMoreTokens()) {
+      final String segment = tokenizer.nextToken();
+      maxlen = Math.max(maxlen, segment.length());
+    }
+
+    tokenizer = new StringTokenizer(text, "\n");
+    int endOffset = 0;
+    while (tokenizer.hasMoreTokens()) {
+      String segment = tokenizer.nextToken();
+      String origSegment = segment;
+
+      if (segment.length() < maxlen) {
+        StringBuilder sb = new StringBuilder(segment);
+        for (int i = segment.length(); i < maxlen; i++) {
+          sb.append(' ');
+        }
+        segment = sb.toString();
+
+        if (col != 0 && col < EditorHelper.getLineLength(editor, line)) {
+          origSegment = segment;
+        }
+      }
+
+      final String pad = EditorHelper.pad(editor, line, col);
+
+      final int insertingOffset = editor.logicalPositionToOffset(new LogicalPosition(line, col));
+      endOffset = insertingOffset;
+      MotionGroup.moveCaret(editor, caret, insertingOffset);
+      VimPlugin.getChange().insertText(editor, caret, origSegment);
+      endOffset += origSegment.length();
+      for (int i = 1; i < count; i++) {
+        MotionGroup.moveCaret(editor, caret, insertingOffset);
+        VimPlugin.getChange().insertText(editor, caret, segment);
+        endOffset += segment.length();
+      }
+
+      if (pad.length() > 0) {
+          VimPlugin.getChange().insertText(editor, insertingOffset, pad);
+          endOffset += pad.length();
+        }
+
+      line++;
+    }
+
+    return endOffset;
+  }
+
+  private void moveCursorToOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull SelectionType selectionType,
+                                  int startOffset, int endOffset, boolean cursorAfter) {
+    switch (selectionType) {
+      case LINE_WISE:
+        if (cursorAfter) {
+          MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStart(editor, caret));
+        } else {
+          MotionGroup.moveCaret(editor, caret, startOffset);
+          MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, caret));
+        }
+        break;
+      case CHARACTER_WISE:
+        if (cursorAfter) {
+          MotionGroup.moveCaret(editor, caret, endOffset);
+        } else {
+          MotionGroup.moveCaret(editor, caret, endOffset - 1);
+        }
+        break;
+      case BLOCK_WISE:
+        if (cursorAfter) {
+          MotionGroup.moveCaret(editor, caret, endOffset);
+        }
+        else {
+          MotionGroup.moveCaret(editor, caret, startOffset);
+        }
+        break;
+    }
   }
 
   /**
@@ -344,7 +484,6 @@ public class CopyGroup {
           insertCnt += txt.length();
           endOffset += txt.length();
         }
-
 
         if (mode == CommandState.SubMode.VISUAL_LINE) {
           VimPlugin.getChange().insertText(editor, endOffset, "\n");

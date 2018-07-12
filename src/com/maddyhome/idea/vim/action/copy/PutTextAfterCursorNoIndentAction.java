@@ -19,11 +19,14 @@
 package com.maddyhome.idea.vim.action.copy;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
+import com.maddyhome.idea.vim.handler.ExecuteMethodNotOverriddenException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,9 +37,21 @@ public class PutTextAfterCursorNoIndentAction extends EditorAction {
     super(new Handler());
   }
 
+//  private static class Handler extends ChangeEditorActionHandler {
+//    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
+//      return VimPlugin.getCopy().putTextAfterCursor(editor, context, count, false, false);
+//    }
+//  }
+
   private static class Handler extends ChangeEditorActionHandler {
-    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
-      return VimPlugin.getCopy().putTextAfterCursor(editor, context, count, false, false);
+    Handler() {
+      super(true, CaretOrder.DECREASING_OFFSET);
+    }
+
+    @Override
+    public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                           int rawCount, @Nullable Argument argument) {
+      return VimPlugin.getCopy().putTextAfterCursor(editor, caret, context, count, false, false);
     }
   }
 }
