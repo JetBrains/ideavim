@@ -87,6 +87,9 @@ public abstract class EditorActionHandlerBase extends EditorActionHandler {
 
   protected boolean execute(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context,
                             @NotNull Command cmd) throws ExecuteMethodNotOverriddenException {
+    if (caret == null) {
+      return false;
+    }
     if (myRunForEachCaret) {
       throw new ExecuteMethodNotOverriddenException(this.getClass());
     }

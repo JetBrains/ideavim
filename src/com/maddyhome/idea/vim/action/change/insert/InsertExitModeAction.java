@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.List;
@@ -41,11 +40,8 @@ public class InsertExitModeAction extends VimCommandAction {
 
     super(new EditorActionHandlerBase(true) {
       @Override
-      protected boolean execute(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context,
+      protected boolean execute(@NotNull Editor editor, Caret caret, @NotNull DataContext context,
                                 @NotNull Command cmd) {
-        if (caret == null) {
-          return false;
-        }
         VimPlugin.getChange().processEscape(editor, caret, context);
         return true;
       }
