@@ -668,25 +668,6 @@ public class SearchHelper {
     return new CountPosition(count, position);
   }
 
-  /**
-   * Find the offset to the start of the next/previous word/WORD.
-   * <p>
-   * This function always returns a non-negative position according to the definition of 'next/previous word'
-   * in Vim. For example, for the last word the end of file position is returned.
-   *
-   * @param editor  The editor to find the words in
-   * @param count   The number of words to skip. Negative for backward searches
-   * @param bigWord Find WORD, as opposed to word
-   * @return The offset of the match
-   */
-  public static int findNextWord(@NotNull Editor editor, int count, boolean bigWord) {
-    CharSequence chars = editor.getDocument().getCharsSequence();
-    int pos = editor.getCaretModel().getOffset();
-    int size = EditorHelper.getFileSize(editor);
-
-    return findNextWord(chars, pos, size, count, bigWord, false);
-  }
-
   public static int findNextWord(@NotNull Editor editor, @NotNull Caret caret, int count, boolean bigWord) {
     CharSequence chars = editor.getDocument().getCharsSequence();
     final int pos = caret.getOffset();
