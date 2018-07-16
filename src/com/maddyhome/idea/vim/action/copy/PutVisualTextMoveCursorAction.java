@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.CaretOrder;
-import com.maddyhome.idea.vim.handler.ExecuteMethodNotOverriddenException;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,7 +42,7 @@ public class PutVisualTextMoveCursorAction extends VimCommandAction {
     super(new VisualOperatorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
       @Override
       protected boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                                @NotNull Command cmd, @NotNull TextRange range) throws ExecuteMethodNotOverriddenException {
+                                @NotNull Command cmd, @NotNull TextRange range) {
         return VimPlugin.getCopy().putVisualRange(editor, caret, context, range, cmd.getCount(), true, true);
       }
     });
