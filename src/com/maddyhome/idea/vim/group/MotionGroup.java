@@ -413,36 +413,6 @@ public class MotionGroup {
     return Math.max(0, Math.min(count, EditorHelper.getFileSize(editor) - 1));
   }
 
-  public int moveCaretToMarkLine(@NotNull Editor editor, @NotNull Caret caret, char ch) {
-    final Mark mark = VimPlugin.getMark().getMark(editor, ch);
-    if (mark == null) {
-      return -1;
-    }
-
-    final VirtualFile vf = EditorData.getVirtualFile(editor);
-    if (vf == null) {
-      return -1;
-    }
-
-    final LogicalPosition lp = new LogicalPosition(mark.getLogicalLine(), mark.getCol());
-    if (!vf.getPath().equals(mark.getFilename())) {
-      final Editor selectedEditor = selectEditor(editor, mark);
-      if (selectedEditor != null) {
-        editor.getCaretModel().removeCaret(caret);
-        final Caret newCaret = selectedEditor.getCaretModel().addCaret(selectedEditor.logicalToVisualPosition(lp),
-            false);
-        if (newCaret != null) {
-          moveCaret(selectedEditor, newCaret, moveCaretToLineStartSkipLeading(selectedEditor, lp.line));
-        }
-      }
-
-      return -2;
-    }
-    else {
-      return moveCaretToLineStartSkipLeading(editor, lp.line);
-    }
-  }
-
   public int moveCaretToMark(@NotNull final Editor editor, char ch) {
     return moveCaretToMark(editor, editor.getCaretModel().getPrimaryCaret(), ch);
   }
