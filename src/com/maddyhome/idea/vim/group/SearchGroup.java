@@ -530,10 +530,6 @@ public class SearchGroup {
     return findItOffset(editor, startOffset, count, lastDir, false);
   }
 
-  public int searchWord(@NotNull Editor editor, int count, boolean whole, int dir) {
-    return searchWord(editor, editor.getCaretModel().getPrimaryCaret(), count, whole, dir);
-  }
-
   public int searchWord(@NotNull Editor editor, @NotNull Caret caret, int count, boolean whole, int dir) {
     TextRange range = SearchHelper.findWordUnderCursor(editor, caret);
     if (range == null) {
@@ -561,16 +557,8 @@ public class SearchGroup {
     return findItOffset(editor, caret.getOffset(), count, lastDir, true);
   }
 
-  public int searchNext(@NotNull Editor editor, int count) {
-    return searchNext(editor, editor.getCaretModel().getPrimaryCaret(), count);
-  }
-
   public int searchNext(@NotNull Editor editor, @NotNull Caret caret, int count) {
     return searchNextWithDirection(editor, caret, count, lastDir);
-  }
-
-  public int searchPrevious(@NotNull Editor editor, int count) {
-    return searchPrevious(editor, editor.getCaretModel().getPrimaryCaret(), count);
   }
 
   public int searchPrevious(@NotNull Editor editor, @NotNull Caret caret, int count) {
