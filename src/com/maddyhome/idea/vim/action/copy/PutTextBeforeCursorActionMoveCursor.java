@@ -44,7 +44,7 @@ public class PutTextBeforeCursorActionMoveCursor extends EditorAction {
     @Override
     public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                            int rawCount, @Nullable Argument argument) {
-      return VimPlugin.getCopy().putTextBeforeCursor(editor, caret, context, count, true, true);
+      return VimPlugin.getCopy().putTextBeforeCursor(editor, caret, count, true, true);
     }
   }
 }

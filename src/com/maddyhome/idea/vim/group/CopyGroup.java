@@ -105,21 +105,8 @@ public class CopyGroup {
     return false;
   }
 
-  /**
-   * Pastes text from the last register into the editor before the current cursor location.
-   *
-   * @param editor  The editor to paste into
-   * @param context The data context
-   * @param count   The number of times to perform the paste
-   * @return true if able to paste, false if not
-   */
-  public boolean putTextBeforeCursor(@NotNull Editor editor, @NotNull DataContext context, int count, boolean indent,
+  public boolean putTextBeforeCursor(@NotNull Editor editor, @NotNull Caret caret, int count, boolean indent,
                                      boolean cursorAfter) {
-    return putTextBeforeCursor(editor, editor.getCaretModel().getPrimaryCaret(), context, count, indent, cursorAfter);
-  }
-
-  public boolean putTextBeforeCursor(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                                     int count, boolean indent, boolean cursorAfter) {
     final Register register = VimPlugin.getRegister().getLastRegister();
     if (register == null)
       return false;
@@ -143,21 +130,8 @@ public class CopyGroup {
     return true;
   }
 
-  /**
-   * Pastes text from the last register into the editor after the current cursor location.
-   *
-   * @param editor  The editor to paste into
-   * @param context The data context
-   * @param count   The number of times to perform the paste
-   * @return true if able to paste, false if not
-   */
-  public boolean putTextAfterCursor(@NotNull Editor editor, @NotNull DataContext context, int count, boolean indent,
+  public boolean putTextAfterCursor(@NotNull Editor editor, @NotNull Caret caret, int count, boolean indent,
                                     boolean cursorAfter) {
-    return putTextAfterCursor(editor, editor.getCaretModel().getPrimaryCaret(), context, count, indent, cursorAfter);
-  }
-
-  public boolean putTextAfterCursor(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                                    int count, boolean indent, boolean cursorAfter) {
     final Register register = VimPlugin.getRegister().getLastRegister();
     if (register == null)
       return false;
@@ -198,8 +172,8 @@ public class CopyGroup {
     return true;
   }
 
-  public boolean putVisualRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                                @NotNull TextRange range, int count, boolean indent, boolean cursorAfter) {
+  public boolean putVisualRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull TextRange range, int count,
+                                boolean indent, boolean cursorAfter) {
     final Register register = VimPlugin.getRegister().getLastRegister();
     if (register == null) {
       return false;
@@ -245,11 +219,6 @@ public class CopyGroup {
     moveCursorToOffset(editor, caret, selectionType, startOffset, endOffset, cursorAfter);
 
     return true;
-  }
-
-  public boolean putVisualRange(@NotNull Editor editor, @NotNull DataContext context, @NotNull TextRange range,
-                                int count, boolean indent, boolean cursorAfter) {
-    return putVisualRange(editor, editor.getCaretModel().getPrimaryCaret(), context, range, count, indent, cursorAfter);
   }
 
   @NotNull
