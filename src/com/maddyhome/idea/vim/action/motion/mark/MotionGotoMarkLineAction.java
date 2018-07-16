@@ -49,12 +49,7 @@ public class MotionGotoMarkLineAction extends MotionEditorAction {
       }
 
       final char mark = argument.getCharacter();
-
-      if (Character.isUpperCase(mark) || Character.isDigit(mark)) {
-          return VimPlugin.getMotion().moveCaretToMarkLine(editor, caret, mark);
-      }
-
-      return VimPlugin.getMotion().moveCaretToFileMarkLine(editor, mark);
+      return VimPlugin.getMotion().moveCaretToMark(editor, caret, mark, true);
     }
   }
 }

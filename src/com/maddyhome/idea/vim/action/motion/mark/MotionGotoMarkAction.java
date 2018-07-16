@@ -40,20 +40,15 @@ public class MotionGotoMarkAction extends MotionEditorAction {
       super(true);
     }
 
-      @Override
-      public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                           int rawCount, @Nullable Argument argument) {
-        if (argument == null) {
-          return -1;
-        }
-
-        final char mark = argument.getCharacter();
-
-        if (Character.isUpperCase(mark) || Character.isDigit(mark)) {
-          return VimPlugin.getMotion().moveCaretToMark(editor, caret, mark);
-        }
-
-        return VimPlugin.getMotion().moveCaretToFileMark(editor, mark);
+    @Override
+    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                         int rawCount, @Nullable Argument argument) {
+      if (argument == null) {
+        return -1;
       }
+
+      final char mark = argument.getCharacter();
+      return VimPlugin.getMotion().moveCaretToMark(editor, caret, mark, false);
+    }
   }
 }
