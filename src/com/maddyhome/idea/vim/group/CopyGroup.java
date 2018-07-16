@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 /**
@@ -73,10 +74,30 @@ public class CopyGroup {
    * @return true if able to yank the lines, false if not
    */
   public boolean yankLine(@NotNull Editor editor, int count) {
-    int start = VimPlugin.getMotion().moveCaretToLineStart(editor);
-    int offset = Math.min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor, count - 1, true) + 1,
-        EditorHelper.getFileSize(editor));
-    return offset != -1 && yankRange(editor, new TextRange(start, offset), SelectionType.LINE_WISE, false);
+    final ArrayList<Integer> starts = new ArrayList<>();
+    final ArrayList<Integer> ends = new ArrayList<>();
+
+    for (Caret caret : editor.getCaretModel().getAllCarets()) {
+      final int start = VimPlugin.getMotion().moveCaretToLineStart(editor, caret);
+      final int end = Math.min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, true) + 1,
+                               EditorHelper.getFileSize(editor));
+      if (end != -1) {
+        starts.add(start);
+        ends.add(end);
+      }
+    }
+
+    final int[] ss = new int[starts.size()];
+    final int[] es = new int[ends.size()];
+    for (int i = 0; i < starts.size(); i++) {
+      ss[i] = starts.get(i);
+      es[i] = ends.get(i);
+      if (i != starts.size() - 1) {
+        --es[i];
+      }
+    }
+
+    return yankRange(editor, new TextRange(ss, es), SelectionType.LINE_WISE, false);
   }
 
   /**
@@ -213,6 +234,7 @@ public class CopyGroup {
         putTextBlockwise(editor, caret, text, count, startOffset) :
         putText(editor, caret, text, count, startOffset);
 
+    //TODO: store range for all carets?
     VimPlugin.getRegister().storeText(editor, new TextRange(startOffset, startOffset + (endOffset - startOffset) / count),
         selectionType, false);
 
