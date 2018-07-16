@@ -37,10 +37,6 @@ public class AutoIndentLinesAction extends EditorAction {
       @Override
       public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                              int rawCount, @Nullable Argument argument) {
-        return doIndent(editor, caret, context, count);
-      }
-
-      private boolean doIndent(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count) {
         VimPlugin.getChange().autoIndentLines(editor, caret, context, count);
         return true;
       }

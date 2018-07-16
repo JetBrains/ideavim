@@ -38,11 +38,10 @@ public class AutoIndentMotionAction extends EditorAction {
       @Override
       public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                              int rawCount, @Nullable Argument argument) {
-        return argument != null && doIndent(editor, caret, context, count, rawCount, argument);
-      }
+        if (argument == null) {
+          return false;
+        }
 
-      private boolean doIndent(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                               int rawCount, @NotNull Argument argument) {
         VimPlugin.getChange().autoIndentMotion(editor, caret, context, count, rawCount, argument);
         return true;
       }
