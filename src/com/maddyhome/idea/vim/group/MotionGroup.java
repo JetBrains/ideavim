@@ -505,7 +505,7 @@ public class MotionGroup {
 
       final Editor newEditor = selectEditor(editor, newFile);
       if (newEditor != null) {
-        if (spot != -1) {
+        if (spot == -1) {
           VimPlugin.getMark().addJump(editor, false);
         }
         moveCaret(newEditor, caret, EditorHelper.normalizeOffset(newEditor, newEditor.logicalPositionToOffset(lp), false));
@@ -1211,15 +1211,6 @@ public class MotionGroup {
     return EditorHelper.getLineStartOffset(editor, line);
   }
 
-  public int moveCaretToLineStartOffset(@NotNull Editor editor) {
-    int line = EditorHelper.normalizeVisualLine(editor, editor.getCaretModel().getVisualPosition().line + 1);
-    return moveCaretToLineStart(editor, EditorHelper.visualLineToLogicalLine(editor, line));
-  }
-
-  public int moveCaretToLineScreenStart(@NotNull Editor editor) {
-    return moveCaretToLineScreenStart(editor, editor.getCaretModel().getPrimaryCaret());
-  }
-
   public int moveCaretToLineScreenStart(@NotNull Editor editor, @NotNull Caret caret) {
     final int col = getLeftmostScreenColumn(editor);
     return moveCaretToColumn(editor, caret, col, false);
@@ -1232,18 +1223,10 @@ public class MotionGroup {
         leftmost - 1;
   }
 
-  public int moveCaretToLineScreenStartSkipLeading(@NotNull Editor editor) {
-    return moveCaretToLineScreenStartSkipLeading(editor, editor.getCaretModel().getCurrentCaret());
-  }
-
   public int moveCaretToLineScreenStartSkipLeading(@NotNull Editor editor, @NotNull Caret caret) {
     final int col = getLeftmostScreenColumn(editor);
     final int logicalLine = caret.getLogicalPosition().line;
     return EditorHelper.getLeadingCharacterOffset(editor, logicalLine, col);
-  }
-
-  public int moveCaretToLineScreenEnd(@NotNull Editor editor, boolean allowEnd) {
-    return moveCaretToLineScreenEnd(editor, editor.getCaretModel().getPrimaryCaret(), allowEnd);
   }
 
   public int moveCaretToLineScreenEnd(@NotNull Editor editor, @NotNull Caret caret, boolean allowEnd) {
