@@ -137,20 +137,29 @@ public class CopyGroup {
    */
   public boolean yankRange(@NotNull Editor editor, @Nullable TextRange range, @NotNull SelectionType type,
                            boolean moveCursor) {
-    // TODO: Add multiple carets support
-    if (range != null) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("yanking range: " + range);
-      }
-      boolean res = VimPlugin.getRegister().storeText(editor, range, type, false);
-      if (moveCursor) {
-        MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), range.normalize().getStartOffset());
-      }
-
-      return res;
+    if (range == null) {
+      return false;
     }
 
-    return false;
+    if (logger.isDebugEnabled()) {
+      logger.debug("yanking range: " + range);
+    }
+
+    if (range.isMultiple()) {
+      type = SelectionType.BLOCK_WISE;
+    }
+
+    final boolean res = VimPlugin.getRegister().storeText(editor, range, type, false);
+    if (moveCursor) {
+      for (int i = 0; i < range.size(); i++) {
+        final TextRange subRange = new TextRange(range.getStartOffsets()[i], range.getEndOffsets()[i]);
+        subRange.normalize();
+        MotionGroup.moveCaret(editor, editor.getCaretModel().getAllCarets().get(i), subRange.getStartOffset());
+      }
+    }
+
+    return res;
+
   }
 
   public boolean putTextBeforeCursor(@NotNull Editor editor, @NotNull Caret caret, int count, boolean indent,
