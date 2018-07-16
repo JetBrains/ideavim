@@ -1305,11 +1305,6 @@ public class MotionGroup {
         .normalizeLine(editor, (EditorHelper.getLineCount(editor) * count + 99) / 100 - 1));
   }
 
-  public int moveCaretGotoLineLast(@NotNull Editor editor, int rawCount, int line) {
-    return moveCaretToLineStartSkipLeading(editor, rawCount == 0 ? EditorHelper
-        .normalizeLine(editor, EditorHelper.getLineCount(editor) - 1) : line);
-  }
-
   public int moveCaretGotoLineLast(@NotNull Editor editor, int rawCount) {
     final int line = rawCount == 0 ?
         EditorHelper.normalizeLine(editor, EditorHelper.getLineCount(editor) - 1) :
