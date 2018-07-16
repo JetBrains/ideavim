@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
-import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
@@ -58,8 +57,7 @@ public class MotionGotoLineLastEndAction extends MotionEditorAction {
         }
       }
 
-      return VimPlugin.getMotion().moveCaretGotoLineLastEnd(editor, rawCount, EditorHelper.getLineCount(editor),
-              allow);
+      return VimPlugin.getMotion().moveCaretGotoLineLastEnd(editor, rawCount, count - 1, allow);
     }
   }
 }
