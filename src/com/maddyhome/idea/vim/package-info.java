@@ -181,7 +181,7 @@
  * |V|                    1 {@link com.maddyhome.idea.vim.action.motion.visual.VisualToggleLineModeAction}
  * |W|                    1 {@link com.maddyhome.idea.vim.action.motion.text.MotionBigWordRightAction}
  * |X|                    1 {@link com.maddyhome.idea.vim.action.change.delete.DeleteCharacterLeftAction}
- * |Y|                    P {@link com.maddyhome.idea.vim.action.copy.YankLineAction}
+ * |Y|                    1 {@link com.maddyhome.idea.vim.action.copy.YankLineAction}
  * |ZZ|                   P {@link com.maddyhome.idea.vim.action.file.FileSaveCloseAction}
  * |ZQ|                   P {@link com.maddyhome.idea.vim.action.file.FileSaveCloseAction}
  * |[|                      see bracket commands
@@ -222,7 +222,7 @@
  * |w|                    1 {@link com.maddyhome.idea.vim.action.motion.text.MotionWordRightAction}
  * |x|                    1 {@link com.maddyhome.idea.vim.action.change.delete.DeleteCharacterRightAction}
  * |y|                    P {@link com.maddyhome.idea.vim.action.copy.YankMotionAction}
- * |yy|                   P {@link com.maddyhome.idea.vim.action.copy.YankLineAction}
+ * |yy|                   1 {@link com.maddyhome.idea.vim.action.copy.YankLineAction}
  * |z|                      see commands starting with 'z'
  * |{|                    1 {@link com.maddyhome.idea.vim.action.motion.text.MotionParagraphPreviousAction}
  * |bar|                  1 {@link com.maddyhome.idea.vim.action.motion.leftright.MotionColumnAction}
