@@ -221,7 +221,7 @@
  * |v|                    1 {@link com.maddyhome.idea.vim.action.motion.visual.VisualToggleCharacterModeAction}
  * |w|                    1 {@link com.maddyhome.idea.vim.action.motion.text.MotionWordRightAction}
  * |x|                    1 {@link com.maddyhome.idea.vim.action.change.delete.DeleteCharacterRightAction}
- * |y|                    P {@link com.maddyhome.idea.vim.action.copy.YankMotionAction}
+ * |y|                    1 {@link com.maddyhome.idea.vim.action.copy.YankMotionAction}
  * |yy|                   1 {@link com.maddyhome.idea.vim.action.copy.YankLineAction}
  * |z|                      see commands starting with 'z'
  * |{|                    1 {@link com.maddyhome.idea.vim.action.motion.text.MotionParagraphPreviousAction}
