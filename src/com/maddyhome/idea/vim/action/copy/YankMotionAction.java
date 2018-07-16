@@ -37,8 +37,11 @@ public class YankMotionAction extends EditorAction {
   private static class Handler extends EditorActionHandlerBase {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       final Argument argument = cmd.getArgument();
-      return argument != null && VimPlugin.getCopy().yankMotion(editor, context, cmd.getCount(), cmd.getRawCount(),
-                                                                argument);
+      if (argument == null) {
+        return false;
+      }
+
+      return VimPlugin.getCopy().yankMotion(editor, context, cmd.getCount(), cmd.getRawCount(), argument);
     }
   }
 }

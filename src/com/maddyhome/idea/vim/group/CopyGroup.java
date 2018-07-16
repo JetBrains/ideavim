@@ -60,10 +60,37 @@ public class CopyGroup {
    */
   public boolean yankMotion(@NotNull Editor editor, DataContext context, int count, int rawCount,
                             @NotNull Argument argument) {
-    TextRange range = MotionGroup
-        .getMotionRange(editor, editor.getCaretModel().getPrimaryCaret(), context, count, rawCount, argument, true);
     final Command motion = argument.getMotion();
-    return motion != null && yankRange(editor, range, SelectionType.fromCommandFlags(motion.getFlags()), true);
+    if (motion == null) {
+      return false;
+    }
+
+    final ArrayList<Integer> starts = new ArrayList<>();
+    final ArrayList<Integer> ends = new ArrayList<>();
+    for (Caret caret : editor.getCaretModel().getAllCarets()) {
+      final TextRange range = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument, true);
+      if (range == null) {
+        continue;
+      }
+      starts.add(range.getStartOffset());
+      ends.add(range.getEndOffset());
+    }
+
+    final int[] ss = new int[starts.size()];
+    final int[] es = new int[ends.size()];
+    for (int i = 0; i < starts.size(); i++) {
+      ss[i] = starts.get(i);
+      es[i] = ends.get(i);
+    }
+
+    final SelectionType type = SelectionType.fromCommandFlags(motion.getFlags());
+    if (type == SelectionType.LINE_WISE) {
+      for (int i = 0; i < es.length - 1; i++) {
+        --es[i];
+      }
+      return yankRange(editor, new TextRange(ss, es), type, true);
+    }
+    return yankRange(editor, new TextRange(ss, es), SelectionType.BLOCK_WISE, true);
   }
 
   /**
