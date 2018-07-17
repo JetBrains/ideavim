@@ -31,14 +31,16 @@ import org.jetbrains.annotations.Nullable;
  */
 public class InsertAtPreviousInsertAction extends EditorAction {
   public InsertAtPreviousInsertAction() {
-    super(new Handler());
-  }
-
-  private static class Handler extends ChangeEditorActionHandler {
-    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
-      VimPlugin.getChange().insertAtPreviousInsert(editor);
-
-      return true;
-    }
+    super(new ChangeEditorActionHandler() {
+      @Override
+      public boolean execute(@NotNull Editor editor,
+                             @NotNull DataContext context,
+                             int count,
+                             int rawCount,
+                             @Nullable Argument argument) {
+        VimPlugin.getChange().insertAtPreviousInsert(editor, context);
+        return true;
+      }
+    });
   }
 }

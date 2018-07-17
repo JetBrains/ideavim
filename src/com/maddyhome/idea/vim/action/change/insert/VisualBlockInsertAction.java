@@ -19,14 +19,13 @@
 package com.maddyhome.idea.vim.action.change.insert;
 
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,19 +38,20 @@ import java.util.Set;
  */
 public class VisualBlockInsertAction extends VimCommandAction {
   public VisualBlockInsertAction() {
-    super(new Handler());
-  }
-
-  private static class Handler extends VisualOperatorActionHandler {
-    Handler() {
-      super(true, CaretOrder.DECREASING_OFFSET);
-    }
-
-    @Override
-    protected boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                              @NotNull Command cmd, @NotNull TextRange range) {
-      return !editor.isOneLineMode() && VimPlugin.getChange().blockInsert(editor, caret, context, range, false);
-    }
+    super(new VisualOperatorActionHandler() {
+      @Override
+      protected boolean execute(@NotNull Editor editor,
+                                @NotNull DataContext context,
+                                @NotNull Command cmd,
+                                @NotNull TextRange range) {
+        if (editor.isOneLineMode()) return false;
+        if (CommandState.getInstance(editor).getSubMode() != CommandState.SubMode.VISUAL_BLOCK) {
+          VimPlugin.getChange().insertBeforeCursor(editor, context);
+          return false;
+        }
+        return VimPlugin.getChange().blockInsert(editor, context, range, false);
+      }
+    });
   }
 
   @NotNull

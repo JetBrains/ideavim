@@ -38,7 +38,7 @@ public class InsertBeforeCursorAction extends VimCommandAction {
     super(new ChangeEditorActionHandler() {
       public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
                              @Nullable Argument argument) {
-        VimPlugin.getChange().insertBeforeCursor(editor);
+        VimPlugin.getChange().insertBeforeCursor(editor, context);
         return true;
       }
     });

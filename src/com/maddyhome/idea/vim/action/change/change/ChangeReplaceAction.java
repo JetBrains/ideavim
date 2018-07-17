@@ -19,12 +19,10 @@
 package com.maddyhome.idea.vim.action.change.change;
 
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,18 +31,16 @@ import org.jetbrains.annotations.Nullable;
  */
 public class ChangeReplaceAction extends EditorAction {
   public ChangeReplaceAction() {
-    super(new Handler());
-  }
-
-  private static class Handler extends ChangeEditorActionHandler {
-    Handler() {
-      super(true, CaretOrder.DECREASING_OFFSET);
-    }
-
-    @Override
-    public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                           int rawCount, @Nullable Argument argument) {
-      return VimPlugin.getChange().changeReplace(editor, caret, context);
-    }
+    super(new ChangeEditorActionHandler() {
+      @Override
+      public boolean execute(@NotNull Editor editor,
+                             @NotNull DataContext context,
+                             int count,
+                             int rawCount,
+                             @Nullable Argument argument) {
+        VimPlugin.getChange().changeReplace(editor, context);
+        return true;
+      }
+    });
   }
 }

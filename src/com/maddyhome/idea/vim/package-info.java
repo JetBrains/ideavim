@@ -25,8 +25,8 @@
  * tag                    M action
  * ---------------------------------------------------------------------------------------------------------------------
  * <p>
- * |i_CTRL-@|             1 {@link com.maddyhome.idea.vim.action.change.insert.InsertPreviousInsertExitAction}
- * |i_CTRL-A|             1 {@link com.maddyhome.idea.vim.action.change.insert.InsertPreviousInsertAction}
+ * |i_CTRL-@|             p {@link com.maddyhome.idea.vim.action.change.insert.InsertPreviousInsertExitAction}
+ * |i_CTRL-A|             p {@link com.maddyhome.idea.vim.action.change.insert.InsertPreviousInsertAction}
  * |i_CTRL-C|             1 {@link com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction}
  * |i_CTRL-D|             1 {@link com.maddyhome.idea.vim.action.change.shift.ShiftLeftLinesAction}
  * |i_CTRL-E|             1 {@link com.maddyhome.idea.vim.action.change.insert.InsertCharacterBelowCursorAction}

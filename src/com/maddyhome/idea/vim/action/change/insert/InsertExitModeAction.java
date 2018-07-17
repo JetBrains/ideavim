@@ -20,14 +20,15 @@ package com.maddyhome.idea.vim.action.change.insert;
 
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
+import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.List;
@@ -37,12 +38,14 @@ public class InsertExitModeAction extends VimCommandAction {
   private static final String ACTION_ID = "VimInsertExitMode";
 
   public InsertExitModeAction() {
-
-    super(new EditorActionHandlerBase(true) {
+    super(new ChangeEditorActionHandler() {
       @Override
-      protected boolean execute(@NotNull Editor editor, Caret caret, @NotNull DataContext context,
-                                @NotNull Command cmd) {
-        VimPlugin.getChange().processEscape(editor, caret, context);
+      public boolean execute(@NotNull Editor editor,
+                             @NotNull DataContext context,
+                             int count,
+                             int rawCount,
+                             @Nullable Argument argument) {
+        VimPlugin.getChange().processEscape(editor, context);
         return true;
       }
     });
