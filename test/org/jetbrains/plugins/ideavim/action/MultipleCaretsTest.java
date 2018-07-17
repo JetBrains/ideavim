@@ -991,7 +991,7 @@ public class MultipleCaretsTest extends VimTestCase {
                           "<caret>a\n");
   }
 
-  public void testOneCaretPostionAfterChangeLineAction() {
+  public void testOneCaretPositionAfterChangeLineAction() {
     typeTextInFile(parseKeys("c2c", "<ESC>"),
                    "abcde\n" +
                    "ab<caret>cde\n" +
@@ -1041,6 +1041,13 @@ public class MultipleCaretsTest extends VimTestCase {
   public void testChangeReplaceAction() {
     typeTextInFile(parseKeys("Rz", "<ESC>"), "on<caret>e <caret>t<caret>w<caret>o th<caret>r<caret>ee");
     myFixture.checkResult("on<caret>z <caret>z<caret>z<caret>z th<caret>z<caret>ze");
+  }
+
+  public void testChangeReplaceActionWithSeveralCharacters() {
+    final String before = "<caret>qwe\n" + "asd <caret>zxc\n" + "qwe<caret>asdzxc";
+    typeTextInFile(parseKeys("Rrty", "<Esc>"), before);
+    final String after = "rt<caret>y\n" + "asd rt<caret>y\n" + "qwert<caret>yzxc";
+    myFixture.checkResult(after);
   }
 
   public void testChangeVisualAction() {
@@ -1329,8 +1336,8 @@ public class MultipleCaretsTest extends VimTestCase {
 
   public void testInsertAfterCursorAction() {
     typeTextInFile(parseKeys("a", "abcd", "<ESC>"),
-                   "on<caret>e two th<caret>ree");
-    myFixture.checkResult("oneabc<caret>d two thrabc<caret>dee");
+                   "on<caret>e two th<caret>re<caret>e");
+    myFixture.checkResult("oneabc<caret>d two thrabc<caret>deeabc<caret>d");
   }
 
   public void testInsertAfterLineEndAction() {
@@ -1403,11 +1410,11 @@ public class MultipleCaretsTest extends VimTestCase {
   }
 
   public void testInsertLineStartAction() {
-    typeTextInFile(parseKeys("I", "four ", "<ESC>"),
+    typeTextInFile(parseKeys("gI", "four ", "<ESC>"),
                    "  three t<caret>wo on<caret>e\n" +
                    "<caret> five six se<caret>ven eight\n");
-    myFixture.checkResult("  four<caret> three two one\n" +
-                          " four<caret> five six seven eight\n");
+    myFixture.checkResult("four<caret>   three two one\n" +
+                          "four<caret>  five six seven eight\n");
   }
 
   public void testInsertNewLineAboveAction() {
@@ -1542,27 +1549,6 @@ public class MultipleCaretsTest extends VimTestCase {
                           "    abcde\n");
   }
 
-  public void testInsertPreviousInsertAction() {
-      typeTextInFile(parseKeys("i", "kek", "<ESC>", "a", "<C-A>"),
-              "foo\n" +
-                      "<caret>bar\n" +
-                      "<caret>baz");
-      myFixture.checkResult("foo\n" +
-              "kekkek<caret>bar\n" +
-              "kekkek<caret>baz");
-      assertMode(CommandState.Mode.INSERT);
-  }
-
-  public void testInsertPreviousInsertExitAction() {
-      typeTextInFile(parseKeys("i", "qwe", "<ESC>", "a", "<C-2>"),
-              "foo\n" +
-                      "<caret>bar\n" +
-                      "<caret>baz");
-      myFixture.checkResult("foo\n" +
-              "qweqw<caret>ebar\n" +
-              "qweqw<caret>ebaz");
-  }
-
   public void testMotionGoToLineFirst() {
       typeTextInFile(parseKeys("i", "<C-Home>"),
                       "    sdf" +
@@ -1635,43 +1621,49 @@ public class MultipleCaretsTest extends VimTestCase {
                     "dflgjdfsgkdflgjdfsklg\n\n");
   }
 
-  public void testPutAfterCursorAction() {
-    typeTextInFile(parseKeys("ye", "j", "2p"),
-            "<caret>qwe asd\n" +
-                    "zxc <caret>asd\n" +
-                    "asd qwe\n");
-    myFixture.checkResult("qwe asd\n" +
-            "zasdas<caret>dxc asd\n" +
-            "asd qasdas<caret>dwe\n");
+  public void testInsertAtPreviousInsert() {
+    final String before = "qw<caret>e\n" + "  a<caret>s<caret>d\n" + "zx<caret>c";
+    final String after = "rtyqwe\n" + "  rtyasd\n" + "rtyfghzxc";
+    doTest(parseKeys("I", "rty", "<Esc>", "2lj", "gi", "fgh"), before, after);
   }
 
-  public void testPutAfterCursorMoveCursorAction() {
-    typeTextInFile(parseKeys("ye", "j", "2gp"),
-            "<caret>qwe asd\n" +
-                    "zxc <caret>asd\n" +
-                    "asd qwe\n");
-    myFixture.checkResult("qwe asd\n" +
-            "zasdasd<caret>xc asd\n" +
-            "asd qasdasd<caret>we\n");
+  public void testVisualBlockAppend() {
+    final String before = "<caret>int a;\n" + "int b;\n" + "int c;";
+    typeTextInFile(parseKeys("<C-V>", "2j", "e", "A", " const", "<Esc>"), before);
+    final String after = "int const a;\n" + "int const b;\n" + "int const c;";
+    myFixture.checkResult(after);
   }
 
-  public void testPutBeforeCursorAction() {
-    typeTextInFile(parseKeys("ye", "j", "2P"),
-            "<caret>qwe asd\n" +
-                    "zxc <caret>asd\n" +
-                    "asd qwe\n");
-    myFixture.checkResult("qwe asd\n" +
-            "asdas<caret>dzxc asd\n" +
-            "asd asdas<caret>dqwe\n");
+  public void testVisualBlockInsert() {
+    final String before = "<caret>int a;\n" + "int b;\n" + "int c;";
+    typeTextInFile(parseKeys("<C-V>", "2j", "I", "const ", "<Esc>"), before);
+    final String after = "const int a;\n" + "const int b;\n" + "const int c;";
+    myFixture.checkResult(after);
   }
 
-  public void testPutBeforeCursorMoveCursorAction() {
-    typeTextInFile(parseKeys("ye", "j", "2gP"),
-            "<caret>qwe asd\n" +
-                    "zxc <caret>asd\n" +
-                    "asd qwe\n");
-    myFixture.checkResult("qwe asd\n" +
-            "asdasd<caret>zxc asd\n" +
-            "asd asdasd<caret>qwe\n");
+  public void testAutoIndentRange() {
+    final String before = "cl<caret>ass C {\n C(int i) {\nmy<caret>I = i;\n}\n private int myI;\n}";
+    configureByJavaText(before);
+    typeText(parseKeys("v2j="));
+    final String after =
+      "<caret>class C {\n" + "    C(int i) {\n" + "        myI = i;\n" + "    }\n" + "    private int myI;\n" + "}";
+    myFixture.checkResult(after);
+  }
+
+  public void testAutoIndentMotion() {
+    final String before = "cl<caret>ass C {\n C(int i) {\nmy<caret>I = i;\n}\n private int myI;\n}";
+    configureByJavaText(before);
+    typeText(parseKeys("=3j"));
+    final String after =
+      "<caret>class C {\n" + "    C(int i) {\n" + "        <caret>myI = i;\n" + "    }\n" + "    private int myI;\n" + "}";
+    myFixture.checkResult(after);
+  }
+
+  public void testAutoIndentLines() {
+    final String before = "class C {\n C<caret>(int i) {\nmyI = i;\n}\n p<caret>rivate int myI;\n}";
+    configureByJavaText(before);
+    typeText(parseKeys("=="));
+    final String after = "class C {\n    C(int i) {\nmyI = i;\n}\n    private int myI;\n}";
+    myFixture.checkResult(after);
   }
 }
