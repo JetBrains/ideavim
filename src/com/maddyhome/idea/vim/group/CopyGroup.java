@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -105,12 +106,15 @@ public class CopyGroup {
   /**
    * Pastes text from the last register into the editor before the current cursor location.
    *
-   * @param editor      The editor to paste into
-   * @param context     The data context
-   * @param count       The number of times to perform the paste
+   * @param editor  The editor to paste into
+   * @param context The data context
+   * @param count   The number of times to perform the paste
    * @return true if able to paste, false if not
    */
-  public boolean putTextBeforeCursor(@NotNull Editor editor, @NotNull DataContext context, int count, boolean indent,
+  public boolean putTextBeforeCursor(@NotNull Editor editor,
+                                     @NotNull DataContext context,
+                                     int count,
+                                     boolean indent,
                                      boolean cursorAfter) {
     final Register register = VimPlugin.getRegister().getLastRegister();
     if (register == null) return false;
@@ -119,8 +123,7 @@ public class CopyGroup {
     final String text = register.getText();
 
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
-      final int startOffset =
-        type == SelectionType.LINE_WISE ? VimPlugin.getMotion().moveCaretToLineStart(editor, caret) : caret.getOffset();
+      final int startOffset = getStartOffset(editor, caret, type, true);
 
       if (text == null) {
         VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, startOffset);
@@ -144,43 +147,53 @@ public class CopyGroup {
    */
   public boolean putTextAfterCursor(@NotNull Editor editor, @NotNull DataContext context, int count, boolean indent,
                                     boolean cursorAfter) {
-    // TODO: add multiple carets support
-    Register reg = VimPlugin.getRegister().getLastRegister();
-    if (reg != null) {
-      if (reg.getType() == SelectionType.LINE_WISE && editor.isOneLineMode()) {
-        return false;
+    final Register register = VimPlugin.getRegister().getLastRegister();
+    if (register == null) return false;
+    final SelectionType type = register.getType();
+    if (type == SelectionType.LINE_WISE && editor.isOneLineMode()) return false;
+
+    final String text = register.getText();
+    for (Caret caret : EditorHelper.getOrderedCaretsList(editor, CaretOrder.DECREASING_OFFSET)) {
+      final int startOffset = getStartOffset(editor, caret, type, false);
+
+      if (text == null) {
+        VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, startOffset);
+        VimPlugin.getMark().setChangeMarks(editor, new TextRange(startOffset, startOffset));
+        continue;
       }
 
-      int pos;
-      // If a linewise paste, the text is inserted after the current line.
-      if (reg.getType() == SelectionType.LINE_WISE) {
-        pos = Math.min(editor.getDocument().getTextLength(),
-                       VimPlugin.getMotion().moveCaretToLineEnd(editor, editor.getCaretModel().getPrimaryCaret()) + 1);
-        if (pos > 0 && pos == editor.getDocument().getTextLength() &&
-            editor.getDocument().getCharsSequence().charAt(pos - 1) != '\n') {
-          editor.getDocument().insertString(pos, "\n");
-          pos++;
-        }
-      }
-      else {
-        pos = editor.getCaretModel().getOffset();
-        if (!EditorHelper.isLineEmpty(editor, editor.getCaretModel().getLogicalPosition().line, false)) {
-          pos++;
-        }
-      }
-      // In case when text is empty this can occur
-      if (pos > 0 && pos > editor.getDocument().getTextLength()) {
-        pos--;
-      }
-      putText(editor, editor.getCaretModel().getPrimaryCaret(), context, StringUtil.notNullize(reg.getText()),
-              reg.getType(), CommandState.SubMode.NONE, pos, count, indent, cursorAfter);
-
-      return true;
+      putText(editor, caret, context, text, type, CommandState.SubMode.NONE, startOffset, count, indent, cursorAfter);
     }
-
-    return false;
+    return true;
   }
 
+  private int getStartOffset(@NotNull Editor editor, @NotNull Caret caret, SelectionType type, boolean beforeCursor) {
+    if (beforeCursor) {
+      return type == SelectionType.LINE_WISE ? VimPlugin.getMotion().moveCaretToLineStart(editor, caret) : caret.getOffset();
+    }
+
+    int startOffset;
+    if (type == SelectionType.LINE_WISE) {
+      startOffset =
+        Math.min(editor.getDocument().getTextLength(), VimPlugin.getMotion().moveCaretToLineEnd(editor, caret) + 1);
+      if (startOffset > 0 &&
+          startOffset == editor.getDocument().getTextLength() &&
+          editor.getDocument().getCharsSequence().charAt(startOffset - 1) != '\n') {
+        editor.getDocument().insertString(startOffset, "\n");
+        startOffset++;
+      }
+    }
+    else {
+      startOffset = caret.getOffset();
+      if (!EditorHelper.isLineEmpty(editor, caret.getLogicalPosition().line, false)) {
+        startOffset++;
+      }
+    }
+    if (startOffset > 0 && startOffset > editor.getDocument().getTextLength()) {
+      startOffset--;
+    }
+    return startOffset;
+  }
 
   public boolean putVisualRange(@NotNull Editor editor, @NotNull DataContext context, @NotNull TextRange range, int count, boolean indent,
                                 boolean cursorAfter) {
@@ -434,9 +447,7 @@ public class CopyGroup {
     final int endLineOffset = editor.getDocument().getLineEndOffset(endLine);
 
     VimPlugin.getChange().autoIndentRange(editor, caret, context, new TextRange(startLineOffset, endLineOffset));
-    endOffset = EditorHelper.getLineEndOffset(editor, endLine, true);
-
-    return endOffset;
+    return EditorHelper.getLineEndOffset(editor, endLine, true);
   }
 
   private static final Logger logger = Logger.getInstance(CopyGroup.class.getName());
