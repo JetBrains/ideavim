@@ -288,6 +288,7 @@ public class ChangeGroup {
     insertText(editor, caret, "\n" + padding(col));
   }
 
+  @NotNull
   private String padding(int to) {
     StringBuilder sb = new StringBuilder(to);
     for (int i = 0; i < to; i++) {
@@ -339,6 +340,7 @@ public class ChangeGroup {
     }
   }
 
+  @NotNull
   private String getInsertedText() {
     final StringBuilder multiCaret = new StringBuilder();
     final StringBuilder singleCaret = new StringBuilder();
@@ -525,52 +527,6 @@ public class ChangeGroup {
     }
   }
 
-  private void initInsert(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                          @NotNull CommandState.Mode mode) {
-    final CommandState state = CommandState.getInstance(editor);
-
-    CaretData.setInsertStart(caret, caret.getOffset());
-    VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_START, caret.getOffset());
-
-    final Command cmd = state.getCommand();
-    if (cmd != null && state.getMode() == CommandState.Mode.REPEAT) {
-      if (mode == CommandState.Mode.REPLACE) {
-        processInsert(editor, context);
-      }
-      if ((cmd.getFlags() & Command.FLAG_NO_REPEAT) != 0) {
-        repeatInsert(editor, caret, 1, false);
-      }
-      else {
-        repeatInsert(editor, caret, cmd.getCount(), false);
-      }
-      if (mode == CommandState.Mode.REPLACE) {
-        processInsert(editor, context);
-      }
-    }
-    else {
-      if (caret == editor.getCaretModel().getPrimaryCaret()) {
-        lastInsert = cmd;
-        strokes.clear();
-        repeatCharsCount = 0;
-        final EventFacade eventFacade = EventFacade.getInstance();
-        if (document != null && documentListener != null) {
-          eventFacade.removeDocumentListener(document, documentListener);
-        }
-        document = editor.getDocument();
-        documentListener = new InsertActionsDocumentListener();
-        eventFacade.addDocumentListener(document, documentListener);
-        oldOffset = -1;
-        inInsert = true;
-        if (mode == CommandState.Mode.REPLACE) {
-          processInsert(editor, context);
-        }
-        state.pushState(mode, CommandState.SubMode.NONE, MappingMode.INSERT);
-
-        resetCursor(editor, true);
-      }
-    }
-  }
-
   /**
    * Performs a mode switch after change action
    *
@@ -628,7 +584,7 @@ public class ChangeGroup {
     }
 
     @NotNull
-    private List<AnAction> getAdjustCaretActions(DocumentEvent e) {
+    private List<AnAction> getAdjustCaretActions(@NotNull DocumentEvent e) {
       final int delta = e.getOffset() - oldOffset;
       if (oldOffset >= 0 && delta != 0) {
         final List<AnAction> positionCaretActions = new ArrayList<AnAction>();
@@ -691,52 +647,6 @@ public class ChangeGroup {
     repeatLines = 0;
     repeatColumn = 0;
     repeatAppend = false;
-  }
-
-  private void repeatInsert(@NotNull Editor editor, @NotNull Caret caret, int count, boolean started) {
-    if (repeatLines > 0) {
-      final int vline = caret.getVisualPosition().line;
-      final int lline = caret.getLogicalPosition().line;
-      final int pos = editor.logicalPositionToOffset(new LogicalPosition(lline, repeatColumn));
-
-      for (int i = 0; i < repeatLines; i++) {
-        if (repeatAppend && repeatColumn < MotionGroup.LAST_COLUMN &&
-            EditorHelper.getVisualLineLength(editor, vline + i) < repeatColumn) {
-          final String pad = EditorHelper.pad(editor, lline + i, repeatColumn);
-          if (pad.length() > 0) {
-            insertText(editor, caret, pad);
-          }
-        }
-        if (repeatColumn >= MotionGroup.LAST_COLUMN) {
-          caret.moveToOffset(VimPlugin.getMotion().moveCaretToLineEnd(editor, lline + i, true));
-          repeatInsertedText(editor, caret, started ? (i == 0 ? count : count + 1) : count);
-        }
-        else if (EditorHelper.getVisualLineLength(editor, vline + i) >= repeatColumn) {
-          caret.moveToVisualPosition(new VisualPosition(vline + i, repeatColumn));
-          repeatInsertedText(editor, caret, started ? (i == 0 ? count : count + 1) : count);
-        }
-      }
-
-      MotionGroup.moveCaret(editor, caret, pos);
-    }
-    else {
-      repeatInsertedText(editor, caret, count);
-      final int pos = VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -1, false);
-      MotionGroup.moveCaret(editor, caret, pos);
-    }
-
-    if (caret == editor.getCaretModel().getPrimaryCaret()) {
-      repeatLines = 0;
-      repeatColumn = 0;
-      repeatAppend = false;
-    }
-  }
-
-  private void repeatInsertedText(@NotNull Editor editor, @NotNull Caret caret, int count) {
-    final String toInsert = getInsertedText();
-    for (int i = 0; i < count; i++) {
-      insertText(editor, caret, toInsert);
-    }
   }
 
   /**

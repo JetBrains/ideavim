@@ -23,7 +23,6 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
@@ -45,10 +44,6 @@ public class VisualBlockInsertAction extends VimCommandAction {
                                 @NotNull Command cmd,
                                 @NotNull TextRange range) {
         if (editor.isOneLineMode()) return false;
-        if (CommandState.getInstance(editor).getSubMode() != CommandState.SubMode.VISUAL_BLOCK) {
-          VimPlugin.getChange().insertBeforeCursor(editor, context);
-          return false;
-        }
         return VimPlugin.getChange().blockInsert(editor, context, range, false);
       }
     });
