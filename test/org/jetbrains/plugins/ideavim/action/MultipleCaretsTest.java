@@ -1666,4 +1666,124 @@ public class MultipleCaretsTest extends VimTestCase {
     final String after = "class C {\n    C(int i) {\nmyI = i;\n}\n    private int myI;\n}";
     myFixture.checkResult(after);
   }
+
+  public void testPutTextBeforeCursor() {
+    final String before = "<caret>qwe asd <caret>zxc rty <caret>fgh vbn";
+    typeTextInFile(parseKeys("ye", "P", "3l", "P"), before);
+    final String after = "fghqwfg<caret>he asd fghzxfg<caret>hc rty fghfgfg<caret>hh vbn";
+    myFixture.checkResult(after);
+  }
+
+  public void testPutTextAfterCursor() {
+    final String before = "<caret>qwe asd <caret>zxc rty <caret>fgh vbn";
+    typeTextInFile(parseKeys("ye", "p", "3l", "2p"), before);
+    final String after = "qfghwe fghfg<caret>hasd zfghxc fghfg<caret>hrty ffghgh fghfg<caret>hvbn";
+    myFixture.checkResult(after);
+  }
+
+  public void testPutTextBeforeCursorLinewise() {
+    final String before = "q<caret>werty\n" + "as<caret>dfgh\n" + "<caret>zxcvbn\n";
+    typeTextInFile(parseKeys("yy", "P"), before);
+    final String after = "<caret>zxcvbn\n" + "qwerty\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n";
+    myFixture.checkResult(after);
+  }
+
+  public void testPutTextAfterCursorLinewise() {
+    final String before = "q<caret>werty\n" + "as<caret>dfgh\n" + "<caret>zxcvbn\n";
+    typeTextInFile(parseKeys("yy", "p"), before);
+    final String after = "qwerty\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n" + "<caret>zxcvbn\n";
+    myFixture.checkResult(after);
+  }
+
+  public void testPutTextBeforeCursorMoveCursor() {
+    final String before = "qw<caret>e asd z<caret>xc rty <caret>fgh vbn";
+    typeTextInFile(parseKeys("ye", "l", "gP", "b", "gP"), before);
+    final String after = "fgh<caret>qwefgh asd fgh<caret>zxfghc rty fgh<caret>ffghgh vbn";
+    myFixture.checkResult(after);
+  }
+
+  public void testPutTextAfterCursorMoveCursor() {
+    final String before = "qw<caret>e asd z<caret>xc rty <caret>fgh vbn";
+    typeTextInFile(parseKeys("ye", "l", "gp", "b", "gp"), before);
+    final String after = "qwe ffgh<caret>ghasd zfgh<caret>xcfgh rty ffgh<caret>gfghh vbn";
+    myFixture.checkResult(after);
+  }
+
+  public void testPutTextBeforeCursorMoveCursorLinewise() {
+    final String before = "qwert<caret>y\n" + "<caret>asdfgh\n" + "zxc<caret>vbn\n";
+    typeTextInFile(parseKeys("yy", "gP"), before);
+    final String after = "zxcvbn\n" + "<caret>qwerty\n" + "zxcvbn\n" + "<caret>asdfgh\n" + "zxcvbn\n" + "<caret>zxcvbn\n";
+    myFixture.checkResult(after);
+  }
+
+  public void testPutTextAfterCursorMoveCursorLinewise() {
+    final String before = "qwert<caret>y\n" + "<caret>asdfgh\n" + "zxc<caret>vbn\n";
+    typeTextInFile(parseKeys("yy", "gp"), before);
+    final String after = "qwerty\n" + "zxcvbn\n" + "<caret>asdfgh\n" + "zxcvbn\n" + "<caret>zxcvbn\n" + "zxcvbn\n<caret>";
+    myFixture.checkResult(after);
+  }
+
+  public void testPutTextBeforeCursorWithIndention() {
+    final String before = "class C {\n" +
+                          "    C(int i) {\n" +
+                          "        myI = i;\n" +
+                          "    }\n" +
+                          "    <caret>private int myI = 0;\n" +
+                          "    {\n" +
+                          "        <caret>private int myJ = 0;\n" +
+                          "    }\n" +
+                          "    <caret>private int myK = 0;\n" +
+                          "}";
+
+    configureByJavaText(before);
+    typeText(parseKeys("yy", "P"));
+
+    final String after = "class C {\n" +
+                         "    C(int i) {\n" +
+                         "        myI = i;\n" +
+                         "    }\n" +
+                         "    <caret>private int myK = 0;\n" +
+                         "    private int myI = 0;\n" +
+                         "    {\n" +
+                         "        <caret>private int myK = 0;\n" +
+                         "        private int myJ = 0;\n" +
+                         "    }\n" +
+                         "    <caret>private int myK = 0;\n" +
+                         "    private int myK = 0;\n" +
+                         "}";
+
+    myFixture.checkResult(after);
+  }
+
+  public void testPutTextAfterCursorWithIndention() {
+    final String before = "class C {\n" +
+                          "    C(int i) {\n" +
+                          "        myI = i;\n" +
+                          "    }\n" +
+                          "    <caret>private int myI = 0;\n" +
+                          "    {\n" +
+                          "        <caret>private int myJ = 0;\n" +
+                          "    }\n" +
+                          "    <caret>private int myK = 0;\n" +
+                          "}";
+
+    configureByJavaText(before);
+    typeText(parseKeys("yy", "p"));
+
+    final String after = "class C {\n" +
+                         "    C(int i) {\n" +
+                         "        myI = i;\n" +
+                         "    }\n" +
+                         "    private int myI = 0;\n" +
+                         "    <caret>private int myK = 0;\n" +
+                         "    {\n" +
+                         "        private int myJ = 0;\n" +
+                         "        <caret>private int myK = 0;\n" +
+                         "    }\n" +
+                         "    private int myK = 0;\n" +
+                         "    <caret>private int myK = 0;\n" +
+                         "}";
+
+    myFixture.checkResult(after);
+  }
 }
