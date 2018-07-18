@@ -39,6 +39,7 @@ public class MoveTextHandler extends CommandHandler {
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
+    //TODO: add multiple carets support
     TextRange range = cmd.getTextRange(editor, context, false);
     LineRange lr = cmd.getLineRange(editor, context);
     int adj = lr.getEndLine() - lr.getStartLine() + 1;
@@ -58,8 +59,9 @@ public class MoveTextHandler extends CommandHandler {
     editor.getDocument().deleteString(range.getStartOffset(), range.getEndOffset());
 
     int offset = VimPlugin.getMotion().moveCaretToLineStart(editor, line + 1);
-    VimPlugin.getCopy().putText(editor, context, offset, text, SelectionType.LINE_WISE, 1, true,
-                                                  false, CommandState.SubMode.NONE);
+    VimPlugin.getCopy()
+      .putText(editor, editor.getCaretModel().getPrimaryCaret(), context, text, SelectionType.LINE_WISE,
+               CommandState.SubMode.NONE, offset, 1, true, false);
 
     return true;
   }
