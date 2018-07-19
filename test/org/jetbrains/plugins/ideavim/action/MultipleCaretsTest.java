@@ -1834,7 +1834,7 @@ public class MultipleCaretsTest extends VimTestCase {
   }
 
   public void testYankMotion() {
-    final String before = "qwe <caret>asd <caret>zxc";
+    final String before = "qwe <caret>asd <caret>zxc\nqwe";
     configureByText(before);
     typeText(parseKeys("ye"));
 
@@ -1842,27 +1842,39 @@ public class MultipleCaretsTest extends VimTestCase {
     assertNotNull(lastRegister);
     final String text = lastRegister.getText();
     assertNotNull(text);
-    final String copied = "asd\n" + "zxc";
-    assert text.equals(copied);
 
-    //commented because yankRange doesn't handle carets indent proper yet
-    /*typeText(parseKeys("P"));
-    final String after = "qwe asdasd asdzxc\n" +
-                         "    zxc    zxc";
-    myFixture.checkResult(after);*/
+    typeText(parseKeys("P"));
+    final String after = "qwe <caret>asdasd <caret>asdzxc\n" +
+                         "qwe zxc    zxc";
+    myFixture.checkResult(after);
   }
 
   public void testYankMotionLineWise() {
-    final String before = "<caret>qwe\n" + "rty\n" + "asd\n" + "<caret>fgh\n" + "zxc\n" + "vbn";
+    final String before = "<caret>qwe\n" + "rty\n" + "asd\n" + "<caret>fgh\n" + "zxc\n" + "vbn\n";
     configureByText(before);
-    typeText(parseKeys("y3j"));
+    typeText(parseKeys("yj"));
 
     final Register lastRegister = VimPlugin.getRegister().getLastRegister();
     assertNotNull(lastRegister);
     final String text = lastRegister.getText();
     assertNotNull(text);
-    final String copied = "qwe\n" + "rty\n" + "asd\n" + "fgh\n" + "fgh\n" + "zxc\n" + "vbn\n";
-    assert text.equals(copied);
+
+    typeText(parseKeys("P"));
+    final String after = "qwe\n" +
+                         "rty\n" +
+                         "fgh\n" +
+                         "zxc\n" +
+                         "qwe\n" +
+                         "rty\n" +
+                         "asd\n" +
+                         "qwe\n" +
+                         "rty\n" +
+                         "fgh\n" +
+                         "zxc\n" +
+                         "fgh\n" +
+                         "zxc\n" +
+                         "vbn\n";
+    myFixture.checkResult(after);
   }
 
   public void testYankLine() {

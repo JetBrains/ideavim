@@ -37,9 +37,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * This group works with command associated with copying and pasting text
@@ -68,12 +66,14 @@ public class CopyGroup {
 
     final CaretModel caretModel = editor.getCaretModel();
     final List<Pair<Integer, Integer>> ranges = new ArrayList<>(caretModel.getCaretCount());
+    final Map<Caret, Integer> startOffsets = new HashMap<>(caretModel.getCaretCount());
     for (Caret caret : caretModel.getAllCarets()) {
       final TextRange motionRange = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument, true);
       if (motionRange == null) continue;
 
       assert motionRange.size() == 1;
       ranges.add(new Pair<>(motionRange.getStartOffset(), motionRange.getEndOffset()));
+      startOffsets.put(caret, motionRange.normalize().getStartOffset());
     }
 
     final SelectionType type = SelectionType.fromCommandFlags(motion.getFlags());
@@ -81,7 +81,7 @@ public class CopyGroup {
 
     final SelectionType selectionType =
       type == SelectionType.CHARACTER_WISE && range.isMultiple() ? SelectionType.BLOCK_WISE : type;
-    return yankRange(editor, range, selectionType, true);
+    return yankRange(editor, range, selectionType, startOffsets);
   }
 
   /**
@@ -105,7 +105,7 @@ public class CopyGroup {
     }
 
     final TextRange range = getTextRange(ranges, SelectionType.LINE_WISE);
-    return yankRange(editor, range, SelectionType.LINE_WISE, false);
+    return yankRange(editor, range, SelectionType.LINE_WISE, null);
   }
 
   /**
@@ -500,5 +500,14 @@ public class CopyGroup {
     }
 
     return new TextRange(starts, ends);
+  }
+
+  private boolean yankRange(@NotNull Editor editor,
+                            @NotNull TextRange range,
+                            @NotNull SelectionType type,
+                            @Nullable Map<Caret, Integer> startOffsets) {
+    if (startOffsets != null) startOffsets.forEach((caret, offset) -> MotionGroup.moveCaret(editor, caret, offset));
+
+    return VimPlugin.getRegister().storeText(editor, range, type, false);
   }
 }
