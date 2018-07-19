@@ -143,7 +143,7 @@
  * |+|                    1 {@link com.maddyhome.idea.vim.action.motion.updown.MotionDownFirstNonSpaceAction}
  * |,|                    1 {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastMatchCharReverseAction}
  * |-|                    1 {@link com.maddyhome.idea.vim.action.motion.updown.MotionUpFirstNonSpaceAction}
- * |.|                    E {@link com.maddyhome.idea.vim.action.change.RepeatChangeAction}
+ * |.|                    P {@link com.maddyhome.idea.vim.action.change.RepeatChangeAction}
  * |/|                    1 {@link com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction}
  * |:|                    1 {@link com.maddyhome.idea.vim.action.ExEntryAction}
  * |;|                    1 {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastMatchCharAction}
@@ -181,7 +181,7 @@
  * |V|                    1 {@link com.maddyhome.idea.vim.action.motion.visual.VisualToggleLineModeAction}
  * |W|                    1 {@link com.maddyhome.idea.vim.action.motion.text.MotionBigWordRightAction}
  * |X|                    1 {@link com.maddyhome.idea.vim.action.change.delete.DeleteCharacterLeftAction}
- * |Y|                    1 {@link com.maddyhome.idea.vim.action.copy.YankLineAction}
+ * |Y|                    E {@link com.maddyhome.idea.vim.action.copy.YankLineAction}
  * |ZZ|                   P {@link com.maddyhome.idea.vim.action.file.FileSaveCloseAction}
  * |ZQ|                   P {@link com.maddyhome.idea.vim.action.file.FileSaveCloseAction}
  * |[|                      see bracket commands
@@ -221,8 +221,8 @@
  * |v|                    1 {@link com.maddyhome.idea.vim.action.motion.visual.VisualToggleCharacterModeAction}
  * |w|                    1 {@link com.maddyhome.idea.vim.action.motion.text.MotionWordRightAction}
  * |x|                    1 {@link com.maddyhome.idea.vim.action.change.delete.DeleteCharacterRightAction}
- * |y|                    1 {@link com.maddyhome.idea.vim.action.copy.YankMotionAction}
- * |yy|                   1 {@link com.maddyhome.idea.vim.action.copy.YankLineAction}
+ * |y|                    E {@link com.maddyhome.idea.vim.action.copy.YankMotionAction}
+ * |yy|                   E {@link com.maddyhome.idea.vim.action.copy.YankLineAction}
  * |z|                      see commands starting with 'z'
  * |{|                    1 {@link com.maddyhome.idea.vim.action.motion.text.MotionParagraphPreviousAction}
  * |bar|                  1 {@link com.maddyhome.idea.vim.action.motion.leftright.MotionColumnAction}
