@@ -149,7 +149,7 @@ public class CopyGroup {
     if (type == SelectionType.LINE_WISE && editor.isOneLineMode()) return false;
     final String text = register.getText();
 
-    for (Caret caret : editor.getCaretModel().getAllCarets()) {
+    for (Caret caret : EditorHelper.getOrderedCaretsList(editor, CaretOrder.DECREASING_OFFSET)) {
       final int startOffset = getStartOffset(editor, caret, type, true);
 
       if (text == null) {
@@ -482,21 +482,25 @@ public class CopyGroup {
     final int[] starts = new int[size];
     final int[] ends = new int[size];
 
-    if (type == SelectionType.LINE_WISE) {
-      starts[size - 1] = ranges.get(size - 1).first;
-      ends[size - 1] = ranges.get(size - 1).second;
-      for (int i = 0; i < size - 1; i++) {
-        final Pair<Integer, Integer> range = ranges.get(i);
-        starts[i] = range.first;
-        ends[i] = range.second - 1;
-      }
-    }
-    else if (type == SelectionType.CHARACTER_WISE) {
-      for (int i = 0; i < size; i++) {
-        final Pair<Integer, Integer> range = ranges.get(i);
-        starts[i] = range.first;
-        ends[i] = range.second;
-      }
+    switch (type) {
+      case LINE_WISE:
+        starts[size - 1] = ranges.get(size - 1).first;
+        ends[size - 1] = ranges.get(size - 1).second;
+        for (int i = 0; i < size - 1; i++) {
+          final Pair<Integer, Integer> range = ranges.get(i);
+          starts[i] = range.first;
+          ends[i] = range.second - 1;
+        }
+        break;
+      case CHARACTER_WISE:
+        for (int i = 0; i < size; i++) {
+          final Pair<Integer, Integer> range = ranges.get(i);
+          starts[i] = range.first;
+          ends[i] = range.second;
+        }
+        break;
+      case BLOCK_WISE:
+        assert ranges.size() == 1;
     }
 
     return new TextRange(starts, ends);
