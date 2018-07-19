@@ -307,7 +307,10 @@ public class CopyGroup {
 
     final int lineCount = StringUtil.getLineBreakCount(text) + 1;
     if (currentLine + lineCount >= EditorHelper.getLineCount(editor)) {
-      for (int i = 0; i < currentLine + lineCount - EditorHelper.getLineCount(editor); i++) {
+      //There was a bug in original VimPlugin. Insufficient amount of blank lines was inserted
+      //TODO: add bugfix in and pr
+      final int limit = currentLine + lineCount - EditorHelper.getLineCount(editor);
+      for (int i = 0; i < limit; i++) {
         VimPlugin.getChange().insertText(editor, EditorHelper.getFileSize(editor, true), "\n");
       }
     }
