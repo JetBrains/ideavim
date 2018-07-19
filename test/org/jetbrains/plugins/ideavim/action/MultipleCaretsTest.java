@@ -5,6 +5,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
+import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
@@ -1806,5 +1807,61 @@ public class MultipleCaretsTest extends VimTestCase {
                          "}";
 
     myFixture.checkResult(after);
+  }
+
+  public void testPutTextBeforeCursorBlockwise() {
+    final String before = " *<caret> on<caret>e\n" +
+                          " * two\n";
+    final Editor editor = configureByText(before);
+    VimPlugin.getRegister()
+      .storeText(editor, new TextRange(new int[]{0, 7}, new int[]{2, 9}), SelectionType.BLOCK_WISE, false);
+    typeText(parseKeys("p"));
+    final String after = " * <caret> *one<caret> *\n" +
+                         " *  *two *\n";
+    myFixture.checkResult(after);
+  }
+
+  public void testPutTextAfterCursorBlockwise() {
+    final String before = " *<caret> on<caret>e\n" +
+                          " * two\n";
+    final Editor editor = configureByText(before);
+    VimPlugin.getRegister()
+      .storeText(editor, new TextRange(new int[]{0, 7}, new int[]{2, 9}), SelectionType.BLOCK_WISE, false);
+    typeText(parseKeys("P"));
+    final String after = " *<caret> * on<caret> *e\n" +
+                         " * * tw *o\n";
+    myFixture.checkResult(after);
+  }
+
+  public void testYankMotion() {
+    final String before = "qwe <caret>asd <caret>zxc";
+    configureByText(before);
+    typeText(parseKeys("ye"));
+
+    final Register lastRegister = VimPlugin.getRegister().getLastRegister();
+    assertNotNull(lastRegister);
+    final String text = lastRegister.getText();
+    assertNotNull(text);
+    final String copied = "asd\n" + "zxc";
+    assert text.equals(copied);
+
+    //commented because yankRange doesn't handle carets indent proper yet
+    /*typeText(parseKeys("P"));
+    final String after = "qwe asdasd asdzxc\n" +
+                         "    zxc    zxc";
+    myFixture.checkResult(after);*/
+  }
+
+  public void testYankMotionLineWise() {
+    final String before = "<caret>qwe\n" + "rty\n" + "asd\n" + "<caret>fgh\n" + "zxc\n" + "vbn";
+    configureByText(before);
+    typeText(parseKeys("y3j"));
+
+    final Register lastRegister = VimPlugin.getRegister().getLastRegister();
+    assertNotNull(lastRegister);
+    final String text = lastRegister.getText();
+    assertNotNull(text);
+    final String copied = "qwe\n" + "rty\n" + "asd\n" + "fgh\n" + "fgh\n" + "zxc\n" + "vbn\n";
+    assert text.equals(copied);
   }
 }
