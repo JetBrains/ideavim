@@ -1834,7 +1834,7 @@ public class MultipleCaretsTest extends VimTestCase {
   }
 
   public void testYankMotion() {
-    final String before = "qwe <caret>asd <caret>zxc\nqwe";
+    final String before = "qwe <caret>asd <caret>zxc";
     configureByText(before);
     typeText(parseKeys("ye"));
 
@@ -1845,7 +1845,7 @@ public class MultipleCaretsTest extends VimTestCase {
 
     typeText(parseKeys("P"));
     final String after = "qwe <caret>asdasd <caret>asdzxc\n" +
-                         "qwe zxc    zxc";
+                         "    zxc    zxc";
     myFixture.checkResult(after);
   }
 
