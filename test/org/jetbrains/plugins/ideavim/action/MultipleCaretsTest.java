@@ -1738,7 +1738,7 @@ public class MultipleCaretsTest extends VimTestCase {
     final String before = "qwert<caret>y\n" + "<caret>asdfgh\n" + "zxc<caret>vbn\n";
     final Editor editor = configureByText(before);
     VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
-    typeText(parseKeys("yy", "gp"));
+    typeText(parseKeys("gp"));
     final String after = "qwerty\n" + "zxcvbn\n" + "<caret>asdfgh\n" + "zxcvbn\n" + "<caret>zxcvbn\n" + "zxcvbn\n<caret>";
     myFixture.checkResult(after);
   }
@@ -1863,5 +1863,34 @@ public class MultipleCaretsTest extends VimTestCase {
     assertNotNull(text);
     final String copied = "qwe\n" + "rty\n" + "asd\n" + "fgh\n" + "fgh\n" + "zxc\n" + "vbn\n";
     assert text.equals(copied);
+  }
+
+  public void testYankLine() {
+    final String before = "<caret>qwe\n" + "asd\n" + "zxc\n" + "<caret>rty\n" + "fgh\n" + "vbn\n";
+    configureByText(before);
+    typeText(parseKeys("2yy"));
+
+    final Register lastRegister = VimPlugin.getRegister().getLastRegister();
+    assertNotNull(lastRegister);
+    final String text = lastRegister.getText();
+    assertNotNull(text);
+
+    typeText(parseKeys("j", "p"));
+    final String after = "qwe\n" +
+                         "asd\n" +
+                         "qwe\n" +
+                         "asd\n" +
+                         "rty\n" +
+                         "fgh\n" +
+                         "zxc\n" +
+                         "rty\n" +
+                         "fgh\n" +
+                         "qwe\n" +
+                         "asd\n" +
+                         "rty\n" +
+                         "fgh\n" +
+                         "vbn\n";
+
+    myFixture.checkResult(after);
   }
 }

@@ -20,8 +20,10 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
+import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.text.StringUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
@@ -35,6 +37,8 @@ import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 /**
@@ -59,10 +63,25 @@ public class CopyGroup {
    */
   public boolean yankMotion(@NotNull Editor editor, DataContext context, int count, int rawCount,
                             @NotNull Argument argument) {
-    TextRange range = MotionGroup
-      .getMotionRange(editor, editor.getCaretModel().getPrimaryCaret(), context, count, rawCount, argument, true);
     final Command motion = argument.getMotion();
-    return motion != null && yankRange(editor, range, SelectionType.fromCommandFlags(motion.getFlags()), true);
+    if (motion == null) return false;
+
+    final CaretModel caretModel = editor.getCaretModel();
+    final List<Pair<Integer, Integer>> ranges = new ArrayList<>(caretModel.getCaretCount());
+    for (Caret caret : caretModel.getAllCarets()) {
+      final TextRange motionRange = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument, true);
+      if (motionRange == null) continue;
+
+      assert motionRange.size() == 1;
+      ranges.add(new Pair<>(motionRange.getStartOffset(), motionRange.getEndOffset()));
+    }
+
+    final SelectionType type = SelectionType.fromCommandFlags(motion.getFlags());
+    final TextRange range = getTextRange(ranges, type);
+
+    final SelectionType selectionType =
+      type == SelectionType.CHARACTER_WISE && range.isMultiple() ? SelectionType.BLOCK_WISE : type;
+    return yankRange(editor, range, selectionType, true);
   }
 
   /**
@@ -73,11 +92,20 @@ public class CopyGroup {
    * @return true if able to yank the lines, false if not
    */
   public boolean yankLine(@NotNull Editor editor, int count) {
-    final Caret caret = editor.getCaretModel().getPrimaryCaret();
-    int start = VimPlugin.getMotion().moveCaretToLineStart(editor, caret);
-    int offset = Math.min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, true) + 1,
-                          EditorHelper.getFileSize(editor));
-    return offset != -1 && yankRange(editor, new TextRange(start, offset), SelectionType.LINE_WISE, false);
+    final CaretModel caretModel = editor.getCaretModel();
+    final List<Pair<Integer, Integer>> ranges = new ArrayList<>(caretModel.getCaretCount());
+    for (Caret caret : caretModel.getAllCarets()) {
+      final int start = VimPlugin.getMotion().moveCaretToLineStart(editor, caret);
+      final int end = Math.min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, true) + 1,
+                               EditorHelper.getFileSize(editor));
+
+      if (end == -1) continue;
+
+      ranges.add(new Pair<>(start, end));
+    }
+
+    final TextRange range = getTextRange(ranges, SelectionType.LINE_WISE);
+    return yankRange(editor, range, SelectionType.LINE_WISE, false);
   }
 
   /**
@@ -446,5 +474,31 @@ public class CopyGroup {
       maxLen = Math.max(s.length(), maxLen);
     }
     return maxLen;
+  }
+
+  @NotNull
+  private TextRange getTextRange(@NotNull List<Pair<Integer, Integer>> ranges, @NotNull SelectionType type) {
+    final int size = ranges.size();
+    final int[] starts = new int[size];
+    final int[] ends = new int[size];
+
+    if (type == SelectionType.LINE_WISE) {
+      starts[size - 1] = ranges.get(size - 1).first;
+      ends[size - 1] = ranges.get(size - 1).second;
+      for (int i = 0; i < size - 1; i++) {
+        final Pair<Integer, Integer> range = ranges.get(i);
+        starts[i] = range.first;
+        ends[i] = range.second - 1;
+      }
+    }
+    else if (type == SelectionType.CHARACTER_WISE) {
+      for (int i = 0; i < size; i++) {
+        final Pair<Integer, Integer> range = ranges.get(i);
+        starts[i] = range.first;
+        ends[i] = range.second;
+      }
+    }
+
+    return new TextRange(starts, ends);
   }
 }
