@@ -324,7 +324,7 @@
  * |[D|                     TODO
  * |[I|                     TODO
  * |[M|                   1 {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodPreviousEndAction}
- * |[P|                   1 {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
+ * |[P|                   E {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
  * |[P|                   1 {@link com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction}
  * |[[|                   ? {@link com.maddyhome.idea.vim.action.motion.text.MotionSectionBackwardStartAction}
  * |[]|                   ? {@link com.maddyhome.idea.vim.action.motion.text.MotionSectionBackwardEndAction}
@@ -333,7 +333,7 @@
  * |[f|                     TODO
  * |[i|                     TODO
  * |[m|                   1 {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodPreviousStartAction}
- * |[p|                   1 {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
+ * |[p|                   E {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
  * |[p|                   1 {@link com.maddyhome.idea.vim.action.copy.PutTextAfterCursorNoIndentAction}
  * |[s|                     TODO
  * |[z|                     TODO
@@ -349,7 +349,7 @@
  * |]D|                     TODO
  * |]I|                     TODO
  * |]M|                   1 {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodNextEndAction}
- * |]P|                   1 {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
+ * |]P|                   E {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
  * |]P|                   1 {@link com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction}
  * |][|                   ? {@link com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardStartAction}
  * |]]|                   ? {@link com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardEndAction}
@@ -358,7 +358,7 @@
  * |]f|                     TODO
  * |]i|                     TODO
  * |]m|                   1 {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodNextStartAction}
- * |]p|                   1 {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
+ * |]p|                   E {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
  * |]p|                   1 {@link com.maddyhome.idea.vim.action.copy.PutTextAfterCursorNoIndentAction}
  * |]s|                     TODO
  * |]z|                     TODO
@@ -416,14 +416,14 @@
  * |gn|                     TODO
  * |gm|                   1 {@link com.maddyhome.idea.vim.action.motion.leftright.MotionMiddleColumnAction}
  * |go|                   P {@link com.maddyhome.idea.vim.action.motion.text.MotionNthCharacterAction}
- * |gp|                   1 {@link com.maddyhome.idea.vim.action.copy.PutVisualTextMoveCursorAction}
+ * |gp|                   E {@link com.maddyhome.idea.vim.action.copy.PutVisualTextMoveCursorAction}
  * |gp|                   1 {@link com.maddyhome.idea.vim.action.copy.PutTextAfterCursorActionMoveCursor}
  * |gq|                     TODO
  * |gr|                     TODO
  * |gs|                     TODO
  * |gt|                   P {@link com.maddyhome.idea.vim.action.motion.tabs.MotionNextTabAction}
  * |gu|                   1 {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerMotionAction}
- * |gv|                   E {@link com.maddyhome.idea.vim.action.motion.visual.VisualSelectPreviousAction}
+ * |gv|                   P {@link com.maddyhome.idea.vim.action.motion.visual.VisualSelectPreviousAction}
  * |gw|                     TODO
  * |g@|                   ? {@link com.maddyhome.idea.vim.action.change.OperatorAction}
  * |g~|                   1 {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseToggleMotionAction}
@@ -510,7 +510,7 @@
  * |v_J|                  1 {@link com.maddyhome.idea.vim.action.change.delete.DeleteJoinVisualLinesSpacesAction}
  * |v_K|                    TODO
  * |v_O|                  1 {@link com.maddyhome.idea.vim.action.motion.visual.VisualSwapEndsBlockAction}
- * |v_P|                  1 {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAction}
+ * |v_P|                  E {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAction}
  * |v_R|                  1 {@link com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesAction}
  * |v_S|                  1 {@link com.maddyhome.idea.vim.action.change.change.ChangeVisualLinesAction}
  * |v_U|                  1 {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseUpperVisualAction}
@@ -539,7 +539,7 @@
  * |v_d|                  1 {@link com.maddyhome.idea.vim.action.change.delete.DeleteVisualAction}
  * |v_gJ|                 1 {@link com.maddyhome.idea.vim.action.change.delete.DeleteJoinVisualLinesAction}
  * |v_gq|                 ? {@link com.maddyhome.idea.vim.action.change.change.ReformatCodeVisualAction}
- * |v_gv|                 E {@link com.maddyhome.idea.vim.action.motion.visual.VisualSwapSelectionsAction}
+ * |v_gv|                 P {@link com.maddyhome.idea.vim.action.motion.visual.VisualSwapSelectionsAction}
  * |v_iquote|             1 {@link com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockDoubleQuoteAction}
  * |v_i'|                 1 {@link com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockSingleQuoteAction}
  * |v_i(|                 1 {@link com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockParenAction}
@@ -559,7 +559,7 @@
  * |v_i{|                 1 {@link com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBraceAction}
  * |v_i}|                 1 {@link com.maddyhome.idea.vim.action.motion.object.MotionInnerBlockBraceAction}
  * |v_o|                  1 {@link com.maddyhome.idea.vim.action.motion.visual.VisualSwapEndsAction}
- * |v_p|                  1 {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAction}
+ * |v_p|                  E {@link com.maddyhome.idea.vim.action.copy.PutVisualTextAction}
  * |v_r|                  1 {@link com.maddyhome.idea.vim.action.change.change.ChangeVisualCharacterAction}
  * |v_s|                  1 {@link com.maddyhome.idea.vim.action.change.change.ChangeVisualAction}
  * |v_u|                  1 {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerVisualAction}
