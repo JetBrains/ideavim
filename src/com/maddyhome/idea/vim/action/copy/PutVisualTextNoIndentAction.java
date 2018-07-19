@@ -19,7 +19,6 @@
 package com.maddyhome.idea.vim.action.copy;
 
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
@@ -41,7 +40,6 @@ public class PutVisualTextNoIndentAction extends VimCommandAction {
     super(new VisualOperatorActionHandler() {
       @Override
       protected boolean execute(@NotNull Editor editor,
-                                @NotNull Caret caret,
                                 @NotNull DataContext context,
                                 @NotNull Command cmd,
                                 @NotNull TextRange range) {
