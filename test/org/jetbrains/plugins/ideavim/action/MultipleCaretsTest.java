@@ -2,7 +2,10 @@ package org.jetbrains.plugins.ideavim.action;
 
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.SelectionType;
+import com.maddyhome.idea.vim.common.TextRange;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -1669,56 +1672,72 @@ public class MultipleCaretsTest extends VimTestCase {
 
   public void testPutTextBeforeCursor() {
     final String before = "<caret>qwe asd <caret>zxc rty <caret>fgh vbn";
-    typeTextInFile(parseKeys("ye", "P", "3l", "P"), before);
+    final Editor editor = configureByText(before);
+    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
+    typeText(parseKeys("P", "3l", "P"));
     final String after = "fghqwfg<caret>he asd fghzxfg<caret>hc rty fghfgfg<caret>hh vbn";
     myFixture.checkResult(after);
   }
 
   public void testPutTextAfterCursor() {
     final String before = "<caret>qwe asd <caret>zxc rty <caret>fgh vbn";
-    typeTextInFile(parseKeys("ye", "p", "3l", "2p"), before);
+    final Editor editor = configureByText(before);
+    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
+    typeText(parseKeys("p", "3l", "2p"));
     final String after = "qfghwe fghfg<caret>hasd zfghxc fghfg<caret>hrty ffghgh fghfg<caret>hvbn";
     myFixture.checkResult(after);
   }
 
   public void testPutTextBeforeCursorLinewise() {
     final String before = "q<caret>werty\n" + "as<caret>dfgh\n" + "<caret>zxcvbn\n";
-    typeTextInFile(parseKeys("yy", "P"), before);
+    final Editor editor = configureByText(before);
+    VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
+    typeText(parseKeys("P"));
     final String after = "<caret>zxcvbn\n" + "qwerty\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n";
     myFixture.checkResult(after);
   }
 
   public void testPutTextAfterCursorLinewise() {
     final String before = "q<caret>werty\n" + "as<caret>dfgh\n" + "<caret>zxcvbn\n";
-    typeTextInFile(parseKeys("yy", "p"), before);
+    final Editor editor = configureByText(before);
+    VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
+    typeText(parseKeys("p"));
     final String after = "qwerty\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n" + "<caret>zxcvbn\n";
     myFixture.checkResult(after);
   }
 
   public void testPutTextBeforeCursorMoveCursor() {
     final String before = "qw<caret>e asd z<caret>xc rty <caret>fgh vbn";
-    typeTextInFile(parseKeys("ye", "l", "gP", "b", "gP"), before);
+    final Editor editor = configureByText(before);
+    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
+    typeText(parseKeys("l", "gP", "b", "gP"));
     final String after = "fgh<caret>qwefgh asd fgh<caret>zxfghc rty fgh<caret>ffghgh vbn";
     myFixture.checkResult(after);
   }
 
   public void testPutTextAfterCursorMoveCursor() {
     final String before = "qw<caret>e asd z<caret>xc rty <caret>fgh vbn";
-    typeTextInFile(parseKeys("ye", "l", "gp", "b", "gp"), before);
+    final Editor editor = configureByText(before);
+    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
+    typeText(parseKeys("l", "gp", "b", "gp"));
     final String after = "qwe ffgh<caret>ghasd zfgh<caret>xcfgh rty ffgh<caret>gfghh vbn";
     myFixture.checkResult(after);
   }
 
   public void testPutTextBeforeCursorMoveCursorLinewise() {
     final String before = "qwert<caret>y\n" + "<caret>asdfgh\n" + "zxc<caret>vbn\n";
-    typeTextInFile(parseKeys("yy", "gP"), before);
+    final Editor editor = configureByText(before);
+    VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
+    typeText(parseKeys("gP"));
     final String after = "zxcvbn\n" + "<caret>qwerty\n" + "zxcvbn\n" + "<caret>asdfgh\n" + "zxcvbn\n" + "<caret>zxcvbn\n";
     myFixture.checkResult(after);
   }
 
   public void testPutTextAfterCursorMoveCursorLinewise() {
     final String before = "qwert<caret>y\n" + "<caret>asdfgh\n" + "zxc<caret>vbn\n";
-    typeTextInFile(parseKeys("yy", "gp"), before);
+    final Editor editor = configureByText(before);
+    VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
+    typeText(parseKeys("yy", "gp"));
     final String after = "qwerty\n" + "zxcvbn\n" + "<caret>asdfgh\n" + "zxcvbn\n" + "<caret>zxcvbn\n" + "zxcvbn\n<caret>";
     myFixture.checkResult(after);
   }
@@ -1735,8 +1754,9 @@ public class MultipleCaretsTest extends VimTestCase {
                           "    <caret>private int myK = 0;\n" +
                           "}";
 
-    configureByJavaText(before);
-    typeText(parseKeys("yy", "P"));
+    final Editor editor = configureByJavaText(before);
+    VimPlugin.getRegister().storeText(editor, new TextRange(118, 139), SelectionType.LINE_WISE, false);
+    typeText(parseKeys("P"));
 
     final String after = "class C {\n" +
                          "    C(int i) {\n" +
@@ -1767,8 +1787,9 @@ public class MultipleCaretsTest extends VimTestCase {
                           "    <caret>private int myK = 0;\n" +
                           "}";
 
-    configureByJavaText(before);
-    typeText(parseKeys("yy", "p"));
+    final Editor editor = configureByJavaText(before);
+    VimPlugin.getRegister().storeText(editor, new TextRange(118, 139), SelectionType.LINE_WISE, false);
+    typeText(parseKeys("p"));
 
     final String after = "class C {\n" +
                          "    C(int i) {\n" +
