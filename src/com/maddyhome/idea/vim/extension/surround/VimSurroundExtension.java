@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.extension.surround;
 
 import com.google.common.collect.ImmutableMap;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.Pair;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -188,7 +189,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
       perform("di" + pick(charFrom), editor);
       List<KeyStroke> innerValue = getRegister(REGISTER);
       if (innerValue == null) {
-        innerValue = new ArrayList<KeyStroke>();
+        innerValue = new ArrayList<>();
       }
 
       // Delete the surrounding
@@ -274,8 +275,11 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
       }
       final ChangeGroup change = VimPlugin.getChange();
       final String leftSurround = pair.getFirst();
-      change.insertText(editor, range.getStartOffset(), leftSurround);
-      change.insertText(editor, range.getEndOffset() + leftSurround.length(), pair.getSecond());
+      final Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+      primaryCaret.moveToOffset(range.getStartOffset());
+      change.insertText(editor, primaryCaret, leftSurround);
+      primaryCaret.moveToOffset(range.getEndOffset() + leftSurround.length());
+      change.insertText(editor, primaryCaret, pair.getSecond());
 
       // Jump back to start
       executeNormal(parseKeys("`["), editor);

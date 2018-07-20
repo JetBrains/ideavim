@@ -56,7 +56,7 @@ public class PutLinesHandler extends CommandHandler {
     final int offset = EditorHelper.getLineStartOffset(editor, line + 1);
     editor.getDocument().insertString(offset, "\n");
     MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
-    final boolean result = VimPlugin.getCopy().putTextAfterCursor(editor, context, 1, false, false);
+    final boolean result = VimPlugin.getCopy().putText(editor, context, 1, false, false, false);
     final int newOffset = EditorHelper.getLineStartOffset(editor, line + 1);
     MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), newOffset);
     return result;

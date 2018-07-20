@@ -38,7 +38,7 @@ public class PutTextAfterCursorActionMoveCursor extends EditorAction {
                              int count,
                              int rawCount,
                              @Nullable Argument argument) {
-        return VimPlugin.getCopy().putTextAfterCursor(editor, context, count, true, true);
+        return VimPlugin.getCopy().putText(editor, context, count, true, true, false);
       }
     });
   }

@@ -131,26 +131,27 @@ public class CopyGroup {
   }
 
   /**
-   * Pastes text from the last register into the editor before the current cursor location.
+   * Pastes text from the last register into the editor.
    *
    * @param editor  The editor to paste into
    * @param context The data context
    * @param count   The number of times to perform the paste
    * @return true if able to paste, false if not
    */
-  public boolean putTextBeforeCursor(@NotNull Editor editor,
-                                     @NotNull DataContext context,
-                                     int count,
-                                     boolean indent,
-                                     boolean cursorAfter) {
+  public boolean putText(@NotNull Editor editor,
+                         @NotNull DataContext context,
+                         int count,
+                         boolean indent,
+                         boolean cursorAfter,
+                         boolean beforeCursor) {
     final Register register = VimPlugin.getRegister().getLastRegister();
     if (register == null) return false;
     final SelectionType type = register.getType();
     if (type == SelectionType.LINE_WISE && editor.isOneLineMode()) return false;
-    final String text = register.getText();
 
+    final String text = register.getText();
     for (Caret caret : EditorHelper.getOrderedCaretsList(editor, CaretOrder.DECREASING_OFFSET)) {
-      final int startOffset = getStartOffset(editor, caret, type, true);
+      final int startOffset = getStartOffset(editor, caret, type, beforeCursor);
 
       if (text == null) {
         VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, startOffset);
@@ -161,36 +162,6 @@ public class CopyGroup {
       putText(editor, caret, context, text, type, CommandState.SubMode.NONE, startOffset, count, indent, cursorAfter);
     }
 
-    return true;
-  }
-
-  /**
-   * Pastes text from the last register into the editor after the current cursor location.
-   *
-   * @param editor      The editor to paste into
-   * @param context     The data context
-   * @param count       The number of times to perform the paste
-   * @return true if able to paste, false if not
-   */
-  public boolean putTextAfterCursor(@NotNull Editor editor, @NotNull DataContext context, int count, boolean indent,
-                                    boolean cursorAfter) {
-    final Register register = VimPlugin.getRegister().getLastRegister();
-    if (register == null) return false;
-    final SelectionType type = register.getType();
-    if (type == SelectionType.LINE_WISE && editor.isOneLineMode()) return false;
-
-    final String text = register.getText();
-    for (Caret caret : EditorHelper.getOrderedCaretsList(editor, CaretOrder.DECREASING_OFFSET)) {
-      final int startOffset = getStartOffset(editor, caret, type, false);
-
-      if (text == null) {
-        VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, startOffset);
-        VimPlugin.getMark().setChangeMarks(editor, new TextRange(startOffset, startOffset));
-        continue;
-      }
-
-      putText(editor, caret, context, text, type, CommandState.SubMode.NONE, startOffset, count, indent, cursorAfter);
-    }
     return true;
   }
 
