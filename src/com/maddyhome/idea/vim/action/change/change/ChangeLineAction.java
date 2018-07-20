@@ -33,18 +33,16 @@ import org.jetbrains.annotations.Nullable;
  */
 public class ChangeLineAction extends EditorAction {
   public ChangeLineAction() {
-    super(new Handler());
-  }
-
-  private static class Handler extends ChangeEditorActionHandler {
-    public Handler() {
-      super(true, CaretOrder.DECREASING_OFFSET);
-    }
-
-    @Override
-    public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                           int rawCount, @Nullable Argument argument) {
-      return VimPlugin.getChange().changeLine(editor, caret, context, count);
-    }
+    super(new ChangeEditorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
+      @Override
+      public boolean execute(@NotNull Editor editor,
+                             @NotNull Caret caret,
+                             @NotNull DataContext context,
+                             int count,
+                             int rawCount,
+                             @Nullable Argument argument) {
+        return VimPlugin.getChange().changeLine(editor, caret, context, count);
+      }
+    });
   }
 }
