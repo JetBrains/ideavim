@@ -278,7 +278,8 @@ public class CopyGroup {
 
     final int lineCount = StringUtil.getLineBreakCount(text) + 1;
     if (currentLine + lineCount >= EditorHelper.getLineCount(editor)) {
-      for (int i = 0; i < currentLine + lineCount - EditorHelper.getLineCount(editor); i++) {
+      final int limit = currentLine + lineCount - EditorHelper.getLineCount(editor);
+      for (int i = 0; i < limit; i++) {
         MotionGroup.moveCaret(editor, caret, EditorHelper.getFileSize(editor, true));
         VimPlugin.getChange().insertText(editor, caret, "\n");
       }
