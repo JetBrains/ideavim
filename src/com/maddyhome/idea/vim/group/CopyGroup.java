@@ -145,17 +145,16 @@ public class CopyGroup {
       else {
         final List<Caret> carets = caretModel.getAllCarets();
         for (int i = 0; i < carets.size(); i++) {
-          startOffsets.put(carets.get(i), (Math.min(rangeStartOffsets[i], rangeEndOffsets[i])));
+          startOffsets
+            .put(carets.get(i), new TextRange(rangeStartOffsets[i], rangeEndOffsets[i]).normalize().getStartOffset());
         }
       }
 
-      yankRange(editor, range, selectionType, startOffsets);
+      return yankRange(editor, range, selectionType, startOffsets);
     }
     else {
-      yankRange(editor, range, selectionType, null);
+      return yankRange(editor, range, selectionType, null);
     }
-
-    return true;
   }
 
   /**
