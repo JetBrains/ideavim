@@ -139,9 +139,14 @@ public class CopyGroup {
 
     if (moveCursor) {
       final Map<Caret, Integer> startOffsets = new HashMap<>(caretModel.getCaretCount());
-      final List<Caret> carets = caretModel.getAllCarets();
-      for (int i = 0; i < carets.size(); i++) {
-        startOffsets.put(carets.get(i), (Math.min(rangeStartOffsets[i], rangeEndOffsets[i])));
+      if (type == SelectionType.BLOCK_WISE) {
+        startOffsets.put(caretModel.getPrimaryCaret(), range.normalize().getStartOffset());
+      }
+      else {
+        final List<Caret> carets = caretModel.getAllCarets();
+        for (int i = 0; i < carets.size(); i++) {
+          startOffsets.put(carets.get(i), (Math.min(rangeStartOffsets[i], rangeEndOffsets[i])));
+        }
       }
 
       yankRange(editor, range, selectionType, startOffsets);
