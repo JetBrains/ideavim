@@ -116,18 +116,41 @@ public class CopyGroup {
    * @param type   The type of yank
    * @return true if able to yank the range, false if not
    */
-  public boolean yankRange(@NotNull Editor editor, @Nullable TextRange range, @NotNull SelectionType type, boolean moveCursor) {
-    if (range != null) {
+  public boolean yankRange(@NotNull Editor editor,
+                           @Nullable TextRange range,
+                           @NotNull SelectionType type,
+                           boolean moveCursor) {
+    if (range == null) return false;
 
-      boolean res = VimPlugin.getRegister().storeText(editor, range, type, false);
-      if (moveCursor) {
-        MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), range.normalize().getStartOffset());
+    final SelectionType selectionType =
+      type == SelectionType.CHARACTER_WISE && range.isMultiple() ? SelectionType.BLOCK_WISE : type;
+
+    final CaretModel caretModel = editor.getCaretModel();
+    final int[] rangeStartOffsets = range.getStartOffsets();
+    final int[] rangeEndOffsets = range.getEndOffsets();
+    if (selectionType == SelectionType.LINE_WISE) {
+      final ArrayList<Pair<Integer, Integer>> ranges = new ArrayList<>(caretModel.getCaretCount());
+      for (int i = 0; i < caretModel.getCaretCount(); i++) {
+        ranges.add(new Pair<>(EditorHelper.getLineStartForOffset(editor, rangeStartOffsets[i]),
+                              EditorHelper.getLineEndForOffset(editor, rangeEndOffsets[i]) + 1));
       }
-
-      return res;
+      range = getTextRange(ranges, selectionType);
     }
 
-    return false;
+    if (moveCursor) {
+      final Map<Caret, Integer> startOffsets = new HashMap<>(caretModel.getCaretCount());
+      final List<Caret> carets = caretModel.getAllCarets();
+      for (int i = 0; i < carets.size(); i++) {
+        startOffsets.put(carets.get(i), (Math.min(rangeStartOffsets[i], rangeEndOffsets[i])));
+      }
+
+      yankRange(editor, range, selectionType, startOffsets);
+    }
+    else {
+      yankRange(editor, range, selectionType, null);
+    }
+
+    return true;
   }
 
   /**

@@ -1905,4 +1905,48 @@ public class MultipleCaretsTest extends VimTestCase {
 
     myFixture.checkResult(after);
   }
+
+  public void testYankVisualRange() {
+    final String before = "q<caret>werty\n" + "asdf<caret>gh\n" + "<caret>zxcvbn\n";
+    configureByText(before);
+    typeText(parseKeys("vey"));
+
+    final Register lastRegister = VimPlugin.getRegister().getLastRegister();
+    assertNotNull(lastRegister);
+    final String text = lastRegister.getText();
+    assertNotNull(text);
+
+    typeText(parseKeys("G", "$", "p"));
+    final String after = "qwerty\n" + "asdfgh\n" + "zxcvbnwerty\n" + "      gh\n" + "      zxcvbn\n";
+    myFixture.checkResult(after);
+  }
+
+  public void testYankVisualLines() {
+    final String before = "q<caret>we\n" + "asd\n" + "z<caret>xc\n" + "rt<caret>y\n" + "fgh\n" + "vbn\n";
+    configureByText(before);
+    typeText(parseKeys("vlY"));
+
+    final Register lastRegister = VimPlugin.getRegister().getLastRegister();
+    assertNotNull(lastRegister);
+    final String text = lastRegister.getText();
+    assertNotNull(text);
+
+    typeText(parseKeys("p"));
+    final String after = "qwe\n" +
+                         "qwe\n" +
+                         "zxc\n" +
+                         "rty\n" +
+                         "asd\n" +
+                         "zxc\n" +
+                         "qwe\n" +
+                         "zxc\n" +
+                         "rty\n" +
+                         "rty\n" +
+                         "qwe\n" +
+                         "zxc\n" +
+                         "rty\n" +
+                         "fgh\n" +
+                         "vbn\n";
+    myFixture.checkResult(after);
+  }
 }

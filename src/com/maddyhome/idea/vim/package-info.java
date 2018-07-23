@@ -516,7 +516,7 @@
  * |v_U|                  1 {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseUpperVisualAction}
  * |v_V|                    NV mapping
  * |v_X|                  1 {@link com.maddyhome.idea.vim.action.change.delete.DeleteVisualLinesAction}
- * |v_Y|                  E {@link com.maddyhome.idea.vim.action.copy.YankVisualLinesAction}
+ * |v_Y|                  1 {@link com.maddyhome.idea.vim.action.copy.YankVisualLinesAction}
  * |v_aquote|             1 {@link com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockDoubleQuoteAction}
  * |v_a'|                 1 {@link com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockSingleQuoteAction}
  * |v_a(|                 1 {@link com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockParenAction}
@@ -565,7 +565,7 @@
  * |v_u|                  1 {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseLowerVisualAction}
  * |v_v|                    NV mapping
  * |v_x|                  1 {@link com.maddyhome.idea.vim.action.change.delete.DeleteVisualAction}
- * |v_y|                  E {@link com.maddyhome.idea.vim.action.copy.YankVisualAction}
+ * |v_y|                  1 {@link com.maddyhome.idea.vim.action.copy.YankVisualAction}
  * |v_~|                  1 {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseToggleVisualAction}
  * <p>
  * <p>

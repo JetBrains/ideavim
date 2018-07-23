@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -48,9 +47,7 @@ public class YankVisualLinesAction extends VimCommandAction {
           return VimPlugin.getCopy().yankRange(editor, range, SelectionType.fromSubMode(mode), true);
         }
         else {
-          final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
-                                                    EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
-          return VimPlugin.getCopy().yankRange(editor, lineRange, SelectionType.LINE_WISE, true);
+          return VimPlugin.getCopy().yankRange(editor, range, SelectionType.LINE_WISE, true);
         }
       }
     });
