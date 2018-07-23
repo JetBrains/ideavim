@@ -72,7 +72,7 @@ public class CopyGroup {
       if (motionRange == null) continue;
 
       assert motionRange.size() == 1;
-      ranges.add(new Pair<>(motionRange.getStartOffset(), motionRange.getEndOffset()));
+      ranges.add(Pair.create(motionRange.getStartOffset(), motionRange.getEndOffset()));
       startOffsets.put(caret, motionRange.normalize().getStartOffset());
     }
 
@@ -101,7 +101,7 @@ public class CopyGroup {
 
       if (end == -1) continue;
 
-      ranges.add(new Pair<>(start, end));
+      ranges.add(Pair.create(start, end));
     }
 
     final TextRange range = getTextRange(ranges, SelectionType.LINE_WISE);
@@ -131,7 +131,7 @@ public class CopyGroup {
     if (selectionType == SelectionType.LINE_WISE) {
       final ArrayList<Pair<Integer, Integer>> ranges = new ArrayList<>(caretModel.getCaretCount());
       for (int i = 0; i < caretModel.getCaretCount(); i++) {
-        ranges.add(new Pair<>(EditorHelper.getLineStartForOffset(editor, rangeStartOffsets[i]),
+        ranges.add(Pair.create(EditorHelper.getLineStartForOffset(editor, rangeStartOffsets[i]),
                               EditorHelper.getLineEndForOffset(editor, rangeEndOffsets[i]) + 1));
       }
       range = getTextRange(ranges, selectionType);
@@ -213,7 +213,7 @@ public class CopyGroup {
     for (int i = 0; i < range.size(); i++) {
       final int start = range.getStartOffsets()[i];
       final int end = range.getEndOffsets()[i];
-      ranges.add(new Pair<>(start, end));
+      ranges.add(Pair.create(start, end));
       endLines.add(editor.offsetToLogicalPosition(end).line);
     }
 
