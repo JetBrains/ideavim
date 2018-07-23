@@ -1689,6 +1689,15 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult(after);
   }
 
+  public void testPutVisualText() {
+    final String before = "<caret>qwe asd <caret>zxc rty <caret>fgh vbn";
+    final Editor editor = configureByText(before);
+    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
+    typeText(parseKeys("v2e", "2p"));
+    final String after = "fghfg<caret>h fghfg<caret>h fghfg<caret>h";
+    myFixture.checkResult(after);
+  }
+
   public void testPutTextBeforeCursorLinewise() {
     final String before = "q<caret>werty\n" + "as<caret>dfgh\n" + "<caret>zxcvbn\n";
     final Editor editor = configureByText(before);
@@ -1704,6 +1713,15 @@ public class MultipleCaretsTest extends VimTestCase {
     VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
     typeText(parseKeys("p"));
     final String after = "qwerty\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n" + "<caret>zxcvbn\n";
+    myFixture.checkResult(after);
+  }
+
+  public void testPutVisualTextLinewise() {
+    final String before = "q<caret>werty\n" + "as<caret>dfgh\n" + "<caret>zxcvbn\n";
+    final Editor editor = configureByText(before);
+    VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
+    typeText(parseKeys("vl", "p"));
+    final String after = "q\n" + "zxcvbn\n" + "rty\n" + "as\n" + "zxcvbn\n" + "gh\n" + "\n" + "zxcvbn\n" + "cvbn\n";
     myFixture.checkResult(after);
   }
 
@@ -1724,6 +1742,16 @@ public class MultipleCaretsTest extends VimTestCase {
     final String after = "qwe ffgh<caret>ghasd zfgh<caret>xcfgh rty ffgh<caret>gfghh vbn";
     myFixture.checkResult(after);
   }
+
+  public void testPutVisualTextMoveCursor() {
+    final String before = "qw<caret>e asd z<caret>xc rty <caret>fgh vbn";
+    final Editor editor = configureByText(before);
+    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
+    typeText(parseKeys("vh", "gP"));
+    final String after = "qfgh<caret> asd fgh<caret>c rtyfgh<caret>gh vbn";
+    myFixture.checkResult(after);
+  }
+
 
   public void testPutTextBeforeCursorMoveCursorLinewise() {
     final String before = "qwert<caret>y\n" + "<caret>asdfgh\n" + "zxc<caret>vbn\n";
