@@ -65,14 +65,14 @@ public class CopyGroup {
     if (motion == null) return false;
 
     final CaretModel caretModel = editor.getCaretModel();
-    final List<Pair<Integer, Integer>> ranges = new ArrayList<>(caretModel.getCaretCount());
+    final List<Pair.NonNull<Integer, Integer>> ranges = new ArrayList<>(caretModel.getCaretCount());
     final Map<Caret, Integer> startOffsets = new HashMap<>(caretModel.getCaretCount());
     for (Caret caret : caretModel.getAllCarets()) {
       final TextRange motionRange = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument, true);
       if (motionRange == null) continue;
 
       assert motionRange.size() == 1;
-      ranges.add(Pair.create(motionRange.getStartOffset(), motionRange.getEndOffset()));
+      ranges.add(Pair.createNonNull(motionRange.getStartOffset(), motionRange.getEndOffset()));
       startOffsets.put(caret, motionRange.normalize().getStartOffset());
     }
 
@@ -93,7 +93,7 @@ public class CopyGroup {
    */
   public boolean yankLine(@NotNull Editor editor, int count) {
     final CaretModel caretModel = editor.getCaretModel();
-    final List<Pair<Integer, Integer>> ranges = new ArrayList<>(caretModel.getCaretCount());
+    final List<Pair.NonNull<Integer, Integer>> ranges = new ArrayList<>(caretModel.getCaretCount());
     for (Caret caret : caretModel.getAllCarets()) {
       final int start = VimPlugin.getMotion().moveCaretToLineStart(editor, caret);
       final int end = Math.min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, true) + 1,
@@ -101,7 +101,7 @@ public class CopyGroup {
 
       if (end == -1) continue;
 
-      ranges.add(Pair.create(start, end));
+      ranges.add(Pair.createNonNull(start, end));
     }
 
     final TextRange range = getTextRange(ranges, SelectionType.LINE_WISE);
@@ -129,9 +129,9 @@ public class CopyGroup {
     final int[] rangeStartOffsets = range.getStartOffsets();
     final int[] rangeEndOffsets = range.getEndOffsets();
     if (selectionType == SelectionType.LINE_WISE) {
-      final ArrayList<Pair<Integer, Integer>> ranges = new ArrayList<>(caretModel.getCaretCount());
+      final ArrayList<Pair.NonNull<Integer, Integer>> ranges = new ArrayList<>(caretModel.getCaretCount());
       for (int i = 0; i < caretModel.getCaretCount(); i++) {
-        ranges.add(Pair.create(EditorHelper.getLineStartForOffset(editor, rangeStartOffsets[i]),
+        ranges.add(Pair.createNonNull(EditorHelper.getLineStartForOffset(editor, rangeStartOffsets[i]),
                               EditorHelper.getLineEndForOffset(editor, rangeEndOffsets[i]) + 1));
       }
       range = getTextRange(ranges, selectionType);
@@ -207,13 +207,13 @@ public class CopyGroup {
 
     final CaretModel caretModel = editor.getCaretModel();
 
-    final ArrayList<Pair<Integer, Integer>> ranges = new ArrayList<>(caretModel.getCaretCount());
+    final ArrayList<Pair.NonNull<Integer, Integer>> ranges = new ArrayList<>(caretModel.getCaretCount());
     final List<Integer> endLines = new ArrayList<>(caretModel.getCaretCount());
 
     for (int i = 0; i < range.size(); i++) {
       final int start = range.getStartOffsets()[i];
       final int end = range.getEndOffsets()[i];
-      ranges.add(Pair.create(start, end));
+      ranges.add(Pair.createNonNull(start, end));
       endLines.add(editor.offsetToLogicalPosition(end).line);
     }
 
@@ -222,7 +222,7 @@ public class CopyGroup {
       final int[] starts = new int[caretModel.getCaretCount()];
       final int[] ends = new int[caretModel.getCaretCount()];
       for (int i = 0; i < ranges.size(); i++) {
-        final Pair<Integer, Integer> subRange = ranges.get(i);
+        final Pair.NonNull<Integer, Integer> subRange = ranges.get(i);
         starts[i] = subRange.first;
         ends[i] = Math.min(subRange.second + 1, EditorHelper.getFileSize(editor));
       }
@@ -502,7 +502,7 @@ public class CopyGroup {
   }
 
   @NotNull
-  private TextRange getTextRange(@NotNull List<Pair<Integer, Integer>> ranges, @NotNull SelectionType type) {
+  private TextRange getTextRange(@NotNull List<Pair.NonNull<Integer, Integer>> ranges, @NotNull SelectionType type) {
     final int size = ranges.size();
     final int[] starts = new int[size];
     final int[] ends = new int[size];
@@ -512,14 +512,14 @@ public class CopyGroup {
         starts[size - 1] = ranges.get(size - 1).first;
         ends[size - 1] = ranges.get(size - 1).second;
         for (int i = 0; i < size - 1; i++) {
-          final Pair<Integer, Integer> range = ranges.get(i);
+          final Pair.NonNull<Integer, Integer> range = ranges.get(i);
           starts[i] = range.first;
           ends[i] = range.second - 1;
         }
         break;
       case CHARACTER_WISE:
         for (int i = 0; i < size; i++) {
-          final Pair<Integer, Integer> range = ranges.get(i);
+          final Pair.NonNull<Integer, Integer> range = ranges.get(i);
           starts[i] = range.first;
           ends[i] = range.second;
         }
