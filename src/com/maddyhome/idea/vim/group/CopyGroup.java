@@ -316,7 +316,7 @@ public class CopyGroup {
                               boolean indent) {
     final int endOffset = type != SelectionType.BLOCK_WISE
                           ? putTextInternal(editor, caret, text, startOffset, count)
-                          : putTextInternal(editor, caret, text, mode, startOffset, count);
+                          : putTextInternal(editor, caret, context, text, mode, startOffset, count);
 
     if (indent) return doIndent(editor, caret, context, startOffset, endOffset);
 
@@ -325,6 +325,7 @@ public class CopyGroup {
 
   private int putTextInternal(@NotNull Editor editor,
                               @NotNull Caret caret,
+                              @NotNull DataContext context,
                               @NotNull String text,
                               @NotNull CommandState.SubMode mode,
                               int startOffset,
@@ -361,7 +362,7 @@ public class CopyGroup {
         }
       }
 
-      final String pad = EditorHelper.pad(editor, currentLine, currentColumn);
+      final String pad = EditorHelper.pad(editor, context, currentLine, currentColumn);
 
       final int insertOffset = editor.logicalPositionToOffset(new LogicalPosition(currentLine, currentColumn));
       MotionGroup.moveCaret(editor, caret, insertOffset);

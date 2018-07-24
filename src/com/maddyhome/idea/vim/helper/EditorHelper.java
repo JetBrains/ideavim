@@ -18,12 +18,19 @@
 
 package com.maddyhome.idea.vim.helper;
 
+import com.intellij.application.options.CodeStyle;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.CaretOrder;
@@ -543,23 +550,38 @@ public class EditorHelper {
   }
 
   @NotNull
-  public static String pad(@NotNull final Editor editor, int line, final int to) {
-    StringBuilder res = new StringBuilder();
+  public static String pad(@NotNull final Editor editor, @NotNull DataContext context, int line, final int to) {
+    final int len = getLineLength(editor, line);
+    if(len >= to) return "";
 
-    int len = getLineLength(editor, line);
-    if (logger.isDebugEnabled()) {
-      logger.debug("line=" + line);
-      logger.debug("len=" + len);
-      logger.debug("to=" + to);
+    final VirtualFile virtualFile = EditorData.getVirtualFile(editor);
+    final Project project = PlatformDataKeys.PROJECT.getData(context);
+    final int tabSize;
+    final boolean useTabs;
+    if (virtualFile != null && project != null) {
+      final FileType fileType = FileTypeManager.getInstance().getFileTypeByFile(virtualFile);
+      final CodeStyleSettings settings = CodeStyle.getSettings(project);
+      useTabs = settings.useTabCharacter(fileType);
+      tabSize = settings.getTabSize(fileType);
     }
-    if (len < to) {
-      // TODO - use tabs as needed
-      for (int i = len; i < to; i++) {
-        res.append(' ');
-      }
+    else {
+      tabSize = 8;
+      useTabs = false;
     }
 
-    return res.toString();
+    final int limit = to - len;
+    final int tabsCnt;
+    final int spacesCnt;
+    if (useTabs) {
+      tabsCnt = (limit) / tabSize;
+      spacesCnt = (limit) % tabSize;
+    }
+    else {
+      tabsCnt = 0;
+      spacesCnt = limit;
+    }
+
+    return StringUtil.repeat("\t", tabsCnt) + StringUtil.repeat(" ", spacesCnt);
   }
 
   public static boolean canEdit(@NotNull final Project project, @NotNull final Editor editor) {

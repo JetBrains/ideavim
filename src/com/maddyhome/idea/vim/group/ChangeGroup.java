@@ -537,7 +537,7 @@ public class ChangeGroup {
           if (repeatAppend &&
               repeatColumn < MotionGroup.LAST_COLUMN &&
               EditorHelper.getVisualLineLength(editor, visualLine + i) < repeatColumn) {
-            final String pad = EditorHelper.pad(editor, logicalLine + i, repeatColumn);
+            final String pad = EditorHelper.pad(editor, context, logicalLine + i, repeatColumn);
             if (pad.length() > 0) {
               final int offset = editor.getDocument().getLineEndOffset(logicalLine + i);
               caret.moveToOffset(offset);
@@ -1313,7 +1313,7 @@ public class ChangeGroup {
 
       final int lineLength = EditorHelper.getLineLength(editor, line);
       if (column < MotionGroup.LAST_COLUMN && lineLength < column) {
-        final String pad = EditorHelper.pad(editor, line, column);
+        final String pad = EditorHelper.pad(editor, context, line, column);
         final int offset = editor.getDocument().getLineEndOffset(line);
         caret.moveToOffset(offset);
         insertText(editor, caret, pad);
