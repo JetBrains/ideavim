@@ -293,16 +293,30 @@ public class CopyGroup {
   private int putTextInternal(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                               @NotNull String text, @NotNull SelectionType type, @NotNull CommandState.SubMode mode,
                               int startOffset, int count, boolean indent) {
-    final int endOffset = type != SelectionType.BLOCK_WISE ? putTextInternal(editor, caret, text, startOffset, count)
-                                                           : putTextInternal(editor, caret, context, text, mode,
-                                                                             startOffset, count);
+    final int endOffset;
+    switch (type) {
+      case CHARACTER_WISE:
+        endOffset = putTextCharacterwise(editor, caret, text, startOffset, count);
+        break;
+      case LINE_WISE:
+        endOffset = putTextLinewise(editor, caret, text, startOffset, count);
+        break;
+      default:
+        endOffset = putTextBlockwise(editor, caret, context, text, mode, startOffset, count);
+    }
 
     if (indent) return doIndent(editor, caret, context, startOffset, endOffset);
 
     return endOffset;
   }
 
-  private int putTextInternal(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+  private int putTextLinewise(@NotNull Editor editor, @NotNull Caret caret, @NotNull String text, int startOffset,
+                              int count) {
+    //TODO: carets can overlap here when they at the same line which leads to bug
+    return putTextCharacterwise(editor, caret, text, startOffset, count);
+  }
+
+  private int putTextBlockwise(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                               @NotNull String text, @NotNull CommandState.SubMode mode, int startOffset, int count) {
     final LogicalPosition startPosition = editor.offsetToLogicalPosition(startOffset);
     final int currentColumn = mode == CommandState.SubMode.VISUAL_LINE ? 0 : startPosition.column;
@@ -359,8 +373,8 @@ public class CopyGroup {
     return endOffset;
   }
 
-  private int putTextInternal(@NotNull Editor editor, @NotNull Caret caret, @NotNull String text, int startOffset,
-                              int count) {
+  private int putTextCharacterwise(@NotNull Editor editor, @NotNull Caret caret, @NotNull String text, int startOffset,
+                                   int count) {
     MotionGroup.moveCaret(editor, caret, startOffset);
     final String insertedText = StringUtil.repeat(text, count);
     VimPlugin.getChange().insertText(editor, caret, insertedText);
