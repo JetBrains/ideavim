@@ -171,7 +171,9 @@ public class CopyGroup {
     if (selectionType == SelectionType.LINE_WISE && editor.isOneLineMode()) return false;
 
     final String text = register.getText();
-    for (Caret caret : EditorHelper.getOrderedCaretsList(editor, CaretOrder.DECREASING_OFFSET)) {
+    final List<Caret> carets = EditorHelper.getOrderedCaretsList(editor, beforeCursor ? CaretOrder.INCREASING_OFFSET
+                                                                                      : CaretOrder.DECREASING_OFFSET);
+    for (Caret caret : carets) {
       final int startOffset = getStartOffset(editor, caret, selectionType, beforeCursor);
 
       if (text == null) {

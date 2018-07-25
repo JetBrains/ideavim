@@ -39,9 +39,7 @@ public class PutVisualTextMoveCursorAction extends VimCommandAction {
   public PutVisualTextMoveCursorAction() {
     super(new VisualOperatorActionHandler() {
       @Override
-      protected boolean execute(@NotNull Editor editor,
-                                @NotNull DataContext context,
-                                @NotNull Command cmd,
+      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
                                 @NotNull TextRange range) {
         return VimPlugin.getCopy().putVisualRange(editor, context, range, cmd.getCount(), true, true);
       }
