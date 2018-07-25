@@ -496,7 +496,7 @@ public class EditorHelper {
     return editor.getDocument().getLineEndOffset(pos.line);
   }
 
-  public static int getLineCharCount(@NotNull final Editor editor, final int line) {
+  private static int getLineCharCount(@NotNull final Editor editor, final int line) {
     return getLineEndOffset(editor, line, true) - getLineStartOffset(editor, line);
   }
 
@@ -558,9 +558,9 @@ public class EditorHelper {
     final Project project = PlatformDataKeys.PROJECT.getData(context);
     final int tabSize;
     final boolean useTabs;
-    if (virtualFile != null && project != null) {
+    if (virtualFile != null) {
       final FileType fileType = FileTypeManager.getInstance().getFileTypeByFile(virtualFile);
-      final CodeStyleSettings settings = CodeStyle.getSettings(project);
+      final CodeStyleSettings settings = project == null ? CodeStyle.getDefaultSettings() : CodeStyle.getSettings(project);
       useTabs = settings.useTabCharacter(fileType);
       tabSize = settings.getTabSize(fileType);
     }

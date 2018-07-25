@@ -47,7 +47,7 @@ public class ChangeVisualLinesAction extends VimCommandAction {
                                 @NotNull Command cmd, @NotNull TextRange range) {
         final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
                                                   EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
-        return VimPlugin.getChange().changeRange(editor, caret, context, lineRange, SelectionType.LINE_WISE);
+        return VimPlugin.getChange().changeRange(editor, caret, lineRange, SelectionType.LINE_WISE);
       }
     });
   }

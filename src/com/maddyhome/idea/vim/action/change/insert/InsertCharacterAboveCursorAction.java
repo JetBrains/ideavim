@@ -24,10 +24,8 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,7 +48,7 @@ public class InsertCharacterAboveCursorAction extends EditorAction {
         return false;
       }
 
-      return VimPlugin.getChange().insertCharacterAroundCursor(editor, caret, context, -1);
+      return VimPlugin.getChange().insertCharacterAroundCursor(editor, caret, -1);
     }
   }
 }
