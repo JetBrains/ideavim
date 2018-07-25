@@ -70,6 +70,13 @@ public class ChangeGroup {
 
   public static final int MAX_REPEAT_CHARS_COUNT = 10000;
 
+  private static final String VIM_MOTION_BIG_WORD_RIGHT = "VimMotionBigWordRight";
+  private static final String VIM_MOTION_WORD_RIGHT = "VimMotionWordRight";
+  private static final String VIM_MOTION_CAMEL_RIGHT = "VimMotionCamelRight";
+  private static final String VIM_MOTION_WORD_END_RIGHT = "VimMotionWordEndRight";
+  private static final String VIM_MOTION_BIG_WORD_END_RIGHT = "VimMotionBigWordEndRight";
+  private static final String VIM_MOTION_CAMEL_END_RIGHT = "VimMotionCamelEndRight";
+
   /**
    * Creates the group
    */
@@ -986,9 +993,9 @@ public class ChangeGroup {
         final Command motion = argument.getMotion();
         if (motion != null) {
           final String id = ActionManager.getInstance().getId(motion.getAction());
-          if (id.equals("VimMotionWordRight") ||
-              id.equals("VimMotionBigWordRight") ||
-              id.equals("VimMotionCamelRight")) {
+          if (id.equals(VIM_MOTION_WORD_RIGHT) ||
+              id.equals(VIM_MOTION_BIG_WORD_RIGHT) ||
+              id.equals(VIM_MOTION_CAMEL_RIGHT)) {
             if (!SearchHelper.anyNonWhitespace(editor, range.getEndOffset(), -1)) {
               final int start = range.getStartOffset();
               range = new TextRange(start, start + lastNewLine);
@@ -1215,8 +1222,6 @@ public class ChangeGroup {
    */
   public boolean changeMotion(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                               int rawCount, @NotNull Argument argument) {
-    // TODO: Hack - find better way to do this exceptional case - at least make constants out of these strings
-
     // Vim treats cw as ce and cW as cE if cursor is on a non-blank character
     final Command motion = argument.getMotion();
     if (motion == null) {
@@ -1224,7 +1229,7 @@ public class ChangeGroup {
     }
     String id = ActionManager.getInstance().getId(motion.getAction());
     boolean kludge = false;
-    boolean bigWord = id.equals("VimMotionBigWordRight");
+    boolean bigWord = id.equals(VIM_MOTION_BIG_WORD_RIGHT);
     final CharSequence chars = editor.getDocument().getCharsSequence();
     final int offset = caret.getOffset();
     final CharacterHelper.CharacterType charType = CharacterHelper.charType(chars.charAt(offset), bigWord);
@@ -1232,7 +1237,7 @@ public class ChangeGroup {
       final boolean lastWordChar = offset > EditorHelper.getFileSize(editor) ||
                                    CharacterHelper.charType(chars.charAt(offset + 1), bigWord) != charType;
       final ImmutableSet<String> wordMotions =
-        ImmutableSet.of("VimMotionWordRight", "VimMotionBigWordRight", "VimMotionCamelRight");
+        ImmutableSet.of(VIM_MOTION_WORD_RIGHT, VIM_MOTION_BIG_WORD_RIGHT, VIM_MOTION_CAMEL_RIGHT);
       if (wordMotions.contains(id) && lastWordChar && motion.getCount() == 1) {
         final boolean res = deleteCharacter(editor, caret, 1, true);
         if (res) {
@@ -1240,19 +1245,19 @@ public class ChangeGroup {
         }
         return res;
       }
-      if (id.equals("VimMotionWordRight")) {
+      if (id.equals(VIM_MOTION_WORD_RIGHT)) {
         kludge = true;
-        motion.setAction(ActionManager.getInstance().getAction("VimMotionWordEndRight"));
+        motion.setAction(ActionManager.getInstance().getAction(VIM_MOTION_WORD_END_RIGHT));
         motion.setFlags(Command.FLAG_MOT_INCLUSIVE);
       }
-      else if (id.equals("VimMotionBigWordRight")) {
+      else if (id.equals(VIM_MOTION_BIG_WORD_RIGHT)) {
         kludge = true;
-        motion.setAction(ActionManager.getInstance().getAction("VimMotionBigWordEndRight"));
+        motion.setAction(ActionManager.getInstance().getAction(VIM_MOTION_BIG_WORD_END_RIGHT));
         motion.setFlags(Command.FLAG_MOT_INCLUSIVE);
       }
-      else if (id.equals("VimMotionCamelRight")) {
+      else if (id.equals(VIM_MOTION_CAMEL_RIGHT)) {
         kludge = true;
-        motion.setAction(ActionManager.getInstance().getAction("VimMotionCamelEndRight"));
+        motion.setAction(ActionManager.getInstance().getAction(VIM_MOTION_CAMEL_END_RIGHT));
         motion.setFlags(Command.FLAG_MOT_INCLUSIVE);
       }
     }
