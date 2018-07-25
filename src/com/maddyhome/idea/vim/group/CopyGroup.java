@@ -351,11 +351,7 @@ public class CopyGroup {
       String origSegment = segment;
 
       if (segment.length() < maxLen) {
-        final int diff = maxLen - segment.length();
-        final StringBuilder sb = new StringBuilder(segment.length() + diff);
-        sb.append(segment);
-        for (int i = 0; i < diff; i++) sb.append(' ');
-        segment = sb.toString();
+        segment += StringUtil.repeat(" ", maxLen - segment.length());
 
         if (currentColumn != 0 && currentColumn < EditorHelper.getLineLength(editor, currentLine)) {
           origSegment = segment;
@@ -366,10 +362,9 @@ public class CopyGroup {
 
       final int insertOffset = editor.logicalPositionToOffset(new LogicalPosition(currentLine, currentColumn));
       MotionGroup.moveCaret(editor, caret, insertOffset);
-      VimPlugin.getChange().insertText(editor, caret, origSegment);
-      endOffset = insertOffset + origSegment.length();
-      for (int i = 1; i < count; i++) VimPlugin.getChange().insertText(editor, caret, segment);
-      endOffset += segment.length() * count;
+      final String insertedText = origSegment + StringUtil.repeat(segment, count - 1);
+      VimPlugin.getChange().insertText(editor, caret, insertedText);
+      endOffset += insertedText.length();
 
       if (mode == CommandState.SubMode.VISUAL_LINE) {
         MotionGroup.moveCaret(editor, caret, endOffset);
@@ -392,11 +387,9 @@ public class CopyGroup {
 
   private int putTextInternal(@NotNull Editor editor, @NotNull Caret caret, @NotNull String text, int startOffset, int count) {
     MotionGroup.moveCaret(editor, caret, startOffset);
-    for (int i = 0; i < count; i++) {
-      //TODO: change to stringbuilder?
-      VimPlugin.getChange().insertText(editor, caret, text);
-    }
-    return startOffset + text.length() * count;
+    final String insertedText = StringUtil.repeat(text, count);
+    VimPlugin.getChange().insertText(editor, caret, insertedText);
+    return startOffset + insertedText.length();
   }
 
   private int getStartOffset(@NotNull Editor editor, @NotNull Caret caret, SelectionType type, boolean beforeCursor) {
