@@ -1627,8 +1627,9 @@ public class MultipleCaretsTest extends VimTestCase {
 
   public void testInsertAtPreviousInsert() {
     final String before = "qw<caret>e\n" + "  a<caret>s<caret>d\n" + "zx<caret>c";
-    final String after = "rtyqwe\n" + "  rtyasd\n" + "rtyfghzxc";
-    doTest(parseKeys("I", "rty", "<Esc>", "2lj", "gi", "fgh"), before, after);
+    typeTextInFile(parseKeys("I", "rty", "<Esc>", "2lj", "gi", "fgh", "<Esc>"), before);
+    final String after = "rtyqwe\n" + "  rtyasd\n" + "rtyfg<caret>hzxc";
+    myFixture.checkResult(after);
   }
 
   public void testVisualBlockAppend() {
@@ -1641,7 +1642,7 @@ public class MultipleCaretsTest extends VimTestCase {
   public void testVisualBlockInsert() {
     final String before = "<caret>int a;\n" + "int b;\n" + "int c;";
     typeTextInFile(parseKeys("<C-V>", "2j", "I", "const ", "<Esc>"), before);
-    final String after = "const int a;\n" + "const int b;\n" + "const int c;";
+    final String after = "<caret>const int a;\n" + "const int b;\n" + "const int c;";
     myFixture.checkResult(after);
   }
 
@@ -1667,7 +1668,7 @@ public class MultipleCaretsTest extends VimTestCase {
     final String before = "class C {\n C<caret>(int i) {\nmyI = i;\n}\n p<caret>rivate int myI;\n}";
     configureByJavaText(before);
     typeText(parseKeys("=="));
-    final String after = "class C {\n    C(int i) {\nmyI = i;\n}\n    private int myI;\n}";
+    final String after = "class C {\n    <caret>C(int i) {\nmyI = i;\n}\n    <caret>private int myI;\n}";
     myFixture.checkResult(after);
   }
 
@@ -1721,7 +1722,7 @@ public class MultipleCaretsTest extends VimTestCase {
     final Editor editor = configureByText(before);
     VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
     typeText(parseKeys("vl", "p"));
-    final String after = "q\n" + "zxcvbn\n" + "rty\n" + "as\n" + "zxcvbn\n" + "gh\n" + "\n" + "zxcvbn\n" + "cvbn\n";
+    final String after = "q\n" + "<caret>zxcvbn\n" + "rty\n" + "as\n" + "<caret>zxcvbn\n" + "gh\n" + "\n" + "<caret>zxcvbn\n" + "cvbn\n";
     myFixture.checkResult(after);
   }
 
@@ -1888,14 +1889,14 @@ public class MultipleCaretsTest extends VimTestCase {
     assertNotNull(text);
 
     typeText(parseKeys("P"));
-    final String after = "qwe\n" +
+    final String after = "<caret>qwe\n" +
                          "rty\n" +
                          "fgh\n" +
                          "zxc\n" +
                          "qwe\n" +
                          "rty\n" +
                          "asd\n" +
-                         "qwe\n" +
+                         "<caret>qwe\n" +
                          "rty\n" +
                          "fgh\n" +
                          "zxc\n" +
@@ -1918,14 +1919,14 @@ public class MultipleCaretsTest extends VimTestCase {
     typeText(parseKeys("j", "p"));
     final String after = "qwe\n" +
                          "asd\n" +
-                         "qwe\n" +
+                         "<caret>qwe\n" +
                          "asd\n" +
                          "rty\n" +
                          "fgh\n" +
                          "zxc\n" +
                          "rty\n" +
                          "fgh\n" +
-                         "qwe\n" +
+                         "<caret>qwe\n" +
                          "asd\n" +
                          "rty\n" +
                          "fgh\n" +
@@ -1945,7 +1946,7 @@ public class MultipleCaretsTest extends VimTestCase {
     assertNotNull(text);
 
     typeText(parseKeys("G", "$", "p"));
-    final String after = "qwerty\n" + "asdfgh\n" + "zxcvbnwerty\n" + "      gh\n" + "      zxcvbn\n";
+    final String after = "qwerty\n" + "asdfgh\n" + "zxcvbn<caret>werty\n" + "      gh\n" + "      zxcvbn\n";
     myFixture.checkResult(after);
   }
 
@@ -1961,16 +1962,16 @@ public class MultipleCaretsTest extends VimTestCase {
 
     typeText(parseKeys("p"));
     final String after = "qwe\n" +
-                         "qwe\n" +
+                         "<caret>qwe\n" +
                          "zxc\n" +
                          "rty\n" +
                          "asd\n" +
                          "zxc\n" +
-                         "qwe\n" +
+                         "<caret>qwe\n" +
                          "zxc\n" +
                          "rty\n" +
                          "rty\n" +
-                         "qwe\n" +
+                         "<caret>qwe\n" +
                          "zxc\n" +
                          "rty\n" +
                          "fgh\n" +
