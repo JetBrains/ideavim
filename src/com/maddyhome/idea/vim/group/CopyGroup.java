@@ -430,24 +430,26 @@ public class CopyGroup {
                          boolean cursorAfter,
                          int endOffset) {
     int cursorMode;
-    if (type == SelectionType.BLOCK_WISE) {
-      if (mode == CommandState.SubMode.VISUAL_LINE) {
-        cursorMode = cursorAfter ? 4 : 1;
-      }
-      else {
-        cursorMode = cursorAfter ? 5 : 1;
-      }
-    }
-    else if (type == SelectionType.LINE_WISE) {
-      cursorMode = cursorAfter ? 4 : 3;
-    }
-    else /* Characterwise */ {
-      if (mode == CommandState.SubMode.VISUAL_LINE) {
-        cursorMode = cursorAfter ? 4 : 1;
-      }
-      else {
-        cursorMode = cursorAfter ? 5 : 2;
-      }
+    switch (type) {
+      case BLOCK_WISE:
+        if (mode == CommandState.SubMode.VISUAL_LINE) {
+          cursorMode = cursorAfter ? 4 : 1;
+        }
+        else {
+          cursorMode = cursorAfter ? 5 : 1;
+        }
+        break;
+      case LINE_WISE:
+        cursorMode = cursorAfter ? 4 : 3;
+        break;
+      default:
+        if (mode == CommandState.SubMode.VISUAL_LINE) {
+          cursorMode = cursorAfter ? 4 : 1;
+        }
+        else {
+          cursorMode = cursorAfter ? 5 : 2;
+        }
+        break;
     }
 
     switch (cursorMode) {
