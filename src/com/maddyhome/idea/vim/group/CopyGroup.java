@@ -116,9 +116,7 @@ public class CopyGroup {
    * @param type   The type of yank
    * @return true if able to yank the range, false if not
    */
-  public boolean yankRange(@NotNull Editor editor,
-                           @Nullable TextRange range,
-                           @NotNull SelectionType type,
+  public boolean yankRange(@NotNull Editor editor, @Nullable TextRange range, @NotNull SelectionType type,
                            boolean moveCursor) {
     if (range == null) return false;
 
@@ -132,7 +130,7 @@ public class CopyGroup {
       final ArrayList<Pair.NonNull<Integer, Integer>> ranges = new ArrayList<>(caretModel.getCaretCount());
       for (int i = 0; i < caretModel.getCaretCount(); i++) {
         ranges.add(Pair.createNonNull(EditorHelper.getLineStartForOffset(editor, rangeStartOffsets[i]),
-                              EditorHelper.getLineEndForOffset(editor, rangeEndOffsets[i]) + 1));
+                                      EditorHelper.getLineEndForOffset(editor, rangeEndOffsets[i]) + 1));
       }
       range = getTextRange(ranges, selectionType);
     }
@@ -145,8 +143,8 @@ public class CopyGroup {
       else {
         final List<Caret> carets = caretModel.getAllCarets();
         for (int i = 0; i < carets.size(); i++) {
-          startOffsets
-            .put(carets.get(i), new TextRange(rangeStartOffsets[i], rangeEndOffsets[i]).normalize().getStartOffset());
+          startOffsets.put(carets.get(i),
+                           new TextRange(rangeStartOffsets[i], rangeEndOffsets[i]).normalize().getStartOffset());
         }
       }
 
@@ -165,12 +163,8 @@ public class CopyGroup {
    * @param count   The number of times to perform the paste
    * @return true if able to paste, false if not
    */
-  public boolean putText(@NotNull Editor editor,
-                         @NotNull DataContext context,
-                         int count,
-                         boolean indent,
-                         boolean cursorAfter,
-                         boolean beforeCursor) {
+  public boolean putText(@NotNull Editor editor, @NotNull DataContext context, int count, boolean indent,
+                         boolean cursorAfter, boolean beforeCursor) {
     final Register register = VimPlugin.getRegister().getLastRegister();
     if (register == null) return false;
     final SelectionType selectionType = register.getType();
@@ -193,12 +187,8 @@ public class CopyGroup {
     return true;
   }
 
-  public boolean putVisualRange(@NotNull Editor editor,
-                                @NotNull DataContext context,
-                                @NotNull TextRange range,
-                                int count,
-                                boolean indent,
-                                boolean cursorAfter) {
+  public boolean putVisualRange(@NotNull Editor editor, @NotNull DataContext context, @NotNull TextRange range,
+                                int count, boolean indent, boolean cursorAfter) {
     final Register register = VimPlugin.getRegister().getLastRegister();
     VimPlugin.getRegister().resetRegister();
     if (register == null) return false;
@@ -233,9 +223,9 @@ public class CopyGroup {
     for (int i = 0; i < carets.size(); i++) {
       final Caret caret = carets.get(i);
       final int index = carets.size() - i - 1;
-      VimPlugin.getChange()
-        .deleteRange(editor, caret, new TextRange(range.getStartOffsets()[index], range.getEndOffsets()[index]),
-                     SelectionType.fromSubMode(subMode), false);
+      VimPlugin.getChange().deleteRange(editor, caret,
+                                        new TextRange(range.getStartOffsets()[index], range.getEndOffsets()[index]),
+                                        SelectionType.fromSubMode(subMode), false);
 
       final int start = ranges.get(index).first;
       caret.moveToOffset(start);
@@ -284,16 +274,9 @@ public class CopyGroup {
    * @param mode        The type of highlight prior to the put.
    * @param caret       The caret to insert to
    */
-  public void putText(@NotNull Editor editor,
-                      @NotNull Caret caret,
-                      @NotNull DataContext context,
-                      @NotNull String text,
-                      @NotNull SelectionType type,
-                      @NotNull CommandState.SubMode mode,
-                      int startOffset,
-                      int count,
-                      boolean indent,
-                      boolean cursorAfter) {
+  public void putText(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, @NotNull String text,
+                      @NotNull SelectionType type, @NotNull CommandState.SubMode mode, int startOffset, int count,
+                      boolean indent, boolean cursorAfter) {
     if (mode == CommandState.SubMode.VISUAL_LINE && editor.isOneLineMode()) return;
     if (indent && type != SelectionType.LINE_WISE && mode != CommandState.SubMode.VISUAL_LINE) indent = false;
     if (type == SelectionType.LINE_WISE && text.length() > 0 && text.charAt(text.length() - 1) != '\n') {
@@ -305,31 +288,20 @@ public class CopyGroup {
     VimPlugin.getMark().setChangeMarks(editor, new TextRange(startOffset, endOffset));
   }
 
-  private int putTextInternal(@NotNull Editor editor,
-                              @NotNull Caret caret,
-                              @NotNull DataContext context,
-                              @NotNull String text,
-                              @NotNull SelectionType type,
-                              @NotNull CommandState.SubMode mode,
-                              int startOffset,
-                              int count,
-                              boolean indent) {
-    final int endOffset = type != SelectionType.BLOCK_WISE
-                          ? putTextInternal(editor, caret, text, startOffset, count)
-                          : putTextInternal(editor, caret, context, text, mode, startOffset, count);
+  private int putTextInternal(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                              @NotNull String text, @NotNull SelectionType type, @NotNull CommandState.SubMode mode,
+                              int startOffset, int count, boolean indent) {
+    final int endOffset = type != SelectionType.BLOCK_WISE ? putTextInternal(editor, caret, text, startOffset, count)
+                                                           : putTextInternal(editor, caret, context, text, mode,
+                                                                             startOffset, count);
 
     if (indent) return doIndent(editor, caret, context, startOffset, endOffset);
 
     return endOffset;
   }
 
-  private int putTextInternal(@NotNull Editor editor,
-                              @NotNull Caret caret,
-                              @NotNull DataContext context,
-                              @NotNull String text,
-                              @NotNull CommandState.SubMode mode,
-                              int startOffset,
-                              int count) {
+  private int putTextInternal(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                              @NotNull String text, @NotNull CommandState.SubMode mode, int startOffset, int count) {
     final LogicalPosition startPosition = editor.offsetToLogicalPosition(startOffset);
     final int currentColumn = mode == CommandState.SubMode.VISUAL_LINE ? 0 : startPosition.column;
     int currentLine = startPosition.line;
@@ -385,7 +357,8 @@ public class CopyGroup {
     return endOffset;
   }
 
-  private int putTextInternal(@NotNull Editor editor, @NotNull Caret caret, @NotNull String text, int startOffset, int count) {
+  private int putTextInternal(@NotNull Editor editor, @NotNull Caret caret, @NotNull String text, int startOffset,
+                              int count) {
     MotionGroup.moveCaret(editor, caret, startOffset);
     final String insertedText = StringUtil.repeat(text, count);
     VimPlugin.getChange().insertText(editor, caret, insertedText);
@@ -394,17 +367,15 @@ public class CopyGroup {
 
   private int getStartOffset(@NotNull Editor editor, @NotNull Caret caret, SelectionType type, boolean beforeCursor) {
     if (beforeCursor) {
-      return type == SelectionType.LINE_WISE
-             ? VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
-             : caret.getOffset();
+      return type == SelectionType.LINE_WISE ? VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
+                                             : caret.getOffset();
     }
 
     int startOffset;
     if (type == SelectionType.LINE_WISE) {
-      startOffset =
-        Math.min(editor.getDocument().getTextLength(), VimPlugin.getMotion().moveCaretToLineEnd(editor, caret) + 1);
-      if (startOffset > 0 &&
-          startOffset == editor.getDocument().getTextLength() &&
+      startOffset = Math.min(editor.getDocument().getTextLength(),
+                             VimPlugin.getMotion().moveCaretToLineEnd(editor, caret) + 1);
+      if (startOffset > 0 && startOffset == editor.getDocument().getTextLength() &&
           editor.getDocument().getCharsSequence().charAt(startOffset - 1) != '\n') {
         editor.getDocument().insertString(startOffset, "\n");
         startOffset++;
@@ -422,13 +393,8 @@ public class CopyGroup {
     return startOffset;
   }
 
-  private void moveCaret(@NotNull Editor editor,
-                         @NotNull Caret caret,
-                         @NotNull SelectionType type,
-                         @NotNull CommandState.SubMode mode,
-                         int startOffset,
-                         boolean cursorAfter,
-                         int endOffset) {
+  private void moveCaret(@NotNull Editor editor, @NotNull Caret caret, @NotNull SelectionType type,
+                         @NotNull CommandState.SubMode mode, int startOffset, boolean cursorAfter, int endOffset) {
     int cursorMode;
     switch (type) {
       case BLOCK_WISE:
@@ -473,10 +439,7 @@ public class CopyGroup {
     }
   }
 
-  private int doIndent(@NotNull Editor editor,
-                       @NotNull Caret caret,
-                       @NotNull DataContext context,
-                       int startOffset,
+  private int doIndent(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int startOffset,
                        int endOffset) {
     final int startLine = editor.offsetToLogicalPosition(startOffset).line;
     final int endLine = editor.offsetToLogicalPosition(endOffset - 1).line;
@@ -527,9 +490,7 @@ public class CopyGroup {
     return new TextRange(starts, ends);
   }
 
-  private boolean yankRange(@NotNull Editor editor,
-                            @NotNull TextRange range,
-                            @NotNull SelectionType type,
+  private boolean yankRange(@NotNull Editor editor, @NotNull TextRange range, @NotNull SelectionType type,
                             @Nullable Map<Caret, Integer> startOffsets) {
     if (startOffsets != null) startOffsets.forEach((caret, offset) -> MotionGroup.moveCaret(editor, caret, offset));
 
