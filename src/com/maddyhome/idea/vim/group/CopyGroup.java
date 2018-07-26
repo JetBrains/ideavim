@@ -286,7 +286,7 @@ public class CopyGroup {
     }
 
     final int endOffset = putTextInternal(editor, caret, context, text, type, mode, startOffset, count, indent);
-    moveCaret(editor, caret, type, mode, startOffset, cursorAfter, endOffset);
+    moveCaret(editor, caret, type, mode, startOffset, endOffset, cursorAfter);
     VimPlugin.getMark().setChangeMarks(editor, new TextRange(startOffset, endOffset));
   }
 
@@ -410,7 +410,7 @@ public class CopyGroup {
   }
 
   private void moveCaret(@NotNull Editor editor, @NotNull Caret caret, @NotNull SelectionType type,
-                         @NotNull CommandState.SubMode mode, int startOffset, boolean cursorAfter, int endOffset) {
+                         @NotNull CommandState.SubMode mode, int startOffset, int endOffset, boolean cursorAfter) {
     int cursorMode;
     switch (type) {
       case BLOCK_WISE:
