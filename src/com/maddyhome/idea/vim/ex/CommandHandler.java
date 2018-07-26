@@ -19,13 +19,19 @@
 package com.maddyhome.idea.vim.ex;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.handler.CaretOrder;
+import com.maddyhome.idea.vim.handler.ExecuteMethodNotOverriddenException;
+import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * Base class for all Ex command handlers.
@@ -79,7 +85,11 @@ public abstract class CommandHandler {
    * @param flags Range and Arguments commands
    */
   public CommandHandler(CommandName[] names, int flags) {
-    this(names, flags, 0);
+    this(names, flags, 0, false, CaretOrder.NATIVE);
+  }
+
+  public CommandHandler(CommandName[] names, int flags, boolean runForEachCaret, CaretOrder caretOrder) {
+    this(names, flags, 0, runForEachCaret, caretOrder);
   }
 
   /**
@@ -94,6 +104,20 @@ public abstract class CommandHandler {
     this.argFlags = argFlags;
     this.optFlags = optFlags;
 
+    myRunForEachCaret = false;
+    myCaretOrder = CaretOrder.NATIVE;
+
+    CommandParser.getInstance().addHandler(this);
+  }
+
+  public CommandHandler(@Nullable CommandName[] names, int argFlags, int optFlags, boolean runForEachCaret, CaretOrder caretOrder) {
+    this.names = names;
+    this.argFlags = argFlags;
+    this.optFlags = optFlags;
+
+    myRunForEachCaret = runForEachCaret;
+    myCaretOrder = caretOrder;
+
     CommandParser.getInstance().addHandler(this);
   }
 
@@ -105,7 +129,11 @@ public abstract class CommandHandler {
    * @param argFlags Range and Arguments commands
    */
   public CommandHandler(String text, String optional, int argFlags) {
-    this(text, optional, argFlags, 0);
+    this(text, optional, argFlags, 0, false, CaretOrder.NATIVE);
+  }
+
+  public CommandHandler(String text, String optional, int argFlags, boolean runForEachCaret, CaretOrder caretOrder) {
+    this(text, optional, argFlags, 0, runForEachCaret, caretOrder);
   }
 
   /**
@@ -117,7 +145,11 @@ public abstract class CommandHandler {
    * @param optFlags Other command specific flags
    */
   public CommandHandler(String text, String optional, int argFlags, int optFlags) {
-    this(new CommandName[]{new CommandName(text, optional)}, argFlags, optFlags);
+    this(new CommandName[]{new CommandName(text, optional)}, argFlags, optFlags, false, CaretOrder.NATIVE);
+  }
+
+  public CommandHandler(String text, String optional, int argFlags, int optFlags, boolean runForEachCaret, CaretOrder caretOrder) {
+    this(new CommandName[]{new CommandName(text, optional)}, argFlags, optFlags, runForEachCaret, caretOrder);
   }
 
   /**
@@ -126,7 +158,11 @@ public abstract class CommandHandler {
    * @param argFlags Range and Arguments commands
    */
   public CommandHandler(int argFlags) {
-    this(argFlags, 0);
+    this(argFlags, 0, false, CaretOrder.NATIVE);
+  }
+
+  public CommandHandler(int argFlags, boolean runForEachCaret, CaretOrder caretOrder) {
+    this(argFlags, 0, runForEachCaret, caretOrder);
   }
 
   /**
@@ -139,6 +175,18 @@ public abstract class CommandHandler {
     this.names = null;
     this.argFlags = argFlags;
     this.optFlags = optFlags;
+
+    myRunForEachCaret = false;
+    myCaretOrder = CaretOrder.NATIVE;
+  }
+
+  public CommandHandler(int argFlags, int optFlags, boolean runForEachCaret, CaretOrder caretOrder) {
+    this.names = null;
+    this.argFlags = argFlags;
+    this.optFlags = optFlags;
+
+    myRunForEachCaret = runForEachCaret;
+    myCaretOrder = caretOrder;
   }
 
   /**
@@ -233,11 +281,30 @@ public abstract class CommandHandler {
 
     CommandState.getInstance(editor).setFlags(optFlags);
 
+    boolean res = true;
     try {
-      boolean res = true;
-      for (int i = 0; i < count && res; i++) {
-        res = execute(editor, context, cmd);
+      if (myRunForEachCaret) {
+        final List<Caret> carets = EditorHelper.getOrderedCaretsList(editor, myCaretOrder);
+        for (Caret caret : carets) {
+          for (int i = 0; i < count && res; i++) {
+            try {
+              res = execute(editor, caret, context, cmd);
+            } catch (ExecuteMethodNotOverriddenException e) {
+              return false;
+            }
+          }
+        }
       }
+      else {
+        for (int i = 0; i < count && res; i++) {
+          try {
+            res = execute(editor, context, cmd);
+          } catch (ExecuteMethodNotOverriddenException e) {
+            return false;
+          }
+        }
+      }
+
       if (!res) {
         VimPlugin.indicateError();
       }
@@ -259,9 +326,22 @@ public abstract class CommandHandler {
    * @return True if able to perform the command, false if not
    * @throws ExException if the range or arguments are invalid for the command
    */
-  public abstract boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException;
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context,
+                         @NotNull ExCommand cmd) throws ExException, ExecuteMethodNotOverriddenException {
+    if (!myRunForEachCaret) throw new ExecuteMethodNotOverriddenException(this.getClass());
+    return execute(editor, editor.getCaretModel().getPrimaryCaret(), context, cmd);
+  }
+
+  public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                          @NotNull ExCommand cmd) throws ExException, ExecuteMethodNotOverriddenException {
+    if (myRunForEachCaret) throw new ExecuteMethodNotOverriddenException(this.getClass());
+    return execute(editor, context, cmd);
+  }
 
   @Nullable protected final CommandName[] names;
   protected final int argFlags;
   protected final int optFlags;
+
+  private final boolean myRunForEachCaret;
+  private final CaretOrder myCaretOrder;
 }

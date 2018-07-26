@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.ex;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -39,7 +40,7 @@ public class Ranges {
    * Create the empty range list
    */
   public Ranges() {
-    ranges = new ArrayList<Range>();
+    ranges = new ArrayList<>();
   }
 
   /**
@@ -83,6 +84,11 @@ public class Ranges {
     return endLine;
   }
 
+  public int getLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {
+    processRange(editor, caret, context);
+    return endLine;
+  }
+
   /**
    * Gets the start line number the range represents
    *
@@ -112,6 +118,11 @@ public class Ranges {
     else {
       return count;
     }
+  }
+
+  public int getCount(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count) {
+    if (count == -1) return getLine(editor, caret, context);
+    return count;
   }
 
   /**
@@ -228,6 +239,27 @@ public class Ranges {
     done = true;
   }
 
+  private void processRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {
+    if (done) return;
+
+    startLine = defaultLine == -1 ? caret.getLogicalPosition().line : defaultLine;
+    endLine = startLine;
+    boolean lastZero = false;
+    for (Range range : ranges) {
+      startLine = endLine;
+      endLine = range.getLine(editor, context, lastZero);
+
+      if (range.isMove()) MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLine(editor, endLine));
+
+      lastZero = endLine < 0;
+      ++count;
+    }
+
+    if (count == 1) startLine = endLine;
+
+    done = true;
+  }
+
   @NotNull
   public String toString() {
 
@@ -239,5 +271,6 @@ public class Ranges {
   private int count = 0;
   private int defaultLine = -1;
   private boolean done = false;
-  @NotNull private final List<Range> ranges;
+  @NotNull
+  private final List<Range> ranges;
 }

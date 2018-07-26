@@ -19,7 +19,7 @@
 package com.maddyhome.idea.vim.ex;
 
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.common.TextRange;
 import org.jetbrains.annotations.NotNull;
@@ -52,6 +52,13 @@ public class ExCommand {
     return res;
   }
 
+  public int getCount(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int defaultCount,
+                      boolean checkCount) {
+    final int count = ranges.getCount(editor, caret, context, checkCount ? getCountArgument() : -1);
+    if (count == -1) return defaultCount;
+    return count;
+  }
+
   @NotNull
   public LineRange getLineRange(@NotNull Editor editor, DataContext context) {
     return ranges.getLineRange(editor, context, -1);
@@ -67,7 +74,7 @@ public class ExCommand {
     return ranges.getTextRange(editor, context, count);
   }
 
-  protected int getCountArgument() {
+  private int getCountArgument() {
     try {
       return Integer.parseInt(argument);
     }
@@ -95,9 +102,10 @@ public class ExCommand {
     return ranges;
   }
 
-  @NotNull private final Ranges ranges;
-  @NotNull private final String command;
-  @NotNull private String argument;
-
-  private static Logger logger = Logger.getInstance(ExCommand.class.getName());
+  @NotNull
+  private final Ranges ranges;
+  @NotNull
+  private final String command;
+  @NotNull
+  private String argument;
 }
