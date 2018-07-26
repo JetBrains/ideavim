@@ -293,31 +293,41 @@ public class CopyGroup {
   private int putTextInternal(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                               @NotNull String text, @NotNull SelectionType type, @NotNull CommandState.SubMode mode,
                               int startOffset, int count, boolean indent) {
-    final int endOffset;
     switch (type) {
       case CHARACTER_WISE:
-        endOffset = putTextCharacterwise(editor, caret, text, startOffset, count);
-        break;
+        return putTextCharacterwise(editor, caret, context, text, startOffset, count, indent);
       case LINE_WISE:
-        endOffset = putTextLinewise(editor, caret, text, startOffset, count);
-        break;
+        return putTextLinewise(editor, caret, context, text, startOffset, count, indent);
       default:
-        endOffset = putTextBlockwise(editor, caret, context, text, mode, startOffset, count);
+        return putTextBlockwise(editor, caret, context, text, mode, startOffset, count, indent);
+    }
+  }
+
+  private int putTextLinewise(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                              @NotNull String text, int startOffset, int count, boolean indent) {
+    final CaretModel caretModel = editor.getCaretModel();
+    final ArrayList<Caret> overlappedCarets = new ArrayList<>(caretModel.getCaretCount());
+    for (Caret possiblyOverlappedCaret : caretModel.getAllCarets()) {
+      if (possiblyOverlappedCaret.getOffset() != startOffset || possiblyOverlappedCaret == caret) continue;
+
+      MotionGroup.moveCaret(editor, possiblyOverlappedCaret,
+                            VimPlugin.getMotion().moveCaretHorizontal(editor, possiblyOverlappedCaret, 1, true));
+      overlappedCarets.add(possiblyOverlappedCaret);
     }
 
-    if (indent) return doIndent(editor, caret, context, startOffset, endOffset);
+    final int endOffset = putTextCharacterwise(editor, caret, context, text, startOffset, count, indent);
+
+    for (Caret overlappedCaret : overlappedCarets) {
+      MotionGroup.moveCaret(editor, overlappedCaret,
+                            VimPlugin.getMotion().moveCaretHorizontal(editor, overlappedCaret, -1, true));
+    }
 
     return endOffset;
   }
 
-  private int putTextLinewise(@NotNull Editor editor, @NotNull Caret caret, @NotNull String text, int startOffset,
-                              int count) {
-    //TODO: carets can overlap here when they at the same line which leads to bug
-    return putTextCharacterwise(editor, caret, text, startOffset, count);
-  }
-
   private int putTextBlockwise(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                              @NotNull String text, @NotNull CommandState.SubMode mode, int startOffset, int count) {
+                               @NotNull String text, @NotNull CommandState.SubMode mode, int startOffset, int count,
+                               boolean indent) {
     final LogicalPosition startPosition = editor.offsetToLogicalPosition(startOffset);
     final int currentColumn = mode == CommandState.SubMode.VISUAL_LINE ? 0 : startPosition.column;
     int currentLine = startPosition.line;
@@ -370,15 +380,20 @@ public class CopyGroup {
       ++currentLine;
     }
 
+    if (indent) return doIndent(editor, caret, context, startOffset, endOffset);
+
     return endOffset;
   }
 
-  private int putTextCharacterwise(@NotNull Editor editor, @NotNull Caret caret, @NotNull String text, int startOffset,
-                                   int count) {
+  private int putTextCharacterwise(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                                   @NotNull String text, int startOffset, int count, boolean indent) {
     MotionGroup.moveCaret(editor, caret, startOffset);
     final String insertedText = StringUtil.repeat(text, count);
     VimPlugin.getChange().insertText(editor, caret, insertedText);
-    return startOffset + insertedText.length();
+
+    final int endOffset = startOffset + insertedText.length();
+    if (indent) return doIndent(editor, caret, context, startOffset, endOffset);
+    return endOffset;
   }
 
   private int getStartOffset(@NotNull Editor editor, @NotNull Caret caret, SelectionType type, boolean beforeCursor) {
