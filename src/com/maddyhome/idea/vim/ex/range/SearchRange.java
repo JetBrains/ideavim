@@ -132,8 +132,27 @@ public class SearchRange extends AbstractRange {
   @Override
   protected int getRangeLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                              boolean lastZero) {
-    //TODO: add multicaret support
-    return getRangeLine(editor, context, lastZero);
+    int line = caret.getLogicalPosition().line;
+    int offset = -1;
+    for (int i = 0; i < patterns.size(); i++) {
+      final String pattern = patterns.get(i);
+      final int flag = flags.get(i);
+
+      offset = VimPlugin.getSearch().search(editor, pattern, getSearchOffset(editor, line, flag, lastZero), 1, flag);
+      if (offset == -1) break;
+
+      line = editor.offsetToLogicalPosition(offset).line;
+    }
+
+    return offset != -1 ? line : -1;
+  }
+
+  private int getSearchOffset(@NotNull Editor editor, int line, int flag, boolean lastZero) {
+    if ((flag & Command.FLAG_SEARCH_FWD) != 0 && !lastZero) {
+      return VimPlugin.getMotion().moveCaretToLineEnd(editor, line, true);
+    }
+
+    return VimPlugin.getMotion().moveCaretToLineStart(editor, line);
   }
 
   @NotNull
