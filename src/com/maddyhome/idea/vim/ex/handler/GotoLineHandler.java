@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.MotionGroup;
+import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,34 +40,29 @@ public class GotoLineHandler extends CommandHandler {
    * Create the handler
    */
   public GotoLineHandler() {
-    super(RANGE_REQUIRED | ARGUMENT_OPTIONAL, Command.FLAG_MOT_EXCLUSIVE);
+    super(RANGE_REQUIRED | ARGUMENT_OPTIONAL, Command.FLAG_MOT_EXCLUSIVE, true, CaretOrder.DECREASING_OFFSET);
   }
 
   /**
    * Moves the cursor to the line entered by the user
    *
-   * @param editor  The editor to perform the action in.
+   * @param editor  The editor to perform the action in
+   * @param caret   The caret to perform the action on
    * @param context The data context
    * @param cmd     The complete Ex command including range, command, and arguments
    * @return True if able to perform the command, false if not
    */
   @Override
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd)
-    throws ExException {
-    final int lineCount = EditorHelper.getLineCount(editor);
-    final int line = Math.min(lineCount - 1, cmd.getLine(editor, context));
+  public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                         @NotNull ExCommand cmd) throws ExException {
+    final int line = Math.min(cmd.getLine(editor, caret, context), EditorHelper.getLineCount(editor) - 1);
 
     if (line >= 0) {
-      final int offset = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, line);
-      for (Caret caret : editor.getCaretModel().getAllCarets()) {
-        MotionGroup.moveCaret(editor, caret, offset);
-      }
+      MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, line));
       return true;
     }
 
-    for (Caret caret : editor.getCaretModel().getAllCarets()) {
-      MotionGroup.moveCaret(editor, caret, 0);
-    }
+    MotionGroup.moveCaret(editor, caret, 0);
     return false;
   }
 }

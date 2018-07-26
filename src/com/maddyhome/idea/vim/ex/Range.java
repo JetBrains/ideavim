@@ -19,7 +19,9 @@
 package com.maddyhome.idea.vim.ex;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents an Ex command range
@@ -34,6 +36,8 @@ public interface Range {
    * @return The zero based logical line in the editor that the range represents
    */
   int getLine(Editor editor, DataContext context, boolean lastZero);
+
+  int getLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, boolean lastZero);
 
   /**
    * Should the cursor be moved to this range's line?

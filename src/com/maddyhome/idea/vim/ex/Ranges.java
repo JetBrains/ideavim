@@ -240,14 +240,14 @@ public class Ranges {
   }
 
   private void processRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {
-    if (done) return;
+    //if (done) return;
 
     startLine = defaultLine == -1 ? caret.getLogicalPosition().line : defaultLine;
     endLine = startLine;
     boolean lastZero = false;
     for (Range range : ranges) {
       startLine = endLine;
-      endLine = range.getLine(editor, context, lastZero);
+      endLine = range.getLine(editor, caret, context, lastZero);
 
       if (range.isMove()) MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLine(editor, endLine));
 
@@ -257,7 +257,7 @@ public class Ranges {
 
     if (count == 1) startLine = endLine;
 
-    done = true;
+    //done = true;
   }
 
   @NotNull

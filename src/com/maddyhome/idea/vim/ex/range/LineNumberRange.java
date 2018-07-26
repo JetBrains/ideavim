@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.ex.range;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
@@ -69,6 +70,14 @@ public class LineNumberRange extends AbstractRange {
     else if (line == LAST_LINE) {
       line = EditorHelper.getLineCount(editor) - 1;
     }
+
+    return line;
+  }
+
+  protected int getRangeLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                             boolean lastZero) {
+    if (line == LAST_LINE) line = EditorHelper.getLineCount(editor) - 1;
+    else line = caret.getLogicalPosition().line;
 
     return line;
   }

@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.ex.range;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.ex.Range;
 import org.jetbrains.annotations.NotNull;
@@ -124,6 +125,12 @@ public abstract class AbstractRange implements Range {
     return line + offset;
   }
 
+  public int getLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, boolean lastZero) {
+    if (offset == 0) return getRangeLine(editor, context, lastZero);
+
+    return getRangeLine(editor, caret, context, lastZero) + offset;
+  }
+
   @NotNull
   public String toString() {
     return "AbstractRange" + "{offset=" + offset + ", move=" + move + '}';
@@ -138,6 +145,9 @@ public abstract class AbstractRange implements Range {
    * @return The zero based line number, -1 if inable to get the line number
    */
   protected abstract int getRangeLine(Editor editor, DataContext context, boolean lastZero);
+
+  protected abstract int getRangeLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                                      boolean lastZero);
 
   protected final int offset;
   protected final boolean move;

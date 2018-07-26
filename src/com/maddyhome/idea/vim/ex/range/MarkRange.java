@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.ex.range;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Mark;
@@ -58,6 +59,13 @@ public class MarkRange extends AbstractRange {
     else {
       return -1;
     }
+  }
+
+  @Override
+  protected int getRangeLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                             boolean lastZero) {
+    //TODO: add multicaret support
+    return getRangeLine(editor, context, lastZero);
   }
 
   @NotNull

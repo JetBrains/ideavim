@@ -10,4 +10,20 @@ class MultipleCaretsTest : VimTestCase() {
     val after = "qwe <caret>rty asd\n fgh zxc vbn"
     myFixture.checkResult(after)
   }
+
+  fun testGotoLine() {
+    val before = "qwe\n" + "rty\n" + "asd\n" + "f<caret>gh\n" + "zxc\n" + "v<caret>bn\n"
+    configureByText(before)
+    typeText(commandToKeys("2"))
+    val after = "qwe\n" + "<caret>rty\n" + "asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+    myFixture.checkResult(after)
+  }
+
+  fun testGotoLineInc() {
+    val before = "qwe\n" + "rt<caret>y\n" + "asd\n" + "fgh\n" + "zxc\n" + "v<caret>bn\n"
+    configureByText(before)
+    typeText(commandToKeys("+2"))
+    val after = "qwe\n" + "rty\n" + "asd\n" + "<caret>fgh\n" + "zxc\n" + "<caret>vbn\n"
+    myFixture.checkResult(after)
+  }
 }

@@ -38,6 +38,10 @@ public class ExCommand {
     return ranges.getLine(editor, context);
   }
 
+  public int getLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {
+    return ranges.getLine(editor, caret, context);
+  }
+
   public int getCount(@NotNull Editor editor, DataContext context, int defaultCount, boolean checkCount) {
     int count = -1;
     if (checkCount) {
