@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.MotionGroup;
+import com.maddyhome.idea.vim.handler.CaretOrder;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -34,21 +35,20 @@ import org.jetbrains.annotations.NotNull;
  */
 public class GotoCharacterHandler extends CommandHandler {
   public GotoCharacterHandler() {
-    super("go", "to", RANGE_OPTIONAL | ARGUMENT_OPTIONAL | RANGE_IS_COUNT, Command.FLAG_MOT_EXCLUSIVE);
+    super("go", "to", RANGE_OPTIONAL | ARGUMENT_OPTIONAL | RANGE_IS_COUNT, Command.FLAG_MOT_EXCLUSIVE, true,
+          CaretOrder.DECREASING_OFFSET);
   }
 
   @Override
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd)
-    throws ExException {
-    final int count = cmd.getCount(editor, context, 1, true);
+  public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                         @NotNull ExCommand cmd) throws ExException {
+    final int count = cmd.getCount(editor, caret, context, 1, true);
     if (count <= 0) return false;
 
     final int offset = VimPlugin.getMotion().moveCaretToNthCharacter(editor, count - 1);
     if (offset == -1) return false;
 
-    for (Caret caret : editor.getCaretModel().getAllCarets()) {
-      MotionGroup.moveCaret(editor, caret, offset);
-    }
+    MotionGroup.moveCaret(editor, caret, offset);
 
     return true;
   }
