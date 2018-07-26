@@ -24,10 +24,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.LogicalPosition;
-import com.intellij.openapi.editor.event.DocumentAdapter;
-import com.intellij.openapi.editor.event.DocumentEvent;
-import com.intellij.openapi.editor.event.EditorFactoryAdapter;
-import com.intellij.openapi.editor.event.EditorFactoryEvent;
+import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -98,13 +95,15 @@ public class MarkGroup {
 
     VirtualFile vf = EditorData.getVirtualFile(editor);
     if ("{}".indexOf(ch) >= 0 && vf != null) {
-      int offset = SearchHelper.findNextParagraph(editor, ch == '{' ? -1 : 1, false);
+      int offset = SearchHelper.findNextParagraph(editor, editor.getCaretModel().getPrimaryCaret(), ch == '{' ? -1 : 1,
+                                                  false);
       offset = EditorHelper.normalizeOffset(editor, offset, false);
       LogicalPosition lp = editor.offsetToLogicalPosition(offset);
       mark = new Mark(ch, lp.line, lp.column, vf.getPath(), extractProtocol(vf));
     }
     else if ("()".indexOf(ch) >= 0 && vf != null) {
-      int offset = SearchHelper.findNextSentenceStart(editor, ch == '(' ? -1 : 1, false, true);
+      int offset = SearchHelper.findNextSentenceStart(editor, editor.getCaretModel().getPrimaryCaret(),
+                                                      ch == '(' ? -1 : 1, false, true);
       offset = EditorHelper.normalizeOffset(editor, offset, false);
       LogicalPosition lp = editor.offsetToLogicalPosition(offset);
       mark = new Mark(ch, lp.line, lp.column, vf.getPath(), extractProtocol(vf));
@@ -113,18 +112,18 @@ public class MarkGroup {
     else if (FILE_MARKS.indexOf(ch) >= 0) {
       final HashMap fmarks = getFileMarks(editor.getDocument());
       if (fmarks != null) {
-        mark = (Mark)fmarks.get(new Character(ch));
+        mark = (Mark)fmarks.get(ch);
         if (mark != null && mark.isClear()) {
-          fmarks.remove(new Character(ch));
+          fmarks.remove(ch);
           mark = null;
         }
       }
     }
     // This is a mark from another file
     else if (GLOBAL_MARKS.indexOf(ch) >= 0) {
-      mark = globalMarks.get(new Character(ch));
+      mark = globalMarks.get(ch);
       if (mark != null && mark.isClear()) {
-        globalMarks.remove(new Character(ch));
+        globalMarks.remove(ch);
         mark = null;
       }
     }
@@ -164,9 +163,9 @@ public class MarkGroup {
     if (fmarks == null) {
       return null;
     }
-    Mark mark = (Mark)fmarks.get(new Character(ch));
+    Mark mark = (Mark)fmarks.get(ch);
     if (mark != null && mark.isClear()) {
-      fmarks.remove(new Character(ch));
+      fmarks.remove(ch);
       mark = null;
     }
 
@@ -301,10 +300,10 @@ public class MarkGroup {
   private void removeMark(char ch, @NotNull Mark mark) {
     if (FILE_MARKS.indexOf(ch) >= 0) {
       HashMap fmarks = getFileMarks(mark.getFilename());
-      fmarks.remove(new Character(ch));
+      fmarks.remove(ch);
     }
     else if (GLOBAL_MARKS.indexOf(ch) >= 0) {
-      globalMarks.remove(new Character(ch));
+      globalMarks.remove(ch);
     }
 
     mark.clear();
@@ -312,7 +311,7 @@ public class MarkGroup {
 
   @NotNull
   public List<Mark> getMarks(@NotNull Editor editor) {
-    HashSet<Mark> res = new HashSet<Mark>();
+    HashSet<Mark> res = new HashSet<>();
 
     final FileMarks<Character, Mark> marks = getFileMarks(editor.getDocument());
     if (marks != null) {
@@ -320,9 +319,9 @@ public class MarkGroup {
     }
     res.addAll(globalMarks.values());
 
-    ArrayList<Mark> list = new ArrayList<Mark>(res);
+    ArrayList<Mark> list = new ArrayList<>(res);
 
-    Collections.sort(list, new Mark.KeySorter<Mark>());
+    list.sort(new Mark.KeySorter<>());
 
     return list;
   }
@@ -360,7 +359,7 @@ public class MarkGroup {
       return null;
     }
 
-    HashMap<Character, Mark> res = new HashMap<Character, Mark>();
+    HashMap<Character, Mark> res = new HashMap<>();
     FileMarks<Character, Mark> fileMarks = getFileMarks(doc);
     if (fileMarks != null) {
       res.putAll(fileMarks);
@@ -386,7 +385,7 @@ public class MarkGroup {
   private FileMarks<Character, Mark> getFileMarks(String filename) {
     FileMarks<Character, Mark> marks = fileMarks.get(filename);
     if (marks == null) {
-      marks = new FileMarks<Character, Mark>();
+      marks = new FileMarks<>();
       fileMarks.put(filename, marks);
     }
 
@@ -413,12 +412,8 @@ public class MarkGroup {
 
     Element fileMarksElem = new Element("filemarks");
 
-    List<FileMarks<Character, Mark>> files = new ArrayList<FileMarks<Character, Mark>>(fileMarks.values());
-    Collections.sort(files, new Comparator<FileMarks<Character, Mark>>() {
-      public int compare(@NotNull FileMarks<Character, Mark> o1, @NotNull FileMarks<Character, Mark> o2) {
-        return o1.timestamp.compareTo(o2.timestamp);
-      }
-    });
+    List<FileMarks<Character, Mark>> files = new ArrayList<>(fileMarks.values());
+    files.sort(Comparator.comparing(o -> o.timestamp));
 
     if (files.size() > SAVE_MARK_COUNT) {
       files = files.subList(files.size() - SAVE_MARK_COUNT, files.size());
@@ -632,10 +627,6 @@ public class MarkGroup {
   }
 
   private static class FileMarks<K, V> extends HashMap<K, V> {
-    public Date getTimestamp() {
-      return timestamp;
-    }
-
     public void setTimestamp(Date timestamp) {
       this.timestamp = timestamp;
     }
@@ -651,7 +642,7 @@ public class MarkGroup {
   /**
    * This class is used to listen to editor document changes
    */
-  public static class MarkUpdater extends DocumentAdapter {
+  public static class MarkUpdater implements DocumentListener {
     /**
      * Creates the listener for the supplied editor
      */
@@ -707,9 +698,9 @@ public class MarkGroup {
     }
   }
 
-  @NotNull private final HashMap<String, FileMarks<Character, Mark>> fileMarks = new HashMap<String, FileMarks<Character, Mark>>();
-  @NotNull private final HashMap<Character, Mark> globalMarks = new HashMap<Character, Mark>();
-  @NotNull private final List<Jump> jumps = new ArrayList<Jump>();
+  @NotNull private final HashMap<String, FileMarks<Character, Mark>> fileMarks = new HashMap<>();
+  @NotNull private final HashMap<Character, Mark> globalMarks = new HashMap<>();
+  @NotNull private final List<Jump> jumps = new ArrayList<>();
   private int jumpSpot = -1;
 
   private static final int SAVE_MARK_COUNT = 20;
