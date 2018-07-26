@@ -7,6 +7,7 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -1727,25 +1728,33 @@ public class MultipleCaretsTest extends VimTestCase {
   }
 
   public void testPutTextBeforeCursorLinewiseOverlapRange() {
-    String before = "q<caret>we<caret>rty\n" + "asdfgh\n" + "<caret>zxcvbn\n";
+    testPutOverlapLine("q<caret>we<caret>rty\n" + "asdfgh\n" + "<caret>zxcvbn\n",
+                       "<caret>zxcvbn\n" + "<caret>zxcvbn\n" + "qwerty\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n",
+                       true);
+    testPutOverlapLine("qwerty\n" + "a<caret>sd<caret>fgh\n" + "<caret>zxcvbn\n",
+                       "qwerty\n" + "<caret>zxcvbn\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n",
+                       true);
+    testPutOverlapLine("qwerty\n" + "asd<caret>fgh\n" + "<caret>zxcvb<caret>n\n",
+                       "qwerty\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "<caret>zxcvbn\n" + "zxcvbn\n",
+                       true);
+  }
+
+  public void testPutTextAfterCursorLinewiseOverlapRange() {
+    testPutOverlapLine("q<caret>wert<caret>y\n" + "asdfgh\n" + "<caret>zxcvbn\n",
+                       "qwerty\n" + "<caret>zxcvbn\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "zxcvbn\n" + "<caret>zxcvbn\n",
+                       false);
+    testPutOverlapLine("qwerty\n" + "as<caret>dfg<caret>h\n" + "<caret>zxcvbn\n",
+                       "qwerty\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "<caret>zxcvbn\n" + "zxcvbn\n" + "<caret>zxcvbn\n",
+                       false);
+    testPutOverlapLine("qwerty\n" + "asdfg<caret>h\n" + "<caret>zxcv<caret>bn\n",
+                       "qwerty\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n" + "<caret>zxcvbn\n" + "<caret>zxcvbn\n",
+                       false);
+  }
+
+  private void testPutOverlapLine(@NotNull String before, @NotNull String after, boolean beforeCursor) {
     Editor editor = configureByText(before);
     VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
-    typeText(parseKeys("P"));
-    String after = "<caret>zxcvbn\n" + "<caret>zxcvbn\n" + "qwerty\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n";
-    myFixture.checkResult(after);
-
-    before = "qwerty\n" + "a<caret>sd<caret>fgh\n" + "<caret>zxcvbn\n";
-    editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
-    typeText(parseKeys("P"));
-    after = "qwerty\n" + "<caret>zxcvbn\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n";
-    myFixture.checkResult(after);
-
-    before = "qwerty\n" + "asd<caret>fgh\n" + "<caret>zxcvb<caret>n\n";
-    editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
-    typeText(parseKeys("P"));
-    after = "qwerty\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "<caret>zxcvbn\n" + "zxcvbn\n";
+    typeText(parseKeys(beforeCursor ? "P" : "p"));
     myFixture.checkResult(after);
   }
 
@@ -1757,30 +1766,6 @@ public class MultipleCaretsTest extends VimTestCase {
     final String after = "qwerty\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n" + "<caret>zxcvbn\n";
     myFixture.checkResult(after);
   }
-
-  //TODO fix this case
-  /*public void testPutTextAfterCursorLinewiseOverlapRange() {
-    String before = "q<caret>wert<caret>y\n" + "asdfgh\n" + "<caret>zxcvbn\n";
-    Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
-    typeText(parseKeys("p"));
-    String after = "qwerty\n" + "<caret>zxcvbn\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "zxcvbn\n" + "<caret>zxcvbn\n";
-    myFixture.checkResult(after);
-
-    before = "qwerty\n" + "as<caret>dfg<caret>h\n" + "<caret>zxcvbn\n";
-    editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
-    typeText(parseKeys("p"));
-    after = "qwerty\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "<caret>zxcvbn\n" + "zxcvbn\n" + "<caret>zxcvbn\n";
-    myFixture.checkResult(after);
-
-    before = "qwerty\n" + "asdfg<caret>h\n" + "<caret>zxcv<caret>bn\n";
-    editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
-    typeText(parseKeys("p"));
-    after = "qwerty\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n" + "<caret>zxcvbn\n" + "<caret>zxcvbn\n";
-    myFixture.checkResult(after);
-  }*/
 
   public void testPutVisualTextLinewise() {
     final String before = "q<caret>werty\n" + "as<caret>dfgh\n" + "<caret>zxcvbn\n";
