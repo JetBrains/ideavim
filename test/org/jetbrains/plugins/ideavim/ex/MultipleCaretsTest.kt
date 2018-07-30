@@ -1,5 +1,6 @@
 package org.jetbrains.plugins.ideavim.ex
 
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MultipleCaretsTest : VimTestCase() {
@@ -24,6 +25,23 @@ class MultipleCaretsTest : VimTestCase() {
     configureByText(before)
     typeText(commandToKeys("+2"))
     val after = "qwe\n" + "rty\n" + "asd\n" + "<caret>fgh\n" + "zxc\n" + "<caret>vbn\n"
+    myFixture.checkResult(after)
+  }
+
+  fun testJoinLines() {
+    val before = "qwe\n" + "r<caret>ty\n" + "asd\n" + "fg<caret>h\n" + "zxc\n" + "vbn\n"
+    configureByText(before)
+    typeText(commandToKeys("j"))
+    val after = "qwe\n" + "rty<caret> asd\n" + "fgh<caret> zxc\n" + "vbn\n"
+    myFixture.checkResult(after)
+  }
+
+  fun testJoinVisualLines() {
+    val before = "qwe\n" + "r<caret>ty\n" + "asd\n" + "fg<caret>h\n" + "zxc\n" + "vbn\n"
+    configureByText(before)
+    typeText(parseKeys("vj"))
+    typeText(commandToKeys("j"))
+    val after = "qwe\n" + "rty<caret> asd\n" + "fgh<caret> zxc\n" + "vbn\n"
     myFixture.checkResult(after)
   }
 }
