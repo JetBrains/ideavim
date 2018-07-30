@@ -23,7 +23,6 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.util.Function;
 import com.intellij.util.containers.ContainerUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction;
@@ -31,7 +30,10 @@ import com.maddyhome.idea.vim.action.motion.search.SearchAgainNextAction;
 import com.maddyhome.idea.vim.action.motion.search.SearchAgainPreviousAction;
 import com.maddyhome.idea.vim.action.motion.search.SearchEntryFwdAction;
 import com.maddyhome.idea.vim.action.motion.search.SearchEntryRevAction;
-import com.maddyhome.idea.vim.action.motion.text.*;
+import com.maddyhome.idea.vim.action.motion.text.MotionParagraphNextAction;
+import com.maddyhome.idea.vim.action.motion.text.MotionParagraphPreviousAction;
+import com.maddyhome.idea.vim.action.motion.text.MotionSentenceNextStartAction;
+import com.maddyhome.idea.vim.action.motion.text.MotionSentencePreviousStartAction;
 import com.maddyhome.idea.vim.action.motion.updown.MotionPercentOrMatchAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
@@ -42,8 +44,6 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.option.ListOption;
-import com.maddyhome.idea.vim.option.OptionChangeEvent;
-import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.ClipboardHandler;
 import org.jdom.Element;
@@ -52,7 +52,10 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * This group works with command associated with copying and pasting text
@@ -68,26 +71,24 @@ public class RegisterGroup {
 
   private char defaultRegister = '"';
   private char lastRegister = defaultRegister;
-  @NotNull private final HashMap<Character, Register> registers = new HashMap<Character, Register>();
+  @NotNull private final HashMap<Character, Register> registers = new HashMap<>();
   private char recordRegister = 0;
   @Nullable private List<KeyStroke> recordList = null;
 
   public RegisterGroup() {
     final ListOption clipboardOption = Options.getInstance().getListOption(Options.CLIPBOARD);
     if (clipboardOption != null) {
-      clipboardOption.addOptionChangeListener(new OptionChangeListener() {
-        public void valueChange(OptionChangeEvent event) {
-          if (clipboardOption.contains("unnamed")) {
-            defaultRegister = '*';
-          }
-          else if (clipboardOption.contains("unnamedplus")) {
-            defaultRegister = '+';
-          }
-          else {
-            defaultRegister = '"';
-          }
-          lastRegister = defaultRegister;
+      clipboardOption.addOptionChangeListener(event -> {
+        if (clipboardOption.contains("unnamed")) {
+          defaultRegister = '*';
         }
+        else if (clipboardOption.contains("unnamedplus")) {
+          defaultRegister = '+';
+        }
+        else {
+          defaultRegister = '"';
+        }
+        lastRegister = defaultRegister;
       });
     }
   }
@@ -95,7 +96,7 @@ public class RegisterGroup {
   /**
    * Check to see if the last selected register can be written to.
    */
-  public boolean isRegisterWritable() {
+  private boolean isRegisterWritable() {
     return READONLY_REGISTERS.indexOf(lastRegister) < 0;
   }
 
@@ -166,7 +167,7 @@ public class RegisterGroup {
     // If this is an uppercase register, we need to append the text to the corresponding lowercase register
     if (Character.isUpperCase(register)) {
       char lreg = Character.toLowerCase(register);
-      Register r = registers.get(new Character(lreg));
+      Register r = registers.get(lreg);
       // Append the text if the lowercase register existed
       if (r != null) {
         r.addText(text);
@@ -273,7 +274,7 @@ public class RegisterGroup {
     if (Character.isUpperCase(r)) {
       r = Character.toLowerCase(r);
     }
-    return CLIPBOARD_REGISTERS.contains(r) ? refreshClipboardRegister(r) : registers.get(new Character(r));
+    return CLIPBOARD_REGISTERS.contains(r) ? refreshClipboardRegister(r) : registers.get(r);
   }
 
   /**
@@ -294,14 +295,14 @@ public class RegisterGroup {
 
   @NotNull
   public List<Register> getRegisters() {
-    final List<Register> res = new ArrayList<Register>(registers.values());
+    final List<Register> res = new ArrayList<>(registers.values());
     for (Character r : CLIPBOARD_REGISTERS) {
       final Register register = refreshClipboardRegister(r);
       if (register != null) {
         res.add(register);
       }
     }
-    Collections.sort(res, new Register.KeySorter<Register>());
+    res.sort(new Register.KeySorter<>());
     return res;
   }
 
@@ -309,7 +310,7 @@ public class RegisterGroup {
     if (RECORDABLE_REGISTER.indexOf(register) != -1) {
       CommandState.getInstance(editor).setRecording(true);
       recordRegister = register;
-      recordList = new ArrayList<KeyStroke>();
+      recordList = new ArrayList<>();
       return true;
     }
     else {
@@ -412,7 +413,7 @@ public class RegisterGroup {
           final Element keysElement = registerElement.getChild("keys");
           //noinspection unchecked
           final List<Element> keyElements = keysElement.getChildren("key");
-          final List<KeyStroke> strokes = new ArrayList<KeyStroke>();
+          final List<KeyStroke> strokes = new ArrayList<>();
           for (Element keyElement : keyElements) {
             final int code = Integer.parseInt(keyElement.getAttributeValue("code"));
             final int modifiers = Integer.parseInt(keyElement.getAttributeValue("mods"));
@@ -441,12 +442,7 @@ public class RegisterGroup {
   @NotNull
   private SelectionType guessSelectionType(@NotNull String text) {
     final String[] lines = StringUtil.splitByLines(text);
-    final HashSet<Integer> lengths = new HashSet<Integer>(ContainerUtil.map(lines, new Function<String, Integer>() {
-      @Override
-      public Integer fun(String s) {
-        return s.length();
-      }
-    }));
+    final HashSet<Integer> lengths = new HashSet<>(ContainerUtil.map(lines, String::length));
     if (lines.length > 1 && lengths.size() == 1) {
       return SelectionType.BLOCK_WISE;
     }
