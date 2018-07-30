@@ -999,21 +999,6 @@ public class ChangeGroup {
    * Delete the range of text.
    *
    * @param editor   The editor to delete the text from
-   * @param range    The range to delete
-   * @param type     The type of deletion
-   * @param isChange is from a change action
-   * @return true if able to delete the text, false if not
-   * @deprecated Use {@link #deleteRange(Editor, Caret, TextRange, SelectionType, boolean)}
-   */
-  public boolean deleteRange(@NotNull Editor editor, @NotNull TextRange range, @Nullable SelectionType type,
-                             boolean isChange) {
-    return deleteRange(editor, editor.getCaretModel().getPrimaryCaret(), range, type, isChange);
-  }
-
-  /**
-   * Delete the range of text.
-   *
-   * @param editor   The editor to delete the text from
    * @param caret    The caret to be moved after deletion
    * @param range    The range to delete
    * @param type     The type of deletion
