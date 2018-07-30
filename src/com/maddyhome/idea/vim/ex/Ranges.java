@@ -258,7 +258,6 @@ public class Ranges {
   }
 
   private void processRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {
-    //if (done) return;
     //TODO: if count > 1 -> multicaret?
     startLine = defaultLine == -1 ? caret.getLogicalPosition().line : defaultLine;
     endLine = startLine;
@@ -275,7 +274,6 @@ public class Ranges {
 
     if (count == 1) startLine = endLine;
 
-    //done = true;
     count = 0;
   }
 
