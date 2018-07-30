@@ -102,6 +102,11 @@ public class Ranges {
     return startLine;
   }
 
+  public int getFirstLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {
+    processRange(editor, caret, context);
+    return startLine;
+  }
+
   /**
    * Gets the count for an Ex command. This is either an explicit count enter at the end of the command or the
    * end of the specified range.
@@ -151,6 +156,12 @@ public class Ranges {
     return new LineRange(start, end);
   }
 
+  public LineRange getLineRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count) {
+    processRange(editor, caret, context);
+    if (count == -1) return new LineRange(startLine, endLine);
+    return new LineRange(endLine, endLine + count - 1);
+  }
+
   /**
    * Gets the text range represented by this range. If a count is given, the range is the range end line through
    * count-1 lines. If no count is given (-1), the range is the range given by the user. The text range is based
@@ -166,6 +177,15 @@ public class Ranges {
     LineRange lr = getLineRange(editor, context, count);
     int start = EditorHelper.getLineStartOffset(editor, lr.getStartLine());
     int end = EditorHelper.getLineEndOffset(editor, lr.getEndLine(), true) + 1;
+
+    return new TextRange(start, Math.min(end, EditorHelper.getFileSize(editor)));
+  }
+
+  public TextRange getTextRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count) {
+    final LineRange lineRange = getLineRange(editor, caret, context, count);
+
+    final int start = EditorHelper.getLineStartOffset(editor, lineRange.getStartLine());
+    final int end = EditorHelper.getLineEndOffset(editor, lineRange.getEndLine(), true) + 1;
 
     return new TextRange(start, Math.min(end, EditorHelper.getFileSize(editor)));
   }
@@ -209,8 +229,6 @@ public class Ranges {
    * @param context The data context
    */
   private void processRange(@NotNull Editor editor, DataContext context) {
-    // TODO: Add multiple carets support
-
     // Already done
     if (done) return;
 
@@ -241,7 +259,7 @@ public class Ranges {
 
   private void processRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {
     //if (done) return;
-
+    //TODO: if count > 1 -> multicaret?
     startLine = defaultLine == -1 ? caret.getLogicalPosition().line : defaultLine;
     endLine = startLine;
     boolean lastZero = false;
@@ -258,6 +276,7 @@ public class Ranges {
     if (count == 1) startLine = endLine;
 
     //done = true;
+    count = 0;
   }
 
   @NotNull

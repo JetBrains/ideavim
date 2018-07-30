@@ -23,11 +23,10 @@ import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.ExecuteMethodNotOverriddenException;
-import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.helper.MessageHelper;
-import com.maddyhome.idea.vim.helper.Msg;
+import com.maddyhome.idea.vim.helper.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -281,9 +280,27 @@ public abstract class CommandHandler {
 
     CommandState.getInstance(editor).setFlags(optFlags);
 
+    final boolean forEachCaret = myRunForEachCaret && !CommandState.inVisualBlockMode(editor);
+    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
+      if (forEachCaret) {
+        for (Caret caret : editor.getCaretModel().getAllCarets()) {
+          final TextRange range = CommandState.getInstance(editor).getMode() != CommandState.Mode.VISUAL
+                                  ? null
+                                  : VimPlugin.getMotion().getVisualRange(caret);
+          CaretData.setVisualTextRange(caret, range);
+        }
+      }
+      else {
+        final TextRange range = CommandState.getInstance(editor).getMode() != CommandState.Mode.VISUAL
+                                ? null
+                                : VimPlugin.getMotion().getVisualRange(editor);
+        CaretData.setVisualTextRange(editor.getCaretModel().getPrimaryCaret(), range);
+      }
+    }
+
     boolean res = true;
     try {
-      if (myRunForEachCaret) {
+      if (forEachCaret) {
         final List<Caret> carets = EditorHelper.getOrderedCaretsList(editor, myCaretOrder);
         for (Caret caret : carets) {
           for (int i = 0; i < count && res; i++) {

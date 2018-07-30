@@ -78,6 +78,11 @@ public class ExCommand {
     return ranges.getTextRange(editor, context, count);
   }
 
+  public TextRange getTextRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                                boolean checkCount) {
+    return ranges.getTextRange(editor, caret, context, checkCount ? getCountArgument() : -1);
+  }
+
   private int getCountArgument() {
     try {
       return Integer.parseInt(argument);
