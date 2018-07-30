@@ -44,4 +44,21 @@ class MultipleCaretsTest : VimTestCase() {
     val after = "qwe\n" + "rty<caret> asd\n" + "fgh<caret> zxc\n" + "vbn\n"
     myFixture.checkResult(after)
   }
+
+  fun testCopyText() {
+    val before = "qwe\n" + "rty\n" + "a<caret>sd\n" + "fg<caret>h\n" + "zxc\n" + "vbn\n"
+    configureByText(before)
+    typeText(commandToKeys("co 2"))
+    val after = "qwe\n" + "rty\n" + "<caret>asd\n" + "<caret>fgh\n" + "asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+    myFixture.checkResult(after)
+  }
+
+  fun testCopyVisualText() {
+    val before = "qwe\n" + "<caret>rty\n" + "asd\n" + "f<caret>gh\n" + "zxc\n" + "vbn\n"
+    configureByText(before)
+    typeText(parseKeys("vj"))
+    typeText(commandToKeys(":co 2"))
+    val after = "qwe\n" + "rty\n" + "<caret>rty\n" + "asd\n" + "<caret>fgh\n" + "zxc\n" + "asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+    myFixture.checkResult(after)
+  }
 }
