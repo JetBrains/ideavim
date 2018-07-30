@@ -106,15 +106,7 @@ public class Register {
     public int compare(V o1, V o2) {
       Register a = (Register)o1;
       Register b = (Register)o2;
-      if (a.name < b.name) {
-        return -1;
-      }
-      else if (a.name > b.name) {
-        return 1;
-      }
-      else {
-        return 0;
-      }
+      return Character.compare(a.name, b.name);
     }
   }
 }
