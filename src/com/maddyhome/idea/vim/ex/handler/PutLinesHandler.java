@@ -19,16 +19,27 @@
 package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.SelectionType;
+import com.maddyhome.idea.vim.common.Register;
+import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.CommandName;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.group.MotionGroup;
+import com.maddyhome.idea.vim.group.MarkGroup;
 import com.maddyhome.idea.vim.group.RegisterGroup;
+import com.maddyhome.idea.vim.handler.CaretOrder;
+import com.maddyhome.idea.vim.helper.CaretData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PutLinesHandler extends CommandHandler {
   public PutLinesHandler() {
@@ -39,26 +50,60 @@ public class PutLinesHandler extends CommandHandler {
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context,
                          @NotNull ExCommand cmd) throws ExException {
-    // TODO: Add multiple carets support
-    final RegisterGroup registerGroup = VimPlugin.getRegister();
-    final int line = cmd.getLine(editor, context);
-    final String arg = cmd.getArgument();
+    if (editor.isOneLineMode()) return false;
 
-    if (arg.length() > 0) {
-      if (!registerGroup.selectRegister(arg.charAt(0))) {
-        return false;
-      }
+    final RegisterGroup registerGroup = VimPlugin.getRegister();
+    final String arg = cmd.getArgument();
+    if (arg.length() > 0 && !registerGroup.selectRegister(arg.charAt(0))) {
+      return false;
     }
     else {
       registerGroup.selectRegister(registerGroup.getDefaultRegister());
     }
 
-    final int offset = EditorHelper.getLineStartOffset(editor, line + 1);
-    editor.getDocument().insertString(offset, "\n");
-    MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
-    final boolean result = VimPlugin.getCopy().putText(editor, context, 1, false, false, false);
-    final int newOffset = EditorHelper.getLineStartOffset(editor, line + 1);
-    MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), newOffset);
-    return result;
+    final Register register = registerGroup.getLastRegister();
+    if (register == null) return false;
+    final String text = register.getText();
+
+    final List<Integer> lines;
+    final List<Caret> carets = EditorHelper.getOrderedCaretsList(editor, CaretOrder.DECREASING_OFFSET);
+    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
+      final CaretModel caretModel = editor.getCaretModel();
+
+      final TextRange range = CaretData.getVisualTextRange(caretModel.getPrimaryCaret());
+      if (range == null) return false;
+
+      lines = new ArrayList<>(caretModel.getCaretCount());
+      for (int i = range.getStartOffsets().length - 1; i >= 0; i--) {
+        final int offset = editor.offsetToLogicalPosition(range.getStartOffsets()[i]).line + 1;
+        lines.add(offset);
+      }
+    }
+    else {
+      lines = cmd.getOrderedLines(editor, context, CaretOrder.DECREASING_OFFSET);
+    }
+    for (int i = 0; i < carets.size(); i++) {
+      final Caret caret = carets.get(i);
+      final int line = lines.get(i);
+
+      int startOffset = Math.min(editor.getDocument().getTextLength(),
+                                       VimPlugin.getMotion().moveCaretToLineEnd(editor, line, true) + 1);
+      if (startOffset > 0 && startOffset == editor.getDocument().getTextLength() &&
+          editor.getDocument().getCharsSequence().charAt(startOffset - 1) != '\n') {
+        editor.getDocument().insertString(startOffset, "\n");
+        startOffset++;
+      }
+
+      if (text == null) {
+        VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, startOffset);
+        VimPlugin.getMark().setChangeMarks(editor, new TextRange(startOffset, startOffset));
+        continue;
+      }
+
+      VimPlugin.getCopy().putText(editor, caret, context, text, SelectionType.LINE_WISE, CommandState.SubMode.NONE,
+                                  startOffset, 1, false, false);
+    }
+
+    return true;
   }
 }
