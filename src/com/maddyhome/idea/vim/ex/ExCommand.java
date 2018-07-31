@@ -83,6 +83,10 @@ public class ExCommand {
     return ranges.getLineRange(editor, context, -1);
   }
 
+  public LineRange getLineRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {
+    return ranges.getLineRange(editor, caret, context, -1);
+  }
+
   @NotNull
   public TextRange getTextRange(@NotNull Editor editor, DataContext context, boolean checkCount) {
     int count = -1;

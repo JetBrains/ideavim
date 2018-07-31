@@ -19,16 +19,22 @@
 package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.*;
+import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.helper.Msg;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -38,31 +44,56 @@ public class MoveTextHandler extends CommandHandler {
     super("m", "ove", RANGE_OPTIONAL | ARGUMENT_REQUIRED | WRITABLE);
   }
 
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
-    //TODO: add multiple carets support
-    TextRange range = cmd.getTextRange(editor, context, false);
-    LineRange lr = cmd.getLineRange(editor, context);
-    int adj = lr.getEndLine() - lr.getStartLine() + 1;
+  @Override
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context,
+                         @NotNull ExCommand cmd) throws ExException {
+    final List<Caret> carets = EditorHelper.getOrderedCaretsList(editor, CaretOrder.DECREASING_OFFSET);
+    final CaretModel caretModel = editor.getCaretModel();
+    final int caretCount = caretModel.getCaretCount();
 
-    final ExCommand argumentCmd = CommandParser.getInstance().parse(cmd.getArgument());
-    int line = argumentCmd.getRanges().getFirstLine(editor, context);
+    final List<String> texts = new ArrayList<>(caretCount);
+    final List<TextRange> ranges = new ArrayList<>(caretCount);
+    int line = EditorHelper.getFileSize(editor);
+    final ExCommand command = CommandParser.getInstance().parse(cmd.getArgument());
 
-    if (line >= lr.getEndLine()) {
-      line -= adj;
+    TextRange lastRange = null;
+    for (Caret caret : carets) {
+      final TextRange range = cmd.getTextRange(editor, caret, context, false);
+      final LineRange lineRange = cmd.getLineRange(editor, caret, context);
+
+      line = Math.min(line, normalizeLine(editor, caret, context, command, lineRange));
+      texts.add(EditorHelper.getText(editor, range.getStartOffset(), range.getEndOffset()));
+
+      if (lastRange == null ||
+          (lastRange.getStartOffset() != range.getStartOffset() && lastRange.getEndOffset() != range.getEndOffset())) {
+        ranges.add(range);
+        lastRange = range;
+      }
     }
-    else if (line >= lr.getStartLine()) {
-      throw new InvalidRangeException(MessageHelper.message(Msg.e_backrange));
+
+    for (TextRange range : ranges) {
+      editor.getDocument().deleteString(range.getStartOffset(), range.getEndOffset());
     }
 
-    String text = EditorHelper.getText(editor, range.getStartOffset(), range.getEndOffset());
+    for (int i = 0; i < caretCount; i++) {
+      final Caret caret = carets.get(i);
+      final String text = texts.get(i);
 
-    editor.getDocument().deleteString(range.getStartOffset(), range.getEndOffset());
-
-    int offset = VimPlugin.getMotion().moveCaretToLineStart(editor, line + 1);
-    VimPlugin.getCopy()
-      .putText(editor, editor.getCaretModel().getPrimaryCaret(), context, text, SelectionType.LINE_WISE,
-               CommandState.SubMode.NONE, offset, 1, true, false);
+      final int offset = VimPlugin.getMotion().moveCaretToLineStart(editor, line + 1);
+      VimPlugin.getCopy().putText(editor, caret, context, text, SelectionType.LINE_WISE, CommandState.SubMode.NONE,
+                                  offset, 1, true, false);
+    }
 
     return true;
+  }
+
+  private int normalizeLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                            @NotNull ExCommand command, @NotNull LineRange lineRange) throws InvalidRangeException {
+    int line = command.getRanges().getFirstLine(editor, caret, context);
+    final int adj = lineRange.getEndLine() - lineRange.getStartLine() + 1;
+    if (line >= lineRange.getEndLine()) line -= adj;
+    else if (line >= lineRange.getStartLine()) throw new InvalidRangeException(MessageHelper.message(Msg.e_backrange));
+
+    return line;
   }
 }
