@@ -94,4 +94,29 @@ class MultipleCaretsTest : VimTestCase() {
     val after = "qwe\n" + "rty\n" + "<caret>zxc\n" + "asd\n" + "fgh\n" + "<caret>zxc\n" + "zxc\n" + "vbn\n"
     myFixture.checkResult(after)
   }
+
+  fun testMoveTextBeforeCarets() {
+    val before = "qwe\n" + "rty\n" + "<caret>asd\n" + "fgh\n" + "z<caret>xc\n" + "vbn\n"
+    configureByText(before)
+    typeText(commandToKeys("m 1"))
+    val after = "qwe\n" + "<caret>asd\n" + "<caret>zxc\n" + "rty\n" + "fgh\n" + "vbn\n"
+    myFixture.checkResult(after)
+
+  }
+
+  fun testMoveTextAfterCarets() {
+    val before = "q<caret>we\n" + "rty\n" + "<caret>asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+    configureByText(before)
+    typeText(commandToKeys("m 4"))
+    val after = "rty\n" + "fgh\n" + "zxc\n" + "<caret>qwe\n" + "<caret>asd\n" + "vbn\n"
+    myFixture.checkResult(after)
+  }
+
+  fun testMoveTextBetweenCarets() {
+    val before = "q<caret>we\n" + "rty\n" + "<caret>asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+    configureByText(before)
+    typeText(commandToKeys("m 2"))
+    val after = "rty\n" + "<caret>qwe\n" + "<caret>asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+    myFixture.checkResult(after)
+  }
 }
