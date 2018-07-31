@@ -1,5 +1,8 @@
 package org.jetbrains.plugins.ideavim.ex
 
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -59,6 +62,36 @@ class MultipleCaretsTest : VimTestCase() {
     typeText(parseKeys("vj"))
     typeText(commandToKeys(":co 2"))
     val after = "qwe\n" + "rty\n" + "<caret>rty\n" + "asd\n" + "<caret>fgh\n" + "zxc\n" + "asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+    myFixture.checkResult(after)
+  }
+
+  fun testPutText() {
+    val before = "<caret>qwe\n" + "rty\n" + "<caret>as<caret>d\n" + "fgh\n" + "zxc\n" + "vbn\n"
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+    typeText(commandToKeys("pu"))
+    val after = "qwe\n" + "<caret>zxc\n" + "rty\n" + "asd\n" + "<caret>zxc\n" + "<caret>zxc\n" + "fgh\n" + "zxc\n" + "vbn\n"
+    myFixture.checkResult(after)
+  }
+
+  fun testPutTextCertainLine() {
+    val before = "<caret>qwe\n" + "rty\n" + "<caret>as<caret>d\n" + "fgh\n" + "zxc\n" + "vbn\n"
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+    typeText(commandToKeys("4pu"))
+    val after = "qwe\n" + "rty\n" + "asd\n" + "fgh\n" + "<caret>zxc\n" + "<caret>zxc\n" + "<caret>zxc\n" + "zxc\n" + "vbn\n"
+    myFixture.checkResult(after)
+  }
+
+  fun testPutVisualLines() {
+    val before = "<caret>qwe\n" + "rty\n" + "as<caret>d\n" + "fgh\n" + "zxc\n" + "vbn\n"
+    val editor = configureByText(before)
+    VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
+
+    typeText(parseKeys("vj"))
+    typeText(commandToKeys("pu"))
+
+    val after = "qwe\n" + "rty\n" + "<caret>zxc\n" + "asd\n" + "fgh\n" + "<caret>zxc\n" + "zxc\n" + "vbn\n"
     myFixture.checkResult(after)
   }
 }
