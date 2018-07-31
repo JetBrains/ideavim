@@ -64,7 +64,6 @@ public class MarkRange extends AbstractRange {
   @Override
   protected int getRangeLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                              boolean lastZero) {
-    //TODO: add multicaret support?
     return getRangeLine(editor, context, lastZero);
   }
 
