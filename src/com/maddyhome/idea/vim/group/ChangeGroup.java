@@ -411,8 +411,12 @@ public class ChangeGroup {
   private void initInsert(@NotNull Editor editor, @NotNull DataContext context, @NotNull CommandState.Mode mode) {
     final CommandState state = CommandState.getInstance(editor);
 
-    for (Caret caret : editor.getCaretModel().getAllCarets()) {
+    final CaretModel caretModel = editor.getCaretModel();
+    for (Caret caret : caretModel.getAllCarets()) {
       CaretData.setInsertStart(caret, caret.getOffset());
+      if (caret == caretModel.getPrimaryCaret()) {
+        VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_START, caret.getOffset());
+      }
     }
 
     final Command cmd = state.getCommand();
@@ -549,7 +553,7 @@ public class ChangeGroup {
               insertText(editor, caret, pad);
             }
           }
-          if (repeatColumn > MotionGroup.LAST_COLUMN) {
+          if (repeatColumn >= MotionGroup.LAST_COLUMN) {
             caret.moveToOffset(VimPlugin.getMotion().moveCaretToLineEnd(editor, logicalLine + i, true));
             repeatInsertText(editor, context, started ? (i == 0 ? count : count + 1) : count);
           }
@@ -1518,11 +1522,11 @@ public class ChangeGroup {
       logger.debug("count=" + count);
     }
 
-    Project proj = PlatformDataKeys.PROJECT.getData(context); // API change - don't merge
-    int tabSize = 8;
-    int indentSize = 8;
-    boolean useTabs = true;
+    final Project proj = PlatformDataKeys.PROJECT.getData(context); // API change - don't merge
     VirtualFile file = EditorData.getVirtualFile(editor);
+    final int tabSize;
+    final int indentSize;
+    final boolean useTabs;
     if (file != null) {
       FileType type = FileTypeManager.getInstance().getFileTypeByFile(file);
       CodeStyleSettings settings = proj == null ? CodeStyle.getDefaultSettings() : CodeStyle.getSettings(proj);
@@ -1530,39 +1534,39 @@ public class ChangeGroup {
       indentSize = settings.getIndentSize(type);
       useTabs = settings.useTabCharacter(type);
     }
+    else {
+      tabSize = 8;
+      indentSize = 8;
+      useTabs = true;
+    }
 
-    int sline = editor.offsetToLogicalPosition(range.getStartOffset()).line;
-    int eline = editor.offsetToLogicalPosition(range.getEndOffset()).line;
+    final int sline = editor.offsetToLogicalPosition(range.getStartOffset()).line;
+    final int eline = editor.offsetToLogicalPosition(range.getEndOffset()).line;
 
     if (range.isMultiple()) {
-      int col = editor.offsetToLogicalPosition(range.getStartOffset()).column;
-      int size = indentSize * count;
+      final int from = editor.offsetToLogicalPosition(range.getStartOffset()).column;
+      final int size = indentSize * count;
       if (dir == 1) {
         // Right shift blockwise selection
-        StringBuilder space = new StringBuilder();
-        int tabCnt = 0;
-        int spcCnt;
+        final int tabCnt;
+        final int spcCnt;
         if (useTabs) {
           tabCnt = size / tabSize;
           spcCnt = size % tabSize;
         }
         else {
+          tabCnt = 0;
           spcCnt = size;
         }
 
-        for (int i = 0; i < tabCnt; i++) {
-          space.append('\t');
-        }
-        for (int i = 0; i < spcCnt; i++) {
-          space.append(' ');
-        }
+        final String indent = StringUtil.repeat("\t", tabCnt) + StringUtil.repeat(" ", spcCnt);
 
         for (int l = sline; l <= eline; l++) {
           int len = EditorHelper.getLineLength(editor, l);
-          if (len > col) {
-            LogicalPosition spos = new LogicalPosition(l, col);
+          if (len > from) {
+            LogicalPosition spos = new LogicalPosition(l, from);
             caret.moveToOffset(editor.logicalPositionToOffset(spos));
-            insertText(editor, caret, space.toString());
+            insertText(editor, caret, indent);
           }
         }
       }
@@ -1571,9 +1575,9 @@ public class ChangeGroup {
         CharSequence chars = editor.getDocument().getCharsSequence();
         for (int l = sline; l <= eline; l++) {
           int len = EditorHelper.getLineLength(editor, l);
-          if (len > col) {
-            LogicalPosition spos = new LogicalPosition(l, col);
-            LogicalPosition epos = new LogicalPosition(l, col + size - 1);
+          if (len > from) {
+            LogicalPosition spos = new LogicalPosition(l, from);
+            LogicalPosition epos = new LogicalPosition(l, from + size - 1);
             int wsoff = editor.logicalPositionToOffset(spos);
             int weoff = editor.logicalPositionToOffset(epos);
             int pos;
@@ -1592,31 +1596,25 @@ public class ChangeGroup {
     else {
       // Shift non-blockwise selection
       for (int l = sline; l <= eline; l++) {
-        int soff = EditorHelper.getLineStartOffset(editor, l);
-        int eoff = EditorHelper.getLineEndOffset(editor, l, true);
-        int woff = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, l);
-        int col = editor.offsetToVisualPosition(woff).column;
-        int newCol = Math.max(0, col + dir * indentSize * count);
+        final int soff = EditorHelper.getLineStartOffset(editor, l);
+        final int eoff = EditorHelper.getLineEndOffset(editor, l, true);
+        final int woff = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, l);
+        final int col = editor.offsetToVisualPosition(woff).column;
+        final int limit = Math.max(0, col + dir * indentSize * count);
         if (col > 0 || soff != eoff) {
-          StringBuilder space = new StringBuilder();
-          int tabCnt = 0;
-          int spcCnt;
+          final int tabsCnt;
+          final int spacesCnt;
           if (useTabs) {
-            tabCnt = newCol / tabSize;
-            spcCnt = newCol % tabSize;
+            tabsCnt = limit / tabSize;
+            spacesCnt = limit % tabSize;
           }
           else {
-            spcCnt = newCol;
+            tabsCnt = 0;
+            spacesCnt = limit;
           }
 
-          for (int i = 0; i < tabCnt; i++) {
-            space.append('\t');
-          }
-          for (int i = 0; i < spcCnt; i++) {
-            space.append(' ');
-          }
-
-          replaceText(editor, soff, woff, space.toString());
+          final String indent = StringUtil.repeat("\t", tabsCnt) + StringUtil.repeat(" ", spacesCnt);
+          replaceText(editor, soff, woff, indent);
         }
       }
     }
