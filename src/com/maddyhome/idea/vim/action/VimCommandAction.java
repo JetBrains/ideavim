@@ -63,7 +63,7 @@ public abstract class VimCommandAction extends EditorAction {
    *
    * These legacy flags will be refactored in future releases.
    *
-   * @see {@link Command}.
+   * @see com.maddyhome.idea.vim.command.Command
    */
   public int getFlags() {
     return 0;
