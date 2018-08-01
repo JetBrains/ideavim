@@ -1233,9 +1233,7 @@ public class MotionGroup {
     }
   }
 
-  public int moveCaretHorizontal(@NotNull Editor editor, @Nullable Caret caret, int count, boolean allowPastEnd) {
-    if (caret == null) return -1;
-
+  public int moveCaretHorizontal(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowPastEnd) {
     int oldOffset = caret.getOffset();
     int offset = EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, oldOffset + count, allowPastEnd);
 
