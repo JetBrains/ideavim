@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -242,7 +243,7 @@ public class CopyGroup {
           startOffset = start + 1;
         }
       }
-      else if (type != SelectionType.CHARACTER_WISE) {
+      else if (type == SelectionType.CHARACTER_WISE) {
         if (subMode == CommandState.SubMode.VISUAL_LINE) {
           editor.getDocument().insertString(start, "\n");
         }
@@ -497,31 +498,28 @@ public class CopyGroup {
     return maxLen;
   }
 
+  @Contract("_, _ -> new")
   @NotNull
   private TextRange getTextRange(@NotNull List<Pair.NonNull<Integer, Integer>> ranges, @NotNull SelectionType type) {
     final int size = ranges.size();
     final int[] starts = new int[size];
     final int[] ends = new int[size];
 
-    switch (type) {
-      case LINE_WISE:
-        starts[size - 1] = ranges.get(size - 1).first;
-        ends[size - 1] = ranges.get(size - 1).second;
-        for (int i = 0; i < size - 1; i++) {
-          final Pair.NonNull<Integer, Integer> range = ranges.get(i);
-          starts[i] = range.first;
-          ends[i] = range.second - 1;
-        }
-        break;
-      case CHARACTER_WISE:
-        for (int i = 0; i < size; i++) {
-          final Pair.NonNull<Integer, Integer> range = ranges.get(i);
-          starts[i] = range.first;
-          ends[i] = range.second;
-        }
-        break;
-      case BLOCK_WISE:
-        assert ranges.size() == 1;
+    if (type == SelectionType.LINE_WISE) {
+      starts[size - 1] = ranges.get(size - 1).first;
+      ends[size - 1] = ranges.get(size - 1).second;
+      for (int i = 0; i < size - 1; i++) {
+        final Pair.NonNull<Integer, Integer> range = ranges.get(i);
+        starts[i] = range.first;
+        ends[i] = range.second - 1;
+      }
+    }
+    else {
+      for (int i = 0; i < size; i++) {
+        final Pair.NonNull<Integer, Integer> range = ranges.get(i);
+        starts[i] = range.first;
+        ends[i] = range.second;
+      }
     }
 
     return new TextRange(starts, ends);

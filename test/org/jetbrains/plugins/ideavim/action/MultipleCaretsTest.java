@@ -1905,10 +1905,65 @@ public class MultipleCaretsTest extends VimTestCase {
                           " * two\n";
     final Editor editor = configureByText(before);
     VimPlugin.getRegister()
-      .storeText(editor, new TextRange(new int[]{0, 7}, new int[]{2, 9}), SelectionType.BLOCK_WISE, false);
+      .storeText(editor, new TextRange(new int[]{0, 7}, new int[]{2, 8}), SelectionType.BLOCK_WISE, false);
     typeText(parseKeys("P"));
     final String after = " *<caret> * on<caret> *e\n" +
-                         " * * tw *o\n";
+                         " *   tw  o\n";
+    myFixture.checkResult(after);
+  }
+
+  public void testPutEmptyText() {
+    final String before = "qwe\n<caret>asd\nz<caret>xc\n";
+    final Editor editor = configureByText(before);
+
+    final String text = "\uFFFF";
+    final Register register = new Register('a', SelectionType.CHARACTER_WISE, parseKeys(text));
+    VimPlugin.getRegister().selectRegister('a');
+    assertNull(register.getText());
+    VimPlugin.getRegister().storeTextInternal(editor, new TextRange(0, 1), text, SelectionType.CHARACTER_WISE, 'a',
+                                              false);
+
+    typeText(parseKeys("p"));
+    myFixture.checkResult(before);
+
+    typeText(parseKeys("vlp"));
+    final String after = "qwe\nd\nz\n";
+    myFixture.checkResult(after);
+  }
+
+  public void testPutVisualTextVisualLineMode() {
+    final String before = "qw<caret>e\nasd\nzxc\nrty\nfgh\nvbn";
+    final Editor editor = configureByText(before);
+    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
+    typeText(parseKeys("<S-v>", "gP"));
+    final String after = "fgh\n<caret>asd\nzxc\nrty\nfgh\nvbn";
+    myFixture.checkResult(after);
+  }
+
+  public void testPutVisualBlockVisualLineMode() {
+    final String before = "qw<caret>e\nasd\nzxc\nrty\nfgh\nvbn";
+    final Editor editor = configureByText(before);
+    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.BLOCK_WISE, false);
+    typeText(parseKeys("<S-v>", "p"));
+    final String after = "<caret>fgh\nasd\nzxc\nrty\nfgh\nvbn";
+    myFixture.checkResult(after);
+  }
+
+  public void testPutVisualBlockLinewise() {
+   final String before = "qw<caret>e\nasd\nzxc\nrty\nfgh\nvbn";
+    final Editor editor = configureByText(before);
+    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.LINE_WISE, false);
+    typeText(parseKeys("<C-v>", "h", "p"));
+    final String after = "<caret>q\nfgh\nasd\nzxc\nrty\nfgh\nvbn";
+    myFixture.checkResult(after);
+  }
+
+  public void testPutLinewiseWithoutLineSeparatorAtTheEndOfFile() {
+    final String before = "qwe\nasd\nz<caret>xc\nrty\nfg<caret>h\nvb<caret>n";
+    final Editor editor = configureByText(before);
+    VimPlugin.getRegister().storeText(editor, new TextRange(0, 3), SelectionType.LINE_WISE, false);
+    typeText(parseKeys("p"));
+    final String after = "qwe\nasd\nzxc\n<caret>qwe\nrty\nfgh\n<caret>qwe\nvbn\n<caret>qwe\n";
     myFixture.checkResult(after);
   }
 
@@ -2003,7 +2058,7 @@ public class MultipleCaretsTest extends VimTestCase {
   public void testYankVisualLines() {
     final String before = "q<caret>we\n" + "asd\n" + "z<caret>xc\n" + "rt<caret>y\n" + "fgh\n" + "vbn\n";
     configureByText(before);
-    typeText(parseKeys("vlY"));
+    typeText(parseKeys("<S-v>y"));
 
     final Register lastRegister = VimPlugin.getRegister().getLastRegister();
     assertNotNull(lastRegister);
