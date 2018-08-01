@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.helper;
 import com.intellij.application.options.CodeStyle;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -47,8 +46,6 @@ import java.util.List;
  * This is a set of helper methods for working with editors. All line and column values are zero based.
  */
 public class EditorHelper {
-  private static final Logger logger = Logger.getInstance(EditorHelper.class.getName());
-
   public static int getVisualLineAtTopOfScreen(@NotNull final Editor editor) {
     int lh = editor.getLineHeight();
     return (editor.getScrollingModel().getVerticalScrollOffset() + lh - 1) / lh;
@@ -556,32 +553,20 @@ public class EditorHelper {
 
     final VirtualFile virtualFile = EditorData.getVirtualFile(editor);
     final Project project = PlatformDataKeys.PROJECT.getData(context);
-    final int tabSize;
-    final boolean useTabs;
+    final int limit = to - len;
     if (virtualFile != null) {
       final FileType fileType = FileTypeManager.getInstance().getFileTypeByFile(virtualFile);
       final CodeStyleSettings settings = project == null ? CodeStyle.getDefaultSettings() : CodeStyle.getSettings(project);
-      useTabs = settings.useTabCharacter(fileType);
-      tabSize = settings.getTabSize(fileType);
-    }
-    else {
-      tabSize = 8;
-      useTabs = false;
+      if (settings.useTabCharacter(fileType)) {
+        final int tabSize = settings.getTabSize(fileType);
+        final int tabsCnt = limit / tabSize;
+        final int spacesCnt = limit % tabSize;
+
+        return StringUtil.repeat("\t", tabsCnt) + StringUtil.repeat(" ", spacesCnt);
+      }
     }
 
-    final int limit = to - len;
-    final int tabsCnt;
-    final int spacesCnt;
-    if (useTabs) {
-      tabsCnt = (limit) / tabSize;
-      spacesCnt = (limit) % tabSize;
-    }
-    else {
-      tabsCnt = 0;
-      spacesCnt = limit;
-    }
-
-    return StringUtil.repeat("\t", tabsCnt) + StringUtil.repeat(" ", spacesCnt);
+    return StringUtil.repeat(" ", limit);
   }
 
   public static boolean canEdit(@NotNull final Project project, @NotNull final Editor editor) {
