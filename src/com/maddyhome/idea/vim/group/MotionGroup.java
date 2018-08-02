@@ -227,10 +227,11 @@ public class MotionGroup {
 
       setVisualMode(editor, CommandState.SubMode.VISUAL_LINE);
 
-      VisualChange range = getVisualOperatorRange(editor, Command.FLAG_MOT_LINEWISE);
+      final Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+      VisualChange range = getVisualOperatorRange(editor, primaryCaret, Command.FLAG_MOT_LINEWISE);
       if (range.getLines() > 1) {
-        MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(),
-            moveCaretVertical(editor, editor.getCaretModel().getPrimaryCaret(), -1));
+        MotionGroup.moveCaret(editor, primaryCaret,
+                              moveCaretVertical(editor, primaryCaret, -1));
       }
     }
   }
@@ -913,7 +914,7 @@ public class MotionGroup {
     return true;
   }
 
-  public static void moveCaretToView(@NotNull Editor editor) {
+  private static void moveCaretToView(@NotNull Editor editor) {
     int scrollOffset = ((NumberOption) Options.getInstance().getOption("scrolloff")).value();
     int sideScrollOffset = ((NumberOption) Options.getInstance().getOption("sidescrolloff")).value();
     int height = EditorHelper.getScreenHeight(editor);
@@ -971,7 +972,7 @@ public class MotionGroup {
     return scrollPage(editor, pages, height - 2, line, false);
   }
 
-  public boolean scrollPage(@NotNull Editor editor, int pages, int height, int line, boolean partial) {
+  private boolean scrollPage(@NotNull Editor editor, int pages, int height, int line, boolean partial) {
     int visualTopLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
 
     int newLine = visualTopLine + pages * height;
@@ -1077,12 +1078,9 @@ public class MotionGroup {
 
   public int moveCaretToLineEndSkipLeadingOffset(@NotNull Editor editor, @NotNull Caret caret, int linesOffset) {
     int line = EditorHelper.normalizeVisualLine(editor, caret.getVisualPosition().line + linesOffset);
-    return moveCaretToLineEndSkipLeading(editor, EditorHelper.visualLineToLogicalLine(editor, line));
-  }
-
-  public int moveCaretToLineEndSkipLeading(@NotNull Editor editor, int line) {
-    int start = EditorHelper.getLineStartOffset(editor, line);
-    int end = EditorHelper.getLineEndOffset(editor, line, true);
+    int line1 = EditorHelper.visualLineToLogicalLine(editor, line);
+    int start = EditorHelper.getLineStartOffset(editor, line1);
+    int end = EditorHelper.getLineEndOffset(editor, line1, true);
     CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = start;
     for (int offset = end; offset > start; offset--) {
@@ -1322,7 +1320,7 @@ public class MotionGroup {
     return editor.getCaretModel().getOffset();
   }
 
-  public static void scrollCaretIntoView(@NotNull Editor editor) {
+  private static void scrollCaretIntoView(@NotNull Editor editor) {
     final boolean scrollJump = (CommandState.getInstance(editor).getFlags() & Command.FLAG_IGNORE_SCROLL_JUMP) == 0;
     scrollPositionIntoView(editor, editor.getCaretModel().getVisualPosition(), scrollJump);
   }
@@ -1532,7 +1530,7 @@ public class MotionGroup {
       CaretData.setVisualOffset(caret, caret.getOffset());
     }
 
-    VimPlugin.getMark().setVisualSelectionMarks(editor, getRawVisualRange(editor));
+    VimPlugin.getMark().setVisualSelectionMarks(editor, getRawVisualRange(editor.getCaretModel().getPrimaryCaret()));
   }
 
   public boolean toggleVisual(@NotNull Editor editor, int count, int rawCount, @NotNull CommandState.SubMode mode) {
@@ -1699,11 +1697,6 @@ public class MotionGroup {
   }
 
   @NotNull
-  public VisualChange getVisualOperatorRange(@NotNull Editor editor, int cmdFlags) {
-    return getVisualOperatorRange(editor, editor.getCaretModel().getPrimaryCaret(), cmdFlags);
-  }
-
-  @NotNull
   public TextRange getVisualRange(@NotNull Editor editor) {
     return new TextRange(editor.getSelectionModel().getBlockSelectionStarts(),
         editor.getSelectionModel().getBlockSelectionEnds());
@@ -1712,11 +1705,6 @@ public class MotionGroup {
   @NotNull
   public TextRange getVisualRange(@NotNull Caret caret) {
     return new TextRange(caret.getSelectionStart(), caret.getSelectionEnd());
-  }
-
-  @NotNull
-  public TextRange getRawVisualRange(@NotNull Editor editor) {
-    return getRawVisualRange(editor.getCaretModel().getPrimaryCaret());
   }
 
   @NotNull
