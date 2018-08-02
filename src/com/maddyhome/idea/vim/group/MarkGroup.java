@@ -225,7 +225,7 @@ public class MarkGroup {
     return true;
   }
 
-  private String extractProtocol(VirtualFile vf) {
+  private String extractProtocol(@NotNull VirtualFile vf) {
     return VirtualFileManager.extractProtocol(vf.getUrl());
   }
 

@@ -50,7 +50,7 @@ public class HistoryGroup {
     HistoryBlock block = blocks(key);
 
     List<HistoryEntry> entries = block.getEntries();
-    List<HistoryEntry> res = new ArrayList<HistoryEntry>();
+    List<HistoryEntry> res = new ArrayList<>();
     if (first < 0) {
       if (-first > entries.size()) {
         first = Integer.MAX_VALUE;
@@ -189,7 +189,7 @@ public class HistoryGroup {
       return entries;
     }
 
-    @NotNull private final List<HistoryEntry> entries = new ArrayList<HistoryEntry>();
+    @NotNull private final List<HistoryEntry> entries = new ArrayList<>();
     private int counter;
   }
 
@@ -212,7 +212,7 @@ public class HistoryGroup {
     @NotNull private final String entry;
   }
 
-  @NotNull private final Map<String, HistoryBlock> histories = new HashMap<String, HistoryBlock>();
+  @NotNull private final Map<String, HistoryBlock> histories = new HashMap<>();
 
   private static final Logger logger = Logger.getInstance(HistoryGroup.class.getName());
 }

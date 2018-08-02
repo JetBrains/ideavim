@@ -111,7 +111,7 @@ public class WindowGroup {
                                                      @NotNull List<EditorWindow> windows, final boolean vertical) {
     final Rectangle anchorRect = getEditorWindowRectangle(anchor);
     if (anchorRect != null) {
-      final List<EditorWindow> result = new ArrayList<EditorWindow>();
+      final List<EditorWindow> result = new ArrayList<>();
       final double coord = vertical ? anchorRect.getX() : anchorRect.getY();
       for (EditorWindow window : windows) {
         final Rectangle rect = getEditorWindowRectangle(window);
@@ -123,17 +123,14 @@ public class WindowGroup {
           }
         }
       }
-      Collections.sort(result, new Comparator<EditorWindow>() {
-        @Override
-        public int compare(EditorWindow window1, EditorWindow window2) {
-          final Rectangle rect1 = getEditorWindowRectangle(window1);
-          final Rectangle rect2 = getEditorWindowRectangle(window2);
-          if (rect1 != null && rect2 != null) {
-            final double diff = vertical ? (rect1.getY() - rect2.getY()) : (rect1.getX() - rect2.getX());
-            return diff < 0 ? -1 : diff > 0 ? 1 : 0;
-          }
-          return 0;
+      result.sort((window1, window2) -> {
+        final Rectangle rect1 = getEditorWindowRectangle(window1);
+        final Rectangle rect2 = getEditorWindowRectangle(window2);
+        if (rect1 != null && rect2 != null) {
+          final double diff = vertical ? (rect1.getY() - rect2.getY()) : (rect1.getX() - rect2.getX());
+          return diff < 0 ? -1 : diff > 0 ? 1 : 0;
         }
+        return 0;
       });
       return result;
     }

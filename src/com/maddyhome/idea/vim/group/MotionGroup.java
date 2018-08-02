@@ -80,11 +80,15 @@ public class MotionGroup {
         // using the gd and gD commands (Goto Declaration). This bug has been around since Idea 6.0.4?
         // Prior to this change the visible area code was moving the cursor around during file load and messing
         // with the cursor position of the Goto Declaration processing.
-        ApplicationManager.getApplication().invokeLater(() -> ApplicationManager.getApplication().invokeLater(
-            () -> ApplicationManager.getApplication().invokeLater(() -> {
-              addEditorListener(editor);
-              EditorData.setMotionGroup(editor, true);
-            })));
+        ApplicationManager.getApplication().invokeLater(
+            () -> ApplicationManager.getApplication().invokeLater(
+                () -> ApplicationManager.getApplication().invokeLater(
+                    () -> {
+                      addEditorListener(editor);
+                      EditorData.setMotionGroup(editor, true);
+                    })
+            )
+        );
       }
 
       public void editorReleased(@NotNull EditorFactoryEvent event) {

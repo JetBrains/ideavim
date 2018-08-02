@@ -104,7 +104,7 @@ public class ProcessGroup {
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true);
     boolean res = true;
-    int flags = 0;
+    int flags;
     try {
       CommandState.getInstance(editor).popState();
       logger.debug("processing command");

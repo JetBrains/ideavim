@@ -112,39 +112,32 @@ public class MacroGroup {
     // events getting queued, they get queued before the next key, just what would happen if the user was typing
     // the keys one at a time. With the old loop approach, all the keys got queued, then any events they caused
     // were queued - after the keys. This is what caused the problem.
-    final Runnable run = new Runnable() {
-      public void run() {
-        if (logger.isDebugEnabled()) {
-          logger.debug("processing key " + pos);
-        }
-        // Handle one keystroke then queue up the next key
-        KeyHandler.getInstance().handleKey(editor, keys.get(pos), context);
-        if (pos < keys.size() - 1) {
-          playbackKeys(editor, context, project, keys, pos + 1, cnt, total);
-        }
-        else if (cnt < total) {
-          playbackKeys(editor, context, project, keys, 0, cnt + 1, total);
-        }
+    final Runnable run = () -> {
+      if (logger.isDebugEnabled()) {
+        logger.debug("processing key " + pos);
+      }
+      // Handle one keystroke then queue up the next key
+      KeyHandler.getInstance().handleKey(editor, keys.get(pos), context);
+      if (pos < keys.size() - 1) {
+        playbackKeys(editor, context, project, keys, pos + 1, cnt, total);
+      }
+      else {
+        playbackKeys(editor, context, project, keys, 0, cnt + 1, total);
       }
     };
 
-    ApplicationManager.getApplication().invokeLater(new Runnable() {
-      public void run() {
-        CommandProcessor.getInstance().executeCommand(project, run, "Vim Macro Playback", keys.get(pos));
-      }
-    });
+    ApplicationManager.getApplication().invokeLater(
+        () -> CommandProcessor.getInstance().executeCommand(project, run, "Vim Macro Playback", keys.get(pos)));
   }
 
   public void postKey(@NotNull KeyStroke stroke, @NotNull Editor editor) {
     final Component component = SwingUtilities.getAncestorOfClass(Window.class, editor.getComponent());
     final KeyEvent event = createKeyEvent(stroke, component);
-    ApplicationManager.getApplication().invokeLater(new Runnable() {
-      public void run() {
-        if (logger.isDebugEnabled()) {
-          logger.debug("posting " + event);
-        }
-        Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(event);
+    ApplicationManager.getApplication().invokeLater(() -> {
+      if (logger.isDebugEnabled()) {
+        logger.debug("posting " + event);
       }
+      Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(event);
     });
   }
 

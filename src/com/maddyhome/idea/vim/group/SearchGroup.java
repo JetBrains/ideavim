@@ -35,7 +35,6 @@ import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
-import com.intellij.util.Processor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -56,7 +55,6 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.*;
@@ -423,33 +421,30 @@ public class SearchGroup {
     // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for this method
     final ExEntryPanel exEntryPanel = ExEntryPanel.getInstance();
     exEntryPanel.activate(editor, new EditorDataContext(editor), "Replace with " + match + " (y/n/a/q/l)?", "", 1);
-    ModalEntry.activate(new Processor<KeyStroke>() {
-      @Override
-      public boolean process(KeyStroke key) {
-        final ReplaceConfirmationChoice choice;
-        final char c = key.getKeyChar();
-        if (StringHelper.isCloseKeyStroke(key) || c == 'q') {
-          choice = ReplaceConfirmationChoice.QUIT;
-        }
-        else if (c == 'y') {
-          choice = ReplaceConfirmationChoice.SUBSTITUTE_THIS;
-        }
-        else if (c == 'l') {
-          choice = ReplaceConfirmationChoice.SUBSTITUTE_LAST;
-        }
-        else if (c == 'n') {
-          choice = ReplaceConfirmationChoice.SKIP;
-        }
-        else if (c == 'a') {
-          choice = ReplaceConfirmationChoice.SUBSTITUTE_ALL;
-        }
-        else {
-          return true;
-        }
-        result.set(choice);
-        exEntryPanel.deactivate(true);
-        return false;
+    ModalEntry.activate(key -> {
+      final ReplaceConfirmationChoice choice;
+      final char c = key.getKeyChar();
+      if (StringHelper.isCloseKeyStroke(key) || c == 'q') {
+        choice = ReplaceConfirmationChoice.QUIT;
       }
+      else if (c == 'y') {
+        choice = ReplaceConfirmationChoice.SUBSTITUTE_THIS;
+      }
+      else if (c == 'l') {
+        choice = ReplaceConfirmationChoice.SUBSTITUTE_LAST;
+      }
+      else if (c == 'n') {
+        choice = ReplaceConfirmationChoice.SKIP;
+      }
+      else if (c == 'a') {
+        choice = ReplaceConfirmationChoice.SUBSTITUTE_ALL;
+      }
+      else {
+        return true;
+      }
+      result.set(choice);
+      exEntryPanel.deactivate(true);
+      return false;
     });
     return result.get();
   }
@@ -625,20 +620,17 @@ public class SearchGroup {
       return null;
     }
     final int size = EditorHelper.getFileSize(editor);
-    final TextRange max = Collections.max(results, new Comparator<TextRange>() {
-      @Override
-      public int compare(TextRange r1, TextRange r2) {
-        final int d1 = distance(r1, offset, forwards, size);
-        final int d2 = distance(r2, offset, forwards, size);
-        if (d1 < 0 && d2 >= 0) {
-          return Integer.MAX_VALUE;
-        }
-        return d2 - d1;
+    final TextRange max = Collections.max(results, (r1, r2) -> {
+      final int d1 = distance(r1, offset, forwards, size);
+      final int d2 = distance(r2, offset, forwards, size);
+      if (d1 < 0 && d2 >= 0) {
+        return Integer.MAX_VALUE;
       }
+      return d2 - d1;
     });
     if (!Options.getInstance().isSet("wrapscan")) {
       final int start = max.getStartOffset();
-      if (forwards && start < offset || start >= offset) {
+      if (forwards || start >= offset) {
         return null;
       }
     }
@@ -709,7 +701,7 @@ public class SearchGroup {
     final TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
     Collection<RangeHighlighter> highlighters = EditorData.getLastHighlights(editor);
     if (highlighters == null) {
-      highlighters = new ArrayList<RangeHighlighter>();
+      highlighters = new ArrayList<>();
       EditorData.setLastHighlights(editor, highlighters);
     }
 
