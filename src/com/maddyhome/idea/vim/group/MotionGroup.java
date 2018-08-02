@@ -1546,17 +1546,7 @@ public class MotionGroup {
         if (range == null) {
           return false;
         }
-        switch (range.getType()) {
-          case CHARACTER_WISE:
-            mode = CommandState.SubMode.VISUAL_CHARACTER;
-            break;
-          case LINE_WISE:
-            mode = CommandState.SubMode.VISUAL_LINE;
-            break;
-          case BLOCK_WISE:
-            mode = CommandState.SubMode.VISUAL_BLOCK;
-            break;
-        }
+        mode = range.getType().toSubMode();
         int start = editor.getCaretModel().getOffset();
         int end = calculateVisualRange(editor, range, count);
         Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
