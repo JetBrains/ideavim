@@ -405,69 +405,35 @@ public class MotionGroup {
     return Math.max(0, Math.min(count, EditorHelper.getFileSize(editor) - 1));
   }
 
-  public int moveCaretToMark(@NotNull Editor editor, @NotNull Caret caret, char ch) {
-    final Mark mark = VimPlugin.getMark().getMark(editor, ch);
-    if (mark == null) {
-      return -1;
-    }
+  public int moveCaretToFileMark(@NotNull Editor editor, char ch, boolean toLineStart) {
+    final Mark mark = VimPlugin.getMark().getFileMark(editor, ch);
+    if (mark == null) return -1;
 
-    final VirtualFile vf = EditorData.getVirtualFile(editor);
-    if (vf == null) {
-      return -1;
-    }
-
-    final LogicalPosition lp = new LogicalPosition(mark.getLogicalLine(), mark.getCol());
-    if (!vf.getPath().equals(mark.getFilename())) {
-      final Editor selectedEditor = selectEditor(editor, mark);
-      if (selectedEditor != null) {
-        editor.getCaretModel().removeCaret(caret);
-        final Caret newCaret = selectedEditor.getCaretModel().addCaret(selectedEditor.logicalToVisualPosition(lp),
-            false);
-        if (newCaret != null) {
-          moveCaret(selectedEditor, newCaret, selectedEditor.logicalPositionToOffset(lp));
-        }
-      }
-
-      return -2;
-    }
-    else {
-      return editor.logicalPositionToOffset(lp);
-    }
+    final int line = mark.getLogicalLine();
+    return toLineStart ? moveCaretToLineStartSkipLeading(editor, line)
+                       : editor.logicalPositionToOffset(new LogicalPosition(line, mark.getCol()));
   }
 
-  public int moveCaretToMark(@NotNull Editor editor, @NotNull Caret caret, char ch, boolean toLineStart) {
+  public int moveCaretToMark(@NotNull Editor editor, char ch, boolean toLineStart) {
     final Mark mark = VimPlugin.getMark().getMark(editor, ch);
-    if (mark == null) {
-      return -1;
-    }
+    if (mark == null) return -1;
 
     final VirtualFile vf = EditorData.getVirtualFile(editor);
-    if (vf == null) {
-      return -1;
+    if (vf == null) return -1;
+
+    final int line = mark.getLogicalLine();
+    if (vf.getPath().equals(mark.getFilename())) {
+      return toLineStart ? moveCaretToLineStartSkipLeading(editor, line)
+                         : editor.logicalPositionToOffset(new LogicalPosition(line, mark.getCol()));
     }
 
-    final LogicalPosition lp = new LogicalPosition(mark.getLogicalLine(), mark.getCol());
-    if (!vf.getPath().equals(mark.getFilename())) {
-      final Editor selectedEditor = selectEditor(editor, mark);
-      if (selectedEditor != null) {
-        editor.getCaretModel().removeCaret(caret);
-        final Caret newCaret = selectedEditor.getCaretModel().addCaret(selectedEditor.logicalToVisualPosition(lp),
-            false);
-        if (newCaret != null) {
-          final int offset = toLineStart
-              ? moveCaretToLineStartSkipLeading(selectedEditor, lp.line)
-              : selectedEditor.logicalPositionToOffset(lp);
-          moveCaret(selectedEditor, newCaret, offset);
-        }
-      }
-
-      return -2;
+    final Editor selectedEditor = selectEditor(editor, mark);
+    if (selectedEditor != null) {
+      moveCaret(selectedEditor, selectedEditor.getCaretModel().getPrimaryCaret(),
+                toLineStart ? moveCaretToLineStartSkipLeading(selectedEditor, line)
+                            : selectedEditor.logicalPositionToOffset(new LogicalPosition(line, mark.getCol())));
     }
-    else {
-      return toLineStart
-          ? moveCaretToLineStartSkipLeading(editor, lp.line)
-          : editor.logicalPositionToOffset(lp);
-    }
+    return -2;
   }
 
   public int moveCaretToJump(@NotNull Editor editor, @NotNull Caret caret, int count) {
@@ -1210,21 +1176,6 @@ public class MotionGroup {
     // FIX - allows cursor over newlines
     int oldOffset = caret.getOffset();
     int offset = Math.min(Math.max(0, caret.getOffset() + count), EditorHelper.getFileSize(editor));
-    if (offset == oldOffset) {
-      return -1;
-    }
-    else {
-      return offset;
-    }
-  }
-
-  /**
-   * @deprecated To move the caret, use {@link #moveCaret(Editor, Caret, int)}
-   */
-  public int moveCaretHorizontal(@NotNull Editor editor, int count, boolean allowPastEnd) {
-    int oldOffset = editor.getCaretModel().getOffset();
-    int offset = EditorHelper
-        .normalizeOffset(editor, editor.getCaretModel().getLogicalPosition().line, oldOffset + count, allowPastEnd);
     if (offset == oldOffset) {
       return -1;
     }
