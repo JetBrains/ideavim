@@ -515,10 +515,10 @@ public class RegisterActions {
                           new Shortcut("gp"));
     parser.registerAction(MappingMode.N, "VimCopyPutTextBeforeCursorNoIndent", Command.Type.PASTE, new Shortcut[]{
       new Shortcut("[P"),
-      new Shortcut("]P")
+      new Shortcut("]P"),
+      new Shortcut("[p")
     });
     parser.registerAction(MappingMode.N, "VimCopyPutTextAfterCursorNoIndent", Command.Type.PASTE, new Shortcut[]{
-      new Shortcut("[p"),
       new Shortcut("]p")
     });
     parser.registerAction(MappingMode.N, "VimCopyYankLine", Command.Type.COPY,

@@ -133,8 +133,8 @@
  * |$|                    1 {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnAction}
  * |%|                    1 {@link com.maddyhome.idea.vim.action.motion.updown.MotionPercentOrMatchAction}
  * |&|                    ? {@link com.maddyhome.idea.vim.action.change.change.ChangeLastSearchReplaceAction}
- * |'|                    1 {@link com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkLineAction}
- * |'|                    1 {@link com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction}
+ * |'|                    p {@link com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkLineAction}
+ * |'|                    p {@link com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction}
  * |''|                     ?
  * ...
  * |(|                    1 {@link com.maddyhome.idea.vim.action.motion.text.MotionSentencePreviousStartAction}
@@ -188,8 +188,8 @@
  * |]|                      see bracket commands
  * |^|                    1 {@link com.maddyhome.idea.vim.action.motion.leftright.MotionFirstNonSpaceAction}
  * |_|                    1 {@link com.maddyhome.idea.vim.action.motion.updown.MotionDownLess1FirstNonSpaceAction}
- * |`|                    1 {@link com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction}
- * |`|                    1 {@link com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkAction}
+ * |`|                    p {@link com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction}
+ * |`|                    p {@link com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkAction}
  * |``|                     ?
  * ...
  * |0|                    1 {@link com.maddyhome.idea.vim.action.motion.leftright.MotionFirstColumnAction}
@@ -324,7 +324,7 @@
  * |[D|                     TODO
  * |[I|                     TODO
  * |[M|                   1 {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodPreviousEndAction}
- * |[P|                   E {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
+ * |[P|                   1 {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
  * |[P|                   1 {@link com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction}
  * |[[|                   ? {@link com.maddyhome.idea.vim.action.motion.text.MotionSectionBackwardStartAction}
  * |[]|                   ? {@link com.maddyhome.idea.vim.action.motion.text.MotionSectionBackwardEndAction}
@@ -333,7 +333,7 @@
  * |[f|                     TODO
  * |[i|                     TODO
  * |[m|                   1 {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodPreviousStartAction}
- * |[p|                   E {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
+ * |[p|                   1 {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
  * |[p|                   1 {@link com.maddyhome.idea.vim.action.copy.PutTextAfterCursorNoIndentAction}
  * |[s|                     TODO
  * |[z|                     TODO
@@ -349,7 +349,7 @@
  * |]D|                     TODO
  * |]I|                     TODO
  * |]M|                   1 {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodNextEndAction}
- * |]P|                   E {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
+ * |]P|                   1 {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
  * |]P|                   1 {@link com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorNoIndentAction}
  * |][|                   ? {@link com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardStartAction}
  * |]]|                   ? {@link com.maddyhome.idea.vim.action.motion.text.MotionSectionForwardEndAction}
@@ -358,7 +358,7 @@
  * |]f|                     TODO
  * |]i|                     TODO
  * |]m|                   1 {@link com.maddyhome.idea.vim.action.motion.text.MotionMethodNextStartAction}
- * |]p|                   E {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
+ * |]p|                   1 {@link com.maddyhome.idea.vim.action.copy.PutVisualTextNoIndentAction}
  * |]p|                   1 {@link com.maddyhome.idea.vim.action.copy.PutTextAfterCursorNoIndentAction}
  * |]s|                     TODO
  * |]z|                     TODO
