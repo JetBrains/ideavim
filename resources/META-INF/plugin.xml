@@ -334,7 +334,7 @@
     <action id="VimSearchWordBackward" class="com.maddyhome.idea.vim.action.motion.search.SearchWordBackwardAction" text="Search Again"/>
     <action id="VimGotoDeclaration" class="com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction" text="Goto Declaration"/>
 
-    <action id="VimSelectNextOccureance" class="com.maddyhome.idea.vim.action.motion.visual.VisualSelectNextOccurrence" text="Select Next Occureance"/>
+    <action id="VimSelectNextOccureance" class="com.maddyhome.idea.vim.action.motion.visual.VisualSelectNextOccurrence" text="Select Next Occurrence"/>
 
     <!-- Macro -->
     <action id="VimToggleRecording" class="com.maddyhome.idea.vim.action.macro.ToggleRecordingAction" text="Record Keystrokes"/>
