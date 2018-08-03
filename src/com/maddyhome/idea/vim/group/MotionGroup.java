@@ -1752,7 +1752,7 @@ public class MotionGroup {
     VimPlugin.getMark().setVisualSelectionMarks(editor, new TextRange(start, end));
   }
 
-  private void updateSelection(@NotNull Editor editor, @NotNull Caret caret, int offset) {
+  public void updateSelection(@NotNull Editor editor, @NotNull Caret caret, int offset) {
     if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_BLOCK) {
       updateBlockSelection(editor, offset);
     }
