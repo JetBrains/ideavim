@@ -280,27 +280,9 @@ public abstract class CommandHandler {
 
     CommandState.getInstance(editor).setFlags(optFlags);
 
-    final boolean forEachCaret = myRunForEachCaret && !CommandState.inVisualBlockMode(editor);
-    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-      if (forEachCaret) {
-        for (Caret caret : editor.getCaretModel().getAllCarets()) {
-          final TextRange range = CommandState.getInstance(editor).getMode() != CommandState.Mode.VISUAL
-                                  ? null
-                                  : VimPlugin.getMotion().getVisualRange(caret);
-          CaretData.setVisualTextRange(caret, range);
-        }
-      }
-      else {
-        final TextRange range = CommandState.getInstance(editor).getMode() != CommandState.Mode.VISUAL
-                                ? null
-                                : VimPlugin.getMotion().getVisualRange(editor);
-        CaretData.setVisualTextRange(editor.getCaretModel().getPrimaryCaret(), range);
-      }
-    }
-
     boolean res = true;
     try {
-      if (forEachCaret) {
+      if (myRunForEachCaret) {
         final List<Caret> carets = EditorHelper.getOrderedCaretsList(editor, myCaretOrder);
         for (Caret caret : carets) {
           for (int i = 0; i < count && res; i++) {

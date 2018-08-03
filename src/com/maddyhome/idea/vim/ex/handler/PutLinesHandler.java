@@ -20,7 +20,6 @@ package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -34,11 +33,9 @@ import com.maddyhome.idea.vim.ex.ExException;
 import com.maddyhome.idea.vim.group.MarkGroup;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.handler.CaretOrder;
-import com.maddyhome.idea.vim.helper.CaretData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PutLinesHandler extends CommandHandler {
@@ -65,23 +62,8 @@ public class PutLinesHandler extends CommandHandler {
     if (register == null) return false;
     final String text = register.getText();
 
-    final List<Integer> lines;
+    final List<Integer> lines = cmd.getOrderedLines(editor, context, CaretOrder.DECREASING_OFFSET);
     final List<Caret> carets = EditorHelper.getOrderedCaretsList(editor, CaretOrder.DECREASING_OFFSET);
-    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-      final CaretModel caretModel = editor.getCaretModel();
-
-      final TextRange range = CaretData.getVisualTextRange(caretModel.getPrimaryCaret());
-      if (range == null) return false;
-
-      lines = new ArrayList<>(caretModel.getCaretCount());
-      for (int i = range.getStartOffsets().length - 1; i >= 0; i--) {
-        final int offset = editor.offsetToLogicalPosition(range.getStartOffsets()[i]).line + 1;
-        lines.add(offset);
-      }
-    }
-    else {
-      lines = cmd.getOrderedLines(editor, context, CaretOrder.DECREASING_OFFSET);
-    }
     for (int i = 0; i < carets.size(); i++) {
       final Caret caret = carets.get(i);
       final int line = lines.get(i);

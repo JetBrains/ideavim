@@ -26,7 +26,7 @@ class VisualSelectNextOccurrence : VimCommandAction(Handler()) {
 
   override fun getMappingModes(): EnumSet<MappingMode> = MappingMode.NVO
 
-  override fun getKeyStrokesSet(): Set<MutableList<KeyStroke>> = parseKeysSet("gn")
+  override fun getKeyStrokesSet(): Set<List<KeyStroke>> = parseKeysSet("gn")
 
   override fun getType() = Command.Type.MOTION
 }
