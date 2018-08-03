@@ -3,6 +3,7 @@ package org.jetbrains.plugins.ideavim.ex
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MultipleCaretsTest : VimTestCase() {
@@ -116,6 +117,37 @@ class MultipleCaretsTest : VimTestCase() {
     configureByText(before)
     typeText(commandToKeys("m 2"))
     val after = "rty\n" + "<caret>qwe\n" + "<caret>asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+    myFixture.checkResult(after)
+  }
+
+  fun testYankLines() {
+    val before = """qwe
+      |rt<caret>y
+      |asd
+      |<caret>fgh
+      |zxc
+      |vbn
+    """.trimMargin()
+    configureByText(before)
+    typeText(commandToKeys("y"))
+
+    val lastRegister = VimPlugin.getRegister().lastRegister
+    assertNotNull(lastRegister)
+    val text = lastRegister!!.text
+    assertNotNull(text)
+
+    typeText(parseKeys("p"))
+    val after = """qwe
+      |rty
+      |<caret>rty
+      |fgh
+      |asd
+      |fgh
+      |<caret>rty
+      |fgh
+      |zxc
+      |vbn
+    """.trimMargin()
     myFixture.checkResult(after)
   }
 }
