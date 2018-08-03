@@ -42,13 +42,10 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
   }
 
   @Override
-  protected final boolean execute(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context,
+  protected final boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                                   @NotNull Command cmd) {
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
       TextRange range;
-      if (caret == null) {
-        return false;
-      }
       range = getRange(editor, caret, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
 
       if (range == null) {

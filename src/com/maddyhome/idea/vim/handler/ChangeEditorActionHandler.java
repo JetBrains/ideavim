@@ -35,7 +35,7 @@ import java.util.List;
 /**
  */
 public abstract class ChangeEditorActionHandler extends EditorActionHandlerBase {
-  private boolean myIsMulticaretChangeAction = false;
+  private boolean myIsMulticaretChangeAction;
   private CaretOrder myCaretOrder;
 
   public ChangeEditorActionHandler(boolean runForEachCaret, CaretOrder caretOrder) {

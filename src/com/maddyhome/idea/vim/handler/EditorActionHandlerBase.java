@@ -58,7 +58,7 @@ public abstract class EditorActionHandlerBase extends EditorActionHandler {
 
     try {
       if (myRunForEachCaret) {
-        if (cmd == null || !execute(editor, caret, context, cmd)) {
+        if (cmd == null || caret == null || !execute(editor, caret, context, cmd)) {
           VimPlugin.indicateError();
         }
       }
@@ -85,11 +85,8 @@ public abstract class EditorActionHandlerBase extends EditorActionHandler {
     return execute(editor, editor.getCaretModel().getPrimaryCaret(), context, cmd);
   }
 
-  protected boolean execute(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context,
+  protected boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                             @NotNull Command cmd) throws ExecuteMethodNotOverriddenException {
-    if (caret == null) {
-      return false;
-    }
     if (myRunForEachCaret) {
       throw new ExecuteMethodNotOverriddenException(this.getClass());
     }

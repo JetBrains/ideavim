@@ -84,7 +84,7 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
   }
 
   @Override
-  protected final boolean execute(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context,
+  protected final boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                                   @NotNull Command cmd) {
     if (!CommandState.inVisualBlockMode(editor)) {
       // It comes out that merging of the overlapping selections is done by IDE. In ideavim we should be
@@ -92,9 +92,6 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
       // set up the caret data to the actual values.
       @NotNull Caret currentCaret;
       if (myRunForEachCaret) {
-        if (caret == null) {
-          return false;
-        }
         currentCaret = caret;
       }
       else {
@@ -104,9 +101,6 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
     }
 
     if (myRunForEachCaret) {
-      if (caret == null) {
-        return false;
-      }
       if (CommandState.inVisualBlockMode(editor) && caret != editor.getCaretModel().getPrimaryCaret()) {
         // In visual block mode, ideavim creates multiple carets to make a selection on each line.
         // Only the primary caret of the selection should be moved though. This temporary hack
@@ -121,9 +115,6 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
 
     int offset;
     if (myRunForEachCaret) {
-      if (caret == null) {
-        return false;
-      }
       try {
         offset = getOffset(editor, caret, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
       }
@@ -152,9 +143,6 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
         offset = EditorHelper.normalizeOffset(editor, offset, false);
       }
       if (myRunForEachCaret) {
-        if (caret == null) {
-          return false;
-        }
         MotionGroup.moveCaret(editor, caret, offset);
         postMove(editor, caret, context, cmd);
       }
