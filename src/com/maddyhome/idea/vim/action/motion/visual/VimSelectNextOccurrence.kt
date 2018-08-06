@@ -3,6 +3,7 @@ package com.maddyhome.idea.vim.action.motion.visual
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.ScrollType
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimCommandAction
 import com.maddyhome.idea.vim.command.Argument
@@ -39,6 +40,7 @@ fun MotionGroup.selectNextSearch(editor: Editor): Int {
     val endOffset = range.endOffset - 1
     CaretData.setVisualStart(caret, startOffset)
     updateSelection(editor, caret, endOffset)
+    editor.scrollingModel.scrollToCaret(ScrollType.CENTER)
 
     return endOffset
   }

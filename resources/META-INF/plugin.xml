@@ -72,6 +72,7 @@
 
   <extensions defaultExtensionNs="IdeaVIM">
     <vimExtension implementation="com.maddyhome.idea.vim.extension.surround.VimSurroundExtension"/>
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.multiplecursors.VimMultipleCursorsExtension"/>
   </extensions>
 
   <actions>
