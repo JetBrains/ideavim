@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.util.text.StringUtil;
@@ -49,15 +50,22 @@ public class SortHandler extends CommandHandler {
     final boolean ignoreCase = nonEmptyArg && arg.contains("i");
     final boolean number = nonEmptyArg && arg.contains("n");
 
-    final LineRange range = getLineRange(editor, context, cmd);
     final Comparator<String> lineComparator = new LineComparator(ignoreCase, number, reverse);
+    boolean worked = true;
+    for (Caret caret : editor.getCaretModel().getAllCarets()) {
+      final LineRange range = getLineRange(editor, caret, context, cmd);
+      if (!VimPlugin.getChange().sortRange(editor, range, lineComparator)) {
+        worked = false;
+      }
+      caret.moveToOffset(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, range.getStartLine()));
+    }
 
-    return VimPlugin.getChange().sortRange(editor, range, lineComparator);
+    return worked;
   }
 
   @NotNull
-  private LineRange getLineRange(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
-    final LineRange range = cmd.getLineRange(editor, context);
+  private LineRange getLineRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, @NotNull ExCommand cmd) {
+    final LineRange range = cmd.getLineRange(editor, caret, context);
     final LineRange normalizedRange;
 
     // Something like "30,20sort" gets converted to "20,30sort"
