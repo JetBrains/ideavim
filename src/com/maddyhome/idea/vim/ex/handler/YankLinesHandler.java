@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.ex.handler;
 
-import com.google.common.collect.Lists;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.CaretModel;
@@ -35,6 +34,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+import static com.google.common.collect.Lists.newArrayListWithCapacity;
+
 /**
  *
  */
@@ -43,7 +44,8 @@ public class YankLinesHandler extends CommandHandler {
     super("y", "ank", RANGE_OPTIONAL | ARGUMENT_OPTIONAL);
   }
 
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
+  public boolean execute(@NotNull Editor editor, @NotNull DataContext context,
+                         @NotNull ExCommand cmd) throws ExException {
     final String argument = cmd.getArgument();
     final RegisterGroup registerGroup = VimPlugin.getRegister();
     final char register;
@@ -58,8 +60,8 @@ public class YankLinesHandler extends CommandHandler {
     if (!registerGroup.selectRegister(register)) return false;
 
     final CaretModel caretModel = editor.getCaretModel();
-    final List<Integer> starts = Lists.newArrayListWithCapacity(caretModel.getCaretCount());
-    final List<Integer> ends = Lists.newArrayListWithCapacity(caretModel.getCaretCount());
+    final List<Integer> starts = newArrayListWithCapacity(caretModel.getCaretCount());
+    final List<Integer> ends = newArrayListWithCapacity(caretModel.getCaretCount());
     for (Caret caret : caretModel.getAllCarets()) {
       final TextRange range = cmd.getTextRange(editor, caret, context, true);
       starts.add(range.getStartOffset());
