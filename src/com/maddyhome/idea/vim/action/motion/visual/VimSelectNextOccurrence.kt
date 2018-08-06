@@ -21,7 +21,7 @@ import javax.swing.KeyStroke
 class VimSelectNextOccurrence : VimCommandAction(Handler()) {
   class Handler : MotionEditorActionHandler() {
     override fun getOffset(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-      return VimPlugin.getMotion().selectNextSearch(editor)
+      return VimPlugin.getMotion().selectNextOccurrence(editor)
     }
   }
 
@@ -32,19 +32,7 @@ class VimSelectNextOccurrence : VimCommandAction(Handler()) {
   override fun getType() = Command.Type.MOTION
 }
 
-fun MotionGroup.selectNextSearch(editor: Editor): Int {
-
-  fun addNewSelection(caret: Caret): Int {
-    val range = SearchHelper.findWordUnderCursor(editor, caret) ?: return -1
-    val startOffset = range.startOffset
-    val endOffset = range.endOffset - 1
-    CaretData.setVisualStart(caret, startOffset)
-    updateSelection(editor, caret, endOffset)
-    editor.scrollingModel.scrollToCaret(ScrollType.CENTER)
-
-    return endOffset
-  }
-
+fun MotionGroup.selectNextOccurrence(editor: Editor): Int {
   val caretModel = editor.caretModel
   val primaryCaret = caretModel.primaryCaret
   val nextOffset = VimPlugin.getSearch().searchNext(editor, primaryCaret, 1)
@@ -54,10 +42,20 @@ fun MotionGroup.selectNextSearch(editor: Editor): Int {
   if (caretModel.caretCount == 1 && state.mode != Mode.VISUAL) {
     primaryCaret.moveToOffset(nextOffset)
     state.pushState(Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER, MappingMode.VISUAL)
-    return addNewSelection(primaryCaret)
+    return addNewSelection(editor)
   }
 
-  val caret = caretModel.addCaret(editor.offsetToVisualPosition(nextOffset), true) ?: return -1
-  return addNewSelection(caret)
+  caretModel.addCaret(editor.offsetToVisualPosition(nextOffset), true) ?: return -1
+  return addNewSelection(editor)
 }
 
+internal fun MotionGroup.addNewSelection(editor: Editor, caret: Caret = editor.caretModel.primaryCaret): Int {
+  val range = SearchHelper.findWordUnderCursor(editor, caret) ?: return -1
+  val startOffset = range.startOffset
+  val endOffset = range.endOffset - 1
+  CaretData.setVisualStart(caret, startOffset)
+  updateSelection(editor, caret, endOffset)
+  editor.scrollingModel.scrollToCaret(ScrollType.CENTER)
+
+  return endOffset
+}

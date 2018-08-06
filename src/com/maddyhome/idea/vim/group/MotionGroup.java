@@ -1259,13 +1259,6 @@ public class MotionGroup {
     moveCaret(editor, caret, offset, false);
   }
 
-  /**
-   * @deprecated Use the {@link #moveCaret(Editor, Caret, int) multi-caret version} of this function.
-   */
-  public static void moveCaret(@NotNull Editor editor, int offset) {
-    moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
-  }
-
   public static void moveCaret(@NotNull Editor editor, @NotNull Caret caret, int offset, boolean forceKeepVisual) {
     if (offset >= 0 && offset <= editor.getDocument().getTextLength()) {
       final boolean keepVisual = forceKeepVisual || keepVisual(editor);
