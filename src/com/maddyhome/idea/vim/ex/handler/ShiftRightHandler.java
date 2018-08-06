@@ -18,27 +18,38 @@
 
 package com.maddyhome.idea.vim.ex.handler;
 
+import com.google.common.collect.Lists;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.util.ArrayUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
+import com.maddyhome.idea.vim.handler.CaretOrder;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 /**
  *
  */
 public class ShiftRightHandler extends CommandHandler {
   public ShiftRightHandler() {
-    super(">", ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", ARGUMENT_OPTIONAL | WRITABLE);
+    super(">", ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", ARGUMENT_OPTIONAL | WRITABLE, true, CaretOrder.DECREASING_OFFSET);
   }
 
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
-    TextRange range = cmd.getTextRange(editor, context, true);
-
-    VimPlugin.getChange()
-      .indentRange(editor, editor.getCaretModel().getPrimaryCaret(), context, range, cmd.getCommand().length(), 1);
+  public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, @NotNull ExCommand cmd) {
+    final TextRange range = cmd.getTextRange(editor, caret, context, true);
+    final int[] endOffsets = range.getEndOffsets();
+    final List<Integer> ends = Lists.newArrayListWithCapacity(endOffsets.length);
+    for (int endOffset : endOffsets) {
+      ends.add(endOffset - 1);
+    }
+    VimPlugin.getChange().indentRange(editor, caret, context,
+                                      new TextRange(range.getStartOffsets(), ArrayUtil.toIntArray(ends)),
+                                      cmd.getCommand().length(), 1);
 
     return true;
   }
