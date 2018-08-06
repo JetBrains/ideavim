@@ -37,11 +37,7 @@ public class FindSymbolHandler extends CommandHandler {
 
   public boolean execute(@NotNull Editor editor, @NotNull final DataContext context, @NotNull ExCommand cmd) throws ExException {
     // TODO: Check the command argument and jump to a specific symbol
-    ApplicationManager.getApplication().invokeLater(new Runnable() {
-      public void run() {
-        KeyHandler.executeAction("GotoSymbol", context);
-      }
-    });
+    ApplicationManager.getApplication().invokeLater(() -> KeyHandler.executeAction("GotoSymbol", context));
     return true;
   }
 }

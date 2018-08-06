@@ -47,11 +47,7 @@ public class FindClassHandler extends CommandHandler {
       return res;
     }
 
-    ApplicationManager.getApplication().invokeLater(new Runnable() {
-      public void run() {
-        KeyHandler.executeAction("GotoClass", context);
-      }
-    });
+    ApplicationManager.getApplication().invokeLater(() -> KeyHandler.executeAction("GotoClass", context));
 
     return true;
   }

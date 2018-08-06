@@ -47,11 +47,7 @@ public class FindFileHandler extends CommandHandler {
       return res;
     }
 
-    ApplicationManager.getApplication().invokeLater(new Runnable() {
-      public void run() {
-        KeyHandler.executeAction("GotoFile", context);
-      }
-    });
+    ApplicationManager.getApplication().invokeLater(() -> KeyHandler.executeAction("GotoFile", context));
 
     return true;
   }

@@ -29,7 +29,6 @@ import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -46,7 +45,7 @@ public class ActionListHandler extends CommandHandler {
     final List<String> args = StringUtil.split(arg, "*");
     final ActionManager actionManager = ActionManager.getInstance();
     final List<String> actionNames = Arrays.asList(actionManager.getActionIds(""));
-    Collections.sort(actionNames, String.CASE_INSENSITIVE_ORDER);
+    actionNames.sort(String.CASE_INSENSITIVE_ORDER);
 
     final StringBuilder builder = new StringBuilder();
     builder.append("--- Actions ---\n");
