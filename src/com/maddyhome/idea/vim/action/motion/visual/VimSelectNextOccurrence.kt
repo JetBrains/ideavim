@@ -17,7 +17,7 @@ import com.maddyhome.idea.vim.helper.SearchHelper
 import java.util.*
 import javax.swing.KeyStroke
 
-class VisualSelectNextOccurrence : VimCommandAction(Handler()) {
+class VimSelectNextOccurrence : VimCommandAction(Handler()) {
   class Handler : MotionEditorActionHandler() {
     override fun getOffset(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
       return VimPlugin.getMotion().selectNextSearch(editor)
