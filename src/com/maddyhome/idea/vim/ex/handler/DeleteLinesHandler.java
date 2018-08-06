@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.SelectionType;
@@ -26,6 +27,7 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
+import com.maddyhome.idea.vim.handler.CaretOrder;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -33,24 +35,25 @@ import org.jetbrains.annotations.NotNull;
  */
 public class DeleteLinesHandler extends CommandHandler {
   public DeleteLinesHandler() {
-    super("d", "elete", RANGE_OPTIONAL | ARGUMENT_OPTIONAL | WRITABLE);
+    super("d", "elete", RANGE_OPTIONAL | ARGUMENT_OPTIONAL | WRITABLE, true, CaretOrder.DECREASING_OFFSET);
   }
 
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd)
-    throws ExException {
-    StringBuilder arg = new StringBuilder(cmd.getArgument());
-    char register = VimPlugin.getRegister().getDefaultRegister();
-    if (arg.length() > 0 && (arg.charAt(0) < '0' || arg.charAt(0) > '9')) {
+  public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                         @NotNull ExCommand cmd) throws ExException {
+    final String argument = cmd.getArgument();
+    StringBuilder arg = new StringBuilder(argument);
+    final char register;
+    if (argument.length() > 0 && !Character.isDigit(argument.charAt(0))) {
       register = arg.charAt(0);
-      arg.deleteCharAt(0);
-      cmd.setArgument(arg.toString());
+      cmd.setArgument(argument.substring(1));
+    }
+    else {
+      register = VimPlugin.getRegister().getDefaultRegister();
     }
 
-    VimPlugin.getRegister().selectRegister(register);
+    if (!VimPlugin.getRegister().selectRegister(register)) return false;
 
-    TextRange range = cmd.getTextRange(editor, context, true);
-
-    return VimPlugin.getChange()
-      .deleteRange(editor, editor.getCaretModel().getPrimaryCaret(), range, SelectionType.LINE_WISE, false);
+    final TextRange textRange = cmd.getTextRange(editor, caret, context, true);
+    return VimPlugin.getChange().deleteRange(editor, caret, textRange, SelectionType.LINE_WISE, false);
   }
 }

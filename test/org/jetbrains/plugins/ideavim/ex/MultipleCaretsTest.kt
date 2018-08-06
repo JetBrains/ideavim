@@ -150,4 +150,29 @@ class MultipleCaretsTest : VimTestCase() {
     """.trimMargin()
     myFixture.checkResult(after)
   }
+
+  fun testDeleteLines() {
+    val before = """qwe
+      |r<caret>ty
+      |asd
+      |f<caret>gh
+      |zxc
+      |vbn
+    """.trimMargin()
+
+    configureByText(before)
+    typeText(commandToKeys("d"))
+
+    val lastRegister = VimPlugin.getRegister().lastRegister
+    assertNotNull(lastRegister)
+    val text = lastRegister!!.text
+    assertNotNull(text)
+
+    val after = """qwe
+      |<caret>asd
+      |<caret>zxc
+      |vbn
+    """.trimMargin()
+    myFixture.checkResult(after)
+  }
 }
