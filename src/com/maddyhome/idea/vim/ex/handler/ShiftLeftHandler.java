@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.ex.handler;
 
-import com.google.common.collect.Lists;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
@@ -30,6 +29,7 @@ import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.handler.CaretOrder;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,7 +43,7 @@ public class ShiftLeftHandler extends CommandHandler {
   public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, @NotNull ExCommand cmd) {
     final TextRange range = cmd.getTextRange(editor, caret, context, true);
     final int[] endOffsets = range.getEndOffsets();
-    final List<Integer> ends = Lists.newArrayListWithCapacity(endOffsets.length);
+    final List<Integer> ends = new ArrayList<>();
     for (int endOffset : endOffsets) {
       ends.add(endOffset - 1);
     }

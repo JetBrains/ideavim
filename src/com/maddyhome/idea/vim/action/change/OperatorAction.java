@@ -49,7 +49,6 @@ public class OperatorAction extends VimCommandAction {
           if (argument != null) {
             final Command motion = argument.getMotion();
             if (motion != null) {
-              // TODO: add support for multiple carets there
               final TextRange range = MotionGroup
                 .getMotionRange(editor, editor.getCaretModel().getPrimaryCaret(), context, cmd.getCount(),
                                 cmd.getRawCount(), argument, true);

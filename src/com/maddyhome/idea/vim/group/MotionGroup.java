@@ -1081,10 +1081,11 @@ public class MotionGroup {
   }
 
   public int moveCaretToLineEndSkipLeadingOffset(@NotNull Editor editor, @NotNull Caret caret, int linesOffset) {
-    int line = EditorHelper.normalizeVisualLine(editor, caret.getVisualPosition().line + linesOffset);
-    int line1 = EditorHelper.visualLineToLogicalLine(editor, line);
-    int start = EditorHelper.getLineStartOffset(editor, line1);
-    int end = EditorHelper.getLineEndOffset(editor, line1, true);
+    int line = EditorHelper.visualLineToLogicalLine(editor,
+                                                    EditorHelper.normalizeVisualLine(editor,
+                                                                                     caret.getVisualPosition().line + linesOffset));
+    int start = EditorHelper.getLineStartOffset(editor, line);
+    int end = EditorHelper.getLineEndOffset(editor, line, true);
     CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = start;
     for (int offset = end; offset > start; offset--) {

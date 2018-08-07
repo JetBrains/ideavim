@@ -627,7 +627,10 @@ public class SearchGroup {
     });
     if (!Options.getInstance().isSet("wrapscan")) {
       final int start = max.getStartOffset();
-      if (forwards || start >= offset) {
+      if (forwards && start < offset) {
+        return null;
+      }
+      else if (start >= offset) {
         return null;
       }
     }
