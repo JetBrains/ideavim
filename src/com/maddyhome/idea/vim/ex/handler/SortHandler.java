@@ -56,8 +56,7 @@ public class SortHandler extends CommandHandler {
       final Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
       final LineRange range = getLineRange(editor, primaryCaret, context, cmd);
       final boolean worked = VimPlugin.getChange().sortRange(editor, range, lineComparator);
-      primaryCaret.moveToOffset(
-          VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, range.getStartLine()));
+      primaryCaret.moveToOffset(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, range.getStartLine()));
       return worked;
     }
 
@@ -74,7 +73,8 @@ public class SortHandler extends CommandHandler {
   }
 
   @NotNull
-  private LineRange getLineRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, @NotNull ExCommand cmd) {
+  private LineRange getLineRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                                 @NotNull ExCommand cmd) {
     final LineRange range = cmd.getLineRange(editor, caret, context);
     final LineRange normalizedRange;
 
