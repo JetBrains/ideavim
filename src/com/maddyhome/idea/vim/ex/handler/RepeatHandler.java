@@ -19,11 +19,13 @@
 package com.maddyhome.idea.vim.ex.handler;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.ex.*;
 import com.maddyhome.idea.vim.group.MotionGroup;
+import com.maddyhome.idea.vim.handler.CaretOrder;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -31,37 +33,30 @@ import org.jetbrains.annotations.NotNull;
  */
 public class RepeatHandler extends CommandHandler {
   public RepeatHandler() {
-    super(new CommandName[]{new CommandName("@", "")}, RANGE_OPTIONAL | ARGUMENT_REQUIRED | DONT_SAVE_LAST);
+    super(new CommandName[]{new CommandName("@", "")}, RANGE_OPTIONAL | ARGUMENT_REQUIRED | DONT_SAVE_LAST, true,
+          CaretOrder.DECREASING_OFFSET);
   }
 
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd)
-    throws ExException {
-    // TODO: Add multiple carets support
+  public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                         @NotNull ExCommand cmd) throws ExException {
     char arg = cmd.getArgument().charAt(0);
-    int line = cmd.getLine(editor, context);
-
-    if (arg == '@') {
-      arg = lastArg;
-    }
-
-    MotionGroup
-      .moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), VimPlugin.getMotion().moveCaretToLine(editor, line));
+    if (arg == '@') arg = lastArg;
     lastArg = arg;
+
+    final int line = cmd.getLine(editor, caret, context);
+    MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLine(editor, line));
 
     if (arg == ':') {
       return CommandParser.getInstance().processLastCommand(editor, context, 1);
     }
-    else {
-      final Register reg = VimPlugin.getRegister().getPlaybackRegister(arg);
-      if (reg != null) {
-        final String text = reg.getText();
-        if (text != null) {
-          CommandParser.getInstance().processCommand(editor, context, text, 1);
-          return true;
-        }
-      }
-      return false;
-    }
+
+    final Register reg = VimPlugin.getRegister().getPlaybackRegister(arg);
+    if (reg == null) return false;
+    final String text = reg.getText();
+    if (text == null) return false;
+
+    CommandParser.getInstance().processCommand(editor, context, text, 1);
+    return true;
   }
 
   private char lastArg = ':';
