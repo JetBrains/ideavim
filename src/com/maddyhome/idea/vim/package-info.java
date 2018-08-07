@@ -132,7 +132,7 @@
  * |#|                    1 {@link com.maddyhome.idea.vim.action.motion.search.SearchWholeWordBackwardAction}
  * |$|                    1 {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnAction}
  * |%|                    1 {@link com.maddyhome.idea.vim.action.motion.updown.MotionPercentOrMatchAction}
- * |&|                    ? {@link com.maddyhome.idea.vim.action.change.change.ChangeLastSearchReplaceAction}
+ * |&|                    1 {@link com.maddyhome.idea.vim.action.change.change.ChangeLastSearchReplaceAction}
  * |'|                    p {@link com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkLineAction}
  * |'|                    p {@link com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction}
  * |''|                     ?
@@ -376,7 +376,7 @@
  * |g_CTRL-]|               TODO
  * |g#|                   1 {@link com.maddyhome.idea.vim.action.motion.search.SearchWordBackwardAction}
  * |g$|                   1 {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastScreenColumnAction}
- * |g&|                   ? {@link com.maddyhome.idea.vim.action.change.change.ChangeLastGlobalSearchReplaceAction}
+ * |g&|                   1 {@link com.maddyhome.idea.vim.action.change.change.ChangeLastGlobalSearchReplaceAction}
  * |g'|                     TODO
  * |g`|                     TODO
  * |gstar|                1 {@link com.maddyhome.idea.vim.action.motion.search.SearchWordForwardAction}

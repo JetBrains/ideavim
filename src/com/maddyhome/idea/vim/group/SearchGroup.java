@@ -78,9 +78,8 @@ public class SearchGroup {
     VimPlugin.getHistory().addEntry(HistoryGroup.SEARCH, lastPattern);
   }
 
-  public boolean searchAndReplace(@NotNull Editor editor, @NotNull LineRange range, @NotNull String excmd, String exarg) {
-    // TODO: Add multiple carets support
-
+  public boolean searchAndReplace(@NotNull Editor editor, @NotNull Caret caret, @NotNull LineRange range,
+                                  @NotNull String excmd, String exarg) {
     // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
       VimPlugin.getMotion().exitVisual(editor);
@@ -102,18 +101,18 @@ public class SearchGroup {
     CharPointer sub;
     char delimiter;
     /* new pattern and substitution */
-    if (excmd.charAt(0) == 's' && !cmd.isNul() && !Character.isWhitespace(cmd.charAt()) &&
-        "0123456789cegriIp|\"".indexOf(cmd.charAt()) == -1) {
+    if (excmd.charAt(0) == 's' && !cmd.isNul() && !Character.isWhitespace(
+        cmd.charAt()) && "0123456789cegriIp|\"".indexOf(cmd.charAt()) == -1) {
       /* don't accept alphanumeric for separator */
       if (CharacterClasses.isAlpha(cmd.charAt())) {
         VimPlugin.showMessage(MessageHelper.message(Msg.E146));
         return false;
       }
       /*
-      * undocumented vi feature:
-      *  "\/sub/" and "\?sub?" use last used search pattern (almost like
-      *  //sub/r).  "\&sub&" use last substitute pattern (like //sub/).
-      */
+       * undocumented vi feature:
+       *  "\/sub/" and "\?sub?" use last used search pattern (almost like
+       *  //sub/r).  "\&sub&" use last substitute pattern (like //sub/).
+       */
       if (cmd.charAt() == '\\') {
         cmd.inc();
         if ("/?&".indexOf(cmd.charAt()) == -1) {
@@ -139,9 +138,9 @@ public class SearchGroup {
       }
 
       /*
-      * Small incompatibility: vi sees '\n' as end of the command, but in
-      * Vim we want to use '\n' to find/substitute a NUL.
-      */
+       * Small incompatibility: vi sees '\n' as end of the command, but in
+       * Vim we want to use '\n' to find/substitute a NUL.
+       */
       sub = cmd.ref(0);          /* remember the start of the substitution */
 
       while (!cmd.isNul()) {
@@ -165,8 +164,8 @@ public class SearchGroup {
     }
 
     /*
-    * Find trailing options.  When '&' is used, keep old options.
-    */
+     * Find trailing options.  When '&' is used, keep old options.
+     */
     if (cmd.charAt() == '&') {
       cmd.inc();
     }
@@ -179,9 +178,9 @@ public class SearchGroup {
     }
     while (!cmd.isNul()) {
       /*
-      * Note that 'g' and 'c' are always inverted, also when p_ed is off.
-      * 'r' is never inverted.
-      */
+       * Note that 'g' and 'c' are always inverted, also when p_ed is off.
+       * 'r' is never inverted.
+       */
       if (cmd.charAt() == 'g') {
         do_all = !do_all;
       }
@@ -214,8 +213,8 @@ public class SearchGroup {
     }
 
     /*
-    * check for a trailing count
-    */
+     * check for a trailing count
+     */
     cmd = CharHelper.skipwhite(cmd);
     if (CharacterClasses.isDigit(cmd.charAt())) {
       int i = CharHelper.getdigits(cmd);
@@ -228,8 +227,8 @@ public class SearchGroup {
     }
 
     /*
-    * check for trailing command or garbage
-    */
+     * check for trailing command or garbage
+     */
     cmd = CharHelper.skipwhite(cmd);
     if (!cmd.isNul() && cmd.charAt() != '"')        /* if not end-of-line or comment */ {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_trailing));
@@ -285,10 +284,10 @@ public class SearchGroup {
     }
 
     /*
-    * ~ in the substitute pattern is replaced with the old pattern.
-    * We do it here once to avoid it to be replaced over and over again.
-    * But don't do it when it starts with "\=", then it's an expression.
-    */
+     * ~ in the substitute pattern is replaced with the old pattern.
+     * We do it here once to avoid it to be replaced over and over again.
+     * But don't do it when it starts with "\=", then it's an expression.
+     */
     if (!(sub.charAt(0) == '\\' && sub.charAt(1) == '=') && lastReplace != null) {
       StringBuffer tmp = new StringBuffer(sub.toString());
       int pos = 0;
@@ -332,10 +331,8 @@ public class SearchGroup {
         //logger.debug("found match[" + spos + "," + epos + "] - replace " + match);
 
         int line = lnum + regmatch.startpos[0].lnum;
-        CharacterPosition startpos = new CharacterPosition(lnum + regmatch.startpos[0].lnum,
-                                                           regmatch.startpos[0].col);
-        CharacterPosition endpos = new CharacterPosition(lnum + regmatch.endpos[0].lnum,
-                                                         regmatch.endpos[0].col);
+        CharacterPosition startpos = new CharacterPosition(lnum + regmatch.startpos[0].lnum, regmatch.startpos[0].col);
+        CharacterPosition endpos = new CharacterPosition(lnum + regmatch.endpos[0].lnum, regmatch.endpos[0].col);
         int startoff = EditorHelper.characterPositionToOffset(editor, startpos);
         int endoff = EditorHelper.characterPositionToOffset(editor, endpos);
         int newend = startoff + match.length();
@@ -345,7 +342,7 @@ public class SearchGroup {
           if (do_ask) {
             RangeHighlighter hl = highlightConfirm(editor, startoff, endoff);
             MotionGroup.scrollPositionIntoView(editor, editor.offsetToVisualPosition(startoff), true);
-            MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), startoff);
+            MotionGroup.moveCaret(editor, caret, start);
             final ReplaceConfirmationChoice choice = confirmChoice(editor, match);
             editor.getMarkupModel().removeHighlighter(hl);
             switch (choice) {
@@ -404,9 +401,9 @@ public class SearchGroup {
     }
 
     if (lastMatch != -1) {
-      MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), VimPlugin.getMotion()
-        .moveCaretToLineStartSkipLeading(editor, editor.offsetToLogicalPosition(lastMatch).line
-        ));
+      MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor,
+                                                                                                 editor.offsetToLogicalPosition(
+                                                                                                     lastMatch).line));
     }
     else {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));

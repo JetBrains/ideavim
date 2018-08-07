@@ -19,7 +19,7 @@ import java.util.*
 import javax.swing.KeyStroke
 
 class VimSelectNextOccurrence : VimCommandAction(Handler()) {
-  class Handler : MotionEditorActionHandler() {
+  private class Handler : MotionEditorActionHandler() {
     override fun getOffset(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
       return VimPlugin.getMotion().selectNextOccurrence(editor)
     }
