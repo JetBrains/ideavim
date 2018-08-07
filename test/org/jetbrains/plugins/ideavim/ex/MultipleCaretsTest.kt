@@ -199,7 +199,7 @@ class MultipleCaretsTest : VimTestCase() {
   }
 
   fun testShiftRight() {
-     val before = """qw<caret>e
+    val before = """qw<caret>e
       |   rty
       |  asd
       |f<caret>gh
@@ -216,6 +216,87 @@ class MultipleCaretsTest : VimTestCase() {
       |        <caret>fgh
       |     zxc
       |        <caret>vbn
+    """.trimMargin()
+    myFixture.checkResult(after)
+  }
+
+  fun testSortRangeWholeFile() {
+    val before = """qwe
+      |as<caret>d
+      |zxc
+      |<caret>rty
+      |fgh
+      |vbn
+    """.trimMargin()
+    configureByText(before)
+
+    typeText(commandToKeys("sor"))
+
+    val after = "<caret>" + before.replace("<caret>", "").split('\n').sorted().joinToString(separator = "\n")
+    myFixture.checkResult(after)
+  }
+
+  fun testSortRange() {
+    val before = """qwe
+      |as<caret>d
+      | zxc
+      |rty
+      |f<caret>gh
+      |vbn
+    """.trimMargin()
+    configureByText(before)
+
+    typeText(commandToKeys("2,4 sor"))
+
+    val after = """qwe
+      | <caret>zxc
+      |asd
+      |rty
+      |fgh
+      |vbn
+    """.trimMargin()
+    myFixture.checkResult(after)
+  }
+
+  fun testSortRangeReverse() {
+    val before = """qwe
+      |as<caret>d
+      |zxc
+      |<caret>rty
+      |fgh
+      |vbn
+    """.trimMargin()
+    configureByText(before)
+
+    typeText(commandToKeys("sor!"))
+
+    val after = "<caret>" +
+        before
+            .replace("<caret>", "")
+            .split('\n')
+            .sortedWith(reverseOrder())
+            .joinToString(separator = "\n")
+    myFixture.checkResult(after)
+  }
+
+  fun testSortRangeIgnoreCase() {
+    val before = """qwe
+      |as<caret>d
+      |   zxc
+      |<caret>Rty
+      |fgh
+      |vbn
+    """.trimMargin()
+    configureByText(before)
+
+    typeText(commandToKeys("2,4 sor i"))
+
+    val after = """qwe
+      |   <caret>zxc
+      |asd
+      |Rty
+      |fgh
+      |vbn
     """.trimMargin()
     myFixture.checkResult(after)
   }
