@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.util.text.StringUtil;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
@@ -51,6 +52,15 @@ public class SortHandler extends CommandHandler {
     final boolean number = nonEmptyArg && arg.contains("n");
 
     final Comparator<String> lineComparator = new LineComparator(ignoreCase, number, reverse);
+    if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_BLOCK) {
+      final Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+      final LineRange range = getLineRange(editor, primaryCaret, context, cmd);
+      final boolean worked = VimPlugin.getChange().sortRange(editor, range, lineComparator);
+      primaryCaret.moveToOffset(
+          VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, range.getStartLine()));
+      return worked;
+    }
+
     boolean worked = true;
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
       final LineRange range = getLineRange(editor, caret, context, cmd);
