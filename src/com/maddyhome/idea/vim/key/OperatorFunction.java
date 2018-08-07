@@ -19,8 +19,10 @@
 package com.maddyhome.idea.vim.key;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.command.SelectionType;
+import com.maddyhome.idea.vim.handler.ExecuteMethodNotOverriddenException;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -28,4 +30,14 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface OperatorFunction {
   boolean apply(@NotNull Editor editor, @NotNull DataContext context, @NotNull SelectionType selectionType);
+
+  default boolean apply(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                        @NotNull SelectionType selectionType) throws ExecuteMethodNotOverriddenException {
+    if (!isMulticaret()) throw new ExecuteMethodNotOverriddenException(this.getClass());
+    return apply(editor, context, selectionType);
+  }
+
+  default boolean isMulticaret() {
+    return false;
+  }
 }
