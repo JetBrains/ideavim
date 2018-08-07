@@ -33,14 +33,18 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
   private class NextOccurrenceHandler : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
       val offset = VimPlugin.getMotion().selectNextOccurrence(editor)
-      if (offset != -1) MotionGroup.moveCaret(editor, editor.caretModel.primaryCaret, offset, true)
+      if (offset != -1) {
+        MotionGroup.moveCaret(editor, editor.caretModel.primaryCaret, offset, true)
+      }
     }
   }
 
   private class SkipOccurrenceHandler : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
       val offset = VimPlugin.getMotion().skipCurrentOccurrence(editor)
-      if (offset != -1) MotionGroup.moveCaret(editor, editor.caretModel.primaryCaret, offset, true)
+      if (offset != -1) {
+        MotionGroup.moveCaret(editor, editor.caretModel.primaryCaret, offset, true)
+      }
     }
 
   }

@@ -41,10 +41,9 @@ public class DeleteLinesHandler extends CommandHandler {
   public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                          @NotNull ExCommand cmd) throws ExException {
     final String argument = cmd.getArgument();
-    StringBuilder arg = new StringBuilder(argument);
     final char register;
     if (argument.length() > 0 && !Character.isDigit(argument.charAt(0))) {
-      register = arg.charAt(0);
+      register = argument.charAt(0);
       cmd.setArgument(argument.substring(1));
     }
     else {
