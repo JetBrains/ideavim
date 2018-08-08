@@ -20,6 +20,7 @@ import com.maddyhome.idea.vim.helper.CaretData
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 
 private const val NEXT_OCCURRENCE = "<Plug>NextOccurrence"
+private const val NOT_WHOLE_OCCURRENCE = "<Plug>NotWholeOccurrence"
 private const val SKIP_OCCURRENCE = "<Plug>SkipOccurrence"
 private const val REMOVE_OCCURRENCE = "<Plug>RemoveOccurrence"
 private const val ALL_OCCURRENCES = "<Plug>AllOccurrences"
@@ -48,17 +49,18 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
 
   override fun initOnce() {
     putExtensionHandlerMapping(MappingMode.NVO, parseKeys(NEXT_OCCURRENCE), NextOccurrenceHandler(), false)
+    putExtensionHandlerMapping(MappingMode.NVO, parseKeys(NOT_WHOLE_OCCURRENCE), NextOccurrenceHandler(false), false)
     putExtensionHandlerMapping(MappingMode.NO, parseKeys(ALL_OCCURRENCES), AllOccurrencesHandler(), false)
     putExtensionHandlerMapping(MappingMode.V, parseKeys(SKIP_OCCURRENCE), SkipOccurrenceHandler(), false)
     putExtensionHandlerMapping(MappingMode.V, parseKeys(REMOVE_OCCURRENCE), RemoveOccurrenceHandler(), false)
 
     putKeyMapping(MappingMode.NVO, parseKeys("<A-n>"), parseKeys(NEXT_OCCURRENCE), true)
+    putKeyMapping(MappingMode.NVO, parseKeys("g<A-n>"), parseKeys(NOT_WHOLE_OCCURRENCE), true)
     putKeyMapping(MappingMode.V, parseKeys("<A-x>"), parseKeys(SKIP_OCCURRENCE), true)
     putKeyMapping(MappingMode.V, parseKeys("<A-p>"), parseKeys(REMOVE_OCCURRENCE), true)
   }
 
-  private class NextOccurrenceHandler : VimExtensionHandler {
-
+  private class NextOccurrenceHandler(val whole: Boolean = true) : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
       val commandState = CommandState.getInstance(editor)
       val state = State.instance
@@ -70,7 +72,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
         val startOffset = firstRange.startOffset
         val endOffset = firstRange.endOffset
 
-        state.nextOffset = VimPlugin.getSearch().searchWord(editor, caret, 1, true, 1)
+        state.nextOffset = VimPlugin.getSearch().searchWord(editor, caret, 1, whole, 1)
 
         commandState.pushState(Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER, MappingMode.VISUAL)
         selectRange(editor, caret, startOffset, endOffset)
@@ -80,17 +82,18 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
         val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(state.nextOffset), true) ?: return
         val range = VimPlugin.getMotion().getWordRange(editor, caret, 1, false, false)
 
-        val startOffset = range.startOffset
-        val endOffset = range.endOffset
-
         val firstRange = state.firstRange ?: return
+
+        val startOffset = range.startOffset
+        val endOffset = range.startOffset + firstRange.endOffset - firstRange.startOffset
+
         if (startOffset == firstRange.startOffset && endOffset == firstRange.endOffset) {
           editor.caretModel.removeCaret(caret)
 //          TODO: no more matches notification
           return
         }
 
-        state.nextOffset = VimPlugin.getSearch().searchWord(editor, caret, 1, true, 1)
+        state.nextOffset = VimPlugin.getSearch().searchNext(editor, caret, 1)
 
         selectRange(editor, caret, startOffset, endOffset)
         MotionGroup.moveCaret(editor, caret, endOffset, true)

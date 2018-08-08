@@ -50,7 +50,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
-  fun testAllOccurrences() {
+  fun testAllOccurrencesIterative() {
     val before = """public class ChangeLineAction extends EditorAction {
   public ChangeLineAction() {
     super(new ChangeEditorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
@@ -233,6 +233,30 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       |<selection>qwe</selection>
       |asd
       |qwe
+    """.trimMargin()
+    myFixture.checkResult(after)
+  }
+
+  fun testNotWholeOccurrence() {
+    val before = """Int
+      |Integer
+      |I<caret>nt
+      |Integer
+      |Integer
+      |Int
+      |Intger
+    """.trimMargin()
+    configureByText(before)
+
+    typeText(parseKeys("g<A-n>", "<A-n>".repeat(before.count { it -> it == '\n' } - 1)))
+
+    val after = """<selection>Int</selection>
+      |Integer
+      |<selection>Int</selection>
+      |<selection>Int</selection>eger
+      |<selection>Int</selection>eger
+      |<selection>Int</selection>
+      |<selection>Int</selection>ger
     """.trimMargin()
     myFixture.checkResult(after)
   }
