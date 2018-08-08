@@ -122,7 +122,6 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
 
   private class AllOccurrencesHandler(val whole: Boolean = true) : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
-
       handleFirstSelection(editor, whole)
       while (handleNextSelection(editor)) {}
     }
@@ -153,7 +152,6 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
   private class RemoveOccurrenceHandler : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
       State.instance.nextOffset = CaretData.getVisualStart(editor.caretModel.primaryCaret)
-
       editor.selectionModel.removeSelection()
       if (!editor.caretModel.removeCaret(editor.caretModel.primaryCaret)) {
         getInstance(editor).popState()
