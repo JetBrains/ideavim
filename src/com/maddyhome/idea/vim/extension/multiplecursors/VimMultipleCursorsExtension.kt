@@ -75,7 +75,7 @@ fun handleNextSelection(editor: Editor): Boolean {
 
   if (startOffset == firstRange.startOffset && endOffset == firstRange.endOffset) {
     editor.caretModel.removeCaret(caret)
-    //          TODO: no more matches notification
+    VimPlugin.showMessage("No more matches")
     return false
   }
 
