@@ -1,5 +1,3 @@
-@file:Suppress("NAME_SHADOWING")
-
 package com.maddyhome.idea.vim.extension.multiplecursors
 
 import com.intellij.openapi.actionSystem.DataContext
