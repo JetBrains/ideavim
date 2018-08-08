@@ -434,9 +434,11 @@ public class MotionGroup {
 
     final Editor selectedEditor = selectEditor(editor, mark);
     if (selectedEditor != null) {
-      moveCaret(selectedEditor, selectedEditor.getCaretModel().getPrimaryCaret(),
-                toLineStart ? moveCaretToLineStartSkipLeading(selectedEditor, line)
-                            : selectedEditor.logicalPositionToOffset(new LogicalPosition(line, mark.getCol())));
+      for (Caret caret : selectedEditor.getCaretModel().getAllCarets()) {
+        moveCaret(selectedEditor, caret, toLineStart ? moveCaretToLineStartSkipLeading(selectedEditor, line)
+                                                     : selectedEditor.logicalPositionToOffset(
+                                                         new LogicalPosition(line, mark.getCol())));
+      }
     }
     return -2;
   }

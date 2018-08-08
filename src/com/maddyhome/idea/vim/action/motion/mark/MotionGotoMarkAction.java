@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.action.motion.mark;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
@@ -31,10 +32,10 @@ import org.jetbrains.annotations.Nullable;
  */
 public class MotionGotoMarkAction extends MotionEditorAction {
   public MotionGotoMarkAction() {
-    super(new MotionEditorActionHandler() {
+    super(new MotionEditorActionHandler(true) {
       @Override
-      public int getOffset(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
-                           @Nullable Argument argument) {
+      public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+                           int rawCount, @Nullable Argument argument) {
         if (argument == null) return -1;
 
         final char mark = argument.getCharacter();
