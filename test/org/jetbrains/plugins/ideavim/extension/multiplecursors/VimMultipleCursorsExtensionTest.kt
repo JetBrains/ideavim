@@ -29,17 +29,53 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 }"""
     configureByJavaText(before)
 
-    typeText(parseKeys("*"))
-    typeText(parseKeys("<A-n>"))
-    typeText(parseKeys("<A-n>"))
-    typeText(parseKeys("<A-n>"))
+    typeText(parseKeys("<A-n>".repeat(3)))
 
     val after = """public class ChangeLineAction extends EditorAction {
   public ChangeLineAction() {
     super(new ChangeEditorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
       @Override
       public boolean execute(@<selection>NotNull</selection> Editor editor,
+                             @<selection>NotNull</selection> Caret caret,
+                             @<selection>NotNull</selection> DataContext context,
+                             int count,
+                             int rawCount,
+                             @NotNull Argument argument) {
+        return VimPlugin.getChange().changeLine(editor, caret, count);
+      }
+    });
+  }
+}"""
+
+    myFixture.checkResult(after)
+  }
+
+  fun testAllOccurrences() {
+    val before = """public class ChangeLineAction extends EditorAction {
+  public ChangeLineAction() {
+    super(new ChangeEditorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
+      @Override
+      public boolean execute(@Not<caret>Null Editor editor,
                              @NotNull Caret caret,
+                             @NotNull DataContext context,
+                             int count,
+                             int rawCount,
+                             @NotNull Argument argument) {
+        return VimPlugin.getChange().changeLine(editor, caret, count);
+      }
+    });
+  }
+}"""
+    configureByJavaText(before)
+
+    typeText(parseKeys("<A-n>".repeat(6)))
+
+    val after = """public class ChangeLineAction extends EditorAction {
+  public ChangeLineAction() {
+    super(new ChangeEditorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
+      @Override
+      public boolean execute(@<selection>NotNull</selection> Editor editor,
+                             @<selection>NotNull</selection> Caret caret,
                              @<selection>NotNull</selection> DataContext context,
                              int count,
                              int rawCount,
@@ -60,12 +96,28 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     configureByJavaText(before)
 
-    typeText(parseKeys("*"))
     typeText(parseKeys("<A-n>", "<A-x>", "<A-n>"))
+
+    val after = """private int a = 0;
+      |<selection>private</selection> int b = 1;
+      |<selection>private</selection> int c = 2;
+    """.trimMargin()
+
+    myFixture.checkResult(after)
+  }
+
+  fun testSkipAndThenSelectAllOccurrences() {
+    val before = """pr<caret>ivate int a = 0;
+      |private int b = 1;
+      |private int c = 2;
+    """.trimMargin()
+    configureByJavaText(before)
+
+    typeText(parseKeys("<A-n>", "<A-x>", "<A-n>".repeat(3)))
 
     val after = """<selection>private</selection> int a = 0;
       |<selection>private</selection> int b = 1;
-      |private int c = 2;
+      |<selection>private</selection> int c = 2;
     """.trimMargin()
 
     myFixture.checkResult(after)
@@ -81,12 +133,12 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     configureByJavaText(before)
 
 
-    typeText(parseKeys("*", "<A-n>", "<A-n>", "<A-n>", "<A-p>", "<A-n>"))
-    val after = """private int a = 0;
-      |private int b = 1;
+    typeText(parseKeys("<A-n>", "<A-n>", "<A-n>", "<A-p>", "<A-n>"))
+    val after = """private <selection>int</selection> a = 0;
+      |private <selection>int</selection> b = 1;
       |private <selection>int</selection> c = 2;
-      |private <selection>int</selection> d = 3;
-      |private <selection>int</selection> e = 4;
+      |private int d = 3;
+      |private int e = 4;
     """.trimMargin()
     myFixture.checkResult(after)
   }
@@ -106,16 +158,16 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     configureByJavaText(before)
 
-    typeText(parseKeys("*", "<A-n>", "<A-x>", "<A-n>", "<A-n>", "<A-n>", "<A-p>", "<A-n>", "<A-x>"))
+    typeText(parseKeys("<A-n>", "<A-x>", "<A-n>", "<A-n>", "<A-n>", "<A-p>", "<A-n>", "<A-x>"))
     typeText(parseKeys("<Esc>"))
 
     val after = """public class Main {
       |  public static void main(String[] args) {
-      |    <selection>final</selection> Integer a = 0;
-      |    final Integer b = 1;
-      |    final Integer c = 2;
+      |    final Integer a = 0;
+      |    <selection>final</selection> Integer b = 1;
+      |    <selection>final</selection> Integer c = 2;
       |    <selection>final</selection> Integer d = 3;
-      |    <selection>final</selection> Integer e = 5;
+      |    final Integer e = 5;
       |    <selection>final</selection> Integer f = 6;
       |    final Integer g = 7;
       |  }
@@ -128,11 +180,11 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     typeText(parseKeys("<Esc>"))
     val afterEscape = """public class Main {
       |  public static void main(String[] args) {
-      |    fina<caret>l Integer a = 0;
-      |    final Integer b = 1;
-      |    final Integer c = 2;
+      |    final Integer a = 0;
+      |    fina<caret>l Integer b = 1;
+      |    fina<caret>l Integer c = 2;
       |    fina<caret>l Integer d = 3;
-      |    fina<caret>l Integer e = 5;
+      |    final Integer e = 5;
       |    fina<caret>l Integer f = 6;
       |    final Integer g = 7;
       |  }
@@ -146,11 +198,11 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     assertMode(CommandState.Mode.COMMAND)
     val afterInsert = """public class Main {
       |  public static void main(String[] args) {
-      |    @NotNull final Integer a = 0;
-      |    final Integer b = 1;
-      |    final Integer c = 2;
+      |    final Integer a = 0;
+      |    @NotNull final Integer b = 1;
+      |    @NotNull final Integer c = 2;
       |    @NotNull final Integer d = 3;
-      |    @NotNull final Integer e = 5;
+      |    final Integer e = 5;
       |    @NotNull final Integer f = 6;
       |    final Integer g = 7;
       |  }
@@ -159,5 +211,29 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 
     assertMode(CommandState.Mode.COMMAND)
     myFixture.checkResult(afterInsert)
+  }
+
+  fun testSelectTwice() {
+    val before = """qwe
+      |asd
+      |qwe
+      |asd
+      |qwe
+    """.trimMargin()
+    configureByText(before)
+
+    typeText(parseKeys("<A-n>".repeat(3)))
+    assertMode(CommandState.Mode.VISUAL)
+    typeText(parseKeys("<A-p>".repeat(3)))
+    assertMode(CommandState.Mode.COMMAND)
+    typeText(parseKeys("<A-n>".repeat(2)))
+
+    val after = """<selection>qwe</selection>
+      |asd
+      |<selection>qwe</selection>
+      |asd
+      |qwe
+    """.trimMargin()
+    myFixture.checkResult(after)
   }
 }
