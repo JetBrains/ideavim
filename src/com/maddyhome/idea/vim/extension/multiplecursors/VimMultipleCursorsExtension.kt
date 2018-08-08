@@ -28,7 +28,7 @@ private const val NOT_WHOLE_ALL_OCCURRENCES = "<Plug>NotWholeAllOccurrences"
 
 private class State private constructor() {
   var nextOffset = -1
-  var firstRange: TextRange? = null
+  lateinit var firstRange: TextRange
 
   private object Holder {
     val INSTANCE = State()
@@ -52,7 +52,7 @@ private fun handleFirstSelection(editor: Editor, whole: Boolean) {
   val caret = editor.caretModel.primaryCaret
   state.firstRange = VimPlugin.getMotion().getWordRange(editor, caret, 1, false, false)
 
-  val firstRange = state.firstRange ?: return
+  val firstRange = state.firstRange
   val startOffset = firstRange.startOffset
   val endOffset = firstRange.endOffset
 
@@ -66,10 +66,12 @@ private fun handleFirstSelection(editor: Editor, whole: Boolean) {
 fun handleNextSelection(editor: Editor): Boolean {
   val state = State.instance
 
-  val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(state.nextOffset), true) ?: return false
+  val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(state.nextOffset), true)
+      ?: throw IllegalStateException("Multiple carets are not supported")
+
   val range = VimPlugin.getMotion().getWordRange(editor, caret, 1, false, false)
 
-  val firstRange = state.firstRange ?: return false
+  val firstRange = state.firstRange
   val startOffset = range.startOffset
   val endOffset = range.startOffset + firstRange.endOffset - firstRange.startOffset
 
