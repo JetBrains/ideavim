@@ -260,4 +260,47 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     myFixture.checkResult(after)
   }
+
+  fun testSelectAll() {
+    val before = """qwe
+      |asd
+      |q<caret>we
+      |asd
+      |qwe
+    """.trimMargin()
+    configureByText(before)
+
+    typeText(parseKeys("<Plug>AllOccurrences"))
+
+    val after = """<selection>qwe</selection>
+      |asd
+      |<selection>qwe</selection>
+      |asd
+      |<selection>qwe</selection>
+    """.trimMargin()
+    myFixture.checkResult(after)
+  }
+
+  fun testSelectAllNotWhole() {
+    val before = """Int
+      |Integer
+      |I<caret>nt
+      |Integer
+      |Integer
+      |Int
+      |Intger
+    """.trimMargin()
+    configureByText(before)
+
+    typeText(parseKeys("<Plug>NotWholeAllOccurrences"))
+    val after = """<selection>Int</selection>
+      |<selection>Int</selection>eger
+      |<selection>Int</selection>
+      |<selection>Int</selection>eger
+      |<selection>Int</selection>eger
+      |<selection>Int</selection>
+      |<selection>Int</selection>ger
+    """.trimMargin()
+    myFixture.checkResult(after)
+  }
 }
