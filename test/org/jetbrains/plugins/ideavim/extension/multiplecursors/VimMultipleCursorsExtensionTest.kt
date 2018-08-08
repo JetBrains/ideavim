@@ -248,7 +248,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     configureByText(before)
 
-    typeText(parseKeys("g<A-n>", "<A-n>".repeat(before.count { it -> it == '\n' } - 1)))
+    typeText(parseKeys("g<A-n>", "<A-n>".repeat(before.count { it == '\n' } - 1)))
 
     val after = """<selection>Int</selection>
       |Integer
