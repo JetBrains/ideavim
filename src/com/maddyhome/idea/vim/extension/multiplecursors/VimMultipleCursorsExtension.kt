@@ -61,7 +61,7 @@ private fun handleFirstSelection(editor: Editor, whole: Boolean) {
   MotionGroup.moveCaret(editor, caret, endOffset, true)
 }
 
-fun handleNextSelection(editor: Editor): Boolean {
+private fun handleNextSelection(editor: Editor): Boolean {
   val state = State.instance
 
   val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(state.nextOffset), true)
