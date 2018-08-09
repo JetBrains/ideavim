@@ -80,6 +80,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
       if (nextOffset == -1) return
 
       val caret = editor.caretModel.primaryCaret
+      val offset = caret.offset
       val selectionStart = editor.selectionModel.selectionStart
       val selectionEnd = editor.selectionModel.selectionEnd
       val selectedText = editor.selectionModel.selectedText ?: return
@@ -101,7 +102,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
       if (selectedText != editor.selectionModel.selectedText) {
         reset()
         caret.removeSelection()
-        caret.moveToOffset(selectionStart)
+        caret.moveToOffset(offset)
         caret.setSelection(selectionStart, selectionEnd)
         return
       }
@@ -137,6 +138,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
       }
       else {
         caret.removeSelection()
+        editor.scrollingModel.scrollToCaret(ScrollType.CENTER)
       }
     }
   }
