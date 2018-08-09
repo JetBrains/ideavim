@@ -270,7 +270,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     configureByText(before)
 
-    typeText(parseKeys("<Plug>AllOccurrences"))
+    typeText(parseKeys("<Plug>AllWholeOccurrences"))
 
     val after = """<selection>qwe</selection>
       |asd
@@ -292,7 +292,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     configureByText(before)
 
-    typeText(parseKeys("<Plug>NotWholeAllOccurrences"))
+    typeText(parseKeys("<Plug>AllOccurrences"))
     val after = """<selection>Int</selection>
       |<selection>Int</selection>eger
       |<selection>Int</selection>
@@ -300,6 +300,101 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       |<selection>Int</selection>eger
       |<selection>Int</selection>
       |<selection>Int</selection>ger
+    """.trimMargin()
+    myFixture.checkResult(after)
+  }
+
+  fun testSelectSubstring() {
+    val before = """q<caret>we
+      |asdqweasd
+      |qwe
+      |asd
+    """.trimMargin()
+    configureByText(before)
+
+    typeText(parseKeys("g<A-n>".repeat(3)))
+
+    val after = """<selection>qwe</selection>
+      |asd<selection>qwe</selection>asd
+      |<selection>qwe</selection>
+      |asd
+    """.trimMargin()
+    myFixture.checkResult(after)
+  }
+
+  fun testSkipSelectionSubstring() {
+    val before = """qw<caret>e
+      |asdqweasd
+      |ads
+      |asdqweasd
+      |qwe
+    """.trimMargin()
+    configureByText(before)
+
+    typeText(parseKeys("g<A-n>", "<A-x>", "<A-n>".repeat(2)))
+
+    val after = """qwe
+      |asd<selection>qwe</selection>asd
+      |ads
+      |asd<selection>qwe</selection>asd
+      |<selection>qwe</selection>
+    """.trimMargin()
+    myFixture.checkResult(after)
+  }
+
+  fun testSelectSingleOccurrence() {
+    val before = """q<caret>we
+      |asd
+      |zxc
+      |cvb
+      |dfg
+      |rty
+    """.trimMargin()
+    configureByText(before)
+
+    typeText(parseKeys("<A-n>".repeat(4)))
+
+    val after = """<selection>qwe</selection>
+      |asd
+      |zxc
+      |cvb
+      |dfg
+      |rty
+    """.trimMargin()
+    myFixture.checkResult(after)
+  }
+
+  fun testSelectAllSingleOccurrence() {
+    val before = """qwe
+      |asd
+      |z<caret>xc
+      |adgf
+      |dfgh
+      |awe
+      |td
+      |gfhsd
+      |fg
+    """.trimMargin()
+    configureByText(before)
+
+    typeText(parseKeys("<Plug>AllOccurrences"))
+
+    val after = before.replace("z<caret>xc", "<selection>zxc</selection>")
+    myFixture.checkResult(after)
+  }
+
+  fun testRemoveSubSelection() {
+    val before = """Int
+      |kekInteger
+      |lolInteger
+    """.trimMargin()
+    configureByText(before)
+
+    typeText(parseKeys("g<A-n>", "<A-n>".repeat(2), "<A-p>"))
+
+    val after = """<selection>Int</selection>
+      |kek<selection>Int</selection>eger
+      |lolInteger
     """.trimMargin()
     myFixture.checkResult(after)
   }
