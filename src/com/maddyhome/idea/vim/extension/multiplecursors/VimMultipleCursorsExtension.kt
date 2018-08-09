@@ -53,13 +53,16 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
   }
 
   inner class NextOccurrenceHandler(val whole: Boolean = true) : VimExtensionHandler {
-    override fun execute(editor: Editor, context: DataContext) =
+    override fun execute(editor: Editor, context: DataContext) {
       if (editor.caretModel.caretCount == 1 && CommandState.getInstance(editor).mode != Mode.VISUAL) {
+        nextOffset = -1
+        firstRange = null
         handleFirstSelection(editor, whole)
       }
-      else {
+      else if (CommandState.getInstance(editor).mode == Mode.VISUAL) {
         handleNextSelection(editor)
       }
+    }
   }
 
   inner class AllOccurrencesHandler(val whole: Boolean = true) : VimExtensionHandler {
