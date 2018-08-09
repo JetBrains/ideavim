@@ -67,6 +67,8 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
 
   inner class AllOccurrencesHandler(val whole: Boolean = true) : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
+      if (editor.caretModel.caretCount != 1) return
+
       handleFirstSelection(editor, whole)
       while (hasNext) {
         handleNextSelection(editor)
