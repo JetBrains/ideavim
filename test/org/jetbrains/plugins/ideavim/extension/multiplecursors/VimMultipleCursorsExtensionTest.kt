@@ -450,4 +450,16 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     myFixture.checkResult(after)
   }
+
+  fun testSelectionWithMultipleSelections() {
+    val before = """gsdhfklgjh<selection>lgjsfg</selection>akjgf
+      |dsfdf<selection>gldfsg</selection>dfkgjhsk
+      |gkjsdhfgklsf
+      |flgjd<selection>lgjdflgj</selection>dksjghdsfkl
+    """.trimMargin()
+    configureByText(before)
+
+    typeText(parseKeys("<A-n>"))
+
+  }
 }
