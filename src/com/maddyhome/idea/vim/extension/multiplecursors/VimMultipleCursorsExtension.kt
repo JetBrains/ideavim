@@ -130,6 +130,8 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
   }
 
   private fun handleNextSelection(editor: Editor) {
+    if (nextOffset == -1) return
+
     if (!hasNext) {
       VimPlugin.showMessage("No more matches")
       return

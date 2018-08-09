@@ -422,4 +422,17 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     typeText(parseKeys("<A-p>"))
     myFixture.checkResult(before)
   }
+
+  fun testSelectionWithMultipleCarets() {
+    val before = """qwe
+      |sdfgdfs<caret>fdasfg
+      |<caret>dfkjsghdfs
+      |gkj dhfs
+      |dfsgdf<caret>dfkgh dfs
+    """.trimMargin()
+    configureByText(before)
+
+    typeText(parseKeys("<A-n>"))
+    myFixture.checkResult(before)
+  }
 }
