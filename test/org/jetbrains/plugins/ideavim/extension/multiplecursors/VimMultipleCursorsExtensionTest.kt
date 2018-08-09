@@ -1,6 +1,7 @@
 package org.jetbrains.plugins.ideavim.extension.multiplecursors
 
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -405,9 +406,12 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       |dsfg dhjs</selection>dafkljgh
       |dfkjsg
     """.trimMargin()
-    configureByText(before)
+    val editor = configureByText(before)
+    CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER,
+                                               MappingMode.VISUAL)
 
     typeText(parseKeys("<A-x>"))
+    assertMode(CommandState.Mode.VISUAL)
     myFixture.checkResult(before)
   }
 
@@ -417,7 +421,9 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
       |dsfg dhjs</selection>dafkljgh
       |dfkjsg
     """.trimMargin()
-    configureByText(before)
+    val editor = configureByText(before)
+    CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER,
+                                               MappingMode.VISUAL)
 
     typeText(parseKeys("<A-p>"))
     myFixture.checkResult(before)

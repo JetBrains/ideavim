@@ -55,8 +55,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
   inner class NextOccurrenceHandler(val whole: Boolean = true) : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
       if (editor.caretModel.caretCount == 1 && CommandState.getInstance(editor).mode != Mode.VISUAL) {
-        nextOffset = -1
-        firstRange = null
+        reset()
         handleFirstSelection(editor, whole)
       }
       else if (CommandState.getInstance(editor).mode == Mode.VISUAL) {
@@ -81,6 +80,9 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
       if (nextOffset == -1) return
 
       val caret = editor.caretModel.primaryCaret
+      val selectionStart = editor.selectionModel.selectionStart
+      val selectionEnd = editor.selectionModel.selectionEnd
+      val selectedText = editor.selectionModel.selectedText ?: return
 
       editor.selectionModel.removeSelection()
       MotionGroup.moveCaret(editor, caret, nextOffset)
@@ -96,6 +98,13 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
       val length = firstRange?.length ?: return
       val endOffset = nextOffset + length
       selectRange(editor, caret, nextOffset, endOffset)
+      if (selectedText != editor.selectionModel.selectedText) {
+        reset()
+        caret.removeSelection()
+        caret.moveToOffset(selectionStart)
+        caret.setSelection(selectionStart, selectionEnd)
+        return
+      }
       MotionGroup.moveCaret(editor, caret, endOffset, true)
 
       nextOffset = VimPlugin.getSearch().searchNext(editor, caret, 1)
@@ -106,16 +115,35 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
     override fun execute(editor: Editor, context: DataContext) {
       if (nextOffset == -1) return
 
+      val caret = editor.caretModel.primaryCaret
+      val visualPosition = caret.visualPosition
+      val selectionStart = editor.selectionModel.selectionStart
+      val selectionEnd = editor.selectionModel.selectionEnd
+      val selectedText = editor.selectionModel.selectedText ?: return
+
       nextOffset = CaretData.getVisualStart(editor.caretModel.primaryCaret)
-      editor.selectionModel.removeSelection()
       if (!editor.caretModel.removeCaret(editor.caretModel.primaryCaret)) {
+        reset()
         if (CommandState.getInstance(editor).mode == Mode.VISUAL) {
           CommandState.getInstance(editor).popState()
-          nextOffset = -1
-          firstRange = null
         }
+        return
+      }
+
+      if (selectedText != editor.selectionModel.selectedText) {
+        reset()
+        editor.caretModel.addCaret(visualPosition, true) ?: return
+        editor.selectionModel.setSelection(selectionStart, selectionEnd)
+      }
+      else {
+        caret.removeSelection()
       }
     }
+  }
+
+  private fun reset() {
+    nextOffset = -1
+    firstRange = null
   }
 
   private fun selectRange(editor: Editor, caret: Caret, startOffset: Int, endOffset: Int) {
