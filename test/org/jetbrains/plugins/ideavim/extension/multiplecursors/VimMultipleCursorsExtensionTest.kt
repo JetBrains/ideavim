@@ -435,4 +435,19 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     typeText(parseKeys("<A-n>"))
     myFixture.checkResult(before)
   }
+
+  fun testAddSelectionVisualMode() {
+    val before = """jdfsg sdf<caret>dfkgjhfkgkldfjsg
+      |dfkjghdfsgs
+      |dflsgsdfgh
+    """.trimMargin()
+    configureByText(before)
+
+    typeText(parseKeys("vll", "<A-n>"))
+    val after = """jdfsg sdf<selection>dfk</selection>gjhfkgkldfjsg
+      |dfkjghdfsgs
+      |dflsgsdfgh
+    """.trimMargin()
+    myFixture.checkResult(after)
+  }
 }

@@ -109,6 +109,8 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
       if (!editor.caretModel.removeCaret(editor.caretModel.primaryCaret)) {
         if (CommandState.getInstance(editor).mode == Mode.VISUAL) {
           CommandState.getInstance(editor).popState()
+          nextOffset = -1
+          firstRange = null
         }
       }
     }
