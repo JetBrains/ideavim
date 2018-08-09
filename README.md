@@ -92,6 +92,7 @@ Supported:
 Emulated Vim plugins:
 
 * vim-surround
+* vim-multiple-cursors
 
 Not supported (yet):
 
@@ -137,6 +138,9 @@ Available extensions:
 * surround
     * Emulates [vim-surround](https://github.com/tpope/vim-surround)
     * Commands: `ys`, `cs`, `ds`, `S`
+* multiple-cursors
+    * Emulates [vim-multiple-cursors](https://github.com/terryma/vim-multiple-cursors)
+    * Commands: `<A-n>`, `g<A-n>`, `<A-x>`, `<A-p>`
 
 
 Changes to the IDE

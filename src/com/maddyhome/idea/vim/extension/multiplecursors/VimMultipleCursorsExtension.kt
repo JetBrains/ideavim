@@ -25,11 +25,16 @@ private const val REMOVE_OCCURRENCE = "<Plug>RemoveOccurrence"
 private const val ALL_WHOLE_OCCURRENCES = "<Plug>AllWholeOccurrences"
 private const val ALL_OCCURRENCES = "<Plug>AllOccurrences"
 
+/**
+ * Port of vim-multiple-cursors.
+ *
+ * See https://github.com/terryma/vim-multiple-cursors
+ * */
 class VimMultipleCursorsExtension : VimNonDisposableExtension() {
   private var nextOffset = -1
-  private lateinit var firstRange: TextRange
+  private var firstRange: TextRange? = null
 
-  private val hasNext: Boolean get() = nextOffset != firstRange.startOffset
+  private val hasNext: Boolean get() = nextOffset != firstRange?.startOffset ?: false
 
   override fun getName() = "multiple-cursors"
 
@@ -60,25 +65,31 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
   inner class AllOccurrencesHandler(val whole: Boolean = true) : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
       handleFirstSelection(editor, whole)
-      while (hasNext) handleNextSelection(editor)
+      while (hasNext) {
+        handleNextSelection(editor)
+      }
     }
   }
 
   inner class SkipOccurrenceHandler : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
+      if (nextOffset == -1) return
+
       val caret = editor.caretModel.primaryCaret
 
       editor.selectionModel.removeSelection()
       MotionGroup.moveCaret(editor, caret, nextOffset)
       if (editor.caretModel.caretCount == 1) {
-        val firstLength = firstRange.length
+        val firstLength = firstRange?.length ?: return
         firstRange = VimPlugin.getMotion().getWordRange(editor, caret, 1, false, false)
-        if (firstRange.length != firstLength) {
-          firstRange = TextRange(firstRange.startOffset, firstRange.startOffset + firstLength)
+        if (firstRange?.length != firstLength) {
+          val startOffset = firstRange?.startOffset ?: return
+          firstRange = TextRange(startOffset, startOffset + firstLength)
         }
       }
 
-      val endOffset = nextOffset + firstRange.length
+      val length = firstRange?.length ?: return
+      val endOffset = nextOffset + length
       selectRange(editor, caret, nextOffset, endOffset)
       MotionGroup.moveCaret(editor, caret, endOffset, true)
 
@@ -88,6 +99,8 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
 
   inner class RemoveOccurrenceHandler : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
+      if (nextOffset == -1) return
+
       nextOffset = CaretData.getVisualStart(editor.caretModel.primaryCaret)
       editor.selectionModel.removeSelection()
       if (!editor.caretModel.removeCaret(editor.caretModel.primaryCaret)) {
@@ -110,8 +123,10 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
     nextOffset = VimPlugin.getSearch().searchWord(editor, caret, 1, whole, 1)
 
     CommandState.getInstance(editor).pushState(Mode.VISUAL, SubMode.VISUAL_CHARACTER, MappingMode.VISUAL)
-    selectRange(editor, caret, firstRange.startOffset, firstRange.endOffset)
-    MotionGroup.moveCaret(editor, caret, firstRange.endOffset, true)
+    val startOffset = firstRange?.startOffset ?: return
+    val endOffset = firstRange?.endOffset ?: return
+    selectRange(editor, caret, startOffset, endOffset)
+    MotionGroup.moveCaret(editor, caret, endOffset, true)
   }
 
   private fun handleNextSelection(editor: Editor) {
@@ -123,7 +138,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
     val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(nextOffset), true)
         ?: throw IllegalStateException("Multiple carets are not supported")
 
-    val endOffset = nextOffset + firstRange.length
+    val endOffset = nextOffset + (firstRange?.length ?: return)
     selectRange(editor, caret, nextOffset, endOffset)
     MotionGroup.moveCaret(editor, caret, endOffset, true)
 
