@@ -172,7 +172,10 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
       }
 
       editor.caretModel.allCarets.forEach {
-        if (it.selectionStart == nextOffset) return
+        if (it.selectionStart == nextOffset) {
+          VimPlugin.showMessage("No more matches")
+          return
+        }
       }
 
       val newCaret = editor.caretModel.addCaret(editor.offsetToVisualPosition(nextOffset)) ?: return
