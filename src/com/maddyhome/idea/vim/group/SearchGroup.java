@@ -557,6 +557,11 @@ public class SearchGroup {
     return searchNextWithDirection(editor, caret, count, -lastDir);
   }
 
+  public int searchNextFromOffset(@NotNull Editor editor, int offset, int count) {
+    searchHighlight(false);
+    return findItOffset(editor, offset, count, 1, false);
+  }
+
   private int searchNextWithDirection(@NotNull Editor editor, @NotNull Caret caret, int count, int dir) {
     searchHighlight(false);
     return findItOffset(editor, caret.getOffset(), count, dir, false);
