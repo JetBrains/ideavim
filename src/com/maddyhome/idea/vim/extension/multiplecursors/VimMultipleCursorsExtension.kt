@@ -8,6 +8,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
@@ -60,11 +61,8 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
         val range = findWordUnderCursor(editor, caret) ?: return
         if (range.startOffset > caret.offset) return
 
-        caret.selectWordAtCaret(false)
-        VimPlugin.getMotion().setVisualMode(editor, commandState.subMode)
-
-        VimPlugin.getSearch().searchWord(editor, caret, 1, whole, 1)
-        MotionGroup.moveCaret(editor, caret, range.endOffset - 1, true)
+        val nextOffset = findNextOccurrence(editor, caret, range, whole)
+        if (nextOffset == caret.selectionStart) VimPlugin.showMessage("No more matches")
       }
       else {
         val newPositions = arrayListOf<VisualPosition>()
@@ -135,14 +133,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
         if (range.startOffset > primaryCaret.offset) {
           return
         }
-        else {
-          primaryCaret.selectWordAtCaret(false)
-          VimPlugin.getMotion().setVisualMode(editor, CommandState.getInstance(editor).subMode)
-
-          val nextOffset = VimPlugin.getSearch().searchWord(editor, primaryCaret, 1, whole, 1)
-          MotionGroup.moveCaret(editor, primaryCaret, range.endOffset - 1, true)
-          nextOffset
-        }
+        findNextOccurrence(editor, primaryCaret, range, whole)
       }
 
       val firstOffset = primaryCaret.selectionStart
@@ -165,11 +156,8 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
       val caret = editor.caretModel.primaryCaret
       val selectedText = caret.selectedText ?: return
 
-      val nextOffset = VimPlugin.getSearch().searchNextFromOffset(editor, caret.offset + 1, 1)
-      if (nextOffset == -1 || EditorHelper.getText(editor, nextOffset,
-                                                   nextOffset + selectedText.length) != selectedText) {
-        return
-      }
+      val nextOffset = tryFindNextOccurrence(editor, caret, selectedText)
+      if (nextOffset == -1) return
 
       editor.caretModel.allCarets.forEach {
         if (it.selectionStart == nextOffset) {
@@ -189,11 +177,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
       val caret = editor.caretModel.primaryCaret
       val selectedText = caret.selectedText ?: return
 
-      val nextOffset = VimPlugin.getSearch().searchNextFromOffset(editor, caret.offset + 1, 1)
-      if (nextOffset == -1 || EditorHelper.getText(editor, nextOffset,
-                                                   nextOffset + selectedText.length) != selectedText) {
-        return
-      }
+      if (tryFindNextOccurrence(editor, caret, selectedText) == -1) return
 
       if (!editor.caretModel.removeCaret(caret)) {
         VimPlugin.getMotion().exitVisual(editor)
@@ -205,5 +189,22 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
     CaretData.setVisualStart(caret, offset)
     VimPlugin.getMotion().updateSelection(editor, caret, offset + pattern.length - 1)
     MotionGroup.moveCaret(editor, caret, offset + pattern.length - 1)
+  }
+
+  private fun findNextOccurrence(editor: Editor, caret: Caret, range: TextRange, whole: Boolean): Int {
+    caret.selectWordAtCaret(false)
+    VimPlugin.getMotion().setVisualMode(editor, CommandState.getInstance(editor).subMode)
+
+    val offset = VimPlugin.getSearch().searchWord(editor, caret, 1, whole, 1)
+    MotionGroup.moveCaret(editor, caret, range.endOffset - 1, true)
+
+    return offset
+  }
+
+  private fun tryFindNextOccurrence(editor: Editor, caret: Caret, pattern: String): Int {
+    val nextOffset = VimPlugin.getSearch().searchNextFromOffset(editor, caret.offset + 1, 1)
+    if (nextOffset == -1) return -1
+    if (EditorHelper.getText(editor, nextOffset, nextOffset + pattern.length) != pattern) return -1
+    return nextOffset
   }
 }
