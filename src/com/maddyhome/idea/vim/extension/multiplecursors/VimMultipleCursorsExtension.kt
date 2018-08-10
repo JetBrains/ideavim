@@ -146,14 +146,14 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
       }
 
       val firstOffset = primaryCaret.selectionStart
-      val newPositions = arrayListOf(nextOffset)
+      val newPositions = arrayListOf(nextOffset, firstOffset)
       while (nextOffset != firstOffset) {
         nextOffset = VimPlugin.getSearch().searchNextFromOffset(editor, nextOffset + 1, 1)
         newPositions += nextOffset
       }
 
       val pattern = primaryCaret.selectedText ?: return
-      newPositions.forEach {
+      newPositions.sorted().forEach {
         val caret = caretModel.addCaret(editor.offsetToVisualPosition(it)) ?: return
         selectWord(editor, caret, pattern, it)
       }
@@ -166,8 +166,20 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
   }
 
   inner class RemoveOccurrenceHandler : VimExtensionHandler {
+    override fun execute(editor: Editor, context: DataContext) {
+      val caret = editor.caretModel.primaryCaret
+      val selectedText = caret.selectedText ?: return
 
-    override fun execute(editor: Editor, context: DataContext) {}
+      val nextOffset = VimPlugin.getSearch().searchNextFromOffset(editor, caret.offset + 1, 1)
+      if (nextOffset == -1 || EditorHelper.getText(editor, nextOffset,
+                                                   nextOffset + selectedText.length) != selectedText) {
+        return
+      }
+
+      if (!editor.caretModel.removeCaret(caret)) {
+        VimPlugin.getMotion().exitVisual(editor)
+      }
+    }
   }
 
   private fun selectWord(editor: Editor, caret: Caret, pattern: String, newNextOffset: Int) {

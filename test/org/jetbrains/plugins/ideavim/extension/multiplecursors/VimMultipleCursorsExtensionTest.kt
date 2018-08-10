@@ -1,5 +1,7 @@
 package org.jetbrains.plugins.ideavim.extension.multiplecursors
 
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -227,6 +229,44 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  fun testRemoveSelectionVisualMode() {
+    val before = """q<selection>we
+      |dsgkldfjs ldfl gkjsdsl kj
+      |dsfg dhjs</selection>dafkljgh
+      |dfkjsg
+    """.trimMargin()
+    val editor = configureByText(before)
+    CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER,
+                                               MappingMode.VISUAL)
+
+    typeText(parseKeys("<A-p>"))
+    myFixture.checkResult(before)
+  }
+
+  fun testRemoveSubSelection() {
+    val before = """Int
+      |kekInteger
+      |lolInteger
+    """.trimMargin()
+    configureByText(before)
+
+    typeText(parseKeys("g<A-n>", "<A-n>".repeat(2), "<A-p>"))
+
+    val after = """<selection>Int</selection>
+      |kek<selection>Int</selection>eger
+      |lolInteger
+    """.trimMargin()
+    myFixture.checkResult(after)
+  }
+  fun testRemoveOccurrence() {
+    val before = """private i<caret>nt a = 0;
+      |private int b = 1;
+      |private int c = 2;
+      |private int d = 3;
+      |private int e = 4;
+    """.trimMargin()
+    configureByJavaText(before)
+  }
 
 //  fun testSkipOccurrence() {
 //    val before = """pr<caret>ivate int a = 0;
@@ -261,15 +301,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 //
 //    myFixture.checkResult(after)
 //  }
-//
-//  fun testRemoveOccurrence() {
-//    val before = """private i<caret>nt a = 0;
-//      |private int b = 1;
-//      |private int c = 2;
-//      |private int d = 3;
-//      |private int e = 4;
-//    """.trimMargin()
-//    configureByJavaText(before)
 //
 //
 //    typeText(parseKeys("<A-n>", "<A-n>", "<A-n>", "<A-p>", "<A-n>"))
@@ -396,22 +427,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 //    """.trimMargin()
 //    myFixture.checkResult(after)
 //  }
-
-//  fun testRemoveSubSelection() {
-//    val before = """Int
-//      |kekInteger
-//      |lolInteger
-//    """.trimMargin()
-//    configureByText(before)
-//
-//    typeText(parseKeys("g<A-n>", "<A-n>".repeat(2), "<A-p>"))
-//
-//    val after = """<selection>Int</selection>
-//      |kek<selection>Int</selection>eger
-//      |lolInteger
-//    """.trimMargin()
-//    myFixture.checkResult(after)
-//  }
 //
 //  fun testSkipSelectionVisualMode() {
 //    val before = """q<selection>we
@@ -428,21 +443,6 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
 //    myFixture.checkResult(before)
 //  }
 //
-//  fun testRemoveSelectionVisualMode() {
-//    val before = """q<selection>we
-//      |dsgkldfjs ldfl gkjsdsl kj
-//      |dsfg dhjs</selection>dafkljgh
-//      |dfkjsg
-//    """.trimMargin()
-//    val editor = configureByText(before)
-//    CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER,
-//                                               MappingMode.VISUAL)
-//
-//    typeText(parseKeys("<A-p>"))
-//    myFixture.checkResult(before)
-//  }
-//
-
 //  fun testAddSelectionVisualMode() {
 //    val before = """jdfsg sdf<caret>dfkgjhfkgkldfjsg
 //      |dfkjghdfsgs
