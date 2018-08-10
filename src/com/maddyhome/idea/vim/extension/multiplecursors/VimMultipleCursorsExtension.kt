@@ -162,6 +162,22 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
 
   inner class SkipOccurrenceHandler : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
+      val caret = editor.caretModel.primaryCaret
+      val selectedText = caret.selectedText ?: return
+
+      val nextOffset = VimPlugin.getSearch().searchNextFromOffset(editor, caret.offset + 1, 1)
+      if (nextOffset == -1 || EditorHelper.getText(editor, nextOffset,
+                                                   nextOffset + selectedText.length) != selectedText) {
+        return
+      }
+
+      editor.caretModel.allCarets.forEach {
+        if (it.selectionStart == nextOffset) return
+      }
+
+      val newCaret = editor.caretModel.addCaret(editor.offsetToVisualPosition(nextOffset)) ?: return
+      selectWord(editor, newCaret, selectedText, nextOffset)
+      editor.caretModel.removeCaret(caret)
     }
   }
 
@@ -182,9 +198,9 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
     }
   }
 
-  private fun selectWord(editor: Editor, caret: Caret, pattern: String, newNextOffset: Int) {
-    CaretData.setVisualStart(caret, newNextOffset)
-    VimPlugin.getMotion().updateSelection(editor, caret, newNextOffset + pattern.length - 1)
-    MotionGroup.moveCaret(editor, caret, newNextOffset + pattern.length - 1)
+  private fun selectWord(editor: Editor, caret: Caret, pattern: String, offset: Int) {
+    CaretData.setVisualStart(caret, offset)
+    VimPlugin.getMotion().updateSelection(editor, caret, offset + pattern.length - 1)
+    MotionGroup.moveCaret(editor, caret, offset + pattern.length - 1)
   }
 }
