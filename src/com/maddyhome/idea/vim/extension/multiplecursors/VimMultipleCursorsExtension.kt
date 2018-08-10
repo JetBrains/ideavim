@@ -71,7 +71,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
           val selectedText = caret.selectedText ?: return
           patterns += selectedText
 
-          val lines = selectedText.count { it == '\n'}
+          val lines = selectedText.count { it == '\n' }
           if (lines > 0) {
             val selectionStart = min(caret.selectionStart, caret.selectionEnd)
             val startPosition = editor.offsetToVisualPosition(selectionStart)
@@ -91,9 +91,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
         val primaryCaret = editor.caretModel.primaryCaret
         val nextOffset = VimPlugin.getSearch().searchNextFromOffset(editor, primaryCaret.offset + 1, 1)
         val pattern = patterns.first()
-        if (nextOffset == -1 ||
-            EditorHelper.getText(editor, nextOffset, nextOffset + pattern.length).indexOf(pattern) == -1) {
-
+        if (nextOffset == -1 || EditorHelper.getText(editor, nextOffset, nextOffset + pattern.length) != pattern) {
           if (caretModel.caretCount > 1) return
 
           val newNextOffset = VimPlugin.getSearch().search(editor, pattern, 1, Command.FLAG_SEARCH_FWD, false)
@@ -203,8 +201,10 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
 
   private fun tryFindNextOccurrence(editor: Editor, caret: Caret, pattern: String): Int {
     val nextOffset = VimPlugin.getSearch().searchNextFromOffset(editor, caret.offset + 1, 1)
-    if (nextOffset == -1) return -1
-    if (EditorHelper.getText(editor, nextOffset, nextOffset + pattern.length) != pattern) return -1
+    if (nextOffset == -1 || EditorHelper.getText(editor, nextOffset, nextOffset + pattern.length) != pattern) {
+      return -1
+    }
+
     return nextOffset
   }
 }
