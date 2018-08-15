@@ -28,6 +28,7 @@ import com.intellij.openapi.editor.markup.HighlighterLayer;
 import com.intellij.openapi.editor.markup.HighlighterTargetArea;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.editor.VisualPosition;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
@@ -344,7 +345,10 @@ public class SearchGroup {
           boolean doReplace = true;
           if (do_ask) {
             RangeHighlighter hl = highlightConfirm(editor, startoff, endoff);
-            MotionGroup.scrollPositionIntoView(editor, editor.offsetToVisualPosition(startoff), true);
+            VisualPosition position = editor.offsetToVisualPosition(startoff);
+            // add another line so that there's room for the confirmation bar below
+            VisualPosition adjustedPosotion = new VisualPosition(position.line + 1, position.column);
+            MotionGroup.scrollPositionIntoView(editor, adjustedPosotion, true);
             MotionGroup.moveCaret(editor, startoff);
             final ReplaceConfirmationChoice choice = confirmChoice(editor, match);
             editor.getMarkupModel().removeHighlighter(hl);
