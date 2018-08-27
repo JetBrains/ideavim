@@ -49,6 +49,8 @@ Contributors:
 * [Florian Hassmann](mailto:hassmann@hwdev.de)
 * [Jan Palus](mailto:jpalus@fastmail.com)
 * [Konstantin Petrov](mailto:kpetrov@ripe.net)
+* [Vasily Alferov](mailto:ya-ikmik2012@yandex.ru)
+* [Vitalii Karavaev](mailto:fkve97@gmail.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
