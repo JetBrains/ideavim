@@ -101,7 +101,7 @@ Not supported (yet):
 
 See also:
 
-* [List of recently added commands](src/com/maddyhome/idea/vim/package-info.java)
+* [The list of all supported commands](src/com/maddyhome/idea/vim/package-info.java)
 * [Top features and bugs](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+sort+by%3A+votes)
 
 
