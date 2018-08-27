@@ -15,8 +15,8 @@ IdeaVim
 </div>
 
 <div>
-  <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20172&guest=1">
-    <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20172)/statusIcon.svg?guest=1"/>
+  <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20182&guest=1">
+    <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20182)/statusIcon.svg?guest=1"/>
   </a>
   <span>Tests</span>
 </div>
@@ -200,7 +200,7 @@ in the issue tracker.
 
 1. Fork IdeaVim on GitHub and clone the repository on your local machine.
 
-2. Import the project from existing sources in IntelliJ IDEA 2017.1+ (Community or
+2. Import the project from existing sources in IntelliJ IDEA 2018.1 or newer (Community or
    Ultimate) using "File | New | Project from Existing Sources..." or "Import
    Project" from the start window.
 
