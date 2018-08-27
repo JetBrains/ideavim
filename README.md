@@ -140,7 +140,7 @@ Available extensions:
     * Commands: `ys`, `cs`, `ds`, `S`
 * multiple-cursors
     * Emulates [vim-multiple-cursors](https://github.com/terryma/vim-multiple-cursors)
-    * Commands: `<A-n>`, `g<A-n>`, `<A-x>`, `<A-p>`
+    * Commands: `<A-n>`, `<A-x>`, `<A-p>`, `g<A-n>`
 
 
 Changes to the IDE
