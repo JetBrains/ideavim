@@ -258,6 +258,7 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     """.trimMargin()
     myFixture.checkResult(after)
   }
+
   fun testRemoveOccurrence() {
     val before = """private i<caret>nt a = 0;
       |private int b = 1;
@@ -444,4 +445,33 @@ class VimMultipleCursorsExtensionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  fun testNextOccurrenceIgnorecase() {
+    val before = """fun getCellType(<caret>pos: VisualPosition): CellType {
+    if (pos in snakeCells) {
+      return CellType.SNAKE
+    }
+    val char = getCharAt(pos)
+    return when {
+      char.isWhitespace() || pos in eatenCells -> CellType.EMPTY
+      char in ANTI_PYTHON_CHARS -> CellType.FOOD
+      else -> CellType.WALL
+    }
+    }"""
+    configureByText(before)
+
+    typeText(commandToKeys("set ignorecase"))
+    typeText(parseKeys("g<A-n><A-n><A-n>"))
+    val after = """fun getCellType(<selection>pos</selection>: Visual<selection>Pos</selection>ition): CellType {
+    if (<selection>pos</selection> in snakeCells) {
+      return CellType.SNAKE
+    }
+    val char = getCharAt(pos)
+    return when {
+      char.isWhitespace() || pos in eatenCells -> CellType.EMPTY
+      char in ANTI_PYTHON_CHARS -> CellType.FOOD
+      else -> CellType.WALL
+    }
+    }"""
+    myFixture.checkResult(after)
+  }
 }

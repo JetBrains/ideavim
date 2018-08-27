@@ -18,6 +18,7 @@ import com.maddyhome.idea.vim.helper.CaretData
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.SearchHelper.findWordUnderCursor
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.option.Options
 import java.lang.Integer.min
 
 private const val NEXT_WHOLE_OCCURRENCE = "<Plug>NextWholeOccurrence"
@@ -69,7 +70,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
         val patterns = sortedSetOf<String>()
         for (caret in caretModel.allCarets) {
           val selectedText = caret.selectedText ?: return
-          patterns += selectedText
+          patterns += if (Options.getInstance().isSet("ignorecase")) selectedText.toLowerCase() else selectedText
 
           val lines = selectedText.count { it == '\n' }
           if (lines > 0) {
