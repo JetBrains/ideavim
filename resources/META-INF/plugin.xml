@@ -4,6 +4,9 @@
   <change-notes><![CDATA[
       <p>To be released:</p>
       <ul>
+        <li>Support for vim-multiple-cursors commands <code>&lt;A-n&gt;</code>, <code>&lt;A-x&gt;</code>, <code>&lt;A-p&gt;</code>, <code>g&lt;A-n&gt;</code></li>
+        <li>Support for running Vim commands for multiple cursors</li>
+        <li>The index of supported commands on the GitHub page</li>
         <li>Various bug fixes</li>
       </ul>
       <p>0.49:</p>
@@ -27,14 +30,6 @@
         <li>Support for vim-surround commands <code>ys</code>, <code>cs</code>, <code>ds</code>, <code>S</code>, enable it with <code>set surround</code> in your ~/.ideavimrc</li>
         <li>Support for <code>={motion}</code> formatting command</li>
         <li>Various bug fixes</li>
-      </ul>
-      <p>0.44:</p>
-      <ul>
-        <li>Fixed typing keys in completion menus and typing with the plugin disabled</li>
-      </ul>
-      <p>0.43:</p>
-      <ul>
-        <li>Fixed running the plugin with Java 6</li>
       </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
     ]]></change-notes>

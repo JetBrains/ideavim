@@ -20,8 +20,12 @@ usual beta standards.
 To Be Released
 --------------
 
-A bugfix release.
+Support for vim-multiple-cursors commands `<A-n>`, `<A-x>`, `<A-p>`, `g<A-n>`. Support
+for running Vim commands for multiple cursors. Various bug fixes.
 
+
+* [VIM-634](https://youtrack.jetbrains.com/issue/VIM-634) Support for vim-multiple-cursors commands `<A-n>`, `<A-x>`, `<A-p>`, `g<A-n>`
+* [VIM-780](https://youtrack.jetbrains.com/issue/VIM-780) Support for running Vim commands for multiple cursors
 * [VIM-862](https://youtrack.jetbrains.com/issue/VIM-862) Allow `:action` to work in visual mode
 * [VIM-1110](https://youtrack.jetbrains.com/issue/VIM-1110) Put the caret in correct place after `I` in visual block mode
 * [VIM-1329](https://youtrack.jetbrains.com/issue/VIM-1329) Request focus reliably for Ex entry and output panels
@@ -39,7 +43,6 @@ A bugfix release.
 
 Enabled zero-latency typing for Vim emulation. Added support for `iskeyword` option. Various bug fixes.
 
-
 * [VIM-1254](https://youtrack.jetbrains.com/issue/VIM-1254) Enable zero-latency typing for Vim emulation
 * [VIM-1367](https://youtrack.jetbrains.com/issue/VIM-1367) Support `iskeyword` option
 * [VIM-523](https://youtrack.jetbrains.com/issue/VIM-523) Fixed global mark remembering only the line number
@@ -53,7 +56,6 @@ Bug fixes:
 
 * [VIM-1205](https://youtrack.jetbrains.com/issue/VIM-1205) Don't move key handling into separate event for raw handlers
 * [VIM-1216](https://youtrack.jetbrains.com/issue/VIM-1216) Fixed `.` resetting the last find movement while repeating change that also uses movement
-
 
 Features:
 
