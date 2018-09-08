@@ -569,12 +569,6 @@ public class EditorHelper {
     return StringUtil.repeat(" ", limit);
   }
 
-  public static boolean canEdit(@NotNull final Project project, @NotNull final Editor editor) {
-    return (editor.getDocument().isWritable() ||
-            FileDocumentManager.fileForDocumentCheckedOutSuccessfully(editor.getDocument(), project)) &&
-           !EditorData.isConsoleOutput(editor);
-  }
-
   /**
    * Get list of all carets from the editor.
    *

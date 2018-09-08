@@ -468,7 +468,7 @@ public class KeyHandler {
     lastWasBS = ((cmd.getFlags() & Command.FLAG_IS_BACKSPACE) != 0);
 
     Project project = editor.getProject();
-    if (cmd.getType().isRead() || project == null || EditorHelper.canEdit(project, editor)) {
+    if (cmd.getType().isRead() || project == null || editor.getDocument().isWritable()) {
       if (ApplicationManager.getApplication().isDispatchThread()) {
         Runnable action = new ActionRunner(editor, context, cmd, key);
         String name = cmd.getAction().getTemplatePresentation().getText();

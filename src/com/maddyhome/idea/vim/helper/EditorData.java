@@ -34,7 +34,6 @@ import com.maddyhome.idea.vim.ui.ExOutputPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.Field;
 import java.util.Collection;
 
 /**
@@ -173,12 +172,6 @@ public class EditorData {
 
   public static void setLineNumbersShown(@NotNull Editor editor, boolean value) {
     editor.putUserData(LINE_NUMBERS_SHOWN, value);
-  }
-
-  public static boolean isConsoleOutput(@NotNull Editor editor) {
-    Object res = editor.getUserData(CONSOLE_VIEW_IN_EDITOR_VIEW);
-    logger.debug("isConsoleOutput for editor " + editor + " - " + res);
-    return res != null;
   }
 
   @Nullable
@@ -406,39 +399,7 @@ public class EditorData {
   private static final Key<Boolean> WAS_VISUAL_BLOCK_MODE = new Key<>("wasVisualBlockMode");
   private static final  Key<Caret> LAST_DOWN_CARET = new Key<>("lastDownCaret");
 
-  private static Key CONSOLE_VIEW_IN_EDITOR_VIEW = Key.create("CONSOLE_VIEW_IN_EDITOR_VIEW");
-
   private static final Logger logger = Logger.getInstance(EditorData.class.getName());
-
-  static {
-    try {
-      // Yikes! The console output pane is really an editor. I need to be able to differentiate this editor
-      // from other editors. After an email with Jetbrains I learned that the class to look at was ConsoleViewImpl
-      // This class creates the editor and adds itself as user data to the editor. Unfortunately the Key used
-      // for the user data is a private static in the class. And the name is obfuscated (why should this be easy).
-      // This code looks at all the fields in ConsoleViewImpl and looks for a field of type Key. It is assumed
-      // the first Key is the one I need. The key is created as:
-      // private static final Key c = Key.create("CONSOLE_VIEW_IN_EDITOR_VIEW");
-      // I tried to create a Key with the same name but it doesn't work. Most likely the Key implementation is
-      // coded such that two keys with the same name are treated as different keys - oh well.
-      // This code will work as long as the key I need is the first one in the ConsoleViewImpl.
-      Class cvi = Class.forName("com.intellij.execution.impl.ConsoleViewImpl");
-      Field[] fields = cvi.getDeclaredFields();
-      for (Field f : fields) {
-        if (f.getType().equals(Key.class)) {
-          f.setAccessible(true);
-          CONSOLE_VIEW_IN_EDITOR_VIEW = (Key)f.get(null);
-          break;
-        }
-      }
-    }
-    catch (ClassNotFoundException e) {
-      logger.error("ConsoleViewImpl not found");
-    }
-    catch (IllegalAccessException e) {
-      logger.error("Can't access field 'c'");
-    }
-  }
 
   /**
    * Checks if editor is file editor, also it takes into account that editor can be placed in editors hierarchy
