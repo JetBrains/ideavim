@@ -20,12 +20,14 @@ usual beta standards.
 To Be Released
 --------------
 
-Support for vim-multiple-cursors commands `<A-n>`, `<A-x>`, `<A-p>`, `g<A-n>`. Support
+Moved "Vim Emulation" settings into "File | Settings | Vim Emulation". Support
+for vim-multiple-cursors commands `<A-n>`, `<A-x>`, `<A-p>`, `g<A-n>`. Support
 for running Vim commands for multiple cursors. Various bug fixes.
-
 
 * [VIM-634](https://youtrack.jetbrains.com/issue/VIM-634) Support for vim-multiple-cursors commands `<A-n>`, `<A-x>`, `<A-p>`, `g<A-n>`
 * [VIM-780](https://youtrack.jetbrains.com/issue/VIM-780) Support for running Vim commands for multiple cursors
+* [VIM-176](https://youtrack.jetbrains.com/issue/VIM-176) Fixed arrow key navigation in Run/Debug tool windows
+* [VIM-339](https://youtrack.jetbrains.com/issue/VIM-339) Fixed `<Esc>` in diff windows
 * [VIM-862](https://youtrack.jetbrains.com/issue/VIM-862) Allow `:action` to work in visual mode
 * [VIM-1110](https://youtrack.jetbrains.com/issue/VIM-1110) Put the caret in correct place after `I` in visual block mode
 * [VIM-1329](https://youtrack.jetbrains.com/issue/VIM-1329) Request focus reliably for Ex entry and output panels
