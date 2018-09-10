@@ -26,6 +26,8 @@ import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.ex.util.EditorUtil;
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.DumbAware;
@@ -38,6 +40,7 @@ import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
+import one.util.streamex.StreamEx;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -158,6 +161,9 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
         if (LookupManager.getActiveLookup(editor) != null) {
           return isExitInsertMode(keyStroke);
         }
+        if (keyCode == VK_ESCAPE) {
+          return isEnabledForEscape(editor);
+        }
         if (CommandState.inInsertMode(editor)) {
           // XXX: <Tab> won't be recorded in macros
           if (keyCode == VK_TAB) {
@@ -188,6 +194,22 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
       }
     }
     return false;
+  }
+
+  private boolean isEnabledForEscape(@NotNull Editor editor) {
+    final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
+    return isPrimaryEditor(editor) || (EditorData.isFileEditor(editor) && mode != CommandState.Mode.COMMAND);
+  }
+
+  /**
+   * Checks if the editor is a primary editor in the main editing area.
+   */
+  private boolean isPrimaryEditor(@NotNull Editor editor) {
+    final Project project = editor.getProject();
+    if (project == null) return false;
+    final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
+    return StreamEx.of(fileEditorManager.getAllEditors())
+      .anyMatch(fileEditor -> editor.equals(EditorUtil.getEditorEx(fileEditor)));
   }
 
   private boolean isExitInsertMode(@NotNull KeyStroke keyStroke) {
