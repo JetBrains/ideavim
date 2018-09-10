@@ -4,6 +4,7 @@
   <change-notes><![CDATA[
       <p>To be released:</p>
       <ul>
+        <li>Moved "Vim Emulation" settings into "File | Settings | Editor"</li>
         <li>Support for vim-multiple-cursors commands <code>&lt;A-n&gt;</code>, <code>&lt;A-x&gt;</code>, <code>&lt;A-p&gt;</code>, <code>g&lt;A-n&gt;</code></li>
         <li>Support for running Vim commands for multiple cursors</li>
         <li>The index of supported commands on the GitHub page</li>
@@ -62,7 +63,7 @@
   </extensionPoints>
 
   <extensions defaultExtensionNs="com.intellij">
-    <applicationConfigurable instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"/>
+    <applicationConfigurable groupId="editor" instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"/>
   </extensions>
 
   <extensions defaultExtensionNs="IdeaVIM">
