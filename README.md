@@ -140,6 +140,7 @@ Available extensions:
     * Commands: `ys`, `cs`, `ds`, `S`
 * multiple-cursors
     * Emulates [vim-multiple-cursors](https://github.com/terryma/vim-multiple-cursors)
+    * Enable it with: `set multiple-cursors` in `.ideavimrc`
     * Commands: `<A-n>`, `<A-x>`, `<A-p>`, `g<A-n>`
 
 
