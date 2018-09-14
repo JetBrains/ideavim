@@ -173,11 +173,9 @@ public class EditorGroup {
     if (settings.isLineNumbersShown() ^ showEditorLineNumbers) {
       // Update line numbers later since it may be called from a caret listener
       // on the caret move and it may move the caret internally
-      ApplicationManager.getApplication().invokeLater(new Runnable() {
-        @Override
-        public void run() {
-          settings.setLineNumbersShown(showEditorLineNumbers);
-        }
+      ApplicationManager.getApplication().invokeLater(() -> {
+        if (editor.isDisposed()) return;
+        settings.setLineNumbersShown(showEditorLineNumbers);
       });
     }
 
