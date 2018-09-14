@@ -145,6 +145,10 @@ public class Command {
     OTHER_READONLY,
     OTHER_WRITABLE,
     OTHER_READ_WRITE,
+    /**
+     * Represent commands that don't require an outer read or write action for synchronization.
+     */
+    OTHER_SELF_SYNCHRONIZED,
     COMPLETION;
 
     public boolean isRead() {

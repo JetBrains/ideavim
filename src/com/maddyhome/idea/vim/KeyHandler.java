@@ -295,12 +295,11 @@ public class KeyHandler {
             }
           }
           else if (extensionHandler != null) {
-            RunnableHelper.runWriteCommand(editor.getProject(), new Runnable() {
-              @Override
-              public void run() {
-                extensionHandler.execute(editor, context);
-              }
-            }, "Vim " + extensionHandler.getClass().getSimpleName(), null);
+            final CommandProcessor processor = CommandProcessor.getInstance();
+            processor.executeCommand(editor.getProject(),
+                                     () -> extensionHandler.execute(editor, context),
+                                     "Vim " + extensionHandler.getClass().getSimpleName(),
+                                     null);
           }
           if (prevMappingInfo != null) {
             handleKey(editor, key, currentContext);
@@ -468,22 +467,24 @@ public class KeyHandler {
     lastWasBS = ((cmd.getFlags() & Command.FLAG_IS_BACKSPACE) != 0);
 
     Project project = editor.getProject();
-    if (cmd.getType().isRead() || project == null || editor.getDocument().isWritable()) {
-      if (ApplicationManager.getApplication().isDispatchThread()) {
-        Runnable action = new ActionRunner(editor, context, cmd, key);
-        String name = cmd.getAction().getTemplatePresentation().getText();
-        name = name != null ? "Vim " + name : "";
-        if (cmd.getType().isWrite()) {
-          RunnableHelper.runWriteCommand(project, action, name, action);
-        }
-        else {
-          RunnableHelper.runReadCommand(project, action, name, action);
-        }
-      }
-    }
-    else {
+    final Command.Type type = cmd.getType();
+    if (type.isWrite() && !editor.getDocument().isWritable()) {
       VimPlugin.indicateError();
       reset(editor);
+    }
+    if (ApplicationManager.getApplication().isDispatchThread()) {
+      Runnable action = new ActionRunner(editor, context, cmd, key);
+      String name = cmd.getAction().getTemplatePresentation().getText();
+      name = name != null ? "Vim " + name : "";
+      if (type.isWrite()) {
+        RunnableHelper.runWriteCommand(project, action, name, action);
+      }
+      else if (type.isRead()) {
+        RunnableHelper.runReadCommand(project, action, name, action);
+      }
+      else {
+        CommandProcessor.getInstance().executeCommand(project, action, name, action);
+      }
     }
   }
 
