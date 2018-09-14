@@ -313,7 +313,7 @@ public class StringHelper {
 
   public static boolean containsUpperCase(@NotNull String text) {
     for (int i = 0; i < text.length(); i++) {
-      if (Character.isUpperCase(text.charAt(i)) && (i == 0 || text.charAt(i - 1) == '\\')) {
+      if (Character.isUpperCase(text.charAt(i)) && (i == 0 || text.charAt(i - 1) != '\\')) {
         return true;
       }
     }
