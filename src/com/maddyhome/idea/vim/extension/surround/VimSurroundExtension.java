@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.extension.surround;
 
 import com.google.common.collect.ImmutableMap;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.Pair;
@@ -152,10 +153,11 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
         return;
       }
 
-      // Leave visual mode
-      executeNormal(parseKeys("<Esc>"), editor);
-
-      editor.getCaretModel().moveToOffset(visualRange.getStartOffset());
+      WriteAction.run(() -> {
+        // Leave visual mode
+        executeNormal(parseKeys("<Esc>"), editor);
+        editor.getCaretModel().moveToOffset(visualRange.getStartOffset());
+      });
     }
 
   }
@@ -178,7 +180,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
         return;
       }
 
-      change(editor, charFrom, newSurround);
+      WriteAction.run(() -> change(editor, charFrom, newSurround));
     }
 
     static void change(@NotNull Editor editor, char charFrom, @Nullable Pair<String, String> newSurround) {
@@ -253,7 +255,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
       if (charFrom == 0) {
         return;
       }
-      CSurroundHandler.change(editor, charFrom, null);
+      WriteAction.run(() -> CSurroundHandler.change(editor, charFrom, null));
     }
   }
 
@@ -273,16 +275,18 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
       if (range == null) {
         return false;
       }
-      final ChangeGroup change = VimPlugin.getChange();
-      final String leftSurround = pair.getFirst();
-      final Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-      primaryCaret.moveToOffset(range.getStartOffset());
-      change.insertText(editor, primaryCaret, leftSurround);
-      primaryCaret.moveToOffset(range.getEndOffset() + leftSurround.length());
-      change.insertText(editor, primaryCaret, pair.getSecond());
+      WriteAction.run(() -> {
+        final ChangeGroup change = VimPlugin.getChange();
+        final String leftSurround = pair.getFirst();
+        final Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+        primaryCaret.moveToOffset(range.getStartOffset());
+        change.insertText(editor, primaryCaret, leftSurround);
+        primaryCaret.moveToOffset(range.getEndOffset() + leftSurround.length());
+        change.insertText(editor, primaryCaret, pair.getSecond());
 
-      // Jump back to start
-      executeNormal(parseKeys("`["), editor);
+        // Jump back to start
+        executeNormal(parseKeys("`["), editor);
+      });
       return true;
     }
 

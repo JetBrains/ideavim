@@ -1,6 +1,7 @@
 package com.maddyhome.idea.vim.extension.multiplecursors
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
@@ -50,8 +51,18 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
     putKeyMapping(MappingMode.V, parseKeys("<A-p>"), parseKeys(REMOVE_OCCURRENCE), true)
   }
 
-  inner class NextOccurrenceHandler(val whole: Boolean = true) : VimExtensionHandler {
+  abstract class WriteActionHandler : VimExtensionHandler {
     override fun execute(editor: Editor, context: DataContext) {
+      ApplicationManager.getApplication().runWriteAction {
+        executeInWriteAction(editor, context)
+      }
+    }
+
+    abstract fun executeInWriteAction(editor: Editor, context: DataContext)
+  }
+
+  inner class NextOccurrenceHandler(val whole: Boolean = true) : WriteActionHandler() {
+    override fun executeInWriteAction(editor: Editor, context: DataContext) {
       val caretModel = editor.caretModel
       val commandState = CommandState.getInstance(editor)
 
@@ -116,8 +127,8 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
     }
   }
 
-  inner class AllOccurrencesHandler(val whole: Boolean = true) : VimExtensionHandler {
-    override fun execute(editor: Editor, context: DataContext) {
+  inner class AllOccurrencesHandler(val whole: Boolean = true) : WriteActionHandler() {
+    override fun executeInWriteAction(editor: Editor, context: DataContext) {
       val caretModel = editor.caretModel
       if (caretModel.caretCount > 1) return
 
@@ -150,8 +161,8 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
     }
   }
 
-  inner class SkipOccurrenceHandler : VimExtensionHandler {
-    override fun execute(editor: Editor, context: DataContext) {
+  inner class SkipOccurrenceHandler : WriteActionHandler() {
+    override fun executeInWriteAction(editor: Editor, context: DataContext) {
       val caret = editor.caretModel.primaryCaret
       val selectedText = caret.selectedText ?: return
 
@@ -171,8 +182,8 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
     }
   }
 
-  inner class RemoveOccurrenceHandler : VimExtensionHandler {
-    override fun execute(editor: Editor, context: DataContext) {
+  inner class RemoveOccurrenceHandler : WriteActionHandler() {
+    override fun executeInWriteAction(editor: Editor, context: DataContext) {
       val caret = editor.caretModel.primaryCaret
       val selectedText = caret.selectedText ?: return
 
