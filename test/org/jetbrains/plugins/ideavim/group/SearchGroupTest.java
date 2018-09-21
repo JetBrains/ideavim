@@ -95,6 +95,20 @@ public class SearchGroupTest extends VimTestCase {
     assertEquals(-1, pos);
   }
 
+  public void testSmartCaseSearchCaseInsensitive() {
+    setIgnoreCaseAndSmartCase();
+    final int pos = search("tostring",
+                           "obj.toString();\n");
+    assertEquals(4, pos);
+  }
+
+  public void testSmartCaseSearchCaseSensitive() {
+    setIgnoreCaseAndSmartCase();
+    final int pos = search("toString",
+                           "obj.tostring();\nobj.toString();\n");
+    assertEquals(20, pos);
+  }
+
   // |/|
   public void testSearchMotion() {
     typeTextInFile(parseKeys("/", "two", "<Enter>"),
@@ -108,7 +122,7 @@ public class SearchGroupTest extends VimTestCase {
                    "<caret>Hello, Österreich!\n");
     assertOffset(7);
   }
-  
+
   private void setHighlightSearch() {
     final Options options = Options.getInstance();
     options.resetAllOptions();
@@ -116,6 +130,19 @@ public class SearchGroupTest extends VimTestCase {
     assertInstanceOf(option, ToggleOption.class);
     final ToggleOption highlightSearch = (ToggleOption)option;
     highlightSearch.set();
+  }
+
+  private void setIgnoreCaseAndSmartCase() {
+    final Options options = Options.getInstance();
+    options.resetAllOptions();
+    final Option ignoreCaseOption = options.getOption("ignorecase");
+    final Option smartCaseOption = options.getOption("smartcase");
+    assertInstanceOf(ignoreCaseOption, ToggleOption.class);
+    assertInstanceOf(smartCaseOption, ToggleOption.class);
+    final ToggleOption ignoreCase = (ToggleOption)ignoreCaseOption;
+    final ToggleOption smartCase = (ToggleOption)smartCaseOption;
+    ignoreCase.set();
+    smartCase.set();
   }
 
   private int search(final String pattern, String input) {
