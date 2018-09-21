@@ -40,6 +40,7 @@ for running Vim commands for multiple cursors. Various bug fixes.
 * [VIM-1287](https://youtrack.jetbrains.com/issue/VIM-1287) Fixed `i(` actions inside string literals
 * [VIM-1317](https://youtrack.jetbrains.com/issue/VIM-1317) Don't run Undo/Redo inside write actions
 * [VIM-1366](https://youtrack.jetbrains.com/issue/VIM-1366) Don't wrap a secondary event loop for `input()` into a write action
+* [VIM-1274](https://youtrack.jetbrains.com/issue/VIM-1274) Correctly process escaping when `smartcase` is on
 
 
 0.49, 2017-12-12
