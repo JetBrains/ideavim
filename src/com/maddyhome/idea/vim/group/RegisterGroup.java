@@ -22,8 +22,6 @@ import com.google.common.collect.ImmutableList;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.util.containers.ContainerUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction;
 import com.maddyhome.idea.vim.action.motion.search.SearchAgainNextAction;
@@ -433,7 +431,11 @@ public class RegisterGroup {
   @Nullable
   private Register refreshClipboardRegister(char r) {
     final String text = ClipboardHandler.getClipboardText();
+    final Register currentRegister = registers.get(r);
     if (text != null) {
+      if (currentRegister != null && text.equals(currentRegister.getText())) {
+        return currentRegister;
+      }
       return new Register(r, guessSelectionType(text), text);
     }
     return null;
@@ -441,12 +443,7 @@ public class RegisterGroup {
 
   @NotNull
   private SelectionType guessSelectionType(@NotNull String text) {
-    final String[] lines = StringUtil.splitByLines(text);
-    final HashSet<Integer> lengths = new HashSet<>(ContainerUtil.map(lines, String::length));
-    if (lines.length > 1 && lengths.size() == 1) {
-      return SelectionType.BLOCK_WISE;
-    }
-    else if (text.endsWith("\n")) {
+    if (text.endsWith("\n")) {
       return SelectionType.LINE_WISE;
     }
     else {
