@@ -1,6 +1,8 @@
 IdeaVim
 =======
 
+[![Join the chat at https://gitter.im/JetBrains/ideavim](https://badges.gitter.im/JetBrains/ideavim.svg)](https://gitter.im/JetBrains/ideavim?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 <div>
   <a href="https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub">
     <img src="http://jb.gg/badges/official.svg" alt="official JetBrains project"/>
