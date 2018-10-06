@@ -452,7 +452,9 @@ public class ChangeGroup {
       if (mode == CommandState.Mode.REPLACE) {
         processInsert(editor, context);
       }
-      state.pushState(mode, CommandState.SubMode.NONE, MappingMode.INSERT);
+      if (state.getSubMode() != CommandState.SubMode.SINGLE_COMMAND || mode != CommandState.Mode.INSERT) {
+        state.pushState(mode, CommandState.SubMode.NONE, MappingMode.INSERT);
+      }
 
       resetCursor(editor, true);
     }
