@@ -31,7 +31,8 @@ Resources:
 * [Changelog](CHANGES.md)
 * [Bug tracker](http://youtrack.jetbrains.com/issues/VIM)
 * [Continuous integration builds](http://teamcity.jetbrains.com/project.html?projectId=IdeaVim&guest=1)
-* [@IdeaVim](http://twitter.com/ideavim) in Twitter
+* [@IdeaVim](http://twitter.com/ideavim) on Twitter
+* [Community Discord](https://discord.gg/9naSRZU)
 
 
 Installation
