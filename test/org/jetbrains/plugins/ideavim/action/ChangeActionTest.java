@@ -29,6 +29,20 @@ public class ChangeActionTest extends VimTestCase {
            "}\n");
   }
 
+  // VIM-620 |i_CTRL-O|
+  public void testInsertSingleCommandAndInserting() {
+    doTest(parseKeys("i", "<C-O>", "a", "123", "<Esc>", "x"),
+            "abc<caret>d\n",
+            "abcd12\n");
+  }
+
+  // VIM-620 |i_CTRL-O|
+  public void testInsertSingleCommandAndNewLineInserting() {
+    doTest(parseKeys("i", "<C-O>", "o", "123", "<Esc>", "x"),
+           "abc<caret>d\n",
+           "abcd\n12\n");
+  }
+
   // VIM-311 |i_CTRL-O|
   public void testInsertSingleCommand() {
     doTest(parseKeys("i", "def", "<C-O>", "d2h", "x"),
