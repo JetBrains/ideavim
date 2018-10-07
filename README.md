@@ -21,6 +21,12 @@ IdeaVim
   <span>Tests</span>
 </div>
 
+<div>
+  <a href="https://discord.gg/9naSRZU">
+    <img src="https://goo.gl/xe5fjk" alt="JetBrains community Discord"/>
+  </a>
+</div>
+
 IdeaVim is a Vim emulation plugin for IDEs based on the IntelliJ platform.
 IdeaVim can be used with IntelliJ IDEA, PyCharm, CLion, PhpStorm, WebStorm,
 RubyMine, AppCode, DataGrip, GoLand, Cursive, and Android Studio.
