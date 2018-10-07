@@ -1,11 +1,15 @@
-IdeaVim
-=======
-
 <div>
   <a href="https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub">
     <img src="http://jb.gg/badges/official.svg" alt="official JetBrains project"/>
   </a>
+  
+  <a href="https://discord.gg/9naSRZU">
+    <img src="https://goo.gl/xe5fjk" alt="JetBrains community Discord"/>
+  </a>
 </div>
+
+IdeaVim
+=======
 
 <div>
   <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_Build&guest=1">
@@ -19,12 +23,6 @@ IdeaVim
     <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20182)/statusIcon.svg?guest=1"/>
   </a>
   <span>Tests</span>
-</div>
-
-<div>
-  <a href="https://discord.gg/9naSRZU">
-    <img src="https://goo.gl/xe5fjk" alt="JetBrains community Discord"/>
-  </a>
 </div>
 
 IdeaVim is a Vim emulation plugin for IDEs based on the IntelliJ platform.
