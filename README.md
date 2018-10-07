@@ -1,11 +1,15 @@
-IdeaVim
-=======
-
 <div>
   <a href="https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub">
     <img src="http://jb.gg/badges/official.svg" alt="official JetBrains project"/>
   </a>
+  
+  <a href="https://discord.gg/9naSRZU">
+    <img src="https://goo.gl/xe5fjk" alt="JetBrains community Discord"/>
+  </a>
 </div>
+
+IdeaVim
+=======
 
 <div>
   <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_Build&guest=1">
@@ -31,7 +35,8 @@ Resources:
 * [Changelog](CHANGES.md)
 * [Bug tracker](http://youtrack.jetbrains.com/issues/VIM)
 * [Continuous integration builds](http://teamcity.jetbrains.com/project.html?projectId=IdeaVim&guest=1)
-* [@IdeaVim](http://twitter.com/ideavim) in Twitter
+* [@IdeaVim](http://twitter.com/ideavim) on Twitter
+* [Community Discord](https://discord.gg/9naSRZU)
 
 
 Installation
