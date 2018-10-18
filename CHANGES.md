@@ -20,9 +20,16 @@ usual beta standards.
 To Be Released
 --------------
 
+...
+
+
+0.50, 2018-10-18
+----------------
+
 Moved "Vim Emulation" settings into "File | Settings | Vim Emulation". Support
-for vim-multiple-cursors commands `<A-n>`, `<A-x>`, `<A-p>`, `g<A-n>`. Support
-for running Vim commands for multiple cursors. Various bug fixes.
+for vim-multiple-cursors commands `<A-n>`, `<A-x>`, `<A-p>`, `g<A-n>` (put `set
+multiple-cursors` into your ~/.ideavimrc to enable it). Support for running
+Vim commands for multiple cursors. Various bug fixes.
 
 * [VIM-634](https://youtrack.jetbrains.com/issue/VIM-634) Support for vim-multiple-cursors commands `<A-n>`, `<A-x>`, `<A-p>`, `g<A-n>`
 * [VIM-780](https://youtrack.jetbrains.com/issue/VIM-780) Support for running Vim commands for multiple cursors
