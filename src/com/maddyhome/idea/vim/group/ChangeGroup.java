@@ -20,11 +20,9 @@ package com.maddyhome.idea.vim.group;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.intellij.application.options.CodeStyle;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
@@ -36,17 +34,15 @@ import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx;
 import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.editor.impl.TextRangeInterval;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.util.ArrayUtil;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.*;
+import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.LineRange;
@@ -230,7 +226,7 @@ public class ChangeGroup {
     }
 
     EditorData.setChangeSwitchMode(editor, CommandState.Mode.INSERT);
-    insertText(editor, caret, "\n" + StringUtil.repeat(" ", col));
+    insertText(editor, caret, "\n" + IndentConfig.create(editor).createIndentBySize(col));
 
     if (CaretData.wasInFirstLine(caret)) {
       MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretVertical(editor, caret, -1));
@@ -268,7 +264,7 @@ public class ChangeGroup {
 
     MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, caret));
     EditorData.setChangeSwitchMode(editor, CommandState.Mode.INSERT);
-    insertText(editor, caret, "\n" + StringUtil.repeat(" ", col));
+    insertText(editor, caret, "\n" + IndentConfig.create(editor).createIndentBySize(col));
   }
 
   private void runEnterAction(Editor editor, @NotNull DataContext context) {
@@ -1560,44 +1556,16 @@ public class ChangeGroup {
       logger.debug("count=" + count);
     }
 
-    final Project proj = PlatformDataKeys.PROJECT.getData(context); // API change - don't merge
-    VirtualFile file = EditorData.getVirtualFile(editor);
-    final int tabSize;
-    final int indentSize;
-    final boolean useTabs;
-    if (file != null) {
-      FileType type = FileTypeManager.getInstance().getFileTypeByFile(file);
-      CodeStyleSettings settings = proj == null ? CodeStyle.getDefaultSettings() : CodeStyle.getSettings(proj);
-      tabSize = settings.getTabSize(type);
-      indentSize = settings.getIndentSize(type);
-      useTabs = settings.useTabCharacter(type);
-    }
-    else {
-      tabSize = 8;
-      indentSize = 8;
-      useTabs = true;
-    }
+    IndentConfig indentConfig = IndentConfig.create(editor, context);
 
     final int sline = editor.offsetToLogicalPosition(range.getStartOffset()).line;
     final int eline = editor.offsetToLogicalPosition(range.getEndOffset()).line;
 
     if (range.isMultiple()) {
       final int from = editor.offsetToLogicalPosition(range.getStartOffset()).column;
-      final int size = indentSize * count;
       if (dir == 1) {
         // Right shift blockwise selection
-        final int tabCnt;
-        final int spcCnt;
-        if (useTabs) {
-          tabCnt = size / tabSize;
-          spcCnt = size % tabSize;
-        }
-        else {
-          tabCnt = 0;
-          spcCnt = size;
-        }
-
-        final String indent = StringUtil.repeat("\t", tabCnt) + StringUtil.repeat(" ", spcCnt);
+        final String indent = indentConfig.createIndentByCount(count);
 
         for (int l = sline; l <= eline; l++) {
           int len = EditorHelper.getLineLength(editor, l);
@@ -1615,7 +1583,7 @@ public class ChangeGroup {
           int len = EditorHelper.getLineLength(editor, l);
           if (len > from) {
             LogicalPosition spos = new LogicalPosition(l, from);
-            LogicalPosition epos = new LogicalPosition(l, from + size - 1);
+            LogicalPosition epos = new LogicalPosition(l, from + indentConfig.getTotalIndent(count) - 1);
             int wsoff = editor.logicalPositionToOffset(spos);
             int weoff = editor.logicalPositionToOffset(epos);
             int pos;
@@ -1638,20 +1606,9 @@ public class ChangeGroup {
         final int eoff = EditorHelper.getLineEndOffset(editor, l, true);
         final int woff = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, l);
         final int col = editor.offsetToVisualPosition(woff).column;
-        final int limit = Math.max(0, col + dir * indentSize * count);
+        final int limit = Math.max(0, col + dir * indentConfig.getTotalIndent(count));
         if (col > 0 || soff != eoff) {
-          final int tabsCnt;
-          final int spacesCnt;
-          if (useTabs) {
-            tabsCnt = limit / tabSize;
-            spacesCnt = limit % tabSize;
-          }
-          else {
-            tabsCnt = 0;
-            spacesCnt = limit;
-          }
-
-          final String indent = StringUtil.repeat("\t", tabsCnt) + StringUtil.repeat(" ", spacesCnt);
+          final String indent = indentConfig.createIndentBySize(limit);
           replaceText(editor, soff, woff, indent);
         }
       }

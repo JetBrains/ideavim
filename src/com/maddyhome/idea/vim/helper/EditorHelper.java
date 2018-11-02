@@ -18,19 +18,13 @@
 
 package com.maddyhome.idea.vim.helper;
 
-import com.intellij.application.options.CodeStyle;
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.fileTypes.FileTypeManager;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.maddyhome.idea.vim.common.CharacterPosition;
+import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.CaretOrder;
 import org.jetbrains.annotations.NotNull;
@@ -551,22 +545,8 @@ public class EditorHelper {
     final int len = getLineLength(editor, line);
     if(len >= to) return "";
 
-    final VirtualFile virtualFile = EditorData.getVirtualFile(editor);
-    final Project project = PlatformDataKeys.PROJECT.getData(context);
     final int limit = to - len;
-    if (virtualFile != null) {
-      final FileType fileType = FileTypeManager.getInstance().getFileTypeByFile(virtualFile);
-      final CodeStyleSettings settings = project == null ? CodeStyle.getDefaultSettings() : CodeStyle.getSettings(project);
-      if (settings.useTabCharacter(fileType)) {
-        final int tabSize = settings.getTabSize(fileType);
-        final int tabsCnt = limit / tabSize;
-        final int spacesCnt = limit % tabSize;
-
-        return StringUtil.repeat("\t", tabsCnt) + StringUtil.repeat(" ", spacesCnt);
-      }
-    }
-
-    return StringUtil.repeat(" ", limit);
+    return IndentConfig.create(editor, context).createIndentBySize(limit);
   }
 
   /**
