@@ -20,7 +20,8 @@ usual beta standards.
 To Be Released
 --------------
 
-...
+* [VIM-620](https://youtrack.jetbrains.com/issue/VIM-620) Fixed handling `<C-O>` and `<Esc>` in Insert and Replace modes
+* [VIM-798](https://youtrack.jetbrains.com/issue/VIM-798) Allow arrow keys for window navigation commands
 
 
 0.50, 2018-10-18

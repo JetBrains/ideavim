@@ -2,6 +2,10 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
+      <p>To be released:</p>
+      <ul>
+        <li>Various bug fixes</li>
+      </ul>
       <p>0.50:</p>
       <ul>
         <li>Moved "Vim Emulation" settings into "File | Settings | Editor"</li>
