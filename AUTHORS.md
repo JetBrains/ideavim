@@ -52,6 +52,7 @@ Contributors:
 * [Vasily Alferov](mailto:ya-ikmik2012@yandex.ru)
 * [Vitalii Karavaev](mailto:fkve97@gmail.com)
 * [John Lin](mailto:johnlinp@gmail.com)
+* [Alex Plate](mailto:alexpl292@gmail.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
