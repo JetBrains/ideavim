@@ -40,6 +40,7 @@ import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -767,53 +768,99 @@ public class SearchHelper {
     return res;
   }
 
+  @NotNull
+  public static List<TextRange> findNumbersInRange(@NotNull final Editor editor, @NotNull TextRange textRange,
+                                                   final boolean alpha, final boolean hex, final boolean octal) {
+    List<TextRange> result = new ArrayList<>();
+    int firstLine = editor.offsetToLogicalPosition(textRange.getStartOffset()).line;
+    int lastLine = editor.offsetToLogicalPosition(textRange.getEndOffset()).line;
+
+    int startOffset = textRange.getStartOffset();
+    for (int lineNumber = firstLine; lineNumber <= lastLine; lineNumber++) {
+      int endOffset = EditorHelper.getLineEndOffset(editor, lineNumber, true);
+      if (endOffset > textRange.getEndOffset()) endOffset = textRange.getEndOffset();
+
+      String text = EditorHelper.getText(editor, startOffset, endOffset);
+
+      TextRange numberRange = findNumberInText(text, 0, alpha, hex, octal);
+
+      if (numberRange == null) continue;
+
+      result.add(new TextRange(numberRange.getStartOffset() + startOffset, numberRange.getEndOffset() + startOffset));
+
+      startOffset = endOffset + 1;
+    }
+
+    return result;
+  }
+
   @Nullable
   public static TextRange findNumberUnderCursor(@NotNull final Editor editor, @NotNull Caret caret, final boolean alpha,
                                                 final boolean hex, final boolean octal) {
     int lline = caret.getLogicalPosition().line;
     String text = EditorHelper.getLineText(editor, lline).toLowerCase();
-    int offset = EditorHelper.getLineStartOffset(editor, lline);
-    int pos = caret.getOffset() - offset;
+    int startLineOffset = EditorHelper.getLineStartOffset(editor, lline);
+    int posOnLine = caret.getOffset() - startLineOffset;
+
+    TextRange numberTextRange = findNumberInText(text, posOnLine, alpha, hex, octal);
+
+    if (numberTextRange == null) {
+      return null;
+    }
+    return new TextRange(numberTextRange.getStartOffset() + startLineOffset,
+            numberTextRange.getEndOffset() + startLineOffset);
+  }
+
+  /**
+   * Search for number in given text from start position
+   *
+   * @param textInRange - text to search in
+   * @param startPosOnLine - start offset to search
+   * @return - text range with number
+   */
+  @Nullable
+  public static TextRange findNumberInText(@NotNull final String textInRange, int startPosOnLine, final boolean alpha,
+                                            final boolean hex, final boolean octal) {
 
     if (logger.isDebugEnabled()) {
-      logger.debug("lline=" + lline);
-      logger.debug("text=" + text);
-      logger.debug("offset=" + offset);
-      logger.debug("pos=" + pos);
+      logger.debug("text=" + textInRange);
     }
+
+    int pos = startPosOnLine;
+    int lineEndOffset = textInRange.length();
 
     while (true) {
       // Skip over current whitespace if any
-      while (pos < text.length() && !isNumberChar(text.charAt(pos), alpha, hex, octal, true)) {
+      while (pos < lineEndOffset && !isNumberChar(textInRange.charAt(pos), alpha, hex, octal, true)) {
         pos++;
       }
 
       if (logger.isDebugEnabled()) logger.debug("pos=" + pos);
-      if (pos >= text.length()) {
+      if (pos >= lineEndOffset) {
         logger.debug("no number char on line");
         return null;
       }
 
-      boolean isHexChar = "abcdefABCDEF".indexOf(text.charAt(pos)) >= 0;
+      boolean isHexChar = "abcdefABCDEF".indexOf(textInRange.charAt(pos)) >= 0;
 
       if (hex) {
         // Ox and OX handling
-        if (text.charAt(pos) == '0' && pos < text.length() - 1 && "xX".indexOf(text.charAt(pos + 1)) >= 0) {
+        if (textInRange.charAt(pos) == '0' && pos < lineEndOffset - 1 && "xX".indexOf(textInRange.charAt(pos + 1)) >= 0) {
           pos += 2;
         }
-        else if ("xX".indexOf(text.charAt(pos)) >= 0 && pos > 0 && text.charAt(pos - 1) == '0') {
+        else if ("xX".indexOf(textInRange.charAt(pos)) >= 0 && pos > 0 && textInRange.charAt(pos - 1) == '0') {
           pos++;
         }
 
         logger.debug("checking hex");
-        final Pair<Integer, Integer> range = findRange(text, pos, false, true, false, false);
+        final Pair<Integer, Integer> range = findRange(textInRange, pos, false, true, false, false);
         int start = range.first;
         int end = range.second;
 
         // Ox and OX
-        if (start >= 2 && text.substring(start - 2, start).toLowerCase().equals("0x")) {
+        if (start >= 2 && textInRange.substring(start - 2, start).toLowerCase().equals("0x")) {
           logger.debug("found hex");
-          return new TextRange(start - 2 + offset, end + offset);
+          return new TextRange(start - 2, end);
         }
 
         if (!isHexChar || alpha) {
@@ -830,34 +877,34 @@ public class SearchHelper {
 
     if (octal) {
       logger.debug("checking octal");
-      final Pair<Integer, Integer> range = findRange(text, pos, false, false, true, false);
+      final Pair<Integer, Integer> range = findRange(textInRange, pos, false, false, true, false);
       int start = range.first;
       int end = range.second;
 
-      if (text.charAt(start) == '0' &&
+      if (textInRange.charAt(start) == '0' &&
           end > start &&
-          !(start > 0 && isNumberChar(text.charAt(start - 1), false, false, false, true))) {
+          !(start > 0 && isNumberChar(textInRange.charAt(start - 1), false, false, false, true))) {
         logger.debug("found octal");
-        return new TextRange(start + offset, end + offset);
+        return new TextRange(start, end);
       }
     }
 
     if (alpha) {
-      if (logger.isDebugEnabled()) logger.debug("checking alpha for " + text.charAt(pos));
-      if (isNumberChar(text.charAt(pos), true, false, false, false)) {
+      if (logger.isDebugEnabled()) logger.debug("checking alpha for " + textInRange.charAt(pos));
+      if (isNumberChar(textInRange.charAt(pos), true, false, false, false)) {
         if (logger.isDebugEnabled()) logger.debug("found alpha at " + pos);
-        return new TextRange(pos + offset, pos + 1 + offset);
+        return new TextRange(pos, pos + 1);
       }
     }
 
-    final Pair<Integer, Integer> range = findRange(text, pos, false, false, false, true);
+    final Pair<Integer, Integer> range = findRange(textInRange, pos, false, false, false, true);
     int start = range.first;
     int end = range.second;
-    if (start > 0 && text.charAt(start - 1) == '-') {
+    if (start > 0 && textInRange.charAt(start - 1) == '-') {
       start--;
     }
 
-    return new TextRange(start + offset, end + offset);
+    return new TextRange(start, end);
   }
 
   /**

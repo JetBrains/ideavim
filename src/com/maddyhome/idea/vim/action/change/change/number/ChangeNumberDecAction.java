@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action.change.change;
+package com.maddyhome.idea.vim.action.change.change.number;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
@@ -31,8 +31,8 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  */
-public class ChangeNumberIncAction extends EditorAction {
-  public ChangeNumberIncAction() {
+public class ChangeNumberDecAction extends EditorAction {
+  public ChangeNumberDecAction() {
     super(new Handler());
   }
 
@@ -44,7 +44,7 @@ public class ChangeNumberIncAction extends EditorAction {
     @Override
     public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                            int rawCount, @Nullable Argument argument) {
-      return VimPlugin.getChange().changeNumber(editor, caret, count);
+      return VimPlugin.getChange().changeNumber(editor, caret, -count);
     }
   }
 }
