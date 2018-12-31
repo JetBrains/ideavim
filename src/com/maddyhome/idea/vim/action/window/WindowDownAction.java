@@ -54,7 +54,7 @@ public class WindowDownAction extends VimCommandAction {
   @NotNull
   @Override
   public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("<C-W>j");
+    return parseKeysSet("<C-W>j", "<C-W><Down>");
   }
 
   @NotNull
