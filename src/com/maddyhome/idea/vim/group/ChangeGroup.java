@@ -34,6 +34,7 @@ import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx;
 import com.intellij.openapi.editor.event.*;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.impl.TextRangeInterval;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileTypes.FileType;
@@ -43,6 +44,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.util.ArrayUtil;
+import com.intellij.util.ObjectUtils;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -66,7 +68,6 @@ import java.util.List;
 
 /**
  * Provides all the insert/replace related functionality
- * TODO - change cursor for the different modes
  */
 public class ChangeGroup {
 
@@ -424,7 +425,7 @@ public class ChangeGroup {
     final Command cmd = state.getCommand();
     if (cmd != null && state.getMode() == CommandState.Mode.REPEAT) {
       if (mode == CommandState.Mode.REPLACE) {
-        processInsert(editor, context);
+        setInsertEditorState(editor, false);
       }
       if ((cmd.getFlags() & Command.FLAG_NO_REPEAT) != 0) {
         repeatInsert(editor, context, 1, false);
@@ -433,7 +434,7 @@ public class ChangeGroup {
         repeatInsert(editor, context, cmd.getCount(), false);
       }
       if (mode == CommandState.Mode.REPLACE) {
-        processInsert(editor, context);
+        setInsertEditorState(editor, true);
       }
     }
     else {
@@ -448,10 +449,7 @@ public class ChangeGroup {
       documentListener = new InsertActionsDocumentListener();
       eventFacade.addDocumentListener(document, documentListener);
       oldOffset = -1;
-      inInsert = true;
-      if (mode == CommandState.Mode.REPLACE) {
-        processInsert(editor, context);
-      }
+      setInsertEditorState(editor, mode == CommandState.Mode.INSERT);
       state.pushState(mode, CommandState.SubMode.NONE, MappingMode.INSERT);
 
       resetCursor(editor, true);
@@ -468,7 +466,7 @@ public class ChangeGroup {
   public void processPostChangeModeSwitch(@NotNull Editor editor, @NotNull DataContext context,
                                           @NotNull CommandState.Mode toSwitch) {
     if (toSwitch == CommandState.Mode.INSERT) {
-      initInsert(editor, context, toSwitch);
+      initInsert(editor, context, CommandState.Mode.INSERT);
     }
   }
 
@@ -617,7 +615,7 @@ public class ChangeGroup {
   public void processEscape(@NotNull Editor editor, @NotNull DataContext context) {
     int cnt = lastInsert != null ? lastInsert.getCount() : 0;
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.REPLACE) {
-      KeyHandler.executeAction("VimInsertReplaceToggle", context);
+      setInsertEditorState(editor, true);
     }
 
     if (lastInsert != null && (lastInsert.getFlags() & Command.FLAG_NO_REPEAT) != 0) {
@@ -639,6 +637,7 @@ public class ChangeGroup {
     markGroup.setMark(editor, MarkGroup.MARK_CHANGE_END, offset);
     markGroup.setMark(editor, MarkGroup.MARK_CHANGE_POS, offset);
     CommandState.getInstance(editor).popState();
+    exitAllSingleCommandInsertModes(editor);
 
     if (!CommandState.inInsertMode(editor)) {
       resetCursor(editor, false);
@@ -656,7 +655,7 @@ public class ChangeGroup {
    */
   public void processEnter(@NotNull Editor editor, @NotNull DataContext context) {
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.REPLACE) {
-      KeyHandler.executeAction("EditorToggleInsertState", context);
+      setInsertEditorState(editor, true);
     }
     final KeyStroke enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
     final List<AnAction> actions = VimPlugin.getKey().getActions(editor.getComponent(), enterKeyStroke);
@@ -666,7 +665,7 @@ public class ChangeGroup {
       }
     }
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.REPLACE) {
-      KeyHandler.executeAction("EditorToggleInsertState", context);
+      setInsertEditorState(editor, false);
     }
   }
 
@@ -675,12 +674,21 @@ public class ChangeGroup {
    * Insert/Overwrite state which updates the status bar.
    *
    * @param editor  The editor to toggle the state in
-   * @param context The data context
    */
-  public void processInsert(Editor editor, @NotNull DataContext context) {
-    KeyHandler.executeAction("EditorToggleInsertState", context);
+  public void processInsert(Editor editor) {
+    final EditorEx editorEx = ObjectUtils.tryCast(editor, EditorEx.class);
+    if (editorEx == null) return;
+    editorEx.setInsertMode(!editorEx.isInsertMode());
     CommandState.getInstance(editor).toggleInsertOverwrite();
-    inInsert = !inInsert;
+  }
+
+  /**
+   * Sets the insert/replace state of the editor.
+   */
+  private void setInsertEditorState(@NotNull Editor editor, boolean value) {
+    final EditorEx editorEx = ObjectUtils.tryCast(editor, EditorEx.class);
+    if (editorEx == null) return;
+    editorEx.setInsertMode(value);
   }
 
   /**
@@ -1893,12 +1901,20 @@ public class ChangeGroup {
     }
   }
 
+  private void exitAllSingleCommandInsertModes(@NotNull Editor editor) {
+    while (CommandState.inSingleCommandMode(editor)) {
+      CommandState.getInstance(editor).popState();
+      if (CommandState.inInsertMode(editor)) {
+        CommandState.getInstance(editor).popState();
+      }
+    }
+  }
+
   private final List<Object> strokes = new ArrayList<>();
   private int repeatCharsCount;
   private List<Object> lastStrokes;
   @Nullable
   private Command lastInsert;
-  private boolean inInsert;
   private int repeatLines;
   private int repeatColumn;
   private boolean repeatAppend;

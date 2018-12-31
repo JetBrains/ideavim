@@ -90,6 +90,11 @@ public class CommandState {
     return state.getMode() == Mode.VISUAL && state.getSubMode() == SubMode.VISUAL_BLOCK;
   }
 
+  public static boolean inSingleCommandMode(@Nullable Editor editor) {
+    final CommandState state = getInstance(editor);
+    return state.getMode() == Mode.COMMAND && state.getSubMode() == SubMode.SINGLE_COMMAND;
+  }
+
   @Nullable
   public Command getCommand() {
     return myCommand;

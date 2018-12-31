@@ -1,6 +1,7 @@
 package org.jetbrains.plugins.ideavim.action;
 
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.CommandState;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -658,5 +659,14 @@ public class ChangeActionTest extends VimTestCase {
                           " */\n" +
                           "<caret>Xfoo\n" +
                           "Xbar\n");
+  }
+
+  public void testRepeatReplace() {
+    configureByText("<caret>foobarbaz spam\n");
+    typeText(parseKeys("R"));
+    assertMode(CommandState.Mode.REPLACE);
+    typeText(parseKeys("FOO", "<Esc>", "l", "2."));
+    myFixture.checkResult("FOOFOOFO<caret>O spam\n");
+    assertMode(CommandState.Mode.COMMAND);
   }
 }
