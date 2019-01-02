@@ -1192,12 +1192,52 @@ public class MotionGroup {
   public int moveCaretHorizontal(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowPastEnd) {
     int oldOffset = caret.getOffset();
     int offset = EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, oldOffset + count, allowPastEnd);
+    int end = EditorHelper.getLineLength(editor);
+    int colPosition = caret.getLogicalPosition().column;
 
-    if (offset == oldOffset) {
-      return -1;
-    }
-    else {
-      return offset;
+    if (Options.getInstance().isSet("whichwrap")) {
+      if (!CommandState.inInsertMode(editor) && end != 0) {
+        end = end - 1;
+      }
+
+      if (offset == oldOffset) {
+        if (colPosition == 0) {
+          if (count < 0) { // left
+            offset = moveCaretToLineEndSkipLeadingOffset(editor, caret, count);
+            if (CommandState.inInsertMode(editor)) {
+              offset = offset + 1;
+            }
+            return offset;
+          } else { // right
+            return moveCaretToLineStartSkipLeadingOffset(editor, caret, count);
+          }
+        }
+        if (end == colPosition) { // right
+          return moveCaretToLineStartSkipLeadingOffset(editor, caret, count);
+        }
+        return -1;
+      } else if (oldOffset > offset) {  // left
+        if (colPosition == 0) {
+          offset = moveCaretToLineEndSkipLeadingOffset(editor, caret, count);
+          if (CommandState.inInsertMode(editor)) {
+            offset = offset + 1;
+          }
+          return offset;
+        }
+        return offset;
+      } else { // right
+        if (end == colPosition) {
+          return moveCaretToLineStartSkipLeadingOffset(editor, caret, count);
+        }
+        return offset;
+      }
+    } else {
+      if (offset == oldOffset) {
+        return -1;
+      }
+      else {
+        return offset;
+      }
     }
   }
 
