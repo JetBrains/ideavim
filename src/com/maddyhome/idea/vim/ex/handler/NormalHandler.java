@@ -19,7 +19,7 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 public class NormalHandler extends CommandHandler {
     public NormalHandler() {
         super("norm", "al", RANGE_OPTIONAL | ARGUMENT_REQUIRED | WRITABLE, true,
-                CaretOrder.DECREASING_OFFSET);
+                CaretOrder.INCREASING_OFFSET);
     }
 
     @Override
