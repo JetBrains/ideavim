@@ -3,6 +3,7 @@ package com.maddyhome.idea.vim.ex.handler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
@@ -23,6 +24,12 @@ public class NormalHandler extends CommandHandler {
 
     @Override
     public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException, ExecuteMethodNotOverriddenException {
+        List<KeyStroke> keys = parseKeys(cmd.getArgument());
+        KeyHandler keyHandler = KeyHandler.getInstance();
+        keyHandler.reset(editor);
+        for (KeyStroke key : keys) {
+            keyHandler.handleKey(editor, key, context);
+        }
         return true;
     }
 }
