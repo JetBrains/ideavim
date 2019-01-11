@@ -24,11 +24,19 @@ public class NormalHandler extends CommandHandler {
 
     @Override
     public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException, ExecuteMethodNotOverriddenException {
-        List<KeyStroke> keys = parseKeys(cmd.getArgument());
+        String argument = cmd.getArgument();
+        boolean useMapping = true;
+
+        if (!argument.isEmpty() && argument.charAt(0) == '!') {
+            useMapping = false;
+            argument = argument.substring(1).trim();
+        }
+
+        List<KeyStroke> keys = parseKeys(argument);
         KeyHandler keyHandler = KeyHandler.getInstance();
         keyHandler.reset(editor);
         for (KeyStroke key : keys) {
-            keyHandler.handleKey(editor, key, context);
+            keyHandler.handleKey(editor, key, context, useMapping);
         }
         return true;
     }
