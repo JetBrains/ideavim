@@ -4,6 +4,8 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.KeyHandler;
+import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
@@ -37,6 +39,16 @@ public class NormalHandler extends CommandHandler {
         keyHandler.reset(editor);
         for (KeyStroke key : keys) {
             keyHandler.handleKey(editor, key, context, useMapping);
+        }
+
+        // Exit if state leaves as insert or cmd_line
+        CommandState commandState = CommandState.getInstance(editor);
+        CommandState.Mode mode = commandState.getMode();
+        if (mode == CommandState.Mode.EX_ENTRY) {
+            VimPlugin.getProcess().cancelExEntry(editor, context);
+        }
+        if (mode == CommandState.Mode.INSERT || mode == CommandState.Mode.REPLACE) {
+            VimPlugin.getChange().processEscape(editor, context);
         }
         return true;
     }
