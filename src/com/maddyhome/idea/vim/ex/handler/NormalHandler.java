@@ -28,15 +28,22 @@ public class NormalHandler extends CommandHandler {
 
     @Override
     public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException, ExecuteMethodNotOverriddenException {
-
         String argument = cmd.getArgument();
         boolean useMapping = true;
+        if (!argument.isEmpty() && argument.charAt(0) == '!') {
+            // Disable mapping by "!" option
+            useMapping = false;
+            argument = argument.substring(1).trim();
+        }
 
+        // True if line range was explicitly defined by user
         boolean rangeUsed = cmd.getRanges().size() != 0;
+
         LineRange range = cmd.getLineRange(editor, caret, context);
 
         for (int line = range.getStartLine(); line <= range.getEndLine(); line++) {
             if (rangeUsed) {
+                // Move caret to the first position on line
                 if (editor.getDocument().getLineCount() < line) {
                     break;
                 }
@@ -44,11 +51,7 @@ public class NormalHandler extends CommandHandler {
                 editor.getCaretModel().moveToOffset(startOffset);
             }
 
-            if (!argument.isEmpty() && argument.charAt(0) == '!') {
-                useMapping = false;
-                argument = argument.substring(1).trim();
-            }
-
+            // Perform operations
             List<KeyStroke> keys = parseKeys(argument);
             KeyHandler keyHandler = KeyHandler.getInstance();
             keyHandler.reset(editor);
