@@ -1,5 +1,6 @@
 package org.jetbrains.plugins.ideavim.ex
 
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -66,6 +67,23 @@ class NormalCommandTest : VimTestCase() {
         myFixture.checkResult("""123456
             |123456
             |<caret>123456
+        """.trimMargin())
+    }
+
+    fun `test from visual mode`() {
+        myFixture.configureByText("a.java", """<caret>123456
+            |123456
+            |123456
+            |123456
+            |123456
+        """.trimMargin())
+        typeText(parseKeys("Vjj"))
+        typeText(commandToKeys("normal x"))
+        myFixture.checkResult("""23456
+            |23456
+            |<caret>23456
+            |123456
+            |123456
         """.trimMargin())
     }
 

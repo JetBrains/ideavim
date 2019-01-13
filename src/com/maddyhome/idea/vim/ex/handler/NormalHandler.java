@@ -41,6 +41,11 @@ public class NormalHandler extends CommandHandler {
 
         LineRange range = cmd.getLineRange(editor, caret, context);
 
+        CommandState commandState = CommandState.getInstance(editor);
+        if (commandState.getMode() == CommandState.Mode.VISUAL) {
+            VimPlugin.getMotion().exitVisual(editor);
+        }
+
         for (int line = range.getStartLine(); line <= range.getEndLine(); line++) {
             if (rangeUsed) {
                 // Move caret to the first position on line
@@ -60,7 +65,6 @@ public class NormalHandler extends CommandHandler {
             }
 
             // Exit if state leaves as insert or cmd_line
-            CommandState commandState = CommandState.getInstance(editor);
             CommandState.Mode mode = commandState.getMode();
             if (mode == CommandState.Mode.EX_ENTRY) {
                 VimPlugin.getProcess().cancelExEntry(editor, context);
