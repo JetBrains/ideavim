@@ -87,6 +87,21 @@ class NormalCommandTest : VimTestCase() {
         """.trimMargin())
     }
 
+    fun `test execute visual mode`() {
+        myFixture.configureByText("a.java", """<caret>123456
+            |123456
+            |123456
+            |123456
+            |123456
+        """.trimMargin())
+        typeText(commandToKeys("normal Vjj"))
+        typeText(parseKeys("x"))
+        myFixture.checkResult("""
+            |<caret>123456
+            |123456
+        """.trimMargin())
+    }
+
     private fun doTest(command: String, before: String, after: String) {
         myFixture.configureByText("a.java", before)
         typeText(commandToKeys(command))

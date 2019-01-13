@@ -84,7 +84,11 @@ abstract class CommandHandler {
      * Indicates that this command does not modify the editor
      */
     READ_ONLY,
-    DONT_SAVE_LAST
+    DONT_SAVE_LAST,
+    /**
+     * Indicates that visual mode should NOT be exited after command execution
+     */
+    SAVE_VISUAL_MODE
   }
 
   /**

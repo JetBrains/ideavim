@@ -40,6 +40,8 @@ import javax.swing.*;
 import java.io.*;
 import java.util.EnumSet;
 
+import static com.maddyhome.idea.vim.ex.CommandParser.RES_SAVE_VISUAL;
+
 /**
  *
  */
@@ -116,7 +118,8 @@ public class ProcessGroup {
       if (panel.getLabel().equals(":")) {
         flags = CommandParser.getInstance().processCommand(editor, context, text, 1);
         if (logger.isDebugEnabled()) logger.debug("flags=" + flags);
-        if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
+        if ((flags & RES_SAVE_VISUAL) == 0 &&
+                CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
           VimPlugin.getMotion().exitVisual(editor);
         }
       }
