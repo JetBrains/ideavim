@@ -43,6 +43,8 @@ public class NormalHandler extends CommandHandler {
 
         CommandState commandState = CommandState.getInstance(editor);
         if (commandState.getMode() == CommandState.Mode.VISUAL) {
+            // Disable visual mode before command execution
+            // Otherwise commands will be applied to selected text
             VimPlugin.getMotion().exitVisual(editor);
         }
 
