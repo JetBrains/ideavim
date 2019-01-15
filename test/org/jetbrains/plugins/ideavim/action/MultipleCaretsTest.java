@@ -1,6 +1,5 @@
 package org.jetbrains.plugins.ideavim.action;
 
-import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -454,7 +453,7 @@ public class MultipleCaretsTest extends VimTestCase {
   }
 
   public void testMotionMethodNextEndAction() {
-    myFixture.configureByText(JavaFileType.INSTANCE,
+    configureByJavaText(
                               "public class Foo {\n" +
                               "    private static void firstMethod(int argument) {\n" +
                               "        // Do som<caret>ething...\n" +
@@ -477,7 +476,7 @@ public class MultipleCaretsTest extends VimTestCase {
   }
 
   public void testMotionMethodNextStartAction() {
-    myFixture.configureByText(JavaFileType.INSTANCE,
+    configureByJavaText(
                               "public class Foo {\n" +
                               " <caret>   private static void firstMethod(int argument) {\n" +
                               "        // Do som<caret>ething...\n" +
@@ -500,7 +499,7 @@ public class MultipleCaretsTest extends VimTestCase {
   }
 
   public void testMotionMethodPreviousEndAction() {
-    myFixture.configureByText(JavaFileType.INSTANCE,
+    configureByJavaText(
                               "public class Foo {\n" +
                               " <caret>   private static void firstMethod(int argument) {\n" +
                               "        // Do som<caret>ething...\n" +
@@ -523,7 +522,7 @@ public class MultipleCaretsTest extends VimTestCase {
   }
 
   public void testMotionMethodPreviousStartAction() {
-    myFixture.configureByText(JavaFileType.INSTANCE,
+    configureByJavaText(
                               "public class Foo {\n" +
                               " <caret>   private static void firstMethod(int argument) {\n" +
                               "        // Do som<caret>ething...\n" +
