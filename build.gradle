@@ -42,6 +42,9 @@ intellij {
     username publishUsername
     password publishPassword
   }
+  if (Boolean.valueOf(isRider)) {
+    plugins = ['rider-plugins-appender']
+  }
 }
 
 repositories {
@@ -51,4 +54,8 @@ repositories {
 dependencies {
   compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
   compile "org.jetbrains.kotlin:kotlin-runtime:$kotlinVersion"
+
+  compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+  testCompile "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
+  testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
 }
