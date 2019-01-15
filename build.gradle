@@ -36,6 +36,7 @@ intellij {
   updateSinceUntilBuild false
   downloadSources Boolean.valueOf(downloadIdeaSources)
   instrumentCode Boolean.valueOf(instrumentPluginCode)
+  intellijRepo = "https://www.jetbrains.com/intellij-repository"
 
   publishPlugin {
     channels publishChannels.split(',')
