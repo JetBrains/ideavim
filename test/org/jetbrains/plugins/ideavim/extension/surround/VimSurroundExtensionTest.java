@@ -82,6 +82,12 @@ public class VimSurroundExtensionTest extends VimTestCase {
     myFixture.checkResult("Hello <em>World</em>!\n");
   }
 
+  public void testSurroundTagWithAttributes() {
+    configureByText("Hello <caret>World!");
+    typeText(parseKeys("ysiw\\<span class=\"important\" data-foo=\"bar\">"));
+    myFixture.checkResult("Hello <span class=\"important\" data-foo=\"bar\">World</span>!");
+  }
+
   /* visual surround */
 
   public void testVisualSurroundWordParens() {
