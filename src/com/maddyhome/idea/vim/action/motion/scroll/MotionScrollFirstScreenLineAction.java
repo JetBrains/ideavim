@@ -35,7 +35,7 @@ public class MotionScrollFirstScreenLineAction extends EditorAction {
 
   private static class Handler extends EditorActionHandlerBase {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      return VimPlugin.getMotion().scrollLineToFirstScreenLine(editor, cmd.getRawCount(), cmd.getCount(), false);
+      return VimPlugin.getMotion().scrollLineToFirstScreenLine(editor, cmd.getRawCount(), false);
     }
   }
 }
