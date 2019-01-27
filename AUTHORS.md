@@ -53,6 +53,7 @@ Contributors:
 * [Vitalii Karavaev](mailto:fkve97@gmail.com)
 * [John Lin](mailto:johnlinp@gmail.com)
 * [Alex Plate](mailto:alexpl292@gmail.com)
+* [Matt Ellis](mailto:m.t.ellis@gmail.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
