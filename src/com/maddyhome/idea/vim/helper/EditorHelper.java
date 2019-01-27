@@ -22,6 +22,7 @@ import com.intellij.application.options.CodeStyle;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.*;
+import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileTypes.FileType;
@@ -223,6 +224,9 @@ public class EditorHelper {
    * @return The visual line number
    */
   public static int logicalLineToVisualLine(@NotNull final Editor editor, final int line) {
+    if (editor instanceof EditorImpl) {
+      return ((EditorImpl) editor).offsetToVisualLine(editor.getDocument().getLineStartOffset(line));
+    }
     return editor.logicalToVisualPosition(new LogicalPosition(line, 0)).line;
   }
 
