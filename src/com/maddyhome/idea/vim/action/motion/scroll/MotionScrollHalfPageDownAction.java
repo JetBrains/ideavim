@@ -35,7 +35,7 @@ public class MotionScrollHalfPageDownAction extends EditorAction {
 
   private static class Handler extends EditorActionHandlerBase {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      return VimPlugin.getMotion().scrollHalfPage(editor, 1, cmd.getRawCount());
+      return VimPlugin.getMotion().scrollScreen(editor, cmd.getRawCount(), true);
     }
   }
 }

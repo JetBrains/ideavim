@@ -35,7 +35,7 @@ public class MotionScrollLastScreenLineAction extends EditorAction {
 
   private static class Handler extends EditorActionHandlerBase {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      return VimPlugin.getMotion().scrollLineToLastScreenLine(editor, cmd.getRawCount(), cmd.getCount(), false);
+      return VimPlugin.getMotion().scrollLineToLastScreenLine(editor, cmd.getRawCount(), false);
     }
   }
 }
