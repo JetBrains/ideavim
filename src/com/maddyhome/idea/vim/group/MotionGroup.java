@@ -816,8 +816,8 @@ public class MotionGroup {
 
   // Scrolls current or [count] line to given screen location
   // In Vim, [count] refers to a file line, so it's a logical line
-  private void scrollLineToScreenLocation(@NotNull Editor editor, ScreenLocation screenLocation, int line, boolean start) {
-
+  private void scrollLineToScreenLocation(@NotNull Editor editor, @NotNull ScreenLocation screenLocation, int line,
+                                          boolean start) {
     final int scrollOffset = getNormalizedScrollOffset(editor);
 
     line = EditorHelper.normalizeLine(editor, line);
@@ -866,7 +866,8 @@ public class MotionGroup {
   }
 
   // [count] is a visual line offset, which means it's 1 based. The value is ignored for ScreenLocation.MIDDLE
-  private int moveCaretToScreenLocation(@NotNull Editor editor, ScreenLocation screenLocation, int visualLineOffset) {
+  private int moveCaretToScreenLocation(@NotNull Editor editor, @NotNull ScreenLocation screenLocation,
+                                        int visualLineOffset) {
     final int scrollOffset = getNormalizedScrollOffset(editor);
 
     int topVisualLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
@@ -1909,7 +1910,7 @@ public class MotionGroup {
   }
 
   private static class EditorMouseHandler implements EditorMouseListener, EditorMouseMotionListener {
-    public void mouseMoved(EditorMouseEvent event) {
+    public void mouseMoved(@NotNull EditorMouseEvent event) {
     }
 
     public void mouseDragged(@NotNull EditorMouseEvent event) {
@@ -1932,7 +1933,7 @@ public class MotionGroup {
       }
     }
 
-    public void mousePressed(EditorMouseEvent event) {
+    public void mousePressed(@NotNull EditorMouseEvent event) {
     }
 
     public void mouseClicked(@NotNull EditorMouseEvent event) {
@@ -1958,10 +1959,10 @@ public class MotionGroup {
       }
     }
 
-    public void mouseEntered(EditorMouseEvent event) {
+    public void mouseEntered(@NotNull EditorMouseEvent event) {
     }
 
-    public void mouseExited(EditorMouseEvent event) {
+    public void mouseExited(@NotNull EditorMouseEvent event) {
     }
 
     @Nullable
