@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
@@ -36,16 +37,26 @@ public class MotionScrollLastScreenLinePageStartAction extends EditorAction {
 
   private static class Handler extends EditorActionHandlerBase {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      int raw = cmd.getRawCount();
-      int cnt = cmd.getCount();
-      if (raw == 0) {
-        int lines = EditorHelper.getScreenHeight(editor);
 
-        return VimPlugin.getMotion().scrollLine(editor, -lines);
+      final MotionGroup motion = VimPlugin.getMotion();
+
+      int line = cmd.getRawCount();
+      if (line == 0) {
+        final int prevVisualLine = EditorHelper.getVisualLineAtTopOfScreen(editor) - 1;
+        line = EditorHelper.visualLineToLogicalLine(editor, prevVisualLine) + 1;  // rawCount is 1 based
+        return motion.scrollLineToLastScreenLine(editor, line, true);
       }
-      else {
-        return VimPlugin.getMotion().scrollLineToLastScreenLine(editor, raw, cnt, true);
+
+      // [count]z^ first scrolls [count] to the bottom of the window, then moves the caret to the line that is now at
+      // the top, and then move that line to the bottom of the window
+      line = EditorHelper.normalizeLine(editor, line);
+      if (motion.scrollLineToLastScreenLine(editor, line, true)) {
+
+        line = EditorHelper.getVisualLineAtTopOfScreen(editor);
+        line = EditorHelper.visualLineToLogicalLine(editor, line) + 1;  // rawCount is 1 based
+        return motion.scrollLineToLastScreenLine(editor, line, true);
       }
+      return false;
     }
   }
 }

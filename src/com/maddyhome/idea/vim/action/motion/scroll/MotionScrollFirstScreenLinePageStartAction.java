@@ -36,16 +36,14 @@ public class MotionScrollFirstScreenLinePageStartAction extends EditorAction {
 
   private static class Handler extends EditorActionHandlerBase {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      int raw = cmd.getRawCount();
-      int cnt = cmd.getCount();
-      if (raw == 0) {
-        int lines = EditorHelper.getScreenHeight(editor);
 
-        return VimPlugin.getMotion().scrollLine(editor, lines);
+      int line = cmd.getRawCount();
+      if (line == 0) {
+        final int nextVisualLine = EditorHelper.getVisualLineAtBottomOfScreen(editor) + 1;
+        line = EditorHelper.visualLineToLogicalLine(editor, nextVisualLine) + 1; // rawCount is 1 based
       }
-      else {
-        return VimPlugin.getMotion().scrollLineToFirstScreenLine(editor, raw, cnt, true);
-      }
+
+      return VimPlugin.getMotion().scrollLineToFirstScreenLine(editor, line, true);
     }
   }
 }
