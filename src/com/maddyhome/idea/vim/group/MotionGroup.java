@@ -73,7 +73,7 @@ public class MotionGroup {
    * Create the group
    */
   public MotionGroup() {
-    EventFacade.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
+    EventFacade.getInstance().addEditorFactoryListener(new EditorFactoryListener() {
       public void editorCreated(@NotNull EditorFactoryEvent event) {
         final Editor editor = event.getEditor();
         // This ridiculous code ensures that a lot of events are processed BEFORE we finally start listening
