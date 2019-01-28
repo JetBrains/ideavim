@@ -120,25 +120,18 @@ public class AddInlaysAction extends AnAction {
 
 
     protected class MyFontMetrics {
-
       private FontMetrics metrics;
-      private int lineHeight;
 
       MyFontMetrics(Editor editor, String familyName, int size) {
         Font font = UIUtil.getFontWithFallback(familyName, Font.PLAIN, size);
         FontRenderContext context = getCurrentContext(editor);
         metrics = FontInfo.getFontMetrics(font, context);
         // We assume this will be a better approximation to a real line height for a given font
-        lineHeight = (int)Math.ceil(font.createGlyphVector(context, "Ap").getVisualBounds().getHeight());
-      }
-
-      public Font getFont() {
-        return metrics.getFont();
       }
 
       public boolean isActual(Editor editor, String familyName, int size) {
         Font font = metrics.getFont();
-        if (familyName != font.getFamily() || size != font.getSize()) return false;
+        if (!familyName.equals(font.getFamily()) || size != font.getSize()) return false;
         FontRenderContext currentContext = getCurrentContext(editor);
         return currentContext.equals(metrics.getFontRenderContext());
       }
