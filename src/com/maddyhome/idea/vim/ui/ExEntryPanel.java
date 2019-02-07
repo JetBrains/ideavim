@@ -18,6 +18,8 @@
 
 package com.maddyhome.idea.vim.ui;
 
+import com.intellij.ide.ui.LafManager;
+import com.intellij.ide.ui.LafManagerListener;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
@@ -26,6 +28,7 @@ import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.ui.DocumentAdapter;
+import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.group.SearchGroup;
@@ -44,7 +47,7 @@ import java.awt.event.ComponentEvent;
 /**
  * This is used to enter ex commands such as searches and "colon" commands
  */
-public class ExEntryPanel extends JPanel {
+public class ExEntryPanel extends JPanel implements LafManagerListener {
   public static ExEntryPanel getInstance() {
     if (instance == null) {
       instance = new ExEntryPanel();
@@ -54,18 +57,8 @@ public class ExEntryPanel extends JPanel {
   }
 
   private ExEntryPanel() {
-    setBorder(BorderFactory.createEtchedBorder());
     label = new JLabel(" ");
     entry = new ExTextField();
-    entry.setBorder(null);
-
-    setFontForElements();
-
-    setForeground(entry.getForeground());
-    setBackground(entry.getBackground());
-
-    label.setForeground(entry.getForeground());
-    label.setBackground(entry.getBackground());
 
     GridBagLayout layout = new GridBagLayout();
     GridBagConstraints gbc = new GridBagConstraints();
@@ -79,19 +72,27 @@ public class ExEntryPanel extends JPanel {
     gbc.fill = GridBagConstraints.HORIZONTAL;
     layout.setConstraints(entry, gbc);
     add(entry);
-    setBorder(BorderFactory.createEtchedBorder());
 
     adapter = new ComponentAdapter() {
       public void componentResized(ComponentEvent e) {
         positionPanel();
       }
     };
+
+    LafManager.getInstance().addLafManagerListener(this);
+
+    updateUI();
+  }
+
+  @Override
+  public void lookAndFeelChanged(@NotNull LafManager source) {
+    // Calls updateUI on this and child components
+    IJSwingUtilities.updateComponentTreeUI(this);
   }
 
   private void setFontForElements() {
     final Font font = UiHelper.getEditorFont();
     label.setFont(font);
-    entry.setFont(font);
   }
 
   /**
@@ -131,6 +132,37 @@ public class ExEntryPanel extends JPanel {
       entry.requestFocusInWindow();
     }
     active = true;
+  }
+
+  // Called automatically when the LAF is changed and the component is visible, and manually by the LAF listener handler
+  @Override
+  public void updateUI() {
+    super.updateUI();
+
+    setBorder(BorderFactory.createEtchedBorder());
+
+    // Can be null when called from base constructor
+    //noinspection ConstantConditions
+    if (entry != null && label != null) {
+
+      setFontForElements();
+
+      // Label background is automatically picked up
+      label.setForeground(entry.getForeground());
+    }
+  }
+
+  // Entry can be null if getForeground is called during base class initialisation
+  @SuppressWarnings("ConstantConditions")
+  @Override
+  public Color getForeground() {
+    return entry != null ? entry.getForeground() : super.getForeground();
+  }
+
+  @SuppressWarnings("ConstantConditions")
+  @Override
+  public Color getBackground() {
+    return entry != null ? entry.getBackground() : super.getBackground();
   }
 
   /**

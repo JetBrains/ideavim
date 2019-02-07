@@ -18,11 +18,14 @@
 
 package com.maddyhome.idea.vim.ui;
 
+import com.intellij.ide.ui.LafManager;
+import com.intellij.ide.ui.LafManagerListener;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorFontType;
+import com.intellij.util.ui.JBUI;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.group.HistoryGroup;
 import org.jetbrains.annotations.NotNull;
@@ -42,11 +45,43 @@ import java.util.List;
  * Provides a custom keymap for the text field. The keymap is the VIM Ex command keymapping
  */
 public class ExTextField extends JTextField {
-  /**
-   */
-  public ExTextField() {
+
+  ExTextField() {
+    addFocusListener(new FocusListener() {
+      @Override
+      public void focusGained(FocusEvent e) {
+        setCaretPosition(getText().length());
+      }
+
+      @Override
+      public void focusLost(FocusEvent e) {
+      }
+    });
+  }
+
+  // Minimize margins and insets. These get added to the default margins in the UI class that we can't override.
+  // (I.e. DarculaTextFieldUI#getDefaultMargins, MacIntelliJTextFieldUI#getDefaultMargin, WinIntelliJTextFieldUI#getDefaultMargin)
+  // This is an attempt to mitigate the gap in ExEntryPanel between the label (':', '/', '?') and the text field.
+  // See VIM-1485
+  @Override
+  public Insets getMargin() {
+    return JBUI.emptyInsets();
+  }
+
+  @Override
+  public Insets getInsets() {
+    return JBUI.emptyInsets();
+  }
+
+  // Called when the LAF is changed, but only if the control is visible
+  @Override
+  public void updateUI() {
+    super.updateUI();
+
     Font font = EditorColorsManager.getInstance().getGlobalScheme().getFont(EditorFontType.PLAIN);
     setFont(font);
+
+    setBorder(null);
 
     // Do not override getActions() method, because it is has side effect: propogates these actions to defaults.
     final Action[] actions = ExEditorKit.getInstance().getActions();
@@ -61,19 +96,6 @@ public class ExTextField extends JTextField {
     loadKeymap(map, ExKeyBindings.getBindings(), actions);
     map.setDefaultAction(new ExEditorKit.DefaultExKeyHandler());
     setKeymap(map);
-    addFocusListener(new FocusListener() {
-      @Override
-      public void focusGained(FocusEvent e) {
-        setCaretPosition(getText().length());
-      }
-
-      @Override
-      public void focusLost(FocusEvent e) {
-      }
-    });
-
-    //origCaret = getCaret();
-    //blockCaret = new BlockCaret();
   }
 
   public void setType(@NotNull String type) {
