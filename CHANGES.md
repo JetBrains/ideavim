@@ -16,9 +16,14 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
-
 To Be Released
 --------------
+
+...
+
+
+0.51, 2019-02-12
+----------------
 
 * [VIM-1558](https://youtrack.jetbrains.com/issue/VIM-1558) Fixed scrolling for code with block inlays in Rider 2018.3 
 * [VIM-1187](https://youtrack.jetbrains.com/issue/VIM-1187) Improved performance of `set relativelinenumber` on large files
