@@ -173,13 +173,6 @@ public class FileGroup {
   }
 
   /**
-   * Closes all editors except for the current editor.
-   */
-  public void closeAllButCurrent(@NotNull DataContext context) {
-    KeyHandler.executeAction("CloseAllEditorsButCurrent", context);
-  }
-
-  /**
    * Closes all editors.
    */
   public void closeAllFiles(@NotNull DataContext context) {
