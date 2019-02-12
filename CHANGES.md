@@ -21,6 +21,7 @@ To Be Released
 
 * Fixed `:only` command
 * Support `:shell` command
+* [VIM-1119](https://youtrack.jetbrains.com/issue/VIM-1119) Fixed 'e' search offset
 
 
 0.51, 2019-02-12
