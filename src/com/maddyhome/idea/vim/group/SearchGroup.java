@@ -486,8 +486,13 @@ public class SearchGroup {
         pattern = p.substring(end.pointer() - p.pointer());
         if (logger.isDebugEnabled()) logger.debug("pattern=" + pattern);
         if (p.charAt() != type) {
-          logger.debug("no offset");
-          offset = "";
+          if (end.charAt() == type) {
+            end.inc();
+            offset = end.toString();
+          } else {
+            logger.debug("no offset");
+            offset = "";
+          }
         }
         else {
           p.inc();
