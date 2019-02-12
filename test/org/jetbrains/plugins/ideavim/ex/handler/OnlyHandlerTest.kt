@@ -1,4 +1,4 @@
-package org.jetbrains.plugins.ideavim.ex
+package org.jetbrains.plugins.ideavim.ex.handler
 
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimFileEditorTestCase
