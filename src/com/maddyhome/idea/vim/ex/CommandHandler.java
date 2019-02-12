@@ -23,10 +23,11 @@ import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.ExecuteMethodNotOverriddenException;
-import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.MessageHelper;
+import com.maddyhome.idea.vim.helper.Msg;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -84,6 +85,16 @@ public abstract class CommandHandler {
    * @param flags Range and Arguments commands
    */
   public CommandHandler(CommandName[] names, int flags) {
+    this(names, flags, 0, false, CaretOrder.NATIVE);
+  }
+
+  /**
+   * Create the handler
+   *
+   * @param flags Range and Arguments commands
+   * @param names A list of names this command answers to
+   */
+  public CommandHandler(int flags, CommandName... names) {
     this(names, flags, 0, false, CaretOrder.NATIVE);
   }
 

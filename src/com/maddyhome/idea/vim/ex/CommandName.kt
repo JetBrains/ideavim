@@ -16,25 +16,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.ex;
+package com.maddyhome.idea.vim.ex
 
-/**
- *
- */
-public class CommandName {
-  public CommandName(String required, String optional) {
-    this.required = required;
-    this.optional = optional;
-  }
+class CommandName(val required: String, val optional: String)
 
-  public String getRequired() {
-    return required;
-  }
-
-  public String getOptional() {
-    return optional;
-  }
-
-  private final String required;
-  private final String optional;
-}
+infix fun String.withOptional(optional: String) = CommandName(this, optional)
+fun String.noOptional() = CommandName(this, "")
