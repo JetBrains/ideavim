@@ -18,6 +18,7 @@ class OnlyHandlerTest : VimFileEditorTestCase() {
 
         typeText(commandToKeys("only"))
         TestCase.assertEquals(1, fileManager.windows.size)
+        TestCase.assertTrue(fileManager.windows[0].files.isNotEmpty())
     }
 
     fun `test short command`() {
@@ -29,6 +30,7 @@ class OnlyHandlerTest : VimFileEditorTestCase() {
 
         typeText(commandToKeys("on"))
         TestCase.assertEquals(1, fileManager.windows.size)
+        TestCase.assertTrue(fileManager.windows[0].files.isNotEmpty())
     }
 
     fun `test multiple window close`() {
@@ -42,5 +44,6 @@ class OnlyHandlerTest : VimFileEditorTestCase() {
 
         typeText(commandToKeys("only"))
         TestCase.assertEquals(1, fileManager.windows.size)
+        TestCase.assertTrue(fileManager.windows[0].files.isNotEmpty())
     }
 }

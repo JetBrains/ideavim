@@ -56,6 +56,10 @@ public class WindowGroup {
     }
   }
 
+  public void closeAll(@NotNull DataContext context) {
+    getFileEditorManager(context).closeAllFiles();
+  }
+
   public void selectNextWindow(@NotNull DataContext context) {
     final FileEditorManagerEx fileEditorManager = getFileEditorManager(context);
     final EditorWindow current = fileEditorManager.getCurrentWindow();

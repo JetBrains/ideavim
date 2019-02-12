@@ -41,8 +41,7 @@ public class ExitHandler extends CommandHandler {
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) throws ExException {
-    VimPlugin.getFile().closeAllFiles(context);
-
+    VimPlugin.getWindow().closeAll(context);
     return true;
   }
 }
