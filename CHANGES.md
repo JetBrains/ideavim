@@ -19,7 +19,7 @@ usual beta standards.
 To Be Released
 --------------
 
-...
+* Fixed `:only` command
 
 
 0.51, 2019-02-12
