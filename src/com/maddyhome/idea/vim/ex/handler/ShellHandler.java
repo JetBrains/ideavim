@@ -31,14 +31,12 @@ import org.jetbrains.annotations.NotNull;
 public class ShellHandler extends CommandHandler {
 
   public ShellHandler() {
-    super("sh", "ell", RANGE_FORBIDDEN | ARGUMENT_OPTIONAL);
+    super("sh", "ell", RANGE_FORBIDDEN | ARGUMENT_FORBIDDEN);
   }
 
   @Override
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context,
                          @NotNull ExCommand cmd) throws ExException {
-
-    KeyHandler.executeAction("ActivateTerminalToolWindow", context);
-    return true;
+    return KeyHandler.executeAction("ActivateTerminalToolWindow", context);
   }
 }

@@ -20,6 +20,7 @@ To Be Released
 --------------
 
 * Fixed `:only` command
+* Support `:shell` command
 
 
 0.51, 2019-02-12

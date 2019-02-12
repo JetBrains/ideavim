@@ -123,7 +123,6 @@ public class CommandParser {
     new WritePreviousFileHandler();
     new WriteQuitHandler();
     new YankLinesHandler();
-
     new ShellHandler();
 
     registered = true;
