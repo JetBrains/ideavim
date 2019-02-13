@@ -20,7 +20,7 @@ To Be Released
 --------------
 
 * Fixed `:only` command
-* Support `:shell` command
+* [VIM-1586](https://youtrack.jetbrains.com/issue/VIM-1586) Support `:shell` command
 * [VIM-1119](https://youtrack.jetbrains.com/issue/VIM-1119) Fixed 'e' search offset
 
 
