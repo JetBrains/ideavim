@@ -593,6 +593,11 @@
  * |:shell|               {@link com.maddyhome.idea.vim.ex.handler.ShellHandler}
  * |:sort|                {@link com.maddyhome.idea.vim.ex.handler.SortHandler}
  * |:source|              {@link com.maddyhome.idea.vim.ex.handler.SourceHandler}
+ * |:qall|                {@link com.maddyhome.idea.vim.ex.handler.ExitHandler}
+ * |:quitall|             {@link com.maddyhome.idea.vim.ex.handler.ExitHandler}
+ * |:quitall|             {@link com.maddyhome.idea.vim.ex.handler.ExitHandler}
+ * |:wqall|               {@link com.maddyhome.idea.vim.ex.handler.ExitHandler}
+ * |:xall|                {@link com.maddyhome.idea.vim.ex.handler.ExitHandler}
  * ...
  *
  * The list of supported Ex commands is incomplete.

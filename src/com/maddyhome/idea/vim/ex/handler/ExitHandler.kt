@@ -23,13 +23,15 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.withOptional
+import com.maddyhome.idea.vim.ex.commands
 
-class ExitHandler : CommandHandler(CommandHandler.DONT_REOPEN,
-        "qa" withOptional "ll",
-        "quita" withOptional "ll",
-        "wqa" withOptional "ll",
-        "xa" withOptional "ll") {
+class ExitHandler : CommandHandler(
+        commands {
+            +"qa" withOptional "ll"
+            +"quita" withOptional "ll"
+            +"wqa" withOptional "ll"
+            +"xa" withOptional "ll"
+        }, CommandHandler.DONT_REOPEN) {
 
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         VimPlugin.getWindow().closeAll(context)

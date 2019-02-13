@@ -18,7 +18,34 @@
 
 package com.maddyhome.idea.vim.ex
 
-class CommandName(val required: String, val optional: String)
+data class CommandName(val required: String, val optional: String = "")
 
-infix fun String.withOptional(optional: String) = CommandName(this, optional)
-fun String.noOptional() = CommandName(this, "")
+class CommandNameBuilder {
+    val commands = hashSetOf<CommandName>()
+
+    operator fun String.unaryPlus(): CommandName {
+        val command = CommandName(this)
+        commands.add(command)
+        return command
+    }
+
+    operator fun CommandName.unaryPlus(): CommandName {
+        commands.add(this)
+        return this
+    }
+
+    infix fun CommandName.withOptional(optional: String): CommandName {
+        val command = CommandName(this.required, optional)
+        commands.remove(this)
+        commands.add(command)
+        return command
+    }
+
+    fun build() = commands.toTypedArray()
+}
+
+inline fun commands(addCommands: CommandNameBuilder.() -> Unit): Array<CommandName> {
+    val commands = CommandNameBuilder()
+    commands.addCommands()
+    return commands.build()
+}
