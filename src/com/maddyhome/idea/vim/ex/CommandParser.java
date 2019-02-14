@@ -124,7 +124,6 @@ public class CommandParser {
     new WriteQuitHandler();
     new YankLinesHandler();
     new ShellHandler();
-
     new NextTabHandler();
     new PreviousTabHandler();
 
