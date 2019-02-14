@@ -20,6 +20,16 @@ package com.maddyhome.idea.vim.ex
 
 data class CommandName(val required: String, val optional: String = "")
 
+inline fun commands(addCommands: CommandNameBuilder.() -> Unit): Array<CommandName> {
+    val commands = CommandNameBuilder()
+    commands.addCommands()
+    return commands.build()
+}
+
+fun flags(vararg flags: Int): Int {
+    return flags.reduce { acc, i -> acc or i }
+}
+
 class CommandNameBuilder {
     val commands = hashSetOf<CommandName>()
 
@@ -42,10 +52,4 @@ class CommandNameBuilder {
     }
 
     fun build() = commands.toTypedArray()
-}
-
-inline fun commands(addCommands: CommandNameBuilder.() -> Unit): Array<CommandName> {
-    val commands = CommandNameBuilder()
-    commands.addCommands()
-    return commands.build()
 }

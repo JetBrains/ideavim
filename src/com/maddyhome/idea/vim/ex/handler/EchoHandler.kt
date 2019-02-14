@@ -20,10 +20,7 @@ package com.maddyhome.idea.vim.ex.handler
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.ExOutputModel
-import com.maddyhome.idea.vim.ex.commands
+import com.maddyhome.idea.vim.ex.*
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 
@@ -32,7 +29,7 @@ import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
  */
 class EchoHandler : CommandHandler(
         commands { +"ec" withOptional "ho" },
-        CommandHandler.RANGE_FORBIDDEN or CommandHandler.ARGUMENT_OPTIONAL
+        flags(CommandHandler.RANGE_FORBIDDEN, CommandHandler.ARGUMENT_OPTIONAL)
 ) {
 
     override fun execute(editor: Editor, context: DataContext,
