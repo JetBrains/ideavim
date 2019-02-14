@@ -57,6 +57,7 @@ Contributors:
 * [John Grib](mailto:johngrib82@gmail.com)
 * [Marcel Hild](mailto:hild@b4mad.net)
 * [Vedran Budimcic](mailto:vedranb@gmail.com)
+* [Andrei Gasparovici](mailto:andreigasparovici1@gmail.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.

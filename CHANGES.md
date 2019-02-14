@@ -21,6 +21,7 @@ To Be Released
 
 * Fixed `:only` command
 * [VIM-1586](https://youtrack.jetbrains.com/issue/VIM-1586) Support `:shell` command
+* [VIM-801](https://youtrack.jetbrains.com/issue/VIM-801) Support `:tabnext` and `:tabprevious` commands
 * [VIM-1119](https://youtrack.jetbrains.com/issue/VIM-1119) Fixed 'e' search offset
 * [VIM-1587](https://youtrack.jetbrains.com/issue/VIM-1587) Fixed end-of-line multi line percent match in visual mode
 
