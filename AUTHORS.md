@@ -56,6 +56,7 @@ Contributors:
 * [Matt Ellis](mailto:m.t.ellis@gmail.com)
 * [John Grib](mailto:johngrib82@gmail.com)
 * [Marcel Hild](mailto:hild@b4mad.net)
+* [Vedran Budimcic](mailto:vedranb@gmail.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
