@@ -176,28 +176,6 @@ class MultipleCaretsTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
-  fun testShiftLeft() {
-    val before = """qwe
-      |   r<caret>ty
-      |  asd
-      |f<caret>gh
-      |     z<caret>xc
-      |vbn
-    """.trimMargin()
-    configureByJavaText(before)
-
-    typeText(commandToKeys("<"))
-
-    val after = """qwe
-      |<caret>rty
-      |  asd
-      |<caret>fgh
-      | <caret>zxc
-      |vbn
-    """.trimMargin()
-    myFixture.checkResult(after)
-  }
-
   fun testShiftRight() {
     val before = """qw<caret>e
       |   rty
