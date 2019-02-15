@@ -16,27 +16,19 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.ex.handler;
+package com.maddyhome.idea.vim.ex.handler
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.ex.CommandHandler;
-import com.maddyhome.idea.vim.ex.CommandName;
-import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.helper.UndoRedoHelper;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.commands
+import com.maddyhome.idea.vim.ex.flags
+import com.maddyhome.idea.vim.helper.UndoRedoHelper
 
-/**
- *
- */
-public class UndoHandler extends CommandHandler {
-  public UndoHandler() {
-    super(new CommandName[]{
-      new CommandName("u", "ndo")
-    }, RANGE_FORBIDDEN | ARGUMENT_FORBIDDEN | WRITABLE);
-  }
-
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
-    return UndoRedoHelper.undo(context);
-  }
+class UndoHandler : CommandHandler(
+        commands { +"u" withOptional "ndo" },
+        flags(CommandHandler.RANGE_FORBIDDEN, CommandHandler.ARGUMENT_FORBIDDEN, CommandHandler.WRITABLE)
+) {
+    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) = UndoRedoHelper.undo(context)
 }
