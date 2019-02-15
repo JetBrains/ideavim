@@ -18,10 +18,13 @@
 
 package com.maddyhome.idea.vim.ui;
 
+import com.intellij.ide.ui.LafManager;
+import com.intellij.ide.ui.LafManagerListener;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
@@ -42,7 +45,7 @@ import java.util.List;
 /**
  * This panel displays text in a <code>more</code> like window.
  */
-public class ExOutputPanel extends JPanel {
+public class ExOutputPanel extends JPanel implements LafManagerListener {
   @NotNull private final Editor myEditor;
 
   @NotNull private final JLabel myLabel = new JLabel("more");
@@ -68,19 +71,7 @@ public class ExOutputPanel extends JPanel {
     add(myScrollPane, BorderLayout.CENTER);
     add(myLabel, BorderLayout.SOUTH);
 
-    setFontForElements();
-
-    myText.setBorder(null);
-    myScrollPane.setBorder(null);
-
-    myLabel.setForeground(myText.getForeground());
-    myLabel.setBackground(myText.getBackground());
-    setForeground(myText.getForeground());
-    setBackground(myText.getBackground());
-
     myText.setEditable(false);
-
-    setBorder(BorderFactory.createEtchedBorder());
 
     myAdapter = new ComponentAdapter() {
       public void componentResized(ComponentEvent e) {
@@ -92,6 +83,10 @@ public class ExOutputPanel extends JPanel {
     MoreKeyListener moreKeyListener = new MoreKeyListener(this);
     addKeyListener(moreKeyListener);
     myText.addKeyListener(moreKeyListener);
+
+    LafManager.getInstance().addLafManagerListener(this);
+
+    updateUI();
   }
 
   @NotNull
@@ -104,6 +99,29 @@ public class ExOutputPanel extends JPanel {
     return panel;
   }
 
+  @Override
+  public void lookAndFeelChanged(@NotNull LafManager source) {
+    // Calls updateUI on this and child components
+    IJSwingUtilities.updateComponentTreeUI(this);
+  }
+
+  // Called automatically when the LAF is changed and the component is visible, and manually by the LAF listener handler
+  @Override
+  public void updateUI() {
+    super.updateUI();
+
+    setBorder(BorderFactory.createEtchedBorder());
+
+    // Can be null when called from base constructor
+    //noinspection ConstantConditions
+    if (myText != null && myLabel != null && myScrollPane != null) {
+      setFontForElements();
+      myText.setBorder(null);
+      myScrollPane.setBorder(null);
+      myLabel.setForeground(myText.getForeground());
+    }
+  }
+
   public void setText(@NotNull String data) {
     if (data.length() > 0 && data.charAt(data.length() - 1) == '\n') {
       data = data.substring(0, data.length() - 1);
@@ -114,6 +132,18 @@ public class ExOutputPanel extends JPanel {
     if (data.length() > 0) {
       activate();
     }
+  }
+
+  @SuppressWarnings("ConstantConditions")
+  @Override
+  public Color getForeground() {
+    return myText != null ? myText.getForeground() : super.getForeground();
+  }
+
+  @SuppressWarnings("ConstantConditions")
+  @Override
+  public Color getBackground() {
+    return myText != null ? myText.getBackground() : super.getBackground();
   }
 
   /**
