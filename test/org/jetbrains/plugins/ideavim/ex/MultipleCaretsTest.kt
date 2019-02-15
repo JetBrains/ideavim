@@ -256,48 +256,4 @@ class MultipleCaretsTest : VimTestCase() {
     """.trimMargin()
     myFixture.checkResult(after)
   }
-
-  fun testSubstitute() {
-    val before = """public class C {
-      |  Stri<caret>ng a;
-      |<caret>  String b;
-      |  Stri<caret>ng c;
-      |  String d;
-      |}
-    """.trimMargin()
-    configureByJavaText(before)
-
-    typeText(commandToKeys("s/String/Integer"))
-
-    val after = """public class C {
-      |  <caret>Integer a;
-      |  <caret>Integer b;
-      |  <caret>Integer c;
-      |  String d;
-      |}
-    """.trimMargin()
-    myFixture.checkResult(after)
-  }
-
-  fun testSubstituteAllOccurrences() {
-    val before = """public class C {
-      |  Stri<caret>ng a; String e;
-      |<caret>  String b;
-      |  Stri<caret>ng c; String f;
-      |  String d;
-      |}
-    """.trimMargin()
-    configureByJavaText(before)
-
-    typeText(commandToKeys("s/String/Integer/g"))
-
-    val after = """public class C {
-      |  <caret>Integer a; Integer e;
-      |  <caret>Integer b;
-      |  <caret>Integer c; Integer f;
-      |  String d;
-      |}
-    """.trimMargin()
-    myFixture.checkResult(after)
-  }
 }
