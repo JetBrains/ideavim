@@ -15,28 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.maddyhome.idea.vim.ex.handler;
+package com.maddyhome.idea.vim.ex.handler
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.KeyHandler;
-import com.maddyhome.idea.vim.ex.CommandHandler;
-import com.maddyhome.idea.vim.ex.ExCommand;
-import com.maddyhome.idea.vim.ex.ExException;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.KeyHandler
+import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.commands
+import com.maddyhome.idea.vim.ex.flags
 
 /**
  * @author John Grib
  */
-public class ShellHandler extends CommandHandler {
-
-  public ShellHandler() {
-    super("sh", "ell", RANGE_FORBIDDEN | ARGUMENT_FORBIDDEN);
-  }
-
-  @Override
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context,
-                         @NotNull ExCommand cmd) throws ExException {
-    return KeyHandler.executeAction("ActivateTerminalToolWindow", context);
-  }
+class ShellHandler : CommandHandler(
+        commands { +"sh" withOptional "ell" },
+        flags(CommandHandler.RANGE_FORBIDDEN, CommandHandler.ARGUMENT_FORBIDDEN)
+) {
+    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) =
+            KeyHandler.executeAction("ActivateTerminalToolWindow", context)
 }
