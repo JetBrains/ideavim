@@ -30,8 +30,6 @@ class PromptFindHandler : CommandHandler(
         commands { +"pro" withOptional "mptfind" },
         flags(ARGUMENT_OPTIONAL, RANGE_FORBIDDEN)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        KeyHandler.executeAction("Find", context)
-        return true
-    }
+    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) =
+            KeyHandler.executeAction("Find", context)
 }
