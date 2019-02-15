@@ -16,29 +16,22 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.ex.handler;
+package com.maddyhome.idea.vim.ex.handler
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.ex.CommandHandler;
-import com.maddyhome.idea.vim.ex.CommandName;
-import com.maddyhome.idea.vim.ex.ExCommand;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.commands
+import com.maddyhome.idea.vim.ex.flags
 
-/**
- *
- */
-public class WriteHandler extends CommandHandler {
-  public WriteHandler() {
-    super(new CommandName[]{
-      new CommandName("w", "rite")
-    }, RANGE_OPTIONAL | ARGUMENT_OPTIONAL);
-  }
-
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
-    VimPlugin.getFile().saveFile(editor);
-
-    return true;
-  }
+class WriteHandler : CommandHandler(
+        commands { +"w" withOptional "rite" },
+        flags(CommandHandler.RANGE_OPTIONAL, CommandHandler.ARGUMENT_OPTIONAL)
+) {
+    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+        VimPlugin.getFile().saveFile(editor)
+        return true
+    }
 }
