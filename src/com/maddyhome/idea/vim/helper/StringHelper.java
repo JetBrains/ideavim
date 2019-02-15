@@ -95,6 +95,10 @@ public class StringHelper {
 
   private StringHelper() {}
 
+  /**
+   * @deprecated please use String.padEnd function of kotlin
+   */
+  @Deprecated
   @NotNull
   public static String leftJustify(@NotNull String text, int width, char fillChar) {
     final StringBuilder builder = new StringBuilder(text);
