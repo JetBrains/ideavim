@@ -253,6 +253,12 @@ public class VimSurroundExtensionTest extends VimTestCase {
     doTest(parseKeys("cst\\<b>"), before, after);
   }
 
+   public void testAddSurroundingTagWithProperties(){
+    final String before = "<p><caret>Hello</p>";
+    final String after = "<div class = \"container\"><p>Hello</p></div>";
+    doTest(parseKeys("VS<div class = \"container\">"), before, after);
+  }
+
   // TODO if/when we add proper repeat support
   //public void testRepeatChangeSurroundingParens() {
   //  final String before =

@@ -106,17 +106,19 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
     }
   }
 
-  @Nullable
-  private static Pair<String, String> inputTagPair(@NotNull Editor editor) {
-    final String tagInput = inputString(editor, "<");
-    if (tagInput.endsWith(">")) {
-      final String tagName = tagInput.substring(0, tagInput.length() - 1);
-      return Pair.create("<" + tagName + ">", "</" + tagName + ">");
-    }
-    else {
-      return null;
-    }
-  }
+      @Nullable
+      private static Pair<String, String> inputTagPair(@NotNull Editor editor) {
+        final String tagInput = inputString(editor, "<");
+        if (tagInput.endsWith(">")) {
+          final int propertiesBegin = tagInput.indexOf(' ') == -1 ? tagInput.length() - 1 : tagInput.indexOf(' ');
+          final String tagName = tagInput.substring(0, propertiesBegin);
+          final String tagProperties = tagInput.substring(propertiesBegin, tagInput.length() - 1);
+
+          return Pair.create("<" + tagName + tagProperties + ">", "</" + tagName + ">");
+        } else {
+          return null;
+        }
+      }
 
   @Nullable
   private static Pair<String, String> getOrInputPair(char c, @NotNull Editor editor) {
