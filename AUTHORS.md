@@ -58,6 +58,7 @@ Contributors:
 * [Marcel Hild](mailto:hild@b4mad.net)
 * [Vedran Budimcic](mailto:vedranb@gmail.com)
 * [Andrei Gasparovici](mailto:andreigasparovici1@gmail.com)
+* [dos65](mailto:qtankle@gmail.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
