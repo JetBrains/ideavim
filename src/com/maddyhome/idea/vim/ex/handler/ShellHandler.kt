@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.ex.flags
  * @author John Grib
  */
 class ShellHandler : CommandHandler(
-        commands { +"sh" withOptional "ell" },
+        commands("sh[ell]"),
         flags(CommandHandler.RANGE_FORBIDDEN, CommandHandler.ARGUMENT_FORBIDDEN)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) =

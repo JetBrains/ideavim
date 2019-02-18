@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 
-class DigraphHandler : CommandHandler(commands { +"dig" withOptional "raphs" }, CommandHandler.ARGUMENT_OPTIONAL) {
+class DigraphHandler : CommandHandler(commands("dig[raphs]"), CommandHandler.ARGUMENT_OPTIONAL) {
 
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         val arg = cmd.argument

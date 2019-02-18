@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class SelectLastFileHandler : CommandHandler(
-        commands { +"la" withOptional "st" },
+        commands("la[st]"),
         flags(CommandHandler.ARGUMENT_OPTIONAL or CommandHandler.DONT_REOPEN)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {

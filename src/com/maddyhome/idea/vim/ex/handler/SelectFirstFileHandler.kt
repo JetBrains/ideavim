@@ -27,10 +27,7 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class SelectFirstFileHandler : CommandHandler(
-        commands {
-            +"fir" withOptional "st"
-            +"rew" withOptional "ind"
-        },
+        commands("fir[st]", "rew[ind]"),
         flags(CommandHandler.ARGUMENT_OPTIONAL, CommandHandler.DONT_REOPEN)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {

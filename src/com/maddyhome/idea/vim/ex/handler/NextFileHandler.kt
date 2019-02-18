@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class NextFileHandler : CommandHandler(
-        commands { +"n" withOptional "ext" },
+        commands("n[ext]"),
         flags(RANGE_OPTIONAL, ARGUMENT_OPTIONAL, RANGE_IS_COUNT, DONT_REOPEN)
 ) {
 

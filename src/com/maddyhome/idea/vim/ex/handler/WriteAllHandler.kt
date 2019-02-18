@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class WriteAllHandler : CommandHandler(
-        commands { +"wa" withOptional "ll" },
+        commands("wa[ll]"),
         flags(CommandHandler.RANGE_OPTIONAL, CommandHandler.ARGUMENT_OPTIONAL)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {

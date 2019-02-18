@@ -27,11 +27,7 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class SubstituteHandler : CommandHandler(
-        commands {
-            +"s" withOptional "ubstitute"
-            +"&"
-            +"~"
-        },
+        commands("s[ubstitute]", "&", "~"),
         flags(RANGE_OPTIONAL, ARGUMENT_OPTIONAL, WRITABLE)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {

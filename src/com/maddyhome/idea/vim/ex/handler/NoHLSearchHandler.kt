@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class NoHLSearchHandler : CommandHandler(
-        commands { +"noh" withOptional "lsearch" },
+        commands("noh[lsearch]"),
         flags(ARGUMENT_FORBIDDEN, RANGE_FORBIDDEN)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {

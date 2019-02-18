@@ -30,7 +30,7 @@ import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.handler.CaretOrder
 
 class ShiftRightHandler : CommandHandler(
-        commands { +">" withOptional ">".repeat(31) },
+        commands(">[${">".repeat(31)}]"),
         flags(CommandHandler.ARGUMENT_OPTIONAL, CommandHandler.WRITABLE),
         true, CaretOrder.DECREASING_OFFSET
 ) {

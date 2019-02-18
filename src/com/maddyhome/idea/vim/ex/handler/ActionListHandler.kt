@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.helper.StringHelper
  * @author smartbomb
  */
 class ActionListHandler : CommandHandler(
-        commands { +"actionlist" },
+        commands("actionlist"),
         flags(RANGE_FORBIDDEN, DONT_REOPEN, ARGUMENT_OPTIONAL)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {

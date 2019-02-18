@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class FileHandler : CommandHandler(
-        commands { +"f" withOptional "ile" },
+        commands("f[ile]"),
         flags(CommandHandler.ARGUMENT_FORBIDDEN, CommandHandler.RANGE_FORBIDDEN, CommandHandler.RANGE_IS_COUNT)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {

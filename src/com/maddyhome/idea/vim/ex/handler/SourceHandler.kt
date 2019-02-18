@@ -32,7 +32,7 @@ import java.io.File
  * @author vlan
  */
 class SourceHandler : CommandHandler(
-        commands { +"so" withOptional "urce" },
+        commands("so[urce]"),
         flags(CommandHandler.RANGE_FORBIDDEN, CommandHandler.ARGUMENT_REQUIRED)
 ), VimScriptCommandHandler {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {

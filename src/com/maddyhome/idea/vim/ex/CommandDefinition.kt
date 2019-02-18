@@ -20,36 +20,12 @@ package com.maddyhome.idea.vim.ex
 
 data class CommandName(val required: String, val optional: String = "")
 
-inline fun commands(addCommands: CommandNameBuilder.() -> Unit): Array<CommandName> {
-    val commands = CommandNameBuilder()
-    commands.addCommands()
-    return commands.build()
-}
+private val commandPattern: Regex = "^([^\\[]+)(?:\\[([^]]+)])?\$".toRegex()
+fun commands(vararg commands: String) = commands.map { command ->
+    commandPattern.matchEntire(command)?.groupValues?.let { CommandName(it[1], it[2]) }
+            ?: throw RuntimeException("$command is invalid!")
+}.toTypedArray()
 
 fun flags(vararg flags: Int): Int {
     return flags.reduce { acc, i -> acc or i }
-}
-
-class CommandNameBuilder {
-    val commands = hashSetOf<CommandName>()
-
-    operator fun String.unaryPlus(): CommandName {
-        val command = CommandName(this)
-        commands.add(command)
-        return command
-    }
-
-    operator fun CommandName.unaryPlus(): CommandName {
-        commands.add(this)
-        return this
-    }
-
-    infix fun CommandName.withOptional(optional: String): CommandName {
-        val command = CommandName(this.required, optional)
-        commands.remove(this)
-        commands.add(command)
-        return command
-    }
-
-    fun build() = commands.toTypedArray()
 }

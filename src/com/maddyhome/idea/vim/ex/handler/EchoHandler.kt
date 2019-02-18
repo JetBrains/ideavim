@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
  * @author vlan
  */
 class EchoHandler : CommandHandler(
-        commands { +"ec" withOptional "ho" },
+        commands("ec[ho]"),
         flags(CommandHandler.RANGE_FORBIDDEN, CommandHandler.ARGUMENT_OPTIONAL)
 ) {
 

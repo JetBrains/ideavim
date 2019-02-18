@@ -27,11 +27,7 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class QuitHandler : CommandHandler(
-        commands {
-            +"q" withOptional "uit"
-            +"clo" withOptional "se"
-            +"hid" withOptional "e"
-        },
+        commands("q[uit]", "clo[se]", "hid[e]"),
         flags(CommandHandler.ARGUMENT_OPTIONAL, CommandHandler.DONT_REOPEN)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {

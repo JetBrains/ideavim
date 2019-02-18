@@ -27,11 +27,7 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class WriteQuitHandler : CommandHandler(
-        commands {
-            +"wq"
-            +"exi" withOptional "t"
-            +"x" withOptional "it"
-        },
+        commands("wq", "exi[t]", "x[it]"),
         flags(RANGE_OPTIONAL, ARGUMENT_OPTIONAL, DONT_REOPEN)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {

@@ -31,7 +31,7 @@ import java.net.URLEncoder
  * @author vlan
  */
 class HelpHandler : CommandHandler(
-        commands { +"h" withOptional "elp" },
+        commands("h[elp]"),
         CommandHandler.ARGUMENT_OPTIONAL
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {

@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class PromptFindHandler : CommandHandler(
-        commands { +"pro" withOptional "mptfind" },
+        commands("pro[mptfind]"),
         flags(ARGUMENT_OPTIONAL, RANGE_FORBIDDEN)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) =

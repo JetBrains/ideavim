@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.ex.vimscript.VimScriptCommandHandler
 import com.maddyhome.idea.vim.option.Options
 
 class SetHandler : CommandHandler(
-        commands { +"se" withOptional "t" },
+        commands("se[t]"),
         CommandHandler.ARGUMENT_OPTIONAL
 ), VimScriptCommandHandler {
 

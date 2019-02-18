@@ -9,7 +9,7 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class NextTabHandler : CommandHandler(
-        commands { +"tabn" withOptional "ext" },
+        commands("tabn[ext]"),
         flags(ARGUMENT_OPTIONAL, RANGE_FORBIDDEN)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {

@@ -27,10 +27,7 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class WritePreviousFileHandler : CommandHandler(
-        commands {
-            +"wN" withOptional "ext"
-            +"wp" withOptional "revious"
-        },
+        commands("wN[ext]", "wp[revious]"),
         flags(RANGE_OPTIONAL, ARGUMENT_OPTIONAL, RANGE_IS_COUNT)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {

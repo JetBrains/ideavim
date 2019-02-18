@@ -9,12 +9,9 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class PreviousTabHandler : CommandHandler(
-        commands {
-            +"tabp" withOptional "revious"
-            +"tabN" withOptional "ext"
-        },
-        flags(ARGUMENT_OPTIONAL, RANGE_FORBIDDEN)) {
-
+        commands("tabp[revious]", "tabN[ext]"),
+        flags(ARGUMENT_OPTIONAL, RANGE_FORBIDDEN)
+) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         VimPlugin.getMotion().moveCaretGotoPreviousTab(editor, context, cmd.argument.toIntOrNull() ?: 0)
         return true
