@@ -16,26 +16,22 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.ex.handler;
+package com.maddyhome.idea.vim.ex.handler
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.ex.CommandHandler;
-import com.maddyhome.idea.vim.ex.ExCommand;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.commands
+import com.maddyhome.idea.vim.ex.flags
 
-/**
- *
- */
-public class AsciiHandler extends CommandHandler {
-  public AsciiHandler() {
-    super("as", "cii", ARGUMENT_FORBIDDEN | RANGE_FORBIDDEN);
-  }
-
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
-    VimPlugin.getFile().displayAsciiInfo(editor);
-
-    return true;
-  }
+class AsciiHandler : CommandHandler(
+        commands("as[cii]"),
+        flags(ARGUMENT_FORBIDDEN, RANGE_FORBIDDEN)
+) {
+    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+        VimPlugin.getFile().displayAsciiInfo(editor)
+        return true
+    }
 }
