@@ -23,11 +23,13 @@ import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -65,8 +67,8 @@ public abstract class VimCommandAction extends EditorAction {
    *
    * @see com.maddyhome.idea.vim.command.Command
    */
-  public int getFlags() {
-    return 0;
+  public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.noneOf(CommandFlags.class);
   }
 
   @NotNull

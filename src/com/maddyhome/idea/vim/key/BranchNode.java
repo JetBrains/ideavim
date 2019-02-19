@@ -18,10 +18,12 @@
 
 package com.maddyhome.idea.vim.key;
 
+import com.maddyhome.idea.vim.command.CommandFlags;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.EnumSet;
 
 /**
  * This node of the key/action tree will contain one or more child nodes.
@@ -38,10 +40,10 @@ public class BranchNode extends ParentNode {
    * @param key The keystroke to get to this node
    */
   public BranchNode(KeyStroke key) {
-    this(key, 0);
+    this(key, EnumSet.noneOf(CommandFlags.class));
   }
 
-  public BranchNode(KeyStroke key, int flags) {
+  public BranchNode(KeyStroke key, EnumSet<CommandFlags> flags) {
     this.key = key;
     this.flags = flags;
   }
@@ -76,7 +78,7 @@ public class BranchNode extends ParentNode {
     return key;
   }
 
-  public int getFlags() {
+  public EnumSet<CommandFlags> getFlags() {
     return flags;
   }
 
@@ -103,5 +105,5 @@ public class BranchNode extends ParentNode {
   }
 
   protected final KeyStroke key;
-  protected final int flags;
+  protected final EnumSet<CommandFlags> flags;
 }

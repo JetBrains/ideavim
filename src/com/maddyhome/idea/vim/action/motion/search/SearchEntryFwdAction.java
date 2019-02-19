@@ -24,10 +24,12 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.EnumSet;
 
 /**
  *
@@ -53,7 +55,7 @@ public class SearchEntryFwdAction extends MotionEditorAction {
       return -1;
     }
 
-    return VimPlugin.getSearch().search(editor, caret, command, count, Command.FLAG_SEARCH_FWD, false);
+    return VimPlugin.getSearch().search(editor, caret, command, count, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false);
   }
 }
 }

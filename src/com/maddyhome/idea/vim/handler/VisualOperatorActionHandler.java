@@ -25,6 +25,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
@@ -33,6 +34,8 @@ import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.EnumSet;
 
 /**
  *
@@ -162,7 +165,7 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
         }
         if (!wasRepeat) {
           change = VimPlugin.getMotion()
-            .getVisualOperatorRange(editor, caret, cmd == null ? Command.FLAG_MOT_LINEWISE : cmd.getFlags());
+            .getVisualOperatorRange(editor, caret, cmd == null ? EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE) : cmd.getFlags());
         }
         if (logger.isDebugEnabled()) logger.debug("change=" + change);
       }
@@ -173,7 +176,7 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
     public void start() {
       logger.debug("start");
       wasRepeat = CommandState.getInstance(editor).getMode() == CommandState.Mode.REPEAT;
-      EditorData.setKeepingVisualOperatorAction(editor, (cmd.getFlags() & Command.FLAG_EXIT_VISUAL) == 0);
+      EditorData.setKeepingVisualOperatorAction(editor, !cmd.getFlags().contains(CommandFlags.FLAG_EXIT_VISUAL));
 
       if (myRunForEachCaret) {
         for (Caret caret : editor.getCaretModel().getAllCarets()) {
@@ -185,13 +188,13 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
       }
 
       // If this is a mutli key change then exit visual now
-      if (cmd != null && (cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) != 0) {
+      if (cmd.getFlags().contains(CommandFlags.FLAG_MULTIKEY_UNDO)) {
         logger.debug("multikey undo - exit visual");
         VimPlugin.getMotion().exitVisual(editor);
       }
-      else if (cmd != null && (cmd.getFlags() & Command.FLAG_FORCE_LINEWISE) != 0) {
+      else if (cmd.getFlags().contains(CommandFlags.FLAG_FORCE_LINEWISE)) {
         lastMode = CommandState.getInstance(editor).getSubMode();
-        if (lastMode != CommandState.SubMode.VISUAL_LINE && (cmd.getFlags() & Command.FLAG_FORCE_VISUAL) != 0) {
+        if (lastMode != CommandState.SubMode.VISUAL_LINE && cmd.getFlags().contains(CommandFlags.FLAG_FORCE_VISUAL)) {
           VimPlugin.getMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE);
         }
       }
@@ -199,7 +202,7 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
 
     private void finishForCaret(Caret caret) {
       if (cmd == null ||
-          ((cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) == 0 && (cmd.getFlags() & Command.FLAG_EXPECT_MORE) == 0)) {
+          (!cmd.getFlags().contains(CommandFlags.FLAG_MULTIKEY_UNDO) && !cmd.getFlags().contains(CommandFlags.FLAG_EXPECT_MORE))) {
         if (wasRepeat) {
           CaretData.setLastColumn(editor, caret, CaretData.getPreviousLastColumn(caret));
         }
@@ -216,14 +219,14 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
     public void finish() {
       logger.debug("finish");
 
-      if (cmd != null && (cmd.getFlags() & Command.FLAG_FORCE_LINEWISE) != 0) {
-        if (lastMode != CommandState.SubMode.VISUAL_LINE && (cmd.getFlags() & Command.FLAG_FORCE_VISUAL) != 0) {
+      if (cmd != null && cmd.getFlags().contains(CommandFlags.FLAG_FORCE_LINEWISE)) {
+        if (lastMode != CommandState.SubMode.VISUAL_LINE && cmd.getFlags().contains(CommandFlags.FLAG_FORCE_VISUAL)) {
           VimPlugin.getMotion().toggleVisual(editor, 1, 0, lastMode);
         }
       }
 
       if (cmd == null ||
-          ((cmd.getFlags() & Command.FLAG_MULTIKEY_UNDO) == 0 && (cmd.getFlags() & Command.FLAG_EXPECT_MORE) == 0)) {
+              !cmd.getFlags().contains(CommandFlags.FLAG_MULTIKEY_UNDO) && !cmd.getFlags().contains(CommandFlags.FLAG_EXPECT_MORE)) {
         logger.debug("not multikey undo - exit visual");
         VimPlugin.getMotion().exitVisual(editor);
       }

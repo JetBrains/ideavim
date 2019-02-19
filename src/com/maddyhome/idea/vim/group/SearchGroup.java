@@ -36,8 +36,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -453,11 +453,11 @@ public class SearchGroup {
     return ic && !(sc && StringHelper.containsUpperCase(pattern));
   }
 
-  public int search(@NotNull Editor editor, @NotNull String command, int count, int flags, boolean moveCursor) {
+  public int search(@NotNull Editor editor, @NotNull String command, int count, EnumSet<CommandFlags> flags, boolean moveCursor) {
     return search(editor, editor.getCaretModel().getPrimaryCaret(), command, count, flags, moveCursor);
   }
 
-  public int search(@NotNull Editor editor, @NotNull Caret caret, @NotNull String command, int count, int flags,
+  public int search(@NotNull Editor editor, @NotNull Caret caret, @NotNull String command, int count, EnumSet<CommandFlags> flags,
                     boolean moveCursor) {
     final int res = search(editor, command, caret.getOffset(), count, flags);
 
@@ -469,12 +469,12 @@ public class SearchGroup {
     return res;
   }
 
-  public int search(@NotNull Editor editor, @NotNull String command, int startOffset, int count, int flags) {
+  public int search(@NotNull Editor editor, @NotNull String command, int startOffset, int count, EnumSet<CommandFlags> flags) {
     int dir = 1;
     char type = '/';
     String pattern = lastSearch;
     String offset = lastOffset;
-    if ((flags & Command.FLAG_SEARCH_REV) != 0) {
+    if (flags.contains(CommandFlags.FLAG_SEARCH_REV)) {
       dir = -1;
       type = '?';
     }
@@ -792,12 +792,12 @@ public class SearchGroup {
 
     int ppos = pp.getIndex();
     if (ppos < lastOffset.length() - 1 && lastOffset.charAt(ppos) == ';') {
-      int flags;
+      EnumSet<CommandFlags> flags = EnumSet.noneOf(CommandFlags.class);
       if (lastOffset.charAt(ppos + 1) == '/') {
-        flags = Command.FLAG_SEARCH_FWD;
+        flags.add(CommandFlags.FLAG_SEARCH_FWD);
       }
       else if (lastOffset.charAt(ppos + 1) == '?') {
-        flags = Command.FLAG_SEARCH_REV;
+        flags.add(CommandFlags.FLAG_SEARCH_REV);
       }
       else {
         return res;

@@ -58,6 +58,7 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.EnumSet;
 
 /**
  * This handles all motion related commands and marks
@@ -233,7 +234,7 @@ public class MotionGroup {
       setVisualMode(editor, CommandState.SubMode.VISUAL_LINE);
 
       final Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-      VisualChange range = getVisualOperatorRange(editor, primaryCaret, Command.FLAG_MOT_LINEWISE);
+      VisualChange range = getVisualOperatorRange(editor, primaryCaret, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE));
       if (range.getLines() > 1) {
         MotionGroup.moveCaret(editor, primaryCaret,
                               moveCaretVertical(editor, primaryCaret, -1));
@@ -380,8 +381,8 @@ public class MotionGroup {
 
     // If we are a linewise motion we need to normalize the start and stop then move the start to the beginning
     // of the line and move the end to the end of the line.
-    int flags = cmd.getFlags();
-    if ((flags & Command.FLAG_MOT_LINEWISE) != 0) {
+    EnumSet<CommandFlags> flags = cmd.getFlags();
+    if (flags.contains(CommandFlags.FLAG_MOT_LINEWISE)) {
       if (start > end) {
         int t = start;
         start = end;
@@ -393,7 +394,7 @@ public class MotionGroup {
           .min(EditorHelper.getLineEndForOffset(editor, end) + (incNewline ? 1 : 0), EditorHelper.getFileSize(editor));
     }
     // If characterwise and inclusive, add the last character to the range
-    else if ((flags & Command.FLAG_MOT_INCLUSIVE) != 0) {
+    else if (flags.contains(CommandFlags.FLAG_MOT_INCLUSIVE)) {
       end++;
     }
 
@@ -1338,7 +1339,7 @@ public class MotionGroup {
     final CommandState commandState = CommandState.getInstance(editor);
     if (commandState.getMode() == CommandState.Mode.VISUAL) {
       final Command command = commandState.getCommand();
-      return command == null || (command.getFlags() & Command.FLAG_EXIT_VISUAL) == 0;
+      return command == null || !command.getFlags().contains(CommandFlags.FLAG_EXIT_VISUAL);
     }
     return false;
   }
@@ -1373,7 +1374,7 @@ public class MotionGroup {
   }
 
   private static void scrollCaretIntoView(@NotNull Editor editor) {
-    final boolean scrollJump = (CommandState.getInstance(editor).getFlags() & Command.FLAG_IGNORE_SCROLL_JUMP) == 0;
+    final boolean scrollJump = !CommandState.getInstance(editor).getFlags().contains(CommandFlags.FLAG_IGNORE_SCROLL_JUMP);
     scrollPositionIntoView(editor, editor.getCaretModel().getVisualPosition(), scrollJump);
   }
 
@@ -1432,7 +1433,7 @@ public class MotionGroup {
 
     int visualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
     int width = EditorHelper.getScreenWidth(editor);
-    scrollJump = (CommandState.getInstance(editor).getFlags() & Command.FLAG_IGNORE_SIDE_SCROLL_JUMP) == 0;
+    scrollJump = !CommandState.getInstance(editor).getFlags().contains(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP);
     scrollOffset = ((NumberOption) Options.getInstance().getOption("sidescrolloff")).value();
     scrollJumpSize = 0;
     if (scrollJump) {
@@ -1703,7 +1704,7 @@ public class MotionGroup {
   }
 
   @NotNull
-  public VisualChange getVisualOperatorRange(@NotNull Editor editor, @NotNull Caret caret, int cmdFlags) {
+  public VisualChange getVisualOperatorRange(@NotNull Editor editor, @NotNull Caret caret, EnumSet<CommandFlags> cmdFlags) {
     int start = CaretData.getVisualStart(caret);
     int end = CaretData.getVisualEnd(caret);
 
@@ -1726,7 +1727,7 @@ public class MotionGroup {
     int chars;
     SelectionType type;
     if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_LINE ||
-        (cmdFlags & Command.FLAG_MOT_LINEWISE) != 0) {
+        cmdFlags.contains(CommandFlags.FLAG_MOT_LINEWISE)) {
       chars = ep.column;
       type = SelectionType.LINE_WISE;
     }

@@ -22,7 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.ex.CommandHandler;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.ExException;
@@ -30,6 +30,8 @@ import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.EnumSet;
 
 /**
  * This handles Ex commands that just specify a range which translates to moving the cursor to the line given by the
@@ -40,7 +42,7 @@ public class GotoLineHandler extends CommandHandler {
    * Create the handler
    */
   public GotoLineHandler() {
-    super(RANGE_REQUIRED | ARGUMENT_OPTIONAL, Command.FLAG_MOT_EXCLUSIVE, true, CaretOrder.DECREASING_OFFSET);
+    super(RANGE_REQUIRED | ARGUMENT_OPTIONAL, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE), true, CaretOrder.DECREASING_OFFSET);
   }
 
   /**

@@ -61,10 +61,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Provides all the insert/replace related functionality
@@ -427,7 +424,7 @@ public class ChangeGroup {
       if (mode == CommandState.Mode.REPLACE) {
         setInsertEditorState(editor, false);
       }
-      if ((cmd.getFlags() & Command.FLAG_NO_REPEAT) != 0) {
+      if (cmd.getFlags().contains(CommandFlags.FLAG_NO_REPEAT)) {
         repeatInsert(editor, context, 1, false);
       }
       else {
@@ -618,7 +615,7 @@ public class ChangeGroup {
       setInsertEditorState(editor, true);
     }
 
-    if (lastInsert != null && (lastInsert.getFlags() & Command.FLAG_NO_REPEAT) != 0) {
+    if (lastInsert != null && (lastInsert.getFlags().contains(CommandFlags.FLAG_NO_REPEAT))) {
       cnt = 1;
     }
 
@@ -760,10 +757,10 @@ public class ChangeGroup {
    */
   public void processCommand(@NotNull Editor editor, @NotNull Command cmd) {
     // return value never used here
-    if ((cmd.getFlags() & Command.FLAG_SAVE_STROKE) != 0) {
+    if (cmd.getFlags().contains(CommandFlags.FLAG_SAVE_STROKE)) {
       strokes.add(cmd.getAction());
     }
-    else if ((cmd.getFlags() & Command.FLAG_CLEAR_STROKES) != 0) {
+    else if (cmd.getFlags().contains(CommandFlags.FLAG_CLEAR_STROKES)) {
       clearStrokes(editor);
     }
   }
@@ -1000,17 +997,16 @@ public class ChangeGroup {
     if (motion == null) {
       return false;
     }
-    if (!isChange && (motion.getFlags() & Command.FLAG_MOT_LINEWISE) == 0) {
+    if (!isChange && !motion.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE)) {
       LogicalPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
       LogicalPosition end = editor.offsetToLogicalPosition(range.getEndOffset());
       if (start.line != end.line) {
         if (!SearchHelper.anyNonWhitespace(editor, range.getStartOffset(), -1) &&
             !SearchHelper.anyNonWhitespace(editor, range.getEndOffset(), 1)) {
-          int flags = motion.getFlags();
-          flags &= ~Command.FLAG_MOT_EXCLUSIVE;
-          flags &= ~Command.FLAG_MOT_INCLUSIVE;
-          flags |= Command.FLAG_MOT_LINEWISE;
-          motion.setFlags(flags);
+          EnumSet<CommandFlags> flags = motion.getFlags();
+          flags.remove(CommandFlags.FLAG_MOT_EXCLUSIVE);
+          flags.remove(CommandFlags.FLAG_MOT_INCLUSIVE);
+          flags.add(CommandFlags.FLAG_MOT_LINEWISE);
         }
       }
     }
@@ -1268,17 +1264,17 @@ public class ChangeGroup {
         case VIM_MOTION_WORD_RIGHT:
           kludge = true;
           motion.setAction(ActionManager.getInstance().getAction(VIM_MOTION_WORD_END_RIGHT));
-          motion.setFlags(Command.FLAG_MOT_INCLUSIVE);
+          motion.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE));
           break;
         case VIM_MOTION_BIG_WORD_RIGHT:
           kludge = true;
           motion.setAction(ActionManager.getInstance().getAction(VIM_MOTION_BIG_WORD_END_RIGHT));
-          motion.setFlags(Command.FLAG_MOT_INCLUSIVE);
+          motion.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE));
           break;
         case VIM_MOTION_CAMEL_RIGHT:
           kludge = true;
           motion.setAction(ActionManager.getInstance().getAction(VIM_MOTION_CAMEL_END_RIGHT));
-          motion.setFlags(Command.FLAG_MOT_INCLUSIVE);
+          motion.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE));
           break;
       }
     }
@@ -1304,7 +1300,7 @@ public class ChangeGroup {
           motion.setCount(motion.getCount() - 1);
         }
         else {
-          motion.setFlags(Command.FLAG_MOT_EXCLUSIVE);
+          motion.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE));
         }
       }
     }

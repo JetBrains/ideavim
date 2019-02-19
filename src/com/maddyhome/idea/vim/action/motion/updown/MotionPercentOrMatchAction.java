@@ -25,9 +25,12 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.EnumSet;
 
 /**
  */
@@ -54,10 +57,10 @@ public class MotionPercentOrMatchAction extends MotionEditorAction {
 
     public void process(@NotNull Command cmd) {
       if (cmd.getRawCount() == 0) {
-        cmd.setFlags(Command.FLAG_MOT_INCLUSIVE);
+        cmd.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE));
       }
       else {
-        cmd.setFlags(Command.FLAG_MOT_LINEWISE);
+        cmd.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE));
       }
     }
   }

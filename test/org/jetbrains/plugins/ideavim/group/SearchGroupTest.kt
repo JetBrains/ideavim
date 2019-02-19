@@ -3,12 +3,13 @@ package org.jetbrains.plugins.ideavim.group
 import com.intellij.openapi.util.Ref
 import com.intellij.testFramework.UsefulTestCase
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.helper.RunnableHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.Options
 import com.maddyhome.idea.vim.option.ToggleOption
 import org.jetbrains.plugins.ideavim.VimTestCase
+import java.util.*
 
 /**
  * @author Alex Plate
@@ -232,7 +233,7 @@ class SearchGroupTest : VimTestCase() {
         val searchGroup = VimPlugin.getSearch()
         val ref = Ref.create(-1)
         RunnableHelper.runReadCommand(project, {
-            val n = searchGroup.search(editor, pattern, 1, Command.FLAG_SEARCH_FWD, false)
+            val n = searchGroup.search(editor, pattern, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
             ref.set(n)
         }, null, null)
         return ref.get()

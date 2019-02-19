@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.key.OperatorFunction;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -93,7 +94,7 @@ public class OperatorAction extends VimCommandAction {
   }
 
   @Override
-  public int getFlags() {
-    return Command.FLAG_OP_PEND;
+  public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_OP_PEND);
   }
 }

@@ -30,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Stack;
 
@@ -45,7 +46,7 @@ public class CommandState {
   @NotNull private ParentNode myCurrentNode = VimPlugin.getKey().getKeyRoot(getMappingMode());
   @NotNull private final List<KeyStroke> myMappingKeys = new ArrayList<KeyStroke>();
   @NotNull private final Timer myMappingTimer;
-  private int myFlags;
+  private EnumSet<CommandFlags> myFlags = EnumSet.noneOf(CommandFlags.class);
   private boolean myIsRecording = false;
 
   private CommandState() {
@@ -105,11 +106,11 @@ public class CommandState {
     setFlags(cmd.getFlags());
   }
 
-  public int getFlags() {
+  public EnumSet<CommandFlags> getFlags() {
     return myFlags;
   }
 
-  public void setFlags(int flags) {
+  public void setFlags(EnumSet<CommandFlags> flags) {
     this.myFlags = flags;
   }
 

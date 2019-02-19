@@ -34,6 +34,7 @@ public class FilterCountLinesAction extends EditorAction {
   }
 
   private static class Handler extends EditorActionHandlerBase {
+    @Override
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       VimPlugin.getProcess().startFilterCommand(editor, context, cmd);
 
