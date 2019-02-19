@@ -43,6 +43,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.*;
 
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.*;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -109,9 +110,13 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
   @Nullable
   private static Pair<String, String> inputTagPair(@NotNull Editor editor) {
     final String tagInput = inputString(editor, "<");
-    if (tagInput.endsWith(">")) {
-      final String tagName = tagInput.substring(0, tagInput.length() - 1);
-      return Pair.create("<" + tagName + ">", "</" + tagName + ">");
+    final Pattern tagNameAndAttributesCapturePattern = Pattern.compile("(\\w+)([^>]*)>");
+    final Matcher matcher = tagNameAndAttributesCapturePattern.matcher(tagInput);
+
+    if (matcher.find()) {
+      final String tagName = matcher.group(1);
+      final String tagAttributes = matcher.group(2);
+      return Pair.create("<" + tagName + tagAttributes + ">", "</" + tagName + ">");
     }
     else {
       return null;
