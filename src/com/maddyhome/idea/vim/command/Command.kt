@@ -28,7 +28,7 @@ class Command(
     }
 
     var count: Int
-        get() = if (rawCount == 0) 1 else rawCount
+        get() = rawCount.coerceAtLeast(1)
         set(value) {
             rawCount = value
         }
