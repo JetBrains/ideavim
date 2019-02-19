@@ -82,10 +82,18 @@ public class VimSurroundExtensionTest extends VimTestCase {
     myFixture.checkResult("Hello <em>World</em>!\n");
   }
 
+  // VIM-1569
   public void testSurroundTagWithAttributes() {
     configureByText("Hello <caret>World!");
     typeText(parseKeys("ysiw\\<span class=\"important\" data-foo=\"bar\">"));
     myFixture.checkResult("Hello <span class=\"important\" data-foo=\"bar\">World</span>!");
+  }
+
+  // VIM-1569
+  public void testSurraungTagAsInIssue(){
+    configureByText("<p><caret>Hello</p>");
+    typeText(parseKeys("VS<div class = \"container\">"));
+    myFixture.checkResult("<div class = \"container\"><p>Hello</p></div>");
   }
 
   /* visual surround */

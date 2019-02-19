@@ -59,6 +59,7 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 public class VimSurroundExtension extends VimNonDisposableExtension {
 
   private static final char REGISTER = '"';
+  private final static Pattern tagNameAndAttributesCapturePattern = Pattern.compile("(\\w+)([^>]*)>");
 
   private static final Map<Character, Pair<String, String>> SURROUND_PAIRS = ImmutableMap.<Character, Pair<String, String>>builder()
     .put('b', Pair.create("(", ")"))
@@ -110,7 +111,6 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
   @Nullable
   private static Pair<String, String> inputTagPair(@NotNull Editor editor) {
     final String tagInput = inputString(editor, "<");
-    final Pattern tagNameAndAttributesCapturePattern = Pattern.compile("(\\w+)([^>]*)>");
     final Matcher matcher = tagNameAndAttributesCapturePattern.matcher(tagInput);
 
     if (matcher.find()) {
