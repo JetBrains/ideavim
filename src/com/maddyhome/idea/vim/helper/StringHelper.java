@@ -108,6 +108,10 @@ public class StringHelper {
     return builder.toString();
   }
 
+  /**
+   * @deprecated please use String.padStart function of kotlin
+   */
+  @Deprecated
   @NotNull
   public static String rightJustify(@NotNull String text, int width, char fillChar) {
     final StringBuilder builder = new StringBuilder(text);
