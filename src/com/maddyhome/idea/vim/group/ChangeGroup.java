@@ -1808,6 +1808,42 @@ public class ChangeGroup {
     }
   }
 
+  /**
+   * Perform increment and decrement for numbers in visual mode
+   *
+   * Flag [avalanche] marks if increment (or decrement) should be performed in avalanche mode
+   * (for v_g_Ctrl-A and v_g_Ctrl-X commands)
+   *
+   * @return true
+   */
+  public boolean changeNumberVisualMode(@NotNull final Editor editor, @NotNull Caret caret,
+                                        @NotNull TextRange selectedRange, final int count, boolean avalanche) {
+    BoundListOption nf = (BoundListOption) Options.getInstance().getOption("nrformats");
+    boolean alpha = nf.contains("alpha");
+    boolean hex = nf.contains("hex");
+    boolean octal = nf.contains("octal");
+
+    List<TextRange> numberRanges = SearchHelper.findNumbersInRange(editor, selectedRange, alpha, hex, octal);
+
+    List<String> newNumbers = new ArrayList<>();
+    for (int i = 0; i < numberRanges.size(); i++) {
+      TextRange numberRange = numberRanges.get(i);
+      int iCount = avalanche ? (i + 1) * count : count;
+      String newNumber = changeNumberInRange(editor, numberRange, iCount, alpha, hex, octal);
+      newNumbers.add(newNumber);
+    }
+
+    for (int i = newNumbers.size() - 1; i >= 0; i--) {
+      // Replace text bottom up. In other direction ranges will be desynchronized after inc numbers like 99
+      TextRange rangeToReplace = numberRanges.get(i);
+      String newNumber = newNumbers.get(i);
+      replaceText(editor, rangeToReplace.getStartOffset(), rangeToReplace.getEndOffset(), newNumber);
+    }
+
+    caret.moveToOffset(selectedRange.getStartOffset());
+    return true;
+  }
+
   public boolean changeNumber(@NotNull final Editor editor, @NotNull Caret caret, final int count) {
     final BoundListOption nf = (BoundListOption)Options.getInstance().getOption("nrformats");
     final boolean alpha = nf.contains("alpha");
@@ -1819,82 +1855,89 @@ public class ChangeGroup {
       logger.debug("no number on line");
       return false;
     }
-    else {
-      String text = EditorHelper.getText(editor, range);
-      if (logger.isDebugEnabled()) {
-        logger.debug("found range " + range);
-        logger.debug("text=" + text);
-      }
-      String number = text;
-      if (text.length() == 0) {
-        return false;
-      }
 
-      char ch = text.charAt(0);
-      if (hex && text.toLowerCase().startsWith("0x")) {
-        for (int i = text.length() - 1; i >= 2; i--) {
-          int index = "abcdefABCDEF".indexOf(text.charAt(i));
-          if (index >= 0) {
-            lastLower = index < 6;
-            break;
-          }
-        }
-
-        int num = (int)Long.parseLong(text.substring(2), 16);
-        num += count;
-        number = Integer.toHexString(num);
-        number = StringHelper.rightJustify(number, text.length() - 2, '0');
-
-        if (!lastLower) {
-          number = number.toUpperCase();
-        }
-
-        number = text.substring(0, 2) + number;
-      }
-      else if (octal && text.startsWith("0") && text.length() > 1) {
-        int num = (int)Long.parseLong(text, 8);
-        num += count;
-        number = Integer.toOctalString(num);
-        number = "0" + StringHelper.rightJustify(number, text.length() - 1, '0');
-      }
-      else if (alpha && Character.isLetter(ch)) {
-        ch += count;
-        if (Character.isLetter(ch)) {
-          number = "" + ch;
-        }
-      }
-      else if (ch == '-' || Character.isDigit(ch)) {
-        boolean pad = ch == '0';
-        int len = text.length();
-        if (ch == '-' && text.charAt(1) == '0') {
-          pad = true;
-          len--;
-        }
-
-        int num = Integer.parseInt(text);
-        num += count;
-        number = Integer.toString(num);
-
-        if (!octal && pad) {
-          boolean neg = false;
-          if (number.charAt(0) == '-') {
-            neg = true;
-            number = number.substring(1);
-          }
-          number = StringHelper.rightJustify(number, len, '0');
-          if (neg) {
-            number = "-" + number;
-          }
-        }
-      }
-
-      if (!text.equals(number)) {
-        replaceText(editor, range.getStartOffset(), range.getEndOffset(), number);
-        caret.moveToOffset(range.getStartOffset() + number.length() - 1);
-      }
-
+    String newNumber = changeNumberInRange(editor, range, count, alpha, hex, octal);
+    if (newNumber == null) {
+      return false;
+    } else {
+      replaceText(editor, range.getStartOffset(), range.getEndOffset(), newNumber);
+      caret.moveToOffset(range.getStartOffset() + newNumber.length() - 1);
       return true;
     }
+  }
+
+  @Nullable
+  public String changeNumberInRange(@NotNull final Editor editor, @NotNull TextRange range, final int count,
+                                     boolean alpha, boolean hex, boolean octal) {
+    String text = EditorHelper.getText(editor, range);
+    if (logger.isDebugEnabled()) {
+      logger.debug("found range " + range);
+      logger.debug("text=" + text);
+    }
+    String number = text;
+    if (text.length() == 0) {
+      return null;
+    }
+
+    char ch = text.charAt(0);
+    if (hex && text.toLowerCase().startsWith("0x")) {
+      for (int i = text.length() - 1; i >= 2; i--) {
+        int index = "abcdefABCDEF".indexOf(text.charAt(i));
+        if (index >= 0) {
+          lastLower = index < 6;
+          break;
+        }
+      }
+
+      int num = (int)Long.parseLong(text.substring(2), 16);
+      num += count;
+      number = Integer.toHexString(num);
+      number = StringHelper.rightJustify(number, text.length() - 2, '0');
+
+      if (!lastLower) {
+        number = number.toUpperCase();
+      }
+
+      number = text.substring(0, 2) + number;
+    }
+    else if (octal && text.startsWith("0") && text.length() > 1) {
+      int num = (int)Long.parseLong(text, 8);
+      num += count;
+      number = Integer.toOctalString(num);
+      number = "0" + StringHelper.rightJustify(number, text.length() - 1, '0');
+    }
+    else if (alpha && Character.isLetter(ch)) {
+      ch += count;
+      if (Character.isLetter(ch)) {
+        number = "" + ch;
+      }
+    }
+    else if (ch == '-' || Character.isDigit(ch)) {
+      boolean pad = ch == '0';
+      int len = text.length();
+      if (ch == '-' && text.charAt(1) == '0') {
+        pad = true;
+        len--;
+      }
+
+      int num = Integer.parseInt(text);
+      num += count;
+      number = Integer.toString(num);
+
+      if (!octal && pad) {
+        boolean neg = false;
+        if (number.charAt(0) == '-') {
+          neg = true;
+          number = number.substring(1);
+        }
+        number = StringHelper.rightJustify(number, len, '0');
+        if (neg) {
+          number = "-" + number;
+        }
+      }
+    }
+
+    return number;
   }
 
   private void exitAllSingleCommandInsertModes(@NotNull Editor editor) {
