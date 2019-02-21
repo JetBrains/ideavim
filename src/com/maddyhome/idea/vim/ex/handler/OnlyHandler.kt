@@ -16,28 +16,21 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.ex.handler;
+package com.maddyhome.idea.vim.ex.handler
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.ex.CommandHandler;
-import com.maddyhome.idea.vim.ex.CommandName;
-import com.maddyhome.idea.vim.ex.ExCommand;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandHandler.*
+import com.maddyhome.idea.vim.ex.CommandName
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.commands
 
-/**
- *
- */
-public class OnlyHandler extends CommandHandler {
-  public OnlyHandler() {
-    super(new CommandName[]{
-      new CommandName("on", "ly")
-    }, ARGUMENT_OPTIONAL);
-  }
+class OnlyHandler : CommandHandler(commands("on[ly]"), ARGUMENT_OPTIONAL) {
 
-  public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull ExCommand cmd) {
-    VimPlugin.getWindow().closeAllExceptCurrent(context);
-    return true;
-  }
+    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+        VimPlugin.getWindow().closeAllExceptCurrent(context)
+        return true
+    }
 }
