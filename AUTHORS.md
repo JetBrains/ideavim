@@ -5,9 +5,10 @@ The original author:
 
 * [Rick Maddy](mailto:rmaddy@maddyhome.com)
 
-The current maintainer:
+The current maintainers:
 
 * [Andrey Vlasovskikh](mailto:andrey.vlasovskikh@gmail.com)
+* [Alex Plate](mailto:alexpl292@gmail.com)
 
 Previous maintainers:
 
@@ -60,6 +61,7 @@ Contributors:
 * [Andrei Gasparovici](mailto:andreigasparovici1@gmail.com)
 * [dos65](mailto:qtankle@gmail.com)
 * [Tony Arra](mailto:ttonyarra@gmail.com)
+* [Brad Ziolko](mailto:bradziolko@gmail.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
