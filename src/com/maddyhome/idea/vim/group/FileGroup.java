@@ -26,7 +26,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.fileEditor.*;
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
-import com.intellij.openapi.fileEditor.impl.EditorTabbedContainer;
 import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
@@ -152,21 +151,10 @@ public class FileGroup {
     if (project != null) {
       final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
       final EditorWindow window = fileEditorManager.getCurrentWindow();
-      final EditorTabbedContainer tabbedPane = window.getTabbedPane();
-      if (tabbedPane != null) {
-        if (tabbedPane.getTabCount() > 1) {
-          final int index = tabbedPane.getSelectedIndex();
-          tabbedPane.removeTabAt(index, index + 1);
-        }
-        else {
-          tabbedPane.close();
-        }
-      }
-      else {
-        VirtualFile virtualFile = EditorData.getVirtualFile(editor);
-        if (virtualFile != null) {
-          fileEditorManager.closeFile(virtualFile);
-        }
+      final VirtualFile virtualFile = EditorData.getVirtualFile(editor);
+
+      if (virtualFile != null) {
+        window.closeFile(virtualFile);
       }
     }
   }
