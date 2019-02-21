@@ -8,18 +8,19 @@ IdeaVim
 </div>
 
 <div>
-  <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_Build&guest=1">
-    <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_Build)/statusIcon.svg?guest=1"/>
+  <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_Deploy&guest=1">
+    <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_Deploy)/statusIcon.svg?guest=1"/>
   </a>
-  <span>Build<span>
+  <span>Stable</span>
 </div>
 
 <div>
-  <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20182&guest=1">
-    <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20182)/statusIcon.svg?guest=1"/>
+  <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_Build&guest=1">
+    <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_Build)/statusIcon.svg?guest=1"/>
   </a>
-  <span>Tests</span>
+  <span>EAP</span>
 </div>
+
 
 IdeaVim is a Vim emulation plugin for IDEs based on the IntelliJ platform.
 IdeaVim can be used with IntelliJ IDEA, PyCharm, CLion, PhpStorm, WebStorm,

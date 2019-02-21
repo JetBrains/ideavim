@@ -1,3 +1,17 @@
+<div>
+  <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20183&guest=1">
+    <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20183)/statusIcon.svg?guest=1"/>
+  </a>
+  <span>2018.3 Tests</span>
+</div>
+<div>
+  <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20191&guest=1">
+    <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20191)/statusIcon.svg?guest=1"/>
+  </a>
+  <span>2019.1 Tests</span>
+</div>
+
+
 ### Where to Start
 
 In order to contribute to IdeaVim you should have some understanding of Java or [Kotlin](https://kotlinlang.org/).
