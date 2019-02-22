@@ -8,7 +8,13 @@
     <JavaCodeStyleSettings>
       <option name="FIELD_NAME_PREFIX" value="my" />
       <option name="STATIC_FIELD_NAME_PREFIX" value="our" />
+      <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="999999999" />
+      <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99999999" />
     </JavaCodeStyleSettings>
+    <JetCodeStyleSettings>
+      <option name="NAME_COUNT_TO_USE_STAR_IMPORT" value="2147483647" />
+      <option name="NAME_COUNT_TO_USE_STAR_IMPORT_FOR_MEMBERS" value="2147483647" />
+    </JetCodeStyleSettings>
     <XML>
       <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
     </XML>
