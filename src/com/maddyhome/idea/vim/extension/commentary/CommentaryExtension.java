@@ -4,6 +4,7 @@ import com.intellij.codeInsight.actions.MultiCaretCodeInsightActionHandler;
 import com.intellij.codeInsight.generation.CommentByBlockCommentHandler;
 import com.intellij.codeInsight.generation.CommentByLineCommentHandler;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
@@ -65,10 +66,11 @@ public class CommentaryExtension extends VimNonDisposableExtension {
         return;
       }
 
-      // Leave visual mode
-      executeNormal(parseKeys("<Esc>"), editor);
-
-      editor.getCaretModel().moveToOffset(visualRange.getStartOffset());
+      WriteAction.run(() -> {
+        // Leave visual mode
+        executeNormal(parseKeys("<Esc>"), editor);
+        editor.getCaretModel().moveToOffset(visualRange.getStartOffset());
+      });
     }
   }
 
@@ -87,23 +89,25 @@ public class CommentaryExtension extends VimNonDisposableExtension {
           ? new CommentByBlockCommentHandler()
           : new CommentByLineCommentHandler();
 
-      try {
-        Project proj = editor.getProject();
-        if (proj == null) return false;
+      return WriteAction.compute(() -> {
+        try {
+          Project proj = editor.getProject();
+          if (proj == null) return false;
 
-        PsiFile file = PsiDocumentManager.getInstance(proj).getPsiFile(editor.getDocument());
-        if (file == null) return false;
+          PsiFile file = PsiDocumentManager.getInstance(proj).getPsiFile(editor.getDocument());
+          if (file == null) return false;
 
-        handler.invoke(editor.getProject(), editor, editor.getCaretModel().getCurrentCaret(), file);
-        handler.postInvoke();
+          handler.invoke(editor.getProject(), editor, editor.getCaretModel().getCurrentCaret(), file);
+          handler.postInvoke();
 
-        // Jump back to start
-        executeNormal(parseKeys("`["), editor);
-        return true;
-      } finally {
-        // remove the selection
-        editor.getSelectionModel().removeSelection();
-      }
+          // Jump back to start
+          executeNormal(parseKeys("`["), editor);
+          return true;
+        } finally {
+          // remove the selection
+          editor.getSelectionModel().removeSelection();
+        }
+      });
     }
 
     @Nullable
