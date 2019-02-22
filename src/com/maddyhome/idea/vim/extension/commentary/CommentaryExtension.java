@@ -100,14 +100,10 @@ public class CommentaryExtension extends VimNonDisposableExtension {
         // Jump back to start
         executeNormal(parseKeys("`["), editor);
         return true;
-      } catch (RuntimeException e) {
-        e.printStackTrace(); // ???
       } finally {
         // remove the selection
         editor.getSelectionModel().removeSelection();
       }
-
-      return true;
     }
 
     @Nullable
