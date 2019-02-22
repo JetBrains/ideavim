@@ -1,7 +1,7 @@
 <component name="CopyrightManager">
-  <settings default="IdeaVIM">
+  <settings default="IdeaVim">
     <module2copyright>
-      <element module="Copyright scope" copyright="IdeaVIM" />
+      <element module="Copyright scope" copyright="IdeaVim" />
     </module2copyright>
   </settings>
 </component>
