@@ -309,12 +309,7 @@ public class KeyHandler {
             // post to end of queue so it's handled AFTER
             //  an <Plug> mapping is invoked (since that
             //  will also get posted)
-            Runnable handleRemainingKey = new Runnable() {
-              @Override
-              public void run() {
-                handleKey(editor, key, currentContext);
-              }
-            };
+            Runnable handleRemainingKey = () -> handleKey(editor, key, currentContext);
 
             if (application.isUnitTestMode()) {
               handleRemainingKey.run();
