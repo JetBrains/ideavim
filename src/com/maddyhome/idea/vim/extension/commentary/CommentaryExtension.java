@@ -100,8 +100,10 @@ public class CommentaryExtension extends VimNonDisposableExtension {
           handler.invoke(editor.getProject(), editor, editor.getCaretModel().getCurrentCaret(), file);
           handler.postInvoke();
 
-          // Jump back to start
-          executeNormal(parseKeys("`["), editor);
+          // Jump back to start if in block mode
+          if (selectionType == SelectionType.CHARACTER_WISE) {
+            executeNormal(parseKeys("`["), editor);
+          }
           return true;
         } finally {
           // remove the selection
