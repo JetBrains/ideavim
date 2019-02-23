@@ -47,7 +47,7 @@ public class CommentaryExtensionTest extends JavaVimTestCase {
   public void testBlockCommentOuterParens() {
     doTest(parseKeys("gcab"),
            "if (<caret>condition) {\n" + "}\n",
-           "if /*(condition)*/ {\n" + "}\n");
+           "if <caret>/*(condition)*/ {\n" + "}\n");
   }
 
   /*
@@ -126,6 +126,15 @@ public class CommentaryExtensionTest extends JavaVimTestCase {
            "<caret>if (condition) {\n" + "}\n",
            "//if (condition) {\n" +
            "<caret>}\n");
+    assertMode(COMMAND);
+    assertSelection(null);
+  }
+
+  // |gcc|
+  public void testLineCommentShortcutPreservesCaret() {
+    doTest(parseKeys("gcc"),
+           "if (<caret>condition) {\n" + "}\n",
+           "//if (<caret>condition) {\n" + "}\n");
     assertMode(COMMAND);
     assertSelection(null);
   }
