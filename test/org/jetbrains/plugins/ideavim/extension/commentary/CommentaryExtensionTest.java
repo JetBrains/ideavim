@@ -1,5 +1,6 @@
 package org.jetbrains.plugins.ideavim.extension.commentary;
 
+import com.intellij.ide.highlighter.HtmlFileType;
 import org.jetbrains.plugins.ideavim.JavaVimTestCase;
 
 import static com.maddyhome.idea.vim.command.CommandState.Mode.COMMAND;
@@ -135,6 +136,15 @@ public class CommentaryExtensionTest extends JavaVimTestCase {
            "<caret>//if (condition) {\n" + "}\n",
            "<caret>if (condition) {\n" +
            "}\n");
+    assertMode(COMMAND);
+    assertSelection(null);
+  }
+
+  // |gcc|
+  public void testHTMLCommentShortcut() {
+    myFixture.configureByText(HtmlFileType.INSTANCE, "<div />");
+    typeText(parseKeys("gcc"));
+    myFixture.checkResult("<!--<div />-->");
     assertMode(COMMAND);
     assertSelection(null);
   }
