@@ -759,6 +759,24 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("abcde</tag>fg<tag>hi");
   }
 
+  //|d| |v_it|
+  public void testDeleteInnerTagIsCaseInsensitive() {
+    typeTextInFile(parseKeys("dit"), "<a> <as<caret>df> </A>");
+    myFixture.checkResult("<a></A>");
+  }
+
+  // VIM-1090 |d| |v_at|
+  public void testDeleteOuterTagDuplicateTags() {
+    typeTextInFile(parseKeys("dat"), "<a><a></a></a<caret>>");
+    myFixture.checkResult("");
+  }
+  // VIM-1090 |d| |v_it|
+  // Adapted from vim source file "test_textobjects.vim"
+  public void testDeleteInnerTagDuplicateTags() {
+    typeTextInFile(parseKeys("dit"), "<b>as<caret>d<i>as<b />df</i>asdf</b>");
+    myFixture.checkResult("<b></b>");
+  }
+
   // |v_it|
   public void testFileStartsWithSlash() {
     configureByText("/*hello\n" +
