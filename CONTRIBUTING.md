@@ -68,7 +68,7 @@ in the issue tracker.
 2. Go to `Preferences | Editor | Copyright | Copyright Profiles`, press "+" button.  
        Name: IdeaVim  
        Text:  
-       ```
+       
        IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
        Copyright (C) 2003-$today.year The IdeaVim authors
        
@@ -84,7 +84,7 @@ in the issue tracker.
        
        You should have received a copy of the GNU General Public License
        along with this program. If not, see <http://www.gnu.org/licenses/>.
-       ```
+       
 3. Go to `Preferences | Editor | Copyright`, press "+" button.  
        Scope: Copyright scope  
        Copyright: IdeaVim
