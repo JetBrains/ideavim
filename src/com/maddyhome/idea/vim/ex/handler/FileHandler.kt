@@ -22,13 +22,16 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_FORBIDDEN
+import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_FORBIDDEN
+import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_IS_COUNT
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class FileHandler : CommandHandler(
         commands("f[ile]"),
-        flags(CommandHandler.ARGUMENT_FORBIDDEN, CommandHandler.RANGE_FORBIDDEN, CommandHandler.RANGE_IS_COUNT)
+        flags(ARGUMENT_FORBIDDEN, RANGE_FORBIDDEN, RANGE_IS_COUNT)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         val count = cmd.getCount(editor, context, 0, false)

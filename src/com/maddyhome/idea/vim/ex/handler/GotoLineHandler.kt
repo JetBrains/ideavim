@@ -24,12 +24,13 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_OPTIONAL
+import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_REQUIRED
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.CaretOrder
 import com.maddyhome.idea.vim.helper.EditorHelper
-import java.util.*
 
 /**
  * This handles Ex commands that just specify a range which translates to moving the cursor to the line given by the
@@ -37,7 +38,7 @@ import java.util.*
  */
 class GotoLineHandler : CommandHandler(
         flags(RANGE_REQUIRED, ARGUMENT_OPTIONAL),
-        EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE),
+        flags(CommandFlags.FLAG_MOT_EXCLUSIVE),
         true, CaretOrder.DECREASING_OFFSET
 ) {
     /**
@@ -49,8 +50,7 @@ class GotoLineHandler : CommandHandler(
      * @param cmd     The complete Ex command including range, command, and arguments
      * @return True if able to perform the command, false if not
      */
-    override fun execute(editor: Editor, caret: Caret, context: DataContext,
-                         cmd: ExCommand): Boolean {
+    override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
         val line = Math.min(cmd.getLine(editor, caret, context), EditorHelper.getLineCount(editor) - 1)
 
         if (line >= 0) {

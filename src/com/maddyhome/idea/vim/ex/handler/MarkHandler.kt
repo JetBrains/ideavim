@@ -22,6 +22,8 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_REQUIRED
+import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_OPTIONAL
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
@@ -31,7 +33,7 @@ import com.maddyhome.idea.vim.helper.Msg
 
 class MarkHandler : CommandHandler(
         commands("ma[rk]", "k"),
-        flags(CommandHandler.RANGE_OPTIONAL, CommandHandler.ARGUMENT_REQUIRED)
+        flags(RANGE_OPTIONAL, ARGUMENT_REQUIRED)
 ) {
 
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {

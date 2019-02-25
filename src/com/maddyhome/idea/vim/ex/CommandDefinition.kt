@@ -18,6 +18,8 @@
 
 package com.maddyhome.idea.vim.ex
 
+import java.util.*
+
 data class CommandName(val required: String, val optional: String = "")
 
 private val commandPattern: Regex = "^([^\\[]+)(?:\\[([^]]+)])?\$".toRegex()
@@ -26,6 +28,6 @@ fun commands(vararg commands: String) = commands.map { command ->
             ?: throw RuntimeException("$command is invalid!")
 }.toTypedArray()
 
-fun flags(vararg flags: Int): Int {
-    return flags.reduce { acc, i -> acc or i }
+fun <T: Enum<T>> flags(first: T, vararg rest: T): EnumSet<T> {
+    return EnumSet.of(first, *rest)
 }

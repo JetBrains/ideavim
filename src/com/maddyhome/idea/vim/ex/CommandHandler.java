@@ -39,62 +39,63 @@ import java.util.List;
  * Base class for all Ex command handlers.
  */
 public abstract class CommandHandler {
-  /**
-   * Indicates that a range must be specified with this command
-   */
-  public static final int RANGE_REQUIRED = 1;
-  /**
-   * Indicates that a range is optional for this command
-   */
-  public static final int RANGE_OPTIONAL = 2;
-  /**
-   * Indicates that a range can't be specified for this command
-   */
-  public static final int RANGE_FORBIDDEN = 4;
-  /**
-   * Indicates that an argument must be specified with this command
-   */
-  public static final int ARGUMENT_REQUIRED = 8;
-  /**
-   * Indicates that an argument is optional for this command
-   */
-  public static final int ARGUMENT_OPTIONAL = 16;
-  /**
-   * Indicates that an argument can't be specified for this command
-   */
-  public static final int ARGUMENT_FORBIDDEN = 32;
-  /**
-   * Indicates that the command takes a count, not a range - effects default
-   */
-  public static final int RANGE_IS_COUNT = 64;
+  public enum Flag {
+    /**
+     * Indicates that a range must be specified with this command
+     */
+    RANGE_REQUIRED,
+    /**
+     * Indicates that a range is optional for this command
+     */
+    RANGE_OPTIONAL,
+    /**
+     * Indicates that a range can't be specified for this command
+     */
+    RANGE_FORBIDDEN,
+    /**
+     * Indicates that an argument must be specified with this command
+     */
+    ARGUMENT_REQUIRED,
+    /**
+     * Indicates that an argument is optional for this command
+     */
+    ARGUMENT_OPTIONAL,
+    /**
+     * Indicates that an argument can't be specified for this command
+     */
+    ARGUMENT_FORBIDDEN,
+    /**
+     * Indicates that the command takes a count, not a range - effects default
+     */
+    RANGE_IS_COUNT,
 
-  public static final int DONT_REOPEN = 256;
+    DONT_REOPEN,
 
-  /**
-   * Indicates that this is a command that modifies the editor
-   */
-  public static final int WRITABLE = 512;
-  /**
-   * Indicates that this command does not modify the editor
-   */
-  public static final int READ_ONLY = 1024;
-  public static final int DONT_SAVE_LAST = 2048;
-
+    /**
+     * Indicates that this is a command that modifies the editor
+     */
+    WRITABLE,
+    /**
+     * Indicates that this command does not modify the editor
+     */
+    READ_ONLY,
+    DONT_SAVE_LAST,
+  }
   /**
    * Create the handler
    *
    * @param names A list of names this command answers to
    * @param flags Range and Arguments commands
    */
-  public CommandHandler(CommandName[] names, int flags) {
+  public CommandHandler(CommandName[] names, EnumSet<Flag> flags) {
     this(names, flags, EnumSet.noneOf(CommandFlags.class), false, CaretOrder.NATIVE);
   }
 
-  public CommandHandler(CommandName[] names, int flags, boolean runForEachCaret, CaretOrder caretOrder) {
+  public CommandHandler(CommandName[] names, EnumSet<Flag> flags, boolean runForEachCaret, CaretOrder caretOrder) {
     this(names, flags, EnumSet.noneOf(CommandFlags.class), runForEachCaret, caretOrder);
   }
 
-  public CommandHandler(@Nullable CommandName[] names, int argFlags, EnumSet<CommandFlags> optFlags, boolean runForEachCaret, CaretOrder caretOrder) {
+  public CommandHandler(@Nullable CommandName[] names, EnumSet<Flag> argFlags, EnumSet<CommandFlags> optFlags, boolean runForEachCaret, CaretOrder caretOrder) {
     this.names = names;
     this.argFlags = argFlags;
     this.optFlags = optFlags;
@@ -105,7 +106,7 @@ public abstract class CommandHandler {
     CommandParser.getInstance().addHandler(this);
   }
 
-  public CommandHandler(int argFlags, EnumSet<CommandFlags> optFlags, boolean runForEachCaret, CaretOrder caretOrder) {
+  public CommandHandler(EnumSet<Flag> argFlags, EnumSet<CommandFlags> optFlags, boolean runForEachCaret, CaretOrder caretOrder) {
     this.names = null;
     this.argFlags = argFlags;
     this.optFlags = optFlags;
@@ -129,7 +130,7 @@ public abstract class CommandHandler {
    *
    * @return The range and argument flags
    */
-  public int getArgFlags() {
+  public EnumSet<Flag> getArgFlags() {
     return argFlags;
   }
 
@@ -145,23 +146,23 @@ public abstract class CommandHandler {
   public boolean process(@NotNull Editor editor, @NotNull DataContext context,
                          @NotNull ExCommand cmd, int count) throws ExException {
     // No range allowed
-    if ((argFlags & RANGE_FORBIDDEN) != 0 && cmd.getRanges().size() != 0) {
+    if (argFlags.contains(Flag.RANGE_FORBIDDEN) && cmd.getRanges().size() != 0) {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_norange));
       throw new NoRangeAllowedException();
     }
 
-    if ((argFlags & RANGE_REQUIRED) != 0 && cmd.getRanges().size() == 0) {
+    if (argFlags.contains(Flag.RANGE_REQUIRED) && cmd.getRanges().size() == 0) {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_rangereq));
       throw new MissingRangeException();
     }
 
     // Argument required
-    if ((argFlags & ARGUMENT_REQUIRED) != 0 && cmd.getArgument().length() == 0) {
+    if (argFlags.contains(Flag.ARGUMENT_REQUIRED) && cmd.getArgument().length() == 0) {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_argreq));
       throw new MissingArgumentException();
     }
 
-    if ((argFlags & RANGE_IS_COUNT) != 0) {
+    if (argFlags.contains(Flag.RANGE_IS_COUNT)) {
       cmd.getRanges().setDefaultLine(1);
     }
 
@@ -225,7 +226,7 @@ public abstract class CommandHandler {
   }
 
   @Nullable private final CommandName[] names;
-  private final int argFlags;
+  private final EnumSet<Flag> argFlags;
   private final EnumSet<CommandFlags> optFlags;
 
   private final boolean myRunForEachCaret;

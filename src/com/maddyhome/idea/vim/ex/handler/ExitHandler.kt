@@ -22,12 +22,14 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandHandler.Flag.DONT_REOPEN
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
+import com.maddyhome.idea.vim.ex.flags
 
 class ExitHandler : CommandHandler(
         commands("qa[ll]", "quita[ll]", "wqa[ll]", "xa[ll]"),
-        CommandHandler.DONT_REOPEN
+        flags(DONT_REOPEN)
 ) {
 
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {

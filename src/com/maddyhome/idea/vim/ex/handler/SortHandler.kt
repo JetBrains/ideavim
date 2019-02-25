@@ -25,15 +25,15 @@ import com.intellij.openapi.util.text.StringUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.ARGUMENT_OPTIONAL
-import com.maddyhome.idea.vim.ex.CommandHandler.RANGE_OPTIONAL
+import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_OPTIONAL
+import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_OPTIONAL
+import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.ExException
 import com.maddyhome.idea.vim.ex.LineRange
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
-
-import java.util.Comparator
+import java.util.*
 
 /**
  * @author Alex Selesse

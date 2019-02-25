@@ -22,12 +22,21 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.ex.*
-import com.maddyhome.idea.vim.group.HistoryGroup.*
+import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_OPTIONAL
+import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_FORBIDDEN
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.ExOutputModel
+import com.maddyhome.idea.vim.ex.commands
+import com.maddyhome.idea.vim.ex.flags
+import com.maddyhome.idea.vim.group.HistoryGroup.COMMAND
+import com.maddyhome.idea.vim.group.HistoryGroup.EXPRESSION
+import com.maddyhome.idea.vim.group.HistoryGroup.INPUT
+import com.maddyhome.idea.vim.group.HistoryGroup.SEARCH
 
 class HistoryHandler : CommandHandler(
         commands("his[tory]"),
-        flags(CommandHandler.RANGE_FORBIDDEN, CommandHandler.ARGUMENT_OPTIONAL)
+        flags(RANGE_FORBIDDEN, ARGUMENT_OPTIONAL)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         logger.debug("execute")
