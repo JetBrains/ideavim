@@ -38,22 +38,53 @@ in the issue tracker.
 
     * Select your Java 8+ JDK as the Gradle JVM, leave other parameters unchanged
 
-3. Run your IdeaVim plugin within IntelliJ via a Gradle task
+3. Set up [copyright](#copyright)
+4. Run your IdeaVim plugin within IntelliJ via a Gradle task
 
     * Select "View | Tool Windows | Gradle" tool window
     
     * Launch "ideavim | intellij | runIde" from the tool window
 
-4. Run IdeaVim tests via a Gradle task
+5. Run IdeaVim tests via a Gradle task
 
     * Select "View | Tool Windows | Gradle" tool window
     
     * Launch "ideavim | verification | test" from the tool window
 
-5. Build the plugin distribution by running `./gradlew clean buildPlugin` in the
+6. Build the plugin distribution by running `./gradlew clean buildPlugin` in the
    terminal in your project root.
 
     * The resulting distribution file is build/distributions/IdeaVim-VERSION.zip
 
     * You can install this file using "Settings | Plugins | Install plugin
       from disk"
+
+### Copyright
+
+1. Go to `Preferences | Appearance & Behavior | Scopes`, press "+" button, `local`.  
+       Name: Copyright scope  
+       Pattern: `file[IdeaVIM.main]:com//*||file[IdeaVIM.test]:*/`
+
+2. Go to `Preferences | Editor | Copyright | Copyright Profiles`, press "+" button.  
+       Name: IdeaVim  
+       Text:  
+       ```
+       IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+       Copyright (C) 2003-$today.year The IdeaVim authors
+       
+       This program is free software: you can redistribute it and/or modify
+       it under the terms of the GNU General Public License as published by
+       the Free Software Foundation, either version 2 of the License, or
+       (at your option) any later version.
+       
+       This program is distributed in the hope that it will be useful,
+       but WITHOUT ANY WARRANTY; without even the implied warranty of
+       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+       GNU General Public License for more details.
+       
+       You should have received a copy of the GNU General Public License
+       along with this program. If not, see <http://www.gnu.org/licenses/>.
+       ```
+3. Go to `Preferences | Editor | Copyright`, press "+" button.  
+       Scope: Copyright scope  
+       Copyright: IdeaVim
