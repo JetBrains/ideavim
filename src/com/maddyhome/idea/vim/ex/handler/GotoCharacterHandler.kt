@@ -35,7 +35,7 @@ import com.maddyhome.idea.vim.handler.CaretOrder
 
 class GotoCharacterHandler : CommandHandler(commands("go[to]"),
         flags(RANGE_OPTIONAL, ARGUMENT_OPTIONAL, RANGE_IS_COUNT),
-        flags(CommandFlags.FLAG_MOT_EXCLUSIVE), true, CaretOrder.DECREASING_OFFSET
+        true, CaretOrder.DECREASING_OFFSET, flags(CommandFlags.FLAG_MOT_EXCLUSIVE)
 ) {
     override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
         val count = cmd.getCount(editor, caret, context, 1, true)
