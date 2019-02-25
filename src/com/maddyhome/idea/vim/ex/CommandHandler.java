@@ -90,36 +90,8 @@ public abstract class CommandHandler {
     this(names, flags, EnumSet.noneOf(CommandFlags.class), false, CaretOrder.NATIVE);
   }
 
-  /**
-   * Create the handler
-   *
-   * @param flags Range and Arguments commands
-   * @param names A list of names this command answers to
-   */
-  public CommandHandler(int flags, CommandName... names) {
-    this(names, flags, EnumSet.noneOf(CommandFlags.class), false, CaretOrder.NATIVE);
-  }
-
   public CommandHandler(CommandName[] names, int flags, boolean runForEachCaret, CaretOrder caretOrder) {
     this(names, flags, EnumSet.noneOf(CommandFlags.class), runForEachCaret, caretOrder);
-  }
-
-  /**
-   * Create the handler
-   *
-   * @param names    A list of names this command answers to
-   * @param argFlags Range and Arguments commands
-   * @param optFlags Other command specific flags
-   */
-  public CommandHandler(@Nullable CommandName[] names, int argFlags, EnumSet<CommandFlags> optFlags) {
-    this.names = names;
-    this.argFlags = argFlags;
-    this.optFlags = optFlags;
-
-    myRunForEachCaret = false;
-    myCaretOrder = CaretOrder.NATIVE;
-
-    CommandParser.getInstance().addHandler(this);
   }
 
   public CommandHandler(@Nullable CommandName[] names, int argFlags, EnumSet<CommandFlags> optFlags, boolean runForEachCaret, CaretOrder caretOrder) {
@@ -133,65 +105,6 @@ public abstract class CommandHandler {
     CommandParser.getInstance().addHandler(this);
   }
 
-  /**
-   * Create the handler
-   *
-   * @param text     The required portion of the command name
-   * @param optional The optional portion of the command name
-   * @param argFlags Range and Arguments commands
-   */
-  public CommandHandler(String text, String optional, int argFlags) {
-    this(text, optional, argFlags, EnumSet.noneOf(CommandFlags.class), false, CaretOrder.NATIVE);
-  }
-
-  public CommandHandler(String text, String optional, int argFlags, boolean runForEachCaret, CaretOrder caretOrder) {
-    this(text, optional, argFlags, EnumSet.noneOf(CommandFlags.class), runForEachCaret, caretOrder);
-  }
-
-  /**
-   * Create the handler
-   *
-   * @param text     The required portion of the command name
-   * @param optional The optional portion of the command name
-   * @param argFlags Range and Arguments commands
-   * @param optFlags Other command specific flags
-   */
-  public CommandHandler(String text, String optional, int argFlags, EnumSet<CommandFlags> optFlags) {
-    this(new CommandName[]{new CommandName(text, optional)}, argFlags, optFlags, false, CaretOrder.NATIVE);
-  }
-
-  public CommandHandler(String text, String optional, int argFlags, EnumSet<CommandFlags> optFlags, boolean runForEachCaret, CaretOrder caretOrder) {
-    this(new CommandName[]{new CommandName(text, optional)}, argFlags, optFlags, runForEachCaret, caretOrder);
-  }
-
-  /**
-   * Create the handler. Do not register the handler with the parser
-   *
-   * @param argFlags Range and Arguments commands
-   */
-  public CommandHandler(int argFlags) {
-    this(argFlags, EnumSet.noneOf(CommandFlags.class), false, CaretOrder.NATIVE);
-  }
-
-  public CommandHandler(int argFlags, boolean runForEachCaret, CaretOrder caretOrder) {
-    this(argFlags, EnumSet.noneOf(CommandFlags.class), runForEachCaret, caretOrder);
-  }
-
-  /**
-   * Create the handler. Do not register the handler with the parser
-   *
-   * @param argFlags Range and Arguments commands
-   * @param optFlags Other command specific flags
-   */
-  public CommandHandler(int argFlags, EnumSet<CommandFlags> optFlags) {
-    this.names = null;
-    this.argFlags = argFlags;
-    this.optFlags = optFlags;
-
-    myRunForEachCaret = false;
-    myCaretOrder = CaretOrder.NATIVE;
-  }
-
   public CommandHandler(int argFlags, EnumSet<CommandFlags> optFlags, boolean runForEachCaret, CaretOrder caretOrder) {
     this.names = null;
     this.argFlags = argFlags;
@@ -199,36 +112,6 @@ public abstract class CommandHandler {
 
     myRunForEachCaret = runForEachCaret;
     myCaretOrder = caretOrder;
-  }
-
-  /**
-   * Gets the required portion of the command name
-   *
-   * @return The required portion of the command name. Returns the first if there are several names
-   */
-  @Nullable
-  public String getRequired() {
-    if (names == null) {
-      return null;
-    }
-    else {
-      return names[0].getRequired();
-    }
-  }
-
-  /**
-   * Gets the optional portion of the command name
-   *
-   * @return The optional portion of the command name. Returns the first if there are several names
-   */
-  @Nullable
-  public String getOptional() {
-    if (names == null) {
-      return null;
-    }
-    else {
-      return names[0].getOptional();
-    }
   }
 
   /**
@@ -248,15 +131,6 @@ public abstract class CommandHandler {
    */
   public int getArgFlags() {
     return argFlags;
-  }
-
-  /**
-   * Gets the command specific flags
-   *
-   * @return The command flags
-   */
-  public EnumSet<CommandFlags> getOptFlags() {
-    return optFlags;
   }
 
   /**
@@ -350,9 +224,9 @@ public abstract class CommandHandler {
     return execute(editor, context, cmd);
   }
 
-  @Nullable protected final CommandName[] names;
-  protected final int argFlags;
-  protected final EnumSet<CommandFlags> optFlags;
+  @Nullable private final CommandName[] names;
+  private final int argFlags;
+  private final EnumSet<CommandFlags> optFlags;
 
   private final boolean myRunForEachCaret;
   private final CaretOrder myCaretOrder;
