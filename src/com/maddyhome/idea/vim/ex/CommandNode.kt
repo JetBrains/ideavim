@@ -16,46 +16,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.ex;
+package com.maddyhome.idea.vim.ex
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import java.util.HashMap
 
-import java.util.HashMap;
+class CommandNode(command: CommandHandler? = null) {
 
-/**
- *
- */
-public class CommandNode {
-  public CommandNode() {
-    command = null;
-  }
+    var commandHandler: CommandHandler? = command
+    private val nodes = HashMap<Char, CommandNode>()
 
-  public CommandNode(@Nullable CommandHandler command) {
-    this.command = command;
-  }
+    fun addChild(ch: Char, command: CommandHandler?) = CommandNode(command).also {
+        nodes[ch] = it
+    }
 
-  @NotNull
-  public CommandNode addChild(char ch, CommandHandler command) {
-    CommandNode res = new CommandNode(command);
-    nodes.put(ch, res);
-
-    return res;
-  }
-
-  public CommandNode getChild(char ch) {
-    return nodes.get(ch);
-  }
-
-  @Nullable
-  public CommandHandler getCommandHandler() {
-    return command;
-  }
-
-  public void setCommandHandler(CommandHandler command) {
-    this.command = command;
-  }
-
-  @Nullable private CommandHandler command;
-  @NotNull private final HashMap<Character, CommandNode> nodes = new HashMap<Character, CommandNode>();
+    fun getChild(ch: Char) = nodes[ch]
 }
