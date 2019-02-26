@@ -21,11 +21,11 @@ package com.maddyhome.idea.vim.action.motion.visual;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.group.motion.VisualMotionGroup;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,12 +41,12 @@ public class VisualSwapEndsBlockAction extends VimCommandAction {
     super(new EditorActionHandlerBase() {
       protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         if (CommandState.inVisualBlockMode(editor)) {
-          return VimPlugin.getMotion().swapVisualBlockEnds(editor);
+          return VisualMotionGroup.INSTANCE.swapVisualBlockEnds(editor);
         }
         else {
           boolean ret = true;
           for (Caret caret : editor.getCaretModel().getAllCarets()) {
-            ret = ret && VimPlugin.getMotion().swapVisualEnds(editor, caret);
+            ret = ret && VisualMotionGroup.INSTANCE.swapVisualEnds(editor, caret);
           }
           return ret;
         }

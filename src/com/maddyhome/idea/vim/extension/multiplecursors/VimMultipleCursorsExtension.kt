@@ -33,6 +33,8 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.extension.VimNonDisposableExtension
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
+import com.maddyhome.idea.vim.group.motion.VisualMotionGroup.updateSelection
 import com.maddyhome.idea.vim.helper.CaretData
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.SearchHelper.findWordUnderCursor
@@ -113,7 +115,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
           }
         }
         if (newPositions.size > 0) {
-          VimPlugin.getMotion().exitVisual(editor)
+          VisualMotionGroup.exitVisual(editor)
           newPositions.forEach { editor.caretModel.addCaret(it) ?: return }
           return
         }
@@ -209,20 +211,20 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
       if (tryFindNextOccurrence(editor, caret, selectedText) == -1) return
 
       if (!editor.caretModel.removeCaret(caret)) {
-        VimPlugin.getMotion().exitVisual(editor)
+        VisualMotionGroup.exitVisual(editor)
       }
     }
   }
 
   private fun selectWord(editor: Editor, caret: Caret, pattern: String, offset: Int) {
     CaretData.setVisualStart(caret, offset)
-    VimPlugin.getMotion().updateSelection(editor, caret, offset + pattern.length - 1)
+    VisualMotionGroup.updateSelection(editor, caret, offset + pattern.length - 1)
     MotionGroup.moveCaret(editor, caret, offset + pattern.length - 1)
   }
 
   private fun findNextOccurrence(editor: Editor, caret: Caret, range: TextRange, whole: Boolean): Int {
     caret.selectWordAtCaret(false)
-    VimPlugin.getMotion().setVisualMode(editor, CommandState.getInstance(editor).subMode)
+    VisualMotionGroup.setVisualMode(editor, CommandState.getInstance(editor).subMode)
 
     val offset = VimPlugin.getSearch().searchWord(editor, caret, 1, whole, 1)
     MotionGroup.moveCaret(editor, caret, range.endOffset - 1, true)

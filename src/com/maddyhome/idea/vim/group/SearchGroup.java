@@ -36,13 +36,20 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.CommandFlags;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.LineRange;
-import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.group.motion.VisualMotionGroup;
+import com.maddyhome.idea.vim.helper.EditorData;
+import com.maddyhome.idea.vim.helper.EditorDataContext;
+import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.MessageHelper;
+import com.maddyhome.idea.vim.helper.Msg;
+import com.maddyhome.idea.vim.helper.SearchHelper;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.regexp.CharHelper;
@@ -57,7 +64,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.text.NumberFormat;
 import java.text.ParsePosition;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.List;
 
 public class SearchGroup {
   @Nullable
@@ -82,7 +94,7 @@ public class SearchGroup {
                                   @NotNull String excmd, String exarg) {
     // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-      VimPlugin.getMotion().exitVisual(editor);
+      VisualMotionGroup.INSTANCE.exitVisual(editor);
     }
 
     CharPointer cmd = new CharPointer(new StringBuffer(exarg));

@@ -21,11 +21,11 @@ package com.maddyhome.idea.vim.helper;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.Key;
-import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.VisualChange;
+import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
+import com.maddyhome.idea.vim.group.motion.VisualMotionGroup;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -69,7 +69,7 @@ public class CaretData {
     }
 
     if (previousWasDollar != currentIsDollar && CommandState.inVisualBlockMode(editor)) {
-      VimPlugin.getMotion().updateBlockSelection(editor);
+      VisualMotionGroup.INSTANCE.updateBlockSelection(editor);
     }
   }
 

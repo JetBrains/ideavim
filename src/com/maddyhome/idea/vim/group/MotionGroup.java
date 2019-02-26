@@ -19,8 +19,22 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.editor.*;
-import com.intellij.openapi.editor.event.*;
+import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.CaretModel;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.LogicalPosition;
+import com.intellij.openapi.editor.ScrollingModel;
+import com.intellij.openapi.editor.VisualPosition;
+import com.intellij.openapi.editor.event.EditorFactoryEvent;
+import com.intellij.openapi.editor.event.EditorFactoryListener;
+import com.intellij.openapi.editor.event.EditorMouseEvent;
+import com.intellij.openapi.editor.event.EditorMouseEventArea;
+import com.intellij.openapi.editor.event.EditorMouseListener;
+import com.intellij.openapi.editor.event.EditorMouseMotionListener;
+import com.intellij.openapi.editor.event.SelectionEvent;
+import com.intellij.openapi.editor.event.SelectionListener;
 import com.intellij.openapi.editor.ex.DocumentEx;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.fileEditor.FileEditor;
@@ -38,17 +52,21 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.action.motion.TextObjectAction;
-import com.maddyhome.idea.vim.command.*;
+import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandFlags;
+import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.VisualChange;
 import com.maddyhome.idea.vim.common.Jump;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
+import com.maddyhome.idea.vim.group.motion.VisualMotionGroup;
 import com.maddyhome.idea.vim.handler.ExecuteMethodNotOverriddenException;
 import com.maddyhome.idea.vim.helper.CaretData;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
-import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
@@ -169,7 +187,7 @@ public class MotionGroup {
         break;
     }
 
-    setVisualMode(editor, visualMode);
+    VisualMotionGroup.INSTANCE.setVisualMode(editor, visualMode);
 
     final CaretModel caretModel = editor.getCaretModel();
     if (CommandState.getInstance(editor).getSubMode() != CommandState.SubMode.NONE) {
@@ -218,7 +236,7 @@ public class MotionGroup {
     if (update) {
       if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
         for (@NotNull Caret caret : editor.getCaretModel().getAllCarets()) {
-          updateSelection(editor, caret, caret.getOffset());
+          VisualMotionGroup.INSTANCE.updateSelection(editor, caret, caret.getOffset());
         }
       }
     }
@@ -231,10 +249,10 @@ public class MotionGroup {
       int end = editor.getSelectionModel().getSelectionEnd();
       editor.getSelectionModel().setSelection(start, Math.max(start, end - 1));
 
-      setVisualMode(editor, CommandState.SubMode.VISUAL_LINE);
+      VisualMotionGroup.INSTANCE.setVisualMode(editor, CommandState.SubMode.VISUAL_LINE);
 
       final Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-      VisualChange range = getVisualOperatorRange(editor, primaryCaret, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE));
+      VisualChange range = VisualMotionGroup.INSTANCE.getVisualOperatorRange(editor, primaryCaret, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE));
       if (range.getLines() > 1) {
         MotionGroup.moveCaret(editor, primaryCaret,
                               moveCaretVertical(editor, primaryCaret, -1));
@@ -274,7 +292,7 @@ public class MotionGroup {
     }
 
     MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), start);
-    toggleVisual(editor, 1, 0, mode);
+    VisualMotionGroup.INSTANCE.toggleVisual(editor, 1, 0, mode);
     MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), end);
     KeyHandler.getInstance().reset(editor);
   }
@@ -1335,7 +1353,7 @@ public class MotionGroup {
       }
 
       if (keepVisual) {
-        VimPlugin.getMotion().updateSelection(editor, caret, offset);
+        VisualMotionGroup.INSTANCE.updateSelection(editor, caret, offset);
       }
       else {
         editor.getSelectionModel().removeSelection();
@@ -1494,395 +1512,6 @@ public class MotionGroup {
     }
   }
 
-  public boolean selectPreviousVisualMode(@NotNull Editor editor) {
-    final SelectionType lastSelectionType = EditorData.getLastSelectionType(editor);
-    if (lastSelectionType == null) {
-      return false;
-    }
-
-    final TextRange visualMarks = VimPlugin.getMark().getVisualSelectionMarks(editor);
-    if (visualMarks == null) {
-      return false;
-    }
-
-    editor.getCaretModel().removeSecondaryCarets();
-
-    CommandState.getInstance(editor)
-        .pushState(CommandState.Mode.VISUAL, lastSelectionType.toSubMode(), MappingMode.VISUAL);
-
-    Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-
-    CaretData.setVisualStart(primaryCaret, visualMarks.getStartOffset());
-    CaretData.setVisualEnd(primaryCaret, visualMarks.getEndOffset());
-    CaretData.setVisualOffset(primaryCaret, visualMarks.getEndOffset());
-
-    updateSelection(editor, primaryCaret, visualMarks.getEndOffset());
-
-    primaryCaret.moveToOffset(visualMarks.getEndOffset());
-    editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
-
-    return true;
-  }
-
-  public boolean swapVisualSelections(@NotNull Editor editor) {
-    final SelectionType lastSelectionType = EditorData.getLastSelectionType(editor);
-    final TextRange lastVisualRange = EditorData.getLastVisualRange(editor);
-    if (lastSelectionType == null || lastVisualRange == null) {
-      return false;
-    }
-
-    final SelectionType selectionType = SelectionType.fromSubMode(CommandState.getInstance(editor).getSubMode());
-    EditorData.setLastSelectionType(editor, selectionType);
-
-    editor.getCaretModel().removeSecondaryCarets();
-
-    Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-    CaretData.setVisualStart(primaryCaret, lastVisualRange.getStartOffset());
-    CaretData.setVisualEnd(primaryCaret, lastVisualRange.getEndOffset());
-    CaretData.setVisualOffset(primaryCaret, lastVisualRange.getEndOffset());
-
-    CommandState.getInstance(editor).setSubMode(lastSelectionType.toSubMode());
-
-    updateSelection(editor, primaryCaret, lastVisualRange.getEndOffset());
-
-    primaryCaret.moveToOffset(lastVisualRange.getEndOffset());
-    editor.getScrollingModel().scrollToCaret(ScrollType.CENTER);
-
-    return true;
-  }
-
-  public void setVisualMode(@NotNull Editor editor, @NotNull CommandState.SubMode mode) {
-    CommandState.SubMode oldMode = CommandState.getInstance(editor).getSubMode();
-    if (mode == CommandState.SubMode.NONE) {
-      int start = editor.getSelectionModel().getSelectionStart();
-      int end = editor.getSelectionModel().getSelectionEnd();
-      if (start != end) {
-        int line = editor.offsetToLogicalPosition(start).line;
-        int logicalStart = EditorHelper.getLineStartOffset(editor, line);
-        int lend = EditorHelper.getLineEndOffset(editor, line, true);
-        if (logicalStart == start && lend + 1 == end) {
-          mode = CommandState.SubMode.VISUAL_LINE;
-        }
-        else {
-          mode = CommandState.SubMode.VISUAL_CHARACTER;
-        }
-      }
-    }
-
-    if (oldMode == CommandState.SubMode.NONE && mode == CommandState.SubMode.NONE) {
-      editor.getSelectionModel().removeSelection();
-      return;
-    }
-
-    if (mode == CommandState.SubMode.NONE) {
-      exitVisual(editor);
-    }
-    else {
-      CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, MappingMode.VISUAL);
-    }
-
-    KeyHandler.getInstance().reset(editor);
-
-    for (Caret caret : editor.getCaretModel().getAllCarets()) {
-      CaretData.setVisualStart(caret, caret.getSelectionStart());
-      int visualEnd = caret.getSelectionEnd();
-      if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_CHARACTER) {
-        BoundStringOption opt = (BoundStringOption) Options.getInstance().getOption("selection");
-        int adj = 1;
-        if (opt.getValue().equals("exclusive")) {
-          adj = 0;
-        }
-        visualEnd -= adj;
-      }
-      CaretData.setVisualEnd(caret, visualEnd);
-      CaretData.setVisualOffset(caret, caret.getOffset());
-    }
-
-    VimPlugin.getMark().setVisualSelectionMarks(editor, getRawVisualRange(editor.getCaretModel().getPrimaryCaret()));
-  }
-
-  public boolean toggleVisual(@NotNull Editor editor, int count, int rawCount, @NotNull CommandState.SubMode mode) {
-    CommandState.SubMode currentMode = CommandState.getInstance(editor).getSubMode();
-    if (CommandState.getInstance(editor).getMode() != CommandState.Mode.VISUAL) {
-      if (rawCount > 0) {
-        if (editor.getCaretModel().getCaretCount() > 1) {
-          return false;
-        }
-        VisualChange range = CaretData.getLastVisualOperatorRange(editor.getCaretModel().getPrimaryCaret());
-        if (range == null) {
-          return false;
-        }
-        mode = range.getType().toSubMode();
-        int start = editor.getCaretModel().getOffset();
-        int end = calculateVisualRange(editor, range, count);
-        Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-        CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, MappingMode.VISUAL);
-        CaretData.setVisualStart(primaryCaret, start);
-        updateSelection(editor, primaryCaret, end);
-        MotionGroup.moveCaret(editor, primaryCaret, CaretData.getVisualEnd(primaryCaret), true);
-      }
-      else {
-        CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, MappingMode.VISUAL);
-        if (mode == CommandState.SubMode.VISUAL_BLOCK) {
-          EditorData.setVisualBlockStart(editor, editor.getSelectionModel().getSelectionStart());
-          updateBlockSelection(editor, editor.getSelectionModel().getSelectionEnd());
-          MotionGroup
-              .moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), EditorData.getVisualBlockEnd(editor), true);
-        }
-        else {
-          for (Caret caret : editor.getCaretModel().getAllCarets()) {
-            CaretData.setVisualStart(caret, caret.getSelectionStart());
-            updateSelection(editor, caret, caret.getSelectionEnd());
-            MotionGroup.moveCaret(editor, caret, CaretData.getVisualEnd(caret), true);
-          }
-        }
-      }
-    }
-    else if (mode == currentMode) {
-      exitVisual(editor);
-    }
-    else if (mode == CommandState.SubMode.VISUAL_BLOCK) {
-      CommandState.getInstance(editor).setSubMode(mode);
-      updateBlockSelection(editor, EditorData.getVisualBlockEnd(editor));
-    }
-    else {
-      CommandState.getInstance(editor).setSubMode(mode);
-      for (Caret caret : editor.getCaretModel().getAllCarets()) {
-        updateSelection(editor, caret, CaretData.getVisualEnd(caret));
-      }
-    }
-
-    return true;
-  }
-
-  private int calculateVisualRange(@NotNull Editor editor, @NotNull VisualChange range, int count) {
-    int lines = range.getLines();
-    int chars = range.getColumns();
-    if (range.getType() == SelectionType.LINE_WISE || range.getType() == SelectionType.BLOCK_WISE || lines > 1) {
-      lines *= count;
-    }
-    if ((range.getType() == SelectionType.CHARACTER_WISE && lines == 1) ||
-        range.getType() == SelectionType.BLOCK_WISE) {
-      chars *= count;
-    }
-    int start = editor.getCaretModel().getOffset();
-    LogicalPosition sp = editor.offsetToLogicalPosition(start);
-    int endLine = sp.line + lines - 1;
-    int res;
-    if (range.getType() == SelectionType.LINE_WISE) {
-      res = moveCaretToLine(editor, endLine);
-    }
-    else if (range.getType() == SelectionType.CHARACTER_WISE) {
-      if (lines > 1) {
-        res = moveCaretToLineStart(editor, endLine) + Math.min(EditorHelper.getLineLength(editor, endLine), chars);
-      }
-      else {
-        res = EditorHelper.normalizeOffset(editor, sp.line, start + chars - 1, false);
-      }
-    }
-    else {
-      int endColumn = Math.min(EditorHelper.getLineLength(editor, endLine), sp.column + chars - 1);
-      res = editor.logicalPositionToOffset(new LogicalPosition(endLine, endColumn));
-    }
-
-    return res;
-  }
-
-  public void exitVisual(@NotNull final Editor editor) {
-    resetVisual(editor, true);
-    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-      CommandState.getInstance(editor).popState();
-    }
-  }
-
-  public void resetVisual(@NotNull final Editor editor, final boolean removeSelection) {
-    final boolean wasVisualBlock = CommandState.inVisualBlockMode(editor);
-    final SelectionType selectionType = SelectionType.fromSubMode(CommandState.getInstance(editor).getSubMode());
-    EditorData.setLastSelectionType(editor, selectionType);
-    final TextRange visualMarks = VimPlugin.getMark().getVisualSelectionMarks(editor);
-    if (visualMarks != null) {
-      EditorData.setLastVisualRange(editor, visualMarks);
-    }
-    if (removeSelection) {
-      if (!EditorData.isKeepingVisualOperatorAction(editor)) {
-        for (Caret caret : editor.getCaretModel().getAllCarets()) {
-          caret.removeSelection();
-        }
-      }
-      if (wasVisualBlock) {
-        editor.getCaretModel().removeSecondaryCarets();
-      }
-    }
-    CommandState.getInstance(editor).setSubMode(CommandState.SubMode.NONE);
-  }
-
-  @NotNull
-  public VisualChange getVisualOperatorRange(@NotNull Editor editor, @NotNull Caret caret, EnumSet<CommandFlags> cmdFlags) {
-    int start = CaretData.getVisualStart(caret);
-    int end = CaretData.getVisualEnd(caret);
-
-    if (CommandState.inVisualBlockMode(editor)) {
-      start = EditorData.getVisualBlockStart(editor);
-      end = EditorData.getVisualBlockEnd(editor);
-    }
-
-    if (start > end) {
-      int t = start;
-      start = end;
-      end = t;
-    }
-
-    start = EditorHelper.normalizeOffset(editor, start, false);
-    end = EditorHelper.normalizeOffset(editor, end, false);
-    LogicalPosition sp = editor.offsetToLogicalPosition(start);
-    LogicalPosition ep = editor.offsetToLogicalPosition(end);
-    int lines = ep.line - sp.line + 1;
-    int chars;
-    SelectionType type;
-    if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_LINE ||
-        cmdFlags.contains(CommandFlags.FLAG_MOT_LINEWISE)) {
-      chars = ep.column;
-      type = SelectionType.LINE_WISE;
-    }
-    else if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_CHARACTER) {
-      type = SelectionType.CHARACTER_WISE;
-      if (lines > 1) {
-        chars = ep.column;
-      }
-      else {
-        chars = ep.column - sp.column + 1;
-      }
-    }
-    else {
-      chars = ep.column - sp.column + 1;
-      if (CaretData.getLastColumn(editor.getCaretModel().getPrimaryCaret()) == MotionGroup.LAST_COLUMN) {
-        chars = MotionGroup.LAST_COLUMN;
-      }
-      type = SelectionType.BLOCK_WISE;
-    }
-
-    return new VisualChange(lines, chars, type);
-  }
-
-  @NotNull
-  public TextRange getVisualRange(@NotNull Editor editor) {
-    return new TextRange(editor.getSelectionModel().getBlockSelectionStarts(),
-        editor.getSelectionModel().getBlockSelectionEnds());
-  }
-
-  @NotNull
-  public TextRange getVisualRange(@NotNull Caret caret) {
-    return new TextRange(caret.getSelectionStart(), caret.getSelectionEnd());
-  }
-
-  @NotNull
-  public TextRange getRawVisualRange(@NotNull Caret caret) {
-    return new TextRange(CaretData.getVisualStart(caret), CaretData.getVisualEnd(caret));
-  }
-
-  public void updateBlockSelection(@NotNull Editor editor) {
-    updateBlockSelection(editor, EditorData.getVisualBlockEnd(editor));
-  }
-
-  private void updateBlockSelection(@NotNull Editor editor, int offset) {
-    EditorData.setVisualBlockEnd(editor, offset);
-    EditorData.setVisualBlockOffset(editor, offset);
-    int start = EditorData.getVisualBlockStart(editor);
-    int end = EditorData.getVisualBlockEnd(editor);
-
-    LogicalPosition blockStart = editor.offsetToLogicalPosition(start);
-    LogicalPosition blockEnd = editor.offsetToLogicalPosition(end);
-    if (blockStart.column < blockEnd.column) {
-      blockEnd = new LogicalPosition(blockEnd.line, blockEnd.column + 1);
-    }
-    else {
-      blockStart = new LogicalPosition(blockStart.line, blockStart.column + 1);
-    }
-    editor.getSelectionModel().setBlockSelection(blockStart, blockEnd);
-
-    for (Caret caret : editor.getCaretModel().getAllCarets()) {
-      int line = caret.getLogicalPosition().line;
-      int lineEndOffset = EditorHelper.getLineEndOffset(editor, line, true);
-
-      if (CaretData.getLastColumn(editor.getCaretModel().getPrimaryCaret()) >= MotionGroup.LAST_COLUMN) {
-        caret.setSelection(caret.getSelectionStart(), lineEndOffset);
-      }
-      if (!EditorHelper.isLineEmpty(editor, line, false)) {
-        caret.moveToOffset(caret.getSelectionEnd() - 1);
-      }
-    }
-    editor.getCaretModel().getPrimaryCaret().moveToOffset(end);
-
-    VimPlugin.getMark().setVisualSelectionMarks(editor, new TextRange(start, end));
-  }
-
-  public void updateSelection(@NotNull Editor editor, @NotNull Caret caret, int offset) {
-    if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_BLOCK) {
-      updateBlockSelection(editor, offset);
-    }
-    else {
-      CaretData.setVisualEnd(caret, offset);
-      CaretData.setVisualOffset(caret, offset);
-      int start = CaretData.getVisualStart(caret);
-      int end = offset;
-      final CommandState.SubMode subMode = CommandState.getInstance(editor).getSubMode();
-
-      if (subMode == CommandState.SubMode.VISUAL_CHARACTER) {
-        if (start > end) {
-          int t = start;
-          start = end;
-          end = t;
-        }
-        final BoundStringOption opt = (BoundStringOption) Options.getInstance().getOption("selection");
-        int lineEnd = EditorHelper.getLineEndForOffset(editor, end);
-        final int adj = opt.getValue().equals("exclusive") || end == lineEnd ? 0 : 1;
-        final int adjEnd = Math.min(EditorHelper.getFileSize(editor), end + adj);
-        caret.setSelection(start, adjEnd);
-      }
-      else if (subMode == CommandState.SubMode.VISUAL_LINE) {
-        if (start > end) {
-          int t = start;
-          start = end;
-          end = t;
-        }
-        start = EditorHelper.getLineStartForOffset(editor, start);
-        end = EditorHelper.getLineEndForOffset(editor, end);
-        caret.setSelection(start, end);
-      }
-
-      VimPlugin.getMark().setVisualSelectionMarks(editor, new TextRange(start, end));
-    }
-  }
-
-  public boolean swapVisualBlockEnds(@NotNull Editor editor) {
-    if (!CommandState.inVisualBlockMode(editor)) return false;
-    int t = EditorData.getVisualBlockEnd(editor);
-    EditorData.setVisualBlockEnd(editor, EditorData.getVisualBlockStart(editor));
-    EditorData.setVisualBlockStart(editor, t);
-
-    moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), EditorData.getVisualBlockEnd(editor));
-
-    return true;
-  }
-
-  public boolean swapVisualEnds(@NotNull Editor editor, @NotNull Caret caret) {
-    int t = CaretData.getVisualEnd(caret);
-    CaretData.setVisualEnd(caret, CaretData.getVisualStart(caret));
-    CaretData.setVisualStart(caret, t);
-
-    moveCaret(editor, caret, CaretData.getVisualEnd(caret));
-
-    return true;
-  }
-
-  public void moveVisualStart(@NotNull Caret caret, int startOffset) {
-    CaretData.setVisualStart(caret, startOffset);
-  }
-
-  public void processEscape(@NotNull Editor editor) {
-    exitVisual(editor);
-  }
-
   public static class MotionEditorChange implements FileEditorManagerListener {
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
       if (ExEntryPanel.getInstance().isActive()) {
@@ -1893,7 +1522,7 @@ public class MotionGroup {
         final Editor editor = ((TextEditor) fileEditor).getEditor();
         ExOutputModel.getInstance(editor).clear();
         if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-          VimPlugin.getMotion().exitVisual(editor);
+          VisualMotionGroup.INSTANCE.exitVisual(editor);
         }
       }
     }
