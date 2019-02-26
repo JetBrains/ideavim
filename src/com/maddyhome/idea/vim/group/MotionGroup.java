@@ -215,8 +215,6 @@ public class MotionGroup {
         break;
     }
 
-    CaretData.setVisualOffset(caretModel.getPrimaryCaret(), caretModel.getOffset());
-
     CaretData.setLastColumn(editor, caretModel.getPrimaryCaret(), caretModel.getVisualPosition().column);
   }
 

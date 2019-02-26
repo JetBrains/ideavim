@@ -33,6 +33,12 @@ import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
  * @author vlan
  */
 public class MotionActionTest extends VimTestCase {
+  public void testDoubleToggleVisual() {
+    typeTextInFile(parseKeys("vv"),
+                   "one tw<caret>o\n");
+    assertMode(COMMAND);
+  }
+
   // VIM-198 |v_iw|
   public void testVisualMotionInnerWordNewLineAtEOF() {
     typeTextInFile(parseKeys("viw"),

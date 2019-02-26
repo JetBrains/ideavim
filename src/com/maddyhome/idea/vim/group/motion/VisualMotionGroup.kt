@@ -56,7 +56,6 @@ object VisualMotionGroup {
 
         CaretData.setVisualStart(primaryCaret, visualMarks.startOffset)
         CaretData.setVisualEnd(primaryCaret, visualMarks.endOffset)
-        CaretData.setVisualOffset(primaryCaret, visualMarks.endOffset)
 
         updateSelection(editor, primaryCaret, visualMarks.endOffset)
 
@@ -78,7 +77,6 @@ object VisualMotionGroup {
         val primaryCaret = editor.caretModel.primaryCaret
         CaretData.setVisualStart(primaryCaret, lastVisualRange.startOffset)
         CaretData.setVisualEnd(primaryCaret, lastVisualRange.endOffset)
-        CaretData.setVisualOffset(primaryCaret, lastVisualRange.endOffset)
 
         CommandState.getInstance(editor).subMode = lastSelectionType.toSubMode()
 
@@ -131,7 +129,6 @@ object VisualMotionGroup {
                 visualEnd -= if (opt.value == "exclusive") 0 else 1
             }
             CaretData.setVisualEnd(caret, visualEnd)
-            CaretData.setVisualOffset(caret, caret.offset)
         }
 
         VimPlugin.getMark().setVisualSelectionMarks(editor, getRawVisualRange(editor.caretModel.primaryCaret))
@@ -307,7 +304,6 @@ object VisualMotionGroup {
         }
 
         CaretData.setVisualEnd(caret, offset)
-        CaretData.setVisualOffset(caret, offset)
         var start = CaretData.getVisualStart(caret)
         var end = offset
         val subMode = CommandState.getInstance(editor).subMode

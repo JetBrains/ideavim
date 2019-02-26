@@ -116,27 +116,6 @@ public class CaretData {
   }
 
   /**
-   * Gets the visual offset for the caret.
-   */
-  public static int getVisualOffset(@NotNull Caret caret) {
-    Integer visualOffset = caret.getUserData(VISUAL_OFFSET);
-
-    if (visualOffset == null) {
-      return caret.getOffset();
-    }
-    else {
-      return visualOffset;
-    }
-  }
-
-  /**
-   * Sets the visual offset for the caret.
-   */
-  public static void setVisualOffset(@NotNull Caret caret, int visualOffset) {
-    caret.putUserData(VISUAL_OFFSET, visualOffset);
-  }
-
-  /**
    * Gets the previous visual operator range on the caret.
    */
   @Nullable
@@ -248,7 +227,6 @@ public class CaretData {
   private static final Key<Integer> LAST_COLUMN = new Key<>("lastColumn");
   private static final Key<Integer> VISUAL_START = new Key<>("visualStart");
   private static final Key<Integer> VISUAL_END = new Key<>("visualEnd");
-  private static final Key<Integer> VISUAL_OFFSET = new Key<>("visualOffset");
   private static final Key<Integer> PREV_LAST_COLUMN = new Key<>("previousLastColumn");
   private static final Key<Integer> INSERT_START = new Key<>("insertStart");
   private static final Key<Boolean> WAS_IN_FIRST_LINE = new Key<>("wasInFirstLine");
