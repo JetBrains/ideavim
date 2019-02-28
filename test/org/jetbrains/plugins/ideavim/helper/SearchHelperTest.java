@@ -3,6 +3,8 @@ package org.jetbrains.plugins.ideavim.helper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
+import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
+
 public class SearchHelperTest extends VimTestCase {
   public void testFindNextWord() {
     String text = "first second";
@@ -51,5 +53,10 @@ public class SearchHelperTest extends VimTestCase {
     int previousWordPosition = SearchHelper.findNextWord(text, text.length(), text.length(), -1, true, false);
 
     assertEquals(previousWordPosition, text.indexOf("second"));
+  }
+
+  public void testMotionOuterWordAction() {
+    typeTextInFile(parseKeys("v", "a("), "((int) nu<caret>m)");
+    myFixture.checkResult("<selection>((int) num)</selection>");
   }
 }
