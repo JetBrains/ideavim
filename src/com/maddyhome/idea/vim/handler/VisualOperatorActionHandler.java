@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
@@ -32,7 +33,6 @@ import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.CaretData;
 import com.maddyhome.idea.vim.helper.EditorData;
-import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -75,23 +75,24 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
     VisualStartFinishRunnable runnable = new VisualStartFinishRunnable(editor, cmd, willRunForEachCaret);
     runnable.start();
 
-    boolean res;
+
+    final Ref<Boolean> res = Ref.create(true);
     if (willRunForEachCaret) {
-      res = true;
-      for (Caret caret : EditorHelper.getOrderedCaretsList(editor, myCaretOrder)) {
+      editor.getCaretModel().runForEachCaret(caret -> {
         TextRange range = CaretData.getVisualTextRange(caret);
         if (range == null) {
-          return false;
+          res.set(false);
+          return;
         }
         try {
           if (!execute(editor, caret, context, cmd, range)) {
-            res = false;
+            res.set(false);
           }
         }
         catch (ExecuteMethodNotOverriddenException e) {
-          return false;
+          res.set(false);
         }
-      }
+      }, myCaretOrder == CaretOrder.DECREASING_OFFSET);
     }
     else {
       TextRange range = CaretData.getVisualTextRange(editor.getCaretModel().getPrimaryCaret());
@@ -99,14 +100,14 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
         return false;
       }
       try {
-        res = execute(editor, context, cmd, range);
+        res.set(execute(editor, context, cmd, range));
       }
       catch (ExecuteMethodNotOverriddenException e) {
         return false;
       }
     }
 
-    runnable.setRes(res);
+    runnable.setRes(res.get());
     runnable.finish();
 
     CommandState.Mode toSwitch = EditorData.getChangeSwitchMode(editor);
@@ -114,7 +115,7 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
       VimPlugin.getChange().processPostChangeModeSwitch(editor, context, toSwitch);
     }
 
-    return res;
+    return res.get();
   }
 
   protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
