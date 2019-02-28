@@ -27,7 +27,8 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
+import com.maddyhome.idea.vim.group.motion.visualBlockRange
+import com.maddyhome.idea.vim.group.motion.visualRange
 import com.maddyhome.idea.vim.helper.EditorData
 
 /**
@@ -59,7 +60,7 @@ abstract class VisualOperatorActionHandlerModern(
         EditorData.setWasVisualBlockMode(editor, CommandState.inVisualBlockMode(editor))
 
         if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
-            val range = VisualMotionGroup.getVisualRange(editor)
+            val range = editor.visualBlockRange
             logger.debug("range=$range")
         }
 
@@ -69,8 +70,7 @@ abstract class VisualOperatorActionHandlerModern(
 
         if (!beforeExecution(editor, context, cmd)) return false
 
-
-        val ranges = editor.caretModel.allCarets.associateWith { TextRange(it.selectionStart, it.selectionEnd) }
+        val ranges = editor.caretModel.allCarets.associateWith { it.visualRange }
 
         val res = Ref.create(true)
 

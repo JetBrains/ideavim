@@ -258,9 +258,9 @@ object VisualMotionGroup {
         return VisualChange(lines, chars, type)
     }
 
-    fun getVisualRange(editor: Editor) = editor.selectionModel.run { TextRange(blockSelectionStarts, blockSelectionEnds) }
+    fun getVisualRange(editor: Editor) = editor.visualBlockRange
 
-    fun getVisualRange(caret: Caret) = TextRange(caret.selectionStart, caret.selectionEnd)
+    fun getVisualRange(caret: Caret) = caret.visualRange
 
     fun getRawVisualRange(caret: Caret) = TextRange(CaretData.getVisualStart(caret), CaretData.getVisualEnd(caret))
 
@@ -381,3 +381,9 @@ object VisualMotionGroup {
 
     fun moveVisualStart(caret: Caret, startOffset: Int) = CaretData.setVisualStart(caret, startOffset)
 }
+
+val Caret.visualRange: TextRange
+    get() = TextRange(selectionStart, selectionEnd)
+
+val Editor.visualBlockRange: TextRange
+    get() = selectionModel.run { TextRange(blockSelectionStarts, blockSelectionEnds) }
