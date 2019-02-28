@@ -21,9 +21,9 @@ package com.maddyhome.idea.vim.action.copy;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
-import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.group.copy.YankCopyGroup;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,7 +41,7 @@ public class YankMotionAction extends EditorAction {
         return false;
       }
 
-      return VimPlugin.getCopy().yankMotion(editor, context, cmd.getCount(), cmd.getRawCount(), argument);
+      return YankCopyGroup.INSTANCE.yankMotion(editor, context, cmd.getCount(), cmd.getRawCount(), argument);
     }
   }
 }

@@ -20,7 +20,11 @@ package com.maddyhome.idea.vim;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.notification.*;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationDisplayType;
+import com.intellij.notification.NotificationListener;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
@@ -51,7 +55,19 @@ import com.intellij.openapi.wm.WindowManager;
 import com.intellij.util.io.HttpRequests;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser;
-import com.maddyhome.idea.vim.group.*;
+import com.maddyhome.idea.vim.group.ChangeGroup;
+import com.maddyhome.idea.vim.group.DigraphGroup;
+import com.maddyhome.idea.vim.group.EditorGroup;
+import com.maddyhome.idea.vim.group.FileGroup;
+import com.maddyhome.idea.vim.group.HistoryGroup;
+import com.maddyhome.idea.vim.group.KeyGroup;
+import com.maddyhome.idea.vim.group.MacroGroup;
+import com.maddyhome.idea.vim.group.MarkGroup;
+import com.maddyhome.idea.vim.group.MotionGroup;
+import com.maddyhome.idea.vim.group.ProcessGroup;
+import com.maddyhome.idea.vim.group.RegisterGroup;
+import com.maddyhome.idea.vim.group.SearchGroup;
+import com.maddyhome.idea.vim.group.WindowGroup;
 import com.maddyhome.idea.vim.helper.DocumentManager;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.option.Options;
@@ -102,7 +118,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   @NotNull private final MotionGroup motion;
   @NotNull private final ChangeGroup change;
-  @NotNull private final CopyGroup copy;
   @NotNull private final MarkGroup mark;
   @NotNull private final RegisterGroup register;
   @NotNull private final FileGroup file;
@@ -118,7 +133,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   public VimPlugin() {
     motion = new MotionGroup();
     change = new ChangeGroup();
-    copy = new CopyGroup();
     mark = new MarkGroup();
     register = new RegisterGroup();
     file = new FileGroup();
@@ -235,11 +249,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   @NotNull
   public static ChangeGroup getChange() {
     return getInstance().change;
-  }
-
-  @NotNull
-  public static CopyGroup getCopy() {
-    return getInstance().copy;
   }
 
   @NotNull
