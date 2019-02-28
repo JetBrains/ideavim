@@ -56,7 +56,7 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
   }
 
   @Override
-  protected final boolean execute(@NotNull final Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+  protected boolean execute(@NotNull final Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
     // As in ChangeEditorActionHandler, some actions there should also be done before and after each action (such as
     // exiting/entering/toggling visual mode, so this also overrides single-caret version.
 
@@ -134,7 +134,7 @@ public abstract class VisualOperatorActionHandler extends EditorActionHandlerBas
     return execute(editor, context, cmd, range);
   }
 
-  private static class VisualStartFinishRunnable {
+  protected static class VisualStartFinishRunnable {
     public VisualStartFinishRunnable(@NotNull Editor editor, Command cmd, boolean runForEachCaret) {
       this.editor = editor;
       this.cmd = cmd;

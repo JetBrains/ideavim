@@ -1727,14 +1727,6 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult(after);
   }
 
-  public void testPutVisualText() {
-    final String before = "<caret>qwe asd <caret>zxc rty <caret>fgh vbn";
-    final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
-    typeText(parseKeys("v2e", "2p"));
-    final String after = "fghfg<caret>h fghfg<caret>h fghfg<caret>h";
-    myFixture.checkResult(after);
-  }
 
   public void testPutTextBeforeCursorLinewise() {
     final String before = "q<caret>werty\n" + "as<caret>dfgh\n" + "<caret>zxcvbn\n";
@@ -1785,14 +1777,7 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult(after);
   }
 
-  public void testPutVisualTextLinewise() {
-    final String before = "q<caret>werty\n" + "as<caret>dfgh\n" + "<caret>zxcvbn\n";
-    final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
-    typeText(parseKeys("vl", "p"));
-    final String after = "q\n" + "<caret>zxcvbn\n" + "rty\n" + "as\n" + "<caret>zxcvbn\n" + "gh\n" + "\n" + "<caret>zxcvbn\n" + "cvbn\n";
-    myFixture.checkResult(after);
-  }
+
 
   public void testPutTextBeforeCursorMoveCursor() {
     final String before = "qw<caret>e asd z<caret>xc rty <caret>fgh vbn";
@@ -1809,15 +1794,6 @@ public class MultipleCaretsTest extends VimTestCase {
     VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
     typeText(parseKeys("l", "gp", "b", "gp"));
     final String after = "qwe ffgh<caret>ghasd zfgh<caret>xcfgh rty ffgh<caret>gfghh vbn";
-    myFixture.checkResult(after);
-  }
-
-  public void testPutVisualTextMoveCursor() {
-    final String before = "qw<caret>e asd z<caret>xc rty <caret>fgh vbn";
-    final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
-    typeText(parseKeys("vh", "gP"));
-    final String after = "qfgh<caret> asd fgh<caret>c rtyfgh<caret>gh vbn";
     myFixture.checkResult(after);
   }
 
@@ -1930,51 +1906,6 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult(after);
   }
 
-  public void testPutEmptyText() {
-    final String before = "qwe\n<caret>asd\nz<caret>xc\n";
-    final Editor editor = configureByText(before);
-
-    final String text = "\uFFFF";
-    final Register register = new Register('a', SelectionType.CHARACTER_WISE, parseKeys(text));
-    VimPlugin.getRegister().selectRegister('a');
-    assertNull(register.getText());
-    VimPlugin.getRegister().storeTextInternal(editor, new TextRange(0, 1), text, SelectionType.CHARACTER_WISE, 'a',
-                                              false);
-
-    typeText(parseKeys("p"));
-    myFixture.checkResult(before);
-
-    typeText(parseKeys("vlp"));
-    final String after = "qwe\nd\nz\n";
-    myFixture.checkResult(after);
-  }
-
-  public void testPutVisualTextVisualLineMode() {
-    final String before = "qw<caret>e\nasd\nzxc\nrty\nfgh\nvbn";
-    final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
-    typeText(parseKeys("<S-v>", "gP"));
-    final String after = "fgh\n<caret>asd\nzxc\nrty\nfgh\nvbn";
-    myFixture.checkResult(after);
-  }
-
-  public void testPutVisualBlockVisualLineMode() {
-    final String before = "qw<caret>e\nasd\nzxc\nrty\nfgh\nvbn";
-    final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.BLOCK_WISE, false);
-    typeText(parseKeys("<S-v>", "p"));
-    final String after = "<caret>fgh\nasd\nzxc\nrty\nfgh\nvbn";
-    myFixture.checkResult(after);
-  }
-
-  public void testPutVisualBlockLinewise() {
-   final String before = "qw<caret>e\nasd\nzxc\nrty\nfgh\nvbn";
-    final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.LINE_WISE, false);
-    typeText(parseKeys("<C-v>", "h", "p"));
-    final String after = "<caret>q\nfgh\nasd\nzxc\nrty\nfgh\nvbn";
-    myFixture.checkResult(after);
-  }
 
   public void testPutLinewiseWithoutLineSeparatorAtTheEndOfFile() {
     final String before = "qwe\nasd\nz<caret>xc\nrty\nfg<caret>h\nvb<caret>n";

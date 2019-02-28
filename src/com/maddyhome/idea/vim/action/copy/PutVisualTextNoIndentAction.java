@@ -19,19 +19,25 @@
 package com.maddyhome.idea.vim.action.copy;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.command.SelectionType;
+import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
+import com.maddyhome.idea.vim.group.copy.PutCopyGroup;
+import com.maddyhome.idea.vim.handler.VisualOperatorActionHandlerModern;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -39,13 +45,40 @@ import java.util.Set;
  */
 public class PutVisualTextNoIndentAction extends VimCommandAction {
   public PutVisualTextNoIndentAction() {
-    super(new VisualOperatorActionHandler() {
+    super(new VisualOperatorActionHandlerModern() {
+
+      private Register register;
+
       @Override
-      protected boolean execute(@NotNull Editor editor,
-                                @NotNull DataContext context,
-                                @NotNull Command cmd,
-                                @NotNull TextRange range) {
-        return VimPlugin.getCopy().putVisualRange(editor, context, range, cmd.getCount(), false, false);
+      protected boolean executeBlockwise(@NotNull Editor editor,
+                                         @NotNull DataContext context,
+                                         @NotNull Command cmd,
+                                         @NotNull Map<Caret, ? extends TextRange> ranges) {
+        boolean isBigP = cmd.getKeys().get(1).equals(StringHelper.parseKeys("P").get(0));
+        return PutCopyGroup.INSTANCE
+          .putVisualRangeBlockwise(editor, context, ranges, cmd.getCount(), false, false, register, isBigP);
+      }
+
+
+      @Override
+      protected boolean executeCharacterAndLinewise(@NotNull Editor editor,
+                                                    @NotNull Caret caret,
+                                                    @NotNull DataContext context,
+                                                    @NotNull Command cmd,
+                                                    @NotNull TextRange range) {
+        return PutCopyGroup.INSTANCE
+          .putVisualRangeCaL(editor, context, caret, range, cmd.getCount(), false, false, register);
+      }
+
+      @Override
+      protected boolean beforeExecution(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+        Register register = VimPlugin.getRegister().getLastRegister();
+        VimPlugin.getRegister().resetRegister();
+        if (register == null) return false;
+        if (register.getType() == SelectionType.LINE_WISE && editor.isOneLineMode()) return false;
+        if (register.getText() == null) return false;
+        this.register = register;
+        return true;
       }
     });
   }
