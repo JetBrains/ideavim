@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.action.copy;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.RangeMarker;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
@@ -28,7 +29,6 @@ import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
-import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.copy.PutCopyGroup;
 import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandlerModern;
@@ -53,8 +53,7 @@ public class PutVisualTextMoveCursorAction extends VimCommandAction {
       @Override
       protected boolean executeBlockwise(@NotNull Editor editor,
                                          @NotNull DataContext context,
-                                         @NotNull Command cmd,
-                                         @NotNull Map<Caret, ? extends TextRange> ranges) {
+                                         @NotNull Command cmd, @NotNull Map<Caret, ? extends RangeMarker> ranges) {
         boolean isBigP = cmd.getKeys().get(1).equals(StringHelper.parseKeys("P").get(0));
         return PutCopyGroup.INSTANCE
           .putVisualRangeBlockwise(editor, context, ranges, cmd.getCount(), true, true, register, isBigP);
@@ -65,8 +64,7 @@ public class PutVisualTextMoveCursorAction extends VimCommandAction {
       protected boolean executeCharacterAndLinewise(@NotNull Editor editor,
                                                     @NotNull Caret caret,
                                                     @NotNull DataContext context,
-                                                    @NotNull Command cmd,
-                                                    @NotNull TextRange range) {
+                                                    @NotNull Command cmd, @NotNull RangeMarker range) {
         return PutCopyGroup.INSTANCE
           .putVisualRangeCaL(editor, context, caret, range, cmd.getCount(), true, true, register);
       }

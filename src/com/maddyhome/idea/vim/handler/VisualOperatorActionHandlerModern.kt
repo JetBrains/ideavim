@@ -22,14 +22,15 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.RangeMarker
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.group.motion.visualBlockRange
-import com.maddyhome.idea.vim.group.motion.visualRange
 import com.maddyhome.idea.vim.helper.EditorData
+import com.maddyhome.idea.vim.helper.visualBlockRange
+import com.maddyhome.idea.vim.helper.visualRangeMarker
 
 /**
  * @author Alex Plate
@@ -39,10 +40,8 @@ abstract class VisualOperatorActionHandlerModern(
         private val caretOrder: CaretOrder
 ) : VisualOperatorActionHandler(runForEachCaret, caretOrder) {
 
-    constructor() : this(false, CaretOrder.NATIVE)
-
-    protected abstract fun executeCharacterAndLinewise(editor: Editor, caret: Caret, context: DataContext, cmd: Command, range: TextRange): Boolean
-    protected abstract fun executeBlockwise(editor: Editor, context: DataContext, cmd: Command, ranges: Map<Caret, TextRange>): Boolean
+    protected abstract fun executeCharacterAndLinewise(editor: Editor, caret: Caret, context: DataContext, cmd: Command, range: RangeMarker): Boolean
+    protected abstract fun executeBlockwise(editor: Editor, context: DataContext, cmd: Command, ranges: Map<Caret, RangeMarker>): Boolean
 
     protected open fun beforeExecution(editor: Editor, context: DataContext, cmd: Command) = true
     protected open fun afterExecution(editor: Editor, context: DataContext, cmd: Command, res: Boolean) {}
@@ -70,25 +69,20 @@ abstract class VisualOperatorActionHandlerModern(
 
         if (!beforeExecution(editor, context, cmd)) return false
 
-        val ranges = editor.caretModel.allCarets.associateWith { it.visualRange }
+        val ranges = editor.caretModel.allCarets.associateWith { it.visualRangeMarker }
 
         val res = Ref.create(true)
-
         if (executeForEachCaretSeparately) {
             if (!beforeCaLExecution(editor, context, cmd)) return false
             editor.caretModel.runForEachCaret({ caret ->
-                val range = ranges[caret] ?: run {
-                    res.set(false)
-                    return@runForEachCaret
-                }
+                val range = ranges.getValue(caret)
                 val loopRes = executeCharacterAndLinewise(editor, caret, context, cmd, range)
-                res.set(loopRes)
+                res.set(loopRes and res.get())
             }, caretOrder == CaretOrder.DECREASING_OFFSET)
             afterCaLExecution(editor, context, cmd, res.get())
         } else {
             if (!beforeBlockExecution(editor, context, cmd)) return false
-            val loopRes = executeBlockwise(editor, context, cmd, ranges)
-            res.set(loopRes)
+            res.set(executeBlockwise(editor, context, cmd, ranges))
             afterBlockExecution(editor, context, cmd, res.get())
         }
 
@@ -96,6 +90,7 @@ abstract class VisualOperatorActionHandlerModern(
 
         runnable.setRes(res.get())
         runnable.finish()
+        ranges.values.forEach { it.dispose() }
 
         EditorData.getChangeSwitchMode(editor)?.let {
             VimPlugin.getChange().processPostChangeModeSwitch(editor, context, it)

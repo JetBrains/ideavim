@@ -22,6 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.RangeMarker
 import com.intellij.openapi.util.Ref
 import com.intellij.openapi.util.text.StringUtil
 import com.maddyhome.idea.vim.VimPlugin
@@ -34,6 +35,7 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.CaretOrder.DECREASING_OFFSET
 import com.maddyhome.idea.vim.handler.CaretOrder.INCREASING_OFFSET
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.vimTextRange
 import java.util.*
 
 object PutCopyGroup {
@@ -41,20 +43,18 @@ object PutCopyGroup {
             editor: Editor,
             context: DataContext,
             caret: Caret,
-            range: TextRange,
+            range: RangeMarker,
             count: Int,
             indent: Boolean,
             cursorAfter: Boolean,
             register: Register
     ): Boolean {
-        if (range.isMultiple) return false
-
         val subMode = CommandState.getInstance(editor).subMode
         val updatedRange = if (subMode == CommandState.SubMode.VISUAL_LINE) {
             val fileSize = EditorHelper.getFileSize(editor)
             val end = minOf(range.endOffset + 1, fileSize)
             TextRange(range.startOffset, end)
-        } else range
+        } else range.vimTextRange
 
         VimPlugin.getChange().deleteRange(editor, caret, updatedRange, SelectionType.fromSubMode(subMode), false)
         caret.moveToOffset(range.startOffset)
@@ -88,7 +88,7 @@ object PutCopyGroup {
     fun putVisualRangeBlockwise(
             editor: Editor,
             context: DataContext,
-            ranges: Map<Caret, TextRange>,
+            ranges: Map<Caret, RangeMarker>,
             count: Int,
             indent: Boolean,
             cursorAfter: Boolean,
@@ -110,7 +110,7 @@ object PutCopyGroup {
                 res.set(false)
                 return@runForEachCaret
             }
-            VimPlugin.getChange().deleteRange(editor, caret, range, SelectionType.fromSubMode(subMode), false)
+            VimPlugin.getChange().deleteRange(editor, caret, range.vimTextRange, SelectionType.fromSubMode(subMode), false)
 
             caret.moveToOffset(range.startOffset)
 

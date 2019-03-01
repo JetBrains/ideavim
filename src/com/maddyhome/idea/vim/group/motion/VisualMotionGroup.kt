@@ -34,6 +34,8 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.CaretData
 import com.maddyhome.idea.vim.helper.EditorData
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.visualBlockRange
+import com.maddyhome.idea.vim.helper.visualRange
 import com.maddyhome.idea.vim.option.BoundStringOption
 import com.maddyhome.idea.vim.option.Options
 import java.util.*
@@ -381,9 +383,3 @@ object VisualMotionGroup {
 
     fun moveVisualStart(caret: Caret, startOffset: Int) = CaretData.setVisualStart(caret, startOffset)
 }
-
-val Caret.visualRange: TextRange
-    get() = TextRange(selectionStart, selectionEnd)
-
-val Editor.visualBlockRange: TextRange
-    get() = selectionModel.run { TextRange(blockSelectionStarts, blockSelectionEnds) }
