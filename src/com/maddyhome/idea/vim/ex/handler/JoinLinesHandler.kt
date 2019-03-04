@@ -30,7 +30,6 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.handler.CaretOrder
-import com.maddyhome.idea.vim.helper.CaretData
 
 class JoinLinesHandler : CommandHandler(
         commands("j[oin]"),
@@ -44,7 +43,7 @@ class JoinLinesHandler : CommandHandler(
         val textRange = if (CommandState.getInstance(editor).mode != CommandState.Mode.VISUAL)
             cmd.getTextRange(editor, caret, context, true)
         else
-            CaretData.getVisualTextRange(caret)
+            VimPlugin.getMark().getVisualSelectionMarks(editor)
 
         textRange ?: return false
 

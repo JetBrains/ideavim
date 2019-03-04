@@ -152,7 +152,6 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
                 if (logger.isDebugEnabled) logger.debug("change=$change")
             }
             CaretData.setVisualChange(caret, change)
-            CaretData.setVisualTextRange(caret, res)
         }
 
         fun start() {

@@ -23,7 +23,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.Key;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.VisualChange;
-import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroup;
 import org.jetbrains.annotations.NotNull;
@@ -168,21 +167,6 @@ public class CaretData {
   }
 
   /**
-   * Gets the text range for current visual operator action.
-   */
-  @Nullable
-  public static TextRange getVisualTextRange(@NotNull Caret caret) {
-    return caret.getUserData(VISUAL_TEXT_RANGE);
-  }
-
-  /**
-   * Sets the text range for current visual operator action.
-   */
-  public static void setVisualTextRange(@NotNull Caret caret, @Nullable TextRange range) {
-    caret.putUserData(VISUAL_TEXT_RANGE, range);
-  }
-
-  /**
    * Gets the insertion start for the caret
    */
   public static int getInsertStart(@NotNull Caret caret) {
@@ -232,5 +216,4 @@ public class CaretData {
   private static final Key<Boolean> WAS_IN_FIRST_LINE = new Key<>("wasInFirstLine");
   private static final Key<VisualChange> VISUAL_CHANGE = new Key<>("visualChange");
   private static final Key<VisualChange> VISUAL_OP = new Key<>("visualOp");
-  private static final Key<TextRange> VISUAL_TEXT_RANGE = new Key<>("visualTextRange");
 }
