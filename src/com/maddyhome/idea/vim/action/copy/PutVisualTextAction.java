@@ -30,8 +30,7 @@ import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.group.copy.PutCopyGroup;
-import com.maddyhome.idea.vim.handler.CaretOrder;
-import com.maddyhome.idea.vim.handler.VisualOperatorActionHandlerModern;
+import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,7 +47,7 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
  */
 public class PutVisualTextAction extends VimCommandAction {
   public PutVisualTextAction() {
-    super(new VisualOperatorActionHandlerModern(true, CaretOrder.DECREASING_OFFSET) {
+    super(new VisualOperatorActionHandler() {
 
       @Nullable private Register register;
 

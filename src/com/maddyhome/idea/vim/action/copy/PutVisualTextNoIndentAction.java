@@ -30,8 +30,7 @@ import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.group.copy.PutCopyGroup;
-import com.maddyhome.idea.vim.handler.CaretOrder;
-import com.maddyhome.idea.vim.handler.VisualOperatorActionHandlerModern;
+import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,7 +45,7 @@ import java.util.Set;
  */
 public class PutVisualTextNoIndentAction extends VimCommandAction {
   public PutVisualTextNoIndentAction() {
-    super(new VisualOperatorActionHandlerModern(true, CaretOrder.DECREASING_OFFSET) {
+    super(new VisualOperatorActionHandler() {
 
       private Register register;
 

@@ -21,19 +21,20 @@ package com.maddyhome.idea.vim.action.change.change;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.RangeMarker;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
+import com.maddyhome.idea.vim.helper.UtilsKt;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -41,11 +42,24 @@ import java.util.Set;
  */
 public class AutoIndentLinesVisualAction extends VimCommandAction {
   public AutoIndentLinesVisualAction() {
-    super(new VisualOperatorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
+    super(new VisualOperatorActionHandler() {
       @Override
-      protected boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                                @NotNull Command cmd, @NotNull TextRange range) {
-        VimPlugin.getChange().autoIndentRange(editor, caret, context, range);
+      protected boolean executeCharacterAndLinewise(@NotNull Editor editor,
+                                                    @NotNull Caret caret,
+                                                    @NotNull DataContext context,
+                                                    @NotNull Command cmd,
+                                                    @NotNull RangeMarker range) {
+        VimPlugin.getChange().autoIndentRange(editor, caret, context, UtilsKt.getVimTextRange(range));
+        return true;
+      }
+
+      @Override
+      protected boolean executeBlockwise(@NotNull Editor editor,
+                                         @NotNull DataContext context,
+                                         @NotNull Command cmd,
+                                         @NotNull Map<Caret, ? extends RangeMarker> ranges) {
+        VimPlugin.getChange()
+          .autoIndentRange(editor, editor.getCaretModel().getPrimaryCaret(), context, UtilsKt.getVimTextRange(ranges));
         return true;
       }
     });

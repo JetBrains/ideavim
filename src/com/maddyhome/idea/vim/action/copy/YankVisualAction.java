@@ -19,21 +19,24 @@
 package com.maddyhome.idea.vim.action.copy;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.RangeMarker;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
-import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.copy.YankCopyGroup;
-import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
+import com.maddyhome.idea.vim.handler.VisualOperatorActionBatchHandler;
+import com.maddyhome.idea.vim.helper.UtilsKt;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -41,11 +44,15 @@ import java.util.Set;
  */
 public class YankVisualAction extends VimCommandAction {
   public YankVisualAction() {
-    super(new VisualOperatorActionHandler() {
-      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
-                                @NotNull TextRange range) {
+    super(new VisualOperatorActionBatchHandler() {
+      @Override
+      public boolean executeBatch(@NotNull Editor editor,
+                                  @NotNull DataContext context,
+                                  @NotNull Command cmd,
+                                  @NotNull Map<Caret, ? extends RangeMarker> ranges) {
         final CommandState.SubMode subMode = CommandState.getInstance(editor).getSubMode();
-        return YankCopyGroup.INSTANCE.yankRange(editor, range, SelectionType.fromSubMode(subMode), true);
+        return YankCopyGroup.INSTANCE
+          .yankRange(editor, UtilsKt.getVimTextRange(ranges), SelectionType.fromSubMode(subMode), true);
       }
     });
   }

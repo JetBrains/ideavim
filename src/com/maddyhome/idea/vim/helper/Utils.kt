@@ -33,6 +33,19 @@ val Caret.visualRangeMarker: RangeMarker
 val RangeMarker.vimTextRange: TextRange
     get() = TextRange(startOffset, endOffset)
 
+val Map<Caret, RangeMarker>.vimTextRange: TextRange
+    get() {
+        val starts = IntArray(this.size)
+        val ends = IntArray(this.size)
+        var counter = 0
+        this.forEach {
+            starts[counter] += it.value.startOffset
+            ends[counter] += it.value.endOffset
+            counter++
+        }
+        return TextRange(starts, ends)
+    }
+
 val Caret.visualRange: TextRange
     get() = TextRange(selectionStart, selectionEnd)
 

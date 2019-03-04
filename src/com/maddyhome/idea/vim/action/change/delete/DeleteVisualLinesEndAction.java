@@ -21,18 +21,23 @@ package com.maddyhome.idea.vim.action.change.delete;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.RangeMarker;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
-import com.maddyhome.idea.vim.command.*;
+import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandFlags;
+import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.UtilsKt;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -40,27 +45,34 @@ import java.util.Set;
  */
 public class DeleteVisualLinesEndAction extends VimCommandAction {
   public DeleteVisualLinesEndAction() {
-    super(new VisualOperatorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
+    super(new VisualOperatorActionHandler() {
       @Override
-      protected boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                                @NotNull Command cmd, @NotNull TextRange range) {
-        if (CommandState.inVisualBlockMode(editor)) {
-          final int[] starts = range.getStartOffsets();
-          final int[] ends = range.getEndOffsets();
-          for (int i = 0; i < starts.length; i++) {
-            if (ends[i] > starts[i]) {
-              ends[i] = EditorHelper.getLineEndForOffset(editor, starts[i]);
-            }
+      protected boolean executeCharacterAndLinewise(@NotNull Editor editor,
+                                                    @NotNull Caret caret,
+                                                    @NotNull DataContext context,
+                                                    @NotNull Command cmd,
+                                                    @NotNull RangeMarker range) {
+        final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
+                                                  EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
+        return VimPlugin.getChange().deleteRange(editor, caret, lineRange, SelectionType.LINE_WISE, false);
+      }
+
+      @Override
+      protected boolean executeBlockwise(@NotNull Editor editor,
+                                         @NotNull DataContext context,
+                                         @NotNull Command cmd,
+                                         @NotNull Map<Caret, ? extends RangeMarker> ranges) {
+        TextRange vimTextRange = UtilsKt.getVimTextRange(ranges);
+        final int[] starts = vimTextRange.getStartOffsets();
+        final int[] ends = vimTextRange.getEndOffsets();
+        for (int i = 0; i < starts.length; i++) {
+          if (ends[i] > starts[i]) {
+            ends[i] = EditorHelper.getLineEndForOffset(editor, starts[i]);
           }
-          final TextRange blockRange = new TextRange(starts, ends);
-          return VimPlugin.getChange()
-            .deleteRange(editor, editor.getCaretModel().getPrimaryCaret(), blockRange, SelectionType.BLOCK_WISE, false);
         }
-        else {
-          final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
-                                                    EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
-          return VimPlugin.getChange().deleteRange(editor, caret, lineRange, SelectionType.LINE_WISE, false);
-        }
+        final TextRange blockRange = new TextRange(starts, ends);
+        return VimPlugin.getChange()
+          .deleteRange(editor, editor.getCaretModel().getPrimaryCaret(), blockRange, SelectionType.BLOCK_WISE, false);
       }
     });
   }
