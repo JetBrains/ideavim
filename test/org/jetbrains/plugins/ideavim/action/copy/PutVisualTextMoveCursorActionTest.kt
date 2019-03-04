@@ -86,29 +86,6 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
         myFixture.checkResult(newFile)
     }
 
-    fun `test put text in block selection`() {
-        val file = """
-            A Discovery
-
-            <caret>I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-        """.trimIndent()
-        val newFile = """
-            A Discovery
-
-            Discovery<caret> it in a legendary land
-            Discoveryks and lavender and tufted grass,
-            Discoveryt was settled on some sodden sand
-            Discovery the torrent of a mountain pass.
-        """.trimIndent()
-        val editor = configureByText(file)
-        VimPlugin.getRegister().storeText(editor, TextRange(2, 11), SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("<C-v>", "3j", "2e", "gp"))
-        myFixture.checkResult(newFile)
-    }
-
     fun `test put line in block selection`() {
         val file = """
             <caret>A Discovery

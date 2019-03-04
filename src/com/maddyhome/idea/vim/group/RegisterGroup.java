@@ -126,6 +126,10 @@ public class RegisterGroup {
     logger.debug("register reset");
   }
 
+  public void resetRegisters() {
+    registers.clear();
+  }
+
   /**
    * Store text into the last register.
    *

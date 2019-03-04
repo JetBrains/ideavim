@@ -19,63 +19,117 @@
 
 package org.jetbrains.plugins.ideavim.action.copy
 
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.common.Register
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import junit.framework.TestCase
+import com.maddyhome.idea.vim.helper.VimBehaviourDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.junit.Test
 
 
 /**
  * @author Alex Plate
+ *
+ * c - characterwise
+ * l - linewise
+ * b - blockwise
+ *
+ *   Table of test cases
+ *
+ *            ||    copied with
+ *            ||  c  |  l  |  b  |
+ *   p      ======================
+ *   a w    c ||  1  |  2  |  3  |
+ *   s i    --||------------------
+ *   t t    l ||  4  |  5  |  6  |
+ *   e h    --||------------------
+ *   d      b ||  7  |  8  |  9  |
  */
-
 class PutVisualTextActionTest : VimTestCase() {
 
+    // ----- Case 1: Copied | Characterwise | --- pasted | Characterwise | ---| small p |--------------------
+
+    @Test
+    fun `test put visual line without copy`() {
+        val before = """
+            <caret>I found it in a legendary land
+            all rocks and lavender and tufted grass,
+        """.trimIndent()
+        configureByText(before)
+        typeText(parseKeys("V", "p"))
+        val after = """
+            <caret>all rocks and lavender and tufted grass,
+        """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @Test
+    fun `test put visual text without copy`() {
+        val before = "<caret>I found it in a legendary land"
+        configureByText(before)
+        typeText(parseKeys("ve", "p"))
+        val after = "<caret> it in a legendary land"
+        myFixture.checkResult(after)
+    }
+
+    @Test
     fun `test put visual text`() {
         val before = "<caret>I found it in a legendary land"
         val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+        typeText(parseKeys("ve", "p"))
+        val after = "legendar<caret>y it in a legendary land"
+        myFixture.checkResult(after)
+    }
+
+    @Test
+    fun `test put visual text twice`() {
+        val before = "<caret>I found it in a legendary land"
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
         typeText(parseKeys("v2e", "2p"))
         val after = "legendarylegendar<caret>y in a legendary land"
         myFixture.checkResult(after)
     }
 
+    @Test
     fun `test put visual text full line`() {
         val before = "<caret>I found it in a legendary land"
         val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
         typeText(parseKeys("v$", "2p"))
         val after = "legendarylegendar<caret>y"
         myFixture.checkResult(after)
     }
 
+    @Test
+    fun `test put visual text multicaret`() {
+        val before = "<caret>I found <caret>it in a <caret>legendary land"
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+        typeText(parseKeys("ve", "p"))
+        val after = "legendar<caret>y legendar<caret>y in a legendar<caret>y land"
+        myFixture.checkResult(after)
+    }
+
+    @Test
+    fun `test put visual text another direction`() {
+        val before = "I foun<caret>d it in a legendary land"
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
+        typeText(parseKeys("vb", "p"))
+        val after = "I legendar<caret>y it in a legendary land"
+        myFixture.checkResult(after)
+    }
+
+    // ----- Case 2: Copied | Linewise | --- pasted | Characterwise | ---| small p |--------------------
+
+    @Test
     fun `test put visual text linewise`() {
-        val before = "<caret>I found it in a legendary land"
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.LINE_WISE, false)
-        typeText(parseKeys("v2e", "p"))
-        val after = """
-
-            <caret>legendary
-             in a legendary land
-            """.trimIndent()
-        myFixture.checkResult(after)
-    }
-
-    fun `test put visual text line linewise`() {
-        val before = "<caret>I found it in a legendary land"
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("V", "p"))
-        val after = "<caret>legendary\n"
-        myFixture.checkResult(after)
-    }
-
-    fun `test replace row`() {
-        val file = """
+        val before = """
             A Discovery
 
             <caret>I found it in a legendary land
@@ -83,241 +137,1215 @@ class PutVisualTextActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val newFile = """
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+        typeText(parseKeys("ve", "p"))
+        val after = """
+            A Discovery
+
+
+            <caret>A Discovery
+             it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @Test
+    fun `test put visual text linewise in middle`() {
+        val before = """
+            A Discovery
+
+            I found<caret> it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+        typeText(parseKeys("ve", "p"))
+        val after = """
+            A Discovery
+
+            I found
+            <caret>A Discovery
+             in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @Test
+    fun `test put visual text linewise last line`() {
+        val before = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            <caret>hard by the torrent of a mountain pass.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+        typeText(parseKeys("ve", "p"))
+        val after = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+
+            <caret>A Discovery
+             by the torrent of a mountain pass.
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @Test
+    fun `test put visual text linewise last line full line`() {
+        val before = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            <caret>hard by the torrent of a mountain pass.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+        typeText(parseKeys("v$", "p"))
+        val after = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+
+            <caret>A Discovery
+
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @Test
+    fun `test put visual text linewise multicaret`() {
+        val before = """
+            A Discovery
+
+            <caret>I found it in a legendary land
+            <caret>all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            <caret>hard by the torrent of a mountain pass.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+        typeText(parseKeys("ve", "p"))
+        val after = """
+            A Discovery
+
+
+            <caret>A Discovery
+             it in a legendary land
+
+            <caret>A Discovery
+             rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+
+            <caret>A Discovery
+             by the torrent of a mountain pass.
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @Test
+    fun `test put visual text linewise multicaret on same line`() {
+        val before = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            <caret>hard by the<caret> torrent of a mountain pass.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+        typeText(parseKeys("ve", "p"))
+        val after = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+
+            <caret>A Discovery
+             by the
+            <caret>A Discovery
+             of a mountain pass.
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @Test
+    fun `test put visual text linewise multicaret on same line twice`() {
+        val before = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            <caret>hard by the<caret> torrent of a mountain pass.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+        typeText(parseKeys("ve", "2p"))
+        val after = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+
+            <caret>A Discovery
+            A Discovery
+             by the
+            <caret>A Discovery
+            A Discovery
+             of a mountain pass.
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    // ----- Case 3: Copied | Blockwise | --- pasted | Characterwise | ---| small p |--------------------
+
+    @Test
+    fun `test put visual text blockwise`() {
+        val before = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The <caret>features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            the dingy underside, the checquered fringe.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+        typeText(parseKeys("ve", "p"))
+        val after = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The <caret>|found| it combines mark it as new
+            to s|l roc|cience: shape and shade -- the special tinge,
+            akin|ere i| to moonlight, tempering its blue,
+            the dingy underside, the checquered fringe.
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @Test
+    fun `test put visual text blockwise on last line`() {
+        val before = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            the dingy <caret>underside, the checquered fringe.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+        typeText(parseKeys("ve", "p"))
+        val after = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            the dingy <caret>|found|, the checquered fringe.
+                      |l roc|
+                      |ere i|
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @Test
+    fun `test put visual text blockwise on last line twice`() {
+        val before = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            the dingy <caret>underside, the checquered fringe.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+        typeText(parseKeys("ve", "2p"))
+        val after = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            the dingy <caret>|found||found|, the checquered fringe.
+                      |l roc||l roc|
+                      |ere i||ere i|
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @Test
+    fun `test put visual text blockwise multicaret`() {
+        val before = """
+            A Discovery
+
+            I |found| it in a <caret>legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            the dingy <caret>underside, the checquered fringe.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+        typeText(parseKeys("ve", "p"))
+        val after = """
+            A Discovery
+
+            I |found| it in a <caret>|found| land
+            al|l roc|ks and la|l roc|vender and tufted grass,
+            wh|ere i|t was set|ere i|tled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            the dingy <caret>|found|, the checquered fringe.
+                      |l roc|
+                      |ere i|
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    // ----- Case 4: Copied | Characterwise | --- pasted | Linewise | ---| small p |--------------------
+
+    @Test
+    fun `test put visual text character to line`() {
+        val before = """
+            A Discovery
+
+            I found <caret>it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+        typeText(parseKeys("V", "p"))
+        val after = """
             A Discovery
 
             <caret>Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @Test
+    fun `test put visual text character to line twice`() {
+        val before = """
+            A Discovery
+
+            I found <caret>it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
         """.trimIndent()
-        val editor = configureByText(file)
-        VimPlugin.getRegister().storeText(editor, TextRange(2, 11), SelectionType.LINE_WISE, false)
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+        typeText(parseKeys("V", "2p"))
+        val after = """
+            A Discovery
+
+            <caret>Discovery
+            Discovery
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            <caret>Discovery
+    """, trimIndent = true)
+    @Test
+    fun `test put visual text character to last line`() {
+        val before = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by <caret>the torrent of a mountain pass.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
         typeText(parseKeys("V", "p"))
-        myFixture.checkResult(newFile)
-    }
-
-    fun `test put text in block selection`() {
-        val file = """
+        val after = """
             A Discovery
-
-            <caret>I found it in a legendary land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-        """.trimIndent()
-        val newFile = """
-            A Discovery
-
-            Discover<caret>y it in a legendary land
-            Discoveryks and lavender and tufted grass,
-            Discoveryt was settled on some sodden sand
-            Discovery the torrent of a mountain pass.
-        """.trimIndent()
-        val editor = configureByText(file)
-        VimPlugin.getRegister().storeText(editor, TextRange(2, 11), SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("<C-v>", "3j", "2e", "p"))
-        myFixture.checkResult(newFile)
-    }
-
-    fun `test put line in block selection`() {
-        val file = """
-            <caret>A Discovery
 
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-        """.trimIndent()
-        val newFile = """
-            A Discovery
+            <caret>Discovery
 
-            ound it in a legendary land
-             rocks and lavender and tufted grass,
-            re it was settled on some sodden sand
-            <caret>d by the torrent of a mountain pass.
-            A Discovery
-
-        """.trimIndent()
-        typeTextInFile(parseKeys("Y", "2j", "<C-v>", "2l", "3j", "p"), file)
-        myFixture.checkResult(newFile)
-    }
-
-    fun `test Put visual text linewise`() {
-        val before = "<caret>I found it in a legendary land"
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.LINE_WISE, false)
-        typeText(parseKeys("v2e", "P"))
-        val after = """
-
-            <caret>legendary
-             in a legendary land
             """.trimIndent()
         myFixture.checkResult(after)
     }
 
-    fun `test Put visual text`() {
-        val before = "<caret>I found it in a legendary land"
+    @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
+
+            <caret>Discovery
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            <caret>Discovery
+    """, trimIndent = true)
+    @Test
+    fun `test put visual text character to line multicaret`() {
+        val before = """
+            A Discovery
+
+            I found <caret>it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the <caret>torrent of a mountain pass.
+        """.trimIndent()
         val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("v2e", "2P"))
-        val after = "legendarylegendar<caret>y in a legendary land"
+        VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+        typeText(parseKeys("V", "p"))
+        val after = """
+            A Discovery
+
+            <caret>Discovery
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            <caret>Discovery
+
+            """.trimIndent()
         myFixture.checkResult(after)
     }
 
-    fun `test Put visual text full line`() {
-        val before = "<caret>I found it in a legendary land"
+    @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
+
+            <caret>Discovery
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            <caret>Discovery
+    """, trimIndent = true)
+    @Test
+    fun `test put visual text character to line multicaret on same line`() {
+        val before = """
+            A Discovery
+
+            I found <caret>it in a <caret>legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the <caret>torrent of a mountain pass.
+        """.trimIndent()
         val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("v$", "2P"))
-        val after = "legendarylegendar<caret>y"
+        VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+        typeText(parseKeys("V", "p"))
+        val after = """
+            A Discovery
+
+            <caret>Discovery
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            <caret>Discovery
+
+            """.trimIndent()
         myFixture.checkResult(after)
     }
 
-    fun `test Put visual text line linewise`() {
-        val before = "<caret>I found it in a legendary land"
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("V", "P"))
-        val after = "<caret>legendary\n"
-        myFixture.checkResult(after)
-    }
+    // ----- Case 5: Copied | Linewise | --- pasted | Linewise | ---| small p |--------------------
 
-    fun `test Put line in block selection`() {
-        val file = """
-            <caret>A Discovery
+    @Test
+    fun `test put visual text line to line`() {
+        val before = """
+            A Discovery
 
-            I found it in a legendary land
+            I found <caret>it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val newFile = """
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+        typeText(parseKeys("V", "p"))
+        val after = """
             A Discovery
 
             <caret>A Discovery
-            ound it in a legendary land
-             rocks and lavender and tufted grass,
-            re it was settled on some sodden sand
-            d by the torrent of a mountain pass.
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @Test
+    fun `test put visual text line to line twice`() {
+        val before = """
+            A Discovery
+
+            I found <caret>it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
         """.trimIndent()
-        typeTextInFile(parseKeys("Y", "2j", "<C-v>", "2l", "3j", "P"), file)
-        myFixture.checkResult(newFile)
-    }
-
-
-    // Legacy tests
-    fun `test put visual text linewise multicaret`() {
-        val before = """
-            q<caret>werty
-            as<caret>dfgh
-            <caret>zxcvbn
-
-            """.trimIndent()
         val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, TextRange(14, 21), SelectionType.LINE_WISE, false)
-        typeText(parseKeys("vl", "p"))
+        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+        typeText(parseKeys("V", "2p"))
         val after = """
-            q
-            <caret>zxcvbn
-            rty
-            as
-            <caret>zxcvbn
-            gh
+            A Discovery
 
-            <caret>zxcvbn
-            cvbn
-
+            <caret>A Discovery
+            A Discovery
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
             """.trimIndent()
         myFixture.checkResult(after)
     }
 
+    @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
 
-    fun `test put visual block visual line mode`() {
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            <caret>A Discovery
+    """, trimIndent = true)
+    @Test
+    fun `test put visual text line to last line`() {
         val before = """
-            qw<caret>e
-            asd
-            zxc
-            rty
-            fgh
-            vbn
-            """.trimIndent()
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the <caret>torrent of a mountain pass.
+        """.trimIndent()
         val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.BLOCK_WISE, false)
-        typeText(parseKeys("<S-v>", "p"))
+        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+        typeText(parseKeys("V", "p"))
         val after = """
-            <caret>fgh
-            asd
-            zxc
-            rty
-            fgh
-            vbn
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            <caret>A Discovery
+
             """.trimIndent()
         myFixture.checkResult(after)
     }
 
-    fun `test put visual block linewise`() {
+    @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
+
+            <caret>A Discovery
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            <caret>A Discovery
+    """, trimIndent = true)
+    @Test
+    fun `test put visual text line to line multicaret`() {
         val before = """
-            qw<caret>e
-            asd
-            zxc
-            rty
-            fgh
-            vbn
-            """.trimIndent()
+            A Discovery
+
+            I found <caret>it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the <caret>torrent of a mountain pass.
+        """.trimIndent()
         val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.LINE_WISE, false)
-        typeText(parseKeys("<C-v>", "h", "p"))
+        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+        typeText(parseKeys("V", "p"))
         val after = """
-            <caret>q
-            fgh
+            A Discovery
 
-            asd
-            zxc
-            rty
-            fgh
-            vbn
+            <caret>A Discovery
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            <caret>A Discovery
+
             """.trimIndent()
         myFixture.checkResult(after)
     }
 
+    @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
 
-    fun `test put visual text multicaret`() {
-        val before = "<caret>qwe asd <caret>zxc rty <caret>fgh vbn"
-        val editor = configureByText(before)
-        VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
-        typeText(parseKeys("v2e", "2p"))
-        val after = "fghfg<caret>h fghfg<caret>h fghfg<caret>h"
-        myFixture.checkResult(after)
-    }
-
-    fun `test put empty text`() {
+            <caret>A Discovery
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            <caret>A Discovery
+    """, trimIndent = true)
+    @Test
+    fun `test put visual text line to line multicaret on same line`() {
         val before = """
-            qwe
-            <caret>asd
-            z<caret>xc
+            A Discovery
 
-            """.trimIndent()
+            I found <caret>it in a <caret>legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the <caret>torrent of a mountain pass.
+        """.trimIndent()
         val editor = configureByText(before)
-
-        val text = "\uFFFF"
-        val register = Register('a', SelectionType.CHARACTER_WISE, parseKeys(text))
-        VimPlugin.getRegister().selectRegister('a')
-        TestCase.assertNull(register.getText())
-        VimPlugin.getRegister().storeTextInternal(editor, TextRange(0, 1), text, SelectionType.CHARACTER_WISE, 'a',
-                false)
-
-        typeText(parseKeys("p"))
-        myFixture.checkResult(before)
-
-        typeText(parseKeys("vlp"))
+        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+        typeText(parseKeys("V", "p"))
         val after = """
-            qwe
-            d
-            z
+            A Discovery
+
+            <caret>A Discovery
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            <caret>A Discovery
 
             """.trimIndent()
         myFixture.checkResult(after)
     }
 
+    // ----- Case 6: Copied | Blockwise | --- pasted | Linewise | ---| small p |--------------------
+
+
+    @Test
+    fun `test put visual text blockwise to line`() {
+        val before = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The <caret>features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            the dingy underside, the checquered fringe.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+        typeText(parseKeys("V", "p"))
+        val after = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            <caret>|found|
+            |l roc|
+            |ere i|
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            the dingy underside, the checquered fringe.
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            <caret>|found|
+            |l roc|
+            |ere i|
+    """, trimIndent = true)
+    @Test
+    fun `test put visual text blockwise on last line to line`() {
+        val before = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            the dingy <caret>underside, the checquered fringe.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+        typeText(parseKeys("V", "p"))
+        val after = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            <caret>|found|
+            |l roc|
+            |ere i|
+
+
+
+
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            <caret>|found|
+            |l roc|
+            |ere i|
+            |found|
+            |l roc|
+            |ere i|
+    """, trimIndent = true)
+    @Test
+    fun `test put visual text blockwise on last line twice to line`() {
+        val before = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            the dingy <caret>underside, the checquered fringe.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+        typeText(parseKeys("V", "2p"))
+        val after = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            |found||found|
+            |l roc||l roc|
+            |ere i||ere i|
+
+
+
+
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
+
+            <caret>|found|
+            |l roc|
+            |ere i|
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            <caret>|found|
+            |l roc|
+            |ere i|
+    """, trimIndent = true)
+    @Test
+    fun `test put visual text blockwise multicaret to line`() {
+        val before = """
+            A Discovery
+
+            I |found| it in a <caret>legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            the dingy <caret>underside, the checquered fringe.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+        typeText(parseKeys("V", "p"))
+        val after = """
+            A Discovery
+
+            <caret>|found|
+            |l roc|
+            |ere i|
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            <caret>|found|
+            |l roc|
+            |ere i|
+
+
+
+
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    // ----- Case 7: Copied | Characterwise | --- pasted | Blockwise | ---| small p |--------------------
+
+    @Test
+    fun `test put visual block without copy`() {
+        val before = """
+            I <caret>|found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+        """.trimIndent()
+        configureByText(before)
+        typeText(parseKeys("<C-V>2ej", "p"))
+        val after = """
+            I  it in a legendary land
+            alks and lavender and tufted grass,
+        """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+
+    @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
+
+            I Discover<caret>y it in a legendary land
+            alDiscoveryks and lavender and tufted grass,
+            whDiscoveryt was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+    """, trimIndent = true, description = "Different cursor position")
+    @Test
+    fun `test put visual text character to block`() {
+        val before = """
+            A Discovery
+
+            I <caret>|found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+        typeText(parseKeys("<C-V>2e2j", "p"))
+        val after = """
+            A Discovery
+
+            I Discovery it in a legendary land
+            alDiscoveryks and lavender and tufted grass,
+            whDiscover<caret>yt was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
+
+            I DiscoveryDiscover<caret>y it in a legendary land
+            alDiscoveryDiscoveryks and lavender and tufted grass,
+            whDiscoveryDiscoveryt was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+    """, trimIndent = true, description = "Different cursor position")
+    @Test
+    fun `test put visual text character to block twice`() {
+        val before = """
+            A Discovery
+
+            I <caret>|found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+        typeText(parseKeys("<C-V>2e2j", "2p"))
+        val after = """
+            A Discovery
+
+            I DiscoveryDiscovery it in a legendary land
+            alDiscoveryDiscoveryks and lavender and tufted grass,
+            whDiscoveryDiscover<caret>yt was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    // ----- Case 8: Copied | Linewise | --- pasted | Blockwise | ---| small p |--------------------
+
+
+    @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
+
+            I  it in a legendary land
+            alks and lavender and tufted grass,
+            wht was settled on some sodden sand
+            <caret>A Discovery
+            hard by the torrent of a mountain pass.
+    """, trimIndent = true)
+    @Test
+    fun `test put visual text line to block`() {
+        val before = """
+            A Discovery
+
+            I <caret>|found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+        typeText(parseKeys("<C-V>2e2j", "p"))
+        val after = """
+            A Discovery
+
+            I  it in a legendary land
+            alks and lavender and tufted grass,
+            <caret>wht was settled on some sodden sand
+            A Discovery
+
+            hard by the torrent of a mountain pass.
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
+
+            I  it in a legendary land
+            alks and lavender and tufted grass,
+            wht was settled on some sodden sand
+            <caret>A Discovery
+            A Discovery
+            hard by the torrent of a mountain pass.
+            """, trimIndent = true)
+    @Test
+    fun `test put visual text line to block twice`() {
+        val before = """
+            A Discovery
+
+            I <caret>|found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+        typeText(parseKeys("<C-V>2e2j", "2p"))
+        val after = """
+            A Discovery
+
+            I  it in a legendary land
+            alks and lavender and tufted grass,
+            <caret>wht was settled on some sodden sand
+            A Discovery
+
+            A Discovery
+
+            hard by the torrent of a mountain pass.
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+
+    @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
+
+            I  it in a legendary land
+            alks and lavender and tufted grass,
+            wht was settled on some sodden sand
+            ha the torrent of a mountain pass.
+            <caret>A Discovery
+    """, trimIndent = true)
+    @Test
+    fun `test put visual text line to block till end`() {
+        val before = """
+            A Discovery
+
+            I <caret>|found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            ha|rd by| the torrent of a mountain pass.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+        typeText(parseKeys("<C-V>2e3j", "p"))
+        val after = """
+            A Discovery
+
+            I  it in a legendary land
+            alks and lavender and tufted grass,
+            wht was settled on some sodden sand
+            <caret>ha the torrent of a mountain pass.
+            A Discovery
+
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    // ----- Case 9: Copied | Blockwise | --- pasted | Blockwise | ---| small p |--------------------
+
+    @Test
+    fun `test put visual text blockwise to block`() {
+        val before = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The <caret>|features| it combines mark it as new
+            to s|cience: |shape and shade -- the special tinge,
+            akin| to moon|light, tempering its blue,
+            the dingy underside, the checquered fringe.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+        typeText(parseKeys("<C-V>2e2j", "p"))
+        val after = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The <caret>|found| it combines mark it as new
+            to s|l roc|shape and shade -- the special tinge,
+            akin|ere i|light, tempering its blue,
+            the dingy underside, the checquered fringe.
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The <caret>|found| it combines mark it as new
+            to s|l roc|shape and shade -- the special tinge,
+            akin|ere i|light, tempering its blue,
+            the derside, the checquered fringe.
+    """, trimIndent = true, description = "Cursor position differs")
+    @Test
+    fun `test put visual text blockwise to longer block`() {
+        val before = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The <caret>|features| it combines mark it as new
+            to s|cience: |shape and shade -- the special tinge,
+            akin| to moon|light, tempering its blue,
+            the |dingy un|derside, the checquered fringe.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+        typeText(parseKeys("<C-V>2e3j", "p"))
+        val after = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The |found| it combines mark it as new
+            to s|l roc|shape and shade -- the special tinge,
+            akin|ere i|light, tempering its blue,
+            the <caret>derside, the checquered fringe.
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @Test
+    fun `test put visual text blockwise to shorter block`() {
+        val before = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The <caret>|features| it combines mark it as new
+            to s|cience: |shape and shade -- the special tinge,
+            akin to moonlight, tempering its blue,
+            the dingy underside, the checquered fringe.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+        typeText(parseKeys("<C-V>2ej", "p"))
+        val after = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The <caret>|found| it combines mark it as new
+            to s|l roc|shape and shade -- the special tinge,
+            akin|ere i| to moonlight, tempering its blue,
+            the dingy underside, the checquered fringe.
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @Test
+    fun `test put visual text blockwise to shorter block on line end`() {
+        val before = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to <caret>|moonlight|, tempering its blue,
+            the ding|y undersi|de, the checquered fringe.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+        typeText(parseKeys("<C-V>elj", "p"))
+        val after = """
+            A Discovery
+
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+
+            The features it combines mark it as new
+            to science: shape and shade -- the special tinge,
+            akin to <caret>|found|, tempering its blue,
+            the ding|l roc|de, the checquered fringe.
+                    |ere i|
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+}
+
+infix fun String.rangeOf(str: String): TextRange {
+    val clearString = this.replace("<caret>", "")
+    val indexOf = clearString.indexOf(str)
+    if (indexOf == -1) throw RuntimeException("$str was not found in $clearString")
+
+    return TextRange(indexOf, indexOf + str.length)
+}
+
+fun Editor.rangeOf(first: String, nLinesDown: Int): TextRange {
+    val starts = ArrayList<Int>()
+    val ends = ArrayList<Int>()
+
+    val indexOf = document.text.replace("<caret>", "").indexOf(first)
+    if (indexOf == -1) throw RuntimeException("$first was not found in $this")
+
+    val position = offsetToLogicalPosition(indexOf)
+    if (position.line + nLinesDown > document.lineCount) throw RuntimeException("To much lines")
+
+    starts += indexOf
+    ends += indexOf + first.length
+
+    for (i in 1..nLinesDown) {
+        val nextOffset = logicalPositionToOffset(LogicalPosition(position.line + i, position.column))
+        starts += nextOffset
+        ends += nextOffset + first.length
+    }
+    return TextRange(starts.toIntArray(), ends.toIntArray())
 }

@@ -47,7 +47,7 @@ object PutCopyGroup {
             count: Int,
             indent: Boolean,
             cursorAfter: Boolean,
-            register: Register
+            register: Register?
     ): Boolean {
         val subMode = CommandState.getInstance(editor).subMode
         val updatedRange = if (subMode == CommandState.SubMode.VISUAL_LINE) {
@@ -61,6 +61,13 @@ object PutCopyGroup {
 
         var startOffset = range.startOffset
 
+        if (register == null) return false
+        var text = register.text ?: run {
+            VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, startOffset)
+            VimPlugin.getMark().setChangeMarks(editor, TextRange(startOffset, startOffset))
+            return false
+        }
+
         val type = register.type
         if (type == SelectionType.LINE_WISE) {
             if (subMode != CommandState.SubMode.VISUAL_LINE) {
@@ -69,14 +76,8 @@ object PutCopyGroup {
             }
         } else if (type == SelectionType.CHARACTER_WISE) {
             if (subMode == CommandState.SubMode.VISUAL_LINE) {
-                editor.document.insertString(startOffset, "\n")
+                text += "\n"
             }
-        }
-
-        val text = register.text ?: run {
-            VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, startOffset)
-            VimPlugin.getMark().setChangeMarks(editor, TextRange(startOffset, startOffset))
-            return false
         }
 
         PutCopyGroup.putText(editor, caret, context, text, type, subMode, startOffset,
@@ -92,12 +93,21 @@ object PutCopyGroup {
             count: Int,
             indent: Boolean,
             cursorAfter: Boolean,
-            register: Register,
+            register: Register?,
             insertBefore: Boolean
     ): Boolean {
         val res = Ref.create(true)
         val subMode = CommandState.getInstance(editor).subMode
-        val type = register.type
+
+        editor.caretModel.runForEachCaret({ caret ->
+            val range = ranges[caret] ?: run {
+                res.set(false)
+                return@runForEachCaret
+            }
+            VimPlugin.getChange().deleteRangeWithoutVisual(editor, caret, range.vimTextRange, SelectionType.fromSubMode(subMode), false)
+        })
+
+        val type = register?.type ?: return false
         val lineWiseInsert = type == SelectionType.LINE_WISE
 
         val linewiseLine = if (insertBefore)
@@ -105,48 +115,74 @@ object PutCopyGroup {
         else
             EditorHelper.getOrderedCaretsList(editor, DECREASING_OFFSET)[0].visualPosition.line
 
-        editor.caretModel.runForEachCaret({ caret ->
-            val range = ranges[caret] ?: run {
-                res.set(false)
-                return@runForEachCaret
+        when (type) {
+            SelectionType.CHARACTER_WISE -> {
+                editor.caretModel.runForEachCaret({ caret ->
+                    val range = ranges[caret] ?: run {
+                        res.set(false)
+                        return@runForEachCaret
+                    }
+
+                    caret.moveToOffset(range.startOffset)
+
+                    if (!lineWiseInsert) {
+                        val startOffset = range.startOffset
+
+                        val text = register.text ?: run {
+                            VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, startOffset)
+                            VimPlugin.getMark().setChangeMarks(editor, TextRange(startOffset, startOffset))
+                            res.set(false)
+                            return@runForEachCaret
+                        }
+
+                        PutCopyGroup.putText(editor, caret, context, text, type, subMode, startOffset,
+                                count, indent && type == SelectionType.LINE_WISE, cursorAfter)
+                    }
+
+                }, true)
+
             }
-            VimPlugin.getChange().deleteRange(editor, caret, range.vimTextRange, SelectionType.fromSubMode(subMode), false)
-
-            caret.moveToOffset(range.startOffset)
-
-            if (!lineWiseInsert) {
-                val startOffset = range.startOffset
-
-                val text = register.text ?: run {
-                    VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, startOffset)
-                    VimPlugin.getMark().setChangeMarks(editor, TextRange(startOffset, startOffset))
-                    res.set(false)
-                    return@runForEachCaret
+            SelectionType.LINE_WISE -> {
+                val startOffset = if (insertBefore) {
+                    EditorHelper.getLineStartOffset(editor, linewiseLine)
+                } else {
+                    EditorHelper.getLineEndOffset(editor, linewiseLine, true)
                 }
 
-                PutCopyGroup.putText(editor, caret, context, text, type, subMode, startOffset,
+                var text = register.text ?: run {
+                    VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, startOffset)
+                    VimPlugin.getMark().setChangeMarks(editor, TextRange(startOffset, startOffset))
+                    return false
+                }
+
+                if (!insertBefore) text = "\n" + text
+
+                PutCopyGroup.putText(editor, editor.caretModel.primaryCaret, context, text, type, subMode, startOffset,
                         count, indent && type == SelectionType.LINE_WISE, cursorAfter)
             }
+            SelectionType.BLOCK_WISE -> {
+                val caret = EditorHelper.getOrderedCaretsList(editor, INCREASING_OFFSET)[0]
+                val range = ranges[caret] ?: run {
+                    res.set(false)
+                    return false
+                }
 
-        }, true)
+                caret.moveToOffset(range.startOffset)
 
-        if (lineWiseInsert) {
-            val startOffset = if (insertBefore) {
-                EditorHelper.getLineStartOffset(editor, linewiseLine)
-            } else {
-                EditorHelper.getLineEndOffset(editor, linewiseLine, true)
+                if (!lineWiseInsert) {
+                    val startOffset = range.startOffset
+
+                    val text = register.text ?: run {
+                        VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, startOffset)
+                        VimPlugin.getMark().setChangeMarks(editor, TextRange(startOffset, startOffset))
+                        res.set(false)
+                        return false
+                    }
+
+                    PutCopyGroup.putText(editor, caret, context, text, type, subMode, startOffset,
+                            count, indent && type == SelectionType.LINE_WISE, cursorAfter)
+                }
             }
-
-            var text = register.text ?: run {
-                VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, startOffset)
-                VimPlugin.getMark().setChangeMarks(editor, TextRange(startOffset, startOffset))
-                return false
-            }
-
-            if (!insertBefore) text = "\n" + text
-
-            PutCopyGroup.putText(editor, editor.caretModel.primaryCaret, context, text, type, subMode, startOffset,
-                    count, indent && type == SelectionType.LINE_WISE, cursorAfter)
         }
 
         return res.get()

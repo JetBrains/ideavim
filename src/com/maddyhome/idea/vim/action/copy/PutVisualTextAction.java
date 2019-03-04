@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.group.copy.PutCopyGroup;
 import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandlerModern;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.EnumSet;
@@ -49,7 +50,7 @@ public class PutVisualTextAction extends VimCommandAction {
   public PutVisualTextAction() {
     super(new VisualOperatorActionHandlerModern(true, CaretOrder.DECREASING_OFFSET) {
 
-      private Register register;
+      @Nullable private Register register;
 
       @Override
       protected boolean executeBlockwise(@NotNull Editor editor,
@@ -73,8 +74,7 @@ public class PutVisualTextAction extends VimCommandAction {
       protected boolean beforeExecution(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         Register register = VimPlugin.getRegister().getLastRegister();
         VimPlugin.getRegister().resetRegister();
-        if (register == null) return false;
-        if (register.getType() == SelectionType.LINE_WISE && editor.isOneLineMode()) return false;
+        if (register != null && register.getType() == SelectionType.LINE_WISE && editor.isOneLineMode()) return false;
         this.register = register;
         return true;
       }

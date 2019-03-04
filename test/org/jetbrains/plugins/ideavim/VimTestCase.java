@@ -37,7 +37,10 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
-import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.helper.EditorDataContext;
+import com.maddyhome.idea.vim.helper.RunnableHelper;
+import com.maddyhome.idea.vim.helper.StringHelper;
+import com.maddyhome.idea.vim.helper.TestInputModel;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.option.ToggleOption;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
@@ -80,6 +83,7 @@ public abstract class VimTestCase extends UsefulTestCase {
     myFixture = null;
     ExEntryPanel.getInstance().deactivate(false);
     VimScriptGlobalEnvironment.getInstance().getVariables().clear();
+    VimPlugin.getRegister().resetRegisters();
     super.tearDown();
   }
 

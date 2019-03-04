@@ -27,11 +27,22 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.*;
+import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.CaretModel;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.LogicalPosition;
+import com.intellij.openapi.editor.VisualPosition;
 import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx;
-import com.intellij.openapi.editor.event.*;
+import com.intellij.openapi.editor.event.DocumentEvent;
+import com.intellij.openapi.editor.event.DocumentListener;
+import com.intellij.openapi.editor.event.EditorFactoryAdapter;
+import com.intellij.openapi.editor.event.EditorFactoryEvent;
+import com.intellij.openapi.editor.event.EditorMouseAdapter;
+import com.intellij.openapi.editor.event.EditorMouseEvent;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.impl.TextRangeInterval;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -43,13 +54,23 @@ import com.intellij.util.ObjectUtils;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.*;
+import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandFlags;
+import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.handler.CaretOrder;
-import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.helper.CaretData;
+import com.maddyhome.idea.vim.helper.CharacterHelper;
+import com.maddyhome.idea.vim.helper.EditorData;
+import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.SearchHelper;
+import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.option.BoundListOption;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
@@ -57,7 +78,11 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.List;
 
 /**
  * Provides all the insert/replace related functionality
@@ -1005,6 +1030,37 @@ public class ChangeGroup {
         pos = EditorHelper.normalizeOffset(editor, range.getStartOffset(), isChange);
       }
       MotionGroup.moveCaret(editor, caret, pos, true);
+    }
+    return res;
+  }
+
+  /**
+   * Delete the range of text.
+   *
+   * @param editor   The editor to delete the text from
+   * @param caret    The caret to be moved after deletion
+   * @param range    The range to delete
+   * @param type     The type of deletion
+   * @param isChange Is from a change action
+   * @return true if able to delete the text, false if not
+   */
+  public boolean deleteRangeWithoutVisual(@NotNull Editor editor,
+                                          @NotNull Caret caret,
+                                          @NotNull TextRange range,
+                                          @Nullable SelectionType type,
+                                          boolean isChange) {
+
+    final boolean res = deleteText(editor, range, type);
+    final int size = EditorHelper.getFileSize(editor);
+    if (res) {
+      final int pos;
+      if (caret.getOffset() > size) {
+        pos = size - 1;
+      }
+      else {
+        pos = EditorHelper.normalizeOffset(editor, range.getStartOffset(), isChange);
+      }
+      MotionGroup.moveCaret(editor, caret, pos, false);
     }
     return res;
   }

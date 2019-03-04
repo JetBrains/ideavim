@@ -38,3 +38,10 @@ val Caret.visualRange: TextRange
 
 val Editor.visualBlockRange: TextRange
     get() = selectionModel.run { TextRange(blockSelectionStarts, blockSelectionEnds) }
+
+@Target(AnnotationTarget.FUNCTION)
+annotation class VimBehaviourDiffers(
+        val originalVimAfter: String = "",
+        val trimIndent: Boolean = false,
+        val description: String = ""
+)
