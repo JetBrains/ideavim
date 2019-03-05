@@ -34,8 +34,6 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.CaretData
 import com.maddyhome.idea.vim.helper.EditorData
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.visualBlockRange
-import com.maddyhome.idea.vim.helper.visualRange
 import com.maddyhome.idea.vim.option.BoundStringOption
 import com.maddyhome.idea.vim.option.Options
 import java.util.*
@@ -259,10 +257,6 @@ object VisualMotionGroup {
 
         return VisualChange(lines, chars, type)
     }
-
-    fun getVisualRange(editor: Editor) = editor.visualBlockRange
-
-    fun getVisualRange(caret: Caret) = caret.visualRange
 
     fun getRawVisualRange(caret: Caret) = TextRange(CaretData.getVisualStart(caret), CaretData.getVisualEnd(caret))
 

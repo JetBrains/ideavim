@@ -24,7 +24,12 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
-import com.intellij.openapi.fileEditor.*;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
+import com.intellij.openapi.fileEditor.FileEditorManagerListener;
+import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.fileTypes.FileType;
@@ -40,11 +45,11 @@ import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.group.motion.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
+import com.maddyhome.idea.vim.helper.UtilsKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -304,7 +309,7 @@ public class FileGroup {
     else {
       msg.append("Selected ");
 
-      TextRange vr = VisualMotionGroup.INSTANCE.getVisualRange(editor);
+      TextRange vr = UtilsKt.getVisualBlockRange(editor);
       vr.normalize();
 
       int lines;

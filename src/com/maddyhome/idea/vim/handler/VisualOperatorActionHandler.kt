@@ -101,6 +101,10 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         return res.get()
     }
 
+    final override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
+        return super.execute(editor, caret, context, cmd)
+    }
+
     private fun Editor.collectVisualRanges(): Map<Caret, RangeMarker>? = this.caretModel.allCarets.associateWith {
         if (CommandState.getInstance(this).mode == CommandState.Mode.VISUAL)
             it.visualRangeMarker
