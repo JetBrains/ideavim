@@ -29,19 +29,19 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.VisualChange
-import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
 import com.maddyhome.idea.vim.helper.CaretData
 import com.maddyhome.idea.vim.helper.EditorData
 import com.maddyhome.idea.vim.helper.visualBlockRange
 import com.maddyhome.idea.vim.helper.visualRangeMarker
-import java.util.*
 
 /**
  * @author Alex Plate
  */
 abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
+
+    protected open val operateCaretsInAlwaysBatch: Boolean = false
 
     protected abstract fun executeCharacterAndLinewise(editor: Editor, caret: Caret, context: DataContext, cmd: Command, range: RangeMarker): Boolean
     protected abstract fun executeBlockwise(editor: Editor, context: DataContext, cmd: Command, ranges: Map<Caret, RangeMarker>): Boolean
@@ -68,9 +68,9 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
         val ranges = editor.collectVisualRanges() ?: return false
 
-        val executeInBatch = operateCaretsInBatch || CommandState.inVisualBlockMode(editor)
-        val runnable = VisualStartFinishRunnable(editor, cmd, true)
-        runnable.start()
+        val executeInBatch = operateCaretsInAlwaysBatch || CommandState.inVisualBlockMode(editor)
+        val commandWrapper = VisualStartFinishWrapper(editor, cmd)
+        commandWrapper.start()
 
         if (!beforeExecution(editor, context, cmd)) return false
 
@@ -91,8 +91,7 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
         afterExecution(editor, context, cmd, res.get())
 
-        runnable.setRes(res.get())
-        runnable.finish()
+        commandWrapper.finish(res.get())
         ranges.values.forEach { it.dispose() }
 
         EditorData.getChangeSwitchMode(editor)?.let {
@@ -101,8 +100,6 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
         return res.get()
     }
-
-    protected open val operateCaretsInBatch: Boolean = false
 
     private fun Editor.collectVisualRanges(): Map<Caret, RangeMarker>? = this.caretModel.allCarets.associateWith {
         if (CommandState.getInstance(this).mode == CommandState.Mode.VISUAL)
@@ -113,18 +110,9 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         }
     }
 
-    protected class VisualStartFinishRunnable(private val editor: Editor, private val cmd: Command?, private val myRunForEachCaret: Boolean) {
-        private var res: Boolean = false
+    protected class VisualStartFinishWrapper(private val editor: Editor, private val cmd: Command) {
         private lateinit var lastMode: CommandState.SubMode
         private var wasRepeat: Boolean = false
-
-        init {
-            this.res = true
-        }
-
-        fun setRes(res: Boolean) {
-            this.res = res
-        }
 
         private fun startForCaret(caret: Caret) {
             if (CommandState.getInstance(editor).mode == CommandState.Mode.REPEAT) {
@@ -137,90 +125,71 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
             }
 
             var change: VisualChange? = null
-            var res: TextRange? = null
             if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
-                res = if (!myRunForEachCaret) {
-                    VisualMotionGroup.getVisualRange(editor)
-                } else {
-                    VisualMotionGroup.getVisualRange(caret)
-                }
                 if (!wasRepeat) {
                     change = VisualMotionGroup
-                            .getVisualOperatorRange(editor, caret, cmd?.flags
-                                    ?: EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE))
+                            .getVisualOperatorRange(editor, caret, cmd.flags)
                 }
-                if (logger.isDebugEnabled) logger.debug("change=$change")
+                logger.debug("change=$change")
             }
             CaretData.setVisualChange(caret, change)
         }
 
         fun start() {
             logger.debug("start")
-            if (cmd == null) return
             wasRepeat = CommandState.getInstance(editor).mode == CommandState.Mode.REPEAT
-            EditorData.setKeepingVisualOperatorAction(editor, !cmd.flags.contains(CommandFlags.FLAG_EXIT_VISUAL))
+            EditorData.setKeepingVisualOperatorAction(editor, CommandFlags.FLAG_EXIT_VISUAL !in cmd.flags)
 
-            if (myRunForEachCaret) {
-                for (caret in editor.caretModel.allCarets) {
-                    startForCaret(caret)
-                }
-            } else {
-                startForCaret(editor.caretModel.primaryCaret)
+            for (caret in editor.caretModel.allCarets) {
+                startForCaret(caret)
             }
 
             // If this is a mutli key change then exit visual now
-            if (cmd.flags.contains(CommandFlags.FLAG_MULTIKEY_UNDO)) {
+            if (CommandFlags.FLAG_MULTIKEY_UNDO in cmd.flags) {
                 logger.debug("multikey undo - exit visual")
                 VisualMotionGroup.exitVisual(editor)
-            } else if (cmd.flags.contains(CommandFlags.FLAG_FORCE_LINEWISE)) {
+            } else if (CommandFlags.FLAG_FORCE_LINEWISE in cmd.flags) {
                 lastMode = CommandState.getInstance(editor).subMode
-                if (lastMode != CommandState.SubMode.VISUAL_LINE && cmd.flags.contains(CommandFlags.FLAG_FORCE_VISUAL)) {
+                if (lastMode != CommandState.SubMode.VISUAL_LINE && CommandFlags.FLAG_FORCE_VISUAL in cmd.flags) {
                     VisualMotionGroup.toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE)
                 }
             }
         }
 
-        private fun finishForCaret(caret: Caret) {
-            if (cmd == null || !cmd.flags.contains(CommandFlags.FLAG_MULTIKEY_UNDO) && !cmd.flags.contains(CommandFlags.FLAG_EXPECT_MORE)) {
+        private fun finishForCaret(caret: Caret, res: Boolean) {
+            if (CommandFlags.FLAG_MULTIKEY_UNDO !in cmd.flags && CommandFlags.FLAG_EXPECT_MORE !in cmd.flags) {
                 if (wasRepeat) {
                     CaretData.setLastColumn(editor, caret, CaretData.getPreviousLastColumn(caret))
                 }
             }
 
             if (res) {
-                val change = CaretData.getVisualChange(caret)
-                if (change != null) {
-                    CaretData.setLastVisualOperatorRange(caret, change)
+                CaretData.getVisualChange(caret)?.let {
+                    CaretData.setLastVisualOperatorRange(caret, it)
                 }
             }
         }
 
-        fun finish() {
+        fun finish(res: Boolean) {
             logger.debug("finish")
 
-            if (cmd != null && cmd.flags.contains(CommandFlags.FLAG_FORCE_LINEWISE)) {
-                if (this::lastMode.isInitialized && lastMode != CommandState.SubMode.VISUAL_LINE && cmd.flags.contains(CommandFlags.FLAG_FORCE_VISUAL)) {
+            if (CommandFlags.FLAG_FORCE_LINEWISE in cmd.flags) {
+                if (this::lastMode.isInitialized && lastMode != CommandState.SubMode.VISUAL_LINE && CommandFlags.FLAG_FORCE_VISUAL in cmd.flags) {
                     VisualMotionGroup.toggleVisual(editor, 1, 0, lastMode)
                 }
             }
 
-            if (cmd == null || !cmd.flags.contains(CommandFlags.FLAG_MULTIKEY_UNDO) && !cmd.flags.contains(CommandFlags.FLAG_EXPECT_MORE)) {
+            if (CommandFlags.FLAG_MULTIKEY_UNDO !in cmd.flags && CommandFlags.FLAG_EXPECT_MORE !in cmd.flags) {
                 logger.debug("not multikey undo - exit visual")
                 VisualMotionGroup.exitVisual(editor)
             }
 
             if (res) {
-                if (cmd != null) {
-                    CommandState.getInstance(editor).saveLastChangeCommand(cmd)
-                }
+                CommandState.getInstance(editor).saveLastChangeCommand(cmd)
             }
 
-            if (myRunForEachCaret) {
-                for (caret in editor.caretModel.allCarets) {
-                    finishForCaret(caret)
-                }
-            } else {
-                finishForCaret(editor.caretModel.primaryCaret)
+            for (caret in editor.caretModel.allCarets) {
+                finishForCaret(caret, res)
             }
 
             EditorData.setKeepingVisualOperatorAction(editor, false)

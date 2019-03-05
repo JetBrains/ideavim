@@ -31,7 +31,7 @@ abstract class VisualOperatorActionBatchHandler : VisualOperatorActionHandler() 
 
     abstract fun executeBatch(editor: Editor, context: DataContext, cmd: Command, ranges: Map<Caret, RangeMarker>): Boolean
 
-    final override val operateCaretsInBatch: Boolean = true
+    final override val operateCaretsInAlwaysBatch: Boolean = true
 
     final override fun beforeCaLExecution(editor: Editor, context: DataContext, cmd: Command) = true
     final override fun afterCaLExecution(editor: Editor, context: DataContext, cmd: Command, res: Boolean) = Unit

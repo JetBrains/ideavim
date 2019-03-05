@@ -130,7 +130,7 @@ public class CaretData {
   }
 
   /**
-   * Gets the previous last column (set by {@link com.maddyhome.idea.vim.handler.VisualOperatorActionHandler.VisualStartFinishRunnable}).
+   * Gets the previous last column (set by {@link com.maddyhome.idea.vim.handler.VisualOperatorActionHandler.VisualStartFinishWrapper}).
    */
   public static int getPreviousLastColumn(@NotNull Caret caret) {
     @Nullable Integer ret = caret.getUserData(PREV_LAST_COLUMN);
