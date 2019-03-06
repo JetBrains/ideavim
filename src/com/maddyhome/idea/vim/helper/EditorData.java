@@ -28,7 +28,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.LightVirtualFile;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
-import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.ui.ExOutputPanel;
 import org.jetbrains.annotations.NotNull;
@@ -61,7 +60,6 @@ public class EditorData {
     editor.putUserData(COMMAND_STATE, null);
     editor.putUserData(LAST_HIGHLIGHTS, null);
     editor.putUserData(LAST_SELECTION_TYPE, null);
-    editor.putUserData(LAST_VISUAL_RANGE, null);
     editor.putUserData(MORE_PANEL, null);
     editor.putUserData(EX_OUTPUT_MODEL, null);
   }
@@ -116,15 +114,6 @@ public class EditorData {
 
   public static void setLastSelectionType(@NotNull Editor editor, @NotNull SelectionType selectionType) {
     editor.getDocument().putUserData(LAST_SELECTION_TYPE, selectionType);
-  }
-
-  @Nullable
-  public static TextRange getLastVisualRange(@NotNull Editor editor) {
-    return editor.getDocument().getUserData(LAST_VISUAL_RANGE);
-  }
-
-  public static void setLastVisualRange(@NotNull Editor editor, @NotNull TextRange textRange) {
-    editor.getDocument().putUserData(LAST_VISUAL_RANGE, textRange);
   }
 
   @Nullable
@@ -190,81 +179,6 @@ public class EditorData {
 
   public static void setExOutputModel(@NotNull Editor editor, @NotNull ExOutputModel model) {
     editor.putUserData(EX_OUTPUT_MODEL, model);
-  }
-
-  /**
-   * Sets the visual block start for the editor.
-   *
-   * @param editor The editor
-   */
-  public static void setVisualBlockStart(@NotNull Editor editor, int visualBlockStart) {
-    editor.putUserData(VISUAL_BLOCK_START, visualBlockStart);
-  }
-
-  /**
-   * Gets the visual block start for the editor.
-   *
-   * @param editor The editor
-   */
-  public static int getVisualBlockStart(@NotNull Editor editor) {
-    Integer visualBlockStart = editor.getUserData(VISUAL_BLOCK_START);
-
-    if (visualBlockStart == null) {
-      return editor.getCaretModel().getPrimaryCaret().getOffset();
-    }
-    else {
-      return visualBlockStart;
-    }
-  }
-
-  /**
-   * Sets the visual block end for the editor.
-   *
-   * @param editor The editor
-   */
-  public static void setVisualBlockEnd(@NotNull Editor editor, int visualBlockEnd) {
-    editor.putUserData(VISUAL_BLOCK_END, visualBlockEnd);
-  }
-
-  /**
-   * Gets the visual block offset for the editor.
-   *
-   * @param editor The editor
-   */
-  public static int getVisualBlockOffset(@NotNull Editor editor) {
-    Integer visualBlockOffset = editor.getUserData(VISUAL_BLOCK_OFFSET);
-
-    if (visualBlockOffset == null) {
-      return editor.getCaretModel().getPrimaryCaret().getOffset();
-    }
-    else {
-      return visualBlockOffset;
-    }
-  }
-
-  /**
-   * Sets the visual block offset for the editor.
-   *
-   * @param editor The editor
-   */
-  public static void setVisualBlockOffset(@NotNull Editor editor, int visualBlockOffset) {
-    editor.putUserData(VISUAL_BLOCK_OFFSET, visualBlockOffset);
-  }
-
-  /**
-   * Gets the visual block end for the editor.
-   *
-   * @param editor The editor
-   */
-  public static int getVisualBlockEnd(@NotNull Editor editor) {
-    Integer visualBlockEnd = editor.getUserData(VISUAL_BLOCK_END);
-
-    if (visualBlockEnd == null) {
-      return editor.getCaretModel().getPrimaryCaret().getOffset();
-    }
-    else {
-      return visualBlockEnd;
-    }
   }
 
   /**
@@ -378,7 +292,6 @@ public class EditorData {
   }
 
   private static final Key<SelectionType> LAST_SELECTION_TYPE = new Key<SelectionType>("lastSelectionType");
-  public static final Key<TextRange> LAST_VISUAL_RANGE = new Key<TextRange>("lastVisualRange");
   private static final Key<String> LAST_SEARCH = new Key<String>("lastSearch");
   private static final Key<Collection<RangeHighlighter>> LAST_HIGHLIGHTS =
     new Key<Collection<RangeHighlighter>>("lastHighlights");
@@ -390,14 +303,11 @@ public class EditorData {
   private static final Key<ExOutputPanel> MORE_PANEL = new Key<ExOutputPanel>("IdeaVim.morePanel");
   private static final Key<ExOutputModel> EX_OUTPUT_MODEL = new Key<ExOutputModel>("IdeaVim.exOutputModel");
   private static final Key<TestInputModel> TEST_INPUT_MODEL = new Key<TestInputModel>("IdeaVim.testInputModel");
-  private static final Key<Integer> VISUAL_BLOCK_START = new Key<>("visuaBlockStart");
-  private static final Key<Integer> VISUAL_BLOCK_END = new Key<>("visualBlockEnd");
-  private static final Key<Integer> VISUAL_BLOCK_OFFSET = new Key<>("visualBlockOffset");
   private static final Key<Boolean> IGNORE_NEXT_MOVE = new Key<>("shouldIgnoreNextMove");
   private static final Key<Boolean> IS_KEEPING_VISUAL_OPERATOR_ACTION = new Key<>("isKeepingVisualOperatorAction");
   private static final Key<CommandState.Mode> CHANGE_ACTION_SWITCH_MODE = new Key<>("changeActionSwitchMode");
   private static final Key<Boolean> WAS_VISUAL_BLOCK_MODE = new Key<>("wasVisualBlockMode");
-  private static final  Key<Caret> LAST_DOWN_CARET = new Key<>("lastDownCaret");
+  private static final Key<Caret> LAST_DOWN_CARET = new Key<>("lastDownCaret");
 
   private static final Logger logger = Logger.getInstance(EditorData.class.getName());
 

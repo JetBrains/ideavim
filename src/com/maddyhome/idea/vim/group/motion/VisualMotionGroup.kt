@@ -34,6 +34,9 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.CaretData
 import com.maddyhome.idea.vim.helper.EditorData
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.helper.vimStartSelectionAtPoint
+import com.maddyhome.idea.vim.helper.vimUpdateEditorSelection
 import com.maddyhome.idea.vim.option.BoundStringOption
 import com.maddyhome.idea.vim.option.Options
 import java.util.*
@@ -54,12 +57,9 @@ object VisualMotionGroup {
 
         val primaryCaret = editor.caretModel.primaryCaret
 
-        CaretData.setVisualStart(primaryCaret, visualMarks.startOffset)
-        CaretData.setVisualEnd(primaryCaret, visualMarks.endOffset)
+        primaryCaret.vimStartSelectionAtPoint(visualMarks.startOffset)
+        MotionGroup.moveCaret(editor, primaryCaret, visualMarks.endOffset)
 
-        updateSelection(editor, primaryCaret, visualMarks.endOffset)
-
-        primaryCaret.moveToOffset(visualMarks.endOffset)
         editor.scrollingModel.scrollToCaret(ScrollType.CENTER)
 
         return true
@@ -67,22 +67,21 @@ object VisualMotionGroup {
 
     fun swapVisualSelections(editor: Editor): Boolean {
         val lastSelectionType = EditorData.getLastSelectionType(editor) ?: return false
-        val lastVisualRange = EditorData.getLastVisualRange(editor) ?: return false
+
+        val lastVisualRange = VimPlugin.getMark().getVisualSelectionMarks(editor) ?: return false
+        val primaryCaret = editor.caretModel.primaryCaret
+        editor.caretModel.removeSecondaryCarets()
+        val vimSelectionStart = primaryCaret.vimSelectionStart
+                ?: throw RuntimeException("Trying to access selection start, but it's not set")
 
         val selectionType = SelectionType.fromSubMode(CommandState.getInstance(editor).subMode)
         EditorData.setLastSelectionType(editor, selectionType)
-
-        editor.caretModel.removeSecondaryCarets()
-
-        val primaryCaret = editor.caretModel.primaryCaret
-        CaretData.setVisualStart(primaryCaret, lastVisualRange.startOffset)
-        CaretData.setVisualEnd(primaryCaret, lastVisualRange.endOffset)
+        VimPlugin.getMark().setVisualSelectionMarks(editor, TextRange(vimSelectionStart, primaryCaret.offset))
 
         CommandState.getInstance(editor).subMode = lastSelectionType.toSubMode()
+        primaryCaret.vimStartSelectionAtPoint(lastVisualRange.startOffset)
+        MotionGroup.moveCaret(editor, primaryCaret, lastVisualRange.endOffset)
 
-        updateSelection(editor, primaryCaret, lastVisualRange.endOffset)
-
-        primaryCaret.moveToOffset(lastVisualRange.endOffset)
         editor.scrollingModel.scrollToCaret(ScrollType.CENTER)
 
         return true
@@ -121,77 +120,69 @@ object VisualMotionGroup {
 
         KeyHandler.getInstance().reset(editor)
 
-        for (caret in editor.caretModel.allCarets) {
-            CaretData.setVisualStart(caret, caret.selectionStart)
-            var visualEnd = caret.selectionEnd
-            if (CommandState.getInstance(editor).subMode == CommandState.SubMode.VISUAL_CHARACTER) {
-                val opt = Options.getInstance().getOption("selection") as BoundStringOption
-                visualEnd -= if (opt.value == "exclusive") 0 else 1
-            }
-            CaretData.setVisualEnd(caret, visualEnd)
-        }
-
-        VimPlugin.getMark().setVisualSelectionMarks(editor, getRawVisualRange(editor.caretModel.primaryCaret))
+        VimPlugin.getMark().setVisualSelectionMarks(editor, TextRange(editor.caretModel.primaryCaret.selectionStart, editor.caretModel.primaryCaret.selectionEnd))
     }
 
     /**
      * This function toggles visual mode.
      *
      * If visual mode is disabled, enable it
-     * If visual mode is enabled, but [mode] differs, update visual according to new [mode]
-     * If visual mode is enabled with the same [mode], disable it
+     * If visual mode is enabled, but [subMode] differs, update visual according to new [subMode]
+     * If visual mode is enabled with the same [subMode], disable it
      */
-    fun toggleVisual(editor: Editor, count: Int, rawCount: Int, mode: CommandState.SubMode): Boolean {
+    fun toggleVisual(editor: Editor, count: Int, rawCount: Int, subMode: CommandState.SubMode): Boolean {
         if (CommandState.getInstance(editor).mode != CommandState.Mode.VISUAL) {
-            // Enable visual mode
+            // Enable visual subMode
             if (rawCount > 0) {
                 if (editor.caretModel.caretCount > 1) {
+                    // FIXME: 2019-03-05 Support multicaret
                     return false
                 }
+                // FIXME: 2019-03-05  When there was no previous Visual operation [count] characters are selected.
                 val range = CaretData.getLastVisualOperatorRange(editor.caretModel.primaryCaret) ?: return false
-                val newMode = range.type.toSubMode()
+                val newSubMode = range.type.toSubMode()
                 val start = editor.caretModel.offset
                 val end = calculateVisualRange(editor, range, count)
                 val primaryCaret = editor.caretModel.primaryCaret
-                CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, newMode, MappingMode.VISUAL)
-                CaretData.setVisualStart(primaryCaret, start)
-                updateSelection(editor, primaryCaret, end)
-                MotionGroup.moveCaret(editor, primaryCaret, CaretData.getVisualEnd(primaryCaret), true)
+                CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, newSubMode, MappingMode.VISUAL)
+                primaryCaret.vimStartSelectionAtPoint(start)
+                MotionGroup.moveCaret(editor, primaryCaret, end, true)
             } else {
-                CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, MappingMode.VISUAL)
-                if (mode == CommandState.SubMode.VISUAL_BLOCK) {
-                    EditorData.setVisualBlockStart(editor, editor.selectionModel.selectionStart)
-                    updateBlockSelection(editor, editor.selectionModel.selectionEnd)
-                    MotionGroup
-                            .moveCaret(editor, editor.caretModel.primaryCaret, EditorData.getVisualBlockEnd(editor), true)
-                } else {
-                    for (caret in editor.caretModel.allCarets) {
-                        CaretData.setVisualStart(caret, caret.selectionStart)
-                        updateSelection(editor, caret, caret.selectionEnd)
-                        MotionGroup.moveCaret(editor, caret, CaretData.getVisualEnd(caret), true)
-                    }
-                }
+                CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, subMode, MappingMode.VISUAL)
+                editor.caretModel.allCarets.forEach { it.vimStartSelectionAtPoint(it.offset) }
             }
             return true
         }
 
-        if (mode == CommandState.getInstance(editor).subMode) {
-            // Disable visual mode
+        if (subMode == CommandState.getInstance(editor).subMode) {
+            // Disable visual subMode
             VisualMotionGroup.exitVisual(editor)
             return true
         }
 
-        // Update visual mode with new sub mode
-        CommandState.getInstance(editor).subMode = mode
-        if (mode == CommandState.SubMode.VISUAL_BLOCK) {
-            updateBlockSelection(editor, EditorData.getVisualBlockEnd(editor))
-        } else {
-            for (caret in editor.caretModel.allCarets) {
-                updateSelection(editor, caret, CaretData.getVisualEnd(caret))
-            }
+        // Update visual subMode with new sub subMode
+        CommandState.getInstance(editor).subMode = subMode
+        for (caret in editor.caretModel.allCarets) {
+            caret.vimUpdateEditorSelection()
         }
 
         return true
+    }
+
+    fun controlNonVimSelectionChange(editor: Editor) {
+        if (CommandState.getInstance(editor).mode != CommandState.Mode.VISUAL) {
+            if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
+                CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER, MappingMode.VISUAL)
+                editor.caretModel.allCarets.filter(Caret::hasSelection).forEach { caret ->
+                    val start = caret.selectionStart
+                    val endAdj = if (exclusiveSelection) 0 else 1
+                    val end = (caret.selectionEnd - endAdj).coerceAtLeast(0)
+                    caret.vimStartSelectionAtPoint(start)
+                    MotionGroup.moveCaret(editor, caret, end, true)
+                }
+                KeyHandler.getInstance().reset(editor)
+            }
+        }
     }
 
     private fun calculateVisualRange(editor: Editor, range: VisualChange, count: Int): Int {
@@ -222,12 +213,13 @@ object VisualMotionGroup {
     }
 
     fun getVisualOperatorRange(editor: Editor, caret: Caret, cmdFlags: EnumSet<CommandFlags>): VisualChange {
-        var start = CaretData.getVisualStart(caret)
-        var end = CaretData.getVisualEnd(caret)
+        var start = caret.selectionStart
+        var end = caret.selectionEnd
 
         if (CommandState.inVisualBlockMode(editor)) {
-            start = EditorData.getVisualBlockStart(editor)
-            end = EditorData.getVisualBlockEnd(editor)
+            start = caret.vimSelectionStart
+                    ?: throw RuntimeException("Trying to access selection start, but it's not set")
+            end = caret.offset
         }
 
         if (start > end) {
@@ -244,136 +236,61 @@ object VisualMotionGroup {
         val (type, chars) = if (CommandState.getInstance(editor).subMode == CommandState.SubMode.VISUAL_LINE || CommandFlags.FLAG_MOT_LINEWISE in cmdFlags) {
             SelectionType.LINE_WISE to ep.column
         } else if (CommandState.getInstance(editor).subMode == CommandState.SubMode.VISUAL_CHARACTER) {
-            SelectionType.CHARACTER_WISE to if (lines > 1) {
-                ep.column
-            } else {
-                ep.column - sp.column + 1
-            }
+            SelectionType.CHARACTER_WISE to if (lines > 1) ep.column else ep.column - sp.column
         } else {
             SelectionType.BLOCK_WISE to if (CaretData.getLastColumn(editor.caretModel.primaryCaret) == MotionGroup.LAST_COLUMN) {
                 MotionGroup.LAST_COLUMN
-            } else ep.column - sp.column + 1
+            } else ep.column - sp.column
         }
 
         return VisualChange(lines, chars, type)
     }
 
-    fun getRawVisualRange(caret: Caret) = TextRange(CaretData.getVisualStart(caret), CaretData.getVisualEnd(caret))
-
-    fun updateBlockSelection(editor: Editor) = updateBlockSelection(editor, EditorData.getVisualBlockEnd(editor))
-
-    private fun updateBlockSelection(editor: Editor, offset: Int) {
-        EditorData.setVisualBlockEnd(editor, offset)
-        EditorData.setVisualBlockOffset(editor, offset)
-        val start = EditorData.getVisualBlockStart(editor)
-        val end = EditorData.getVisualBlockEnd(editor)
-
-        var blockStart = editor.offsetToLogicalPosition(start)
-        var blockEnd = editor.offsetToLogicalPosition(end)
-        if (blockStart.column < blockEnd.column) {
-            blockEnd = LogicalPosition(blockEnd.line, blockEnd.column + 1)
-        } else {
-            blockStart = LogicalPosition(blockStart.line, blockStart.column + 1)
-        }
-        editor.selectionModel.setBlockSelection(blockStart, blockEnd)
-
-        for (caret in editor.caretModel.allCarets) {
-            val line = caret.logicalPosition.line
-            val lineEndOffset = EditorHelper.getLineEndOffset(editor, line, true)
-
-            if (CaretData.getLastColumn(editor.caretModel.primaryCaret) >= MotionGroup.LAST_COLUMN) {
-                caret.setSelection(caret.selectionStart, lineEndOffset)
-            }
-            if (!EditorHelper.isLineEmpty(editor, line, false)) {
-                caret.moveToOffset(caret.selectionEnd - 1)
-            }
-        }
-        editor.caretModel.primaryCaret.moveToOffset(end)
-
-        VimPlugin.getMark().setVisualSelectionMarks(editor, TextRange(start, end))
-    }
-
-    fun updateSelection(editor: Editor, caret: Caret, offset: Int) {
-        if (CommandState.getInstance(editor).subMode == CommandState.SubMode.VISUAL_BLOCK) {
-            VisualMotionGroup.updateBlockSelection(editor, offset)
-            return
-        }
-
-        CaretData.setVisualEnd(caret, offset)
-        var start = CaretData.getVisualStart(caret)
-        var end = offset
-        val subMode = CommandState.getInstance(editor).subMode
-
-        if (start > end) {
-            val t = start
-            start = end
-            end = t
-        }
-        if (subMode == CommandState.SubMode.VISUAL_CHARACTER) {
-            val opt = Options.getInstance().getOption("selection") as BoundStringOption
-            val lineEnd = EditorHelper.getLineEndForOffset(editor, end)
-            val adj = if (opt.value == "exclusive" || end == lineEnd) 0 else 1
-            val adjEnd = minOf(EditorHelper.getFileSize(editor), end + adj)
-            caret.setSelection(start, adjEnd)
-        } else if (subMode == CommandState.SubMode.VISUAL_LINE) {
-            start = EditorHelper.getLineStartForOffset(editor, start)
-            end = EditorHelper.getLineEndForOffset(editor, end)
-            caret.setSelection(start, end)
-        }
-
-        VimPlugin.getMark().setVisualSelectionMarks(editor, TextRange(start, end))
-    }
-
-    fun swapVisualBlockEnds(editor: Editor): Boolean {
-        if (!CommandState.inVisualBlockMode(editor)) return false
-        val t = EditorData.getVisualBlockEnd(editor)
-        EditorData.setVisualBlockEnd(editor, EditorData.getVisualBlockStart(editor))
-        EditorData.setVisualBlockStart(editor, t)
-
-        MotionGroup.moveCaret(editor, editor.caretModel.primaryCaret, EditorData.getVisualBlockEnd(editor))
-
-        return true
-    }
-
     fun swapVisualEnds(editor: Editor, caret: Caret): Boolean {
-        val t = CaretData.getVisualEnd(caret)
-        CaretData.setVisualEnd(caret, CaretData.getVisualStart(caret))
-        CaretData.setVisualStart(caret, t)
+        val vimSelectionStart = caret.vimSelectionStart
+                ?: throw RuntimeException("Trying to access selection start, but it's not set")
+        caret.vimSelectionStart = caret.offset
 
-        MotionGroup.moveCaret(editor, caret, CaretData.getVisualEnd(caret))
+        MotionGroup.moveCaret(editor, caret, vimSelectionStart)
 
         return true
     }
 
     fun processEscape(editor: Editor) = VisualMotionGroup.exitVisual(editor)
 
-    fun resetVisual(editor: Editor, removeSelection: Boolean) {
+    fun resetVisual(editor: Editor) {
         val wasVisualBlock = CommandState.inVisualBlockMode(editor)
         val selectionType = SelectionType.fromSubMode(CommandState.getInstance(editor).subMode)
         EditorData.setLastSelectionType(editor, selectionType)
-        VimPlugin.getMark().getVisualSelectionMarks(editor)?.let {
-            EditorData.setLastVisualRange(editor, it)
+
+        // FIXME: 2019-03-05 Make it multicaret
+        val primaryCaret = editor.caretModel.primaryCaret
+        val vimSelectionStart = primaryCaret.vimSelectionStart
+                ?: throw RuntimeException("Trying to access selection start, but it's not set")
+        VimPlugin.getMark().setVisualSelectionMarks(editor, TextRange(vimSelectionStart, primaryCaret.offset))
+        editor.caretModel.allCarets.forEach { it.vimSelectionStart = null }
+
+        if (!EditorData.isKeepingVisualOperatorAction(editor)) {
+            for (caret in editor.caretModel.allCarets) {
+                caret.removeSelection()
+            }
         }
-        if (removeSelection) {
-            if (!EditorData.isKeepingVisualOperatorAction(editor)) {
-                for (caret in editor.caretModel.allCarets) {
-                    caret.removeSelection()
-                }
-            }
-            if (wasVisualBlock) {
-                editor.caretModel.removeSecondaryCarets()
-            }
+        if (wasVisualBlock) {
+            editor.caretModel.removeSecondaryCarets()
         }
         CommandState.getInstance(editor).subMode = CommandState.SubMode.NONE
     }
 
     fun exitVisual(editor: Editor) {
-        resetVisual(editor, true)
+        resetVisual(editor)
         if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
             CommandState.getInstance(editor).popState()
         }
     }
 
-
-    fun moveVisualStart(caret: Caret, startOffset: Int) = CaretData.setVisualStart(caret, startOffset)
+    val exclusiveSelection: Boolean
+        get() {
+            val opt = Options.getInstance().getOption("selection") as BoundStringOption
+            return opt.value == "exclusive"
+        }
 }

@@ -53,16 +53,10 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
         return false;
       }
 
-      TextRange vr;
-      vr = VisualMotionGroup.INSTANCE.getRawVisualRange(caret);
+      TextRange vr = new TextRange(caret.getSelectionStart(), caret.getSelectionEnd());
 
       boolean block = cmd.getFlags().contains(CommandFlags.FLAG_TEXT_BLOCK);
-      int newstart = block || vr.getEndOffset() >= vr.getStartOffset() ? range.getStartOffset() : range.getEndOffset();
       int newend = block || vr.getEndOffset() >= vr.getStartOffset() ? range.getEndOffset() : range.getStartOffset();
-
-      if (vr.getStartOffset() == vr.getEndOffset() || block) {
-        VisualMotionGroup.INSTANCE.moveVisualStart(caret, newstart);
-      }
 
       if ((cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE) &&
            !cmd.getFlags().contains(CommandFlags.FLAG_VISUAL_CHARACTERWISE)) &&

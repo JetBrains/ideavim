@@ -33,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  */
 public abstract class EditorActionHandlerBase extends EditorActionHandler {
+  public static boolean vimActionInExecution = false;
   protected boolean myRunForEachCaret;
 
   public EditorActionHandlerBase() {
@@ -57,6 +58,7 @@ public abstract class EditorActionHandlerBase extends EditorActionHandler {
     final Command cmd = state.getCommand();
 
     try {
+      vimActionInExecution = true;
       if (myRunForEachCaret) {
         if (cmd == null || caret == null || !execute(editor, caret, context, cmd)) {
           VimPlugin.indicateError();
@@ -70,6 +72,9 @@ public abstract class EditorActionHandlerBase extends EditorActionHandler {
     }
     catch (ExecuteMethodNotOverriddenException e) {
       VimPlugin.indicateError();
+    }
+    finally {
+      vimActionInExecution = false;
     }
   }
 

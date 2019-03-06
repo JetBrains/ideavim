@@ -41,7 +41,7 @@ public class VisualSwapEndsAction extends VimCommandAction {
     super(new EditorActionHandlerBase() {
       protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         if (CommandState.inVisualBlockMode(editor)) {
-          return VisualMotionGroup.INSTANCE.swapVisualBlockEnds(editor);
+          return VisualMotionGroup.INSTANCE.swapVisualEnds(editor, editor.getCaretModel().getPrimaryCaret());
         }
         boolean ret = true;
         for (Caret caret : editor.getCaretModel().getAllCarets()) {

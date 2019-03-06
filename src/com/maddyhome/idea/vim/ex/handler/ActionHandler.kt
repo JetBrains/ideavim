@@ -32,7 +32,6 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
-import com.maddyhome.idea.vim.group.motion.VisualMotionGroup.selectPreviousVisualMode
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
 
 /**
@@ -61,6 +60,7 @@ class ActionHandler : CommandHandler(
                               context: DataContext, actionName: String) {
         val visualAction = cmd.ranges.size() > 0
         if (visualAction) {
+            // FIXME: 2019-03-05 use '< and '> marks
             VisualMotionGroup.selectPreviousVisualMode(editor)
         }
         try {

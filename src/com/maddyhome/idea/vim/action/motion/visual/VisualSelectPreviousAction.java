@@ -38,6 +38,7 @@ public class VisualSelectPreviousAction extends VimCommandAction {
   public VisualSelectPreviousAction() {
     super(new EditorActionHandlerBase() {
       protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+        // FIXME: 2019-03-05 Make it multicaret
         return VisualMotionGroup.INSTANCE.selectPreviousVisualMode(editor);
       }
     });

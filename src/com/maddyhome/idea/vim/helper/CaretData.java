@@ -23,8 +23,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.Key;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.VisualChange;
-import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.group.motion.VisualMotionGroup;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -57,61 +55,12 @@ public class CaretData {
    * @param editor The editor
    */
   public static void setLastColumn(@NotNull Editor editor, @NotNull Caret caret, int col) {
-    boolean previousWasDollar = getLastColumn(caret) >= MotionGroup.LAST_COLUMN;
-    boolean currentIsDollar = col >= MotionGroup.LAST_COLUMN;
-
     if (!CommandState.inVisualBlockMode(editor)) {
       caret.putUserData(LAST_COLUMN, col);
     }
     else {
       editor.getCaretModel().getPrimaryCaret().putUserData(LAST_COLUMN, col);
     }
-
-    if (previousWasDollar != currentIsDollar && CommandState.inVisualBlockMode(editor)) {
-      VisualMotionGroup.INSTANCE.updateBlockSelection(editor);
-    }
-  }
-
-  /**
-   * Gets the visual block start for the caret.
-   */
-  public static int getVisualStart(@NotNull Caret caret) {
-    Integer visualStart = caret.getUserData(VISUAL_START);
-
-    if (visualStart == null) {
-      return caret.getOffset();
-    }
-    else {
-      return visualStart;
-    }
-  }
-
-  /**
-   * Sets the visual block start for the caret.
-   */
-  public static void setVisualStart(@NotNull Caret caret, int visualStart) {
-    caret.putUserData(VISUAL_START, visualStart);
-  }
-
-  /**
-   * Gets the visual block end for the caret.
-   */
-  public static int getVisualEnd(@NotNull Caret caret) {
-    Integer visualEnd = caret.getUserData(VISUAL_END);
-
-    if (visualEnd == null) {
-      return caret.getOffset();
-    }
-    else {
-      return visualEnd;
-    }
-  }
-
-  /**
-   * Sets the visual block end for the caret.
-   */
-  public static void setVisualEnd(@NotNull Caret caret, int visualEnd) {
-    caret.putUserData(VISUAL_END, visualEnd);
   }
 
   /**
@@ -209,8 +158,6 @@ public class CaretData {
   }
 
   private static final Key<Integer> LAST_COLUMN = new Key<>("lastColumn");
-  private static final Key<Integer> VISUAL_START = new Key<>("visualStart");
-  private static final Key<Integer> VISUAL_END = new Key<>("visualEnd");
   private static final Key<Integer> PREV_LAST_COLUMN = new Key<>("previousLastColumn");
   private static final Key<Integer> INSERT_START = new Key<>("insertStart");
   private static final Key<Boolean> WAS_IN_FIRST_LINE = new Key<>("wasInFirstLine");

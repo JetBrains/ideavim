@@ -104,7 +104,7 @@ object PutCopyGroup {
                 res.set(false)
                 return@runForEachCaret
             }
-            VimPlugin.getChange().deleteRangeWithoutVisual(editor, caret, range.vimTextRange, SelectionType.fromSubMode(subMode), false)
+            VimPlugin.getChange().deleteRange(editor, caret, range.vimTextRange, SelectionType.fromSubMode(subMode), false)
         })
 
         val type = register?.type ?: return false

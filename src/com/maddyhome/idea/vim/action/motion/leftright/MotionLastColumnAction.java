@@ -35,6 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ *
  */
 public class MotionLastColumnAction extends MotionEditorAction {
   public MotionLastColumnAction() {
@@ -47,8 +48,12 @@ public class MotionLastColumnAction extends MotionEditorAction {
     }
 
     @Override
-    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                         int rawCount, @Nullable Argument argument) {
+    public int getOffset(@NotNull Editor editor,
+                         @NotNull Caret caret,
+                         @NotNull DataContext context,
+                         int count,
+                         int rawCount,
+                         @Nullable Argument argument) {
       boolean allow = false;
       if (CommandState.inInsertMode(editor)) {
         allow = true;

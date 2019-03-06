@@ -29,11 +29,13 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
 import com.maddyhome.idea.vim.helper.CaretData;
+import com.maddyhome.idea.vim.helper.CaretDataKt;
 import com.maddyhome.idea.vim.helper.EditorData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ *
  */
 public class MotionDownAction extends MotionEditorAction {
   public MotionDownAction() {
@@ -46,8 +48,12 @@ public class MotionDownAction extends MotionEditorAction {
     }
 
     @Override
-    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                         int rawCount, @Nullable Argument argument) {
+    public int getOffset(@NotNull Editor editor,
+                         @NotNull Caret caret,
+                         @NotNull DataContext context,
+                         int count,
+                         int rawCount,
+                         @Nullable Argument argument) {
       Caret lastDownCaret = EditorData.getLastDownCaret(editor);
       EditorData.setLastDownCaret(editor, caret);
       if (CommandState.inVisualBlockMode(editor) && EditorData.shouldIgnoreNextMove(editor)) {
@@ -57,8 +63,12 @@ public class MotionDownAction extends MotionEditorAction {
         }
       }
       if (CommandState.inVisualBlockMode(editor)) {
-        int blockEndOffset = EditorData.getVisualBlockEnd(editor);
-        int blockStartOffset = EditorData.getVisualBlockStart(editor);
+        Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+        Integer blockEndOffset = CaretDataKt.getVimSelectionStart(primaryCaret);
+        if (blockEndOffset == null) {
+          throw new RuntimeException("Trying to access selection start, but it's not set");
+        }
+        int blockStartOffset = primaryCaret.getOffset();
         VisualPosition blockEndPosition = editor.offsetToVisualPosition(blockEndOffset);
         VisualPosition blockStartPosition = editor.offsetToVisualPosition(blockStartOffset);
         if (blockEndPosition.getLine() < blockStartPosition.getLine()) {

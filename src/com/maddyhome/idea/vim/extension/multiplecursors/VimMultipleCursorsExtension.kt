@@ -24,8 +24,8 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
@@ -34,11 +34,10 @@ import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.extension.VimNonDisposableExtension
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
-import com.maddyhome.idea.vim.group.motion.VisualMotionGroup.updateSelection
-import com.maddyhome.idea.vim.helper.CaretData
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.SearchHelper.findWordUnderCursor
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.vimStartSelectionAtPoint
 import com.maddyhome.idea.vim.option.Options
 import java.lang.Integer.min
 import java.util.*
@@ -217,13 +216,13 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
   }
 
   private fun selectWord(editor: Editor, caret: Caret, pattern: String, offset: Int) {
-    CaretData.setVisualStart(caret, offset)
-    VisualMotionGroup.updateSelection(editor, caret, offset + pattern.length - 1)
+    caret.vimStartSelectionAtPoint(offset)
     MotionGroup.moveCaret(editor, caret, offset + pattern.length - 1)
   }
 
   private fun findNextOccurrence(editor: Editor, caret: Caret, range: TextRange, whole: Boolean): Int {
     caret.selectWordAtCaret(false)
+    VisualMotionGroup.controlNonVimSelectionChange(editor)
     VisualMotionGroup.setVisualMode(editor, CommandState.getInstance(editor).subMode)
 
     val offset = VimPlugin.getSearch().searchWord(editor, caret, 1, whole, 1)
