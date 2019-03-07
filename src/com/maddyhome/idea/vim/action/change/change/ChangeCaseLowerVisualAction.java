@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.action.change.change;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.RangeMarker;
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
@@ -31,12 +30,12 @@ import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
 import com.maddyhome.idea.vim.helper.UtilsKt;
+import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -46,25 +45,14 @@ public class ChangeCaseLowerVisualAction extends VimCommandAction {
   public ChangeCaseLowerVisualAction() {
     super(new VisualOperatorActionHandler() {
       @Override
-      protected boolean executeCharacterAndLinewise(@NotNull Editor editor,
-                                                    @NotNull Caret caret,
-                                                    @NotNull DataContext context,
-                                                    @NotNull Command cmd,
-                                                    @NotNull RangeMarker range) {
+      protected boolean executeAction(@NotNull Editor editor,
+                                      @NotNull Caret caret,
+                                      @NotNull DataContext context,
+                                      @NotNull Command cmd,
+                                      @NotNull VimSelection range) {
         final Editor topLevelEditor = InjectedLanguageUtil.getTopLevelEditor(editor);
         return VimPlugin.getChange()
-          .changeCaseRange(topLevelEditor, caret, UtilsKt.getVimTextRange(range), CharacterHelper.CASE_LOWER);
-      }
-
-      @Override
-      protected boolean executeBlockwise(@NotNull Editor editor,
-                                         @NotNull DataContext context,
-                                         @NotNull Command cmd,
-                                         @NotNull Map<Caret, ? extends RangeMarker> ranges) {
-        final Editor topLevelEditor = InjectedLanguageUtil.getTopLevelEditor(editor);
-        return VimPlugin.getChange()
-          .changeCaseRange(topLevelEditor, editor.getCaretModel().getPrimaryCaret(), UtilsKt.getVimTextRange(ranges),
-                           CharacterHelper.CASE_LOWER);
+          .changeCaseRange(topLevelEditor, caret, UtilsKt.toVimTextRange(range, editor), CharacterHelper.CASE_LOWER);
       }
     });
   }

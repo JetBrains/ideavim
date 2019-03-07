@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.action.change.delete;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.RangeMarker;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
@@ -29,12 +28,12 @@ import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.UtilsKt;
+import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -44,24 +43,13 @@ public class DeleteJoinVisualLinesAction extends VimCommandAction {
   public DeleteJoinVisualLinesAction() {
     super(new VisualOperatorActionHandler() {
       @Override
-      protected boolean executeCharacterAndLinewise(@NotNull Editor editor,
-                                                    @NotNull Caret caret,
-                                                    @NotNull DataContext context,
-                                                    @NotNull Command cmd,
-                                                    @NotNull RangeMarker range) {
+      protected boolean executeAction(@NotNull Editor editor,
+                                      @NotNull Caret caret,
+                                      @NotNull DataContext context,
+                                      @NotNull Command cmd,
+                                      @NotNull VimSelection range) {
         return !editor.isOneLineMode() &&
-               VimPlugin.getChange().deleteJoinRange(editor, caret, UtilsKt.getVimTextRange(range), false);
-      }
-
-      @Override
-      protected boolean executeBlockwise(@NotNull Editor editor,
-                                         @NotNull DataContext context,
-                                         @NotNull Command cmd,
-                                         @NotNull Map<Caret, ? extends RangeMarker> ranges) {
-        return !editor.isOneLineMode() &&
-               VimPlugin.getChange()
-                 .deleteJoinRange(editor, editor.getCaretModel().getPrimaryCaret(), UtilsKt.getVimTextRange(ranges),
-                                  false);
+               VimPlugin.getChange().deleteJoinRange(editor, caret, UtilsKt.toVimTextRange(range, editor), false);
       }
     });
   }

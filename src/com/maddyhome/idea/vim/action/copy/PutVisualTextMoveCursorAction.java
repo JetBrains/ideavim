@@ -26,19 +26,23 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.group.copy.PutCopyGroup;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import com.maddyhome.idea.vim.helper.StringHelper;
+import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
 /**
  * @author vlan
@@ -50,22 +54,28 @@ public class PutVisualTextMoveCursorAction extends VimCommandAction {
       private Register register;
 
       @Override
-      protected boolean executeBlockwise(@NotNull Editor editor,
-                                         @NotNull DataContext context,
-                                         @NotNull Command cmd, @NotNull Map<Caret, ? extends RangeMarker> ranges) {
-        boolean isBigP = cmd.getKeys().get(1).equals(StringHelper.parseKeys("P").get(0));
-        return PutCopyGroup.INSTANCE
-          .putVisualRangeBlockwise(editor, context, ranges, cmd.getCount(), true, true, register, isBigP);
-      }
+      protected boolean executeAction(@NotNull Editor editor,
+                                      @NotNull Caret caret,
+                                      @NotNull DataContext context,
+                                      @NotNull Command cmd,
+                                      @NotNull VimSelection range) {
+        if (CommandState.inVisualBlockMode(editor)) {
+          boolean isBigP = cmd.getKeys().get(0).equals(parseKeys("P").get(1));
+          Map<Caret, RangeMarker> ranges = new HashMap<>();
 
+          for (Caret aCaret : editor.getCaretModel().getAllCarets()) {
+            ranges.put(aCaret,
+                       editor.getDocument().createRangeMarker(aCaret.getSelectionStart(), aCaret.getSelectionEnd()));
+          }
 
-      @Override
-      protected boolean executeCharacterAndLinewise(@NotNull Editor editor,
-                                                    @NotNull Caret caret,
-                                                    @NotNull DataContext context,
-                                                    @NotNull Command cmd, @NotNull RangeMarker range) {
-        return PutCopyGroup.INSTANCE
-          .putVisualRangeCaL(editor, context, caret, range, cmd.getCount(), true, true, register);
+          return PutCopyGroup.INSTANCE
+            .putVisualRangeBlockwise(editor, context, ranges, cmd.getCount(), true, true, register, isBigP);
+        }
+        else {
+          RangeMarker rangeMarker = editor.getDocument().createRangeMarker(range.getStart(), range.getEnd());
+          return PutCopyGroup.INSTANCE
+            .putVisualRangeCaL(editor, context, caret, rangeMarker, cmd.getCount(), true, true, register);
+        }
       }
 
       @Override

@@ -22,38 +22,30 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.RangeMarker
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VisualChange
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
 import com.maddyhome.idea.vim.helper.CaretData
 import com.maddyhome.idea.vim.helper.EditorData
+import com.maddyhome.idea.vim.helper.VimSelection
+import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.helper.visualBlockRange
-import com.maddyhome.idea.vim.helper.visualRangeMarker
 
 /**
  * @author Alex Plate
  */
 abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
-    protected open val operateCaretsInAlwaysBatch: Boolean = false
-
-    protected abstract fun executeCharacterAndLinewise(editor: Editor, caret: Caret, context: DataContext, cmd: Command, range: RangeMarker): Boolean
-    protected abstract fun executeBlockwise(editor: Editor, context: DataContext, cmd: Command, ranges: Map<Caret, RangeMarker>): Boolean
+    protected abstract fun executeAction(editor: Editor, caret: Caret, context: DataContext, cmd: Command, range: VimSelection): Boolean
 
     protected open fun beforeExecution(editor: Editor, context: DataContext, cmd: Command) = true
     protected open fun afterExecution(editor: Editor, context: DataContext, cmd: Command, res: Boolean) {}
-
-    protected open fun beforeCaLExecution(editor: Editor, context: DataContext, cmd: Command) = true
-    protected open fun afterCaLExecution(editor: Editor, context: DataContext, cmd: Command, res: Boolean) {}
-
-    protected open fun beforeBlockExecution(editor: Editor, context: DataContext, cmd: Command) = true
-    protected open fun afterBlockExecution(editor: Editor, context: DataContext, cmd: Command, res: Boolean) {}
 
     final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
         logger.debug("execute, cmd=$cmd")
@@ -66,33 +58,27 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
             logger.debug("range=$range")
         }
 
-        val ranges = editor.collectVisualRanges() ?: return false
+        val selections = editor.collectSelections() ?: return false
 
-        val executeInBatch = operateCaretsInAlwaysBatch || CommandState.inVisualBlockMode(editor)
         val commandWrapper = VisualStartFinishWrapper(editor, cmd)
         commandWrapper.start()
 
         if (!beforeExecution(editor, context, cmd)) return false
 
         val res = Ref.create(true)
-        if (executeInBatch) {
-            if (!beforeBlockExecution(editor, context, cmd)) return false
-            res.set(executeBlockwise(editor, context, cmd, ranges))
-            afterBlockExecution(editor, context, cmd, res.get())
-        } else {
-            if (!beforeCaLExecution(editor, context, cmd)) return false
-            editor.caretModel.runForEachCaret({ caret ->
-                val range = ranges.getValue(caret)
-                val loopRes = executeCharacterAndLinewise(editor, caret, context, cmd, range)
+        when {
+            selections.keys.isEmpty() -> return false
+            selections.keys.size == 1 -> res.set(executeAction(editor, editor.caretModel.primaryCaret, context, cmd, selections.values.first()))
+            else -> editor.caretModel.runForEachCaret({ caret ->
+                val range = selections.getValue(caret)
+                val loopRes = executeAction(editor, caret, context, cmd, range)
                 res.set(loopRes and res.get())
             }, true)
-            afterCaLExecution(editor, context, cmd, res.get())
         }
 
         afterExecution(editor, context, cmd, res.get())
 
         commandWrapper.finish(res.get())
-        ranges.values.forEach { it.dispose() }
 
         EditorData.getChangeSwitchMode(editor)?.let {
             VimPlugin.getChange().processPostChangeModeSwitch(editor, context, it)
@@ -105,14 +91,23 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         return super.execute(editor, caret, context, cmd)
     }
 
-    private fun Editor.collectVisualRanges(): Map<Caret, RangeMarker>? = this.caretModel.allCarets.associateWith {
-        if (CommandState.getInstance(this).mode == CommandState.Mode.VISUAL)
-            it.visualRangeMarker
-        else {
-            val startAndEnd = VimPlugin.getMark().getVisualSelectionMarks(this) ?: return null
-            this.document.createRangeMarker(startAndEnd.startOffset, startAndEnd.endOffset, true)
-        }
-    }
+    private fun Editor.collectSelections(): Map<Caret, VimSelection>? =
+            this.caretModel.allCarets.associateWith { caret ->
+                val subMode = CommandState.getInstance(this).subMode
+                val adj = if (VisualMotionGroup.exclusiveSelection) 0 else 1
+                if (CommandState.getInstance(this).mode == CommandState.Mode.VISUAL)
+                    if (CommandState.inVisualBlockMode(this)) {
+                        VimSelection(caret.vimSelectionStart, caret.offset + adj, SelectionType.fromSubMode(subMode))
+                    } else {
+                        val primaryCaret = caretModel.primaryCaret
+                        return mapOf(primaryCaret to VimSelection(primaryCaret.vimSelectionStart, primaryCaret.offset + adj, SelectionType.BLOCK_WISE))
+                    }
+                else {
+                    val startAndEnd = VimPlugin.getMark().getVisualSelectionMarks(this) ?: return null
+                    val lastSelectionType = EditorData.getLastSelectionType(this) ?: return null
+                    VimSelection(startAndEnd.startOffset, startAndEnd.endOffset, lastSelectionType)
+                }
+            }
 
     protected class VisualStartFinishWrapper(private val editor: Editor, private val cmd: Command) {
         private lateinit var lastMode: CommandState.SubMode

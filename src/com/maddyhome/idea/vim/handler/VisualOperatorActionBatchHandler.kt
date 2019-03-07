@@ -21,26 +21,20 @@ package com.maddyhome.idea.vim.handler
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.RangeMarker
 import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.helper.VimSelection
 
 /**
  * @author Alex Plate
  */
 abstract class VisualOperatorActionBatchHandler : VisualOperatorActionHandler() {
+    abstract fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command): Boolean
 
-    abstract fun executeBatch(editor: Editor, context: DataContext, cmd: Command, ranges: Map<Caret, RangeMarker>): Boolean
+    final override fun executeAction(editor: Editor, caret: Caret, context: DataContext, cmd: Command, range: VimSelection) = true
 
-    final override val operateCaretsInAlwaysBatch: Boolean = true
-
-    final override fun beforeCaLExecution(editor: Editor, context: DataContext, cmd: Command) = true
-    final override fun afterCaLExecution(editor: Editor, context: DataContext, cmd: Command, res: Boolean) = Unit
-    final override fun beforeBlockExecution(editor: Editor, context: DataContext, cmd: Command) = true
-    final override fun afterBlockExecution(editor: Editor, context: DataContext, cmd: Command, res: Boolean) = Unit
-
-    final override fun executeCharacterAndLinewise(editor: Editor, caret: Caret, context: DataContext, cmd: Command, range: RangeMarker) = true
-
-    final override fun executeBlockwise(editor: Editor, context: DataContext, cmd: Command, ranges: Map<Caret, RangeMarker>): Boolean {
-        return executeBatch(editor, context, cmd, ranges)
+    final override fun beforeExecution(editor: Editor, context: DataContext, cmd: Command): Boolean {
+        return executeForAllCarets(editor, context, cmd)
     }
+
+    final override fun afterExecution(editor: Editor, context: DataContext, cmd: Command, res: Boolean) {}
 }

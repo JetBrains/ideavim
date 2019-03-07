@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.action.change.change;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.RangeMarker;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
@@ -30,12 +29,12 @@ import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.UtilsKt;
+import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -45,26 +44,15 @@ public class ChangeVisualCharacterAction extends VimCommandAction {
   public ChangeVisualCharacterAction() {
     super(new VisualOperatorActionHandler() {
       @Override
-      protected boolean executeCharacterAndLinewise(@NotNull Editor editor,
-                                                    @NotNull Caret caret,
-                                                    @NotNull DataContext context,
-                                                    @NotNull Command cmd,
-                                                    @NotNull RangeMarker range) {
+      protected boolean executeAction(@NotNull Editor editor,
+                                      @NotNull Caret caret,
+                                      @NotNull DataContext context,
+                                      @NotNull Command cmd,
+                                      @NotNull VimSelection range) {
         final Argument argument = cmd.getArgument();
         return argument != null &&
                VimPlugin.getChange()
-                 .changeCharacterRange(editor, UtilsKt.getVimTextRange(range), argument.getCharacter());
-      }
-
-      @Override
-      protected boolean executeBlockwise(@NotNull Editor editor,
-                                         @NotNull DataContext context,
-                                         @NotNull Command cmd,
-                                         @NotNull Map<Caret, ? extends RangeMarker> ranges) {
-        final Argument argument = cmd.getArgument();
-        return argument != null &&
-               VimPlugin.getChange()
-                 .changeCharacterRange(editor, UtilsKt.getVimTextRange(ranges), argument.getCharacter());
+                 .changeCharacterRange(editor, UtilsKt.toVimTextRange(range, editor), argument.getCharacter());
       }
     });
   }

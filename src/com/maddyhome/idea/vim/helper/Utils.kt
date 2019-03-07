@@ -25,21 +25,30 @@ import com.intellij.openapi.editor.RangeMarker
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-/**
- * @author Alex Plate
- */
-
-val Caret.visualRangeMarker: RangeMarker
-    get() = this.editor.document.createRangeMarker(selectionStart, selectionEnd, true)
-
 val RangeMarker.vimTextRange: TextRange
     get() = TextRange(startOffset, endOffset)
+
+fun VimSelection.toVimTextRange(editor: Editor): TextRange = if (type == SelectionType.BLOCK_WISE) {
+    val logicalStart = editor.offsetToLogicalPosition(start)
+    val logicalEnd = editor.offsetToLogicalPosition(end)
+    val lineRange = if (logicalStart.line > logicalEnd.line) logicalStart.line downTo logicalEnd.line else logicalStart.line..logicalEnd.line
+    val starts = ArrayList<Int>()
+    val ends = ArrayList<Int>()
+    for (line in lineRange) {
+        starts += editor.logicalPositionToOffset(LogicalPosition(line, logicalStart.column))
+        ends += editor.logicalPositionToOffset(LogicalPosition(line, logicalEnd.column))
+    }
+    TextRange(starts.toIntArray(), ends.toIntArray())
+} else {
+    TextRange(start, end)
+}
 
 val Map<Caret, RangeMarker>.vimTextRange: TextRange
     get() {
