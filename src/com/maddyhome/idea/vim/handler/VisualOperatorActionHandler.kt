@@ -94,11 +94,14 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
     private fun Editor.collectSelections(): Map<Caret, VimSelection>? =
             this.caretModel.allCarets.associateWith { caret ->
                 val subMode = CommandState.getInstance(this).subMode
-                val adj = if (VisualMotionGroup.exclusiveSelection) 0 else 1
                 if (CommandState.getInstance(this).mode == CommandState.Mode.VISUAL)
-                    if (CommandState.inVisualBlockMode(this)) {
-                        VimSelection(caret.vimSelectionStart, caret.offset + adj, SelectionType.fromSubMode(subMode))
+                    if (!CommandState.inVisualBlockMode(this)) {
+                        val (start, end) = if (caret.vimSelectionStart > caret.offset) {
+                            caret.selectionEnd to caret.selectionStart
+                        } else caret.selectionStart to caret.selectionEnd
+                        VimSelection(start, end, SelectionType.fromSubMode(subMode))
                     } else {
+                        val adj = if (VisualMotionGroup.exclusiveSelection) 0 else 1
                         val primaryCaret = caretModel.primaryCaret
                         return mapOf(primaryCaret to VimSelection(primaryCaret.vimSelectionStart, primaryCaret.offset + adj, SelectionType.BLOCK_WISE))
                     }

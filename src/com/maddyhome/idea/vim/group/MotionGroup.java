@@ -64,6 +64,7 @@ import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroup;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.CaretData;
+import com.maddyhome.idea.vim.helper.CaretDataKt;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
@@ -837,7 +838,7 @@ public class MotionGroup {
         break;
     }
 
-    VisualMotionGroup.INSTANCE.setVisualMode(editor, visualMode);
+    //VisualMotionGroup.INSTANCE.setVisualMode(editor, visualMode);
 
     final CaretModel caretModel = editor.getCaretModel();
     if (CommandState.getInstance(editor).getSubMode() != CommandState.SubMode.NONE) {
@@ -965,7 +966,7 @@ public class MotionGroup {
     int dir = 1;
     boolean selection = false;
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-      if (caret.getSelectionEnd() < caret.getSelectionStart()) {
+      if (CaretDataKt.getVimSelectionStart(caret) > caret.getOffset()) {
         dir = -1;
       }
       if (caret.getSelectionEnd() != caret.getSelectionStart()) {

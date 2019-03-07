@@ -221,12 +221,13 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
   }
 
   private fun findNextOccurrence(editor: Editor, caret: Caret, range: TextRange, whole: Boolean): Int {
-    caret.selectWordAtCaret(false)
-    VisualMotionGroup.controlNonVimSelectionChange(editor)
     VisualMotionGroup.setVisualMode(editor, CommandState.getInstance(editor).subMode)
+    val wordRange = VimPlugin.getMotion().getWordRange(editor, caret, 1, false, false)
+    caret.vimStartSelectionAtPoint(wordRange.startOffset)
+    MotionGroup.moveCaret(editor, caret, wordRange.endOffset)
 
     val offset = VimPlugin.getSearch().searchWord(editor, caret, 1, whole, 1)
-    MotionGroup.moveCaret(editor, caret, range.endOffset - 1, true)
+    MotionGroup.moveCaret(editor, caret, range.endOffset - 1)
 
     return offset
   }

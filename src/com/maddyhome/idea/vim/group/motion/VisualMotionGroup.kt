@@ -94,15 +94,13 @@ object VisualMotionGroup {
             // Detect if visual mode is character wise or line wise
             val start = editor.selectionModel.selectionStart
             val end = editor.selectionModel.selectionEnd
-            if (start != end) {
-                val line = editor.offsetToLogicalPosition(start).line
-                val logicalStart = EditorHelper.getLineStartOffset(editor, line)
-                val lend = EditorHelper.getLineEndOffset(editor, line, true)
-                autodetectedMode = if (logicalStart == start && lend + 1 == end) {
-                    CommandState.SubMode.VISUAL_LINE
-                } else {
-                    CommandState.SubMode.VISUAL_CHARACTER
-                }
+            val line = editor.offsetToLogicalPosition(start).line
+            val logicalStart = EditorHelper.getLineStartOffset(editor, line)
+            val lend = EditorHelper.getLineEndOffset(editor, line, true)
+            autodetectedMode = if (logicalStart == start && lend + 1 == end) {
+                CommandState.SubMode.VISUAL_LINE
+            } else {
+                CommandState.SubMode.VISUAL_CHARACTER
             }
         }
 
@@ -149,7 +147,11 @@ object VisualMotionGroup {
                 MotionGroup.moveCaret(editor, primaryCaret, end, true)
             } else {
                 CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, subMode, MappingMode.VISUAL)
-                editor.caretModel.allCarets.forEach { it.vimStartSelectionAtPoint(it.offset) }
+                if (CommandState.inVisualBlockMode(editor)) {
+                    editor.caretModel.primaryCaret.let { it.vimStartSelectionAtPoint(it.offset) }
+                } else {
+                    editor.caretModel.allCarets.forEach { it.vimStartSelectionAtPoint(it.offset) }
+                }
             }
             return true
         }

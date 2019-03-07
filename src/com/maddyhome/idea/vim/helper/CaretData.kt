@@ -19,19 +19,31 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.command.CommandState
 
 /**
  * @author Alex Plate
  */
 
 var Caret.vimSelectionStart: Int
-    get() = _vimSelectionStart
-            ?: throw AssertionError("Trying to access selection start, but it's not set")
-    set(value) {
+    get() = if (CommandState.inVisualBlockMode(editor)) {
+        editor._vimBlockSelectinoStart
+                ?: throw AssertionError("Trying to access selection start, but it's not set")
+    } else {
+        _vimSelectionStart
+                ?: throw AssertionError("Trying to access selection start, but it's not set")
+    }
+    set(value) = if (CommandState.inVisualBlockMode(editor)) {
+        editor._vimBlockSelectinoStart = value
+    } else {
         _vimSelectionStart = value
     }
 
-private var Caret._vimSelectionStart: Int? by userData()
 fun Caret.vimSelectionStartSetToNull() {
     this._vimSelectionStart = null
+    editor._vimBlockSelectinoStart = null
 }
+
+private var Caret._vimSelectionStart: Int? by userData()
+private var Editor._vimBlockSelectinoStart: Int? by userData()

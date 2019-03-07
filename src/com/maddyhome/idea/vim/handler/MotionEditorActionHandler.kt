@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.handler
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
@@ -45,39 +44,33 @@ abstract class MotionEditorActionHandler : EditorActionHandlerBase(false) {
     final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
         val visualBlockActive = CommandState.inVisualBlockMode(editor)
 
-        return if (visualBlockActive || editor.caretModel.caretCount == 1 || alwaysBatchExecution) {
+        if (visualBlockActive || editor.caretModel.caretCount == 1 || alwaysBatchExecution) {
             val primaryCaret = editor.caretModel.primaryCaret
             doExecute(editor, primaryCaret, context, cmd)
         } else {
-            val resHolder = Ref.create(true)
             editor.caretModel.runForEachCaret { caret ->
-                resHolder.set(resHolder.get() && doExecute(editor, caret, context, cmd))
+                doExecute(editor, caret, context, cmd)
             }
-            resHolder.get()
         }
+        return true
     }
 
-    private fun doExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
+    private fun doExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
+        if (!preMove(editor, caret, context, cmd)) return
+
         var offset = getOffset(editor, caret, context, cmd.count, cmd.rawCount, cmd.argument)
 
-        if (!preMove(editor, caret, context, cmd)) return false
-
-        return when {
-            offset == -1 -> false
-            offset >= 0 -> {
-                if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
-                    VimPlugin.getMark().saveJumpLocation(editor)
-                }
-                if (!CommandState.inInsertMode(editor) &&
-                        !CommandState.inRepeatMode(editor) &&
-                        !CommandState.inVisualCharacterMode(editor)) {
-                    offset = EditorHelper.normalizeOffset(editor, offset, false)
-                }
-                MotionGroup.moveCaret(editor, caret, offset)
-                postMove(editor, caret, context, cmd)
-                true
+        if (offset >= 0) {
+            if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
+                VimPlugin.getMark().saveJumpLocation(editor)
             }
-            else -> true
+            if (!CommandState.inInsertMode(editor) &&
+                    !CommandState.inRepeatMode(editor) &&
+                    !CommandState.inVisualCharacterMode(editor)) {
+                offset = EditorHelper.normalizeOffset(editor, offset, false)
+            }
+            MotionGroup.moveCaret(editor, caret, offset)
+            postMove(editor, caret, context, cmd)
         }
     }
 
