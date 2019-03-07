@@ -104,7 +104,7 @@ abstract class CommandHandler {
           names: Array<CommandName>?,
           argFlags: CommandHandlerFlags,
           runForEachCaret: Boolean = false,
-          caretOrder: CaretOrder = CaretOrder.NATIVE,
+          caretOrder: CaretOrder = CaretOrder.DECREASING_OFFSET,
           optFlags: EnumSet<CommandFlags> = EnumSet.noneOf<CommandFlags>(CommandFlags::class.java)
   ) {
     this.names = names
