@@ -43,10 +43,6 @@ public class MotionLastColumnAction extends MotionEditorAction {
   }
 
   private static class Handler extends MotionEditorActionHandler {
-    public Handler() {
-      super(true);
-    }
-
     @Override
     public int getOffset(@NotNull Editor editor,
                          @NotNull Caret caret,

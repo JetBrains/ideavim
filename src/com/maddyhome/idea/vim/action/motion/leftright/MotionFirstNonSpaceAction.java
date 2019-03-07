@@ -37,7 +37,7 @@ public class MotionFirstNonSpaceAction extends MotionEditorAction {
 
   private static class Handler extends MotionEditorActionHandler {
     public Handler() {
-      super(true);
+      super();
     }
 
     @Override

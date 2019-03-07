@@ -36,10 +36,6 @@ public class MotionParagraphPreviousAction extends MotionEditorAction {
   }
 
   private static class MotionParagraphPreviousHandler extends MotionEditorActionHandler {
-    public MotionParagraphPreviousHandler() {
-      super(true);
-    }
-
     @Override
     public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                          int rawCount, @Nullable Argument argument) {

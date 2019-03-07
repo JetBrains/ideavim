@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class MotionGotoMarkLineAction extends MotionEditorAction {
   public MotionGotoMarkLineAction() {
-    super(new MotionEditorActionHandler(true) {
+    super(new MotionEditorActionHandler() {
       @Override
       public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                            int rawCount, @Nullable Argument argument) {

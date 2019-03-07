@@ -38,10 +38,6 @@ public class MotionUpAction extends MotionEditorAction {
   }
 
   private static class Handler extends MotionEditorActionHandler {
-    public Handler() {
-      super(true);
-    }
-
     @Override
     public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                          int rawCount, @Nullable Argument argument) {
@@ -49,9 +45,10 @@ public class MotionUpAction extends MotionEditorAction {
     }
 
     @Override
-    protected void preMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                           @NotNull Command cmd) {
+    protected boolean preMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                              @NotNull Command cmd) {
       col = CaretData.getLastColumn(caret);
+      return true;
     }
 
     @Override

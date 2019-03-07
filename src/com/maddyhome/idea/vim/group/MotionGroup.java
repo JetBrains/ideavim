@@ -63,7 +63,6 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroup;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
-import com.maddyhome.idea.vim.handler.ExecuteMethodNotOverriddenException;
 import com.maddyhome.idea.vim.helper.CaretData;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
@@ -194,14 +193,7 @@ public class MotionGroup {
       start = caret.getOffset();
 
       // Execute the motion (without moving the cursor) and get where we end
-      try {
-        end = action.getOffset(editor, caret, context, cnt, raw, cmd.getArgument());
-      }
-      catch (ExecuteMethodNotOverriddenException e) {
-        // This actually should have fallen even earlier.
-        end = -1;
-        VimPlugin.indicateError();
-      }
+      end = action.getOffset(editor, caret, context, cnt, raw, cmd.getArgument());
 
       // Invalid motion
       if (end == -1) {

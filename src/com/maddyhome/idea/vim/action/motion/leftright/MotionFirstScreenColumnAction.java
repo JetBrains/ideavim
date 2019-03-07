@@ -36,7 +36,7 @@ public class MotionFirstScreenColumnAction extends MotionEditorAction {
 
   private static class Handler extends MotionEditorActionHandler {
     Handler() {
-      super(true);
+      super();
     }
 
     @Override

@@ -44,7 +44,7 @@ public class MotionDownAction extends MotionEditorAction {
 
   private static class Handler extends MotionEditorActionHandler {
     public Handler() {
-      super(true);
+      super();
     }
 
     @Override
@@ -77,9 +77,10 @@ public class MotionDownAction extends MotionEditorAction {
     }
 
     @Override
-    protected void preMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                           @NotNull Command cmd) {
+    protected boolean preMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+                              @NotNull Command cmd) {
       col = CaretData.getLastColumn(caret);
+      return true;
     }
 
     @Override

@@ -37,10 +37,6 @@ public class SearchAgainPreviousAction extends MotionEditorAction {
   }
 
   private static class Handler extends MotionEditorActionHandler {
-    public Handler() {
-      super(true);
-    }
-
     @Override
     public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                          int rawCount, @Nullable Argument argument) {

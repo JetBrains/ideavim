@@ -37,7 +37,7 @@ public class MotionBigWordRightAction extends MotionEditorAction {
 
   private static class Handler extends MotionEditorActionHandler {
     public Handler() {
-      super(true);
+      super();
     }
 
     @Override

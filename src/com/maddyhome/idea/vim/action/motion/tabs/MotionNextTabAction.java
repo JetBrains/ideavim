@@ -23,7 +23,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
+import com.maddyhome.idea.vim.handler.MotionEditorActionBatchHandler;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -34,7 +34,7 @@ public class MotionNextTabAction extends MotionEditorAction {
     super(new Handler());
   }
 
-  private static class Handler extends MotionEditorActionHandler {
+  private static class Handler extends MotionEditorActionBatchHandler {
     public int getOffset(@NotNull final Editor editor, @NotNull final DataContext context, final int count, final int rawCount, final Argument argument) {
       return VimPlugin.getMotion().moveCaretGotoNextTab(editor, context, rawCount);
     }

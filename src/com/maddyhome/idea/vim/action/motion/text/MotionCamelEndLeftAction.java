@@ -37,7 +37,7 @@ public class MotionCamelEndLeftAction extends MotionEditorAction {
 
   private static class Handler extends MotionEditorActionHandler {
     public Handler() {
-      super(true);
+      super();
     }
 
     public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
