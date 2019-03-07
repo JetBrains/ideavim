@@ -114,13 +114,13 @@ object VisualMotionGroup {
 
         if (autodetectedMode == CommandState.SubMode.NONE) {
             VisualMotionGroup.exitVisual(editor)
+        } else if (autodetectedMode == oldMode) {
+            return
         } else {
             CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, autodetectedMode, MappingMode.VISUAL)
         }
 
         KeyHandler.getInstance().reset(editor)
-
-        VimPlugin.getMark().setVisualSelectionMarks(editor, TextRange(editor.caretModel.primaryCaret.selectionStart, editor.caretModel.primaryCaret.selectionEnd))
     }
 
     /**
