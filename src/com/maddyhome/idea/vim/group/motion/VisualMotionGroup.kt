@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.helper.CaretData
 import com.maddyhome.idea.vim.helper.EditorData
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.helper.vimSelectionStartSetToNull
 import com.maddyhome.idea.vim.helper.vimStartSelectionAtPoint
 import com.maddyhome.idea.vim.helper.vimUpdateEditorSelection
 import com.maddyhome.idea.vim.option.BoundStringOption
@@ -72,7 +73,6 @@ object VisualMotionGroup {
         val primaryCaret = editor.caretModel.primaryCaret
         editor.caretModel.removeSecondaryCarets()
         val vimSelectionStart = primaryCaret.vimSelectionStart
-                ?: throw RuntimeException("Trying to access selection start, but it's not set")
 
         val selectionType = SelectionType.fromSubMode(CommandState.getInstance(editor).subMode)
         EditorData.setLastSelectionType(editor, selectionType)
@@ -218,7 +218,6 @@ object VisualMotionGroup {
 
         if (CommandState.inVisualBlockMode(editor)) {
             start = caret.vimSelectionStart
-                    ?: throw RuntimeException("Trying to access selection start, but it's not set")
             end = caret.offset
         }
 
@@ -248,7 +247,6 @@ object VisualMotionGroup {
 
     fun swapVisualEnds(editor: Editor, caret: Caret): Boolean {
         val vimSelectionStart = caret.vimSelectionStart
-                ?: throw RuntimeException("Trying to access selection start, but it's not set")
         caret.vimSelectionStart = caret.offset
 
         MotionGroup.moveCaret(editor, caret, vimSelectionStart)
@@ -266,9 +264,8 @@ object VisualMotionGroup {
         // FIXME: 2019-03-05 Make it multicaret
         val primaryCaret = editor.caretModel.primaryCaret
         val vimSelectionStart = primaryCaret.vimSelectionStart
-                ?: throw RuntimeException("Trying to access selection start, but it's not set")
         VimPlugin.getMark().setVisualSelectionMarks(editor, TextRange(vimSelectionStart, primaryCaret.offset))
-        editor.caretModel.allCarets.forEach { it.vimSelectionStart = null }
+        editor.caretModel.allCarets.forEach { it.vimSelectionStartSetToNull() }
 
         if (!EditorData.isKeepingVisualOperatorAction(editor)) {
             for (caret in editor.caretModel.allCarets) {
@@ -289,8 +286,5 @@ object VisualMotionGroup {
     }
 
     val exclusiveSelection: Boolean
-        get() {
-            val opt = Options.getInstance().getOption("selection") as BoundStringOption
-            return opt.value == "exclusive"
-        }
+        get() = (Options.getInstance().getOption("selection") as BoundStringOption).value == "exclusive"
 }

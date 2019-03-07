@@ -68,14 +68,12 @@ fun Caret.vimMoveSelectionToCaret() {
         throw RuntimeException("Attempt to extent selection in non-visual mode")
 
     val startOffsetMark = vimSelectionStart
-            ?: throw RuntimeException("Trying to access selection start, but it's not set")
 
     setVisualSelection(startOffsetMark, offset, this)
 }
 
 fun Caret.vimUpdateEditorSelection() {
     val startOffsetMark = vimSelectionStart
-            ?: throw RuntimeException("Trying to access selection start, but it's not set")
     setVisualSelection(startOffsetMark, offset, this)
 }
 

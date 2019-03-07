@@ -64,10 +64,7 @@ public class MotionDownAction extends MotionEditorAction {
       }
       if (CommandState.inVisualBlockMode(editor)) {
         Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-        Integer blockEndOffset = CaretDataKt.getVimSelectionStart(primaryCaret);
-        if (blockEndOffset == null) {
-          throw new RuntimeException("Trying to access selection start, but it's not set");
-        }
+        int blockEndOffset = CaretDataKt.getVimSelectionStart(primaryCaret);
         int blockStartOffset = primaryCaret.getOffset();
         VisualPosition blockEndPosition = editor.offsetToVisualPosition(blockEndOffset);
         VisualPosition blockStartPosition = editor.offsetToVisualPosition(blockStartOffset);

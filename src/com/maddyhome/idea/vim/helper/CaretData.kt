@@ -24,4 +24,14 @@ import com.intellij.openapi.editor.Caret
  * @author Alex Plate
  */
 
-var Caret.vimSelectionStart: Int? by userData()
+var Caret.vimSelectionStart: Int
+    get() = _vimSelectionStart
+            ?: throw AssertionError("Trying to access selection start, but it's not set")
+    set(value) {
+        _vimSelectionStart = value
+    }
+
+private var Caret._vimSelectionStart: Int? by userData()
+fun Caret.vimSelectionStartSetToNull() {
+    this._vimSelectionStart = null
+}
