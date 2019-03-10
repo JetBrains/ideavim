@@ -445,7 +445,7 @@ public class ChangeGroup {
       document = editor.getDocument();
       documentListener = new InsertActionsDocumentListener();
       eventFacade.addDocumentListener(document, documentListener);
-      oldOffset = -1;
+      oldOffset = editor.getCaretModel().getOffset();
       setInsertEditorState(editor, mode == CommandState.Mode.INSERT);
       state.pushState(mode, CommandState.SubMode.NONE, MappingMode.INSERT);
 
