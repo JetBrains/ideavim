@@ -624,6 +624,36 @@ public class ChangeActionTest extends VimTestCase {
                           "}\n");
   }
 
+  // VIM-1067 |.|
+  public void testRepeatWithInsertAfterLineEnd() {
+    //Case 1
+    configureByText("<caret>- 1\n" +
+            "- 2\n" +
+            "- 3\n");
+    typeText(parseKeys("A", "<BS>", "<Esc>", "j", "."));
+    myFixture.checkResult("- \n" +
+            "- \n" +
+            "- 3\n");
+
+    //Case 2
+    configureByText("<caret>- 1\n" +
+            "- 2\n" +
+            "- 3\n");
+    typeText(parseKeys("A", "4", "<BS>", "<Esc>", "j", "."));
+    myFixture.checkResult("- 1\n" +
+            "- 2\n" +
+            "- 3\n");
+
+    //Case 3
+    configureByText("<caret>- 1\n" +
+            "- 2\n" +
+            "- 3\n");
+    typeText(parseKeys("A", "<BS>", "4",  "<Esc>", "j", "."));
+    myFixture.checkResult("- 4\n" +
+            "- 4\n" +
+            "- 3\n");
+  }
+
   // VIM-287 |zc| |O|
   public void testInsertAfterFold() {
     configureByJavaText("<caret>/**\n" +
