@@ -116,6 +116,11 @@ object VisualMotionGroup {
             return
         } else {
             CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, autodetectedMode, MappingMode.VISUAL)
+            if (CommandState.inVisualBlockMode(editor)) {
+                editor.caretModel.primaryCaret.let { it.vimStartSelectionAtPoint(it.offset) }
+            } else {
+                editor.caretModel.allCarets.forEach { it.vimStartSelectionAtPoint(it.offset) }
+            }
         }
 
         KeyHandler.getInstance().reset(editor)

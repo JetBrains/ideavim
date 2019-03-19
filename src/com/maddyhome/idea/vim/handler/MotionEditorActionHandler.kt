@@ -21,6 +21,8 @@ package com.maddyhome.idea.vim.handler
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.event.CaretEvent
+import com.intellij.openapi.editor.event.CaretListener
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
@@ -28,6 +30,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.vimSelectionStart
 
 /**
  * @author Alex Plate
@@ -48,9 +51,11 @@ abstract class MotionEditorActionHandler : EditorActionHandlerBase(false) {
             val primaryCaret = editor.caretModel.primaryCaret
             doExecute(editor, primaryCaret, context, cmd)
         } else {
+            editor.caretModel.addCaretListener(CaretMergingWatcher)
             editor.caretModel.runForEachCaret { caret ->
                 doExecute(editor, caret, context, cmd)
             }
+            editor.caretModel.removeCaretListener(CaretMergingWatcher)
         }
         return true
     }
@@ -75,4 +80,23 @@ abstract class MotionEditorActionHandler : EditorActionHandlerBase(false) {
     }
 
     final override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command) = true
+
+    private object CaretMergingWatcher : CaretListener {
+        override fun caretRemoved(event: CaretEvent) {
+            val editor = event.editor
+            val caretToDelete = event.caret ?: return
+            if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
+                for (caret in editor.caretModel.allCarets) {
+                    if (caretToDelete.selectionStart < caret.selectionEnd ||
+                            caretToDelete.selectionStart > caret.selectionStart ||
+                            caretToDelete.selectionEnd < caret.selectionEnd ||
+                            caretToDelete.selectionEnd > caret.selectionStart) {
+                        // Okay, caret is being removed because of merging
+                        val vimSelectionStart = caretToDelete.vimSelectionStart
+                        caret.vimSelectionStart = vimSelectionStart
+                    }
+                }
+            }
+        }
+    }
 }
