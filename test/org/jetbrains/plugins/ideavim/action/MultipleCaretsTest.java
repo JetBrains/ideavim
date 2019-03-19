@@ -1224,13 +1224,8 @@ public class MultipleCaretsTest extends VimTestCase {
   }
 
   public void testDeleteJoinVisualLinesAction() {
-    typeTextInFile(parseKeys("VkgJ"),
-                   "abcde\n" +
-                   "abcd<caret>e\n" +
-                   "abcde\n" +
-                   "ab<caret>cde\n");
-    myFixture.checkResult("abcde<caret>abcde\n" +
-                          "abcde<caret>abcde\n");
+    typeTextInFile(parseKeys("VkgJ"), "one\n" + "tw<caret>o\n" + "three\n" + "fo<caret>ur\n");
+    myFixture.checkResult("one<caret>two\n" + "three<caret>four\n");
   }
 
   public void testDeleteJoinVisualLinesSpacesAction() {
@@ -1314,7 +1309,7 @@ public class MultipleCaretsTest extends VimTestCase {
                    "abcde\n" +
                    "a<caret>bcde\n" +
                    "abcde\n");
-    myFixture.checkResult("<caret>abcde\n");
+    myFixture.checkResult("<caret>abcd<caret>e\n");
   }
 
   public void testDeleteVisualLinesEndAction() {

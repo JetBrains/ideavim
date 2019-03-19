@@ -49,7 +49,8 @@ public class DeleteJoinVisualLinesAction extends VimCommandAction {
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
         return !editor.isOneLineMode() &&
-               VimPlugin.getChange().deleteJoinRange(editor, caret, UtilsKt.toVimTextRange(range, editor), false);
+               VimPlugin.getChange()
+                 .deleteJoinRange(editor, caret, UtilsKt.toVimTextRange(range, editor).normalize(), false);
       }
     });
   }
