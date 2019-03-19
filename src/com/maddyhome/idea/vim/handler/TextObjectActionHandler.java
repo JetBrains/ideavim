@@ -28,10 +28,13 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroup;
+import com.maddyhome.idea.vim.helper.CaretDataKt;
+import com.maddyhome.idea.vim.helper.UtilsKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ *
  */
 public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
   public TextObjectActionHandler() {
@@ -53,10 +56,17 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
         return false;
       }
 
-      TextRange vr = new TextRange(caret.getSelectionStart(), caret.getSelectionEnd());
-
       boolean block = cmd.getFlags().contains(CommandFlags.FLAG_TEXT_BLOCK);
-      int newend = block || vr.getEndOffset() >= vr.getStartOffset() ? range.getEndOffset() : range.getStartOffset();
+      int newstart = block || caret.getOffset() >= CaretDataKt.getVimSelectionStart(caret)
+                     ? range.getStartOffset()
+                     : range.getEndOffset();
+      int newend = block || caret.getOffset() >= CaretDataKt.getVimSelectionStart(caret)
+                   ? range.getEndOffset()
+                   : range.getStartOffset();
+
+      if (CaretDataKt.getVimSelectionStart(caret) == caret.getOffset() || block) {
+        UtilsKt.vimStartSelectionAtPoint(caret, newstart);
+      }
 
       if ((cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE) &&
            !cmd.getFlags().contains(CommandFlags.FLAG_VISUAL_CHARACTERWISE)) &&
@@ -76,6 +86,10 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
   }
 
   @Nullable
-  public abstract TextRange getRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                                     int count, int rawCount, @Nullable Argument argument);
+  public abstract TextRange getRange(@NotNull Editor editor,
+                                     @NotNull Caret caret,
+                                     @NotNull DataContext context,
+                                     int count,
+                                     int rawCount,
+                                     @Nullable Argument argument);
 }

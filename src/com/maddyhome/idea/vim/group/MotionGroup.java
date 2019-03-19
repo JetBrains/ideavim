@@ -969,7 +969,7 @@ public class MotionGroup {
       if (CaretDataKt.getVimSelectionStart(caret) > caret.getOffset()) {
         dir = -1;
       }
-      if (caret.getSelectionEnd() != caret.getSelectionStart()) {
+      if (CaretDataKt.getVimSelectionStart(caret) != caret.getOffset()) {
         selection = true;
       }
     }
