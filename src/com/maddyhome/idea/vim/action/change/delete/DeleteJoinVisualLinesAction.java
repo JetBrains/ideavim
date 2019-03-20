@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import com.maddyhome.idea.vim.helper.UtilsKt;
 import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,8 +48,7 @@ public class DeleteJoinVisualLinesAction extends VimCommandAction {
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
         return !editor.isOneLineMode() &&
-               VimPlugin.getChange()
-                 .deleteJoinRange(editor, caret, UtilsKt.toVimTextRange(range, editor).normalize(), false);
+               VimPlugin.getChange().deleteJoinRange(editor, caret, range.toVimTextRange().normalize(), false);
       }
     });
   }

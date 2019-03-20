@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import com.maddyhome.idea.vim.helper.UtilsKt;
 import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,7 +47,7 @@ public class AutoIndentLinesVisualAction extends VimCommandAction {
                                       @NotNull DataContext context,
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
-        VimPlugin.getChange().autoIndentRange(editor, caret, context, UtilsKt.toVimTextRange(range, editor));
+        VimPlugin.getChange().autoIndentRange(editor, caret, context, range.toVimTextRange());
         return true;
       }
     });

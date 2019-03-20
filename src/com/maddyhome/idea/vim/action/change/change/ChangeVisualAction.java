@@ -30,7 +30,6 @@ import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorData;
-import com.maddyhome.idea.vim.helper.UtilsKt;
 import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,7 +50,7 @@ public class ChangeVisualAction extends VimCommandAction {
                                       @NotNull DataContext context,
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
-        TextRange vimTextRange = UtilsKt.toVimTextRange(range, editor);
+        TextRange vimTextRange = range.toVimTextRange();
         final SelectionType type = EditorData.wasVisualBlockMode(editor) && vimTextRange.isMultiple()
                                    ? SelectionType.BLOCK_WISE
                                    : SelectionType.CHARACTER_WISE;

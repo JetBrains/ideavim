@@ -28,12 +28,12 @@ import com.maddyhome.idea.vim.helper.VimSelection
  * @author Alex Plate
  */
 abstract class VisualOperatorActionBatchHandler : VisualOperatorActionHandler() {
-    abstract fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command): Boolean
+    abstract fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>): Boolean
 
     final override fun executeAction(editor: Editor, caret: Caret, context: DataContext, cmd: Command, range: VimSelection) = true
 
-    final override fun beforeExecution(editor: Editor, context: DataContext, cmd: Command): Boolean {
-        return executeForAllCarets(editor, context, cmd)
+    final override fun beforeExecution(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>): Boolean {
+        return executeForAllCarets(editor, context, cmd, caretsAndSelections)
     }
 
     final override fun afterExecution(editor: Editor, context: DataContext, cmd: Command, res: Boolean) {}

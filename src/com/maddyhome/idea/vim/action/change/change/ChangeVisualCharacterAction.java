@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import com.maddyhome.idea.vim.helper.UtilsKt;
 import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,8 +50,7 @@ public class ChangeVisualCharacterAction extends VimCommandAction {
                                       @NotNull VimSelection range) {
         final Argument argument = cmd.getArgument();
         return argument != null &&
-               VimPlugin.getChange()
-                 .changeCharacterRange(editor, UtilsKt.toVimTextRange(range, editor), argument.getCharacter());
+               VimPlugin.getChange().changeCharacterRange(editor, range.toVimTextRange(), argument.getCharacter());
       }
     });
   }

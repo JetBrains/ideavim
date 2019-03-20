@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import com.maddyhome.idea.vim.helper.UtilsKt;
 import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,7 +48,7 @@ public class VisualBlockInsertAction extends VimCommandAction {
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
         if (editor.isOneLineMode()) return false;
-        return VimPlugin.getChange().blockInsert(editor, context, UtilsKt.toVimTextRange(range, editor), false);
+        return VimPlugin.getChange().blockInsert(editor, context, range.toVimTextRange(), false);
       }
     });
   }

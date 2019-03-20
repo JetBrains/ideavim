@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import com.maddyhome.idea.vim.helper.UtilsKt;
 import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,7 +45,7 @@ public class ChangeVisualNumberAvalancheIncAction extends VimCommandAction {
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
         return VimPlugin.getChange()
-          .changeNumberVisualMode(editor, caret, UtilsKt.toVimTextRange(range, editor), cmd.getCount(), true);
+          .changeNumberVisualMode(editor, caret, range.toVimTextRange(), cmd.getCount(), true);
       }
     });
   }

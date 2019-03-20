@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
-import com.maddyhome.idea.vim.helper.UtilsKt;
 import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,7 +49,7 @@ public class ChangeCaseToggleVisualAction extends VimCommandAction {
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
         return VimPlugin.getChange()
-          .changeCaseRange(editor, caret, UtilsKt.toVimTextRange(range, editor), CharacterHelper.CASE_TOGGLE);
+          .changeCaseRange(editor, caret, range.toVimTextRange(), CharacterHelper.CASE_TOGGLE);
       }
     });
   }

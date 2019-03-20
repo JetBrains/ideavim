@@ -29,7 +29,6 @@ import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
-import com.maddyhome.idea.vim.helper.UtilsKt;
 import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
@@ -52,7 +51,7 @@ public class ChangeCaseLowerVisualAction extends VimCommandAction {
                                       @NotNull VimSelection range) {
         final Editor topLevelEditor = InjectedLanguageUtil.getTopLevelEditor(editor);
         return VimPlugin.getChange()
-          .changeCaseRange(topLevelEditor, caret, UtilsKt.toVimTextRange(range, editor), CharacterHelper.CASE_LOWER);
+          .changeCaseRange(topLevelEditor, caret, range.toVimTextRange(), CharacterHelper.CASE_LOWER);
       }
     });
   }

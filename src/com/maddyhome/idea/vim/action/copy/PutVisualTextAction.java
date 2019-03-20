@@ -21,13 +21,10 @@ package com.maddyhome.idea.vim.action.copy;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.RangeMarker;
-import com.intellij.util.containers.hash.HashMap;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
@@ -60,27 +57,23 @@ public class PutVisualTextAction extends VimCommandAction {
                                       @NotNull DataContext context,
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
-        if (CommandState.inVisualBlockMode(editor)) {
+        if (range.getType() == SelectionType.BLOCK_WISE) {
           boolean isBigP = cmd.getKeys().get(0).equals(parseKeys("P").get(0));
-          Map<Caret, RangeMarker> ranges = new HashMap<>();
-
-          for (Caret aCaret : editor.getCaretModel().getAllCarets()) {
-            ranges.put(aCaret,
-                       editor.getDocument().createRangeMarker(aCaret.getSelectionStart(), aCaret.getSelectionEnd()));
-          }
 
           return PutCopyGroup.INSTANCE
-            .putVisualRangeBlockwise(editor, context, ranges, cmd.getCount(), true, false, register, isBigP);
+            .putVisualRangeBlockwise(editor, context, range, cmd.getCount(), true, false, register, isBigP);
         }
         else {
-          RangeMarker rangeMarker = editor.getDocument().createRangeMarker(range.getStart(), range.getEnd());
           return PutCopyGroup.INSTANCE
-            .putVisualRangeCaL(editor, context, caret, rangeMarker, cmd.getCount(), true, false, register);
+            .putVisualRangeCaL(editor, context, caret, range, cmd.getCount(), true, false, register);
         }
       }
 
       @Override
-      protected boolean beforeExecution(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+      protected boolean beforeExecution(@NotNull Editor editor,
+                                        @NotNull DataContext context,
+                                        @NotNull Command cmd,
+                                        @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
         Register register = VimPlugin.getRegister().getLastRegister();
         VimPlugin.getRegister().resetRegister();
         if (register != null && register.getType() == SelectionType.LINE_WISE && editor.isOneLineMode()) return false;

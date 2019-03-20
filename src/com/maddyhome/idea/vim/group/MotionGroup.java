@@ -369,7 +369,7 @@ public class MotionGroup {
         UtilsKt.vimMoveSelectionToCaret(caret);
       }
       else {
-        editor.getSelectionModel().removeSelection();
+        VisualMotionGroup.INSTANCE.exitVisual(editor);
       }
     }
   }
@@ -1443,11 +1443,7 @@ public class MotionGroup {
 
   private static boolean keepVisual(Editor editor) {
     final CommandState commandState = CommandState.getInstance(editor);
-    if (commandState.getMode() == CommandState.Mode.VISUAL) {
-      final Command command = commandState.getCommand();
-      return command == null || !command.getFlags().contains(CommandFlags.FLAG_EXIT_VISUAL);
-    }
-    return false;
+    return commandState.getMode() == CommandState.Mode.VISUAL;
   }
 
   /**

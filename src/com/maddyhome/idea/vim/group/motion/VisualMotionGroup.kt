@@ -268,12 +268,6 @@ object VisualMotionGroup {
         val selectionType = SelectionType.fromSubMode(CommandState.getInstance(editor).subMode)
         EditorData.setLastSelectionType(editor, selectionType)
 
-        // FIXME: 2019-03-05 Make it multicaret
-        val primaryCaret = editor.caretModel.primaryCaret
-        val vimSelectionStart = primaryCaret.vimSelectionStart
-        VimPlugin.getMark().setVisualSelectionMarks(editor, TextRange(vimSelectionStart, primaryCaret.offset))
-        editor.caretModel.allCarets.forEach { it.vimSelectionStartSetToNull() }
-
         if (!EditorData.isKeepingVisualOperatorAction(editor)) {
             for (caret in editor.caretModel.allCarets) {
                 caret.removeSelection()
@@ -282,7 +276,16 @@ object VisualMotionGroup {
         if (wasVisualBlock) {
             editor.caretModel.removeSecondaryCarets()
         }
-        CommandState.getInstance(editor).subMode = CommandState.SubMode.NONE
+
+        if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
+            // FIXME: 2019-03-05 Make it multicaret
+            val primaryCaret = editor.caretModel.primaryCaret
+            val vimSelectionStart = primaryCaret.vimSelectionStart
+            VimPlugin.getMark().setVisualSelectionMarks(editor, TextRange(vimSelectionStart, primaryCaret.offset))
+            editor.caretModel.allCarets.forEach { it.vimSelectionStartSetToNull() }
+
+            CommandState.getInstance(editor).subMode = CommandState.SubMode.NONE
+        }
     }
 
     fun exitVisual(editor: Editor) {

@@ -24,17 +24,20 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.copy.YankCopyGroup;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionBatchHandler;
+import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -44,18 +47,25 @@ public class YankVisualAction extends VimCommandAction {
   public YankVisualAction() {
     super(new VisualOperatorActionBatchHandler() {
       @Override
-      public boolean executeForAllCarets(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-        final CommandState.SubMode subMode = CommandState.getInstance(editor).getSubMode();
-        int[] starts = new int[editor.getCaretModel().getCaretCount()];
-        int[] ends = new int[editor.getCaretModel().getCaretCount()];
-        int pointer = 0;
-        for (Caret caret : editor.getCaretModel().getAllCarets()) {
-          starts[pointer] = caret.getSelectionStart();
-          ends[pointer] = caret.getSelectionEnd();
-          pointer++;
-        }
+      public boolean executeForAllCarets(@NotNull Editor editor,
+                                         @NotNull DataContext context,
+                                         @NotNull Command cmd,
+                                         @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
+        Collection<? extends VimSelection> selections = caretsAndSelections.values();
+
+        List<Integer> starts = new ArrayList<>();
+        List<Integer> ends = new ArrayList<>();
+        selections.forEach(selection -> {
+          TextRange textRange = selection.toVimTextRange();
+          Arrays.stream(textRange.getStartOffsets()).boxed().forEach(starts::add);
+          Arrays.stream(textRange.getEndOffsets()).boxed().forEach(ends::add);
+        });
+        VimSelection vimSelection = selections.stream().findFirst().orElse(null);
+        if (vimSelection == null) return false;
+        int[] startsArray = starts.stream().mapToInt(i -> i).toArray();
+        int[] endsArray = ends.stream().mapToInt(i -> i).toArray();
         return YankCopyGroup.INSTANCE
-          .yankRange(editor, new TextRange(starts, ends), SelectionType.fromSubMode(subMode), true);
+          .yankRange(editor, new TextRange(startsArray, endsArray), vimSelection.getType(), true);
       }
     });
   }

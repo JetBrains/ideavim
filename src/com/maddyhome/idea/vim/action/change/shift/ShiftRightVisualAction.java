@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import com.maddyhome.idea.vim.helper.UtilsKt;
 import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,8 +47,7 @@ public class ShiftRightVisualAction extends VimCommandAction {
                                       @NotNull DataContext context,
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
-        VimPlugin.getChange()
-          .indentRange(editor, caret, context, UtilsKt.toVimTextRange(range, editor), cmd.getCount(), 1);
+        VimPlugin.getChange().indentRange(editor, caret, context, range.toVimTextRange(), cmd.getCount(), 1);
         return true;
       }
     });

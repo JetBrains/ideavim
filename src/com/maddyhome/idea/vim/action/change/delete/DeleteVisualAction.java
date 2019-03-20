@@ -25,13 +25,11 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.helper.UtilsKt;
 import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
@@ -52,15 +50,14 @@ public class DeleteVisualAction extends VimCommandAction {
                                       @NotNull DataContext context,
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
-        final CommandState.SubMode mode = CommandState.getInstance(editor).getSubMode();
-        if (mode == CommandState.SubMode.VISUAL_LINE) {
+        SelectionType selectionType = range.getType();
+        if (selectionType == SelectionType.LINE_WISE) {
           final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStart()),
                                                     EditorHelper.getLineEndForOffset(editor, range.getEnd()) + 1);
-          return VimPlugin.getChange().deleteRange(editor, caret, lineRange, SelectionType.fromSubMode(mode), false);
+          return VimPlugin.getChange().deleteRange(editor, caret, lineRange, selectionType, false);
         }
         else {
-          return VimPlugin.getChange()
-            .deleteRange(editor, caret, UtilsKt.toVimTextRange(range, editor), SelectionType.fromSubMode(mode), false);
+          return VimPlugin.getChange().deleteRange(editor, caret, range.toVimTextRange(), selectionType, false);
         }
       }
     });

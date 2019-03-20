@@ -31,7 +31,6 @@ import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.helper.UtilsKt;
 import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,7 +54,7 @@ public class DeleteVisualLinesAction extends VimCommandAction {
         final CommandState.SubMode mode = CommandState.getInstance(editor).getSubMode();
         if (mode == CommandState.SubMode.VISUAL_BLOCK) {
           return VimPlugin.getChange()
-            .deleteRange(editor, editor.getCaretModel().getPrimaryCaret(), UtilsKt.toVimTextRange(range, editor),
+            .deleteRange(editor, editor.getCaretModel().getPrimaryCaret(), range.toVimTextRange(),
                          SelectionType.fromSubMode(mode), false);
         }
         else {

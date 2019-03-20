@@ -31,7 +31,6 @@ import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.helper.UtilsKt;
 import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
@@ -53,7 +52,7 @@ public class DeleteVisualLinesEndAction extends VimCommandAction {
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
         if (CommandState.inVisualBlockMode(editor)) {
-          TextRange vimTextRange = UtilsKt.toVimTextRange(range, editor);
+          TextRange vimTextRange = range.toVimTextRange();
           final int[] starts = vimTextRange.getStartOffsets();
           final int[] ends = vimTextRange.getEndOffsets();
           for (int i = 0; i < starts.length; i++) {

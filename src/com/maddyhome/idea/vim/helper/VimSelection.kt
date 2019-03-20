@@ -18,13 +18,54 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.command.SelectionType.BLOCK_WISE
+import com.maddyhome.idea.vim.command.SelectionType.CHARACTER_WISE
+import com.maddyhome.idea.vim.command.SelectionType.LINE_WISE
+import com.maddyhome.idea.vim.common.TextRange
 
 /**
  * @author Alex Plate
  */
-data class VimSelection(
+open class VimSelection(
         val start: Int,
         val end: Int,
-        val type: SelectionType
-)
+        val type: SelectionType,
+        val editor: Editor
+) {
+    fun toVimTextRange() = when (type) {
+        CHARACTER_WISE, LINE_WISE -> TextRange(start, end)
+        BLOCK_WISE -> {
+            val logicalStart = editor.offsetToLogicalPosition(start)
+            val logicalEnd = editor.offsetToLogicalPosition(end)
+            val lineRange = if (logicalStart.line > logicalEnd.line) logicalStart.line downTo logicalEnd.line else logicalStart.line..logicalEnd.line
+            val starts = ArrayList<Int>()
+            val ends = ArrayList<Int>()
+            for (line in lineRange) {
+                starts += editor.logicalPositionToOffset(LogicalPosition(line, logicalStart.column))
+                ends += editor.logicalPositionToOffset(LogicalPosition(line, logicalEnd.column))
+            }
+            TextRange(starts.toIntArray(), ends.toIntArray())
+        }
+    }
+
+    inline fun forEachLine(action: (startOffset: Int, endOffset: Int) -> Unit) {
+        val logicalStart = editor.offsetToLogicalPosition(start)
+        val logicalEnd = editor.offsetToLogicalPosition(end)
+        val lineRange = if (logicalStart.line > logicalEnd.line) logicalStart.line downTo logicalEnd.line else logicalStart.line..logicalEnd.line
+        for (line in lineRange) {
+            val start = editor.logicalPositionToOffset(LogicalPosition(line, logicalStart.column))
+            val end = editor.logicalPositionToOffset(LogicalPosition(line, logicalEnd.column))
+            action(start, end)
+        }
+    }
+
+    override fun toString(): String {
+        val startLogPosition = editor.offsetToLogicalPosition(start)
+        val endLogPosition = editor.offsetToLogicalPosition(end)
+        return "Selection [$type]: start[offset: $start : col ${startLogPosition.column} line ${startLogPosition.line}]" +
+                " end[offset: $end : col ${endLogPosition.column} line ${endLogPosition.line}]"
+    }
+}

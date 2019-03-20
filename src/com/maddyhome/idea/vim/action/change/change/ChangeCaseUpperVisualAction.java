@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
-import com.maddyhome.idea.vim.helper.UtilsKt;
 import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,8 +48,7 @@ public class ChangeCaseUpperVisualAction extends VimCommandAction {
                                       @NotNull DataContext context,
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
-        return VimPlugin.getChange()
-          .changeCaseRange(editor, caret, UtilsKt.toVimTextRange(range, editor), CharacterHelper.CASE_UPPER);
+        return VimPlugin.getChange().changeCaseRange(editor, caret, range.toVimTextRange(), CharacterHelper.CASE_UPPER);
       }
     });
   }

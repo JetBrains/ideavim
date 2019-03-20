@@ -44,7 +44,7 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
     protected abstract fun executeAction(editor: Editor, caret: Caret, context: DataContext, cmd: Command, range: VimSelection): Boolean
 
-    protected open fun beforeExecution(editor: Editor, context: DataContext, cmd: Command) = true
+    protected open fun beforeExecution(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>) = true
     protected open fun afterExecution(editor: Editor, context: DataContext, cmd: Command, res: Boolean) {}
 
     final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
@@ -63,7 +63,7 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         val commandWrapper = VisualStartFinishWrapper(editor, cmd)
         commandWrapper.start()
 
-        if (!beforeExecution(editor, context, cmd)) return false
+        if (!beforeExecution(editor, context, cmd, selections)) return false
 
         val res = Ref.create(true)
         when {
@@ -91,26 +91,28 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         return super.execute(editor, caret, context, cmd)
     }
 
-    private fun Editor.collectSelections(): Map<Caret, VimSelection>? =
-            this.caretModel.allCarets.associateWith { caret ->
-                val subMode = CommandState.getInstance(this).subMode
-                if (CommandState.getInstance(this).mode == CommandState.Mode.VISUAL)
-                    if (!CommandState.inVisualBlockMode(this)) {
-                        val (start, end) = if (caret.vimSelectionStart > caret.offset) {
-                            caret.selectionEnd to caret.selectionStart
-                        } else caret.selectionStart to caret.selectionEnd
-                        VimSelection(start, end, SelectionType.fromSubMode(subMode))
-                    } else {
-                        val adj = if (VisualMotionGroup.exclusiveSelection) 0 else 1
-                        val primaryCaret = caretModel.primaryCaret
-                        return mapOf(primaryCaret to VimSelection(primaryCaret.vimSelectionStart, primaryCaret.offset + adj, SelectionType.BLOCK_WISE))
-                    }
-                else {
-                    val startAndEnd = VimPlugin.getMark().getVisualSelectionMarks(this) ?: return null
-                    val lastSelectionType = EditorData.getLastSelectionType(this) ?: return null
-                    VimSelection(startAndEnd.startOffset, startAndEnd.endOffset, lastSelectionType)
-                }
+    private fun Editor.collectSelections(): Map<Caret, VimSelection>? {
+
+        if (CommandState.inVisualBlockMode(this)) {
+            val adj = if (VisualMotionGroup.exclusiveSelection) 0 else 1
+            val primaryCaret = caretModel.primaryCaret
+            return mapOf(primaryCaret to VimSelection(primaryCaret.vimSelectionStart, primaryCaret.offset + adj, SelectionType.BLOCK_WISE, this))
+        }
+
+        return this.caretModel.allCarets.associateWith { caret ->
+            val subMode = CommandState.getInstance(this).subMode
+            if (CommandState.getInstance(this).mode == CommandState.Mode.VISUAL) {
+                val (start, end) = if (caret.vimSelectionStart > caret.offset) {
+                    caret.selectionEnd to caret.selectionStart
+                } else caret.selectionStart to caret.selectionEnd
+                VimSelection(start, end, SelectionType.fromSubMode(subMode), this)
+            } else {
+                val startAndEnd = VimPlugin.getMark().getVisualSelectionMarks(this) ?: return null
+                val lastSelectionType = EditorData.getLastSelectionType(this) ?: return null
+                VimSelection(startAndEnd.startOffset, startAndEnd.endOffset, lastSelectionType, this)
             }
+        }
+    }
 
     protected class VisualStartFinishWrapper(private val editor: Editor, private val cmd: Command) {
         private lateinit var lastMode: CommandState.SubMode
@@ -155,6 +157,10 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
                 if (lastMode != CommandState.SubMode.VISUAL_LINE && CommandFlags.FLAG_FORCE_VISUAL in cmd.flags) {
                     VisualMotionGroup.toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE)
                 }
+            }
+
+            if (CommandFlags.FLAG_EXIT_VISUAL in cmd.flags) {
+                VisualMotionGroup.exitVisual(editor)
             }
         }
 
