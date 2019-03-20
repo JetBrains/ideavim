@@ -47,3 +47,17 @@ fun Caret.vimSelectionStartSetToNull() {
 
 private var Caret._vimSelectionStart: Int? by userData()
 private var Editor._vimBlockSelectinoStart: Int? by userData()
+
+
+var Editor.vimBlockMainCaret: Caret
+    get() = _vimBlockMainCaret
+            ?: throw AssertionError("Trying to access block main caret, but it's not set")
+    set(value) {
+        _vimBlockMainCaret = value
+    }
+
+fun Editor.vimBlockMainCaretSetToNull() {
+    this._vimBlockMainCaret = null
+}
+
+private var Editor._vimBlockMainCaret: Caret? by userData()

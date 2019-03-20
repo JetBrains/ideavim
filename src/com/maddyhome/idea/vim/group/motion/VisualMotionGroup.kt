@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.CaretData
 import com.maddyhome.idea.vim.helper.EditorData
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.vimBlockMainCaretSetToNull
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.helper.vimSelectionStartSetToNull
 import com.maddyhome.idea.vim.helper.vimStartSelectionAtPoint
@@ -283,6 +284,7 @@ object VisualMotionGroup {
             val vimSelectionStart = primaryCaret.vimSelectionStart
             VimPlugin.getMark().setVisualSelectionMarks(editor, TextRange(vimSelectionStart, primaryCaret.offset))
             editor.caretModel.allCarets.forEach { it.vimSelectionStartSetToNull() }
+            editor.vimBlockMainCaretSetToNull()
 
             CommandState.getInstance(editor).subMode = CommandState.SubMode.NONE
         }

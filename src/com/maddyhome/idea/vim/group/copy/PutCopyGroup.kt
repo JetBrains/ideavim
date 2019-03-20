@@ -97,8 +97,14 @@ object PutCopyGroup {
     ): Boolean {
         val res = Ref.create(true)
         val caret = editor.caretModel.primaryCaret
-
         val range = selection.toVimTextRange().normalize()
+        val line = if (insertBefore) {
+            editor.offsetToLogicalPosition(range.startOffset).line
+        } else {
+            editor.offsetToLogicalPosition(range.endOffset).line
+        }
+
+
         VimPlugin.getChange().deleteRange(editor, caret, range, SelectionType.BLOCK_WISE, false)
 
         val type = register?.type ?: return false
@@ -124,9 +130,9 @@ object PutCopyGroup {
             }
             SelectionType.LINE_WISE -> {
                 val startOffset = if (insertBefore) {
-                    EditorHelper.getLineStartForOffset(editor, range.startOffset)
+                    EditorHelper.getLineStartOffset(editor, line)
                 } else {
-                    EditorHelper.getLineEndForOffset(editor, range.endOffset)
+                    EditorHelper.getLineEndOffset(editor, line, true)
                 }
 
                 var text = register.text ?: run {

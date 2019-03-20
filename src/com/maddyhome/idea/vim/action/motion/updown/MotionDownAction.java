@@ -54,18 +54,13 @@ public class MotionDownAction extends MotionEditorAction {
                          int count,
                          int rawCount,
                          @Nullable Argument argument) {
-      Caret lastDownCaret = EditorData.getLastDownCaret(editor);
-      EditorData.setLastDownCaret(editor, caret);
       if (CommandState.inVisualBlockMode(editor) && EditorData.shouldIgnoreNextMove(editor)) {
         EditorData.dontIgnoreNextMove(editor);
-        if (lastDownCaret != caret) {
-          return caret.getOffset();
-        }
+        return caret.getOffset();
       }
       if (CommandState.inVisualBlockMode(editor)) {
-        Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-        int blockEndOffset = CaretDataKt.getVimSelectionStart(primaryCaret);
-        int blockStartOffset = primaryCaret.getOffset();
+        int blockEndOffset = CaretDataKt.getVimSelectionStart(caret);
+        int blockStartOffset = caret.getOffset();
         VisualPosition blockEndPosition = editor.offsetToVisualPosition(blockEndOffset);
         VisualPosition blockStartPosition = editor.offsetToVisualPosition(blockStartOffset);
         if (blockEndPosition.getLine() < blockStartPosition.getLine()) {

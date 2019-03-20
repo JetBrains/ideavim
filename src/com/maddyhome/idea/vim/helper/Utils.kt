@@ -38,17 +38,29 @@ val Editor.visualBlockRange: TextRange
     get() = selectionModel.run { TextRange(blockSelectionStarts, blockSelectionEnds) }
 
 fun Caret.vimStartSelectionAtPoint(point: Int) {
-    setVisualSelection(point, point, this)
     vimSelectionStart = point
+    setVisualSelection(point, point, this)
 }
 
 fun Caret.vimMoveSelectionToCaret() {
     if (CommandState.getInstance(editor).mode != CommandState.Mode.VISUAL)
         throw RuntimeException("Attempt to extent selection in non-visual mode")
+    if (CommandState.inVisualBlockMode(editor))
+        throw RuntimeException("Move caret with [vimMoveBlockSelectionToOffset]")
 
     val startOffsetMark = vimSelectionStart
 
     setVisualSelection(startOffsetMark, offset, this)
+}
+
+fun vimMoveBlockSelectionToOffset(editor: Editor, offset: Int) {
+    if (!CommandState.inVisualBlockMode(editor))
+        throw RuntimeException("Move caret with [vimMoveSelectionToCaret]")
+
+    val vimBlockMainCaret = editor.vimBlockMainCaret
+    val startOffsetMark = vimBlockMainCaret.vimSelectionStart
+
+    setVisualSelection(startOffsetMark, offset, vimBlockMainCaret)
 }
 
 fun Caret.vimUpdateEditorSelection() {
@@ -73,12 +85,14 @@ private fun setVisualSelection(firstOffset: Int, secondOffset: Int, caret: Caret
             caret.setSelection(start, adjEnd)
         }
         CommandState.SubMode.VISUAL_BLOCK -> {
-            if (caret != editor.caretModel.primaryCaret) return  // Block operations are performed only on primary caret
-
             editor.caretModel.removeSecondaryCarets()
 
-            val blockStart = editor.offsetToLogicalPosition(start)
+            var blockStart = editor.offsetToLogicalPosition(start)
             var blockEnd = editor.offsetToLogicalPosition(end)
+            if (blockStart.column > blockEnd.column) {
+                // swap variables
+                blockStart = blockEnd.also { blockEnd = blockStart }
+            }
             if (!VisualMotionGroup.exclusiveSelection) {
                 blockEnd = LogicalPosition(blockEnd.line, blockEnd.column + 1)
             }
@@ -94,6 +108,17 @@ private fun setVisualSelection(firstOffset: Int, secondOffset: Int, caret: Caret
                 if (!EditorHelper.isLineEmpty(editor, line, false)) {
                     aCaret.moveToOffset(aCaret.selectionEnd - 1)
                 }
+            }
+
+            val startLine = editor.offsetToLogicalPosition(caret.vimSelectionStart).line
+            val startColumn = editor.offsetToLogicalPosition(caret.vimSelectionStart).column
+            if (editor.caretModel.allCarets.first().logicalPosition.line == startLine) {
+                editor.vimBlockMainCaret = editor.caretModel.allCarets.last()
+            } else {
+                editor.vimBlockMainCaret = editor.caretModel.allCarets.first()
+            }
+            if (editor.vimBlockMainCaret.logicalPosition.column <= startColumn) {
+                editor.vimBlockMainCaret.moveToOffset(editor.vimBlockMainCaret.selectionStart)
             }
         }
     }

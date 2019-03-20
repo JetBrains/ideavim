@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
 import com.maddyhome.idea.vim.helper.CaretData
 import com.maddyhome.idea.vim.helper.EditorData
 import com.maddyhome.idea.vim.helper.VimSelection
+import com.maddyhome.idea.vim.helper.vimBlockMainCaret
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.helper.visualBlockRange
 
@@ -68,7 +69,7 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         val res = Ref.create(true)
         when {
             selections.keys.isEmpty() -> return false
-            selections.keys.size == 1 -> res.set(executeAction(editor, editor.caretModel.primaryCaret, context, cmd, selections.values.first()))
+            selections.keys.size == 1 -> res.set(executeAction(editor, selections.keys.first(), context, cmd, selections.values.first()))
             else -> editor.caretModel.runForEachCaret({ caret ->
                 val range = selections.getValue(caret)
                 val loopRes = executeAction(editor, caret, context, cmd, range)
@@ -95,8 +96,8 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
         if (CommandState.inVisualBlockMode(this)) {
             val adj = if (VisualMotionGroup.exclusiveSelection) 0 else 1
-            val primaryCaret = caretModel.primaryCaret
-            return mapOf(primaryCaret to VimSelection(primaryCaret.vimSelectionStart, primaryCaret.offset + adj, SelectionType.BLOCK_WISE, this))
+            val (start, end) = vimBlockMainCaret.run { if (vimSelectionStart > offset) vimSelectionStart + adj to offset else vimSelectionStart to offset + adj }
+            return mapOf(vimBlockMainCaret to VimSelection(start, end, SelectionType.BLOCK_WISE, this))
         }
 
         return this.caretModel.allCarets.associateWith { caret ->

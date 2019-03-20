@@ -271,21 +271,6 @@ public class EditorData {
   }
 
   /**
-   * Gets the last caret used in down movement.
-   */
-  @Nullable
-  public static Caret getLastDownCaret(@NotNull Editor editor) {
-    return editor.getUserData(LAST_DOWN_CARET);
-  }
-
-  /**
-   * Sets the last caret used in down movement.
-   */
-  public static void setLastDownCaret(@NotNull Editor editor, @NotNull Caret caret) {
-    editor.putUserData(LAST_DOWN_CARET, caret);
-  }
-
-  /**
    * This is a static helper - no instances needed
    */
   private EditorData() {
@@ -307,7 +292,6 @@ public class EditorData {
   private static final Key<Boolean> IS_KEEPING_VISUAL_OPERATOR_ACTION = new Key<>("isKeepingVisualOperatorAction");
   private static final Key<CommandState.Mode> CHANGE_ACTION_SWITCH_MODE = new Key<>("changeActionSwitchMode");
   private static final Key<Boolean> WAS_VISUAL_BLOCK_MODE = new Key<>("wasVisualBlockMode");
-  private static final Key<Caret> LAST_DOWN_CARET = new Key<>("lastDownCaret");
 
   private static final Logger logger = Logger.getInstance(EditorData.class.getName());
 

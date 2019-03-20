@@ -59,7 +59,8 @@ public class CaretData {
       caret.putUserData(LAST_COLUMN, col);
     }
     else {
-      editor.getCaretModel().getPrimaryCaret().putUserData(LAST_COLUMN, col);
+      Caret vimBlockMainCaret = CaretDataKt.getVimBlockMainCaret(editor);
+      vimBlockMainCaret.putUserData(LAST_COLUMN, col);
     }
   }
 

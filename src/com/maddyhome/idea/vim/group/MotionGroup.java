@@ -356,6 +356,15 @@ public class MotionGroup {
 
   public static void moveCaret(@NotNull Editor editor, @NotNull Caret caret, int offset, boolean forceKeepVisual) {
     if (offset >= 0 && offset <= editor.getDocument().getTextLength()) {
+
+      if (CommandState.inVisualBlockMode(editor)) {
+        scrollCaretIntoView(editor);
+        UtilsKt.vimMoveBlockSelectionToOffset(editor, offset);
+        Caret blockMainCaret = CaretDataKt.getVimBlockMainCaret(editor);
+        CaretData.setLastColumn(editor, blockMainCaret, blockMainCaret.getVisualPosition().column);
+        return;
+      }
+
       final boolean keepVisual = forceKeepVisual || keepVisual(editor);
       if (caret.getOffset() != offset) {
         caret.moveToOffset(offset);

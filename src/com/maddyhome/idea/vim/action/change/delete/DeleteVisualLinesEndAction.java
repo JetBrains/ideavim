@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -51,7 +50,7 @@ public class DeleteVisualLinesEndAction extends VimCommandAction {
                                       @NotNull DataContext context,
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
-        if (CommandState.inVisualBlockMode(editor)) {
+        if (range.getType() == SelectionType.BLOCK_WISE) {
           TextRange vimTextRange = range.toVimTextRange();
           final int[] starts = vimTextRange.getStartOffsets();
           final int[] ends = vimTextRange.getEndOffsets();

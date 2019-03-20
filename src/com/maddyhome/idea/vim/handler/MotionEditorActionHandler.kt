@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.vimBlockMainCaret
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 
 /**
@@ -47,7 +48,10 @@ abstract class MotionEditorActionHandler : EditorActionHandlerBase(false) {
     final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
         val visualBlockActive = CommandState.inVisualBlockMode(editor)
 
-        if (visualBlockActive || editor.caretModel.caretCount == 1 || alwaysBatchExecution) {
+        if (visualBlockActive) {
+            val primaryCaret = editor.vimBlockMainCaret
+            doExecute(editor, primaryCaret, context, cmd)
+        } else if (editor.caretModel.caretCount == 1 || alwaysBatchExecution) {
             val primaryCaret = editor.caretModel.primaryCaret
             doExecute(editor, primaryCaret, context, cmd)
         } else {
