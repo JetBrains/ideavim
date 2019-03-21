@@ -354,7 +354,7 @@ public class MotionGroup {
     return EditorHelper.normalizeScrollOffset(editor, scrollOffset);
   }
 
-  public static void moveCaret(@NotNull Editor editor, @NotNull Caret caret, int offset, boolean forceKeepVisual) {
+  public static void moveCaret(@NotNull Editor editor, @NotNull Caret caret, int offset) {
     if (offset >= 0 && offset <= editor.getDocument().getTextLength()) {
 
       if (CommandState.inVisualBlockMode(editor)) {
@@ -365,7 +365,6 @@ public class MotionGroup {
         return;
       }
 
-      final boolean keepVisual = forceKeepVisual || keepVisual(editor);
       if (caret.getOffset() != offset) {
         caret.moveToOffset(offset);
         CaretData.setLastColumn(editor, caret, caret.getVisualPosition().column);
@@ -374,7 +373,7 @@ public class MotionGroup {
         }
       }
 
-      if (keepVisual) {
+      if (CommandState.inVisualMode(editor)) {
         UtilsKt.vimMoveSelectionToCaret(caret);
       }
       else {
@@ -1434,10 +1433,6 @@ public class MotionGroup {
     return moveCaretToLineStartSkipLeading(editor, line);
   }
 
-  public static void moveCaret(@NotNull Editor editor, @NotNull Caret caret, int offset) {
-    moveCaret(editor, caret, offset, false);
-  }
-
   public int moveCaretToLineEndOffset(@NotNull Editor editor, @NotNull Caret caret, int cntForward,
                                       boolean allowPastEnd) {
     int line = EditorHelper.normalizeVisualLine(editor, caret.getVisualPosition().line + cntForward);
@@ -1448,11 +1443,6 @@ public class MotionGroup {
     else {
       return moveCaretToLineEnd(editor, EditorHelper.visualLineToLogicalLine(editor, line), allowPastEnd);
     }
-  }
-
-  private static boolean keepVisual(Editor editor) {
-    final CommandState commandState = CommandState.getInstance(editor);
-    return commandState.getMode() == CommandState.Mode.VISUAL;
   }
 
   /**
@@ -1643,6 +1633,7 @@ public class MotionGroup {
         VimPlugin.getMotion().processLineSelection(event.getEditor());
       }
     }
+
     private int startOff;
     private int endOff;
   }

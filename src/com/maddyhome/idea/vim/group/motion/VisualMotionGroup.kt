@@ -149,7 +149,7 @@ object VisualMotionGroup {
                 val primaryCaret = editor.caretModel.primaryCaret
                 CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, newSubMode, MappingMode.VISUAL)
                 primaryCaret.vimStartSelectionAtPoint(start)
-                MotionGroup.moveCaret(editor, primaryCaret, end, true)
+                MotionGroup.moveCaret(editor, primaryCaret, end)
             } else {
                 CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, subMode, MappingMode.VISUAL)
                 if (CommandState.inVisualBlockMode(editor)) {
@@ -185,7 +185,7 @@ object VisualMotionGroup {
                     val endAdj = if (exclusiveSelection) 0 else 1
                     val end = (caret.selectionEnd - endAdj).coerceAtLeast(0)
                     caret.vimStartSelectionAtPoint(start)
-                    MotionGroup.moveCaret(editor, caret, end, true)
+                    MotionGroup.moveCaret(editor, caret, end)
                 }
                 KeyHandler.getInstance().reset(editor)
             }
