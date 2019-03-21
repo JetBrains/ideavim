@@ -19,9 +19,11 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.CaretVisualAttributes
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.RangeMarker
+import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
 import com.maddyhome.idea.vim.command.CommandState
@@ -108,6 +110,12 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
                 }
                 if (!EditorHelper.isLineEmpty(editor, line, false)) {
                     aCaret.moveToOffset(aCaret.selectionEnd - 1)
+                }
+
+                if (aCaret != editor.caretModel.primaryCaret) {
+                    val color = editor.colorsScheme.getColor(EditorColors.SELECTION_BACKGROUND_COLOR)
+                    val visualAttributes = aCaret.visualAttributes
+                    aCaret.visualAttributes = CaretVisualAttributes(color, visualAttributes.weight)
                 }
             }
 
