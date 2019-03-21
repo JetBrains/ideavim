@@ -52,8 +52,8 @@ public class DeleteVisualAction extends VimCommandAction {
                                       @NotNull VimSelection range) {
         SelectionType selectionType = range.getType();
         if (selectionType == SelectionType.LINE_WISE) {
-          final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStart()),
-                                                    EditorHelper.getLineEndForOffset(editor, range.getEnd()) + 1);
+          final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getNormStart()),
+                                                    EditorHelper.getLineEndForOffset(editor, range.getNormEnd()) + 1);
           return VimPlugin.getChange().deleteRange(editor, caret, lineRange, selectionType, false);
         }
         else {

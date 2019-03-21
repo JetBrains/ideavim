@@ -29,7 +29,6 @@ import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,9 +50,13 @@ public class ChangeVisualAction extends VimCommandAction {
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
         TextRange vimTextRange = range.toVimTextRange();
-        final SelectionType type = EditorData.wasVisualBlockMode(editor) && vimTextRange.isMultiple()
-                                   ? SelectionType.BLOCK_WISE
-                                   : SelectionType.CHARACTER_WISE;
+        SelectionType type;
+        if (range.getType() == SelectionType.BLOCK_WISE) {
+          type = SelectionType.BLOCK_WISE;
+        }
+        else {
+          type = SelectionType.CHARACTER_WISE;
+        }
         return VimPlugin.getChange().changeRange(editor, caret, vimTextRange, type);
       }
     });

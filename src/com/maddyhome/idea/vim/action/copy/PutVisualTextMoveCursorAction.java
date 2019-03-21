@@ -71,8 +71,7 @@ public class PutVisualTextMoveCursorAction extends VimCommandAction {
       @Override
       protected boolean beforeExecution(@NotNull Editor editor,
                                         @NotNull DataContext context,
-                                        @NotNull Command cmd,
-                                        @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
+                                        @NotNull Command cmd, @NotNull Map<Caret, VimSelection> caretsAndSelections) {
         Register register = VimPlugin.getRegister().getLastRegister();
         VimPlugin.getRegister().resetRegister();
         if (register == null) return false;

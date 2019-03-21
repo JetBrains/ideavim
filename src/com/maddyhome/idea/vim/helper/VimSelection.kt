@@ -29,12 +29,15 @@ import com.maddyhome.idea.vim.common.TextRange
 /**
  * @author Alex Plate
  */
-open class VimSelection(
+data class VimSelection(
         val start: Int,
         val end: Int,
         val type: SelectionType,
         val editor: Editor
 ) {
+    val normStart: Int = if (start > end) end else start
+    val normEnd: Int = if (start > end) start else end
+
     fun toVimTextRange() = when (type) {
         CHARACTER_WISE, LINE_WISE -> TextRange(start, end)
         BLOCK_WISE -> {
