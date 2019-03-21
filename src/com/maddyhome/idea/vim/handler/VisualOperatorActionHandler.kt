@@ -31,11 +31,13 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VisualChange
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
-import com.maddyhome.idea.vim.helper.CaretData
 import com.maddyhome.idea.vim.helper.EditorData
 import com.maddyhome.idea.vim.helper.VimSelection
 import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
+import com.maddyhome.idea.vim.helper.vimPreviousLastColumn
 import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.helper.vimVisualChange
 import com.maddyhome.idea.vim.helper.visualBlockRange
 
 /**
@@ -121,8 +123,8 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
         private fun startForCaret(caret: Caret) {
             if (CommandState.getInstance(editor).mode == CommandState.Mode.REPEAT) {
-                CaretData.setPreviousLastColumn(caret, caret.vimLastColumn)
-                val range = CaretData.getLastVisualOperatorRange(caret)
+                caret.vimPreviousLastColumn = caret.vimLastColumn
+                val range = caret.vimLastVisualOperatorRange
                 VisualMotionGroup.toggleVisual(editor, 1, 1, CommandState.SubMode.NONE)
                 if (range != null && range.columns == MotionGroup.LAST_COLUMN) {
                     caret.vimLastColumn = MotionGroup.LAST_COLUMN
@@ -137,7 +139,7 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
                 }
                 logger.debug("change=$change")
             }
-            CaretData.setVisualChange(caret, change)
+            caret.vimVisualChange = change
         }
 
         fun start() {
@@ -168,13 +170,13 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         private fun finishForCaret(caret: Caret, res: Boolean) {
             if (CommandFlags.FLAG_MULTIKEY_UNDO !in cmd.flags && CommandFlags.FLAG_EXPECT_MORE !in cmd.flags) {
                 if (wasRepeat) {
-                    caret.vimLastColumn = CaretData.getPreviousLastColumn(caret)
+                    caret.vimLastColumn = caret.vimPreviousLastColumn
                 }
             }
 
             if (res) {
-                CaretData.getVisualChange(caret)?.let {
-                    CaretData.setLastVisualOperatorRange(caret, it)
+                caret.vimVisualChange?.let {
+                    caret.vimLastVisualOperatorRange = it
                 }
             }
         }

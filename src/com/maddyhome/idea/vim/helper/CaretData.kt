@@ -22,6 +22,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.VisualChange
 
 /**
  * @author Alex Plate
@@ -49,6 +50,7 @@ fun Caret.vimSelectionStartSetToNull() {
 private var Caret._vimSelectionStart: Int? by userData()
 private var Editor._vimBlockSelectinoStart: Int? by userData()
 
+
 private val LAST_COLUMN: Key<Int> = Key.create("lastColumn")
 var Caret.vimLastColumn: Int
     get() = getUserData(LAST_COLUMN) ?: visualPosition.column
@@ -57,3 +59,9 @@ var Caret.vimLastColumn: Int
     } else {
         putUserData(LAST_COLUMN, value)
     }
+
+var Caret.vimLastVisualOperatorRange: VisualChange? by userData()
+var Caret.vimVisualChange: VisualChange? by userData()
+var Caret.vimPreviousLastColumn: Int by userDataOr { (this as Caret).logicalPosition.column }
+var Caret.vimInsertStart: Int by userDataOr { (this as Caret).offset }
+var Caret.vimWasIsFirstLine: Boolean by userDataOr { false }

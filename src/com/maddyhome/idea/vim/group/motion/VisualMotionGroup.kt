@@ -31,10 +31,10 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VisualChange
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.helper.CaretData
 import com.maddyhome.idea.vim.helper.EditorData
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.helper.vimSelectionStartSetToNull
 import com.maddyhome.idea.vim.helper.vimStartSelectionAtPoint
@@ -143,7 +143,7 @@ object VisualMotionGroup {
                     return false
                 }
                 // FIXME: 2019-03-05  When there was no previous Visual operation [count] characters are selected.
-                val range = CaretData.getLastVisualOperatorRange(editor.caretModel.primaryCaret) ?: return false
+                val range = editor.caretModel.primaryCaret.vimLastVisualOperatorRange ?: return false
                 val newSubMode = range.type.toSubMode()
                 val start = editor.caretModel.offset
                 val end = calculateVisualRange(editor, range, count)

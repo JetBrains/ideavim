@@ -150,3 +150,23 @@ fun <T> userData(): ReadWriteProperty<UserDataHolder, T?> {
         }
     }
 }
+
+fun <T> userDataOr(default: UserDataHolder.() -> T): ReadWriteProperty<UserDataHolder, T> {
+    return object : ReadWriteProperty<UserDataHolder, T> {
+        private var key: Key<T>? = null
+        private fun getKey(property: KProperty<*>): Key<T> {
+            if (key == null) {
+                key = Key.create(property.name + "by userData()")
+            }
+            return key as Key<T>
+        }
+
+        override fun getValue(thisRef: UserDataHolder, property: KProperty<*>): T {
+            return thisRef.getUserData(getKey(property)) ?: thisRef.default()
+        }
+
+        override fun setValue(thisRef: UserDataHolder, property: KProperty<*>, value: T) {
+            thisRef.putUserData(getKey(property), value)
+        }
+    }
+}

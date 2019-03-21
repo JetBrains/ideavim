@@ -65,7 +65,6 @@ import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.handler.CaretOrder;
-import com.maddyhome.idea.vim.helper.CaretData;
 import com.maddyhome.idea.vim.helper.CaretDataKt;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
 import com.maddyhome.idea.vim.helper.EditorData;
@@ -174,7 +173,7 @@ public class ChangeGroup {
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
       if (caret.getVisualPosition().line == 0) {
         MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStart(editor, caret));
-        CaretData.setWasInFirstLine(caret, true);
+        CaretDataKt.setVimWasIsFirstLine(caret, true);
       }
       else {
         MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretVertical(editor, caret, -1));
@@ -186,8 +185,8 @@ public class ChangeGroup {
     runEnterAction(editor, context);
 
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
-      if (CaretData.wasInFirstLine(caret)) {
-        CaretData.setWasInFirstLine(caret, false);
+      if (CaretDataKt.getVimWasIsFirstLine(caret)) {
+        CaretDataKt.setVimWasIsFirstLine(caret, false);
         MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretVertical(editor, caret, -1));
       }
     }
@@ -205,7 +204,7 @@ public class ChangeGroup {
 
     if (caret.getVisualPosition().line == 0) {
       MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStart(editor, caret));
-      CaretData.setWasInFirstLine(caret, true);
+      CaretDataKt.setVimWasIsFirstLine(caret, true);
     }
     else {
       MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretVertical(editor, caret, -1));
@@ -215,9 +214,9 @@ public class ChangeGroup {
     EditorData.setChangeSwitchMode(editor, CommandState.Mode.INSERT);
     insertText(editor, caret, "\n" + IndentConfig.create(editor).createIndentBySize(col));
 
-    if (CaretData.wasInFirstLine(caret)) {
+    if (CaretDataKt.getVimWasIsFirstLine(caret)) {
       MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretVertical(editor, caret, -1));
-      CaretData.setWasInFirstLine(caret, false);
+      CaretDataKt.setVimWasIsFirstLine(caret, false);
     }
   }
 
@@ -332,7 +331,7 @@ public class ChangeGroup {
    * @return true if able to delete the text, false if not
    */
   public boolean insertDeleteInsertedText(@NotNull Editor editor, @NotNull Caret caret) {
-    int deleteTo = CaretData.getInsertStart(caret);
+    int deleteTo = CaretDataKt.getVimInsertStart(caret);
     int offset = caret.getOffset();
     if (offset == deleteTo) {
       deleteTo = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, caret);
@@ -375,7 +374,7 @@ public class ChangeGroup {
 
     final CaretModel caretModel = editor.getCaretModel();
     for (Caret caret : caretModel.getAllCarets()) {
-      CaretData.setInsertStart(caret, caret.getOffset());
+      CaretDataKt.setVimInsertStart(caret, caret.getOffset());
       if (caret == caretModel.getPrimaryCaret()) {
         VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_START, caret.getOffset());
       }
@@ -716,7 +715,7 @@ public class ChangeGroup {
     strokes.clear();
     repeatCharsCount = 0;
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
-      CaretData.setInsertStart(caret, caret.getOffset());
+      CaretDataKt.setVimInsertStart(caret, caret.getOffset());
     }
   }
 
