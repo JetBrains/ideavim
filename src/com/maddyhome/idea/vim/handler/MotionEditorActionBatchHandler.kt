@@ -32,14 +32,19 @@ abstract class MotionEditorActionBatchHandler : MotionEditorActionHandler() {
     override val alwaysBatchExecution = true
 
     abstract fun getOffset(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int
-    protected open fun preMove(editor: Editor, context: DataContext, cmd: Command): Boolean = true
+    protected open fun preOffsetComputation(editor: Editor, context: DataContext, cmd: Command): Boolean = true
+    protected open fun preMove(editor: Editor, context: DataContext, cmd: Command) = Unit
     protected open fun postMove(editor: Editor, context: DataContext, cmd: Command) = Unit
 
     final override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
         return getOffset(editor, context, count, rawCount, argument)
     }
 
-    final override fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
+    final override fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
+        return preOffsetComputation(editor, context, cmd)
+    }
+
+    final override fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
         return preMove(editor, context, cmd)
     }
 

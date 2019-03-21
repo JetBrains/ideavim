@@ -1204,19 +1204,6 @@ class PutVisualTextActionTest : VimTestCase() {
         myFixture.checkResult(after)
     }
 
-    @VimBehaviourDiffers(originalVimAfter = """
-            A Discovery
-
-            I |found| it in a legendary land
-            al|l roc|ks and lavender and tufted grass,
-            wh|ere i|t was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-
-            The <caret>|found| it combines mark it as new
-            to s|l roc|shape and shade -- the special tinge,
-            akin|ere i|light, tempering its blue,
-            the derside, the checquered fringe.
-    """, trimIndent = true, description = "Cursor position differs")
     @Test
     fun `test put visual text blockwise to longer block`() {
         val before = """
@@ -1243,10 +1230,10 @@ class PutVisualTextActionTest : VimTestCase() {
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
 
-            The |found| it combines mark it as new
+            The <caret>|found| it combines mark it as new
             to s|l roc|shape and shade -- the special tinge,
             akin|ere i|light, tempering its blue,
-            the <caret>derside, the checquered fringe.
+            the derside, the checquered fringe.
             """.trimIndent()
         myFixture.checkResult(after)
     }

@@ -39,7 +39,9 @@ abstract class MotionEditorActionHandler : EditorActionHandlerBase(false) {
 
     abstract fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int
 
-    protected open fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean = true
+    protected open fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean = true
+    // TODO: 2019-03-21 doc about caret and primary caret in block mode
+    protected open fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) = Unit
     protected open fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) = Unit
 
     protected open val alwaysBatchExecution = false
@@ -61,7 +63,7 @@ abstract class MotionEditorActionHandler : EditorActionHandlerBase(false) {
     }
 
     private fun doExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
-        if (!preMove(editor, caret, context, cmd)) return
+        if (!preOffsetComputation(editor, caret, context, cmd)) return
 
         var offset = getOffset(editor, caret, context, cmd.count, cmd.rawCount, cmd.argument)
 
@@ -74,6 +76,7 @@ abstract class MotionEditorActionHandler : EditorActionHandlerBase(false) {
                     !CommandState.inVisualCharacterMode(editor)) {
                 offset = EditorHelper.normalizeOffset(editor, offset, false)
             }
+            preMove(editor, caret, context, cmd)
             MotionGroup.moveCaret(editor, caret, offset)
             postMove(editor, caret, context, cmd)
         }

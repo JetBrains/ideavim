@@ -45,8 +45,10 @@ public class MotionUpAction extends MotionEditorAction {
     }
 
     @Override
-    protected boolean preMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                              @NotNull Command cmd) {
+    protected boolean preOffsetComputation(@NotNull Editor editor,
+                                           @NotNull Caret caret,
+                                           @NotNull DataContext context,
+                                           @NotNull Command cmd) {
       col = CaretData.getLastColumn(caret);
       return true;
     }

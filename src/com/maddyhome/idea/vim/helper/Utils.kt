@@ -96,13 +96,14 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
                     blockEnd = LogicalPosition(blockEnd.line, blockEnd.column + 1)
                 }
             }
+            val lastColumn = CaretData.getLastColumn(editor.caretModel.primaryCaret)
             editor.selectionModel.setBlockSelection(blockStart, blockEnd)
 
             for (aCaret in editor.caretModel.allCarets) {
                 val line = aCaret.logicalPosition.line
                 val lineEndOffset = EditorHelper.getLineEndOffset(editor, line, true)
 
-                if (CaretData.getLastColumn(editor.caretModel.primaryCaret) >= MotionGroup.LAST_COLUMN) {
+                if (lastColumn >= MotionGroup.LAST_COLUMN) {
                     aCaret.setSelection(aCaret.selectionStart, lineEndOffset)
                 }
                 if (!EditorHelper.isLineEmpty(editor, line, false)) {
