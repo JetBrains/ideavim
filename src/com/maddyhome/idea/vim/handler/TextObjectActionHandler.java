@@ -27,9 +27,9 @@ import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
+import com.maddyhome.idea.vim.group.motion.VisualGroupKt;
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.CaretDataKt;
-import com.maddyhome.idea.vim.helper.UtilsKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -65,7 +65,7 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
                    : range.getStartOffset();
 
       if (CaretDataKt.getVimSelectionStart(caret) == caret.getOffset() || block) {
-        UtilsKt.vimStartSelectionAtPoint(caret, newstart);
+        VisualGroupKt.vimStartSelectionAtPoint(caret, newstart);
       }
 
       if ((cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE) &&

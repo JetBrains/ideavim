@@ -45,11 +45,11 @@ import com.intellij.openapi.vfs.VirtualFileVisitor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.group.motion.VisualGroupKt;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
-import com.maddyhome.idea.vim.helper.UtilsKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -309,7 +309,7 @@ public class FileGroup {
     else {
       msg.append("Selected ");
 
-      TextRange vr = UtilsKt.getVisualBlockRange(editor);
+      TextRange vr = VisualGroupKt.getVisualBlockRange(editor);
       vr.normalize();
 
       int lines;

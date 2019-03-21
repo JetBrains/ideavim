@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VisualChange
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
+import com.maddyhome.idea.vim.group.motion.visualBlockRange
 import com.maddyhome.idea.vim.helper.EditorData
 import com.maddyhome.idea.vim.helper.VimSelection
 import com.maddyhome.idea.vim.helper.vimLastColumn
@@ -38,7 +39,6 @@ import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
 import com.maddyhome.idea.vim.helper.vimPreviousLastColumn
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.helper.vimVisualChange
-import com.maddyhome.idea.vim.helper.visualBlockRange
 
 /**
  * @author Alex Plate

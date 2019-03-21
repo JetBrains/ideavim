@@ -61,13 +61,13 @@ import com.maddyhome.idea.vim.common.Jump;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
+import com.maddyhome.idea.vim.group.motion.VisualGroupKt;
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroup;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.CaretDataKt;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
-import com.maddyhome.idea.vim.helper.UtilsKt;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
@@ -357,7 +357,7 @@ public class MotionGroup {
     if (offset >= 0 && offset <= editor.getDocument().getTextLength()) {
 
       if (CommandState.inVisualBlockMode(editor)) {
-        UtilsKt.vimMoveBlockSelectionToOffset(editor, offset);
+        VisualGroupKt.vimMoveBlockSelectionToOffset(editor, offset);
         Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
         CaretDataKt.setVimLastColumn(primaryCaret, primaryCaret.getVisualPosition().column);
         scrollCaretIntoView(editor);
@@ -373,7 +373,7 @@ public class MotionGroup {
       }
 
       if (CommandState.inVisualMode(editor)) {
-        UtilsKt.vimMoveSelectionToCaret(caret);
+        VisualGroupKt.vimMoveSelectionToCaret(caret);
       }
       else {
         VisualMotionGroup.INSTANCE.exitVisual(editor);

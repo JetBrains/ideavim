@@ -34,10 +34,10 @@ import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.extension.VimNonDisposableExtension
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
+import com.maddyhome.idea.vim.group.motion.vimStartSelectionAtPoint
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.SearchHelper.findWordUnderCursor
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.vimStartSelectionAtPoint
 import com.maddyhome.idea.vim.option.Options
 import java.lang.Integer.min
 import java.util.*

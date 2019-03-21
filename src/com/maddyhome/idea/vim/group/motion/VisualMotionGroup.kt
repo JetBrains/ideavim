@@ -37,8 +37,6 @@ import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.helper.vimSelectionStartSetToNull
-import com.maddyhome.idea.vim.helper.vimStartSelectionAtPoint
-import com.maddyhome.idea.vim.helper.vimUpdateEditorSelection
 import com.maddyhome.idea.vim.option.BoundStringOption
 import com.maddyhome.idea.vim.option.Options
 import java.util.*
@@ -178,7 +176,7 @@ object VisualMotionGroup {
     }
 
     fun controlNonVimSelectionChange(editor: Editor) {
-        if (CommandState.getInstance(editor).mode != CommandState.Mode.VISUAL) {
+        if (!CommandState.inVisualMode(editor)) {
             if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
                 CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER, MappingMode.VISUAL)
                 editor.caretModel.allCarets.filter(Caret::hasSelection).forEach { caret ->
