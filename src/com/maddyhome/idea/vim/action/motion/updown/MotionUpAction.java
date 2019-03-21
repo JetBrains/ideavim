@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
-import com.maddyhome.idea.vim.helper.CaretData;
+import com.maddyhome.idea.vim.helper.CaretDataKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,14 +49,14 @@ public class MotionUpAction extends MotionEditorAction {
                                            @NotNull Caret caret,
                                            @NotNull DataContext context,
                                            @NotNull Command cmd) {
-      col = CaretData.getLastColumn(caret);
+      col = CaretDataKt.getVimLastColumn(caret);
       return true;
     }
 
     @Override
     protected void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                             @NotNull Command cmd) {
-      CaretData.setLastColumn(editor, caret, col);
+      CaretDataKt.setVimLastColumn(caret, col);
     }
 
     private int col;

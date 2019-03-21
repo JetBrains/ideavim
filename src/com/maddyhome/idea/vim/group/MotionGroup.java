@@ -63,7 +63,6 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroup;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
-import com.maddyhome.idea.vim.helper.CaretData;
 import com.maddyhome.idea.vim.helper.CaretDataKt;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
@@ -266,7 +265,7 @@ public class MotionGroup {
     int col = editor.getCaretModel().getVisualPosition().column;
     int oldColumn = col;
     if (col >= EditorHelper.getLineLength(editor) - 1) {
-      col = CaretData.getLastColumn(editor.getCaretModel().getPrimaryCaret());
+      col = CaretDataKt.getVimLastColumn(editor.getCaretModel().getPrimaryCaret());
     }
     int visualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
     int caretColumn = col;
@@ -288,7 +287,7 @@ public class MotionGroup {
       int offset = EditorHelper.visualPositionToOffset(editor, new VisualPosition(newline, newColumn));
       moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
 
-      CaretData.setLastColumn(editor, editor.getCaretModel().getPrimaryCaret(), col);
+      CaretDataKt.setVimLastColumn(editor.getCaretModel().getPrimaryCaret(), col);
     }
   }
 
@@ -360,14 +359,14 @@ public class MotionGroup {
       if (CommandState.inVisualBlockMode(editor)) {
         UtilsKt.vimMoveBlockSelectionToOffset(editor, offset);
         Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-        CaretData.setLastColumn(editor, primaryCaret, primaryCaret.getVisualPosition().column);
+        CaretDataKt.setVimLastColumn(primaryCaret, primaryCaret.getVisualPosition().column);
         scrollCaretIntoView(editor);
         return;
       }
 
       if (caret.getOffset() != offset) {
         caret.moveToOffset(offset);
-        CaretData.setLastColumn(editor, caret, caret.getVisualPosition().column);
+        CaretDataKt.setVimLastColumn(caret, caret.getVisualPosition().column);
         if (caret == editor.getCaretModel().getPrimaryCaret()) {
           scrollCaretIntoView(editor);
         }
@@ -874,7 +873,7 @@ public class MotionGroup {
         break;
     }
 
-    CaretData.setLastColumn(editor, caretModel.getPrimaryCaret(), caretModel.getVisualPosition().column);
+    CaretDataKt.setVimLastColumn(caretModel.getPrimaryCaret(), caretModel.getVisualPosition().column);
   }
 
   /**
@@ -1336,7 +1335,7 @@ public class MotionGroup {
   }
 
   public int moveCaretToLine(@NotNull Editor editor, int logicalLine) {
-    int col = CaretData.getLastColumn(editor.getCaretModel().getPrimaryCaret());
+    int col = CaretDataKt.getVimLastColumn(editor.getCaretModel().getPrimaryCaret());
     int line = logicalLine;
     if (logicalLine < 0) {
       line = 0;
@@ -1480,7 +1479,7 @@ public class MotionGroup {
       return -1;
     }
     else {
-      int col = CaretData.getLastColumn(caret);
+      int col = CaretDataKt.getVimLastColumn(caret);
       int line = EditorHelper.normalizeVisualLine(editor, pos.line + count);
       VisualPosition newPos = new VisualPosition(line, EditorHelper
         .normalizeVisualColumn(editor, line, col, CommandState.inInsertMode(editor)));

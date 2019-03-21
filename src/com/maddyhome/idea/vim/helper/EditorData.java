@@ -19,7 +19,6 @@
 package com.maddyhome.idea.vim.helper;
 
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -62,28 +61,6 @@ public class EditorData {
     editor.putUserData(LAST_SELECTION_TYPE, null);
     editor.putUserData(MORE_PANEL, null);
     editor.putUserData(EX_OUTPUT_MODEL, null);
-  }
-
-  /**
-   * This gets the last column the primary cursor was in for the editor.
-   *
-   * @param editor The editor to get the last column from
-   * @return Returns the last column as set by {@link #setLastColumn} or the current primary cursor column
-   * @deprecated Use {@link CaretData#getLastColumn(Caret)} to get the primary cursor last column
-   */
-  public static int getLastColumn(@NotNull Editor editor) {
-    return CaretData.getLastColumn(editor.getCaretModel().getPrimaryCaret());
-  }
-
-  /**
-   * Sets the last column for the primary caret of this editor
-   *
-   * @param col    The column
-   * @param editor The editor
-   * @deprecated Use {@link CaretData#setLastColumn(Editor, Caret, int)} to set the caret last column
-   */
-  public static void setLastColumn(@NotNull Editor editor, int col) {
-    CaretData.setLastColumn(editor, editor.getCaretModel().getPrimaryCaret(), col);
   }
 
   @Nullable

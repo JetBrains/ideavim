@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
 import com.maddyhome.idea.vim.helper.CaretData
 import com.maddyhome.idea.vim.helper.EditorData
 import com.maddyhome.idea.vim.helper.VimSelection
+import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.helper.visualBlockRange
 
@@ -120,11 +121,11 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
         private fun startForCaret(caret: Caret) {
             if (CommandState.getInstance(editor).mode == CommandState.Mode.REPEAT) {
-                CaretData.setPreviousLastColumn(caret, CaretData.getLastColumn(caret))
+                CaretData.setPreviousLastColumn(caret, caret.vimLastColumn)
                 val range = CaretData.getLastVisualOperatorRange(caret)
                 VisualMotionGroup.toggleVisual(editor, 1, 1, CommandState.SubMode.NONE)
                 if (range != null && range.columns == MotionGroup.LAST_COLUMN) {
-                    CaretData.setLastColumn(editor, caret, MotionGroup.LAST_COLUMN)
+                    caret.vimLastColumn = MotionGroup.LAST_COLUMN
                 }
             }
 
@@ -167,7 +168,7 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         private fun finishForCaret(caret: Caret, res: Boolean) {
             if (CommandFlags.FLAG_MULTIKEY_UNDO !in cmd.flags && CommandFlags.FLAG_EXPECT_MORE !in cmd.flags) {
                 if (wasRepeat) {
-                    CaretData.setLastColumn(editor, caret, CaretData.getPreviousLastColumn(caret))
+                    caret.vimLastColumn = CaretData.getPreviousLastColumn(caret)
                 }
             }
 

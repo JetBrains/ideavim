@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.CaretData
 import com.maddyhome.idea.vim.helper.EditorData
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.helper.vimSelectionStartSetToNull
 import com.maddyhome.idea.vim.helper.vimStartSelectionAtPoint
@@ -244,7 +245,7 @@ object VisualMotionGroup {
         } else if (CommandState.getInstance(editor).subMode == CommandState.SubMode.VISUAL_CHARACTER) {
             SelectionType.CHARACTER_WISE to if (lines > 1) ep.column else ep.column - sp.column
         } else {
-            SelectionType.BLOCK_WISE to if (CaretData.getLastColumn(editor.caretModel.primaryCaret) == MotionGroup.LAST_COLUMN) {
+            SelectionType.BLOCK_WISE to if (editor.caretModel.primaryCaret.vimLastColumn == MotionGroup.LAST_COLUMN) {
                 MotionGroup.LAST_COLUMN
             } else ep.column - sp.column
         }

@@ -98,7 +98,7 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
                     blockEnd = LogicalPosition(blockEnd.line, blockEnd.column + 1)
                 }
             }
-            val lastColumn = CaretData.getLastColumn(editor.caretModel.primaryCaret)
+            val lastColumn = editor.caretModel.primaryCaret.vimLastColumn
             editor.selectionModel.setBlockSelection(blockStart, blockEnd)
 
             for (aCaret in editor.caretModel.allCarets) {
