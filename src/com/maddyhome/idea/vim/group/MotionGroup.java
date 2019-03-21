@@ -358,10 +358,10 @@ public class MotionGroup {
     if (offset >= 0 && offset <= editor.getDocument().getTextLength()) {
 
       if (CommandState.inVisualBlockMode(editor)) {
-        scrollCaretIntoView(editor);
         UtilsKt.vimMoveBlockSelectionToOffset(editor, offset);
-        Caret blockMainCaret = CaretDataKt.getVimBlockMainCaret(editor);
-        CaretData.setLastColumn(editor, blockMainCaret, blockMainCaret.getVisualPosition().column);
+        Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+        CaretData.setLastColumn(editor, primaryCaret, primaryCaret.getVisualPosition().column);
+        scrollCaretIntoView(editor);
         return;
       }
 

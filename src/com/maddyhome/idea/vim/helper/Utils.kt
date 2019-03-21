@@ -57,10 +57,10 @@ fun vimMoveBlockSelectionToOffset(editor: Editor, offset: Int) {
     if (!CommandState.inVisualBlockMode(editor))
         throw RuntimeException("Move caret with [vimMoveSelectionToCaret]")
 
-    val vimBlockMainCaret = editor.vimBlockMainCaret
-    val startOffsetMark = vimBlockMainCaret.vimSelectionStart
+    val primaryCaret = editor.caretModel.primaryCaret
+    val startOffsetMark = primaryCaret.vimSelectionStart
 
-    setVisualSelection(startOffsetMark, offset, vimBlockMainCaret)
+    setVisualSelection(startOffsetMark, offset, primaryCaret)
 }
 
 fun Caret.vimUpdateEditorSelection() {
@@ -68,8 +68,8 @@ fun Caret.vimUpdateEditorSelection() {
     setVisualSelection(startOffsetMark, offset, this)
 }
 
-private fun setVisualSelection(firstOffset: Int, secondOffset: Int, caret: Caret) {
-    val (start, end) = if (firstOffset > secondOffset) secondOffset to firstOffset else firstOffset to secondOffset
+private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Caret) {
+    val (start, end) = if (selectionStart > selectionEnd) selectionEnd to selectionStart else selectionStart to selectionEnd
     val editor = caret.editor
     val subMode = CommandState.getInstance(editor).subMode
     when (subMode) {
@@ -87,14 +87,14 @@ private fun setVisualSelection(firstOffset: Int, secondOffset: Int, caret: Caret
         CommandState.SubMode.VISUAL_BLOCK -> {
             editor.caretModel.removeSecondaryCarets()
 
-            var blockStart = editor.offsetToLogicalPosition(start)
-            var blockEnd = editor.offsetToLogicalPosition(end)
-            if (blockStart.column > blockEnd.column) {
-                // swap variables
-                blockStart = blockEnd.also { blockEnd = blockStart }
-            }
+            var blockStart = editor.offsetToLogicalPosition(selectionStart)
+            var blockEnd = editor.offsetToLogicalPosition(selectionEnd)
             if (!VisualMotionGroup.exclusiveSelection) {
-                blockEnd = LogicalPosition(blockEnd.line, blockEnd.column + 1)
+                if (blockStart.column > blockEnd.column) {
+                    blockStart = LogicalPosition(blockStart.line, blockStart.column + 1)
+                } else {
+                    blockEnd = LogicalPosition(blockEnd.line, blockEnd.column + 1)
+                }
             }
             editor.selectionModel.setBlockSelection(blockStart, blockEnd)
 
@@ -110,16 +110,7 @@ private fun setVisualSelection(firstOffset: Int, secondOffset: Int, caret: Caret
                 }
             }
 
-            val startLine = editor.offsetToLogicalPosition(caret.vimSelectionStart).line
-            val startColumn = editor.offsetToLogicalPosition(caret.vimSelectionStart).column
-            if (editor.caretModel.allCarets.first().logicalPosition.line == startLine) {
-                editor.vimBlockMainCaret = editor.caretModel.allCarets.last()
-            } else {
-                editor.vimBlockMainCaret = editor.caretModel.allCarets.first()
-            }
-            if (editor.vimBlockMainCaret.logicalPosition.column <= startColumn) {
-                editor.vimBlockMainCaret.moveToOffset(editor.vimBlockMainCaret.selectionStart)
-            }
+            editor.caretModel.primaryCaret.moveToOffset(selectionEnd)
         }
     }
 }

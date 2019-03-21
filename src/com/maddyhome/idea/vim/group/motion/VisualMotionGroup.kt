@@ -34,7 +34,6 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.CaretData
 import com.maddyhome.idea.vim.helper.EditorData
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.vimBlockMainCaretSetToNull
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.helper.vimSelectionStartSetToNull
 import com.maddyhome.idea.vim.helper.vimStartSelectionAtPoint
@@ -267,7 +266,6 @@ object VisualMotionGroup {
     fun resetVisual(editor: Editor) {
         val wasVisualBlock = CommandState.inVisualBlockMode(editor)
         val selectionType = SelectionType.fromSubMode(CommandState.getInstance(editor).subMode)
-        EditorData.setLastSelectionType(editor, selectionType)
 
         if (!EditorData.isKeepingVisualOperatorAction(editor)) {
             for (caret in editor.caretModel.allCarets) {
@@ -278,13 +276,13 @@ object VisualMotionGroup {
             editor.caretModel.removeSecondaryCarets()
         }
 
-        if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
+        if (CommandState.inVisualMode(editor)) {
+            EditorData.setLastSelectionType(editor, selectionType)
             // FIXME: 2019-03-05 Make it multicaret
             val primaryCaret = editor.caretModel.primaryCaret
             val vimSelectionStart = primaryCaret.vimSelectionStart
             VimPlugin.getMark().setVisualSelectionMarks(editor, TextRange(vimSelectionStart, primaryCaret.offset))
             editor.caretModel.allCarets.forEach { it.vimSelectionStartSetToNull() }
-            editor.vimBlockMainCaretSetToNull()
 
             CommandState.getInstance(editor).subMode = CommandState.SubMode.NONE
         }

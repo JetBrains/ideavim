@@ -34,7 +34,6 @@ import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
 import com.maddyhome.idea.vim.helper.CaretData
 import com.maddyhome.idea.vim.helper.EditorData
 import com.maddyhome.idea.vim.helper.VimSelection
-import com.maddyhome.idea.vim.helper.vimBlockMainCaret
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import com.maddyhome.idea.vim.helper.visualBlockRange
 
@@ -96,8 +95,8 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
         if (CommandState.inVisualBlockMode(this)) {
             val adj = if (VisualMotionGroup.exclusiveSelection) 0 else 1
-            val (start, end) = vimBlockMainCaret.run { if (vimSelectionStart > offset) vimSelectionStart + adj to offset else vimSelectionStart to offset + adj }
-            return mapOf(vimBlockMainCaret to VimSelection(start, end, SelectionType.BLOCK_WISE, this))
+            val (start, end) = caretModel.primaryCaret.run { if (vimSelectionStart > offset) vimSelectionStart + adj to offset else vimSelectionStart to offset + adj }
+            return mapOf(caretModel.primaryCaret to VimSelection(start, end, SelectionType.BLOCK_WISE, this))
         }
 
         return this.caretModel.allCarets.associateWith { caret ->
