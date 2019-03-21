@@ -39,10 +39,10 @@ data class VimSelection(
     val normEnd: Int = if (start > end) start else end
 
     fun toVimTextRange() = when (type) {
-        CHARACTER_WISE, LINE_WISE -> TextRange(start, end)
+        CHARACTER_WISE, LINE_WISE -> TextRange(normStart, normEnd)
         BLOCK_WISE -> {
-            val logicalStart = editor.offsetToLogicalPosition(start)
-            val logicalEnd = editor.offsetToLogicalPosition(end)
+            val logicalStart = editor.offsetToLogicalPosition(normStart)
+            val logicalEnd = editor.offsetToLogicalPosition(normEnd)
             val lineRange = if (logicalStart.line > logicalEnd.line) logicalStart.line downTo logicalEnd.line else logicalStart.line..logicalEnd.line
             val starts = ArrayList<Int>()
             val ends = ArrayList<Int>()
@@ -50,7 +50,7 @@ data class VimSelection(
                 starts += editor.logicalPositionToOffset(LogicalPosition(line, logicalStart.column))
                 ends += editor.logicalPositionToOffset(LogicalPosition(line, logicalEnd.column))
             }
-            TextRange(starts.toIntArray(), ends.toIntArray())
+            TextRange(starts.toIntArray(), ends.toIntArray()).also { it.normalize(editor.document.textLength) }
         }
     }
 

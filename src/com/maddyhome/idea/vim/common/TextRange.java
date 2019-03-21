@@ -81,7 +81,7 @@ public class TextRange {
   private void normalizeIndex(final int index) {
     if (index< size() && ends[index] < starts[index]) {
       int t = starts[index];
-      starts[0] = ends[index];
+      starts[index] = ends[index];
       ends[index] = t;
     }
   }
