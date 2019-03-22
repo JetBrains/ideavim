@@ -264,20 +264,16 @@ object VisualMotionGroup {
         return true
     }
 
-    fun processEscape(editor: Editor) = exitVisual(editor)
-
     fun resetVisual(editor: Editor) {
         val wasVisualBlock = CommandState.inVisualBlockMode(editor)
         val selectionType = SelectionType.fromSubMode(CommandState.getInstance(editor).subMode)
 
-        if (!EditorData.isKeepingVisualOperatorAction(editor)) {
-            for (caret in editor.caretModel.allCarets) {
-                caret.removeSelection()
-            }
-        }
         if (wasVisualBlock) {
-            editor.caretModel.runForEachCaret { it.visualAttributes = editor.caretModel.primaryCaret.visualAttributes }
+            editor.caretModel.allCarets.forEach { it.visualAttributes = editor.caretModel.primaryCaret.visualAttributes }
             editor.caretModel.removeSecondaryCarets()
+        }
+        if (!EditorData.isKeepingVisualOperatorAction(editor)) {
+            editor.caretModel.allCarets.forEach(Caret::removeSelection)
         }
 
         if (CommandState.inVisualMode(editor)) {
