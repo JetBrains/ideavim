@@ -30,25 +30,25 @@ import com.maddyhome.idea.vim.command.VisualChange
 
 var Caret.vimSelectionStart: Int
     get() = if (CommandState.inVisualBlockMode(editor)) {
-        editor._vimBlockSelectinoStart
+        editor._vimBlockSelectionStart
                 ?: throw AssertionError("Trying to access selection start, but it's not set")
     } else {
         _vimSelectionStart
                 ?: throw AssertionError("Trying to access selection start, but it's not set")
     }
     set(value) = if (CommandState.inVisualBlockMode(editor)) {
-        editor._vimBlockSelectinoStart = value
+        editor._vimBlockSelectionStart = value
     } else {
         _vimSelectionStart = value
     }
 
 fun Caret.vimSelectionStartSetToNull() {
     this._vimSelectionStart = null
-    editor._vimBlockSelectinoStart = null
+    editor._vimBlockSelectionStart = null
 }
 
 private var Caret._vimSelectionStart: Int? by userData()
-private var Editor._vimBlockSelectinoStart: Int? by userData()
+private var Editor._vimBlockSelectionStart: Int? by userData()
 
 
 private val LAST_COLUMN: Key<Int> = Key.create("lastColumn")

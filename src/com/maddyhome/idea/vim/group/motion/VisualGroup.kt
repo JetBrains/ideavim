@@ -67,10 +67,13 @@ fun Caret.vimUpdateEditorSelection() {
     setVisualSelection(startOffsetMark, offset, this)
 }
 
+var vimSuppressSelectionListener = false
+
 private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Caret) {
     val (start, end) = if (selectionStart > selectionEnd) selectionEnd to selectionStart else selectionStart to selectionEnd
     val editor = caret.editor
     val subMode = CommandState.getInstance(editor).subMode
+    vimSuppressSelectionListener = true
     when (subMode) {
         CommandState.SubMode.VISUAL_LINE -> {
             val lineStart = EditorHelper.getLineStartForOffset(editor, start)
@@ -119,4 +122,5 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
             editor.caretModel.primaryCaret.moveToOffset(selectionEnd)
         }
     }
+    vimSuppressSelectionListener = false
 }

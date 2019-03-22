@@ -33,8 +33,8 @@ import org.jetbrains.annotations.Nullable;
 /**
  */
 public abstract class EditorActionHandlerBase extends EditorActionHandler {
-  public static boolean vimActionInExecution = false;
   protected boolean myRunForEachCaret;
+  public static boolean vimSuppressCaretListener = false;
 
   public EditorActionHandlerBase() {
     this(false);
@@ -57,8 +57,8 @@ public abstract class EditorActionHandlerBase extends EditorActionHandler {
     final CommandState state = CommandState.getInstance(editor);
     final Command cmd = state.getCommand();
 
+    vimSuppressCaretListener = true;
     try {
-      vimActionInExecution = true;
       if (myRunForEachCaret) {
         if (cmd == null || caret == null || !execute(editor, caret, context, cmd)) {
           VimPlugin.indicateError();
@@ -74,7 +74,7 @@ public abstract class EditorActionHandlerBase extends EditorActionHandler {
       VimPlugin.indicateError();
     }
     finally {
-      vimActionInExecution = false;
+      vimSuppressCaretListener = false;
     }
   }
 
