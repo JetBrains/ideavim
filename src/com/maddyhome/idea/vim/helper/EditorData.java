@@ -170,33 +170,6 @@ public class EditorData {
   }
 
   /**
-   * Asks whether next down move should be ignored.
-   */
-  public static boolean shouldIgnoreNextMove(@NotNull Editor editor) {
-    Boolean ret = editor.getUserData(IGNORE_NEXT_MOVE);
-    if (ret == null) {
-      return false;
-    }
-    else {
-      return ret;
-    }
-  }
-
-  /**
-   * Indicate that the next down move should be ignored.
-   */
-  public static void ignoreNextMove(@NotNull Editor editor) {
-    editor.putUserData(IGNORE_NEXT_MOVE, true);
-  }
-
-  /**
-   * Indicate that the next down move should not be ignored.
-   */
-  public static void dontIgnoreNextMove(@NotNull Editor editor) {
-    editor.putUserData(IGNORE_NEXT_MOVE, false);
-  }
-
-  /**
    * Checks whether a keeping visual mode visual operator action is performed on editor.
    */
   public static boolean isKeepingVisualOperatorAction(@NotNull Editor editor) {
@@ -265,7 +238,6 @@ public class EditorData {
   private static final Key<ExOutputPanel> MORE_PANEL = new Key<ExOutputPanel>("IdeaVim.morePanel");
   private static final Key<ExOutputModel> EX_OUTPUT_MODEL = new Key<ExOutputModel>("IdeaVim.exOutputModel");
   private static final Key<TestInputModel> TEST_INPUT_MODEL = new Key<TestInputModel>("IdeaVim.testInputModel");
-  private static final Key<Boolean> IGNORE_NEXT_MOVE = new Key<>("shouldIgnoreNextMove");
   private static final Key<Boolean> IS_KEEPING_VISUAL_OPERATOR_ACTION = new Key<>("isKeepingVisualOperatorAction");
   private static final Key<CommandState.Mode> CHANGE_ACTION_SWITCH_MODE = new Key<>("changeActionSwitchMode");
   private static final Key<Boolean> WAS_VISUAL_BLOCK_MODE = new Key<>("wasVisualBlockMode");

@@ -21,15 +21,12 @@ package com.maddyhome.idea.vim.action.motion.updown;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.VisualPosition;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
 import com.maddyhome.idea.vim.helper.CaretDataKt;
-import com.maddyhome.idea.vim.helper.EditorData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,20 +50,6 @@ public class MotionDownAction extends MotionEditorAction {
                          int count,
                          int rawCount,
                          @Nullable Argument argument) {
-      if (CommandState.inVisualBlockMode(editor) && EditorData.shouldIgnoreNextMove(editor)) {
-        EditorData.dontIgnoreNextMove(editor);
-        return caret.getOffset();
-      }
-      if (CommandState.inVisualBlockMode(editor)) {
-        int blockEndOffset = CaretDataKt.getVimSelectionStart(caret);
-        int blockStartOffset = caret.getOffset();
-        VisualPosition blockEndPosition = editor.offsetToVisualPosition(blockEndOffset);
-        VisualPosition blockStartPosition = editor.offsetToVisualPosition(blockStartOffset);
-        if (blockEndPosition.getLine() < blockStartPosition.getLine()) {
-          EditorData.ignoreNextMove(editor);
-        }
-      }
-
       return VimPlugin.getMotion().moveCaretVertical(editor, caret, count);
     }
 
