@@ -27,7 +27,7 @@ import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.group.motion.VisualGroupKt;
+import com.maddyhome.idea.vim.group.CaretVimListenerSuppressor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +35,6 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class EditorActionHandlerBase extends EditorActionHandler {
   protected boolean myRunForEachCaret;
-  public static boolean vimSuppressCaretListener = false;
 
   public EditorActionHandlerBase() {
     this(false);
@@ -58,8 +57,7 @@ public abstract class EditorActionHandlerBase extends EditorActionHandler {
     final CommandState state = CommandState.getInstance(editor);
     final Command cmd = state.getCommand();
 
-    vimSuppressCaretListener = true;
-    VisualGroupKt.setVimSuppressSelectionListener(true);
+    CaretVimListenerSuppressor.INSTANCE.lock();
     try {
       if (myRunForEachCaret) {
         if (cmd == null || caret == null || !execute(editor, caret, context, cmd)) {
@@ -76,8 +74,7 @@ public abstract class EditorActionHandlerBase extends EditorActionHandler {
       VimPlugin.indicateError();
     }
     finally {
-      vimSuppressCaretListener = false;
-      VisualGroupKt.setVimSuppressSelectionListener(false);
+      CaretVimListenerSuppressor.INSTANCE.unlock();
     }
   }
 

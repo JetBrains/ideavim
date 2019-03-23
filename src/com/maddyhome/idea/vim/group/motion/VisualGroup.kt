@@ -25,6 +25,7 @@ import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.colors.EditorColors
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.group.CaretVimListenerSuppressor
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimLastColumn
@@ -67,26 +68,24 @@ fun Caret.vimUpdateEditorSelection() {
     setVisualSelection(startOffsetMark, offset, this)
 }
 
-var vimSuppressSelectionListener = false
-
 private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Caret) {
     val (start, end) = if (selectionStart > selectionEnd) selectionEnd to selectionStart else selectionStart to selectionEnd
     val editor = caret.editor
     val subMode = CommandState.getInstance(editor).subMode
-    vimSuppressSelectionListener = true
     when (subMode) {
         CommandState.SubMode.VISUAL_LINE -> {
             val lineStart = EditorHelper.getLineStartForOffset(editor, start)
             val lineEnd = EditorHelper.getLineEndForOffset(editor, end)
-            caret.setSelection(lineStart, lineEnd)
+            caret.vimSetSelectionSilently(lineStart, lineEnd)
         }
         CommandState.SubMode.VISUAL_CHARACTER -> {
             val lineEnd = EditorHelper.getLineEndForOffset(editor, end)
             val adj = if (VisualMotionGroup.exclusiveSelection || end == lineEnd) 0 else 1
             val adjEnd = (end + adj).coerceAtMost(EditorHelper.getFileSize(editor))
-            caret.setSelection(start, adjEnd)
+            caret.vimSetSelectionSilently(start, adjEnd)
         }
         CommandState.SubMode.VISUAL_BLOCK -> {
+            CaretVimListenerSuppressor.lock()
             editor.caretModel.removeSecondaryCarets()
 
             var blockStart = editor.offsetToLogicalPosition(selectionStart)
@@ -106,7 +105,7 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
                 val lineEndOffset = EditorHelper.getLineEndOffset(editor, line, true)
 
                 if (lastColumn >= MotionGroup.LAST_COLUMN) {
-                    aCaret.setSelection(aCaret.selectionStart, lineEndOffset)
+                    aCaret.vimSetSelectionSilently(aCaret.selectionStart, lineEndOffset)
                 }
                 if (!EditorHelper.isLineEmpty(editor, line, false)) {
                     aCaret.moveToOffset(aCaret.selectionEnd - 1)
@@ -120,7 +119,7 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
             }
 
             editor.caretModel.primaryCaret.moveToOffset(selectionEnd)
+            CaretVimListenerSuppressor.unlock()
         }
     }
-    vimSuppressSelectionListener = false
 }

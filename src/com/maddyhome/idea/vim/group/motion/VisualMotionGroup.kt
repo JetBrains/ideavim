@@ -22,6 +22,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.ScrollType
+import com.intellij.openapi.editor.SelectionModel
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -30,7 +31,9 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VisualChange
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.group.CaretVimListenerSuppressor
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.group.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.helper.EditorData
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimLastColumn
@@ -87,53 +90,90 @@ object VisualMotionGroup {
     }
 
     fun setVisualMode(editor: Editor, mode: CommandState.SubMode) {
-        var autodetectedMode = mode
-        val commandState = CommandState.getInstance(editor)
-        val oldMode = commandState.subMode
-        val selectionStart = editor.selectionModel.selectionStart
-        val selectionEnd = editor.selectionModel.selectionEnd
-        if (autodetectedMode == CommandState.SubMode.NONE) {
-            // Detect if visual mode is character wise or line wise
-            val logicalStartLine = editor.offsetToLogicalPosition(selectionStart).line
-            val logicalEnd = editor.offsetToLogicalPosition(selectionEnd)
-            val logicalEndLine = if (logicalEnd.column == 0) (logicalEnd.line - 1).coerceAtLeast(0) else logicalEnd.line
-            val lineStartOfSelectionStart = EditorHelper.getLineStartOffset(editor, logicalStartLine)
-            val lineEndOfSelectionEnd = EditorHelper.getLineEndOffset(editor, logicalEndLine, true)
-            // TODO: 2019-03-22 What about block mode?
-            autodetectedMode = if (lineStartOfSelectionStart == selectionStart && (lineEndOfSelectionEnd + 1 == selectionEnd || lineEndOfSelectionEnd == selectionEnd)) {
-                CommandState.SubMode.VISUAL_LINE
-            } else {
-                CommandState.SubMode.VISUAL_CHARACTER
-            }
-        }
+        val autodetectedMode = autodetectVisualMode(editor, mode)
 
-        if (autodetectedMode == CommandState.SubMode.NONE) {
-            // TODO: 2019-03-22 Probably we should not exit visual mode
-            exitVisual(editor)
-        } else if (autodetectedMode == oldMode) {
-            // TODO: 2019-03-22 Adapt caret to new mode (and selection start)
-            return
-        } else {
-            if (CommandState.inVisualMode(editor)) {
-                commandState.popState()
+        if (CommandState.inVisualMode(editor)) {
+            CommandState.getInstance(editor).popState()
+        }
+        CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, autodetectedMode, MappingMode.VISUAL)
+        if (autodetectedMode == CommandState.SubMode.VISUAL_BLOCK) {
+            val (start, end) = blockModeStartAndEnd(editor)
+            CaretVimListenerSuppressor.lock()
+            editor.caretModel.removeSecondaryCarets()
+            CaretVimListenerSuppressor.unlock()
+            editor.caretModel.primaryCaret.let {
+                it.vimStartSelectionAtPoint(start)
+                MotionGroup.moveCaret(editor, it, (end - selectionAdj).coerceAtLeast(0))
             }
-            commandState.pushState(CommandState.Mode.VISUAL, autodetectedMode, MappingMode.VISUAL)
-            if (autodetectedMode == CommandState.SubMode.VISUAL_BLOCK) {
-                editor.caretModel.primaryCaret.let { it.vimStartSelectionAtPoint(it.offset) }
-            } else {
-                editor.caretModel.allCarets.forEach {
-                    if (selectionStart == it.offset) {
-                        it.vimStartSelectionAtPoint((selectionEnd - selectionAdj).coerceAtLeast(0))
-                        MotionGroup.moveCaret(editor, it, selectionStart)
-                    } else {
-                        it.vimStartSelectionAtPoint(selectionStart)
-                        MotionGroup.moveCaret(editor, it, (selectionEnd - selectionAdj).coerceAtLeast(0))
-                    }
+        } else {
+            editor.caretModel.allCarets.forEach {
+                val selectionStart = it.selectionStart
+                val selectionEnd = it.selectionEnd
+                if (selectionStart == it.offset) {
+                    it.vimStartSelectionAtPoint((selectionEnd - selectionAdj).coerceAtLeast(0))
+                    MotionGroup.moveCaret(editor, it, selectionStart)
+                } else {
+                    it.vimStartSelectionAtPoint(selectionStart)
+                    MotionGroup.moveCaret(editor, it, (selectionEnd - selectionAdj).coerceAtLeast(0))
                 }
             }
         }
 
         KeyHandler.getInstance().reset(editor)
+    }
+
+    private fun autodetectVisualMode(editor: Editor, mode: CommandState.SubMode): CommandState.SubMode {
+        if (mode != CommandState.SubMode.NONE) return mode
+        if (editor.caretModel.caretCount > 1 && seemsLikeBlockMode(editor)) {
+            return CommandState.SubMode.VISUAL_BLOCK
+        }
+        if (editor.caretModel.allCarets.all { caret ->
+                    // Detect if visual mode is character wise or line wise
+                    val selectionStart = caret.selectionStart
+                    val selectionEnd = caret.selectionEnd
+                    val logicalStartLine = editor.offsetToLogicalPosition(selectionStart).line
+                    val logicalEnd = editor.offsetToLogicalPosition(selectionEnd)
+                    val logicalEndLine = if (logicalEnd.column == 0) (logicalEnd.line - 1).coerceAtLeast(0) else logicalEnd.line
+                    val lineStartOfSelectionStart = EditorHelper.getLineStartOffset(editor, logicalStartLine)
+                    val lineEndOfSelectionEnd = EditorHelper.getLineEndOffset(editor, logicalEndLine, true)
+                    lineStartOfSelectionStart == selectionStart && (lineEndOfSelectionEnd + 1 == selectionEnd || lineEndOfSelectionEnd == selectionEnd)
+                }) return CommandState.SubMode.VISUAL_LINE
+        return CommandState.SubMode.VISUAL_CHARACTER
+    }
+
+    private fun seemsLikeBlockMode(editor: Editor): Boolean {
+        val selections = editor.caretModel.allCarets.map {
+            val adj = if (editor.offsetToLogicalPosition(it.selectionEnd).column == 0) 1 else 0
+            it.selectionStart to (it.selectionEnd - adj).coerceAtLeast(0)
+        }.sortedBy { it.first }
+        val selectionStartColumn = editor.offsetToLogicalPosition(selections.first().first).column
+        val selectionStartLine = editor.offsetToLogicalPosition(selections.first().first).line
+
+        val maxColumn = selections.map { editor.offsetToLogicalPosition(it.second).column }.max() ?: return false
+        selections.forEachIndexed { i, it ->
+            if (editor.offsetToLogicalPosition(it.first).line != editor.offsetToLogicalPosition(it.second).line) {
+                return false
+            }
+            if (editor.offsetToLogicalPosition(it.first).column != selectionStartColumn) {
+                return false
+            }
+            val lineEnd = editor.offsetToLogicalPosition(EditorHelper.getLineEndForOffset(editor, it.second)).column
+            if (editor.offsetToLogicalPosition(it.second).column != maxColumn.coerceAtMost(lineEnd)) {
+                return false
+            }
+            if (editor.offsetToLogicalPosition(it.first).line != selectionStartLine + i) {
+                return false
+            }
+        }
+        return true
+    }
+
+    private fun blockModeStartAndEnd(editor: Editor): Pair<Int, Int> {
+        val selections = editor.caretModel.allCarets.map { it.selectionStart to it.selectionEnd }.sortedBy { it.first }
+        val maxColumn = selections.map { editor.offsetToLogicalPosition(it.second).column }.max()
+                ?: throw RuntimeException("No carets")
+        val lastLine = editor.offsetToLogicalPosition(selections.last().first).line
+        return selections.first().first to editor.logicalPositionToOffset(LogicalPosition(lastLine, maxColumn))
     }
 
     /**
@@ -268,6 +308,7 @@ object VisualMotionGroup {
         val wasVisualBlock = CommandState.inVisualBlockMode(editor)
         val selectionType = SelectionType.fromSubMode(CommandState.getInstance(editor).subMode)
 
+        SelectionVimListenerSuppressor.lock()
         if (wasVisualBlock) {
             editor.caretModel.allCarets.forEach { it.visualAttributes = editor.caretModel.primaryCaret.visualAttributes }
             editor.caretModel.removeSecondaryCarets()
@@ -275,6 +316,7 @@ object VisualMotionGroup {
         if (!EditorData.isKeepingVisualOperatorAction(editor)) {
             editor.caretModel.allCarets.forEach(Caret::removeSelection)
         }
+        SelectionVimListenerSuppressor.unlock()
 
         if (CommandState.inVisualMode(editor)) {
             EditorData.setLastSelectionType(editor, selectionType)
@@ -299,4 +341,16 @@ object VisualMotionGroup {
         get() = (Options.getInstance().getOption("selection") as BoundStringOption).value == "exclusive"
     val selectionAdj: Int
         get() = if (exclusiveSelection) 0 else 1
+}
+
+fun SelectionModel.vimSetSelectionSilently(start: Int, end: Int) {
+    SelectionVimListenerSuppressor.lock()
+    setSelection(start, end)
+    SelectionVimListenerSuppressor.unlock()
+}
+
+fun Caret.vimSetSelectionSilently(start: Int, end: Int) {
+    SelectionVimListenerSuppressor.lock()
+    setSelection(start, end)
+    SelectionVimListenerSuppressor.unlock()
 }
