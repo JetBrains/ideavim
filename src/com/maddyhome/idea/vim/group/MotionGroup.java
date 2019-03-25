@@ -21,23 +21,13 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.CaretModel;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.ScrollingModel;
 import com.intellij.openapi.editor.VisualPosition;
-import com.intellij.openapi.editor.event.CaretEvent;
-import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.editor.event.EditorFactoryListener;
-import com.intellij.openapi.editor.event.EditorMouseEvent;
-import com.intellij.openapi.editor.event.EditorMouseEventArea;
-import com.intellij.openapi.editor.event.EditorMouseListener;
-import com.intellij.openapi.editor.event.EditorMouseMotionListener;
-import com.intellij.openapi.editor.event.SelectionEvent;
-import com.intellij.openapi.editor.event.SelectionListener;
-import com.intellij.openapi.editor.ex.DocumentEx;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
@@ -63,7 +53,6 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.group.motion.VisualGroupKt;
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroup;
-import com.maddyhome.idea.vim.group.motion.VisualMotionGroupKt;
 import com.maddyhome.idea.vim.helper.CaretDataKt;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
@@ -75,7 +64,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.EnumSet;
 
@@ -88,53 +76,6 @@ public class MotionGroup {
   public static final int LAST_T = 3;
   public static final int LAST_t = 4;
   public static final int LAST_COLUMN = 9999;
-
-  @NotNull private final EditorMouseHandler mouseHandler = new EditorMouseHandler();
-
-  public void turnOn() {
-    Editor[] editors = EditorFactory.getInstance().getAllEditors();
-    for (Editor editor : editors) {
-      if (!EditorData.getMotionGroup(editor)) {
-        addEditorListener(editor);
-        EditorData.setMotionGroup(editor, true);
-      }
-    }
-  }
-
-  public void turnOff() {
-    Editor[] editors = EditorFactory.getInstance().getAllEditors();
-    for (Editor editor : editors) {
-      if (EditorData.getMotionGroup(editor)) {
-        removeEditorListener(editor);
-        EditorData.setMotionGroup(editor, false);
-      }
-    }
-  }
-
-  @NotNull private final VimCaretListener myVimCaretListener = new VimCaretListener();
-
-  private static void putCaretAtEndOfSelection(@Nullable Caret caret) {
-    if (caret != null &&
-        caret.getSelectionEnd() == caret.getOffset() &&
-        !VisualMotionGroup.INSTANCE.getExclusiveSelection() &&
-        caret.getSelectionStart() != caret.getSelectionEnd()) {
-      CaretVimListenerSuppressor.INSTANCE.lock();
-      caret.moveToOffset(Math.max(0, caret.getSelectionEnd() - 1));
-      CaretVimListenerSuppressor.INSTANCE.unlock();
-    }
-  }
-
-  @NotNull private final EditorSelectionHandler selectionHandler = new EditorSelectionHandler();
-
-  private static void extendSelectionToCaret(@Nullable Caret caret) {
-    if (caret != null &&
-        caret.getSelectionEnd() == caret.getOffset() &&
-        !VisualMotionGroup.INSTANCE.getExclusiveSelection()) {
-      CaretVimListenerSuppressor.INSTANCE.lock();
-      VisualMotionGroupKt.vimSetSelectionSilently(caret, caret.getSelectionStart(), caret.getSelectionEnd() + 1);
-      CaretVimListenerSuppressor.INSTANCE.unlock();
-    }
-  }
 
   /**
    * Create the group
@@ -150,7 +91,7 @@ public class MotionGroup {
         // with the cursor position of the Goto Declaration processing.
         ApplicationManager.getApplication().invokeLater(() -> ApplicationManager.getApplication()
           .invokeLater(() -> ApplicationManager.getApplication().invokeLater(() -> {
-            addEditorListener(editor);
+            VimListenerManager.INSTANCE.addEditorListeners(editor);
             EditorData.setMotionGroup(editor, true);
           })));
       }
@@ -158,11 +99,31 @@ public class MotionGroup {
       public void editorReleased(@NotNull EditorFactoryEvent event) {
         Editor editor = event.getEditor();
         if (EditorData.getMotionGroup(editor)) {
-          removeEditorListener(editor);
+          VimListenerManager.INSTANCE.removeEditorListeners(editor);
           EditorData.setMotionGroup(editor, false);
         }
       }
     }, ApplicationManager.getApplication());
+  }
+
+  public void turnOn() {
+    Editor[] editors = EditorFactory.getInstance().getAllEditors();
+    for (Editor editor : editors) {
+      if (!EditorData.getMotionGroup(editor)) {
+        VimListenerManager.INSTANCE.addEditorListeners(editor);
+        EditorData.setMotionGroup(editor, true);
+      }
+    }
+  }
+
+  public void turnOff() {
+    Editor[] editors = EditorFactory.getInstance().getAllEditors();
+    for (Editor editor : editors) {
+      if (EditorData.getMotionGroup(editor)) {
+        VimListenerManager.INSTANCE.removeEditorListeners(editor);
+        EditorData.setMotionGroup(editor, false);
+      }
+    }
   }
 
   /**
@@ -1015,14 +976,6 @@ public class MotionGroup {
     return moveCaretToLineStartSkipLeadingOffset(editor, editor.getCaretModel().getPrimaryCaret(), linesOffset);
   }
 
-  private void addEditorListener(@NotNull Editor editor) {
-    final EventFacade eventFacade = EventFacade.getInstance();
-    eventFacade.addEditorMouseListener(editor, mouseHandler);
-    eventFacade.addEditorMouseMotionListener(editor, mouseHandler);
-    eventFacade.addEditorSelectionListener(editor, selectionHandler);
-    eventFacade.addCaretListener(editor, myVimCaretListener);
-  }
-
   /**
    * @deprecated Use {@link #moveCaretToLineEnd(Editor, Caret)}
    */
@@ -1035,14 +988,6 @@ public class MotionGroup {
     final int lastVisualLineColumn = EditorUtil.getLastVisualLineColumnNumber(editor, visualPosition.line);
     final VisualPosition visualEndOfLine = new VisualPosition(visualPosition.line, lastVisualLineColumn, true);
     return moveCaretToLineEnd(editor, editor.visualToLogicalPosition(visualEndOfLine).line, true);
-  }
-
-  private void removeEditorListener(@NotNull Editor editor) {
-    final EventFacade eventFacade = EventFacade.getInstance();
-    eventFacade.removeEditorMouseListener(editor, mouseHandler);
-    eventFacade.removeEditorMouseMotionListener(editor, mouseHandler);
-    eventFacade.removeEditorSelectionListener(editor, selectionHandler);
-    eventFacade.removeCaretListener(editor, myVimCaretListener);
   }
 
   public boolean scrollColumn(@NotNull Editor editor, int columns) {
@@ -1437,118 +1382,4 @@ public class MotionGroup {
     }
   }
 
-  private static class EditorSelectionHandler implements SelectionListener {
-    private boolean myMakingChanges = false;
-
-    /**
-     * This event is executed for each caret using [runForEachCaret]
-     */
-    public void selectionChanged(@NotNull SelectionEvent selectionEvent) {
-      final Editor editor = selectionEvent.getEditor();
-      final Document document = editor.getDocument();
-
-      if (SelectionVimListenerSuppressor.INSTANCE.isNotLocked()) {
-        CaretVimListenerSuppressor.INSTANCE.lock();
-        VisualMotionGroup.INSTANCE.controlNonVimSelectionChange(editor);
-        CaretVimListenerSuppressor.INSTANCE.unlock();
-      }
-
-      if (myMakingChanges || (document instanceof DocumentEx && ((DocumentEx)document).isInEventsHandling())) {
-        return;
-      }
-
-      myMakingChanges = true;
-      try {
-        // Synchronize selections between editors
-        final com.intellij.openapi.util.TextRange newRange = selectionEvent.getNewRange();
-        for (Editor e : EditorFactory.getInstance().getEditors(document)) {
-          if (!e.equals(editor)) {
-            VisualMotionGroupKt
-              .vimSetSelectionSilently(e.getSelectionModel(), newRange.getStartOffset(), newRange.getEndOffset());
-          }
-        }
-      }
-      finally {
-        myMakingChanges = false;
-      }
-    }
-  }
-
-  private static class VimCaretListener implements CaretListener {
-    @Override
-    public void caretPositionChanged(@NotNull CaretEvent event) {
-      if (CaretVimListenerSuppressor.INSTANCE.isNotLocked()) {
-        putCaretAtEndOfSelection(event.getCaret());
-      }
-    }
-  }
-
-  private static class EditorMouseHandler implements EditorMouseListener, EditorMouseMotionListener {
-    private boolean mouseDragging = false;
-
-    @Override
-    public void mouseDragged(@NotNull EditorMouseEvent e) {
-      SelectionVimListenerSuppressor.INSTANCE.lock();
-      CaretVimListenerSuppressor.INSTANCE.lock();
-      mouseDragging = true;
-    }
-
-    @Override
-    public void mouseReleased(@NotNull EditorMouseEvent event) {
-      if (mouseDragging) {
-        // TODO: 2019-03-22 Docs about lead selectino
-        Editor editor = event.getEditor();
-        if (event.getArea() == EditorMouseEventArea.EDITING_AREA) {
-          editor.getCaretModel().runForEachCaret(MotionGroup::extendSelectionToCaret);
-        }
-        VisualMotionGroup.INSTANCE.controlNonVimSelectionChange(editor);
-        SelectionVimListenerSuppressor.INSTANCE.unlock();
-        CaretVimListenerSuppressor.INSTANCE.unlock();
-        mouseDragging = false;
-      }
-    }
-
-    public void mouseClicked(@NotNull EditorMouseEvent event) {
-      if (!VimPlugin.isEnabled()) return;
-
-      if (event.getArea() == EditorMouseEventArea.EDITING_AREA) {
-        VimPlugin.getMotion();
-        Editor editor = event.getEditor();
-        if (ExEntryPanel.getInstance().isActive()) {
-          ExEntryPanel.getInstance().deactivate(false);
-        }
-
-        ExOutputModel.getInstance(editor).clear();
-
-        final CaretModel caretModel = editor.getCaretModel();
-        if (CommandState.getInstance(editor).getSubMode() != CommandState.SubMode.NONE) {
-          caretModel.removeSecondaryCarets();
-        }
-
-        if (!CommandState.inInsertMode(editor)) {
-          caretModel.runForEachCaret(caret -> {
-            if (caret.getOffset() == EditorHelper.getLineEndForOffset(editor, caret.getOffset())) {
-              MotionGroup.moveCaret(editor, caret, caret.getOffset() - 1);
-            }
-          });
-        }
-
-        // TODO: 2019-03-22 Multi?
-        CaretDataKt.setVimLastColumn(caretModel.getPrimaryCaret(), caretModel.getVisualPosition().column);
-        if (CommandState.inVisualMode(editor)) {
-          VisualMotionGroup.INSTANCE.exitVisual(editor);
-        }
-      }
-      else if (event.getArea() != EditorMouseEventArea.ANNOTATIONS_AREA &&
-               event.getArea() != EditorMouseEventArea.FOLDING_OUTLINE_AREA &&
-               event.getMouseEvent().getButton() != MouseEvent.BUTTON3) {
-        VimPlugin.getMotion();
-        if (ExEntryPanel.getInstance().isActive()) {
-          ExEntryPanel.getInstance().deactivate(false);
-        }
-
-        ExOutputModel.getInstance(event.getEditor()).clear();
-      }
-    }
-  }
 }
