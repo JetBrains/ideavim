@@ -16,14 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.action.change.change.number
+package org.jetbrains.plugins.ideavim.action.change.change
 
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-/**
- * @author Alex Plate
- */
 class ChangeVisualActionTest : VimTestCase() {
     fun `test multiple line change`() {
         val keys = parseKeys("VjcHello<esc>")
@@ -43,5 +41,35 @@ class ChangeVisualActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent()
         doTest(keys, before, after)
+    }
+
+    fun `test change visual action`() {
+        typeTextInFile(parseKeys("v2lc", "aaa", "<ESC>"),
+                "abcd<caret>ffffff<caret>abcde<caret>aaaa\n")
+        assertMode(CommandState.Mode.COMMAND)
+        myFixture.checkResult("abcdaa<caret>afffaa<caret>adeaa<caret>aa\n")
+    }
+
+    // VIM-1379 |CTRL-V| |j| |v_b_c|
+    fun `test change visual block with empty line in the middle`() {
+        doTest(parseKeys("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
+                "foo foo\n" +
+                        "\n" +
+                        "bar bar\n",
+                ("fo_quux_foo\n" +
+                        "\n" +
+                        "ba_quux_bar\n"))
+    }
+
+
+    // VIM-1379 |CTRL-V| |j| |v_b_c|
+    fun `test change visual block with shorter line in the middle`() {
+        doTest(parseKeys("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
+                "foo foo\n" +
+                        "x\n" +
+                        "bar bar\n",
+                ("fo_quux_foo\n" +
+                        "x\n" +
+                        "ba_quux_bar\n"))
     }
 }

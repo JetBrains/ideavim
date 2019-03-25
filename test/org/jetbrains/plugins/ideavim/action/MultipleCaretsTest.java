@@ -21,7 +21,6 @@ package org.jetbrains.plugins.ideavim.action;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -1071,13 +1070,6 @@ public class MultipleCaretsTest extends VimTestCase {
     typeTextInFile(parseKeys("Rrty", "<Esc>"), before);
     final String after = "rt<caret>y\n" + "asd rt<caret>y\n" + "qwert<caret>yzxc";
     myFixture.checkResult(after);
-  }
-
-  public void testChangeVisualAction() {
-    typeTextInFile(parseKeys("v2lc", "aaa", "<ESC>"),
-                   "abcd<caret>ffffff<caret>abcde<caret>aaaa\n");
-    assertMode(CommandState.Mode.COMMAND);
-    myFixture.checkResult("abcdaa<caret>afffaa<caret>adeaa<caret>aa\n");
   }
 
   public void testChangeVisualCharacterAction() {

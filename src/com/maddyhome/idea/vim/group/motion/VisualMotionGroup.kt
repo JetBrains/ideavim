@@ -107,6 +107,12 @@ object VisualMotionGroup {
             }
         } else {
             editor.caretModel.allCarets.forEach {
+                if (!it.hasSelection()) {
+                    it.vimStartSelectionAtPoint(it.offset)
+                    MotionGroup.moveCaret(editor, it, it.offset)
+                    return@forEach
+                }
+
                 val selectionStart = it.selectionStart
                 val selectionEnd = it.selectionEnd
                 if (selectionStart == it.offset) {

@@ -442,28 +442,6 @@ public class ChangeActionTest extends VimTestCase {
             "ba_quux_r\n");
   }
 
-  // VIM-1379 |CTRL-V| |j| |v_b_c|
-  public void testChangeVisualBlockWithEmptyLineInTheMiddle() {
-    doTest(parseKeys("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
-            "foo foo\n" +
-            "\n" +
-            "bar bar\n",
-            "fo_quux_foo\n" +
-            "\n" +
-            "ba_quux_bar\n");
-  }
-
-  // VIM-1379 |CTRL-V| |j| |v_b_c|
-  public void testChangeVisualBlockWithShorterLineInTheMiddle() {
-    doTest(parseKeys("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
-            "foo foo\n" +
-            "x\n" +
-            "bar bar\n",
-            "fo_quux_foo\n" +
-            "x\n" +
-            "ba_quux_bar\n");
-  }
-
   // VIM-845 |CTRL-V| |x|
   public void testDeleteVisualBlockOneCharWide() {
     configureByText("foo\n" +
