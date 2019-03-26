@@ -45,7 +45,7 @@ import java.awt.event.MouseEvent
  * @author Alex Plate
  */
 
-abstract class VimListenerSuppressor {
+sealed class VimListenerSuppressor {
     private var caretListenerSuppressor = 0
 
     fun lock() {
