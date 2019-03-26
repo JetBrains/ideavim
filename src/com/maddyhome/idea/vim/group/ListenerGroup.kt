@@ -207,10 +207,21 @@ object VimListenerManager {
                     caret.selectionEnd == caret.offset &&
                     !VisualMotionGroup.exclusiveSelection &&
                     caret.selectionStart != caret.selectionEnd &&
-                    caret.offset > 0) {
+                    caret.selectionEnd > 0) {
                 CaretVimListenerSuppressor.lock()
                 caret.moveToOffset(caret.selectionEnd - 1)
                 CaretVimListenerSuppressor.unlock()
+                return
+            }
+            if (caret != null &&
+                    caret.offset != caret.selectionStart &&
+                    caret.offset != caret.selectionEnd - VisualMotionGroup.selectionAdj &&
+                    caret.selectionStart != caret.selectionEnd &&
+                    caret.selectionEnd > 0) {
+                CaretVimListenerSuppressor.lock()
+                caret.moveToOffset(caret.selectionEnd - VisualMotionGroup.selectionAdj)
+                CaretVimListenerSuppressor.unlock()
+                return
             }
         }
     }
