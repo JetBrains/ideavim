@@ -26,13 +26,15 @@ import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
+import com.maddyhome.idea.vim.command.SelectionType;
+import com.maddyhome.idea.vim.handler.VisualOperatorActionBatchHandler;
 import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -40,15 +42,22 @@ import java.util.Set;
  */
 public class VisualBlockAppendAction extends VimCommandAction {
   public VisualBlockAppendAction() {
-    super(new VisualOperatorActionHandler() {
+    super(new VisualOperatorActionBatchHandler() {
       @Override
-      protected boolean executeAction(@NotNull Editor editor,
-                                      @NotNull Caret caret,
-                                      @NotNull DataContext context,
-                                      @NotNull Command cmd,
-                                      @NotNull VimSelection range) {
+      public boolean executeForAllCarets(@NotNull Editor editor,
+                                         @NotNull DataContext context,
+                                         @NotNull Command cmd,
+                                         @NotNull Map<Caret, VimSelection> caretsAndSelections) {
         if (editor.isOneLineMode()) return false;
-        return VimPlugin.getChange().blockInsert(editor, context, range.toVimTextRange(), true);
+        VimSelection range = caretsAndSelections.values().stream().findFirst().orElse(null);
+        if (range == null) return false;
+        if (range.getType() == SelectionType.BLOCK_WISE) {
+          return VimPlugin.getChange().blockInsert(editor, context, range.toVimTextRange(), true);
+        }
+        else {
+          VimPlugin.getChange().insertAfterLineEnd(editor, context);
+          return true;
+        }
       }
     });
   }

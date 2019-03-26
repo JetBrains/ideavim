@@ -26,13 +26,15 @@ import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
+import com.maddyhome.idea.vim.command.SelectionType;
+import com.maddyhome.idea.vim.handler.VisualOperatorActionBatchHandler;
 import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -40,15 +42,22 @@ import java.util.Set;
  */
 public class VisualBlockInsertAction extends VimCommandAction {
   public VisualBlockInsertAction() {
-    super(new VisualOperatorActionHandler() {
+    super(new VisualOperatorActionBatchHandler() {
       @Override
-      protected boolean executeAction(@NotNull Editor editor,
-                                      @NotNull Caret caret,
-                                      @NotNull DataContext context,
-                                      @NotNull Command cmd,
-                                      @NotNull VimSelection range) {
+      public boolean executeForAllCarets(@NotNull Editor editor,
+                                         @NotNull DataContext context,
+                                         @NotNull Command cmd,
+                                         @NotNull Map<Caret, VimSelection> caretsAndSelections) {
         if (editor.isOneLineMode()) return false;
-        return VimPlugin.getChange().blockInsert(editor, context, range.toVimTextRange(), false);
+        VimSelection vimSelection = caretsAndSelections.values().stream().findFirst().orElse(null);
+        if (vimSelection == null) return false;
+        if (vimSelection.getType() == SelectionType.BLOCK_WISE) {
+          return VimPlugin.getChange().blockInsert(editor, context, vimSelection.toVimTextRange(), false);
+        }
+        else {
+          VimPlugin.getChange().insertBeforeFirstNonBlank(editor, context);
+          return true;
+        }
       }
     });
   }

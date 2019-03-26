@@ -1350,14 +1350,6 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult("oneabc<caret>d two thrabc<caret>deeabc<caret>d");
   }
 
-  public void testInsertAfterLineEndAction() {
-    typeTextInFile(parseKeys("A", "four", "<ESC>"),
-                   "one two <caret>three \n" +
-                   "sev<caret>en si<caret>x five \n");
-    myFixture.checkResult("one two three fou<caret>r\n" +
-                          "seven six five fou<caret>r\n");
-  }
-
   public void testInsertBeforeCursorAction() {
     typeTextInFile(parseKeys("i", "four", "<ESC>"),
                    "one two three <caret> \n" +
@@ -1635,20 +1627,6 @@ public class MultipleCaretsTest extends VimTestCase {
     final String before = "qw<caret>e\n" + "  a<caret>s<caret>d\n" + "zx<caret>c";
     typeTextInFile(parseKeys("I", "rty", "<Esc>", "2lj", "gi", "fgh", "<Esc>"), before);
     final String after = "rtyqwe\n" + "  rtyasd\n" + "rtyfg<caret>hzxc";
-    myFixture.checkResult(after);
-  }
-
-  public void testVisualBlockAppend() {
-    final String before = "<caret>int a;\n" + "int b;\n" + "int c;";
-    typeTextInFile(parseKeys("<C-V>", "2j", "e", "A", " const", "<Esc>"), before);
-    final String after = "int const a;\n" + "int const b;\n" + "int const c;";
-    myFixture.checkResult(after);
-  }
-
-  public void testVisualBlockInsert() {
-    final String before = "<caret>int a;\n" + "int b;\n" + "int c;";
-    typeTextInFile(parseKeys("<C-V>", "2j", "I", "const ", "<Esc>"), before);
-    final String after = "<caret>const int a;\n" + "const int b;\n" + "const int c;";
     myFixture.checkResult(after);
   }
 

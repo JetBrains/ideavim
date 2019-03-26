@@ -295,17 +295,6 @@ public class ChangeActionTest extends VimTestCase {
            "$<caret>\n");
   }
 
-  // VIM-632 |CTRL-V| |v_b_I|
-  public void testChangeVisualBlock() {
-    doTest(parseKeys("<C-V>", "j", "I", "quux ", "<Esc>"),
-           "foo bar\n" +
-           "<caret>baz quux\n" +
-           "spam eggs\n",
-           "foo bar\n" +
-           "<caret>quux baz quux\n" +
-           "quux spam eggs\n");
-  }
-
   // VIM-632 |CTRL-V| |v_d|
   public void testDeleteVisualBlock() {
     doTest(parseKeys("<C-V>", "jjl", "d"),
@@ -418,28 +407,6 @@ public class ChangeActionTest extends VimTestCase {
            "fo\n" +
            "x\n" +
            "br\n");
-  }
-
-  // VIM-1379 |CTRL-V| |j| |v_b_I|
-  public void testInsertVisualBlockWithEmptyLineInTheMiddle() {
-    doTest(parseKeys("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
-            "foo\n" +
-            "\n" +
-            "bar\n",
-            "fo_quux_o\n" +
-            "\n" +
-            "ba_quux_r\n");
-  }
-
-  // VIM-1379 |CTRL-V| |j| |v_b_I|
-  public void testInsertVisualBlockWithShorterLineInTheMiddle() {
-    doTest(parseKeys("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
-            "foo\n" +
-            "x\n" +
-            "bar\n",
-            "fo_quux_o\n" +
-            "x\n" +
-            "ba_quux_r\n");
   }
 
   // VIM-845 |CTRL-V| |x|
@@ -670,21 +637,6 @@ public class ChangeActionTest extends VimTestCase {
 
   public void testRepeatChangeWordDoesNotBreakNextRepeatFind() {
     doTest(parseKeys("fXcfYPATATA<Esc>fX.;."), "<caret>aaaaXBBBBYaaaaaaaXBBBBYaaaaaaXBBBBYaaaaaaaa\n", "aaaaPATATAaaaaaaaPATATAaaaaaaPATATAaaaaaaaa\n");
-  }
-
-  // VIM-1110 |CTRL-V| |v_b_i| |zc|
-  public void testBlockInsertAfterFolds() {
-    configureByJavaText("<caret>/**\n" +
-                        " * Something to fold.\n" +
-                        " */\n" +
-                        "foo\n" +
-                        "bar\n");
-    typeText(parseKeys("zc", "j", "<C-V>", "j", "I", "X", "<Esc>"));
-    myFixture.checkResult("/**\n" +
-                          " * Something to fold.\n" +
-                          " */\n" +
-                          "<caret>Xfoo\n" +
-                          "Xbar\n");
   }
 
   public void testRepeatReplace() {

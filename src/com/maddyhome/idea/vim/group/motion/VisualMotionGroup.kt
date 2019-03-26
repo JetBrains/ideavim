@@ -355,6 +355,12 @@ fun SelectionModel.vimSetSelectionSilently(start: Int, end: Int) {
     SelectionVimListenerSuppressor.unlock()
 }
 
+fun SelectionModel.vimSetBlockSelectionSilently(start: LogicalPosition, end: LogicalPosition) {
+    SelectionVimListenerSuppressor.lock()
+    setBlockSelection(start, end)
+    SelectionVimListenerSuppressor.unlock()
+}
+
 fun Caret.vimSetSelectionSilently(start: Int, end: Int) {
     SelectionVimListenerSuppressor.lock()
     setSelection(start, end)
