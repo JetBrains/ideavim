@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.VisualChange
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.CaretVimListenerSuppressor
+import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.helper.EditorData
@@ -234,7 +235,12 @@ object VisualMotionGroup {
 
     fun controlNonVimSelectionChange(editor: Editor) {
         if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
+            val commandState = CommandState.getInstance(editor)
+            while (commandState.mode != CommandState.Mode.COMMAND) {
+                commandState.popState()
+            }
             setVisualMode(editor, CommandState.SubMode.NONE)
+            ChangeGroup.resetCursor(editor, false)
             KeyHandler.getInstance().reset(editor)
         } else {
             exitVisual(editor)
