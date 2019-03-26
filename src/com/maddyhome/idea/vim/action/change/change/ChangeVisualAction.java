@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.VimSelection;
@@ -48,7 +49,14 @@ public class ChangeVisualAction extends VimCommandAction {
                                       @NotNull DataContext context,
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
-        TextRange vimTextRange = range.toVimTextRange();
+
+        TextRange vimTextRange;
+        if (range.getType() == SelectionType.LINE_WISE) {
+          vimTextRange = new TextRange(range.getNormStart(), range.getNormEnd() + 1);
+        }
+        else {
+          vimTextRange = range.toVimTextRange();
+        }
         return VimPlugin.getChange().changeRange(editor, caret, vimTextRange, range.getType());
       }
     });
