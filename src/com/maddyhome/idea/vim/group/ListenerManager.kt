@@ -46,6 +46,30 @@ import java.awt.event.MouseEvent
  * @author Alex Plate
  */
 
+/**
+ * Base class for listener suppressors.
+ * Children of this class have an ability to suppress editor listeners
+ *
+ * E.g.
+ * ```
+ *  CaretVimListenerSuppressor.lock()
+ *  caret.moveToOffset(10) // vim's caret listener will not be executed
+ *  CaretVimListenerSuppressor.unlock()
+ * ````
+ *
+ *  Locks can be nested:
+ * ```
+ *      CaretVimListenerSuppressor.lock()
+ *      moveCaret(caret) // vim's caret listener will not be executed
+ *      CaretVimListenerSuppressor.unlock()
+ *
+ *  fun moveCaret(caret: Caret) {
+ *      CaretVimListenerSuppressor.lock()
+ *      caret.moveToOffset(10)
+ *      CaretVimListenerSuppressor.unlock()
+ *  }
+ * ```
+ */
 sealed class VimListenerSuppressor {
     private var caretListenerSuppressor = 0
 

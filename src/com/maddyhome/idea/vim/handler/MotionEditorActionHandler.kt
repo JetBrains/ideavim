@@ -34,14 +34,40 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
 
 /**
  * @author Alex Plate
+ *
+ * Base class for motion handlers.
+ * This handler executes an action for each caret. That means that if you have 5 carets, [getOffset] will be
+ *   called 5 times.
+ * @see [MotionEditorActionBatchHandler] for only one execution
  */
 abstract class MotionEditorActionHandler : EditorActionHandlerBase(false) {
 
+    /**
+     * This method should return new offset for [caret]
+     * It executes once for each [caret]. That means that if you have 5 carets, [getOffset] will be
+     *   called 5 times.
+     * The method executes only once it there is block selection.
+     */
     abstract fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int
 
+    /**
+     * This method is called before [getOffset] once for each [caret].
+     * The method executes only once it there is block selection.
+     */
     protected open fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean = true
-    // TODO: 2019-03-21 doc about caret and primary caret in block mode
+
+    /**
+     * This method is called after [getOffset], but before caret motion.
+     *
+     * The method executes for each caret, but only once it there is block selection.
+     */
     protected open fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) = Unit
+
+    /**
+     * This method is called after [getOffset] and after caret motion.
+     *
+     * The method executes for each caret, but only once it there is block selection.
+     */
     protected open fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) = Unit
 
     protected open val alwaysBatchExecution = false

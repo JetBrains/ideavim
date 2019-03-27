@@ -23,14 +23,43 @@ import com.intellij.openapi.util.UserDataHolder
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-// TODO: 2019-03-21 Add kotlindoc. Create properly annotations
+/**
+ * This annotation is created for test functions (methods)
+ * It means that original vim behaviour has small differences from behaviour of IdeaVim
+ *
+ * E.g. after execution some commands original vim has next text;
+ *    Hello1
+ *    Hello2
+ *    Hello3
+ *
+ * But IdeaVim gives you:
+ *    Hello1
+ *
+ *    Hello2
+ *    Hello3
+ *
+ * Why this annotation exists?
+ * After creating some functionality you can understand that IdeaVim has a bit different behaviour, but you
+ *   cannot fix it right now because of any reasons (bugs in IDE, the impossibility of this functionality in IDEA,
+ *   leak of time for fixing).
+ *   In that case, you should NOT remove the corresponding test or leave it without any marks that this test
+ *   not fully convenient with vim, but leave the test with IdeaVim's behaviour and put this annotation
+ *   with description of how original vim works.
+ *
+ * Note that using this annotation should be avoided as much as possible and behaviour of IdeaVim should be as close
+ *   to vim as possible.
+ */
+@Retention(AnnotationRetention.SOURCE)
 @Target(AnnotationTarget.FUNCTION)
 annotation class VimBehaviourDiffers(
         val originalVimAfter: String = "",
-        val trimIndent: Boolean = false,
         val description: String = ""
 )
 
+/**
+ * Function for delegated properties.
+ * The property will be delegated to UserData and has nullable type.
+ */
 fun <T> userData(): ReadWriteProperty<UserDataHolder, T?> {
     return object : ReadWriteProperty<UserDataHolder, T?> {
         private var key: Key<T>? = null
@@ -51,6 +80,11 @@ fun <T> userData(): ReadWriteProperty<UserDataHolder, T?> {
     }
 }
 
+/**
+ * Function for delegated properties.
+ * The property will be delegated to UserData and has non-nullable type.
+ * [default] action will be executed if UserData doesn't have this property now.
+ */
 fun <T> userDataOr(default: UserDataHolder.() -> T): ReadWriteProperty<UserDataHolder, T> {
     return object : ReadWriteProperty<UserDataHolder, T> {
         private var key: Key<T>? = null

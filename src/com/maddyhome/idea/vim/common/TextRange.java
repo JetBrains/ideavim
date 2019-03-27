@@ -20,6 +20,10 @@ package com.maddyhome.idea.vim.common;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @deprecated Please use com.maddyhome.idea.vim.helper.VimSelection
+ */
+@Deprecated
 public class TextRange {
   public TextRange(int start, int end) {
     this(new int[]{start}, new int[]{end});
@@ -79,7 +83,7 @@ public class TextRange {
   }
 
   private void normalizeIndex(final int index) {
-    if (index< size() && ends[index] < starts[index]) {
+    if (index < size() && ends[index] < starts[index]) {
       int t = starts[index];
       starts[index] = ends[index];
       ends[index] = t;
@@ -87,7 +91,7 @@ public class TextRange {
   }
 
   public boolean normalize(final int fileSize) {
-    for (int i=0;i<size();i++) {
+    for (int i = 0; i < size(); i++) {
       normalizeIndex(i);
       starts[i] = Math.max(0, Math.min(starts[i], fileSize));
       if (starts[i] == fileSize) {

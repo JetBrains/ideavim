@@ -42,12 +42,35 @@ import com.maddyhome.idea.vim.helper.vimVisualChange
 
 /**
  * @author Alex Plate
+ *
+ * Base class for visual operation handlers.
+ * This handler executes an action for each caret. That means that if you have 5 carets, [executeAction] will be
+ *   called 5 times.
+ * @see [VisualOperatorActionBatchHandler] for only one execution
  */
 abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
+    /**
+     * Execute an action for current [caret].
+     * The selection offsets and type should be takes from [range] because this [caret] doesn't have this selection
+     *   anymore in time of action execution (and editor is in normal mode, not visual).
+     *
+     * This method is executed once for each caret except case with block selection. If there is block selection,
+     *   the method will be executed only once with [Caret#primaryCaret].
+     */
     protected abstract fun executeAction(editor: Editor, caret: Caret, context: DataContext, cmd: Command, range: VimSelection): Boolean
 
+    /**
+     * This method executes before [executeAction] and only once for all carets.
+     * [caretsAndSelections] contains a map of all current carets and corresponding selections.
+     *   If there is block selection, only one caret is in [caretsAndSelections].
+     */
     protected open fun beforeExecution(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>) = true
+
+    /**
+     * This method executes after [executeAction] and only once for all carets.
+     * [res] has true if ALL executions of [executeAction] returned true.
+     */
     protected open fun afterExecution(editor: Editor, context: DataContext, cmd: Command, res: Boolean) {}
 
     final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {

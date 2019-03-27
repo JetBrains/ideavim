@@ -28,6 +28,14 @@ import com.maddyhome.idea.vim.common.TextRange
 
 /**
  * @author Alex Plate
+ *
+ * Class for storing selection range.
+ *   [start] and [end] are the offsets of selection and type of selection is stored in [type]
+ *
+ * This selection has direction. That means that by moving in left-up direction (e.g. `vbbbb`)
+ *    [start] will be greater then [end].
+ * If you need normalized [start] and [end] (start always less than end) you
+ *   can use [normStart] and [normEnd] properties.
  */
 data class VimSelection(
         val start: Int,
@@ -38,6 +46,9 @@ data class VimSelection(
     val normStart: Int = if (start > end) end else start
     val normEnd: Int = if (start > end) start else end
 
+    /**
+     * Converting to an old TextRange class
+     */
     fun toVimTextRange() = when (type) {
         CHARACTER_WISE, LINE_WISE -> TextRange(normStart, normEnd)
         BLOCK_WISE -> {
@@ -54,6 +65,12 @@ data class VimSelection(
         }
     }
 
+    /**
+     * Execute [action] for each line of selection.
+     * Action will be executed in bottom-up direction if [start] > [end]
+     *
+     * [action#startOffset] and [action#endOffset] are offsets in current line
+     */
     inline fun forEachLine(action: (startOffset: Int, endOffset: Int) -> Unit) {
         val logicalStart = editor.offsetToLogicalPosition(start)
         val logicalEnd = editor.offsetToLogicalPosition(end)

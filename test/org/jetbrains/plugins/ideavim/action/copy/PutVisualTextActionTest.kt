@@ -521,7 +521,7 @@ class PutVisualTextActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             <caret>Discovery
-    """, trimIndent = true)
+    """)
     @Test
     fun `test put visual text character to last line`() {
         val before = """
@@ -554,7 +554,7 @@ class PutVisualTextActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             <caret>Discovery
-    """, trimIndent = true)
+    """)
     @Test
     fun `test put visual text character to line multicaret`() {
         val before = """
@@ -587,7 +587,7 @@ class PutVisualTextActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             <caret>Discovery
-    """, trimIndent = true)
+    """)
     @Test
     fun `test put visual text character to line multicaret on same line`() {
         val before = """
@@ -671,7 +671,7 @@ class PutVisualTextActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             <caret>A Discovery
-    """, trimIndent = true)
+    """)
     @Test
     fun `test put visual text line to last line`() {
         val before = """
@@ -704,7 +704,7 @@ class PutVisualTextActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             <caret>A Discovery
-    """, trimIndent = true)
+    """)
     @Test
     fun `test put visual text line to line multicaret`() {
         val before = """
@@ -737,7 +737,7 @@ class PutVisualTextActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             <caret>A Discovery
-    """, trimIndent = true)
+    """)
     @Test
     fun `test put visual text line to line multicaret on same line`() {
         val before = """
@@ -816,7 +816,7 @@ class PutVisualTextActionTest : VimTestCase() {
             <caret>|found|
             |l roc|
             |ere i|
-    """, trimIndent = true)
+    """)
     @Test
     fun `test put visual text blockwise on last line to line`() {
         val before = """
@@ -874,7 +874,7 @@ class PutVisualTextActionTest : VimTestCase() {
             |found|
             |l roc|
             |ere i|
-    """, trimIndent = true)
+    """)
     @Test
     fun `test put visual text blockwise on last line twice to line`() {
         val before = """
@@ -931,7 +931,7 @@ class PutVisualTextActionTest : VimTestCase() {
             <caret>|found|
             |l roc|
             |ere i|
-    """, trimIndent = true)
+    """)
     @Test
     fun `test put visual text blockwise multicaret to line`() {
         val before = """
@@ -999,7 +999,7 @@ class PutVisualTextActionTest : VimTestCase() {
             alDiscoveryks and lavender and tufted grass,
             whDiscoveryt was settled on some sodden sand
             hard by the torrent of a mountain pass.
-    """, trimIndent = true, description = "Different cursor position")
+    """, description = "Different cursor position")
     @Test
     fun `test put visual text character to block`() {
         val before = """
@@ -1031,7 +1031,7 @@ class PutVisualTextActionTest : VimTestCase() {
             alDiscoveryDiscoveryks and lavender and tufted grass,
             whDiscoveryDiscoveryt was settled on some sodden sand
             hard by the torrent of a mountain pass.
-    """, trimIndent = true, description = "Different cursor position")
+    """, description = "Different cursor position")
     @Test
     fun `test put visual text character to block twice`() {
         val before = """
@@ -1067,7 +1067,7 @@ class PutVisualTextActionTest : VimTestCase() {
             wht was settled on some sodden sand
             <caret>A Discovery
             hard by the torrent of a mountain pass.
-    """, trimIndent = true)
+    """)
     @Test
     fun `test put visual text line to block`() {
         val before = """
@@ -1103,7 +1103,7 @@ class PutVisualTextActionTest : VimTestCase() {
             <caret>A Discovery
             A Discovery
             hard by the torrent of a mountain pass.
-            """, trimIndent = true)
+            """)
     @Test
     fun `test put visual text line to block twice`() {
         val before = """
@@ -1141,7 +1141,7 @@ class PutVisualTextActionTest : VimTestCase() {
             wht was settled on some sodden sand
             ha the torrent of a mountain pass.
             <caret>A Discovery
-    """, trimIndent = true)
+    """)
     @Test
     fun `test put visual text line to block till end`() {
         val before = """

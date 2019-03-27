@@ -26,8 +26,20 @@ import com.maddyhome.idea.vim.helper.VimSelection
 
 /**
  * @author Alex Plate
+ *
+ * Base class for visual operation handlers.
+ * This handler executes an action only once for all carets. That means that if you have 5 carets,
+ *   [executeAction] will be called 1 time.
+ * @see [VisualOperatorActionHandler] for per-caret execution
  */
 abstract class VisualOperatorActionBatchHandler : VisualOperatorActionHandler() {
+    /**
+     * Execute an action
+     * [caretsAndSelections] contains a map of all current carets and corresponding selections.
+     *   If there is block selection, only one caret is in [caretsAndSelections].
+     *
+     * This method is executed once for all carets.
+     */
     abstract fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>): Boolean
 
     final override fun executeAction(editor: Editor, caret: Caret, context: DataContext, cmd: Command, range: VimSelection) = true

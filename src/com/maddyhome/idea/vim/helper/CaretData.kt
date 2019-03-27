@@ -28,6 +28,10 @@ import com.maddyhome.idea.vim.command.VisualChange
  * @author Alex Plate
  */
 
+// ----------------------------------------------------
+/**
+ * Caret's offset when entering visual mode
+ */
 var Caret.vimSelectionStart: Int
     get() = if (CommandState.inVisualBlockMode(editor)) {
         editor._vimBlockSelectionStart
@@ -46,10 +50,9 @@ fun Caret.vimSelectionStartSetToNull() {
     this._vimSelectionStart = null
     editor._vimBlockSelectionStart = null
 }
-
 private var Caret._vimSelectionStart: Int? by userData()
 private var Editor._vimBlockSelectionStart: Int? by userData()
-
+// ----------------------------------------------------
 
 private val LAST_COLUMN: Key<Int> = Key.create("lastColumn")
 var Caret.vimLastColumn: Int
