@@ -209,7 +209,9 @@ object VimListenerManager {
 
                 if (!CommandState.inInsertMode(editor)) {
                     caretModel.runForEachCaret { caret ->
-                        if (caret.offset == EditorHelper.getLineEndForOffset(editor, caret.offset)) {
+                        val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
+                        val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
+                        if (caret.offset == lineEnd && lineEnd != lineStart) {
                             MotionGroup.moveCaret(editor, caret, caret.offset - 1)
                         }
                     }
