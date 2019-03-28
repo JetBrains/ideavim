@@ -223,12 +223,20 @@
     <action id="VimVisualSwapSelections" class="com.maddyhome.idea.vim.action.motion.visual.VisualSwapSelectionsAction" text="Swap Visual Selection Ends"/>
 
     <!-- Select-->
-    <action id="VimSelectEnableMode" class="com.maddyhome.idea.vim.action.motion.select.SelectEnableModeAction"
+    <action id="VimSelectEnableCharacterMode"
+            class="com.maddyhome.idea.vim.action.motion.select.SelectEnableCharacterModeAction"
             text="Enter Character Select Mode"/>
+    <action id="VimSelectEnableLineMode" class="com.maddyhome.idea.vim.action.motion.select.SelectEnableLineModeAction"
+            text="Enter Line Select Mode"/>
+    <action id="VimSelectEnableBlockMode"
+            class="com.maddyhome.idea.vim.action.motion.select.SelectEnableBlockModeAction"
+            text="Enter Block Select Mode"/>
     <action id="VimExtendToRight" class="com.maddyhome.idea.vim.action.motion.select.SelectExtendToRight"
             text="Extend To Right Select Mode"/>
     <action id="VimExtendToLeft" class="com.maddyhome.idea.vim.action.motion.select.SelectExtendToLeft"
             text="Extend To Left Select Mode"/>
+    <action id="VimToggleVisual" class="com.maddyhome.idea.vim.action.motion.select.SelectToggleVisualMode"
+            text="Toggle Select/Visual mode"/>
 
     <!-- Insert -->
     <action id="VimInsertAfterCursor" class="com.maddyhome.idea.vim.action.change.insert.InsertAfterCursorAction" text="Insert After Cursor"/>

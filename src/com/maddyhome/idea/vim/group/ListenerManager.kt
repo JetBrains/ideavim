@@ -185,6 +185,16 @@ object VimListenerManager {
                     caretModel.removeSecondaryCarets()
                 }
 
+                // TODO: 2019-03-22 Multi?
+                caretModel.primaryCaret.vimLastColumn = caretModel.visualPosition.column
+                if (event.mouseEvent.clickCount == 1) {
+                    if (CommandState.inVisualMode(editor)) {
+                        VisualMotionGroup.exitVisual(editor)
+                    } else if (CommandState.getInstance(editor).mode == CommandState.Mode.SELECT) {
+                        VimPlugin.getChange().exitSelectMode(editor)
+                    }
+                }
+
                 if (!CommandState.inInsertMode(editor)) {
                     caretModel.runForEachCaret { caret ->
                         val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
@@ -193,12 +203,6 @@ object VimListenerManager {
                             MotionGroup.moveCaret(editor, caret, caret.offset - 1)
                         }
                     }
-                }
-
-                // TODO: 2019-03-22 Multi?
-                caretModel.primaryCaret.vimLastColumn = caretModel.visualPosition.column
-                if (event.mouseEvent.clickCount == 1 && CommandState.inVisualMode(editor)) {
-                    VisualMotionGroup.exitVisual(editor)
                 }
             } else if (event.area != EditorMouseEventArea.ANNOTATIONS_AREA &&
                     event.area != EditorMouseEventArea.FOLDING_OUTLINE_AREA &&

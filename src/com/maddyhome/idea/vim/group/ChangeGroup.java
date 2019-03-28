@@ -825,21 +825,24 @@ public class ChangeGroup {
   }
 
   public boolean processKeyInSelectMode(@NotNull final Editor editor,
-                                        @NotNull final DataContext context,
-                                        @NotNull final KeyStroke key) {
+                                        @NotNull final DataContext context, @NotNull final KeyStroke key) {
     boolean res = processKey(editor, context, key);
 
-    CommandState.getInstance(editor).popState();
-    Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-    primaryCaret.removeSelection();
-    CaretDataKt.vimSelectionStartSetToNull(primaryCaret);
-    ChangeGroup.resetCursor(editor, false);
+    exitSelectMode(editor);
 
     if (isPrintableChar(key.getKeyChar())) {
       VimPlugin.getChange().insertBeforeCursor(editor, context);
     }
 
     return res;
+  }
+
+  public void exitSelectMode(@NotNull Editor editor) {
+    CommandState.getInstance(editor).popState();
+    Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+    primaryCaret.removeSelection();
+    CaretDataKt.vimSelectionStartSetToNull(primaryCaret);
+    ChangeGroup.resetCursor(editor, false);
   }
 
   public boolean isPrintableChar(char c) {

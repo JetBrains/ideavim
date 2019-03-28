@@ -9,26 +9,28 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
 import com.maddyhome.idea.vim.group.motion.vimSetSelectionSilently
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.helper.EditorHelper
 import javax.swing.KeyStroke
 
 /**
  * @author Alex Plate
  */
 
-private object SelectEnableModeActionHandler : EditorActionHandlerBase() {
+private object SelectEnableLineModeActionHandler : EditorActionHandlerBase() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+        val lineEnd = EditorHelper.getLineEndForOffset(editor, editor.caretModel.primaryCaret.offset)
+        val lineStart = EditorHelper.getLineStartForOffset(editor, editor.caretModel.primaryCaret.offset)
         editor.caretModel.primaryCaret.run {
-            vimSetSelectionSilently(offset, offset + 1)
-            moveToOffset(offset + 1)
+            vimSetSelectionSilently(lineStart, lineEnd)
         }
-        return VisualMotionGroup.enterSelectionMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
+        return VisualMotionGroup.enterSelectionMode(editor, CommandState.SubMode.VISUAL_LINE)
     }
 }
 
-class SelectEnableModeAction : VimCommandAction(SelectEnableModeActionHandler) {
+class SelectEnableLineModeAction : VimCommandAction(SelectEnableLineModeActionHandler) {
     override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.N
 
-    override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("gh")
+    override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("gH")
 
     override fun getType(): Command.Type = Command.Type.OTHER_READONLY
 }
