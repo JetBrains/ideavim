@@ -235,7 +235,16 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     final InputEvent inputEvent = e.getInputEvent();
     if (inputEvent instanceof KeyEvent) {
       final KeyEvent keyEvent = (KeyEvent)inputEvent;
-      return KeyStroke.getKeyStrokeForEvent(keyEvent);
+      if (keyEvent.getKeyCode() == keyEvent.getExtendedKeyCode()) {
+        return KeyStroke.getKeyStrokeForEvent(keyEvent);
+      }
+      else {
+        int id = keyEvent.getID();
+        boolean isReleased = keyEvent.getID() == KeyEvent.KEY_RELEASED;
+        if (id == KeyEvent.KEY_PRESSED || isReleased) {
+          return KeyStroke.getKeyStroke(keyEvent.getExtendedKeyCode(), keyEvent.getModifiers(), isReleased);
+        }
+      }
     }
     return null;
   }
