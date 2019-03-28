@@ -21,13 +21,13 @@ package com.maddyhome.idea.vim.ex
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
 import com.maddyhome.idea.vim.handler.CaretOrder
 import com.maddyhome.idea.vim.handler.ExecuteMethodNotOverriddenException
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 import java.util.*
@@ -170,26 +170,27 @@ abstract class CommandHandler {
       VisualMotionGroup.exitVisual(editor)
     }
 
-    var res = true
+    val res = Ref.create(true)
     try {
       if (runForEachCaret) {
-        EditorHelper.getOrderedCaretsList(editor, caretOrder).forEach { caret ->
+        editor.caretModel.runForEachCaret({ caret ->
           var i = 0
-          while (i < count && res) {
+          while (i < count && res.get()) {
             try {
-              res = execute(editor, caret, context, cmd)
+              res.set(execute(editor, caret, context, cmd))
             } catch (e: ExecuteMethodNotOverriddenException) {
-              return false
+              res.set(false)
+              return@runForEachCaret
             }
 
             i++
           }
-        }
+        }, caretOrder == CaretOrder.DECREASING_OFFSET)
       } else {
         var i = 0
-        while (i < count && res) {
+        while (i < count && res.get()) {
           try {
-            res = execute(editor, context, cmd)
+            res.set(execute(editor, context, cmd))
           } catch (e: ExecuteMethodNotOverriddenException) {
             return false
           }
@@ -198,10 +199,10 @@ abstract class CommandHandler {
         }
       }
 
-      if (!res) {
+      if (!res.get()) {
         VimPlugin.indicateError()
       }
-      return res
+      return res.get()
     } catch (e: ExException) {
       VimPlugin.showMessage(e.message)
       VimPlugin.indicateError()
