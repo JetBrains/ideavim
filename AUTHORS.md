@@ -37,7 +37,7 @@ Contributors:
 * [Jackson Popkin](mailto:jackson@donorschoose.org)
 * [Teruo Kunihiro](mailto:yuyuyu1999@gmail.com)
 * [Liubov Paina](mailto:lubashka.994@mail.ru)
-* [Daniel Leong](mailto:falcone88@gmail.com)
+* [Daniel Leong](mailto:me@dhleong.net)
 * [Aleksey Lagoshin](mailto:aleksey@pri-num.com)
 * [Paulo Bu](mailto:pbu_98@yahoo.com)
 * [Giorgos Gaganis](mailto:gaganis@yahoo.com)
