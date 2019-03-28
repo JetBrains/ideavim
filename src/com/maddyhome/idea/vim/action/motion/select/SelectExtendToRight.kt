@@ -9,7 +9,6 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.MotionEditorActionHandler
-import java.util.*
 import javax.swing.KeyStroke
 
 /**
@@ -23,7 +22,7 @@ private object SelectExtendToRightHandler : MotionEditorActionHandler() {
 }
 
 class SelectExtendToRight : VimCommandAction(SelectExtendToRightHandler) {
-    override fun getMappingModes(): MutableSet<MappingMode> = EnumSet.of(MappingMode.SELECT)
+    override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.S
 
     override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<S-Right>")
 

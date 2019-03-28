@@ -54,6 +54,7 @@ public enum MappingMode {
   public static final EnumSet<MappingMode> O = EnumSet.of(OP_PENDING);
   public static final EnumSet<MappingMode> I = EnumSet.of(INSERT);
   public static final EnumSet<MappingMode> C = EnumSet.of(CMD_LINE);
+  public static final EnumSet<MappingMode> S = EnumSet.of(SELECT);
 
   public static final EnumSet<MappingMode> NO = EnumSet.of(NORMAL, OP_PENDING);
   public static final EnumSet<MappingMode> VO = EnumSet.of(VISUAL, OP_PENDING);

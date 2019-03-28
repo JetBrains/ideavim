@@ -237,6 +237,8 @@
             text="Extend To Left Select Mode"/>
     <action id="VimToggleVisual" class="com.maddyhome.idea.vim.action.motion.select.SelectToggleVisualMode"
             text="Toggle Select/Visual mode"/>
+    <action id="VimSelectInsert" class="com.maddyhome.idea.vim.action.motion.select.SelectEnterAction"
+            text="Select Enter Action"/>
 
     <!-- Insert -->
     <action id="VimInsertAfterCursor" class="com.maddyhome.idea.vim.action.change.insert.InsertAfterCursorAction" text="Insert After Cursor"/>
