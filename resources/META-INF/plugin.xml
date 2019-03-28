@@ -222,6 +222,14 @@
     <action id="VimVisualSelectPrevious" class="com.maddyhome.idea.vim.action.motion.visual.VisualSelectPreviousAction" text="Visual Select Previous"/>
     <action id="VimVisualSwapSelections" class="com.maddyhome.idea.vim.action.motion.visual.VisualSwapSelectionsAction" text="Swap Visual Selection Ends"/>
 
+    <!-- Select-->
+    <action id="VimSelectEnableMode" class="com.maddyhome.idea.vim.action.motion.select.SelectEnableModeAction"
+            text="Enter Character Select Mode"/>
+    <action id="VimExtendToRight" class="com.maddyhome.idea.vim.action.motion.select.SelectExtendToRight"
+            text="Extend To Right Select Mode"/>
+    <action id="VimExtendToLeft" class="com.maddyhome.idea.vim.action.motion.select.SelectExtendToLeft"
+            text="Extend To Left Select Mode"/>
+
     <!-- Insert -->
     <action id="VimInsertAfterCursor" class="com.maddyhome.idea.vim.action.change.insert.InsertAfterCursorAction" text="Insert After Cursor"/>
     <action id="VimInsertAfterLineEnd" class="com.maddyhome.idea.vim.action.change.insert.InsertAfterLineEndAction" text="Insert After Line End"/>

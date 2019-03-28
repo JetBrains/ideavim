@@ -214,6 +214,9 @@ public class CommandState {
             msg.append("VISUAL");
         }
         break;
+      case SELECT:
+        msg.append("SELECT");
+        break;
     }
 
     return msg.toString();
@@ -336,7 +339,7 @@ public class CommandState {
     INSERT,
     REPLACE,
     REPEAT,
-    VISUAL,
+    VISUAL, SELECT,
     EX_ENTRY
   }
 

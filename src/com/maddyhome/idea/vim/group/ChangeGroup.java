@@ -27,22 +27,11 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.CaretModel;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.EditorFactory;
-import com.intellij.openapi.editor.LogicalPosition;
-import com.intellij.openapi.editor.VisualPosition;
+import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx;
-import com.intellij.openapi.editor.event.DocumentEvent;
-import com.intellij.openapi.editor.event.DocumentListener;
-import com.intellij.openapi.editor.event.EditorFactoryAdapter;
-import com.intellij.openapi.editor.event.EditorFactoryEvent;
-import com.intellij.openapi.editor.event.EditorMouseAdapter;
-import com.intellij.openapi.editor.event.EditorMouseEvent;
+import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.impl.TextRangeInterval;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
@@ -54,24 +43,14 @@ import com.intellij.util.ObjectUtils;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.command.SelectionType;
+import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroupKt;
 import com.maddyhome.idea.vim.handler.CaretOrder;
-import com.maddyhome.idea.vim.helper.CaretDataKt;
-import com.maddyhome.idea.vim.helper.CharacterHelper;
-import com.maddyhome.idea.vim.helper.EditorData;
-import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.helper.SearchHelper;
-import com.maddyhome.idea.vim.helper.StringHelper;
+import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.BoundListOption;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
@@ -79,11 +58,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * Provides all the insert/replace related functionality
@@ -847,6 +822,34 @@ public class ChangeGroup {
     }
 
     return false;
+  }
+
+  public boolean processKeyInSelectMode(@NotNull final Editor editor,
+                                        @NotNull final DataContext context,
+                                        @NotNull final KeyStroke key) {
+    boolean res = processKey(editor, context, key);
+
+    CommandState.getInstance(editor).popState();
+    CaretVimListenerSuppressor.INSTANCE.lock();
+    Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+    primaryCaret.removeSelection();
+    CaretDataKt.vimSelectionStartSetToNull(primaryCaret);
+    ChangeGroup.resetCursor(editor, false);
+    CaretVimListenerSuppressor.INSTANCE.unlock();
+
+    if (isPrintableChar(key.getKeyChar())) {
+      VimPlugin.getChange().insertBeforeCursor(editor, context);
+    }
+
+    return res;
+  }
+
+  public boolean isPrintableChar(char c) {
+    Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
+    return (!Character.isISOControl(c)) &&
+           c != KeyEvent.CHAR_UNDEFINED &&
+           block != null &&
+           block != Character.UnicodeBlock.SPECIALS;
   }
 
   public boolean deleteCharacter(@NotNull Editor editor, int count, boolean isChange) {

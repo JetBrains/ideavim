@@ -33,6 +33,10 @@ public enum MappingMode {
    */
   VISUAL,
   /**
+   * Indicates this key mapping applies to Select mode
+   */
+  SELECT,
+  /**
    * Indicates this key mapping applies to Operator Pending mode
    */
   OP_PENDING,

@@ -19,13 +19,7 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.CaretModel;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.EditorFactory;
-import com.intellij.openapi.editor.LogicalPosition;
-import com.intellij.openapi.editor.ScrollingModel;
-import com.intellij.openapi.editor.VisualPosition;
+import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.editor.event.EditorFactoryListener;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
@@ -342,7 +336,7 @@ public class MotionGroup {
         }
       }
 
-      if (CommandState.inVisualMode(editor)) {
+      if (CommandState.inVisualMode(editor) || CommandState.getInstance(editor).getMode() == CommandState.Mode.SELECT) {
         VisualGroupKt.vimMoveSelectionToCaret(caret);
       }
       else {

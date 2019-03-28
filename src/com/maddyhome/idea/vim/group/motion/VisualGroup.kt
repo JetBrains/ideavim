@@ -43,7 +43,7 @@ fun Caret.vimStartSelectionAtPoint(point: Int) {
 }
 
 fun Caret.vimMoveSelectionToCaret() {
-    if (CommandState.getInstance(editor).mode != CommandState.Mode.VISUAL)
+    if (CommandState.getInstance(editor).mode != CommandState.Mode.VISUAL && CommandState.getInstance(editor).mode != CommandState.Mode.SELECT)
         throw RuntimeException("Attempt to extent selection in non-visual mode")
     if (CommandState.inVisualBlockMode(editor))
         throw RuntimeException("Move caret with [vimMoveBlockSelectionToOffset]")
@@ -54,9 +54,6 @@ fun Caret.vimMoveSelectionToCaret() {
 }
 
 fun vimMoveBlockSelectionToOffset(editor: Editor, offset: Int) {
-    if (!CommandState.inVisualBlockMode(editor))
-        throw RuntimeException("Move caret with [vimMoveSelectionToCaret]")
-
     val primaryCaret = editor.caretModel.primaryCaret
     val startOffsetMark = primaryCaret.vimSelectionStart
 
@@ -72,6 +69,7 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
     val (start, end) = if (selectionStart > selectionEnd) selectionEnd to selectionStart else selectionStart to selectionEnd
     val editor = caret.editor
     val subMode = CommandState.getInstance(editor).subMode
+    val mode = CommandState.getInstance(editor).mode
     when (subMode) {
         CommandState.SubMode.VISUAL_LINE -> {
             val lineStart = EditorHelper.getLineStartForOffset(editor, start)
@@ -80,7 +78,7 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
         }
         CommandState.SubMode.VISUAL_CHARACTER -> {
             val lineEnd = EditorHelper.getLineEndForOffset(editor, end)
-            val adj = if (VisualMotionGroup.exclusiveSelection || end == lineEnd) 0 else 1
+            val adj = if (VisualMotionGroup.exclusiveSelection || end == lineEnd || mode == CommandState.Mode.SELECT) 0 else 1
             val adjEnd = (end + adj).coerceAtMost(EditorHelper.getFileSize(editor))
             caret.vimSetSelectionSilently(start, adjEnd)
         }
@@ -90,7 +88,7 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
 
             var blockStart = editor.offsetToLogicalPosition(selectionStart)
             var blockEnd = editor.offsetToLogicalPosition(selectionEnd)
-            if (!VisualMotionGroup.exclusiveSelection) {
+            if (!VisualMotionGroup.exclusiveSelection && mode != CommandState.Mode.SELECT) {
                 if (blockStart.column > blockEnd.column) {
                     blockStart = LogicalPosition(blockStart.line, blockStart.column + 1)
                 } else {
