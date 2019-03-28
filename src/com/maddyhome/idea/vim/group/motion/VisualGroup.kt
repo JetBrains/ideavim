@@ -25,7 +25,6 @@ import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.colors.EditorColors
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.group.CaretVimListenerSuppressor
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimLastColumn
@@ -83,7 +82,6 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
             caret.vimSetSelectionSilently(start, adjEnd)
         }
         CommandState.SubMode.VISUAL_BLOCK -> {
-            CaretVimListenerSuppressor.lock()
             editor.caretModel.removeSecondaryCarets()
 
             var blockStart = editor.offsetToLogicalPosition(selectionStart)
@@ -117,7 +115,6 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
             }
 
             editor.caretModel.primaryCaret.moveToOffset(selectionEnd)
-            CaretVimListenerSuppressor.unlock()
         }
     }
 }

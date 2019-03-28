@@ -830,12 +830,10 @@ public class ChangeGroup {
     boolean res = processKey(editor, context, key);
 
     CommandState.getInstance(editor).popState();
-    CaretVimListenerSuppressor.INSTANCE.lock();
     Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
     primaryCaret.removeSelection();
     CaretDataKt.vimSelectionStartSetToNull(primaryCaret);
     ChangeGroup.resetCursor(editor, false);
-    CaretVimListenerSuppressor.INSTANCE.unlock();
 
     if (isPrintableChar(key.getKeyChar())) {
       VimPlugin.getChange().insertBeforeCursor(editor, context);

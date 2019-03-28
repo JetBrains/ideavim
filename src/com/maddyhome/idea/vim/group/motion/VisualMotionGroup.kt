@@ -18,29 +18,15 @@
 
 package com.maddyhome.idea.vim.group.motion
 
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.LogicalPosition
-import com.intellij.openapi.editor.ScrollType
-import com.intellij.openapi.editor.SelectionModel
+import com.intellij.openapi.editor.*
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.command.VisualChange
+import com.maddyhome.idea.vim.command.*
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.group.CaretVimListenerSuppressor
 import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.SelectionVimListenerSuppressor
-import com.maddyhome.idea.vim.helper.EditorData
-import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
-import com.maddyhome.idea.vim.helper.vimSelectionStart
-import com.maddyhome.idea.vim.helper.vimSelectionStartSetToNull
+import com.maddyhome.idea.vim.helper.*
 import com.maddyhome.idea.vim.option.BoundStringOption
 import com.maddyhome.idea.vim.option.Options
 import java.util.*
@@ -99,9 +85,7 @@ object VisualMotionGroup {
         CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, autodetectedMode, MappingMode.VISUAL)
         if (autodetectedMode == CommandState.SubMode.VISUAL_BLOCK) {
             val (start, end) = blockModeStartAndEnd(editor)
-            CaretVimListenerSuppressor.lock()
             editor.caretModel.removeSecondaryCarets()
-            CaretVimListenerSuppressor.unlock()
             editor.caretModel.primaryCaret.let {
                 it.vimStartSelectionAtPoint(start)
                 MotionGroup.moveCaret(editor, it, (end - selectionAdj).coerceAtLeast(0))
@@ -125,7 +109,6 @@ object VisualMotionGroup {
                 }
             }
         }
-
         KeyHandler.getInstance().reset(editor)
     }
 
@@ -233,15 +216,27 @@ object VisualMotionGroup {
         return true
     }
 
+    fun enterSelectionMode(editor: Editor, subMode: CommandState.SubMode): Boolean {
+        CommandState.getInstance(editor).pushState(CommandState.Mode.SELECT, subMode, MappingMode.SELECT)
+        editor.caretModel.primaryCaret.run {
+            vimSelectionStart = leadSelectionOffset
+        }
+        KeyHandler.getInstance().reset(editor)
+        ChangeGroup.resetCursor(editor, true)
+        return true
+    }
+
     fun controlNonVimSelectionChange(editor: Editor) {
         if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
             val commandState = CommandState.getInstance(editor)
             while (commandState.mode != CommandState.Mode.COMMAND) {
                 commandState.popState()
             }
-            setVisualMode(editor, CommandState.SubMode.NONE)
-            ChangeGroup.resetCursor(editor, false)
-            KeyHandler.getInstance().reset(editor)
+            val autodetectedMode = autodetectVisualMode(editor, CommandState.SubMode.NONE)
+            while (CommandState.getInstance(editor).mode != CommandState.Mode.COMMAND) {
+                CommandState.getInstance(editor).popState()
+            }
+            enterSelectionMode(editor, autodetectedMode)
         } else {
             exitVisual(editor)
         }

@@ -27,12 +27,7 @@ import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.actionSystem.EditorActionManager;
 import com.intellij.openapi.editor.actionSystem.TypedAction;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
-import com.intellij.openapi.editor.event.CaretListener;
-import com.intellij.openapi.editor.event.DocumentListener;
-import com.intellij.openapi.editor.event.EditorFactoryListener;
-import com.intellij.openapi.editor.event.EditorMouseListener;
-import com.intellij.openapi.editor.event.EditorMouseMotionListener;
-import com.intellij.openapi.editor.event.SelectionListener;
+import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
@@ -123,14 +118,6 @@ public class EventFacade {
 
   public void removeEditorSelectionListener(@NotNull Editor editor, @NotNull SelectionListener listener) {
     editor.getSelectionModel().removeSelectionListener(listener);
-  }
-
-  public void addCaretListener(@NotNull Editor editor, @NotNull CaretListener listener) {
-    editor.getCaretModel().addCaretListener(listener);
-  }
-
-  public void removeCaretListener(@NotNull Editor editor, @NotNull CaretListener listener) {
-    editor.getCaretModel().removeCaretListener(listener);
   }
 
   @NotNull

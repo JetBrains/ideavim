@@ -27,7 +27,6 @@ import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.group.CaretVimListenerSuppressor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -57,7 +56,6 @@ public abstract class EditorActionHandlerBase extends EditorActionHandler {
     final CommandState state = CommandState.getInstance(editor);
     final Command cmd = state.getCommand();
 
-    CaretVimListenerSuppressor.INSTANCE.lock();
     try {
       if (myRunForEachCaret) {
         if (cmd == null || caret == null || !execute(editor, caret, context, cmd)) {
@@ -72,9 +70,6 @@ public abstract class EditorActionHandlerBase extends EditorActionHandler {
     }
     catch (ExecuteMethodNotOverriddenException e) {
       VimPlugin.indicateError();
-    }
-    finally {
-      CaretVimListenerSuppressor.INSTANCE.unlock();
     }
   }
 

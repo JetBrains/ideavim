@@ -19,17 +19,9 @@
 package com.maddyhome.idea.vim.group
 
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
-import com.intellij.openapi.editor.event.CaretEvent
-import com.intellij.openapi.editor.event.CaretListener
-import com.intellij.openapi.editor.event.EditorMouseEvent
-import com.intellij.openapi.editor.event.EditorMouseEventArea
-import com.intellij.openapi.editor.event.EditorMouseListener
-import com.intellij.openapi.editor.event.EditorMouseMotionListener
-import com.intellij.openapi.editor.event.SelectionEvent
-import com.intellij.openapi.editor.event.SelectionListener
+import com.intellij.openapi.editor.event.*
 import com.intellij.openapi.editor.ex.DocumentEx
 import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.VimPlugin
@@ -99,7 +91,6 @@ sealed class VimListenerSuppressor {
     }
 }
 
-object CaretVimListenerSuppressor : VimListenerSuppressor()
 object SelectionVimListenerSuppressor : VimListenerSuppressor()
 
 object VimListenerManager {
@@ -111,7 +102,6 @@ object VimListenerManager {
         eventFacade.addEditorMouseListener(editor, EditorMouseHandler)
         eventFacade.addEditorMouseMotionListener(editor, EditorMouseHandler)
         eventFacade.addEditorSelectionListener(editor, EditorSelectionHandler)
-        eventFacade.addCaretListener(editor, VimCaretListener)
     }
 
     fun removeEditorListeners(editor: Editor) {
@@ -119,7 +109,6 @@ object VimListenerManager {
         eventFacade.removeEditorMouseListener(editor, EditorMouseHandler)
         eventFacade.removeEditorMouseMotionListener(editor, EditorMouseHandler)
         eventFacade.removeEditorSelectionListener(editor, EditorSelectionHandler)
-        eventFacade.removeCaretListener(editor, VimCaretListener)
     }
 
     private object EditorSelectionHandler : SelectionListener {
@@ -133,10 +122,8 @@ object VimListenerManager {
             val document = editor.document
 
             if (SelectionVimListenerSuppressor.isNotLocked) {
-                CaretVimListenerSuppressor.lock()
                 logger.debug("Adjust non vim selection change")
                 VisualMotionGroup.controlNonVimSelectionChange(editor)
-                CaretVimListenerSuppressor.unlock()
             }
 
             if (myMakingChanges || document is DocumentEx && document.isInEventsHandling) {
@@ -162,31 +149,22 @@ object VimListenerManager {
     private object EditorMouseHandler : EditorMouseListener, EditorMouseMotionListener {
         private var mouseDragging = false
 
-        override fun mousePressed(event: EditorMouseEvent) {
-            CaretVimListenerSuppressor.lock()
-        }
-
         override fun mouseDragged(e: EditorMouseEvent) {
             if (!mouseDragging) {
                 logger.debug("Mouse dragging")
                 SelectionVimListenerSuppressor.lock()
                 mouseDragging = true
+                ChangeGroup.resetCursor(e.editor, true)
             }
         }
 
         override fun mouseReleased(event: EditorMouseEvent) {
             if (mouseDragging) {
                 logger.debug("Release mouse after dragging")
-                // TODO: 2019-03-22 Docs about lead selectino
-                val editor = event.editor
-                if (event.area == EditorMouseEventArea.EDITING_AREA) {
-                    editor.caretModel.runForEachCaret(this::extendSelectionToCaret)
-                }
-                VisualMotionGroup.controlNonVimSelectionChange(editor)
+                VisualMotionGroup.controlNonVimSelectionChange(event.editor)
                 SelectionVimListenerSuppressor.unlock()
                 mouseDragging = false
             }
-            CaretVimListenerSuppressor.unlock()
         }
 
         override fun mouseClicked(event: EditorMouseEvent) {
@@ -231,51 +209,6 @@ object VimListenerManager {
                 }
 
                 ExOutputModel.getInstance(event.editor).clear()
-            }
-        }
-
-        private fun extendSelectionToCaret(caret: Caret?) {
-            if (caret != null &&
-                    caret.selectionEnd == caret.offset &&
-                    !VisualMotionGroup.exclusiveSelection &&
-                    caret.offset < caret.editor.document.textLength) {
-                CaretVimListenerSuppressor.lock()
-                logger.debug("Extend selection to caret")
-                caret.vimSetSelectionSilently(caret.selectionStart, caret.selectionEnd + 1)
-                CaretVimListenerSuppressor.unlock()
-            }
-        }
-    }
-
-    private object VimCaretListener : CaretListener {
-        override fun caretPositionChanged(event: CaretEvent) {
-            if (CaretVimListenerSuppressor.isNotLocked) {
-                putCaretAtEndOfSelection(event.caret)
-            }
-        }
-
-        private fun putCaretAtEndOfSelection(caret: Caret?) {
-            if (caret != null &&
-                    caret.selectionEnd == caret.offset &&
-                    !VisualMotionGroup.exclusiveSelection &&
-                    caret.selectionStart != caret.selectionEnd &&
-                    caret.selectionEnd > 0) {
-                CaretVimListenerSuppressor.lock()
-                logger.debug("Put caret at the end of selection")
-                caret.moveToOffset(caret.selectionEnd - 1)
-                CaretVimListenerSuppressor.unlock()
-                return
-            }
-            if (caret != null &&
-                    caret.offset != caret.selectionStart &&
-                    caret.offset != caret.selectionEnd - VisualMotionGroup.selectionAdj &&
-                    caret.selectionStart != caret.selectionEnd &&
-                    caret.selectionEnd > 0) {
-                CaretVimListenerSuppressor.lock()
-                logger.debug("Put caret at the end of selection")
-                caret.moveToOffset(caret.selectionEnd - VisualMotionGroup.selectionAdj)
-                CaretVimListenerSuppressor.unlock()
-                return
             }
         }
     }
