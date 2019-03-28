@@ -293,17 +293,29 @@ public class MapCommandTest extends VimTestCase {
   public void testAmbiguousMapping() {
     configureByText("\n");
     typeText(commandToKeys("nmap ,f iHello<Esc>"));
-    typeText(commandToKeys("nmap ,f2 iBye<Esc>"));
-    typeText(parseKeys(",fh"));
-    myFixture.checkResult("Hello\n");
+    typeText(commandToKeys("nmap ,fc iBye<Esc>"));
+    typeText(parseKeys(",fdh"));
+    myFixture.checkResult("Helo\n");
+
+    typeText(parseKeys("diw"));
+    myFixture.checkResult("\n");
+
+    typeText(parseKeys(",fch"));
+    myFixture.checkResult("Bye\n");
   }
 
   public void testLongAmbiguousMapping() {
     configureByText("\n");
     typeText(commandToKeys("nmap ,foo iHello<Esc>"));
-    typeText(commandToKeys("nmap ,foo2 iBye<Esc>"));
-    typeText(parseKeys(",fooh"));
-    myFixture.checkResult("Hello\n");
+    typeText(commandToKeys("nmap ,fooc iBye<Esc>"));
+    typeText(parseKeys(",foodh"));
+    myFixture.checkResult("Helo\n");
+
+    typeText(parseKeys("diw"));
+    myFixture.checkResult("\n");
+
+    typeText(parseKeys(",fooch"));
+    myFixture.checkResult("Bye\n");
   }
 
   public void testPlugMapping() {

@@ -300,8 +300,23 @@ public class KeyHandler {
                                      "Vim " + extensionHandler.getClass().getSimpleName(),
                                      null);
           }
-          if (prevMappingInfo != null) {
-            handleKey(editor, key, currentContext);
+
+          // NB: mappingInfo MUST be non-null here, so if equal
+          //  then prevMappingInfo is also non-null; this also
+          //  means that the prev mapping was a prefix, but the
+          //  next key typed (`key`) was not part of that
+          if (prevMappingInfo == mappingInfo) {
+            // post to end of queue so it's handled AFTER
+            //  an <Plug> mapping is invoked (since that
+            //  will also get posted)
+            Runnable handleRemainingKey = () -> handleKey(editor, key, currentContext);
+
+            if (application.isUnitTestMode()) {
+              handleRemainingKey.run();
+            }
+            else {
+              application.invokeLater(handleRemainingKey);
+            }
           }
         }
       };
