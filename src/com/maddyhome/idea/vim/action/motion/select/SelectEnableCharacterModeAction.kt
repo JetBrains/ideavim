@@ -9,6 +9,7 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
 import com.maddyhome.idea.vim.group.motion.vimSetSelectionSilently
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.helper.EditorHelper
 import javax.swing.KeyStroke
 
 /**
@@ -17,9 +18,12 @@ import javax.swing.KeyStroke
 
 private object SelectEnableCharacterModeActionHandler : EditorActionHandlerBase() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-        editor.caretModel.primaryCaret.run {
-            vimSetSelectionSilently(offset, offset + 1)
-            moveToOffset(offset + 1)
+        editor.caretModel.runForEachCaret { caret ->
+            val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
+            caret.run {
+                vimSetSelectionSilently(offset, (offset + 1).coerceAtMost(lineEnd))
+                moveToOffset((offset + 1).coerceAtMost(lineEnd))
+            }
         }
         return VisualMotionGroup.enterSelectionMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
     }

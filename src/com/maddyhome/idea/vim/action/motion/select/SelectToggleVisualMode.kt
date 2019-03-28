@@ -23,13 +23,13 @@ private object SelectToggleVisualModeHandler : EditorActionHandlerBase() {
         commandState.popState()
         if (mode == CommandState.Mode.VISUAL) {
             commandState.pushState(CommandState.Mode.SELECT, subMode, MappingMode.SELECT)
-            editor.caretModel.primaryCaret.run {
-                moveToOffset(offset + selectionAdj)
+            editor.caretModel.runForEachCaret {
+                it.moveToOffset(it.offset + selectionAdj)
             }
         } else {
             commandState.pushState(CommandState.Mode.VISUAL, subMode, MappingMode.VISUAL)
-            editor.caretModel.primaryCaret.run {
-                moveToOffset(selectionEnd - selectionAdj)
+            editor.caretModel.runForEachCaret {
+                it.moveToOffset(it.selectionEnd - selectionAdj)
             }
         }
         ChangeGroup.resetCursor(editor, mode == CommandState.Mode.VISUAL)

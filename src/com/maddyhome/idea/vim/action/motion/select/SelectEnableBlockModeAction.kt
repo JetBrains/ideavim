@@ -17,6 +17,7 @@ import javax.swing.KeyStroke
 
 private object SelectEnableBlockModeActionHandler : EditorActionHandlerBase() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+        editor.caretModel.removeSecondaryCarets()
         editor.caretModel.primaryCaret.run {
             vimSetSelectionSilently(offset, offset + 1)
             moveToOffset(offset + 1)

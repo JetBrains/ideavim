@@ -18,10 +18,10 @@ import javax.swing.KeyStroke
 
 private object SelectEnableLineModeActionHandler : EditorActionHandlerBase() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-        val lineEnd = EditorHelper.getLineEndForOffset(editor, editor.caretModel.primaryCaret.offset)
-        val lineStart = EditorHelper.getLineStartForOffset(editor, editor.caretModel.primaryCaret.offset)
-        editor.caretModel.primaryCaret.run {
-            vimSetSelectionSilently(lineStart, lineEnd)
+        editor.caretModel.runForEachCaret { caret ->
+            val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
+            val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
+            caret.vimSetSelectionSilently(lineStart, lineEnd)
         }
         return VisualMotionGroup.enterSelectionMode(editor, CommandState.SubMode.VISUAL_LINE)
     }

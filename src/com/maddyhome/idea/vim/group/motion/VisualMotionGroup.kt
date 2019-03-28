@@ -218,8 +218,10 @@ object VisualMotionGroup {
 
     fun enterSelectionMode(editor: Editor, subMode: CommandState.SubMode): Boolean {
         CommandState.getInstance(editor).pushState(CommandState.Mode.SELECT, subMode, MappingMode.SELECT)
-        editor.caretModel.primaryCaret.run {
-            vimSelectionStart = if (subMode == CommandState.SubMode.VISUAL_LINE) offset else leadSelectionOffset
+        editor.caretModel.allCarets.forEach {
+            it.run {
+                vimSelectionStart = if (subMode == CommandState.SubMode.VISUAL_LINE) offset else leadSelectionOffset
+            }
         }
         KeyHandler.getInstance().reset(editor)
         ChangeGroup.resetCursor(editor, true)
