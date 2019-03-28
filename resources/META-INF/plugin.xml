@@ -6,6 +6,7 @@
       <ul>
         <li>Support :shell command</li>
         <li>Support :tabnext and :tabprevious commands</li>
+        <li>Commentary extension</li>
         <li>Various bug fixes</li>
       </ul>
       <p>0.51:</p>
