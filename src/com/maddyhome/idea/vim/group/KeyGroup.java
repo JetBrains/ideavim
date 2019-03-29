@@ -366,7 +366,7 @@ public class KeyGroup {
     // Lets get the actual action for the supplied action name
     ActionManager aMgr = ActionManager.getInstance();
     AnAction action = aMgr.getAction(actName);
-    assert action != null;
+    assert action != null : actName + " is null";
 
     Node node = base.getChild(key);
     // Is this the first time we have seen this character at this point in the tree?
