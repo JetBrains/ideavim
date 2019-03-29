@@ -253,9 +253,9 @@ class VisualMotionGroup {
             }
             enterSelectionMode(editor, autodetectedMode)
         } else {
+            ChangeGroup.resetCursor(editor, resetCaretToInsert)
             exitVisual(editor)
             exitSelectMode(editor)
-            ChangeGroup.resetCursor(editor, resetCaretToInsert)
         }
     }
 
