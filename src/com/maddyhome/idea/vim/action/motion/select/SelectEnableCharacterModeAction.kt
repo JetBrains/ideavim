@@ -10,6 +10,7 @@ import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
 import com.maddyhome.idea.vim.group.motion.vimSetSelectionSilently
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.vimLastColumn
 import javax.swing.KeyStroke
 
 /**
@@ -23,6 +24,7 @@ private object SelectEnableCharacterModeActionHandler : EditorActionHandlerBase(
             caret.run {
                 vimSetSelectionSilently(offset, (offset + 1).coerceAtMost(lineEnd))
                 moveToOffset((offset + 1).coerceAtMost(lineEnd))
+                vimLastColumn = visualPosition.column
             }
         }
         return VisualMotionGroup.enterSelectionMode(editor, CommandState.SubMode.VISUAL_CHARACTER)

@@ -1,4 +1,4 @@
-package com.maddyhome.idea.vim.action.motion.select
+package com.maddyhome.idea.vim.action.motion.select.motion
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
