@@ -27,7 +27,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class SubstituteHandlerTest : VimTestCase() {
     fun `test one letter`() {
         doTest("s/a/b/",
-                """a<caret>baba
+                """a${c}baba
                  |ab
                """.trimMargin(),
                 """bbaba
@@ -38,7 +38,7 @@ class SubstituteHandlerTest : VimTestCase() {
 
     fun `test one letter multi per line`() {
         doTest("s/a/b/g",
-                """a<caret>baba
+                """a${c}baba
                  |ab
                """.trimMargin(),
                 """bbbbb
@@ -49,7 +49,7 @@ class SubstituteHandlerTest : VimTestCase() {
 
     fun `test one letter multi per line whole file`() {
         doTest("%s/a/b/g",
-                """a<caret>baba
+                """a${c}baba
                  |ab
                """.trimMargin(),
                 """bbbbb
@@ -61,7 +61,7 @@ class SubstituteHandlerTest : VimTestCase() {
     // VIM-146
     fun `test eoLto quote`() {
         doTest("s/$/'/g",
-                """<caret>one
+                """${c}one
                   |two
                """.trimMargin(),
                 """one'
@@ -72,7 +72,7 @@ class SubstituteHandlerTest : VimTestCase() {
 
     fun `test soLto quote`() {
         doTest("s/^/'/g",
-                """<caret>one
+                """${c}one
                   |two
                """.trimMargin(),
                 """'one
@@ -83,41 +83,41 @@ class SubstituteHandlerTest : VimTestCase() {
 
     fun `test dot to nul`() {
         doTest("s/\\./\\n/g",
-                "<caret>one.two.three\n",
+                "${c}one.two.three\n",
                 "one\u0000two\u0000three\n")
     }
 
     // VIM-528
     fun `test groups`() {
         doTest("s/\\(a\\|b\\)/z\\1/g",
-                "<caret>abcdefg",
+                "${c}abcdefg",
                 "zazbcdefg")
     }
 
     fun `test to nl`() {
         doTest("s/\\./\\r/g",
-                "<caret>one.two.three\n",
+                "${c}one.two.three\n",
                 "one\ntwo\nthree\n")
     }
 
     // VIM-289
     fun `test dot to nlDot`() {
         doTest("s/\\./\\r\\./g",
-                "<caret>one.two.three\n",
+                "${c}one.two.three\n",
                 "one\n.two\n.three\n")
     }
 
     // VIM-702
     fun `test end of line to nl`() {
         doTest("%s/$/\\r/g",
-                "<caret>one\ntwo\nthree\n",
+                "${c}one\ntwo\nthree\n",
                 "one\n\ntwo\n\nthree\n\n")
     }
 
     // VIM-702
     fun `test start of line to nl`() {
         doTest("%s/^/\\r/g",
-                "<caret>one\ntwo\nthree\n",
+                "${c}one\ntwo\nthree\n",
                 "\none\n\ntwo\n\nthree\n")
     }
 
@@ -130,15 +130,15 @@ class SubstituteHandlerTest : VimTestCase() {
 
     fun `test offset range`() {
         doTest(".,+2s/a/b/g",
-                "aaa\naa<caret>a\naaa\naaa\naaa\n",
+                "aaa\naa${c}a\naaa\naaa\naaa\n",
                 "aaa\nbbb\nbbb\nbbb\naaa\n")
     }
 
     fun `test multiple carets`() {
         val before = """public class C {
-      |  Stri<caret>ng a;
-      |<caret>  String b;
-      |  Stri<caret>ng c;
+      |  Stri${c}ng a;
+      |$c  String b;
+      |  Stri${c}ng c;
       |  String d;
       |}
     """.trimMargin()
@@ -147,9 +147,9 @@ class SubstituteHandlerTest : VimTestCase() {
         typeText(commandToKeys("s/String/Integer"))
 
         val after = """public class C {
-      |  <caret>Integer a;
-      |  <caret>Integer b;
-      |  <caret>Integer c;
+      |  ${c}Integer a;
+      |  ${c}Integer b;
+      |  ${c}Integer c;
       |  String d;
       |}
     """.trimMargin()
@@ -158,9 +158,9 @@ class SubstituteHandlerTest : VimTestCase() {
 
     fun `test multiple carets substitute all occurrences`() {
         val before = """public class C {
-      |  Stri<caret>ng a; String e;
-      |<caret>  String b;
-      |  Stri<caret>ng c; String f;
+      |  Stri${c}ng a; String e;
+      |$c  String b;
+      |  Stri${c}ng c; String f;
       |  String d;
       |}
     """.trimMargin()
@@ -169,9 +169,9 @@ class SubstituteHandlerTest : VimTestCase() {
         typeText(commandToKeys("s/String/Integer/g"))
 
         val after = """public class C {
-      |  <caret>Integer a; Integer e;
-      |  <caret>Integer b;
-      |  <caret>Integer c; Integer f;
+      |  ${c}Integer a; Integer e;
+      |  ${c}Integer b;
+      |  ${c}Integer c; Integer f;
       |  String d;
       |}
     """.trimMargin()

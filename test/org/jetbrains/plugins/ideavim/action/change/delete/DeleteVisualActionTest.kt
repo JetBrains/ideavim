@@ -30,7 +30,7 @@ class DeleteVisualActionTest : VimTestCase() {
         val before = """
             A Discovery
 
-            I |<caret>found| it in a legendary land
+            I |${c}found| it in a legendary land
             al|l roc|ks and lavender and tufted grass,
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -38,7 +38,7 @@ class DeleteVisualActionTest : VimTestCase() {
         val after = """
             A Discovery
 
-            I |<caret>| it in a legendary land
+            I |$c| it in a legendary land
             al||ks and lavender and tufted grass,
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -51,7 +51,7 @@ class DeleteVisualActionTest : VimTestCase() {
         val before = """
             A Discovery
 
-            I |foun<caret>d| it in a legendary land
+            I |foun${c}d| it in a legendary land
             al|l roc|ks and lavender and tufted grass,
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -59,7 +59,7 @@ class DeleteVisualActionTest : VimTestCase() {
         val after = """
             A Discovery
 
-            I |<caret>| it in a legendary land
+            I |$c| it in a legendary land
             al||ks and lavender and tufted grass,
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -74,13 +74,13 @@ class DeleteVisualActionTest : VimTestCase() {
 
             I |found| it in a legendary land
             al|l roc|ks and lavender and tufted grass,
-            wh|ere <caret>i|t was settled on some sodden sand
+            wh|ere ${c}i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
         val after = """
             A Discovery
 
-            I |<caret>| it in a legendary land
+            I |$c| it in a legendary land
             al||ks and lavender and tufted grass,
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -95,13 +95,13 @@ class DeleteVisualActionTest : VimTestCase() {
 
             I |found| it in a legendary land
             al|l roc|ks and lavender and tufted grass,
-            wh|<caret>ere i|t was settled on some sodden sand
+            wh|${c}ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
         val after = """
             A Discovery
 
-            I |<caret>| it in a legendary land
+            I |$c| it in a legendary land
             al||ks and lavender and tufted grass,
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.

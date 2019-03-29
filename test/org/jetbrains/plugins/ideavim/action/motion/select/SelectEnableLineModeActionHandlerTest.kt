@@ -10,7 +10,7 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
                 """
                 A Discovery
 
-                <caret>I found it in a legendary land
+                ${c}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
@@ -18,7 +18,7 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
                 """
                 A Discovery
 
-                <selection><caret>I found it in a legendary land</selection>
+                $s${c}I found it in a legendary land$se
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
@@ -35,14 +35,14 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass<caret>.""".trimIndent(),
+                hard by the torrent of a mountain pass$c.""".trimIndent(),
                 """
                 A Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                <selection>hard by the torrent of a mountain pass<caret>.</selection>""".trimIndent())
+                ${s}hard by the torrent of a mountain pass$c.$se""".trimIndent())
         assertMode(CommandState.Mode.SELECT)
         assertSubMode(CommandState.SubMode.VISUAL_LINE)
     }
@@ -51,14 +51,14 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
         doTest(parseKeys("gH"),
                 """
                 A Discovery
-                <caret>
+                $c
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.""".trimIndent(),
                 """
                 A Discovery
-                <selection><caret></selection>
+                $s$c$se
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
@@ -71,17 +71,17 @@ class SelectEnableLineModeActionHandlerTest : VimTestCase() {
         doTest(parseKeys("gH"),
                 """
                 A Discovery
-                <caret>
-                <caret>I found it in a legendary land
+                $c
+                ${c}I found it in a legendary land
                 all rocks and lavender and tufted grass,
-                where it was <caret>settled on <caret>some sodden sand
+                where it was ${c}settled on ${c}some sodden sand
                 hard by the torrent of a mountain pass.""".trimIndent(),
                 """
                 A Discovery
-                <selection><caret></selection>
-                <selection><caret>I found it in a legendary land</selection>
+                $s$c$se
+                $s${c}I found it in a legendary land$se
                 all rocks and lavender and tufted grass,
-                <selection>where it was <caret>settled on some sodden sand</selection>
+                ${s}where it was ${c}settled on some sodden sand$se
                 hard by the torrent of a mountain pass.""".trimIndent())
         assertMode(CommandState.Mode.SELECT)
         assertSubMode(CommandState.SubMode.VISUAL_LINE)

@@ -33,33 +33,33 @@ import org.junit.Ignore
 class PutVisualTextMoveCursorActionTest : VimTestCase() {
 
     fun `test put visual text`() {
-        val before = "<caret>I found it in a legendary land"
+        val before = "${c}I found it in a legendary land"
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
         typeText(parseKeys("v2e", "2gp"))
-        val after = "legendarylegendary<caret> in a legendary land"
+        val after = "legendarylegendary$c in a legendary land"
         myFixture.checkResult(after)
     }
 
     fun `test put visual text linewise`() {
-        val before = "<caret>I found it in a legendary land"
+        val before = "${c}I found it in a legendary land"
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.LINE_WISE, false)
         typeText(parseKeys("v2e", "gp"))
         val after = """
 
             legendary
-            <caret> in a legendary land
+            $c in a legendary land
             """.trimIndent()
         myFixture.checkResult(after)
     }
 
     fun `test put visual text line linewise`() {
-        val before = "<caret>I found it in a legendary land"
+        val before = "${c}I found it in a legendary land"
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
         typeText(parseKeys("V", "gp"))
-        val after = "legendary\n<caret>"
+        val after = "legendary\n$c"
         myFixture.checkResult(after)
     }
 
@@ -67,7 +67,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
         val file = """
             A Discovery
 
-            <caret>I found it in a legendary land
+            ${c}I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -76,7 +76,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             A Discovery
 
             Discovery
-            <caret>all rocks and lavender and tufted grass,
+            ${c}all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
@@ -88,7 +88,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
 
     fun `test put line in block selection`() {
         val file = """
-            <caret>A Discovery
+            ${c}A Discovery
 
             I found it in a legendary land
             all rocks and lavender and tufted grass,
@@ -103,55 +103,55 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             re it was settled on some sodden sand
             d by the torrent of a mountain pass.
             A Discovery
-            <caret>
+            $c
         """.trimIndent()
         typeTextInFile(parseKeys("Y", "2j", "<C-v>", "2l", "3j", "gp"), file)
         myFixture.checkResult(newFile)
     }
 
     fun `test Put visual text linewise`() {
-        val before = "<caret>I found it in a legendary land"
+        val before = "${c}I found it in a legendary land"
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.LINE_WISE, false)
         typeText(parseKeys("v2e", "gP"))
         val after = """
 
             legendary
-            <caret> in a legendary land
+            $c in a legendary land
             """.trimIndent()
         myFixture.checkResult(after)
     }
 
     fun `test Put visual text`() {
-        val before = "<caret>I found it in a legendary land"
+        val before = "${c}I found it in a legendary land"
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
         typeText(parseKeys("v2e", "2gP"))
-        val after = "legendarylegendary<caret> in a legendary land"
+        val after = "legendarylegendary$c in a legendary land"
         myFixture.checkResult(after)
     }
 
     fun `test Put visual text full line`() {
-        val before = "<caret>I found it in a legendary land"
+        val before = "${c}I found it in a legendary land"
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
         typeText(parseKeys("v$", "2gP"))
-        val after = "legendarylegendar<caret>y"
+        val after = "legendarylegendar${c}y"
         myFixture.checkResult(after)
     }
 
     fun `test Put visual text line linewise`() {
-        val before = "<caret>I found it in a legendary land"
+        val before = "${c}I found it in a legendary land"
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, TextRange(16, 25), SelectionType.CHARACTER_WISE, false)
         typeText(parseKeys("V", "gP"))
-        val after = "legendary\n<caret>"
+        val after = "legendary\n$c"
         myFixture.checkResult(after)
     }
 
     fun `test Put line in block selection`() {
         val file = """
-            <caret>A Discovery
+            ${c}A Discovery
 
             I found it in a legendary land
             all rocks and lavender and tufted grass,
@@ -162,7 +162,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
             A Discovery
 
             A Discovery
-            <caret>ound it in a legendary land
+            ${c}ound it in a legendary land
              rocks and lavender and tufted grass,
             re it was settled on some sodden sand
             d by the torrent of a mountain pass.
@@ -175,9 +175,9 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     // Legacy tests
     fun `test put visual text linewise multicaret`() {
         val before = """
-            q<caret>werty
-            as<caret>dfgh
-            <caret>zxcvbn
+            q${c}werty
+            as${c}dfgh
+            ${c}zxcvbn
 
             """.trimIndent()
         val editor = configureByText(before)
@@ -186,13 +186,13 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
         val after = """
             q
             zxcvbn
-            <caret>rty
+            ${c}rty
             as
             zxcvbn
-            <caret>gh
+            ${c}gh
 
             zxcvbn
-            <caret>cvbn
+            ${c}cvbn
 
             """.trimIndent()
         myFixture.checkResult(after)
@@ -202,7 +202,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
     @Ignore
     fun `ingoretest put visual block visual line mode`() {
         val before = """
-            qw<caret>e
+            qw${c}e
             asd
             zxc
             rty
@@ -213,7 +213,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
         VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.BLOCK_WISE, false)
         typeText(parseKeys("<S-v>", "gp"))
         val after = """
-            <caret>fgh
+            ${c}fgh
             asd
             zxc
             rty
@@ -225,7 +225,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
 
     fun `test put visual block linewise`() {
         val before = """
-            qw<caret>e
+            qw${c}e
             asd
             zxc
             rty
@@ -238,7 +238,7 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
         val after = """
             q
             fgh
-            <caret>
+            $c
             asd
             zxc
             rty
@@ -251,11 +251,11 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
 
     @Ignore
     fun `ignoretest put visual text multicaret`() {
-        val before = "<caret>qwe asd <caret>zxc rty <caret>fgh vbn"
+        val before = "${c}qwe asd ${c}zxc rty ${c}fgh vbn"
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
         typeText(parseKeys("v2e", "2gp"))
-        val after = "fghfgh<caret> fghfgh<caret> fghfgh<caret>"
+        val after = "fghfgh$c fghfgh$c fghfgh$c"
         myFixture.checkResult(after)
     }
 }

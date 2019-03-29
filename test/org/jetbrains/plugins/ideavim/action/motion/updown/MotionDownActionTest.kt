@@ -32,7 +32,7 @@ class MotionDownActionTest : VimTestCase() {
 
             I |found| it in a legendary land
             al|l roc|ks and lavender and tufted grass,
-            wh|<caret>ere i|t was settled on some sodden sand
+            wh|${c}ere i|t was settled on some sodden sand
             ha|rd by| the torrent of a mountain pass.
         """.trimIndent()
         val after = """
@@ -40,8 +40,8 @@ class MotionDownActionTest : VimTestCase() {
 
             I |found| it in a legendary land
             al|l roc|ks and lavender and tufted grass,
-            wh|<selection>e</selection>re i|t was settled on some sodden sand
-            ha|<selection>r</selection>d by| the torrent of a mountain pass.
+            wh|${s}e${se}re i|t was settled on some sodden sand
+            ha|${s}r${se}d by| the torrent of a mountain pass.
         """.trimIndent()
         doTest(keys, before, after)
     }

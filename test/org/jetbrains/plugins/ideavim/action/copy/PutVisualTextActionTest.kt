@@ -55,73 +55,73 @@ class PutVisualTextActionTest : VimTestCase() {
     @Test
     fun `test put visual line without copy`() {
         val before = """
-            <caret>I found it in a legendary land
+            ${c}I found it in a legendary land
             all rocks and lavender and tufted grass,
         """.trimIndent()
         configureByText(before)
         typeText(parseKeys("V", "p"))
         val after = """
-            <caret>all rocks and lavender and tufted grass,
+            ${c}all rocks and lavender and tufted grass,
         """.trimIndent()
         myFixture.checkResult(after)
     }
 
     @Test
     fun `test put visual text without copy`() {
-        val before = "<caret>I found it in a legendary land"
+        val before = "${c}I found it in a legendary land"
         configureByText(before)
         typeText(parseKeys("ve", "p"))
-        val after = "<caret> it in a legendary land"
+        val after = "$c it in a legendary land"
         myFixture.checkResult(after)
     }
 
     @Test
     fun `test put visual text`() {
-        val before = "<caret>I found it in a legendary land"
+        val before = "${c}I found it in a legendary land"
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
         typeText(parseKeys("ve", "p"))
-        val after = "legendar<caret>y it in a legendary land"
+        val after = "legendar${c}y it in a legendary land"
         myFixture.checkResult(after)
     }
 
     @Test
     fun `test put visual text twice`() {
-        val before = "<caret>I found it in a legendary land"
+        val before = "${c}I found it in a legendary land"
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
         typeText(parseKeys("v2e", "2p"))
-        val after = "legendarylegendar<caret>y in a legendary land"
+        val after = "legendarylegendar${c}y in a legendary land"
         myFixture.checkResult(after)
     }
 
     @Test
     fun `test put visual text full line`() {
-        val before = "<caret>I found it in a legendary land"
+        val before = "${c}I found it in a legendary land"
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
         typeText(parseKeys("v$", "2p"))
-        val after = "legendarylegendar<caret>y"
+        val after = "legendarylegendar${c}y"
         myFixture.checkResult(after)
     }
 
     @Test
     fun `test put visual text multicaret`() {
-        val before = "<caret>I found <caret>it in a <caret>legendary land"
+        val before = "${c}I found ${c}it in a ${c}legendary land"
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
         typeText(parseKeys("ve", "p"))
-        val after = "legendar<caret>y legendar<caret>y in a legendar<caret>y land"
+        val after = "legendar${c}y legendar${c}y in a legendar${c}y land"
         myFixture.checkResult(after)
     }
 
     @Test
     fun `test put visual text another direction`() {
-        val before = "I foun<caret>d it in a legendary land"
+        val before = "I foun${c}d it in a legendary land"
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, before rangeOf "legendary", SelectionType.CHARACTER_WISE, false)
         typeText(parseKeys("vb", "p"))
-        val after = "I legendar<caret>y it in a legendary land"
+        val after = "I legendar${c}y it in a legendary land"
         myFixture.checkResult(after)
     }
 
@@ -132,7 +132,7 @@ class PutVisualTextActionTest : VimTestCase() {
         val before = """
             A Discovery
 
-            <caret>I found it in a legendary land
+            ${c}I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -144,7 +144,7 @@ class PutVisualTextActionTest : VimTestCase() {
             A Discovery
 
 
-            <caret>A Discovery
+            ${c}A Discovery
              it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
@@ -158,7 +158,7 @@ class PutVisualTextActionTest : VimTestCase() {
         val before = """
             A Discovery
 
-            I found<caret> it in a legendary land
+            I found$c it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -170,7 +170,7 @@ class PutVisualTextActionTest : VimTestCase() {
             A Discovery
 
             I found
-            <caret>A Discovery
+            ${c}A Discovery
              in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
@@ -187,7 +187,7 @@ class PutVisualTextActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            <caret>hard by the torrent of a mountain pass.
+            ${c}hard by the torrent of a mountain pass.
         """.trimIndent()
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
@@ -199,7 +199,7 @@ class PutVisualTextActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
 
-            <caret>A Discovery
+            ${c}A Discovery
              by the torrent of a mountain pass.
             """.trimIndent()
         myFixture.checkResult(after)
@@ -213,7 +213,7 @@ class PutVisualTextActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            <caret>hard by the torrent of a mountain pass.
+            ${c}hard by the torrent of a mountain pass.
         """.trimIndent()
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
@@ -225,7 +225,7 @@ class PutVisualTextActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
 
-            <caret>A Discovery
+            ${c}A Discovery
 
             """.trimIndent()
         myFixture.checkResult(after)
@@ -236,10 +236,10 @@ class PutVisualTextActionTest : VimTestCase() {
         val before = """
             A Discovery
 
-            <caret>I found it in a legendary land
-            <caret>all rocks and lavender and tufted grass,
+            ${c}I found it in a legendary land
+            ${c}all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            <caret>hard by the torrent of a mountain pass.
+            ${c}hard by the torrent of a mountain pass.
         """.trimIndent()
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
@@ -248,14 +248,14 @@ class PutVisualTextActionTest : VimTestCase() {
             A Discovery
 
 
-            <caret>A Discovery
+            ${c}A Discovery
              it in a legendary land
 
-            <caret>A Discovery
+            ${c}A Discovery
              rocks and lavender and tufted grass,
             where it was settled on some sodden sand
 
-            <caret>A Discovery
+            ${c}A Discovery
              by the torrent of a mountain pass.
             """.trimIndent()
         myFixture.checkResult(after)
@@ -269,7 +269,7 @@ class PutVisualTextActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            <caret>hard by the<caret> torrent of a mountain pass.
+            ${c}hard by the$c torrent of a mountain pass.
         """.trimIndent()
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
@@ -281,9 +281,9 @@ class PutVisualTextActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
 
-            <caret>A Discovery
+            ${c}A Discovery
              by the
-            <caret>A Discovery
+            ${c}A Discovery
              of a mountain pass.
             """.trimIndent()
         myFixture.checkResult(after)
@@ -297,7 +297,7 @@ class PutVisualTextActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            <caret>hard by the<caret> torrent of a mountain pass.
+            ${c}hard by the$c torrent of a mountain pass.
         """.trimIndent()
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
@@ -309,10 +309,10 @@ class PutVisualTextActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
 
-            <caret>A Discovery
+            ${c}A Discovery
             A Discovery
              by the
-            <caret>A Discovery
+            ${c}A Discovery
             A Discovery
              of a mountain pass.
             """.trimIndent()
@@ -331,7 +331,7 @@ class PutVisualTextActionTest : VimTestCase() {
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
 
-            The <caret>features it combines mark it as new
+            The ${c}features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
             the dingy underside, the checquered fringe.
@@ -347,7 +347,7 @@ class PutVisualTextActionTest : VimTestCase() {
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
 
-            The <caret>|found| it combines mark it as new
+            The $c|found| it combines mark it as new
             to s|l roc|cience: shape and shade -- the special tinge,
             akin|ere i| to moonlight, tempering its blue,
             the dingy underside, the checquered fringe.
@@ -368,7 +368,7 @@ class PutVisualTextActionTest : VimTestCase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            the dingy <caret>underside, the checquered fringe.
+            the dingy ${c}underside, the checquered fringe.
         """.trimIndent()
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
@@ -384,7 +384,7 @@ class PutVisualTextActionTest : VimTestCase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            the dingy <caret>|found|, the checquered fringe.
+            the dingy $c|found|, the checquered fringe.
                       |l roc|
                       |ere i|
             """.trimIndent()
@@ -404,7 +404,7 @@ class PutVisualTextActionTest : VimTestCase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            the dingy <caret>underside, the checquered fringe.
+            the dingy ${c}underside, the checquered fringe.
         """.trimIndent()
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
@@ -420,7 +420,7 @@ class PutVisualTextActionTest : VimTestCase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            the dingy <caret>|found||found|, the checquered fringe.
+            the dingy $c|found||found|, the checquered fringe.
                       |l roc||l roc|
                       |ere i||ere i|
             """.trimIndent()
@@ -432,7 +432,7 @@ class PutVisualTextActionTest : VimTestCase() {
         val before = """
             A Discovery
 
-            I |found| it in a <caret>legendary land
+            I |found| it in a ${c}legendary land
             al|l roc|ks and lavender and tufted grass,
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -440,7 +440,7 @@ class PutVisualTextActionTest : VimTestCase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            the dingy <caret>underside, the checquered fringe.
+            the dingy ${c}underside, the checquered fringe.
         """.trimIndent()
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
@@ -448,7 +448,7 @@ class PutVisualTextActionTest : VimTestCase() {
         val after = """
             A Discovery
 
-            I |found| it in a <caret>|found| land
+            I |found| it in a $c|found| land
             al|l roc|ks and la|l roc|vender and tufted grass,
             wh|ere i|t was set|ere i|tled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -456,7 +456,7 @@ class PutVisualTextActionTest : VimTestCase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            the dingy <caret>|found|, the checquered fringe.
+            the dingy $c|found|, the checquered fringe.
                       |l roc|
                       |ere i|
             """.trimIndent()
@@ -470,7 +470,7 @@ class PutVisualTextActionTest : VimTestCase() {
         val before = """
             A Discovery
 
-            I found <caret>it in a legendary land
+            I found ${c}it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -481,7 +481,7 @@ class PutVisualTextActionTest : VimTestCase() {
         val after = """
             A Discovery
 
-            <caret>Discovery
+            ${c}Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -494,7 +494,7 @@ class PutVisualTextActionTest : VimTestCase() {
         val before = """
             A Discovery
 
-            I found <caret>it in a legendary land
+            I found ${c}it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -505,7 +505,7 @@ class PutVisualTextActionTest : VimTestCase() {
         val after = """
             A Discovery
 
-            <caret>Discovery
+            ${c}Discovery
             Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
@@ -520,7 +520,7 @@ class PutVisualTextActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            <caret>Discovery
+            ${c}Discovery
     """)
     @Test
     fun `test put visual text character to last line`() {
@@ -530,7 +530,7 @@ class PutVisualTextActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            hard by <caret>the torrent of a mountain pass.
+            hard by ${c}the torrent of a mountain pass.
         """.trimIndent()
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
@@ -541,7 +541,7 @@ class PutVisualTextActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            <caret>Discovery
+            ${c}Discovery
 
             """.trimIndent()
         myFixture.checkResult(after)
@@ -550,20 +550,20 @@ class PutVisualTextActionTest : VimTestCase() {
     @VimBehaviourDiffers(originalVimAfter = """
             A Discovery
 
-            <caret>Discovery
+            ${c}Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            <caret>Discovery
+            ${c}Discovery
     """)
     @Test
     fun `test put visual text character to line multicaret`() {
         val before = """
             A Discovery
 
-            I found <caret>it in a legendary land
+            I found ${c}it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            hard by the <caret>torrent of a mountain pass.
+            hard by the ${c}torrent of a mountain pass.
         """.trimIndent()
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
@@ -571,10 +571,10 @@ class PutVisualTextActionTest : VimTestCase() {
         val after = """
             A Discovery
 
-            <caret>Discovery
+            ${c}Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            <caret>Discovery
+            ${c}Discovery
 
             """.trimIndent()
         myFixture.checkResult(after)
@@ -583,20 +583,20 @@ class PutVisualTextActionTest : VimTestCase() {
     @VimBehaviourDiffers(originalVimAfter = """
             A Discovery
 
-            <caret>Discovery
+            ${c}Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            <caret>Discovery
+            ${c}Discovery
     """)
     @Test
     fun `test put visual text character to line multicaret on same line`() {
         val before = """
             A Discovery
 
-            I found <caret>it in a <caret>legendary land
+            I found ${c}it in a ${c}legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            hard by the <caret>torrent of a mountain pass.
+            hard by the ${c}torrent of a mountain pass.
         """.trimIndent()
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
@@ -604,10 +604,10 @@ class PutVisualTextActionTest : VimTestCase() {
         val after = """
             A Discovery
 
-            <caret>Discovery
+            ${c}Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            <caret>Discovery
+            ${c}Discovery
 
             """.trimIndent()
         myFixture.checkResult(after)
@@ -620,7 +620,7 @@ class PutVisualTextActionTest : VimTestCase() {
         val before = """
             A Discovery
 
-            I found <caret>it in a legendary land
+            I found ${c}it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -631,7 +631,7 @@ class PutVisualTextActionTest : VimTestCase() {
         val after = """
             A Discovery
 
-            <caret>A Discovery
+            ${c}A Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -644,7 +644,7 @@ class PutVisualTextActionTest : VimTestCase() {
         val before = """
             A Discovery
 
-            I found <caret>it in a legendary land
+            I found ${c}it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -655,7 +655,7 @@ class PutVisualTextActionTest : VimTestCase() {
         val after = """
             A Discovery
 
-            <caret>A Discovery
+            ${c}A Discovery
             A Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
@@ -670,7 +670,7 @@ class PutVisualTextActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            <caret>A Discovery
+            ${c}A Discovery
     """)
     @Test
     fun `test put visual text line to last line`() {
@@ -680,7 +680,7 @@ class PutVisualTextActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            hard by the <caret>torrent of a mountain pass.
+            hard by the ${c}torrent of a mountain pass.
         """.trimIndent()
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
@@ -691,7 +691,7 @@ class PutVisualTextActionTest : VimTestCase() {
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            <caret>A Discovery
+            ${c}A Discovery
 
             """.trimIndent()
         myFixture.checkResult(after)
@@ -700,20 +700,20 @@ class PutVisualTextActionTest : VimTestCase() {
     @VimBehaviourDiffers(originalVimAfter = """
             A Discovery
 
-            <caret>A Discovery
+            ${c}A Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            <caret>A Discovery
+            ${c}A Discovery
     """)
     @Test
     fun `test put visual text line to line multicaret`() {
         val before = """
             A Discovery
 
-            I found <caret>it in a legendary land
+            I found ${c}it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            hard by the <caret>torrent of a mountain pass.
+            hard by the ${c}torrent of a mountain pass.
         """.trimIndent()
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
@@ -721,10 +721,10 @@ class PutVisualTextActionTest : VimTestCase() {
         val after = """
             A Discovery
 
-            <caret>A Discovery
+            ${c}A Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            <caret>A Discovery
+            ${c}A Discovery
 
             """.trimIndent()
         myFixture.checkResult(after)
@@ -733,20 +733,20 @@ class PutVisualTextActionTest : VimTestCase() {
     @VimBehaviourDiffers(originalVimAfter = """
             A Discovery
 
-            <caret>A Discovery
+            ${c}A Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            <caret>A Discovery
+            ${c}A Discovery
     """)
     @Test
     fun `test put visual text line to line multicaret on same line`() {
         val before = """
             A Discovery
 
-            I found <caret>it in a <caret>legendary land
+            I found ${c}it in a ${c}legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            hard by the <caret>torrent of a mountain pass.
+            hard by the ${c}torrent of a mountain pass.
         """.trimIndent()
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
@@ -754,10 +754,10 @@ class PutVisualTextActionTest : VimTestCase() {
         val after = """
             A Discovery
 
-            <caret>A Discovery
+            ${c}A Discovery
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            <caret>A Discovery
+            ${c}A Discovery
 
             """.trimIndent()
         myFixture.checkResult(after)
@@ -776,7 +776,7 @@ class PutVisualTextActionTest : VimTestCase() {
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
 
-            The <caret>features it combines mark it as new
+            The ${c}features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
             the dingy underside, the checquered fringe.
@@ -792,7 +792,7 @@ class PutVisualTextActionTest : VimTestCase() {
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
 
-            <caret>|found|
+            $c|found|
             |l roc|
             |ere i|
             to science: shape and shade -- the special tinge,
@@ -813,7 +813,7 @@ class PutVisualTextActionTest : VimTestCase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            <caret>|found|
+            $c|found|
             |l roc|
             |ere i|
     """)
@@ -830,7 +830,7 @@ class PutVisualTextActionTest : VimTestCase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            the dingy <caret>underside, the checquered fringe.
+            the dingy ${c}underside, the checquered fringe.
         """.trimIndent()
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
@@ -846,7 +846,7 @@ class PutVisualTextActionTest : VimTestCase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            <caret>|found|
+            $c|found|
             |l roc|
             |ere i|
 
@@ -868,7 +868,7 @@ class PutVisualTextActionTest : VimTestCase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            <caret>|found|
+            $c|found|
             |l roc|
             |ere i|
             |found|
@@ -888,7 +888,7 @@ class PutVisualTextActionTest : VimTestCase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            the dingy <caret>underside, the checquered fringe.
+            the dingy ${c}underside, the checquered fringe.
         """.trimIndent()
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
@@ -918,7 +918,7 @@ class PutVisualTextActionTest : VimTestCase() {
     @VimBehaviourDiffers(originalVimAfter = """
             A Discovery
 
-            <caret>|found|
+            $c|found|
             |l roc|
             |ere i|
             al|l roc|ks and lavender and tufted grass,
@@ -928,7 +928,7 @@ class PutVisualTextActionTest : VimTestCase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            <caret>|found|
+            $c|found|
             |l roc|
             |ere i|
     """)
@@ -937,7 +937,7 @@ class PutVisualTextActionTest : VimTestCase() {
         val before = """
             A Discovery
 
-            I |found| it in a <caret>legendary land
+            I |found| it in a ${c}legendary land
             al|l roc|ks and lavender and tufted grass,
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -945,7 +945,7 @@ class PutVisualTextActionTest : VimTestCase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            the dingy <caret>underside, the checquered fringe.
+            the dingy ${c}underside, the checquered fringe.
         """.trimIndent()
         val editor = configureByText(before)
         VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
@@ -953,7 +953,7 @@ class PutVisualTextActionTest : VimTestCase() {
         val after = """
             A Discovery
 
-            <caret>|found|
+            $c|found|
             |l roc|
             |ere i|
             al|l roc|ks and lavender and tufted grass,
@@ -963,7 +963,7 @@ class PutVisualTextActionTest : VimTestCase() {
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
-            <caret>|found|
+            $c|found|
             |l roc|
             |ere i|
 
@@ -979,7 +979,7 @@ class PutVisualTextActionTest : VimTestCase() {
     @Test
     fun `test put visual block without copy`() {
         val before = """
-            I <caret>|found| it in a legendary land
+            I $c|found| it in a legendary land
             al|l roc|ks and lavender and tufted grass,
         """.trimIndent()
         configureByText(before)
@@ -995,7 +995,7 @@ class PutVisualTextActionTest : VimTestCase() {
     @VimBehaviourDiffers(originalVimAfter = """
             A Discovery
 
-            I Discover<caret>y it in a legendary land
+            I Discover${c}y it in a legendary land
             alDiscoveryks and lavender and tufted grass,
             whDiscoveryt was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -1005,7 +1005,7 @@ class PutVisualTextActionTest : VimTestCase() {
         val before = """
             A Discovery
 
-            I <caret>|found| it in a legendary land
+            I $c|found| it in a legendary land
             al|l roc|ks and lavender and tufted grass,
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -1018,7 +1018,7 @@ class PutVisualTextActionTest : VimTestCase() {
 
             I Discovery it in a legendary land
             alDiscoveryks and lavender and tufted grass,
-            whDiscover<caret>yt was settled on some sodden sand
+            whDiscover${c}yt was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
         myFixture.checkResult(after)
@@ -1027,7 +1027,7 @@ class PutVisualTextActionTest : VimTestCase() {
     @VimBehaviourDiffers(originalVimAfter = """
             A Discovery
 
-            I DiscoveryDiscover<caret>y it in a legendary land
+            I DiscoveryDiscover${c}y it in a legendary land
             alDiscoveryDiscoveryks and lavender and tufted grass,
             whDiscoveryDiscoveryt was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -1037,7 +1037,7 @@ class PutVisualTextActionTest : VimTestCase() {
         val before = """
             A Discovery
 
-            I <caret>|found| it in a legendary land
+            I $c|found| it in a legendary land
             al|l roc|ks and lavender and tufted grass,
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -1050,7 +1050,7 @@ class PutVisualTextActionTest : VimTestCase() {
 
             I DiscoveryDiscovery it in a legendary land
             alDiscoveryDiscoveryks and lavender and tufted grass,
-            whDiscoveryDiscover<caret>yt was settled on some sodden sand
+            whDiscoveryDiscover${c}yt was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
         myFixture.checkResult(after)
@@ -1065,7 +1065,7 @@ class PutVisualTextActionTest : VimTestCase() {
             I  it in a legendary land
             alks and lavender and tufted grass,
             wht was settled on some sodden sand
-            <caret>A Discovery
+            ${c}A Discovery
             hard by the torrent of a mountain pass.
     """)
     @Test
@@ -1073,7 +1073,7 @@ class PutVisualTextActionTest : VimTestCase() {
         val before = """
             A Discovery
 
-            I <caret>|found| it in a legendary land
+            I $c|found| it in a legendary land
             al|l roc|ks and lavender and tufted grass,
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -1086,7 +1086,7 @@ class PutVisualTextActionTest : VimTestCase() {
 
             I  it in a legendary land
             alks and lavender and tufted grass,
-            <caret>wht was settled on some sodden sand
+            ${c}wht was settled on some sodden sand
             A Discovery
 
             hard by the torrent of a mountain pass.
@@ -1100,7 +1100,7 @@ class PutVisualTextActionTest : VimTestCase() {
             I  it in a legendary land
             alks and lavender and tufted grass,
             wht was settled on some sodden sand
-            <caret>A Discovery
+            ${c}A Discovery
             A Discovery
             hard by the torrent of a mountain pass.
             """)
@@ -1109,7 +1109,7 @@ class PutVisualTextActionTest : VimTestCase() {
         val before = """
             A Discovery
 
-            I <caret>|found| it in a legendary land
+            I $c|found| it in a legendary land
             al|l roc|ks and lavender and tufted grass,
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -1122,7 +1122,7 @@ class PutVisualTextActionTest : VimTestCase() {
 
             I  it in a legendary land
             alks and lavender and tufted grass,
-            <caret>wht was settled on some sodden sand
+            ${c}wht was settled on some sodden sand
             A Discovery
 
             A Discovery
@@ -1140,14 +1140,14 @@ class PutVisualTextActionTest : VimTestCase() {
             alks and lavender and tufted grass,
             wht was settled on some sodden sand
             ha the torrent of a mountain pass.
-            <caret>A Discovery
+            ${c}A Discovery
     """)
     @Test
     fun `test put visual text line to block till end`() {
         val before = """
             A Discovery
 
-            I <caret>|found| it in a legendary land
+            I $c|found| it in a legendary land
             al|l roc|ks and lavender and tufted grass,
             wh|ere i|t was settled on some sodden sand
             ha|rd by| the torrent of a mountain pass.
@@ -1161,7 +1161,7 @@ class PutVisualTextActionTest : VimTestCase() {
             I  it in a legendary land
             alks and lavender and tufted grass,
             wht was settled on some sodden sand
-            <caret>ha the torrent of a mountain pass.
+            ${c}ha the torrent of a mountain pass.
             A Discovery
 
             """.trimIndent()
@@ -1180,7 +1180,7 @@ class PutVisualTextActionTest : VimTestCase() {
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
 
-            The <caret>|features| it combines mark it as new
+            The $c|features| it combines mark it as new
             to s|cience: |shape and shade -- the special tinge,
             akin| to moon|light, tempering its blue,
             the dingy underside, the checquered fringe.
@@ -1196,7 +1196,7 @@ class PutVisualTextActionTest : VimTestCase() {
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
 
-            The <caret>|found| it combines mark it as new
+            The $c|found| it combines mark it as new
             to s|l roc|shape and shade -- the special tinge,
             akin|ere i|light, tempering its blue,
             the dingy underside, the checquered fringe.
@@ -1214,7 +1214,7 @@ class PutVisualTextActionTest : VimTestCase() {
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
 
-            The <caret>|features| it combines mark it as new
+            The $c|features| it combines mark it as new
             to s|cience: |shape and shade -- the special tinge,
             akin| to moon|light, tempering its blue,
             the |dingy un|derside, the checquered fringe.
@@ -1230,7 +1230,7 @@ class PutVisualTextActionTest : VimTestCase() {
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
 
-            The <caret>|found| it combines mark it as new
+            The $c|found| it combines mark it as new
             to s|l roc|shape and shade -- the special tinge,
             akin|ere i|light, tempering its blue,
             the derside, the checquered fringe.
@@ -1248,7 +1248,7 @@ class PutVisualTextActionTest : VimTestCase() {
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
 
-            The <caret>|features| it combines mark it as new
+            The $c|features| it combines mark it as new
             to s|cience: |shape and shade -- the special tinge,
             akin to moonlight, tempering its blue,
             the dingy underside, the checquered fringe.
@@ -1264,7 +1264,7 @@ class PutVisualTextActionTest : VimTestCase() {
             wh|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
 
-            The <caret>|found| it combines mark it as new
+            The $c|found| it combines mark it as new
             to s|l roc|shape and shade -- the special tinge,
             akin|ere i| to moonlight, tempering its blue,
             the dingy underside, the checquered fringe.
@@ -1284,7 +1284,7 @@ class PutVisualTextActionTest : VimTestCase() {
 
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
-            akin to <caret>|moonlight|, tempering its blue,
+            akin to $c|moonlight|, tempering its blue,
             the ding|y undersi|de, the checquered fringe.
         """.trimIndent()
         val editor = configureByText(before)
@@ -1300,7 +1300,7 @@ class PutVisualTextActionTest : VimTestCase() {
 
             The features it combines mark it as new
             to science: shape and shade -- the special tinge,
-            akin to <caret>|found|, tempering its blue,
+            akin to $c|found|, tempering its blue,
             the ding|l roc|de, the checquered fringe.
                     |ere i|
             """.trimIndent()

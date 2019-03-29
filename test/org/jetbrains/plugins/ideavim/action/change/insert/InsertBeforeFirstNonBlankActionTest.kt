@@ -26,18 +26,18 @@ class InsertBeforeFirstNonBlankActionTest : VimTestCase() {
     fun `test insert multiple carets`() {
         doTest(parseKeys("IHello<esc>"),
                 """
-                <caret>A Discovery
+                ${c}A Discovery
 
-                <caret>I found it in a legendary land
-                all rocks and <caret>lavender and tufted grass,
+                ${c}I found it in a legendary land
+                all rocks and ${c}lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
                 """
-                Hell<caret>oA Discovery
+                Hell${c}oA Discovery
 
-                Hell<caret>oI found it in a legendary land
-                Hell<caret>oall rocks and lavender and tufted grass,
+                Hell${c}oI found it in a legendary land
+                Hell${c}oall rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent())

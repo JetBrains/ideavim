@@ -9,7 +9,7 @@ class JoinLinesHandlerTest : VimTestCase() {
                 """
                 A Discovery
 
-                <caret>I found it in a legendary land
+                ${c}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
@@ -17,7 +17,7 @@ class JoinLinesHandlerTest : VimTestCase() {
                 """
                 A Discovery
 
-                I found it in a legendary land<caret> all rocks and lavender and tufted grass,
+                I found it in a legendary land$c all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent())
@@ -28,7 +28,7 @@ class JoinLinesHandlerTest : VimTestCase() {
                 """
                 A Discovery
 
-                <caret>I found it in a legendary land
+                ${c}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
@@ -36,7 +36,7 @@ class JoinLinesHandlerTest : VimTestCase() {
                 """
                 A Discovery
 
-                I found it in a legendary land<caret> all rocks and lavender and tufted grass,
+                I found it in a legendary land$c all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent())
@@ -47,7 +47,7 @@ class JoinLinesHandlerTest : VimTestCase() {
                 """
                 A Discovery
 
-                <caret>I found it in a legendary land
+                ${c}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
@@ -56,7 +56,7 @@ class JoinLinesHandlerTest : VimTestCase() {
                 A Discovery
 
                 I found it in a legendary land
-                all rocks and lavender and tufted grass, where it was settled on some sodden sand<caret> hard by the torrent of a mountain pass.
+                all rocks and lavender and tufted grass, where it was settled on some sodden sand$c hard by the torrent of a mountain pass.
                     """.trimIndent())
     }
 
@@ -64,7 +64,7 @@ class JoinLinesHandlerTest : VimTestCase() {
         configureByText("""
                 A Discovery
 
-                <caret>I found it in a legendary land
+                ${c}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
@@ -74,7 +74,7 @@ class JoinLinesHandlerTest : VimTestCase() {
         myFixture.checkResult("""
                 A Discovery
 
-                I found it in a legendary land all rocks and lavender and tufted grass,<caret> where it was settled on some sodden sand
+                I found it in a legendary land all rocks and lavender and tufted grass,$c where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent())
     }

@@ -27,20 +27,20 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class ChangeVisualNumberDecActionTest : VimTestCase() {
     fun `test dec visual full number`() {
         doTest(parseKeys("V<C-X>"),
-                "<caret>12345",
-                "<caret>12344")
+                "${c}12345",
+                "${c}12344")
     }
 
     fun `test dec visual multiple numbers`() {
         doTest(parseKeys("v10w<C-X>"),
-                "11 <- should not be decremented |<caret>11| should not be decremented -> 12",
-                "11 <- should not be decremented |<caret>10| should not be decremented -> 12")
+                "11 <- should not be decremented |${c}11| should not be decremented -> 12",
+                "11 <- should not be decremented |${c}10| should not be decremented -> 12")
     }
 
     fun `test dec visual part of number`() {
         doTest(parseKeys("v4l<C-X>"),
-                "11111<caret>33333111111",
-                "11111<caret>33332111111")
+                "11111${c}33333111111",
+                "11111${c}33332111111")
     }
 
     fun `test dec visual multiple lines`() {
@@ -48,7 +48,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
                 """
                     no dec 1
                     no dec 1
-                    <caret>dec    5
+                    ${c}dec    5
                     dec   5
                     dec   5
                     no dec 1
@@ -58,7 +58,7 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
                 """
                     no dec 1
                     no dec 1
-                    <caret>dec    4
+                    ${c}dec    4
                     dec   4
                     dec   4
                     no dec 1
@@ -71,12 +71,12 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
     fun `test dec visual 1000 multiple lines`() {
         doTest(parseKeys("V2j<C-X>"),
                 """
-                    <caret>1000
+                    ${c}1000
                     1000
                     1000
                     """.trimIndent(),
                 """
-                    <caret>999
+                    ${c}999
                     999
                     999
                     """.trimIndent())
@@ -84,24 +84,24 @@ class ChangeVisualNumberDecActionTest : VimTestCase() {
 
     fun `test dec visual multiple numbers on line`() {
         doTest(parseKeys("V<C-X>"),
-                "1 should<caret> not be decremented -> 2",
-                "<caret>0 should not be decremented -> 2")
+                "1 should$c not be decremented -> 2",
+                "${c}0 should not be decremented -> 2")
     }
 
     fun `test change number dec visual action`() {
         typeTextInFile(parseKeys("Vj<C-X>"),
                 """
-                    <caret>1
+                    ${c}1
                     2
                     3
-                    <caret>4
+                    ${c}4
                     5
                     """.trimIndent())
         myFixture.checkResult("""
-                <caret>0
+                ${c}0
                 1
                 3
-                <caret>3
+                ${c}3
                 4
                 """.trimIndent())
     }

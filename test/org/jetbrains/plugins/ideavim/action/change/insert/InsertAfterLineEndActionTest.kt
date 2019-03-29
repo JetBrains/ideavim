@@ -26,13 +26,13 @@ class InsertAfterLineEndActionTest : VimTestCase() {
     fun `test insert after line end action`() {
         typeTextInFile(parseKeys("A", " four", "<ESC>"),
                 """
-                    one two <caret>three
-                    sev<caret>en si<caret>x five
+                    one two ${c}three
+                    sev${c}en si${c}x five
 
                     """.trimIndent())
         myFixture.checkResult("""
-    one two three fou<caret>r
-    seven six five fou<caret>r
+    one two three fou${c}r
+    seven six five fou${c}r
 
     """.trimIndent())
     }
@@ -40,18 +40,18 @@ class InsertAfterLineEndActionTest : VimTestCase() {
     fun `test multiple carets`() {
         doTest(parseKeys("AHello<esc>"),
                 """
-                <caret>A Discovery
+                ${c}A Discovery
 
-                <caret>I found it in a legendary land
-                all rocks and <caret>lavender and tufted grass,
+                ${c}I found it in a legendary land
+                all rocks and ${c}lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
                 """
-                A DiscoveryHell<caret>o
+                A DiscoveryHell${c}o
 
-                I found it in a legendary landHell<caret>o
-                all rocks and lavender and tufted grass,Hell<caret>o
+                I found it in a legendary landHell${c}o
+                all rocks and lavender and tufted grass,Hell${c}o
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent())

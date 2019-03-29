@@ -8,14 +8,14 @@ class SelectEnterActionTest : VimTestCase() {
     fun `test simple enter`() {
         configureByJavaText("""
         class C {
-            int my<caret>Var = 5;
+            int my${c}Var = 5;
         }
         """.trimIndent())
         this.typeText(parseKeys("gh", "<enter>"))
         myFixture.checkResult("""
         class C {
             int my
-                <caret>ar = 5;
+                ${c}ar = 5;
         }
         """.trimIndent())
         assertMode(CommandState.Mode.INSERT)

@@ -26,7 +26,7 @@ class VisualBlockInsertActionTest : VimTestCase() {
 
     // VIM-1110 |CTRL-V| |v_b_i| |zc|
     fun `test block insert after folds`() {
-        configureByJavaText("""<caret>/**
+        configureByJavaText("""$c/**
  * Something to fold.
  */
 foo
@@ -36,7 +36,7 @@ bar
         myFixture.checkResult("""/**
  * Something to fold.
  */
-<caret>Xfoo
+${c}Xfoo
 Xbar
 """)
     }
@@ -63,13 +63,13 @@ Xbar
         doTest(parseKeys("<C-V>", "j", "I", "quux ", "<Esc>"),
                 """
                     foo bar
-                    <caret>baz quux
+                    ${c}baz quux
                     spam eggs
 
                     """.trimIndent(),
                 ("""
                     foo bar
-                    <caret>quux baz quux
+                    ${c}quux baz quux
                     quux spam eggs
 
                     """.trimIndent()))
@@ -77,13 +77,13 @@ Xbar
 
     fun `test visual block insert`() {
         val before = """
-            <caret>int a;
+            ${c}int a;
             int b;
             int c;
             """.trimIndent()
         typeTextInFile(parseKeys("<C-V>", "2j", "I", "const ", "<Esc>"), before)
         val after = """
-            <caret>const int a;
+            ${c}const int a;
             const int b;
             const int c;
             """.trimIndent()
@@ -111,18 +111,18 @@ Xbar
     fun `test insert in non block mode`() {
         doTest(parseKeys("vwIHello<esc>"),
                 """
-                <caret>A Discovery
+                ${c}A Discovery
 
-                <caret>I found it in a legendary land
-                all rocks and <caret>lavender and tufted grass,
+                ${c}I found it in a legendary land
+                all rocks and ${c}lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
                 """
-                Hell<caret>oA Discovery
+                Hell${c}oA Discovery
 
-                Hell<caret>oI found it in a legendary land
-                Hell<caret>oall rocks and lavender and tufted grass,
+                Hell${c}oI found it in a legendary land
+                Hell${c}oall rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent())

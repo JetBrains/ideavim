@@ -57,6 +57,10 @@ import java.util.List;
 public abstract class VimTestCase extends UsefulTestCase {
   protected CodeInsightTestFixture myFixture;
 
+  protected static final String c = "<caret>";
+  protected static final String s = "<selection>";
+  protected static final String se = "</selection>";
+
   @Override
   protected void setUp() throws Exception {
     super.setUp();

@@ -28,12 +28,12 @@ class ChangeVisualNumberAvalancheIncActionTest : VimTestCase() {
     fun `test inc visual avalanche`() {
         doTest(parseKeys("VGg<C-A>"),
                 """
-                    <caret>number 1
+                    ${c}number 1
                     number 1
                     number 1
                     """.trimIndent(),
                 """
-                    <caret>number 2
+                    ${c}number 2
                     number 3
                     number 4
                     """.trimIndent())
@@ -42,12 +42,12 @@ class ChangeVisualNumberAvalancheIncActionTest : VimTestCase() {
     fun `test inc visual avalanche multiple times`() {
         doTest(parseKeys("VG2g<C-A>"),
                 """
-                    <caret>number 1
+                    ${c}number 1
                     number 1
                     number 1
                     """.trimIndent(),
                 """
-                    <caret>number 3
+                    ${c}number 3
                     number 5
                     number 7
                     """.trimIndent())

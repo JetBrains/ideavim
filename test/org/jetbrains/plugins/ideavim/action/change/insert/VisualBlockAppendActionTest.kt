@@ -26,7 +26,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 class VisualBlockAppendActionTest : VimTestCase() {
     fun `test visual block append`() {
         val before = """
-            <caret>int a;
+            ${c}int a;
             int b;
             int c;
             """.trimIndent()
@@ -42,18 +42,18 @@ class VisualBlockAppendActionTest : VimTestCase() {
     fun `test append in non block mode`() {
         doTest(parseKeys("vwAHello<esc>"),
                 """
-                <caret>A Discovery
+                ${c}A Discovery
 
-                <caret>I found it in a legendary land
-                all rocks and <caret>lavender and tufted grass,
+                ${c}I found it in a legendary land
+                all rocks and ${c}lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
                 """
-                A DiscoveryHell<caret>o
+                A DiscoveryHell${c}o
 
-                I found it in a legendary landHell<caret>o
-                all rocks and lavender and tufted grass,Hell<caret>o
+                I found it in a legendary landHell${c}o
+                all rocks and lavender and tufted grass,Hell${c}o
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent())

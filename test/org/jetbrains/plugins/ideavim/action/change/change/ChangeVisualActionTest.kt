@@ -26,7 +26,7 @@ class ChangeVisualActionTest : VimTestCase() {
     fun `test multiple line change`() {
         val keys = parseKeys("VjcHello<esc>")
         val before = """
-            <caret>A Discovery
+            ${c}A Discovery
 
             I found it in a legendary land
             all rocks and lavender and tufted grass,
@@ -45,9 +45,9 @@ class ChangeVisualActionTest : VimTestCase() {
 
     fun `test change visual action`() {
         typeTextInFile(parseKeys("v2lc", "aaa", "<ESC>"),
-                "abcd<caret>ffffff<caret>abcde<caret>aaaa\n")
+                "abcd${c}ffffff${c}abcde${c}aaaa\n")
         assertMode(CommandState.Mode.COMMAND)
-        myFixture.checkResult("abcdaa<caret>afffaa<caret>adeaa<caret>aa\n")
+        myFixture.checkResult("abcdaa${c}afffaa${c}adeaa${c}aa\n")
     }
 
     // VIM-1379 |CTRL-V| |j| |v_b_c|

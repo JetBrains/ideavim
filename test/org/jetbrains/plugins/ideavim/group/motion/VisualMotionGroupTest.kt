@@ -30,7 +30,7 @@ class VisualMotionGroupTest : VimTestCase() {
         configureByText("""
             A Discovery
 
-            I <selection>found it</selection> in a legendary land
+            I ${s}found it$se in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -45,8 +45,8 @@ class VisualMotionGroupTest : VimTestCase() {
         configureByText("""
             A Discovery
 
-            I <selection>found it<caret></selection> in a legendary land
-            all rocks and lavender <selection>and tufted<caret></selection> grass,
+            I ${s}found it$c$se in a legendary land
+            all rocks and lavender ${s}and tufted$c$se grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
@@ -61,7 +61,7 @@ class VisualMotionGroupTest : VimTestCase() {
         configureByText("""
             A Discovery
 
-            <selection>I found it in a legendary land</selection>
+            ${s}I found it in a legendary land$se
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -76,9 +76,9 @@ class VisualMotionGroupTest : VimTestCase() {
         configureByText("""
             A Discovery
 
-            <selection>I found it in a legendary land<caret></selection>
+            ${s}I found it in a legendary land$c$se
             all rocks and lavender and tufted grass,
-            <selection>where it was settled on some sodden sand<caret></selection>
+            ${s}where it was settled on some sodden sand$c$se
             hard by the torrent of a mountain pass.
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
@@ -91,8 +91,8 @@ class VisualMotionGroupTest : VimTestCase() {
         configureByText("""
             A Discovery
 
-            <selection>I found it in a legendary land
-            </selection>all rocks and lavender and tufted grass,
+            ${s}I found it in a legendary land
+            ${se}all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
@@ -104,10 +104,10 @@ class VisualMotionGroupTest : VimTestCase() {
 
     fun `test enable line selection till next line multicaret`() {
         configureByText("""
-            <selection>A Discovery
-            <caret></selection>
-            <selection>I found it in a legendary land
-            <caret></selection>all rocks and lavender and tufted grass,
+            ${s}A Discovery
+            $c$se
+            ${s}I found it in a legendary land
+            $c${se}all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
@@ -122,9 +122,9 @@ class VisualMotionGroupTest : VimTestCase() {
         configureByText("""
             A Discovery
 
-            I <selection>found<caret></selection> it in a legendary land
-            al<selection>l roc<caret></selection>ks and lavender and tufted grass,
-            wh<selection>ere i<caret></selection>t was settled on some sodden sand
+            I ${s}found$c$se it in a legendary land
+            al${s}l roc$c${se}ks and lavender and tufted grass,
+            wh${s}ere i$c${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
@@ -137,9 +137,9 @@ class VisualMotionGroupTest : VimTestCase() {
         configureByText("""
             A Discovery
 
-            I <selection>found it in a legendary land<caret></selection>
-            al<selection>l rocks and lavender and tufted grass,<caret></selection>
-            wh<selection>ere it was settled on some sodden sand<caret></selection>
+            I ${s}found it in a legendary land$c$se
+            al${s}l rocks and lavender and tufted grass,$c$se
+            wh${s}ere it was settled on some sodden sand$c$se
             hard by the torrent of a mountain pass.
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
@@ -152,9 +152,9 @@ class VisualMotionGroupTest : VimTestCase() {
         configureByText("""
             A Discovery
 
-            I <selection>found it in a legendary land<caret></selection>
-            al<selection>l rocks and lavender and tufted grass,<caret></selection>
-            wh<selection>ere it was settled on some sodden sand12345<caret></selection>6789
+            I ${s}found it in a legendary land$c$se
+            al${s}l rocks and lavender and tufted grass,$c$se
+            wh${s}ere it was settled on some sodden sand12345$c${se}6789
             hard by the torrent of a mountain pass.
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
