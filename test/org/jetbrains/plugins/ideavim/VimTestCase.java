@@ -22,7 +22,9 @@ import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.testFramework.LightProjectDescriptor;
@@ -48,6 +50,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -187,6 +190,29 @@ public abstract class VimTestCase extends UsefulTestCase {
 
   public void assertPluginError(boolean isError) {
     assertEquals(isError, VimPlugin.isError());
+  }
+
+  protected void assertCaretsColour() {
+    Color selectionColour = myFixture.getEditor().getColorsScheme().getColor(EditorColors.SELECTION_BACKGROUND_COLOR);
+    Color caretColour = myFixture.getEditor().getColorsScheme().getColor(EditorColors.CARET_COLOR);
+    if (CommandState.inVisualBlockMode(myFixture.getEditor())) {
+      CaretModel caretModel = myFixture.getEditor().getCaretModel();
+      caretModel.getAllCarets().forEach(caret -> {
+        if (caret != caretModel.getPrimaryCaret()) {
+          assertEquals(selectionColour, caret.getVisualAttributes().getColor());
+        }
+        else {
+          Color color = caret.getVisualAttributes().getColor();
+          if (color != null) assertEquals(caretColour, color);
+        }
+      });
+    }
+    else {
+      myFixture.getEditor().getCaretModel().getAllCarets().forEach(caret -> {
+        Color color = caret.getVisualAttributes().getColor();
+        if (color != null) assertEquals(caretColour, color);
+      });
+    }
   }
 
   public void doTest(final List<KeyStroke> keys, String before, String after) {

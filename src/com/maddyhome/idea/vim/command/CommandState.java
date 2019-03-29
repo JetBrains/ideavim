@@ -101,7 +101,7 @@ public class CommandState {
 
   public static boolean inVisualBlockMode(@Nullable Editor editor) {
     final CommandState state = getInstance(editor);
-    return state.getMode() == Mode.VISUAL && state.getSubMode() == SubMode.VISUAL_BLOCK;
+    return state.getSubMode() == SubMode.VISUAL_BLOCK;
   }
 
   public static boolean inSingleCommandMode(@Nullable Editor editor) {
