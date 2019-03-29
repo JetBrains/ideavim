@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.command.Command
 /**
  * @author Alex Plate
  *
- * Base class for motion handlers.
+ * Base class for visual handlers.
  * This handler executes an action only once for all carets. That means that if you have 5 carets, [getOffset] will be
  *   called 1 time.
  * @see [MotionEditorActionHandler] for per-caret execution
@@ -50,14 +50,14 @@ abstract class MotionEditorActionBatchHandler : MotionEditorActionHandler() {
     protected open fun preOffsetComputation(editor: Editor, context: DataContext, cmd: Command): Boolean = true
 
     /**
-     * This method is called after [getOffset], but before caret motion.
+     * This method is called after [getOffset], but before caret visual.
      *
      * The method executes only once.
      */
     protected open fun preMove(editor: Editor, context: DataContext, cmd: Command) = Unit
 
     /**
-     * This method is called after [getOffset] and after caret motion.
+     * This method is called after [getOffset] and after caret visual.
      *
      * The method executes only once it there is block selection.
      */

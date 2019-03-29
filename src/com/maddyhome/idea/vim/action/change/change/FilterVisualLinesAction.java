@@ -25,7 +25,6 @@ import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.group.motion.VisualMotionGroup;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,7 +42,7 @@ public class FilterVisualLinesAction extends VimCommandAction {
       @Override
       protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         VimPlugin.getProcess().startFilterCommand(editor, context, cmd);
-        VisualMotionGroup.INSTANCE.resetVisual(editor);
+        VimPlugin.getVisualMotion().resetVisual(editor);
         return true;
       }
     });

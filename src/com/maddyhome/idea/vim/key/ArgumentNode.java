@@ -29,7 +29,7 @@ import java.util.Objects;
 
 /**
  * This represents a command argument node in the key/action tree. Currently arguments of argType character
- * and motion command are used.
+ * and visual command are used.
  */
 public class ArgumentNode implements Node {
   /**

@@ -27,7 +27,6 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.*
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
-import com.maddyhome.idea.vim.group.copy.PutCopyGroup
 import com.maddyhome.idea.vim.handler.CaretOrder
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -72,7 +71,7 @@ class MoveTextHandler : CommandHandler(
       val text = texts[i]
 
       val offset = VimPlugin.getMotion().moveCaretToLineStart(editor, line + 1)
-      PutCopyGroup.putText(editor, caret, context, text, SelectionType.LINE_WISE, CommandState.SubMode.NONE,
+        VimPlugin.getPut().putText(editor, caret, context, text, SelectionType.LINE_WISE, CommandState.SubMode.NONE,
               offset, 1, true, false)
     }
 

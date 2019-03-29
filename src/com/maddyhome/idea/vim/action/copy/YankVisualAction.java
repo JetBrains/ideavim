@@ -21,24 +21,18 @@ package com.maddyhome.idea.vim.action.copy;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.group.copy.YankCopyGroup;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionBatchHandler;
 import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author vlan
@@ -63,7 +57,7 @@ public class YankVisualAction extends VimCommandAction {
         if (vimSelection == null) return false;
         int[] startsArray = starts.stream().mapToInt(i -> i).toArray();
         int[] endsArray = ends.stream().mapToInt(i -> i).toArray();
-        return YankCopyGroup.INSTANCE
+        return VimPlugin.getYank()
           .yankRange(editor, new TextRange(startsArray, endsArray), vimSelection.getType(), true);
       }
     });

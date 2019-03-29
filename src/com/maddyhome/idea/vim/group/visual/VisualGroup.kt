@@ -16,16 +16,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.group.motion
+package com.maddyhome.idea.vim.group.visual
 
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.CaretVisualAttributes
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.*
 import com.intellij.openapi.editor.colors.EditorColors
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.group.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimSelectionStart
@@ -64,6 +63,24 @@ fun Caret.vimUpdateEditorSelection() {
     setVisualSelection(startOffsetMark, offset, this)
 }
 
+fun SelectionModel.vimSetSelectionSilently(start: Int, end: Int) {
+    SelectionVimListenerSuppressor.lock()
+    setSelection(start, end)
+    SelectionVimListenerSuppressor.unlock()
+}
+
+fun SelectionModel.vimSetBlockSelectionSilently(start: LogicalPosition, end: LogicalPosition) {
+    SelectionVimListenerSuppressor.lock()
+    setBlockSelection(start, end)
+    SelectionVimListenerSuppressor.unlock()
+}
+
+fun Caret.vimSetSelectionSilently(start: Int, end: Int) {
+    SelectionVimListenerSuppressor.lock()
+    setSelection(start, end)
+    SelectionVimListenerSuppressor.unlock()
+}
+
 private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Caret) {
     val (start, end) = if (selectionStart > selectionEnd) selectionEnd to selectionStart else selectionStart to selectionEnd
     val editor = caret.editor
@@ -77,7 +94,7 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
         }
         CommandState.SubMode.VISUAL_CHARACTER -> {
             val lineEnd = EditorHelper.getLineEndForOffset(editor, end)
-            val adj = if (VisualMotionGroup.exclusiveSelection || end == lineEnd || mode == CommandState.Mode.SELECT) 0 else 1
+            val adj = if (VimPlugin.getVisualMotion().exclusiveSelection || end == lineEnd || mode == CommandState.Mode.SELECT) 0 else 1
             val adjEnd = (end + adj).coerceAtMost(EditorHelper.getFileSize(editor))
             caret.vimSetSelectionSilently(start, adjEnd)
         }
@@ -86,7 +103,7 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
 
             var blockStart = editor.offsetToLogicalPosition(selectionStart)
             var blockEnd = editor.offsetToLogicalPosition(selectionEnd)
-            if (!VisualMotionGroup.exclusiveSelection && mode != CommandState.Mode.SELECT) {
+            if (!VimPlugin.getVisualMotion().exclusiveSelection && mode != CommandState.Mode.SELECT) {
                 if (blockStart.column > blockEnd.column) {
                     blockStart = LogicalPosition(blockStart.line, blockStart.column + 1)
                 } else {

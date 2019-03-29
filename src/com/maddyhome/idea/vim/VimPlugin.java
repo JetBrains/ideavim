@@ -20,11 +20,7 @@ package com.maddyhome.idea.vim;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationDisplayType;
-import com.intellij.notification.NotificationListener;
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
+import com.intellij.notification.*;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
@@ -55,19 +51,10 @@ import com.intellij.openapi.wm.WindowManager;
 import com.intellij.util.io.HttpRequests;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser;
-import com.maddyhome.idea.vim.group.ChangeGroup;
-import com.maddyhome.idea.vim.group.DigraphGroup;
-import com.maddyhome.idea.vim.group.EditorGroup;
-import com.maddyhome.idea.vim.group.FileGroup;
-import com.maddyhome.idea.vim.group.HistoryGroup;
-import com.maddyhome.idea.vim.group.KeyGroup;
-import com.maddyhome.idea.vim.group.MacroGroup;
-import com.maddyhome.idea.vim.group.MarkGroup;
-import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.group.ProcessGroup;
-import com.maddyhome.idea.vim.group.RegisterGroup;
-import com.maddyhome.idea.vim.group.SearchGroup;
-import com.maddyhome.idea.vim.group.WindowGroup;
+import com.maddyhome.idea.vim.group.*;
+import com.maddyhome.idea.vim.group.copy.PutGroup;
+import com.maddyhome.idea.vim.group.copy.YankGroup;
+import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.DocumentManager;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
 import com.maddyhome.idea.vim.option.Options;
@@ -129,6 +116,9 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   @NotNull private final KeyGroup key;
   @NotNull private final WindowGroup window;
   @NotNull private final EditorGroup editor;
+  @NotNull private final VisualMotionGroup visualMotion;
+  @NotNull private final YankGroup yank;
+  @NotNull private final PutGroup put;
 
   public VimPlugin() {
     motion = new MotionGroup();
@@ -144,6 +134,9 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     key = new KeyGroup();
     window = new WindowGroup();
     editor = new EditorGroup();
+    visualMotion = new VisualMotionGroup();
+    yank = new YankGroup();
+    put = new PutGroup();
 
     LOG.debug("VimPlugin ctr");
   }
@@ -304,6 +297,21 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   @NotNull
   public static EditorGroup getEditor() {
     return getInstance().editor;
+  }
+
+  @NotNull
+  public static VisualMotionGroup getVisualMotion() {
+    return getInstance().visualMotion;
+  }
+
+  @NotNull
+  public static YankGroup getYank() {
+    return getInstance().yank;
+  }
+
+  @NotNull
+  public static PutGroup getPut() {
+    return getInstance().put;
   }
 
   @NotNull

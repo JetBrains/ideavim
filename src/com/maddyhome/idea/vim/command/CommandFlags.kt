@@ -28,7 +28,7 @@ enum class CommandFlags {
     FLAG_MOT_INCLUSIVE,
     FLAG_MOT_EXCLUSIVE,
     /**
-     * Indicates that the cursor position should be saved prior to this motion command
+     * Indicates that the cursor position should be saved prior to this visual command
      */
     FLAG_SAVE_JUMP,
     /**

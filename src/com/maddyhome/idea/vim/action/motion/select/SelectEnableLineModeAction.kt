@@ -2,12 +2,12 @@ package com.maddyhome.idea.vim.action.motion.select
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimCommandAction
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
-import com.maddyhome.idea.vim.group.motion.vimSetSelectionSilently
+import com.maddyhome.idea.vim.group.visual.vimSetSelectionSilently
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.helper.EditorHelper
 import javax.swing.KeyStroke
@@ -23,7 +23,7 @@ private object SelectEnableLineModeActionHandler : EditorActionHandlerBase() {
             val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
             caret.vimSetSelectionSilently(lineStart, lineEnd)
         }
-        return VisualMotionGroup.enterSelectionMode(editor, CommandState.SubMode.VISUAL_LINE)
+        return VimPlugin.getVisualMotion().enterSelectionMode(editor, CommandState.SubMode.VISUAL_LINE)
     }
 }
 

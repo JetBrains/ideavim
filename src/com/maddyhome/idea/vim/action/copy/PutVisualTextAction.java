@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
-import com.maddyhome.idea.vim.group.copy.PutCopyGroup;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
@@ -60,11 +59,11 @@ public class PutVisualTextAction extends VimCommandAction {
         if (range.getType() == SelectionType.BLOCK_WISE) {
           boolean isBigP = cmd.getKeys().get(0).equals(parseKeys("P").get(0));
 
-          return PutCopyGroup.INSTANCE
+          return VimPlugin.getPut()
             .putVisualRangeBlockwise(editor, context, range, cmd.getCount(), true, false, register, isBigP);
         }
         else {
-          return PutCopyGroup.INSTANCE
+          return VimPlugin.getPut()
             .putVisualRangeCaL(editor, context, caret, range, cmd.getCount(), true, false, register);
         }
       }

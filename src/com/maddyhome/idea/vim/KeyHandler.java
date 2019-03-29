@@ -451,7 +451,7 @@ public class KeyHandler {
   private void executeCommand(@NotNull Editor editor, @NotNull KeyStroke key, @NotNull DataContext context,
                               @NotNull CommandState editorState) {
     // Let's go through the command stack and merge it all into one command. At this time there should never
-    // be more than two commands on the stack - one is the actual command and the other would be a motion
+    // be more than two commands on the stack - one is the actual command and the other would be a visual
     // command argument needed by the first command
     Command cmd = currentCmd.pop();
     while (currentCmd.size() > 0) {
@@ -460,14 +460,14 @@ public class KeyHandler {
       cmd = top;
     }
 
-    // If we have a command and a motion command argument, both could possibly have their own counts. We
-    // need to adjust the counts so the motion gets the product of both counts and the count associated with
+    // If we have a command and a visual command argument, both could possibly have their own counts. We
+    // need to adjust the counts so the visual gets the product of both counts and the count associated with
     // the command gets reset. Example 3c2w (change 2 words, three times) becomes c6w (change 6 words)
     final Argument arg = cmd.getArgument();
     if (arg != null && arg.getType() == Argument.Type.MOTION) {
       final Command mot = arg.getMotion();
       // If no count was entered for either command then nothing changes. If either had a count then
-      // the motion gets the product of both.
+      // the visual gets the product of both.
       if (mot != null) {
         int cnt = cmd.getRawCount() == 0 && mot.getRawCount() == 0 ? 0 : cmd.getCount() * mot.getCount();
         mot.setCount(cnt);
@@ -550,11 +550,11 @@ public class KeyHandler {
   private void handleCommandNode(@NotNull Editor editor, @NotNull DataContext context, @NotNull CommandNode node) {
     // If all does well we are ready to process this command
     state = State.READY;
-    // Did we just get the completed sequence for a motion command argument?
+    // Did we just get the completed sequence for a visual command argument?
     if (currentArg == Argument.Type.MOTION) {
-      // We have been expecting a motion argument - is this one?
+      // We have been expecting a visual argument - is this one?
       if (node.getCmdType() == Command.Type.MOTION) {
-        // Create the motion command and add it to the stack
+        // Create the visual command and add it to the stack
         Command cmd = new Command(count, node.getActionId(), node.getAction(), node.getCmdType(), node.getFlags());
         cmd.setKeys(keys);
         currentCmd.push(cmd);
@@ -566,7 +566,7 @@ public class KeyHandler {
         currentCmd.push(cmd);
       }
       else {
-        // Oops - this wasn't a motion command. The user goofed and typed something else
+        // Oops - this wasn't a visual command. The user goofed and typed something else
         state = State.BAD_COMMAND;
       }
     }

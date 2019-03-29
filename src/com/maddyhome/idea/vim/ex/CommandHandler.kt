@@ -25,7 +25,6 @@ import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
 import com.maddyhome.idea.vim.handler.CaretOrder
 import com.maddyhome.idea.vim.handler.ExecuteMethodNotOverriddenException
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -167,7 +166,7 @@ abstract class CommandHandler {
     }
     CommandState.getInstance(editor).flags = optFlags
     if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
-      VisualMotionGroup.exitVisual(editor)
+        VimPlugin.getVisualMotion().exitVisual(editor)
     }
 
     val res = Ref.create(true)

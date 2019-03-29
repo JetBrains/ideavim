@@ -33,7 +33,7 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
  * @author Vasily Alferov
  */
 public class MultipleCaretsTest extends VimTestCase {
-  // com.maddyhome.idea.vim.action.motion.leftright
+  // com.maddyhome.idea.vim.action.visual.leftright
 
   public void testMotionLeftAction() {
     typeTextInFile(parseKeys("3h"),
@@ -180,7 +180,7 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult("one\nt<caret>wo three\nfo<caret>ur\n");
   }
 
-  // com.maddyhome.idea.vim.action.motion.updown
+  // com.maddyhome.idea.vim.action.visual.updown
 
   public void testMotionUpAction() {
     typeTextInFile(parseKeys("k"),
@@ -258,7 +258,7 @@ public class MultipleCaretsTest extends VimTestCase {
                           "  two\n");
   }
 
-  // com.maddyhome.idea.vim.action.motion.object
+  // com.maddyhome.idea.vim.action.visual.object
 
   public void testMotionInnerBigWordAction() {
     typeTextInFile(parseKeys("v", "iW"),
@@ -407,7 +407,7 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult("<selection>asdf. asdf. asdf.</selection>");
   }
 
-  // com.maddyhime.idea.vim.action.motion.text
+  // com.maddyhime.idea.vim.action.visual.text
 
   public void testMotionBigWordEndLeftAction() {
     typeTextInFile(parseKeys("gE"), "a.asdf. a<caret>sdf<caret>.a a; as<caret>df\n a<caret>sdf");
@@ -709,7 +709,7 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult("<caret>( <caret>(() )<caret>()<caret>() ");
   }
 
-  // com.maddyhome.idea.vim.action.motion.visual
+  // com.maddyhome.idea.vim.action.visual.visual
 
   public void testVisualSwapEndsAction() {
     typeTextInFile(parseKeys("v", "iw", "o"), "o<caret>ne <caret>two th<caret>ree\n");

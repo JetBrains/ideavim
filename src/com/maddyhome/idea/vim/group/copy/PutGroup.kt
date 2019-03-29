@@ -37,7 +37,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.VimSelection
 import java.util.*
 
-object PutCopyGroup {
+class PutGroup {
     fun putVisualRangeCaL(
             editor: Editor,
             context: DataContext,
@@ -79,7 +79,7 @@ object PutCopyGroup {
             }
         }
 
-        PutCopyGroup.putText(editor, caret, context, text, type, selection.type.toSubMode(), startOffset,
+        putText(editor, caret, context, text, type, selection.type.toSubMode(), startOffset,
                 count, indent && type == SelectionType.LINE_WISE, cursorAfter)
 
         return true
@@ -123,7 +123,7 @@ object PutCopyGroup {
                             return@forEachLine
                         }
 
-                        PutCopyGroup.putText(editor, caret, context, text, type, CommandState.SubMode.VISUAL_BLOCK, startOffset,
+                        putText(editor, caret, context, text, type, CommandState.SubMode.VISUAL_BLOCK, startOffset,
                                 count, indent && type == SelectionType.LINE_WISE, cursorAfter)
                     }
                 }
@@ -143,7 +143,7 @@ object PutCopyGroup {
 
                 if (!insertBefore) text = "\n" + text
 
-                PutCopyGroup.putText(editor, editor.caretModel.primaryCaret, context, text, type, CommandState.SubMode.VISUAL_BLOCK, startOffset,
+                putText(editor, editor.caretModel.primaryCaret, context, text, type, CommandState.SubMode.VISUAL_BLOCK, startOffset,
                         count, indent && type == SelectionType.LINE_WISE, cursorAfter)
             }
             SelectionType.BLOCK_WISE -> {
@@ -158,7 +158,7 @@ object PutCopyGroup {
                         return false
                     }
 
-                    PutCopyGroup.putText(editor, caret, context, text, type, CommandState.SubMode.VISUAL_BLOCK, startOffset,
+                    putText(editor, caret, context, text, type, CommandState.SubMode.VISUAL_BLOCK, startOffset,
                             count, indent && type == SelectionType.LINE_WISE, cursorAfter)
                 }
             }
@@ -193,7 +193,7 @@ object PutCopyGroup {
                 continue
             }
 
-            PutCopyGroup.putText(editor, caret, context, text, selectionType, CommandState.SubMode.NONE, startOffset, count, indent,
+            putText(editor, caret, context, text, selectionType, CommandState.SubMode.NONE, startOffset, count, indent,
                     cursorAfter)
         }
 

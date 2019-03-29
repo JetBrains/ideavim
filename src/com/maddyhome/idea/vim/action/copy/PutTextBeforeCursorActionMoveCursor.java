@@ -21,8 +21,8 @@ package com.maddyhome.idea.vim.action.copy;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.group.copy.PutCopyGroup;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +38,7 @@ public class PutTextBeforeCursorActionMoveCursor extends EditorAction {
                              int count,
                              int rawCount,
                              @Nullable Argument argument) {
-        return PutCopyGroup.INSTANCE.putText(editor, context, count, true, true, true);
+        return VimPlugin.getPut().putText(editor, context, count, true, true, true);
       }
     });
   }

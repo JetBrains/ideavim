@@ -16,9 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.group.motion
+package com.maddyhome.idea.vim.group.visual
 
-import com.intellij.openapi.editor.*
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.ScrollType
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.*
@@ -34,7 +37,7 @@ import java.util.*
 /**
  * @author Alex Plate
  */
-object VisualMotionGroup {
+class VisualMotionGroup {
     fun selectPreviousVisualMode(editor: Editor): Boolean {
         val lastSelectionType = EditorData.getLastSelectionType(editor) ?: return false
 
@@ -362,22 +365,4 @@ object VisualMotionGroup {
         get() = (Options.getInstance().getOption("selection") as BoundStringOption).value == "exclusive"
     val selectionAdj: Int
         get() = if (exclusiveSelection) 0 else 1
-}
-
-fun SelectionModel.vimSetSelectionSilently(start: Int, end: Int) {
-    SelectionVimListenerSuppressor.lock()
-    setSelection(start, end)
-    SelectionVimListenerSuppressor.unlock()
-}
-
-fun SelectionModel.vimSetBlockSelectionSilently(start: LogicalPosition, end: LogicalPosition) {
-    SelectionVimListenerSuppressor.lock()
-    setBlockSelection(start, end)
-    SelectionVimListenerSuppressor.unlock()
-}
-
-fun Caret.vimSetSelectionSilently(start: Int, end: Int) {
-    SelectionVimListenerSuppressor.lock()
-    setSelection(start, end)
-    SelectionVimListenerSuppressor.unlock()
 }

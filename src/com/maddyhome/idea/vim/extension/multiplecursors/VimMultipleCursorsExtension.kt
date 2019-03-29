@@ -33,8 +33,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.extension.VimNonDisposableExtension
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
-import com.maddyhome.idea.vim.group.motion.vimStartSelectionAtPoint
+import com.maddyhome.idea.vim.group.visual.vimStartSelectionAtPoint
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.SearchHelper.findWordUnderCursor
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
@@ -114,7 +113,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
           }
         }
         if (newPositions.size > 0) {
-          VisualMotionGroup.exitVisual(editor)
+            VimPlugin.getVisualMotion().exitVisual(editor)
           newPositions.forEach { editor.caretModel.addCaret(it) ?: return }
           return
         }
@@ -210,7 +209,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
       if (tryFindNextOccurrence(editor, caret, selectedText) == -1) return
 
       if (!editor.caretModel.removeCaret(caret)) {
-        VisualMotionGroup.exitVisual(editor)
+          VimPlugin.getVisualMotion().exitVisual(editor)
       }
     }
   }
@@ -221,7 +220,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
   }
 
   private fun findNextOccurrence(editor: Editor, caret: Caret, range: TextRange, whole: Boolean): Int {
-    VisualMotionGroup.setVisualMode(editor, CommandState.getInstance(editor).subMode)
+      VimPlugin.getVisualMotion().setVisualMode(editor, CommandState.getInstance(editor).subMode)
     val wordRange = VimPlugin.getMotion().getWordRange(editor, caret, 1, false, false)
     caret.vimStartSelectionAtPoint(wordRange.startOffset)
     MotionGroup.moveCaret(editor, caret, wordRange.endOffset)

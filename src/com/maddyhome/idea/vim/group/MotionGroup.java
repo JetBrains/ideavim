@@ -45,8 +45,7 @@ import com.maddyhome.idea.vim.common.Jump;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
-import com.maddyhome.idea.vim.group.motion.VisualGroupKt;
-import com.maddyhome.idea.vim.group.motion.VisualMotionGroup;
+import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.helper.CaretDataKt;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
@@ -62,7 +61,7 @@ import java.io.File;
 import java.util.EnumSet;
 
 /**
- * This handles all motion related commands and marks
+ * This handles all visual related commands and marks
  */
 public class MotionGroup {
   public static final int LAST_F = 1;
@@ -121,17 +120,17 @@ public class MotionGroup {
   }
 
   /**
-   * This helper method calculates the complete range a motion will move over taking into account whether
-   * the motion is FLAG_MOT_LINEWISE or FLAG_MOT_CHARACTERWISE (FLAG_MOT_INCLUSIVE or FLAG_MOT_EXCLUSIVE).
+   * This helper method calculates the complete range a visual will move over taking into account whether
+   * the visual is FLAG_MOT_LINEWISE or FLAG_MOT_CHARACTERWISE (FLAG_MOT_INCLUSIVE or FLAG_MOT_EXCLUSIVE).
    *
-   * @param editor     The editor the motion takes place in
-   * @param caret      The caret the motion takes place on
+   * @param editor     The editor the visual takes place in
+   * @param caret      The caret the visual takes place on
    * @param context    The data context
-   * @param count      The count applied to the motion
+   * @param count      The count applied to the visual
    * @param rawCount   The actual count entered by the user
-   * @param argument   Any argument needed by the motion
+   * @param argument   Any argument needed by the visual
    * @param incNewline True if to include newline
-   * @return The motion's range
+   * @return The visual's range
    */
   @Nullable
   public static TextRange getMotionRange(@NotNull Editor editor,
@@ -145,7 +144,7 @@ public class MotionGroup {
     if (cmd == null) {
       return null;
     }
-    // Normalize the counts between the command and the motion argument
+    // Normalize the counts between the command and the visual argument
     int cnt = cmd.getCount() * count;
     int raw = rawCount == 0 && cmd.getRawCount() == 0 ? 0 : cnt;
     int start = 0;
@@ -156,10 +155,10 @@ public class MotionGroup {
       // This is where we are now
       start = caret.getOffset();
 
-      // Execute the motion (without moving the cursor) and get where we end
+      // Execute the visual (without moving the cursor) and get where we end
       end = action.getOffset(editor, caret, context, cnt, raw, cmd.getArgument());
 
-      // Invalid motion
+      // Invalid visual
       if (end == -1) {
         return null;
       }
@@ -177,7 +176,7 @@ public class MotionGroup {
       end = range.getEndOffset();
     }
 
-    // If we are a linewise motion we need to normalize the start and stop then move the start to the beginning
+    // If we are a linewise visual we need to normalize the start and stop then move the start to the beginning
     // of the line and move the end to the end of the line.
     EnumSet<CommandFlags> flags = cmd.getFlags();
     if (flags.contains(CommandFlags.FLAG_MOT_LINEWISE)) {
@@ -340,7 +339,7 @@ public class MotionGroup {
         VisualGroupKt.vimMoveSelectionToCaret(caret);
       }
       else {
-        VisualMotionGroup.INSTANCE.exitVisual(editor);
+        VimPlugin.getVisualMotion().exitVisual(editor);
       }
     }
   }
@@ -1312,7 +1311,7 @@ public class MotionGroup {
         final Editor editor = ((TextEditor)fileEditor).getEditor();
         ExOutputModel.getInstance(editor).clear();
         if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-          VisualMotionGroup.INSTANCE.exitVisual(editor);
+          VimPlugin.getVisualMotion().exitVisual(editor);
         }
       }
     }

@@ -24,7 +24,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.*
-import com.maddyhome.idea.vim.group.copy.YankCopyGroup
 
 class YankLinesHandler : CommandHandler(
         commands("y[ank]"),
@@ -53,7 +52,7 @@ class YankLinesHandler : CommandHandler(
       ends.add(range.endOffset - 1)
     }
 
-    return YankCopyGroup.yankRange(editor,
+    return VimPlugin.getYank().yankRange(editor,
             TextRange(starts.toIntArray(), ends.toIntArray()),
             SelectionType.LINE_WISE, false)
   }

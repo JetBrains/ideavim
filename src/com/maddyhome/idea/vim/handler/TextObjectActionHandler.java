@@ -21,14 +21,14 @@ package com.maddyhome.idea.vim.handler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.group.motion.VisualGroupKt;
-import com.maddyhome.idea.vim.group.motion.VisualMotionGroup;
+import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.helper.CaretDataKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -71,12 +71,12 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
       if ((cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE) &&
            !cmd.getFlags().contains(CommandFlags.FLAG_VISUAL_CHARACTERWISE)) &&
           CommandState.getInstance(editor).getSubMode() != CommandState.SubMode.VISUAL_LINE) {
-        VisualMotionGroup.INSTANCE.toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE);
+        VimPlugin.getVisualMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE);
       }
       else if ((!cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE) ||
                 cmd.getFlags().contains(CommandFlags.FLAG_VISUAL_CHARACTERWISE)) &&
                CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_LINE) {
-        VisualMotionGroup.INSTANCE.toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER);
+        VimPlugin.getVisualMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER);
       }
 
       MotionGroup.moveCaret(editor, caret, newend);

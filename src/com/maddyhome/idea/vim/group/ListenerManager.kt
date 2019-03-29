@@ -27,8 +27,7 @@ import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.ExOutputModel
-import com.maddyhome.idea.vim.group.motion.VisualMotionGroup
-import com.maddyhome.idea.vim.group.motion.vimSetSelectionSilently
+import com.maddyhome.idea.vim.group.visual.vimSetSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.ui.ExEntryPanel
@@ -123,7 +122,7 @@ object VimListenerManager {
 
             if (SelectionVimListenerSuppressor.isNotLocked) {
                 logger.debug("Adjust non vim selection change")
-                VisualMotionGroup.controlNonVimSelectionChange(editor, !editor.settings.isBlockCursor)
+                VimPlugin.getVisualMotion().controlNonVimSelectionChange(editor, !editor.settings.isBlockCursor)
             }
 
             if (myMakingChanges || document is DocumentEx && document.isInEventsHandling) {
@@ -163,7 +162,7 @@ object VimListenerManager {
         override fun mouseReleased(event: EditorMouseEvent) {
             if (mouseDragging) {
                 logger.debug("Release mouse after dragging")
-                VisualMotionGroup.controlNonVimSelectionChange(event.editor, !isBlockCaret)
+                VimPlugin.getVisualMotion().controlNonVimSelectionChange(event.editor, !isBlockCaret)
                 SelectionVimListenerSuppressor.unlock()
                 mouseDragging = false
             }
@@ -191,9 +190,9 @@ object VimListenerManager {
                 caretModel.primaryCaret.vimLastColumn = caretModel.visualPosition.column
                 if (event.mouseEvent.clickCount == 1) {
                     if (CommandState.inVisualMode(editor)) {
-                        VisualMotionGroup.exitVisual(editor)
+                        VimPlugin.getVisualMotion().exitVisual(editor)
                     } else if (CommandState.getInstance(editor).mode == CommandState.Mode.SELECT) {
-                        VisualMotionGroup.exitSelectMode(editor)
+                        VimPlugin.getVisualMotion().exitSelectMode(editor)
                     }
                 }
 
