@@ -239,6 +239,7 @@ class VisualMotionGroup {
         primaryCaret.removeSelection()
         primaryCaret.vimSelectionStartSetToNull()
         ChangeGroup.resetCursor(editor, false)
+        KeyHandler.getInstance().reset(editor)
     }
 
     fun controlNonVimSelectionChange(editor: Editor, resetCaretToInsert: Boolean = false) {
