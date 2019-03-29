@@ -123,7 +123,7 @@ object VimListenerManager {
 
             if (SelectionVimListenerSuppressor.isNotLocked) {
                 logger.debug("Adjust non vim selection change")
-                VisualMotionGroup.controlNonVimSelectionChange(editor)
+                VisualMotionGroup.controlNonVimSelectionChange(editor, !editor.settings.isBlockCursor)
             }
 
             if (myMakingChanges || document is DocumentEx && document.isInEventsHandling) {
@@ -148,12 +148,14 @@ object VimListenerManager {
 
     private object EditorMouseHandler : EditorMouseListener, EditorMouseMotionListener {
         private var mouseDragging = false
+        private var isBlockCaret = true
 
         override fun mouseDragged(e: EditorMouseEvent) {
             if (!mouseDragging) {
                 logger.debug("Mouse dragging")
                 SelectionVimListenerSuppressor.lock()
                 mouseDragging = true
+                isBlockCaret = e.editor.settings.isBlockCursor
                 ChangeGroup.resetCursor(e.editor, true)
             }
         }
@@ -161,7 +163,7 @@ object VimListenerManager {
         override fun mouseReleased(event: EditorMouseEvent) {
             if (mouseDragging) {
                 logger.debug("Release mouse after dragging")
-                VisualMotionGroup.controlNonVimSelectionChange(event.editor)
+                VisualMotionGroup.controlNonVimSelectionChange(event.editor, !isBlockCaret)
                 SelectionVimListenerSuppressor.unlock()
                 mouseDragging = false
             }

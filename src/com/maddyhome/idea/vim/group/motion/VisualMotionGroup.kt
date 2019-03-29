@@ -238,7 +238,7 @@ object VisualMotionGroup {
         ChangeGroup.resetCursor(editor, false)
     }
 
-    fun controlNonVimSelectionChange(editor: Editor) {
+    fun controlNonVimSelectionChange(editor: Editor, resetCaretToInsert: Boolean = false) {
         if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
             val commandState = CommandState.getInstance(editor)
             while (commandState.mode != CommandState.Mode.COMMAND) {
@@ -252,7 +252,7 @@ object VisualMotionGroup {
         } else {
             exitVisual(editor)
             exitSelectMode(editor)
-            ChangeGroup.resetCursor(editor, false)
+            ChangeGroup.resetCursor(editor, resetCaretToInsert)
         }
     }
 
