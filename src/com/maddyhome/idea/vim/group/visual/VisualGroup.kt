@@ -32,14 +32,27 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
 /**
  * @author Alex Plate
  */
+
+/**
+ * Get deprecated TextRange of editor's selection model
+ */
 val Editor.visualBlockRange: TextRange
     get() = selectionModel.run { TextRange(blockSelectionStarts, blockSelectionEnds) }
 
+/**
+ * Start selection of caret at given point.
+ * This method doesn't change CommandState and operates only with caret and it's properties
+ */
 fun Caret.vimStartSelectionAtPoint(point: Int) {
     vimSelectionStart = point
     setVisualSelection(point, point, this)
 }
 
+/**
+ * Move selection end to current caret position
+ * This method is created only for Character and Line mode
+ * @see vimMoveBlockSelectionToOffset for blockwise selection
+ */
 fun Caret.vimMoveSelectionToCaret() {
     if (CommandState.getInstance(editor).mode != CommandState.Mode.VISUAL && CommandState.getInstance(editor).mode != CommandState.Mode.SELECT)
         throw RuntimeException("Attempt to extent selection in non-visual mode")
@@ -51,6 +64,11 @@ fun Caret.vimMoveSelectionToCaret() {
     setVisualSelection(startOffsetMark, offset, this)
 }
 
+/**
+ * Move selection end to current primary caret position
+ * This method is created only for block mode
+ * @see vimMoveSelectionToCaret for character and line selection
+ */
 fun vimMoveBlockSelectionToOffset(editor: Editor, offset: Int) {
     val primaryCaret = editor.caretModel.primaryCaret
     val startOffsetMark = primaryCaret.vimSelectionStart
@@ -58,23 +76,36 @@ fun vimMoveBlockSelectionToOffset(editor: Editor, offset: Int) {
     setVisualSelection(startOffsetMark, offset, primaryCaret)
 }
 
+/**
+ * Update selection according to new CommandState
+ * This method should be used for switching from character to line wise selection and so on
+ */
 fun Caret.vimUpdateEditorSelection() {
     val startOffsetMark = vimSelectionStart
     setVisualSelection(startOffsetMark, offset, this)
 }
 
+/**
+ * Set selection without calling SelectionListener
+ */
 fun SelectionModel.vimSetSelectionSilently(start: Int, end: Int) {
     SelectionVimListenerSuppressor.lock()
     setSelection(start, end)
     SelectionVimListenerSuppressor.unlock()
 }
 
+/**
+ * Set selection without calling SelectionListener
+ */
 fun SelectionModel.vimSetBlockSelectionSilently(start: LogicalPosition, end: LogicalPosition) {
     SelectionVimListenerSuppressor.lock()
     setBlockSelection(start, end)
     SelectionVimListenerSuppressor.unlock()
 }
 
+/**
+ * Set selection without calling SelectionListener
+ */
 fun Caret.vimSetSelectionSilently(start: Int, end: Int) {
     SelectionVimListenerSuppressor.lock()
     setSelection(start, end)
