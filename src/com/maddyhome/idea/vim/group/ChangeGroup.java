@@ -48,6 +48,7 @@ import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.LineRange;
+import com.maddyhome.idea.vim.group.motion.VisualMotionGroup;
 import com.maddyhome.idea.vim.group.motion.VisualMotionGroupKt;
 import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.helper.*;
@@ -828,21 +829,13 @@ public class ChangeGroup {
                                         @NotNull final DataContext context, @NotNull final KeyStroke key) {
     boolean res = processKey(editor, context, key);
 
-    exitSelectMode(editor);
+    VisualMotionGroup.INSTANCE.exitSelectMode(editor);
 
     if (isPrintableChar(key.getKeyChar())) {
       VimPlugin.getChange().insertBeforeCursor(editor, context);
     }
 
     return res;
-  }
-
-  public void exitSelectMode(@NotNull Editor editor) {
-    CommandState.getInstance(editor).popState();
-    Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-    primaryCaret.removeSelection();
-    CaretDataKt.vimSelectionStartSetToNull(primaryCaret);
-    ChangeGroup.resetCursor(editor, false);
   }
 
   public boolean isPrintableChar(char c) {

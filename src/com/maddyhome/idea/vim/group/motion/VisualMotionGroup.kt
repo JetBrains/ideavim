@@ -228,6 +228,16 @@ object VisualMotionGroup {
         return true
     }
 
+    fun exitSelectMode(editor: Editor) {
+        if (!CommandState.inSelectMode(editor)) return
+
+        CommandState.getInstance(editor).popState()
+        val primaryCaret = editor.caretModel.primaryCaret
+        primaryCaret.removeSelection()
+        primaryCaret.vimSelectionStartSetToNull()
+        ChangeGroup.resetCursor(editor, false)
+    }
+
     fun controlNonVimSelectionChange(editor: Editor) {
         if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
             val commandState = CommandState.getInstance(editor)
@@ -241,6 +251,8 @@ object VisualMotionGroup {
             enterSelectionMode(editor, autodetectedMode)
         } else {
             exitVisual(editor)
+            exitSelectMode(editor)
+            ChangeGroup.resetCursor(editor, false)
         }
     }
 

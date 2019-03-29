@@ -90,6 +90,10 @@ public class CommandState {
     return getInstance(editor).getMode() == Mode.VISUAL;
   }
 
+  public static boolean inSelectMode(@Nullable Editor editor) {
+    return getInstance(editor).getMode() == Mode.SELECT;
+  }
+
   public static boolean inVisualLineMode(@Nullable Editor editor) {
     final CommandState state = getInstance(editor);
     return state.getMode() == Mode.VISUAL && state.getSubMode() == SubMode.VISUAL_LINE;
