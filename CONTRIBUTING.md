@@ -14,7 +14,7 @@
 
 ### Where to Start
 
-In order to contribute to IdeaVim you should have some understanding of Java or [Kotlin](https://kotlinlang.org/).
+In order to contribute to IdeaVim, you should have some understanding of Java or [Kotlin](https://kotlinlang.org/).
 
 See also these docs on the IntelliJ API:
 
@@ -39,19 +39,22 @@ in the issue tracker.
     * Select your Java 8+ JDK as the Gradle JVM, leave other parameters unchanged
 
 3. Set up [copyright](#copyright)
-4. Run your IdeaVim plugin within IntelliJ via a Gradle task
+
+4. Read [testing](#testing) section
+
+5. Run your IdeaVim plugin within IntelliJ via a Gradle task
 
     * Select "View | Tool Windows | Gradle" tool window
     
     * Launch "ideavim | intellij | runIde" from the tool window
 
-5. Run IdeaVim tests via a Gradle task
+6. Run IdeaVim tests via a Gradle task
 
     * Select "View | Tool Windows | Gradle" tool window
     
     * Launch "ideavim | verification | test" from the tool window
 
-6. Build the plugin distribution by running `./gradlew clean buildPlugin` in the
+7. Build the plugin distribution by running `./gradlew clean buildPlugin` in the
    terminal in your project root.
 
     * The resulting distribution file is build/distributions/IdeaVim-VERSION.zip
@@ -88,3 +91,17 @@ in the issue tracker.
 3. Go to `Preferences | Editor | Copyright`, press "+" button.  
        Scope: Copyright scope  
        Copyright: IdeaVim
+       
+### Testing
+
+1. Read about `@VimBehaviourDiffers` annotation.
+
+2. Please avoid senseless text like "dhjkwaldjwa", "asdasdasd",
+"123 123 123 123", etc. Try to select a text that you can simply
+read and find out what is wrong if the test fails.
+For example, take a few lines from your favorite poem, or take
+"Vladimir Nabokov – A Discovery" if you don't have one.
+
+3. Test your functionality properly.
+Especially check whether your command works with:
+line start, line end, file start, file end, empty line, multiple carets.
