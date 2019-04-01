@@ -32,6 +32,7 @@ To Be Released
 * [VIM-1245](https://youtrack.jetbrains.com/issue/VIM-1245) Clear switcher list after`:q`
 * Support `commentary` extension
 * [VIM-907](https://youtrack.jetbrains.com/issue/VIM-907) Fix `va(` command
+* [VIM-1067](https://youtrack.jetbrains.com/issue/VIM-1067) Fix repeating of `A` command
 
 
 0.51, 2019-02-12

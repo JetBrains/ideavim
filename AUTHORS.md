@@ -63,6 +63,7 @@ Contributors:
 * [Tony Arra](mailto:ttonyarra@gmail.com)
 * [Brad Ziolko](mailto:bradziolko@gmail.com)
 * [sumoooru2](mailto:sumoooru2@gmail.com)
+* [gecko655](mailto:aqwsedrft1234@yahoo.co.jp)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
