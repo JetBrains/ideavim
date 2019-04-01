@@ -62,6 +62,7 @@ Contributors:
 * [dos65](mailto:qtankle@gmail.com)
 * [Tony Arra](mailto:ttonyarra@gmail.com)
 * [Brad Ziolko](mailto:bradziolko@gmail.com)
+* [sumoooru2](mailto:sumoooru2@gmail.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
