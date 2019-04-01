@@ -298,8 +298,8 @@ class SelectExtendToLeftTest : VimTestCase() {
                 """
                 A Discovery
 
-                I fo${s}u${c}n${se}d it in a legendary land
-                all ${s}r${c}o${se}cks and lavender and tufted grass,
+                I fo$s${c}un${se}d it in a legendary land
+                all $s${c}ro${se}cks and lavender and tufted grass,
                 wher$s${c}e ${se}it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent())

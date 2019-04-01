@@ -151,7 +151,7 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
                 if (lastColumn >= MotionGroup.LAST_COLUMN) {
                     aCaret.vimSetSelectionSilently(aCaret.selectionStart, lineEndOffset)
                 }
-                if (!EditorHelper.isLineEmpty(editor, line, false)) {
+                if (mode != CommandState.Mode.SELECT && !EditorHelper.isLineEmpty(editor, line, false)) {
                     aCaret.moveToOffset(aCaret.selectionEnd - 1)
                 }
 
