@@ -82,6 +82,24 @@ class SelectExtendToRightTest : VimTestCase() {
                 hard by the torrent of a mountain pass$s.$c$se""".trimIndent())
     }
 
+    fun `test file char mode multicaret`() {
+        doTest(parseKeys("gh", "<S-Right>".repeat(2)),
+                """
+                A Discovery
+
+                I ${c}found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass$c.""".trimIndent(),
+                """
+                A Discovery
+
+                I ${s}fou$c${se}nd it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass$s.$c$se""".trimIndent())
+    }
+
     fun `test simple motion line mode`() {
         doTest(parseKeys("gH", "<S-Right>"),
                 """
@@ -155,6 +173,24 @@ class SelectExtendToRightTest : VimTestCase() {
                 A Discovery
 
                 I found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                ${s}hard by the torrent of a mountain pass.$c$se""".trimIndent())
+    }
+
+    fun `test line mode multicaret`() {
+        doTest(parseKeys("gH", "<S-Right>"),
+                """
+                A Discovery
+
+                I found ${c}it in ${c}a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass$c.""".trimIndent(),
+                """
+                A Discovery
+
+                ${s}I found i${c}t in a legendary land$se
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 ${s}hard by the torrent of a mountain pass.$c$se""".trimIndent())

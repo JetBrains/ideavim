@@ -84,6 +84,26 @@ class SelectExtendToLeftTest : VimTestCase() {
                     """.trimIndent())
     }
 
+    fun `test char mode multicaret`() {
+        doTest(parseKeys("gh", "<S-Left>".repeat(2)),
+                """
+                ${c}A Discovery
+
+                I found$c it in a legendary land
+                all rocks and lavender and tufted grass$c,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                    """.trimIndent(),
+                """
+                $s$c${se}A Discovery
+
+                I foun$s${c}d$se it in a legendary land
+                all rocks and lavender and tufted gras$s${c}s$se,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                    """.trimIndent())
+    }
+
     fun `test simple motion line mode`() {
         doTest(parseKeys("gH", "<S-Left>"),
                 """
@@ -139,6 +159,26 @@ class SelectExtendToLeftTest : VimTestCase() {
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                    """.trimIndent())
+    }
+
+    fun `test line mode multicaret`() {
+        doTest(parseKeys("gH", "<S-Left>".repeat(5)),
+                """
+                A ${c}Discovery
+
+                I found it in a ${c}legendary land
+                all rocks and ${c}lavender and tufted grass$c,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                    """.trimIndent(),
+                """
+                $s${c}A Discovery$se
+
+                ${s}I found it ${c}in a legendary land$se
+                ${s}all rocks$c and lavender and tufted grass,$se
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent())
