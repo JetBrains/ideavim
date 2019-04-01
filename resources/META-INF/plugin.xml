@@ -243,6 +243,8 @@
             text="Toggle Select/Visual mode"/>
     <action id="VimSelectInsert" class="com.maddyhome.idea.vim.action.motion.select.SelectEnterAction"
             text="Select Enter Action"/>
+    <action id="VimEscapeSelect" class="com.maddyhome.idea.vim.action.motion.select.SelectEscapeAction"
+            text="Select Escape Action"/>
 
     <!-- Insert -->
     <action id="VimInsertAfterCursor" class="com.maddyhome.idea.vim.action.change.insert.InsertAfterCursorAction" text="Insert After Cursor"/>

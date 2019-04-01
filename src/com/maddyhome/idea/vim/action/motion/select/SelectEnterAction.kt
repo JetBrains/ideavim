@@ -19,7 +19,7 @@ private object SelectEnterActionHandler : EditorActionHandlerBase() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
         SelectionVimListenerSuppressor.lock()
         VimPlugin.getChange().processEnter(InjectedLanguageUtil.getTopLevelEditor(editor), context)
-        VimPlugin.getVisualMotion().exitSelectMode(editor)
+        VimPlugin.getVisualMotion().exitSelectMode(editor, false)
         VimPlugin.getChange().insertBeforeCursor(editor, context)
         SelectionVimListenerSuppressor.unlock()
         return true

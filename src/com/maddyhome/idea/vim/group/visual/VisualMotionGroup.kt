@@ -18,10 +18,7 @@
 
 package com.maddyhome.idea.vim.group.visual
 
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.LogicalPosition
-import com.intellij.openapi.editor.ScrollType
+import com.intellij.openapi.editor.*
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.*
@@ -231,13 +228,25 @@ class VisualMotionGroup {
         return true
     }
 
-    fun exitSelectMode(editor: Editor) {
+    /**
+     * [adjustCaretPosition] - if true, caret will be moved one char left if it's on the line end
+     */
+    fun exitSelectMode(editor: Editor, adjustCaretPosition: Boolean) {
         if (!CommandState.inSelectMode(editor)) return
 
         CommandState.getInstance(editor).popState()
-        val primaryCaret = editor.caretModel.primaryCaret
-        primaryCaret.removeSelection()
-        primaryCaret.vimSelectionStartSetToNull()
+        editor.caretModel.allCarets.forEach {
+            it.removeSelection()
+            it.vimSelectionStartSetToNull()
+            it.visualAttributes = CaretVisualAttributes.DEFAULT
+            if (adjustCaretPosition) {
+                val lineEnd = EditorHelper.getLineEndForOffset(editor, it.offset)
+                val lineStart = EditorHelper.getLineStartForOffset(editor, it.offset)
+                if (it.offset == lineEnd && it.offset != lineStart) {
+                    it.moveToOffset(it.offset - 1)
+                }
+            }
+        }
         ChangeGroup.resetCursor(editor, false)
         KeyHandler.getInstance().reset(editor)
     }
@@ -256,7 +265,7 @@ class VisualMotionGroup {
         } else {
             ChangeGroup.resetCursor(editor, resetCaretToInsert)
             exitVisual(editor)
-            exitSelectMode(editor)
+            exitSelectMode(editor, true)
         }
     }
 

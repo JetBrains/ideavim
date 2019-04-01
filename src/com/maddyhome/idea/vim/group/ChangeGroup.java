@@ -828,7 +828,7 @@ public class ChangeGroup {
                                         @NotNull final DataContext context, @NotNull final KeyStroke key) {
     boolean res = processKey(editor, context, key);
 
-    VimPlugin.getVisualMotion().exitSelectMode(editor);
+    VimPlugin.getVisualMotion().exitSelectMode(editor, false);
 
     if (isPrintableChar(key.getKeyChar())) {
       VimPlugin.getChange().insertBeforeCursor(editor, context);
