@@ -40,7 +40,7 @@ class ChangeVisualActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after)
+        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test change visual action`() {
@@ -58,7 +58,9 @@ class ChangeVisualActionTest : VimTestCase() {
                         "bar bar\n",
                 ("fo_quux_foo\n" +
                         "\n" +
-                        "ba_quux_bar\n"))
+                        "ba_quux_bar\n"),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
     }
 
 
@@ -70,6 +72,8 @@ class ChangeVisualActionTest : VimTestCase() {
                         "bar bar\n",
                 ("fo_quux_foo\n" +
                         "x\n" +
-                        "ba_quux_bar\n"))
+                        "ba_quux_bar\n"),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
     }
 }

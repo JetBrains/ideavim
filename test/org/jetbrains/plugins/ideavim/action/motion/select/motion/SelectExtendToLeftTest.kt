@@ -1,5 +1,6 @@
 package org.jetbrains.plugins.ideavim.action.motion.select.motion
 
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -21,7 +22,9 @@ class SelectExtendToLeftTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     fun `test double motion char mode`() {
@@ -41,7 +44,9 @@ class SelectExtendToLeftTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     fun `test at line start char mode`() {
@@ -61,7 +66,9 @@ class SelectExtendToLeftTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     fun `test at file start char mode`() {
@@ -81,7 +88,9 @@ class SelectExtendToLeftTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     fun `test char mode multicaret`() {
@@ -101,7 +110,9 @@ class SelectExtendToLeftTest : VimTestCase() {
                 all rocks and lavender and tufted gras$s${c}s$se,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     fun `test simple motion line mode`() {
@@ -121,7 +132,9 @@ class SelectExtendToLeftTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_LINE)
     }
 
     fun `test to line start line mode`() {
@@ -141,7 +154,9 @@ class SelectExtendToLeftTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_LINE)
     }
 
     fun `test to file start line mode`() {
@@ -161,7 +176,9 @@ class SelectExtendToLeftTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_LINE)
     }
 
     fun `test line mode multicaret`() {
@@ -181,7 +198,9 @@ class SelectExtendToLeftTest : VimTestCase() {
                 ${s}all rocks$c and lavender and tufted grass,$se
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_LINE)
     }
 
     fun `test simple motion block mode`() {
@@ -201,7 +220,9 @@ class SelectExtendToLeftTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
     }
 
     fun `test twice motion block mode`() {
@@ -221,7 +242,9 @@ class SelectExtendToLeftTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
     }
 
     fun `test at line start block mode`() {
@@ -241,7 +264,9 @@ class SelectExtendToLeftTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
     }
 
     fun `test at file start block mode`() {
@@ -261,7 +286,9 @@ class SelectExtendToLeftTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
     }
 
     fun `test multiline with empty line block mode`() {
@@ -281,7 +308,9 @@ class SelectExtendToLeftTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
         assertCaretsColour()
     }
 
@@ -302,7 +331,9 @@ class SelectExtendToLeftTest : VimTestCase() {
                 all $s${c}ro${se}cks and lavender and tufted grass,
                 wher$s${c}e ${se}it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
         assertCaretsColour()
     }
 }

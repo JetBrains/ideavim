@@ -55,7 +55,9 @@ Xbar
 
                     ba_quux_r
 
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
     }
 
     // VIM-632 |CTRL-V| |v_b_I|
@@ -72,7 +74,9 @@ Xbar
                     ${c}quux baz quux
                     quux spam eggs
 
-                    """.trimIndent()))
+                    """.trimIndent()),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
     }
 
     fun `test visual block insert`() {
@@ -105,7 +109,9 @@ Xbar
                     x
                     ba_quux_r
 
-                    """.trimIndent()))
+                    """.trimIndent()),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
     }
 
     fun `test insert in non block mode`() {
@@ -125,7 +131,9 @@ Xbar
                 Hell${c}oall rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
         assertMode(CommandState.Mode.COMMAND)
     }
 }

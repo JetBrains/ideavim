@@ -1,5 +1,6 @@
 package org.jetbrains.plugins.ideavim.ex.handler
 
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -20,7 +21,9 @@ class JoinLinesHandlerTest : VimTestCase() {
                 I found it in a legendary land$c all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
     }
 
     fun `test simple join full command`() {
@@ -39,7 +42,9 @@ class JoinLinesHandlerTest : VimTestCase() {
                 I found it in a legendary land$c all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
     }
 
     fun `test join with range`() {
@@ -57,7 +62,9 @@ class JoinLinesHandlerTest : VimTestCase() {
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass, where it was settled on some sodden sand$c hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
     }
 
     fun `test join multicaret`() {

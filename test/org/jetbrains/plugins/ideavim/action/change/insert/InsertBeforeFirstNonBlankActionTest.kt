@@ -40,7 +40,9 @@ class InsertBeforeFirstNonBlankActionTest : VimTestCase() {
                 Hell${c}oall rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
         assertMode(CommandState.Mode.COMMAND)
     }
 }

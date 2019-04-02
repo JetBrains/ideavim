@@ -18,6 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -43,7 +44,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after)
+        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test delete block SW direction`() {
@@ -64,7 +65,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after)
+        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test delete block NW direction`() {
@@ -85,7 +86,7 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after)
+        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test delete block NE direction`() {
@@ -106,6 +107,6 @@ class DeleteVisualActionTest : VimTestCase() {
             wh||t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after)
+        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 }

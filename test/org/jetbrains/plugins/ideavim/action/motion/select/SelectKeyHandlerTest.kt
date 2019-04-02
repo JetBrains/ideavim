@@ -27,7 +27,9 @@ class SelectKeyHandlerTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.INSERT,
+                CommandState.SubMode.NONE)
     }
 
     fun `test char mode on empty line`() {
@@ -48,7 +50,9 @@ class SelectKeyHandlerTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.INSERT,
+                CommandState.SubMode.NONE)
     }
 
     fun `test char mode multicaret`() {
@@ -69,7 +73,9 @@ class SelectKeyHandlerTest : VimTestCase() {
                 all rocks and ${typed}vender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.INSERT,
+                CommandState.SubMode.NONE)
     }
 
     fun `test line mode`() {
@@ -90,7 +96,9 @@ class SelectKeyHandlerTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.INSERT,
+                CommandState.SubMode.NONE)
     }
 
     fun `test line mode empty line`() {
@@ -111,7 +119,9 @@ class SelectKeyHandlerTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.INSERT,
+                CommandState.SubMode.NONE)
     }
 
     fun `test line mode multicaret`() {
@@ -132,7 +142,9 @@ class SelectKeyHandlerTest : VimTestCase() {
                 Hello
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.INSERT,
+                CommandState.SubMode.NONE)
     }
 
     fun `test type in select block mode`() {
@@ -153,8 +165,9 @@ class SelectKeyHandlerTest : VimTestCase() {
                 ${typed}l rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
-        assertCaretsColour()
+                    """.trimIndent(),
+                CommandState.Mode.INSERT,
+                CommandState.SubMode.NONE)
     }
 
     @VimBehaviourDiffers(originalVimAfter = """
@@ -183,8 +196,9 @@ class SelectKeyHandlerTest : VimTestCase() {
                 ${typed}ll rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
-        assertCaretsColour()
+                    """.trimIndent(),
+                CommandState.Mode.INSERT,
+                CommandState.SubMode.NONE)
     }
 
     fun `test block mode longer line`() {
@@ -205,8 +219,9 @@ class SelectKeyHandlerTest : VimTestCase() {
                 all rocks and lavender and tu${typed}d grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
-        assertCaretsColour()
+                    """.trimIndent(),
+                CommandState.Mode.INSERT,
+                CommandState.SubMode.NONE)
     }
 
     fun `test block mode longer line with esc`() {
@@ -227,7 +242,9 @@ class SelectKeyHandlerTest : VimTestCase() {
                 all rocks and lavender and tuHell${c}od grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
         assertCaretsColour()
         assertMode(CommandState.Mode.COMMAND)
     }

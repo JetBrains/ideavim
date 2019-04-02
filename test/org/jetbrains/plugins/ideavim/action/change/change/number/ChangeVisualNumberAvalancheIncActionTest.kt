@@ -18,6 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.change.number
 
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -36,7 +37,9 @@ class ChangeVisualNumberAvalancheIncActionTest : VimTestCase() {
                     ${c}number 2
                     number 3
                     number 4
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
     }
 
     fun `test inc visual avalanche multiple times`() {
@@ -50,6 +53,8 @@ class ChangeVisualNumberAvalancheIncActionTest : VimTestCase() {
                     ${c}number 3
                     number 5
                     number 7
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
     }
 }

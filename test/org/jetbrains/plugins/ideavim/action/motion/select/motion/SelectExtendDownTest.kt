@@ -1,5 +1,6 @@
 package org.jetbrains.plugins.ideavim.action.motion.select.motion
 
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -21,7 +22,9 @@ class SelectExtendDownTest : VimTestCase() {
                 a$c${se}ll rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     fun `test char select move to empty line`() {
@@ -41,7 +44,9 @@ class SelectExtendDownTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     fun `test char select move from empty line`() {
@@ -61,7 +66,9 @@ class SelectExtendDownTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     fun `test char select move to file end`() {
@@ -79,7 +86,9 @@ class SelectExtendDownTest : VimTestCase() {
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard ${s}b$c${se}y the torrent of a mountain pass.""".trimIndent())
+                hard ${s}b$c${se}y the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     fun `test char select move multicaret`() {
@@ -97,7 +106,9 @@ class SelectExtendDownTest : VimTestCase() {
                 I ${s}found it in a legendary land
                 all$c$se rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard ${s}b$c${se}y the torrent of a mountain pass.""".trimIndent())
+                hard ${s}b$c${se}y the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     fun `test line select simple move`() {
@@ -117,7 +128,9 @@ class SelectExtendDownTest : VimTestCase() {
                 ${c}all rocks and lavender and tufted grass,$se
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_LINE)
     }
 
     fun `test line select to empty line`() {
@@ -137,7 +150,9 @@ class SelectExtendDownTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_LINE)
     }
 
     fun `test line select from empty line`() {
@@ -157,7 +172,9 @@ class SelectExtendDownTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_LINE)
     }
 
     fun `test line select to file end`() {
@@ -175,7 +192,9 @@ class SelectExtendDownTest : VimTestCase() {
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                ${s}hard by the ${c}torrent of a mountain pass.$se""".trimIndent())
+                ${s}hard by the ${c}torrent of a mountain pass.$se""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_LINE)
     }
 
     fun `test line select multicaret`() {
@@ -193,7 +212,9 @@ class SelectExtendDownTest : VimTestCase() {
                 ${s}I found it in a legendary land
                 all rock${c}s and lavender and tufted grass,$se
                 where it was settled on some sodden sand
-                ${s}hard by the ${c}torrent of a mountain pass.$se""".trimIndent())
+                ${s}hard by the ${c}torrent of a mountain pass.$se""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_LINE)
     }
 
     fun `test block select simple move`() {
@@ -211,7 +232,9 @@ class SelectExtendDownTest : VimTestCase() {
                 I found ${s}i$c${se}t in a legendary land
                 all rock${s}s$c$se and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent())
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
     }
 
     fun `test block select to empty line`() {
@@ -229,7 +252,9 @@ class SelectExtendDownTest : VimTestCase() {
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent())
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
     }
 
     fun `test block select from empty line`() {
@@ -247,7 +272,9 @@ class SelectExtendDownTest : VimTestCase() {
                 $s$c${se}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent())
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
     }
 
     fun `test block select to file end`() {
@@ -265,6 +292,8 @@ class SelectExtendDownTest : VimTestCase() {
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the ${s}t$c${se}orrent of a mountain pass.""".trimIndent())
+                hard by the ${s}t$c${se}orrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
     }
 }

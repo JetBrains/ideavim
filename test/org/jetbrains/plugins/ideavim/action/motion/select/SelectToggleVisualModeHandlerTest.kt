@@ -20,9 +20,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 I ${s}found$c$se it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent())
-        assertMode(CommandState.Mode.SELECT)
-        assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     fun `test switch to select mode characterwise multicaret`() {
@@ -40,9 +40,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 I ${s}found$c$se it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was ${s}settled$c$se on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent())
-        assertMode(CommandState.Mode.SELECT)
-        assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     fun `test switch to visual mode characterwise`() {
@@ -60,9 +60,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 I ${s}foun${c}d$se it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent())
-        assertMode(CommandState.Mode.VISUAL)
-        assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.VISUAL,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     fun `test switch to visual mode characterwise multicaret`() {
@@ -80,9 +80,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 I ${s}foun${c}d$se it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was ${s}sett${c}l${se}ed on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent())
-        assertMode(CommandState.Mode.VISUAL)
-        assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.VISUAL,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     fun `test switch to select mode linewise`() {
@@ -100,9 +100,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 ${s}I found$c it in a legendary land$se
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent())
-        assertMode(CommandState.Mode.SELECT)
-        assertSubMode(CommandState.SubMode.VISUAL_LINE)
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_LINE)
     }
 
     fun `test switch to select mode linewise multicaret`() {
@@ -120,9 +120,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 ${s}I found$c it in a legendary land$se
                 all rocks and lavender and tufted grass,
                 ${s}where it was settled$c on some sodden sand$se
-                hard by the torrent of a mountain pass.""".trimIndent())
-        assertMode(CommandState.Mode.SELECT)
-        assertSubMode(CommandState.SubMode.VISUAL_LINE)
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_LINE)
     }
 
     fun `test switch to visual mode linewise`() {
@@ -140,9 +140,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 ${s}I found it in a legendary lan${c}d$se
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent())
-        assertMode(CommandState.Mode.VISUAL)
-        assertSubMode(CommandState.SubMode.VISUAL_LINE)
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.VISUAL,
+                CommandState.SubMode.VISUAL_LINE)
     }
 
     fun `test switch to visual mode linewise multicaret`() {
@@ -160,9 +160,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 ${s}I found it in a legendary lan${c}d$se
                 all rocks and lavender and tufted grass,
                 ${s}where it was settled on some sodden san${c}d$se
-                hard by the torrent of a mountain pass.""".trimIndent())
-        assertMode(CommandState.Mode.VISUAL)
-        assertSubMode(CommandState.SubMode.VISUAL_LINE)
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.VISUAL,
+                CommandState.SubMode.VISUAL_LINE)
     }
 
     fun `test switch to select mode blockwise`() {
@@ -180,10 +180,9 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 I ${s}found$c$se it in a legendary land
                 al${s}l roc$c${se}ks and lavender and tufted grass,
                 wh${s}ere i$c${se}t was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent())
-        assertMode(CommandState.Mode.SELECT)
-        assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
-        assertCaretsColour()
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
     }
 
     fun `test switch to visual mode blockwise`() {
@@ -201,9 +200,8 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 I ${s}foun${c}d$se it in a legendary land
                 al${s}l ro${c}c${se}ks and lavender and tufted grass,
                 wh${s}ere ${c}i${se}t was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent())
-        assertMode(CommandState.Mode.VISUAL)
-        assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
-        assertCaretsColour()
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.VISUAL,
+                CommandState.SubMode.VISUAL_BLOCK)
     }
 }

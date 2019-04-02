@@ -22,6 +22,7 @@ import com.intellij.json.JsonFileType;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.VisualPosition;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.CommandState;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.command.CommandState.Mode.COMMAND;
@@ -1021,8 +1022,7 @@ public class MotionActionTest extends VimTestCase {
            "four  \n",
            "one   \n" +
            "two   \n" +
-           "thre<caret>e  \n" +
-           "four  \n");
+           "thre<caret>e  \n" + "four  \n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // |3g_|
@@ -1034,8 +1034,7 @@ public class MotionActionTest extends VimTestCase {
            "four  \n",
            "one   \n" +
            "two   \n" +
-           "thre<caret>e  \n" +
-           "four  \n");
+           "thre<caret>e  \n" + "four  \n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // VIM-646 |gv|

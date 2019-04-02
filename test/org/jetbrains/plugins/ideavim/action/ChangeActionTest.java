@@ -31,12 +31,14 @@ import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
 public class ChangeActionTest extends VimTestCase {
   // |c| |t|
   public void testChangeLinesTillForwards() {
-    doTest(parseKeys("ct(", "for "), "<caret>if (condition) {\n" + "}\n", "for (condition) {\n" + "}\n");
+    doTest(parseKeys("ct(", "for "), "<caret>if (condition) {\n" + "}\n", "for (condition) {\n" + "}\n",
+           CommandState.Mode.INSERT, CommandState.SubMode.NONE);
   }
 
   // VIM-276 |c| |T|
   public void testChangeLinesTillBackwards() {
-    doTest(parseKeys("cT("), "if (condition) {<caret>\n" + "}\n", "if (\n" + "}\n");
+    doTest(parseKeys("cT("), "if (condition) {<caret>\n" + "}\n", "if (\n" + "}\n", CommandState.Mode.INSERT,
+           CommandState.SubMode.NONE);
   }
 
   // VIM-276 |c| |F|
@@ -44,34 +46,30 @@ public class ChangeActionTest extends VimTestCase {
     doTest(parseKeys("cFc"),
            "if (condition) {<caret>\n" +
            "}\n",
-           "if (\n" +
-           "}\n");
+           "if (\n" + "}\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
   }
 
   // VIM-620 |i_CTRL-O|
   public void testInsertSingleCommandAndInserting() {
-    doTest(parseKeys("i", "<C-O>", "a", "123", "<Esc>", "x"),
-            "abc<caret>d\n",
-            "abcd12\n");
+    doTest(parseKeys("i", "<C-O>", "a", "123", "<Esc>", "x"), "abc<caret>d\n", "abcd12\n", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   // VIM-620 |i_CTRL-O|
   public void testInsertSingleCommandAndNewLineInserting() {
     doTest(parseKeys("i", "<C-O>", "o", "123", "<Esc>", "x"),
-           "abc<caret>d\n",
-           "abcd\n12\n");
+           "abc<caret>d\n", "abcd\n12\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // VIM-311 |i_CTRL-O|
   public void testInsertSingleCommand() {
     doTest(parseKeys("i", "def", "<C-O>", "d2h", "x"),
-           "abc<caret>.\n",
-           "abcdx.\n");
+           "abc<caret>.\n", "abcdx.\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
   }
 
   // VIM-321 |d| |count|
   public void testDeleteEmptyRange() {
-    doTest(parseKeys("d0"), "<caret>hello\n", "hello\n");
+    doTest(parseKeys("d0"), "<caret>hello\n", "hello\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // VIM-112 |i| |i_CTRL-W|
@@ -84,38 +82,44 @@ public class ChangeActionTest extends VimTestCase {
 
   // VIM-157 |~|
   public void testToggleCharCase() {
-    doTest(parseKeys("~~"), "<caret>hello world\n", "HEllo world\n");
+    doTest(parseKeys("~~"), "<caret>hello world\n", "HEllo world\n", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   // VIM-157 |~|
   public void testToggleCharCaseLineEnd() {
     doTest(parseKeys("~~"),
-           "hello wor<caret>ld\n",
-           "hello worLD\n");
+           "hello wor<caret>ld\n", "hello worLD\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testToggleCaseMotion() {
-    doTest(parseKeys("g~w"), "<caret>FooBar Baz\n", "fOObAR Baz\n");
+    doTest(parseKeys("g~w"), "<caret>FooBar Baz\n", "fOObAR Baz\n", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   public void testChangeUpperCase() {
-    doTest(parseKeys("gUw"), "<caret>FooBar Baz\n", "FOOBAR Baz\n");
+    doTest(parseKeys("gUw"), "<caret>FooBar Baz\n", "FOOBAR Baz\n", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   public void testChangeLowerCase() {
-    doTest(parseKeys("guw"), "<caret>FooBar Baz\n", "foobar Baz\n");
+    doTest(parseKeys("guw"), "<caret>FooBar Baz\n", "foobar Baz\n", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   public void testToggleCaseVisual() {
-    doTest(parseKeys("ve~"), "<caret>FooBar Baz\n", "fOObAR Baz\n");
+    doTest(parseKeys("ve~"), "<caret>FooBar Baz\n", "fOObAR Baz\n", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   public void testChangeUpperCaseVisual() {
-    doTest(parseKeys("veU"), "<caret>FooBar Baz\n", "FOOBAR Baz\n");
+    doTest(parseKeys("veU"), "<caret>FooBar Baz\n", "FOOBAR Baz\n", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   public void testChangeLowerCaseVisual() {
-    doTest(parseKeys("veu"), "<caret>FooBar Baz\n", "foobar Baz\n");
+    doTest(parseKeys("veu"), "<caret>FooBar Baz\n", "foobar Baz\n", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   // VIM-85 |i| |gi| |gg|
@@ -123,8 +127,8 @@ public class ChangeActionTest extends VimTestCase {
     doTest(parseKeys("i", "hello", "<Esc>", "gg", "gi", " world! "), "one\n" +
                                                                      "two <caret>three\n" +
                                                                      "four\n", "one\n" +
-                                                                               "two hello world! three\n" +
-                                                                               "four\n");
+                                                                               "two hello world! three\n" + "four\n",
+           CommandState.Mode.INSERT, CommandState.SubMode.NONE);
   }
 
   // VIM-312 |d| |w|
@@ -132,14 +136,14 @@ public class ChangeActionTest extends VimTestCase {
     doTest(parseKeys("dw"),
            "one\n" +
            "<caret>two\n",
-           "one\n" +
-           "\n");
+           "one\n" + "\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
     assertOffset(4);
   }
 
   // |d| |w|
   public void testDeleteLastWordBeforeEOL() {
-    doTest(parseKeys("dw"), "one <caret>two\n" + "three\n", "one \n" + "three\n");
+    doTest(parseKeys("dw"), "one <caret>two\n" + "three\n", "one \n" + "three\n", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   // VIM-105 |d| |w|
@@ -147,8 +151,7 @@ public class ChangeActionTest extends VimTestCase {
     doTest(parseKeys("dw"), "one <caret>two\n" +
                             "\n" +
                             "three\n", "one \n" +
-                                       "\n" +
-                                       "three\n");
+                                       "\n" + "three\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // VIM-105 |d| |w|
@@ -156,39 +159,42 @@ public class ChangeActionTest extends VimTestCase {
     doTest(parseKeys("dw"),
            "one <caret>two\n" +
            " three\n",
-           "one \n" +
-           " three\n");
+           "one \n" + " three\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
     assertOffset(3);
   }
 
   // VIM-105 |d| |w| |count|
   public void testDeleteTwoWordsOnTwoLines() {
-    doTest(parseKeys("d2w"), "one <caret>two\n" + "three four\n", "one four\n");
+    doTest(parseKeys("d2w"), "one <caret>two\n" + "three four\n", "one four\n", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   // VIM-200 |c| |w|
   public void testChangeWordAtLastChar() {
-    doTest(parseKeys("cw"), "on<caret>e two three\n", "on<caret> two three\n");
+    doTest(parseKeys("cw"), "on<caret>e two three\n", "on<caret> two three\n", CommandState.Mode.INSERT,
+           CommandState.SubMode.NONE);
   }
 
   // VIM-1380 |c| |w| |count|
   public void testChangeTwoWordsAtLastChar() {
-    doTest(parseKeys("c2w"), "on<caret>e two three\n", "on<caret> three\n");
+    doTest(parseKeys("c2w"), "on<caret>e two three\n", "on<caret> three\n", CommandState.Mode.INSERT,
+           CommandState.SubMode.NONE);
   }
 
   // VIM-1380 |d| |w| |count|
   public void testDeleteTwoWordsAtLastChar() {
-    doTest(parseKeys("d2w"), "on<caret>e two three\n", "on<caret>three\n");
+    doTest(parseKeys("d2w"), "on<caret>e two three\n", "on<caret>three\n", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   // VIM-515 |c| |W|
   public void testChangeBigWordWithPunctuationAndAlpha() {
-    doTest(parseKeys("cW"), "foo<caret>(bar baz\n", "foo baz\n");
+    doTest(parseKeys("cW"), "foo<caret>(bar baz\n", "foo baz\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
   }
 
   // VIM-300 |c| |w|
   public void testChangeWordTwoWordsWithoutWhitespace() {
-    doTest(parseKeys("cw"), "<caret>$value\n", "value\n");
+    doTest(parseKeys("cw"), "<caret>$value\n", "value\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
   }
 
   // VIM-296 |cc|
@@ -196,8 +202,7 @@ public class ChangeActionTest extends VimTestCase {
     doTest(parseKeys("cc"),
            "foo\n" +
            "<caret>bar\n",
-           "foo\n" +
-           "\n");
+           "foo\n" + "\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
     assertOffset(4);
   }
 
@@ -206,18 +211,19 @@ public class ChangeActionTest extends VimTestCase {
     doTest(parseKeys("ccbaz"),
            "<caret>foo\n" +
            "bar\n",
-           "baz\n" +
-           "bar\n");
+           "baz\n" + "bar\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
   }
 
   // VIM-394 |d| |v_aw|
   public void testDeleteIndentedWordBeforePunctuation() {
-    doTest(parseKeys("daw"), "foo\n" + "  <caret>bar, baz\n", "foo\n" + "  , baz\n");
+    doTest(parseKeys("daw"), "foo\n" + "  <caret>bar, baz\n", "foo\n" + "  , baz\n", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   // |d| |v_aw|
   public void testDeleteLastWordAfterPunctuation() {
-    doTest(parseKeys("daw"), "foo(<caret>bar\n" + "baz\n", "foo(\n" + "baz\n");
+    doTest(parseKeys("daw"), "foo(<caret>bar\n" + "baz\n", "foo(\n" + "baz\n", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   // VIM-244 |d| |l|
@@ -225,74 +231,68 @@ public class ChangeActionTest extends VimTestCase {
     doTest(parseKeys("dl"),
            "fo<caret>o\n" +
            "bar\n",
-           "fo\n" +
-           "bar\n");
+           "fo\n" + "bar\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
     assertOffset(1);
   }
 
   // VIM-393 |d|
   public void testDeleteBadArgument() {
-    doTest(parseKeys("dD", "dd"), "one\n" + "two\n", "two\n");
+    doTest(parseKeys("dD", "dd"), "one\n" + "two\n", "two\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // VIM-262 |i_CTRL-R|
   public void testInsertFromRegister() {
     VimPlugin.getRegister().setKeys('a', stringToKeys("World"));
-    doTest(parseKeys("A", ", ", "<C-R>", "a", "!"), "<caret>Hello\n", "Hello, World!\n");
+    doTest(parseKeys("A", ", ", "<C-R>", "a", "!"), "<caret>Hello\n", "Hello, World!\n", CommandState.Mode.INSERT,
+           CommandState.SubMode.NONE);
   }
 
   // VIM-421 |c| |w|
   public void testChangeLastWordInLine() {
     doTest(parseKeys("cw"),
-           "ab.<caret>cd\n",
-           "ab.<caret>\n");
+           "ab.<caret>cd\n", "ab.<caret>\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
   }
 
   // VIM-421 |c| |iw|
   public void testChangeLastInnerWordInLine() {
     doTest(parseKeys("c", "iw", "baz"),
-           "foo bar bo<caret>o\n",
-           "foo bar baz\n");
+           "foo bar bo<caret>o\n", "foo bar baz\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
   }
 
   // VIM-421 |c| |w|
   public void testChangeLastCharInLine() {
-    doTest(parseKeys("cw"), "fo<caret>o\n", "fo<caret>\n");
+    doTest(parseKeys("cw"), "fo<caret>o\n", "fo<caret>\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
   }
 
   // VIM-404 |O|
   public void testInsertNewLineAboveFirstLine() {
     doTest(parseKeys("O", "bar"),
-           "fo<caret>o\n",
-           "bar\nfoo\n");
+           "fo<caret>o\n", "bar\nfoo\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
   }
 
   // VIM-472 |v|
   public void testVisualSelectionRightMargin() {
     doTest(parseKeys("v", "k$d"),
-           "foo\n<caret>bar\n",
-           "fooar\n");
+           "foo\n<caret>bar\n", "fooar\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // VIM-569 |a| |i_CTRL-W|
   public void testDeletePreviousWordDotEOL() {
     doTest(parseKeys("a", "<C-W>"),
-           "this is a sentence<caret>.\n",
-           "this is a sentence<caret>\n");
+           "this is a sentence<caret>.\n", "this is a sentence<caret>\n", CommandState.Mode.INSERT,
+           CommandState.SubMode.NONE);
   }
 
   // VIM-569 |a| |i_CTRL-W|
   public void testDeletePreviousWordLastAfterWhitespace() {
     doTest(parseKeys("A", "<C-W>"),
-           "<caret>this is a sentence\n",
-           "this is a <caret>\n");
+           "<caret>this is a sentence\n", "this is a <caret>\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
   }
 
   // VIM-513 |A| |i_CTRL-W|
   public void testDeletePreviousWordEOL() {
     doTest(parseKeys("A", "<C-W>"),
-           "<caret>$variable\n",
-           "$<caret>\n");
+           "<caret>$variable\n", "$<caret>\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
   }
 
   // VIM-632 |CTRL-V| |v_d|
@@ -304,8 +304,7 @@ public class ChangeActionTest extends VimTestCase {
            "quux\n",
            "<caret>o\n" +
            "r\n" +
-           "z\n" +
-           "quux\n");
+           "z\n" + "quux\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testDeleteCharVisualBlock() {
@@ -316,8 +315,7 @@ public class ChangeActionTest extends VimTestCase {
            "quux\n",
            "<caret>o\n" +
            "r\n" +
-           "z\n" +
-           "quux\n");
+           "z\n" + "quux\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testDeleteJoinLinesSpaces() {
@@ -326,8 +324,7 @@ public class ChangeActionTest extends VimTestCase {
            "    b 2\n" +
            "    c 3\n" +
            "quux\n",
-           "    a 1 b 2 c 3\n" +
-           "quux\n");
+           "    a 1 b 2 c 3\n" + "quux\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testDeleteJoinLines() {
@@ -336,23 +333,20 @@ public class ChangeActionTest extends VimTestCase {
            "    b 2\n" +
            "    c 3\n" +
            "quux\n",
-           "    a 1    b 2    c 3\n" +
-           "quux\n");
+           "    a 1    b 2    c 3\n" + "quux\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testDeleteJoinLinesWithTrailingSpaceThenEmptyLine() {
     doTest(parseKeys("3J"),
            "foo \n" +
            "\n" +
-           "bar",
-           "foo bar");
+           "bar", "foo bar", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testDeleteJoinLinesWithTwoTrailingSpaces() {
     doTest(parseKeys("J"),
            "foo  \n" +
-           "bar",
-           "foo  bar");
+           "bar", "foo  bar", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testDeleteJoinVisualLinesSpaces() {
@@ -361,8 +355,7 @@ public class ChangeActionTest extends VimTestCase {
            "    b 2\n" +
            "    c 3\n" +
            "quux\n",
-           "    a 1 b 2 c 3\n" +
-           "quux\n");
+           "    a 1 b 2 c 3\n" + "quux\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testDeleteJoinVisualLines() {
@@ -371,20 +364,17 @@ public class ChangeActionTest extends VimTestCase {
            "    b 2\n" +
            "    c 3\n" +
            "quux\n",
-           "    a 1    b 2    c 3\n" +
-           "quux\n");
+           "    a 1    b 2    c 3\n" + "quux\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testDeleteCharVisualBlockOnLastCharOfLine() {
     doTest(parseKeys("<C-V>", "x"),
-           "fo<caret>o\n",
-           "fo\n");
+           "fo<caret>o\n", "fo\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testDeleteCharVisualBlockOnEmptyLinesDoesntDeleteAnything() {
     doTest(parseKeys("<C-V>", "j", "x"),
-           "\n\n",
-           "\n\n");
+           "\n\n", "\n\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // VIM-781 |CTRL-V| |j|
@@ -394,8 +384,7 @@ public class ChangeActionTest extends VimTestCase {
            "\n" +
            "bar\n",
            "fo\n" +
-           "\n" +
-           "br\n");
+           "\n" + "br\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // VIM-781 |CTRL-V| |j|
@@ -405,8 +394,7 @@ public class ChangeActionTest extends VimTestCase {
            "x\n" +
            "bar\n",
            "fo\n" +
-           "x\n" +
-           "br\n");
+           "x\n" + "br\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // VIM-845 |CTRL-V| |x|
@@ -421,22 +409,19 @@ public class ChangeActionTest extends VimTestCase {
   // |r|
   public void testReplaceOneChar() {
     doTest(parseKeys("rx"),
-           "b<caret>ar\n",
-           "b<caret>xr\n");
+           "b<caret>ar\n", "b<caret>xr\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // |r|
   public void testReplaceMultipleCharsWithCount() {
     doTest(parseKeys("3rX"),
-           "fo<caret>obar\n",
-           "fo<caret>XXXr\n");
+           "fo<caret>obar\n", "fo<caret>XXXr\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // |r|
   public void testReplaceMultipleCharsWithCountPastEndOfLine() {
     doTest(parseKeys("6rX"),
-           "fo<caret>obar\n",
-           "fo<caret>obar\n");
+           "fo<caret>obar\n", "fo<caret>obar\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // |r|
@@ -444,8 +429,7 @@ public class ChangeActionTest extends VimTestCase {
     doTest(parseKeys("v", "ll", "j", "rZ"),
            "fo<caret>obar\n" +
            "foobaz\n",
-           "foZZZZ\n" +
-           "ZZZZZz\n");
+           "foZZZZ\n" + "ZZZZZz\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // |r|
@@ -454,8 +438,7 @@ public class ChangeActionTest extends VimTestCase {
            "    fo<caret>obar\n" +
            "foobaz\n",
            "    fo\n" +
-           "    bar\n" +
-           "foobaz\n");
+           "    bar\n" + "foobaz\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // |r|
@@ -464,22 +447,19 @@ public class ChangeActionTest extends VimTestCase {
            "    fo<caret>obar\n" +
            "foobaz\n",
            "    fo\n" +
-           "    r\n" +
-           "foobaz\n");
+           "    r\n" + "foobaz\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // |s|
   public void testReplaceOneCharWithText() {
     doTest(parseKeys("sxy<Esc>"),
-           "b<caret>ar\n",
-           "bx<caret>yr\n");
+           "b<caret>ar\n", "bx<caret>yr\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // |s|
   public void testReplaceMultipleCharsWithTextWithCount() {
     doTest(parseKeys("3sxy<Esc>"),
-           "fo<caret>obar\n",
-           "fox<caret>yr\n");
+           "fo<caret>obar\n", "fox<caret>yr\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // |s|
@@ -487,29 +467,26 @@ public class ChangeActionTest extends VimTestCase {
     doTest(parseKeys("99sxyz<Esc>"),
            "foo<caret>bar\n" +
            "biff\n",
-           "fooxy<caret>z\n" +
-           "biff\n");
+           "fooxy<caret>z\n" + "biff\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // |R|
   public void testReplaceMode() {
     doTest(parseKeys("Rbaz<Esc>"),
-           "foo<caret>bar\n",
-           "fooba<caret>z\n");
+           "foo<caret>bar\n", "fooba<caret>z\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // |R| |i_<Insert>|
   public void testReplaceModeSwitchToInsertModeAndBack() {
     doTest(parseKeys("RXXX<Ins>YYY<Ins>ZZZ<Esc>"),
-           "aaa<caret>bbbcccddd\n",
-           "aaaXXXYYYZZ<caret>Zddd\n");
+           "aaa<caret>bbbcccddd\n", "aaaXXXYYYZZ<caret>Zddd\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // |i| |i_<Insert>|
   public void testInsertModeSwitchToReplaceModeAndBack() {
     doTest(parseKeys("iXXX<Ins>YYY<Ins>ZZZ<Esc>"),
-           "aaa<caret>bbbcccddd\n",
-           "aaaXXXYYYZZ<caret>Zcccddd\n");
+           "aaa<caret>bbbcccddd\n", "aaaXXXYYYZZ<caret>Zcccddd\n", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   // VIM-511 |.|
@@ -517,8 +494,7 @@ public class ChangeActionTest extends VimTestCase {
     doTest(parseKeys("ce", "foo", "<BS><BS><BS>", "foo", "<Esc>", "j0", "."),
            "<caret>foo baz\n" +
            "baz quux\n",
-           "foo baz\n" +
-           "fo<caret>o quux\n");
+           "foo baz\n" + "fo<caret>o quux\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // VIM-511 |.|
@@ -636,7 +612,8 @@ public class ChangeActionTest extends VimTestCase {
   }
 
   public void testRepeatChangeWordDoesNotBreakNextRepeatFind() {
-    doTest(parseKeys("fXcfYPATATA<Esc>fX.;."), "<caret>aaaaXBBBBYaaaaaaaXBBBBYaaaaaaXBBBBYaaaaaaaa\n", "aaaaPATATAaaaaaaaPATATAaaaaaaPATATAaaaaaaaa\n");
+    doTest(parseKeys("fXcfYPATATA<Esc>fX.;."), "<caret>aaaaXBBBBYaaaaaaaXBBBBYaaaaaaXBBBBYaaaaaaaa\n",
+           "aaaaPATATAaaaaaaaPATATAaaaaaaPATATAaaaaaaaa\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testRepeatReplace() {
@@ -652,47 +629,47 @@ public class ChangeActionTest extends VimTestCase {
     doTest(parseKeys("ld^j"),
             "lorem <caret>ipsum dolor sit amet\n" +
                    "lorem ipsum dolor sit amet",
-              "psum dolor sit amet\n" +
-                    "<caret>lorem ipsum dolor sit amet");
+           "psum dolor sit amet\n" + "<caret>lorem ipsum dolor sit amet", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   public void ignoredDownMovementAfterDeletionToPrevWord() {
     doTest(parseKeys("ldbj"),
             "lorem<caret> ipsum dolor sit amet\n" +
                     "lorem ipsum dolor sit amet",
-            "ipsum dolor sit amet\n" +
-                    "<caret>lorem ipsum dolor sit amet");
+           "ipsum dolor sit amet\n" + "<caret>lorem ipsum dolor sit amet", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   public void ignoredDownMovementAfterChangeToPrevWord() {
     doTest(parseKeys("lcb<Esc>j"),
             "lorem<caret> ipsum dolor sit amet\n" +
                     "lorem ipsum dolor sit amet",
-            "ipsum dolor sit amet\n" +
-                    "<caret>lorem ipsum dolor sit amet");
+           "ipsum dolor sit amet\n" + "<caret>lorem ipsum dolor sit amet", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   public void ignoredDownMovementAfterChangeToLineStart() {
     doTest(parseKeys("lc^<Esc>j"),
             "lorem<caret> ipsum dolor sit amet\n" +
                     "lorem ipsum dolor sit amet",
-            "ipsum dolor sit amet\n" +
-                    "<caret>lorem ipsum dolor sit amet");
+           "ipsum dolor sit amet\n" + "<caret>lorem ipsum dolor sit amet", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   public void ignoredUpMovementAfterDeletionToStart() {
     doTest(parseKeys("ld^k"),
             "lorem ipsum dolor sit amet\n" +
                     "lorem <caret>ipsum dolor sit amet",
-            "<caret>lorem ipsum dolor sit amet\n" +
-                    "psum dolor sit amet");
+           "<caret>lorem ipsum dolor sit amet\n" + "psum dolor sit amet", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   public void ignoredUpMovementAfterChangeToPrevWord() {
     doTest(parseKeys("lcb<Esc>k"),
             "lorem ipsum dolor sit amet\n" +
                     "lorem<caret> ipsum dolor sit amet",
-            "<caret>lorem ipsum dolor sit amet\n" +
-                    "ipsum dolor sit amet");
+           "<caret>lorem ipsum dolor sit amet\n" + "ipsum dolor sit amet", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 }

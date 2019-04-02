@@ -1,5 +1,6 @@
 package org.jetbrains.plugins.ideavim.action.motion.select.motion
 
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -21,7 +22,9 @@ class SelectExtendToRightTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     fun `test at the lineend char mode`() {
@@ -41,7 +44,9 @@ class SelectExtendToRightTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     fun `test out of line char mode`() {
@@ -61,7 +66,9 @@ class SelectExtendToRightTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     fun `test file end char mode`() {
@@ -79,7 +86,9 @@ class SelectExtendToRightTest : VimTestCase() {
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass$s.$c$se""".trimIndent())
+                hard by the torrent of a mountain pass$s.$c$se""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     fun `test file char mode multicaret`() {
@@ -97,7 +106,9 @@ class SelectExtendToRightTest : VimTestCase() {
                 I ${s}fou$c${se}nd it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass$s.$c$se""".trimIndent())
+                hard by the torrent of a mountain pass$s.$c$se""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     fun `test simple motion line mode`() {
@@ -117,7 +128,9 @@ class SelectExtendToRightTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_LINE)
     }
 
     fun `test lineend line mode`() {
@@ -137,7 +150,9 @@ class SelectExtendToRightTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_LINE)
     }
 
     fun `test out of line line mode`() {
@@ -157,7 +172,9 @@ class SelectExtendToRightTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_LINE)
     }
 
     fun `test fileend line mode`() {
@@ -175,7 +192,9 @@ class SelectExtendToRightTest : VimTestCase() {
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                ${s}hard by the torrent of a mountain pass.$c$se""".trimIndent())
+                ${s}hard by the torrent of a mountain pass.$c$se""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_LINE)
     }
 
     fun `test line mode multicaret`() {
@@ -193,7 +212,9 @@ class SelectExtendToRightTest : VimTestCase() {
                 ${s}I found i${c}t in a legendary land$se
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                ${s}hard by the torrent of a mountain pass.$c$se""".trimIndent())
+                ${s}hard by the torrent of a mountain pass.$c$se""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_LINE)
     }
 
     fun `test simple motion block mode`() {
@@ -213,7 +234,9 @@ class SelectExtendToRightTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
     }
 
     fun `test at the lineend block mode`() {
@@ -233,7 +256,9 @@ class SelectExtendToRightTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
     }
 
     fun `test out of line block mode`() {
@@ -253,7 +278,9 @@ class SelectExtendToRightTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
     }
 
     fun `test file end block mode`() {
@@ -271,7 +298,9 @@ class SelectExtendToRightTest : VimTestCase() {
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass$s.$c$se""".trimIndent())
+                hard by the torrent of a mountain pass$s.$c$se""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
     }
 
     fun `test to longer line block mode`() {
@@ -289,7 +318,8 @@ class SelectExtendToRightTest : VimTestCase() {
                 I found it in a legendary lan${s}d$se
                 all rocks and lavender and tu${s}fted$c$se grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent())
-        assertCaretsColour()
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
     }
 }

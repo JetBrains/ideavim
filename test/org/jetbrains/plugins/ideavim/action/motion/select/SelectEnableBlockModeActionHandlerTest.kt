@@ -22,9 +22,9 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
-        assertMode(CommandState.Mode.SELECT)
-        assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
     }
 
     fun `test entering select mode at the end of file`() {
@@ -42,9 +42,9 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass$s.$c$se""".trimIndent())
-        assertMode(CommandState.Mode.SELECT)
-        assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
+                hard by the torrent of a mountain pass$s.$c$se""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
     }
 
     fun `test entering select mode on empty line`() {
@@ -62,9 +62,9 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent())
-        assertMode(CommandState.Mode.SELECT)
-        assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
     }
 
     fun `test entering select mode multicaret`() {
@@ -82,8 +82,8 @@ class SelectEnableBlockModeActionHandlerTest : VimTestCase() {
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was ${s}s$c${se}ettled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent())
-        assertMode(CommandState.Mode.SELECT)
-        assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
     }
 }

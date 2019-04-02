@@ -23,7 +23,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
         assertMode(CommandState.Mode.COMMAND)
     }
 
@@ -44,7 +46,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
         assertMode(CommandState.Mode.COMMAND)
     }
 
@@ -65,7 +69,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
         assertMode(CommandState.Mode.COMMAND)
     }
 
@@ -86,7 +92,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
         assertMode(CommandState.Mode.COMMAND)
     }
 
@@ -107,7 +115,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
         assertMode(CommandState.Mode.COMMAND)
     }
 
@@ -128,7 +138,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 all rocks a${c}nd lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
         assertMode(CommandState.Mode.COMMAND)
     }
 
@@ -149,7 +161,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
         assertMode(CommandState.Mode.COMMAND)
     }
 
@@ -170,7 +184,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
         assertMode(CommandState.Mode.COMMAND)
     }
 
@@ -191,7 +207,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
         assertMode(CommandState.Mode.COMMAND)
     }
 
@@ -212,7 +230,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
         assertMode(CommandState.Mode.COMMAND)
     }
 
@@ -233,7 +253,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 all rocks ${c}and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
         assertMode(CommandState.Mode.COMMAND)
     }
 
@@ -254,7 +276,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
         assertFalse(myFixture.editor.caretModel.allCarets.any(Caret::hasSelection))
         assertEquals(1, myFixture.editor.caretModel.caretCount)
         assertCaretsColour()
@@ -278,7 +302,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 all ${c}rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
         assertFalse(myFixture.editor.caretModel.allCarets.any(Caret::hasSelection))
         assertEquals(1, myFixture.editor.caretModel.caretCount)
         assertCaretsColour()
@@ -302,7 +328,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 all rocks and lavender and tufted${c} grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
         assertFalse(myFixture.editor.caretModel.allCarets.any(Caret::hasSelection))
         assertEquals(1, myFixture.editor.caretModel.caretCount)
         assertCaretsColour()
@@ -326,7 +354,9 @@ class SelectEscapeActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand12${c}3
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
         assertFalse(myFixture.editor.caretModel.allCarets.any(Caret::hasSelection))
         assertEquals(1, myFixture.editor.caretModel.caretCount)
         assertCaretsColour()

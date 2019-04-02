@@ -54,7 +54,9 @@ class InsertAfterLineEndActionTest : VimTestCase() {
                 all rocks and lavender and tufted grass,Hell${c}o
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
-                    """.trimIndent())
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
         assertMode(CommandState.Mode.COMMAND)
     }
 }
