@@ -199,7 +199,7 @@ public class CommandParser {
     if (handler.getArgFlags().contains(CommandHandler.Flag.DONT_REOPEN)) {
       result |= RES_DONT_REOPEN;
     }
-    if ((handler.getArgFlags() & CommandHandler.SAVE_VISUAL_MODE) != 0) {
+    if (handler.getArgFlags().contains(CommandHandler.Flag.SAVE_VISUAL_MODE)) {
       result |= RES_SAVE_VISUAL;
     }
 
