@@ -192,7 +192,7 @@ object VimListenerManager {
                     if (CommandState.inVisualMode(editor)) {
                         VimPlugin.getVisualMotion().exitVisual(editor)
                     } else if (CommandState.getInstance(editor).mode == CommandState.Mode.SELECT) {
-                        VimPlugin.getVisualMotion().exitSelectMode(editor, false)
+                        VimPlugin.getVisualMotion().exitSelectModeAndResetKeyHandler(editor, false)
                     }
                 }
 

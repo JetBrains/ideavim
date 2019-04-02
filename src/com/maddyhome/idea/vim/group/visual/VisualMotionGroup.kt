@@ -223,14 +223,10 @@ class VisualMotionGroup {
                 vimSelectionStart = if (subMode == CommandState.SubMode.VISUAL_LINE) offset else leadSelectionOffset
             }
         }
-        KeyHandler.getInstance().reset(editor)
         ChangeGroup.resetCursor(editor, true)
         return true
     }
 
-    /**
-     * [adjustCaretPosition] - if true, caret will be moved one char left if it's on the line end
-     */
     fun exitSelectMode(editor: Editor, adjustCaretPosition: Boolean) {
         if (!CommandState.inSelectMode(editor)) return
 
@@ -248,6 +244,18 @@ class VisualMotionGroup {
             }
         }
         ChangeGroup.resetCursor(editor, false)
+    }
+
+    /**
+     * [adjustCaretPosition] - if true, caret will be moved one char left if it's on the line end
+     * This method resets KeyHandler and should be used if you are calling it from non-vim mechanism (like adjusting
+     *   editor's selection)
+     */
+    fun exitSelectModeAndResetKeyHandler(editor: Editor, adjustCaretPosition: Boolean) {
+        if (!CommandState.inSelectMode(editor)) return
+
+        exitSelectMode(editor, adjustCaretPosition)
+
         KeyHandler.getInstance().reset(editor)
     }
 
@@ -262,10 +270,12 @@ class VisualMotionGroup {
                 CommandState.getInstance(editor).popState()
             }
             enterSelectionMode(editor, autodetectedMode)
+            KeyHandler.getInstance().reset(editor)
         } else {
             ChangeGroup.resetCursor(editor, resetCaretToInsert)
             exitVisual(editor)
-            exitSelectMode(editor, true)
+            exitSelectModeAndResetKeyHandler(editor, true)
+            KeyHandler.getInstance().reset(editor)
         }
     }
 

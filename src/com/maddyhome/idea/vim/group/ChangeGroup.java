@@ -829,7 +829,7 @@ public class ChangeGroup {
     SelectionVimListenerSuppressor.INSTANCE.lock();
     boolean res = processKey(editor, context, key);
 
-    VimPlugin.getVisualMotion().exitSelectMode(editor, false);
+    VimPlugin.getVisualMotion().exitSelectModeAndResetKeyHandler(editor, false);
 
     if (isPrintableChar(key.getKeyChar())) {
       VimPlugin.getChange().insertBeforeCursor(editor, context);
