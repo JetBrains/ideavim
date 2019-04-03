@@ -910,10 +910,18 @@ public class MotionGroup {
   }
 
   public boolean scrollLine(@NotNull Editor editor, int lines) {
-    int visualLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
+    assert lines != 0 : "lines cannot be 0";
 
-    visualLine = EditorHelper.normalizeVisualLine(editor, visualLine + lines);
-    EditorHelper.scrollVisualLineToTopOfScreen(editor, visualLine);
+    if (lines > 0) {
+      int visualLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
+      visualLine = EditorHelper.normalizeVisualLine(editor, visualLine + lines);
+      EditorHelper.scrollVisualLineToTopOfScreen(editor, visualLine);
+    }
+    else if (lines < 0) {
+      int visualLine = EditorHelper.getVisualLineAtBottomOfScreen(editor);
+      visualLine = EditorHelper.normalizeVisualLine(editor, visualLine + lines);
+      EditorHelper.scrollVisualLineToBottomOfScreen(editor, visualLine);
+    }
 
     moveCaretToView(editor);
 
