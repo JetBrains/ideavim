@@ -711,21 +711,7 @@ public class EditorHelper {
 
     Rectangle visibleArea = scrollingModel.getVisibleArea();
 
-    // For consistency, we always try to scroll to keep a whole line (with inlays) aligned at the top of the screen.
-    // This is inexact, and means we can bounce around, most visibly when the caret is on the last line and we're moving
-    // down (j) or the caret is on the last line and we're scrolling up (CTRL-Y)
-    // If we want it to be simpler: scrollingModel.scrollVertically(y - visibleArea.height + height);
-
-    int topVisualLine = editor.yToVisualLine(y - visibleArea.height + height);
-    int topLineInlayHeight = getHeightOfVisualLineInlays(editor, topVisualLine, true);
-    int topY = editor.visualLineToY(topVisualLine);
-    if (topY - topLineInlayHeight + visibleArea.height < y + height) {
-      // There's a pathological edge case here, if topVisualLine has a HUGE inlay, then topVisualLine+1 won't put our
-      // given line at the bottom of the screen
-      scrollVisualLineToTopOfScreen(editor, topVisualLine + 1);
-    } else {
-      scrollingModel.scrollVertically(topY - topLineInlayHeight);
-    }
+    scrollingModel.scrollVertically(y - visibleArea.height + height);
 
     return verticalPos != scrollingModel.getVerticalScrollOffset();
   }
