@@ -10,6 +10,7 @@ The current maintainers:
 * [Andrey Vlasovskikh](mailto:andrey.vlasovskikh@gmail.com)
 * [Alex Plate](mailto:alexpl292@gmail.com)
 * [TC](mailto:alexpl292@gmail.com)
+* [TC2](mailto:alexpl292@gmail.com)
 
 Previous maintainers:
 
