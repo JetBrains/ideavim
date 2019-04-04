@@ -14,6 +14,7 @@ The current maintainers:
 * [TC3](mailto:alexpl292@gmail.com)
 * [TC4](mailto:alexpl292@gmail.com)
 * [TC5](mailto:alexpl292@gmail.com)
+* [TC6](mailto:alexpl292@gmail.com)
 
 Previous maintainers:
 
