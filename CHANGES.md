@@ -33,6 +33,7 @@ To Be Released
 * Support `commentary` extension
 * [VIM-907](https://youtrack.jetbrains.com/issue/VIM-907) Fix `va(` command
 * [VIM-1067](https://youtrack.jetbrains.com/issue/VIM-1067) Fix repeating of `A` command
+* [VIM-1615](https://youtrack.jetbrains.com/issue/VIM-1615) Fix `set so=999` command and line "bouncing" with inlays
 
 
 0.51, 2019-02-12
