@@ -910,10 +910,18 @@ public class MotionGroup {
   }
 
   public boolean scrollLine(@NotNull Editor editor, int lines) {
-    int visualLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
+    assert lines != 0 : "lines cannot be 0";
 
-    visualLine = EditorHelper.normalizeVisualLine(editor, visualLine + lines);
-    EditorHelper.scrollVisualLineToTopOfScreen(editor, visualLine);
+    if (lines > 0) {
+      int visualLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
+      visualLine = EditorHelper.normalizeVisualLine(editor, visualLine + lines);
+      EditorHelper.scrollVisualLineToTopOfScreen(editor, visualLine);
+    }
+    else if (lines < 0) {
+      int visualLine = EditorHelper.getVisualLineAtBottomOfScreen(editor);
+      visualLine = EditorHelper.normalizeVisualLine(editor, visualLine + lines);
+      EditorHelper.scrollVisualLineToBottomOfScreen(editor, visualLine);
+    }
 
     moveCaretToView(editor);
 
@@ -1385,7 +1393,8 @@ public class MotionGroup {
     final int visualLine = position.line;
     final int column = position.column;
 
-    int scrollOffset = getNormalizedScrollOffset(editor);
+    // We need the non-normalised value here, so we can handle cases such as so=999 to keep the current line centred
+    int scrollOffset = ((NumberOption) Options.getInstance().getOption("scrolloff")).value();
 
     int scrollJumpSize = 0;
     if (scrollJump) {
@@ -1393,7 +1402,7 @@ public class MotionGroup {
     }
 
     int visualTop = topVisualLine + scrollOffset;
-    int visualBottom = bottomVisualLine - scrollOffset;
+    int visualBottom = bottomVisualLine - scrollOffset + 1;
     if (visualTop == visualBottom) {
       visualBottom++;
     }
@@ -1403,16 +1412,20 @@ public class MotionGroup {
       diff = visualLine - visualTop;
       scrollJumpSize = -scrollJumpSize;
     } else {
-      diff = Math.max(0, visualLine - visualBottom);
+      diff = Math.max(0, visualLine - visualBottom + 1);
     }
 
     if (diff != 0) {
 
-      // If we need to move the top line more than a half screen worth then we just center the cursor line.
-      // Block inlays mean that this half screen height isn't a consistent pixel height, and might be larger than line
-      // height multiplied by number of lines, but it's still a good heuristic to use here
+      // If we need to scroll the current line more than half a screen worth of lines then we just centre the new
+      // current line. This mimics vim behaviour of e.g. 100G in a 300 line file with a screen size of 25 centering line
+      // 100. It also handles so=999 keeping the current line centred.
+      // It doesn't handle keeping the line centred when scroll offset is less than a full page height, as the new line
+      // might be within e.g. top + scroll offset, so we test for that separately.
+      // Note that block inlays means that the pixel height we are scrolling can be larger than half the screen, even if
+      // the number of lines is less. I'm not sure what impact this has.
       int height = bottomVisualLine - topVisualLine + 1;
-      if (Math.abs(diff) > height / 2) {
+      if (Math.abs(diff) > height / 2 || scrollOffset > height / 2) {
         EditorHelper.scrollVisualLineToMiddleOfScreen(editor, visualLine);
       }
       else {
