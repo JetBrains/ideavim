@@ -5,6 +5,7 @@ import com.intellij.codeInsight.generation.CommentByBlockCommentHandler;
 import com.intellij.codeInsight.generation.CommentByLineCommentHandler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.WriteAction;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
@@ -56,8 +57,7 @@ public class CommentaryExtension extends VimNonDisposableExtension {
   private static class CommentMotionVHandler implements VimExtensionHandler {
     @Override
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
-      final TextRange visualRange = VimPlugin.getMark().getVisualSelectionMarks(editor);
-      if (visualRange == null) {
+      if (!editor.getCaretModel().getPrimaryCaret().hasSelection()) {
         return;
       }
 
@@ -69,7 +69,7 @@ public class CommentaryExtension extends VimNonDisposableExtension {
       WriteAction.run(() -> {
         // Leave visual mode
         executeNormal(parseKeys("<Esc>"), editor);
-        editor.getCaretModel().moveToOffset(visualRange.getStartOffset());
+        editor.getCaretModel().moveToOffset(editor.getCaretModel().getPrimaryCaret().getSelectionStart());
       });
     }
   }
@@ -119,7 +119,8 @@ public class CommentaryExtension extends VimNonDisposableExtension {
         case COMMAND:
           return VimPlugin.getMark().getChangeMarks(editor);
         case VISUAL:
-          return VimPlugin.getMark().getVisualSelectionMarks(editor);
+          Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+          return new TextRange(primaryCaret.getSelectionStart(), primaryCaret.getSelectionEnd());
         default:
           return null;
       }
