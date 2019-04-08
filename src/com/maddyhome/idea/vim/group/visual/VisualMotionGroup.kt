@@ -18,7 +18,10 @@
 
 package com.maddyhome.idea.vim.group.visual
 
-import com.intellij.openapi.editor.*
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.ScrollType
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.*
@@ -218,11 +221,12 @@ class VisualMotionGroup {
 
     fun enterSelectionMode(editor: Editor, subMode: CommandState.SubMode): Boolean {
         CommandState.getInstance(editor).pushState(CommandState.Mode.SELECT, subMode, MappingMode.SELECT)
-        editor.caretModel.allCarets.forEach {
-            it.run {
-                vimSelectionStart = if (subMode == CommandState.SubMode.VISUAL_LINE) offset else leadSelectionOffset
-            }
+        if (subMode == CommandState.SubMode.VISUAL_BLOCK) {
+            editor.caretModel.primaryCaret.run { vimSelectionStart = vimLeadSelectionOffset }
+        } else {
+            editor.caretModel.allCarets.forEach { it.vimSelectionStart = it.vimLeadSelectionOffset }
         }
+        updateCaretColours(editor)
         ChangeGroup.resetCursor(editor, true)
         return true
     }
@@ -234,7 +238,6 @@ class VisualMotionGroup {
         editor.caretModel.allCarets.forEach {
             it.removeSelection()
             it.vimSelectionStartSetToNull()
-            it.visualAttributes = CaretVisualAttributes.DEFAULT
             if (adjustCaretPosition) {
                 val lineEnd = EditorHelper.getLineEndForOffset(editor, it.offset)
                 val lineStart = EditorHelper.getLineStartForOffset(editor, it.offset)
@@ -243,6 +246,7 @@ class VisualMotionGroup {
                 }
             }
         }
+        updateCaretColours(editor)
         ChangeGroup.resetCursor(editor, false)
     }
 
@@ -261,14 +265,11 @@ class VisualMotionGroup {
 
     fun controlNonVimSelectionChange(editor: Editor, resetCaretToInsert: Boolean = false) {
         if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
-            val commandState = CommandState.getInstance(editor)
-            while (commandState.mode != CommandState.Mode.COMMAND) {
-                commandState.popState()
-            }
-            val autodetectedMode = autodetectVisualMode(editor, CommandState.SubMode.NONE)
+            CommandState.getInstance(editor)
             while (CommandState.getInstance(editor).mode != CommandState.Mode.COMMAND) {
                 CommandState.getInstance(editor).popState()
             }
+            val autodetectedMode = autodetectVisualMode(editor, CommandState.SubMode.NONE)
             enterSelectionMode(editor, autodetectedMode)
             KeyHandler.getInstance().reset(editor)
         } else {

@@ -112,6 +112,62 @@ fun Caret.vimSetSelectionSilently(start: Int, end: Int) {
     SelectionVimListenerSuppressor.unlock()
 }
 
+/**
+ * This works almost like [Caret.getLeadSelectionOffset], but vim-specific
+ */
+val Caret.vimLeadSelectionOffset: Int
+    get() {
+        val caretOffset = offset
+        if (hasSelection()) {
+            if (caretOffset != selectionStart && caretOffset != selectionEnd) {
+                // Try to check if current selection is tweaked by fold region.
+                val foldingModel = editor.foldingModel
+                val foldRegion = foldingModel.getCollapsedRegionAtOffset(caretOffset)
+                if (foldRegion != null) {
+                    if (foldRegion.startOffset == selectionStart) {
+                        return selectionEnd
+                    } else if (foldRegion.endOffset == selectionEnd) {
+                        return selectionStart
+                    }
+                }
+            }
+
+            return if (CommandState.getInstance(editor).subMode == CommandState.SubMode.VISUAL_LINE) {
+                val selectionStartLine = editor.offsetToLogicalPosition(selectionStart).line
+                val caretLine = editor.offsetToLogicalPosition(this.offset).line
+                if (caretLine == selectionStartLine) selectionEnd else selectionStart
+            } else if (CommandState.getInstance(editor).subMode == CommandState.SubMode.VISUAL_BLOCK) {
+                val selections = editor.caretModel.allCarets.map { it.selectionStart to it.selectionEnd }.sortedBy { it.first }
+                val pCaret = editor.caretModel.primaryCaret
+                when {
+                    pCaret.offset == selections.first().first -> selections.last().second
+                    pCaret.offset == selections.first().second -> selections.last().first
+                    pCaret.offset == selections.last().first -> selections.first().second
+                    pCaret.offset == selections.last().second -> selections.first().first
+                    else -> selections.first().first
+                }
+            } else {
+                if (caretOffset == selectionStart) selectionEnd else selectionStart
+            }
+        }
+        return caretOffset
+    }
+
+fun updateCaretColours(editor: Editor) {
+    val subMode = CommandState.getInstance(editor).subMode
+    if (subMode == CommandState.SubMode.VISUAL_BLOCK) {
+        editor.caretModel.allCarets.forEach {
+            if (it != editor.caretModel.primaryCaret) {
+                val color = editor.colorsScheme.getColor(EditorColors.SELECTION_BACKGROUND_COLOR)
+                val visualAttributes = it.visualAttributes
+                it.visualAttributes = CaretVisualAttributes(color, visualAttributes.weight)
+            }
+        }
+    } else {
+        editor.caretModel.allCarets.forEach { it.visualAttributes = CaretVisualAttributes.DEFAULT }
+    }
+}
+
 private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Caret) {
     val (start, end) = if (selectionStart > selectionEnd) selectionEnd to selectionStart else selectionStart to selectionEnd
     val editor = caret.editor
@@ -154,15 +210,11 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
                 if (mode != CommandState.Mode.SELECT && !EditorHelper.isLineEmpty(editor, line, false)) {
                     aCaret.moveToOffset(aCaret.selectionEnd - 1)
                 }
-
-                if (aCaret != editor.caretModel.primaryCaret) {
-                    val color = editor.colorsScheme.getColor(EditorColors.SELECTION_BACKGROUND_COLOR)
-                    val visualAttributes = aCaret.visualAttributes
-                    aCaret.visualAttributes = CaretVisualAttributes(color, visualAttributes.weight)
-                }
             }
 
             editor.caretModel.primaryCaret.moveToOffset(selectionEnd)
         }
+        else -> Unit
     }
+    updateCaretColours(editor)
 }
