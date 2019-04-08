@@ -602,6 +602,9 @@
  * |:quitall|             {@link com.maddyhome.idea.vim.ex.handler.ExitHandler}
  * |:wqall|               {@link com.maddyhome.idea.vim.ex.handler.ExitHandler}
  * |:xall|                {@link com.maddyhome.idea.vim.ex.handler.ExitHandler}
+ * |:command|             {@link com.maddyhome.idea.vim.ex.handler.CmdHandler}
+ * |:delcommand|          {@link com.maddyhome.idea.vim.ex.handler.DelCmdHandler}
+ * |:comclear|            {@link com.maddyhome.idea.vim.ex.handler.CmdClearHandler}
  * ...
  *
  * The list of supported Ex commands is incomplete.
