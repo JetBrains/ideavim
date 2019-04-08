@@ -55,6 +55,50 @@ class SelectKeyHandlerTest : VimTestCase() {
                 CommandState.SubMode.NONE)
     }
 
+    fun `test char mode backspace`() {
+        this.doTest(parseKeys("gh", "<BS>"),
+                """
+                A Discovery
+
+                I ${c}found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                    """.trimIndent(),
+                """
+                A Discovery
+
+                I ${c}ound it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
+    }
+
+    fun `test char mode delete`() {
+        this.doTest(parseKeys("gh", "<DEL>"),
+                """
+                A Discovery
+
+                I ${c}found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                    """.trimIndent(),
+                """
+                A Discovery
+
+                I ${c}ound it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                    """.trimIndent(),
+                CommandState.Mode.COMMAND,
+                CommandState.SubMode.NONE)
+    }
+
     fun `test char mode multicaret`() {
         val typed = "Hello"
         this.doTest(parseKeys("gh", "<S-Right>", typed),
