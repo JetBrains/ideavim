@@ -508,8 +508,8 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             A Discovery
 
             I ${s}found it in a legendary land$c$se
-            al${s}l rocks and lavender and tufted gras$c${se}s,
-            wh${s}ere it was settled on some sodden sa$c${se}nd
+            al${s}l rocks and lavender and tufted grass$c${se},
+            wh${s}ere it was settled on some sodden san$c${se}d
             ha${s}rd by the torrent of a mountain pass.$c$se
         """.trimIndent())
         assertMode(CommandState.Mode.SELECT)

@@ -135,7 +135,10 @@ val Caret.vimLeadSelectionOffset: Int
             return if (CommandState.getInstance(editor).subMode == CommandState.SubMode.VISUAL_LINE) {
                 val selectionStartLine = editor.offsetToLogicalPosition(selectionStart).line
                 val caretLine = editor.offsetToLogicalPosition(this.offset).line
-                if (caretLine == selectionStartLine) selectionEnd else selectionStart
+                if (caretLine == selectionStartLine) {
+                    val column = editor.offsetToLogicalPosition(selectionEnd).column
+                    if (column == 0) (selectionEnd - 1).coerceAtLeast(0) else selectionEnd
+                } else selectionStart
             } else if (CommandState.getInstance(editor).subMode == CommandState.SubMode.VISUAL_BLOCK) {
                 val selections = editor.caretModel.allCarets.map { it.selectionStart to it.selectionEnd }.sortedBy { it.first }
                 val pCaret = editor.caretModel.primaryCaret
@@ -207,7 +210,7 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
                 if (lastColumn >= MotionGroup.LAST_COLUMN) {
                     aCaret.vimSetSelectionSilently(aCaret.selectionStart, lineEndOffset)
                 }
-                if (mode != CommandState.Mode.SELECT && !EditorHelper.isLineEmpty(editor, line, false)) {
+                if (mode != CommandState.Mode.SELECT && !EditorHelper.isLineEmpty(editor, line, false) && aCaret.offset == aCaret.selectionEnd) {
                     aCaret.moveToOffset(aCaret.selectionEnd - 1)
                 }
             }

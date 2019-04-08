@@ -788,8 +788,7 @@ public class MultipleCaretsTest extends VimTestCase {
     typeTextInFile(parseKeys("<C-V>", "2l", "j", "O"),
                    "a<caret>abcc\n" +
                    "ddeff\n");
-    myFixture.checkResult("a<selection><caret>abc</selection>c\n" +
-                          "d<selection>de<caret>f</selection>f\n");
+    myFixture.checkResult("a<selection><caret>abc</selection>c\n" + "d<selection><caret>def</selection>f\n");
   }
 
   public void testVisualBlockMovementAfterSwapEndsBlockAction() {
@@ -799,8 +798,7 @@ public class MultipleCaretsTest extends VimTestCase {
                    "gghii\n" +
                    "jjkll\n");
     myFixture.checkResult("aabcc\n" +
-                          "<selection><caret>ddef</selection>f\n" +
-                          "<selection>ggh<caret>i</selection>i\n" +
+                          "<selection><caret>ddef</selection>f\n" + "<selection><caret>gghi</selection>i\n" +
                           "jjkll\n");
     typeText(parseKeys("j"));
     myFixture.checkResult("aabcc\n" +

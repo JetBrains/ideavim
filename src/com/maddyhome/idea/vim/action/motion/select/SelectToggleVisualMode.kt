@@ -23,13 +23,21 @@ private object SelectToggleVisualModeHandler : EditorActionHandlerBase() {
         commandState.popState()
         if (mode == CommandState.Mode.VISUAL) {
             commandState.pushState(CommandState.Mode.SELECT, subMode, MappingMode.SELECT)
-            editor.caretModel.runForEachCaret {
-                it.moveToOffset(it.offset + VimPlugin.getVisualMotion().selectionAdj)
+            if (subMode != CommandState.SubMode.VISUAL_LINE) {
+                editor.caretModel.runForEachCaret {
+                    if (it.offset + VimPlugin.getVisualMotion().selectionAdj == it.selectionEnd) {
+                        it.moveToOffset(it.offset + VimPlugin.getVisualMotion().selectionAdj)
+                    }
+                }
             }
         } else {
             commandState.pushState(CommandState.Mode.VISUAL, subMode, MappingMode.VISUAL)
-            editor.caretModel.runForEachCaret {
-                it.moveToOffset(it.selectionEnd - VimPlugin.getVisualMotion().selectionAdj)
+            if (subMode != CommandState.SubMode.VISUAL_LINE) {
+                editor.caretModel.runForEachCaret {
+                    if (it.offset == it.selectionEnd && it.visualLineStart <= it.offset - VimPlugin.getVisualMotion().selectionAdj) {
+                        it.moveToOffset(it.offset - VimPlugin.getVisualMotion().selectionAdj)
+                    }
+                }
             }
         }
         ChangeGroup.resetCursor(editor, mode == CommandState.Mode.VISUAL)

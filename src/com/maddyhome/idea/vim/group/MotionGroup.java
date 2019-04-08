@@ -244,7 +244,8 @@ public class MotionGroup {
       col = newColumn;
     }
 
-    newColumn = EditorHelper.normalizeVisualColumn(editor, newline, newColumn, CommandState.inInsertMode(editor));
+    newColumn = EditorHelper.normalizeVisualColumn(editor, newline, newColumn, CommandState.inInsertMode(editor) ||
+                                                                               CommandState.inSelectMode(editor));
 
     if (newline != caretVisualLine || newColumn != oldColumn) {
       int offset = EditorHelper.visualPositionToOffset(editor, new VisualPosition(newline, newColumn));
@@ -1270,8 +1271,11 @@ public class MotionGroup {
     else {
       int col = CaretDataKt.getVimLastColumn(caret);
       int line = EditorHelper.normalizeVisualLine(editor, pos.line + count);
-      VisualPosition newPos = new VisualPosition(line, EditorHelper
-        .normalizeVisualColumn(editor, line, col, CommandState.inInsertMode(editor)));
+      VisualPosition newPos = new VisualPosition(line, EditorHelper.normalizeVisualColumn(editor, line, col,
+                                                                                          CommandState
+                                                                                            .inInsertMode(editor) ||
+                                                                                          CommandState
+                                                                                            .inSelectMode(editor)));
 
       return EditorHelper.visualPositionToOffset(editor, newPos);
     }
