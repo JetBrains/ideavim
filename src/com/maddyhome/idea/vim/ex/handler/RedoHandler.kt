@@ -21,8 +21,6 @@ package com.maddyhome.idea.vim.ex.handler
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_FORBIDDEN
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_FORBIDDEN
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
@@ -31,7 +29,7 @@ import com.maddyhome.idea.vim.helper.UndoRedoHelper
 
 class RedoHandler : CommandHandler(
         commands("red[o]"),
-        flags(RANGE_FORBIDDEN, ARGUMENT_FORBIDDEN, WRITABLE)
+        flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, WRITABLE)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) = UndoRedoHelper.redo(context)
 }

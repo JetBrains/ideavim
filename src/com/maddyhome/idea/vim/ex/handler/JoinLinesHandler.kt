@@ -25,8 +25,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_OPTIONAL
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_OPTIONAL
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
@@ -36,7 +34,7 @@ import com.maddyhome.idea.vim.helper.CaretData
 
 class JoinLinesHandler : CommandHandler(
         commands("j[oin]"),
-        flags(RANGE_OPTIONAL, ARGUMENT_OPTIONAL, WRITABLE),
+        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE),
         true, CaretOrder.DECREASING_OFFSET
 ) {
     override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {

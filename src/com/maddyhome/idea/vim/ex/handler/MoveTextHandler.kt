@@ -25,17 +25,8 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_REQUIRED
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_OPTIONAL
+import com.maddyhome.idea.vim.ex.*
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
-import com.maddyhome.idea.vim.ex.CommandParser
-import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.ex.InvalidRangeException
-import com.maddyhome.idea.vim.ex.LineRange
-import com.maddyhome.idea.vim.ex.commands
-import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.handler.CaretOrder
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -44,7 +35,7 @@ import java.util.*
 
 class MoveTextHandler : CommandHandler(
         commands("m[ove]"),
-        flags(RANGE_OPTIONAL, ARGUMENT_REQUIRED, WRITABLE)
+        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, WRITABLE)
 ) {
   @Throws(ExException::class)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {

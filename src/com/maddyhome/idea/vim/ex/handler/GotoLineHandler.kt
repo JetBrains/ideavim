@@ -24,8 +24,6 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_OPTIONAL
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_REQUIRED
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.MotionGroup
@@ -37,7 +35,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
  * range.
  */
 class GotoLineHandler : CommandHandler(
-        flags(RANGE_REQUIRED, ARGUMENT_OPTIONAL),
+        flags(RangeFlag.RANGE_REQUIRED, ArgumentFlag.ARGUMENT_OPTIONAL),
         flags(CommandFlags.FLAG_MOT_EXCLUSIVE),
         true, CaretOrder.DECREASING_OFFSET
 ) {

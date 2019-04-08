@@ -24,9 +24,6 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_OPTIONAL
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_IS_COUNT
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_OPTIONAL
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
@@ -34,7 +31,7 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.CaretOrder
 
 class GotoCharacterHandler : CommandHandler(commands("go[to]"),
-        flags(RANGE_OPTIONAL, ARGUMENT_OPTIONAL, RANGE_IS_COUNT),
+        flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL),
         true, CaretOrder.DECREASING_OFFSET, flags(CommandFlags.FLAG_MOT_EXCLUSIVE)
 ) {
     override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {

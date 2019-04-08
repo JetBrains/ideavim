@@ -21,8 +21,6 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_FORBIDDEN
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_FORBIDDEN
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
@@ -32,7 +30,7 @@ import com.maddyhome.idea.vim.ex.flags
  */
 class ShellHandler : CommandHandler(
         commands("sh[ell]"),
-        flags(RANGE_FORBIDDEN, ARGUMENT_FORBIDDEN)
+        flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) =
             KeyHandler.executeAction("ActivateTerminalToolWindow", context)

@@ -22,12 +22,14 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_OPTIONAL
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
-class DumpLineHandler : CommandHandler(commands("dump[line]"), flags(RANGE_OPTIONAL)) {
+class DumpLineHandler : CommandHandler(
+        commands("dump[line]"),
+        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
+) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         if (!logger.isDebugEnabled) return false
 

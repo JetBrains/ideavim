@@ -22,15 +22,13 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_OPTIONAL
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_OPTIONAL
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class WriteAllHandler : CommandHandler(
         commands("wa[ll]"),
-        flags(RANGE_OPTIONAL, ARGUMENT_OPTIONAL)
+        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         VimPlugin.getFile().saveFiles()

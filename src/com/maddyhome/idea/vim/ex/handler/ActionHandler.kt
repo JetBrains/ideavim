@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.DONT_REOPEN
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_OPTIONAL
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
@@ -39,7 +38,7 @@ import com.maddyhome.idea.vim.helper.runAfterGotFocus
  */
 class ActionHandler : CommandHandler(
         commands("action"),
-        flags(RANGE_OPTIONAL, DONT_REOPEN)
+        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         val actionName = cmd.argument.trim()

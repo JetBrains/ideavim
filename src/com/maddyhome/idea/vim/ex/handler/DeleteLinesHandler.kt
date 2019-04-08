@@ -24,8 +24,6 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_OPTIONAL
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_OPTIONAL
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
@@ -33,7 +31,7 @@ import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.handler.CaretOrder
 
 class DeleteLinesHandler : CommandHandler(commands("d[elete]"),
-        flags(RANGE_OPTIONAL, ARGUMENT_OPTIONAL, WRITABLE),
+        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE),
         true, CaretOrder.DECREASING_OFFSET
 ) {
     override fun execute(editor: Editor, caret: Caret, context: DataContext,

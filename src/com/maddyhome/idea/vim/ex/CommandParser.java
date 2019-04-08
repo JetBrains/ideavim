@@ -183,19 +183,19 @@ public class CommandParser {
       throw new InvalidCommandException(message, cmd);
     }
 
-    if (handler.getArgFlags().contains(CommandHandler.Flag.WRITABLE) && !editor.getDocument().isWritable()) {
+    if (handler.getArgFlags().getFlags().contains(CommandHandler.Flag.WRITABLE) && !editor.getDocument().isWritable()) {
       VimPlugin.indicateError();
       return result | RES_READONLY;
     }
 
     // Run the command
     boolean ok = handler.process(editor, context, command, count);
-    if (ok && !handler.getArgFlags().contains(CommandHandler.Flag.DONT_SAVE_LAST)) {
+    if (ok && !handler.getArgFlags().getFlags().contains(CommandHandler.Flag.DONT_SAVE_LAST)) {
       VimPlugin.getRegister().storeTextInternal(editor, new TextRange(-1, -1), cmd,
                                                                   SelectionType.CHARACTER_WISE, ':', false);
     }
 
-    if (handler.getArgFlags().contains(CommandHandler.Flag.DONT_REOPEN)) {
+    if (handler.getArgFlags().getFlags().contains(CommandHandler.Flag.DONT_REOPEN)) {
       result |= RES_DONT_REOPEN;
     }
 

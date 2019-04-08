@@ -28,6 +28,9 @@ fun commands(vararg commands: String) = commands.map { command ->
             ?: throw RuntimeException("$command is invalid!")
 }.toTypedArray()
 
-fun <T: Enum<T>> flags(first: T, vararg rest: T): EnumSet<T> {
+fun <T : Enum<T>> flags(first: T, vararg rest: T): EnumSet<T> {
     return EnumSet.of(first, *rest)
 }
+
+fun flags(rangeFlag: CommandHandler.RangeFlag, argumentFlag: CommandHandler.ArgumentFlag, vararg flags: CommandHandler.Flag) =
+        CommandHandler.CommandHandlerFlags(rangeFlag, argumentFlag, flags.toList())
