@@ -22,7 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_OPTIONAL
+import com.maddyhome.idea.vim.ex.CommandHandler.ArgumentFlag.ARGUMENT_OPTIONAL
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.DONT_REOPEN
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
@@ -30,7 +30,7 @@ import com.maddyhome.idea.vim.ex.flags
 
 class SelectFirstFileHandler : CommandHandler(
         commands("fir[st]", "rew[ind]"),
-        flags(ARGUMENT_OPTIONAL, DONT_REOPEN)
+        flags(RangeFlag.RANGE_OPTIONAL, ARGUMENT_OPTIONAL, DONT_REOPEN)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         val res = VimPlugin.getFile().selectFile(0, context)

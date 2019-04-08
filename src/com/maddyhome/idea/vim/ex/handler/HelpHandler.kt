@@ -22,7 +22,6 @@ import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_OPTIONAL
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
@@ -34,7 +33,7 @@ import java.net.URLEncoder
  */
 class HelpHandler : CommandHandler(
         commands("h[elp]"),
-        flags(ARGUMENT_OPTIONAL)
+        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         BrowserUtil.browse(helpTopicUrl(cmd.argument))

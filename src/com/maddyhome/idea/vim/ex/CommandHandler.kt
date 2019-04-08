@@ -22,15 +22,14 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.handler.CaretOrder
 import com.maddyhome.idea.vim.handler.ExecuteMethodNotOverriddenException
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
-
-import java.util.EnumSet
+import java.util.*
 
 /**
  * Base class for all Ex command handlers.
@@ -38,13 +37,15 @@ import java.util.EnumSet
 abstract class CommandHandler {
 
   val names: Array<CommandName>?
-  val argFlags: EnumSet<Flag>
+  val argFlags: CommandHandlerFlags
   private val optFlags: EnumSet<CommandFlags>
 
   private val runForEachCaret: Boolean
   private val caretOrder: CaretOrder
 
-  enum class Flag {
+  class CommandHandlerFlags(val rangeFlag: RangeFlag, val argumentFlag: ArgumentFlag, val flags: List<Flag>)
+
+  enum class RangeFlag {
     /**
      * Indicates that a range must be specified with this command
      */
@@ -58,6 +59,14 @@ abstract class CommandHandler {
      */
     RANGE_FORBIDDEN,
     /**
+     * Indicates that the command takes a count, not a range - effects default
+     * Works like RANGE_OPTIONAL
+     */
+    RANGE_IS_COUNT
+  }
+
+  enum class ArgumentFlag {
+    /**
      * Indicates that an argument must be specified with this command
      */
     ARGUMENT_REQUIRED,
@@ -68,12 +77,10 @@ abstract class CommandHandler {
     /**
      * Indicates that an argument can't be specified for this command
      */
-    ARGUMENT_FORBIDDEN,
-    /**
-     * Indicates that the command takes a count, not a range - effects default
-     */
-    RANGE_IS_COUNT,
+    ARGUMENT_FORBIDDEN
+  }
 
+  enum class Flag {
     DONT_REOPEN,
 
     /**
@@ -95,7 +102,7 @@ abstract class CommandHandler {
    */
   constructor(
           names: Array<CommandName>?,
-          argFlags: EnumSet<Flag>,
+          argFlags: CommandHandlerFlags,
           runForEachCaret: Boolean = false,
           caretOrder: CaretOrder = CaretOrder.NATIVE,
           optFlags: EnumSet<CommandFlags> = EnumSet.noneOf<CommandFlags>(CommandFlags::class.java)
@@ -111,7 +118,7 @@ abstract class CommandHandler {
     CommandParser.getInstance().addHandler(this)
   }
 
-  constructor(argFlags: EnumSet<Flag>, optFlags: EnumSet<CommandFlags>, runForEachCaret: Boolean, caretOrder: CaretOrder) {
+  constructor(argFlags: CommandHandlerFlags, optFlags: EnumSet<CommandFlags>, runForEachCaret: Boolean, caretOrder: CaretOrder) {
     this.names = null
     this.argFlags = argFlags
     this.optFlags = optFlags
@@ -131,27 +138,32 @@ abstract class CommandHandler {
    */
   @Throws(ExException::class)
   fun process(editor: Editor, context: DataContext, cmd: ExCommand, count: Int): Boolean {
+
     // No range allowed
-    if (Flag.RANGE_FORBIDDEN in argFlags && cmd.ranges.size() != 0) {
+    if (RangeFlag.RANGE_FORBIDDEN == argFlags.rangeFlag && cmd.ranges.size() != 0) {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_norange))
       throw NoRangeAllowedException()
     }
 
-    if (Flag.RANGE_REQUIRED in argFlags && cmd.ranges.size() == 0) {
+    if (RangeFlag.RANGE_REQUIRED == argFlags.rangeFlag && cmd.ranges.size() == 0) {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_rangereq))
       throw MissingRangeException()
     }
 
+    if (RangeFlag.RANGE_IS_COUNT == argFlags.rangeFlag) {
+      cmd.ranges.setDefaultLine(1)
+    }
+
     // Argument required
-    if (Flag.ARGUMENT_REQUIRED in argFlags && cmd.argument.isEmpty()) {
+    if (ArgumentFlag.ARGUMENT_REQUIRED == argFlags.argumentFlag && cmd.argument.isEmpty()) {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_argreq))
       throw MissingArgumentException()
     }
 
-    if (Flag.RANGE_IS_COUNT in argFlags) {
-      cmd.ranges.setDefaultLine(1)
+    if (ArgumentFlag.ARGUMENT_FORBIDDEN == argFlags.argumentFlag && cmd.argument.isNotEmpty()) {
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_argforb))
+      throw NoArgumentAllowedException()
     }
-
     CommandState.getInstance(editor).flags = optFlags
 
     var res = true

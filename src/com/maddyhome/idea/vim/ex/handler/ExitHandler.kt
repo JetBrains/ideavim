@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.ex.flags
 
 class ExitHandler : CommandHandler(
         commands("qa[ll]", "quita[ll]", "wqa[ll]", "xa[ll]"),
-        flags(DONT_REOPEN)
+        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
 ) {
 
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
