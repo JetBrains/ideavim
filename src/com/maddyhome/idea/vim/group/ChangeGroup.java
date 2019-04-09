@@ -467,64 +467,8 @@ public class ChangeGroup {
     }
   }
 
-  private class InsertActionsDocumentListener implements DocumentListener {
-    @Override
-    public void documentChanged(@NotNull DocumentEvent e) {
-      final String newFragment = e.getNewFragment().toString();
-      final String oldFragment = e.getOldFragment().toString();
-      final int newFragmentLength = newFragment.length();
-      final int oldFragmentLength = oldFragment.length();
-
-      // Repeat buffer limits
-      if (repeatCharsCount > MAX_REPEAT_CHARS_COUNT) {
-        return;
-      }
-
-      // <Enter> is added to strokes as an action during processing in order to indent code properly in the repeat
-      // command
-      if (newFragment.startsWith("\n") && newFragment.trim().isEmpty()) {
-        strokes.addAll(getAdjustCaretActions(e));
-        oldOffset = -1;
-        return;
-      }
-
-      // Ignore multi-character indents as they should be inserted automatically while repeating <Enter> actions
-      if (newFragmentLength > 1 && newFragment.trim().isEmpty()) {
-        return;
-      }
-
-      strokes.addAll(getAdjustCaretActions(e));
-
-      if (oldFragmentLength > 0) {
-        final AnAction editorDelete = ActionManager.getInstance().getAction("EditorDelete");
-        for (int i = 0; i < oldFragmentLength; i++) {
-          strokes.add(editorDelete);
-        }
-      }
-
-      if (newFragmentLength > 0) {
-        strokes.add(newFragment.toCharArray());
-      }
-      repeatCharsCount += newFragmentLength;
-      oldOffset = e.getOffset() + newFragmentLength;
-    }
-
-    @NotNull
-    private List<AnAction> getAdjustCaretActions(@NotNull DocumentEvent e) {
-      final int delta = e.getOffset() - oldOffset;
-      if (oldOffset >= 0 && delta != 0) {
-        final List<AnAction> positionCaretActions = new ArrayList<>();
-        final String motionName = delta < 0 ? "VimMotionLeft" : "VimMotionRight";
-        final AnAction action = ActionManager.getInstance().getAction(motionName);
-        final int count = Math.abs(delta);
-        for (int i = 0; i < count; i++) {
-          positionCaretActions.add(action);
-        }
-        return positionCaretActions;
-      }
-      return Collections.emptyList();
-    }
-  }
+  // Workaround for VIM-1546. Another solution is highly appreciated.
+  public boolean tabAction = false;
 
   /**
    * This repeats the previous insert count times
@@ -1962,6 +1906,66 @@ public class ChangeGroup {
   @Nullable
   private DocumentListener documentListener;
   private int oldOffset = -1;
+
+  private class InsertActionsDocumentListener implements DocumentListener {
+    @Override
+    public void documentChanged(@NotNull DocumentEvent e) {
+      final String newFragment = e.getNewFragment().toString();
+      final String oldFragment = e.getOldFragment().toString();
+      final int newFragmentLength = newFragment.length();
+      final int oldFragmentLength = oldFragment.length();
+
+      // Repeat buffer limits
+      if (repeatCharsCount > MAX_REPEAT_CHARS_COUNT) {
+        return;
+      }
+
+      // <Enter> is added to strokes as an action during processing in order to indent code properly in the repeat
+      // command
+      if (newFragment.startsWith("\n") && newFragment.trim().isEmpty()) {
+        strokes.addAll(getAdjustCaretActions(e));
+        oldOffset = -1;
+        return;
+      }
+
+      // Ignore multi-character indents as they should be inserted automatically while repeating <Enter> actions
+      if (!tabAction && newFragmentLength > 1 && newFragment.trim().isEmpty()) {
+        return;
+      }
+      tabAction = false;
+
+      strokes.addAll(getAdjustCaretActions(e));
+
+      if (oldFragmentLength > 0) {
+        final AnAction editorDelete = ActionManager.getInstance().getAction("EditorDelete");
+        for (int i = 0; i < oldFragmentLength; i++) {
+          strokes.add(editorDelete);
+        }
+      }
+
+      if (newFragmentLength > 0) {
+        strokes.add(newFragment.toCharArray());
+      }
+      repeatCharsCount += newFragmentLength;
+      oldOffset = e.getOffset() + newFragmentLength;
+    }
+
+    @NotNull
+    private List<AnAction> getAdjustCaretActions(@NotNull DocumentEvent e) {
+      final int delta = e.getOffset() - oldOffset;
+      if (oldOffset >= 0 && delta != 0) {
+        final List<AnAction> positionCaretActions = new ArrayList<>();
+        final String motionName = delta < 0 ? "VimMotionLeft" : "VimMotionRight";
+        final AnAction action = ActionManager.getInstance().getAction(motionName);
+        final int count = Math.abs(delta);
+        for (int i = 0; i < count; i++) {
+          positionCaretActions.add(action);
+        }
+        return positionCaretActions;
+      }
+      return Collections.emptyList();
+    }
+  }
 
   private static final Logger logger = Logger.getInstance(ChangeGroup.class.getName());
 }

@@ -167,6 +167,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
         if (CommandState.inInsertMode(editor)) {
           // XXX: <Tab> won't be recorded in macros
           if (keyCode == VK_TAB) {
+            VimPlugin.getChange().tabAction = true;
             return false;
           }
           // Debug watch, Python console, etc.
