@@ -18,13 +18,13 @@
 
 package com.maddyhome.idea.vim.ui;
 
-import com.intellij.ide.ui.LafManager;
-import com.intellij.ide.ui.LafManagerListener;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorFontType;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.JBUI;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.group.HistoryGroup;
@@ -164,10 +164,7 @@ public class ExTextField extends JTextField {
     }
   }
 
-  void setEditor(Editor editor, DataContext context) {
-    this.editor = editor;
-    this.context = context;
-  }
+  private static final String vimExTextFieldDisposeKey = "vimExTextFieldDisposeKey";
 
   public Editor getEditor() {
     return editor;
@@ -388,4 +385,17 @@ public class ExTextField extends JTextField {
   //private Caret blockCaret;
 
   private static final Logger logger = Logger.getInstance(ExTextField.class.getName());
+
+  void setEditor(Editor editor, DataContext context) {
+    this.editor = editor;
+    this.context = context;
+    String disposeKey = vimExTextFieldDisposeKey + editor.hashCode();
+    Project project = editor.getProject();
+    if (Disposer.get(disposeKey) == null && project != null) {
+      Disposer.register(project, () -> {
+        this.editor = null;
+        this.context = null;
+      }, disposeKey);
+    }
+  }
 }

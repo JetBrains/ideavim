@@ -35,6 +35,7 @@ To Be Released
 * [VIM-1067](https://youtrack.jetbrains.com/issue/VIM-1067) Fix repeating of `A` command
 * [VIM-1615](https://youtrack.jetbrains.com/issue/VIM-1615) Fix `set so=999` command and line "bouncing" with inlays
 * [VIM-1630](https://youtrack.jetbrains.com/issue/VIM-1630) Support `:tabonly` command
+* [VIM-607](https://youtrack.jetbrains.com/issue/VIM-607) Fix memory leaks
 
 
 0.51, 2019-02-12
