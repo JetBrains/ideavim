@@ -38,7 +38,6 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.util.ArrayUtil;
 import com.intellij.util.ObjectUtils;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
@@ -49,7 +48,6 @@ import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
-import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.BoundListOption;
 import com.maddyhome.idea.vim.option.Options;
@@ -845,41 +843,6 @@ public class ChangeGroup {
            c != KeyEvent.CHAR_UNDEFINED &&
            block != null &&
            block != Character.UnicodeBlock.SPECIALS;
-  }
-
-  public boolean deleteCharacter(@NotNull Editor editor, int count, boolean isChange) {
-    final int caretCount = editor.getCaretModel().getCaretCount();
-    final List<Integer> startOffsets = Lists.newArrayListWithCapacity(caretCount);
-    final List<Integer> endOffsets = Lists.newArrayListWithCapacity(caretCount);
-    final List<Caret> carets = EditorHelper
-      .getOrderedCaretsList(editor, count > 0 ? CaretOrder.DECREASING_OFFSET : CaretOrder.INCREASING_OFFSET);
-    boolean result = true;
-    for (int i = 0; i < caretCount; i++) {
-      final Caret caret = carets.get(i);
-      final int endOffset = VimPlugin.getMotion().moveCaretHorizontal(editor, caret, count, true);
-      if (endOffset == -1) {
-        result = false;
-        continue;
-      }
-
-      final int startOffset = caret.getOffset();
-      startOffsets.add(startOffset);
-      endOffsets.add(endOffset);
-
-      result = deleteText(editor, new TextRange(startOffset, endOffset), SelectionType.CHARACTER_WISE);
-
-      final int normalizeOffset =
-        EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, startOffset, isChange);
-      if (normalizeOffset != startOffset) MotionGroup.moveCaret(editor, caret, normalizeOffset);
-    }
-
-    if (caretCount > 1 && result) {
-      final TextRange range = new TextRange(ArrayUtil.toIntArray(startOffsets), ArrayUtil.toIntArray(endOffsets));
-      VimPlugin.getRegister()
-        .storeText(editor, range, range.isMultiple() ? SelectionType.LINE_WISE : SelectionType.CHARACTER_WISE, true);
-    }
-
-    return result;
   }
 
   /**
