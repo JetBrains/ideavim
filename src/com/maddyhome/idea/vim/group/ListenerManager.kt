@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.ExOutputModel
-import com.maddyhome.idea.vim.group.visual.vimSetSelectionSilently
+import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.ui.ExEntryPanel
@@ -136,7 +136,7 @@ object VimListenerManager {
                 for (e in EditorFactory.getInstance().getEditors(document)) {
                     if (e != editor) {
                         e.selectionModel
-                                .vimSetSelectionSilently(newRange.startOffset, newRange.endOffset)
+                                .vimSetSystemSelectionSilently(newRange.startOffset, newRange.endOffset)
                     }
                 }
             } finally {

@@ -1525,7 +1525,7 @@ public class ChangeGroup {
     final int startOffset = EditorHelper.getLineStartForOffset(editor, range.getStartOffset());
     final int endOffset = EditorHelper.getLineEndForOffset(editor, range.getEndOffset());
 
-    VisualGroupKt.vimSetSelectionSilently(editor.getSelectionModel(), startOffset, endOffset);
+    VisualGroupKt.vimSetSystemSelectionSilently(editor.getSelectionModel(), startOffset, endOffset);
 
     KeyHandler.executeAction("AutoIndentLines", context);
 

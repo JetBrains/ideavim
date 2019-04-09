@@ -50,8 +50,7 @@ class VisualMotionGroup {
 
         val primaryCaret = editor.caretModel.primaryCaret
 
-        primaryCaret.vimStartSelectionAtPoint(visualMarks.startOffset)
-        MotionGroup.moveCaret(editor, primaryCaret, visualMarks.endOffset)
+        primaryCaret.vimSetSelection(visualMarks.startOffset, visualMarks.endOffset, true)
 
         editor.scrollingModel.scrollToCaret(ScrollType.CENTER)
 
@@ -71,8 +70,7 @@ class VisualMotionGroup {
         VimPlugin.getMark().setVisualSelectionMarks(editor, TextRange(vimSelectionStart, primaryCaret.offset))
 
         CommandState.getInstance(editor).subMode = lastSelectionType.toSubMode()
-        primaryCaret.vimStartSelectionAtPoint(lastVisualRange.startOffset)
-        MotionGroup.moveCaret(editor, primaryCaret, lastVisualRange.endOffset)
+        primaryCaret.vimSetSelection(lastVisualRange.startOffset, lastVisualRange.endOffset, true)
 
         editor.scrollingModel.scrollToCaret(ScrollType.CENTER)
 
@@ -90,13 +88,12 @@ class VisualMotionGroup {
             val (start, end) = blockModeStartAndEnd(editor)
             editor.caretModel.removeSecondaryCarets()
             editor.caretModel.primaryCaret.let {
-                it.vimStartSelectionAtPoint(start)
-                MotionGroup.moveCaret(editor, it, (end - selectionAdj).coerceAtLeast(0))
+                it.vimSetSelection(start, (end - selectionAdj).coerceAtLeast(0), true)
             }
         } else {
             editor.caretModel.allCarets.forEach {
                 if (!it.hasSelection()) {
-                    it.vimStartSelectionAtPoint(it.offset)
+                    it.vimSetSelection(it.offset)
                     MotionGroup.moveCaret(editor, it, it.offset)
                     return@forEach
                 }
@@ -104,11 +101,9 @@ class VisualMotionGroup {
                 val selectionStart = it.selectionStart
                 val selectionEnd = it.selectionEnd
                 if (selectionStart == it.offset) {
-                    it.vimStartSelectionAtPoint((selectionEnd - selectionAdj).coerceAtLeast(0))
-                    MotionGroup.moveCaret(editor, it, selectionStart)
+                    it.vimSetSelection((selectionEnd - selectionAdj).coerceAtLeast(0), selectionStart, true)
                 } else {
-                    it.vimStartSelectionAtPoint(selectionStart)
-                    MotionGroup.moveCaret(editor, it, (selectionEnd - selectionAdj).coerceAtLeast(0))
+                    it.vimSetSelection(selectionStart, (selectionEnd - selectionAdj).coerceAtLeast(0), true)
                 }
             }
         }
@@ -191,14 +186,13 @@ class VisualMotionGroup {
                 val end = calculateVisualRange(editor, range, count)
                 val primaryCaret = editor.caretModel.primaryCaret
                 CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, newSubMode, MappingMode.VISUAL)
-                primaryCaret.vimStartSelectionAtPoint(start)
-                MotionGroup.moveCaret(editor, primaryCaret, end)
+                primaryCaret.vimSetSelection(start, end, true)
             } else {
                 CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, subMode, MappingMode.VISUAL)
                 if (CommandState.inVisualBlockMode(editor)) {
-                    editor.caretModel.primaryCaret.let { it.vimStartSelectionAtPoint(it.offset) }
+                    editor.caretModel.primaryCaret.let { it.vimSetSelection(it.offset) }
                 } else {
-                    editor.caretModel.allCarets.forEach { it.vimStartSelectionAtPoint(it.offset) }
+                    editor.caretModel.allCarets.forEach { it.vimSetSelection(it.offset) }
                 }
             }
             return true

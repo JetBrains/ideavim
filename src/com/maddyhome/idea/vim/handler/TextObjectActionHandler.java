@@ -65,7 +65,7 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
                    : range.getStartOffset();
 
       if (CaretDataKt.getVimSelectionStart(caret) == caret.getOffset() || block) {
-        VisualGroupKt.vimStartSelectionAtPoint(caret, newstart);
+        VisualGroupKt.vimSetSelection(caret, newstart, newstart, false);
       }
 
       if ((cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE) &&

@@ -33,7 +33,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping
 import com.maddyhome.idea.vim.extension.VimExtensionHandler
 import com.maddyhome.idea.vim.extension.VimNonDisposableExtension
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.group.visual.vimStartSelectionAtPoint
+import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.SearchHelper.findWordUnderCursor
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
@@ -215,15 +215,13 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
   }
 
   private fun selectWord(editor: Editor, caret: Caret, pattern: String, offset: Int) {
-    caret.vimStartSelectionAtPoint(offset)
-    MotionGroup.moveCaret(editor, caret, offset + pattern.length - 1)
+    caret.vimSetSelection(offset, offset + pattern.length - 1, true)
   }
 
   private fun findNextOccurrence(editor: Editor, caret: Caret, range: TextRange, whole: Boolean): Int {
       VimPlugin.getVisualMotion().setVisualMode(editor, CommandState.getInstance(editor).subMode)
     val wordRange = VimPlugin.getMotion().getWordRange(editor, caret, 1, false, false)
-    caret.vimStartSelectionAtPoint(wordRange.startOffset)
-    MotionGroup.moveCaret(editor, caret, wordRange.endOffset)
+    caret.vimSetSelection(wordRange.startOffset, wordRange.endOffset, true)
 
     val offset = VimPlugin.getSearch().searchWord(editor, caret, 1, whole, 1)
     MotionGroup.moveCaret(editor, caret, range.endOffset - 1)

@@ -7,7 +7,7 @@ import com.maddyhome.idea.vim.action.VimCommandAction
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.group.visual.vimSetSelectionSilently
+import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimLastColumn
@@ -22,7 +22,7 @@ private object SelectEnableCharacterModeActionHandler : EditorActionHandlerBase(
         editor.caretModel.runForEachCaret { caret ->
             val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
             caret.run {
-                vimSetSelectionSilently(offset, (offset + 1).coerceAtMost(lineEnd))
+                vimSetSystemSelectionSilently(offset, (offset + 1).coerceAtMost(lineEnd))
                 moveToOffset((offset + 1).coerceAtMost(lineEnd))
                 vimLastColumn = visualPosition.column
             }

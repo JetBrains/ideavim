@@ -40,12 +40,14 @@ val Editor.visualBlockRange: TextRange
     get() = selectionModel.run { TextRange(blockSelectionStarts, blockSelectionEnds) }
 
 /**
- * Start selection of caret at given point.
+ * Set selection for caret
  * This method doesn't change CommandState and operates only with caret and it's properties
+ * if [moveCaretToSelectionEnd] is true, caret movement to [end] will be performed
  */
-fun Caret.vimStartSelectionAtPoint(point: Int) {
-    vimSelectionStart = point
-    setVisualSelection(point, point, this)
+fun Caret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false) {
+    vimSelectionStart = start
+    setVisualSelection(start, end, this)
+    if (moveCaretToSelectionEnd) moveToOffset(end)
 }
 
 /**
@@ -88,7 +90,7 @@ fun Caret.vimUpdateEditorSelection() {
 /**
  * Set selection without calling SelectionListener
  */
-fun SelectionModel.vimSetSelectionSilently(start: Int, end: Int) {
+fun SelectionModel.vimSetSystemSelectionSilently(start: Int, end: Int) {
     SelectionVimListenerSuppressor.lock()
     setSelection(start, end)
     SelectionVimListenerSuppressor.unlock()
@@ -97,7 +99,7 @@ fun SelectionModel.vimSetSelectionSilently(start: Int, end: Int) {
 /**
  * Set selection without calling SelectionListener
  */
-fun SelectionModel.vimSetBlockSelectionSilently(start: LogicalPosition, end: LogicalPosition) {
+fun SelectionModel.vimSetSystemBlockSelectionSilently(start: LogicalPosition, end: LogicalPosition) {
     SelectionVimListenerSuppressor.lock()
     setBlockSelection(start, end)
     SelectionVimListenerSuppressor.unlock()
@@ -106,7 +108,7 @@ fun SelectionModel.vimSetBlockSelectionSilently(start: LogicalPosition, end: Log
 /**
  * Set selection without calling SelectionListener
  */
-fun Caret.vimSetSelectionSilently(start: Int, end: Int) {
+fun Caret.vimSetSystemSelectionSilently(start: Int, end: Int) {
     SelectionVimListenerSuppressor.lock()
     setSelection(start, end)
     SelectionVimListenerSuppressor.unlock()
@@ -180,13 +182,13 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
         CommandState.SubMode.VISUAL_LINE -> {
             val lineStart = EditorHelper.getLineStartForOffset(editor, start)
             val lineEnd = EditorHelper.getLineEndForOffset(editor, end)
-            caret.vimSetSelectionSilently(lineStart, lineEnd)
+            caret.vimSetSystemSelectionSilently(lineStart, lineEnd)
         }
         CommandState.SubMode.VISUAL_CHARACTER -> {
             val lineEnd = EditorHelper.getLineEndForOffset(editor, end)
             val adj = if (VimPlugin.getVisualMotion().exclusiveSelection || end == lineEnd || mode == CommandState.Mode.SELECT) 0 else 1
             val adjEnd = (end + adj).coerceAtMost(EditorHelper.getFileSize(editor))
-            caret.vimSetSelectionSilently(start, adjEnd)
+            caret.vimSetSystemSelectionSilently(start, adjEnd)
         }
         CommandState.SubMode.VISUAL_BLOCK -> {
             editor.caretModel.removeSecondaryCarets()
@@ -201,14 +203,14 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
                 }
             }
             val lastColumn = editor.caretModel.primaryCaret.vimLastColumn
-            editor.selectionModel.vimSetBlockSelectionSilently(blockStart, blockEnd)
+            editor.selectionModel.vimSetSystemBlockSelectionSilently(blockStart, blockEnd)
 
             for (aCaret in editor.caretModel.allCarets) {
                 val line = aCaret.logicalPosition.line
                 val lineEndOffset = EditorHelper.getLineEndOffset(editor, line, true)
 
                 if (lastColumn >= MotionGroup.LAST_COLUMN) {
-                    aCaret.vimSetSelectionSilently(aCaret.selectionStart, lineEndOffset)
+                    aCaret.vimSetSystemSelectionSilently(aCaret.selectionStart, lineEndOffset)
                 }
                 if (mode != CommandState.Mode.SELECT && !EditorHelper.isLineEmpty(editor, line, false) && aCaret.offset == aCaret.selectionEnd) {
                     aCaret.moveToOffset(aCaret.selectionEnd - 1)
