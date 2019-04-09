@@ -25,13 +25,13 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.DONT_REOPEN
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.SAVE_VISUAL
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
+import com.maddyhome.idea.vim.group.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
 
 /**
@@ -48,30 +48,26 @@ class ActionHandler : CommandHandler(
             return false
         }
         val application = ApplicationManager.getApplication()
+        val selections = editor.caretModel.allCarets.map { if (it.hasSelection()) it.selectionStart to it.selectionEnd else null }
         if (application.isUnitTestMode) {
-            executeAction(editor, cmd, action, context, actionName)
+            executeAction(editor, action, context, selections)
         } else {
-            runAfterGotFocus(Runnable { executeAction(editor, cmd, action, context, actionName) })
+            runAfterGotFocus(Runnable { executeAction(editor, action, context, selections) })
         }
         return true
     }
 
-    private fun executeAction(editor: Editor, cmd: ExCommand, action: AnAction,
-                              context: DataContext, actionName: String) {
-        val visualAction = cmd.ranges.size() > 0
-        if (visualAction) {
-            // FIXME: 2019-03-05 use '< and '> marks
-            VimPlugin.getVisualMotion().selectPreviousVisualMode(editor)
-        }
-        try {
-            KeyHandler.executeAction(action, context)
-        } catch (e: RuntimeException) {
-            assert(false) { "Error while executing :action $actionName ($action): $e" }
-        } finally {
-            if (visualAction) {
-                // Exit visual mode selected above, but do it without resetting the selected text
-                CommandState.getInstance(editor).popState()
+    private fun executeAction(editor: Editor, action: AnAction, context: DataContext, selections: List<Pair<Int, Int>?>) {
+        SelectionVimListenerSuppressor.lock()
+        for (i in selections.indices) {
+            // Restore selections after runAfterGotFocus
+            val selection = selections[i]
+            if (selection != null) {
+                editor.caretModel.allCarets[i].setSelection(selection.first, selection.second)
             }
         }
+        SelectionVimListenerSuppressor.unlock()
+
+        KeyHandler.executeAction(action, context)
     }
 }
