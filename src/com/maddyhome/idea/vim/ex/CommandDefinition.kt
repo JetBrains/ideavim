@@ -33,4 +33,4 @@ fun <T : Enum<T>> flags(first: T, vararg rest: T): EnumSet<T> {
 }
 
 fun flags(rangeFlag: CommandHandler.RangeFlag, argumentFlag: CommandHandler.ArgumentFlag, vararg flags: CommandHandler.Flag) =
-        CommandHandler.CommandHandlerFlags(rangeFlag, argumentFlag, flags.toList())
+        CommandHandler.CommandHandlerFlags(rangeFlag, argumentFlag, flags.toSet())

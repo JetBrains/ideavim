@@ -43,7 +43,7 @@ abstract class CommandHandler {
   private val runForEachCaret: Boolean
   private val caretOrder: CaretOrder
 
-  class CommandHandlerFlags(val rangeFlag: RangeFlag, val argumentFlag: ArgumentFlag, val flags: List<Flag>)
+  class CommandHandlerFlags(val rangeFlag: RangeFlag, val argumentFlag: ArgumentFlag, val flags: Set<Flag>)
 
   enum class RangeFlag {
     /**
