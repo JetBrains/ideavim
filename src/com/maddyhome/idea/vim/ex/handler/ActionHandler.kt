@@ -59,12 +59,8 @@ class ActionHandler : CommandHandler(
 
     private fun executeAction(editor: Editor, action: AnAction, context: DataContext, selections: List<Pair<Int, Int>?>) {
         SelectionVimListenerSuppressor.lock()
-        for (i in selections.indices) {
-            // Restore selections after runAfterGotFocus
-            val selection = selections[i]
-            if (selection != null) {
-                editor.caretModel.allCarets[i].setSelection(selection.first, selection.second)
-            }
+        selections.forEachIndexed { i, selection ->
+            selection?.run { editor.caretModel.allCarets[i].setSelection(first, second) }
         }
         SelectionVimListenerSuppressor.unlock()
 
