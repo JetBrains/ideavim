@@ -36,7 +36,7 @@ To Be Released
 * [VIM-1615](https://youtrack.jetbrains.com/issue/VIM-1615) Fix `set so=999` command and line "bouncing" with inlays
 * [VIM-1630](https://youtrack.jetbrains.com/issue/VIM-1630) Support `:tabonly` command
 * [VIM-607](https://youtrack.jetbrains.com/issue/VIM-607) Fix memory leaks
-
+* [VIM-1546](https://youtrack.jetbrains.com/issue/VIM-1546) Storing TAB key as input
 
 0.51, 2019-02-12
 ----------------
