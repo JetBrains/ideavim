@@ -208,12 +208,22 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
             for (aCaret in editor.caretModel.allCarets) {
                 val line = aCaret.logicalPosition.line
                 val lineEndOffset = EditorHelper.getLineEndOffset(editor, line, true)
+                val lineStartOffset = EditorHelper.getLineStartOffset(editor, line)
 
                 if (lastColumn >= MotionGroup.LAST_COLUMN) {
                     aCaret.vimSetSystemSelectionSilently(aCaret.selectionStart, lineEndOffset)
                 }
-                if (mode != CommandState.Mode.SELECT && !EditorHelper.isLineEmpty(editor, line, false) && aCaret.offset == aCaret.selectionEnd) {
-                    aCaret.moveToOffset(aCaret.selectionEnd - 1)
+                val visualPosition = editor.offsetToVisualPosition(aCaret.selectionEnd)
+                if (aCaret.offset == aCaret.selectionEnd && visualPosition != aCaret.visualPosition) {
+                    // Put right caret position for tab character
+                    aCaret.moveToVisualPosition(visualPosition)
+                }
+                if (mode != CommandState.Mode.SELECT
+                        && !EditorHelper.isLineEmpty(editor, line, false)
+                        && aCaret.offset == aCaret.selectionEnd
+                        && aCaret.selectionEnd - 1 >= lineStartOffset
+                        && aCaret.selectionEnd - aCaret.selectionStart != 0) {
+                    aCaret.moveToVisualPosition(VisualPosition(visualPosition.line, visualPosition.column - 1))
                 }
             }
 
