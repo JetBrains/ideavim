@@ -1240,9 +1240,12 @@ public class MotionGroup {
 
   public int moveCaretHorizontalWrap(@NotNull Editor editor, @NotNull Caret caret, int count) {
     // FIX - allows cursor over newlines
-    int oldOffset = caret.getOffset();
-    int offset = Math.min(Math.max(0, caret.getOffset() + count), EditorHelper.getFileSize(editor));
-    if (offset == oldOffset) {
+    VisualPosition visualPosition = caret.getVisualPosition();
+    int newOffset = EditorHelper
+      .visualPositionToOffset(editor, new VisualPosition(visualPosition.line, visualPosition.column + count));
+    int offset = Math.min(Math.max(0, newOffset), EditorHelper.getFileSize(editor));
+
+    if (offset == caret.getOffset()) {
       return -1;
     }
     else {
@@ -1251,10 +1254,12 @@ public class MotionGroup {
   }
 
   public int moveCaretHorizontal(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowPastEnd) {
-    int oldOffset = caret.getOffset();
-    int offset = EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, oldOffset + count, allowPastEnd);
+    VisualPosition visualPosition = caret.getVisualPosition();
+    int newOffset = EditorHelper
+      .visualPositionToOffset(editor, new VisualPosition(visualPosition.line, visualPosition.column + count));
+    int offset = EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, newOffset, allowPastEnd);
 
-    if (offset == oldOffset) {
+    if (offset == caret.getOffset()) {
       return -1;
     }
     else {
