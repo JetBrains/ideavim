@@ -218,11 +218,14 @@ public abstract class VimTestCase extends UsefulTestCase {
   public void doTest(final List<KeyStroke> keys,
                      String before,
                      String after,
-                     CommandState.Mode modeAfter,
-                     CommandState.SubMode subModeAfter) {
+                     CommandState.Mode modeAfter, CommandState.SubMode subModeAfter) {
     configureByText(before);
     typeText(keys);
     myFixture.checkResult(after);
+    assertState(modeAfter, subModeAfter);
+  }
+
+  protected void assertState(CommandState.Mode modeAfter, CommandState.SubMode subModeAfter) {
     assertCaretsColour();
     assertMode(modeAfter);
     assertSubMode(subModeAfter);

@@ -823,13 +823,14 @@ public class ChangeGroup {
   }
 
   public boolean processKeyInSelectMode(@NotNull final Editor editor,
-                                        @NotNull final DataContext context, @NotNull final KeyStroke key) {
+                                        @NotNull final DataContext context,
+                                        @NotNull final KeyStroke key) {
     SelectionVimListenerSuppressor.INSTANCE.lock();
     boolean res = processKey(editor, context, key);
 
     VimPlugin.getVisualMotion().exitSelectModeAndResetKeyHandler(editor, false);
 
-    if (isPrintableChar(key.getKeyChar())) {
+    if (isPrintableChar(key.getKeyChar()) || activeTemplateWithLeftRightMotion(editor, key)) {
       VimPlugin.getChange().insertBeforeCursor(editor, context);
     }
 
@@ -837,12 +838,19 @@ public class ChangeGroup {
     return res;
   }
 
-  public boolean isPrintableChar(char c) {
+  private boolean isPrintableChar(char c) {
     Character.UnicodeBlock block = Character.UnicodeBlock.of(c);
     return (!Character.isISOControl(c)) &&
            c != KeyEvent.CHAR_UNDEFINED &&
            block != null &&
            block != Character.UnicodeBlock.SPECIALS;
+  }
+
+  private boolean activeTemplateWithLeftRightMotion(Editor editor, KeyStroke keyStroke) {
+    Template template =
+      TemplateManager.getInstance(Objects.requireNonNull(editor.getProject())).getActiveTemplate(editor);
+    return template != null &&
+           (keyStroke.getKeyCode() == KeyEvent.VK_LEFT || keyStroke.getKeyCode() == KeyEvent.VK_RIGHT);
   }
 
   /**

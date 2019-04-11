@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.group.visual
 
+import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
@@ -229,6 +230,7 @@ class VisualMotionGroup {
         if (!CommandState.inSelectMode(editor)) return
 
         CommandState.getInstance(editor).popState()
+        SelectionVimListenerSuppressor.lock()
         editor.caretModel.allCarets.forEach {
             it.removeSelection()
             it.vimSelectionStartSetToNull()
@@ -240,6 +242,7 @@ class VisualMotionGroup {
                 }
             }
         }
+        SelectionVimListenerSuppressor.unlock()
         updateCaretColours(editor)
         ChangeGroup.resetCursor(editor, false)
     }
@@ -270,6 +273,9 @@ class VisualMotionGroup {
             ChangeGroup.resetCursor(editor, resetCaretToInsert)
             exitVisual(editor)
             exitSelectModeAndResetKeyHandler(editor, true)
+
+            TemplateManager.getInstance(editor.project).getActiveTemplate(editor)
+                    .run { VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor)) }
             KeyHandler.getInstance().reset(editor)
         }
     }
