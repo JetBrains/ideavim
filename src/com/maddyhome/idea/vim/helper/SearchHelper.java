@@ -291,13 +291,14 @@ public class SearchHelper {
     int res = -1;
     final int inCheckPos = dir < 0 && pos > 0 ? pos - 1 : pos;
     boolean inString = checkInString(chars, inCheckPos, true);
+    boolean initialInString = inString;
     boolean inChar = checkInString(chars, inCheckPos, false);
     boolean initial = true;
     int stack = 0;
     // Search to start or end of file, as appropriate
     while (pos >= 0 && pos < chars.length() && cnt > 0) {
       // If we found a match and we're not in a string...
-      if (chars.charAt(pos) == match && !inString && !inChar) {
+      if (chars.charAt(pos) == match && initialInString == inString && !inChar) {
         // We found our match
         if (stack == 0) {
           res = pos;
@@ -319,10 +320,10 @@ public class SearchHelper {
           stack++;
         }
         // We found the start/end of a string
-        else if (!inChar && chars.charAt(pos) == '"' && (pos == 0 || chars.charAt(pos - 1) != '\\')) {
+        else if (!inChar && isQuoteWithoutEscape(chars, pos, '"')) {
           inString = !inString;
         }
-        else if (!inString && chars.charAt(pos) == '\'' && (pos == 0 || chars.charAt(pos - 1) != '\\')) {
+        else if (!inString && isQuoteWithoutEscape(chars, pos, '\'')) {
           inChar = !inChar;
         }
       }
@@ -332,6 +333,24 @@ public class SearchHelper {
     }
 
     return res;
+  }
+
+  /**
+   * Returns true if [quote] is at this [pos] and it's not escaped (like \")
+   */
+  private static boolean isQuoteWithoutEscape(@NotNull CharSequence chars, int pos, char quote) {
+    if (chars.charAt(pos) != quote) return false;
+
+    int backslashCounter = 0;
+    while (pos-- > 0) {
+      if (chars.charAt(pos) == '\\') {
+        backslashCounter++;
+      }
+      else {
+        break;
+      }
+    }
+    return backslashCounter % 2 == 0;
   }
 
   private enum Direction {
@@ -517,10 +536,10 @@ public class SearchHelper {
     boolean inString = false;
     boolean inChar = false;
     for (int i = offset; i <= pos; i++) {
-      if (!inChar && chars.charAt(i) == '"' && (i == 0 || chars.charAt(i - 1) != '\\')) {
+      if (!inChar && isQuoteWithoutEscape(chars, i, '"')) {
         inString = !inString;
       }
-      else if (!inString && chars.charAt(i) == '\'' && (i == 0 || chars.charAt(i - 1) != '\\')) {
+      else if (!inString && isQuoteWithoutEscape(chars, i, '\'')) {
         inChar = !inChar;
       }
     }
@@ -939,11 +958,10 @@ public class SearchHelper {
     else if (hex && ((ch >= '0' && ch <= '9') || "abcdefABCDEF".indexOf(ch) >= 0)) {
       return true;
     }
-    else if (decimal && (ch >= '0' && ch <= '9')) {
-      return true;
+    else {
+      return decimal && (ch >= '0' && ch <= '9');
     }
 
-    return false;
   }
 
   /**
