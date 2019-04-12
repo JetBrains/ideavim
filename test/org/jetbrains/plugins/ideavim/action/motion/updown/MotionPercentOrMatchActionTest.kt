@@ -18,6 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -151,7 +152,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
                }
              }
             <caret>}
-        """.trimIndent())
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test motion outside text`() {
@@ -170,26 +171,26 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
             ""${'"'}
             ""${'"'}
             )
-        """.trimIndent())
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test motion in text`() {
         doTest(parseKeys("%"), """ "I found <caret>it in a (legendary) land" """,
-                """ "I found it in a (legendary<caret>) land" """)
+                """ "I found it in a (legendary<caret>) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test motion in text with quotes`() {
         doTest(parseKeys("%"), """ "I found <caret>it in \"a (legendary) land" """,
-                """ "I found it in \"a (legendary<caret>) land" """)
+                """ "I found it in \"a (legendary<caret>) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test motion in text with quotes start before quote`() {
         doTest(parseKeys("%"), """ <caret> "I found it in \"a (legendary) land" """,
-                """  "I found it in \"a (legendary<caret>) land" """)
+                """  "I found it in \"a (legendary<caret>) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test motion in text with quotes and double escape`() {
         doTest(parseKeys("%"), """ "I found <caret>it in \\\"a (legendary) land" """,
-                """ "I found it in \\\"a (legendary<caret>) land" """)
+                """ "I found it in \\\"a (legendary<caret>) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 }

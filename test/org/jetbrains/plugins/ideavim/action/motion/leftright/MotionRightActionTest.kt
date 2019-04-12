@@ -1,5 +1,6 @@
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -19,7 +20,7 @@ class MotionRightActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test simple motion with repeat`() {
@@ -37,7 +38,7 @@ class MotionRightActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test simple motion to the end`() {
@@ -55,7 +56,7 @@ class MotionRightActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `ignore test simple motion non-ascii`() {
@@ -73,7 +74,7 @@ class MotionRightActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `ignore test simple motion emoji`() {
@@ -91,7 +92,7 @@ class MotionRightActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test simple motion tab`() {
@@ -109,6 +110,6 @@ class MotionRightActionTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 }
