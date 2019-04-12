@@ -1251,12 +1251,10 @@ public class MotionGroup {
   }
 
   public int moveCaretHorizontal(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowPastEnd) {
-    VisualPosition visualPosition = caret.getVisualPosition();
-    int newOffset = EditorHelper.visualPositionToOffset(editor, new VisualPosition(visualPosition.line, Math
-      .max(0, visualPosition.column + count)));
-    int offset = EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, newOffset, allowPastEnd);
+    int oldOffset = caret.getOffset();
+    int offset = EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, oldOffset + count, allowPastEnd);
 
-    if (offset == caret.getOffset()) {
+    if (offset == oldOffset) {
       return -1;
     }
     else {

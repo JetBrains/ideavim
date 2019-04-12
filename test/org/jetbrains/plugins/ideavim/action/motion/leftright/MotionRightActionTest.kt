@@ -58,7 +58,7 @@ class MotionRightActionTest : VimTestCase() {
         """.trimIndent())
     }
 
-    fun `test simple motion non-ascii`() {
+    fun `ignore test simple motion non-ascii`() {
         doTest(parseKeys("l"), """
             A Discovery
 
@@ -76,7 +76,7 @@ class MotionRightActionTest : VimTestCase() {
         """.trimIndent())
     }
 
-    fun `test simple motion emoji`() {
+    fun `ignore test simple motion emoji`() {
         doTest(parseKeys("l"), """
             A Discovery
 
@@ -88,6 +88,24 @@ class MotionRightActionTest : VimTestCase() {
             A Discovery
 
             I found it in a legendar🐔<caret> land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent())
+    }
+
+    fun `test simple motion tab`() {
+        doTest(parseKeys("l"), """
+            A Discovery
+
+            I found it in a legendar<caret>	 land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent(), """
+            A Discovery
+
+            I found it in a legendar	<caret> land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
