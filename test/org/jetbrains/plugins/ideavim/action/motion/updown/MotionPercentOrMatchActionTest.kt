@@ -132,4 +132,64 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
         typeText(parseKeys("%"))
         myFixture.checkResult("/* foo <caret> */")
     }
+
+    fun `test motion with quote on the way`() {
+        doTest(parseKeys("%"), """
+            for (; c!= cj;c = it.next()) <caret>{
+             if (dsa) {
+               if (c == '\\') {
+                 dsadsakkk
+               }
+             }
+            }
+        """.trimIndent(),
+                """
+            for (; c!= cj;c = it.next()) {
+             if (dsa) {
+               if (c == '\\') {
+                 dsadsakkk
+               }
+             }
+            <caret>}
+        """.trimIndent())
+    }
+
+    fun `test motion outside text`() {
+        doTest(parseKeys("%"), """
+            (
+            ""${'"'}
+            ""${'"'} + <caret>title("Display")
+            ""${'"'}
+            ""${'"'}
+            )
+        """.trimIndent(),
+                """
+            (
+            ""${'"'}
+            ""${'"'} + title("Display"<caret>)
+            ""${'"'}
+            ""${'"'}
+            )
+        """.trimIndent())
+    }
+
+    fun `test motion in text`() {
+        doTest(parseKeys("%"), """ "I found <caret>it in a (legendary) land" """,
+                """ "I found it in a (legendary<caret>) land" """)
+    }
+
+    fun `test motion in text with quotes`() {
+        doTest(parseKeys("%"), """ "I found <caret>it in \"a (legendary) land" """,
+                """ "I found it in \"a (legendary<caret>) land" """)
+    }
+
+    fun `test motion in text with quotes start before quote`() {
+        doTest(parseKeys("%"), """ <caret> "I found it in \"a (legendary) land" """,
+                """  "I found it in \"a (legendary<caret>) land" """)
+    }
+
+    fun `test motion in text with quotes and double escape`() {
+        doTest(parseKeys("%"), """ "I found <caret>it in \\\"a (legendary) land" """,
+                """ "I found it in \\\"a (legendary<caret>) land" """)
+    }
 }

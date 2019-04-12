@@ -105,7 +105,7 @@ public class SearchHelper {
     char match = blockChars.charAt(loc);
     char found = blockChars.charAt(loc - dir);
 
-    return findBlockLocation(chars, found, match, dir, pos, count);
+    return findBlockLocation(chars, found, match, dir, pos, count, false);
   }
 
   @Nullable
@@ -136,10 +136,10 @@ public class SearchHelper {
         int endOffset = quoteRange.getEndOffset();
         CharSequence subSequence = chars.subSequence(startOffset, endOffset + 1);
         int inQuotePos = pos - startOffset;
-        int inQuoteStart = findBlockLocation(subSequence, close, type, -1, inQuotePos, count);
+        int inQuoteStart = findBlockLocation(subSequence, close, type, -1, inQuotePos, count, false);
         if (inQuoteStart != -1) {
           startPosInStringFound = true;
-          int inQuoteEnd = findBlockLocation(subSequence, type, close, 1, inQuoteStart, 1);
+          int inQuoteEnd = findBlockLocation(subSequence, type, close, 1, inQuoteStart, 1, false);
           if (inQuoteEnd != -1) {
             bstart = inQuoteStart + startOffset;
             bend = inQuoteEnd + startOffset;
@@ -149,9 +149,9 @@ public class SearchHelper {
     }
 
     if (!startPosInStringFound) {
-      bstart = findBlockLocation(chars, close, type, -1, pos, count);
+      bstart = findBlockLocation(chars, close, type, -1, pos, count, false);
       if (bstart != -1) {
-        bend = findBlockLocation(chars, type, close, 1, bstart, 1);
+        bend = findBlockLocation(chars, type, close, 1, bstart, 1, false);
       }
     }
 
@@ -267,7 +267,7 @@ public class SearchHelper {
       // Which character did we find and which should we now search for
       char found = getPairChars().charAt(loc);
       char match = getPairChars().charAt(loc + dir);
-      res = findBlockLocation(chars, found, match, dir, pos, 1);
+      res = findBlockLocation(chars, found, match, dir, pos, 1, true);
     }
 
     return res;
@@ -287,17 +287,24 @@ public class SearchHelper {
     return -1;
   }
 
-  private static int findBlockLocation(@NotNull CharSequence chars, char found, char match, int dir, int pos, int cnt) {
+  private static int findBlockLocation(@NotNull CharSequence chars,
+                                       char found,
+                                       char match,
+                                       int dir,
+                                       int pos,
+                                       int cnt,
+                                       boolean allowInString) {
     int res = -1;
     final int inCheckPos = dir < 0 && pos > 0 ? pos - 1 : pos;
     boolean inString = checkInString(chars, inCheckPos, true);
+    boolean initialInString = inString;
     boolean inChar = checkInString(chars, inCheckPos, false);
     boolean initial = true;
     int stack = 0;
     // Search to start or end of file, as appropriate
     while (pos >= 0 && pos < chars.length() && cnt > 0) {
       // If we found a match and we're not in a string...
-      if (chars.charAt(pos) == match && !inString && !inChar) {
+      if (chars.charAt(pos) == match && (allowInString ? initialInString == inString : !inString) && !inChar) {
         // We found our match
         if (stack == 0) {
           res = pos;
@@ -319,10 +326,10 @@ public class SearchHelper {
           stack++;
         }
         // We found the start/end of a string
-        else if (!inChar && chars.charAt(pos) == '"' && (pos == 0 || chars.charAt(pos - 1) != '\\')) {
+        else if (!inChar && isQuoteWithoutEscape(chars, pos, '"')) {
           inString = !inString;
         }
-        else if (!inString && chars.charAt(pos) == '\'' && (pos == 0 || chars.charAt(pos - 1) != '\\')) {
+        else if (!inString && isQuoteWithoutEscape(chars, pos, '\'')) {
           inChar = !inChar;
         }
       }
@@ -332,6 +339,24 @@ public class SearchHelper {
     }
 
     return res;
+  }
+
+  /**
+   * Returns true if [quote] is at this [pos] and it's not escaped (like \")
+   */
+  private static boolean isQuoteWithoutEscape(@NotNull CharSequence chars, int pos, char quote) {
+    if (chars.charAt(pos) != quote) return false;
+
+    int backslashCounter = 0;
+    while (pos-- > 0) {
+      if (chars.charAt(pos) == '\\') {
+        backslashCounter++;
+      }
+      else {
+        break;
+      }
+    }
+    return backslashCounter % 2 == 0;
   }
 
   private enum Direction {
@@ -517,10 +542,10 @@ public class SearchHelper {
     boolean inString = false;
     boolean inChar = false;
     for (int i = offset; i <= pos; i++) {
-      if (!inChar && chars.charAt(i) == '"' && (i == 0 || chars.charAt(i - 1) != '\\')) {
+      if (!inChar && isQuoteWithoutEscape(chars, i, '"')) {
         inString = !inString;
       }
-      else if (!inString && chars.charAt(i) == '\'' && (i == 0 || chars.charAt(i - 1) != '\\')) {
+      else if (!inString && isQuoteWithoutEscape(chars, i, '\'')) {
         inChar = !inChar;
       }
     }
