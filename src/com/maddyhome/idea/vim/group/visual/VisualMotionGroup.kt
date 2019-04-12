@@ -274,8 +274,8 @@ class VisualMotionGroup {
             exitVisual(editor)
             exitSelectModeAndResetKeyHandler(editor, true)
 
-            TemplateManager.getInstance(editor.project).getActiveTemplate(editor)
-                    .run { VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor)) }
+            TemplateManager.getInstance(editor.project)
+                    .getActiveTemplate(editor)?.run { VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor)) }
             KeyHandler.getInstance().reset(editor)
         }
     }

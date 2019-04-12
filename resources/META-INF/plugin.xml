@@ -239,6 +239,14 @@
             text="Extend Up Select Mode"/>
     <action id="VimExtendDown" class="com.maddyhome.idea.vim.action.motion.select.motion.SelectExtendDown"
             text="Extend Down Select Mode"/>
+    <action id="VimSelectMotionDown" class="com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionDownAction"
+            text="Move Down Select Mode"/>
+    <action id="VimSelectMotionUp" class="com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionUpAction"
+            text="Move Up Select Mode"/>
+    <action id="VimSelectMotionRight" class="com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionRightAction"
+            text="Move Right Select Mode"/>
+    <action id="VimSelectMotionLeft" class="com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionLeftAction"
+            text="Move Left Select Mode"/>
     <action id="VimToggleVisual" class="com.maddyhome.idea.vim.action.motion.select.SelectToggleVisualMode"
             text="Toggle Select/Visual mode"/>
     <action id="VimSelectInsert" class="com.maddyhome.idea.vim.action.motion.select.SelectEnterAction"

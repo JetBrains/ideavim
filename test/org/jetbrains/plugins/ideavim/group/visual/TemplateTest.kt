@@ -92,7 +92,7 @@ class TemplateTest : VimTestCase() {
         myFixture.checkResult("""
             class Hello {
                 public static void main() {
-                    int mypre${c}Var = 5;
+                    int mpre${c}yVar = 5;
                 }
             }
         """.trimIndent())
