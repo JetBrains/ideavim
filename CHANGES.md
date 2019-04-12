@@ -37,6 +37,7 @@ To Be Released
 * [VIM-1630](https://youtrack.jetbrains.com/issue/VIM-1630) Support `:tabonly` command
 * [VIM-607](https://youtrack.jetbrains.com/issue/VIM-607) Fix memory leaks
 * [VIM-1546](https://youtrack.jetbrains.com/issue/VIM-1546) Storing TAB key as input
+* [VIM-1231](https://youtrack.jetbrains.com/issue/VIM-1231) Get indent from PsiFile
 
 0.51, 2019-02-12
 ----------------
