@@ -777,6 +777,113 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("abcde</tag>fg<tag>hi");
   }
 
+  // VIM-1633 |v_a)|
+  public void testNestedBlockSelection() {
+
+    configureByText("(<caret>a)");
+    typeText(parseKeys("va)"));
+    assertSelection("(a)");
+
+    configureByText("((<caret>a))");
+    typeText(parseKeys("va)"));
+    assertSelection("(a)");
+
+    configureByText("(outer\n" +
+            "  <caret>(inner))");
+    typeText(parseKeys("va)"));
+    assertSelection("(inner)");
+
+    configureByText("(outer\n" +
+            "  (inner<caret>))");
+    typeText(parseKeys("va)"));
+    assertSelection("(inner)");
+
+    configureByText("(outer\n" +
+            " <caret> (inner))");
+    typeText(parseKeys("va)"));
+    assertSelection("(outer\n" +
+            "  (inner))");
+
+    configureByText("(outer\n" +
+            "  <caret>(inner))");
+    typeText(parseKeys("va)a)"));
+    assertSelection("(outer\n" +
+            "  (inner))");
+
+    configureByText("(outer\n" +
+            "  <caret>(inner))");
+    typeText(parseKeys("v2a)"));
+    assertSelection("(outer\n" +
+            "  (inner))");
+
+    configureByText("(outer\n" +
+            "  <caret>(inner))");
+    typeText(parseKeys("vlla)"));
+    assertSelection("(outer\n" +
+            "  (inner))");
+
+    configureByText("(outer\n" +
+            "  (inner<caret>))");
+    typeText(parseKeys("vlla)"));
+    assertSelection("(inner)");
+  }
+
+  // VIM-1633 |v_i)|
+  public void testNestedInBlockSelection() {
+
+    configureByText("(<caret>a)");
+    typeText(parseKeys("vi)"));
+    assertSelection("a");
+
+    configureByText("((<caret>a))");
+    typeText(parseKeys("vi)"));
+    assertSelection("(a)");
+
+    configureByText("(outer\n" +
+            "  <caret>(inner))");
+    typeText(parseKeys("vi)"));
+    assertSelection("inner");
+
+    configureByText("(outer\n" +
+            "  (inner<caret>))");
+    typeText(parseKeys("vi)"));
+    assertSelection("inner");
+
+    configureByText("(outer\n" +
+            " <caret> (inner))");
+    typeText(parseKeys("vi)"));
+    assertSelection("outer\n" +
+            "  (inner)");
+
+    configureByText("(outer\n" +
+            "  <caret>(inner))");
+    typeText(parseKeys("vi)i)"));
+    assertSelection("outer\n" +
+            "  (inner)");
+
+    configureByText("(outer\n" +
+            "  <caret>(inner))");
+    typeText(parseKeys("v2i)"));
+    assertSelection("outer\n" +
+            "  (inner)");
+
+    configureByText("(outer\n" +
+            "  <caret>(inner))");
+    typeText(parseKeys("vlli)"));
+    assertSelection("outer\n" +
+            "  (inner)");
+
+    configureByText("(outer\n" +
+            "  (inner<caret>))");
+    typeText(parseKeys("vlli)"));
+    assertSelection("inner");
+
+    configureByText("(outer\n" +
+      "  (<caret>inner))");
+    typeText(parseKeys("vllli)"));
+    assertSelection("inner");
+  }
+
   // |v_it|
   public void testFileStartsWithSlash() {
     configureByText("/*hello\n" +

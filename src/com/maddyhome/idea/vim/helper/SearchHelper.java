@@ -113,14 +113,24 @@ public class SearchHelper {
                                          boolean isOuter) {
     CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = caret.getOffset();
-    int start = caret.getSelectionStart();
-    int end = caret.getSelectionEnd();
-    if (start != end) {
-      pos = Math.min(start, end);
-    }
+    int start = Math.min(caret.getSelectionStart(), caret.getSelectionEnd());
+    int end = Math.max(caret.getSelectionStart(), caret.getSelectionEnd());
 
     int loc = blockChars.indexOf(type);
     char close = blockChars.charAt(loc + 1);
+
+    if (!isOuter
+        && (start - 1) >= 0 && type == chars.charAt(start - 1)
+        && end < chars.length() && close == chars.charAt(end)) {
+      start = start - 1;
+      pos = start;
+    }
+
+    boolean rangeSelection = end - start > 1;
+    if (rangeSelection && start == 0)
+      return null;
+    if (rangeSelection)
+      pos = Math.max(0, start - 1);
 
     boolean initialPosIsInString = checkInString(chars, pos, true);
 
