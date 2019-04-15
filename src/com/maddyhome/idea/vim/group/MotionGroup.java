@@ -52,6 +52,7 @@ import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
+import kotlin.ranges.IntProgression;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -1252,7 +1253,21 @@ public class MotionGroup {
 
   public int moveCaretHorizontal(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowPastEnd) {
     int oldOffset = caret.getOffset();
-    int offset = EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, oldOffset + count, allowPastEnd);
+    int diff = 0;
+    String text = editor.getDocument().getText();
+    int sign = (int)Math.signum(count);
+    for (Integer pointer : new IntProgression(0, count - sign, sign)) {
+      int textPointer = oldOffset + pointer;
+      if (textPointer < text.length() && textPointer >= 0) {
+        // Actual char size can differ from 1 if unicode characters are used (like 🐔)
+        diff += Character.charCount(text.codePointAt(textPointer));
+      }
+      else {
+        diff += 1;
+      }
+    }
+    int offset =
+      EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, oldOffset + (sign * diff), allowPastEnd);
 
     if (offset == oldOffset) {
       return -1;
