@@ -88,9 +88,7 @@ class VisualMotionGroup {
         if (autodetectedMode == CommandState.SubMode.VISUAL_BLOCK) {
             val (start, end) = blockModeStartAndEnd(editor)
             editor.caretModel.removeSecondaryCarets()
-            editor.caretModel.primaryCaret.let {
-                it.vimSetSelection(start, (end - selectionAdj).coerceAtLeast(0), true)
-            }
+            editor.caretModel.primaryCaret.vimSetSelection(start, (end - selectionAdj).coerceAtLeast(0), true)
         } else {
             editor.caretModel.allCarets.forEach {
                 if (!it.hasSelection()) {
@@ -226,6 +224,18 @@ class VisualMotionGroup {
         return true
     }
 
+    fun enterVisualMode(editor: Editor, subMode: CommandState.SubMode): Boolean {
+        CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, subMode, MappingMode.VISUAL)
+        if (subMode == CommandState.SubMode.VISUAL_BLOCK) {
+            editor.caretModel.primaryCaret.run { vimSelectionStart = vimLeadSelectionOffset }
+        } else {
+            editor.caretModel.allCarets.forEach { it.vimSelectionStart = it.vimLeadSelectionOffset }
+        }
+        updateCaretColours(editor)
+        ChangeGroup.resetCursor(editor, false)
+        return true
+    }
+
     fun exitSelectMode(editor: Editor, adjustCaretPosition: Boolean) {
         if (!CommandState.inSelectMode(editor)) return
 
@@ -267,7 +277,11 @@ class VisualMotionGroup {
                 CommandState.getInstance(editor).popState()
             }
             val autodetectedMode = autodetectVisualMode(editor, CommandState.SubMode.NONE)
-            enterSelectionMode(editor, autodetectedMode)
+            if (TemplateManager.getInstance(editor.project).getActiveTemplate(editor) == null) {
+                enterVisualMode(editor, autodetectedMode)
+            } else {
+                enterSelectionMode(editor, autodetectedMode)
+            }
             KeyHandler.getInstance().reset(editor)
         } else {
             ChangeGroup.resetCursor(editor, resetCaretToInsert)

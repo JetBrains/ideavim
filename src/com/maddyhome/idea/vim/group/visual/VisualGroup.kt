@@ -112,13 +112,14 @@ val Caret.vimLeadSelectionOffset: Int
     get() {
         val caretOffset = offset
         if (hasSelection()) {
+            val selectionAdj = VimPlugin.getVisualMotion().selectionAdj
             if (caretOffset != selectionStart && caretOffset != selectionEnd) {
                 // Try to check if current selection is tweaked by fold region.
                 val foldingModel = editor.foldingModel
                 val foldRegion = foldingModel.getCollapsedRegionAtOffset(caretOffset)
                 if (foldRegion != null) {
                     if (foldRegion.startOffset == selectionStart) {
-                        return selectionEnd
+                        return (selectionEnd - selectionAdj).coerceAtLeast(0)
                     } else if (foldRegion.endOffset == selectionEnd) {
                         return selectionStart
                     }
@@ -136,14 +137,14 @@ val Caret.vimLeadSelectionOffset: Int
                 val selections = editor.caretModel.allCarets.map { it.selectionStart to it.selectionEnd }.sortedBy { it.first }
                 val pCaret = editor.caretModel.primaryCaret
                 when {
-                    pCaret.offset == selections.first().first -> selections.last().second
+                    pCaret.offset == selections.first().first -> (selections.last().second - selectionAdj).coerceAtLeast(0)
                     pCaret.offset == selections.first().second -> selections.last().first
-                    pCaret.offset == selections.last().first -> selections.first().second
+                    pCaret.offset == selections.last().first -> (selections.first().second - selectionAdj).coerceAtLeast(0)
                     pCaret.offset == selections.last().second -> selections.first().first
                     else -> selections.first().first
                 }
             } else {
-                if (caretOffset == selectionStart) selectionEnd else selectionStart
+                if (caretOffset == selectionStart) (selectionEnd - selectionAdj).coerceAtLeast(0) else selectionStart
             }
         }
         return caretOffset

@@ -20,7 +20,7 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  */
 class TemplateTest : VimTestCase() {
 
-    lateinit var disposable: Disposable
+    private lateinit var disposable: Disposable
 
     override fun setUp() {
         super.setUp()
@@ -121,6 +121,28 @@ class TemplateTest : VimTestCase() {
         """.trimIndent())
     }
 
+    fun `test escape after typing`() {
+        configureByJavaText("""
+            class Hello {
+                public static void main() {
+                    int my${c}Var = 5;
+                }
+            }
+        """.trimIndent())
+        startRenaming(VariableInplaceRenameHandler())
+        assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+
+        typeText(parseKeys("Hello", "<ESC>"))
+
+        assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+        myFixture.checkResult("""
+            class Hello {
+                public static void main() {
+                    int Hell${c}o = 5;
+                }
+            }
+        """.trimIndent())
+    }
 
     private fun startRenaming(handler: VariableInplaceRenameHandler): Editor {
         val editor = if (myFixture.editor is EditorWindow) (myFixture.editor as EditorWindow).delegate else myFixture.editor

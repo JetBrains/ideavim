@@ -827,8 +827,9 @@ public class ChangeGroup {
   public boolean processKeyInSelectMode(@NotNull final Editor editor,
                                         @NotNull final DataContext context,
                                         @NotNull final KeyStroke key) {
-    boolean res = processKey(editor, context, key);
+    boolean res;
     try (VimListenerSuppressor ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
+      res = processKey(editor, context, key);
 
       VimPlugin.getVisualMotion().exitSelectModeAndResetKeyHandler(editor, false);
 

@@ -1,8 +1,11 @@
+@file:Suppress("RemoveCurlyBracesFromTemplate")
+
 package org.jetbrains.plugins.ideavim.group.motion
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.VimBehaviourDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -37,24 +40,32 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
         VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
         assertCaretsColour()
 
-        typeText(parseKeys("<S-Right>"))
+        typeText(parseKeys("l"))
         myFixture.checkResult("""
             A Discovery
 
-            I ${s}found $c${se}it in a legendary land
+            I ${s}found ${c}i${se}t in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
         assertCaretsColour()
     }
 
+    @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
+
+            I ${s}found i${c}t$se in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+    """)
     fun `test enable character selection cursor on end`() {
         configureByText("""
             A Discovery
@@ -66,20 +77,20 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
         VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
         assertCaretsColour()
 
-        typeText(parseKeys("<S-Right>"))
+        typeText(parseKeys("l"))
         myFixture.checkResult("""
             A Discovery
 
-            I ${s}found it $c${se}in a legendary land
+            I ${s}found it ${c}i${se}n a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
         assertCaretsColour()
     }
@@ -95,20 +106,20 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
         VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
         assertCaretsColour()
 
-        typeText(parseKeys("<S-Right>"))
+        typeText(parseKeys("l"))
         myFixture.checkResult("""
             A Discovery
 
-            I f$c${s}ound it$se in a legendary land
+            I f${s}${c}ound it$se in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
         assertCaretsColour()
     }
@@ -124,20 +135,20 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
         VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
         assertCaretsColour()
 
-        typeText(parseKeys("<S-Right>"))
+        typeText(parseKeys("l"))
         myFixture.checkResult("""
             A Discovery
 
-            I ${s}found i$c${se}t in a legendary land
+            I ${s}found i${c}t${se} in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
         assertCaretsColour()
     }
@@ -153,20 +164,20 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
         VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
         assertCaretsColour()
 
-        typeText(parseKeys("<S-Right>"))
+        typeText(parseKeys("l"))
         myFixture.checkResult("""
             A Discovery
 
-            I ${s}found i$c${se}t in a legendary land
+            I ${s}found i${c}t${se} in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
         assertCaretsColour()
     }
@@ -182,20 +193,20 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
         VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
         assertCaretsColour()
 
-        typeText(parseKeys("<S-Right>"))
+        typeText(parseKeys("l"))
         myFixture.checkResult("""
             A Discovery
 
-            ${s}I found i$c${se}t in a legendary land
+            ${s}I found i${c}t${se} in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
         assertCaretsColour()
     }
@@ -211,20 +222,20 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
         VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
         assertCaretsColour()
 
-        typeText(parseKeys("<S-Right>"))
+        typeText(parseKeys("l"))
         myFixture.checkResult("""
             A Discovery
             $s
-            I found i$c${se}t in a legendary land
+            I found i${c}t${se} in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
         assertCaretsColour()
     }
@@ -239,19 +250,19 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             hard by the torrent of a mountain ${s}pass.$c$se""".trimIndent())
         assertMode(CommandState.Mode.COMMAND)
         VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
         assertCaretsColour()
 
-        typeText(parseKeys("<S-Right>"))
+        typeText(parseKeys("l"))
         myFixture.checkResult("""
             A Discovery
             $s
-            I found i$c${se}t in a legendary land
-            all rocks ${s}a$c${se}nd lavender and tufted grass,
+            I found i${c}t${se} in a legendary land
+            all rocks ${s}a${c}n${se}d lavender and tufted grass,
             where it was s$s${c}ettled$se on some sodden sand
             hard by the torrent of a mountain ${s}pass.$c$se""".trimIndent())
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
         assertCaretsColour()
     }
@@ -267,11 +278,11 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
         VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_LINE)
         assertCaretsColour()
 
-        typeText(parseKeys("<S-Right>"))
+        typeText(parseKeys("l"))
         myFixture.checkResult("""
             A Discovery
 
@@ -280,11 +291,11 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_LINE)
         assertCaretsColour()
 
-        typeText(parseKeys("<S-Down>"))
+        typeText(parseKeys("j"))
         myFixture.checkResult("""
             A Discovery
 
@@ -293,7 +304,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_LINE)
         assertCaretsColour()
     }
@@ -309,11 +320,11 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
         VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_LINE)
         assertCaretsColour()
 
-        typeText(parseKeys("<S-Down>"))
+        typeText(parseKeys("j"))
         myFixture.checkResult("""
             A Discovery
 
@@ -322,7 +333,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_LINE)
         assertCaretsColour()
     }
@@ -338,11 +349,11 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
         VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_LINE)
         assertCaretsColour()
 
-        typeText(parseKeys("<S-Down>"))
+        typeText(parseKeys("j"))
         myFixture.checkResult("""
             A Discovery
 
@@ -351,7 +362,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent o${c}f a mountain pass.$se
         """.trimIndent())
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_LINE)
         assertCaretsColour()
     }
@@ -367,11 +378,11 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
         VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_LINE)
         assertCaretsColour()
 
-        typeText(parseKeys("<S-Down>"))
+        typeText(parseKeys("j"))
         myFixture.checkResult("""
             A Discovery
 
@@ -380,7 +391,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             where it was settled on some sodden sand$se
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_LINE)
         assertCaretsColour()
     }
@@ -396,11 +407,11 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
         VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_LINE)
         assertCaretsColour()
 
-        typeText(parseKeys("<S-Down>"))
+        typeText(parseKeys("j"))
         myFixture.checkResult("""
             A Discovery
 
@@ -409,7 +420,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             where it was settled on some sodden sand
             ${s}hard by the torrent o${c}f a mountain pass.$se
         """.trimIndent())
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_LINE)
         assertCaretsColour()
     }
@@ -425,11 +436,11 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
         VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_LINE)
         assertCaretsColour()
 
-        typeText(parseKeys("<S-Up>"))
+        typeText(parseKeys("k"))
         myFixture.checkResult("""
             A Discovery
 
@@ -438,7 +449,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_LINE)
         assertCaretsColour()
     }
@@ -454,12 +465,12 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
         VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
         assertCaretsColour()
     }
 
-    fun `test enable character selection `() {
+    fun `test enable character selection`() {
         configureByText("""
             A Discovery
 
@@ -470,20 +481,20 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
         VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
         assertCaretsColour()
 
-        typeText(parseKeys("<S-Right>"))
+        typeText(parseKeys("l"))
         myFixture.checkResult("""
             A Discovery
 
-            I ${s}found $c${se}it in a legendary land
-            al${s}l rock$c${se}s and lavender and tufted grass,
-            wh${s}ere it$c$se was settled on some sodden sand
+            I ${s}found ${c}i${se}t in a legendary land
+            al${s}l rock${c}s${se} and lavender and tufted grass,
+            wh${s}ere it${c} ${se}was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
         assertCaretsColour()
     }
@@ -499,20 +510,20 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
         VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
         assertCaretsColour()
 
-        typeText(parseKeys("<S-Down>"))
+        typeText(parseKeys("j"))
         myFixture.checkResult("""
             A Discovery
 
-            I ${s}found it in a legendary land$c$se
-            al${s}l rocks and lavender and tufted grass$c${se},
-            wh${s}ere it was settled on some sodden san$c${se}d
-            ha${s}rd by the torrent of a mountain pass.$c$se
+            I ${s}found it in a legendary lan${c}d$se
+            al${s}l rocks and lavender and tufted gras${c}s${se},
+            wh${s}ere it was settled on some sodden sa${c}n${se}d
+            ha${s}rd by the torrent of a mountain pass${c}.$se
         """.trimIndent())
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
         assertCaretsColour()
     }
@@ -528,11 +539,11 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
         VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
         assertCaretsColour()
 
-        typeText(parseKeys("<S-Right>"))
+        typeText(parseKeys("l"))
         myFixture.checkResult("""
             A Discovery
 
@@ -541,7 +552,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             whe$s${c}re i${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.SELECT)
+        assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
         assertCaretsColour()
     }

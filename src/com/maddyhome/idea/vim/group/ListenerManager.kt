@@ -168,7 +168,10 @@ object VimListenerManager {
         override fun mouseReleased(event: EditorMouseEvent) {
             if (mouseDragging) {
                 logger.debug("Release mouse after dragging")
-                SelectionVimListenerSuppressor.use { VimPlugin.getVisualMotion().controlNonVimSelectionChange(event.editor, !isBlockCaret) }
+                SelectionVimListenerSuppressor.use {
+                    VimPlugin.getVisualMotion().controlNonVimSelectionChange(event.editor, !isBlockCaret)
+                }
+
                 mouseDragging = false
             }
         }
