@@ -58,11 +58,11 @@ class ActionHandler : CommandHandler(
     }
 
     private fun executeAction(editor: Editor, action: AnAction, context: DataContext, selections: List<Pair<Int, Int>?>) {
-        SelectionVimListenerSuppressor.lock()
-        selections.forEachIndexed { i, selection ->
-            selection?.run { editor.caretModel.allCarets[i].setSelection(first, second) }
+        SelectionVimListenerSuppressor.lock().use {
+            selections.forEachIndexed { i, selection ->
+                selection?.run { editor.caretModel.allCarets[i].setSelection(first, second) }
+            }
         }
-        SelectionVimListenerSuppressor.unlock()
 
         KeyHandler.executeAction(action, context)
     }

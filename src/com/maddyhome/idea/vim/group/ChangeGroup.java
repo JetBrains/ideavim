@@ -827,16 +827,16 @@ public class ChangeGroup {
   public boolean processKeyInSelectMode(@NotNull final Editor editor,
                                         @NotNull final DataContext context,
                                         @NotNull final KeyStroke key) {
-    SelectionVimListenerSuppressor.INSTANCE.lock();
     boolean res = processKey(editor, context, key);
+    try (VimListenerSuppressor ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
 
-    VimPlugin.getVisualMotion().exitSelectModeAndResetKeyHandler(editor, false);
+      VimPlugin.getVisualMotion().exitSelectModeAndResetKeyHandler(editor, false);
 
-    if (isPrintableChar(key.getKeyChar()) || activeTemplateWithLeftRightMotion(editor, key)) {
-      VimPlugin.getChange().insertBeforeCursor(editor, context);
+      if (isPrintableChar(key.getKeyChar()) || activeTemplateWithLeftRightMotion(editor, key)) {
+        VimPlugin.getChange().insertBeforeCursor(editor, context);
+      }
     }
 
-    SelectionVimListenerSuppressor.INSTANCE.unlock();
     return res;
   }
 

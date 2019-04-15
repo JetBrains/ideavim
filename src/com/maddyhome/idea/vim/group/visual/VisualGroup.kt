@@ -90,29 +90,20 @@ fun Caret.vimUpdateEditorSelection() {
 /**
  * Set selection without calling SelectionListener
  */
-fun SelectionModel.vimSetSystemSelectionSilently(start: Int, end: Int) {
-    SelectionVimListenerSuppressor.lock()
-    setSelection(start, end)
-    SelectionVimListenerSuppressor.unlock()
-}
+fun SelectionModel.vimSetSystemSelectionSilently(start: Int, end: Int) =
+        SelectionVimListenerSuppressor.lock().use { setSelection(start, end) }
 
 /**
  * Set selection without calling SelectionListener
  */
-fun SelectionModel.vimSetSystemBlockSelectionSilently(start: LogicalPosition, end: LogicalPosition) {
-    SelectionVimListenerSuppressor.lock()
-    setBlockSelection(start, end)
-    SelectionVimListenerSuppressor.unlock()
-}
+fun SelectionModel.vimSetSystemBlockSelectionSilently(start: LogicalPosition, end: LogicalPosition) =
+        SelectionVimListenerSuppressor.lock().use { setBlockSelection(start, end) }
 
 /**
  * Set selection without calling SelectionListener
  */
-fun Caret.vimSetSystemSelectionSilently(start: Int, end: Int) {
-    SelectionVimListenerSuppressor.lock()
-    setSelection(start, end)
-    SelectionVimListenerSuppressor.unlock()
-}
+fun Caret.vimSetSystemSelectionSilently(start: Int, end: Int) =
+        SelectionVimListenerSuppressor.lock().use { setSelection(start, end) }
 
 /**
  * This works almost like [Caret.getLeadSelectionOffset], but vim-specific

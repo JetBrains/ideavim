@@ -230,19 +230,19 @@ class VisualMotionGroup {
         if (!CommandState.inSelectMode(editor)) return
 
         CommandState.getInstance(editor).popState()
-        SelectionVimListenerSuppressor.lock()
-        editor.caretModel.allCarets.forEach {
-            it.removeSelection()
-            it.vimSelectionStartSetToNull()
-            if (adjustCaretPosition) {
-                val lineEnd = EditorHelper.getLineEndForOffset(editor, it.offset)
-                val lineStart = EditorHelper.getLineStartForOffset(editor, it.offset)
-                if (it.offset == lineEnd && it.offset != lineStart) {
-                    it.moveToOffset(it.offset - 1)
+        SelectionVimListenerSuppressor.lock().use {
+            editor.caretModel.allCarets.forEach {
+                it.removeSelection()
+                it.vimSelectionStartSetToNull()
+                if (adjustCaretPosition) {
+                    val lineEnd = EditorHelper.getLineEndForOffset(editor, it.offset)
+                    val lineStart = EditorHelper.getLineStartForOffset(editor, it.offset)
+                    if (it.offset == lineEnd && it.offset != lineStart) {
+                        it.moveToOffset(it.offset - 1)
+                    }
                 }
             }
         }
-        SelectionVimListenerSuppressor.unlock()
         updateCaretColours(editor)
         ChangeGroup.resetCursor(editor, false)
     }
@@ -353,15 +353,15 @@ class VisualMotionGroup {
         val wasVisualBlock = CommandState.inVisualBlockMode(editor)
         val selectionType = SelectionType.fromSubMode(CommandState.getInstance(editor).subMode)
 
-        SelectionVimListenerSuppressor.lock()
-        if (wasVisualBlock) {
-            editor.caretModel.allCarets.forEach { it.visualAttributes = editor.caretModel.primaryCaret.visualAttributes }
-            editor.caretModel.removeSecondaryCarets()
+        SelectionVimListenerSuppressor.lock().use {
+            if (wasVisualBlock) {
+                editor.caretModel.allCarets.forEach { it.visualAttributes = editor.caretModel.primaryCaret.visualAttributes }
+                editor.caretModel.removeSecondaryCarets()
+            }
+            if (!EditorData.isKeepingVisualOperatorAction(editor)) {
+                editor.caretModel.allCarets.forEach(Caret::removeSelection)
+            }
         }
-        if (!EditorData.isKeepingVisualOperatorAction(editor)) {
-            editor.caretModel.allCarets.forEach(Caret::removeSelection)
-        }
-        SelectionVimListenerSuppressor.unlock()
 
         if (CommandState.inVisualMode(editor)) {
             EditorData.setLastSelectionType(editor, selectionType)

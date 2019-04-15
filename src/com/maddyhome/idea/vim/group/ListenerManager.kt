@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.ui.ExEntryPanel
 import java.awt.event.MouseEvent
+import java.io.Closeable
 
 /**
  * @author Alex Plate
@@ -60,34 +61,39 @@ import java.awt.event.MouseEvent
  *      CaretVimListenerSuppressor.unlock()
  *  }
  * ```
+ *
+ * [VimListenerSuppressor] implements [Closeable], so you can use try-with-resources block
+ *
+ * java
+ * ```
+ * try (SelectionVimListenerSuppressor ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
+ *     ....
+ * }
+ * ```
+ *
+ * Kotlin
+ * ```
+ * SelectionVimListenerSuppressor.lock().use { ... }
+ * _or_
+ * SelectionVimListenerSuppressor.use { ... }
+ * ```
  */
-sealed class VimListenerSuppressor {
+sealed class VimListenerSuppressor : Closeable {
     private var caretListenerSuppressor = 0
 
-    fun lock() {
-        if (logger.isDebugEnabled) {
-            val methodName = Throwable().stackTrace[1].methodName
-            val className = Throwable().stackTrace[1].className.takeLastWhile { it != '.' }
-            logger.debug("${this.javaClass.simpleName}: lock by $className#$methodName. State before lock: $caretListenerSuppressor")
-        }
+    fun lock(): VimListenerSuppressor {
         caretListenerSuppressor++
+        return this
     }
 
     fun unlock() {
-        if (logger.isDebugEnabled) {
-            val methodName = Throwable().stackTrace[1].methodName
-            val className = Throwable().stackTrace[1].className.takeLastWhile { it != '.' }
-            logger.debug("${this.javaClass.simpleName}: unlock by $className#$methodName. State before unlock: $caretListenerSuppressor")
-        }
         caretListenerSuppressor--
     }
 
+    override fun close() = unlock()
+
     val isNotLocked: Boolean
         get() = caretListenerSuppressor == 0
-
-    companion object {
-        val logger = Logger.getInstance(VimListenerSuppressor::class.java)
-    }
 }
 
 object SelectionVimListenerSuppressor : VimListenerSuppressor()
@@ -162,8 +168,7 @@ object VimListenerManager {
         override fun mouseReleased(event: EditorMouseEvent) {
             if (mouseDragging) {
                 logger.debug("Release mouse after dragging")
-                VimPlugin.getVisualMotion().controlNonVimSelectionChange(event.editor, !isBlockCaret)
-                SelectionVimListenerSuppressor.unlock()
+                SelectionVimListenerSuppressor.use { VimPlugin.getVisualMotion().controlNonVimSelectionChange(event.editor, !isBlockCaret) }
                 mouseDragging = false
             }
         }

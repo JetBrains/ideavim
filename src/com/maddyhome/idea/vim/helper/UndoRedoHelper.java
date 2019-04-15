@@ -24,6 +24,7 @@ import com.intellij.openapi.command.undo.UndoManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.group.SelectionVimListenerSuppressor;
+import com.maddyhome.idea.vim.group.VimListenerSuppressor;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -37,9 +38,9 @@ public class UndoRedoHelper {
     if (project == null) return false;
     final UndoManager undoManager = UndoManager.getInstance(project);
     if (fileEditor != null && undoManager.isUndoAvailable(fileEditor)) {
-      SelectionVimListenerSuppressor.INSTANCE.lock();
-      undoManager.undo(fileEditor);
-      SelectionVimListenerSuppressor.INSTANCE.unlock();
+      try (final VimListenerSuppressor ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
+        undoManager.undo(fileEditor);
+      }
       return true;
     }
     return false;
@@ -51,9 +52,9 @@ public class UndoRedoHelper {
     final FileEditor fileEditor = PlatformDataKeys.FILE_EDITOR.getData(context);
     final UndoManager undoManager = UndoManager.getInstance(project);
     if (fileEditor != null && undoManager.isRedoAvailable(fileEditor)) {
-      SelectionVimListenerSuppressor.INSTANCE.lock();
-      undoManager.redo(fileEditor);
-      SelectionVimListenerSuppressor.INSTANCE.unlock();
+      try (final VimListenerSuppressor ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
+        undoManager.redo(fileEditor);
+      }
       return true;
     }
     return false;

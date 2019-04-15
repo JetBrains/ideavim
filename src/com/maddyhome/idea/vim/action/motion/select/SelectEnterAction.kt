@@ -17,11 +17,11 @@ import javax.swing.KeyStroke
 
 private object SelectEnterActionHandler : EditorActionHandlerBase() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-        SelectionVimListenerSuppressor.lock()
-        VimPlugin.getChange().processEnter(InjectedLanguageUtil.getTopLevelEditor(editor), context)
-        VimPlugin.getVisualMotion().exitSelectModeAndResetKeyHandler(editor, false)
-        VimPlugin.getChange().insertBeforeCursor(editor, context)
-        SelectionVimListenerSuppressor.unlock()
+        SelectionVimListenerSuppressor.lock().use {
+            VimPlugin.getChange().processEnter(InjectedLanguageUtil.getTopLevelEditor(editor), context)
+            VimPlugin.getVisualMotion().exitSelectModeAndResetKeyHandler(editor, false)
+            VimPlugin.getChange().insertBeforeCursor(editor, context)
+        }
         return true
     }
 }
