@@ -113,22 +113,31 @@ public class SearchHelper {
                                          boolean isOuter) {
     CharSequence chars = editor.getDocument().getCharsSequence();
     int pos = caret.getOffset();
-    int start = Math.min(caret.getSelectionStart(), caret.getSelectionEnd());
-    int end = Math.max(caret.getSelectionStart(), caret.getSelectionEnd());
+    int start = caret.getSelectionStart();
+    int end = caret.getSelectionEnd();
 
     int loc = blockChars.indexOf(type);
     char close = blockChars.charAt(loc + 1);
 
+    boolean rangeSelection = end - start > 1;
+    if (rangeSelection && start == 0) // early return not only for optimization
+      return null;                    // but also not to break the interval semantic on this edge case (see below)
+
+    /* In case of successive inner selection. We want to break out of
+     * the block delimiter of the current inner selection.
+     * In other terms, for the rest of the algorithm, a previous inner selection of a block
+     * if equivalent to an outer one. */
     if (!isOuter
         && (start - 1) >= 0 && type == chars.charAt(start - 1)
         && end < chars.length() && close == chars.charAt(end)) {
       start = start - 1;
       pos = start;
+      rangeSelection = true;
     }
 
-    boolean rangeSelection = end - start > 1;
-    if (rangeSelection && start == 0)
-      return null;
+    /* when one char is selected, we want to find the enclosing block of (start,end]
+     * although when a range of characters is selected, we want the enclosing block of [start, end]
+     * shifting the position allow to express which kind of interval we work on */
     if (rangeSelection)
       pos = Math.max(0, start - 1);
 
