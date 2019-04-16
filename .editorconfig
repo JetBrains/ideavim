@@ -3,3 +3,7 @@ root = true
 [*.java]
 indent_size = 2
 indent_style = space
+
+[*.kt]
+indent_size = 4
+indent_style = space
