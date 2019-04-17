@@ -170,6 +170,11 @@ object VimListenerManager {
                 logger.debug("Release mouse after dragging")
                 SelectionVimListenerSuppressor.use {
                     VimPlugin.getVisualMotion().controlNonVimSelectionChange(event.editor, !isBlockCaret)
+                    event.editor.caretModel.runForEachCaret { caret ->
+                        if (caret.selectionEnd == caret.offset) {
+                            caret.moveToOffset(caret.selectionEnd - 1)
+                        }
+                    }
                 }
 
                 mouseDragging = false
