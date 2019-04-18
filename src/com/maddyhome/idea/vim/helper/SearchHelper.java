@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.helper;
 
-import com.google.common.collect.Lists;
 import com.intellij.lang.CodeDocumentationAwareCommenter;
 import com.intellij.lang.Commenter;
 import com.intellij.lang.Language;
@@ -27,12 +26,12 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.Pair;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.helper.TagBlockHelper.TagBlock;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionChangeEvent;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
@@ -42,8 +41,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Helper methods for searching text
@@ -432,80 +429,85 @@ public class SearchHelper {
     return -1;
   }
 
+  /** returns new position which ignore whitespaces at beginning of the line*/
+  private static int ignoreWhitespaceAtLineStart(CharSequence seq, int lineStart, int pos) {
+    if (seq.subSequence(lineStart, pos).chars().allMatch(i -> ' ' == i)) {
+      while (seq.charAt(pos) == ' ' && pos < seq.length())
+        pos++;
+    }
+    return pos;
+  }
+
+  private static TagBlock findTagBlockEnclosingRange(CharSequence seq, int start, int end, int count) {
+
+    TagBlock tag = null;
+
+    int brange;
+    if (end - start <= 1) {
+      brange = start;
+    } else {
+      brange = start - 1; // interval exclude start position if n chars are selected
+    }
+
+    int i = brange;
+    while (i >= 0 && tag == null) {
+
+      if (seq.charAt(i) != '<') {
+        i--;
+        continue;
+      }
+
+      TagBlock tagblock = TagBlockHelper.find(seq, i);
+      if (tagblock != null
+        && brange >= tagblock.getOuterStart()
+        && end <= tagblock.getOuterEnd()) {
+        tag = tagblock;
+      }
+
+      i--;
+    }
+
+    if (tag == null || count <= 1) {
+      return tag;
+    } else {
+      return findTagBlockEnclosingRange(seq,
+        tag.getOuterStart(), tag.getOuterEnd(),
+        count - 1);
+    }
+  }
+
   @Nullable
   public static TextRange findBlockTagRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter) {
-    final int cursorOffset = caret.getOffset();
-    int pos = cursorOffset;
-    int currentCount = count;
-    final CharSequence sequence = editor.getDocument().getCharsSequence();
-    while (true) {
-      final Pair<TextRange, String> closingTagResult = findClosingTag(sequence, pos);
-      if (closingTagResult == null) {
-        return null;
-      }
-      final TextRange closingTagTextRange = closingTagResult.getFirst();
-      final String tagName = closingTagResult.getSecond();
-      final TextRange openingTagTextRange = findOpeningTag(sequence, closingTagTextRange.getStartOffset(), tagName);
-      if (openingTagTextRange != null && openingTagTextRange.getStartOffset() <= cursorOffset && --currentCount == 0) {
-        if (isOuter) {
-          return new TextRange(openingTagTextRange.getStartOffset(), closingTagTextRange.getEndOffset());
-        }
-        else {
-          return new TextRange(openingTagTextRange.getEndOffset() + 1, closingTagTextRange.getStartOffset() - 1);
-        }
-      }
-      else {
-        pos = closingTagTextRange.getEndOffset() + 1;
-      }
-    }
-  }
+    int pos = caret.getOffset();
+    int begin = caret.getSelectionStart();
+    int end = caret.getSelectionEnd();
+    CharSequence chars = editor.getDocument().getCharsSequence();
+    int line = caret.getLogicalPosition().line;
+    int lineBegin = editor.getDocument().getLineStartOffset(line);
 
-  @Nullable
-  private static TextRange findOpeningTag(@NotNull CharSequence sequence, int position, @NotNull String tagName) {
-    final String tagBeginning = "<" + tagName;
-    final Pattern pattern = Pattern.compile(Pattern.quote(tagBeginning), Pattern.CASE_INSENSITIVE);
-    final Matcher matcher = pattern.matcher(sequence.subSequence(0, position));
-    final List<Integer> possibleBeginnings = Lists.newArrayList();
-    while (matcher.find()) {
-      possibleBeginnings.add(matcher.start());
-    }
-    final List<Integer> reversedBeginnings = Lists.reverse(possibleBeginnings);
-    for (int openingTagPos : reversedBeginnings) {
-      final int openingTagEndPos = openingTagPos + tagBeginning.length();
-      final int closeBracketPos = StringUtil.indexOf(sequence, '>', openingTagEndPos);
-      if (closeBracketPos > 0 && (closeBracketPos == openingTagEndPos || sequence.charAt(openingTagEndPos) == ' ')) {
-        return new TextRange(openingTagPos, closeBracketPos);
-      }
-    }
-    return null;
-  }
+    boolean rangeSelection = end - begin > 1; //n characters are selected
 
-  @Nullable
-  private static Pair<TextRange, String> findClosingTag(@NotNull CharSequence sequence, int pos) {
-    int closeBracketPos = pos;
-    int openBracketPos;
-    while (closeBracketPos < sequence.length()) {
-      closeBracketPos = StringUtil.indexOf(sequence, '>', closeBracketPos);
-      if (closeBracketPos < 0) {
-        return null;
-      }
-      openBracketPos = closeBracketPos - 1;
-      while (openBracketPos >= 0) {
-        openBracketPos = StringUtil.lastIndexOf(sequence, '<', 0, openBracketPos);
-        if (openBracketPos >= 0 &&
-            openBracketPos + 1 < sequence.length() &&
-            sequence.charAt(openBracketPos + 1) == '/') {
-          final String tagName = String.valueOf(sequence.subSequence(openBracketPos + "</".length(), closeBracketPos));
-          if (tagName.length() > 0 && tagName.charAt(0) != ' ') {
-            TextRange textRange = new TextRange(openBracketPos, closeBracketPos);
-            return Pair.create(textRange, tagName);
-          }
-        }
-        openBracketPos--;
-      }
-      closeBracketPos++;
+    TagBlock tag;
+    if (!rangeSelection) {
+      pos = ignoreWhitespaceAtLineStart(chars, lineBegin, pos);
+      tag = findTagBlockEnclosingRange(chars, pos, pos, count);
+    } else {
+      tag = findTagBlockEnclosingRange(chars, begin, end, count);
     }
-    return null;
+
+    /* Special case of consecutive inner tag block selection
+     * a |v_itit| command is equivalent to a |v_at| one. */
+    isOuter = isOuter || tag != null
+      && tag.getInnerStart() == begin
+      && (tag.getInnerEnd() == end || tag.getInnerEnd() == (end+1)); // last one is for closing tag on newline
+
+    if (tag != null) {
+      int b = (isOuter) ? tag.getOuterStart() : tag.getInnerStart();
+      int e = (isOuter) ? tag.getOuterEnd() : tag.getInnerEnd() - 1;
+      return new TextRange(b, e);
+    } else {
+      return null;
+    }
   }
 
 
