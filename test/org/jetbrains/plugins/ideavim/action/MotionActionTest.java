@@ -984,6 +984,13 @@ public class MotionActionTest extends VimTestCase {
 
     //
     configureByText("<t>Outer\n" +
+      " <caret>  <t></t>\n" +
+      "</t>\n");
+    typeText(parseKeys("vitit"));
+    assertSelection("<t></t>");
+
+    //
+    configureByText("<t>Outer\n" +
       "   <t>Inner</t> <caret> <t>Inner</t>\n" +
       "</t>\n");
     typeText(parseKeys("vit"));

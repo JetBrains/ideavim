@@ -497,13 +497,18 @@ public class SearchHelper {
 
     /* Special case of consecutive inner tag block selection
      * a |v_itit| command is equivalent to a |v_at| one. */
+    end = (chars.charAt(end) == '\n')? end+1:end; // include the newline if that's the last char on selection
     isOuter = isOuter || tag != null
-      && tag.getInnerStart() == begin
-      && (tag.getInnerEnd() == end || tag.getInnerEnd() == (end+1)); // last one is for closing tag on newline
+      // In case of empty tag selection, we simplify the selection to single position (i.e: begin)
+      && ((!rangeSelection && tag.getInnerStart() == begin && tag.getInnerEnd() == begin)
+      // 1 char selection or more
+          || (tag.getInnerStart() == begin && (tag.getInnerEnd() == end)));
 
     if (tag != null) {
       int b = (isOuter) ? tag.getOuterStart() : tag.getInnerStart();
       int e = (isOuter) ? tag.getOuterEnd() : tag.getInnerEnd() - 1;
+      if (e < b) // for empty tag selection
+        e = b;
       return new TextRange(b, e);
     } else {
       return null;
