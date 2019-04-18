@@ -67,9 +67,12 @@ public class RegisterActions {
     parser.registerAction(MappingMode.NV, "VimMotionMark", Command.Type.OTHER_READONLY, new Shortcut('m'),
                           Argument.Type.CHARACTER);
     parser.registerAction(MappingMode.NV, "VimGotoDeclaration", Command.Type.OTHER_READONLY, EnumSet.of(CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut[]{new Shortcut("gD"), new Shortcut("gd"),
+                          new Shortcut[]{ new Shortcut("gd"),
                             // TODO: <C-]> is a tag command similar to gD, the tag stack is not implemented
                             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_CLOSE_BRACKET, KeyEvent.CTRL_MASK)),}
+    );
+    parser.registerAction(MappingMode.NV, "VimGotoImplementation", Command.Type.OTHER_READONLY, EnumSet.of(CommandFlags.FLAG_SAVE_JUMP),
+      new Shortcut[]{new Shortcut("gD"),}
     );
     parser.registerAction(MappingMode.NV, "VimFileGetLocationInfo", Command.Type.OTHER_READONLY, new Shortcut(
                             new KeyStroke[]{KeyStroke.getKeyStroke('g'),
