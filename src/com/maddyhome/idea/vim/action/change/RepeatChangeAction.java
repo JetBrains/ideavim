@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +23,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,6 +35,7 @@ public class RepeatChangeAction extends EditorAction {
   }
 
   private static class Handler extends EditorActionHandlerBase {
+    @Override
     public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command command) {
       CommandState state = CommandState.getInstance(editor);
       Command cmd = state.getLastChangeCommand();

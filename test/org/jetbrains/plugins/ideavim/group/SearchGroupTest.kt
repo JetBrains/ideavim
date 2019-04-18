@@ -1,14 +1,33 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2019 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.jetbrains.plugins.ideavim.group
 
 import com.intellij.openapi.util.Ref
 import com.intellij.testFramework.UsefulTestCase
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.helper.RunnableHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.Options
 import com.maddyhome.idea.vim.option.ToggleOption
 import org.jetbrains.plugins.ideavim.VimTestCase
+import java.util.*
 
 /**
  * @author Alex Plate
@@ -232,7 +251,7 @@ class SearchGroupTest : VimTestCase() {
         val searchGroup = VimPlugin.getSearch()
         val ref = Ref.create(-1)
         RunnableHelper.runReadCommand(project, {
-            val n = searchGroup.search(editor, pattern, 1, Command.FLAG_SEARCH_FWD, false)
+            val n = searchGroup.search(editor, pattern, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
             ref.set(n)
         }, null, null)
         return ref.get()

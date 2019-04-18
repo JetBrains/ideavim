@@ -1,3 +1,21 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2019 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
@@ -113,5 +131,65 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
         configureByJavaText("/* foo <caret> */")
         typeText(parseKeys("%"))
         myFixture.checkResult("/* foo <caret> */")
+    }
+
+    fun `test motion with quote on the way`() {
+        doTest(parseKeys("%"), """
+            for (; c!= cj;c = it.next()) <caret>{
+             if (dsa) {
+               if (c == '\\') {
+                 dsadsakkk
+               }
+             }
+            }
+        """.trimIndent(),
+                """
+            for (; c!= cj;c = it.next()) {
+             if (dsa) {
+               if (c == '\\') {
+                 dsadsakkk
+               }
+             }
+            <caret>}
+        """.trimIndent())
+    }
+
+    fun `test motion outside text`() {
+        doTest(parseKeys("%"), """
+            (
+            ""${'"'}
+            ""${'"'} + <caret>title("Display")
+            ""${'"'}
+            ""${'"'}
+            )
+        """.trimIndent(),
+                """
+            (
+            ""${'"'}
+            ""${'"'} + title("Display"<caret>)
+            ""${'"'}
+            ""${'"'}
+            )
+        """.trimIndent())
+    }
+
+    fun `test motion in text`() {
+        doTest(parseKeys("%"), """ "I found <caret>it in a (legendary) land" """,
+                """ "I found it in a (legendary<caret>) land" """)
+    }
+
+    fun `test motion in text with quotes`() {
+        doTest(parseKeys("%"), """ "I found <caret>it in \"a (legendary) land" """,
+                """ "I found it in \"a (legendary<caret>) land" """)
+    }
+
+    fun `test motion in text with quotes start before quote`() {
+        doTest(parseKeys("%"), """ <caret> "I found it in \"a (legendary) land" """,
+                """  "I found it in \"a (legendary<caret>) land" """)
+    }
+
+    fun `test motion in text with quotes and double escape`() {
+        doTest(parseKeys("%"), """ "I found <caret>it in \\\"a (legendary) land" """,
+                """ "I found it in \\\"a (legendary<caret>) land" """)
     }
 }

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,16 +21,14 @@ package com.maddyhome.idea.vim.handler;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.EditorData;
-import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 /**
  */
@@ -57,30 +55,28 @@ public abstract class ChangeEditorActionHandler extends EditorActionHandlerBase 
 
     EditorData.setChangeSwitchMode(editor, null);
 
-    boolean worked;
+    final Ref<Boolean> worked = Ref.create(true);
     if (myIsMulticaretChangeAction) {
-      worked = true;
-      @NotNull List<Caret> carets = EditorHelper.getOrderedCaretsList(editor, myCaretOrder);
-      for (Caret caret : carets) {
+      editor.getCaretModel().runForEachCaret(caret -> {
         try {
           if (!execute(editor, caret, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument())) {
-            worked = false;
+            worked.set(false);
           }
         }
         catch (ExecuteMethodNotOverriddenException e) {
-          return false;
+            worked.set(false);
         }
-      }
+      });
     }
     else {
       try {
-        worked = execute(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+        worked.set(execute(editor, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument()));
       }
       catch (ExecuteMethodNotOverriddenException e) {
         return false;
       }
     }
-    if (worked) {
+    if (worked.get()) {
       CommandState.getInstance(editor).saveLastChangeCommand(cmd);
     }
 
@@ -89,7 +85,7 @@ public abstract class ChangeEditorActionHandler extends EditorActionHandlerBase 
       VimPlugin.getChange().processPostChangeModeSwitch(editor, context, toSwitch);
     }
 
-    return worked;
+    return worked.get();
   }
 
   public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,

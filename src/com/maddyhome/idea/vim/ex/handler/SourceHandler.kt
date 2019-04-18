@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,8 +32,8 @@ import java.io.File
  * @author vlan
  */
 class SourceHandler : CommandHandler(
-        commands { +"so" withOptional "urce" },
-        flags(CommandHandler.RANGE_FORBIDDEN, CommandHandler.ARGUMENT_REQUIRED)
+        commands("so[urce]"),
+        flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED)
 ), VimScriptCommandHandler {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         execute(cmd)

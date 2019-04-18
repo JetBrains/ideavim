@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
+import com.maddyhome.idea.vim.ex.flags
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 
@@ -31,8 +32,8 @@ import java.net.URLEncoder
  * @author vlan
  */
 class HelpHandler : CommandHandler(
-        commands { +"h" withOptional "elp" },
-        CommandHandler.ARGUMENT_OPTIONAL
+        commands("h[elp]"),
+        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         BrowserUtil.browse(helpTopicUrl(cmd.argument))

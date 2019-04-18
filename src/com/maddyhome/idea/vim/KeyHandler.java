@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,10 +31,7 @@ import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.group.RegisterGroup;
 import com.maddyhome.idea.vim.helper.DigraphSequence;
@@ -303,8 +300,23 @@ public class KeyHandler {
                                      "Vim " + extensionHandler.getClass().getSimpleName(),
                                      null);
           }
-          if (prevMappingInfo != null) {
-            handleKey(editor, key, currentContext);
+
+          // NB: mappingInfo MUST be non-null here, so if equal
+          //  then prevMappingInfo is also non-null; this also
+          //  means that the prev mapping was a prefix, but the
+          //  next key typed (`key`) was not part of that
+          if (prevMappingInfo == mappingInfo) {
+            // post to end of queue so it's handled AFTER
+            //  an <Plug> mapping is invoked (since that
+            //  will also get posted)
+            Runnable handleRemainingKey = () -> handleKey(editor, key, currentContext);
+
+            if (application.isUnitTestMode()) {
+              handleRemainingKey.run();
+            }
+            else {
+              application.invokeLater(handleRemainingKey);
+            }
           }
         }
       };
@@ -466,7 +478,7 @@ public class KeyHandler {
     // Save off the command we are about to execute
     editorState.setCommand(cmd);
 
-    lastWasBS = ((cmd.getFlags() & Command.FLAG_IS_BACKSPACE) != 0);
+    lastWasBS = cmd.getFlags().contains(CommandFlags.FLAG_IS_BACKSPACE);
 
     Project project = editor.getProject();
     final Command.Type type = cmd.getType();
@@ -508,7 +520,7 @@ public class KeyHandler {
         currentArg = node.getArgType();
         // Is the current command an operator? If so set the state to only accept "operator pending"
         // commands
-        if ((node.getFlags() & Command.FLAG_OP_PEND) != 0) {
+        if (node.getFlags().contains(CommandFlags.FLAG_OP_PEND)) {
           editorState.pushState(editorState.getMode(), editorState.getSubMode(), MappingMode.OP_PENDING);
         }
         break;
@@ -553,7 +565,7 @@ public class KeyHandler {
         state = State.BAD_COMMAND;
       }
     }
-    else if (currentArg == Argument.Type.EX_STRING && (node.getFlags() & Command.FLAG_COMPLETE_EX) != 0) {
+    else if (currentArg == Argument.Type.EX_STRING && node.getFlags().contains(CommandFlags.FLAG_COMPLETE_EX)) {
       String text = VimPlugin.getProcess().endSearchCommand(editor, context);
       Argument arg = new Argument(text);
       Command cmd = currentCmd.peek();
@@ -578,7 +590,7 @@ public class KeyHandler {
   private void handleBranchNode(@NotNull Editor editor, @NotNull DataContext context, @NotNull CommandState editorState,
                                 char key, @NotNull BranchNode node) {
     // Flag that we aren't allowing any more count digits (unless it's OK)
-    if ((node.getFlags() & Command.FLAG_ALLOW_MID_COUNT) == 0) {
+    if (!node.getFlags().contains(CommandFlags.FLAG_ALLOW_MID_COUNT)) {
       state = State.COMMAND;
     }
     editorState.setCurrentNode(node);
@@ -590,7 +602,7 @@ public class KeyHandler {
         state = State.BAD_COMMAND;
         return;
       }
-      if (editorState.isRecording() && (arg.getFlags() & Command.FLAG_NO_ARG_RECORDING) != 0) {
+      if (editorState.isRecording() && arg.getFlags().contains(CommandFlags.FLAG_NO_ARG_RECORDING)) {
         handleKey(editor, KeyStroke.getKeyStroke(' '), context);
       }
 
@@ -713,7 +725,7 @@ public class KeyHandler {
       // mode commands. An exception is if this command should leave us in the temporary mode such as
       // "select register"
       if (editorState.getSubMode() == CommandState.SubMode.SINGLE_COMMAND &&
-          (cmd.getFlags() & Command.FLAG_EXPECT_MORE) == 0) {
+          (!cmd.getFlags().contains(CommandFlags.FLAG_EXPECT_MORE))) {
         editorState.popState();
       }
 
@@ -741,7 +753,7 @@ public class KeyHandler {
   private int count;
   private List<KeyStroke> keys;
   private State state;
-  @NotNull private final Stack<Command> currentCmd = new Stack<Command>();
+  @NotNull private final Stack<Command> currentCmd = new Stack<>();
   @NotNull private Argument.Type currentArg;
   private TypedActionHandler origHandler;
   @Nullable private DigraphSequence digraph = null;

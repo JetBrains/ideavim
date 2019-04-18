@@ -1,3 +1,21 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2019 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.maddyhome.idea.vim.extension.multiplecursors
 
 import com.intellij.openapi.actionSystem.DataContext
@@ -6,8 +24,8 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.VisualPosition
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping
@@ -21,6 +39,7 @@ import com.maddyhome.idea.vim.helper.SearchHelper.findWordUnderCursor
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.Options
 import java.lang.Integer.min
+import java.util.*
 
 private const val NEXT_WHOLE_OCCURRENCE = "<Plug>NextWholeOccurrence"
 private const val NEXT_OCCURRENCE = "<Plug>NextOccurrence"
@@ -106,7 +125,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
         if (nextOffset == -1 || EditorHelper.getText(editor, nextOffset, nextOffset + pattern.length) != pattern) {
           if (caretModel.caretCount > 1) return
 
-          val newNextOffset = VimPlugin.getSearch().search(editor, pattern, 1, Command.FLAG_SEARCH_FWD, false)
+          val newNextOffset = VimPlugin.getSearch().search(editor, pattern, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
 
           val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(newNextOffset)) ?: return
           selectWord(editor, caret, pattern, newNextOffset)
@@ -135,7 +154,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
       val primaryCaret = caretModel.primaryCaret
       var nextOffset = if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
         val selectedText = primaryCaret.selectedText ?: return
-        val nextOffset = VimPlugin.getSearch().search(editor, selectedText, 1, Command.FLAG_SEARCH_FWD, false)
+        val nextOffset = VimPlugin.getSearch().search(editor, selectedText, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
         nextOffset
       }
       else {

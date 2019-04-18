@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,8 +25,12 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
+import com.maddyhome.idea.vim.ex.flags
 
-class DigraphHandler : CommandHandler(commands { +"dig" withOptional "raphs" }, CommandHandler.ARGUMENT_OPTIONAL) {
+class DigraphHandler : CommandHandler(
+        commands("dig[raphs]"),
+        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
+) {
 
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         val arg = cmd.argument

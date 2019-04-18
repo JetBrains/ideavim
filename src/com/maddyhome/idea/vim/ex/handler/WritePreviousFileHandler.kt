@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,11 +27,8 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class WritePreviousFileHandler : CommandHandler(
-        commands {
-            +"wN" withOptional "ext"
-            +"wp" withOptional "revious"
-        },
-        flags(RANGE_OPTIONAL, ARGUMENT_OPTIONAL, RANGE_IS_COUNT)
+        commands("wN[ext]", "wp[revious]"),
+        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         val count = cmd.getCount(editor, context, 1, true)

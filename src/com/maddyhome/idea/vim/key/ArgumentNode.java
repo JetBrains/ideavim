@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,11 @@ package com.maddyhome.idea.vim.key;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandFlags;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.EnumSet;
+import java.util.Objects;
 
 /**
  * This represents a command argument node in the key/action tree. Currently arguments of argType character
@@ -38,7 +42,7 @@ public class ArgumentNode implements Node {
    * @param flags    Any special flags associated with this argument.
    */
   public ArgumentNode(String actionId, AnAction action, @NotNull Command.Type cmdType, @NotNull Argument.Type argType,
-                      int flags) {
+                      EnumSet<CommandFlags> flags) {
     this.actionId = actionId;
     this.action = action;
     this.argType = argType;
@@ -84,7 +88,7 @@ public class ArgumentNode implements Node {
    *
    * @return The argument's flags
    */
-  public int getFlags() {
+  public EnumSet<CommandFlags> getFlags() {
     return flags;
   }
 
@@ -103,32 +107,26 @@ public class ArgumentNode implements Node {
            "]";
   }
 
+  @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof ArgumentNode)) return false;
-
-    final ArgumentNode node = (ArgumentNode)o;
-
-    return argType == node.argType &&
-           cmdType == node.cmdType &&
-           flags == node.flags &&
-           actionId.equals(node.actionId) &&
-           action.equals(node.action);
+    if (o == null || getClass() != o.getClass()) return false;
+    ArgumentNode that = (ArgumentNode) o;
+    return Objects.equals(actionId, that.actionId) &&
+            Objects.equals(action, that.action) &&
+            argType == that.argType &&
+            cmdType == that.cmdType &&
+            Objects.equals(flags, that.flags);
   }
 
+  @Override
   public int hashCode() {
-    int result;
-    result = action.hashCode();
-    result = 29 * result + actionId.hashCode();
-    result = 29 * result + argType.ordinal();
-    result = 29 * result + cmdType.hashCode();
-    result = 29 * result + flags;
-    return result;
+    return Objects.hash(actionId, action, argType, cmdType, flags);
   }
 
   protected final String actionId;
   protected final AnAction action;
   @NotNull protected final Argument.Type argType;
   @NotNull protected final Command.Type cmdType;
-  protected final int flags;
+  protected final EnumSet<CommandFlags> flags;
 }

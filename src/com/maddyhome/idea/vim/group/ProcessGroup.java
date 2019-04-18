@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandParser;
@@ -37,6 +38,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.io.*;
+import java.util.EnumSet;
 
 /**
  *
@@ -121,8 +123,8 @@ public class ProcessGroup {
       else {
         int pos = VimPlugin.getSearch().search(editor, text, panel.getCount(),
                                                                  panel.getLabel().equals("/")
-                                                                 ? Command.FLAG_SEARCH_FWD
-                                                                 : Command.FLAG_SEARCH_REV, true);
+                                                                 ? EnumSet.of(CommandFlags.FLAG_SEARCH_FWD)
+                                                                 : EnumSet.of(CommandFlags.FLAG_SEARCH_REV), true);
         if (pos == -1) {
           res = false;
         }

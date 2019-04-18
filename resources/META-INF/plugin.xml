@@ -6,6 +6,7 @@
       <ul>
         <li>Support :shell command</li>
         <li>Support :tabnext and :tabprevious commands</li>
+        <li>Commentary extension</li>
         <li>Various bug fixes</li>
       </ul>
       <p>0.51:</p>
@@ -79,6 +80,7 @@
   <extensions defaultExtensionNs="IdeaVIM">
     <vimExtension implementation="com.maddyhome.idea.vim.extension.surround.VimSurroundExtension"/>
     <vimExtension implementation="com.maddyhome.idea.vim.extension.multiplecursors.VimMultipleCursorsExtension"/>
+    <vimExtension implementation="com.maddyhome.idea.vim.extension.commentary.CommentaryExtension"/>
   </extensions>
 
   <actions>
@@ -271,8 +273,12 @@
     <action id="VimChangeEndOfLine" class="com.maddyhome.idea.vim.action.change.change.ChangeEndOfLineAction" text="Change to End-of-Line"/>
     <action id="VimChangeLine" class="com.maddyhome.idea.vim.action.change.change.ChangeLineAction" text="Change Line"/>
     <action id="VimChangeMotion" class="com.maddyhome.idea.vim.action.change.change.ChangeMotionAction" text="Change Motion"/>
-    <action id="VimChangeNumberInc" class="com.maddyhome.idea.vim.action.change.change.ChangeNumberIncAction" text="Increment Number"/>
-    <action id="VimChangeNumberDec" class="com.maddyhome.idea.vim.action.change.change.ChangeNumberDecAction" text="Decrement Number"/>
+    <action id="VimChangeNumberInc" class="com.maddyhome.idea.vim.action.change.change.number.ChangeNumberIncAction" text="Increment Number"/>
+    <action id="VimChangeNumberDec" class="com.maddyhome.idea.vim.action.change.change.number.ChangeNumberDecAction" text="Decrement Number"/>
+    <action id="VimChangeVisualNumberInc" class="com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberIncAction" text="Increment Number"/>
+    <action id="VimChangeVisualNumberDec" class="com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberDecAction" text="Decrement Number"/>
+    <action id="VimChangeVisualAvalancheNumberInc" class="com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberAvalancheIncAction" text="Increment Number"/>
+    <action id="VimChangeVisualAvalancheNumberDec" class="com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberAvalancheDecAction" text="Decrement Number"/>
     <action id="VimChangeReplace" class="com.maddyhome.idea.vim.action.change.change.ChangeReplaceAction" text="Replace"/>
     <action id="VimChangeVisual" class="com.maddyhome.idea.vim.action.change.change.ChangeVisualAction" text="Change Motion"/>
     <action id="VimChangeVisualCharacter" class="com.maddyhome.idea.vim.action.change.change.ChangeVisualCharacterAction" text="Change Motion"/>

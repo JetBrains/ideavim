@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,6 +38,7 @@ import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Matcher;
@@ -103,7 +104,7 @@ public class SearchHelper {
     char match = blockChars.charAt(loc);
     char found = blockChars.charAt(loc - dir);
 
-    return findBlockLocation(chars, found, match, dir, pos, count);
+    return findBlockLocation(chars, found, match, dir, pos, count, false);
   }
 
   @Nullable
@@ -134,10 +135,10 @@ public class SearchHelper {
         int endOffset = quoteRange.getEndOffset();
         CharSequence subSequence = chars.subSequence(startOffset, endOffset + 1);
         int inQuotePos = pos - startOffset;
-        int inQuoteStart = findBlockLocation(subSequence, close, type, -1, inQuotePos, count);
+        int inQuoteStart = findBlockLocation(subSequence, close, type, -1, inQuotePos, count, false);
         if (inQuoteStart != -1) {
           startPosInStringFound = true;
-          int inQuoteEnd = findBlockLocation(subSequence, type, close, 1, inQuoteStart + 1, 1);
+          int inQuoteEnd = findBlockLocation(subSequence, type, close, 1, inQuoteStart, 1, false);
           if (inQuoteEnd != -1) {
             bstart = inQuoteStart + startOffset;
             bend = inQuoteEnd + startOffset;
@@ -147,9 +148,9 @@ public class SearchHelper {
     }
 
     if (!startPosInStringFound) {
-      bstart = findBlockLocation(chars, close, type, -1, pos, count);
+      bstart = findBlockLocation(chars, close, type, -1, pos, count, false);
       if (bstart != -1) {
-        bend = findBlockLocation(chars, type, close, 1, bstart + 1, 1);
+        bend = findBlockLocation(chars, type, close, 1, bstart, 1, false);
       }
     }
 
@@ -265,7 +266,7 @@ public class SearchHelper {
       // Which character did we find and which should we now search for
       char found = getPairChars().charAt(loc);
       char match = getPairChars().charAt(loc + dir);
-      res = findBlockLocation(chars, found, match, dir, pos, 1);
+      res = findBlockLocation(chars, found, match, dir, pos, 1, true);
     }
 
     return res;
@@ -285,17 +286,24 @@ public class SearchHelper {
     return -1;
   }
 
-  private static int findBlockLocation(@NotNull CharSequence chars, char found, char match, int dir, int pos, int cnt) {
+  private static int findBlockLocation(@NotNull CharSequence chars,
+                                       char found,
+                                       char match,
+                                       int dir,
+                                       int pos,
+                                       int cnt,
+                                       boolean allowInString) {
     int res = -1;
     final int inCheckPos = dir < 0 && pos > 0 ? pos - 1 : pos;
     boolean inString = checkInString(chars, inCheckPos, true);
+    boolean initialInString = inString;
     boolean inChar = checkInString(chars, inCheckPos, false);
     boolean initial = true;
     int stack = 0;
     // Search to start or end of file, as appropriate
     while (pos >= 0 && pos < chars.length() && cnt > 0) {
       // If we found a match and we're not in a string...
-      if (chars.charAt(pos) == match && !inString && !inChar) {
+      if (chars.charAt(pos) == match && (allowInString ? initialInString == inString : !inString) && !inChar) {
         // We found our match
         if (stack == 0) {
           res = pos;
@@ -317,10 +325,10 @@ public class SearchHelper {
           stack++;
         }
         // We found the start/end of a string
-        else if (!inChar && chars.charAt(pos) == '"' && (pos == 0 || chars.charAt(pos - 1) != '\\')) {
+        else if (!inChar && isQuoteWithoutEscape(chars, pos, '"')) {
           inString = !inString;
         }
-        else if (!inString && chars.charAt(pos) == '\'' && (pos == 0 || chars.charAt(pos - 1) != '\\')) {
+        else if (!inString && isQuoteWithoutEscape(chars, pos, '\'')) {
           inChar = !inChar;
         }
       }
@@ -330,6 +338,24 @@ public class SearchHelper {
     }
 
     return res;
+  }
+
+  /**
+   * Returns true if [quote] is at this [pos] and it's not escaped (like \")
+   */
+  private static boolean isQuoteWithoutEscape(@NotNull CharSequence chars, int pos, char quote) {
+    if (chars.charAt(pos) != quote) return false;
+
+    int backslashCounter = 0;
+    while (pos-- > 0) {
+      if (chars.charAt(pos) == '\\') {
+        backslashCounter++;
+      }
+      else {
+        break;
+      }
+    }
+    return backslashCounter % 2 == 0;
   }
 
   private enum Direction {
@@ -576,10 +602,10 @@ public class SearchHelper {
     boolean inString = false;
     boolean inChar = false;
     for (int i = offset; i <= pos; i++) {
-      if (!inChar && chars.charAt(i) == '"' && (i == 0 || chars.charAt(i - 1) != '\\')) {
+      if (!inChar && isQuoteWithoutEscape(chars, i, '"')) {
         inString = !inString;
       }
-      else if (!inString && chars.charAt(i) == '\'' && (i == 0 || chars.charAt(i - 1) != '\\')) {
+      else if (!inString && isQuoteWithoutEscape(chars, i, '\'')) {
         inChar = !inChar;
       }
     }
@@ -827,53 +853,99 @@ public class SearchHelper {
     return res;
   }
 
+  @NotNull
+  public static List<TextRange> findNumbersInRange(@NotNull final Editor editor, @NotNull TextRange textRange,
+                                                   final boolean alpha, final boolean hex, final boolean octal) {
+    List<TextRange> result = new ArrayList<>();
+    int firstLine = editor.offsetToLogicalPosition(textRange.getStartOffset()).line;
+    int lastLine = editor.offsetToLogicalPosition(textRange.getEndOffset()).line;
+
+    int startOffset = textRange.getStartOffset();
+    for (int lineNumber = firstLine; lineNumber <= lastLine; lineNumber++) {
+      int endOffset = EditorHelper.getLineEndOffset(editor, lineNumber, true);
+      if (endOffset > textRange.getEndOffset()) endOffset = textRange.getEndOffset();
+
+      String text = EditorHelper.getText(editor, startOffset, endOffset);
+
+      TextRange numberRange = findNumberInText(text, 0, alpha, hex, octal);
+
+      if (numberRange == null) continue;
+
+      result.add(new TextRange(numberRange.getStartOffset() + startOffset, numberRange.getEndOffset() + startOffset));
+
+      startOffset = endOffset + 1;
+    }
+
+    return result;
+  }
+
   @Nullable
   public static TextRange findNumberUnderCursor(@NotNull final Editor editor, @NotNull Caret caret, final boolean alpha,
                                                 final boolean hex, final boolean octal) {
     int lline = caret.getLogicalPosition().line;
     String text = EditorHelper.getLineText(editor, lline).toLowerCase();
-    int offset = EditorHelper.getLineStartOffset(editor, lline);
-    int pos = caret.getOffset() - offset;
+    int startLineOffset = EditorHelper.getLineStartOffset(editor, lline);
+    int posOnLine = caret.getOffset() - startLineOffset;
+
+    TextRange numberTextRange = findNumberInText(text, posOnLine, alpha, hex, octal);
+
+    if (numberTextRange == null) {
+      return null;
+    }
+    return new TextRange(numberTextRange.getStartOffset() + startLineOffset,
+            numberTextRange.getEndOffset() + startLineOffset);
+  }
+
+  /**
+   * Search for number in given text from start position
+   *
+   * @param textInRange - text to search in
+   * @param startPosOnLine - start offset to search
+   * @return - text range with number
+   */
+  @Nullable
+  public static TextRange findNumberInText(@NotNull final String textInRange, int startPosOnLine, final boolean alpha,
+                                            final boolean hex, final boolean octal) {
 
     if (logger.isDebugEnabled()) {
-      logger.debug("lline=" + lline);
-      logger.debug("text=" + text);
-      logger.debug("offset=" + offset);
-      logger.debug("pos=" + pos);
+      logger.debug("text=" + textInRange);
     }
+
+    int pos = startPosOnLine;
+    int lineEndOffset = textInRange.length();
 
     while (true) {
       // Skip over current whitespace if any
-      while (pos < text.length() && !isNumberChar(text.charAt(pos), alpha, hex, octal, true)) {
+      while (pos < lineEndOffset && !isNumberChar(textInRange.charAt(pos), alpha, hex, octal, true)) {
         pos++;
       }
 
       if (logger.isDebugEnabled()) logger.debug("pos=" + pos);
-      if (pos >= text.length()) {
+      if (pos >= lineEndOffset) {
         logger.debug("no number char on line");
         return null;
       }
 
-      boolean isHexChar = "abcdefABCDEF".indexOf(text.charAt(pos)) >= 0;
+      boolean isHexChar = "abcdefABCDEF".indexOf(textInRange.charAt(pos)) >= 0;
 
       if (hex) {
         // Ox and OX handling
-        if (text.charAt(pos) == '0' && pos < text.length() - 1 && "xX".indexOf(text.charAt(pos + 1)) >= 0) {
+        if (textInRange.charAt(pos) == '0' && pos < lineEndOffset - 1 && "xX".indexOf(textInRange.charAt(pos + 1)) >= 0) {
           pos += 2;
         }
-        else if ("xX".indexOf(text.charAt(pos)) >= 0 && pos > 0 && text.charAt(pos - 1) == '0') {
+        else if ("xX".indexOf(textInRange.charAt(pos)) >= 0 && pos > 0 && textInRange.charAt(pos - 1) == '0') {
           pos++;
         }
 
         logger.debug("checking hex");
-        final Pair<Integer, Integer> range = findRange(text, pos, false, true, false, false);
+        final Pair<Integer, Integer> range = findRange(textInRange, pos, false, true, false, false);
         int start = range.first;
         int end = range.second;
 
         // Ox and OX
-        if (start >= 2 && text.substring(start - 2, start).toLowerCase().equals("0x")) {
+        if (start >= 2 && textInRange.substring(start - 2, start).toLowerCase().equals("0x")) {
           logger.debug("found hex");
-          return new TextRange(start - 2 + offset, end + offset);
+          return new TextRange(start - 2, end);
         }
 
         if (!isHexChar || alpha) {
@@ -890,34 +962,34 @@ public class SearchHelper {
 
     if (octal) {
       logger.debug("checking octal");
-      final Pair<Integer, Integer> range = findRange(text, pos, false, false, true, false);
+      final Pair<Integer, Integer> range = findRange(textInRange, pos, false, false, true, false);
       int start = range.first;
       int end = range.second;
 
-      if (text.charAt(start) == '0' &&
+      if (textInRange.charAt(start) == '0' &&
           end > start &&
-          !(start > 0 && isNumberChar(text.charAt(start - 1), false, false, false, true))) {
+          !(start > 0 && isNumberChar(textInRange.charAt(start - 1), false, false, false, true))) {
         logger.debug("found octal");
-        return new TextRange(start + offset, end + offset);
+        return new TextRange(start, end);
       }
     }
 
     if (alpha) {
-      if (logger.isDebugEnabled()) logger.debug("checking alpha for " + text.charAt(pos));
-      if (isNumberChar(text.charAt(pos), true, false, false, false)) {
+      if (logger.isDebugEnabled()) logger.debug("checking alpha for " + textInRange.charAt(pos));
+      if (isNumberChar(textInRange.charAt(pos), true, false, false, false)) {
         if (logger.isDebugEnabled()) logger.debug("found alpha at " + pos);
-        return new TextRange(pos + offset, pos + 1 + offset);
+        return new TextRange(pos, pos + 1);
       }
     }
 
-    final Pair<Integer, Integer> range = findRange(text, pos, false, false, false, true);
+    final Pair<Integer, Integer> range = findRange(textInRange, pos, false, false, false, true);
     int start = range.first;
     int end = range.second;
-    if (start > 0 && text.charAt(start - 1) == '-') {
+    if (start > 0 && textInRange.charAt(start - 1) == '-') {
       start--;
     }
 
-    return new TextRange(start + offset, end + offset);
+    return new TextRange(start, end);
   }
 
   /**
@@ -952,11 +1024,10 @@ public class SearchHelper {
     else if (hex && ((ch >= '0' && ch <= '9') || "abcdefABCDEF".indexOf(ch) >= 0)) {
       return true;
     }
-    else if (decimal && (ch >= '0' && ch <= '9')) {
-      return true;
+    else {
+      return decimal && (ch >= '0' && ch <= '9');
     }
 
-    return false;
   }
 
   /**

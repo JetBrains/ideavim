@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandHandler.Flag.DONT_REOPEN
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
@@ -36,8 +37,8 @@ import com.maddyhome.idea.vim.helper.runAfterGotFocus
  * @author smartbomb
  */
 class ActionHandler : CommandHandler(
-        commands { +"action" },
-        flags(RANGE_OPTIONAL, DONT_REOPEN)
+        commands("action"),
+        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         val actionName = cmd.argument.trim()

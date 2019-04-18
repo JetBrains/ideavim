@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -97,7 +97,7 @@
  * tag                    action
  * -------------------------------------------------------------------------------------------------------------------
  *
- * |CTRL-A|               {@link com.maddyhome.idea.vim.action.change.change.ChangeNumberIncAction}
+ * |CTRL-A|               {@link com.maddyhome.idea.vim.action.change.change.number.ChangeNumberIncAction}
  * |CTRL-B|               {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpAction}
  * |CTRL-C|               TODO
  * |CTRL-D|               {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfPageDownAction}
@@ -121,7 +121,7 @@
  * |CTRL-U|               {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollHalfPageUpAction}
  * |CTRL-V|               {@link com.maddyhome.idea.vim.action.motion.visual.VisualToggleBlockModeAction}
  * |CTRL-W|               see window commands
- * |CTRL-X|               {@link com.maddyhome.idea.vim.action.change.change.ChangeNumberDecAction}
+ * |CTRL-X|               {@link com.maddyhome.idea.vim.action.change.change.number.ChangeNumberDecAction}
  * |CTRL-Y|               {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLineUpAction}
  * |CTRL-Z|               TODO
  * |CTRL-]|               {@link com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction}
@@ -490,6 +490,7 @@
  *
  * |v_CTRL-\_CTRL-N|      {@link com.maddyhome.idea.vim.action.motion.visual.VisualExitModeAction}
  * |v_CTRL-\_CTRL-G|      TODO
+ * |v_CTRL-A|             {@link com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberIncAction}
  * |v_CTRL-C|             {@link com.maddyhome.idea.vim.action.motion.visual.VisualExitModeAction}
  * |v_CTRL-G|             TODO
  * |v_<BS>|               NVO mapping
@@ -497,6 +498,7 @@
  * |v_CTRL-O|             TODO
  * |v_CTRL-V|             NVO mapping
  * |v_<Esc>|              {@link com.maddyhome.idea.vim.action.motion.visual.VisualExitModeAction}
+ * |v_CTRL-X|             {@link com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberDecAction}
  * |v_CTRL-]|             TODO
  * |v_!|                  {@link com.maddyhome.idea.vim.action.change.change.FilterVisualLinesAction}
  * |v_:|                  NVO mapping
@@ -537,6 +539,8 @@
  * |v_a}|                 {@link com.maddyhome.idea.vim.action.motion.object.MotionOuterBlockBraceAction}
  * |v_c|                  {@link com.maddyhome.idea.vim.action.change.change.ChangeVisualAction}
  * |v_d|                  {@link com.maddyhome.idea.vim.action.change.delete.DeleteVisualAction}
+ * |v_gCTRL-A|            {@link com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberAvalancheIncAction}
+ * |v_gCTRL-X|            {@link com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberAvalancheDecAction}
  * |v_gJ|                 {@link com.maddyhome.idea.vim.action.change.delete.DeleteJoinVisualLinesAction}
  * |v_gq|                 {@link com.maddyhome.idea.vim.action.change.change.ReformatCodeVisualAction}
  * |v_gv|                 {@link com.maddyhome.idea.vim.action.motion.visual.VisualSwapSelectionsAction}

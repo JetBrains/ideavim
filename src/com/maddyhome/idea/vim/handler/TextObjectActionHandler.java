@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import org.jetbrains.annotations.NotNull;
@@ -55,7 +56,7 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
       TextRange vr;
       vr = VimPlugin.getMotion().getRawVisualRange(caret);
 
-      boolean block = (cmd.getFlags() & Command.FLAG_TEXT_BLOCK) != 0;
+      boolean block = cmd.getFlags().contains(CommandFlags.FLAG_TEXT_BLOCK);
       int newstart = block || vr.getEndOffset() >= vr.getStartOffset() ? range.getStartOffset() : range.getEndOffset();
       int newend = block || vr.getEndOffset() >= vr.getStartOffset() ? range.getEndOffset() : range.getStartOffset();
 
@@ -63,13 +64,13 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
         VimPlugin.getMotion().moveVisualStart(caret, newstart);
       }
 
-      if (((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) != 0 &&
-           (cmd.getFlags() & Command.FLAG_VISUAL_CHARACTERWISE) == 0) &&
+      if ((cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE) &&
+           !cmd.getFlags().contains(CommandFlags.FLAG_VISUAL_CHARACTERWISE)) &&
           CommandState.getInstance(editor).getSubMode() != CommandState.SubMode.VISUAL_LINE) {
         VimPlugin.getMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE);
       }
-      else if (((cmd.getFlags() & Command.FLAG_MOT_LINEWISE) == 0 ||
-                (cmd.getFlags() & Command.FLAG_VISUAL_CHARACTERWISE) != 0) &&
+      else if ((!cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE) ||
+                cmd.getFlags().contains(CommandFlags.FLAG_VISUAL_CHARACTERWISE)) &&
                CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_LINE) {
         VimPlugin.getMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER);
       }

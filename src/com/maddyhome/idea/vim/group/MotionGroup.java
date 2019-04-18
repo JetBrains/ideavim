@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,12 +52,14 @@ import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
+import kotlin.ranges.IntProgression;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.EnumSet;
 
 /**
  * This handles all motion related commands and marks
@@ -233,7 +235,7 @@ public class MotionGroup {
       setVisualMode(editor, CommandState.SubMode.VISUAL_LINE);
 
       final Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-      VisualChange range = getVisualOperatorRange(editor, primaryCaret, Command.FLAG_MOT_LINEWISE);
+      VisualChange range = getVisualOperatorRange(editor, primaryCaret, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE));
       if (range.getLines() > 1) {
         MotionGroup.moveCaret(editor, primaryCaret,
                               moveCaretVertical(editor, primaryCaret, -1));
@@ -380,8 +382,8 @@ public class MotionGroup {
 
     // If we are a linewise motion we need to normalize the start and stop then move the start to the beginning
     // of the line and move the end to the end of the line.
-    int flags = cmd.getFlags();
-    if ((flags & Command.FLAG_MOT_LINEWISE) != 0) {
+    EnumSet<CommandFlags> flags = cmd.getFlags();
+    if (flags.contains(CommandFlags.FLAG_MOT_LINEWISE)) {
       if (start > end) {
         int t = start;
         start = end;
@@ -393,7 +395,7 @@ public class MotionGroup {
           .min(EditorHelper.getLineEndForOffset(editor, end) + (incNewline ? 1 : 0), EditorHelper.getFileSize(editor));
     }
     // If characterwise and inclusive, add the last character to the range
-    else if ((flags & Command.FLAG_MOT_INCLUSIVE) != 0) {
+    else if (flags.contains(CommandFlags.FLAG_MOT_INCLUSIVE)) {
       end++;
     }
 
@@ -909,10 +911,18 @@ public class MotionGroup {
   }
 
   public boolean scrollLine(@NotNull Editor editor, int lines) {
-    int visualLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
+    assert lines != 0 : "lines cannot be 0";
 
-    visualLine = EditorHelper.normalizeVisualLine(editor, visualLine + lines);
-    EditorHelper.scrollVisualLineToTopOfScreen(editor, visualLine);
+    if (lines > 0) {
+      int visualLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
+      visualLine = EditorHelper.normalizeVisualLine(editor, visualLine + lines);
+      EditorHelper.scrollVisualLineToTopOfScreen(editor, visualLine);
+    }
+    else if (lines < 0) {
+      int visualLine = EditorHelper.getVisualLineAtBottomOfScreen(editor);
+      visualLine = EditorHelper.normalizeVisualLine(editor, visualLine + lines);
+      EditorHelper.scrollVisualLineToBottomOfScreen(editor, visualLine);
+    }
 
     moveCaretToView(editor);
 
@@ -1243,7 +1253,21 @@ public class MotionGroup {
 
   public int moveCaretHorizontal(@NotNull Editor editor, @NotNull Caret caret, int count, boolean allowPastEnd) {
     int oldOffset = caret.getOffset();
-    int offset = EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, oldOffset + count, allowPastEnd);
+    int diff = 0;
+    String text = editor.getDocument().getText();
+    int sign = (int)Math.signum(count);
+    for (Integer pointer : new IntProgression(0, count - sign, sign)) {
+      int textPointer = oldOffset + pointer;
+      if (textPointer < text.length() && textPointer >= 0) {
+        // Actual char size can differ from 1 if unicode characters are used (like 🐔)
+        diff += Character.charCount(text.codePointAt(textPointer));
+      }
+      else {
+        diff += 1;
+      }
+    }
+    int offset =
+      EditorHelper.normalizeOffset(editor, caret.getLogicalPosition().line, oldOffset + (sign * diff), allowPastEnd);
 
     if (offset == oldOffset) {
       return -1;
@@ -1338,7 +1362,7 @@ public class MotionGroup {
     final CommandState commandState = CommandState.getInstance(editor);
     if (commandState.getMode() == CommandState.Mode.VISUAL) {
       final Command command = commandState.getCommand();
-      return command == null || (command.getFlags() & Command.FLAG_EXIT_VISUAL) == 0;
+      return command == null || !command.getFlags().contains(CommandFlags.FLAG_EXIT_VISUAL);
     }
     return false;
   }
@@ -1373,7 +1397,7 @@ public class MotionGroup {
   }
 
   private static void scrollCaretIntoView(@NotNull Editor editor) {
-    final boolean scrollJump = (CommandState.getInstance(editor).getFlags() & Command.FLAG_IGNORE_SCROLL_JUMP) == 0;
+    final boolean scrollJump = !CommandState.getInstance(editor).getFlags().contains(CommandFlags.FLAG_IGNORE_SCROLL_JUMP);
     scrollPositionIntoView(editor, editor.getCaretModel().getVisualPosition(), scrollJump);
   }
 
@@ -1384,7 +1408,8 @@ public class MotionGroup {
     final int visualLine = position.line;
     final int column = position.column;
 
-    int scrollOffset = getNormalizedScrollOffset(editor);
+    // We need the non-normalised value here, so we can handle cases such as so=999 to keep the current line centred
+    int scrollOffset = ((NumberOption) Options.getInstance().getOption("scrolloff")).value();
 
     int scrollJumpSize = 0;
     if (scrollJump) {
@@ -1392,7 +1417,7 @@ public class MotionGroup {
     }
 
     int visualTop = topVisualLine + scrollOffset;
-    int visualBottom = bottomVisualLine - scrollOffset;
+    int visualBottom = bottomVisualLine - scrollOffset + 1;
     if (visualTop == visualBottom) {
       visualBottom++;
     }
@@ -1402,16 +1427,20 @@ public class MotionGroup {
       diff = visualLine - visualTop;
       scrollJumpSize = -scrollJumpSize;
     } else {
-      diff = Math.max(0, visualLine - visualBottom);
+      diff = Math.max(0, visualLine - visualBottom + 1);
     }
 
     if (diff != 0) {
 
-      // If we need to move the top line more than a half screen worth then we just center the cursor line.
-      // Block inlays mean that this half screen height isn't a consistent pixel height, and might be larger than line
-      // height multiplied by number of lines, but it's still a good heuristic to use here
+      // If we need to scroll the current line more than half a screen worth of lines then we just centre the new
+      // current line. This mimics vim behaviour of e.g. 100G in a 300 line file with a screen size of 25 centering line
+      // 100. It also handles so=999 keeping the current line centred.
+      // It doesn't handle keeping the line centred when scroll offset is less than a full page height, as the new line
+      // might be within e.g. top + scroll offset, so we test for that separately.
+      // Note that block inlays means that the pixel height we are scrolling can be larger than half the screen, even if
+      // the number of lines is less. I'm not sure what impact this has.
       int height = bottomVisualLine - topVisualLine + 1;
-      if (Math.abs(diff) > height / 2) {
+      if (Math.abs(diff) > height / 2 || scrollOffset > height / 2) {
         EditorHelper.scrollVisualLineToMiddleOfScreen(editor, visualLine);
       }
       else {
@@ -1432,7 +1461,7 @@ public class MotionGroup {
 
     int visualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
     int width = EditorHelper.getScreenWidth(editor);
-    scrollJump = (CommandState.getInstance(editor).getFlags() & Command.FLAG_IGNORE_SIDE_SCROLL_JUMP) == 0;
+    scrollJump = !CommandState.getInstance(editor).getFlags().contains(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP);
     scrollOffset = ((NumberOption) Options.getInstance().getOption("sidescrolloff")).value();
     scrollJumpSize = 0;
     if (scrollJump) {
@@ -1703,7 +1732,7 @@ public class MotionGroup {
   }
 
   @NotNull
-  public VisualChange getVisualOperatorRange(@NotNull Editor editor, @NotNull Caret caret, int cmdFlags) {
+  public VisualChange getVisualOperatorRange(@NotNull Editor editor, @NotNull Caret caret, EnumSet<CommandFlags> cmdFlags) {
     int start = CaretData.getVisualStart(caret);
     int end = CaretData.getVisualEnd(caret);
 
@@ -1726,7 +1755,7 @@ public class MotionGroup {
     int chars;
     SelectionType type;
     if (CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_LINE ||
-        (cmdFlags & Command.FLAG_MOT_LINEWISE) != 0) {
+        cmdFlags.contains(CommandFlags.FLAG_MOT_LINEWISE)) {
       chars = ep.column;
       type = SelectionType.LINE_WISE;
     }

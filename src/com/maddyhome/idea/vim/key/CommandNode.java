@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,9 +20,12 @@ package com.maddyhome.idea.vim.key;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandFlags;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.util.EnumSet;
+import java.util.Objects;
 
 /**
  * This node represents a command in the key/action tree
@@ -37,7 +40,7 @@ public class CommandNode implements Node {
    * @param cmdType The type of the command
    * @param flags   Any special flags needs by the command
    */
-  public CommandNode(KeyStroke key, String actName, AnAction action, @NotNull Command.Type cmdType, int flags) {
+  public CommandNode(KeyStroke key, String actName, AnAction action, @NotNull Command.Type cmdType, EnumSet<CommandFlags> flags) {
     this.key = key;
     this.actionId = actName;
     this.action = action;
@@ -82,7 +85,7 @@ public class CommandNode implements Node {
    *
    * @return The command's flags
    */
-  public int getFlags() {
+  public EnumSet<CommandFlags> getFlags() {
     return flags;
   }
 
@@ -92,32 +95,26 @@ public class CommandNode implements Node {
     return "CommandNode[key=" + key + ", actionId=" + actionId + ", action=" + action + ", argType=" + type + "]";
   }
 
+  @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof CommandNode)) return false;
-
-    final CommandNode node = (CommandNode)o;
-
-    return flags == node.flags &&
-           type == node.type &&
-           actionId.equals(node.actionId) &&
-           action.equals(node.action) &&
-           key.equals(node.key);
+    if (o == null || getClass() != o.getClass()) return false;
+    CommandNode that = (CommandNode) o;
+    return Objects.equals(key, that.key) &&
+            Objects.equals(action, that.action) &&
+            Objects.equals(actionId, that.actionId) &&
+            type == that.type &&
+            Objects.equals(flags, that.flags);
   }
 
+  @Override
   public int hashCode() {
-    int result;
-    result = key.hashCode();
-    result = 29 * result + actionId.hashCode();
-    result = 29 * result + action.hashCode();
-    result = 29 * result + type.hashCode();
-    result = 29 * result + flags;
-    return result;
+    return Objects.hash(key, action, actionId, type, flags);
   }
 
   protected final KeyStroke key;
   protected final AnAction action;
   protected final String actionId;
   @NotNull protected final Command.Type type;
-  protected final int flags;
+  protected final EnumSet<CommandFlags> flags;
 }

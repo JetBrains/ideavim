@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,11 +20,9 @@ package com.maddyhome.idea.vim.group;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.intellij.application.options.CodeStyle;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
@@ -37,18 +35,16 @@ import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.impl.TextRangeInterval;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.util.ArrayUtil;
 import com.intellij.util.ObjectUtils;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.*;
+import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.LineRange;
@@ -61,10 +57,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Provides all the insert/replace related functionality
@@ -231,7 +224,7 @@ public class ChangeGroup {
     }
 
     EditorData.setChangeSwitchMode(editor, CommandState.Mode.INSERT);
-    insertText(editor, caret, "\n" + StringUtil.repeat(" ", col));
+    insertText(editor, caret, "\n" + IndentConfig.create(editor).createIndentBySize(col));
 
     if (CaretData.wasInFirstLine(caret)) {
       MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretVertical(editor, caret, -1));
@@ -269,7 +262,7 @@ public class ChangeGroup {
 
     MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, caret));
     EditorData.setChangeSwitchMode(editor, CommandState.Mode.INSERT);
-    insertText(editor, caret, "\n" + StringUtil.repeat(" ", col));
+    insertText(editor, caret, "\n" + IndentConfig.create(editor).createIndentBySize(col));
   }
 
   private void runEnterAction(Editor editor, @NotNull DataContext context) {
@@ -427,7 +420,7 @@ public class ChangeGroup {
       if (mode == CommandState.Mode.REPLACE) {
         setInsertEditorState(editor, false);
       }
-      if ((cmd.getFlags() & Command.FLAG_NO_REPEAT) != 0) {
+      if (cmd.getFlags().contains(CommandFlags.FLAG_NO_REPEAT)) {
         repeatInsert(editor, context, 1, false);
       }
       else {
@@ -448,7 +441,7 @@ public class ChangeGroup {
       document = editor.getDocument();
       documentListener = new InsertActionsDocumentListener();
       eventFacade.addDocumentListener(document, documentListener);
-      oldOffset = -1;
+      oldOffset = editor.getCaretModel().getOffset();
       setInsertEditorState(editor, mode == CommandState.Mode.INSERT);
       state.pushState(mode, CommandState.SubMode.NONE, MappingMode.INSERT);
 
@@ -470,64 +463,8 @@ public class ChangeGroup {
     }
   }
 
-  private class InsertActionsDocumentListener implements DocumentListener {
-    @Override
-    public void documentChanged(@NotNull DocumentEvent e) {
-      final String newFragment = e.getNewFragment().toString();
-      final String oldFragment = e.getOldFragment().toString();
-      final int newFragmentLength = newFragment.length();
-      final int oldFragmentLength = oldFragment.length();
-
-      // Repeat buffer limits
-      if (repeatCharsCount > MAX_REPEAT_CHARS_COUNT) {
-        return;
-      }
-
-      // <Enter> is added to strokes as an action during processing in order to indent code properly in the repeat
-      // command
-      if (newFragment.startsWith("\n") && newFragment.trim().isEmpty()) {
-        strokes.addAll(getAdjustCaretActions(e));
-        oldOffset = -1;
-        return;
-      }
-
-      // Ignore multi-character indents as they should be inserted automatically while repeating <Enter> actions
-      if (newFragmentLength > 1 && newFragment.trim().isEmpty()) {
-        return;
-      }
-
-      strokes.addAll(getAdjustCaretActions(e));
-
-      if (oldFragmentLength > 0) {
-        final AnAction editorDelete = ActionManager.getInstance().getAction("EditorDelete");
-        for (int i = 0; i < oldFragmentLength; i++) {
-          strokes.add(editorDelete);
-        }
-      }
-
-      if (newFragmentLength > 0) {
-        strokes.add(newFragment.toCharArray());
-      }
-      repeatCharsCount += newFragmentLength;
-      oldOffset = e.getOffset() + newFragmentLength;
-    }
-
-    @NotNull
-    private List<AnAction> getAdjustCaretActions(@NotNull DocumentEvent e) {
-      final int delta = e.getOffset() - oldOffset;
-      if (oldOffset >= 0 && delta != 0) {
-        final List<AnAction> positionCaretActions = new ArrayList<>();
-        final String motionName = delta < 0 ? "VimMotionLeft" : "VimMotionRight";
-        final AnAction action = ActionManager.getInstance().getAction(motionName);
-        final int count = Math.abs(delta);
-        for (int i = 0; i < count; i++) {
-          positionCaretActions.add(action);
-        }
-        return positionCaretActions;
-      }
-      return Collections.emptyList();
-    }
-  }
+  // Workaround for VIM-1546. Another solution is highly appreciated.
+  public boolean tabAction = false;
 
   /**
    * This repeats the previous insert count times
@@ -618,7 +555,7 @@ public class ChangeGroup {
       setInsertEditorState(editor, true);
     }
 
-    if (lastInsert != null && (lastInsert.getFlags() & Command.FLAG_NO_REPEAT) != 0) {
+    if (lastInsert != null && (lastInsert.getFlags().contains(CommandFlags.FLAG_NO_REPEAT))) {
       cnt = 1;
     }
 
@@ -760,10 +697,10 @@ public class ChangeGroup {
    */
   public void processCommand(@NotNull Editor editor, @NotNull Command cmd) {
     // return value never used here
-    if ((cmd.getFlags() & Command.FLAG_SAVE_STROKE) != 0) {
+    if (cmd.getFlags().contains(CommandFlags.FLAG_SAVE_STROKE)) {
       strokes.add(cmd.getAction());
     }
-    else if ((cmd.getFlags() & Command.FLAG_CLEAR_STROKES) != 0) {
+    else if (cmd.getFlags().contains(CommandFlags.FLAG_CLEAR_STROKES)) {
       clearStrokes(editor);
     }
   }
@@ -1000,21 +937,20 @@ public class ChangeGroup {
     if (motion == null) {
       return false;
     }
-    if (!isChange && (motion.getFlags() & Command.FLAG_MOT_LINEWISE) == 0) {
+    EnumSet<CommandFlags> flags = motion.getFlags().clone();
+    if (!isChange && !motion.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE)) {
       LogicalPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
       LogicalPosition end = editor.offsetToLogicalPosition(range.getEndOffset());
       if (start.line != end.line) {
         if (!SearchHelper.anyNonWhitespace(editor, range.getStartOffset(), -1) &&
             !SearchHelper.anyNonWhitespace(editor, range.getEndOffset(), 1)) {
-          int flags = motion.getFlags();
-          flags &= ~Command.FLAG_MOT_EXCLUSIVE;
-          flags &= ~Command.FLAG_MOT_INCLUSIVE;
-          flags |= Command.FLAG_MOT_LINEWISE;
-          motion.setFlags(flags);
+          flags.remove(CommandFlags.FLAG_MOT_EXCLUSIVE);
+          flags.remove(CommandFlags.FLAG_MOT_INCLUSIVE);
+          flags.add(CommandFlags.FLAG_MOT_LINEWISE);
         }
       }
     }
-    return deleteRange(editor, caret, range, SelectionType.fromCommandFlags(motion.getFlags()), isChange);
+    return deleteRange(editor, caret, range, SelectionType.fromCommandFlags(flags), isChange);
   }
 
   @Nullable
@@ -1268,17 +1204,17 @@ public class ChangeGroup {
         case VIM_MOTION_WORD_RIGHT:
           kludge = true;
           motion.setAction(ActionManager.getInstance().getAction(VIM_MOTION_WORD_END_RIGHT));
-          motion.setFlags(Command.FLAG_MOT_INCLUSIVE);
+          motion.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE));
           break;
         case VIM_MOTION_BIG_WORD_RIGHT:
           kludge = true;
           motion.setAction(ActionManager.getInstance().getAction(VIM_MOTION_BIG_WORD_END_RIGHT));
-          motion.setFlags(Command.FLAG_MOT_INCLUSIVE);
+          motion.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE));
           break;
         case VIM_MOTION_CAMEL_RIGHT:
           kludge = true;
           motion.setAction(ActionManager.getInstance().getAction(VIM_MOTION_CAMEL_END_RIGHT));
-          motion.setFlags(Command.FLAG_MOT_INCLUSIVE);
+          motion.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE));
           break;
       }
     }
@@ -1304,7 +1240,7 @@ public class ChangeGroup {
           motion.setCount(motion.getCount() - 1);
         }
         else {
-          motion.setFlags(Command.FLAG_MOT_EXCLUSIVE);
+          motion.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE));
         }
       }
     }
@@ -1568,44 +1504,16 @@ public class ChangeGroup {
       logger.debug("count=" + count);
     }
 
-    final Project proj = PlatformDataKeys.PROJECT.getData(context); // API change - don't merge
-    VirtualFile file = EditorData.getVirtualFile(editor);
-    final int tabSize;
-    final int indentSize;
-    final boolean useTabs;
-    if (file != null) {
-      FileType type = FileTypeManager.getInstance().getFileTypeByFile(file);
-      CodeStyleSettings settings = proj == null ? CodeStyle.getDefaultSettings() : CodeStyle.getSettings(proj);
-      tabSize = settings.getTabSize(type);
-      indentSize = settings.getIndentSize(type);
-      useTabs = settings.useTabCharacter(type);
-    }
-    else {
-      tabSize = 8;
-      indentSize = 8;
-      useTabs = true;
-    }
+    IndentConfig indentConfig = IndentConfig.create(editor, context);
 
     final int sline = editor.offsetToLogicalPosition(range.getStartOffset()).line;
     final int eline = editor.offsetToLogicalPosition(range.getEndOffset()).line;
 
     if (range.isMultiple()) {
       final int from = editor.offsetToLogicalPosition(range.getStartOffset()).column;
-      final int size = indentSize * count;
       if (dir == 1) {
         // Right shift blockwise selection
-        final int tabCnt;
-        final int spcCnt;
-        if (useTabs) {
-          tabCnt = size / tabSize;
-          spcCnt = size % tabSize;
-        }
-        else {
-          tabCnt = 0;
-          spcCnt = size;
-        }
-
-        final String indent = StringUtil.repeat("\t", tabCnt) + StringUtil.repeat(" ", spcCnt);
+        final String indent = indentConfig.createIndentByCount(count);
 
         for (int l = sline; l <= eline; l++) {
           int len = EditorHelper.getLineLength(editor, l);
@@ -1623,7 +1531,7 @@ public class ChangeGroup {
           int len = EditorHelper.getLineLength(editor, l);
           if (len > from) {
             LogicalPosition spos = new LogicalPosition(l, from);
-            LogicalPosition epos = new LogicalPosition(l, from + size - 1);
+            LogicalPosition epos = new LogicalPosition(l, from + indentConfig.getTotalIndent(count) - 1);
             int wsoff = editor.logicalPositionToOffset(spos);
             int weoff = editor.logicalPositionToOffset(epos);
             int pos;
@@ -1646,20 +1554,9 @@ public class ChangeGroup {
         final int eoff = EditorHelper.getLineEndOffset(editor, l, true);
         final int woff = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, l);
         final int col = editor.offsetToVisualPosition(woff).column;
-        final int limit = Math.max(0, col + dir * indentSize * count);
+        final int limit = Math.max(0, col + dir * indentConfig.getTotalIndent(count));
         if (col > 0 || soff != eoff) {
-          final int tabsCnt;
-          final int spacesCnt;
-          if (useTabs) {
-            tabsCnt = limit / tabSize;
-            spacesCnt = limit % tabSize;
-          }
-          else {
-            tabsCnt = 0;
-            spacesCnt = limit;
-          }
-
-          final String indent = StringUtil.repeat("\t", tabsCnt) + StringUtil.repeat(" ", spacesCnt);
+          final String indent = indentConfig.createIndentBySize(limit);
           replaceText(editor, soff, woff, indent);
         }
       }
@@ -1812,6 +1709,42 @@ public class ChangeGroup {
     }
   }
 
+  /**
+   * Perform increment and decrement for numbers in visual mode
+   *
+   * Flag [avalanche] marks if increment (or decrement) should be performed in avalanche mode
+   * (for v_g_Ctrl-A and v_g_Ctrl-X commands)
+   *
+   * @return true
+   */
+  public boolean changeNumberVisualMode(@NotNull final Editor editor, @NotNull Caret caret,
+                                        @NotNull TextRange selectedRange, final int count, boolean avalanche) {
+    BoundListOption nf = (BoundListOption) Options.getInstance().getOption("nrformats");
+    boolean alpha = nf.contains("alpha");
+    boolean hex = nf.contains("hex");
+    boolean octal = nf.contains("octal");
+
+    List<TextRange> numberRanges = SearchHelper.findNumbersInRange(editor, selectedRange, alpha, hex, octal);
+
+    List<String> newNumbers = new ArrayList<>();
+    for (int i = 0; i < numberRanges.size(); i++) {
+      TextRange numberRange = numberRanges.get(i);
+      int iCount = avalanche ? (i + 1) * count : count;
+      String newNumber = changeNumberInRange(editor, numberRange, iCount, alpha, hex, octal);
+      newNumbers.add(newNumber);
+    }
+
+    for (int i = newNumbers.size() - 1; i >= 0; i--) {
+      // Replace text bottom up. In other direction ranges will be desynchronized after inc numbers like 99
+      TextRange rangeToReplace = numberRanges.get(i);
+      String newNumber = newNumbers.get(i);
+      replaceText(editor, rangeToReplace.getStartOffset(), rangeToReplace.getEndOffset(), newNumber);
+    }
+
+    caret.moveToOffset(selectedRange.getStartOffset());
+    return true;
+  }
+
   public boolean changeNumber(@NotNull final Editor editor, @NotNull Caret caret, final int count) {
     final BoundListOption nf = (BoundListOption)Options.getInstance().getOption("nrformats");
     final boolean alpha = nf.contains("alpha");
@@ -1823,82 +1756,89 @@ public class ChangeGroup {
       logger.debug("no number on line");
       return false;
     }
-    else {
-      String text = EditorHelper.getText(editor, range);
-      if (logger.isDebugEnabled()) {
-        logger.debug("found range " + range);
-        logger.debug("text=" + text);
-      }
-      String number = text;
-      if (text.length() == 0) {
-        return false;
-      }
 
-      char ch = text.charAt(0);
-      if (hex && text.toLowerCase().startsWith("0x")) {
-        for (int i = text.length() - 1; i >= 2; i--) {
-          int index = "abcdefABCDEF".indexOf(text.charAt(i));
-          if (index >= 0) {
-            lastLower = index < 6;
-            break;
-          }
-        }
-
-        int num = (int)Long.parseLong(text.substring(2), 16);
-        num += count;
-        number = Integer.toHexString(num);
-        number = StringHelper.rightJustify(number, text.length() - 2, '0');
-
-        if (!lastLower) {
-          number = number.toUpperCase();
-        }
-
-        number = text.substring(0, 2) + number;
-      }
-      else if (octal && text.startsWith("0") && text.length() > 1) {
-        int num = (int)Long.parseLong(text, 8);
-        num += count;
-        number = Integer.toOctalString(num);
-        number = "0" + StringHelper.rightJustify(number, text.length() - 1, '0');
-      }
-      else if (alpha && Character.isLetter(ch)) {
-        ch += count;
-        if (Character.isLetter(ch)) {
-          number = "" + ch;
-        }
-      }
-      else if (ch == '-' || Character.isDigit(ch)) {
-        boolean pad = ch == '0';
-        int len = text.length();
-        if (ch == '-' && text.charAt(1) == '0') {
-          pad = true;
-          len--;
-        }
-
-        int num = Integer.parseInt(text);
-        num += count;
-        number = Integer.toString(num);
-
-        if (!octal && pad) {
-          boolean neg = false;
-          if (number.charAt(0) == '-') {
-            neg = true;
-            number = number.substring(1);
-          }
-          number = StringHelper.rightJustify(number, len, '0');
-          if (neg) {
-            number = "-" + number;
-          }
-        }
-      }
-
-      if (!text.equals(number)) {
-        replaceText(editor, range.getStartOffset(), range.getEndOffset(), number);
-        caret.moveToOffset(range.getStartOffset() + number.length() - 1);
-      }
-
+    String newNumber = changeNumberInRange(editor, range, count, alpha, hex, octal);
+    if (newNumber == null) {
+      return false;
+    } else {
+      replaceText(editor, range.getStartOffset(), range.getEndOffset(), newNumber);
+      caret.moveToOffset(range.getStartOffset() + newNumber.length() - 1);
       return true;
     }
+  }
+
+  @Nullable
+  public String changeNumberInRange(@NotNull final Editor editor, @NotNull TextRange range, final int count,
+                                     boolean alpha, boolean hex, boolean octal) {
+    String text = EditorHelper.getText(editor, range);
+    if (logger.isDebugEnabled()) {
+      logger.debug("found range " + range);
+      logger.debug("text=" + text);
+    }
+    String number = text;
+    if (text.length() == 0) {
+      return null;
+    }
+
+    char ch = text.charAt(0);
+    if (hex && text.toLowerCase().startsWith("0x")) {
+      for (int i = text.length() - 1; i >= 2; i--) {
+        int index = "abcdefABCDEF".indexOf(text.charAt(i));
+        if (index >= 0) {
+          lastLower = index < 6;
+          break;
+        }
+      }
+
+      int num = (int)Long.parseLong(text.substring(2), 16);
+      num += count;
+      number = Integer.toHexString(num);
+      number = StringHelper.rightJustify(number, text.length() - 2, '0');
+
+      if (!lastLower) {
+        number = number.toUpperCase();
+      }
+
+      number = text.substring(0, 2) + number;
+    }
+    else if (octal && text.startsWith("0") && text.length() > 1) {
+      int num = (int)Long.parseLong(text, 8);
+      num += count;
+      number = Integer.toOctalString(num);
+      number = "0" + StringHelper.rightJustify(number, text.length() - 1, '0');
+    }
+    else if (alpha && Character.isLetter(ch)) {
+      ch += count;
+      if (Character.isLetter(ch)) {
+        number = "" + ch;
+      }
+    }
+    else if (ch == '-' || Character.isDigit(ch)) {
+      boolean pad = ch == '0';
+      int len = text.length();
+      if (ch == '-' && text.charAt(1) == '0') {
+        pad = true;
+        len--;
+      }
+
+      int num = Integer.parseInt(text);
+      num += count;
+      number = Integer.toString(num);
+
+      if (!octal && pad) {
+        boolean neg = false;
+        if (number.charAt(0) == '-') {
+          neg = true;
+          number = number.substring(1);
+        }
+        number = StringHelper.rightJustify(number, len, '0');
+        if (neg) {
+          number = "-" + number;
+        }
+      }
+    }
+
+    return number;
   }
 
   private void exitAllSingleCommandInsertModes(@NotNull Editor editor) {
@@ -1923,6 +1863,66 @@ public class ChangeGroup {
   @Nullable
   private DocumentListener documentListener;
   private int oldOffset = -1;
+
+  private class InsertActionsDocumentListener implements DocumentListener {
+    @Override
+    public void documentChanged(@NotNull DocumentEvent e) {
+      final String newFragment = e.getNewFragment().toString();
+      final String oldFragment = e.getOldFragment().toString();
+      final int newFragmentLength = newFragment.length();
+      final int oldFragmentLength = oldFragment.length();
+
+      // Repeat buffer limits
+      if (repeatCharsCount > MAX_REPEAT_CHARS_COUNT) {
+        return;
+      }
+
+      // <Enter> is added to strokes as an action during processing in order to indent code properly in the repeat
+      // command
+      if (newFragment.startsWith("\n") && newFragment.trim().isEmpty()) {
+        strokes.addAll(getAdjustCaretActions(e));
+        oldOffset = -1;
+        return;
+      }
+
+      // Ignore multi-character indents as they should be inserted automatically while repeating <Enter> actions
+      if (!tabAction && newFragmentLength > 1 && newFragment.trim().isEmpty()) {
+        return;
+      }
+      tabAction = false;
+
+      strokes.addAll(getAdjustCaretActions(e));
+
+      if (oldFragmentLength > 0) {
+        final AnAction editorDelete = ActionManager.getInstance().getAction("EditorDelete");
+        for (int i = 0; i < oldFragmentLength; i++) {
+          strokes.add(editorDelete);
+        }
+      }
+
+      if (newFragmentLength > 0) {
+        strokes.add(newFragment.toCharArray());
+      }
+      repeatCharsCount += newFragmentLength;
+      oldOffset = e.getOffset() + newFragmentLength;
+    }
+
+    @NotNull
+    private List<AnAction> getAdjustCaretActions(@NotNull DocumentEvent e) {
+      final int delta = e.getOffset() - oldOffset;
+      if (oldOffset >= 0 && delta != 0) {
+        final List<AnAction> positionCaretActions = new ArrayList<>();
+        final String motionName = delta < 0 ? "VimMotionLeft" : "VimMotionRight";
+        final AnAction action = ActionManager.getInstance().getAction(motionName);
+        final int count = Math.abs(delta);
+        for (int i = 0; i < count; i++) {
+          positionCaretActions.add(action);
+        }
+        return positionCaretActions;
+      }
+      return Collections.emptyList();
+    }
+  }
 
   private static final Logger logger = Logger.getInstance(ChangeGroup.class.getName());
 }

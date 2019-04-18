@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.fileEditor.*;
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
-import com.intellij.openapi.fileEditor.impl.EditorTabbedContainer;
 import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
@@ -152,21 +152,10 @@ public class FileGroup {
     if (project != null) {
       final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
       final EditorWindow window = fileEditorManager.getCurrentWindow();
-      final EditorTabbedContainer tabbedPane = window.getTabbedPane();
-      if (tabbedPane != null) {
-        if (tabbedPane.getTabCount() > 1) {
-          final int index = tabbedPane.getSelectedIndex();
-          tabbedPane.removeTabAt(index, index + 1);
-        }
-        else {
-          tabbedPane.close();
-        }
-      }
-      else {
-        VirtualFile virtualFile = EditorData.getVirtualFile(editor);
-        if (virtualFile != null) {
-          fileEditorManager.closeFile(virtualFile);
-        }
+      final VirtualFile virtualFile = EditorData.getVirtualFile(editor);
+
+      if (virtualFile != null) {
+        window.closeFile(virtualFile);
       }
     }
   }
@@ -409,6 +398,11 @@ public class FileGroup {
     VimPlugin.showMessage(msg.toString());
   }
 
+  @NotNull private static final String disposableKey = "VimFileGroupDisposable";
+
+  @NotNull private static final HashMap<FileEditorManager, VirtualFile> lastSelections = new HashMap<>();
+  @NotNull private static final Logger logger = Logger.getInstance(FileGroup.class.getName());
+
   /**
    * This class listens for editor tab changes so any insert/replace modes that need to be reset can be.
    */
@@ -418,10 +412,13 @@ public class FileGroup {
       // appropriate repeat
       if (event.getOldFile() != null) {
         lastSelections.put(event.getManager(), event.getOldFile());
+        String disposableKey = FileGroup.disposableKey + event.getManager().hashCode();
+        if (Disposer.get(disposableKey) == null) {
+          Disposer.register(event.getManager().getProject(), () -> {
+            lastSelections.remove(event.getManager());
+          }, disposableKey);
+        }
       }
     }
   }
-
-  @NotNull private static final HashMap<FileEditorManager, VirtualFile> lastSelections = new HashMap<>();
-  @NotNull private static final Logger logger = Logger.getInstance(FileGroup.class.getName());
 }

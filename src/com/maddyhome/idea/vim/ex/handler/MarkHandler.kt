@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,11 +30,9 @@ import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 
 class MarkHandler : CommandHandler(
-        commands {
-            +"ma" withOptional "rk"
-            +"k"
-        },
-        flags(CommandHandler.RANGE_OPTIONAL, CommandHandler.ARGUMENT_REQUIRED)) {
+        commands("ma[rk]", "k"),
+        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED)
+) {
 
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         val mark = cmd.argument[0]

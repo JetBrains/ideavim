@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,17 +22,14 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandHandler.Flag.DONT_REOPEN
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class QuitHandler : CommandHandler(
-        commands {
-            +"q" withOptional "uit"
-            +"clo" withOptional "se"
-            +"hid" withOptional "e"
-        },
-        flags(CommandHandler.ARGUMENT_OPTIONAL, CommandHandler.DONT_REOPEN)
+        commands("q[uit]", "clo[se]", "hid[e]"),
+        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         VimPlugin.getFile().closeFile(editor, context)

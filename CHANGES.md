@@ -22,10 +22,22 @@ To Be Released
 * Fixed `:only` command
 * [VIM-1586](https://youtrack.jetbrains.com/issue/VIM-1586) Support `:shell` command
 * [VIM-801](https://youtrack.jetbrains.com/issue/VIM-801) Support `:tabnext` and `:tabprevious` commands
+* [VIM-1570](https://youtrack.jetbrains.com/issue/VIM-1570) Support `g<C-A>` and `g<C-X>` commands for visual mode
 * [VIM-1119](https://youtrack.jetbrains.com/issue/VIM-1119) Fixed 'e' search offset
 * [VIM-1587](https://youtrack.jetbrains.com/issue/VIM-1587) Fixed end-of-line multi line percent match in visual mode
 * [VIM-1303](https://youtrack.jetbrains.com/issue/VIM-1303) Fixed "Changing color schemes doesn't change find input"
-
+* [VIM-944](https://youtrack.jetbrains.com/issue/VIM-944) Fixed navigation with keypad arrows
+* [VIM-1569](https://youtrack.jetbrains.com/issue/VIM-1569) Fixed surround plugin bug by `S<tag attr="attr">`
+* [VIM-1012](https://youtrack.jetbrains.com/issue/VIM-1012) Fixed wrong tab selection after`:q`
+* [VIM-1245](https://youtrack.jetbrains.com/issue/VIM-1245) Clear switcher list after`:q`
+* Support `commentary` extension
+* [VIM-907](https://youtrack.jetbrains.com/issue/VIM-907) Fix `va(` command
+* [VIM-1067](https://youtrack.jetbrains.com/issue/VIM-1067) Fix repeating of `A` command
+* [VIM-1615](https://youtrack.jetbrains.com/issue/VIM-1615) Fix `set so=999` command and line "bouncing" with inlays
+* [VIM-1630](https://youtrack.jetbrains.com/issue/VIM-1630) Support `:tabonly` command
+* [VIM-607](https://youtrack.jetbrains.com/issue/VIM-607) Fix memory leaks
+* [VIM-1546](https://youtrack.jetbrains.com/issue/VIM-1546) Storing TAB key as input
+* [VIM-1231](https://youtrack.jetbrains.com/issue/VIM-1231) Get indent from PsiFile
 
 0.51, 2019-02-12
 ----------------

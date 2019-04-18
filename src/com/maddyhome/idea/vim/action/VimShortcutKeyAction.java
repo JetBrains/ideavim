@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -167,6 +167,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
         if (CommandState.inInsertMode(editor)) {
           // XXX: <Tab> won't be recorded in macros
           if (keyCode == VK_TAB) {
+            VimPlugin.getChange().tabAction = true;
             return false;
           }
           // Debug watch, Python console, etc.

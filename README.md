@@ -8,18 +8,19 @@ IdeaVim
 </div>
 
 <div>
-  <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_Build&guest=1">
-    <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_Build)/statusIcon.svg?guest=1"/>
+  <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_Deploy&guest=1">
+    <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_Deploy)/statusIcon.svg?guest=1"/>
   </a>
-  <span>Build<span>
+  <span>Stable</span>
 </div>
 
 <div>
-  <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_TestsForIntelliJ20182&guest=1">
-    <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_TestsForIntelliJ20182)/statusIcon.svg?guest=1"/>
+  <a href="http://teamcity.jetbrains.com/viewType.html?buildTypeId=IdeaVim_Build&guest=1">
+    <img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:IdeaVim_Build)/statusIcon.svg?guest=1"/>
   </a>
-  <span>Tests</span>
+  <span>EAP</span>
 </div>
+
 
 IdeaVim is a Vim emulation plugin for IDEs based on the IntelliJ platform.
 IdeaVim can be used with IntelliJ IDEA, PyCharm, CLion, PhpStorm, WebStorm,
@@ -56,9 +57,11 @@ Get an Early Access
 -------------------
 
 Would you like to try new features and fixes? Join the Early Access Program and
-receive EAP builds as updates! Add this URL to "Settings | Plugins |
-Browse Repositories | Manage Repositories":
-[https://plugins.jetbrains.com/plugins/eap/ideavim](https://plugins.jetbrains.com/plugins/eap/ideavim)
+receive EAP builds as updates!  
+
+Add [https://plugins.jetbrains.com/plugins/eap/ideavim](https://plugins.jetbrains.com/plugins/eap/ideavim) to:  
+_IJ versions 2018.3 and newer:_ "Settings | Plugins | Cog icon | Manage Plugin Repositories"  
+_IJ versions 2018.2 and older:_ "Settings | Plugins | Browse Repositories | Manage Repositories"
 
 See [the changelog](CHANGES.md) for the list of hot unreleased features.
 
@@ -142,7 +145,6 @@ Available extensions:
     * Emulates [vim-multiple-cursors](https://github.com/terryma/vim-multiple-cursors)
     * Commands: `<A-n>`, `<A-x>`, `<A-p>`, `g<A-n>`
 
-
 Changes to the IDE
 ------------------
 
@@ -182,52 +184,7 @@ For example, here `\r` is mapped to the Reformat Code action:
 Contributing
 ------------
 
-### Where to Start
-
-In order to contribute to IdeaVim you should have some understanding of Java.
-
-See also these docs on the IntelliJ API:
-
-* [IntelliJ architectural overview](http://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Architectural+Overview)
-* [IntelliJ plugin development resources](http://confluence.jetbrains.com/display/IDEADEV/PluginDevelopment)
-
-You can start by picking relatively simple tasks that are tagged with
-[#patch_welcome](http://youtrack.jetbrains.com/issues/VIM?q=%23patch_welcome)
-in the issue tracker.
-
-
-### Development Environment
-
-1. Fork IdeaVim on GitHub and clone the repository on your local machine.
-
-2. Import the project from existing sources in IntelliJ IDEA 2018.1 or newer (Community or
-   Ultimate) using "File | New | Project from Existing Sources..." or "Import
-   Project" from the start window.
-
-    * In the project wizard select "Import project from external model | Gradle"
-
-    * Select your Java 8+ JDK as the Gradle JVM, leave other parameters unchanged
-
-3. Run your IdeaVim plugin within IntelliJ via a Gradle task
-
-    * Select "View | Tool Windows | Gradle" tool window
-    
-    * Launch "ideavim | intellij | runIde" from the tool window
-
-4. Run IdeaVim tests via a Gradle task
-
-    * Select "View | Tool Windows | Gradle" tool window
-    
-    * Launch "ideavim | verification | test" from the tool window
-
-5. Build the plugin distribution by running `./gradlew clean buildPlugin` in the
-   terminal in your project root.
-
-    * The resulting distribution file is build/distributions/IdeaVim-VERSION.zip
-
-    * You can install this file using "Settings | Plugins | Install plugin
-      from disk"
-
+See [CONTRIBUTING.md](CONTRIBUTING.md)
 
 Authors
 -------

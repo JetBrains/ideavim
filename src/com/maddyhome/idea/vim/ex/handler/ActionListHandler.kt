@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,14 +23,15 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.*
+import com.maddyhome.idea.vim.ex.CommandHandler.Flag.DONT_REOPEN
 import com.maddyhome.idea.vim.helper.StringHelper
 
 /**
  * @author smartbomb
  */
 class ActionListHandler : CommandHandler(
-        commands { +"actionlist" },
-        flags(RANGE_FORBIDDEN, DONT_REOPEN, ARGUMENT_OPTIONAL)
+        commands("actionlist"),
+        flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         val lineSeparator = System.lineSeparator()

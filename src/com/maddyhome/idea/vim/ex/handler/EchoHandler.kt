@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,12 +28,11 @@ import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
  * @author vlan
  */
 class EchoHandler : CommandHandler(
-        commands { +"ec" withOptional "ho" },
-        flags(CommandHandler.RANGE_FORBIDDEN, CommandHandler.ARGUMENT_OPTIONAL)
+        commands("ec[ho]"),
+        flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
 ) {
 
-    override fun execute(editor: Editor, context: DataContext,
-                         cmd: ExCommand): Boolean {
+    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         val env = VimScriptGlobalEnvironment.getInstance()
         val globals = env.variables
         val value = VimScriptParser.evaluate(cmd.argument, globals)

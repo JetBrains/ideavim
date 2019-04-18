@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ public interface Msg {
   String e_norange = "e_norange";
   String e_rangereq = "e_rangereq";
   String e_argreq = "e_argreq";
+  String e_argforb = "e_argforb";
   String e_noprev = "e_noprev";
   String e_nopresub = "e_nopresub";
   String E191 = "E191";

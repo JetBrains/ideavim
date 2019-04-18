@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.CaretData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
@@ -134,7 +135,7 @@ public abstract class MotionEditorActionHandler extends EditorActionHandlerBase 
       return false;
     }
     else if (offset >= 0) {
-      if ((cmd.getFlags() & Command.FLAG_SAVE_JUMP) != 0) {
+      if (cmd.getFlags().contains(CommandFlags.FLAG_SAVE_JUMP)) {
         VimPlugin.getMark().saveJumpLocation(editor);
       }
       if (!CommandState.inInsertMode(editor) &&

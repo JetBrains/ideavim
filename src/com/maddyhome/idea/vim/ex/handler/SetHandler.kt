@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,12 +23,13 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
+import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptCommandHandler
 import com.maddyhome.idea.vim.option.Options
 
 class SetHandler : CommandHandler(
-        commands { +"se" withOptional "t" },
-        CommandHandler.ARGUMENT_OPTIONAL
+        commands("se[t]"),
+        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
 ), VimScriptCommandHandler {
 
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) =

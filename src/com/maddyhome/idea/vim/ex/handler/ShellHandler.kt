@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,8 +29,8 @@ import com.maddyhome.idea.vim.ex.flags
  * @author John Grib
  */
 class ShellHandler : CommandHandler(
-        commands { +"sh" withOptional "ell" },
-        flags(CommandHandler.RANGE_FORBIDDEN, CommandHandler.ARGUMENT_FORBIDDEN)
+        commands("sh[ell]"),
+        flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) =
             KeyHandler.executeAction("ActivateTerminalToolWindow", context)

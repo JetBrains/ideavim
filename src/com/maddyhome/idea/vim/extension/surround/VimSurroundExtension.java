@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.*;
 
 import static com.maddyhome.idea.vim.extension.VimExtensionFacade.*;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -58,6 +59,7 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 public class VimSurroundExtension extends VimNonDisposableExtension {
 
   private static final char REGISTER = '"';
+  private final static Pattern tagNameAndAttributesCapturePattern = Pattern.compile("(\\w+)([^>]*)>");
 
   private static final Map<Character, Pair<String, String>> SURROUND_PAIRS = ImmutableMap.<Character, Pair<String, String>>builder()
     .put('b', Pair.create("(", ")"))
@@ -109,9 +111,12 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
   @Nullable
   private static Pair<String, String> inputTagPair(@NotNull Editor editor) {
     final String tagInput = inputString(editor, "<");
-    if (tagInput.endsWith(">")) {
-      final String tagName = tagInput.substring(0, tagInput.length() - 1);
-      return Pair.create("<" + tagName + ">", "</" + tagName + ">");
+    final Matcher matcher = tagNameAndAttributesCapturePattern.matcher(tagInput);
+
+    if (matcher.find()) {
+      final String tagName = matcher.group(1);
+      final String tagAttributes = matcher.group(2);
+      return Pair.create("<" + tagName + tagAttributes + ">", "</" + tagName + ">");
     }
     else {
       return null;

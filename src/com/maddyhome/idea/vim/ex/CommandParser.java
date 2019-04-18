@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -126,6 +126,7 @@ public class CommandParser {
     new ShellHandler();
     new NextTabHandler();
     new PreviousTabHandler();
+    new TabOnlyHandler();
 
     registered = true;
     //logger.debug("root=" + root);
@@ -182,19 +183,19 @@ public class CommandParser {
       throw new InvalidCommandException(message, cmd);
     }
 
-    if ((handler.getArgFlags() & CommandHandler.WRITABLE) > 0 && !editor.getDocument().isWritable()) {
+    if (handler.getArgFlags().getFlags().contains(CommandHandler.Flag.WRITABLE) && !editor.getDocument().isWritable()) {
       VimPlugin.indicateError();
       return result | RES_READONLY;
     }
 
     // Run the command
     boolean ok = handler.process(editor, context, command, count);
-    if (ok && (handler.getArgFlags() & CommandHandler.DONT_SAVE_LAST) == 0) {
+    if (ok && !handler.getArgFlags().getFlags().contains(CommandHandler.Flag.DONT_SAVE_LAST)) {
       VimPlugin.getRegister().storeTextInternal(editor, new TextRange(-1, -1), cmd,
                                                                   SelectionType.CHARACTER_WISE, ':', false);
     }
 
-    if ((handler.getArgFlags() & CommandHandler.DONT_REOPEN) != 0) {
+    if (handler.getArgFlags().getFlags().contains(CommandHandler.Flag.DONT_REOPEN)) {
       result |= RES_DONT_REOPEN;
     }
 

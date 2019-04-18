@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 package com.maddyhome.idea.vim.command;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.EnumSet;
 
 /**
  * @author vlan
@@ -75,11 +77,11 @@ public enum SelectionType {
     }
   }
 
-  public static SelectionType fromCommandFlags(int flags) {
-    if ((flags & Command.FLAG_MOT_LINEWISE) != 0) {
+  public static SelectionType fromCommandFlags(EnumSet<CommandFlags> flags) {
+    if (flags.contains(CommandFlags.FLAG_MOT_LINEWISE)) {
       return SelectionType.LINE_WISE;
     }
-    else if ((flags & Command.FLAG_MOT_BLOCKWISE) != 0) {
+    else if (flags.contains(CommandFlags.FLAG_MOT_BLOCKWISE)) {
       return SelectionType.BLOCK_WISE;
     }
     else {

@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,14 +22,15 @@ import com.intellij.codeInsight.lookup.Lookup;
 import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.awt.event.KeyEvent;
 
 /**
  * Accepts all regular keystrokes and passes them on to the Vim key handler.
@@ -63,7 +64,7 @@ public class VimTypedActionHandler implements TypedActionHandlerEx {
 
   @Override
   public void execute(@NotNull final Editor editor, final char charTyped, @NotNull final DataContext context) {
-    if (isEnabled(editor)) {
+    if (isEnabled(editor) && charTyped != KeyEvent.CHAR_UNDEFINED) {
       try {
         handler.handleKey(editor, KeyStroke.getKeyStroke(charTyped), new EditorDataContext(editor));
       }

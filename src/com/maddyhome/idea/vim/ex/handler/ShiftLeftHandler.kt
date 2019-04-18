@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,14 +24,15 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.handler.CaretOrder
 
 class ShiftLeftHandler : CommandHandler(
-        commands { +"<" withOptional "<".repeat(31) },
-        flags(CommandHandler.ARGUMENT_OPTIONAL, CommandHandler.WRITABLE),
+        commands("<[${"<".repeat(31)}]"),
+        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE),
         true, CaretOrder.DECREASING_OFFSET
 ) {
     override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {

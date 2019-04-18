@@ -1,6 +1,6 @@
 /*
  * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
- * Copyright (C) 2003-2016 The IdeaVim authors
+ * Copyright (C) 2003-2019 The IdeaVim authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class WriteHandler : CommandHandler(
-        commands { +"w" withOptional "rite" },
-        flags(CommandHandler.RANGE_OPTIONAL, CommandHandler.ARGUMENT_OPTIONAL)
+        commands("w[rite]"),
+        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         VimPlugin.getFile().saveFile(editor)
