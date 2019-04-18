@@ -170,11 +170,7 @@ object VimListenerManager {
                 logger.debug("Release mouse after dragging")
                 SelectionVimListenerSuppressor.use {
                     VimPlugin.getVisualMotion().controlNonVimSelectionChange(event.editor, !isBlockCaret)
-                    event.editor.caretModel.runForEachCaret { caret ->
-                        if (caret.selectionEnd == caret.offset) {
-                            caret.moveToOffset(caret.selectionEnd - 1)
-                        }
-                    }
+                    moveCaretOneCharLeftFromSelectionEnd(event.editor)
                 }
 
                 mouseDragging = false
@@ -204,9 +200,11 @@ object VimListenerManager {
                 if (event.mouseEvent.clickCount == 1) {
                     if (CommandState.inVisualMode(editor)) {
                         VimPlugin.getVisualMotion().exitVisual(editor)
-                    } else if (CommandState.getInstance(editor).mode == CommandState.Mode.SELECT) {
+                    } else if (CommandState.inSelectMode(editor)) {
                         VimPlugin.getVisualMotion().exitSelectModeAndResetKeyHandler(editor, false)
                     }
+                } else if (event.mouseEvent.clickCount == 2) {
+                    moveCaretOneCharLeftFromSelectionEnd(editor)
                 }
 
                 if (!CommandState.inInsertMode(editor)) {
@@ -214,7 +212,7 @@ object VimListenerManager {
                         val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
                         val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
                         if (caret.offset == lineEnd && lineEnd != lineStart) {
-                            MotionGroup.moveCaret(editor, caret, caret.offset - 1)
+                            caret.moveToOffset(caret.offset - 1)
                         }
                     }
                 }
@@ -227,6 +225,14 @@ object VimListenerManager {
                 }
 
                 ExOutputModel.getInstance(event.editor).clear()
+            }
+        }
+
+        private fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor) {
+            editor.caretModel.runForEachCaret { caret ->
+                if (caret.hasSelection() && caret.selectionEnd == caret.offset) {
+                    caret.moveToOffset(caret.selectionEnd - 1)
+                }
             }
         }
     }
