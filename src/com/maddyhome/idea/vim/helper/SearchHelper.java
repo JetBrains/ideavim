@@ -487,16 +487,20 @@ public class SearchHelper {
 
   @Nullable
   private static Pair<TextRange,String> findUnmatchedClosingTag(@NotNull final CharSequence sequence, final int position, int count) {
-    // Ignore empty tags <>, self closing tags <aaa/> and tags starting with whitespace </ aaa> or < aaa>
-    final Pattern tagPattern = Pattern.compile("</?[^/\\s][^/>]*>");
+    // The tag name may contain any characters except slashes, whitespace and '>'
+    final String tagNamePattern = "([^/\\s>]+)";
+    // An opening tag consists of '<' followed by a tag name, optionally some additional text after whitespace and a '>'
+    final String openingTagPattern = String.format("<%s(?:\\s[^>]*)?>", tagNamePattern);
+    final String closingTagPattern = String.format("</%s>", tagNamePattern);
+    final Pattern tagPattern = Pattern.compile(String.format("(?:%s)|(?:%s)", openingTagPattern, closingTagPattern));
     final Matcher matcher = tagPattern.matcher(sequence.subSequence(position, sequence.length()));
 
     final Stack<String> openTags = new Stack<>();
 
     while (matcher.find()) {
-      final String tag = String.valueOf(sequence.subSequence(position + matcher.start(), position + matcher.end()));
-      if (tag.charAt(1) == '/') {
-        final String tagName = tag.substring(2, tag.length()-1);
+      boolean isClosingTag = matcher.group(1) == null;
+      if (isClosingTag) {
+        final String tagName = matcher.group(2);
         // Ignore unmatched open tags. Either the file is malformed or it might be a tag like <br> that does not need to be closed.
         while (!openTags.isEmpty() && !openTags.peek().equalsIgnoreCase(tagName)) {
           openTags.pop();
@@ -511,7 +515,7 @@ public class SearchHelper {
           openTags.pop();
         }
       } else {
-        final String tagName = tag.substring(1, tag.length()-1);
+        final String tagName = matcher.group(1);
         openTags.push(tagName);
       }
     }
@@ -522,10 +526,9 @@ public class SearchHelper {
   private static TextRange findUnmatchedOpeningTag(@NotNull CharSequence sequence, int position, @NotNull String tagName) {
     final String quotedTagName = Pattern.quote(tagName);
     final String patternString = "(</%s>)"  // match closing tags
-            + "|(<%s"        // or opening tags starting with tagName
-            + "(\\s[^>/]*)?" // After at least one whitespace there might be additional text in the tag. E.g. <html lang="en">
-                             // However, no slash is allowed. This is in line with vim behaviour.
-            + ">)";
+            + "|(<%s"      // or opening tags starting with tagName
+            + "(\\s([^>]*"  // After at least one whitespace there might be additional text in the tag. E.g. <html lang="en">
+            + "[^/])?)?>)";  // Slash is not allowed as last character (this would be a self closing tag).
     final Pattern tagPattern = Pattern.compile(String.format(patternString, quotedTagName, quotedTagName), Pattern.CASE_INSENSITIVE);
     final Matcher matcher = tagPattern.matcher(sequence.subSequence(0, position+1));
     final Stack<TextRange> openTags = new Stack<>();

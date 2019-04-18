@@ -783,6 +783,18 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult("<a></A>");
   }
 
+  //|d| |v_it|
+  public void testDeleteInnerTagSlashesInAttribute() {
+    typeTextInFile(parseKeys("dit"), "<a href=\"http://isitchristmas.com\" class=\"button\">Bing <caret>Bing bing</a>");
+    myFixture.checkResult("<a href=\"http://isitchristmas.com\" class=\"button\"></a>");
+  }
+
+  //|d| |v_it|
+  public void testDeleteInnerTagAngleBrackets() {
+    typeTextInFile(parseKeys("dit"), "<div <caret>hello=\"d > hsj < akl\"></div>");
+    myFixture.checkResult("<div hello=\"d ></div>");
+  }
+
   // VIM-1090 |d| |v_at|
   public void testDeleteOuterTagDuplicateTags() {
     typeTextInFile(parseKeys("dat"), "<a><a></a></a<caret>>");
