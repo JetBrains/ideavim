@@ -893,6 +893,19 @@ public class MotionActionTest extends VimTestCase {
     assertPluginError(true);
   }
 
+  // VIM-1633, from VIM-1090 |d| |v_at|
+  public void testDeleteOuterTagDuplicateTags() {
+    typeTextInFile(parseKeys("dat"), "<a><a></a></a<caret>>");
+    myFixture.checkResult("");
+  }
+
+  // VIM-1633, from VIM-1090 |d| |v_it|
+  // Adapted from vim source file "test_textobjects.vim"
+  public void testDeleteInnerTagDuplicateTags() {
+    typeTextInFile(parseKeys("dit"), "<b>as<caret>d<i>as<b />df</i>asdf</b>");
+    myFixture.checkResult("<b></b>");
+  }
+
   // |v_at|
   public void testNestedTagSelection() {
 

@@ -2,7 +2,8 @@ package com.maddyhome.idea.vim.helper;
 
 import org.junit.Test;
 
-import static com.maddyhome.idea.vim.helper.TagBlockHelper.*;
+import static com.maddyhome.idea.vim.helper.TagBlockHelper.TagBlock;
+import static com.maddyhome.idea.vim.helper.TagBlockHelper.find;
 import static org.junit.Assert.*;
 
 public class TagBlockBlockHelperTest {
@@ -17,6 +18,26 @@ public class TagBlockBlockHelperTest {
     assertEquals(3, t.getInnerStart());
     assertEquals(3, t.getInnerEnd());
     assertEquals(6, t.getOuterEnd());
+  }
+
+  @Test
+  public void testSelfClosingTag() {
+
+    String chars = "<br />";
+
+    TagBlock t = find(chars, 0);
+
+    assertNull("Vi should ignore self closing tags", t);
+  }
+
+  @Test
+  public void testTagWithSelfClosingNested() {
+
+    String chars = "<b>abcde <i> 1234 <b /> 1234 </i> dsfjh </b>";
+
+    TagBlock t = find(chars, 0);
+
+    assertNotNull("Nested self closing tags shouldn't prevent to find enclosing one", t);
   }
 
   @Test

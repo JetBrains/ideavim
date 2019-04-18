@@ -30,16 +30,18 @@ public class TagBlockHelper {
     private int is = -1; // inner start
     private int ie = -1; // inner end
     private int oe = -1; // outer end
+    private boolean selfClosing = false;
     private String name = null; // name of the tag
 
     TagBlock() { }
 
-    TagBlock(int os, int is, int ie, int oe, String name) {
+    TagBlock(int os, int is, int ie, int oe, String name, boolean selfClosing) {
       this.os = os;
       this.is = is;
       this.ie = ie;
       this.oe = oe;
       this.name = name;
+      this.selfClosing = selfClosing;
     }
 
     TagBlock merge(TagBlock tagBlock) {
@@ -53,6 +55,7 @@ public class TagBlockHelper {
       result.is = (tagBlock.is == -1)? this.is : tagBlock.is;
       result.ie = (tagBlock.ie == -1)? this.ie: tagBlock.ie;
       result.oe = (tagBlock.oe == -1)? this.oe: tagBlock.oe;
+      result.selfClosing = this.selfClosing || tagBlock.selfClosing;
       return result;
     }
 
@@ -80,6 +83,10 @@ public class TagBlockHelper {
       return name;
     }
 
+    public boolean isSelfClosing() {
+      return selfClosing;
+    }
+
     @Override
     public String toString() {
       return "TagBlock{" +
@@ -98,7 +105,11 @@ public class TagBlockHelper {
     XmlLexer lexer = new XmlLexer();
     lexer.start(seq, pos, seq.length() -1);
     lexer.advance();
-    return find(lexer);
+    TagBlock tag = find(lexer);
+    if (tag != null && tag.isSelfClosing()) // vi ignores self-closing tags
+      return null;
+    else
+      return tag;
   }
 
   static private TagBlock find(Lexer lexer) {
@@ -127,6 +138,10 @@ public class TagBlockHelper {
           buildingTagBlock = buildingTagBlock.merge(lookForOpeningTag(lexer));
           if (buildingTagBlock.name != null) {
             state = State.LOOK_ENDING_TAG;
+          }
+          if (buildingTagBlock.selfClosing) { // case of early termination
+            state = State.END;
+            result = buildingTagBlock;
           }
           break;
         case LOOK_ENDING_TAG:
@@ -179,14 +194,17 @@ public class TagBlockHelper {
       }
       lexer.advance();
     }
-    return new TagBlock(-1, -1, ie, oe, name);
+    return new TagBlock(-1, -1, ie, oe, name, false);
   }
 
   private static TagBlock lookForOpeningTag(Lexer lexer) {
 
     int ob; // outer begin, ie: first '<' of the tag block
     int ib; // inner begin, ie: closing '>' of the opening tag of tag block
+    int ie = -1; // inner end, ie: '/' for self closing tag
+    int oe = -1; //outer end, ie, closing '>' for self closing tag
     String name;
+    boolean selfClosing = false;
 
     //
     if (lexer.getTokenType() != XmlTokenType.XML_START_TAG_START)
@@ -203,13 +221,22 @@ public class TagBlockHelper {
 
     //
     while (lexer.getTokenType() != XmlTokenType.XML_TAG_END
+      && lexer.getTokenType() != XmlTokenType.XML_EMPTY_ELEMENT_END
       && lexer.getTokenType() != null) {
       lexer.advance();
     }
-    if (lexer.getTokenType() != XmlTokenType.XML_TAG_END)
-      return null;
-    ib = lexer.getCurrentPosition().getOffset() + 1;
 
-    return new TagBlock(ob, ib, -1, -1, name);
+    IElementType tokenType = lexer.getTokenType();
+    if (XmlTokenType.XML_TAG_END.equals(tokenType)) {
+      ib = lexer.getCurrentPosition().getOffset() + 1;
+    } else if (XmlTokenType.XML_EMPTY_ELEMENT_END.equals(tokenType)) {
+      ib = ie = lexer.getCurrentPosition().getOffset();
+      oe = lexer.getCurrentPosition().getOffset() + 2;
+      selfClosing = true;
+    } else {
+      return null;
+    }
+
+    return new TagBlock(ob, ib, ie, oe, name, selfClosing);
   }
 }
