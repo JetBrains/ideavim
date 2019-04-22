@@ -22,9 +22,11 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.DONT_REOPEN
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.SAVE_VISUAL
@@ -49,18 +51,25 @@ class ActionHandler : CommandHandler(
         }
         val application = ApplicationManager.getApplication()
         val selections = editor.caretModel.allCarets.map { if (it.hasSelection()) it.selectionStart to it.selectionEnd else null }
+        val oldMode = CommandState.getInstance(editor).subMode
         if (application.isUnitTestMode) {
-            executeAction(editor, action, context, selections)
+            executeAction(editor, action, context, selections, oldMode)
         } else {
-            runAfterGotFocus(Runnable { executeAction(editor, action, context, selections) })
+            runAfterGotFocus(Runnable { executeAction(editor, action, context, selections, oldMode) })
         }
         return true
     }
 
-    private fun executeAction(editor: Editor, action: AnAction, context: DataContext, selections: List<Pair<Int, Int>?>) {
+    private fun executeAction(editor: Editor, action: AnAction, context: DataContext, selections: List<Pair<Int, Int>?>, oldSubMode: CommandState.SubMode) {
         SelectionVimListenerSuppressor.lock().use {
             selections.forEachIndexed { i, selection ->
-                selection?.run { editor.caretModel.allCarets[i].setSelection(first, second) }
+                val caret = editor.caretModel.allCarets[i]
+                if (!caret.hasSelection()) {
+                    selection?.run { caret.setSelection(first, second) }
+                }
+            }
+            if (editor.caretModel.allCarets.any(Caret::hasSelection) && CommandState.getInstance(editor).subMode != oldSubMode) {
+                VimPlugin.getVisualMotion().setVisualMode(editor, oldSubMode)
             }
         }
 
