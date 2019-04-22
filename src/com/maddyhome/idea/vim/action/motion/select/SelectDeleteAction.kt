@@ -25,6 +25,7 @@ private object SelectDeleteActionHandler : EditorActionHandlerBase() {
             }
         }
         VimPlugin.getVisualMotion().exitSelectMode(editor, true)
+        VimPlugin.getChange().insertBeforeCursor(editor, context)
         return true
     }
 }
