@@ -200,6 +200,7 @@ public class CommandState {
         msg.append("REPLACE");
         break;
       case VISUAL:
+      case SELECT:
         if (pos > 0) {
           State tmp = myStates.get(pos - 1);
           if (tmp.getMode() == Mode.COMMAND && tmp.getSubMode() == SubMode.SINGLE_COMMAND) {
@@ -209,17 +210,14 @@ public class CommandState {
         }
         switch (state.getSubMode()) {
           case VISUAL_LINE:
-            msg.append("VISUAL LINE");
+            msg.append(state.getMode()).append(" LINE");
             break;
           case VISUAL_BLOCK:
-            msg.append("VISUAL BLOCK");
+            msg.append(state.getMode()).append(" BLOCK");
             break;
           default:
-            msg.append("VISUAL");
+            msg.append(state.getMode());
         }
-        break;
-      case SELECT:
-        msg.append("SELECT");
         break;
     }
 
