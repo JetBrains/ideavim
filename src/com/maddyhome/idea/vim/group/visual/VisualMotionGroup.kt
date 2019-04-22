@@ -277,7 +277,7 @@ class VisualMotionGroup {
                 CommandState.getInstance(editor).popState()
             }
             val autodetectedMode = autodetectVisualMode(editor, CommandState.SubMode.NONE)
-            if (TemplateManager.getInstance(editor.project).getActiveTemplate(editor) == null) {
+            if (TemplateManager.getInstance(editor.project).getActiveTemplate(editor) == null && !editor.isOneLineMode) {
                 enterVisualMode(editor, autodetectedMode)
             } else {
                 enterSelectionMode(editor, autodetectedMode)
