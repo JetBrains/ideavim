@@ -41,7 +41,7 @@ import java.util.Set;
  */
 public class ChangeCaseUpperVisualAction extends VimCommandAction {
   public ChangeCaseUpperVisualAction() {
-    super(new VisualOperatorActionHandler() {
+    super(new VisualOperatorActionHandler.ForEachCaret() {
       @Override
       protected boolean executeAction(@NotNull Editor editor,
                                       @NotNull Caret caret,

@@ -45,7 +45,7 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
  */
 public class PutVisualTextNoIndentAction extends VimCommandAction {
   public PutVisualTextNoIndentAction() {
-    super(new VisualOperatorActionHandler() {
+    super(new VisualOperatorActionHandler.ForEachCaret() {
 
       private Register register;
 

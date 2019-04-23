@@ -23,11 +23,7 @@ import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.command.SelectionType;
+import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorHelper;
@@ -44,7 +40,7 @@ import java.util.Set;
  */
 public class DeleteVisualLinesAction extends VimCommandAction {
   public DeleteVisualLinesAction() {
-    super(new VisualOperatorActionHandler() {
+    super(new VisualOperatorActionHandler.ForEachCaret() {
       @Override
       protected boolean executeAction(@NotNull Editor editor,
                                       @NotNull Caret caret,

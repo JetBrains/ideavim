@@ -37,7 +37,7 @@ import java.util.Set;
 
 public class ChangeVisualNumberAvalancheIncAction extends VimCommandAction {
   protected ChangeVisualNumberAvalancheIncAction() {
-    super(new VisualOperatorActionHandler() {
+    super(new VisualOperatorActionHandler.ForEachCaret() {
       @Override
       protected boolean executeAction(@NotNull Editor editor,
                                       @NotNull Caret caret,

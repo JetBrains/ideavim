@@ -40,7 +40,7 @@ import java.util.Set;
  */
 public class ReformatCodeVisualAction extends VimCommandAction {
   public ReformatCodeVisualAction() {
-    super(new VisualOperatorActionHandler() {
+    super(new VisualOperatorActionHandler.ForEachCaret() {
       @Override
       protected boolean executeAction(@NotNull Editor editor,
                                       @NotNull Caret caret,

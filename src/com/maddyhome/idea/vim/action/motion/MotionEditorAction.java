@@ -23,17 +23,14 @@ import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
+import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  */
 public abstract class MotionEditorAction extends EditorAction {
-  public MotionEditorAction(MotionEditorActionHandler handler) {
-    super(handler);
-    this.handler = handler;
-  }
+  private final MotionActionHandler handler;
 
   public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                        int rawCount,
@@ -41,5 +38,8 @@ public abstract class MotionEditorAction extends EditorAction {
     return handler.getOffset(editor, caret, context, count, rawCount, argument);
   }
 
-  private final MotionEditorActionHandler handler;
+  public MotionEditorAction(MotionActionHandler handler) {
+    super(handler);
+    this.handler = handler;
+  }
 }

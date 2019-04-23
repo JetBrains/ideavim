@@ -41,7 +41,7 @@ import java.util.Set;
  */
 public class ChangeCaseToggleVisualAction extends VimCommandAction {
   public ChangeCaseToggleVisualAction() {
-    super(new VisualOperatorActionHandler() {
+    super(new VisualOperatorActionHandler.ForEachCaret() {
       @Override
       protected boolean executeAction(@NotNull Editor editor,
                                       @NotNull Caret caret,

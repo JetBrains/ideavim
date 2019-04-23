@@ -37,7 +37,7 @@ import java.util.Set;
 
 public class ChangeVisualNumberDecAction extends VimCommandAction {
   protected ChangeVisualNumberDecAction() {
-    super(new VisualOperatorActionHandler() {
+    super(new VisualOperatorActionHandler.ForEachCaret() {
       @Override
       protected boolean executeAction(@NotNull Editor editor,
                                       @NotNull Caret caret,

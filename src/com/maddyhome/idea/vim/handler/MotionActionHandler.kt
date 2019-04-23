@@ -35,12 +35,10 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
 /**
  * @author Alex Plate
  *
- * Base class for visual handlers.
- * This handler executes an action for each caret. That means that if you have 5 carets, [getOffset] will be
- *   called 5 times.
- * @see [MotionEditorActionBatchHandler] for only one execution
+ * Base class for motion handlers.
+ * @see [MotionActionHandler.SingleExecution] and [MotionActionHandler.ForEachCaret]
  */
-abstract class MotionEditorActionHandler : EditorActionHandlerBase(false) {
+sealed class MotionActionHandler : EditorActionHandlerBase(false) {
 
     /**
      * This method should return new offset for [caret]
@@ -127,6 +125,68 @@ abstract class MotionEditorActionHandler : EditorActionHandlerBase(false) {
                     }
                 }
             }
+        }
+    }
+
+    /**
+    * Base class for motion handlers.
+    * This handler executes an action for each caret. That means that if you have 5 carets, [getOffset] will be
+    *   called 5 times.
+    * @see [MotionActionHandler.SingleExecution] for only one execution
+    */
+    abstract class ForEachCaret : MotionActionHandler()
+
+    /**
+     * Base class for motion handlers.
+     * This handler executes an action only once for all carets. That means that if you have 5 carets,
+     *   [getOffset] will be called 1 time.
+     * @see [MotionActionHandler.ForEachCaret] for per-caret execution
+     */
+    abstract class SingleExecution : MotionActionHandler() {
+
+        override val alwaysBatchExecution = true
+
+        /**
+         * This method should return new offset for primary caret
+         * It executes once for all carets. That means that if you have 5 carets, [getOffset] will be
+         *   called 1 time.
+         */
+        abstract fun getOffset(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int
+
+        /**
+         * This method is called before [getOffset].
+         * The method executes only once.
+         */
+        protected open fun preOffsetComputation(editor: Editor, context: DataContext, cmd: Command): Boolean = true
+
+        /**
+         * This method is called after [getOffset], but before caret visual.
+         *
+         * The method executes only once.
+         */
+        protected open fun preMove(editor: Editor, context: DataContext, cmd: Command) = Unit
+
+        /**
+         * This method is called after [getOffset] and after caret visual.
+         *
+         * The method executes only once it there is block selection.
+         */
+        protected open fun postMove(editor: Editor, context: DataContext, cmd: Command) = Unit
+
+        final override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+            return getOffset(editor, context, count, rawCount, argument)
+        }
+
+        final override fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
+            return preOffsetComputation(editor, context, cmd)
+        }
+
+        final override fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
+            return preMove(editor, context, cmd)
+        }
+
+        final override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
+            return postMove(editor, context, cmd)
         }
     }
 }

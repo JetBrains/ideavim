@@ -46,7 +46,7 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
  */
 public class PutVisualTextAction extends VimCommandAction {
   public PutVisualTextAction() {
-    super(new VisualOperatorActionHandler() {
+    super(new VisualOperatorActionHandler.ForEachCaret() {
 
       @Nullable private Register register;
 

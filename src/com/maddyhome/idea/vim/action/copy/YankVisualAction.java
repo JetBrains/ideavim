@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.handler.VisualOperatorActionBatchHandler;
+import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,7 +39,7 @@ import java.util.*;
  */
 public class YankVisualAction extends VimCommandAction {
   public YankVisualAction() {
-    super(new VisualOperatorActionBatchHandler() {
+    super(new VisualOperatorActionHandler.SingleExecution() {
       @Override
       public boolean executeForAllCarets(@NotNull Editor editor,
                                          @NotNull DataContext context,

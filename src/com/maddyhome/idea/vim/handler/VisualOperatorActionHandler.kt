@@ -33,11 +33,9 @@ import com.maddyhome.idea.vim.helper.*
  * @author Alex Plate
  *
  * Base class for visual operation handlers.
- * This handler executes an action for each caret. That means that if you have 5 carets, [executeAction] will be
- *   called 5 times.
- * @see [VisualOperatorActionBatchHandler] for only one execution
+ * @see [VisualOperatorActionHandler.SingleExecution] and [VisualOperatorActionHandler.ForEachCaret]
  */
-abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
+sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
     /**
      * Execute an action for current [caret].
@@ -222,6 +220,39 @@ abstract class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
             EditorData.setKeepingVisualOperatorAction(editor, false)
         }
+    }
+
+    /**
+     * Base class for visual operation handlers.
+     * This handler executes an action for each caret. That means that if you have 5 carets,
+     *   [executeAction] will be called 5 times.
+     * @see [VisualOperatorActionHandler.SingleExecution] for only one execution
+     */
+    abstract class ForEachCaret : VisualOperatorActionHandler()
+
+    /**
+     * Base class for visual operation handlers.
+     * This handler executes an action only once for all carets. That means that if you have 5 carets,
+     *   [executeAction] will be called 1 time.
+     * @see [VisualOperatorActionHandler.ForEachCaret] for per-caret execution
+     */
+    abstract class SingleExecution : VisualOperatorActionHandler() {
+        /**
+         * Execute an action
+         * [caretsAndSelections] contains a map of all current carets and corresponding selections.
+         *   If there is block selection, only one caret is in [caretsAndSelections].
+         *
+         * This method is executed once for all carets.
+         */
+        abstract fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>): Boolean
+
+        final override fun executeAction(editor: Editor, caret: Caret, context: DataContext, cmd: Command, range: VimSelection) = true
+
+        final override fun beforeExecution(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>): Boolean {
+            return executeForAllCarets(editor, context, cmd, caretsAndSelections)
+        }
+
+        final override fun afterExecution(editor: Editor, context: DataContext, cmd: Command, res: Boolean) {}
     }
 
     companion object {

@@ -8,7 +8,7 @@ import com.maddyhome.idea.vim.action.VimCommandAction
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.handler.MotionEditorActionHandler
+import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import javax.swing.KeyStroke
 
@@ -16,7 +16,7 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 
-private object SelectExtendUpHandler : MotionEditorActionHandler() {
+private object SelectExtendUpHandler : MotionActionHandler.ForEachCaret() {
     override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
         return VimPlugin.getMotion().moveCaretVertical(editor, caret, -count)
     }
