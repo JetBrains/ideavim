@@ -151,41 +151,6 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult(" 0:<caret>_ 1:a 2:b 3:c \n");
   }
 
-  // VIM-326 |d| |v_ib|
-  public void testDeleteInnerBlock() {
-    typeTextInFile(parseKeys("di)"),
-                   "foo(\"b<caret>ar\")\n");
-    myFixture.checkResult("foo()\n");
-  }
-
-  // VIM-326 |d| |v_ib|
-  public void testDeleteInnerBlockCaretBeforeString() {
-    typeTextInFile(parseKeys("di)"),
-                   "foo(<caret>\"bar\")\n");
-    myFixture.checkResult("foo()\n");
-  }
-
-  // VIM-326 |c| |v_ib|
-  public void testChangeInnerBlockCaretBeforeString() {
-    typeTextInFile(parseKeys("ci)"),
-                   "foo(<caret>\"bar\")\n");
-    myFixture.checkResult("foo()\n");
-  }
-
-  // VIM-392 |c| |v_ib|
-  public void testChangeInnerBlockCaretBeforeBlock() {
-    typeTextInFile(parseKeys("ci)"),
-                   "foo<caret>(bar)\n");
-    myFixture.checkResult("foo()\n");
-    assertOffset(4);
-  }
-
-  // |v_ib|
-  public void testInnerBlockCrashWhenNoDelimiterFound() {
-    typeTextInFile(parseKeys("di)"), "(x\n");
-    myFixture.checkResult("(x\n");
-  }
-
   // VIM-314 |d| |v_iB|
   public void testDeleteInnerCurlyBraceBlock() {
     typeTextInFile(parseKeys("di{"),
@@ -218,30 +183,6 @@ public class MotionActionTest extends VimTestCase {
                           "}\n");
     assertOffset(6);
   }
-
-  // VIM-275 |d| |v_ib|
-  public void testDeleteInnerParensBlockBeforeOpen() {
-    typeTextInFile(parseKeys("di)"),
-                   "foo<caret>(bar)\n");
-    myFixture.checkResult("foo()\n");
-    assertOffset(4);
-  }
-
-  // |d| |v_ib|
-  public void testDeleteInnerParensBlockBeforeClose() {
-    typeTextInFile(parseKeys("di)"),
-                   "foo(bar<caret>)\n");
-    myFixture.checkResult("foo()\n");
-  }
-
-  // |d| |v_ab|
-  public void testDeleteOuterBlock() {
-    typeTextInFile(parseKeys("da)"),
-                   "foo(b<caret>ar, baz);\n");
-    myFixture.checkResult("foo;\n");
-  }
-
-
 
   // |d| |v_aw|
   public void testDeleteOuterWord() {
@@ -775,113 +716,6 @@ public class MotionActionTest extends VimTestCase {
   public void testDeleteOuterTagBlockAfterWrongOrder() {
     typeTextInFile(parseKeys("dat"), "abcde</tag>fg<tag>h<caret>i");
     myFixture.checkResult("abcde</tag>fg<tag>hi");
-  }
-
-  // VIM-1633 |v_a)|
-  public void testNestedBlockSelection() {
-
-    configureByText("(<caret>a)");
-    typeText(parseKeys("va)"));
-    assertSelection("(a)");
-
-    configureByText("((<caret>a))");
-    typeText(parseKeys("va)"));
-    assertSelection("(a)");
-
-    configureByText("(outer\n" +
-            "  <caret>(inner))");
-    typeText(parseKeys("va)"));
-    assertSelection("(inner)");
-
-    configureByText("(outer\n" +
-            "  (inner<caret>))");
-    typeText(parseKeys("va)"));
-    assertSelection("(inner)");
-
-    configureByText("(outer\n" +
-            " <caret> (inner))");
-    typeText(parseKeys("va)"));
-    assertSelection("(outer\n" +
-            "  (inner))");
-
-    configureByText("(outer\n" +
-            "  <caret>(inner))");
-    typeText(parseKeys("va)a)"));
-    assertSelection("(outer\n" +
-            "  (inner))");
-
-    configureByText("(outer\n" +
-            "  <caret>(inner))");
-    typeText(parseKeys("v2a)"));
-    assertSelection("(outer\n" +
-            "  (inner))");
-
-    configureByText("(outer\n" +
-            "  <caret>(inner))");
-    typeText(parseKeys("vlla)"));
-    assertSelection("(outer\n" +
-            "  (inner))");
-
-    configureByText("(outer\n" +
-            "  (inner<caret>))");
-    typeText(parseKeys("vlla)"));
-    assertSelection("(inner)");
-  }
-
-  // VIM-1633 |v_i)|
-  public void testNestedInBlockSelection() {
-
-    configureByText("(<caret>a)");
-    typeText(parseKeys("vi)"));
-    assertSelection("a");
-
-    configureByText("((<caret>a))");
-    typeText(parseKeys("vi)"));
-    assertSelection("(a)");
-
-    configureByText("(outer\n" +
-            "  <caret>(inner))");
-    typeText(parseKeys("vi)"));
-    assertSelection("inner");
-
-    configureByText("(outer\n" +
-            "  (inner<caret>))");
-    typeText(parseKeys("vi)"));
-    assertSelection("inner");
-
-    configureByText("(outer\n" +
-            " <caret> (inner))");
-    typeText(parseKeys("vi)"));
-    assertSelection("outer\n" +
-            "  (inner)");
-
-    configureByText("(outer\n" +
-            "  <caret>(inner))");
-    typeText(parseKeys("vi)i)"));
-    assertSelection("outer\n" +
-            "  (inner)");
-
-    configureByText("(outer\n" +
-            "  <caret>(inner))");
-    typeText(parseKeys("v2i)"));
-    assertSelection("outer\n" +
-            "  (inner)");
-
-    configureByText("(outer\n" +
-            "  <caret>(inner))");
-    typeText(parseKeys("vlli)"));
-    assertSelection("outer\n" +
-            "  (inner)");
-
-    configureByText("(outer\n" +
-            "  (inner<caret>))");
-    typeText(parseKeys("vlli)"));
-    assertSelection("inner");
-
-    configureByText("(outer\n" +
-      "  (<caret>inner))");
-    typeText(parseKeys("vllli)"));
-    assertSelection("inner");
   }
 
   // |v_it|
