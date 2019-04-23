@@ -93,6 +93,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
   private void setFontForElements() {
     final Font font = UiHelper.getEditorFont();
     label.setFont(font);
+    entry.setFont(font);
   }
 
   /**
@@ -105,13 +106,13 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
    * @param count    A holder for the ex entry count
    */
   public void activate(@NotNull Editor editor, DataContext context, @NotNull String label, String initText, int count) {
-    entry.setEditor(editor, context);
     this.label.setText(label);
     this.count = count;
     setFontForElements();
-    entry.setDocument(entry.createDefaultModel());
+    entry.setEditor(editor, context);
     entry.setText(initText);
     entry.setType(label);
+    entry.setInsertMode();
     parent = editor.getContentComponent();
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
       JRootPane root = SwingUtilities.getRootPane(parent);
