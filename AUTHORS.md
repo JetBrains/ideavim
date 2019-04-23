@@ -66,6 +66,7 @@ Contributors:
 * [gecko655](mailto:aqwsedrft1234@yahoo.co.jp)
 * [Daniele Megna](mailto:megna.dany@gmail.com)
 * [Andrew Potter](mailto:apottere@gmail.com)
+* [Romain Gautier](mailto:romain.gautier@nimamoh.net)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
