@@ -73,7 +73,7 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                CommandState.Mode.COMMAND,
+                CommandState.Mode.INSERT,
                 CommandState.SubMode.NONE)
     }
 
@@ -95,7 +95,7 @@ class SelectKeyHandlerTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                CommandState.Mode.COMMAND,
+                CommandState.Mode.INSERT,
                 CommandState.SubMode.NONE)
     }
 
