@@ -67,6 +67,9 @@
     <component>
       <implementation-class>com.maddyhome.idea.vim.VimPlugin</implementation-class>
     </component>
+    <component>
+      <implementation-class>com.maddyhome.idea.vim.VimLocalConfig</implementation-class>
+    </component>
   </application-components>
 
   <extensionPoints>
