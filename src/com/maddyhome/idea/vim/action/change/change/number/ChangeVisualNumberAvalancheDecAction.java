@@ -45,7 +45,7 @@ public class ChangeVisualNumberAvalancheDecAction extends VimCommandAction {
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
         return VimPlugin.getChange()
-          .changeNumberVisualMode(editor, caret, range.toVimTextRange(), -cmd.getCount(), true);
+          .changeNumberVisualMode(editor, caret, range.toVimTextRange(false), -cmd.getCount(), true);
       }
     });
   }

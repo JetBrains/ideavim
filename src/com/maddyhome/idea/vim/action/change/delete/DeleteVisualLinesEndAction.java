@@ -50,8 +50,8 @@ public class DeleteVisualLinesEndAction extends VimCommandAction {
                                       @NotNull DataContext context,
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
+        TextRange vimTextRange = range.toVimTextRange(true);
         if (range.getType() == SelectionType.BLOCK_WISE) {
-          TextRange vimTextRange = range.toVimTextRange();
           final int[] starts = vimTextRange.getStartOffsets();
           final int[] ends = vimTextRange.getEndOffsets();
           for (int i = 0; i < starts.length; i++) {
@@ -64,8 +64,8 @@ public class DeleteVisualLinesEndAction extends VimCommandAction {
             .deleteRange(editor, editor.getCaretModel().getPrimaryCaret(), blockRange, SelectionType.BLOCK_WISE, false);
         }
         else {
-          final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStart()),
-                                                    EditorHelper.getLineEndForOffset(editor, range.getEnd()) + 1);
+          final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, vimTextRange.getStartOffset()),
+                                                    EditorHelper.getLineEndForOffset(editor, vimTextRange.getEndOffset()) + 1);
           return VimPlugin.getChange().deleteRange(editor, caret, lineRange, SelectionType.LINE_WISE, false);
         }
       }

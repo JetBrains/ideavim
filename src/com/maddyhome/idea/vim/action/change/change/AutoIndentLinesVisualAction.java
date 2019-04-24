@@ -47,7 +47,7 @@ public class AutoIndentLinesVisualAction extends VimCommandAction {
                                       @NotNull DataContext context,
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
-        VimPlugin.getChange().autoIndentRange(editor, caret, context, range.toVimTextRange());
+        VimPlugin.getChange().autoIndentRange(editor, caret, context, range.toVimTextRange(true));
         return true;
       }
     });

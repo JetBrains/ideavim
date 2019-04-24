@@ -50,7 +50,7 @@ public class ChangeVisualCharacterAction extends VimCommandAction {
                                       @NotNull VimSelection range) {
         final Argument argument = cmd.getArgument();
         return argument != null &&
-               VimPlugin.getChange().changeCharacterRange(editor, range.toVimTextRange(), argument.getCharacter());
+               VimPlugin.getChange().changeCharacterRange(editor, range.toVimTextRange(false), argument.getCharacter());
       }
     });
   }

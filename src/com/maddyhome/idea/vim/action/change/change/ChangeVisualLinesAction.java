@@ -50,8 +50,10 @@ public class ChangeVisualLinesAction extends VimCommandAction {
                                       @NotNull DataContext context,
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
-        final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStart()),
-                                                  EditorHelper.getLineEndForOffset(editor, range.getEnd()) + 1);
+        final TextRange textRange = range.toVimTextRange(true);
+
+        final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, textRange.getStartOffset()),
+                                                  EditorHelper.getLineEndForOffset(editor, textRange.getEndOffset()) + 1);
         return VimPlugin.getChange().changeRange(editor, caret, lineRange, SelectionType.LINE_WISE);
       }
     });

@@ -124,8 +124,8 @@ class SelectExtendToRightTest : VimTestCase() {
                 """
                 A Discovery
 
-                ${s}I$c found it in a legendary land$se
-                all rocks and lavender and tufted grass,
+                ${s}I$c found it in a legendary land
+                ${se}all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
@@ -146,8 +146,8 @@ class SelectExtendToRightTest : VimTestCase() {
                 """
                 A Discovery
 
-                ${s}I found it in a legendary land$c$se
-                all rocks and lavender and tufted grass,
+                ${s}I found it in a legendary land$c
+                ${se}all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
@@ -168,8 +168,8 @@ class SelectExtendToRightTest : VimTestCase() {
                 """
                 A Discovery
 
-                ${s}I found it in a legendary land$c$se
-                all rocks and lavender and tufted grass,
+                ${s}I found it in a legendary land$c
+                ${se}all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
@@ -209,8 +209,8 @@ class SelectExtendToRightTest : VimTestCase() {
                 """
                 A Discovery
 
-                ${s}I found i${c}t in a legendary land$se
-                all rocks and lavender and tufted grass,
+                ${s}I found i${c}t in a legendary land
+                ${se}all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 ${s}hard by the torrent of a mountain pass.$c$se""".trimIndent(),
                 CommandState.Mode.SELECT,

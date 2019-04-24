@@ -51,7 +51,7 @@ public class ChangeCaseLowerVisualAction extends VimCommandAction {
                                       @NotNull VimSelection range) {
         final Editor topLevelEditor = InjectedLanguageUtil.getTopLevelEditor(editor);
         return VimPlugin.getChange()
-          .changeCaseRange(topLevelEditor, caret, range.toVimTextRange(), CharacterHelper.CASE_LOWER);
+          .changeCaseRange(topLevelEditor, caret, range.toVimTextRange(false), CharacterHelper.CASE_LOWER);
       }
     });
   }

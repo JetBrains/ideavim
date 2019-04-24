@@ -125,8 +125,8 @@ class SelectExtendDownTest : VimTestCase() {
                 A Discovery
 
                 ${s}I found it in a legendary land
-                ${c}all rocks and lavender and tufted grass,$se
-                where it was settled on some sodden sand
+                ${c}all rocks and lavender and tufted grass,
+                ${se}where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
                 CommandState.Mode.SELECT,
@@ -145,8 +145,8 @@ class SelectExtendDownTest : VimTestCase() {
                     """.trimIndent(),
                 """
                 ${s}A Discovery
-                $c$se
-                I found it in a legendary land
+                $c
+                ${se}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
@@ -168,8 +168,8 @@ class SelectExtendDownTest : VimTestCase() {
                 """
                 A Discovery
                 $s
-                ${c}I found it in a legendary land$se
-                all rocks and lavender and tufted grass,
+                ${c}I found it in a legendary land
+                ${se}all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
@@ -210,8 +210,8 @@ class SelectExtendDownTest : VimTestCase() {
                 A Discovery
 
                 ${s}I found it in a legendary land
-                all rock${c}s and lavender and tufted grass,$se
-                where it was settled on some sodden sand
+                all rock${c}s and lavender and tufted grass,
+                ${se}where it was settled on some sodden sand
                 ${s}hard by the ${c}torrent of a mountain pass.$se""".trimIndent(),
                 CommandState.Mode.SELECT,
                 CommandState.SubMode.VISUAL_LINE)

@@ -76,7 +76,7 @@ class YankGroup {
         for (caret in caretModel.allCarets) {
             val start = VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
             val end = Math.min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, true) + 1,
-                    EditorHelper.getFileSize(editor))
+                    EditorHelper.getFileSize(editor, true))
 
             if (end == -1) continue
 
@@ -96,26 +96,18 @@ class YankGroup {
      * @return true if able to yank the range, false if not
      */
     fun yankRange(editor: Editor, range: TextRange?, type: SelectionType, moveCursor: Boolean): Boolean {
-        var updatedRange = range ?: return false
+        range ?: return false
 
-        val selectionType = if (type == SelectionType.CHARACTER_WISE && updatedRange.isMultiple) SelectionType.BLOCK_WISE else type
+        val selectionType = if (type == SelectionType.CHARACTER_WISE && range.isMultiple) SelectionType.BLOCK_WISE else type
 
         val caretModel = editor.caretModel
-        val rangeStartOffsets = updatedRange.startOffsets
-        val rangeEndOffsets = updatedRange.endOffsets
-        if (selectionType == SelectionType.LINE_WISE) {
-            val ranges = ArrayList<Pair<Int, Int>>(caretModel.caretCount)
-            for (i in 0 until caretModel.caretCount) {
-                ranges.add(EditorHelper.getLineStartForOffset(editor, rangeStartOffsets[i]) to
-                        EditorHelper.getLineEndForOffset(editor, rangeEndOffsets[i]) + 1)
-            }
-            updatedRange = getTextRange(ranges, selectionType)
-        }
+        val rangeStartOffsets = range.startOffsets
+        val rangeEndOffsets = range.endOffsets
 
         return if (moveCursor) {
             val startOffsets = HashMap<Caret, Int>(caretModel.caretCount)
             if (type == SelectionType.BLOCK_WISE) {
-                startOffsets[caretModel.primaryCaret] = updatedRange.normalize().startOffset
+                startOffsets[caretModel.primaryCaret] = range.normalize().startOffset
             } else {
                 val carets = caretModel.allCarets
                 for (i in carets.indices) {
@@ -123,9 +115,9 @@ class YankGroup {
                 }
             }
 
-            yankRange(editor, updatedRange, selectionType, startOffsets)
+            yankRange(editor, range, selectionType, startOffsets)
         } else {
-            yankRange(editor, updatedRange, selectionType, null)
+            yankRange(editor, range, selectionType, null)
         }
     }
 

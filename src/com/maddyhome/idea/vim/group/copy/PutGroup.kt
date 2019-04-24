@@ -48,15 +48,10 @@ class PutGroup {
             cursorAfter: Boolean,
             register: Register?
     ): Boolean {
-        val range = selection.toVimTextRange().normalize()
-        val updatedRange = if (selection.type == SelectionType.LINE_WISE) {
-            val fileSize = EditorHelper.getFileSize(editor)
-            val end = minOf(range.endOffset + 1, fileSize)
-            TextRange(range.startOffset, end)
-        } else range
+        val range = selection.toVimTextRange(false).normalize()
 
-        VimPlugin.getChange().deleteRange(editor, caret, updatedRange, selection.type, false)
-        var startOffset = updatedRange.startOffset
+        VimPlugin.getChange().deleteRange(editor, caret, range, selection.type, false)
+        var startOffset = range.startOffset
 
         caret.moveToOffset(startOffset)
 
@@ -97,7 +92,7 @@ class PutGroup {
     ): Boolean {
         val res = Ref.create(true)
         val caret = editor.caretModel.primaryCaret
-        val range = selection.toVimTextRange().normalize()
+        val range = selection.toVimTextRange(false).normalize()
         val line = if (insertBefore) {
             editor.offsetToLogicalPosition(range.startOffset).line
         } else {

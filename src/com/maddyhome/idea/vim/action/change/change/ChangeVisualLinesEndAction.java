@@ -51,7 +51,7 @@ public class ChangeVisualLinesEndAction extends VimCommandAction {
                                       @NotNull DataContext context,
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
-        TextRange vimTextRange = range.toVimTextRange();
+        TextRange vimTextRange = range.toVimTextRange(true);
         if (EditorData.wasVisualBlockMode(editor) && vimTextRange.isMultiple()) {
           final int[] starts = vimTextRange.getStartOffsets();
           final int[] ends = vimTextRange.getEndOffsets();
@@ -64,8 +64,8 @@ public class ChangeVisualLinesEndAction extends VimCommandAction {
           return VimPlugin.getChange().changeRange(editor, caret, blockRange, SelectionType.BLOCK_WISE);
         }
         else {
-          final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStart()),
-                                                    EditorHelper.getLineEndForOffset(editor, range.getEnd()) + 1);
+          final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, vimTextRange.getStartOffset()),
+                                                    EditorHelper.getLineEndForOffset(editor, vimTextRange.getEndOffset()) + 1);
           return VimPlugin.getChange().changeRange(editor, caret, lineRange, SelectionType.LINE_WISE);
         }
       }

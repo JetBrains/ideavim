@@ -100,8 +100,15 @@ class VimSelection {
     /**
      * Converting to an old TextRange class
      */
-    fun toVimTextRange() = when (type) {
-        CHARACTER_WISE, LINE_WISE -> TextRange(normStart, normEnd)
+    fun toVimTextRange(skipNewLineForLineMode: Boolean) = when (type) {
+        CHARACTER_WISE -> TextRange(normStart, normEnd)
+        LINE_WISE -> {
+            if (skipNewLineForLineMode && editor.document.text[normEnd] == '\n') {
+                TextRange(normStart, (normEnd - 1).coerceAtLeast(0))
+            } else {
+                TextRange(normStart, normEnd)
+            }
+        }
         BLOCK_WISE -> {
             val logicalStart = editor.offsetToLogicalPosition(normStart)
             val logicalEnd = editor.offsetToLogicalPosition(normEnd)

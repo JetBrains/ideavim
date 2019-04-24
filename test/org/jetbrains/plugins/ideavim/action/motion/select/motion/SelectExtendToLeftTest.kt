@@ -1,3 +1,5 @@
+@file:Suppress("RemoveCurlyBracesFromTemplate")
+
 package org.jetbrains.plugins.ideavim.action.motion.select.motion
 
 import com.maddyhome.idea.vim.command.CommandState
@@ -128,8 +130,8 @@ class SelectExtendToLeftTest : VimTestCase() {
                 """
                 A Discovery
 
-                ${s}I ${c}found it in a legendary land$se
-                all rocks and lavender and tufted grass,
+                ${s}I ${c}found it in a legendary land
+                ${se}all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
@@ -150,8 +152,8 @@ class SelectExtendToLeftTest : VimTestCase() {
                 """
                 A Discovery
 
-                $s${c}I found it in a legendary land$se
-                all rocks and lavender and tufted grass,
+                $s${c}I found it in a legendary land
+                ${se}all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
@@ -170,8 +172,8 @@ class SelectExtendToLeftTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
                 """
-                $s${c}A Discovery$se
-
+                $s${c}A Discovery
+                ${se}
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
@@ -192,11 +194,11 @@ class SelectExtendToLeftTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
                 """
-                $s${c}A Discovery$se
-
-                ${s}I found it ${c}in a legendary land$se
-                ${s}all rocks$c and lavender and tufted grass,$se
-                where it was settled on some sodden sand
+                $s${c}A Discovery
+                ${se}
+                ${s}I found it ${c}in a legendary land
+                ${se}${s}all rocks$c and lavender and tufted grass,
+                ${se}where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
                 CommandState.Mode.SELECT,

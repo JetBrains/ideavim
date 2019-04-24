@@ -47,7 +47,7 @@ public class ShiftLeftVisualAction extends VimCommandAction {
                                       @NotNull DataContext context,
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
-        VimPlugin.getChange().indentRange(editor, caret, context, range.toVimTextRange(), cmd.getCount(), -1);
+        VimPlugin.getChange().indentRange(editor, caret, context, range.toVimTextRange(false), cmd.getCount(), -1);
         return true;
       }
     });

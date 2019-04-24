@@ -49,7 +49,7 @@ public class YankVisualAction extends VimCommandAction {
         List<Integer> starts = new ArrayList<>();
         List<Integer> ends = new ArrayList<>();
         selections.forEach(selection -> {
-          TextRange textRange = selection.toVimTextRange();
+          TextRange textRange = selection.toVimTextRange(false);
           Arrays.stream(textRange.getStartOffsets()).boxed().forEach(starts::add);
           Arrays.stream(textRange.getEndOffsets()).boxed().forEach(ends::add);
         });

@@ -64,7 +64,11 @@ class ActionHandler : CommandHandler(
         SelectionVimListenerSuppressor.lock().use {
             selections.forEachIndexed { i, selection ->
                 val caret = editor.caretModel.allCarets[i]
-                if (!caret.hasSelection()) {
+                if (caret.hasSelection()) caret.removeSelection() // Selection is removed in non-unittest mode
+                if (oldSubMode == CommandState.SubMode.VISUAL_LINE) {
+                    // Skip new line character for Line mode
+                    selection?.run { caret.setSelection(first, (second - 1).coerceAtLeast(0)) }
+                } else {
                     selection?.run { caret.setSelection(first, second) }
                 }
             }

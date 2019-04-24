@@ -49,7 +49,7 @@ public class ChangeCaseToggleVisualAction extends VimCommandAction {
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
         return VimPlugin.getChange()
-          .changeCaseRange(editor, caret, range.toVimTextRange(), CharacterHelper.CASE_TOGGLE);
+          .changeCaseRange(editor, caret, range.toVimTextRange(false), CharacterHelper.CASE_TOGGLE);
       }
     });
   }

@@ -478,7 +478,7 @@ public class EditorHelper {
       int max = range.getMaxLength();
 
       for (int i = 0; i < len; i++) {
-        if (i > 0) {
+        if (i > 0 && res.length() > 0 && res.charAt(res.length() - 1) != '\n') {
           res.append('\n');
         }
         String line = getText(editor, range.getStartOffsets()[i], range.getEndOffsets()[i]);

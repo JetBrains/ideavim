@@ -169,7 +169,7 @@ fun toNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.M
         when (subMode) {
             CommandState.SubMode.VISUAL_LINE -> {
                 val lineStart = EditorHelper.getLineStartForOffset(editor, start)
-                val lineEnd = EditorHelper.getLineEndForOffset(editor, end)
+                val lineEnd = (EditorHelper.getLineEndForOffset(editor, end) + 1).coerceAtMost(EditorHelper.getFileSize(editor, true))
                 lineStart to lineEnd
             }
             CommandState.SubMode.VISUAL_CHARACTER -> {

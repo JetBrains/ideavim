@@ -164,10 +164,6 @@ public class RegisterGroup {
       end = t;
     }
 
-    if (type == SelectionType.LINE_WISE && text.length() > 0 && text.charAt(text.length() - 1) != '\n') {
-      text = text + '\n';
-    }
-
     // If this is an uppercase register, we need to append the text to the corresponding lowercase register
     if (Character.isUpperCase(register)) {
       char lreg = Character.toLowerCase(register);

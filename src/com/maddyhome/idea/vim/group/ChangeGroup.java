@@ -1527,7 +1527,7 @@ public class ChangeGroup {
                           int lines,
                           int dir) {
     int start = caret.getOffset();
-    int end = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, lines - 1, false);
+    int end = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, lines - 1, true);
     indentRange(editor, caret, context, new TextRange(start, end), 1, dir);
   }
 
@@ -1588,7 +1588,8 @@ public class ChangeGroup {
     IndentConfig indentConfig = IndentConfig.create(editor, context);
 
     final int sline = editor.offsetToLogicalPosition(range.getStartOffset()).line;
-    final int eline = editor.offsetToLogicalPosition(range.getEndOffset()).line;
+    final LogicalPosition endLogicalPosition = editor.offsetToLogicalPosition(range.getEndOffset());
+    final int eline = endLogicalPosition.column == 0 ? Math.max(endLogicalPosition.line - 1, 0) : endLogicalPosition.line;
 
     if (range.isMultiple()) {
       final int from = editor.offsetToLogicalPosition(range.getStartOffset()).column;

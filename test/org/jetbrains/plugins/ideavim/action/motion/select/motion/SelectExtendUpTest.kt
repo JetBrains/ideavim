@@ -129,8 +129,8 @@ class SelectExtendUpTest : VimTestCase() {
                 A Discovery
 
                 $s${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,${se}
-                where it was settled on some sodden sand
+                all rocks and lavender and tufted grass,
+                ${se}where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
                 CommandState.Mode.SELECT,
@@ -150,8 +150,8 @@ class SelectExtendUpTest : VimTestCase() {
                 """
                 A Discovery
                 $s$c
-                I found it in a legendary land$se
-                all rocks and lavender and tufted grass,
+                I found it in a legendary land
+                ${se}all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
@@ -171,8 +171,8 @@ class SelectExtendUpTest : VimTestCase() {
                     """.trimIndent(),
                 """
                 $s${c}A Discovery
-                $se
-                I found it in a legendary land
+
+                ${se}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
@@ -217,8 +217,8 @@ class SelectExtendUpTest : VimTestCase() {
                 ${s}A ${c}Discovery$se
 
                 ${s}I found it$c in a legendary land
-                all rocks and lavender and tufted grass,$se
-                where it was settled on some sodden sand
+                all rocks and lavender and tufted grass,
+                ${se}where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
                 CommandState.Mode.SELECT,

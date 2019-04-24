@@ -48,7 +48,7 @@ public class ChangeCaseUpperVisualAction extends VimCommandAction {
                                       @NotNull DataContext context,
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
-        return VimPlugin.getChange().changeCaseRange(editor, caret, range.toVimTextRange(), CharacterHelper.CASE_UPPER);
+        return VimPlugin.getChange().changeCaseRange(editor, caret, range.toVimTextRange(false), CharacterHelper.CASE_UPPER);
       }
     });
   }

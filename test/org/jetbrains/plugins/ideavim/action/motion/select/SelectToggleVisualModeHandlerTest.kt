@@ -316,8 +316,8 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 """
                 A Discovery
 
-                ${s}I foun${c}d it in a legendary land$se
-                all rocks and lavender and tufted grass,
+                ${s}I foun${c}d it in a legendary land
+                ${se}all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.""".trimIndent(),
                 CommandState.Mode.SELECT,
@@ -337,8 +337,8 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 A Discovery
 
                 ${s}I fo${c}und it in a legendary land
-                all rocks and lavender and tufted grass,${se}
-                where it was settled on some sodden sand
+                all rocks and lavender and tufted grass,
+                ${se}where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.""".trimIndent(),
                 CommandState.Mode.SELECT,
                 CommandState.SubMode.VISUAL_LINE)
@@ -355,8 +355,8 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.""".trimIndent(),
                 """
                 A Discovery
-                ${s}${c}${se}
-                I found it in a legendary land
+                ${s}${c}
+                ${se}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.""".trimIndent(),
@@ -376,10 +376,10 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
                 """
                 A Discovery
 
-                ${s}I foun${c}d it in a legendary land$se
-                all rocks and lavender and tufted grass,
-                ${s}where it was settle${c}d on some sodden sand$se
-                hard by the torrent of a mountain pass.""".trimIndent(),
+                ${s}I foun${c}d it in a legendary land
+                ${se}all rocks and lavender and tufted grass,
+                ${s}where it was settle${c}d on some sodden sand
+                ${se}hard by the torrent of a mountain pass.""".trimIndent(),
                 CommandState.Mode.SELECT,
                 CommandState.SubMode.VISUAL_LINE)
     }

@@ -1056,7 +1056,7 @@ public class MotionActionTest extends VimTestCase {
                    "baz\n");
     assertSelection("foo\n" +
                     "bar\n" +
-                    "baz");
+                    "baz\n");
     typeText(parseKeys(">"));
     assertMode(COMMAND);
     myFixture.checkResult("    foo\n" +
@@ -1065,7 +1065,7 @@ public class MotionActionTest extends VimTestCase {
     typeText(parseKeys("gv"));
     assertSelection("    foo\n" +
                     "    bar\n" +
-                    "    baz");
+                    "    baz\n");
     typeText(parseKeys(">"));
     assertMode(COMMAND);
     myFixture.checkResult("        foo\n" +
@@ -1074,7 +1074,7 @@ public class MotionActionTest extends VimTestCase {
     typeText(parseKeys("gv"));
     assertSelection("        foo\n" +
                     "        bar\n" +
-                    "        baz");
+                    "        baz\n");
   }
 
   // VIM-862 |gv|
@@ -1094,7 +1094,7 @@ public class MotionActionTest extends VimTestCase {
                    "quux\n");
     assertMode(VISUAL);
     assertSelection("bar\n" +
-                    "baz");
+                    "baz\n");
     assertOffset(8);
   }
 
@@ -1107,7 +1107,7 @@ public class MotionActionTest extends VimTestCase {
                    "quux\n");
     assertMode(VISUAL);
     assertSelection("bar\n" +
-                    "baz");
+                    "baz\n");
     assertOffset(4);
   }
 }

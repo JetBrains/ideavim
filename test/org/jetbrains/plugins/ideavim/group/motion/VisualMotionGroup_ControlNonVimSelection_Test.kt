@@ -286,8 +286,8 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
         myFixture.checkResult("""
             A Discovery
 
-            ${s}I found i${c}t in a legendary land$se
-            all rocks and lavender and tufted grass,
+            ${s}I found i${c}t in a legendary land
+            ${se}all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
@@ -300,8 +300,8 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             A Discovery
 
             ${s}I found it in a legendary land
-            all rocks$c and lavender and tufted grass,$se
-            where it was settled on some sodden sand
+            all rocks$c and lavender and tufted grass,
+            ${se}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
         assertMode(CommandState.Mode.VISUAL)
@@ -329,8 +329,8 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             A Discovery
 
             ${s}I found it in a legendary land
-            all rock${c}s and lavender and tufted grass,$se
-            where it was settled on some sodden sand
+            all rock${c}s and lavender and tufted grass,
+            ${se}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
         assertMode(CommandState.Mode.VISUAL)
@@ -388,8 +388,8 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
 
             I found it in a legendary land
             ${s}all rocks and la${c}vender and tufted grass,
-            where it was settled on some sodden sand$se
-            hard by the torrent of a mountain pass.
+            where it was settled on some sodden sand
+            ${se}hard by the torrent of a mountain pass.
         """.trimIndent())
         assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_LINE)
@@ -416,8 +416,8 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             A Discovery
 
             ${s}I found it in a legendary land
-            all rocks and la${c}vender and tufted grass,$se
-            where it was settled on some sodden sand
+            all rocks and la${c}vender and tufted grass,
+            ${se}where it was settled on some sodden sand
             ${s}hard by the torrent o${c}f a mountain pass.$se
         """.trimIndent())
         assertMode(CommandState.Mode.VISUAL)
@@ -445,8 +445,8 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             A Discovery
 
             ${s}I found it in a legenda${c}ry land
-            all rocks and lavender and tufted grass,$se
-            where it was settled on some sodden sand
+            all rocks and lavender and tufted grass,
+            ${se}where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
         assertMode(CommandState.Mode.VISUAL)

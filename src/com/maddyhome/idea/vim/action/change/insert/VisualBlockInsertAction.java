@@ -52,7 +52,7 @@ public class VisualBlockInsertAction extends VimCommandAction {
         VimSelection vimSelection = caretsAndSelections.values().stream().findFirst().orElse(null);
         if (vimSelection == null) return false;
         if (vimSelection.getType() == SelectionType.BLOCK_WISE) {
-          return VimPlugin.getChange().blockInsert(editor, context, vimSelection.toVimTextRange(), false);
+          return VimPlugin.getChange().blockInsert(editor, context, vimSelection.toVimTextRange(false), false);
         }
         else {
           VimPlugin.getChange().insertBeforeFirstNonBlank(editor, context);

@@ -52,7 +52,7 @@ public class VisualBlockAppendAction extends VimCommandAction {
         VimSelection range = caretsAndSelections.values().stream().findFirst().orElse(null);
         if (range == null) return false;
         if (range.getType() == SelectionType.BLOCK_WISE) {
-          return VimPlugin.getChange().blockInsert(editor, context, range.toVimTextRange(), true);
+          return VimPlugin.getChange().blockInsert(editor, context, range.toVimTextRange(false), true);
         }
         else {
           VimPlugin.getChange().insertAfterLineEnd(editor, context);
