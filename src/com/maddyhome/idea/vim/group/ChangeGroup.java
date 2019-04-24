@@ -806,7 +806,8 @@ public class ChangeGroup {
    * @param key     The user entered keystroke
    * @return true if this was a regular character, false if not
    */
-  public boolean processKey(@NotNull final Editor editor, @NotNull final DataContext context,
+  public boolean processKey(@NotNull final Editor editor,
+                            @NotNull final DataContext context,
                             @NotNull final KeyStroke key) {
     if (logger.isDebugEnabled()) {
       logger.debug("processKey(" + key + ")");
@@ -895,7 +896,9 @@ public class ChangeGroup {
    *               will be removed. If false, only the newline is removed to join the lines.
    * @return true if able to join the lines, false if not
    */
-  public boolean deleteJoinRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull TextRange range,
+  public boolean deleteJoinRange(@NotNull Editor editor,
+                                 @NotNull Caret caret,
+                                 @NotNull TextRange range,
                                  boolean spaces) {
     int startLine = editor.offsetToLogicalPosition(range.getStartOffset()).line;
     int endLine = editor.offsetToLogicalPosition(range.getEndOffset()).line;
@@ -916,7 +919,10 @@ public class ChangeGroup {
    *                  will be removed. If false, only the newline is removed to join the lines.
    * @return true if able to join the lines, false if not
    */
-  private boolean deleteJoinNLines(@NotNull Editor editor, @NotNull Caret caret, int startLine, int count,
+  private boolean deleteJoinNLines(@NotNull Editor editor,
+                                   @NotNull Caret caret,
+                                   int startLine,
+                                   int count,
                                    boolean spaces) {
     // start my moving the cursor to the very end of the first line
     MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineEnd(editor, startLine, true));
@@ -1305,7 +1311,9 @@ public class ChangeGroup {
     return true;
   }
 
-  public boolean blockInsert(@NotNull Editor editor, @NotNull DataContext context, @NotNull TextRange range,
+  public boolean blockInsert(@NotNull Editor editor,
+                             @NotNull DataContext context,
+                             @NotNull TextRange range,
                              boolean append) {
     final int lines = getLinesCountInVisualBlock(editor, range);
     final LogicalPosition startPosition = editor.offsetToLogicalPosition(range.getStartOffset());
@@ -1411,7 +1419,9 @@ public class ChangeGroup {
    * @param type   The type of the range
    * @return true if able to delete the range, false if not
    */
-  public boolean changeRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull TextRange range,
+  public boolean changeRange(@NotNull Editor editor,
+                             @NotNull Caret caret,
+                             @NotNull TextRange range,
                              @NotNull SelectionType type) {
     int col = 0;
     int lines = 0;
@@ -1494,7 +1504,9 @@ public class ChangeGroup {
     }
   }
 
-  public void autoIndentRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+  public void autoIndentRange(@NotNull Editor editor,
+                              @NotNull Caret caret,
+                              @NotNull DataContext context,
                               @NotNull TextRange range) {
     final int startOffset = EditorHelper.getLineStartForOffset(editor, range.getStartOffset());
     final int endOffset = EditorHelper.getLineEndForOffset(editor, range.getEndOffset());
@@ -1509,7 +1521,10 @@ public class ChangeGroup {
     restoreCursor(editor, caret, caret.getLogicalPosition().line);
   }
 
-  public void indentLines(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int lines,
+  public void indentLines(@NotNull Editor editor,
+                          @NotNull Caret caret,
+                          @NotNull DataContext context,
+                          int lines,
                           int dir) {
     int start = caret.getOffset();
     int end = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, lines - 1, false);
@@ -1649,7 +1664,8 @@ public class ChangeGroup {
    * @param type   The type of deletion
    * @return true if able to delete the text, false if not
    */
-  private boolean deleteText(@NotNull final Editor editor, @NotNull final TextRange range,
+  private boolean deleteText(@NotNull final Editor editor,
+                             @NotNull final TextRange range,
                              @Nullable SelectionType type) {
     // Fix for http://youtrack.jetbrains.net/issue/VIM-35
     if (!range.normalize(EditorHelper.getFileSize(editor, true))) {
@@ -1708,7 +1724,8 @@ public class ChangeGroup {
    * @param lineComparator The comparator to use to sort
    * @return true if able to sort the text, false if not
    */
-  public boolean sortRange(@NotNull Editor editor, @NotNull LineRange range,
+  public boolean sortRange(@NotNull Editor editor,
+                           @NotNull LineRange range,
                            @NotNull Comparator<String> lineComparator) {
     final int startLine = range.getStartLine();
     final int endLine = range.getEndLine();
@@ -1732,7 +1749,9 @@ public class ChangeGroup {
    * @param lineComparator The comparator to use to sort
    * @return true if able to sort the text, false if not
    */
-  private boolean sortTextRange(@NotNull Editor editor, int start, int end,
+  private boolean sortTextRange(@NotNull Editor editor,
+                                int start,
+                                int end,
                                 @NotNull Comparator<String> lineComparator) {
     final String selectedText = editor.getDocument().getText(new TextRangeInterval(start, end));
     final List<String> lines = Lists.newArrayList(Splitter.on("\n").split(selectedText));
@@ -1902,6 +1921,7 @@ public class ChangeGroup {
 
     return number;
   }
+
   private int oldOffset = -1;
 
   private class InsertActionsDocumentListener implements DocumentListener {
