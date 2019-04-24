@@ -20,31 +20,82 @@ package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.command.SelectionType.BLOCK_WISE
-import com.maddyhome.idea.vim.command.SelectionType.CHARACTER_WISE
-import com.maddyhome.idea.vim.command.SelectionType.LINE_WISE
+import com.maddyhome.idea.vim.command.SelectionType.*
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.group.visual.toNativeSelection
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * @author Alex Plate
  *
  * Class for storing selection range.
- *   [start] and [end] are the offsets of selection and type of selection is stored in [type]
+ *   [start] and [end] are the offsets of native selection and type of selection is stored in [type]
+ *
+ * [vimStart] and [vimEnd] - selection offsets in vim model. There values will be stored in '< and '> marks.
+ *   There values can differ from [start] and [end] in case of linewise selection because [vimStart] - initial caret
+ *   position when visual mode entered and [vimEnd] - current caret position.
  *
  * This selection has direction. That means that by moving in left-up direction (e.g. `vbbbb`)
- *    [start] will be greater then [end].
+ *   [vimStart] and [start] will be greater then [vimEnd] and [end].
  * If you need normalized [start] and [end] (start always less than end) you
- *   can use [normStart] and [normEnd] properties.
+ *   can use [normStart] and [normEnd] properties.this.normStart = min(start, end)
+this.normEnd = max(start, end)
  */
-data class VimSelection(
-        val start: Int,
-        val end: Int,
-        val type: SelectionType,
-        val editor: Editor
-) {
-    val normStart: Int = if (start > end) end else start
-    val normEnd: Int = if (start > end) start else end
+class VimSelection {
+    val start: Int
+    val end: Int
+
+    val vimStart: Int
+    val vimEnd: Int
+
+    val normStart: Int
+    val normEnd: Int
+
+    val type: SelectionType
+    val editor: Editor
+
+    constructor(
+            nativeStart: Int,
+            nativeEnd: Int,
+            vimStart: Int,
+            vimEnd: Int,
+            type: SelectionType,
+            editor: Editor
+    ) {
+        this.vimStart = vimStart
+        this.vimEnd = vimEnd
+        this.type = type
+        this.editor = editor
+        this.start = nativeStart
+        this.end = nativeEnd
+
+        this.normStart = min(start, end)
+        this.normEnd = max(start, end)
+    }
+
+    /**
+     * [start] and [end] are calculated based on [vimStart] and [vimEnd] properties
+     */
+    constructor(
+            vimStart: Int,
+            vimEnd: Int,
+            type: SelectionType,
+            editor: Editor
+    ) {
+        this.vimStart = vimStart
+        this.vimEnd = vimEnd
+        this.type = type
+        this.editor = editor
+
+        val nativeStartAndEnd = toNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL, type.toSubMode())
+        this.start = nativeStartAndEnd.first
+        this.end = nativeStartAndEnd.second
+        this.normStart = min(start, end)
+        this.normEnd = max(start, end)
+    }
 
     /**
      * Converting to an old TextRange class

@@ -165,35 +165,49 @@ fun updateCaretColours(editor: Editor) {
     }
 }
 
+fun toNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.Mode, subMode: CommandState.SubMode): Pair<Int, Int> =
+        when (subMode) {
+            CommandState.SubMode.VISUAL_LINE -> {
+                val lineStart = EditorHelper.getLineStartForOffset(editor, start)
+                val lineEnd = EditorHelper.getLineEndForOffset(editor, end)
+                lineStart to lineEnd
+            }
+            CommandState.SubMode.VISUAL_CHARACTER -> {
+                val lineEnd = EditorHelper.getLineEndForOffset(editor, end)
+                val adj = if (VimPlugin.getVisualMotion().exclusiveSelection || end == lineEnd || mode == CommandState.Mode.SELECT) 0 else 1
+                val adjEnd = (end + adj).coerceAtMost(EditorHelper.getFileSize(editor))
+                start to adjEnd
+            }
+            CommandState.SubMode.VISUAL_BLOCK -> {
+                var blockStart = editor.offsetToLogicalPosition(start)
+                var blockEnd = editor.offsetToLogicalPosition(end)
+                if (!VimPlugin.getVisualMotion().exclusiveSelection && mode != CommandState.Mode.SELECT) {
+                    if (blockStart.column > blockEnd.column) {
+                        blockStart = LogicalPosition(blockStart.line, blockStart.column + 1)
+                    } else {
+                        blockEnd = LogicalPosition(blockEnd.line, blockEnd.column + 1)
+                    }
+                }
+                editor.logicalPositionToOffset(blockStart) to editor.logicalPositionToOffset(blockEnd)
+            }
+            else -> start to end
+        }
+
 private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Caret) {
     val (start, end) = if (selectionStart > selectionEnd) selectionEnd to selectionStart else selectionStart to selectionEnd
     val editor = caret.editor
     val subMode = CommandState.getInstance(editor).subMode
     val mode = CommandState.getInstance(editor).mode
     when (subMode) {
-        CommandState.SubMode.VISUAL_LINE -> {
-            val lineStart = EditorHelper.getLineStartForOffset(editor, start)
-            val lineEnd = EditorHelper.getLineEndForOffset(editor, end)
-            caret.vimSetSystemSelectionSilently(lineStart, lineEnd)
-        }
-        CommandState.SubMode.VISUAL_CHARACTER -> {
-            val lineEnd = EditorHelper.getLineEndForOffset(editor, end)
-            val adj = if (VimPlugin.getVisualMotion().exclusiveSelection || end == lineEnd || mode == CommandState.Mode.SELECT) 0 else 1
-            val adjEnd = (end + adj).coerceAtMost(EditorHelper.getFileSize(editor))
-            caret.vimSetSystemSelectionSilently(start, adjEnd)
+        CommandState.SubMode.VISUAL_LINE, CommandState.SubMode.VISUAL_CHARACTER -> {
+            val (nativeStart, nativeEnd) = toNativeSelection(editor, start, end, mode, subMode)
+            caret.vimSetSystemSelectionSilently(nativeStart, nativeEnd)
         }
         CommandState.SubMode.VISUAL_BLOCK -> {
             editor.caretModel.removeSecondaryCarets()
 
-            var blockStart = editor.offsetToLogicalPosition(selectionStart)
-            var blockEnd = editor.offsetToLogicalPosition(selectionEnd)
-            if (!VimPlugin.getVisualMotion().exclusiveSelection && mode != CommandState.Mode.SELECT) {
-                if (blockStart.column > blockEnd.column) {
-                    blockStart = LogicalPosition(blockStart.line, blockStart.column + 1)
-                } else {
-                    blockEnd = LogicalPosition(blockEnd.line, blockEnd.column + 1)
-                }
-            }
+            val (nativeStart, nativeEnd) = toNativeSelection(editor, selectionStart, selectionEnd, mode, subMode)
+            val (blockStart, blockEnd) = editor.offsetToLogicalPosition(nativeStart) to editor.offsetToLogicalPosition(nativeEnd)
             val lastColumn = editor.caretModel.primaryCaret.vimLastColumn
             editor.selectionModel.vimSetSystemBlockSelectionSilently(blockStart, blockEnd)
 

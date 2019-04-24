@@ -107,23 +107,23 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
     private fun Editor.collectSelections(): Map<Caret, VimSelection>? {
 
         if (CommandState.inVisualBlockMode(this)) {
-            val (start, end) = caretModel.primaryCaret.run {
-                if (editor.offsetToLogicalPosition(vimSelectionStart).column > editor.offsetToLogicalPosition(offset).column) {
-                    vimSelectionStart + VimPlugin.getVisualMotion().selectionAdj to offset
-                } else {
-                    vimSelectionStart to offset + VimPlugin.getVisualMotion().selectionAdj
-                }
-            }
-            return mapOf(caretModel.primaryCaret to VimSelection(start, end, SelectionType.BLOCK_WISE, this))
+            val primaryCaret = caretModel.primaryCaret
+            return mapOf(primaryCaret to VimSelection(
+                    primaryCaret.vimSelectionStart,
+                    primaryCaret.offset,
+                    SelectionType.BLOCK_WISE,
+                    this))
         }
 
         return this.caretModel.allCarets.associateWith { caret ->
-            val subMode = CommandState.getInstance(this).subMode
-            if (CommandState.getInstance(this).mode == CommandState.Mode.VISUAL) {
-                val (start, end) = if (caret.vimSelectionStart > caret.offset) {
-                    caret.selectionEnd to caret.selectionStart
-                } else caret.selectionStart to caret.selectionEnd
-                VimSelection(start, end, SelectionType.fromSubMode(subMode), this)
+            if (CommandState.inVisualMode(this)) {
+                val subMode = CommandState.getInstance(this).subMode
+                VimSelection(caret.selectionStart,
+                        caret.selectionEnd,
+                        caret.vimSelectionStart,
+                        caret.offset,
+                        SelectionType.fromSubMode(subMode),
+                        this)
             } else {
                 val startAndEnd = VimPlugin.getMark().getVisualSelectionMarks(this) ?: return null
                 val lastSelectionType = EditorData.getLastSelectionType(this) ?: return null
