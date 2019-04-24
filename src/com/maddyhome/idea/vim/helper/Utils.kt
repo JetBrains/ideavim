@@ -65,7 +65,7 @@ fun <T> userData(): ReadWriteProperty<UserDataHolder, T?> {
         private var key: Key<T>? = null
         private fun getKey(property: KProperty<*>): Key<T> {
             if (key == null) {
-                key = Key.create(property.name + "by userData()")
+                key = Key.create(property.name + " by userData()")
             }
             return key as Key<T>
         }
@@ -92,7 +92,7 @@ fun <T> userDataOr(default: UserDataHolder.() -> T): ReadWriteProperty<UserDataH
         private var key: Key<T>? = null
         private fun getKey(property: KProperty<*>): Key<T> {
             if (key == null) {
-                key = Key.create(property.name + "by userdata()")
+                key = Key.create(property.name + " by userData()")
             }
             return key as Key<T>
         }
