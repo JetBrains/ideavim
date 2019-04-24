@@ -4,6 +4,8 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
+import java.util.Arrays;
+
 /**
  * @author Naoto Ikeno
  */
@@ -13,7 +15,7 @@ public class ActionListCommandTest extends VimTestCase {
     typeText(commandToKeys("actionlist"));
 
     String output = ExOutputModel.getInstance(myFixture.getEditor()).getText();
-    assert output != null;
+    assertNotNull(output);
 
     // Header line
     String[] displayedLines = output.split("\n");
@@ -25,19 +27,38 @@ public class ActionListCommandTest extends VimTestCase {
     assertEquals(displayedActionNum, actionIds.length);
   }
 
-  // This test depends on default IntelliJ IDEA keymap
   public void testSearchByActionName() {
     configureByText("\n");
     typeText(commandToKeys("actionlist quickimpl"));
-    assertExOutput("--- Actions ---\n" +
-                   "QuickImplementations                               <M-S-I>");
+
+    String[] displayedLines = parseActionListOutput();
+    for (int i = 0; i < displayedLines.length; i++) {
+      String line = displayedLines[i];
+      if (i == 0) {
+        assertEquals(line, "--- Actions ---");
+      }else {
+        assertTrue(line.toLowerCase().contains("quickimpl"));
+      }
+    }
   }
 
-  // This test depends on default IntelliJ IDEA keymap
   public void testSearchByAssignedShortcutKey() {
     configureByText("\n");
-    typeText(commandToKeys("actionlist <M-S-I>"));
-    assertExOutput("--- Actions ---\n" +
-                   "QuickImplementations                               <M-S-I>");
+    typeText(commandToKeys("actionlist <M-S-"));
+
+    String[] displayedLines = parseActionListOutput();
+    for (int i = 0; i < displayedLines.length; i++) {
+      String line = displayedLines[i];
+      if (i == 0) {
+        assertEquals(line, "--- Actions ---");
+      }else {
+        assertTrue(line.toLowerCase().contains("<m-s-"));
+      }
+    }
+  }
+
+  private String[] parseActionListOutput() {
+    String output = ExOutputModel.getInstance(myFixture.getEditor()).getText();
+    return output == null ? new String[]{} : output.split("\n");
   }
 }
