@@ -42,16 +42,38 @@ import kotlin.math.min
  *   [vimStart] and [start] will be greater then [vimEnd] and [end].
  * If you need normalized [start] and [end] (start always less than end) you
  *   can use [normStart] and [normEnd] properties.this.normStart = min(start, end)
-this.normEnd = max(start, end)
+ *
+ * All starts are included and ends are excluded
  */
 class VimSelection {
+    /**
+     * Native selection start. Inclusive. Directional.
+     */
     val start: Int
+    /**
+     * Native selection end. Exclusive. Directional.
+     */
     val end: Int
 
+    /**
+     * Vim selection start.
+     * This value can differ from [start] in case of linewise selection because
+     *   [vimStart] - initial caret position when visual mode entered
+     */
     val vimStart: Int
+    /**
+     * Vim selection end.
+     * This value can differ from [end] in case of linewise selection because [vimEnd] - current caret position.
+     */
     val vimEnd: Int
 
+    /**
+     * Native selection start. Inclusive. Non-directional.
+     */
     val normStart: Int
+    /**
+     * Native selection end. Exclusive. Non-directional.
+     */
     val normEnd: Int
 
     val type: SelectionType
@@ -103,7 +125,7 @@ class VimSelection {
     fun toVimTextRange(skipNewLineForLineMode: Boolean) = when (type) {
         CHARACTER_WISE -> TextRange(normStart, normEnd)
         LINE_WISE -> {
-            if (skipNewLineForLineMode && editor.document.text[normEnd] == '\n') {
+            if (skipNewLineForLineMode && editor.document.text[normEnd - 1] == '\n') {
                 TextRange(normStart, (normEnd - 1).coerceAtLeast(0))
             } else {
                 TextRange(normStart, normEnd)
