@@ -26,7 +26,6 @@ import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.*
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.group.visual.visualBlockRange
 import com.maddyhome.idea.vim.helper.*
 
 /**
@@ -64,11 +63,6 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         logger.debug("execute, cmd=$cmd")
 
         EditorData.setChangeSwitchMode(editor, null)
-
-        if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
-            val range = editor.visualBlockRange
-            logger.debug("range=$range")
-        }
 
         val selections = editor.collectSelections() ?: return false
 

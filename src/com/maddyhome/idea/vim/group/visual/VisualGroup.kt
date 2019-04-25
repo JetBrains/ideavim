@@ -22,7 +22,6 @@ import com.intellij.openapi.editor.*
 import com.intellij.openapi.editor.colors.EditorColors
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -32,12 +31,6 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
 /**
  * @author Alex Plate
  */
-
-/**
- * Get deprecated TextRange of editor's selection model
- */
-val Editor.visualBlockRange: TextRange
-    get() = selectionModel.run { TextRange(blockSelectionStarts, blockSelectionEnds) }
 
 /**
  * Set selection for caret
