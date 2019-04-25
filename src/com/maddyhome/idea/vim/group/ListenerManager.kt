@@ -231,7 +231,14 @@ object VimListenerManager {
         private fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor) {
             editor.caretModel.runForEachCaret { caret ->
                 if (caret.hasSelection() && caret.selectionEnd == caret.offset) {
-                    caret.moveToOffset(caret.selectionEnd - 1)
+                    if (caret.selectionEnd <= 0) return@runForEachCaret
+                    if (EditorHelper.getLineStartForOffset(editor, caret.selectionEnd - 1) != caret.selectionEnd - 1
+                            && caret.selectionEnd > 1 && editor.document.text[caret.selectionEnd - 1] == '\n') {
+                        caret.moveToOffset(caret.selectionEnd - 2)
+                    } else {
+                        caret.moveToOffset(caret.selectionEnd - 1)
+                    }
+                    caret.vimLastColumn = caret.visualPosition.column
                 }
             }
         }
