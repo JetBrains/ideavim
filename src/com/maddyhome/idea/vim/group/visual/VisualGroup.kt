@@ -155,6 +155,8 @@ fun updateCaretColours(editor: Editor) {
     if (subMode == CommandState.SubMode.VISUAL_BLOCK) {
         editor.caretModel.allCarets.forEach {
             if (it != editor.caretModel.primaryCaret) {
+                // Set background color for non-primary carets as selection background color
+                //   to make them invisible
                 val color = editor.colorsScheme.getColor(EditorColors.SELECTION_BACKGROUND_COLOR)
                 val visualAttributes = it.visualAttributes
                 it.visualAttributes = CaretVisualAttributes(color, visualAttributes.weight)
@@ -165,10 +167,16 @@ fun updateCaretColours(editor: Editor) {
     }
 }
 
+/**
+ * Convert vims selection start and end to corresponding native selection.
+ *
+ * Adds caret adjustment or extends to line start / end in case of linewise selection
+ */
 fun toNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.Mode, subMode: CommandState.SubMode): Pair<Int, Int> =
         when (subMode) {
             CommandState.SubMode.VISUAL_LINE -> {
                 val lineStart = EditorHelper.getLineStartForOffset(editor, start)
+                // Extend to \n char of line to fill full line with selection
                 val lineEnd = (EditorHelper.getLineEndForOffset(editor, end) + 1).coerceAtMost(EditorHelper.getFileSize(editor, true))
                 lineStart to lineEnd
             }
@@ -206,6 +214,7 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
         CommandState.SubMode.VISUAL_BLOCK -> {
             editor.caretModel.removeSecondaryCarets()
 
+            // Set system selection
             val (nativeStart, nativeEnd) = toNativeSelection(editor, selectionStart, selectionEnd, mode, subMode)
             val (blockStart, blockEnd) = editor.offsetToLogicalPosition(nativeStart) to editor.offsetToLogicalPosition(nativeEnd)
             val lastColumn = editor.caretModel.primaryCaret.vimLastColumn
@@ -216,6 +225,7 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
                 val lineEndOffset = EditorHelper.getLineEndOffset(editor, line, true)
                 val lineStartOffset = EditorHelper.getLineStartOffset(editor, line)
 
+                // Extend selection to line end if it was made with `$` command
                 if (lastColumn >= MotionGroup.LAST_COLUMN) {
                     aCaret.vimSetSystemSelectionSilently(aCaret.selectionStart, lineEndOffset)
                 }
@@ -229,6 +239,7 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
                         && aCaret.offset == aCaret.selectionEnd
                         && aCaret.selectionEnd - 1 >= lineStartOffset
                         && aCaret.selectionEnd - aCaret.selectionStart != 0) {
+                    // Move all carets one char left in case if it's on selection end
                     aCaret.moveToVisualPosition(VisualPosition(visualPosition.line, visualPosition.column - 1))
                 }
             }
