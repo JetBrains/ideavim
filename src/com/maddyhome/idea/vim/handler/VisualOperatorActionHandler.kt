@@ -64,7 +64,6 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         logger.debug("execute, cmd=$cmd")
 
         EditorData.setChangeSwitchMode(editor, null)
-        EditorData.setWasVisualBlockMode(editor, CommandState.inVisualBlockMode(editor))
 
         if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
             val range = editor.visualBlockRange

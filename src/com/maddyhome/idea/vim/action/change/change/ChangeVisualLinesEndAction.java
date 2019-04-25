@@ -29,7 +29,6 @@ import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.VimSelection;
 import org.jetbrains.annotations.NotNull;
@@ -52,7 +51,7 @@ public class ChangeVisualLinesEndAction extends VimCommandAction {
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
         TextRange vimTextRange = range.toVimTextRange(true);
-        if (EditorData.wasVisualBlockMode(editor) && vimTextRange.isMultiple()) {
+        if (range.getType() == SelectionType.BLOCK_WISE && vimTextRange.isMultiple()) {
           final int[] starts = vimTextRange.getStartOffsets();
           final int[] ends = vimTextRange.getEndOffsets();
           for (int i = 0; i < starts.length; i++) {

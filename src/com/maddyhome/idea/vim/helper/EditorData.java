@@ -206,21 +206,6 @@ public class EditorData {
   }
 
   /**
-   * Sets the visual block mode flag in the beginning of handling visual operator actions
-   */
-  public static boolean wasVisualBlockMode(@NotNull Editor editor) {
-    Boolean res = editor.getUserData(WAS_VISUAL_BLOCK_MODE);
-    return res != null && res;
-  }
-
-  /**
-   * Sets the visual block mode flag in the beginning of handling visual operator actions
-   */
-  public static void setWasVisualBlockMode(@NotNull Editor editor, boolean value) {
-    editor.putUserData(WAS_VISUAL_BLOCK_MODE, value);
-  }
-
-  /**
    * This is a static helper - no instances needed
    */
   private EditorData() {
@@ -240,7 +225,6 @@ public class EditorData {
   private static final Key<TestInputModel> TEST_INPUT_MODEL = new Key<TestInputModel>("IdeaVim.testInputModel");
   private static final Key<Boolean> IS_KEEPING_VISUAL_OPERATOR_ACTION = new Key<>("isKeepingVisualOperatorAction");
   private static final Key<CommandState.Mode> CHANGE_ACTION_SWITCH_MODE = new Key<>("changeActionSwitchMode");
-  private static final Key<Boolean> WAS_VISUAL_BLOCK_MODE = new Key<>("wasVisualBlockMode");
 
   private static final Logger logger = Logger.getInstance(EditorData.class.getName());
 

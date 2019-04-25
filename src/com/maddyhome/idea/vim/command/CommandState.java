@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.key.ParentNode;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.Options;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,6 +57,7 @@ public class CommandState {
     myLastChangeRegister = VimPlugin.getRegister().getDefaultRegister();
   }
 
+  @Contract("null -> new")
   @NotNull
   public static CommandState getInstance(@Nullable Editor editor) {
     if (editor == null) {
