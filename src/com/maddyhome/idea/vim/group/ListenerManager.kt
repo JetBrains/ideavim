@@ -171,6 +171,7 @@ object VimListenerManager {
                 SelectionVimListenerSuppressor.use {
                     VimPlugin.getVisualMotion().controlNonVimSelectionChange(event.editor, !isBlockCaret)
                     moveCaretOneCharLeftFromSelectionEnd(event.editor)
+                    event.editor.caretModel.primaryCaret.vimLastColumn = event.editor.caretModel.visualPosition.column
                 }
 
                 mouseDragging = false
@@ -195,8 +196,6 @@ object VimListenerManager {
                     caretModel.removeSecondaryCarets()
                 }
 
-                // TODO: 2019-03-22 Multi?
-                caretModel.primaryCaret.vimLastColumn = caretModel.visualPosition.column
                 if (event.mouseEvent.clickCount == 1) {
                     if (CommandState.inVisualMode(editor)) {
                         VimPlugin.getVisualMotion().exitVisual(editor)
@@ -206,6 +205,8 @@ object VimListenerManager {
                 } else if (event.mouseEvent.clickCount == 2) {
                     moveCaretOneCharLeftFromSelectionEnd(editor)
                 }
+                // TODO: 2019-03-22 Multi?
+                caretModel.primaryCaret.vimLastColumn = caretModel.visualPosition.column
 
                 if (!CommandState.inInsertMode(editor)) {
                     caretModel.runForEachCaret { caret ->
@@ -238,7 +239,6 @@ object VimListenerManager {
                     } else {
                         caret.moveToOffset(caret.selectionEnd - 1)
                     }
-                    caret.vimLastColumn = caret.visualPosition.column
                 }
             }
         }
