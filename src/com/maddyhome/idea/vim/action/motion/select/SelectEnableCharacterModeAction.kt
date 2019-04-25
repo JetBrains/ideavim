@@ -27,7 +27,7 @@ private object SelectEnableCharacterModeActionHandler : EditorActionHandlerBase(
                 vimLastColumn = visualPosition.column
             }
         }
-        return VimPlugin.getVisualMotion().enterSelectionMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
+        return VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
     }
 }
 

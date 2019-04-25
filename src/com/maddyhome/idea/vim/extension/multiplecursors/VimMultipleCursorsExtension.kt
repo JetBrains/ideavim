@@ -127,7 +127,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
                     val newNextOffset = VimPlugin.getSearch().search(editor, pattern, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
 
                     val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(newNextOffset)) ?: return
-                    selectWord(editor, caret, pattern, newNextOffset)
+                    selectWord(caret, pattern, newNextOffset)
 
                     return
                 }
@@ -140,7 +140,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
                 }
 
                 val caret = editor.caretModel.addCaret(editor.offsetToVisualPosition(nextOffset)) ?: return
-                selectWord(editor, caret, pattern, nextOffset)
+                selectWord(caret, pattern, nextOffset)
             }
         }
     }
@@ -173,7 +173,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
             val pattern = primaryCaret.selectedText ?: return
             newPositions.sorted().forEach {
                 val caret = caretModel.addCaret(editor.offsetToVisualPosition(it)) ?: return
-                selectWord(editor, caret, pattern, it)
+                selectWord(caret, pattern, it)
             }
         }
     }
@@ -194,7 +194,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
             }
 
             val newCaret = editor.caretModel.addCaret(editor.offsetToVisualPosition(nextOffset)) ?: return
-            selectWord(editor, newCaret, selectedText, nextOffset)
+            selectWord(newCaret, selectedText, nextOffset)
             editor.caretModel.removeCaret(caret)
         }
     }
@@ -212,7 +212,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
         }
     }
 
-    private fun selectWord(editor: Editor, caret: Caret, pattern: String, offset: Int) {
+    private fun selectWord(caret: Caret, pattern: String, offset: Int) {
         caret.vimSetSelection(offset, offset + pattern.length - 1, true)
     }
 

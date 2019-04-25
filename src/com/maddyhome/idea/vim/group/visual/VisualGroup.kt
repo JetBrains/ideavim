@@ -23,7 +23,6 @@ import com.intellij.openapi.editor.colors.EditorColors
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.group.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimSelectionStart
@@ -79,24 +78,6 @@ fun Caret.vimUpdateEditorSelection() {
     val startOffsetMark = vimSelectionStart
     setVisualSelection(startOffsetMark, offset, this)
 }
-
-/**
- * Set selection without calling SelectionListener
- */
-fun SelectionModel.vimSetSystemSelectionSilently(start: Int, end: Int) =
-        SelectionVimListenerSuppressor.lock().use { setSelection(start, end) }
-
-/**
- * Set selection without calling SelectionListener
- */
-fun SelectionModel.vimSetSystemBlockSelectionSilently(start: LogicalPosition, end: LogicalPosition) =
-        SelectionVimListenerSuppressor.lock().use { setBlockSelection(start, end) }
-
-/**
- * Set selection without calling SelectionListener
- */
-fun Caret.vimSetSystemSelectionSilently(start: Int, end: Int) =
-        SelectionVimListenerSuppressor.lock().use { setSelection(start, end) }
 
 /**
  * This works almost like [Caret.getLeadSelectionOffset], but vim-specific

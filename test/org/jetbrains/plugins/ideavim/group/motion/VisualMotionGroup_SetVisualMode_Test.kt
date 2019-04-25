@@ -37,7 +37,7 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
-        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor, CommandState.SubMode.NONE)
+        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
         assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
     }
@@ -52,7 +52,7 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
-        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor, CommandState.SubMode.NONE)
+        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
         assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
     }
@@ -68,7 +68,7 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
-        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor, CommandState.SubMode.NONE)
+        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
         assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_LINE)
     }
@@ -83,7 +83,7 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
-        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor, CommandState.SubMode.NONE)
+        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
         assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_LINE)
     }
@@ -98,7 +98,7 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
-        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor, CommandState.SubMode.NONE)
+        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
         assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_LINE)
     }
@@ -113,7 +113,7 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
-        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor, CommandState.SubMode.NONE)
+        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
         assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_LINE)
     }
@@ -129,7 +129,7 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
-        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor, CommandState.SubMode.NONE)
+        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
         assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
     }
@@ -144,7 +144,7 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
-        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor, CommandState.SubMode.NONE)
+        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
         assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
     }
@@ -159,7 +159,7 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent())
         assertMode(CommandState.Mode.COMMAND)
-        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor, CommandState.SubMode.NONE)
+        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
         assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
     }

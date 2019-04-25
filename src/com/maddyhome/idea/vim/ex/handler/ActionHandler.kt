@@ -73,7 +73,7 @@ class ActionHandler : CommandHandler(
                 }
             }
             if (editor.caretModel.allCarets.any(Caret::hasSelection) && CommandState.getInstance(editor).subMode != oldSubMode) {
-                VimPlugin.getVisualMotion().setVisualMode(editor, oldSubMode)
+                VimPlugin.getVisualMotion().enterVisualMode(editor, oldSubMode)
             }
         }
 
