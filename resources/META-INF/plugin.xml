@@ -67,6 +67,9 @@
     <component>
       <implementation-class>com.maddyhome.idea.vim.VimPlugin</implementation-class>
     </component>
+    <component>
+      <implementation-class>com.maddyhome.idea.vim.VimLocalConfig</implementation-class>
+    </component>
   </application-components>
 
   <extensionPoints>
@@ -369,7 +372,7 @@
     <action id="VimUndo" class="com.maddyhome.idea.vim.action.change.UndoAction" text="Undo"/>
 
     <!-- Internal -->
-    <action id="VimInternalAddInlays" class="com.maddyhome.idea.vim.action.internal.AddInlaysAction" text="Vim (internal) add test inlays" internal="true"/>
+    <action id="VimInternalAddInlays" class="com.maddyhome.idea.vim.action.internal.AddInlaysAction" text="Add test inlays | IdeaVim internal" internal="true"/>
 
     <!-- Keys -->
     <action id="VimShortcutKeyAction" class="com.maddyhome.idea.vim.action.VimShortcutKeyAction" text="Shortcuts"/>

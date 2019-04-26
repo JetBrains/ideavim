@@ -38,6 +38,7 @@ To Be Released
 * [VIM-607](https://youtrack.jetbrains.com/issue/VIM-607) Fix memory leaks
 * [VIM-1546](https://youtrack.jetbrains.com/issue/VIM-1546) Storing TAB key as input
 * [VIM-1231](https://youtrack.jetbrains.com/issue/VIM-1231) Get indent from PsiFile
+* [VIM-1633](https://youtrack.jetbrains.com/issue/VIM-1633) Fixed sequential text object commands in visual mode
 
 0.51, 2019-02-12
 ----------------

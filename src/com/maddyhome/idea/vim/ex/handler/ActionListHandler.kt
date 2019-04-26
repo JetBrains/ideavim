@@ -39,13 +39,15 @@ class ActionListHandler : CommandHandler(
         val actionManager = ActionManager.getInstance()
 
         val actions = actionManager.getActionIds("")
-                .filter { actionName -> searchPattern.all { it in actionName.toLowerCase() } }
-                .sortedWith(String.CASE_INSENSITIVE_ORDER).joinToString(lineSeparator) { actionName ->
+                .sortedWith(String.CASE_INSENSITIVE_ORDER)
+                .map { actionName ->
                     val shortcuts = actionManager.getAction(actionName).shortcutSet.shortcuts.joinToString(" ") {
                         if (it is KeyboardShortcut) StringHelper.toKeyNotation(it.firstKeyStroke) else it.toString()
                     }
                     if (shortcuts.isBlank()) actionName else "${actionName.padEnd(50)} $shortcuts"
                 }
+                .filter { line -> searchPattern.all { it in line.toLowerCase() } }
+                .joinToString(lineSeparator)
 
 
         ExOutputModel.getInstance(editor).output("--- Actions ---$lineSeparator$actions")

@@ -80,7 +80,7 @@ import java.util.concurrent.TimeUnit;
  */
 @State(
   name = "VimSettings",
-  storages = {@Storage(file = "$APP_CONFIG$/vim_settings.xml")})
+  storages = {@Storage("$APP_CONFIG$/vim_settings.xml")})
 public class VimPlugin implements ApplicationComponent, PersistentStateComponent<Element> {
   private static final String IDEAVIM_COMPONENT_NAME = "VimPlugin";
   private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";
@@ -88,7 +88,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   public static final String IDEAVIM_NOTIFICATION_ID = "ideavim";
   public static final String IDEAVIM_STICKY_NOTIFICATION_ID = "ideavim-sticky";
   public static final String IDEAVIM_NOTIFICATION_TITLE = "IdeaVim";
-  public static final int STATE_VERSION = 4;
+  public static final int STATE_VERSION = 5;
 
   private boolean error = false;
 
@@ -193,10 +193,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     state.setAttribute("enabled", Boolean.toString(enabled));
     element.addContent(state);
 
-    mark.saveData(element);
-    register.saveData(element);
-    search.saveData(element);
-    history.saveData(element);
     key.saveData(element);
     editor.saveData(element);
 
@@ -219,10 +215,13 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
       previousKeyMap = state.getAttributeValue("keymap");
     }
 
-    mark.readData(element);
-    register.readData(element);
-    search.readData(element);
-    history.readData(element);
+    if (previousStateVersion > 0 && previousStateVersion < 5) {
+      // Migrate settings from 4 to 5 version
+      mark.readData(element);
+      register.readData(element);
+      search.readData(element);
+      history.readData(element);
+    }
     key.readData(element);
     editor.readData(element);
   }
