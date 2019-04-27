@@ -431,41 +431,89 @@ public class SearchHelper {
     return -1;
   }
 
+  /** returns new position which ignore whitespaces at beginning of the line*/
+  private static int ignoreWhitespaceAtLineStart(CharSequence seq, int lineStart, int pos) {
+    if (seq.subSequence(lineStart, pos).chars().allMatch(Character::isWhitespace)) {
+      while (pos < seq.length() && seq.charAt(pos) != '\n' && Character.isWhitespace(seq.charAt(pos))) {
+        pos++;
+      }
+    }
+    return pos;
+  }
+
+
   @Nullable
   public static TextRange findBlockTagRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter) {
-    int position = caret.getOffset();
+    final int position = caret.getOffset();
     final CharSequence sequence = editor.getDocument().getCharsSequence();
 
-    if (isInHTMLTag(sequence, position, false)) {
+    final int selectionStart = caret.getSelectionStart();
+    final int selectionEnd = caret.getSelectionEnd();
+
+    final boolean isRangeSelection = selectionEnd - selectionStart > 1;
+
+    int searchStartPosition;
+    if (!isRangeSelection) {
+      final int line = caret.getLogicalPosition().line;
+      final int lineBegin = editor.getDocument().getLineStartOffset(line);
+      searchStartPosition = ignoreWhitespaceAtLineStart(sequence, lineBegin, position);
+    } else {
+      searchStartPosition = selectionEnd;
+    }
+
+    if (isInHTMLTag(sequence, searchStartPosition, false)) {
       // caret is inside opening tag. Move to closing '>'.
-      while (position < sequence.length() && sequence.charAt(position) != '>') {
-        position ++;
+      while (searchStartPosition < sequence.length() && sequence.charAt(searchStartPosition) != '>') {
+        searchStartPosition ++;
       }
     }
-    else if (isInHTMLTag(sequence, position, true)) {
+    else if (isInHTMLTag(sequence, searchStartPosition, true)) {
       // caret is inside closing tag. Move to starting '<'.
-      while (position > 0 && sequence.charAt(position) != '<') {
-        position --;
+      while (searchStartPosition > 0 && sequence.charAt(searchStartPosition) != '<') {
+        searchStartPosition --;
       }
     }
 
-    final Pair<TextRange, String> closingTag = findUnmatchedClosingTag(sequence, position, count);
-    if (closingTag == null) {
-      return null;
-    }
-    final TextRange closingTagTextRange = closingTag.getFirst();
-    final String tagName = closingTag.getSecond();
+    while (true) {
+      final Pair<TextRange, String> closingTag = findUnmatchedClosingTag(sequence, searchStartPosition, count);
+      if (closingTag == null) {
+        return null;
+      }
+      final TextRange closingTagTextRange = closingTag.getFirst();
+      final String tagName = closingTag.getSecond();
 
-    TextRange openingTag = findUnmatchedOpeningTag(sequence, closingTagTextRange.getStartOffset(), tagName);
-    if (openingTag == null) {
-      return null;
-    }
+      TextRange openingTag = findUnmatchedOpeningTag(sequence, closingTagTextRange.getStartOffset(), tagName);
+      if (openingTag == null) {
+        return null;
+      }
 
-    if (isOuter) {
-      return new TextRange(openingTag.getStartOffset(), closingTagTextRange.getEndOffset() - 1);
-    }
-    else {
-      return new TextRange(openingTag.getEndOffset(), closingTagTextRange.getStartOffset() - 1);
+      if (isRangeSelection && openingTag.getEndOffset() - 1 >= selectionStart) {
+        // If there was already some text selected and the new selection would not extend further, we try again
+        searchStartPosition = closingTagTextRange.getEndOffset();
+        count = 1;
+        continue;
+      }
+
+      int selectionEndWithoutNewline = selectionEnd;
+      while (selectionEndWithoutNewline < sequence.length() && sequence.charAt(selectionEndWithoutNewline) == '\n') {
+        selectionEndWithoutNewline ++;
+      }
+
+      if (closingTagTextRange.getStartOffset() == selectionEndWithoutNewline && openingTag.getEndOffset() == selectionStart) {
+        // Special case: if the inner tag is already selected we should like isOuter is active
+        // Note that we need to ignore newlines, because their selection is lost between multiple "it" invocations
+        isOuter = true;
+      } else
+      if (openingTag.getEndOffset() == closingTagTextRange.getStartOffset() && selectionStart == openingTag.getEndOffset()) {
+        // Special case: for an empty tag pair (e.g. <a></a>) the whole tag is selected if the caret is in the middle.
+        isOuter = true;
+      }
+
+      if (isOuter) {
+        return new TextRange(openingTag.getStartOffset(), closingTagTextRange.getEndOffset() - 1);
+      } else {
+        return new TextRange(openingTag.getEndOffset(), Math.max(closingTagTextRange.getStartOffset() - 1, openingTag.getEndOffset()));
+      }
     }
   }
 
@@ -474,7 +522,7 @@ public class SearchHelper {
    */
   private static boolean isInHTMLTag(@NotNull final CharSequence sequence, final int position, final boolean isEndtag) {
     int openingBracket = -1;
-    for (int i = position; i >= 0; i--) {
+    for (int i = position; i >= 0 && i < sequence.length(); i--) {
       if (sequence.charAt(i) == '<') {
         openingBracket = i;
         break;

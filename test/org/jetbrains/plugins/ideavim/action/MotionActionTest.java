@@ -757,6 +757,194 @@ public class MotionActionTest extends VimTestCase {
     assertPluginError(true);
   }
 
+  // |v_it| |v_at|
+  public void testTagSelectionSkipsWhitespaceAtStartOfLine() {
+    configureByText("<o>Outer\n" +
+      " <caret>  <t></t>\n" +
+      "</o>\n");
+    typeText(parseKeys("vit"));
+    assertSelection("<");
+
+    // Also skip tabs
+    configureByText("<o>Outer\n" +
+      " <caret> \t <t>Inner</t>\n" +
+      "</o>\n");
+    typeText(parseKeys("vat"));
+    assertSelection( "<t>Inner</t>");
+
+    // Newline must not be skipped
+    configureByText("<caret>\n" +
+      "    <t>asdf</t>");
+    typeText(parseKeys("vat"));
+    assertSelection(null);
+
+    // Whitespace is only skipped if there is nothing else at the start of the line
+    configureByText("<o>Outer\n" +
+      "a <caret>  <t>Inner</t>\n" +
+      "</o>\n");
+    typeText(parseKeys("vat"));
+    assertSelection("<o>Outer\n" +
+      "a   <t>Inner</t>\n" +
+      "</o>");
+
+  }
+
+  // |v_at|
+  public void testNestedTagSelection() {
+    configureByText("<t>Outer\n" +
+      "   <t><caret>Inner</t>\n" +
+      "</t>\n");
+    typeText(parseKeys("vat"));
+    assertSelection( "<t>Inner</t>");
+
+    //
+    configureByText("<t>Outer\n" +
+      "   <t>Inner</t> <caret> <t>Inner</t>\n" +
+      "</t>\n");
+    typeText(parseKeys("vat"));
+    assertSelection( "<t>Outer\n" +
+      "   <t>Inner</t>  <t>Inner</t>\n" +
+      "</t>");
+
+    //
+    configureByText("<t>Outer\n" +
+      "   <t><caret>Inner</t>\n" +
+      "</t>\n");
+    typeText(parseKeys("vatat"));
+    assertSelection( "<t>Outer\n" +
+      "   <t>Inner</t>\n" +
+      "</t>");
+
+    //
+    configureByText("<t>Outer\n" +
+      "   <t><caret>Inner</t>\n" +
+      "</t>\n");
+    typeText(parseKeys("v2at"));
+    assertSelection( "<t>Outer\n" +
+      "   <t>Inner</t>\n" +
+      "</t>");
+
+    //
+    configureByText("<t>Outer\n" +
+      "   <t>Inner</t>\n" +
+      "</<caret>t>\n");
+    typeText(parseKeys("vat"));
+    assertSelection( "<t>Outer\n" +
+      "   <t>Inner</t>\n" +
+      "</t>");
+
+    //
+    configureByText("<<caret>t>Outer\n" +
+      "   <t>Inner</t>\n" +
+      "</t>\n");
+    typeText(parseKeys("vat"));
+    assertSelection( "<t>Outer\n" +
+      "   <t>Inner</t>\n" +
+      "</t>");
+
+    //
+    configureByText("<caret><t>Outer\n" +
+      "   <t>Inner</t>\n" +
+      "</t>\n");
+    typeText(parseKeys("vat"));
+    assertSelection( "<t>Outer\n" +
+      "   <t>Inner</t>\n" +
+      "</t>");
+  }
+
+  // |v_it|
+  public void testSelectInnerTagEmptyTag() {
+    configureByText("<a><caret></a>");
+    typeText(parseKeys("vit"));
+    assertSelection("<a></a>");
+
+    // The whole tag block is also selected if there is only a single character inside
+    configureByText("<a><caret>a</a>");
+    typeText(parseKeys("vit"));
+    assertSelection("<a>a</a>");
+
+    configureByText("<a<caret>></a>");
+    typeText(parseKeys("vit"));
+    assertSelection("<");
+  }
+
+  // VIM-1633 |v_it|
+  public void testNestedInTagSelection() {
+    configureByText("<t>Outer\n" +
+      "   <t><caret>Inner</t>\n" +
+      "</t>\n");
+    typeText(parseKeys("vit"));
+    assertSelection("Inner");
+
+    //
+    configureByText("<o>Outer\n" +
+      " <caret>  <t></t>\n" +
+      "</o>\n");
+    typeText(parseKeys("vitit"));
+    assertSelection("<t></t>");
+
+    //
+    configureByText("<o><t><caret></t>\n</o>");
+    typeText(parseKeys("vitit"));
+    assertSelection("<o><t></t>\n</o>");
+
+    //
+    configureByText("<t>Outer\n" +
+      "   <t>Inner</t> <caret> <t>Inner</t>\n" +
+      "</t>\n");
+    typeText(parseKeys("vit"));
+    assertSelection( "Outer\n" +
+      "   <t>Inner</t>  <t>Inner</t>");
+
+    //
+    configureByText("<t>Outer\n" +
+      "   <t><caret>Inner</t>\n" +
+      "</t>\n");
+    typeText(parseKeys("v2it"));
+    assertSelection("Outer\n" +
+      "   <t>Inner</t>");
+
+    //
+    configureByText("<o>Outer\n" +
+      "   <t><caret>Inner</t>\n" +
+      "</o>\n");
+    typeText(parseKeys("vitit"));
+    assertSelection("<t>Inner</t>");
+
+    //
+    configureByText("<t>Outer\n" +
+      "   <t><caret>Inner</t>\n" +
+      "</t>\n");
+    typeText(parseKeys("vititit"));
+    assertSelection("Outer\n" +
+      "   <t>Inner</t>");
+
+    //
+    configureByText("<t>Outer\n" +
+      "   <t>Inner</t>\n" +
+      "</<caret>t>\n");
+    typeText(parseKeys("vit"));
+    assertSelection( "Outer\n" +
+      "   <t>Inner</t>");
+
+    //
+    configureByText("<<caret>t>Outer\n" +
+      "   <t>Inner</t>\n" +
+      "</t>\n");
+    typeText(parseKeys("vit"));
+    assertSelection( "Outer\n" +
+      "   <t>Inner</t>");
+
+    //
+    configureByText("<caret><t>Outer\n" +
+      "   <t>Inner</t>\n" +
+      "</t>\n");
+    typeText(parseKeys("vit"));
+    assertSelection( "Outer\n" +
+      "   <t>Inner</t>");
+
+  }
+
   // VIM-1427
   public void testDeleteOuterTagWithCount() {
     typeTextInFile(parseKeys("d2at"),"<a><b><c><caret></c></b></a>");
