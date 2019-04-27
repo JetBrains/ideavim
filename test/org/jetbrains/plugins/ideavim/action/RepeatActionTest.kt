@@ -44,4 +44,30 @@ class RepeatActionTest : VimTestCase() {
                 "Last line.")
     }
 
+    // VIM-1644
+    @Test
+    fun testRepeatChangeInVisualMode() {
+        configureByText("foobar foobar")
+        typeText(parseKeys("<C-V>llc", "fu", "<Esc>", "w", "."))
+        myFixture.checkResult("fubar fubar")
+    }
+
+    // VIM-1644
+    @Test
+    fun testRepeatChangeInVisualModeMultiline() {
+        configureByText(
+            "There is a red house.\n" +
+            "Another red house there.\n" +
+            "They have red windows.\n" +
+            "Good."
+        )
+        typeText(parseKeys("www", "<C-V>ec", "blue", "<Esc>", "j0w.", "j0ww."))
+        myFixture.checkResult(
+            "There is a blue house.\n" +
+            "Another blue house there.\n" +
+            "They have blue windows.\n" +
+            "Good."
+        )
+    }
+
 }
