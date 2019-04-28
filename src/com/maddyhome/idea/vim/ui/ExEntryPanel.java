@@ -79,6 +79,8 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       }
     };
 
+    new ExShortcutKeyAction(this).registerCustomShortcutSet();
+
     LafManager.getInstance().addLafManagerListener(this);
 
     updateUI();
@@ -280,7 +282,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
 
   @NotNull private final DocumentListener documentListener = new DocumentAdapter() {
     @Override
-    protected void textChanged(DocumentEvent e) {
+    protected void textChanged(@NotNull DocumentEvent e) {
       final Editor editor = entry.getEditor();
       final boolean forwards = !label.getText().equals("?");
       if (incHighlighter != null) {

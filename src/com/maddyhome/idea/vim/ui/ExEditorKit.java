@@ -81,7 +81,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   @Nullable
-  public static KeyStroke convert(@NotNull ActionEvent event) {
+  private static KeyStroke convert(@NotNull ActionEvent event) {
     String cmd = event.getActionCommand();
     int mods = event.getModifiers();
     if (cmd != null && cmd.length() > 0) {
@@ -99,25 +99,22 @@ public class ExEditorKit extends DefaultEditorKit {
     return null;
   }
 
-  public static final String DefaultExKey = "default-ex-key";
-  public static final String CancelEntry = "cancel-entry";
-  public static final String CompleteEntry = "complete-entry";
-  public static final String EscapeChar = "escape";
-  public static final String DeletePreviousChar = "delete-prev-char";
-  public static final String DeletePreviousWord = "delete-prev-word";
-  public static final String DeleteToCursor = "delete-to-cursor";
-  public static final String DeleteFromCursor = "delete-from-cursor";
-  public static final String ToggleInsertReplace = "toggle-insert";
-  public static final String InsertRegister = "insert-register";
-  public static final String InsertWord = "insert-word";
-  public static final String InsertWORD = "insert-WORD";
-  public static final String HistoryUp = "history-up";
-  public static final String HistoryDown = "history-down";
-  public static final String HistoryUpFilter = "history-up-filter";
-  public static final String HistoryDownFilter = "history-down-filter";
-  public static final String StartDigraph = "start-digraph";
+  static final String CancelEntry = "cancel-entry";
+  static final String CompleteEntry = "complete-entry";
+  static final String EscapeChar = "escape";
+  static final String DeletePreviousChar = "delete-prev-char";
+  static final String DeletePreviousWord = "delete-prev-word";
+  static final String DeleteToCursor = "delete-to-cursor";
+  static final String DeleteFromCursor = "delete-from-cursor";
+  static final String ToggleInsertReplace = "toggle-insert";
+  static final String InsertRegister = "insert-register";
+  static final String HistoryUp = "history-up";
+  static final String HistoryDown = "history-down";
+  static final String HistoryUpFilter = "history-up-filter";
+  static final String HistoryDownFilter = "history-down-filter";
+  static final String StartDigraph = "start-digraph";
 
-  @NotNull protected final Action[] exActions = new Action[]{
+  @NotNull private final Action[] exActions = new Action[]{
     new ExEditorKit.CancelEntryAction(),
     new ExEditorKit.CompleteEntryAction(),
     new ExEditorKit.EscapeCharAction(),
@@ -161,7 +158,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class HistoryUpAction extends TextAction {
-    public HistoryUpAction() {
+    HistoryUpAction() {
       super(HistoryUp);
     }
 
@@ -172,7 +169,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class HistoryDownAction extends TextAction {
-    public HistoryDownAction() {
+    HistoryDownAction() {
       super(HistoryDown);
     }
 
@@ -183,7 +180,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class HistoryUpFilterAction extends TextAction {
-    public HistoryUpFilterAction() {
+    HistoryUpFilterAction() {
       super(HistoryUpFilter);
     }
 
@@ -194,7 +191,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class HistoryDownFilterAction extends TextAction {
-    public HistoryDownFilterAction() {
+    HistoryDownFilterAction() {
       super(HistoryDownFilter);
     }
 
@@ -205,14 +202,14 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class InsertRegisterAction extends TextAction {
-    private static enum State {
+    private enum State {
       SKIP_CTRL_R,
       WAIT_REGISTER,
     }
 
     @NotNull private State state = State.SKIP_CTRL_R;
 
-    public InsertRegisterAction() {
+    InsertRegisterAction() {
       super(InsertRegister);
     }
 
@@ -248,7 +245,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class CompleteEntryAction extends TextAction {
-    public CompleteEntryAction() {
+    CompleteEntryAction() {
       super(CompleteEntry);
     }
 
@@ -264,7 +261,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class CancelEntryAction extends TextAction {
-    public CancelEntryAction() {
+    CancelEntryAction() {
       super(CancelEntry);
     }
 
@@ -276,7 +273,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class EscapeCharAction extends TextAction {
-    public EscapeCharAction() {
+    EscapeCharAction() {
       super(EscapeChar);
     }
 
@@ -287,7 +284,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class DeletePreviousCharAction extends TextAction {
-    public DeletePreviousCharAction() {
+    DeletePreviousCharAction() {
       super(DeletePreviousChar);
     }
 
@@ -335,7 +332,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class DeletePreviousWordAction extends TextAction {
-    public DeletePreviousWordAction() {
+    DeletePreviousWordAction() {
       super(DeletePreviousWord);
     }
 
@@ -362,7 +359,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class DeleteToCursorAction extends TextAction {
-    public DeleteToCursorAction() {
+    DeleteToCursorAction() {
       super(DeleteToCursor);
     }
 
@@ -385,7 +382,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class DeleteFromCursorAction extends TextAction {
-    public DeleteFromCursorAction() {
+    DeleteFromCursorAction() {
       super(DeleteFromCursor);
     }
 
@@ -408,7 +405,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class ToggleInsertReplaceAction extends TextAction {
-    public ToggleInsertReplaceAction() {
+    ToggleInsertReplaceAction() {
       super(ToggleInsertReplace);
 
       logger.debug("ToggleInsertReplaceAction()");
@@ -427,7 +424,7 @@ public class ExEditorKit extends DefaultEditorKit {
   public static class StartDigraphAction extends TextAction {
     @Nullable private DigraphSequence digraphSequence;
 
-    public StartDigraphAction() {
+    StartDigraphAction() {
       super(StartDigraph);
     }
 
