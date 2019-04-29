@@ -33,8 +33,11 @@ public class ExKeyBindings {
   // TODO - add the following keys:
   // Ctrl-\ Ctrl-N - abort
   static final KeyBinding[] bindings = new KeyBinding[]{
+    // Note that escape will cancel a pending insert digraph/register before cancelling
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), ExEditorKit.EscapeChar),
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_OPEN_BRACKET, KeyEvent.CTRL_MASK), ExEditorKit.EscapeChar),
+
+    // Cancel immediately cancels entry
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_MASK), ExEditorKit.CancelEntry),
 
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), ExEditorKit.CompleteEntry),

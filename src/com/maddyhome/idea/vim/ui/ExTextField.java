@@ -26,6 +26,7 @@ import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.JBUI;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.group.HistoryGroup;
+import kotlin.text.StringsKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
@@ -33,13 +34,12 @@ import org.jetbrains.annotations.TestOnly;
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.util.Date;
 import java.util.List;
 
 import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 /**
  * Provides a custom keymap for the text field. The keymap is the VIM Ex command keymapping
@@ -60,6 +60,15 @@ public class ExTextField extends JTextField {
         setCaretPosition(getDocument().getLength());
       }
     });
+  }
+
+  void reset() {
+    clearCurrentAction();
+    setInsertMode();
+  }
+
+  void deactivate() {
+    clearCurrentAction();
   }
 
   // Minimize margins and insets. These get added to the default margins in the UI class that we can't override.
@@ -231,17 +240,62 @@ public class ExTextField extends JTextField {
     return new ExDocument();
   }
 
-  public void escape() {
+  /**
+   * Cancels current action, if there is one. If not, cancels entry.
+   */
+  void escape() {
     if (currentAction != null) {
-      currentAction = null;
+      clearCurrentAction();
     }
     else {
-      VimPlugin.getProcess().cancelExEntry(editor, context);
+      cancel();
     }
   }
 
-  void setCurrentAction(@Nullable Action action) {
+  /**
+   * Cancels entry, including any current action.
+   */
+  void cancel() {
+    clearCurrentAction();
+    VimPlugin.getProcess().cancelExEntry(editor, context);
+  }
+
+  void setCurrentAction(@NotNull ExEditorKit.MultiStepAction action, char pendingIndicator) {
     this.currentAction = action;
+    setCurrentActionPromptCharacter(pendingIndicator);
+  }
+
+  void clearCurrentAction() {
+    if (currentAction != null) {
+      currentAction.reset();
+    }
+    currentAction = null;
+    clearCurrentActionPromptCharacter();
+  }
+
+  void setCurrentActionPromptCharacter(char promptCharacter) {
+    final String text = removePromptCharacter();
+    this.currentActionPromptCharacter = promptCharacter;
+    currentActionPromptCharacterOffset = currentActionPromptCharacterOffset == -1 ? getCaretPosition() : currentActionPromptCharacterOffset;
+    StringBuilder sb = new StringBuilder(text);
+    sb.insert(currentActionPromptCharacterOffset, currentActionPromptCharacter);
+    updateText(sb.toString());
+    setCaretPosition(currentActionPromptCharacterOffset);
+  }
+
+  void clearCurrentActionPromptCharacter() {
+    final int offset = getCaretPosition();
+    final String text = removePromptCharacter();
+    updateText(text);
+    setCaretPosition(min(offset, text.length()));
+    currentActionPromptCharacter = '\0';
+    currentActionPromptCharacterOffset = -1;
+  }
+
+  private String removePromptCharacter() {
+    return currentActionPromptCharacterOffset == -1
+      ? getText()
+      : StringsKt.removeRange(getText(), currentActionPromptCharacterOffset, currentActionPromptCharacterOffset + 1).toString();
   }
 
   @Nullable
@@ -264,7 +318,7 @@ public class ExTextField extends JTextField {
   }
 
   private void resetCaret() {
-    if (getCaretPosition() == getText().length()) {
+    if (getCaretPosition() == getText().length() || currentActionPromptCharacterOffset == getText().length() - 1) {
       setNormalModeCaret();
     }
     else {
@@ -315,7 +369,6 @@ public class ExTextField extends JTextField {
     }
 
     void setMode(CaretMode mode, int blockPercentage) {
-
       // Make sure damage gets updated for the old and new shape so the flashing works correctly
       updateDamage();
       this.mode = mode;
@@ -403,7 +456,9 @@ public class ExTextField extends JTextField {
   private String lastEntry;
   private List<HistoryGroup.HistoryEntry> history;
   private int histIndex = 0;
-  @Nullable private Action currentAction;
+  @Nullable private ExEditorKit.MultiStepAction currentAction;
+  private char currentActionPromptCharacter;
+  private int currentActionPromptCharacterOffset = -1;
 
   private static final String vimExTextFieldDisposeKey = "vimExTextFieldDisposeKey";
   private static final Logger logger = Logger.getInstance(ExTextField.class.getName());

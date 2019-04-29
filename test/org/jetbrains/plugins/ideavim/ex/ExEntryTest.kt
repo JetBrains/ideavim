@@ -32,7 +32,6 @@ class ExEntryTest: VimTestCase() {
 
         deactivateExEntry()
 
-        // TODO: This has a different implementation, which is correct? What are the side effects?
         assertFalse(options.isSet(Options.INCREMENTAL_SEARCH))
         typeExInput(":set incsearch<C-C>")
         assertFalse(options.isSet(Options.INCREMENTAL_SEARCH))
@@ -65,19 +64,25 @@ class ExEntryTest: VimTestCase() {
     }
 
     fun `test caret shape`() {
+        // Show block at end of input (normal)
+        // Show vertical bar in insert mode
+        // Show horizontal bar in replace mode
         typeExInput(":")
         assertEquals("BLOCK 100", exEntryPanel.entry.caretShape)
 
         typeText("set")
         assertEquals("BLOCK 100", exEntryPanel.entry.caretShape)
 
-        typeText("<Home>")
+        deactivateExEntry()
+        typeExInput(":set<Home>")
         assertEquals("VER 25", exEntryPanel.entry.caretShape)
 
-        typeText("<Insert>")
+        deactivateExEntry()
+        typeExInput(":set<Home><Insert>")
         assertEquals("HOR 20", exEntryPanel.entry.caretShape)
 
-        typeText("<Insert>")
+        deactivateExEntry()
+        typeExInput(":set<Home><Insert><Insert>")
         assertEquals("VER 25", exEntryPanel.entry.caretShape)
     }
 
@@ -349,24 +354,64 @@ class ExEntryTest: VimTestCase() {
     fun `test insert digraph`() {
         typeExInput(":<C-K>OK")
         assertExText("✓")
+        assertExOffset(1)
 
         deactivateExEntry()
 
         typeExInput(":set<Home><C-K>OK")
         assertExText("✓set")
+        assertExOffset(1)
 
         deactivateExEntry()
 
         typeExInput(":set<Home><Insert><C-K>OK")
         assertExText("✓et")
+        assertExOffset(1)
+    }
 
-        // TODO: Test caret feedback
-        // Vim shows "?" as the char under the caret after <C-K>, then echoes the first char of the digraph
+    fun `test prompt while inserting digraph`() {
+        typeExInput(":<C-K>")
+        assertExText("?")
+        assertExOffset(0)
+
+        deactivateExEntry()
+
+        typeExInput(":<C-K>O")
+        assertExText("O")
+        assertExOffset(0)
+
+        deactivateExEntry()
+
+        typeExInput(":set<Home><C-K>")
+        assertExText("?set")
+        assertExOffset(0)
+
+        deactivateExEntry()
+
+        typeExInput(":set<Home><C-K>O")
+        assertExText("Oset")
+        assertExOffset(0)
+    }
+
+    fun `test escape cancels digraph`() {
+        typeExInput(":<C-K><Esc>OK")
+        assertIsActive()
+        assertExText("OK")
+
+        deactivateExEntry()
+
+        // Note that the docs state that hitting escape stops digraph entry and cancels command line mode. In practice,
+        // this isn't true - digraph entry is stopped, but command line mode continues
+        typeExInput(":<C-K>O<Esc>K")
+        assertIsActive()
+        assertEquals("K", exEntryPanel.text)
+
+        deactivateExEntry()
     }
 
     // TODO: Test inserting control characters, if/when supported
 
-    fun `test enter literal character by code`() {
+    fun `test insert literal character`() {
         typeExInput(":<C-V>123<C-V>080")
         assertExText("{P")
 
@@ -394,21 +439,36 @@ class ExEntryTest: VimTestCase() {
 
         typeExInput(":<C-Q>u00a9")
         assertExText("©")
+
+        deactivateExEntry()
+
+        typeExInput(":set<Home><C-V>u00A9")
+        assertExText("©set")
+        assertExOffset(1)
     }
 
-    fun `test escape cancels digraph`() {
-        typeExInput(":<C-K><Esc>OK")
-        assertIsActive()
-        assertExText("OK")
+    fun `test prompt while inserting literal character`() {
+        typeExInput(":<C-V>")
+        assertExText("^")
+        assertExOffset(0)
 
-        // TODO: The Vim docs states Esc exits command line context, but Vim actually cancels digraph context
-//        deactivateExEntry()
-//
-//        typeExInput(":<C-K>O<Esc>K")
-//        assertTrue(exEntryPanel.isActive)
-//        assertEquals("K", exEntryPanel.text)
-//
-//        deactivateExEntry()
+        deactivateExEntry()
+
+        typeExInput(":<C-V>o")
+        assertExText("^")
+        assertExOffset(0)
+
+        typeText("1")
+        assertExText("^")
+        assertExOffset(0)
+
+        typeText("2")
+        assertExText("^")
+        assertExOffset(0)
+
+        typeText("3")
+        assertExText("S")
+        assertExOffset(1)
     }
 
     fun `test insert register`() {
@@ -491,7 +551,7 @@ class ExEntryTest: VimTestCase() {
     private fun deactivateExEntry() {
         // We don't need to reset text, that's handled by #active
         if (exEntryPanel.isActive)
-            typeText("<Esc>")
+            typeText("<C-C>")
     }
 
     private fun assertExText(expected: String) {

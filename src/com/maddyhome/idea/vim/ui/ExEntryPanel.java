@@ -111,10 +111,10 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     this.label.setText(label);
     this.count = count;
     setFontForElements();
+    entry.reset();
     entry.setEditor(editor, context);
     entry.setText(initText);
     entry.setType(label);
-    entry.setInsertMode();
     parent = editor.getContentComponent();
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
       JRootPane root = SwingUtilities.getRootPane(parent);
@@ -232,6 +232,8 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     logger.info("deactivate");
     if (!active) return;
     active = false;
+    entry.deactivate();
+
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
       if (refocusOwningEditor && parent != null) {
         UiHelper.requestFocus(parent);

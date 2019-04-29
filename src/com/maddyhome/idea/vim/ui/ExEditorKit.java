@@ -157,6 +157,10 @@ public class ExEditorKit extends DefaultEditorKit {
     }
   }
 
+  public interface MultiStepAction extends Action {
+    void reset();
+  }
+
   public static class HistoryUpAction extends TextAction {
     HistoryUpAction() {
       super(HistoryUp);
@@ -201,7 +205,7 @@ public class ExEditorKit extends DefaultEditorKit {
     }
   }
 
-  public static class InsertRegisterAction extends TextAction {
+  public static class InsertRegisterAction extends TextAction implements MultiStepAction {
     private enum State {
       SKIP_CTRL_R,
       WAIT_REGISTER,
@@ -220,11 +224,11 @@ public class ExEditorKit extends DefaultEditorKit {
         switch (state) {
           case SKIP_CTRL_R:
             state = State.WAIT_REGISTER;
-            target.setCurrentAction(this);
+            target.setCurrentAction(this, '\"');
             break;
           case WAIT_REGISTER:
             state = State.SKIP_CTRL_R;
-            target.setCurrentAction(null);
+            target.clearCurrentAction();
             final char c = key.getKeyChar();
             if (c != KeyEvent.CHAR_UNDEFINED) {
               final Register register = VimPlugin.getRegister().getRegister(c);
@@ -243,6 +247,11 @@ public class ExEditorKit extends DefaultEditorKit {
             }
         }
       }
+    }
+
+    @Override
+    public void reset() {
+      state = State.SKIP_CTRL_R;
     }
   }
 
@@ -268,9 +277,8 @@ public class ExEditorKit extends DefaultEditorKit {
     }
 
     public void actionPerformed(ActionEvent e) {
-      VimPlugin.getProcess().cancelExEntry(
-        ExEntryPanel.getInstance().getEntry().getEditor(),
-        ExEntryPanel.getInstance().getEntry().getContext());
+      ExTextField target = (ExTextField)getTextComponent(e);
+      target.cancel();
     }
   }
 
@@ -322,9 +330,7 @@ public class ExEditorKit extends DefaultEditorKit {
           doc.remove(dot - delChars, delChars);
         }
         else {
-          VimPlugin.getProcess().cancelExEntry(
-            ExEntryPanel.getInstance().getEntry().getEditor(),
-            ExEntryPanel.getInstance().getEntry().getContext());
+          target.cancel();
         }
       }
       catch (BadLocationException bl) {
@@ -423,7 +429,7 @@ public class ExEditorKit extends DefaultEditorKit {
     }
   }
 
-  public static class StartDigraphAction extends TextAction {
+  public static class StartDigraphAction extends TextAction implements MultiStepAction {
     @Nullable private DigraphSequence digraphSequence;
 
     StartDigraphAction() {
@@ -436,14 +442,17 @@ public class ExEditorKit extends DefaultEditorKit {
       if (key != null && digraphSequence != null) {
         DigraphSequence.DigraphResult res = digraphSequence.processKey(key, target.getEditor());
         switch (res.getResult()) {
+          case DigraphSequence.DigraphResult.RES_OK:
+            target.setCurrentActionPromptCharacter(res.getPromptCharacter());
+            break;
           case DigraphSequence.DigraphResult.RES_BAD:
-            target.setCurrentAction(null);
+            target.clearCurrentAction();
             target.handleKey(key);
             break;
           case DigraphSequence.DigraphResult.RES_DONE:
             final KeyStroke digraph = res.getStroke();
             digraphSequence = null;
-            target.setCurrentAction(null);
+            target.clearCurrentAction();
             if (digraph != null) {
               target.handleKey(digraph);
             }
@@ -451,10 +460,15 @@ public class ExEditorKit extends DefaultEditorKit {
         }
       }
       else if (key != null && DigraphSequence.isDigraphStart(key)) {
-        target.setCurrentAction(this);
         digraphSequence = new DigraphSequence();
-        digraphSequence.processKey(key, target.getEditor());
+        DigraphSequence.DigraphResult res = digraphSequence.processKey(key, target.getEditor());
+        target.setCurrentAction(this, res.getPromptCharacter());
       }
+    }
+
+    @Override
+    public void reset() {
+      digraphSequence = null;
     }
   }
 
