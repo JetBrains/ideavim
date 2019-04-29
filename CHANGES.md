@@ -41,6 +41,7 @@ To Be Released
 * [VIM-1633](https://youtrack.jetbrains.com/issue/VIM-1633) Fixed sequential text object commands in visual mode
 * [VIM-1105](https://youtrack.jetbrains.com/issue/VIM-1105) Added the `:command` command
 * [VIM-1090](https://youtrack.jetbrains.com/issue/VIM-1090) Fixed tag motion with duplicate tags
+* [VIM-1644](https://youtrack.jetbrains.com/issue/VIM-1644) Fixed repeat with visual mode
 
 0.51, 2019-02-12
 ----------------
