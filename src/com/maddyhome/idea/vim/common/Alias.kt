@@ -1,3 +1,20 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2019 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 package com.maddyhome.idea.vim.common
 
@@ -7,29 +24,25 @@ import com.maddyhome.idea.vim.VimPlugin
  * @author Elliot Courant
  */
 class Alias(
-        var minimumNumberOfArguments: Int,
-        var maximumNumberOfArguments: Int,
-        var name: String,
-        var command: String
+        private val minimumNumberOfArguments: Int,
+        private val maximumNumberOfArguments: Int,
+        val name: String,
+        val command: String
 ) {
+    val numberOfArguments =
+            when {
+                this.minimumNumberOfArguments == 0 && this.maximumNumberOfArguments == 0 -> "0" // No arguments
+                this.minimumNumberOfArguments == 0 && this.maximumNumberOfArguments == -1 -> "*" // Any number of arguments
+                this.minimumNumberOfArguments == 0 && this.maximumNumberOfArguments == 1 -> "?" // Zero or one argument
+                this.minimumNumberOfArguments == 1 && this.maximumNumberOfArguments == -1 -> "+" // One or more arguments
+                else -> this.minimumNumberOfArguments.toString() // Specified number of arguments
+            }
+
     private companion object {
         const val LessThan = "<lt>"
         const val Count = "<count>"
         const val Arguments = "<args>"
         const val QuotedArguments = "<q-args>"
-    }
-
-    fun getNumberOfArguments(): String {
-        if (this.minimumNumberOfArguments == 0 && this.maximumNumberOfArguments == 0) {
-            return "0" // No arguments
-        } else if (this.minimumNumberOfArguments == 0 && this.maximumNumberOfArguments == -1) {
-            return "*" // Any number of arguments
-        } else if (this.minimumNumberOfArguments == 0 && this.maximumNumberOfArguments == 1) {
-            return "?" // Zero or one argument
-        } else if (this.minimumNumberOfArguments == 1 && this.maximumNumberOfArguments == -1) {
-            return "+" // One or more arguments
-        }
-        return this.minimumNumberOfArguments.toString() // Specified number of arguments
     }
 
     fun getCommand(input: String, count: Int): String {
@@ -44,10 +57,10 @@ class Alias(
             return ""
         }
         for (symbol in arrayOf(Count, Arguments, QuotedArguments)) {
-            compiledCommand = compiledCommand.replace(symbol, when(symbol) {
+            compiledCommand = compiledCommand.replace(symbol, when (symbol) {
                 Count -> arrayOf(count.toString())
                 Arguments -> arrayOf(cleanedInput)
-                QuotedArguments ->  arrayOf("'$cleanedInput'")
+                QuotedArguments -> arrayOf("'$cleanedInput'")
                 else -> emptyArray()
             }.joinToString(", "))
         }

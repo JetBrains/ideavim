@@ -1,3 +1,21 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2019 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.maddyhome.idea.vim.ex.handler
 
 import com.intellij.openapi.actionSystem.DataContext
@@ -6,6 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.Alias
 import com.maddyhome.idea.vim.ex.*
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptCommandHandler
+import com.maddyhome.idea.vim.group.CommandGroup.Companion.BLACKLISTED_ALIASES
 
 /**
  * @author Elliot Courant
@@ -18,7 +37,6 @@ class CmdHandler : CommandHandler(
     private companion object {
         const val overridePrefix = "!"
         const val argsPrefix = "-nargs"
-        val blacklistedAliases = arrayOf("X", "Next", "Print")
 
         const val anyNumberOfArguments = "*"
         const val zeroOrOneArguments = "?"
@@ -47,7 +65,7 @@ class CmdHandler : CommandHandler(
         val aliases = allAliases.filter {
             (filter.isEmpty() || it.key.startsWith(filter))
         }.map {
-            "${it.key.padEnd(12)}${it.value.getNumberOfArguments().padEnd(11)}${it.value.command}"
+            "${it.key.padEnd(12)}${it.value.numberOfArguments.padEnd(11)}${it.value.command}"
         }.sortedWith(String.CASE_INSENSITIVE_ORDER).joinToString(lineSeparator)
         ExOutputModel.getInstance(editor).output("Name        Args       Definition$lineSeparator$aliases")
         return true
@@ -70,8 +88,7 @@ class CmdHandler : CommandHandler(
             // Extract the -nargs that's part of this execution, it's possible that -nargs is
             // in the actual alias being created, and we don't want to parse that one.
             val trimmedInput = argument.takeWhile { it != ' ' }
-            val pattern = Regex("(?>-nargs=((|[-])\\d+|[?]|[+]|[*]))").find(trimmedInput)
-            if (pattern == null) {
+            val pattern = Regex("(?>-nargs=((|[-])\\d+|[?]|[+]|[*]))").find(trimmedInput) ?: run {
                 VimPlugin.showMessage(errorInvalidNumberOfArguments)
                 return false
             }
@@ -129,7 +146,7 @@ class CmdHandler : CommandHandler(
             return false
         }
 
-        if (blacklistedAliases.contains(alias)) {
+        if (alias in BLACKLISTED_ALIASES) {
             VimPlugin.showMessage(errorReservedName)
             return false
         }
