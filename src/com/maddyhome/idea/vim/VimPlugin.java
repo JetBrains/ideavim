@@ -102,6 +102,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   @NotNull private final MotionGroup motion;
   @NotNull private final ChangeGroup change;
+  @NotNull private final CommandGroup command;
   @NotNull private final CopyGroup copy;
   @NotNull private final MarkGroup mark;
   @NotNull private final RegisterGroup register;
@@ -118,6 +119,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   public VimPlugin() {
     motion = new MotionGroup();
     change = new ChangeGroup();
+    command = new CommandGroup();
     copy = new CopyGroup();
     mark = new MarkGroup();
     register = new RegisterGroup();
@@ -235,6 +237,9 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   public static ChangeGroup getChange() {
     return getInstance().change;
   }
+
+  @NotNull
+  public static CommandGroup getCommand() { return getInstance().command; }
 
   @NotNull
   public static CopyGroup getCopy() {

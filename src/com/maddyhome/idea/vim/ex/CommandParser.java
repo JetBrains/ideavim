@@ -40,6 +40,7 @@ import java.util.regex.Pattern;
  * executes Ex commands entered by the user.
  */
 public class CommandParser {
+  private static final int MAX_RECURSION = 100;
   public static final int RES_EMPTY = 1;
   public static final int RES_ERROR = 1;
   public static final int RES_READONLY = 1;
@@ -73,7 +74,10 @@ public class CommandParser {
     new ActionListHandler();
     new AsciiHandler();
     new CmdFilterHandler();
+    new CmdHandler();
+    new CmdClearHandler();
     new CopyTextHandler();
+    new DelCmdHandler();
     new DeleteLinesHandler();
     new DigraphHandler();
     new DumpLineHandler();
@@ -165,14 +169,51 @@ public class CommandParser {
    */
   public int processCommand(@NotNull Editor editor, @NotNull DataContext context, @NotNull String cmd,
                             int count) throws ExException {
+    return processCommand(editor, context, cmd, count, MAX_RECURSION);
+  }
+
+  /**
+   * Parse and execute an Ex command entered by the user
+   *
+   * @param editor  The editor to run the command in
+   * @param context The data context
+   * @param cmd     The text entered by the user
+   * @param count   The count entered before the colon
+   * @param aliasCountdown A countdown for the depth of alias recursion that is allowed
+   * @return A bitwise collection of flags, if any, from the result of running the command.
+   * @throws ExException if any part of the command is invalid or unknown
+   */
+  private int processCommand(@NotNull Editor editor, @NotNull DataContext context, @NotNull String cmd,
+                             int count, int aliasCountdown) throws ExException {
     // Nothing entered
     int result = 0;
     if (cmd.length() == 0) {
       return result | RES_EMPTY;
     }
 
-    // Save the command history
-    VimPlugin.getHistory().addEntry(HistoryGroup.COMMAND, cmd);
+    // Only save the command to the history if it is at the top of the stack.
+    // We don't want to save the aliases that will be executed, only the actual
+    // user input.
+    if (aliasCountdown == MAX_RECURSION) {
+      // Save the command history
+      VimPlugin.getHistory().addEntry(HistoryGroup.COMMAND, cmd);
+    }
+
+    // If there is a command alias for the entered text, then process the alias and return that
+    // instead of the original command.
+    if (VimPlugin.getCommand().isAlias(cmd)) {
+      if (aliasCountdown > 0) {
+        String commandAlias = VimPlugin.getCommand().getAliasCommand(cmd, count);
+        if (commandAlias.isEmpty()) {
+          return result |= RES_ERROR;
+        }
+        return processCommand(editor, context, commandAlias, count, aliasCountdown - 1);
+      } else {
+        VimPlugin.showMessage("Recursion detected, maximum alias depth reached.");
+        VimPlugin.indicateError();
+        return result |= RES_ERROR;
+      }
+    }
 
     // Parse the command
     final ExCommand command = parse(cmd);
@@ -192,7 +233,7 @@ public class CommandParser {
     boolean ok = handler.process(editor, context, command, count);
     if (ok && !handler.getArgFlags().getFlags().contains(CommandHandler.Flag.DONT_SAVE_LAST)) {
       VimPlugin.getRegister().storeTextInternal(editor, new TextRange(-1, -1), cmd,
-                                                                  SelectionType.CHARACTER_WISE, ':', false);
+              SelectionType.CHARACTER_WISE, ':', false);
     }
 
     if (handler.getArgFlags().getFlags().contains(CommandHandler.Flag.DONT_REOPEN)) {
