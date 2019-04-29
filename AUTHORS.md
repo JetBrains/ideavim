@@ -67,6 +67,7 @@ Contributors:
 * [Daniele Megna](mailto:megna.dany@gmail.com)
 * [Andrew Potter](mailto:apottere@gmail.com)
 * [Romain Gautier](mailto:romain.gautier@nimamoh.net)
+* [Elliot Courant](mailto:elliot.courant@wheniwork.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.

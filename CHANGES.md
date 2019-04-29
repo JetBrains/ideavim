@@ -39,6 +39,7 @@ To Be Released
 * [VIM-1546](https://youtrack.jetbrains.com/issue/VIM-1546) Storing TAB key as input
 * [VIM-1231](https://youtrack.jetbrains.com/issue/VIM-1231) Get indent from PsiFile
 * [VIM-1633](https://youtrack.jetbrains.com/issue/VIM-1633) Fixed sequential text object commands in visual mode
+* [VIM-1105](https://youtrack.jetbrains.com/issue/VIM-1105) Added the `:command` command
 
 0.51, 2019-02-12
 ----------------
