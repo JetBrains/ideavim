@@ -232,7 +232,9 @@ public class ExEditorKit extends DefaultEditorKit {
                 final String oldText = target.getText();
                 final String text = register.getText();
                 if (oldText != null && text != null) {
-                  target.setText(oldText + text);
+                  final int offset = target.getCaretPosition();
+                  target.setText(oldText.substring(0, offset) + text + oldText.substring(offset));
+                  target.setCaretPosition(offset + text.length());
                 }
               }
             }

@@ -346,9 +346,19 @@ class ExEntryTest: VimTestCase() {
         assertExOffset(13)
     }
 
-    fun `test digraphs`() {
+    fun `test insert digraph`() {
         typeExInput(":<C-K>OK")
         assertExText("✓")
+
+        deactivateExEntry()
+
+        typeExInput(":set<Home><C-K>OK")
+        assertExText("✓set")
+
+        deactivateExEntry()
+
+        typeExInput(":set<Home><Insert><C-K>OK")
+        assertExText("✓et")
 
         // TODO: Test caret feedback
         // Vim shows "?" as the char under the caret after <C-K>, then echoes the first char of the digraph
@@ -412,6 +422,12 @@ class ExEntryTest: VimTestCase() {
 
         typeExInput(":<C-R>5")
         assertExText("greetings programs")
+
+        deactivateExEntry()
+
+        typeExInput(":set<Home><C-R>c")
+        assertExText("hello worldset")
+        assertExOffset(11)  // Just before 'set'
 
         // TODO: Test caret feedback
         // Vim shows " after hitting <C-R>
