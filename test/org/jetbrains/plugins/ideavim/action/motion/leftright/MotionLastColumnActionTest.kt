@@ -16,57 +16,52 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@file:Suppress("RemoveCurlyBracesFromTemplate")
-
-package org.jetbrains.plugins.ideavim.action.motion.updown
+package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-/**
- * @author Alex Plate
- */
-class MotionDownActionTest : VimTestCase() {
+class MotionLastColumnActionTest : VimTestCase() {
     fun `test motion down in visual block mode`() {
-        val keys = parseKeys("<C-V>2kjjj")
+        val keys = parseKeys("$")
         val before = """
             A Discovery
 
-            I |found| it in a legendary land
-            al|l roc|ks and lavender and tufted grass,
-            wh|${c}ere i|t was settled on some sodden sand
-            ha|rd by| the torrent of a mountain pass.
+            I ${c}found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
         """.trimIndent()
         val after = """
             A Discovery
 
-            I |found| it in a legendary land
-            al|l roc|ks and lavender and tufted grass,
-            wh|${s}e${se}re i|t was settled on some sodden sand
-            ha|${s}r${se}d by| the torrent of a mountain pass.
+            I found it in a legendary lan${c}d
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
-    fun `test motion down in visual block mode with dollar motion`() {
-        val keys = parseKeys("<C-V>\$jj")
+    fun `test motion down in visual block mode with motion to longer line`() {
+        val keys = parseKeys("\$j")
         val before = """
             A Discovery
 
-            I |${c}found it in a legendary land
-            al|l rocks and lavender and tufted grass,
-            wh|ere it was settled on some sodden sand[additional Chars]
+            I ${c}found it in a legendary land
+            all rocks and lavender and tufted grass,[ additional symbols]
+            where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
         val after = """
             A Discovery
 
-            I |${s}found it in a legendary lan${c}d${se}
-            al|${s}l rocks and lavender and tufted grass${c},${se}
-            wh|${s}ere it was settled on some sodden sand[additional Chars${c}]${se}
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,[ additional symbols${c}]
+            where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 }

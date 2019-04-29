@@ -17,16 +17,16 @@
  */
 
 
+@file:Suppress("RemoveCurlyBracesFromTemplate")
+
 package org.jetbrains.plugins.ideavim.action.copy
 
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviourDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.Test
 
 
@@ -1056,8 +1056,39 @@ class PutVisualTextActionTest : VimTestCase() {
         myFixture.checkResult(after)
     }
 
-    // ----- Case 8: Copied | Linewise | --- pasted | Blockwise | ---| small p |--------------------
+    @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
 
+            I Discover${c}y
+            alDiscovery
+            whDiscovery
+            haDiscovery
+    """, description = "Different cursor position")
+    @Test
+    fun `test put visual text character to block with dollar motion`() {
+        val before = """
+            A Discovery
+
+            I $c|found it in a legendary land
+            al|l rocks and lavender and tufted grass,[ additional characters]
+            wh|ere it was settled on some sodden sand
+            ha|rd by the torrent of a mountain pass.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+        typeText(parseKeys("<C-V>3j$", "p"))
+        val after = """
+            A Discovery
+
+            I Discovery
+            alDiscovery
+            whDiscovery
+            haDiscover${c}y
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    // ----- Case 8: Copied | Linewise | --- pasted | Blockwise | ---| small p |--------------------
 
     @VimBehaviourDiffers(originalVimAfter = """
             A Discovery
@@ -1164,6 +1195,41 @@ class PutVisualTextActionTest : VimTestCase() {
             ${c}ha the torrent of a mountain pass.
             A Discovery
 
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
+
+            I
+            a
+            w
+            ${c}A Discovery
+            hard by the torrent of a mountain pass.
+    """)
+    @Test
+    fun `test put visual text line to block with dollar motion`() {
+        val before = """
+            A Discovery
+
+            I${c}| found it in a legendary land
+            a|ll rocks and lavender and tufted grass,[ additional characters]
+            w|here it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+        typeText(parseKeys("<C-V>2j$", "p"))
+        val after = """
+            A Discovery
+
+            I
+            a
+            ${c}w
+            A Discovery
+
+            hard by the torrent of a mountain pass.
             """.trimIndent()
         myFixture.checkResult(after)
     }
@@ -1306,33 +1372,39 @@ class PutVisualTextActionTest : VimTestCase() {
             """.trimIndent()
         myFixture.checkResult(after)
     }
-}
 
-infix fun String.rangeOf(str: String): TextRange {
-    val clearString = this.replace("<caret>", "")
-    val indexOf = clearString.indexOf(str)
-    if (indexOf == -1) throw RuntimeException("$str was not found in $clearString")
+    @Test
+    fun `test put visual text blockwise to block with dollar motion`() {
+        val before = """
+            A Discovery
 
-    return TextRange(indexOf, indexOf + str.length)
-}
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
 
-fun Editor.rangeOf(first: String, nLinesDown: Int): TextRange {
-    val starts = ArrayList<Int>()
-    val ends = ArrayList<Int>()
+            The $c|features it combines mark it as new
+            to s|cience: shape and shade -- the special tinge,[ additional characters]
+            akin| to moonlight, tempering its blue,
+            the dingy underside, the checquered fringe.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, editor.rangeOf("|found|", 2), SelectionType.BLOCK_WISE, false)
+        typeText(parseKeys("<C-V>2j$", "p"))
+        val after = """
+            A Discovery
 
-    val indexOf = document.text.replace("<caret>", "").indexOf(first)
-    if (indexOf == -1) throw RuntimeException("$first was not found in $this")
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
 
-    val position = offsetToLogicalPosition(indexOf)
-    if (position.line + nLinesDown > document.lineCount) throw RuntimeException("To much lines")
-
-    starts += indexOf
-    ends += indexOf + first.length
-
-    for (i in 1..nLinesDown) {
-        val nextOffset = logicalPositionToOffset(LogicalPosition(position.line + i, position.column))
-        starts += nextOffset
-        ends += nextOffset + first.length
+            The $c|found|
+            to s|l roc|
+            akin|ere i|
+            the dingy underside, the checquered fringe.
+            """.trimIndent()
+        myFixture.checkResult(after)
     }
-    return TextRange(starts.toIntArray(), ends.toIntArray())
+
 }

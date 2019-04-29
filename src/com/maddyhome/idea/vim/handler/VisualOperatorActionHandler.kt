@@ -101,26 +101,20 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
         if (CommandState.inVisualBlockMode(this)) {
             val primaryCaret = caretModel.primaryCaret
-            return mapOf(primaryCaret to VimSelection(
+            return mapOf(primaryCaret to VimBlockSelection(
                     primaryCaret.vimSelectionStart,
                     primaryCaret.offset,
-                    SelectionType.BLOCK_WISE,
-                    this))
+                    this, primaryCaret.vimLastColumn >= MotionGroup.LAST_COLUMN))
         }
 
         return this.caretModel.allCarets.associateWith { caret ->
             if (CommandState.inVisualMode(this)) {
                 val subMode = CommandState.getInstance(this).subMode
-                VimSelection(caret.selectionStart,
-                        caret.selectionEnd,
-                        caret.vimSelectionStart,
-                        caret.offset,
-                        SelectionType.fromSubMode(subMode),
-                        this)
+                VimSelection.create(caret.vimSelectionStart, caret.offset, SelectionType.fromSubMode(subMode), this)
             } else {
-                val startAndEnd = VimPlugin.getMark().getVisualSelectionMarks(this) ?: return null
+                val offsets = VimPlugin.getMark().getVisualSelectionMarks(this) ?: return null
                 val lastSelectionType = EditorData.getLastSelectionType(this) ?: return null
-                VimSelection(startAndEnd.startOffset, startAndEnd.endOffset, lastSelectionType, this)
+                VimSelection.create(offsets.startOffset, offsets.endOffset, lastSelectionType, this)
             }
         }
     }

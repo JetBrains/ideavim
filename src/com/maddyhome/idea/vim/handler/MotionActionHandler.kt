@@ -115,9 +115,9 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
             val caretToDelete = event.caret ?: return
             if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
                 for (caret in editor.caretModel.allCarets) {
-                    if (caretToDelete.selectionStart < caret.selectionEnd ||
-                            caretToDelete.selectionStart > caret.selectionStart ||
-                            caretToDelete.selectionEnd < caret.selectionEnd ||
+                    if (caretToDelete.selectionStart < caret.selectionEnd &&
+                            caretToDelete.selectionStart >= caret.selectionStart ||
+                            caretToDelete.selectionEnd <= caret.selectionEnd &&
                             caretToDelete.selectionEnd > caret.selectionStart) {
                         // Okay, caret is being removed because of merging
                         val vimSelectionStart = caretToDelete.vimSelectionStart

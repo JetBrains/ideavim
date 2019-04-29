@@ -47,7 +47,7 @@ public class VisualBlockInsertAction extends VimCommandAction {
       public boolean executeForAllCarets(@NotNull Editor editor,
                                          @NotNull DataContext context,
                                          @NotNull Command cmd,
-                                         @NotNull Map<Caret, VimSelection> caretsAndSelections) {
+                                         @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
         if (editor.isOneLineMode()) return false;
         VimSelection vimSelection = caretsAndSelections.values().stream().findFirst().orElse(null);
         if (vimSelection == null) return false;

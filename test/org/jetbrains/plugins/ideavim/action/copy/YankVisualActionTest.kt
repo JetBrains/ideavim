@@ -1,3 +1,21 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2019 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 @file:Suppress("RemoveCurlyBracesFromTemplate")
 
 package org.jetbrains.plugins.ideavim.action.copy
@@ -184,6 +202,24 @@ zxcvbn<caret>werty
                             where it was settled on some sodden sand
                             hard by the torrent of a mountain pass.""".trimIndent(),
                 "fo\nl ", SelectionType.BLOCK_WISE)
+    }
+
+    fun `test block yank with dollar motion`() {
+        doTest(parseKeys("<C-V>3j$", "y"),
+                """
+                            A Discovery
+
+                            I ${c}found it in a legendary land
+                            all rocks and lavender and tufted grass,[ additional symbols]
+                            where it was settled on some sodden sand
+                            hard by the torrent of a mountain pass.
+                            """.trimIndent(),
+                """
+                    found it in a legendary land
+                    l rocks and lavender and tufted grass,[ additional symbols]
+                    ere it was settled on some sodden sand
+                    rd by the torrent of a mountain pass.
+                    """.trimIndent(), SelectionType.BLOCK_WISE)
     }
 
     private fun doTest(keys: List<KeyStroke>, before: String, expectedText: String, expectedType: SelectionType) {

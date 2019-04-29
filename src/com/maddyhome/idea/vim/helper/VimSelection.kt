@@ -31,141 +31,170 @@ import kotlin.math.min
 /**
  * @author Alex Plate
  *
- * Class for storing selection range.
- *   [start] and [end] are the offsets of native selection and type of selection is stored in [type]
+ * Interface for storing selection range.
  *
+ * Type of selection is stored in [type]
  * [vimStart] and [vimEnd] - selection offsets in vim model. There values will be stored in '< and '> marks.
- *   There values can differ from [start] and [end] in case of linewise selection because [vimStart] - initial caret
- *   position when visual mode entered and [vimEnd] - current caret position.
+ *   Actually [vimStart] - initial caret position when visual mode entered and [vimEnd] - current caret position.
  *
  * This selection has direction. That means that by moving in left-up direction (e.g. `vbbbb`)
- *   [vimStart] and [start] will be greater then [vimEnd] and [end].
- * If you need normalized [start] and [end] (start always less than end) you
- *   can use [normStart] and [normEnd] properties.this.normStart = min(start, end)
+ *   [vimStart] will be greater then [vimEnd].
  *
  * All starts are included and ends are excluded
  */
-class VimSelection {
-    /**
-     * Native selection start. Inclusive. Directional.
-     */
-    val start: Int
-    /**
-     * Native selection end. Exclusive. Directional.
-     */
-    val end: Int
-
-    /**
-     * Vim selection start.
-     * This value can differ from [start] in case of linewise selection because
-     *   [vimStart] - initial caret position when visual mode entered
-     */
-    val vimStart: Int
-    /**
-     * Vim selection end.
-     * This value can differ from [end] in case of linewise selection because [vimEnd] - current caret position.
-     */
-    val vimEnd: Int
-
-    /**
-     * Native selection start. Inclusive. Non-directional.
-     */
-    val normStart: Int
-    /**
-     * Native selection end. Exclusive. Non-directional.
-     */
-    val normEnd: Int
-
-    val type: SelectionType
-    val editor: Editor
-
-    constructor(
-            nativeStart: Int,
-            nativeEnd: Int,
-            vimStart: Int,
-            vimEnd: Int,
-            type: SelectionType,
-            editor: Editor
-    ) {
-        this.vimStart = vimStart
-        this.vimEnd = vimEnd
-        this.type = type
-        this.editor = editor
-        this.start = nativeStart
-        this.end = nativeEnd
-
-        this.normStart = min(start, end)
-        this.normEnd = max(start, end)
-    }
-
-    /**
-     * [start] and [end] are calculated based on [vimStart] and [vimEnd] properties
-     */
-    constructor(
-            vimStart: Int,
-            vimEnd: Int,
-            type: SelectionType,
-            editor: Editor
-    ) {
-        this.vimStart = vimStart
-        this.vimEnd = vimEnd
-        this.type = type
-        this.editor = editor
-
-        val nativeStartAndEnd = toNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL, type.toSubMode())
-        this.start = nativeStartAndEnd.first
-        this.end = nativeStartAndEnd.second
-        this.normStart = min(start, end)
-        this.normEnd = max(start, end)
-    }
+sealed class VimSelection {
+    abstract val type: SelectionType
+    abstract val vimStart: Int
+    abstract val vimEnd: Int
+    protected abstract val editor: Editor
 
     /**
      * Converting to an old TextRange class
      */
-    fun toVimTextRange(skipNewLineForLineMode: Boolean) = when (type) {
-        CHARACTER_WISE -> TextRange(normStart, normEnd)
-        LINE_WISE -> {
-            if (skipNewLineForLineMode && editor.document.text[normEnd - 1] == '\n') {
-                TextRange(normStart, (normEnd - 1).coerceAtLeast(0))
-            } else {
-                TextRange(normStart, normEnd)
-            }
-        }
-        BLOCK_WISE -> {
-            val logicalStart = editor.offsetToLogicalPosition(normStart)
-            val logicalEnd = editor.offsetToLogicalPosition(normEnd)
-            val lineRange = if (logicalStart.line > logicalEnd.line) logicalStart.line downTo logicalEnd.line else logicalStart.line..logicalEnd.line
-            val starts = ArrayList<Int>()
-            val ends = ArrayList<Int>()
-            for (line in lineRange) {
-                starts += editor.logicalPositionToOffset(LogicalPosition(line, logicalStart.column))
-                ends += editor.logicalPositionToOffset(LogicalPosition(line, logicalEnd.column))
-            }
-            TextRange(starts.toIntArray(), ends.toIntArray()).also { it.normalize(editor.document.textLength) }
-        }
-    }
+    abstract fun toVimTextRange(skipNewLineForLineMode: Boolean = false): TextRange
 
     /**
      * Execute [action] for each line of selection.
-     * Action will be executed in bottom-up direction if [start] > [end]
+     * Action will be executed in bottom-up direction if [vimStart] > [vimEnd]
      *
-     * [action#startOffset] and [action#endOffset] are offsets in current line
+     * [action#start] and [action#end] are offsets in current line
      */
-    inline fun forEachLine(action: (startOffset: Int, endOffset: Int) -> Unit) {
-        val logicalStart = editor.offsetToLogicalPosition(start)
-        val logicalEnd = editor.offsetToLogicalPosition(end)
+    abstract fun forEachLine(action: (start: Int, end: Int) -> Unit)
+
+    companion object {
+        fun create(vimStart: Int, vimEnd: Int, type: SelectionType, editor: Editor): VimSelection {
+            return when (type) {
+                CHARACTER_WISE -> VimCharacterSelection(vimStart, vimEnd, editor)
+                LINE_WISE -> VimLineSelection(vimStart, vimEnd, editor)
+                BLOCK_WISE -> VimBlockSelection(vimStart, vimEnd, editor, false)
+            }
+        }
+    }
+
+    override fun toString(): String {
+        val startLogPosition = editor.offsetToLogicalPosition(vimStart)
+        val endLogPosition = editor.offsetToLogicalPosition(vimEnd)
+        return "Selection [$type]: vim start[offset: $vimStart : col ${startLogPosition.column} line ${startLogPosition.line}]" +
+                " vim end[offset: $vimEnd : col ${endLogPosition.column} line ${endLogPosition.line}]"
+    }
+}
+
+/**
+ * Interface for storing simple selection range.
+ *   Simple means that this selection can be represented only by start and end values.
+ *   There selections in vim are character- and linewise selections.
+ *
+ *  [nativeStart] and [nativeEnd] are the offsets of native selection
+ *
+ * [vimStart] and [vimEnd] - selection offsets in vim model. There values will be stored in '< and '> marks.
+ *   There values can differ from [nativeStart] and [nativeEnd] in case of linewise selection because [vimStart] - initial caret
+ *   position when visual mode entered and [vimEnd] - current caret position.
+ *
+ * This selection has direction. That means that by moving in left-up direction (e.g. `vbbbb`)
+ *   [nativeStart] will be greater than [nativeEnd].
+ * If you need normalized [nativeStart] and [nativeEnd] (start always less than end) you
+ *   can use [normNativeStart] and [normNativeEnd]
+ *
+ * All starts are included and ends are excluded
+ */
+sealed class VimSimpleSelection : VimSelection() {
+    abstract val nativeStart: Int
+    abstract val nativeEnd: Int
+    abstract val normNativeStart: Int
+    abstract val normNativeEnd: Int
+
+    override fun forEachLine(action: (start: Int, end: Int) -> Unit) {
+        val logicalStart = editor.offsetToLogicalPosition(nativeStart)
+        val logicalEnd = editor.offsetToLogicalPosition(nativeEnd)
         val lineRange = if (logicalStart.line > logicalEnd.line) logicalStart.line downTo logicalEnd.line else logicalStart.line..logicalEnd.line
-        for (line in lineRange) {
+        lineRange.map { line ->
             val start = editor.logicalPositionToOffset(LogicalPosition(line, logicalStart.column))
             val end = editor.logicalPositionToOffset(LogicalPosition(line, logicalEnd.column))
             action(start, end)
         }
     }
+}
 
-    override fun toString(): String {
-        val startLogPosition = editor.offsetToLogicalPosition(start)
-        val endLogPosition = editor.offsetToLogicalPosition(end)
-        return "Selection [$type]: start[offset: $start : col ${startLogPosition.column} line ${startLogPosition.line}]" +
-                " end[offset: $end : col ${endLogPosition.column} line ${endLogPosition.line}]"
+class VimCharacterSelection(
+        override val vimStart: Int,
+        override val vimEnd: Int,
+        override val editor: Editor
+) : VimSimpleSelection() {
+    override val nativeStart: Int
+    override val nativeEnd: Int
+    override val normNativeStart: Int
+    override val normNativeEnd: Int
+    override val type: SelectionType = CHARACTER_WISE
+
+    init {
+        val nativeSelection = toNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL, type.toSubMode())
+        nativeStart = nativeSelection.first
+        nativeEnd = nativeSelection.second
+        normNativeStart = min(nativeStart, nativeEnd)
+        normNativeEnd = max(nativeStart, nativeEnd)
+    }
+
+    override fun toVimTextRange(skipNewLineForLineMode: Boolean) = TextRange(normNativeStart, normNativeEnd)
+}
+
+class VimLineSelection(
+        override val vimStart: Int,
+        override val vimEnd: Int,
+        override val editor: Editor
+) : VimSimpleSelection() {
+    override val type = LINE_WISE
+    override val nativeStart: Int
+    override val nativeEnd: Int
+    override val normNativeStart: Int
+    override val normNativeEnd: Int
+
+    init {
+        val nativeSelection = toNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL, type.toSubMode())
+        nativeStart = nativeSelection.first
+        nativeEnd = nativeSelection.second
+        normNativeStart = min(nativeStart, nativeEnd)
+        normNativeEnd = max(nativeStart, nativeEnd)
+    }
+
+    override fun toVimTextRange(skipNewLineForLineMode: Boolean) =
+            if (skipNewLineForLineMode && editor.document.textLength >= normNativeEnd && normNativeEnd > 0 && editor.document.text[normNativeEnd - 1] == '\n') {
+                TextRange(normNativeStart, (normNativeEnd - 1).coerceAtLeast(0))
+            } else {
+                TextRange(normNativeStart, normNativeEnd)
+            }
+}
+
+class VimBlockSelection(
+        override val vimStart: Int,
+        override val vimEnd: Int,
+        override val editor: Editor,
+        val toLineEnd: Boolean
+) : VimSelection() {
+    override val type = BLOCK_WISE
+
+    override fun toVimTextRange(skipNewLineForLineMode: Boolean): TextRange {
+        val starts = mutableListOf<Int>()
+        val ends = mutableListOf<Int>()
+        val lineRanges = forEachLine { start, end ->
+            starts += start
+            ends += end
+        }
+        return TextRange(starts.toIntArray(), ends.toIntArray()).also { it.normalize(editor.document.textLength) }
+    }
+
+    override fun forEachLine(action: (start: Int, end: Int) -> Unit) {
+        val offsets = toNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL, type.toSubMode())
+        val logicalStart = editor.offsetToLogicalPosition(min(offsets.first, offsets.second))
+        val logicalEnd = editor.offsetToLogicalPosition(max(offsets.first, offsets.second))
+        val lineRange = if (logicalStart.line > logicalEnd.line) logicalStart.line downTo logicalEnd.line else logicalStart.line..logicalEnd.line
+        lineRange.map { line ->
+            val start = editor.logicalPositionToOffset(LogicalPosition(line, logicalStart.column))
+            val end = if (toLineEnd) {
+                EditorHelper.getLineEndOffset(editor, line, true)
+            } else {
+                editor.logicalPositionToOffset(LogicalPosition(line, logicalEnd.column))
+            }
+            action(start, end)
+        }
     }
 }

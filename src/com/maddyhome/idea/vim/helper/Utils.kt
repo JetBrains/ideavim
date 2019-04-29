@@ -85,7 +85,6 @@ fun <T> userData(): ReadWriteProperty<UserDataHolder, T?> {
  * The property will be delegated to UserData and has non-nullable type.
  * [default] action will be executed if UserData doesn't have this property now.
  *   The result of [default] will be put to user data and returned.
- *
  */
 fun <T> userDataOr(default: UserDataHolder.() -> T): ReadWriteProperty<UserDataHolder, T> {
     return object : ReadWriteProperty<UserDataHolder, T> {
@@ -110,3 +109,5 @@ fun <T> userDataOr(default: UserDataHolder.() -> T): ReadWriteProperty<UserDataH
         }
     }
 }
+
+fun <T : Comparable<T>> sort(a: T, b: T) = if(a > b) b to a else a to b

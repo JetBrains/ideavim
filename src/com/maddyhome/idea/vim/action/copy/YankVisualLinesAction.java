@@ -44,7 +44,7 @@ public class YankVisualLinesAction extends VimCommandAction {
       @Override
       public boolean executeForAllCarets(@NotNull Editor editor,
                                          @NotNull DataContext context,
-                                         @NotNull Command cmd, @NotNull Map<Caret, VimSelection> caretsAndSelections) {
+                                         @NotNull Command cmd, @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
         Collection<? extends VimSelection> selections = caretsAndSelections.values();
         List<Integer> starts = new ArrayList<>();
         List<Integer> ends = new ArrayList<>();

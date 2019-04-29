@@ -43,6 +43,27 @@ class ChangeVisualActionTest : VimTestCase() {
         doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
+    fun `test change with dollar motion`() {
+        val keys = parseKeys("<C-V>3j$", "c", "Hello<Esc>")
+        val before = """
+            A Discovery
+
+            I |${c}found it in a legendary land
+            al|l rocks and lavender and tufted grass,[ additional symbols]
+            wh|ere it was settled on some sodden sand
+            ha|rd by the torrent of a mountain pass.
+        """.trimIndent()
+        val after = """
+            A Discovery
+
+            I |Hello
+            al|Hello
+            wh|Hello
+            ha|Hello
+        """.trimIndent()
+        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    }
+
     fun `test change visual action`() {
         typeTextInFile(parseKeys("v2lc", "aaa", "<ESC>"),
                 "abcd${c}ffffff${c}abcde${c}aaaa\n")

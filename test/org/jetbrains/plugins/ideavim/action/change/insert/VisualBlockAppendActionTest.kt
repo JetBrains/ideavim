@@ -19,7 +19,6 @@
 package org.jetbrains.plugins.ideavim.action.change.insert
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -30,11 +29,26 @@ class VisualBlockAppendActionTest : VimTestCase() {
             int b;
             int c;
             """.trimIndent()
-        typeTextInFile(StringHelper.parseKeys("<C-V>", "2j", "e", "A", " const", "<Esc>"), before)
+        typeTextInFile(parseKeys("<C-V>", "2j", "e", "A", " const", "<Esc>"), before)
         val after = """
             int const a;
             int const b;
             int const c;
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    fun `test visual block append with dollar motion`() {
+        val before = """
+            ${c}int a;
+            private String b;
+            int c;
+            """.trimIndent()
+        typeTextInFile(parseKeys("<C-V>", "2j", "$", "A", " // My variables", "<Esc>"), before)
+        val after = """
+            int a; // My variables
+            private String b; // My variables
+            int c; // My variables
             """.trimIndent()
         myFixture.checkResult(after)
     }

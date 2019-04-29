@@ -64,7 +64,17 @@ public class MotionLastColumnAction extends MotionEditorAction {
       return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow);
     }
 
-    protected void preMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+    @Override
+    protected void postMove(@NotNull Editor editor,
+                            @NotNull Caret caret,
+                            @NotNull DataContext context,
+                            @NotNull Command cmd) {
+      CaretDataKt.setVimLastColumn(editor.getCaretModel().getPrimaryCaret(), MotionGroup.LAST_COLUMN);
+    }
+
+    protected void preMove(@NotNull Editor editor,
+                           @NotNull Caret caret,
+                           @NotNull DataContext context,
                            @NotNull Command cmd) {
       CaretDataKt.setVimLastColumn(editor.getCaretModel().getPrimaryCaret(), MotionGroup.LAST_COLUMN);
     }

@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.sort
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 
@@ -149,16 +150,18 @@ fun updateCaretColours(editor: Editor) {
 fun toNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.Mode, subMode: CommandState.SubMode): Pair<Int, Int> =
         when (subMode) {
             CommandState.SubMode.VISUAL_LINE -> {
-                val lineStart = EditorHelper.getLineStartForOffset(editor, start)
+                val (nativeStart, nativeEnd) = sort(start, end)
+                val lineStart = EditorHelper.getLineStartForOffset(editor, nativeStart)
                 // Extend to \n char of line to fill full line with selection
-                val lineEnd = (EditorHelper.getLineEndForOffset(editor, end) + 1).coerceAtMost(EditorHelper.getFileSize(editor, true))
+                val lineEnd = (EditorHelper.getLineEndForOffset(editor, nativeEnd) + 1).coerceAtMost(EditorHelper.getFileSize(editor, true))
                 lineStart to lineEnd
             }
             CommandState.SubMode.VISUAL_CHARACTER -> {
-                val lineEnd = EditorHelper.getLineEndForOffset(editor, end)
-                val adj = if (VimPlugin.getVisualMotion().exclusiveSelection || end == lineEnd || mode == CommandState.Mode.SELECT) 0 else 1
-                val adjEnd = (end + adj).coerceAtMost(EditorHelper.getFileSize(editor))
-                start to adjEnd
+                val (nativeStart, nativeEnd) = sort(start, end)
+                val lineEnd = EditorHelper.getLineEndForOffset(editor, nativeEnd)
+                val adj = if (VimPlugin.getVisualMotion().exclusiveSelection || nativeEnd == lineEnd || mode == CommandState.Mode.SELECT) 0 else 1
+                val adjEnd = (nativeEnd + adj).coerceAtMost(EditorHelper.getFileSize(editor))
+                nativeStart to adjEnd
             }
             CommandState.SubMode.VISUAL_BLOCK -> {
                 var blockStart = editor.offsetToLogicalPosition(start)
@@ -172,8 +175,9 @@ fun toNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.M
                 }
                 editor.logicalPositionToOffset(blockStart) to editor.logicalPositionToOffset(blockEnd)
             }
-            else -> start to end
+            else -> sort(start, end)
         }
+
 
 private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Caret) {
     val (start, end) = if (selectionStart > selectionEnd) selectionEnd to selectionStart else selectionStart to selectionEnd
