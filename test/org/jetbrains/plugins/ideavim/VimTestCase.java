@@ -68,6 +68,9 @@ public abstract class VimTestCase extends UsefulTestCase {
     KeyHandler.getInstance().fullReset(myFixture.getEditor());
     Options.getInstance().resetAllOptions();
     VimPlugin.getKey().resetKeyMappings();
+
+    // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
+    ExEntryPanel.getInstance().getEntry().setBounds(0,0, 100, 25);
   }
 
   protected String getTestDataPath() {

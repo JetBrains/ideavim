@@ -38,7 +38,7 @@ public class ExDocument extends PlainDocument {
    *
    * @return true if overwrite, false if insert mode
    */
-  boolean isOverwrite() {
+  public boolean isOverwrite() {
     return overwrite;
   }
 

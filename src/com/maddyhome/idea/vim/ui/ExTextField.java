@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.group.HistoryGroup;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.TestOnly;
 
 import javax.swing.*;
 import javax.swing.text.*;
@@ -389,6 +390,12 @@ public class ExTextField extends JTextField {
       }
       return fullHeight;
     }
+  }
+
+  @TestOnly
+  public String getCaretShape() {
+    CommandLineCaret caret = (CommandLineCaret) getCaret();
+    return String.format("%s %d", caret.mode, caret.blockPercentage);
   }
 
   private Editor editor;

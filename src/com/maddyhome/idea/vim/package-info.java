@@ -637,7 +637,7 @@
  * |c_<S-Up>|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.HistoryUpAction}
  * |c_<Tab>|              TODO
  * |c_<Up>|               {@link com.maddyhome.idea.vim.ui.ExEditorKit.HistoryUpFilterAction}
- * |c_digraph|
+ * |c_digraph|            {char1} <BS> {char2} {@link com.maddyhome.idea.vim.ui.ExEditorKit.StartDigraphAction}
  * |c_wildchar|           TODO
  * |'cedit'|              TODO
  *

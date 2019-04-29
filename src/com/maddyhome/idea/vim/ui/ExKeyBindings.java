@@ -24,12 +24,9 @@ import javax.swing.*;
 import javax.swing.text.JTextComponent.KeyBinding;
 import java.awt.event.KeyEvent;
 
-/**
- *
- */
 public class ExKeyBindings {
   @NotNull
-  public static KeyBinding[] getBindings() {
+  static KeyBinding[] getBindings() {
     return bindings;
   }
 
@@ -82,9 +79,10 @@ public class ExKeyBindings {
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_MASK), ExEditorKit.StartDigraph),
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK), ExEditorKit.StartDigraph),
 
+    new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_MASK), ExEditorKit.InsertRegister),
+
+    // These appear to be non-Vim shortcuts
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_MASK), ExEditorKit.pasteAction),
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, KeyEvent.SHIFT_MASK), ExEditorKit.pasteAction),
-
-    new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_MASK), ExEditorKit.InsertRegister),
   };
 }
