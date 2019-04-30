@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.visual.VisualMotionGroup
+import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimLastColumn
@@ -231,18 +232,5 @@ object VimListenerManager {
             }
         }
 
-        private fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor) {
-            editor.caretModel.runForEachCaret { caret ->
-                if (caret.hasSelection() && caret.selectionEnd == caret.offset) {
-                    if (caret.selectionEnd <= 0) return@runForEachCaret
-                    if (EditorHelper.getLineStartForOffset(editor, caret.selectionEnd - 1) != caret.selectionEnd - 1
-                            && caret.selectionEnd > 1 && editor.document.text[caret.selectionEnd - 1] == '\n') {
-                        caret.moveToOffset(caret.selectionEnd - 2)
-                    } else {
-                        caret.moveToOffset(caret.selectionEnd - 1)
-                    }
-                }
-            }
-        }
     }
 }

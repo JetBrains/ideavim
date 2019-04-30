@@ -178,6 +178,19 @@ fun toNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.M
             else -> sort(start, end)
         }
 
+fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor) {
+    editor.caretModel.runForEachCaret { caret ->
+        if (caret.hasSelection() && caret.selectionEnd == caret.offset) {
+            if (caret.selectionEnd <= 0) return@runForEachCaret
+            if (EditorHelper.getLineStartForOffset(editor, caret.selectionEnd - 1) != caret.selectionEnd - 1
+                    && caret.selectionEnd > 1 && editor.document.text[caret.selectionEnd - 1] == '\n') {
+                caret.moveToOffset(caret.selectionEnd - 2)
+            } else {
+                caret.moveToOffset(caret.selectionEnd - 1)
+            }
+        }
+    }
+}
 
 private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Caret) {
     val (start, end) = if (selectionStart > selectionEnd) selectionEnd to selectionStart else selectionStart to selectionEnd
