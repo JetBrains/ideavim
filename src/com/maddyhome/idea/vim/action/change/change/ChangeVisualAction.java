@@ -48,7 +48,7 @@ public class ChangeVisualAction extends VimCommandAction {
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
 
-        return VimPlugin.getChange().changeRange(editor, caret, range.toVimTextRange(false), range.getType());
+        return VimPlugin.getChange().changeRange(editor, caret, range.toVimTextRange(false), range.getType(), context);
       }
     });
   }

@@ -1417,12 +1417,13 @@ public class ChangeGroup {
    * @param caret  The caret to be moved after range deletion
    * @param range  The range to change
    * @param type   The type of the range
+   * @param context
    * @return true if able to delete the range, false if not
    */
   public boolean changeRange(@NotNull Editor editor,
                              @NotNull Caret caret,
                              @NotNull TextRange range,
-                             @NotNull SelectionType type) {
+                             @NotNull SelectionType type, DataContext context) {
     int col = 0;
     int lines = 0;
     if (type == SelectionType.BLOCK_WISE) {
@@ -1440,7 +1441,9 @@ public class ChangeGroup {
     boolean res = deleteRange(editor, caret, range, type, true);
     if (res) {
       if (type == SelectionType.LINE_WISE) {
-        if (after) {
+        if (editor.getDocument().getText().isEmpty()) {
+          insertBeforeCursor(editor, context);
+        } else if (after) {
           insertNewLineBelow(editor, caret, lp.column);
         }
         else {

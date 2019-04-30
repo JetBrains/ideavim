@@ -64,6 +64,13 @@ class ChangeVisualActionTest : VimTestCase() {
         doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
+    fun `test replace first line`() {
+        val keys = parseKeys("VcHello<esc>")
+        val before = "${c}A Discovery"
+        val after = "Hello"
+        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    }
+
     fun `test change visual action`() {
         typeTextInFile(parseKeys("v2lc", "aaa", "<ESC>"),
                 "abcd${c}ffffff${c}abcde${c}aaaa\n")
