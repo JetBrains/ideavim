@@ -53,11 +53,27 @@ public class ExTextField extends JTextField {
     setNormalModeCaret();
 
     addCaretListener(e -> resetCaret());
-
+    addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        // If we're in the middle of an action (e.g. entering a register to paste, or inserting a digraph), cancel it if
+        // the mouse is clicked anywhere. Vim's behaviour is to use the mouse click as an event, which can lead to
+        // something like : !%!C, which I don't believe is documented, or useful
+        if (currentAction != null) {
+          clearCurrentAction();
+        }
+        super.mouseClicked(e);
+      }
+    });
     addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(FocusEvent e) {
-        setCaretPosition(getDocument().getLength());
+        if (currentActionPromptCharacterOffset != -1) {
+          setCaretPosition(currentActionPromptCharacterOffset);
+        }
+        else {
+          setCaretPosition(getDocument().getLength());
+        }
       }
     });
   }
@@ -216,11 +232,25 @@ public class ExTextField extends JTextField {
         c = Character.toChars(codePoint)[0];
       }
     }
-    KeyEvent event = new KeyEvent(this, keyChar != KeyEvent.CHAR_UNDEFINED ? KeyEvent.KEY_TYPED :
-                                        (stroke.isOnKeyRelease() ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED),
-                                  (new Date()).getTime(), modifiers, keyCode, c);
 
-    super.processKeyEvent(event);
+    // Make sure the current action sees any subsequent keystrokes, and they're not processed by Swing's action system.
+    // Note that this will only handle simple characters and any control characters that are already registered against
+    // ExShortcutKeyAction - any other control characters will can be "stolen" by other IDE actions.
+    // If we need to capture ANY subsequent keystroke (e.g. for ^V<Tab>, or to stop the Swing standard <C-A> going to
+    // start of line), we should replace ExShortcutAction with a dispatcher registered with IdeEventQueue#addDispatcher.
+    // This gets called for ALL events, before the IDE starts to process key events for the action system. We can add a
+    // dispatcher that checks that the plugin is enabled, checks that the component with the focus is ExTextField,
+    // dispatch to ExEntryPanel#handleKey and if it's processed, mark the event as consumed.
+    if (currentAction != null) {
+      currentAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "" + c, modifiers));
+    }
+    else {
+      KeyEvent event = new KeyEvent(this, keyChar != KeyEvent.CHAR_UNDEFINED ? KeyEvent.KEY_TYPED :
+        (stroke.isOnKeyRelease() ? KeyEvent.KEY_RELEASED : KeyEvent.KEY_PRESSED),
+        (new Date()).getTime(), modifiers, keyCode, c);
+
+      super.processKeyEvent(event);
+    }
   }
 
   protected void processKeyEvent(KeyEvent e) {

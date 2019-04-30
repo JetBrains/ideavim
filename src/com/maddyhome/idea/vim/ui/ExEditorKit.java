@@ -87,7 +87,7 @@ public class ExEditorKit extends DefaultEditorKit {
     if (cmd != null && cmd.length() > 0) {
       char ch = cmd.charAt(0);
       if (ch < ' ') {
-        if (mods == KeyEvent.CTRL_MASK) {
+        if ((mods & KeyEvent.CTRL_MASK) != 0) {
           return KeyStroke.getKeyStroke(KeyEvent.VK_A + ch - 1, mods);
         }
       }
@@ -226,6 +226,7 @@ public class ExEditorKit extends DefaultEditorKit {
             state = State.WAIT_REGISTER;
             target.setCurrentAction(this, '\"');
             break;
+
           case WAIT_REGISTER:
             state = State.SKIP_CTRL_R;
             target.clearCurrentAction();
@@ -241,8 +242,8 @@ public class ExEditorKit extends DefaultEditorKit {
                   target.setCaretPosition(offset + text.length());
                 }
               }
-            }
-            else {
+            } else if ((key.getModifiers() & KeyEvent.CTRL_MASK) != 0 && key.getKeyCode() == KeyEvent.VK_C) {
+              // Eat any unused keys, unless it's <C-C>, in which case forward on and cancel entry
               target.handleKey(key);
             }
         }
@@ -445,10 +446,16 @@ public class ExEditorKit extends DefaultEditorKit {
           case DigraphSequence.DigraphResult.RES_OK:
             target.setCurrentActionPromptCharacter(res.getPromptCharacter());
             break;
+
           case DigraphSequence.DigraphResult.RES_BAD:
             target.clearCurrentAction();
-            target.handleKey(key);
+            // Eat the character, unless it's <C-C>, in which case, forward on and cancel entry. Note that at some point
+            // we should support input of control characters
+            if ((key.getModifiers() & KeyEvent.CTRL_MASK) != 0 && key.getKeyCode() == KeyEvent.VK_C) {
+              target.handleKey(key);
+            }
             break;
+
           case DigraphSequence.DigraphResult.RES_DONE:
             final KeyStroke digraph = res.getStroke();
             digraphSequence = null;
