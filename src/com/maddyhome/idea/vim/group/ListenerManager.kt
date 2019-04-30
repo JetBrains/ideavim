@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.ExOutputModel
+import com.maddyhome.idea.vim.group.visual.VisualMotionGroup
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimLastColumn
@@ -166,6 +167,7 @@ object VimListenerManager {
         }
 
         override fun mouseReleased(event: EditorMouseEvent) {
+            VisualMotionGroup.modeBeforeEnteringNonVimVisual = null
             if (mouseDragging) {
                 logger.debug("Release mouse after dragging")
                 SelectionVimListenerSuppressor.use {

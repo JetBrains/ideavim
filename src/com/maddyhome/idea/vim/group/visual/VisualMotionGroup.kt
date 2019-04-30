@@ -39,6 +39,10 @@ import java.util.*
  * @author Alex Plate
  */
 class VisualMotionGroup {
+    companion object {
+        var modeBeforeEnteringNonVimVisual: CommandState.Mode? = null
+    }
+
     fun selectPreviousVisualMode(editor: Editor): Boolean {
         val lastSelectionType = EditorData.getLastSelectionType(editor) ?: return false
         val visualMarks = VimPlugin.getMark().getVisualSelectionMarks(editor) ?: return false
@@ -87,9 +91,10 @@ class VisualMotionGroup {
 
     fun controlNonVimSelectionChange(editor: Editor, resetCaretToInsert: Boolean = false) {
         if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
-            CommandState.getInstance(editor)
-            while (CommandState.getInstance(editor).mode != CommandState.Mode.COMMAND) {
-                CommandState.getInstance(editor).popState()
+            val commandState = CommandState.getInstance(editor)
+            modeBeforeEnteringNonVimVisual = commandState.mode
+            while (commandState.mode != CommandState.Mode.COMMAND) {
+                commandState.popState()
             }
             val autodetectedMode = autodetectVisualMode(editor)
             if (TemplateManager.getInstance(editor.project).getActiveTemplate(editor) == null && !editor.isOneLineMode) {
@@ -103,8 +108,9 @@ class VisualMotionGroup {
             exitVisual(editor)
             exitSelectModeAndResetKeyHandler(editor, true)
 
-            TemplateManager.getInstance(editor.project)
-                    .getActiveTemplate(editor)?.run { VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor)) }
+            if (TemplateManager.getInstance(editor.project).getActiveTemplate(editor) != null || modeBeforeEnteringNonVimVisual == CommandState.Mode.INSERT) {
+                VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
+            }
             KeyHandler.getInstance().reset(editor)
         }
     }
