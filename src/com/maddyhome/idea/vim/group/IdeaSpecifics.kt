@@ -40,11 +40,11 @@ object IdeaSpecifics {
         private val surrounderItems = listOf("if", "if / else")
         private val surrounderAction = "com.intellij.codeInsight.generation.surroundWith.SurroundWithHandler\$InvokeSurrounderAction"
 
-        override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent?) {
+        override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
             if (!VimPlugin.isEnabled()) return
         }
 
-        override fun afterActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent?) {
+        override fun afterActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
             if (!VimPlugin.isEnabled()) return
 
             val editor = dataContext.getData(CommonDataKeys.EDITOR) ?: return
