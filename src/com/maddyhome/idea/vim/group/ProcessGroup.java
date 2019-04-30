@@ -90,7 +90,7 @@ public class ProcessGroup {
 
     ExEntryPanel panel = ExEntryPanel.getInstance();
     if (panel.isActive()) {
-      UiHelper.requestFocus(panel);
+      UiHelper.requestFocus(panel.getEntry());
       panel.handleKey(stroke);
 
       return true;
