@@ -19,7 +19,6 @@
 package org.jetbrains.plugins.ideavim.ex.handler
 import com.maddyhome.idea.vim.VimPlugin
 import org.jetbrains.plugins.ideavim.VimFileEditorTestCase
-import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
  * @author Elliot Courant
@@ -28,17 +27,17 @@ class CmdClearHandlerTest : VimFileEditorTestCase() {
     fun `test clear aliases`() {
         VimPlugin.getCommand().resetAliases()
         configureByText("\n")
-        typeText(VimTestCase.commandToKeys("command"))
+        typeText(commandToKeys("command"))
         assertPluginError(false)
         assertExOutput("Name        Args       Definition\n") // There should not be any aliases.
 
-        typeText(VimTestCase.commandToKeys("command Vs vs"))
+        typeText(commandToKeys("command Vs vs"))
         assertPluginError(false)
-        typeText(VimTestCase.commandToKeys("command Wq wq"))
+        typeText(commandToKeys("command Wq wq"))
         assertPluginError(false)
-        typeText(VimTestCase.commandToKeys("command WQ wq"))
+        typeText(commandToKeys("command WQ wq"))
         assertPluginError(false)
-        typeText(VimTestCase.commandToKeys("command"))
+        typeText(commandToKeys("command"))
         assertPluginError(false)
         // The added alias should be listed
         assertExOutput("""Name        Args       Definition
@@ -48,9 +47,9 @@ class CmdClearHandlerTest : VimFileEditorTestCase() {
         """.trimMargin())
 
         // Delete all of the aliases and then list aliases again.
-        typeText(VimTestCase.commandToKeys("comclear"))
+        typeText(commandToKeys("comclear"))
         assertPluginError(false)
-        typeText(VimTestCase.commandToKeys("command"))
+        typeText(commandToKeys("command"))
         assertPluginError(false)
         assertExOutput("Name        Args       Definition\n") // There should not be any aliases.
     }
