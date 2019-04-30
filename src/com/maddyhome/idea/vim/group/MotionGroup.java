@@ -76,6 +76,7 @@ public class MotionGroup {
   public MotionGroup() {
     EventFacade.getInstance().addEditorFactoryListener(new EditorFactoryListener() {
       public void editorCreated(@NotNull EditorFactoryEvent event) {
+        if (!VimPlugin.isEnabled()) return;
         final Editor editor = event.getEditor();
         // This ridiculous code ensures that a lot of events are processed BEFORE we finally start listening
         // to visible area changes. The primary reason for this change is to fix the cursor position bug
@@ -90,6 +91,7 @@ public class MotionGroup {
       }
 
       public void editorReleased(@NotNull EditorFactoryEvent event) {
+        if (!VimPlugin.isEnabled()) return;
         Editor editor = event.getEditor();
         if (EditorData.getMotionGroup(editor)) {
           VimListenerManager.INSTANCE.removeEditorListeners(editor);
