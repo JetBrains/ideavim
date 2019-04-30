@@ -27,6 +27,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
+import com.intellij.testFramework.EditorTestUtil;
 import com.intellij.testFramework.LightProjectDescriptor;
 import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture;
@@ -60,9 +61,9 @@ import java.util.List;
 public abstract class VimTestCase extends UsefulTestCase {
   protected CodeInsightTestFixture myFixture;
 
-  protected static final String c = "<caret>";
-  protected static final String s = "<selection>";
-  protected static final String se = "</selection>";
+  protected static final String c = EditorTestUtil.CARET_TAG;
+  protected static final String s = EditorTestUtil.SELECTION_START_TAG;
+  protected static final String se = EditorTestUtil.SELECTION_END_TAG;
 
   @Override
   protected void setUp() throws Exception {
