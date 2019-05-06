@@ -52,7 +52,7 @@ object IdeaSpecifics {
         override fun afterActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
             if (!VimPlugin.isEnabled()) return
 
-            val editor = dataContext.getData(CommonDataKeys.EDITOR) ?: return
+            val editor = event.getData(CommonDataKeys.EDITOR) ?: return
             when (ActionManager.getInstance().getId(action)) {
                 IdeActions.ACTION_EDITOR_SELECT_WORD_AT_CARET, IdeActions.ACTION_EDITOR_UNSELECT_WORD_AT_CARET -> {
                     // Rider moves caret to the end of selection
@@ -79,6 +79,8 @@ object IdeaSpecifics {
 
             val editor = state.editor
             if (!editor.selectionModel.hasSelection()) {
+                // Enable insert mode if there is no selection in template
+                // Template with selection is handled by [com.maddyhome.idea.vim.group.visual.VisualMotionGroup.controlNonVimSelectionChange]
                 VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
                 KeyHandler.getInstance().reset(editor)
             }

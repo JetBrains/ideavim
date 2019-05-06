@@ -125,6 +125,11 @@ val Caret.vimLeadSelectionOffset: Int
         return caretOffset
     }
 
+/**
+ * Update caret's colour according to the current state
+ *
+ * Secondary carets became invisible colour in visual block mode
+ */
 fun updateCaretColours(editor: Editor) {
     val subMode = CommandState.getInstance(editor).subMode
     if (subMode == CommandState.SubMode.VISUAL_BLOCK) {
@@ -143,7 +148,7 @@ fun updateCaretColours(editor: Editor) {
 }
 
 /**
- * Convert vims selection start and end to corresponding native selection.
+ * Convert vim's selection start and end to corresponding native selection.
  *
  * Adds caret adjustment or extends to line start / end in case of linewise selection
  */
