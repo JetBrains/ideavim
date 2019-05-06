@@ -485,7 +485,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         eventFacade.addFileEditorManagerListener(project, new MotionGroup.MotionEditorChange());
         eventFacade.addFileEditorManagerListener(project, new FileGroup.SelectionCheck());
         eventFacade.addFileEditorManagerListener(project, new SearchGroup.EditorSelectionCheck());
-        IdeaSpecifics.INSTANCE.addActionListener(project);
+        IdeaSpecifics.INSTANCE.addIdeaSpecificsListener(project);
       }
     });
   }

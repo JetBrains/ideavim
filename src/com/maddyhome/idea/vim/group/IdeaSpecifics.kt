@@ -18,6 +18,9 @@
 
 package com.maddyhome.idea.vim.group
 
+import com.intellij.codeInsight.template.TemplateManager
+import com.intellij.codeInsight.template.TemplateManagerListener
+import com.intellij.codeInsight.template.impl.TemplateState
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.actionSystem.ex.AnActionListener
 import com.intellij.openapi.editor.event.CaretEvent
@@ -26,14 +29,16 @@ import com.intellij.openapi.project.Project
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
+import com.maddyhome.idea.vim.helper.EditorDataContext
 
 /**
  * @author Alex Plate
  */
 object IdeaSpecifics {
-    fun addActionListener(project: Project) {
+    fun addIdeaSpecificsListener(project: Project) {
         val connection = project.messageBus.connect()
         connection.subscribe(AnActionListener.TOPIC, VimActionListener)
+        connection.subscribe(TemplateManager.TEMPLATE_STARTED_TOPIC, VimTemplateManagerListener)
     }
 
     object VimActionListener : AnActionListener {
@@ -63,6 +68,16 @@ object IdeaSpecifics {
             if (surrounderAction == action.javaClass.name && surrounderItems.any { action.templatePresentation.text.endsWith(it) }) {
                 // Enter insert mode after surround with if
                 VimPlugin.getChange().insertBeforeCursor(editor, dataContext)
+                KeyHandler.getInstance().reset(editor)
+            }
+        }
+    }
+
+    object VimTemplateManagerListener : TemplateManagerListener {
+        override fun templateStarted(state: TemplateState) {
+            val editor = state.editor
+            if (!editor.selectionModel.hasSelection()) {
+                VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
                 KeyHandler.getInstance().reset(editor)
             }
         }
