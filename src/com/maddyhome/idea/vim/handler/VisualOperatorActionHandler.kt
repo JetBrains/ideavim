@@ -110,7 +110,14 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         return this.caretModel.allCarets.associateWith { caret ->
             if (CommandState.inVisualMode(this)) {
                 val subMode = CommandState.getInstance(this).subMode
-                VimSelection.create(caret.vimSelectionStart, caret.offset, SelectionType.fromSubMode(subMode), this)
+                VimSimpleSelection.createWithNative(
+                        caret.vimSelectionStart,
+                        caret.offset,
+                        caret.selectionStart,
+                        caret.selectionEnd,
+                        SelectionType.fromSubMode(subMode),
+                        this
+                )
             } else {
                 val offsets = VimPlugin.getMark().getVisualSelectionMarks(this) ?: return null
                 val lastSelectionType = EditorData.getLastSelectionType(this) ?: return null

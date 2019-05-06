@@ -18,6 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.delete
 
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -108,6 +109,27 @@ class DeleteVisualActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent()
         doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    }
+
+    fun `test delete after extend selection`() {
+        // This test emulates deletion after structural selection
+        // In short, when caret is not on the selection end
+        configureByText("""
+            A Discovery
+
+            ${s}I found it in a legendary land
+            all rocks ${c}and lavender and tufted grass,
+            where it was settled on some sodden sand
+            ${se}hard by the torrent of a mountain pass.
+        """.trimIndent())
+        VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+        typeText(parseKeys("d"))
+        myFixture.checkResult("""
+            A Discovery
+
+            hard by the torrent of a mountain pass.
+        """.trimIndent())
+        assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test delete with dollar motion`() {
