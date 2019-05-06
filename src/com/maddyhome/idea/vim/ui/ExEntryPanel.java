@@ -28,7 +28,10 @@ import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.ui.DocumentAdapter;
+import com.intellij.ui.JBColor;
+import com.intellij.ui.SideBorder;
 import com.intellij.util.IJSwingUtilities;
+import com.intellij.util.ui.JBInsets;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.group.SearchGroup;
@@ -142,7 +145,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
   public void updateUI() {
     super.updateUI();
 
-    setBorder(BorderFactory.createEtchedBorder());
+    setBorder(new ExPanelBorder());
 
     // Can be null when called from base constructor
     //noinspection ConstantConditions
@@ -305,6 +308,26 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
   private boolean active;
 
   private static ExEntryPanel instance;
-
   private static final Logger logger = Logger.getInstance(ExEntryPanel.class.getName());
+
+  private static class ExPanelBorder extends SideBorder {
+
+    ExPanelBorder() {
+      super(JBColor.border(), SideBorder.TOP);
+    }
+
+    @Override
+    public Insets getBorderInsets(Component component) {
+      return new JBInsets(getThickness() + 2, 0, 2, 2);
+    }
+
+    @Override
+    public Insets getBorderInsets(Component component, Insets insets) {
+      insets.top = getThickness() + 2;
+      insets.left = 0;
+      insets.bottom = 2;
+      insets.right = 2;
+      return insets;
+    }
+  }
 }

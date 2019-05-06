@@ -32,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.TestOnly;
 
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicTextFieldUI;
 import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -87,10 +88,6 @@ public class ExTextField extends JTextField {
     clearCurrentAction();
   }
 
-  // Minimize margins and insets. These get added to the default margins in the UI class that we can't override.
-  // (I.e. DarculaTextFieldUI#getDefaultMargins, MacIntelliJTextFieldUI#getDefaultMargin, WinIntelliJTextFieldUI#getDefaultMargin)
-  // This is an attempt to mitigate the gap in ExEntryPanel between the label (':', '/', '?') and the text field.
-  // See VIM-1485
   @Override
   public Insets getMargin() {
     return JBUI.emptyInsets();
@@ -104,7 +101,11 @@ public class ExTextField extends JTextField {
   // Called when the LAF is changed, but only if the control is visible
   @Override
   public void updateUI() {
-    super.updateUI();
+    // Override the default look and feel specific UI so we can have a completely borderless and margin-less text field.
+    // (See TextFieldWithPopupHandlerUI#getDefaultMargins and derived classes). This allows us to draw the text field
+    // directly next to the label
+    setUI(new BasicTextFieldUI());
+    invalidate();
 
     setBorder(null);
 
@@ -313,7 +314,7 @@ public class ExTextField extends JTextField {
     setCaretPosition(currentActionPromptCharacterOffset);
   }
 
-  void clearCurrentActionPromptCharacter() {
+  private void clearCurrentActionPromptCharacter() {
     final int offset = getCaretPosition();
     final String text = removePromptCharacter();
     updateText(text);
@@ -333,7 +334,7 @@ public class ExTextField extends JTextField {
     return currentAction;
   }
 
-  void setInsertMode() {
+  private void setInsertMode() {
     ExDocument doc = (ExDocument)getDocument();
     if (doc.isOverwrite()) {
       doc.toggleInsertReplace();
