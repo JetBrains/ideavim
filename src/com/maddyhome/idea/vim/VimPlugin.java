@@ -57,6 +57,7 @@ import com.maddyhome.idea.vim.group.copy.YankGroup;
 import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.DocumentManager;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
+import com.maddyhome.idea.vim.listener.IdeaSpecifics;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import org.jdom.Element;

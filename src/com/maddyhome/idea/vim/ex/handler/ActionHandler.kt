@@ -33,8 +33,8 @@ import com.maddyhome.idea.vim.ex.CommandHandler.Flag.SAVE_VISUAL
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
-import com.maddyhome.idea.vim.group.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
+import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 
 /**
  * @author smartbomb

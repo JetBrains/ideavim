@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.group
+package com.maddyhome.idea.vim.listener
 
 import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.TemplateManagerListener
@@ -75,6 +75,8 @@ object IdeaSpecifics {
 
     object VimTemplateManagerListener : TemplateManagerListener {
         override fun templateStarted(state: TemplateState) {
+            if (!VimPlugin.isEnabled()) return
+
             val editor = state.editor
             if (!editor.selectionModel.hasSelection()) {
                 VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))

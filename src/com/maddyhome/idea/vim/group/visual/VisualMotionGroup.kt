@@ -29,8 +29,8 @@ import com.maddyhome.idea.vim.command.*
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.group.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.helper.*
+import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.option.BoundStringOption
 import com.maddyhome.idea.vim.option.Options
 import java.util.*

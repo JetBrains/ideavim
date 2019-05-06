@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.group
+package com.maddyhome.idea.vim.listener
 
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.ExOutputModel
+import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.visual.VisualMotionGroup
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently

@@ -51,6 +51,8 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.group.visual.NativeSelectionKt;
 import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
+import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.option.BoundListOption;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;

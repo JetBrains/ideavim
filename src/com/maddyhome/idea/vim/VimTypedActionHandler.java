@@ -26,9 +26,9 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx;
-import com.maddyhome.idea.vim.group.SelectionVimListenerSuppressor;
-import com.maddyhome.idea.vim.group.VimListenerSuppressor;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
+import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
+import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;

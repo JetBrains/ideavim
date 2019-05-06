@@ -23,8 +23,8 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.command.undo.UndoManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.project.Project;
-import com.maddyhome.idea.vim.group.SelectionVimListenerSuppressor;
-import com.maddyhome.idea.vim.group.VimListenerSuppressor;
+import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
+import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import org.jetbrains.annotations.NotNull;
 
 /**

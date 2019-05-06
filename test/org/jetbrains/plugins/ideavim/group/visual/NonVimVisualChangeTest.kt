@@ -23,8 +23,8 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.LogicalPosition
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.group.VimListenerManager
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.listener.VimListenerManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
