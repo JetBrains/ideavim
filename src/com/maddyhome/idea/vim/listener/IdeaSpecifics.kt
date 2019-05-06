@@ -23,6 +23,7 @@ import com.intellij.codeInsight.template.TemplateManagerListener
 import com.intellij.codeInsight.template.impl.TemplateState
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.actionSystem.ex.AnActionListener
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
 import com.intellij.openapi.project.Project
@@ -44,19 +45,21 @@ object IdeaSpecifics {
     object VimActionListener : AnActionListener {
         private val surrounderItems = listOf("if", "if / else")
         private val surrounderAction = "com.intellij.codeInsight.generation.surroundWith.SurroundWithHandler\$InvokeSurrounderAction"
+        private var editor: Editor? = null
 
         override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
             if (!VimPlugin.isEnabled()) return
+
+            editor = dataContext.getData(CommonDataKeys.EDITOR) ?: return
         }
 
         override fun afterActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
             if (!VimPlugin.isEnabled()) return
 
-            val editor = event.getData(CommonDataKeys.EDITOR) ?: return
             when (ActionManager.getInstance().getId(action)) {
                 IdeActions.ACTION_EDITOR_SELECT_WORD_AT_CARET, IdeActions.ACTION_EDITOR_UNSELECT_WORD_AT_CARET -> {
                     // Rider moves caret to the end of selection
-                    editor.caretModel.addCaretListener(object : CaretListener {
+                    editor?.caretModel?.addCaretListener(object : CaretListener {
                         override fun caretPositionChanged(event: CaretEvent) {
                             moveCaretOneCharLeftFromSelectionEnd(event.editor)
                             event.editor.caretModel.removeCaretListener(this)
@@ -66,10 +69,14 @@ object IdeaSpecifics {
             }
 
             if (surrounderAction == action.javaClass.name && surrounderItems.any { action.templatePresentation.text.endsWith(it) }) {
-                // Enter insert mode after surround with if
-                VimPlugin.getChange().insertBeforeCursor(editor, dataContext)
-                KeyHandler.getInstance().reset(editor)
+                editor?.let {
+                    // Enter insert mode after surround with if
+                    VimPlugin.getChange().insertBeforeCursor(it, dataContext)
+                    KeyHandler.getInstance().reset(it)
+                }
             }
+
+            editor = null
         }
     }
 
