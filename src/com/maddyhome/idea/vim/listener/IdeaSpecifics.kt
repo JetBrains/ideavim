@@ -56,6 +56,7 @@ object IdeaSpecifics {
         override fun afterActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
             if (!VimPlugin.isEnabled()) return
 
+            //region Extend Selection for Rider
             when (ActionManager.getInstance().getId(action)) {
                 IdeActions.ACTION_EDITOR_SELECT_WORD_AT_CARET, IdeActions.ACTION_EDITOR_UNSELECT_WORD_AT_CARET -> {
                     // Rider moves caret to the end of selection
@@ -67,19 +68,22 @@ object IdeaSpecifics {
                     })
                 }
             }
+            //endregion
 
+            //region Enter insert mode after surround with if
             if (surrounderAction == action.javaClass.name && surrounderItems.any { action.templatePresentation.text.endsWith(it) }) {
                 editor?.let {
-                    // Enter insert mode after surround with if
                     VimPlugin.getChange().insertBeforeCursor(it, dataContext)
                     KeyHandler.getInstance().reset(it)
                 }
             }
+            //endregion
 
             editor = null
         }
     }
 
+    //region Enter insert mode for surround templates without selection
     object VimTemplateManagerListener : TemplateManagerListener {
         override fun templateStarted(state: TemplateState) {
             if (!VimPlugin.isEnabled()) return
@@ -93,4 +97,5 @@ object IdeaSpecifics {
             }
         }
     }
+    //endregion
 }
