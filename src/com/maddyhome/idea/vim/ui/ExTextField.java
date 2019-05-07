@@ -66,17 +66,6 @@ public class ExTextField extends JTextField {
         super.mouseClicked(e);
       }
     });
-    addFocusListener(new FocusAdapter() {
-      @Override
-      public void focusGained(FocusEvent e) {
-        if (currentActionPromptCharacterOffset != -1) {
-          setCaretPosition(currentActionPromptCharacterOffset);
-        }
-        else {
-          setCaretPosition(getDocument().getLength());
-        }
-      }
-    });
   }
 
   void reset() {
@@ -388,6 +377,8 @@ public class ExTextField extends JTextField {
 
     private CaretMode mode;
     private int blockPercentage = 100;
+    private int lastBlinkRate = 0;
+    private boolean hasFocus;
 
     public enum CaretMode {
       BLOCK,
@@ -400,11 +391,15 @@ public class ExTextField extends JTextField {
     }
 
     void setMode(CaretMode mode, int blockPercentage) {
-      // Make sure damage gets updated for the old and new shape so the flashing works correctly
-      updateDamage();
+      if (this.mode == mode && this.blockPercentage == blockPercentage) {
+        return;
+      }
+
+      // Hide the current caret shape before changing and redrawing
+      setVisible(false);
       this.mode = mode;
       this.blockPercentage = blockPercentage;
-      updateDamage();
+      setVisible(true);
     }
 
     private void updateDamage() {
@@ -415,6 +410,26 @@ public class ExTextField extends JTextField {
       catch(BadLocationException e) {
         // ignore
       }
+    }
+
+    @Override
+    public void focusGained(FocusEvent e) {
+      if (lastBlinkRate != 0) {
+        setBlinkRate(lastBlinkRate);
+        lastBlinkRate = 0;
+      }
+      super.focusGained(e);
+      updateDamage();
+      hasFocus = true;
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+      hasFocus = false;
+      lastBlinkRate = getBlinkRate();
+      setBlinkRate(0);
+      setVisible(true);
+      updateDamage();
     }
 
     @Override
@@ -432,9 +447,15 @@ public class ExTextField extends JTextField {
         // We have to use the deprecated version because we still support 1.8
         final Rectangle r = component.getUI().modelToView(component, getDot(), getDotBias());
         FontMetrics fm = g.getFontMetrics();
-        final int blockHeight = fm.getHeight();
-        r.setBounds(r.x, r.y, getBlockWidth(fm), getBlockHeight(blockHeight));
-        g.fillRect(r.x, r.y + blockHeight - r.height, r.width, r.height);
+        final int boundsHeight = fm.getHeight();
+        if (!hasFocus) {
+          r.setBounds(r.x, r.y, getCaretWidth(fm, 100), boundsHeight);
+          g.drawRect(r.x, r.y, r.width, r.height);
+        }
+        else {
+          r.setBounds(r.x, r.y, getCaretWidth(fm, blockPercentage), getBlockHeight(boundsHeight));
+          g.fillRect(r.x, r.y + boundsHeight - r.height, r.width, r.height);
+        }
         g.setPaintMode();
         g.setColor(color);
       }
@@ -449,19 +470,25 @@ public class ExTextField extends JTextField {
         Font font = component.getFont();
         FontMetrics fm = component.getFontMetrics(font);
         final int blockHeight = fm.getHeight();
-        width = getBlockWidth(fm);
-        height = getBlockHeight(blockHeight);
+        if (!hasFocus) {
+          width = this.getCaretWidth(fm, 100);
+          height = blockHeight;
+        }
+        else {
+          width = this.getCaretWidth(fm, blockPercentage);
+          height = getBlockHeight(blockHeight);
+        }
         x = r.x;
         y = r.y + blockHeight - height;
         repaint();
       }
     }
 
-    private int getBlockWidth(FontMetrics fm) {
+    private int getCaretWidth(FontMetrics fm, int widthPercentage) {
       if (mode == CaretMode.VER) {
         // Don't show a proportional width of a proportional font
         final int fullWidth = fm.charWidth('o');
-        return max(1, fullWidth * blockPercentage / 100);
+        return max(1, fullWidth * widthPercentage / 100);
       }
 
       final char c = ((ExDocument)getComponent().getDocument()).getCharacter(getComponent().getCaretPosition());
