@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@file:Suppress("ObjectPropertyName")
+
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Caret
@@ -28,7 +30,7 @@ import com.maddyhome.idea.vim.command.VisualChange
  * @author Alex Plate
  */
 
-// ----------------------------------------------------
+//region Vim selection start ----------------------------------------------------
 /**
  * Caret's offset when entering visual mode
  */
@@ -46,14 +48,16 @@ var Caret.vimSelectionStart: Int
         _vimSelectionStart = value
     }
 
-fun Caret.vimSelectionStartSetToNull() {
+fun Caret.vimSelectionStartClear() {
     this._vimSelectionStart = null
     editor._vimBlockSelectionStart = null
 }
+
 private var Caret._vimSelectionStart: Int? by userData()
 private var Editor._vimBlockSelectionStart: Int? by userData()
-// ----------------------------------------------------
+//endregion ----------------------------------------------------
 
+//region Vim last column
 private val LAST_COLUMN: Key<Int> = Key.create("lastColumn")
 var Caret.vimLastColumn: Int
     get() = getUserData(LAST_COLUMN) ?: visualPosition.column
@@ -62,6 +66,7 @@ var Caret.vimLastColumn: Int
     } else {
         putUserData(LAST_COLUMN, value)
     }
+//endregion
 
 var Caret.vimLastVisualOperatorRange: VisualChange? by userData()
 var Caret.vimVisualChange: VisualChange? by userData()

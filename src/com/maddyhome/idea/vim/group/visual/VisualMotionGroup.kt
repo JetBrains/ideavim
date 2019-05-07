@@ -371,7 +371,7 @@ class VisualMotionGroup {
         SelectionVimListenerSuppressor.lock().use {
             editor.caretModel.allCarets.forEach {
                 it.removeSelection()
-                it.vimSelectionStartSetToNull()
+                it.vimSelectionStartClear()
                 if (adjustCaretPosition) {
                     val lineEnd = EditorHelper.getLineEndForOffset(editor, it.offset)
                     val lineStart = EditorHelper.getLineStartForOffset(editor, it.offset)
@@ -405,7 +405,7 @@ class VisualMotionGroup {
             val primaryCaret = editor.caretModel.primaryCaret
             val vimSelectionStart = primaryCaret.vimSelectionStart
             VimPlugin.getMark().setVisualSelectionMarks(editor, TextRange(vimSelectionStart, primaryCaret.offset))
-            editor.caretModel.allCarets.forEach { it.vimSelectionStartSetToNull() }
+            editor.caretModel.allCarets.forEach { it.vimSelectionStartClear() }
 
             CommandState.getInstance(editor).subMode = CommandState.SubMode.NONE
         }
