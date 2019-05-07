@@ -129,10 +129,11 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
     protected class VisualStartFinishWrapper(private val editor: Editor, private val cmd: Command) {
         private lateinit var lastMode: CommandState.SubMode
         private var wasRepeat: Boolean = false
+        private val previousLastColumns = mutableMapOf<Caret, Int>()
 
         private fun startForCaret(caret: Caret) {
             if (CommandState.getInstance(editor).mode == CommandState.Mode.REPEAT) {
-                caret.vimPreviousLastColumn = caret.vimLastColumn
+                previousLastColumns[caret] = caret.vimLastColumn
                 val range = caret.vimLastVisualOperatorRange
                 VimPlugin.getVisualMotion().toggleVisual(editor, 1, 1, CommandState.SubMode.NONE)
                 if (range != null && range.columns == MotionGroup.LAST_COLUMN) {
@@ -179,7 +180,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         private fun finishForCaret(caret: Caret, res: Boolean) {
             if (CommandFlags.FLAG_MULTIKEY_UNDO !in cmd.flags && CommandFlags.FLAG_EXPECT_MORE !in cmd.flags) {
                 if (wasRepeat) {
-                    caret.vimLastColumn = caret.vimPreviousLastColumn
+                    caret.vimLastColumn = previousLastColumns[caret] ?: caret.logicalPosition.column
                 }
             }
 

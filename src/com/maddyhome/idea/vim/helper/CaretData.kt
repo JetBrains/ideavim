@@ -70,6 +70,4 @@ var Caret.vimLastColumn: Int
 
 var Caret.vimLastVisualOperatorRange: VisualChange? by userData()
 var Caret.vimVisualChange: VisualChange? by userData()
-var Caret.vimPreviousLastColumn: Int by userDataOr { (this as Caret).logicalPosition.column }
 var Caret.vimInsertStart: Int by userDataOr { (this as Caret).offset }
-var Caret.vimWasIsFirstLine: Boolean by userDataOr { false }

@@ -148,10 +148,11 @@ public class ChangeGroup {
   public void insertNewLineAbove(@NotNull final Editor editor, @NotNull DataContext context) {
     if (editor.isOneLineMode()) return;
 
+    Set<Caret> firstLiners = new HashSet<>();
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
       if (caret.getVisualPosition().line == 0) {
         MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStart(editor, caret));
-        CaretDataKt.setVimWasIsFirstLine(caret, true);
+        firstLiners.add(caret);
       }
       else {
         MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretVertical(editor, caret, -1));
@@ -163,8 +164,7 @@ public class ChangeGroup {
     runEnterAction(editor, context);
 
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
-      if (CaretDataKt.getVimWasIsFirstLine(caret)) {
-        CaretDataKt.setVimWasIsFirstLine(caret, false);
+      if (firstLiners.contains(caret)) {
         MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretVertical(editor, caret, -1));
       }
     }
@@ -180,9 +180,10 @@ public class ChangeGroup {
   private void insertNewLineAbove(@NotNull Editor editor, @NotNull Caret caret, int col) {
     if (editor.isOneLineMode()) return;
 
+    boolean firstLiner = false;
     if (caret.getVisualPosition().line == 0) {
       MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStart(editor, caret));
-      CaretDataKt.setVimWasIsFirstLine(caret, true);
+      firstLiner = true;
     }
     else {
       MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretVertical(editor, caret, -1));
@@ -192,9 +193,8 @@ public class ChangeGroup {
     EditorData.setChangeSwitchMode(editor, CommandState.Mode.INSERT);
     insertText(editor, caret, "\n" + IndentConfig.create(editor).createIndentBySize(col));
 
-    if (CaretDataKt.getVimWasIsFirstLine(caret)) {
+    if (firstLiner) {
       MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretVertical(editor, caret, -1));
-      CaretDataKt.setVimWasIsFirstLine(caret, false);
     }
   }
 
