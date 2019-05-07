@@ -24,10 +24,12 @@ import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
 /**
- * This annotation is created for test functions (methods)
- * It means that original vim behaviour has small differences from behaviour of IdeaVim
+ * This annotation is created for test functions (methods).
+ * It means that original vim behaviour has small differences from behaviour of IdeaVim.
+ * [shouldBeFixed] flag indicates whether the given functionality should be fixed
+ *   or the given behavior is normal for IdeaVim and should be leaved as is.
  *
- * E.g. after execution some commands original vim has next text;
+ * E.g. after execution some commands original vim has next text:
  *    Hello1
  *    Hello2
  *    Hello3
@@ -40,8 +42,8 @@ import kotlin.reflect.KProperty
  *
  * Why this annotation exists?
  * After creating some functionality you can understand that IdeaVim has a bit different behaviour, but you
- *   cannot fix it right now because of any reasons (bugs in IDE, the impossibility of this functionality in IDEA,
- *   leak of time for fixing).
+ *   cannot fix it right now because of any reasons (bugs in IDE,
+ *   the impossibility of this functionality in IDEA (*[shouldBeFixed] == false*), leak of time for fixing).
  *   In that case, you should NOT remove the corresponding test or leave it without any marks that this test
  *   not fully convenient with vim, but leave the test with IdeaVim's behaviour and put this annotation
  *   with description of how original vim works.
@@ -53,7 +55,8 @@ import kotlin.reflect.KProperty
 @Target(AnnotationTarget.FUNCTION)
 annotation class VimBehaviourDiffers(
         val originalVimAfter: String = "",
-        val description: String = ""
+        val description: String = "",
+        val shouldBeFixed: Boolean = true
 )
 
 /**

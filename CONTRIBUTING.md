@@ -21,9 +21,11 @@ See also these docs on the IntelliJ API:
 * [IntelliJ architectural overview](http://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Architectural+Overview)
 * [IntelliJ plugin development resources](http://confluence.jetbrains.com/display/IDEADEV/PluginDevelopment)
 
-You can start by picking relatively simple tasks that are tagged with
+You can start by
+ - Picking relatively simple tasks that are tagged with
 [#patch_welcome](https://youtrack.jetbrains.com/issues/VIM?q=%23patch_welcome%20%23Unresolved%20sort%20by:%20votes%20)
 in the issue tracker.
+ - Read about `@VimBehaviourDiffers` annotation and fix corresponding functionality.
 
 
 ### Development Environment
