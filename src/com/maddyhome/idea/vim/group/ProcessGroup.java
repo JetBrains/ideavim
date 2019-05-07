@@ -144,13 +144,11 @@ public class ProcessGroup {
     return res;
   }
 
-  public boolean cancelExEntry(@NotNull final Editor editor, @NotNull final DataContext context) {
+  public void cancelExEntry(@NotNull final Editor editor, @NotNull final DataContext context) {
     CommandState.getInstance(editor).popState();
     KeyHandler.getInstance().reset(editor);
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true);
-
-    return true;
   }
 
   private void record(Editor editor, @NotNull String text) {

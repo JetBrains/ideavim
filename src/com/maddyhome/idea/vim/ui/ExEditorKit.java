@@ -265,10 +265,13 @@ public class ExEditorKit extends DefaultEditorKit {
       logger.debug("complete entry");
       KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
 
-      KeyHandler.getInstance().handleKey(
-        ExEntryPanel.getInstance().getEntry().getEditor(),
-        stroke,
-        ExEntryPanel.getInstance().getEntry().getContext());
+      // We send the <Enter> keystroke through the key handler rather than calling ProcessGroup#processExEntry directly.
+      // We do this for a couple of reasons:
+      // * The C mode mapping for ProcessExEntryAction handles the actual entry, and most importantly, it does so as a
+      //   write action
+      // * The key handler routines get the chance to clean up and reset state
+      final ExTextField entry = ExEntryPanel.getInstance().getEntry();
+      KeyHandler.getInstance().handleKey(entry.getEditor(), stroke, entry.getContext());
     }
   }
 

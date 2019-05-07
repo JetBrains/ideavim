@@ -526,8 +526,8 @@ class ExEntryTest: VimTestCase() {
 
         val keys = mutableListOf<KeyStroke>()
         StringHelper.parseKeys(text).forEach {
-            // <Left> doesn't work - DefaultEditorKit.NextVisualPositionAction fails to move the caret correctly because
-            // the text component has never been painted
+            // <Left> doesn't work correctly in tests. The DefaultEditorKit.NextVisualPositionAction action is correctly
+            // called, but fails to move the caret correctly because the text component has never been painted
             if (it.keyCode == KeyEvent.VK_LEFT && it.modifiers == 0) {
                 if (keys.count() > 0) {
                     typeText(keys)
