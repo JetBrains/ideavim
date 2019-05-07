@@ -90,6 +90,8 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   public static final String IDEAVIM_NOTIFICATION_TITLE = "IdeaVim";
   public static final int STATE_VERSION = 5;
 
+  private static long lastBeepTimeMillis;
+
   private boolean error = false;
 
   private int previousStateVersion = 0;
@@ -102,6 +104,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   @NotNull private final MotionGroup motion;
   @NotNull private final ChangeGroup change;
+  @NotNull private final CommandGroup command;
   @NotNull private final CopyGroup copy;
   @NotNull private final MarkGroup mark;
   @NotNull private final RegisterGroup register;
@@ -118,6 +121,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   public VimPlugin() {
     motion = new MotionGroup();
     change = new ChangeGroup();
+    command = new CommandGroup();
     copy = new CopyGroup();
     mark = new MarkGroup();
     register = new RegisterGroup();
@@ -237,6 +241,9 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   }
 
   @NotNull
+  public static CommandGroup getCommand() { return getInstance().command; }
+
+  @NotNull
   public static CopyGroup getCopy() {
     return getInstance().copy;
   }
@@ -340,7 +347,12 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
       getInstance().error = true;
     }
     else if (!Options.getInstance().isSet("visualbell")) {
-      Toolkit.getDefaultToolkit().beep();
+      // Vim only allows a beep once every half second - :help 'visualbell'
+      final long currentTimeMillis = System.currentTimeMillis();
+      if (currentTimeMillis - lastBeepTimeMillis > 500) {
+        Toolkit.getDefaultToolkit().beep();
+        lastBeepTimeMillis = currentTimeMillis;
+      }
     }
   }
 

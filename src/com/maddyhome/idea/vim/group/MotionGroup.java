@@ -1630,9 +1630,12 @@ public class MotionGroup {
         mode = range.getType().toSubMode();
         int start = editor.getCaretModel().getOffset();
         int end = calculateVisualRange(editor, range, count);
+        EditorData.setVisualBlockStart(editor, start);
+        EditorData.setVisualBlockEnd(editor, end);
         Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
         CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, mode, MappingMode.VISUAL);
         CaretData.setVisualStart(primaryCaret, start);
+        CaretData.setVisualEnd(primaryCaret, end);
         updateSelection(editor, primaryCaret, end);
         MotionGroup.moveCaret(editor, primaryCaret, CaretData.getVisualEnd(primaryCaret), true);
       }

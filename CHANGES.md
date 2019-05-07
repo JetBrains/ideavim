@@ -39,6 +39,9 @@ To Be Released
 * [VIM-1546](https://youtrack.jetbrains.com/issue/VIM-1546) Storing TAB key as input
 * [VIM-1231](https://youtrack.jetbrains.com/issue/VIM-1231) Get indent from PsiFile
 * [VIM-1633](https://youtrack.jetbrains.com/issue/VIM-1633) Fixed sequential text object commands in visual mode
+* [VIM-1105](https://youtrack.jetbrains.com/issue/VIM-1105) Added the `:command` command
+* [VIM-1090](https://youtrack.jetbrains.com/issue/VIM-1090) Fixed tag motion with duplicate tags
+* [VIM-1644](https://youtrack.jetbrains.com/issue/VIM-1644) Fixed repeat with visual mode
 * Fixed invoking IDE actions instead of command line actions with same shortcuts
 * [VIM-1550](https://youtrack.jetbrains.com/issue/VIM-1550) Fixed leaving command line mode on backspace
 * Fix insert position of `<C-R>` in ex commands

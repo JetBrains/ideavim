@@ -84,7 +84,10 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
     addKeyListener(moreKeyListener);
     myText.addKeyListener(moreKeyListener);
 
-    LafManager.getInstance().addLafManagerListener(this, editor.getProject());
+    final Project project = editor.getProject();
+    if (project != null) {
+      LafManager.getInstance().addLafManagerListener(this, project);
+    }
 
     updateUI();
   }
