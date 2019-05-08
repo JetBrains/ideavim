@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.group.visual.VisualChange
 import com.maddyhome.idea.vim.group.visual.VisualOperation
 import com.maddyhome.idea.vim.group.visual.vimForAllOrPrimaryCaret
 import com.maddyhome.idea.vim.helper.*
@@ -135,6 +136,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         private lateinit var lastMode: CommandState.SubMode
         private var wasRepeat: Boolean = false
         private val previousLastColumns = mutableMapOf<Caret, Int>()
+        private val visualChanges = mutableMapOf<Caret, VisualChange?>()
 
         private fun startForCaret(caret: Caret) {
             if (CommandState.getInstance(editor).mode == CommandState.Mode.REPEAT) {
@@ -151,7 +153,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
                 VisualOperation.getRange(editor, caret, cmd.flags)
             } else null
             logger.debug("change=$change")
-            caret.vimVisualChange = change
+            visualChanges[caret] = change
         }
 
         fun start() {
@@ -185,7 +187,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
             }
 
             if (res) {
-                caret.vimVisualChange?.let {
+                visualChanges[caret]?.let {
                     caret.vimLastVisualOperatorRange = it
                 }
             }

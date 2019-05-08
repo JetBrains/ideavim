@@ -69,5 +69,4 @@ var Caret.vimLastColumn: Int
 //endregion
 
 var Caret.vimLastVisualOperatorRange: VisualChange? by userDataCaretToEditor()
-var Caret.vimVisualChange: VisualChange? by userDataCaretToEditor()
 var Caret.vimInsertStart: Int by userDataOr { (this as Caret).offset }
