@@ -97,7 +97,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
             }
             if (!CommandState.inInsertMode(editor) &&
                     !CommandState.inRepeatMode(editor) &&
-                    !CommandState.inVisualCharacterMode(editor) &&
+                    !CommandState.inVisualMode(editor) &&
                     !CommandState.inSelectMode(editor)) {
                 offset = EditorHelper.normalizeOffset(editor, offset, false)
             }

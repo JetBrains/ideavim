@@ -25,7 +25,9 @@ import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.ScrollType
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.*
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
@@ -33,7 +35,6 @@ import com.maddyhome.idea.vim.helper.*
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.option.BoundStringOption
 import com.maddyhome.idea.vim.option.Options
-import java.util.*
 
 /**
  * @author Alex Plate
@@ -115,39 +116,6 @@ class VisualMotionGroup {
         }
     }
 
-    fun getVisualOperatorRange(editor: Editor, caret: Caret, cmdFlags: EnumSet<CommandFlags>): VisualChange {
-        var start = caret.selectionStart
-        var end = caret.selectionEnd
-
-        if (CommandState.inVisualBlockMode(editor)) {
-            start = caret.vimSelectionStart
-            end = caret.offset
-        }
-
-        if (start > end) {
-            val t = start
-            start = end
-            end = t
-        }
-
-        start = EditorHelper.normalizeOffset(editor, start, false)
-        end = EditorHelper.normalizeOffset(editor, end, false)
-        val sp = editor.offsetToLogicalPosition(start)
-        val ep = editor.offsetToLogicalPosition(end)
-        val lines = ep.line - sp.line + 1
-        val (type, chars) = if (CommandState.getInstance(editor).subMode == CommandState.SubMode.VISUAL_LINE || CommandFlags.FLAG_MOT_LINEWISE in cmdFlags) {
-            SelectionType.LINE_WISE to ep.column
-        } else if (CommandState.getInstance(editor).subMode == CommandState.SubMode.VISUAL_CHARACTER) {
-            SelectionType.CHARACTER_WISE to if (lines > 1) ep.column else ep.column - sp.column
-        } else {
-            SelectionType.BLOCK_WISE to if (editor.caretModel.primaryCaret.vimLastColumn == MotionGroup.LAST_COLUMN) {
-                MotionGroup.LAST_COLUMN
-            } else ep.column - sp.column
-        }
-
-        return VisualChange(lines, chars, type)
-    }
-
     //=============================== ENTER VISUAL and SELECT MODE ==============================================
 
     /**
@@ -167,19 +135,16 @@ class VisualMotionGroup {
                 }
                 // FIXME: 2019-03-05  When there was no previous Visual operation [count] characters are selected.
                 val range = editor.caretModel.primaryCaret.vimLastVisualOperatorRange ?: return false
-                val newSubMode = range.type.toSubMode()
-                val start = editor.caretModel.offset
-                val end = calculateVisualRange(editor, range, count)
-                val primaryCaret = editor.caretModel.primaryCaret
-                CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, newSubMode, MappingMode.VISUAL)
-                primaryCaret.vimSetSelection(start, end, true)
+                val end = VisualOperation.calculateRange(editor, range, count)
+                val lastColumn = if (range.columns == MotionGroup.LAST_COLUMN) MotionGroup.LAST_COLUMN else editor.offsetToLogicalPosition(end).column
+                CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, range.type.toSubMode(), MappingMode.VISUAL)
+                editor.vimForAllOrPrimaryCaret {
+                    it.vimLastColumn = lastColumn
+                    it.vimSetSelection(editor.caretModel.offset, end, true)
+                }
             } else {
                 CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, subMode, MappingMode.VISUAL)
-                if (CommandState.inVisualBlockMode(editor)) {
-                    editor.caretModel.primaryCaret.let { it.vimSetSelection(it.offset) }
-                } else {
-                    editor.caretModel.allCarets.forEach { it.vimSetSelection(it.offset) }
-                }
+                editor.vimForAllOrPrimaryCaret { it.vimSetSelection(it.offset) }
             }
             return true
         }
@@ -268,33 +233,6 @@ class VisualMotionGroup {
         updateCaretColours(editor)
         ChangeGroup.resetCursor(editor, true)
         return true
-    }
-
-    private fun calculateVisualRange(editor: Editor, range: VisualChange, count: Int): Int {
-        var lines = range.lines
-        var chars = range.columns
-        if (range.type == SelectionType.LINE_WISE || range.type == SelectionType.BLOCK_WISE || lines > 1) {
-            lines *= count
-        }
-        if (range.type == SelectionType.CHARACTER_WISE && lines == 1 || range.type == SelectionType.BLOCK_WISE) {
-            chars *= count
-        }
-        val start = editor.caretModel.offset
-        val sp = editor.offsetToLogicalPosition(start)
-        val endLine = sp.line + lines - 1
-
-        return if (range.type == SelectionType.LINE_WISE) {
-            VimPlugin.getMotion().moveCaretToLine(editor, endLine)
-        } else if (range.type == SelectionType.CHARACTER_WISE) {
-            if (lines > 1) {
-                VimPlugin.getMotion().moveCaretToLineStart(editor, endLine) + Math.min(EditorHelper.getLineLength(editor, endLine), chars)
-            } else {
-                EditorHelper.normalizeOffset(editor, sp.line, start + chars - 1, false)
-            }
-        } else {
-            val endColumn = Math.min(EditorHelper.getLineLength(editor, endLine), sp.column + chars - 1)
-            editor.logicalPositionToOffset(LogicalPosition(endLine, endColumn))
-        }
     }
 
     private fun autodetectVisualMode(editor: Editor): CommandState.SubMode {

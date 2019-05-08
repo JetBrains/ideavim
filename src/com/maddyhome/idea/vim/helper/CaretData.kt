@@ -24,7 +24,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.command.VisualChange
+import com.maddyhome.idea.vim.group.visual.VisualChange
 
 /**
  * @author Alex Plate
@@ -68,6 +68,6 @@ var Caret.vimLastColumn: Int
     }
 //endregion
 
-var Caret.vimLastVisualOperatorRange: VisualChange? by userData()
-var Caret.vimVisualChange: VisualChange? by userData()
+var Caret.vimLastVisualOperatorRange: VisualChange? by userDataCaretToEditor()
+var Caret.vimVisualChange: VisualChange? by userDataCaretToEditor()
 var Caret.vimInsertStart: Int by userDataOr { (this as Caret).offset }

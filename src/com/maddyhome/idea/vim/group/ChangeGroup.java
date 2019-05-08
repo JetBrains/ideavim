@@ -49,7 +49,7 @@ import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.LineRange;
-import com.maddyhome.idea.vim.group.visual.NativeSelectionKt;
+import com.maddyhome.idea.vim.group.visual.VisualUtilKt;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
@@ -1516,7 +1516,7 @@ public class ChangeGroup {
     final int startOffset = EditorHelper.getLineStartForOffset(editor, range.getStartOffset());
     final int endOffset = EditorHelper.getLineEndForOffset(editor, range.getEndOffset());
 
-    NativeSelectionKt.vimSetSystemSelectionSilently(editor.getSelectionModel(), startOffset, endOffset);
+    VisualUtilKt.vimSetSystemSelectionSilently(editor.getSelectionModel(), startOffset, endOffset);
 
     KeyHandler.executeAction("AutoIndentLines", context);
 

@@ -68,14 +68,6 @@ class MotionLastColumnActionTest : VimTestCase() {
         doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
-    @VimBehaviourDiffers(originalVimAfter = """
-            A Discovery
-
-            I ${s}found it in a legendary lan${c}d${se}
-            al${s}l rocks and lavender and tufted grass,[ additional symbols${c}]${se}
-            wh${s}ere it was settled on some sodden sand${c}${se}
-            hard by the torrent of a mountain pass.
-    """)
     fun `test dollar motion in visual block mode`() {
         val keys = parseKeys("<C-V>jj\$")
         val before = """
@@ -90,8 +82,8 @@ class MotionLastColumnActionTest : VimTestCase() {
             A Discovery
 
             I ${s}found it in a legendary lan${c}d${se}
-            al${s}l rocks and lavender and tufted grass,${c}[ additional symbols]${se}
-            wh${s}ere it was settled on some sodden san${c}d${se}
+            al${s}l rocks and lavender and tufted grass,[ additional symbols${c}]${se}
+            wh${s}ere it was settled on some sodden sand${c}${se}
             hard by the torrent of a mountain pass.
         """.trimIndent()
         doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
@@ -119,8 +111,8 @@ class MotionLastColumnActionTest : VimTestCase() {
             A Discovery
 
             I ${s}found it in a legendary lan${c}d${se}
-            al${s}l rocks and lavender and tufted grass${c},[ additional symbols]${se}
-            wh${s}ere it was settled on some sodden sa${c}nd${se}
+            al${s}l rocks and lavender and tufted grass,[ additional symbols${c}]${se}
+            wh${s}ere it was settled on some sodden san${c}d${se}
             hard by the torrent of a mountain pass.
         """.trimIndent()
         doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)

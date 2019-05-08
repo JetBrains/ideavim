@@ -40,7 +40,7 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
 fun Caret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false) {
     vimSelectionStart = start
     setVisualSelection(start, end, this)
-    if (moveCaretToSelectionEnd) moveToOffset(end)
+    if (moveCaretToSelectionEnd && !CommandState.inVisualBlockMode(editor)) moveToOffset(end)
 }
 
 /**
@@ -224,6 +224,8 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
                 // Extend selection to line end if it was made with `$` command
                 if (lastColumn >= MotionGroup.LAST_COLUMN) {
                     aCaret.vimSetSystemSelectionSilently(aCaret.selectionStart, lineEndOffset)
+                    val newOffset = (lineEndOffset - VimPlugin.getVisualMotion().selectionAdj).coerceAtLeast(lineStartOffset)
+                    aCaret.moveToOffset(newOffset)
                 }
                 val visualPosition = editor.offsetToVisualPosition(aCaret.selectionEnd)
                 if (aCaret.offset == aCaret.selectionEnd && visualPosition != aCaret.visualPosition) {

@@ -24,8 +24,13 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.*
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.group.visual.VisualOperation
+import com.maddyhome.idea.vim.group.visual.vimForAllOrPrimaryCaret
 import com.maddyhome.idea.vim.helper.*
 
 /**
@@ -134,21 +139,18 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         private fun startForCaret(caret: Caret) {
             if (CommandState.getInstance(editor).mode == CommandState.Mode.REPEAT) {
                 previousLastColumns[caret] = caret.vimLastColumn
-                val range = caret.vimLastVisualOperatorRange
                 VimPlugin.getVisualMotion().toggleVisual(editor, 1, 1, CommandState.SubMode.NONE)
-                if (range != null && range.columns == MotionGroup.LAST_COLUMN) {
-                    caret.vimLastColumn = MotionGroup.LAST_COLUMN
+                caret.vimLastVisualOperatorRange?.run {
+                    if (columns == MotionGroup.LAST_COLUMN) {
+                        caret.vimLastColumn = MotionGroup.LAST_COLUMN
+                    }
                 }
             }
 
-            var change: VisualChange? = null
-            if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
-                if (!wasRepeat) {
-                    change = VimPlugin.getVisualMotion()
-                            .getVisualOperatorRange(editor, caret, cmd.flags)
-                }
-                logger.debug("change=$change")
-            }
+            val change = if (CommandState.inVisualMode(editor) && !wasRepeat) {
+                VisualOperation.getRange(editor, caret, cmd.flags)
+            } else null
+            logger.debug("change=$change")
             caret.vimVisualChange = change
         }
 
@@ -157,9 +159,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
             wasRepeat = CommandState.getInstance(editor).mode == CommandState.Mode.REPEAT
             EditorData.setKeepingVisualOperatorAction(editor, CommandFlags.FLAG_EXIT_VISUAL !in cmd.flags)
 
-            for (caret in editor.caretModel.allCarets) {
-                startForCaret(caret)
-            }
+            editor.vimForAllOrPrimaryCaret(this@VisualStartFinishWrapper::startForCaret)
 
             // If this is a mutli key change then exit visual now
             if (CommandFlags.FLAG_MULTIKEY_UNDO in cmd.flags) {

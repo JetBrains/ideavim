@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
 import kotlin.properties.ReadWriteProperty
@@ -79,6 +80,34 @@ fun <T> userData(): ReadWriteProperty<UserDataHolder, T?> {
 
         override fun setValue(thisRef: UserDataHolder, property: KProperty<*>, value: T?) {
             thisRef.putUserData(getKey(property), value)
+        }
+    }
+}
+
+fun <T> userDataCaretToEditor(): ReadWriteProperty<Caret, T?> {
+    return object : ReadWriteProperty<Caret, T?> {
+        private var key: Key<T>? = null
+        private fun getKey(property: KProperty<*>): Key<T> {
+            if (key == null) {
+                key = Key.create(property.name + " by userData()")
+            }
+            return key as Key<T>
+        }
+
+        override fun getValue(thisRef: Caret, property: KProperty<*>): T? {
+            return if (thisRef == thisRef.editor.caretModel.primaryCaret) {
+                thisRef.editor.getUserData(getKey(property))
+            } else {
+                thisRef.getUserData(getKey(property))
+            }
+        }
+
+        override fun setValue(thisRef: Caret, property: KProperty<*>, value: T?) {
+            return if (thisRef == thisRef.editor.caretModel.primaryCaret) {
+                thisRef.editor.putUserData(getKey(property), value)
+            } else {
+                thisRef.putUserData(getKey(property), value)
+            }
         }
     }
 }
