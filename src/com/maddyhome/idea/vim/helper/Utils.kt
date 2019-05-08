@@ -84,30 +84,36 @@ fun <T> userData(): ReadWriteProperty<UserDataHolder, T?> {
     }
 }
 
+/**
+ * Function for delegated properties.
+ * The property will be saved to caret if this caret is not primary
+ *   and to caret and editor otherwise.
+ * In case of primary caret getter uses value stored in caret. If it's null, then the value from editor
+ * Has nullable type.
+ */
 fun <T> userDataCaretToEditor(): ReadWriteProperty<Caret, T?> {
     return object : ReadWriteProperty<Caret, T?> {
         private var key: Key<T>? = null
         private fun getKey(property: KProperty<*>): Key<T> {
             if (key == null) {
-                key = Key.create(property.name + " by userData()")
+                key = Key.create(property.name + " by  userDataCaretToEditor()")
             }
             return key as Key<T>
         }
 
         override fun getValue(thisRef: Caret, property: KProperty<*>): T? {
             return if (thisRef == thisRef.editor.caretModel.primaryCaret) {
-                thisRef.editor.getUserData(getKey(property))
+                thisRef.getUserData(getKey(property)) ?: thisRef.editor.getUserData(getKey(property))
             } else {
                 thisRef.getUserData(getKey(property))
             }
         }
 
         override fun setValue(thisRef: Caret, property: KProperty<*>, value: T?) {
-            return if (thisRef == thisRef.editor.caretModel.primaryCaret) {
+            if (thisRef == thisRef.editor.caretModel.primaryCaret) {
                 thisRef.editor.putUserData(getKey(property), value)
-            } else {
-                thisRef.putUserData(getKey(property), value)
             }
+            thisRef.putUserData(getKey(property), value)
         }
     }
 }
@@ -123,7 +129,7 @@ fun <T> userDataOr(default: UserDataHolder.() -> T): ReadWriteProperty<UserDataH
         private var key: Key<T>? = null
         private fun getKey(property: KProperty<*>): Key<T> {
             if (key == null) {
-                key = Key.create(property.name + " by userData()")
+                key = Key.create(property.name + " by userDataOr()")
             }
             return key as Key<T>
         }
@@ -142,4 +148,4 @@ fun <T> userDataOr(default: UserDataHolder.() -> T): ReadWriteProperty<UserDataH
     }
 }
 
-fun <T : Comparable<T>> sort(a: T, b: T) = if(a > b) b to a else a to b
+fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b

@@ -21,7 +21,6 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.VisualChange
@@ -35,26 +34,16 @@ import com.maddyhome.idea.vim.group.visual.VisualChange
  * Caret's offset when entering visual mode
  */
 var Caret.vimSelectionStart: Int
-    get() = if (CommandState.inVisualBlockMode(editor)) {
-        editor._vimBlockSelectionStart
-                ?: throw AssertionError("Trying to access selection start, but it's not set")
-    } else {
-        _vimSelectionStart
-                ?: throw AssertionError("Trying to access selection start, but it's not set")
-    }
-    set(value) = if (CommandState.inVisualBlockMode(editor)) {
-        editor._vimBlockSelectionStart = value
-    } else {
+    get() = _vimSelectionStart ?: throw AssertionError("Trying to access selection start, but it's not set")
+    set(value) {
         _vimSelectionStart = value
     }
 
 fun Caret.vimSelectionStartClear() {
     this._vimSelectionStart = null
-    editor._vimBlockSelectionStart = null
 }
 
-private var Caret._vimSelectionStart: Int? by userData()
-private var Editor._vimBlockSelectionStart: Int? by userData()
+private var Caret._vimSelectionStart: Int? by userDataCaretToEditor()
 //endregion ----------------------------------------------------
 
 //region Vim last column
