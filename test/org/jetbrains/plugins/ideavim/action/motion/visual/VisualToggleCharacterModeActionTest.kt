@@ -130,6 +130,27 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                 CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
     }
 
+    fun `test enter visual with count multicaret`() {
+        doTest(parseKeys("1v"),
+                """
+                    A Discovery
+
+                    I ${c}found it in a legendary land
+                    all rocks and ${c}lavender and tufted grass,
+                    where it was settled on some sodden sand
+                    hard by the torrent of a mountain pass.
+                """.trimIndent(),
+                """
+                    A Discovery
+
+                    I ${s}${c}f${se}ound it in a legendary land
+                    all rocks and ${s}${c}l${se}avender and tufted grass,
+                    where it was settled on some sodden sand
+                    hard by the torrent of a mountain pass.
+                """.trimIndent(),
+                CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    }
+
     fun `test enter visual with five count`() {
         doTest(parseKeys("5v"),
                 """
@@ -193,6 +214,27 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                 CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
     }
 
+    fun `test enter visual with count after visual operation multicaret`() {
+        doTest(parseKeys("vedx", "1v"),
+                """
+                    A Discovery
+
+                    I ${c}found it in a legendary land
+                    all rocks and ${c}lavender and tufted grass,
+                    where it was settled on some sodden sand
+                    hard by the torrent of a mountain pass.
+                """.trimIndent(),
+                """
+                    A Discovery
+
+                    I ${s}it i${c}n${se} a legendary land
+                    all rocks and ${s}and tuf${c}t${se}ed grass,
+                    where it was settled on some sodden sand
+                    hard by the torrent of a mountain pass.
+                """.trimIndent(),
+                CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    }
+
     fun `test enter visual with count after visual operation multiple time`() {
         doTest(parseKeys("vedx", "1v", "<ESC>bb", "1v"),
                 """
@@ -248,7 +290,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                 """
                     A Discovery
 
-                    I ${s}it in a legendary lan${c}d${se}
+                    I ${s}it in a legendary land${c}${se}
                     all rocks and lavender and tufted grass,
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
@@ -330,7 +372,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     A Discovery
 
                     I
-                    ${s}all rocks and lavender and tufted grass${c},${se}
+                    ${s}all rocks and lavender and tufted grass,${c}${se}
                     where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
                 """.trimIndent(),
@@ -375,6 +417,23 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     ${se}where it was settled on some sodden sand
                     hard by the torrent of a mountain pass.
                 """.trimIndent(),
+                CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE)
+    }
+
+    fun `test enter visual with count after line visual operation multicaret`() {
+        doTest(parseKeys("Vd", "1v"),
+                """
+                    A ${c}Discovery
+
+                    I found it in a legendary land
+                    all ${c}rocks and lavender and tufted grass,
+                    where it was settled on some sodden sand
+                    hard by the torrent of a mountain pass.""".trimIndent(),
+                """
+                    ${s}${c}
+                    ${se}I found it in a legendary land
+                    ${s}${c}where it was settled on some sodden sand
+                    ${se}hard by the torrent of a mountain pass.""".trimIndent(),
                 CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE)
     }
 

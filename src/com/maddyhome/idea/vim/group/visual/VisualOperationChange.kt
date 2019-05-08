@@ -79,7 +79,7 @@ class VisualOperation {
         /**
          * Calculate end offset of [VisualChange]
          */
-        fun calculateRange(editor: Editor, range: VisualChange, count: Int): Int {
+        fun calculateRange(editor: Editor, range: VisualChange, count: Int, caret: Caret): Int {
             var (lines, chars, type) = range
             if (type == SelectionType.LINE_WISE || type == SelectionType.BLOCK_WISE || lines > 1) {
                 lines *= count
@@ -87,16 +87,15 @@ class VisualOperation {
             if (type == SelectionType.CHARACTER_WISE && lines == 1 || type == SelectionType.BLOCK_WISE) {
                 chars *= count
             }
-            val start = editor.caretModel.offset
-            val sp = editor.offsetToLogicalPosition(start)
+            val sp = editor.offsetToLogicalPosition(caret.offset)
             val linesDiff = (lines - 1).coerceAtLeast(0)
             val endLine = (sp.line + linesDiff).coerceAtMost(editor.document.lineCount - 1)
 
             return when (type) {
-                SelectionType.LINE_WISE -> VimPlugin.getMotion().moveCaretToLine(editor, endLine)
+                SelectionType.LINE_WISE -> VimPlugin.getMotion().moveCaretToLine(editor, endLine, caret)
                 SelectionType.CHARACTER_WISE -> when {
                     lines > 1 -> VimPlugin.getMotion().moveCaretToLineStart(editor, endLine) + min(EditorHelper.getLineLength(editor, endLine), chars)
-                    else -> EditorHelper.normalizeOffset(editor, sp.line, start + chars - 1, true)
+                    else -> EditorHelper.normalizeOffset(editor, sp.line, caret.offset + chars - 1, true)
                 }
                 SelectionType.BLOCK_WISE -> {
                     val endColumn = min(EditorHelper.getLineLength(editor, endLine), sp.column + chars - 1)

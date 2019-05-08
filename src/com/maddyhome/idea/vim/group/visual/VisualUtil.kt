@@ -47,7 +47,7 @@ fun SelectionModel.vimSetSystemBlockSelectionSilently(start: LogicalPosition, en
 fun Caret.vimSetSystemSelectionSilently(start: Int, end: Int) =
         SelectionVimListenerSuppressor.lock().use { setSelection(start, end) }
 
-inline fun Editor.vimForAllOrPrimaryCaret(action: (caret: Caret) -> Unit) {
+fun Editor.vimForAllOrPrimaryCaret(action: (caret: Caret) -> Unit) {
     if (CommandState.inVisualBlockMode(this)) {
        action(this.caretModel.primaryCaret)
     } else {

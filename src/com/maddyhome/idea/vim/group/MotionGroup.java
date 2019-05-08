@@ -1098,8 +1098,8 @@ public class MotionGroup {
     return false;
   }
 
-  public int moveCaretToLine(@NotNull Editor editor, int logicalLine) {
-    int col = CaretDataKt.getVimLastColumn(editor.getCaretModel().getPrimaryCaret());
+  public int moveCaretToLine(@NotNull Editor editor, int logicalLine, @NotNull Caret caret) {
+    int col = CaretDataKt.getVimLastColumn(caret);
     int line = logicalLine;
     if (logicalLine < 0) {
       line = 0;

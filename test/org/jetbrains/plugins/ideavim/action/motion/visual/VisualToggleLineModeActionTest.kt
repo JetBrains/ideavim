@@ -46,6 +46,27 @@ class VisualToggleLineModeActionTest : VimTestCase() {
                 CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE)
     }
 
+    fun `test enter visual with count multicaret`() {
+        doTest(parseKeys("1V"),
+                """
+                    A Discovery
+
+                    I ${c}found it in a legendary land
+                    all rocks and lavender and tufted grass,
+                    where it ${c}was settled on some sodden sand
+                    hard by the torrent of a mountain pass.
+                """.trimIndent(),
+                """
+                    A Discovery
+
+                    ${s}I ${c}found it in a legendary land
+                    ${se}all rocks and lavender and tufted grass,
+                    ${s}where it ${c}was settled on some sodden sand
+                    ${se}hard by the torrent of a mountain pass.
+                """.trimIndent(),
+                CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE)
+    }
+
     fun `test enter visual with 3 count`() {
         doTest(parseKeys("3V"),
                 """

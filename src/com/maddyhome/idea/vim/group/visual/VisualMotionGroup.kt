@@ -129,17 +129,16 @@ class VisualMotionGroup {
         if (!CommandState.inVisualMode(editor)) {
             // Enable visual subMode
             if (rawCount > 0) {
-                if (editor.caretModel.caretCount > 1) {
-                    // FIXME: 2019-03-05 Support multicaret
-                    return false
-                }
-                val range = editor.caretModel.primaryCaret.vimLastVisualOperatorRange ?: VisualChange.default(subMode)
-                val end = VisualOperation.calculateRange(editor, range, count)
-                val lastColumn = if (range.columns == MotionGroup.LAST_COLUMN) MotionGroup.LAST_COLUMN else editor.offsetToLogicalPosition(end).column
-                CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, range.type.toSubMode(), MappingMode.VISUAL)
+                val primarySubMode = editor.caretModel.primaryCaret.vimLastVisualOperatorRange?.type?.toSubMode()
+                        ?: subMode
+                CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, primarySubMode, MappingMode.VISUAL)
+
                 editor.vimForAllOrPrimaryCaret {
+                    val range = it.vimLastVisualOperatorRange ?: VisualChange.default(subMode)
+                    val end = VisualOperation.calculateRange(editor, range, count, it)
+                    val lastColumn = if (range.columns == MotionGroup.LAST_COLUMN) MotionGroup.LAST_COLUMN else editor.offsetToLogicalPosition(end).column
                     it.vimLastColumn = lastColumn
-                    it.vimSetSelection(editor.caretModel.offset, end, true)
+                    it.vimSetSelection(it.offset, end, true)
                 }
             } else {
                 CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, subMode, MappingMode.VISUAL)
