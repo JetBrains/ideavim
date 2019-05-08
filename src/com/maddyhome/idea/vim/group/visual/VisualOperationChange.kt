@@ -33,7 +33,15 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
 import java.util.*
 import kotlin.math.min
 
-data class VisualChange(val lines: Int, val columns: Int, val type: SelectionType)
+data class VisualChange(val lines: Int, val columns: Int, val type: SelectionType) {
+    companion object {
+        fun default(subMode: CommandState.SubMode) =
+                when (val type = SelectionType.fromSubMode(subMode)) {
+                    SelectionType.LINE_WISE, SelectionType.CHARACTER_WISE -> VisualChange(1, 1, type)
+                    SelectionType.BLOCK_WISE -> VisualChange(0, 1, type)
+                }
+    }
+}
 
 class VisualOperation {
     companion object {
@@ -81,13 +89,14 @@ class VisualOperation {
             }
             val start = editor.caretModel.offset
             val sp = editor.offsetToLogicalPosition(start)
-            val endLine = (sp.line + lines - 1).coerceAtMost(editor.document.lineCount - 1)
+            val linesDiff = (lines - 1).coerceAtLeast(0)
+            val endLine = (sp.line + linesDiff).coerceAtMost(editor.document.lineCount - 1)
 
             return when (type) {
                 SelectionType.LINE_WISE -> VimPlugin.getMotion().moveCaretToLine(editor, endLine)
                 SelectionType.CHARACTER_WISE -> when {
                     lines > 1 -> VimPlugin.getMotion().moveCaretToLineStart(editor, endLine) + min(EditorHelper.getLineLength(editor, endLine), chars)
-                    else -> EditorHelper.normalizeOffset(editor, sp.line, start + chars - 1, false)
+                    else -> EditorHelper.normalizeOffset(editor, sp.line, start + chars - 1, true)
                 }
                 SelectionType.BLOCK_WISE -> {
                     val endColumn = min(EditorHelper.getLineLength(editor, endLine), sp.column + chars - 1)

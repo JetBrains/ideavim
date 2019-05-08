@@ -109,6 +109,69 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
         assertEquals(startOffset2, myFixture.editor.caretModel.allCarets[1].vimSelectionStart)
     }
 
+    fun `test enter visual with count`() {
+        doTest(parseKeys("1v"),
+                """
+                    A Discovery
+
+                    I ${c}found it in a legendary land
+                    all rocks and lavender and tufted grass,
+                    where it was settled on some sodden sand
+                    hard by the torrent of a mountain pass.
+                """.trimIndent(),
+                """
+                    A Discovery
+
+                    I ${s}${c}f${se}ound it in a legendary land
+                    all rocks and lavender and tufted grass,
+                    where it was settled on some sodden sand
+                    hard by the torrent of a mountain pass.
+                """.trimIndent(),
+                CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    }
+
+    fun `test enter visual with five count`() {
+        doTest(parseKeys("5v"),
+                """
+                    A Discovery
+
+                    I ${c}found it in a legendary land
+                    all rocks and lavender and tufted grass,
+                    where it was settled on some sodden sand
+                    hard by the torrent of a mountain pass.
+                """.trimIndent(),
+                """
+                    A Discovery
+
+                    I ${s}foun${c}d${se} it in a legendary land
+                    all rocks and lavender and tufted grass,
+                    where it was settled on some sodden sand
+                    hard by the torrent of a mountain pass.
+                """.trimIndent(),
+                CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    }
+
+    fun `test enter visual with 100 count`() {
+        doTest(parseKeys("100v"),
+                """
+                    A Discovery
+
+                    I ${c}found it in a legendary land
+                    all rocks and lavender and tufted grass,
+                    where it was settled on some sodden sand
+                    hard by the torrent of a mountain pass.
+                """.trimIndent(),
+                """
+                    A Discovery
+
+                    I ${s}found it in a legendary land${c}${se}
+                    all rocks and lavender and tufted grass,
+                    where it was settled on some sodden sand
+                    hard by the torrent of a mountain pass.
+                """.trimIndent(),
+                CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    }
+
     fun `test enter visual with count after visual operation`() {
         doTest(parseKeys("vedx", "1v"),
                 """

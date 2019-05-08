@@ -133,8 +133,7 @@ class VisualMotionGroup {
                     // FIXME: 2019-03-05 Support multicaret
                     return false
                 }
-                // FIXME: 2019-03-05  When there was no previous Visual operation [count] characters are selected.
-                val range = editor.caretModel.primaryCaret.vimLastVisualOperatorRange ?: return false
+                val range = editor.caretModel.primaryCaret.vimLastVisualOperatorRange ?: VisualChange.default(subMode)
                 val end = VisualOperation.calculateRange(editor, range, count)
                 val lastColumn = if (range.columns == MotionGroup.LAST_COLUMN) MotionGroup.LAST_COLUMN else editor.offsetToLogicalPosition(end).column
                 CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, range.type.toSubMode(), MappingMode.VISUAL)
