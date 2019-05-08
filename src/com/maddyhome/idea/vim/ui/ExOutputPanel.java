@@ -113,7 +113,7 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
   public void updateUI() {
     super.updateUI();
 
-    setBorder(BorderFactory.createEtchedBorder());
+    setBorder(new ExPanelBorder());
 
     // Can be null when called from base constructor
     //noinspection ConstantConditions
