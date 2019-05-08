@@ -60,7 +60,7 @@ class CmdHandler : CommandHandler(
     }
 
     private fun listAlias(editor: Editor, filter: String): Boolean {
-        val lineSeparator = System.lineSeparator()
+        val lineSeparator = "\n"
         val allAliases = VimPlugin.getCommand().listAliases()
         val aliases = allAliases.filter {
             (filter.isEmpty() || it.key.startsWith(filter))

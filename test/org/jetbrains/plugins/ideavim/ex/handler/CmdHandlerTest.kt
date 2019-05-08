@@ -42,8 +42,7 @@ class CmdHandlerTest : VimFileEditorTestCase() {
         configureByText("\n")
         typeText(VimTestCase.commandToKeys("command"))
         assertPluginError(false)
-        val lineSeparator = System.lineSeparator()
-        assertExOutput("Name        Args       Definition$lineSeparator") // There should not be any aliases.
+        assertExOutput("Name        Args       Definition\n") // There should not be any aliases.
 
         typeText(VimTestCase.commandToKeys("command Vs vs"))
         assertPluginError(false)
