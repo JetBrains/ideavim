@@ -395,11 +395,17 @@ public class ExTextField extends JTextField {
         return;
       }
 
-      // Hide the current caret shape before changing and redrawing
-      setVisible(false);
+      // Hide the current caret and redraw without it. Then make the new caret visible, but only if it was already
+      // (logically) visible/active. Always making it visible can start the flasher timer unnecessarily.
+      final boolean active = isActive();
+      if (isVisible()) {
+        setVisible(false);
+      }
       this.mode = mode;
       this.blockPercentage = blockPercentage;
-      setVisible(true);
+      if (active) {
+        setVisible(true);
+      }
     }
 
     private void updateDamage() {
@@ -428,14 +434,14 @@ public class ExTextField extends JTextField {
       hasFocus = false;
       lastBlinkRate = getBlinkRate();
       setBlinkRate(0);
+      // We might be losing focus while the cursor is flashing, and is currently not visible
       setVisible(true);
       updateDamage();
     }
 
     @Override
     public void paint(Graphics g) {
-      if (!isVisible())
-        return;
+      if (!isVisible()) return;
 
       try {
         final JTextComponent component = getComponent();
