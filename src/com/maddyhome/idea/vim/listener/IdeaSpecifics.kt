@@ -88,7 +88,7 @@ object IdeaSpecifics {
         override fun templateStarted(state: TemplateState) {
             if (!VimPlugin.isEnabled()) return
 
-            val editor = state.editor
+            val editor = state.editor ?: return
             if (!editor.selectionModel.hasSelection()) {
                 // Enable insert mode if there is no selection in template
                 // Template with selection is handled by [com.maddyhome.idea.vim.group.visual.VisualMotionGroup.controlNonVimSelectionChange]
