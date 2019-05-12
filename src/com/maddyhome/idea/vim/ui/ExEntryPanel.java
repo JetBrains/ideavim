@@ -32,6 +32,8 @@ import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.group.SearchGroup;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.regexp.CharPointer;
+import com.maddyhome.idea.vim.regexp.RegExp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -283,7 +285,9 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       if (incHighlighter != null) {
         editor.getMarkupModel().removeHighlighter(incHighlighter);
       }
-      final String pattern = entry.getText();
+      final CharPointer p = new CharPointer(entry.getText());
+      final CharPointer end = RegExp.skip_regexp(new CharPointer(entry.getText()), forwards ? '/' : '?', true);
+      final String pattern = p.substring(end.pointer() - p.pointer());
       final boolean ignoreCase = SearchGroup.shouldIgnoreCase(pattern, false);
       final TextRange range = SearchGroup.findNext(editor, pattern, editor.getCaretModel().getOffset(), ignoreCase, forwards);
       if (range != null) {
