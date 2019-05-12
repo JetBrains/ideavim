@@ -284,7 +284,8 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
         editor.getMarkupModel().removeHighlighter(incHighlighter);
       }
       final String pattern = entry.getText();
-      final TextRange range = SearchGroup.findNext(editor, pattern, editor.getCaretModel().getOffset(), true, forwards);
+      final boolean ignoreCase = SearchGroup.shouldIgnoreCase(pattern, false);
+      final TextRange range = SearchGroup.findNext(editor, pattern, editor.getCaretModel().getOffset(), ignoreCase, forwards);
       if (range != null) {
         incHighlighter = SearchGroup.highlightMatch(editor, range.getStartOffset(), range.getEndOffset(), true, pattern);
         MotionGroup.scrollPositionIntoView(editor, editor.offsetToVisualPosition(range.getStartOffset()), true);

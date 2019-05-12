@@ -443,7 +443,7 @@ public class SearchGroup {
     return result.get();
   }
 
-  private static boolean shouldIgnoreCase(@NotNull String pattern, boolean noSmartCase) {
+  public static boolean shouldIgnoreCase(@NotNull String pattern, boolean noSmartCase) {
     boolean sc = !noSmartCase && Options.getInstance().isSet("smartcase");
     boolean ic = Options.getInstance().isSet("ignorecase");
 
