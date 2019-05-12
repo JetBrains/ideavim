@@ -24,9 +24,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.colors.EditorColors;
-import com.intellij.openapi.editor.markup.RangeHighlighter;
-import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.editor.markup.*;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -288,10 +286,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       final String pattern = entry.getText();
       final TextRange range = SearchGroup.findNext(editor, pattern, editor.getCaretModel().getOffset(), true, forwards);
       if (range != null) {
-        final TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
-        incHighlighter = SearchGroup.highlightMatch(editor, range.getStartOffset(), range.getEndOffset());
-        incHighlighter.setErrorStripeMarkColor(color.getBackgroundColor());
-        incHighlighter.setErrorStripeTooltip(pattern);
+        incHighlighter = SearchGroup.highlightMatch(editor, range.getStartOffset(), range.getEndOffset(), true, pattern);
         MotionGroup.scrollPositionIntoView(editor, editor.offsetToVisualPosition(range.getStartOffset()), true);
       }
     }

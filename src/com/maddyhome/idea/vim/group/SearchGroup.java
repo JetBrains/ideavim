@@ -25,10 +25,7 @@ import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.editor.event.DocumentAdapter;
 import com.intellij.openapi.editor.event.DocumentEvent;
-import com.intellij.openapi.editor.markup.HighlighterLayer;
-import com.intellij.openapi.editor.markup.HighlighterTargetArea;
-import com.intellij.openapi.editor.markup.RangeHighlighter;
-import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.editor.markup.*;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
@@ -708,7 +705,6 @@ public class SearchGroup {
 
   private static void highlightSearchLines(@NotNull Editor editor, @NotNull String pattern, int startLine, int endLine,
                                            boolean ignoreCase) {
-    final TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
     Collection<RangeHighlighter> highlighters = EditorData.getLastHighlights(editor);
     if (highlighters == null) {
       highlighters = new ArrayList<>();
@@ -716,9 +712,7 @@ public class SearchGroup {
     }
 
     for (TextRange range : findAll(editor, pattern, startLine, endLine, ignoreCase)) {
-      final RangeHighlighter highlighter = highlightMatch(editor, range.getStartOffset(), range.getEndOffset());
-      highlighter.setErrorStripeMarkColor(color.getBackgroundColor());
-      highlighter.setErrorStripeTooltip(pattern);
+      final RangeHighlighter highlighter = highlightMatch(editor, range.getStartOffset(), range.getEndOffset(), false, pattern);
       highlighters.add(highlighter);
     }
   }
@@ -1096,15 +1090,23 @@ public class SearchGroup {
       editor.getColorsScheme().getColor(EditorColors.SELECTION_BACKGROUND_COLOR),
       null, null, 0
     );
-    return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.ADDITIONAL_SYNTAX + 2,
+    return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.SELECTION,
                                                        color, HighlighterTargetArea.EXACT_RANGE);
   }
 
   @NotNull
-  public static RangeHighlighter highlightMatch(@NotNull Editor editor, int start, int end) {
-    TextAttributes color = editor.getColorsScheme().getAttributes(EditorColors.SEARCH_RESULT_ATTRIBUTES);
-    return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.ADDITIONAL_SYNTAX + 1,
-                                                       color, HighlighterTargetArea.EXACT_RANGE);
+  public static RangeHighlighter highlightMatch(@NotNull Editor editor, int start, int end, boolean current, String tooltip) {
+    TextAttributes attributes = editor.getColorsScheme().getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES);
+    if (current) {
+      // This mimics what IntelliJ does with the Find live preview
+      attributes = attributes.clone();
+      attributes.setEffectType(EffectType.ROUNDED_BOX);
+      attributes.setEffectColor(editor.getColorsScheme().getColor(EditorColors.CARET_COLOR));
+    }
+    final RangeHighlighter highlighter = editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.SELECTION - 1,
+      attributes, HighlighterTargetArea.EXACT_RANGE);
+    highlighter.setErrorStripeTooltip(tooltip);
+    return highlighter;
   }
 
   public void clearSearchHighlight() {
