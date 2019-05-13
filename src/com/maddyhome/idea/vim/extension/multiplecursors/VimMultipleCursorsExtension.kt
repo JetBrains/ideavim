@@ -214,6 +214,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
 
     private fun selectWord(caret: Caret, pattern: String, offset: Int) {
         caret.vimSetSelection(offset, offset + pattern.length - 1, true)
+        if (caret == caret.editor.caretModel.primaryCaret) MotionGroup.scrollCaretIntoView(caret.editor)
     }
 
     private fun findNextOccurrence(editor: Editor, caret: Caret, range: TextRange, whole: Boolean): Int {
