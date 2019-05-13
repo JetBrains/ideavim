@@ -1605,7 +1605,7 @@ public class ChangeGroup {
       return false;
     }
 
-    if (type == null || VimPlugin.getRegister().storeText(editor, range, type, true)) {
+    if (type == null || CommandState.inInsertMode(editor) || VimPlugin.getRegister().storeText(editor, range, type, true)) {
       final Document document = editor.getDocument();
       final int[] startOffsets = range.getStartOffsets();
       final int[] endOffsets = range.getEndOffsets();
