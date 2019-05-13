@@ -16,64 +16,36 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action.motion.visual;
+package com.maddyhome.idea.vim.action.motion.visual
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.group.visual.VisualUtilKt;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
-import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-import java.util.List;
-import java.util.Set;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.group.visual.vimForAllOrPrimaryCaret
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import java.util.*
+import javax.swing.KeyStroke
 
 /**
  * @author vlan
  */
-public class VisualSwapEndsAction extends VimCommandAction {
-  public VisualSwapEndsAction() {
-    super(new EditorActionHandlerBase() {
-      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+private object VisualSwapEndsActionHandler : EditorActionHandlerBase() {
+    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+        var ret = true
+        editor.vimForAllOrPrimaryCaret { ret = ret and VimPlugin.getVisualMotion().swapVisualEnds(editor, it) }
+        return ret
+    }
+}
 
-        VisualUtilKt.vimForAllOrPrimaryCaret(editor, caret -> {
-          
-        });
+class VisualSwapEndsAction : VimCommandAction(VisualSwapEndsActionHandler) {
 
-        if (CommandState.inVisualBlockMode(editor)) {
-          return VimPlugin.getVisualMotion().swapVisualEnds(editor, editor.getCaretModel().getPrimaryCaret());
-        }
-        boolean ret = true;
-        for (Caret caret : editor.getCaretModel().getAllCarets()) {
-          ret = ret && VimPlugin.getVisualMotion().swapVisualEnds(editor, caret);
-        }
-        return ret;
-      }
-    });
-  }
+    override fun getMappingModes(): EnumSet<MappingMode> = MappingMode.V
 
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.V;
-  }
+    override fun getKeyStrokesSet(): Set<List<KeyStroke>> = parseKeysSet("o")
 
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("o");
-  }
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.OTHER_READONLY;
-  }
+    override fun getType(): Command.Type = Command.Type.OTHER_READONLY
 }
 

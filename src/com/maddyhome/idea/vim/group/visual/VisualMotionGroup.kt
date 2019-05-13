@@ -90,6 +90,22 @@ class VisualMotionGroup {
         return true
     }
 
+    fun swapVisualEndsBigO(editor: Editor): Boolean {
+        val caret = editor.caretModel.primaryCaret
+        val anotherSideCaret = editor.caretModel.allCarets.let { if (it.first() == caret) it.last() else it.first() }
+        val adj = VimPlugin.getVisualMotion().selectionAdj
+
+        if (caret.offset == caret.selectionStart) {
+            caret.vimSelectionStart = anotherSideCaret.selectionStart
+            MotionGroup.moveCaret(editor, caret, caret.selectionEnd - adj)
+        } else {
+            caret.vimSelectionStart = anotherSideCaret.selectionEnd - adj
+            MotionGroup.moveCaret(editor, caret, caret.selectionStart)
+        }
+
+        return true
+    }
+
     fun controlNonVimSelectionChange(editor: Editor, resetCaretToInsert: Boolean = false) {
         if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
             val commandState = CommandState.getInstance(editor)

@@ -16,58 +16,41 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action.motion.visual;
+package com.maddyhome.idea.vim.action.motion.visual
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
-import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-import java.util.List;
-import java.util.Set;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import javax.swing.KeyStroke
 
 /**
  * @author vlan
  */
-public class VisualSwapEndsBlockAction extends VimCommandAction {
-  public VisualSwapEndsBlockAction() {
-    super(new EditorActionHandlerBase() {
-      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+private object VisualSwapEndsBlockActionHandler : EditorActionHandlerBase() {
+    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
         if (CommandState.inVisualBlockMode(editor)) {
-          return VimPlugin.getVisualMotion().swapVisualEndsBigO(editor);
+            return VimPlugin.getVisualMotion().swapVisualEndsBigO(editor)
         }
-        boolean ret = true;
-        for (Caret caret : editor.getCaretModel().getAllCarets()) {
-          ret = ret && VimPlugin.getVisualMotion().swapVisualEnds(editor, caret);
+
+        var ret = true
+        for (caret in editor.caretModel.allCarets) {
+            ret = ret && VimPlugin.getVisualMotion().swapVisualEnds(editor, caret)
         }
-        return ret;
-      }
-    });
-  }
+        return ret
+    }
+}
 
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.V;
-  }
+class VisualSwapEndsBlockAction : VimCommandAction(VisualSwapEndsBlockActionHandler) {
 
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("O");
-  }
+    override fun getMappingModes(): Set<MappingMode> = MappingMode.V
 
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.OTHER_READONLY;
-  }
+    override fun getKeyStrokesSet(): Set<List<KeyStroke>> = parseKeysSet("O")
+
+    override fun getType(): Command.Type = Command.Type.OTHER_READONLY
 }
 
