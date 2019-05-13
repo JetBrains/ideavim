@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.helper
+package com.maddyhome.idea.vim.group.visual
 
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.command.SelectionType.*
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.group.visual.toNativeSelection
+import com.maddyhome.idea.vim.helper.EditorHelper
 import kotlin.math.max
 import kotlin.math.min
 

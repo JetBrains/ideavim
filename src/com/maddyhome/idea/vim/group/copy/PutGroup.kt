@@ -34,7 +34,7 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.CaretOrder.DECREASING_OFFSET
 import com.maddyhome.idea.vim.handler.CaretOrder.INCREASING_OFFSET
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.VimSelection
+import com.maddyhome.idea.vim.group.visual.VimSelection
 import java.util.*
 
 class PutGroup {

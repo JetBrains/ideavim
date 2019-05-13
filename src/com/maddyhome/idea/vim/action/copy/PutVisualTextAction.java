@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import com.maddyhome.idea.vim.helper.VimSelection;
+import com.maddyhome.idea.vim.group.visual.VimSelection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

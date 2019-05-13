@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.helper.VimSelection;
+import com.maddyhome.idea.vim.group.visual.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;

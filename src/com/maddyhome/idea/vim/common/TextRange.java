@@ -21,7 +21,7 @@ package com.maddyhome.idea.vim.common;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * @deprecated Please use com.maddyhome.idea.vim.helper.VimSelection
+ * @deprecated Please use com.maddyhome.idea.vim.group.visual.VimSelection
  */
 @Deprecated
 public class TextRange {

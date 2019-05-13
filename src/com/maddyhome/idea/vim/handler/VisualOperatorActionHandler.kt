@@ -29,9 +29,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.group.visual.VisualChange
-import com.maddyhome.idea.vim.group.visual.VisualOperation
-import com.maddyhome.idea.vim.group.visual.vimForAllOrPrimaryCaret
+import com.maddyhome.idea.vim.group.visual.*
 import com.maddyhome.idea.vim.helper.*
 
 /**
