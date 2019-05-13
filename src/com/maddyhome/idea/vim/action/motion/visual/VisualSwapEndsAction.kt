@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.group.visual.VisualUtilKt;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
@@ -40,6 +41,11 @@ public class VisualSwapEndsAction extends VimCommandAction {
   public VisualSwapEndsAction() {
     super(new EditorActionHandlerBase() {
       protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+
+        VisualUtilKt.vimForAllOrPrimaryCaret(editor, caret -> {
+          
+        });
+
         if (CommandState.inVisualBlockMode(editor)) {
           return VimPlugin.getVisualMotion().swapVisualEnds(editor, editor.getCaretModel().getPrimaryCaret());
         }
