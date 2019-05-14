@@ -16,26 +16,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action.ex;
+package org.jetbrains.plugins.ideavim.action.change.insert
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
-import org.jetbrains.annotations.NotNull;
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.VimTestCase
 
-/**
- */
-public class CancelExEntryAction extends EditorAction {
-  public CancelExEntryAction() {
-    super(new Handler());
-  }
+class InsertDeletePreviousWordActionTest : VimTestCase() {
+    // VIM-1655
+    fun `test deleted word is not yanked`() {
+        doTest(parseKeys("yiw", "3wea", "<C-W>", "<ESC>p"), """
+            A Discovery
 
-  private static class Handler extends EditorActionHandlerBase {
-    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      return VimPlugin.getProcess().cancelExEntry(editor, context);
+            I found <caret>it in a legendary land
+        """.trimIndent(), """
+            A Discovery
+
+            I found it in a i<caret>t land
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
-  }
 }

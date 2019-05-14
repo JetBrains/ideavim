@@ -247,14 +247,14 @@ public class KeyHandler {
     final CommandState commandState = CommandState.getInstance(editor);
     commandState.stopMappingTimer();
 
-    final List<KeyStroke> mappingKeys = commandState.getMappingKeys();
-    final List<KeyStroke> fromKeys = new ArrayList<KeyStroke>(mappingKeys);
-    fromKeys.add(key);
-
     final MappingMode mappingMode = commandState.getMappingMode();
     if (MappingMode.NVO.contains(mappingMode) && (state != State.NEW_COMMAND || currentArg != Argument.Type.NONE)) {
       return false;
     }
+
+    final List<KeyStroke> mappingKeys = commandState.getMappingKeys();
+    final List<KeyStroke> fromKeys = new ArrayList<KeyStroke>(mappingKeys);
+    fromKeys.add(key);
 
     final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mappingMode);
     final MappingInfo currentMappingInfo = mapping.get(fromKeys);

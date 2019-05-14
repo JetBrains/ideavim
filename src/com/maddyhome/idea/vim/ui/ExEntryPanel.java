@@ -79,6 +79,8 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       }
     };
 
+    new ExShortcutKeyAction(this).registerCustomShortcutSet();
+
     LafManager.getInstance().addLafManagerListener(this);
 
     updateUI();
@@ -93,6 +95,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
   private void setFontForElements() {
     final Font font = UiHelper.getEditorFont();
     label.setFont(font);
+    entry.setFont(font);
   }
 
   /**
@@ -105,11 +108,11 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
    * @param count    A holder for the ex entry count
    */
   public void activate(@NotNull Editor editor, DataContext context, @NotNull String label, String initText, int count) {
-    entry.setEditor(editor, context);
     this.label.setText(label);
     this.count = count;
     setFontForElements();
-    entry.setDocument(entry.createDefaultModel());
+    entry.reset();
+    entry.setEditor(editor, context);
     entry.setText(initText);
     entry.setType(label);
     parent = editor.getContentComponent();
@@ -139,7 +142,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
   public void updateUI() {
     super.updateUI();
 
-    setBorder(BorderFactory.createEtchedBorder());
+    setBorder(new ExPanelBorder());
 
     // Can be null when called from base constructor
     //noinspection ConstantConditions
@@ -229,6 +232,8 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     logger.info("deactivate");
     if (!active) return;
     active = false;
+    entry.deactivate();
+
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
       if (refocusOwningEditor && parent != null) {
         UiHelper.requestFocus(parent);
@@ -279,7 +284,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
 
   @NotNull private final DocumentListener documentListener = new DocumentAdapter() {
     @Override
-    protected void textChanged(DocumentEvent e) {
+    protected void textChanged(@NotNull DocumentEvent e) {
       final Editor editor = entry.getEditor();
       final boolean forwards = !label.getText().equals("?");
       if (incHighlighter != null) {
@@ -300,6 +305,5 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
   private boolean active;
 
   private static ExEntryPanel instance;
-
   private static final Logger logger = Logger.getInstance(ExEntryPanel.class.getName());
 }

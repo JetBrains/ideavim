@@ -16,26 +16,22 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action.ex;
+package com.maddyhome.idea.vim.ex.handler
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.commands
+import com.maddyhome.idea.vim.ex.flags
 
-/**
- */
-public class BackspaceAction extends EditorAction {
-  public BackspaceAction() {
-    super(new Handler());
-  }
-
-  private static class Handler extends EditorActionHandlerBase {
-    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      return VimPlugin.getProcess().processExKey(editor, cmd.getKeys().get(0));
+class CmdClearHandler : CommandHandler(
+        commands("comc[lear]"),
+        flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN)
+) {
+    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+        VimPlugin.getCommand().resetAliases()
+        return true
     }
-  }
 }

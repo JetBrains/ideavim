@@ -31,11 +31,11 @@ import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.util.EnumSet;
 
-public class RegisterActions {
+class RegisterActions {
   /**
    * Register all the key/action mappings for the plugin.
    */
-  public static void registerActions() {
+  static void registerActions() {
     registerVimCommandActions();
 
     registerInsertModeActions();

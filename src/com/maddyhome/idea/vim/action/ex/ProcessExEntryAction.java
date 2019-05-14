@@ -27,6 +27,9 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
 /**
+ * Called by KeyHandler to process the contents of the ex entry panel
+ * <p>
+ * The mapping for this action means that the ex command is executed as a write action
  */
 public class ProcessExEntryAction extends EditorAction {
   public ProcessExEntryAction() {

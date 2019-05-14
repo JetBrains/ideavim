@@ -66,7 +66,7 @@ in the issue tracker.
 
 ### Copyright
 
-1. Go to `Preferences | Appearance & Behavior | Scopes`, press "+" button, `local`.  
+1. Go to `Preferences | Appearance & Behavior | Scopes`, press "+" button, `Shared`.  
        Name: Copyright scope  
        Pattern: `file[IdeaVIM.main]:com//*||file[IdeaVIM.test]:*/`
 

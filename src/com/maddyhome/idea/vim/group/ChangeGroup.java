@@ -1069,20 +1069,20 @@ public class ChangeGroup {
     if (motion == null) {
       return false;
     }
+    EnumSet<CommandFlags> flags = motion.getFlags().clone();
     if (!isChange && !motion.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE)) {
       LogicalPosition start = editor.offsetToLogicalPosition(range.getStartOffset());
       LogicalPosition end = editor.offsetToLogicalPosition(range.getEndOffset());
       if (start.line != end.line) {
         if (!SearchHelper.anyNonWhitespace(editor, range.getStartOffset(), -1) &&
             !SearchHelper.anyNonWhitespace(editor, range.getEndOffset(), 1)) {
-          EnumSet<CommandFlags> flags = motion.getFlags();
           flags.remove(CommandFlags.FLAG_MOT_EXCLUSIVE);
           flags.remove(CommandFlags.FLAG_MOT_INCLUSIVE);
           flags.add(CommandFlags.FLAG_MOT_LINEWISE);
         }
       }
     }
-    return deleteRange(editor, caret, range, SelectionType.fromCommandFlags(motion.getFlags()), isChange);
+    return deleteRange(editor, caret, range, SelectionType.fromCommandFlags(flags), isChange);
   }
 
   /**
@@ -1678,7 +1678,7 @@ public class ChangeGroup {
       return false;
     }
 
-    if (type == null || VimPlugin.getRegister().storeText(editor, range, type, true)) {
+    if (type == null || CommandState.inInsertMode(editor) || VimPlugin.getRegister().storeText(editor, range, type, true)) {
       final Document document = editor.getDocument();
       final int[] startOffsets = range.getStartOffsets();
       final int[] endOffsets = range.getEndOffsets();

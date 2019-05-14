@@ -24,20 +24,20 @@ import javax.swing.*;
 import javax.swing.text.JTextComponent.KeyBinding;
 import java.awt.event.KeyEvent;
 
-/**
- *
- */
 public class ExKeyBindings {
   @NotNull
-  public static KeyBinding[] getBindings() {
+  static KeyBinding[] getBindings() {
     return bindings;
   }
 
   // TODO - add the following keys:
   // Ctrl-\ Ctrl-N - abort
   static final KeyBinding[] bindings = new KeyBinding[]{
+    // Note that escape will cancel a pending insert digraph/register before cancelling
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), ExEditorKit.EscapeChar),
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_OPEN_BRACKET, KeyEvent.CTRL_MASK), ExEditorKit.EscapeChar),
+
+    // Cancel immediately cancels entry
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.CTRL_MASK), ExEditorKit.CancelEntry),
 
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), ExEditorKit.CompleteEntry),
@@ -82,9 +82,10 @@ public class ExKeyBindings {
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_MASK), ExEditorKit.StartDigraph),
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK), ExEditorKit.StartDigraph),
 
+    new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_MASK), ExEditorKit.InsertRegister),
+
+    // These appear to be non-Vim shortcuts
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_MASK), ExEditorKit.pasteAction),
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, KeyEvent.SHIFT_MASK), ExEditorKit.pasteAction),
-
-    new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_MASK), ExEditorKit.InsertRegister),
   };
 }

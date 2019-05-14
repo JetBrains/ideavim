@@ -81,13 +81,13 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   @Nullable
-  public static KeyStroke convert(@NotNull ActionEvent event) {
+  private static KeyStroke convert(@NotNull ActionEvent event) {
     String cmd = event.getActionCommand();
     int mods = event.getModifiers();
     if (cmd != null && cmd.length() > 0) {
       char ch = cmd.charAt(0);
       if (ch < ' ') {
-        if (mods == KeyEvent.CTRL_MASK) {
+        if ((mods & KeyEvent.CTRL_MASK) != 0) {
           return KeyStroke.getKeyStroke(KeyEvent.VK_A + ch - 1, mods);
         }
       }
@@ -99,25 +99,22 @@ public class ExEditorKit extends DefaultEditorKit {
     return null;
   }
 
-  public static final String DefaultExKey = "default-ex-key";
-  public static final String CancelEntry = "cancel-entry";
-  public static final String CompleteEntry = "complete-entry";
-  public static final String EscapeChar = "escape";
-  public static final String DeletePreviousChar = "delete-prev-char";
-  public static final String DeletePreviousWord = "delete-prev-word";
-  public static final String DeleteToCursor = "delete-to-cursor";
-  public static final String DeleteFromCursor = "delete-from-cursor";
-  public static final String ToggleInsertReplace = "toggle-insert";
-  public static final String InsertRegister = "insert-register";
-  public static final String InsertWord = "insert-word";
-  public static final String InsertWORD = "insert-WORD";
-  public static final String HistoryUp = "history-up";
-  public static final String HistoryDown = "history-down";
-  public static final String HistoryUpFilter = "history-up-filter";
-  public static final String HistoryDownFilter = "history-down-filter";
-  public static final String StartDigraph = "start-digraph";
+  static final String CancelEntry = "cancel-entry";
+  static final String CompleteEntry = "complete-entry";
+  static final String EscapeChar = "escape";
+  static final String DeletePreviousChar = "delete-prev-char";
+  static final String DeletePreviousWord = "delete-prev-word";
+  static final String DeleteToCursor = "delete-to-cursor";
+  static final String DeleteFromCursor = "delete-from-cursor";
+  static final String ToggleInsertReplace = "toggle-insert";
+  static final String InsertRegister = "insert-register";
+  static final String HistoryUp = "history-up";
+  static final String HistoryDown = "history-down";
+  static final String HistoryUpFilter = "history-up-filter";
+  static final String HistoryDownFilter = "history-down-filter";
+  static final String StartDigraph = "start-digraph";
 
-  @NotNull protected final Action[] exActions = new Action[]{
+  @NotNull private final Action[] exActions = new Action[]{
     new ExEditorKit.CancelEntryAction(),
     new ExEditorKit.CompleteEntryAction(),
     new ExEditorKit.EscapeCharAction(),
@@ -160,8 +157,12 @@ public class ExEditorKit extends DefaultEditorKit {
     }
   }
 
+  public interface MultiStepAction extends Action {
+    void reset();
+  }
+
   public static class HistoryUpAction extends TextAction {
-    public HistoryUpAction() {
+    HistoryUpAction() {
       super(HistoryUp);
     }
 
@@ -172,7 +173,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class HistoryDownAction extends TextAction {
-    public HistoryDownAction() {
+    HistoryDownAction() {
       super(HistoryDown);
     }
 
@@ -183,7 +184,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class HistoryUpFilterAction extends TextAction {
-    public HistoryUpFilterAction() {
+    HistoryUpFilterAction() {
       super(HistoryUpFilter);
     }
 
@@ -194,7 +195,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class HistoryDownFilterAction extends TextAction {
-    public HistoryDownFilterAction() {
+    HistoryDownFilterAction() {
       super(HistoryDownFilter);
     }
 
@@ -204,15 +205,15 @@ public class ExEditorKit extends DefaultEditorKit {
     }
   }
 
-  public static class InsertRegisterAction extends TextAction {
-    private static enum State {
+  public static class InsertRegisterAction extends TextAction implements MultiStepAction {
+    private enum State {
       SKIP_CTRL_R,
       WAIT_REGISTER,
     }
 
     @NotNull private State state = State.SKIP_CTRL_R;
 
-    public InsertRegisterAction() {
+    InsertRegisterAction() {
       super(InsertRegister);
     }
 
@@ -223,11 +224,12 @@ public class ExEditorKit extends DefaultEditorKit {
         switch (state) {
           case SKIP_CTRL_R:
             state = State.WAIT_REGISTER;
-            target.setCurrentAction(this);
+            target.setCurrentAction(this, '\"');
             break;
+
           case WAIT_REGISTER:
             state = State.SKIP_CTRL_R;
-            target.setCurrentAction(null);
+            target.clearCurrentAction();
             final char c = key.getKeyChar();
             if (c != KeyEvent.CHAR_UNDEFINED) {
               final Register register = VimPlugin.getRegister().getRegister(c);
@@ -235,20 +237,27 @@ public class ExEditorKit extends DefaultEditorKit {
                 final String oldText = target.getText();
                 final String text = register.getText();
                 if (oldText != null && text != null) {
-                  target.setText(oldText + text);
+                  final int offset = target.getCaretPosition();
+                  target.setText(oldText.substring(0, offset) + text + oldText.substring(offset));
+                  target.setCaretPosition(offset + text.length());
                 }
               }
-            }
-            else {
+            } else if ((key.getModifiers() & KeyEvent.CTRL_MASK) != 0 && key.getKeyCode() == KeyEvent.VK_C) {
+              // Eat any unused keys, unless it's <C-C>, in which case forward on and cancel entry
               target.handleKey(key);
             }
         }
       }
     }
+
+    @Override
+    public void reset() {
+      state = State.SKIP_CTRL_R;
+    }
   }
 
   public static class CompleteEntryAction extends TextAction {
-    public CompleteEntryAction() {
+    CompleteEntryAction() {
       super(CompleteEntry);
     }
 
@@ -256,27 +265,29 @@ public class ExEditorKit extends DefaultEditorKit {
       logger.debug("complete entry");
       KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
 
-      KeyHandler.getInstance().handleKey(
-        ExEntryPanel.getInstance().getEntry().getEditor(),
-        stroke,
-        ExEntryPanel.getInstance().getEntry().getContext());
+      // We send the <Enter> keystroke through the key handler rather than calling ProcessGroup#processExEntry directly.
+      // We do this for a couple of reasons:
+      // * The C mode mapping for ProcessExEntryAction handles the actual entry, and most importantly, it does so as a
+      //   write action
+      // * The key handler routines get the chance to clean up and reset state
+      final ExTextField entry = ExEntryPanel.getInstance().getEntry();
+      KeyHandler.getInstance().handleKey(entry.getEditor(), stroke, entry.getContext());
     }
   }
 
   public static class CancelEntryAction extends TextAction {
-    public CancelEntryAction() {
+    CancelEntryAction() {
       super(CancelEntry);
     }
 
     public void actionPerformed(ActionEvent e) {
-      VimPlugin.getProcess().cancelExEntry(
-        ExEntryPanel.getInstance().getEntry().getEditor(),
-        ExEntryPanel.getInstance().getEntry().getContext());
+      ExTextField target = (ExTextField)getTextComponent(e);
+      target.cancel();
     }
   }
 
   public static class EscapeCharAction extends TextAction {
-    public EscapeCharAction() {
+    EscapeCharAction() {
       super(EscapeChar);
     }
 
@@ -287,7 +298,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class DeletePreviousCharAction extends TextAction {
-    public DeletePreviousCharAction() {
+    DeletePreviousCharAction() {
       super(DeletePreviousChar);
     }
 
@@ -323,9 +334,7 @@ public class ExEditorKit extends DefaultEditorKit {
           doc.remove(dot - delChars, delChars);
         }
         else {
-          VimPlugin.getProcess().cancelExEntry(
-            ExEntryPanel.getInstance().getEntry().getEditor(),
-            ExEntryPanel.getInstance().getEntry().getContext());
+          target.cancel();
         }
       }
       catch (BadLocationException bl) {
@@ -335,7 +344,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class DeletePreviousWordAction extends TextAction {
-    public DeletePreviousWordAction() {
+    DeletePreviousWordAction() {
       super(DeletePreviousWord);
     }
 
@@ -362,7 +371,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class DeleteToCursorAction extends TextAction {
-    public DeleteToCursorAction() {
+    DeleteToCursorAction() {
       super(DeleteToCursor);
     }
 
@@ -385,7 +394,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class DeleteFromCursorAction extends TextAction {
-    public DeleteFromCursorAction() {
+    DeleteFromCursorAction() {
       super(DeleteFromCursor);
     }
 
@@ -408,7 +417,7 @@ public class ExEditorKit extends DefaultEditorKit {
   }
 
   public static class ToggleInsertReplaceAction extends TextAction {
-    public ToggleInsertReplaceAction() {
+    ToggleInsertReplaceAction() {
       super(ToggleInsertReplace);
 
       logger.debug("ToggleInsertReplaceAction()");
@@ -424,10 +433,10 @@ public class ExEditorKit extends DefaultEditorKit {
     }
   }
 
-  public static class StartDigraphAction extends TextAction {
+  public static class StartDigraphAction extends TextAction implements MultiStepAction {
     @Nullable private DigraphSequence digraphSequence;
 
-    public StartDigraphAction() {
+    StartDigraphAction() {
       super(StartDigraph);
     }
 
@@ -437,14 +446,23 @@ public class ExEditorKit extends DefaultEditorKit {
       if (key != null && digraphSequence != null) {
         DigraphSequence.DigraphResult res = digraphSequence.processKey(key, target.getEditor());
         switch (res.getResult()) {
-          case DigraphSequence.DigraphResult.RES_BAD:
-            target.setCurrentAction(null);
-            target.handleKey(key);
+          case DigraphSequence.DigraphResult.RES_OK:
+            target.setCurrentActionPromptCharacter(res.getPromptCharacter());
             break;
+
+          case DigraphSequence.DigraphResult.RES_BAD:
+            target.clearCurrentAction();
+            // Eat the character, unless it's <C-C>, in which case, forward on and cancel entry. Note that at some point
+            // we should support input of control characters
+            if ((key.getModifiers() & KeyEvent.CTRL_MASK) != 0 && key.getKeyCode() == KeyEvent.VK_C) {
+              target.handleKey(key);
+            }
+            break;
+
           case DigraphSequence.DigraphResult.RES_DONE:
             final KeyStroke digraph = res.getStroke();
             digraphSequence = null;
-            target.setCurrentAction(null);
+            target.clearCurrentAction();
             if (digraph != null) {
               target.handleKey(digraph);
             }
@@ -452,10 +470,15 @@ public class ExEditorKit extends DefaultEditorKit {
         }
       }
       else if (key != null && DigraphSequence.isDigraphStart(key)) {
-        target.setCurrentAction(this);
         digraphSequence = new DigraphSequence();
-        digraphSequence.processKey(key, target.getEditor());
+        DigraphSequence.DigraphResult res = digraphSequence.processKey(key, target.getEditor());
+        target.setCurrentAction(this, res.getPromptCharacter());
       }
+    }
+
+    @Override
+    public void reset() {
+      digraphSequence = null;
     }
   }
 

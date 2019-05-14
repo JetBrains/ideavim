@@ -38,6 +38,18 @@ To Be Released
 * [VIM-607](https://youtrack.jetbrains.com/issue/VIM-607) Fix memory leaks
 * [VIM-1546](https://youtrack.jetbrains.com/issue/VIM-1546) Storing TAB key as input
 * [VIM-1231](https://youtrack.jetbrains.com/issue/VIM-1231) Get indent from PsiFile
+* [VIM-1633](https://youtrack.jetbrains.com/issue/VIM-1633) Fixed sequential text object commands in visual mode
+* [VIM-1105](https://youtrack.jetbrains.com/issue/VIM-1105) Added the `:command` command
+* [VIM-1090](https://youtrack.jetbrains.com/issue/VIM-1090) Fixed tag motion with duplicate tags
+* [VIM-1644](https://youtrack.jetbrains.com/issue/VIM-1644) Fixed repeat with visual mode
+* Fixed invoking IDE actions instead of command line actions with same shortcuts
+* [VIM-1550](https://youtrack.jetbrains.com/issue/VIM-1550) Fixed leaving command line mode on backspace
+* Fix insert position of `<C-R>` in ex commands
+* Command line editing caret shape and insert digraph/register feedback
+* [VIM-1419](https://youtrack.jetbrains.com/issue/VIM-1419), [VIM-1493](https://youtrack.jetbrains.com/issue/VIM-1493) Correctly set focus when handling cmode mapping
+* Fix incorrect handling of subsequent key strokes after ex command line loses focus
+* [VIM-1240](https://youtrack.jetbrains.com/issue/VIM-1240) Improve UI of ex command line and output panel
+* [VIM-1485](https://youtrack.jetbrains.com/issue/VIM-1485) Remove incorrect gap between ex command line label and text
 
 0.51, 2019-02-12
 ----------------

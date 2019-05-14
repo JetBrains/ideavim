@@ -190,7 +190,7 @@ object VimListenerManager {
                 VimPlugin.getMotion()
                 val editor = event.editor
                 if (ExEntryPanel.getInstance().isActive) {
-                    ExEntryPanel.getInstance().deactivate(false)
+                    VimPlugin.getProcess().cancelExEntry(editor, ExEntryPanel.getInstance().entry.context)
                 }
 
                 ExOutputModel.getInstance(editor).clear()
@@ -226,7 +226,7 @@ object VimListenerManager {
                     event.mouseEvent.button != MouseEvent.BUTTON3) {
                 VimPlugin.getMotion()
                 if (ExEntryPanel.getInstance().isActive) {
-                    ExEntryPanel.getInstance().deactivate(false)
+                    VimPlugin.getProcess().cancelExEntry(event.editor, ExEntryPanel.getInstance().entry.context)
                 }
 
                 ExOutputModel.getInstance(event.editor).clear()

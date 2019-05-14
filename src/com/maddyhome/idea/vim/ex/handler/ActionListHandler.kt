@@ -34,18 +34,20 @@ class ActionListHandler : CommandHandler(
         flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        val lineSeparator = System.lineSeparator()
+        val lineSeparator = "\n"
         val searchPattern = cmd.argument.trim().toLowerCase().split("*")
         val actionManager = ActionManager.getInstance()
 
         val actions = actionManager.getActionIds("")
-                .filter { actionName -> searchPattern.all { it in actionName.toLowerCase() } }
-                .sortedWith(String.CASE_INSENSITIVE_ORDER).joinToString(lineSeparator) { actionName ->
+                .sortedWith(String.CASE_INSENSITIVE_ORDER)
+                .map { actionName ->
                     val shortcuts = actionManager.getAction(actionName).shortcutSet.shortcuts.joinToString(" ") {
                         if (it is KeyboardShortcut) StringHelper.toKeyNotation(it.firstKeyStroke) else it.toString()
                     }
                     if (shortcuts.isBlank()) actionName else "${actionName.padEnd(50)} $shortcuts"
                 }
+                .filter { line -> searchPattern.all { it in line.toLowerCase() } }
+                .joinToString(lineSeparator)
 
 
         ExOutputModel.getInstance(editor).output("--- Actions ---$lineSeparator$actions")

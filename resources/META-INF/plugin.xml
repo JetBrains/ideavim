@@ -4,6 +4,7 @@
   <change-notes><![CDATA[
       <p>To be released:</p>
       <ul>
+        <li>Support :command command</li>
         <li>Support :shell command</li>
         <li>Support :tabnext and :tabprevious commands</li>
         <li>Commentary extension</li>
@@ -66,6 +67,9 @@
   <application-components>
     <component>
       <implementation-class>com.maddyhome.idea.vim.VimPlugin</implementation-class>
+    </component>
+    <component>
+      <implementation-class>com.maddyhome.idea.vim.VimLocalConfig</implementation-class>
     </component>
   </application-components>
 
@@ -387,10 +391,7 @@
     <action id="VimPlaybackLastRegister" class="com.maddyhome.idea.vim.action.macro.PlaybackLastRegisterAction" text="Playback Last Register"/>
 
     <!-- Command Line -->
-    <action id="VimExBackspace" class="com.maddyhome.idea.vim.action.ex.BackspaceAction" text="Backspace"/>
     <action id="VimProcessExEntry" class="com.maddyhome.idea.vim.action.ex.ProcessExEntryAction" text="Process Ex Entry"/>
-    <action id="VimProcessExKey" class="com.maddyhome.idea.vim.action.ex.ProcessExKeyAction" text="Process Ex Key"/>
-    <action id="VimCancelExEntry" class="com.maddyhome.idea.vim.action.ex.CancelExEntryAction" text="Cancel Ex Entry"/>
 
     <!-- Other -->
     <action id="VimLastSearchReplace" class="com.maddyhome.idea.vim.action.change.change.ChangeLastSearchReplaceAction" text="Repeat Last :s"/>
@@ -403,7 +404,7 @@
     <action id="VimUndo" class="com.maddyhome.idea.vim.action.change.UndoAction" text="Undo"/>
 
     <!-- Internal -->
-    <action id="VimInternalAddInlays" class="com.maddyhome.idea.vim.action.internal.AddInlaysAction" text="Vim (internal) add test inlays" internal="true"/>
+    <action id="VimInternalAddInlays" class="com.maddyhome.idea.vim.action.internal.AddInlaysAction" text="Add test inlays | IdeaVim internal" internal="true"/>
 
     <!-- Keys -->
     <action id="VimShortcutKeyAction" class="com.maddyhome.idea.vim.action.VimShortcutKeyAction" text="Shortcuts"/>

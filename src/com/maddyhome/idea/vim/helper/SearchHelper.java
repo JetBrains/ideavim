@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.helper;
 
-import com.google.common.collect.Lists;
 import com.intellij.lang.CodeDocumentationAwareCommenter;
 import com.intellij.lang.Commenter;
 import com.intellij.lang.Language;
@@ -27,7 +26,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.Pair;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -42,6 +40,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -115,12 +114,31 @@ public class SearchHelper {
     int pos = caret.getOffset();
     int start = caret.getSelectionStart();
     int end = caret.getSelectionEnd();
-    if (start != end) {
-      pos = Math.min(start, end);
-    }
 
     int loc = blockChars.indexOf(type);
     char close = blockChars.charAt(loc + 1);
+
+    boolean rangeSelection = end - start > 1;
+    if (rangeSelection && start == 0) // early return not only for optimization
+      return null;                    // but also not to break the interval semantic on this edge case (see below)
+
+    /* In case of successive inner selection. We want to break out of
+     * the block delimiter of the current inner selection.
+     * In other terms, for the rest of the algorithm, a previous inner selection of a block
+     * if equivalent to an outer one. */
+    if (!isOuter
+        && (start - 1) >= 0 && type == chars.charAt(start - 1)
+        && end < chars.length() && close == chars.charAt(end)) {
+      start = start - 1;
+      pos = start;
+      rangeSelection = true;
+    }
+
+    /* when one char is selected, we want to find the enclosing block of (start,end]
+     * although when a range of characters is selected, we want the enclosing block of [start, end]
+     * shifting the position allow to express which kind of interval we work on */
+    if (rangeSelection)
+      pos = Math.max(0, start - 1);
 
     boolean initialPosIsInString = checkInString(chars, pos, true);
 
@@ -413,80 +431,192 @@ public class SearchHelper {
     return -1;
   }
 
+  /** returns new position which ignore whitespaces at beginning of the line*/
+  private static int ignoreWhitespaceAtLineStart(CharSequence seq, int lineStart, int pos) {
+    if (seq.subSequence(lineStart, pos).chars().allMatch(Character::isWhitespace)) {
+      while (pos < seq.length() && seq.charAt(pos) != '\n' && Character.isWhitespace(seq.charAt(pos))) {
+        pos++;
+      }
+    }
+    return pos;
+  }
+
+
   @Nullable
   public static TextRange findBlockTagRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter) {
-    final int cursorOffset = caret.getOffset();
-    int pos = cursorOffset;
-    int currentCount = count;
+    final int position = caret.getOffset();
     final CharSequence sequence = editor.getDocument().getCharsSequence();
+
+    final int selectionStart = caret.getSelectionStart();
+    final int selectionEnd = caret.getSelectionEnd();
+
+    final boolean isRangeSelection = selectionEnd - selectionStart > 1;
+
+    int searchStartPosition;
+    if (!isRangeSelection) {
+      final int line = caret.getLogicalPosition().line;
+      final int lineBegin = editor.getDocument().getLineStartOffset(line);
+      searchStartPosition = ignoreWhitespaceAtLineStart(sequence, lineBegin, position);
+    } else {
+      searchStartPosition = selectionEnd;
+    }
+
+    if (isInHTMLTag(sequence, searchStartPosition, false)) {
+      // caret is inside opening tag. Move to closing '>'.
+      while (searchStartPosition < sequence.length() && sequence.charAt(searchStartPosition) != '>') {
+        searchStartPosition ++;
+      }
+    }
+    else if (isInHTMLTag(sequence, searchStartPosition, true)) {
+      // caret is inside closing tag. Move to starting '<'.
+      while (searchStartPosition > 0 && sequence.charAt(searchStartPosition) != '<') {
+        searchStartPosition --;
+      }
+    }
+
     while (true) {
-      final Pair<TextRange, String> closingTagResult = findClosingTag(sequence, pos);
-      if (closingTagResult == null) {
+      final Pair<TextRange, String> closingTag = findUnmatchedClosingTag(sequence, searchStartPosition, count);
+      if (closingTag == null) {
         return null;
       }
-      final TextRange closingTagTextRange = closingTagResult.getFirst();
-      final String tagName = closingTagResult.getSecond();
-      final TextRange openingTagTextRange = findOpeningTag(sequence, closingTagTextRange.getStartOffset(), tagName);
-      if (openingTagTextRange != null && openingTagTextRange.getStartOffset() <= cursorOffset && --currentCount == 0) {
-        if (isOuter) {
-          return new TextRange(openingTagTextRange.getStartOffset(), closingTagTextRange.getEndOffset());
+      final TextRange closingTagTextRange = closingTag.getFirst();
+      final String tagName = closingTag.getSecond();
+
+      TextRange openingTag = findUnmatchedOpeningTag(sequence, closingTagTextRange.getStartOffset(), tagName);
+      if (openingTag == null) {
+        return null;
+      }
+
+      if (isRangeSelection && openingTag.getEndOffset() - 1 >= selectionStart) {
+        // If there was already some text selected and the new selection would not extend further, we try again
+        searchStartPosition = closingTagTextRange.getEndOffset();
+        count = 1;
+        continue;
+      }
+
+      int selectionEndWithoutNewline = selectionEnd;
+      while (selectionEndWithoutNewline < sequence.length() && sequence.charAt(selectionEndWithoutNewline) == '\n') {
+        selectionEndWithoutNewline ++;
+      }
+
+      if (closingTagTextRange.getStartOffset() == selectionEndWithoutNewline && openingTag.getEndOffset() == selectionStart) {
+        // Special case: if the inner tag is already selected we should like isOuter is active
+        // Note that we need to ignore newlines, because their selection is lost between multiple "it" invocations
+        isOuter = true;
+      } else
+      if (openingTag.getEndOffset() == closingTagTextRange.getStartOffset() && selectionStart == openingTag.getEndOffset()) {
+        // Special case: for an empty tag pair (e.g. <a></a>) the whole tag is selected if the caret is in the middle.
+        isOuter = true;
+      }
+
+      if (isOuter) {
+        return new TextRange(openingTag.getStartOffset(), closingTagTextRange.getEndOffset() - 1);
+      } else {
+        return new TextRange(openingTag.getEndOffset(), Math.max(closingTagTextRange.getStartOffset() - 1, openingTag.getEndOffset()));
+      }
+    }
+  }
+
+  /**
+   * Returns true if there is a html at the given position. Ignores tags with a trailing slash like <aaa/>.
+   */
+  private static boolean isInHTMLTag(@NotNull final CharSequence sequence, final int position, final boolean isEndtag) {
+    int openingBracket = -1;
+    for (int i = position; i >= 0 && i < sequence.length(); i--) {
+      if (sequence.charAt(i) == '<') {
+        openingBracket = i;
+        break;
+      }
+      if (sequence.charAt(i) == '>' && i != position) {
+        return false;
+      }
+    }
+
+    if (openingBracket == -1) {
+      return false;
+    }
+
+    boolean hasSlashAfterOpening = openingBracket + 1 < sequence.length() && sequence.charAt(openingBracket + 1) == '/';
+    if ((isEndtag && !hasSlashAfterOpening) || (!isEndtag && hasSlashAfterOpening)) {
+      return false;
+    }
+
+    int closingBracket = -1;
+    for (int i = openingBracket; i < sequence.length(); i++) {
+      if (sequence.charAt(i) == '>') {
+        closingBracket = i;
+        break;
+      }
+    }
+
+    return closingBracket != -1 && sequence.charAt(closingBracket - 1) != '/';
+  }
+
+  @Nullable
+  private static Pair<TextRange,String> findUnmatchedClosingTag(@NotNull final CharSequence sequence, final int position, int count) {
+    // The tag name may contain any characters except slashes, whitespace and '>'
+    final String tagNamePattern = "([^/\\s>]+)";
+    // An opening tag consists of '<' followed by a tag name, optionally some additional text after whitespace and a '>'
+    final String openingTagPattern = String.format("<%s(?:\\s[^>]*)?>", tagNamePattern);
+    final String closingTagPattern = String.format("</%s>", tagNamePattern);
+    final Pattern tagPattern = Pattern.compile(String.format("(?:%s)|(?:%s)", openingTagPattern, closingTagPattern));
+    final Matcher matcher = tagPattern.matcher(sequence.subSequence(position, sequence.length()));
+
+    final Stack<String> openTags = new Stack<>();
+
+    while (matcher.find()) {
+      boolean isClosingTag = matcher.group(1) == null;
+      if (isClosingTag) {
+        final String tagName = matcher.group(2);
+        // Ignore unmatched open tags. Either the file is malformed or it might be a tag like <br> that does not need to be closed.
+        while (!openTags.isEmpty() && !openTags.peek().equalsIgnoreCase(tagName)) {
+          openTags.pop();
         }
-        else {
-          return new TextRange(openingTagTextRange.getEndOffset() + 1, closingTagTextRange.getStartOffset() - 1);
+        if (openTags.isEmpty()) {
+          if (count <= 1) {
+            return Pair.create(new TextRange(position + matcher.start(), position + matcher.end()), tagName);
+          } else {
+            count--;
+          }
+        } else {
+          openTags.pop();
+        }
+      } else {
+        final String tagName = matcher.group(1);
+        openTags.push(tagName);
+      }
+    }
+    return null;
+  }
+
+  @Nullable
+  private static TextRange findUnmatchedOpeningTag(@NotNull CharSequence sequence, int position, @NotNull String tagName) {
+    final String quotedTagName = Pattern.quote(tagName);
+    final String patternString = "(</%s>)"  // match closing tags
+            + "|(<%s"      // or opening tags starting with tagName
+            + "(\\s([^>]*"  // After at least one whitespace there might be additional text in the tag. E.g. <html lang="en">
+            + "[^/])?)?>)";  // Slash is not allowed as last character (this would be a self closing tag).
+    final Pattern tagPattern = Pattern.compile(String.format(patternString, quotedTagName, quotedTagName), Pattern.CASE_INSENSITIVE);
+    final Matcher matcher = tagPattern.matcher(sequence.subSequence(0, position+1));
+    final Stack<TextRange> openTags = new Stack<>();
+
+    while (matcher.find()) {
+      final TextRange match = new TextRange(matcher.start(), matcher.end());
+      if (sequence.charAt(matcher.start() + 1) == '/') {
+        if (!openTags.isEmpty()) {
+          openTags.pop();
         }
       }
       else {
-        pos = closingTagTextRange.getEndOffset() + 1;
+        openTags.push(match);
       }
     }
-  }
 
-  @Nullable
-  private static TextRange findOpeningTag(@NotNull CharSequence sequence, int position, @NotNull String tagName) {
-    final String tagBeginning = "<" + tagName;
-    final Pattern pattern = Pattern.compile(Pattern.quote(tagBeginning), Pattern.CASE_INSENSITIVE);
-    final Matcher matcher = pattern.matcher(sequence.subSequence(0, position));
-    final List<Integer> possibleBeginnings = Lists.newArrayList();
-    while (matcher.find()) {
-      possibleBeginnings.add(matcher.start());
+    if (openTags.isEmpty()) {
+      return null;
+    } else {
+      return openTags.pop();
     }
-    final List<Integer> reversedBeginnings = Lists.reverse(possibleBeginnings);
-    for (int openingTagPos : reversedBeginnings) {
-      final int openingTagEndPos = openingTagPos + tagBeginning.length();
-      final int closeBracketPos = StringUtil.indexOf(sequence, '>', openingTagEndPos);
-      if (closeBracketPos > 0 && (closeBracketPos == openingTagEndPos || sequence.charAt(openingTagEndPos) == ' ')) {
-        return new TextRange(openingTagPos, closeBracketPos);
-      }
-    }
-    return null;
-  }
-
-  @Nullable
-  private static Pair<TextRange, String> findClosingTag(@NotNull CharSequence sequence, int pos) {
-    int closeBracketPos = pos;
-    int openBracketPos;
-    while (closeBracketPos < sequence.length()) {
-      closeBracketPos = StringUtil.indexOf(sequence, '>', closeBracketPos);
-      if (closeBracketPos < 0) {
-        return null;
-      }
-      openBracketPos = closeBracketPos - 1;
-      while (openBracketPos >= 0) {
-        openBracketPos = StringUtil.lastIndexOf(sequence, '<', 0, openBracketPos);
-        if (openBracketPos >= 0 &&
-            openBracketPos + 1 < sequence.length() &&
-            sequence.charAt(openBracketPos + 1) == '/') {
-          final String tagName = String.valueOf(sequence.subSequence(openBracketPos + "</".length(), closeBracketPos));
-          if (tagName.length() > 0 && tagName.charAt(0) != ' ') {
-            TextRange textRange = new TextRange(openBracketPos, closeBracketPos);
-            return Pair.create(textRange, tagName);
-          }
-        }
-        openBracketPos--;
-      }
-      closeBracketPos++;
-    }
-    return null;
   }
 
 

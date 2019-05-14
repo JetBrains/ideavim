@@ -22,7 +22,6 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.VimBehaviourDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionRightActionTest : VimTestCase() {
@@ -80,14 +79,6 @@ class MotionRightActionTest : VimTestCase() {
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
-    @VimBehaviourDiffers("""
-            A Discovery
-
-            I found it in a legendar𝛁<caret> land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-    """)
     fun `test simple motion non-ascii`() {
         doTest(parseKeys("l"), """
             A Discovery
@@ -99,21 +90,13 @@ class MotionRightActionTest : VimTestCase() {
         """.trimIndent(), """
             A Discovery
 
-            I found it in a legendar<caret>𝛁 land
+            I found it in a legendar𝛁<caret> land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
-    @VimBehaviourDiffers("""
-            A Discovery
-
-            I found it in a legendar🐔<caret> land
-            all rocks and lavender and tufted grass,
-            where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-    """)
     fun `test simple motion emoji`() {
         doTest(parseKeys("l"), """
             A Discovery
@@ -125,7 +108,25 @@ class MotionRightActionTest : VimTestCase() {
         """.trimIndent(), """
             A Discovery
 
-            I found it in a legendar<caret>🐔 land
+            I found it in a legendar🐔<caret> land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    }
+
+    fun `test simple motion czech`() {
+        doTest(parseKeys("l"), """
+            A Discovery
+
+            I found it in a legendar<caret>ž land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent(), """
+            A Discovery
+
+            I found it in a legendarž<caret> land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
