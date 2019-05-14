@@ -225,6 +225,62 @@ class SearchGroupTest : VimTestCase() {
         assertOffset(6)
     }
 
+    fun `test search word matches case`() {
+        resetAllOptions()
+        typeTextInFile(parseKeys("*"),
+            "<caret>Editor editor Editor")
+        assertOffset(14)
+    }
+
+    fun `test search next word matches case`() {
+        resetAllOptions()
+        typeTextInFile(parseKeys("*", "n"),
+            "<caret>Editor editor Editor editor Editor")
+        assertOffset(28)
+    }
+
+    fun `test search word honours ignorecase`() {
+        resetAllOptions()
+        setIgnoreCase()
+        typeTextInFile(parseKeys("*"),
+            "<caret>editor Editor editor")
+        assertOffset(7)
+    }
+
+    fun `test search next word honours ignorecase`() {
+        resetAllOptions()
+        setIgnoreCase()
+        typeTextInFile(parseKeys("*", "n"),
+            "<caret>editor Editor editor")
+        assertOffset(14)
+    }
+
+    fun `test search word overrides smartcase`() {
+        resetAllOptions()
+        setIgnoreCaseAndSmartCase()
+        typeTextInFile(parseKeys("*"),
+            "<caret>Editor editor Editor")
+        assertOffset(7)
+    }
+
+    fun `test search next word overrides smartcase`() {
+        resetAllOptions()
+        setIgnoreCaseAndSmartCase()
+        typeTextInFile(parseKeys("*", "n"),
+            "<caret>Editor editor editor")
+        assertOffset(14)
+    }
+
+    private fun resetAllOptions() {
+        val options = Options.getInstance()
+        options.resetAllOptions()
+    }
+
+    private fun setIgnoreCase() {
+        val options = Options.getInstance()
+        (options.getOption("ignorecase") as ToggleOption).set()
+    }
+
     private fun setIgnoreCaseAndSmartCase() {
         val options = Options.getInstance()
         options.resetAllOptions()

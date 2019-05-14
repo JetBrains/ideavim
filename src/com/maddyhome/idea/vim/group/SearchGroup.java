@@ -301,8 +301,7 @@ public class SearchGroup {
 
     lastReplace = sub.toString();
 
-    // This is incorrect if we pass /i or /I as a flag, as it only looks at options
-    searchHighlight(false);
+    resetSearchHighlights();
 
     if (logger.isDebugEnabled()) {
       logger.debug("search range=[" + start + "," + end + "]");
@@ -445,8 +444,8 @@ public class SearchGroup {
     return result.get();
   }
 
-  public static boolean shouldIgnoreCase(@NotNull String pattern, boolean noSmartCase) {
-    boolean sc = !noSmartCase && Options.getInstance().isSet("smartcase");
+  public static boolean shouldIgnoreCase(@NotNull String pattern, boolean ignoreSmartCase) {
+    boolean sc = !ignoreSmartCase && Options.getInstance().isSet("smartcase");
     boolean ic = Options.getInstance().isSet("ignorecase");
 
     return ic && !(sc && StringHelper.containsUpperCase(pattern));
@@ -509,6 +508,7 @@ public class SearchGroup {
     }
 
     lastSearch = pattern;
+    lastIgnoreSmartCase = false;
     if (pattern != null) {
       setLastPattern(editor, pattern);
     }
@@ -521,9 +521,9 @@ public class SearchGroup {
       logger.debug("lastDir=" + lastDir);
     }
 
-    searchHighlight(false);
+    resetSearchHighlights();
 
-    return findItOffset(editor, startOffset, count, lastDir, false);
+    return findItOffset(editor, startOffset, count, lastDir);
   }
 
   public int searchWord(@NotNull Editor editor, @NotNull Caret caret, int count, boolean whole, int dir) {
@@ -544,13 +544,14 @@ public class SearchGroup {
     MotionGroup.moveCaret(editor, caret, range.getStartOffset());
 
     lastSearch = pattern.toString();
+    lastIgnoreSmartCase = true;
     setLastPattern(editor, lastSearch);
     lastOffset = "";
     lastDir = dir;
 
-    searchHighlight(true);
+    resetSearchHighlights();
 
-    return findItOffset(editor, caret.getOffset(), count, lastDir, true);
+    return findItOffset(editor, caret.getOffset(), count, lastDir);
   }
 
   public int searchNext(@NotNull Editor editor, @NotNull Caret caret, int count) {
@@ -562,25 +563,30 @@ public class SearchGroup {
   }
 
   public int searchNextFromOffset(@NotNull Editor editor, int offset, int count) {
-    searchHighlight(false);
-    return findItOffset(editor, offset, count, 1, false);
+    updateSearchHighlights();
+    return findItOffset(editor, offset, count, 1);
   }
 
   private int searchNextWithDirection(@NotNull Editor editor, @NotNull Caret caret, int count, int dir) {
-    searchHighlight(false);
-    return findItOffset(editor, caret.getOffset(), count, dir, false);
+    updateSearchHighlights();
+    return findItOffset(editor, caret.getOffset(), count, dir);
   }
 
   private void updateHighlight() {
     highlightSearch(false);
   }
 
-  private void searchHighlight(boolean noSmartCase) {
+  private void resetSearchHighlights() {
     showSearchHighlight = Options.getInstance().isSet("hlsearch");
-    highlightSearch(noSmartCase);
+    highlightSearch(true);
   }
 
-  private void highlightSearch(final boolean noSmartCase) {
+  private void updateSearchHighlights() {
+    showSearchHighlight = Options.getInstance().isSet("hlsearch");
+    highlightSearch(false);
+  }
+
+  private void highlightSearch(boolean forceUpdate) {
     Project[] projects = ProjectManager.getInstance().getOpenProjects();
     for (Project project : projects) {
       Editor current = FileEditorManager.getInstance(project).getSelectedTextEditor();
@@ -594,34 +600,38 @@ public class SearchGroup {
         String els = EditorData.getLastSearch(editor);
         if (!showSearchHighlight) {
           removeSearchHighlight(editor);
+          continue;
+        }
 
+        // Force update for the situations where the text is the same, but the ignore case values have changed.
+        // E.g. Use `*` to search for a word (which ignores smartcase), then use `/<Up>` to search for the same pattern,
+        // which will match smartcase. Or changing the smartcase/ignorecase settings
+        if (lastSearch != null && lastSearch.equals(els) && !forceUpdate) {
           continue;
         }
-        else if (lastSearch != null && lastSearch.equals(els)) {
-          continue;
-        }
-        else if (lastSearch == null) {
+
+        if (lastSearch == null) {
           continue;
         }
 
         removeSearchHighlight(editor);
-        highlightSearchLines(editor, lastSearch, 0, -1, shouldIgnoreCase(lastSearch, noSmartCase));
+        highlightSearchLines(editor, lastSearch, 0, -1, shouldIgnoreCase(lastSearch, lastIgnoreSmartCase));
 
         EditorData.setLastSearch(editor, lastSearch);
       }
     }
   }
 
-  private void highlightSearchLines(@NotNull Editor editor, boolean noSmartCase, int startLine, int endLine) {
+  private void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine) {
     if (lastSearch != null) {
-      highlightSearchLines(editor, lastSearch, startLine, endLine, shouldIgnoreCase(lastSearch, noSmartCase));
+      highlightSearchLines(editor, lastSearch, startLine, endLine, shouldIgnoreCase(lastSearch, lastIgnoreSmartCase));
     }
   }
 
   @Nullable
   public static TextRange findNext(@NotNull Editor editor, @NotNull String pattern, final int offset, boolean ignoreCase,
                                    final boolean forwards) {
-    final List<TextRange> results = findAll(editor, pattern, 0, -1, shouldIgnoreCase(pattern, ignoreCase));
+    final List<TextRange> results = findAll(editor, pattern, 0, -1, ignoreCase);
     if (results.isEmpty()) {
       return null;
     }
@@ -719,10 +729,9 @@ public class SearchGroup {
     }
   }
 
-  private int findItOffset(@NotNull Editor editor, int startOffset, int count, int dir,
-                           boolean noSmartCase) {
+  private int findItOffset(@NotNull Editor editor, int startOffset, int count, int dir) {
     boolean wrap = Options.getInstance().isSet("wrapscan");
-    TextRange range = findIt(editor, startOffset, count, dir, noSmartCase, wrap, true, true);
+    TextRange range = findIt(editor, startOffset, count, dir, wrap, true, true);
     if (range == null) {
       return -1;
     }
@@ -814,24 +823,17 @@ public class SearchGroup {
 
   @Nullable
   private TextRange findIt(@NotNull Editor editor, int startOffset, int count, int dir,
-                           boolean noSmartCase, boolean wrap, boolean showMessages, boolean wholeFile) {
+                           boolean wrap, boolean showMessages, boolean wholeFile) {
     TextRange res = null;
 
     if (lastSearch == null || lastSearch.length() == 0) {
       return res;
     }
 
-    /*
-    int pflags = RE.REG_MULTILINE;
-    if (shouldIgnoreCase(lastSearch, noSmartCase))
-    {
-        pflags |= RE.REG_ICASE;
-    }
-    */
     //RE sp;
     RegExp sp;
     RegExp.regmmatch_T regmatch = new RegExp.regmmatch_T();
-    regmatch.rmm_ic = shouldIgnoreCase(lastSearch, noSmartCase);
+    regmatch.rmm_ic = shouldIgnoreCase(lastSearch, lastIgnoreSmartCase);
     sp = new RegExp();
     regmatch.regprog = sp.vim_regcomp(lastSearch, 1);
     if (regmatch == null) {
@@ -1250,9 +1252,9 @@ public class SearchGroup {
 
           int sl = editor.offsetToLogicalPosition(soff).line;
           int el = editor.offsetToLogicalPosition(eoff).line;
-          VimPlugin.getSearch().highlightSearchLines(editor, false, sl, el);
-          hls = EditorData.getLastHighlights(editor);
+          VimPlugin.getSearch().highlightSearchLines(editor, sl, el);
           if (logger.isDebugEnabled()) {
+            hls = EditorData.getLastHighlights(editor);
             logger.debug("sl=" + sl + ", el=" + el);
             logger.debug("hls=" + hls);
           }
@@ -1274,6 +1276,7 @@ public class SearchGroup {
   @Nullable private String lastSubstitute;
   @Nullable private String lastReplace;
   @Nullable private String lastOffset;
+  private boolean lastIgnoreSmartCase;
   private int lastDir;
   private boolean showSearchHighlight = Options.getInstance().isSet("hlsearch");
 
