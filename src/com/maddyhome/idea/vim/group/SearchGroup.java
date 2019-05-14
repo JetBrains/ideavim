@@ -273,6 +273,7 @@ public class SearchGroup {
     }
 
     /* the 'i' or 'I' flag overrules 'ignorecase' and 'smartcase' */
+    regmatch.rmm_ic = shouldIgnoreCase(pattern != null ? pattern : "", false);
     if (do_ic == 'i') {
       regmatch.rmm_ic = true;
     }
@@ -300,6 +301,7 @@ public class SearchGroup {
 
     lastReplace = sub.toString();
 
+    // This is incorrect if we pass /i or /I as a flag, as it only looks at options
     searchHighlight(false);
 
     if (logger.isDebugEnabled()) {

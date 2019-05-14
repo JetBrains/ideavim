@@ -19,6 +19,8 @@
 package org.jetbrains.plugins.ideavim.ex.handler
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.option.Options
+import com.maddyhome.idea.vim.option.ToggleOption
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -121,6 +123,65 @@ class SubstituteHandlerTest : VimTestCase() {
                 "\none\n\ntwo\n\nthree\n")
     }
 
+    fun `test ignorecase option`() {
+        setIgnoreCase()
+        doTest("%s/foo/bar/g",
+            "foo Foo foo\nFoo FOO foo",
+            "bar bar bar\nbar bar bar")
+    }
+
+    fun `test smartcase option`() {
+        setSmartCase()
+
+        // smartcase does nothing if ignorecase is not set
+        doTest("%s/foo/bar/g",
+            "foo Foo foo\nFoo FOO foo",
+            "bar Foo bar\nFoo FOO bar")
+        doTest("%s/Foo/bar/g",
+            "foo Foo foo\nFoo FOO foo",
+            "foo bar foo\nbar FOO foo")
+
+        setIgnoreCase()
+        doTest("%s/foo/bar/g",
+            "foo Foo foo\nFoo FOO foo",
+            "bar bar bar\nbar bar bar")
+        doTest("%s/Foo/bar/g",
+            "foo Foo foo\nFoo FOO foo",
+            "foo bar foo\nbar FOO foo")
+    }
+
+    fun `test force ignore case flag`() {
+        doTest("%s/foo/bar/gi",
+            "foo Foo foo\nFoo FOO foo",
+            "bar bar bar\nbar bar bar")
+
+        setIgnoreCase()
+        doTest("%s/foo/bar/gi",
+            "foo Foo foo\nFoo FOO foo",
+            "bar bar bar\nbar bar bar")
+
+        setSmartCase()
+        doTest("%s/foo/bar/gi",
+            "foo Foo foo\nFoo FOO foo",
+            "bar bar bar\nbar bar bar")
+    }
+
+    fun `test force match case flag`() {
+        doTest("%s/foo/bar/gI",
+            "foo Foo foo\nFoo FOO foo",
+            "bar Foo bar\nFoo FOO bar")
+
+        setIgnoreCase()
+        doTest("%s/foo/bar/gI",
+            "foo Foo foo\nFoo FOO foo",
+            "bar Foo bar\nFoo FOO bar")
+
+        setSmartCase()
+        doTest("%s/Foo/bar/gI",
+            "foo Foo foo\nFoo FOO foo",
+            "foo bar foo\nbar FOO foo")
+    }
+
     // VIM-864
     fun `test visual substitute doesnt change visual marks`() {
         myFixture.configureByText("a.java", "foo\nbar\nbaz\n")
@@ -182,5 +243,15 @@ class SubstituteHandlerTest : VimTestCase() {
         myFixture.configureByText("a.java", before)
         typeText(commandToKeys(command))
         myFixture.checkResult(after)
+    }
+
+    private fun setIgnoreCase() {
+        val options = Options.getInstance()
+        (options.getOption("ignorecase") as ToggleOption).set()
+    }
+
+    private fun setSmartCase() {
+        val options = Options.getInstance()
+        (options.getOption("smartcase") as ToggleOption).set()
     }
 }
