@@ -58,10 +58,8 @@ class VisualOperation {
             end = EditorHelper.normalizeOffset(editor, end, false)
             val sp = editor.offsetToLogicalPosition(start)
             val ep = editor.offsetToLogicalPosition(end)
-            val lines = when (type) {
-                SelectionType.LINE_WISE -> ep.line - sp.line
-                SelectionType.BLOCK_WISE, SelectionType.CHARACTER_WISE -> ep.line - sp.line + 1
-            }
+            var lines = ep.line - sp.line + 1
+            if (type == SelectionType.LINE_WISE && ep.column == 0 && lines > 0) lines--
 
             if (CommandFlags.FLAG_MOT_LINEWISE in cmdFlags) return VisualChange(lines, ep.column, SelectionType.LINE_WISE)
 

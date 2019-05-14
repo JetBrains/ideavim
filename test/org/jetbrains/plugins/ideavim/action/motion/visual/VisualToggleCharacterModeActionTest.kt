@@ -420,6 +420,34 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                 CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE)
     }
 
+    fun `test enter visual with count after line visual operation to line end`() {
+        doTest(parseKeys("V3jd3k", "1v"),
+                """
+                    A Discovery
+
+                    I found it in a legendary land
+                    all rocks and lavender and tufted grass,
+                    where it was settled on some sodden sand
+                    hard by the torrent of a mountain pass.
+
+                    ${c}The features it combines mark it as new
+                    to science: shape and shade -- the special tinge,
+                    akin to moonlight, tempering its blue,
+                    the dingy underside, the checquered fringe.
+                    """.trimIndent(),
+                """
+                    A Discovery
+
+                    ${s}I found it in a legendary land
+                    all rocks and lavender and tufted grass,
+                    where it was settled on some sodden sand
+                    hard by the torrent of a mountain pass${c}.
+                    ${se}
+
+                    """.trimIndent(),
+                CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_LINE)
+    }
+
     fun `test enter visual with count after line visual operation multicaret`() {
         doTest(parseKeys("Vd", "1v"),
                 """
