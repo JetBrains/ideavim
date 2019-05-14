@@ -16,37 +16,46 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action.motion.visual;
+package com.maddyhome.idea.vim.action.motion.visual
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
-import com.maddyhome.idea.vim.option.ListOption;
-import com.maddyhome.idea.vim.option.Options;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.group.visual.vimForAllOrPrimaryCaret
+import com.maddyhome.idea.vim.group.visual.vimSetSelection
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.option.Options
+import java.util.*
+import javax.swing.KeyStroke
 
 /**
  *
  */
-public class VisualToggleLineModeAction extends EditorAction {
-  public VisualToggleLineModeAction() {
-    super(new Handler());
-  }
+private object VisualToggleLineModeActionHandler : EditorActionHandlerBase() {
+    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+        val listOption = Options.getInstance().getListOption(Options.SELECTMODE)
+        return if (listOption != null && "cmd" in listOption) {
+            VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_LINE).also {
+                editor.vimForAllOrPrimaryCaret { it.vimSetSelection(it.offset) }
+            }
+        } else VimPlugin.getVisualMotion()
+                .toggleVisual(editor, cmd.count, cmd.rawCount, CommandState.SubMode.VISUAL_LINE)
 
-  private static class Handler extends EditorActionHandlerBase {
-    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      final ListOption listOption = Options.getInstance().getListOption(Options.SELECTMODE);
-      if (listOption != null && listOption.contains("cmd")) {
-        return VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_LINE);
-      }
-
-      return VimPlugin.getVisualMotion()
-        .toggleVisual(editor, cmd.getCount(), cmd.getRawCount(), CommandState.SubMode.VISUAL_LINE);
     }
-  }
+}
+
+class VisualToggleLineModeAction : VimCommandAction(VisualToggleLineModeActionHandler) {
+    override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NV
+
+    override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("V")
+
+    override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+
+    override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
 }
 

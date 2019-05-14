@@ -22,6 +22,8 @@ package org.jetbrains.plugins.ideavim.action.motion.visual
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.option.Options
+import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VisualToggleBlockModeActionTest : VimTestCase() {
@@ -86,5 +88,22 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     hard by the torrent of a mountain pass.
                 """.trimIndent(),
                 CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    }
+
+    fun `test selectmode option`() {
+        configureByText("""
+                    A Discovery
+
+                    I${c} found it in a legendary land
+                    all rocks and lavender and tufted grass,
+                    where it was settled on some sodden sand[long line]
+                    hard by the torrent of a mountain pass.
+        """.trimIndent())
+        Options.getInstance().getListOption(Options.SELECTMODE)?.set("cmd") ?: run {
+            TestCase.fail()
+            return
+        }
+        typeText(parseKeys("<C-V>"))
+        assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_BLOCK)
     }
 }

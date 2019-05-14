@@ -24,6 +24,8 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.VimBehaviourDiffers
 import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.option.Options
+import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
 
@@ -633,5 +635,22 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
                     ${s}hard by the torrent of a mountain pass.${c}${se}
                 """.trimIndent(),
                 CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+    }
+
+    fun `test selectmode option`() {
+        configureByText("""
+                    A Discovery
+
+                    I${c} found it in a legendary land
+                    all rocks and lavender and tufted grass,
+                    where it was settled on some sodden sand[long line]
+                    hard by the torrent of a mountain pass.
+        """.trimIndent())
+        Options.getInstance().getListOption(Options.SELECTMODE)?.set("cmd") ?: run {
+            TestCase.fail()
+            return
+        }
+        typeText(parseKeys("v"))
+        assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
     }
 }

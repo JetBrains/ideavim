@@ -57,8 +57,6 @@ class RegisterActions {
 
   private static void registerVariousModesActions() {
     final KeyGroup parser = VimPlugin.getKey();
-    parser.registerAction(MappingMode.NV, "VimVisualToggleLineMode", Command.Type.OTHER_READONLY, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE),
-                          new Shortcut('V'));
     parser.registerAction(MappingMode.NV, "VimVisualToggleBlockMode", Command.Type.OTHER_READONLY,
                           EnumSet.of(CommandFlags.FLAG_MOT_BLOCKWISE),
                           new Shortcut[]{new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK)),
