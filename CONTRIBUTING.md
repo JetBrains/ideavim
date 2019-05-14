@@ -106,4 +106,4 @@ For example, take a few lines from your favorite poem, or take
 
 3. Test your functionality properly.
 Especially check whether your command works with:
-line start, line end, file start, file end, empty line, multiple carets.
+line start, line end, file start, file end, empty line, multiple carets, dollar motion.
