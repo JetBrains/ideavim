@@ -53,9 +53,11 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.*;
+import java.util.List;
 
 public class SearchGroup {
   public SearchGroup() {
@@ -1117,7 +1119,8 @@ public class SearchGroup {
     TextAttributes color = new TextAttributes(
       editor.getColorsScheme().getColor(EditorColors.SELECTION_FOREGROUND_COLOR),
       editor.getColorsScheme().getColor(EditorColors.SELECTION_BACKGROUND_COLOR),
-      null, null, 0
+      editor.getColorsScheme().getColor(EditorColors.CARET_COLOR),
+      EffectType.ROUNDED_BOX, Font.PLAIN
     );
     return editor.getMarkupModel().addRangeHighlighter(start, end, HighlighterLayer.SELECTION,
                                                        color, HighlighterTargetArea.EXACT_RANGE);
