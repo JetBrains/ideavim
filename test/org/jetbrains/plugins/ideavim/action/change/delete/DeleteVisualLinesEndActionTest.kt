@@ -1,3 +1,21 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2019 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 @file:Suppress("RemoveCurlyBracesFromTemplate")
 
 package org.jetbrains.plugins.ideavim.action.change.delete
@@ -224,7 +242,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
                     abcde
 
                     """.trimIndent())
-        myFixture.checkResult("<caret>abcd<caret>e\n")
+        myFixture.checkResult("${c}abcd${c}e\n")
     }
 
     fun `test line simple deletion`() {
@@ -401,7 +419,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
                     abcde
 
                     """.trimIndent())
-        myFixture.checkResult("<caret>abcd<caret>e\n")
+        myFixture.checkResult("${c}abcd${c}e\n")
     }
 
     fun `test block simple deletion`() {
@@ -534,7 +552,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
         typeTextInFile(parseKeys("<C-V>", "2j", "2l", "D"),
                 """
                     abcde
-                    a<caret>bcde
+                    a${c}bcde
                     abcde
                     abcde
                     abcde
@@ -542,7 +560,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
                     """.trimIndent())
         myFixture.checkResult(("""
     abcde
-    <caret>a
+    ${c}a
     a
     a
     abcde

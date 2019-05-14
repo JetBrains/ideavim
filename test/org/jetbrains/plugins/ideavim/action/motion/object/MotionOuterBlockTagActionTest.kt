@@ -25,133 +25,133 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
 
     //|d| |v_at|
     fun testDeleteOuterTagBlockBefore() {
-        typeTextInFile(parseKeys("dat"), "abc<caret>de<tag>fg</tag>hi")
+        typeTextInFile(parseKeys("dat"), "abc${c}de<tag>fg</tag>hi")
         myFixture.checkResult("abcde<tag>fg</tag>hi")
     }
 
     //|d| |v_at|
     fun testDeleteOuterTagBlockInOpen() {
-        typeTextInFile(parseKeys("dat"), "abcde<ta<caret>g>fg</tag>hi")
+        typeTextInFile(parseKeys("dat"), "abcde<ta${c}g>fg</tag>hi")
         myFixture.checkResult("abcdehi")
     }
 
     //|d| |v_at|
     fun testDeleteOuterTagBlockInOpenWithArgs() {
-        typeTextInFile(parseKeys("dat"), "abcde<ta<caret>g name = \"name\">fg</tag>hi")
+        typeTextInFile(parseKeys("dat"), "abcde<ta${c}g name = \"name\">fg</tag>hi")
         myFixture.checkResult("abcdehi")
     }
 
     //|d| |v_at|
     fun testDeleteOuterTagBlockBetween() {
-        typeTextInFile(parseKeys("dat"), "abcde<tag>f<caret>g</tag>hi")
+        typeTextInFile(parseKeys("dat"), "abcde<tag>f${c}g</tag>hi")
         myFixture.checkResult("abcdehi")
     }
 
     //|d| |v_at|
     fun testDeleteOuterTagBlockBetweenWithArgs() {
-        typeTextInFile(parseKeys("dat"), "abcde<tag name = \"name\">f<caret>g</tag>hi")
+        typeTextInFile(parseKeys("dat"), "abcde<tag name = \"name\">f${c}g</tag>hi")
         myFixture.checkResult("abcdehi")
     }
 
     //|d| |v_at|
     fun testDeleteOuterTagBlockInClose() {
-        typeTextInFile(parseKeys("dat"), "abcde<tag>fg</ta<caret>g>hi")
+        typeTextInFile(parseKeys("dat"), "abcde<tag>fg</ta${c}g>hi")
         myFixture.checkResult("abcdehi")
     }
 
     //|d| |v_at|
     fun testDeleteOuterTagBlockAfter() {
-        typeTextInFile(parseKeys("dat"), "abcde<tag>fg</tag>h<caret>i")
+        typeTextInFile(parseKeys("dat"), "abcde<tag>fg</tag>h${c}i")
         myFixture.checkResult("abcde<tag>fg</tag>hi")
     }
 
     //|d| |v_at|
     fun testDeleteOuterTagBlockInAlone() {
-        typeTextInFile(parseKeys("dat"), "abcde<ta<caret>g>fghi")
+        typeTextInFile(parseKeys("dat"), "abcde<ta${c}g>fghi")
         myFixture.checkResult("abcde<tag>fghi")
     }
 
     //|d| |v_at|
     fun testDeleteOuterTagBlockWithoutTags() {
-        typeTextInFile(parseKeys("dat"), "abc<caret>de")
+        typeTextInFile(parseKeys("dat"), "abc${c}de")
         myFixture.checkResult("abcde")
     }
 
     //|d| |v_at|
     fun testDeleteOuterTagBlockBeforeWithoutOpenTag() {
-        typeTextInFile(parseKeys("dat"), "abc<caret>defg</tag>hi")
+        typeTextInFile(parseKeys("dat"), "abc${c}defg</tag>hi")
         myFixture.checkResult("abcdefg</tag>hi")
     }
 
     //|d| |v_at|
     fun testDeleteOuterTagBlockInCloseWithoutOpenTag() {
-        typeTextInFile(parseKeys("dat"), "abcdefg</ta<caret>g>hi")
+        typeTextInFile(parseKeys("dat"), "abcdefg</ta${c}g>hi")
         myFixture.checkResult("abcdefg</tag>hi")
     }
 
     //|d| |v_at|
     fun testDeleteOuterTagBlockAfterWithoutOpenTag() {
-        typeTextInFile(parseKeys("dat"), "abcdefg</tag>h<caret>i")
+        typeTextInFile(parseKeys("dat"), "abcdefg</tag>h${c}i")
         myFixture.checkResult("abcdefg</tag>hi")
     }
 
     //|d| |v_at|
     fun testDeleteOuterTagBlockBeforeWithoutCloseTag() {
-        typeTextInFile(parseKeys("dat"), "abc<caret>defg<tag>hi")
+        typeTextInFile(parseKeys("dat"), "abc${c}defg<tag>hi")
         myFixture.checkResult("abcdefg<tag>hi")
     }
 
     //|d| |v_at|
     fun testDeleteOuterTagBlockInOpenWithoutCloseTag() {
-        typeTextInFile(parseKeys("dat"), "abcdefg<ta<caret>g>hi")
+        typeTextInFile(parseKeys("dat"), "abcdefg<ta${c}g>hi")
         myFixture.checkResult("abcdefg<tag>hi")
     }
 
     //|d| |v_at|
     fun testDeleteOuterTagBlockAfterWithoutCloseTag() {
-        typeTextInFile(parseKeys("dat"), "abcdefg<tag>h<caret>i")
+        typeTextInFile(parseKeys("dat"), "abcdefg<tag>h${c}i")
         myFixture.checkResult("abcdefg<tag>hi")
     }
 
     //|d| |v_at|
     fun testDeleteOuterTagBlockBeforeWrongOrder() {
-        typeTextInFile(parseKeys("dat"), "abc<caret>de</tag>fg<tag>hi")
+        typeTextInFile(parseKeys("dat"), "abc${c}de</tag>fg<tag>hi")
         myFixture.checkResult("abcde</tag>fg<tag>hi")
     }
 
     //|d| |v_at|
     fun testDeleteOuterTagBlockInOpenWrongOrder() {
-        typeTextInFile(parseKeys("dat"), "abcde</ta<caret>g>fg<tag>hi")
+        typeTextInFile(parseKeys("dat"), "abcde</ta${c}g>fg<tag>hi")
         myFixture.checkResult("abcde</tag>fg<tag>hi")
     }
 
     //|d| |v_at|
     fun testDeleteOuterTagBlockBetweenWrongOrder() {
-        typeTextInFile(parseKeys("dat"), "abcde</tag>f<caret>g<tag>hi")
+        typeTextInFile(parseKeys("dat"), "abcde</tag>f${c}g<tag>hi")
         myFixture.checkResult("abcde</tag>fg<tag>hi")
     }
 
     //|d| |v_at|
     fun testDeleteOuterTagBlockInCloseWrongOrder() {
-        typeTextInFile(parseKeys("dat"), "abcde</tag>fg<ta<caret>g>hi")
+        typeTextInFile(parseKeys("dat"), "abcde</tag>fg<ta${c}g>hi")
         myFixture.checkResult("abcde</tag>fg<tag>hi")
     }
 
     //|d| |v_at|
     fun testDeleteOuterTagBlockAfterWrongOrder() {
-        typeTextInFile(parseKeys("dat"), "abcde</tag>fg<tag>h<caret>i")
+        typeTextInFile(parseKeys("dat"), "abcde</tag>fg<tag>h${c}i")
         myFixture.checkResult("abcde</tag>fg<tag>hi")
     }
 
     //|d| |v_it|
     fun testDeleteInnerTagAngleBrackets() {
-        typeTextInFile(parseKeys("dit"), "<div <caret>hello=\"d > hsj < akl\"></div>")
+        typeTextInFile(parseKeys("dit"), "<div ${c}hello=\"d > hsj < akl\"></div>")
         myFixture.checkResult("<div hello=\"d ></div>")
     }
 
     // VIM-1090 |d| |v_at|
     fun testDeleteOuterTagDuplicateTags() {
-        typeTextInFile(parseKeys("dat"), "<a><a></a></a<caret>>")
+        typeTextInFile(parseKeys("dat"), "<a><a></a></a${c}>")
         myFixture.checkResult("")
     }
 
@@ -159,7 +159,7 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
     fun testTagSelectionSkipsWhitespaceAtStartOfLine() {
         // Also skip tabs
         configureByText("<o>Outer\n" +
-                " <caret> \t <t>Inner</t>\n" +
+                " ${c} \t <t>Inner</t>\n" +
                 "</o>\n")
         typeText(parseKeys("vat"))
         assertSelection("<t>Inner</t>")
@@ -167,7 +167,7 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
 
     fun `test skip new line`() {
         // Newline must not be skipped
-        configureByText("<caret>\n" + "    <t>asdf</t>")
+        configureByText("${c}\n" + "    <t>asdf</t>")
         typeText(parseKeys("vat"))
         assertSelection(null)
     }
@@ -175,7 +175,7 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
     fun `test whitespace skip`() {
         // Whitespace is only skipped if there is nothing else at the start of the line
         configureByText("<o>Outer\n" +
-                "a <caret>  <t>Inner</t>\n" +
+                "a ${c}  <t>Inner</t>\n" +
                 "</o>\n")
         typeText(parseKeys("vat"))
         assertSelection("<o>Outer\n" +
@@ -186,7 +186,7 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
     // |v_at|
     fun testNestedTagSelection() {
         configureByText("<t>Outer\n" +
-                "   <t><caret>Inner</t>\n" +
+                "   <t>${c}Inner</t>\n" +
                 "</t>\n")
         typeText(parseKeys("vat"))
         assertSelection("<t>Inner</t>")
@@ -194,7 +194,7 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
 
     fun `test nested tags between tags`() {
         configureByText("<t>Outer\n" +
-                "   <t>Inner</t> <caret> <t>Inner</t>\n" +
+                "   <t>Inner</t> ${c} <t>Inner</t>\n" +
                 "</t>\n")
         typeText(parseKeys("vat"))
         assertSelection("<t>Outer\n" +
@@ -204,7 +204,7 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
 
     fun `test nested tags double motion`() {
         configureByText("<t>Outer\n" +
-                "   <t><caret>Inner</t>\n" +
+                "   <t>${c}Inner</t>\n" +
                 "</t>\n")
         typeText(parseKeys("vatat"))
         assertSelection("<t>Outer\n" +
@@ -214,7 +214,7 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
 
     fun `test nested tags number motion`() {
         configureByText("<t>Outer\n" +
-                "   <t><caret>Inner</t>\n" +
+                "   <t>${c}Inner</t>\n" +
                 "</t>\n")
         typeText(parseKeys("v2at"))
         assertSelection("<t>Outer\n" +
@@ -225,7 +225,7 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
     fun `test nested tags on outer`() {
         configureByText("<t>Outer\n" +
                 "   <t>Inner</t>\n" +
-                "</<caret>t>\n")
+                "</${c}t>\n")
         typeText(parseKeys("vat"))
         assertSelection("<t>Outer\n" +
                 "   <t>Inner</t>\n" +
@@ -233,7 +233,7 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
     }
 
     fun `test nested tags on outer start`() {
-        configureByText("<<caret>t>Outer\n" +
+        configureByText("<${c}t>Outer\n" +
                 "   <t>Inner</t>\n" +
                 "</t>\n")
         typeText(parseKeys("vat"))
@@ -243,7 +243,7 @@ class MotionOuterBlockTagActionTest : VimTestCase() {
     }
 
     fun `test nested tags outside outer`() {
-        configureByText("<caret><t>Outer\n" +
+        configureByText("${c}<t>Outer\n" +
                 "   <t>Inner</t>\n" +
                 "</t>\n")
         typeText(parseKeys("vat"))

@@ -28,11 +28,11 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
         doTest(parseKeys("yiw", "3wea", "<C-W>", "<ESC>p"), """
             A Discovery
 
-            I found <caret>it in a legendary land
+            I found ${c}it in a legendary land
         """.trimIndent(), """
             A Discovery
 
-            I found it in a i<caret>t land
+            I found it in a i${c}t land
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 }

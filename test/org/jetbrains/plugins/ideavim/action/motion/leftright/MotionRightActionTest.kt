@@ -29,14 +29,14 @@ class MotionRightActionTest : VimTestCase() {
         doTest(parseKeys("l"), """
             A Discovery
 
-            I found <caret>it in a legendary land
+            I found ${c}it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), """
             A Discovery
 
-            I found i<caret>t in a legendary land
+            I found i${c}t in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -47,14 +47,14 @@ class MotionRightActionTest : VimTestCase() {
         doTest(parseKeys("3l"), """
             A Discovery
 
-            I found <caret>it in a legendary land
+            I found ${c}it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), """
             A Discovery
 
-            I found it <caret>in a legendary land
+            I found it ${c}in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -65,14 +65,14 @@ class MotionRightActionTest : VimTestCase() {
         doTest(parseKeys("3l"), """
             A Discovery
 
-            I found it in a legendary lan<caret>d
+            I found it in a legendary lan${c}d
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), """
             A Discovery
 
-            I found it in a legendary lan<caret>d
+            I found it in a legendary lan${c}d
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -83,14 +83,14 @@ class MotionRightActionTest : VimTestCase() {
         doTest(parseKeys("l"), """
             A Discovery
 
-            I found it in a legendar<caret>𝛁 land
+            I found it in a legendar${c}𝛁 land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), """
             A Discovery
 
-            I found it in a legendar𝛁<caret> land
+            I found it in a legendar𝛁${c} land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -101,14 +101,14 @@ class MotionRightActionTest : VimTestCase() {
         doTest(parseKeys("l"), """
             A Discovery
 
-            I found it in a legendar<caret>🐔 land
+            I found it in a legendar${c}🐔 land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), """
             A Discovery
 
-            I found it in a legendar🐔<caret> land
+            I found it in a legendar🐔${c} land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -119,14 +119,14 @@ class MotionRightActionTest : VimTestCase() {
         doTest(parseKeys("l"), """
             A Discovery
 
-            I found it in a legendar<caret>ž land
+            I found it in a legendar${c}ž land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), """
             A Discovery
 
-            I found it in a legendarž<caret> land
+            I found it in a legendarž${c} land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -137,14 +137,14 @@ class MotionRightActionTest : VimTestCase() {
         doTest(parseKeys("l"), """
             A Discovery
 
-            I found it in a legendar<caret>	 land
+            I found it in a legendar${c}	 land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), """
             A Discovery
 
-            I found it in a legendar	<caret> land
+            I found it in a legendar	${c} land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.

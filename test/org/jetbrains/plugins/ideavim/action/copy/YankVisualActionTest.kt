@@ -86,9 +86,9 @@ class YankVisualActionTest : VimTestCase() {
 
     fun testYankVisualRange() {
         val before = """
-            q<caret>werty
-            asdf<caret>gh
-            <caret>zxcvbn
+            q${c}werty
+            asdf${c}gh
+            ${c}zxcvbn
 
             """.trimIndent()
         configureByText(before)
@@ -102,7 +102,7 @@ class YankVisualActionTest : VimTestCase() {
         typeText(parseKeys("G", "$", "p"))
         val after = """qwerty
 asdfgh
-zxcvbn<caret>werty
+zxcvbn${c}werty
       gh
       zxcvbn
 """

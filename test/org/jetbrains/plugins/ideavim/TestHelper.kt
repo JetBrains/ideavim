@@ -20,6 +20,7 @@ package org.jetbrains.plugins.ideavim
 
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.testFramework.EditorTestUtil
 import com.maddyhome.idea.vim.common.TextRange
 
 /**
@@ -27,7 +28,7 @@ import com.maddyhome.idea.vim.common.TextRange
  */
 
 infix fun String.rangeOf(str: String): TextRange {
-    val clearString = this.replace("<caret>", "")
+    val clearString = this.replace(EditorTestUtil.CARET_TAG, "")
     val indexOf = clearString.indexOf(str)
     if (indexOf == -1) throw RuntimeException("$str was not found in $clearString")
 
@@ -38,7 +39,7 @@ fun Editor.rangeOf(first: String, nLinesDown: Int): TextRange {
     val starts = ArrayList<Int>()
     val ends = ArrayList<Int>()
 
-    val indexOf = document.text.replace("<caret>", "").indexOf(first)
+    val indexOf = document.text.replace(EditorTestUtil.CARET_TAG, "").indexOf(first)
     if (indexOf == -1) throw RuntimeException("$first was not found in $this")
 
     val position = offsetToLogicalPosition(indexOf)

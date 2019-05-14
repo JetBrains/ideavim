@@ -28,11 +28,11 @@ class InsertDeleteInsertedTextActionTest : VimTestCase() {
         doTest(parseKeys("yiw", "ea", "Hello", "<C-U>", "<ESC>p"), """
             A Discovery
 
-            I found <caret>it in a legendary land
+            I found ${c}it in a legendary land
         """.trimIndent(), """
             A Discovery
 
-            I found iti<caret>t in a legendary land
+            I found iti${c}t in a legendary land
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
@@ -42,11 +42,11 @@ class InsertDeleteInsertedTextActionTest : VimTestCase() {
         doTest(parseKeys("yiw", "eR", "Hello", "<C-U>", "<ESC>p"), """
             A Discovery
 
-            I found <caret>it in a legendary land
+            I found ${c}it in a legendary land
         """.trimIndent(), """
             A Discovery
 
-            I found ii<caret>ta legendary land
+            I found ii${c}ta legendary land
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 }

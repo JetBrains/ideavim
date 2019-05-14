@@ -136,7 +136,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
 
     fun `test motion with quote on the way`() {
         doTest(parseKeys("%"), """
-            for (; c!= cj;c = it.next()) <caret>{
+            for (; c!= cj;c = it.next()) ${c}{
              if (dsa) {
                if (c == '\\') {
                  dsadsakkk
@@ -151,7 +151,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
                  dsadsakkk
                }
              }
-            <caret>}
+            ${c}}
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
@@ -159,7 +159,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
         doTest(parseKeys("%"), """
             (
             ""${'"'}
-            ""${'"'} + <caret>title("Display")
+            ""${'"'} + ${c}title("Display")
             ""${'"'}
             ""${'"'}
             )
@@ -167,7 +167,7 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
                 """
             (
             ""${'"'}
-            ""${'"'} + title("Display"<caret>)
+            ""${'"'} + title("Display"${c})
             ""${'"'}
             ""${'"'}
             )
@@ -175,22 +175,22 @@ class MotionPercentOrMatchActionTest : VimTestCase() {
     }
 
     fun `test motion in text`() {
-        doTest(parseKeys("%"), """ "I found <caret>it in a (legendary) land" """,
-                """ "I found it in a (legendary<caret>) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+        doTest(parseKeys("%"), """ "I found ${c}it in a (legendary) land" """,
+                """ "I found it in a (legendary${c}) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test motion in text with quotes`() {
-        doTest(parseKeys("%"), """ "I found <caret>it in \"a (legendary) land" """,
-                """ "I found it in \"a (legendary<caret>) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+        doTest(parseKeys("%"), """ "I found ${c}it in \"a (legendary) land" """,
+                """ "I found it in \"a (legendary${c}) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test motion in text with quotes start before quote`() {
-        doTest(parseKeys("%"), """ <caret> "I found it in \"a (legendary) land" """,
-                """  "I found it in \"a (legendary<caret>) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+        doTest(parseKeys("%"), """ ${c} "I found it in \"a (legendary) land" """,
+                """  "I found it in \"a (legendary${c}) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test motion in text with quotes and double escape`() {
-        doTest(parseKeys("%"), """ "I found <caret>it in \\\"a (legendary) land" """,
-                """ "I found it in \\\"a (legendary<caret>) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+        doTest(parseKeys("%"), """ "I found ${c}it in \\\"a (legendary) land" """,
+                """ "I found it in \\\"a (legendary${c}) land" """, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 }
