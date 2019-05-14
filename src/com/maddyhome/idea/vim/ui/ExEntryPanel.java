@@ -24,7 +24,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.markup.*;
+import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -125,7 +125,8 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       positionPanel();
       oldGlass.setVisible(true);
       if (isIncSearchEnabled(label)) {
-        entry.getDocument().addDocumentListener(documentListener);
+        entry.getDocument().addDocumentListener(incSearchDocumentListener);
+        caretOffset = editor.getCaretModel().getOffset();
         verticalOffset = editor.getScrollingModel().getVerticalScrollOffset();
         horizontalOffset = editor.getScrollingModel().getHorizontalScrollOffset();
       }
@@ -229,6 +230,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     logger.info("deactivate");
     if (!active) return;
     active = false;
+
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
       if (refocusOwningEditor && parent != null) {
         UiHelper.requestFocus(parent);
@@ -239,9 +241,12 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       oldGlass.remove(this);
       oldGlass.setOpaque(wasOpaque);
       oldGlass.setLayout(oldLayout);
+
+      // incsearch won't change in the lifetime of this activation
       if (isIncSearchEnabled(label.getText())) {
-        entry.getDocument().removeDocumentListener(documentListener);
+        entry.getDocument().removeDocumentListener(incSearchDocumentListener);
         final Editor editor = entry.getEditor();
+        MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), caretOffset);
         editor.getScrollingModel().scrollVertically(verticalOffset);
         editor.getScrollingModel().scrollHorizontally(horizontalOffset);
         if (incHighlighter != null) {
@@ -249,6 +254,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
         }
       }
     }
+
     parent = null;
   }
 
@@ -276,10 +282,11 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
   @Nullable private RangeHighlighter incHighlighter = null;
   private int verticalOffset;
   private int horizontalOffset;
+  private int caretOffset;
 
-  @NotNull private final DocumentListener documentListener = new DocumentAdapter() {
+  @NotNull private final DocumentListener incSearchDocumentListener = new DocumentAdapter() {
     @Override
-    protected void textChanged(DocumentEvent e) {
+    protected void textChanged(@NotNull DocumentEvent e) {
       final Editor editor = entry.getEditor();
       final boolean forwards = !label.getText().equals("?");
       if (incHighlighter != null) {
@@ -289,10 +296,13 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       final CharPointer end = RegExp.skip_regexp(new CharPointer(entry.getText()), forwards ? '/' : '?', true);
       final String pattern = p.substring(end.pointer() - p.pointer());
       final boolean ignoreCase = SearchGroup.shouldIgnoreCase(pattern, false);
-      final TextRange range = SearchGroup.findNext(editor, pattern, editor.getCaretModel().getOffset(), ignoreCase, forwards);
+      final TextRange range = SearchGroup.findNext(editor, pattern, caretOffset, ignoreCase, forwards);
       if (range != null) {
         incHighlighter = SearchGroup.highlightMatch(editor, range.getStartOffset(), range.getEndOffset(), true, pattern);
-        MotionGroup.scrollPositionIntoView(editor, editor.offsetToVisualPosition(range.getStartOffset()), true);
+        MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), range.getStartOffset());
+      }
+      else {
+        MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), caretOffset);
       }
     }
   };
