@@ -28,6 +28,7 @@ import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.EventFacade;
+import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.*;
@@ -93,6 +94,7 @@ public class EditorGroup {
           if (!EditorData.isFileEditor(editor) && editor.getDocument().isWritable() &&
               !CommandState.inInsertMode(editor)) {
             VimPlugin.getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
+            KeyHandler.getInstance().reset(editor);
           }
           editor.getSettings().setBlockCursor(!CommandState.inInsertMode(editor));
           editor.getSettings().setAnimatedScrolling(ANIMATED_SCROLLING_VIM_VALUE);
