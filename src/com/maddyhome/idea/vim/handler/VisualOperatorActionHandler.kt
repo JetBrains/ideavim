@@ -30,7 +30,10 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.*
-import com.maddyhome.idea.vim.helper.*
+import com.maddyhome.idea.vim.helper.EditorData
+import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
+import com.maddyhome.idea.vim.helper.vimSelectionStart
 
 /**
  * @author Alex Plate
@@ -103,16 +106,35 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
     private fun Editor.collectSelections(): Map<Caret, VimSelection>? {
 
-        if (CommandState.inVisualBlockMode(this)) {
-            val primaryCaret = caretModel.primaryCaret
-            return mapOf(primaryCaret to VimBlockSelection(
-                    primaryCaret.vimSelectionStart,
-                    primaryCaret.offset,
-                    this, primaryCaret.vimLastColumn >= MotionGroup.LAST_COLUMN))
-        }
+        return when {
+            CommandState.inRepeatMode(this) -> {
+                if (EditorData.getLastSelectionType(this) == SelectionType.BLOCK_WISE) {
+                    val primaryCaret = caretModel.primaryCaret
+                    val range = primaryCaret.vimLastVisualOperatorRange ?: return null
+                    val end = VisualOperation.calculateRange(this, range, 1, primaryCaret)
+                    mapOf(primaryCaret to VimBlockSelection(
+                            primaryCaret.offset,
+                            end,
+                            this, range.columns >= MotionGroup.LAST_COLUMN))
+                } else {
+                    val carets = mutableMapOf<Caret, VimSelection>()
+                    this.caretModel.allCarets.forEach { caret ->
+                        val range = caret.vimLastVisualOperatorRange ?: return@forEach
+                        val end = VisualOperation.calculateRange(this, range, 1, caret)
+                        carets += caret to VimSelection.create(caret.offset, end, range.type, this)
+                    }
+                    carets.toMap()
+                }
+            }
+            CommandState.inVisualBlockMode(this) -> {
+                val primaryCaret = caretModel.primaryCaret
+                mapOf(primaryCaret to VimBlockSelection(
+                        primaryCaret.vimSelectionStart,
+                        primaryCaret.offset,
+                        this, primaryCaret.vimLastColumn >= MotionGroup.LAST_COLUMN))
+            }
+            else -> this.caretModel.allCarets.associateWith { caret ->
 
-        return this.caretModel.allCarets.associateWith { caret ->
-            if (CommandState.inVisualMode(this)) {
                 val subMode = CommandState.getInstance(this).subMode
                 VimSimpleSelection.createWithNative(
                         caret.vimSelectionStart,
@@ -122,32 +144,16 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
                         SelectionType.fromSubMode(subMode),
                         this
                 )
-            } else {
-                val offsets = VimPlugin.getMark().getVisualSelectionMarks(this) ?: return null
-                val lastSelectionType = EditorData.getLastSelectionType(this) ?: return null
-                VimSelection.create(offsets.startOffset, offsets.endOffset, lastSelectionType, this)
             }
         }
     }
 
     protected class VisualStartFinishWrapper(private val editor: Editor, private val cmd: Command) {
         private lateinit var lastMode: CommandState.SubMode
-        private var wasRepeat: Boolean = false
-        private val previousLastColumns = mutableMapOf<Caret, Int>()
         private val visualChanges = mutableMapOf<Caret, VisualChange?>()
 
         private fun startForCaret(caret: Caret) {
-            if (CommandState.getInstance(editor).mode == CommandState.Mode.REPEAT) {
-                previousLastColumns[caret] = caret.vimLastColumn
-                VimPlugin.getVisualMotion().toggleVisual(editor, 1, 1, CommandState.SubMode.NONE)
-                caret.vimLastVisualOperatorRange?.run {
-                    if (columns == MotionGroup.LAST_COLUMN) {
-                        caret.vimLastColumn = MotionGroup.LAST_COLUMN
-                    }
-                }
-            }
-
-            val change = if (CommandState.inVisualMode(editor) && !wasRepeat) {
+            val change = if (CommandState.inVisualMode(editor) && !CommandState.inRepeatMode(editor)) {
                 VisualOperation.getRange(editor, caret, cmd.flags)
             } else null
             logger.debug("change=$change")
@@ -156,7 +162,6 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
         fun start() {
             logger.debug("start")
-            wasRepeat = CommandState.getInstance(editor).mode == CommandState.Mode.REPEAT
             EditorData.setKeepingVisualOperatorAction(editor, CommandFlags.FLAG_EXIT_VISUAL !in cmd.flags)
 
             editor.vimForAllOrPrimaryCaret(this@VisualStartFinishWrapper::startForCaret)
@@ -178,12 +183,6 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         }
 
         private fun finishForCaret(caret: Caret, res: Boolean) {
-            if (CommandFlags.FLAG_MULTIKEY_UNDO !in cmd.flags && CommandFlags.FLAG_EXPECT_MORE !in cmd.flags) {
-                if (wasRepeat) {
-                    caret.vimLastColumn = previousLastColumns[caret] ?: caret.logicalPosition.column
-                }
-            }
-
             if (res) {
                 visualChanges[caret]?.let {
                     caret.vimLastVisualOperatorRange = it
