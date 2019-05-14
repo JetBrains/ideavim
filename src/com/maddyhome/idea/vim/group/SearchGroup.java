@@ -23,24 +23,25 @@ import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.colors.EditorColors;
-import com.intellij.openapi.editor.event.DocumentAdapter;
 import com.intellij.openapi.editor.event.DocumentEvent;
+import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.markup.*;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.FileEditorManagerAdapter;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
+import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.CommandFlags;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.ListOption;
+import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.regexp.CharHelper;
 import com.maddyhome.idea.vim.regexp.CharPointer;
@@ -57,6 +58,21 @@ import java.text.ParsePosition;
 import java.util.*;
 
 public class SearchGroup {
+  public SearchGroup() {
+    final OptionChangeListener updateHighlightsIfVisible = event -> {
+      if (showSearchHighlight) {
+        resetSearchHighlights();
+      }
+    };
+
+    // It appears that when changing smartcase, Vim only redraws the highlights when the screen is redrawn. We can't
+    // reliably copy that, so do the most intuitive thing
+    final Options options = Options.getInstance();
+    options.getOption(Options.HIGHLIGHT_SEARCH).addOptionChangeListener(event -> resetSearchHighlights());
+    options.getOption(Options.IGNORE_CASE).addOptionChangeListener(updateHighlightsIfVisible);
+    options.getOption(Options.SMART_CASE).addOptionChangeListener(updateHighlightsIfVisible);
+  }
+
   @Nullable
   public String getLastSearch() {
     return lastSearch;
@@ -445,8 +461,8 @@ public class SearchGroup {
   }
 
   public static boolean shouldIgnoreCase(@NotNull String pattern, boolean ignoreSmartCase) {
-    boolean sc = !ignoreSmartCase && Options.getInstance().isSet("smartcase");
-    boolean ic = Options.getInstance().isSet("ignorecase");
+    boolean sc = !ignoreSmartCase && Options.getInstance().isSet(Options.SMART_CASE);
+    boolean ic = Options.getInstance().isSet(Options.IGNORE_CASE);
 
     return ic && !(sc && StringHelper.containsUpperCase(pattern));
   }
@@ -572,17 +588,26 @@ public class SearchGroup {
     return findItOffset(editor, caret.getOffset(), count, dir);
   }
 
-  private void updateHighlight() {
-    highlightSearch(false);
-  }
-
+  /**
+   * Forces update of search highlights
+   */
   private void resetSearchHighlights() {
-    showSearchHighlight = Options.getInstance().isSet("hlsearch");
+    showSearchHighlight = Options.getInstance().isSet(Options.HIGHLIGHT_SEARCH);
     highlightSearch(true);
   }
 
+  /**
+   * Update search highlights if they've changed
+   */
   private void updateSearchHighlights() {
-    showSearchHighlight = Options.getInstance().isSet("hlsearch");
+    showSearchHighlight = Options.getInstance().isSet(Options.HIGHLIGHT_SEARCH);
+    highlightSearch(false);
+  }
+
+  /**
+   * Refreshes current search highlights for all editors of currently active text editor/document
+   */
+  private void refreshSearchHighlights() {
     highlightSearch(false);
   }
 
@@ -1115,7 +1140,7 @@ public class SearchGroup {
 
   public void clearSearchHighlight() {
     showSearchHighlight = false;
-    updateHighlight();
+    refreshSearchHighlights();
   }
 
   private static void removeSearchHighlight(@NotNull Editor editor) {
@@ -1201,25 +1226,16 @@ public class SearchGroup {
     return child != null ? StringHelper.getSafeXmlText(child) : null;
   }
 
-  public static class EditorSelectionCheck extends FileEditorManagerAdapter {
-    /*
-    public void fileOpened(FileEditorManager fileEditorManager, VirtualFile virtualFile)
-    {
-        FileDocumentManager.getInstance().getDocument(virtualFile).addDocumentListener(listener);
-    }
-
-    public void fileClosed(FileEditorManager fileEditorManager, VirtualFile virtualFile)
-    {
-        FileDocumentManager.getInstance().getDocument(virtualFile).removeDocumentListener(listener);
-    }
-    */
-
+  public static class EditorSelectionCheck implements FileEditorManagerListener {
+    /**
+     * Updates search highlights when the selected editor changes
+     */
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
-      VimPlugin.getSearch().updateHighlight();
+      VimPlugin.getSearch().refreshSearchHighlights();
     }
   }
 
-  public static class DocumentSearchListener extends DocumentAdapter {
+  public static class DocumentSearchListener implements DocumentListener {
     public void documentChanged(@NotNull DocumentEvent event) {
       if (!VimPlugin.isEnabled()) {
         return;
@@ -1278,7 +1294,7 @@ public class SearchGroup {
   @Nullable private String lastOffset;
   private boolean lastIgnoreSmartCase;
   private int lastDir;
-  private boolean showSearchHighlight = Options.getInstance().isSet("hlsearch");
+  private boolean showSearchHighlight = Options.getInstance().isSet(Options.HIGHLIGHT_SEARCH);
 
   private boolean do_all = false; /* do multiple substitutions per line */
   private boolean do_ask = false; /* ask for confirmation */

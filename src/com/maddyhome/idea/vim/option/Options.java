@@ -38,7 +38,10 @@ public class Options {
   public static final String RELATIVE_NUMBER = "relativenumber";
   public static final String NUMBER = "number";
   public static final String CLIPBOARD = "clipboard";
+  public static final String HIGHLIGHT_SEARCH = "hlsearch";
+  public static final String IGNORE_CASE = "ignorecase";
   public static final String INCREMENTAL_SEARCH = "incsearch";
+  public static final String SMART_CASE = "smartcase";
   public static final String TIMEOUT = "timeout";
   public static final String VIMINFO = "viminfo";
 
@@ -448,8 +451,8 @@ public class Options {
     addOption(new ToggleOption("digraph", "dg", false));
     addOption(new ToggleOption("gdefault", "gd", false));
     addOption(new NumberOption("history", "hi", 20, 1, Integer.MAX_VALUE));
-    addOption(new ToggleOption("hlsearch", "hls", false));
-    addOption(new ToggleOption("ignorecase", "ic", false));
+    addOption(new ToggleOption(HIGHLIGHT_SEARCH, "hls", false));
+    addOption(new ToggleOption(IGNORE_CASE, "ic", false));
     addOption(new ListOption("matchpairs", "mps", new String[]{"(:)", "{:}", "[:]"}, ".:."));
     addOption(new ToggleOption("more", "more", true));
     addOption(new BoundListOption("nrformats", "nf", new String[]{"octal", "hex"}, new String[]{"octal", "hex", "alpha"}));
@@ -460,7 +463,7 @@ public class Options {
     addOption(new ToggleOption("showmode", "smd", false));
     addOption(new NumberOption("sidescroll", "ss", 0));
     addOption(new NumberOption("sidescrolloff", "siso", 0));
-    addOption(new ToggleOption("smartcase", "scs", false));
+    addOption(new ToggleOption(SMART_CASE, "scs", false));
     addOption(new NumberOption("timeoutlen", "tm", 1000, -1, Integer.MAX_VALUE));
     addOption(new NumberOption("undolevels", "ul", 1000, -1, Integer.MAX_VALUE));
     addOption(new ToggleOption("visualbell", "vb", false));
