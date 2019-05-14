@@ -372,7 +372,7 @@
  *
  * |g_CTRL-A|             not applicable
  * |g_CTRL-G|             {@link com.maddyhome.idea.vim.action.file.FileGetLocationInfoAction}
- * |g_CTRL-H|             TODO
+ * |g_CTRL-H|             {@link com.maddyhome.idea.vim.action.motion.select.SelectEnableBlockModeAction} [To Be Released]
  * |g_CTRL-]|             TODO
  * |g#|                   {@link com.maddyhome.idea.vim.action.motion.search.SearchWordBackwardAction}
  * |g$|                   {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastScreenColumnAction}
@@ -391,7 +391,8 @@
  * |g?g?|                 TODO
  * |gD|                   {@link com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction}
  * |gE|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionBigWordEndLeftAction}
- * |gH|                   TODO
+ * |gF|                   TODO
+ * |gH|                   {@link com.maddyhome.idea.vim.action.motion.select.SelectEnableLineModeAction} [To Be Released]
  * |gI|                   {@link com.maddyhome.idea.vim.action.change.insert.InsertLineStartAction}
  * |gJ|                   {@link com.maddyhome.idea.vim.action.change.delete.DeleteJoinLinesAction}
  * |gN|                   TODO
@@ -408,8 +409,8 @@
  * |gd|                   {@link com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction}
  * |ge|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionWordEndLeftAction}
  * |gf|                   TODO
- * |gF|                   TODO
  * |gg|                   {@link com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineFirstAction}
+ * |gh|                   {@link com.maddyhome.idea.vim.action.motion.select.SelectEnableCharacterModeAction} [To Be Released]
  * |gi|                   {@link com.maddyhome.idea.vim.action.change.insert.InsertAtPreviousInsertAction}
  * |gj|                   TODO
  * |gk|                   TODO
@@ -492,7 +493,7 @@
  * |v_CTRL-\_CTRL-G|      TODO
  * |v_CTRL-A|             {@link com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberIncAction}
  * |v_CTRL-C|             {@link com.maddyhome.idea.vim.action.motion.visual.VisualExitModeAction}
- * |v_CTRL-G|             TODO
+ * |v_CTRL-G|             {@link com.maddyhome.idea.vim.action.motion.select.SelectToggleVisualMode} [To Be Released]
  * |v_<BS>|               NVO mapping
  * |v_CTRL-H|             NVO mapping
  * |v_CTRL-O|             TODO
@@ -573,11 +574,29 @@
  * |v_~|                  {@link com.maddyhome.idea.vim.action.change.change.ChangeCaseToggleVisualAction}
  *
  *
- * 4. Command line editing
+ * 4. Select mode [To Be Released]
+ *
+ * tag                    action
+ * -------------------------------------------------------------------------------------------------------------------
+ * |<BS>|                 {@link com.maddyhome.idea.vim.action.motion.select.SelectDeleteAction}
+ * |<CR>|                 {@link com.maddyhome.idea.vim.action.motion.select.SelectEnterAction}
+ * |<DEL>|                {@link com.maddyhome.idea.vim.action.motion.select.SelectDeleteAction}
+ * |<ESC>|                {@link com.maddyhome.idea.vim.action.motion.select.SelectEscapeAction}
+ * |<C-G>|                {@link com.maddyhome.idea.vim.action.motion.select.SelectToggleVisualMode}
+ * |<S-Down>|             {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectExtendDown}
+ * |<S-Left>|             {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectExtendToLeft}
+ * |<S-Right>|            {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectExtendToRight}
+ * |<S-Up>|               {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectExtendUp}
+ * |<Down>|               {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionDownAction}
+ * |<Left>|               {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionLeftAction}
+ * |<Right>|              {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionRightAction}
+ * |<Up>|                 {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionUpAction}
+ *
+ * 5. Command line editing
  *
  * There is no up-to-date list of supported command line editing commands.
  *
- * 5. Ex commands
+ * 6. Ex commands
  *
  * tag                    handler
  * -------------------------------------------------------------------------------------------------------------------

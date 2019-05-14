@@ -91,6 +91,7 @@ Supported:
 * Command line and search history
 * Window commands
 * Vim web help
+* Select mode [To Be Released]
 
 Emulated Vim plugins:
 
