@@ -1147,13 +1147,17 @@ public class ChangeGroup {
    * @param count  The number of lines to change
    * @return true if able to delete count lines, false if not
    */
-  public boolean changeLine(@NotNull Editor editor, @NotNull Caret caret, int count) {
+  public boolean changeLine(@NotNull Editor editor, @NotNull Caret caret, int count, DataContext context) {
     final LogicalPosition pos = editor.offsetToLogicalPosition(caret.getOffset());
     final boolean insertBelow = pos.line + count >= EditorHelper.getLineCount(editor);
 
     final LogicalPosition lp =
       editor.offsetToLogicalPosition(VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, caret));
 
+    if (editor.getDocument().getText().isEmpty()) {
+      insertBeforeCursor(editor, context);
+      return true;
+    }
     boolean res = deleteLine(editor, caret, count);
     if (res) {
       if (insertBelow) {
