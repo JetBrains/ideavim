@@ -21,15 +21,11 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.Options
-import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionShiftRightActionHandlerTest : VimTestCase() {
     fun `test visual right`() {
-        Options.getInstance().getListOption(Options.KEYMODEL)?.set("startsel") ?: run {
-            TestCase.fail()
-            return
-        }
+        Options.getInstance().getListOption(Options.KEYMODEL)!!.set("startsel")
 
         doTest(parseKeys("<S-Right>"),
                 """
@@ -53,10 +49,7 @@ class MotionShiftRightActionHandlerTest : VimTestCase() {
     }
 
     fun `test visual right twice`() {
-        Options.getInstance().getListOption(Options.KEYMODEL)?.set("startsel") ?: run {
-            TestCase.fail()
-            return
-        }
+        Options.getInstance().getListOption(Options.KEYMODEL)!!.set("startsel")
 
         doTest(parseKeys("<S-Right><S-Right>"),
                 """
@@ -80,14 +73,8 @@ class MotionShiftRightActionHandlerTest : VimTestCase() {
     }
 
     fun `test select right`() {
-        Options.getInstance().getListOption(Options.KEYMODEL)?.set("startsel") ?: run {
-            TestCase.fail()
-            return
-        }
-        Options.getInstance().getListOption(Options.SELECTMODE)?.set("key") ?: run {
-            TestCase.fail()
-            return
-        }
+        Options.getInstance().getListOption(Options.KEYMODEL)!!.set("startsel")
+        Options.getInstance().getListOption(Options.SELECTMODE)!!.set("key")
 
         doTest(parseKeys("<S-Right>"),
                 """
@@ -111,14 +98,8 @@ class MotionShiftRightActionHandlerTest : VimTestCase() {
     }
 
     fun `test select right twice`() {
-        Options.getInstance().getListOption(Options.KEYMODEL)?.set("startsel") ?: run {
-            TestCase.fail()
-            return
-        }
-        Options.getInstance().getListOption(Options.SELECTMODE)?.set("key") ?: run {
-            TestCase.fail()
-            return
-        }
+        Options.getInstance().getListOption(Options.KEYMODEL)!!.set("startsel")
+        Options.getInstance().getListOption(Options.SELECTMODE)!!.set("key")
 
         doTest(parseKeys("<S-Right><S-Right>"),
                 """

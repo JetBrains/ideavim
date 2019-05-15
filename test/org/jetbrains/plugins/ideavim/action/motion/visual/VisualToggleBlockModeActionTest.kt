@@ -23,7 +23,6 @@ package org.jetbrains.plugins.ideavim.action.motion.visual
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.Options
-import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VisualToggleBlockModeActionTest : VimTestCase() {
@@ -99,10 +98,7 @@ class VisualToggleBlockModeActionTest : VimTestCase() {
                     where it was settled on some sodden sand[long line]
                     hard by the torrent of a mountain pass.
         """.trimIndent())
-        Options.getInstance().getListOption(Options.SELECTMODE)?.set("cmd") ?: run {
-            TestCase.fail()
-            return
-        }
+        Options.getInstance().getListOption(Options.SELECTMODE)!!.set("cmd")
         typeText(parseKeys("<C-V>"))
         assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_BLOCK)
     }

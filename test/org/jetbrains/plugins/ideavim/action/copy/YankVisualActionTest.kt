@@ -226,10 +226,7 @@ zxcvbn${c}werty
         configureByText(before)
         typeText(keys)
 
-        val lastRegister = VimPlugin.getRegister().lastRegister ?: run {
-            TestCase.fail()
-            return
-        }
+        val lastRegister = VimPlugin.getRegister().lastRegister!!
         val text = lastRegister.text
         val type = lastRegister.type
         assertEquals(expectedText, text)

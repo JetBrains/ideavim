@@ -23,15 +23,11 @@ package org.jetbrains.plugins.ideavim.action.motion.updown
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.Options
-import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionShiftDownActionHandlerTest : VimTestCase() {
     fun `test visual down`() {
-        Options.getInstance().getListOption(Options.KEYMODEL)?.set("startsel") ?: run {
-            TestCase.fail()
-            return
-        }
+        Options.getInstance().getListOption(Options.KEYMODEL)!!.set("startsel")
 
         doTest(parseKeys("<S-Down>"),
                 """
@@ -55,10 +51,7 @@ class MotionShiftDownActionHandlerTest : VimTestCase() {
     }
 
     fun `test visual down twice`() {
-        Options.getInstance().getListOption(Options.KEYMODEL)?.set("startsel") ?: run {
-            TestCase.fail()
-            return
-        }
+        Options.getInstance().getListOption(Options.KEYMODEL)!!.set("startsel")
 
         doTest(parseKeys("<S-Down><S-Down>"),
                 """
@@ -82,10 +75,7 @@ class MotionShiftDownActionHandlerTest : VimTestCase() {
     }
 
     fun `test save column`() {
-        Options.getInstance().getListOption(Options.KEYMODEL)?.set("startsel") ?: run {
-            TestCase.fail()
-            return
-        }
+        Options.getInstance().getListOption(Options.KEYMODEL)!!.set("startsel")
 
         doTest(parseKeys("<S-Down><S-Down><S-Down>"),
                 """
@@ -109,14 +99,8 @@ class MotionShiftDownActionHandlerTest : VimTestCase() {
     }
 
     fun `test select down`() {
-        Options.getInstance().getListOption(Options.KEYMODEL)?.set("startsel") ?: run {
-            TestCase.fail()
-            return
-        }
-        Options.getInstance().getListOption(Options.SELECTMODE)?.set("key") ?: run {
-            TestCase.fail()
-            return
-        }
+        Options.getInstance().getListOption(Options.KEYMODEL)!!.set("startsel")
+        Options.getInstance().getListOption(Options.SELECTMODE)!!.set("key")
 
         doTest(parseKeys("<S-Down>"),
                 """
@@ -140,14 +124,8 @@ class MotionShiftDownActionHandlerTest : VimTestCase() {
     }
 
     fun `test select down twice`() {
-        Options.getInstance().getListOption(Options.KEYMODEL)?.set("startsel") ?: run {
-            TestCase.fail()
-            return
-        }
-        Options.getInstance().getListOption(Options.SELECTMODE)?.set("key") ?: run {
-            TestCase.fail()
-            return
-        }
+        Options.getInstance().getListOption(Options.KEYMODEL)!!.set("startsel")
+        Options.getInstance().getListOption(Options.SELECTMODE)!!.set("key")
 
         doTest(parseKeys("<S-Down><S-Down>"),
                 """
