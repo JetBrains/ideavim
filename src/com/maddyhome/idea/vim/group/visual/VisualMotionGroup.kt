@@ -114,7 +114,8 @@ class VisualMotionGroup {
                 commandState.popState()
             }
             val autodetectedMode = autodetectVisualMode(editor)
-            if (TemplateManager.getInstance(editor.project).getActiveTemplate(editor) == null && !editor.isOneLineMode) {
+            val project = editor.project
+            if (project != null && TemplateManager.getInstance(project).getActiveTemplate(editor) == null && !editor.isOneLineMode) {
                 enterVisualMode(editor, autodetectedMode)
             } else {
                 enterSelectMode(editor, autodetectedMode)
@@ -125,7 +126,8 @@ class VisualMotionGroup {
             exitVisual(editor)
             exitSelectModeAndResetKeyHandler(editor, true)
 
-            if (TemplateManager.getInstance(editor.project).getActiveTemplate(editor) != null || modeBeforeEnteringNonVimVisual == CommandState.Mode.INSERT) {
+            val project = editor.project
+            if (project != null && TemplateManager.getInstance(project).getActiveTemplate(editor) != null || modeBeforeEnteringNonVimVisual == CommandState.Mode.INSERT) {
                 VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
             }
             KeyHandler.getInstance().reset(editor)
