@@ -173,7 +173,7 @@ object VimListenerManager {
             if (mouseDragging) {
                 logger.debug("Release mouse after dragging")
                 SelectionVimListenerSuppressor.use {
-                    VimPlugin.getVisualMotion().controlNonVimSelectionChange(event.editor, !isBlockCaret)
+                    VimPlugin.getVisualMotion().controlNonVimSelectionChange(event.editor, !isBlockCaret, VimListenerManager.SelectionSource.MOUSE)
                     moveCaretOneCharLeftFromSelectionEnd(event.editor)
                     event.editor.caretModel.primaryCaret.vimLastColumn = event.editor.caretModel.visualPosition.column
                 }
@@ -233,5 +233,10 @@ object VimListenerManager {
             }
         }
 
+    }
+
+    enum class SelectionSource {
+        MOUSE,
+        OTHER
     }
 }

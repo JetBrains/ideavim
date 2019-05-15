@@ -184,6 +184,7 @@ fun toNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.M
         }
 
 fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor) {
+    if (!CommandState.inVisualMode(editor)) return
     editor.caretModel.allCarets.forEach { caret ->
         if (caret.hasSelection() && caret.selectionEnd == caret.offset) {
             if (caret.selectionEnd <= 0) return@forEach

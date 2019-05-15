@@ -33,6 +33,7 @@ import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.*
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
+import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.option.BoundStringOption
 import com.maddyhome.idea.vim.option.Options
 
@@ -106,7 +107,7 @@ class VisualMotionGroup {
         return true
     }
 
-    fun controlNonVimSelectionChange(editor: Editor, resetCaretToInsert: Boolean = false) {
+    fun controlNonVimSelectionChange(editor: Editor, resetCaretToInsert: Boolean = false, selectionSource: VimListenerManager.SelectionSource = VimListenerManager.SelectionSource.OTHER) {
         if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
             val commandState = CommandState.getInstance(editor)
             modeBeforeEnteringNonVimVisual = commandState.mode
@@ -115,10 +116,13 @@ class VisualMotionGroup {
             }
             val autodetectedMode = autodetectVisualMode(editor)
             val project = editor.project
-            if (project != null && TemplateManager.getInstance(project).getActiveTemplate(editor) == null && !editor.isOneLineMode) {
-                enterVisualMode(editor, autodetectedMode)
-            } else {
-                enterSelectMode(editor, autodetectedMode)
+            val selectMode = Options.getInstance().getListOption(Options.SELECTMODE)
+            when {
+                editor.isOneLineMode -> enterSelectMode(editor, autodetectedMode)
+                selectionSource == VimListenerManager.SelectionSource.MOUSE && selectMode?.contains("mouse") == true -> enterSelectMode(editor, autodetectedMode)
+                project != null && TemplateManager.getInstance(project).getActiveTemplate(editor) != null && selectMode?.contains("template") == true -> enterSelectMode(editor, autodetectedMode)
+                selectionSource == VimListenerManager.SelectionSource.OTHER && selectMode?.contains("refactoring") == true -> enterSelectMode(editor, autodetectedMode)
+                else -> enterVisualMode(editor, autodetectedMode)
             }
             KeyHandler.getInstance().reset(editor)
         } else {

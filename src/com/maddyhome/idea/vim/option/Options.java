@@ -20,7 +20,6 @@ package com.maddyhome.idea.vim.option;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.extensions.Extensions;
-import com.intellij.util.ArrayUtilRt;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.extension.VimExtension;
@@ -475,7 +474,7 @@ public class Options {
     addOption(new ToggleOption(TIMEOUT, "to", true));
     addOption(new ListOption(VIMINFO, "vi", new String[]{"'100", "<50", "s10", "h"}, null));
     addOption(new KeywordOption("iskeyword", "isk", new String[]{"@", "48-57", "_"}));
-    addOption(new BoundListOption(SELECTMODE, "slm", ArrayUtilRt.EMPTY_STRING_ARRAY, new String[]{"mouse", "key", "cmd"}));
+    addOption(new BoundListOption(SELECTMODE, "slm", new String[]{"template"}, new String[]{"mouse", "key", "cmd", "template", "refactoring"}));
     addOption(new BoundListOption(KEYMODEL, "km", new String[]{"continueselect"}, new String[]{"startsel", "stopsel", "continueselect", "continuevisual"}));
 
     registerExtensionOptions();
