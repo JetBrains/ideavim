@@ -62,6 +62,7 @@ public enum MappingMode {
   public static final EnumSet<MappingMode> IC = EnumSet.of(INSERT, CMD_LINE);
   public static final EnumSet<MappingMode> VS = EnumSet.of(VISUAL, SELECT);
 
+  public static final EnumSet<MappingMode> NVS = EnumSet.of(NORMAL, VISUAL, SELECT);
   public static final EnumSet<MappingMode> NVO = EnumSet.of(NORMAL, VISUAL, OP_PENDING);
   public static final EnumSet<MappingMode> ALL = EnumSet.allOf(MappingMode.class);
 }

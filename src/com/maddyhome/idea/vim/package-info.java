@@ -587,10 +587,10 @@
  * |<DEL>|                {@link com.maddyhome.idea.vim.action.motion.select.SelectDeleteAction}
  * |<ESC>|                {@link com.maddyhome.idea.vim.action.motion.select.SelectEscapeAction}
  * |<C-G>|                {@link com.maddyhome.idea.vim.action.motion.select.SelectToggleVisualMode}
- * |<S-Down>|             {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectExtendDown}
- * |<S-Left>|             {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectExtendToLeft}
- * |<S-Right>|            {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectExtendToRight}
- * |<S-Up>|               {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectExtendUp}
+ * |<S-Down>|             {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftDownAction}
+ * |<S-Left>|             {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftLeftAction}
+ * |<S-Right>|            {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftRightAction}
+ * |<S-Up>|               {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftUpAction}
  * |<Down>|               {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionDownAction}
  * |<Left>|               {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionLeftAction}
  * |<Right>|              {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionRightAction}

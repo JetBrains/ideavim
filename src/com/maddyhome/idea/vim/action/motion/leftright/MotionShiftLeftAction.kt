@@ -35,11 +35,17 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 
+@Suppress("DuplicatedCode")
 private object MotionShiftLeftActionHandler : EditorActionHandlerBase() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-        if (Options.getInstance().getListOption(Options.KEYMODEL)?.contains("startsel") == true) {
-            @Suppress("DuplicatedCode")
-            if (!CommandState.inVisualMode(editor) && !CommandState.inSelectMode(editor)) {
+        val keymodelOption = Options.getInstance().getListOption(Options.KEYMODEL)
+        val startSel = keymodelOption?.contains("startsel") == true
+        val continueSelect = keymodelOption?.contains("continueselect") == true
+        val continueVisual = keymodelOption?.contains("continuevisual") == true
+        val inVisualMode = CommandState.inVisualMode(editor)
+        val inSelectMode = CommandState.inSelectMode(editor)
+        if (startSel || continueSelect && inSelectMode || continueVisual && inVisualMode) {
+            if (!inVisualMode && !inSelectMode) {
                 if (Options.getInstance().getListOption(Options.SELECTMODE)?.contains("key") == true) {
                     VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
                 } else {
@@ -47,7 +53,7 @@ private object MotionShiftLeftActionHandler : EditorActionHandlerBase() {
                             .toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
                 }
             }
-            editor.caretModel.allCarets.forEach { caret ->
+            editor.vimForAllOrPrimaryCaret { caret ->
                 val vertical = VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -cmd.count, true)
                 MotionGroup.moveCaret(editor, caret, vertical)
             }
@@ -62,7 +68,7 @@ private object MotionShiftLeftActionHandler : EditorActionHandlerBase() {
 }
 
 class MotionShiftLeftAction : VimCommandAction(MotionShiftLeftActionHandler) {
-    override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NV
+    override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVS
 
     override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<S-Left>")
 

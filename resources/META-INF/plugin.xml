@@ -239,14 +239,6 @@
     <action id="VimSelectEnableBlockMode"
             class="com.maddyhome.idea.vim.action.motion.select.SelectEnableBlockModeAction"
             text="Enter Block Select Mode"/>
-    <action id="VimExtendToRight" class="com.maddyhome.idea.vim.action.motion.select.motion.SelectExtendToRight"
-            text="Extend To Right Select Mode"/>
-    <action id="VimExtendToLeft" class="com.maddyhome.idea.vim.action.motion.select.motion.SelectExtendToLeft"
-            text="Extend To Left Select Mode"/>
-    <action id="VimExtendUp" class="com.maddyhome.idea.vim.action.motion.select.motion.SelectExtendUp"
-            text="Extend Up Select Mode"/>
-    <action id="VimExtendDown" class="com.maddyhome.idea.vim.action.motion.select.motion.SelectExtendDown"
-            text="Extend Down Select Mode"/>
     <action id="VimSelectMotionDown" class="com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionDownAction"
             text="Move Down Select Mode"/>
     <action id="VimSelectMotionUp" class="com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionUpAction"
