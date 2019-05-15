@@ -18,7 +18,7 @@
 
 @file:Suppress("RemoveCurlyBracesFromTemplate")
 
-package org.jetbrains.plugins.ideavim.action.motion.leftright
+package org.jetbrains.plugins.ideavim.action.motion.updown
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
@@ -26,27 +26,27 @@ import com.maddyhome.idea.vim.option.Options
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-class MotionShiftUpActionHandlerTest : VimTestCase() {
-    fun `test visual up`() {
+class MotionShiftDownActionHandlerTest : VimTestCase() {
+    fun `test visual down`() {
         Options.getInstance().getListOption(Options.KEYMODEL)?.set("startsel") ?: run {
             TestCase.fail()
             return
         }
 
-        doTest(parseKeys("<S-Up>"),
+        doTest(parseKeys("<S-Down>"),
                 """
                 A Discovery
 
-                I found it in a legendary land
-                al${c}l rocks and lavender and tufted grass,
+                I ${c}found it in a legendary land
+                all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
                 """
                 A Discovery
 
-                I ${s}${c}found it in a legendary land
-                all${se} rocks and lavender and tufted grass,
+                I ${s}found it in a legendary land
+                al${c}l${se} rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
@@ -54,27 +54,27 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
         )
     }
 
-    fun `test visual up twice`() {
+    fun `test visual down twice`() {
         Options.getInstance().getListOption(Options.KEYMODEL)?.set("startsel") ?: run {
             TestCase.fail()
             return
         }
 
-        doTest(parseKeys("<S-Up><S-Up>"),
+        doTest(parseKeys("<S-Down><S-Down>"),
                 """
                 A Discovery
 
-                I found it in a legendary land
+                I ${c}found it in a legendary land
                 all rocks and lavender and tufted grass,
-                wh${c}ere it was settled on some sodden sand
+                where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
                 """
                 A Discovery
 
-                I ${s}${c}found it in a legendary land
+                I ${s}found it in a legendary land
                 all rocks and lavender and tufted grass,
-                whe${se}re it was settled on some sodden sand
+                wh${c}e${se}re it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
                 CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
@@ -87,28 +87,28 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
             return
         }
 
-        doTest(parseKeys("<S-Up><S-Up><S-Up>"),
+        doTest(parseKeys("<S-Down><S-Down><S-Down>"),
                 """
                 A Discovery
 
-                I found it in a legendary land[additional chars]
+                I found it in a legendary land[additional chars${c}]
                 all rocks and lavender and tufted grass,[additional chars]
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.[additio${c}nal chars]
+                hard by the torrent of a mountain pass.[additional chars]
                 """.trimIndent(),
                 """
                 A Discovery
 
-                I found it in a legendary land[additional chars${s}${c}]
+                I found it in a legendary land[additional chars${s}]
                 all rocks and lavender and tufted grass,[additional chars]
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.[addition${se}al chars]
+                hard by the torrent of a mountain pass.[additio${c}n${se}al chars]
                 """.trimIndent(),
                 CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
         )
     }
 
-    fun `test select up`() {
+    fun `test select down`() {
         Options.getInstance().getListOption(Options.KEYMODEL)?.set("startsel") ?: run {
             TestCase.fail()
             return
@@ -118,20 +118,20 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
             return
         }
 
-        doTest(parseKeys("<S-Up>"),
+        doTest(parseKeys("<S-Down>"),
                 """
                 A Discovery
 
-                I found it in a legendary land
-                al${c}l rocks and lavender and tufted grass,
+                I ${c}found it in a legendary land
+                all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
                 """
                 A Discovery
 
-                I ${s}${c}found it in a legendary land
-                al${se}l rocks and lavender and tufted grass,
+                I ${s}found it in a legendary land
+                al${c}${se}l rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
@@ -139,7 +139,7 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
         )
     }
 
-    fun `test select up twice`() {
+    fun `test select down twice`() {
         Options.getInstance().getListOption(Options.KEYMODEL)?.set("startsel") ?: run {
             TestCase.fail()
             return
@@ -149,51 +149,29 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
             return
         }
 
-        doTest(parseKeys("<S-Up><S-Up>"),
+        doTest(parseKeys("<S-Down><S-Down>"),
                 """
                 A Discovery
 
-                I found it in a legendary land
+                I ${c}found it in a legendary land
                 all rocks and lavender and tufted grass,
-                wh${c}ere it was settled on some sodden sand
+                where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
                 """
                 A Discovery
 
-                I ${s}${c}found it in a legendary land
+                I ${s}found it in a legendary land
                 all rocks and lavender and tufted grass,
-                wh${se}ere it was settled on some sodden sand
+                wh${c}${se}ere it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
                 CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER
         )
     }
 
-    fun `test char mode simple motion`() {
-        doTest(parseKeys("gh", "<S-Up>"),
-                """
-                A Discovery
-
-                I found it in a legendary land
-                ${c}all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
-                """
-                A Discovery
-
-                I$s$c found it in a legendary land
-                ${se}all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_CHARACTER)
-    }
-
-    fun `test char mode to empty line`() {
-        doTest(parseKeys("gh", "<S-Up>"),
+    fun `test char select simple move`() {
+        doTest(parseKeys("gh", "<S-Down>"),
                 """
                 A Discovery
 
@@ -204,8 +182,30 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                     """.trimIndent(),
                 """
                 A Discovery
-                $s$c
-                ${se}I found it in a legendary land
+
+                ${s}I found it in a legendary land
+                a$c${se}ll rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
+    }
+
+    fun `test char select move to empty line`() {
+        doTest(parseKeys("gh", "<S-Down>"),
+                """
+                A ${c}Discovery
+
+                I found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                    """.trimIndent(),
+                """
+                A ${s}Discovery
+                $c$se
+                I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
@@ -214,8 +214,8 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 CommandState.SubMode.VISUAL_CHARACTER)
     }
 
-    fun `test char mode from empty line`() {
-        doTest(parseKeys("gh", "<S-Up>"),
+    fun `test char select move from empty line`() {
+        doTest(parseKeys("gh", "<S-Down>"),
                 """
                 A Discovery
                 $c
@@ -225,9 +225,9 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
                 """
-                $s${c}A Discovery
-                $se
-                I found it in a legendary land
+                A Discovery
+                $s
+                $c${se}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
@@ -236,8 +236,70 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 CommandState.SubMode.VISUAL_CHARACTER)
     }
 
-    fun `test char mode on file start`() {
-        doTest(parseKeys("gh", "<S-Up>"),
+    fun `test char select move to file end`() {
+        doTest(parseKeys("gh", "<S-Down>"),
+                """
+                A Discovery
+
+                I found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard ${c}by the torrent of a mountain pass.""".trimIndent(),
+                """
+                A Discovery
+
+                I found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard ${s}b$c${se}y the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
+    }
+
+    fun `test char select move multicaret`() {
+        doTest(parseKeys("gh", "<S-Down>"),
+                """
+                A Discovery
+
+                I ${c}found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard ${c}by the torrent of a mountain pass.""".trimIndent(),
+                """
+                A Discovery
+
+                I ${s}found it in a legendary land
+                all$c$se rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard ${s}b$c${se}y the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
+    }
+
+    fun `test line select simple move`() {
+        doTest(parseKeys("gH", "<S-Down>"),
+                """
+                A Discovery
+
+                ${c}I found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                    """.trimIndent(),
+                """
+                A Discovery
+
+                ${s}I found it in a legendary land
+                ${c}all rocks and lavender and tufted grass,
+                ${se}where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_LINE)
+    }
+
+    fun `test line select to empty line`() {
+        doTest(parseKeys("gH", "<S-Down>"),
                 """
                 A ${c}Discovery
 
@@ -247,233 +309,155 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
                 """
-                A ${s}D$c${se}iscovery
-
-                I found it in a legendary land
+                ${s}A Discovery
+                $c
+                ${se}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
                 CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_CHARACTER)
+                CommandState.SubMode.VISUAL_LINE)
     }
 
-    fun `test char mode multicaret`() {
-        doTest(parseKeys("gh", "<S-Up>"),
+    fun `test line select from empty line`() {
+        doTest(parseKeys("gH", "<S-Down>"),
                 """
-                A ${c}Discovery
+                A Discovery
+                $c
+                I found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                    """.trimIndent(),
+                """
+                A Discovery
+                $s
+                ${c}I found it in a legendary land
+                ${se}all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                    """.trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_LINE)
+    }
+
+    fun `test line select to file end`() {
+        doTest(parseKeys("gH", "<S-Down>"),
+                """
+                A Discovery
+
+                I found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the ${c}torrent of a mountain pass.""".trimIndent(),
+                """
+                A Discovery
+
+                I found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                ${s}hard by the ${c}torrent of a mountain pass.$se""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_LINE)
+    }
+
+    fun `test line select multicaret`() {
+        doTest(parseKeys("gH", "<S-Down>"),
+                """
+                A Discovery
 
                 I found ${c}it in a legendary land
                 all rocks and lavender and tufted grass,
-                where it was ${c}settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
-                """
-                A ${s}D$c${se}iscovery
-                $s$c
-                I found ${se}it in a legendary land
-                all rocks and $s${c}lavender and tufted grass,
-                where it was ${se}settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_CHARACTER)
-    }
-
-    fun `test line mode simple motion`() {
-        doTest(parseKeys("gH", "<S-Up>"),
-                """
-                A Discovery
-
-                I found it in a legendary land
-                ${c}all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+                hard by the ${c}torrent of a mountain pass.""".trimIndent(),
                 """
                 A Discovery
 
-                $s${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
+                ${s}I found it in a legendary land
+                all rock${c}s and lavender and tufted grass,
                 ${se}where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+                ${s}hard by the ${c}torrent of a mountain pass.$se""".trimIndent(),
                 CommandState.Mode.SELECT,
                 CommandState.SubMode.VISUAL_LINE)
     }
 
-    fun `test line mode to empty line`() {
-        doTest(parseKeys("gH", "<S-Up>"),
+    fun `test block select simple move`() {
+        doTest(parseKeys("g<C-H>", "<S-Down>"),
                 """
                 A Discovery
 
-                ${c}I found it in a legendary land
+                I found ${c}it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+                hard by the torrent of a mountain pass.""".trimIndent(),
                 """
                 A Discovery
-                $s$c
-                I found it in a legendary land
-                ${se}all rocks and lavender and tufted grass,
+
+                I found ${s}i$c${se}t in a legendary land
+                all rock${s}s$c$se and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+                hard by the torrent of a mountain pass.""".trimIndent(),
                 CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_LINE)
+                CommandState.SubMode.VISUAL_BLOCK)
     }
 
-    fun `test line mode from empty line`() {
-        doTest(parseKeys("gH", "<S-Up>"),
+    fun `test block select to empty line`() {
+        doTest(parseKeys("g<C-H>", "<S-Down>"),
+                """
+                A ${c}Discovery
+
+                I found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                """
+                ${s}A ${se}Discovery
+                $c
+                I found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_BLOCK)
+    }
+
+    fun `test block select from empty line`() {
+        doTest(parseKeys("g<C-H>", "<S-Down>"),
                 """
                 A Discovery
                 $c
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
-                """
-                $s${c}A Discovery
-
-                ${se}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_LINE)
-    }
-
-    fun `test line mode to line start`() {
-        doTest(parseKeys("gH", "<S-Up>"),
-                """
-                A ${c}Discovery
-
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
-                """
-                ${s}A ${c}Discovery$se
-
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_LINE)
-    }
-
-    fun `test line mode multicaret`() {
-        doTest(parseKeys("gH", "<S-Up>"),
-                """
-                A ${c}Discovery
-
-                I found it in a legendary land
-                all rocks ${c}and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
-                """
-                ${s}A ${c}Discovery$se
-
-                ${s}I found it$c in a legendary land
-                all rocks and lavender and tufted grass,
-                ${se}where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_LINE)
-    }
-
-    fun `test block mode simple motion`() {
-        doTest(parseKeys("g<C-H>", "<S-Up>"),
-                """
-                A Discovery
-
-                I found it in a legendary land
-                ${c}all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
-                """
-                A Discovery
-
-                ${s}I$c$se found it in a legendary land
-                ${s}a$c${se}ll rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_BLOCK)
-    }
-
-    fun `test block mode to empty line`() {
-        doTest(parseKeys("g<C-H>", "<S-Up>"),
-                """
-                A Discovery
-
-                ${c}I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+                hard by the torrent of a mountain pass.""".trimIndent(),
                 """
                 A Discovery
                 $s$c$se
-                ${s}$c${se}I found it in a legendary land
+                $s$c${se}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+                hard by the torrent of a mountain pass.""".trimIndent(),
                 CommandState.Mode.SELECT,
                 CommandState.SubMode.VISUAL_BLOCK)
     }
 
-    fun `test block mode from empty line`() {
-        doTest(parseKeys("g<C-H>", "<S-Up>"),
+    fun `test block select to file end`() {
+        doTest(parseKeys("g<C-H>", "<S-Down>"),
                 """
                 A Discovery
-                $c
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
-                """
-                $s$c${se}A Discovery
-                $s$c$se
-                I found it in a legendary land
-                all rocks and lavender and tufted grass,
-                where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_BLOCK)
-    }
-
-    fun `test block mode to line start`() {
-        doTest(parseKeys("g<C-H>", "<S-Up>"),
-                """
-                A ${c}Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+                hard by the ${c}torrent of a mountain pass.""".trimIndent(),
                 """
-                A ${s}D$c${se}iscovery
+                A Discovery
 
                 I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.
-                    """.trimIndent(),
+                hard by the ${s}t$c${se}orrent of a mountain pass.""".trimIndent(),
                 CommandState.Mode.SELECT,
                 CommandState.SubMode.VISUAL_BLOCK)
     }
