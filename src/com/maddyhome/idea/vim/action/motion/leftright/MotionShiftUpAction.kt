@@ -37,9 +37,14 @@ import javax.swing.KeyStroke
 private object MotionShiftUpActionHandler : EditorActionHandlerBase() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
         if (Options.getInstance().getListOption(Options.KEYMODEL)?.contains("startsel") == true) {
-            if (!CommandState.inVisualMode(editor)) {
-                VimPlugin.getVisualMotion()
-                        .toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
+            @Suppress("DuplicatedCode")
+            if (!CommandState.inVisualMode(editor) && !CommandState.inSelectMode(editor)) {
+                if (Options.getInstance().getListOption(Options.SELECTMODE)?.contains("key") == true) {
+                    VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
+                } else {
+                    VimPlugin.getVisualMotion()
+                            .toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
+                }
             }
             editor.caretModel.allCarets.forEach { caret ->
                 val vertical = VimPlugin.getMotion().moveCaretVertical(editor, caret, -cmd.count)

@@ -80,4 +80,66 @@ class MotionShiftLeftActionHandlerTest : VimTestCase() {
                 CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
         )
     }
+
+    fun `test select left`() {
+        Options.getInstance().getListOption(Options.KEYMODEL)?.set("startsel") ?: run {
+            TestCase.fail()
+            return
+        }
+        Options.getInstance().getListOption(Options.SELECTMODE)?.set("key") ?: run {
+            TestCase.fail()
+            return
+        }
+
+        doTest(parseKeys("<S-Left>"),
+                """
+                A Discovery
+
+                I foun${c}d it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                """.trimIndent(),
+                """
+                A Discovery
+
+                I fou${s}${c}n${se}d it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                """.trimIndent(),
+                CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER
+        )
+    }
+
+    fun `test select left twice`() {
+        Options.getInstance().getListOption(Options.KEYMODEL)?.set("startsel") ?: run {
+            TestCase.fail()
+            return
+        }
+        Options.getInstance().getListOption(Options.SELECTMODE)?.set("key") ?: run {
+            TestCase.fail()
+            return
+        }
+
+        doTest(parseKeys("<S-Left><S-Left>"),
+                """
+                A Discovery
+
+                I foun${c}d it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                """.trimIndent(),
+                """
+                A Discovery
+
+                I fo${s}${c}un${se}d it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                """.trimIndent(),
+                CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER
+        )
+    }
 }

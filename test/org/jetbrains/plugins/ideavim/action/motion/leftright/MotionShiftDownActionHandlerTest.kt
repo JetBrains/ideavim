@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@file:Suppress("RemoveCurlyBracesFromTemplate")
+
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.CommandState
@@ -76,6 +78,68 @@ class MotionShiftDownActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
                 CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+        )
+    }
+
+    fun `test select down`() {
+        Options.getInstance().getListOption(Options.KEYMODEL)?.set("startsel") ?: run {
+            TestCase.fail()
+            return
+        }
+        Options.getInstance().getListOption(Options.SELECTMODE)?.set("key") ?: run {
+            TestCase.fail()
+            return
+        }
+
+        doTest(parseKeys("<S-Down>"),
+                """
+                A Discovery
+
+                I ${c}found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                """.trimIndent(),
+                """
+                A Discovery
+
+                I ${s}found it in a legendary land
+                al${c}${se}l rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                """.trimIndent(),
+                CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER
+        )
+    }
+
+    fun `test select down twice`() {
+        Options.getInstance().getListOption(Options.KEYMODEL)?.set("startsel") ?: run {
+            TestCase.fail()
+            return
+        }
+        Options.getInstance().getListOption(Options.SELECTMODE)?.set("key") ?: run {
+            TestCase.fail()
+            return
+        }
+
+        doTest(parseKeys("<S-Down><S-Down>"),
+                """
+                A Discovery
+
+                I ${c}found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                """.trimIndent(),
+                """
+                A Discovery
+
+                I ${s}found it in a legendary land
+                all rocks and lavender and tufted grass,
+                wh${c}${se}ere it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                """.trimIndent(),
+                CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER
         )
     }
 }
