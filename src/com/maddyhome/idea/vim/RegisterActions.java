@@ -378,14 +378,12 @@ class RegisterActions {
                             new Shortcut(new KeyStroke[]{KeyStroke.getKeyStroke('z'), KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0)})
                           });
     parser.registerAction(MappingMode.NVO, "VimMotionScrollPageDown", Command.Type.OTHER_READONLY, new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.SHIFT_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0))
     });
     parser.registerAction(MappingMode.NVO, "VimMotionScrollPageUp", Command.Type.OTHER_READONLY, new Shortcut[]{
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_MASK))
+      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0))
     });
     parser.registerAction(MappingMode.NVO, "VimMotionUp", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE), new Shortcut[]{
       new Shortcut('k'),
@@ -404,12 +402,10 @@ class RegisterActions {
     parser.registerAction(MappingMode.NVO, "VimMotionWordEndRight", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE),
                           new Shortcut('e'));
     parser.registerAction(MappingMode.NVO, "VimMotionWordLeft", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE), new Shortcut[]{
-      new Shortcut('b'),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_MASK))
+      new Shortcut('b')
     });
     parser.registerAction(MappingMode.NVO, "VimMotionWordRight", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE), new Shortcut[]{
-      new Shortcut('w'),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_MASK))
+      new Shortcut('w')
     });
     parser.registerAction(MappingMode.NVO, "VimMotionBigWordEndLeft", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE),
                           new Shortcut("gE"));

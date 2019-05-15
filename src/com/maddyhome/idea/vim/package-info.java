@@ -242,10 +242,10 @@
  * |<PageDown>|           {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownAction}
  * |<PageUp>|             {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpAction}
  * |<Right>|              {@link com.maddyhome.idea.vim.action.motion.leftright.MotionRightAction}
- * |<S-Down>|             {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownAction}
- * |<S-Left>|             {@link com.maddyhome.idea.vim.action.motion.text.MotionWordLeftAction}
- * |<S-Right>|            {@link com.maddyhome.idea.vim.action.motion.text.MotionWordRightAction}
- * |<S-Up>|               {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpAction}
+ * |<S-Down>|             {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftDownAction}
+ * |<S-Left>|             {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftLeftAction}
+ * |<S-Right>|            {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftRightAction}
+ * |<S-Up>|               {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftUpAction}
  * |<Up>|                 {@link com.maddyhome.idea.vim.action.motion.updown.MotionUpAction}
  *
  *

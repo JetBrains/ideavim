@@ -216,6 +216,10 @@
     <action id="VimMotionScrollLastScreenColumn" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenColumnAction" text="Scroll Column to last column"/>
     <action id="VimMotionScrollColumnLeft" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnLeftAction" text="Scroll Column Left"/>
     <action id="VimMotionScrollColumnRight" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnRightAction" text="Scroll Column Right"/>
+    <action id="VimMotionShiftDown" class="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftDownAction" text="Shift Down"/>
+    <action id="VimMotionShiftUp" class="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftUpAction" text="Shift Up"/>
+    <action id="VimMotionShiftRight" class="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftRightAction" text="Shift Right"/>
+    <action id="VimMotionShiftLeft" class="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftLeftAction" text="Shift Left"/>
     <!-- Visual -->
     <action id="VimVisualExitMode" class="com.maddyhome.idea.vim.action.motion.visual.VisualExitModeAction" text="Exit Visual Mode"/>
     <action id="VimVisualToggleCharacterMode" class="com.maddyhome.idea.vim.action.motion.visual.VisualToggleCharacterModeAction" text="Toggle Character Selection"/>

@@ -43,6 +43,7 @@ public class Options {
   public static final String TIMEOUT = "timeout";
   public static final String VIMINFO = "viminfo";
   public static final String SELECTMODE = "selectmode";
+  public static final String KEYMODEL = "keymodel";
 
   /**
    * Gets the singleton instance of the options
@@ -475,6 +476,7 @@ public class Options {
     addOption(new ListOption(VIMINFO, "vi", new String[]{"'100", "<50", "s10", "h"}, null));
     addOption(new KeywordOption("iskeyword", "isk", new String[]{"@", "48-57", "_"}));
     addOption(new BoundListOption(SELECTMODE, "slm", ArrayUtilRt.EMPTY_STRING_ARRAY, new String[]{"mouse", "key", "cmd"}));
+    addOption(new BoundListOption(KEYMODEL, "km", ArrayUtilRt.EMPTY_STRING_ARRAY, new String[]{"startsel", "stopsel"}));
 
     registerExtensionOptions();
   }
