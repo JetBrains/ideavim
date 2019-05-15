@@ -233,20 +233,20 @@
  * |<C-Left>|             {@link com.maddyhome.idea.vim.action.motion.text.MotionWordLeftAction}
  * |<C-Right>|            {@link com.maddyhome.idea.vim.action.motion.text.MotionWordRightAction}
  * |<Del>|                {@link com.maddyhome.idea.vim.action.change.delete.DeleteCharacterAction}
- * |<Down>|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionDownAction}
+ * |<Down>|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionArrowDownAction}
  * |<End>|                {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnAction}
  * |<F1>|                 IntelliJ help
  * |<Home>|               {@link com.maddyhome.idea.vim.action.motion.leftright.MotionFirstColumnAction}
  * |<Insert>|             {@link com.maddyhome.idea.vim.action.change.insert.InsertBeforeCursorAction}
- * |<Left>|               {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLeftAction}
+ * |<Left>|               {@link com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftAction}
  * |<PageDown>|           {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownAction}
  * |<PageUp>|             {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpAction}
- * |<Right>|              {@link com.maddyhome.idea.vim.action.motion.leftright.MotionRightAction}
+ * |<Right>|              {@link com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightAction}
  * |<S-Down>|             {@link com.maddyhome.idea.vim.action.motion.updown.MotionShiftDownAction}
  * |<S-Left>|             {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftLeftAction}
  * |<S-Right>|            {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftRightAction}
  * |<S-Up>|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionShiftUpAction}
- * |<Up>|                 {@link com.maddyhome.idea.vim.action.motion.updown.MotionUpAction}
+ * |<Up>|                 {@link com.maddyhome.idea.vim.action.motion.updown.MotionArrowUpAction}
  *
  *
  * 2.1. Text objects
@@ -591,10 +591,10 @@
  * |<S-Left>|             {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftLeftAction}
  * |<S-Right>|            {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftRightAction}
  * |<S-Up>|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionShiftUpAction}
- * |<Down>|               {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionDownAction}
+ * |<Down>|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionArrowDownAction}
  * |<Left>|               {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionLeftAction}
  * |<Right>|              {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionRightAction}
- * |<Up>|                 {@link com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionUpAction}
+ * |<Up>|                 {@link com.maddyhome.idea.vim.action.motion.updown.MotionArrowUpAction}
  *
  * 5. Command line editing
  *

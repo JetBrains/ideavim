@@ -475,7 +475,7 @@ public class Options {
     addOption(new ListOption(VIMINFO, "vi", new String[]{"'100", "<50", "s10", "h"}, null));
     addOption(new KeywordOption("iskeyword", "isk", new String[]{"@", "48-57", "_"}));
     addOption(new BoundListOption(SELECTMODE, "slm", new String[]{"template"}, new String[]{"mouse", "key", "cmd", "template", "refactoring"}));
-    addOption(new BoundListOption(KEYMODEL, "km", new String[]{"continueselect"}, new String[]{"startsel", "stopsel", "continueselect", "continuevisual"}));
+    addOption(new BoundListOption(KEYMODEL, "km", new String[]{"continueselect", "stopselect"}, new String[]{"startsel", "stopsel", "stopselect", "stopvisual", "continueselect", "continuevisual"}));
 
     registerExtensionOptions();
   }

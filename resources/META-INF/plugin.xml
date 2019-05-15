@@ -126,6 +126,10 @@
     <action id="VimMotionPercentOrMatch" class="com.maddyhome.idea.vim.action.motion.updown.MotionPercentOrMatchAction" text="Percent Down or Match"/>
     <action id="VimMotionUp" class="com.maddyhome.idea.vim.action.motion.updown.MotionUpAction" text="Up"/>
     <action id="VimMotionUpFirstNonSpace" class="com.maddyhome.idea.vim.action.motion.updown.MotionUpFirstNonSpaceAction" text="Up to First non-Space"/>
+    <action id="VimArrowMotionDown" class="com.maddyhome.idea.vim.action.motion.updown.MotionArrowDownAction" text="Arrow Down"/>
+    <action id="VimArrowMotionUp" class="com.maddyhome.idea.vim.action.motion.updown.MotionArrowUpAction" text="Arrow Up"/>
+    <action id="VimArrowMotionLeft" class="com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftAction" text="Arrow Left"/>
+    <action id="VimArrowMotionRight" class="com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightAction" text="Arrow Right"/>
     <!-- Text -->
     <action id="VimMotionCamelEndLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionCamelEndLeftAction" text="Camel Word End Left"/>
     <action id="VimMotionCamelEndRight" class="com.maddyhome.idea.vim.action.motion.text.MotionCamelEndRightAction" text="Camel Word End Right"/>
@@ -239,10 +243,6 @@
     <action id="VimSelectEnableBlockMode"
             class="com.maddyhome.idea.vim.action.motion.select.SelectEnableBlockModeAction"
             text="Enter Block Select Mode"/>
-    <action id="VimSelectMotionDown" class="com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionDownAction"
-            text="Move Down Select Mode"/>
-    <action id="VimSelectMotionUp" class="com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionUpAction"
-            text="Move Up Select Mode"/>
     <action id="VimSelectMotionRight" class="com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionRightAction"
             text="Move Right Select Mode"/>
     <action id="VimSelectMotionLeft" class="com.maddyhome.idea.vim.action.motion.select.motion.SelectMotionLeftAction"

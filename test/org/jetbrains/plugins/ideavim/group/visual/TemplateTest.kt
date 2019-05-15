@@ -31,6 +31,7 @@ import com.intellij.testFramework.fixtures.CodeInsightTestUtil.doInlineRename
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.listener.VimListenerManager
+import com.maddyhome.idea.vim.option.Options
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -89,6 +90,19 @@ class TemplateTest : VimTestCase() {
                 }
             }
         """.trimIndent())
+    }
+
+    fun `test selectmode without template`() {
+        Options.getInstance().getListOption(Options.SELECTMODE)!!.remove("template")
+        configureByJavaText("""
+            class Hello {
+                public static void main() {
+                    int my${c}Var = 5;
+                }
+            }
+        """.trimIndent())
+        startRenaming(VariableInplaceRenameHandler())
+        assertState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
     }
 
     fun `test prepend`() {
