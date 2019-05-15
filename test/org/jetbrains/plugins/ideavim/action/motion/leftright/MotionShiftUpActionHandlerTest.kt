@@ -81,6 +81,33 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
         )
     }
 
+    fun `test save column`() {
+        Options.getInstance().getListOption(Options.KEYMODEL)?.set("startsel") ?: run {
+            TestCase.fail()
+            return
+        }
+
+        doTest(parseKeys("<S-Up><S-Up><S-Up>"),
+                """
+                A Discovery
+
+                I found it in a legendary land[additional chars]
+                all rocks and lavender and tufted grass,[additional chars]
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.[additio${c}nal chars]
+                """.trimIndent(),
+                """
+                A Discovery
+
+                I found it in a legendary land[additional chars${s}${c}]
+                all rocks and lavender and tufted grass,[additional chars]
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.[addition${se}al chars]
+                """.trimIndent(),
+                CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER
+        )
+    }
+
     fun `test select up`() {
         Options.getInstance().getListOption(Options.KEYMODEL)?.set("startsel") ?: run {
             TestCase.fail()

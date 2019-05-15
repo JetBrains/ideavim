@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.option.Options
 import javax.swing.KeyStroke
 
@@ -48,7 +49,9 @@ private object MotionShiftUpActionHandler : EditorActionHandlerBase() {
             }
             editor.caretModel.allCarets.forEach { caret ->
                 val vertical = VimPlugin.getMotion().moveCaretVertical(editor, caret, -cmd.count)
+                val col = caret.vimLastColumn
                 MotionGroup.moveCaret(editor, caret, vertical)
+                caret.vimLastColumn = col
             }
             return true
         }
