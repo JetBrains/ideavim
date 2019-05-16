@@ -67,7 +67,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
     protected open fun afterExecution(editor: Editor, context: DataContext, cmd: Command, res: Boolean) {}
 
     final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-        logger.debug("execute, cmd=$cmd")
+        logger.info("Execute visual command cmd=$cmd")
 
         EditorData.setChangeSwitchMode(editor, null)
 
@@ -156,7 +156,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
             val change = if (CommandState.inVisualMode(editor) && !CommandState.inRepeatMode(editor)) {
                 VisualOperation.getRange(editor, caret, cmd.flags)
             } else null
-            logger.debug("change=$change")
+            logger.info("visual change = $change")
             visualChanges[caret] = change
         }
 
