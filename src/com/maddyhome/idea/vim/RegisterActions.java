@@ -241,8 +241,7 @@ class RegisterActions {
     parser.registerAction(MappingMode.NVO, "VimMotionDownLess1FirstNonSpace", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE),
                           new Shortcut('_'));
     parser.registerAction(MappingMode.NVO, "VimMotionFirstColumn", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE), new Shortcut[]{
-      new Shortcut('0'),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0))
+      new Shortcut('0')
     });
     parser.registerAction(MappingMode.NVO, "VimMotionFirstScreenColumn", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE), new Shortcut[]{
       new Shortcut("g0"),

@@ -236,7 +236,7 @@
  * |<Down>|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionArrowDownAction}
  * |<End>|                {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnAction}
  * |<F1>|                 IntelliJ help
- * |<Home>|               {@link com.maddyhome.idea.vim.action.motion.leftright.MotionFirstColumnAction}
+ * |<Home>|               {@link com.maddyhome.idea.vim.action.motion.leftright.MotionHomeAction}
  * |<Insert>|             {@link com.maddyhome.idea.vim.action.change.insert.InsertBeforeCursorAction}
  * |<Left>|               {@link com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftAction}
  * |<PageDown>|           {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownAction}
@@ -246,6 +246,7 @@
  * |<S-Left>|             {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftLeftAction}
  * |<S-Right>|            {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftRightAction}
  * |<S-Up>|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionShiftUpAction}
+ * |<S-Home>|             {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftHomeAction}
  * |<Up>|                 {@link com.maddyhome.idea.vim.action.motion.updown.MotionArrowUpAction}
  *
  *
