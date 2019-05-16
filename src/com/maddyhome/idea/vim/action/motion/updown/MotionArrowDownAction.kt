@@ -23,48 +23,30 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimCommandAction
-import com.maddyhome.idea.vim.command.*
-import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.handler.specialkeys.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.option.Options
-import com.maddyhome.idea.vim.option.Options.KEYMODEL
 import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
-@Suppress("DuplicatedCode")
-private object MotionArrowDownActionHandler : MotionActionHandler.ForEachCaret() {
-
+private object MotionArrowDownActionHandler : NonShiftedSpecialKeyHandler() {
     private var col: Int = 0
 
-    override fun getOffset(editor: Editor,
-                           caret: Caret,
-                           context: DataContext,
-                           count: Int,
-                           rawCount: Int,
-                           argument: Argument?): Int {
-        val keymodel = Options.getInstance().getListOption(KEYMODEL)
-        if (CommandState.inSelectMode(editor) && (keymodel?.contains("stopsel") == true || keymodel?.contains("stopselect") == true)) {
-            VimPlugin.getVisualMotion().exitSelectMode(editor, false)
-        }
-        if (CommandState.inVisualMode(editor) && (keymodel?.contains("stopsel") == true || keymodel?.contains("stopvisual") == true)) {
-            VimPlugin.getVisualMotion().exitVisual(editor)
-        }
-
+    override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
         return VimPlugin.getMotion().moveCaretVertical(editor, caret, count)
     }
 
-    override fun preOffsetComputation(editor: Editor,
-                                      caret: Caret,
-                                      context: DataContext,
-                                      cmd: Command): Boolean {
+    override fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
         col = caret.vimLastColumn
         return true
     }
 
-    override fun postMove(editor: Editor, caret: Caret, context: DataContext,
-                          cmd: Command) {
+    override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
         caret.vimLastColumn = col
     }
 }
