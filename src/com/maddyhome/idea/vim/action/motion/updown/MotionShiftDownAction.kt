@@ -23,46 +23,29 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimCommandAction
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.vimForAllOrPrimaryCaret
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.handler.specialkeys.ShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.option.Options
 import javax.swing.KeyStroke
 
 /**
  * @author Alex Plate
  */
 
-@Suppress("DuplicatedCode")
-private object MotionShiftDownActionHandler : EditorActionHandlerBase() {
-    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-        val keymodelOption = Options.getInstance().getListOption(Options.KEYMODEL)
-        val startSel = keymodelOption?.contains("startsel") == true
-        val continueSelect = keymodelOption?.contains("continueselect") == true
-        val continueVisual = keymodelOption?.contains("continuevisual") == true
-        val inVisualMode = CommandState.inVisualMode(editor)
-        val inSelectMode = CommandState.inSelectMode(editor)
-        if (startSel || continueSelect && inSelectMode || continueVisual && inVisualMode) {
-            if (!inVisualMode && !inSelectMode) {
-                if (Options.getInstance().getListOption(Options.SELECTMODE)?.contains("key") == true) {
-                    VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
-                } else {
-                    VimPlugin.getVisualMotion()
-                            .toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
-                }
-            }
-            editor.vimForAllOrPrimaryCaret { caret ->
-                val vertical = VimPlugin.getMotion().moveCaretVertical(editor, caret, cmd.count)
-                val col = caret.vimLastColumn
-                MotionGroup.moveCaret(editor, caret, vertical)
-                caret.vimLastColumn = col
-            }
-            return true
+private object MotionShiftDownActionHandler : ShiftedSpecialKeyHandler() {
+    override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {
+        editor.vimForAllOrPrimaryCaret { caret ->
+            val vertical = VimPlugin.getMotion().moveCaretVertical(editor, caret, cmd.count)
+            val col = caret.vimLastColumn
+            MotionGroup.moveCaret(editor, caret, vertical)
+            caret.vimLastColumn = col
         }
-        return VimPlugin.getMotion().scrollFullPage(editor, cmd.count)
+    }
+
+    override fun motionWithoutKeyModel(editor: Editor, context: DataContext, cmd: Command) {
+        VimPlugin.getMotion().scrollFullPage(editor, cmd.count)
     }
 }
 
