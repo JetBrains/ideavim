@@ -218,7 +218,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
    * @return The user entered text
    */
   public String getText() {
-    return entry.getText();
+    return entry.getActualText();
   }
 
   @NotNull
@@ -296,8 +296,9 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       if (incHighlighter != null) {
         editor.getMarkupModel().removeHighlighter(incHighlighter);
       }
-      final CharPointer p = new CharPointer(entry.getText());
-      final CharPointer end = RegExp.skip_regexp(new CharPointer(entry.getText()), forwards ? '/' : '?', true);
+      final String searchText = entry.getActualText();
+      final CharPointer p = new CharPointer(searchText);
+      final CharPointer end = RegExp.skip_regexp(new CharPointer(searchText), forwards ? '/' : '?', true);
       final String pattern = p.substring(end.pointer() - p.pointer());
       final boolean ignoreCase = SearchGroup.shouldIgnoreCase(pattern, false);
       final TextRange range = SearchGroup.findNext(editor, pattern, caretOffset, ignoreCase, forwards);

@@ -554,8 +554,9 @@ class ExEntryTest: VimTestCase() {
             typeText("<C-C>")
     }
 
+    @Suppress("DEPRECATION")
     private fun assertExText(expected: String) {
-        assertEquals(expected, exEntryPanel.text)
+        assertEquals(expected, exEntryPanel.entry.text)
     }
 
     private fun assertIsActive() {

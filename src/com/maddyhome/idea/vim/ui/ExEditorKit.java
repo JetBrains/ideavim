@@ -234,7 +234,7 @@ public class ExEditorKit extends DefaultEditorKit {
             if (c != KeyEvent.CHAR_UNDEFINED) {
               final Register register = VimPlugin.getRegister().getRegister(c);
               if (register != null) {
-                final String oldText = target.getText();
+                final String oldText = target.getActualText();
                 final String text = register.getText();
                 if (oldText != null && text != null) {
                   final int offset = target.getCaretPosition();
@@ -357,7 +357,7 @@ public class ExEditorKit extends DefaultEditorKit {
 
       Document doc = target.getDocument();
       Caret caret = target.getCaret();
-      int offset = SearchHelper.findNextWord(target.getText(), caret.getDot(), target.getText().length(),
+      int offset = SearchHelper.findNextWord(target.getActualText(), caret.getDot(), target.getActualText().length(),
                                              -1, false, false);
       if (logger.isDebugEnabled()) logger.debug("offset=" + offset);
       try {

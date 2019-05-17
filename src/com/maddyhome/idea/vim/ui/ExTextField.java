@@ -132,7 +132,7 @@ public class ExTextField extends JTextField {
   }
 
   void saveLastEntry() {
-    lastEntry = getText();
+    lastEntry = super.getText();
   }
 
   void selectHistory(boolean isUp, boolean filter) {
@@ -187,6 +187,23 @@ public class ExTextField extends JTextField {
     super.setText(string);
 
     saveLastEntry();
+  }
+
+  /**
+   * @deprecated Use getActualText()
+   * Using this method can include prompt characters used when entering digraphs or register text
+   */
+  @Override
+  @Deprecated
+  public String getText() {
+    return super.getText();
+  }
+
+  String getActualText() {
+    if (actualText != null) {
+      return actualText;
+    }
+    return super.getText();
   }
 
   void setEditor(Editor editor, DataContext context) {
@@ -294,10 +311,10 @@ public class ExTextField extends JTextField {
   }
 
   void setCurrentActionPromptCharacter(char promptCharacter) {
-    final String text = removePromptCharacter();
+    actualText = removePromptCharacter();
     this.currentActionPromptCharacter = promptCharacter;
     currentActionPromptCharacterOffset = currentActionPromptCharacterOffset == -1 ? getCaretPosition() : currentActionPromptCharacterOffset;
-    StringBuilder sb = new StringBuilder(text);
+    StringBuilder sb = new StringBuilder(actualText);
     sb.insert(currentActionPromptCharacterOffset, currentActionPromptCharacter);
     updateText(sb.toString());
     setCaretPosition(currentActionPromptCharacterOffset);
@@ -310,12 +327,13 @@ public class ExTextField extends JTextField {
     setCaretPosition(min(offset, text.length()));
     currentActionPromptCharacter = '\0';
     currentActionPromptCharacterOffset = -1;
+    actualText = null;
   }
 
   private String removePromptCharacter() {
     return currentActionPromptCharacterOffset == -1
-      ? getText()
-      : StringsKt.removeRange(getText(), currentActionPromptCharacterOffset, currentActionPromptCharacterOffset + 1).toString();
+      ? super.getText()
+      : StringsKt.removeRange(super.getText(), currentActionPromptCharacterOffset, currentActionPromptCharacterOffset + 1).toString();
   }
 
   @Nullable
@@ -338,7 +356,7 @@ public class ExTextField extends JTextField {
   }
 
   private void resetCaret() {
-    if (getCaretPosition() == getText().length() || currentActionPromptCharacterOffset == getText().length() - 1) {
+    if (getCaretPosition() == super.getText().length() || currentActionPromptCharacterOffset == super.getText().length() - 1) {
       setNormalModeCaret();
     }
     else {
@@ -518,6 +536,7 @@ public class ExTextField extends JTextField {
   private Editor editor;
   private DataContext context;
   private String lastEntry;
+  private String actualText;
   private List<HistoryGroup.HistoryEntry> history;
   private int histIndex = 0;
   @Nullable private ExEditorKit.MultiStepAction currentAction;
