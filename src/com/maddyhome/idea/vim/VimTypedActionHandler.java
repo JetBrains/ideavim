@@ -40,11 +40,9 @@ import java.awt.event.KeyEvent;
 public class VimTypedActionHandler implements TypedActionHandlerEx {
   private static final Logger logger = Logger.getInstance(VimTypedActionHandler.class.getName());
 
-  private final TypedActionHandler origHandler;
   @NotNull private final KeyHandler handler;
 
-  public VimTypedActionHandler(TypedActionHandler origHandler) {
-    this.origHandler = origHandler;
+  VimTypedActionHandler(TypedActionHandler origHandler) {
     handler = KeyHandler.getInstance();
     handler.setOriginalHandler(origHandler);
   }
@@ -55,7 +53,7 @@ public class VimTypedActionHandler implements TypedActionHandlerEx {
       handler.beforeHandleKey(editor, KeyStroke.getKeyStroke(charTyped), context, plan);
     }
     else {
-      TypedActionHandler originalHandler = KeyHandler.getInstance().getOriginalHandler();
+      TypedActionHandler originalHandler = handler.getOriginalHandler();
       if (originalHandler instanceof TypedActionHandlerEx) {
         ((TypedActionHandlerEx)originalHandler).beforeExecute(editor, charTyped, context, plan);
       }
@@ -73,6 +71,7 @@ public class VimTypedActionHandler implements TypedActionHandlerEx {
       }
     }
     else {
+      TypedActionHandler origHandler = handler.getOriginalHandler();
       origHandler.execute(editor, charTyped, context);
     }
   }

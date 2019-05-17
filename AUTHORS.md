@@ -69,6 +69,7 @@ Contributors:
 * [Romain Gautier](mailto:romain.gautier@nimamoh.net)
 * [Elliot Courant](mailto:elliot.courant@wheniwork.com)
 * [Simon Rainer](mailto:simon.rainer@fau.de)
+* [Michael Ziwisky](mailto:mziwisky@instructure.com)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.

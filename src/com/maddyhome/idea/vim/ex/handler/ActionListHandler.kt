@@ -34,7 +34,7 @@ class ActionListHandler : CommandHandler(
         flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
 ) {
     override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        val lineSeparator = System.lineSeparator()
+        val lineSeparator = "\n"
         val searchPattern = cmd.argument.trim().toLowerCase().split("*")
         val actionManager = ActionManager.getInstance()
 

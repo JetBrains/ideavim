@@ -146,7 +146,7 @@ public class MotionGroup {
    */
   private void processMouseClick(@NotNull Editor editor, @NotNull MouseEvent event) {
     if (ExEntryPanel.getInstance().isActive()) {
-      ExEntryPanel.getInstance().deactivate(false);
+      VimPlugin.getProcess().cancelExEntry(editor, ExEntryPanel.getInstance().getEntry().getContext());
     }
 
     ExOutputModel.getInstance(editor).clear();

@@ -68,13 +68,12 @@ public class KeyGroup {
   @NotNull private final Map<MappingMode, KeyMapping> keyMappings = new HashMap<>();
   @Nullable private OperatorFunction operatorFunction = null;
 
-  public void registerRequiredShortcutKeys(@NotNull Editor editor) {
-    final Set<KeyStroke> requiredKeys = VimPlugin.getKey().requiredShortcutKeys;
+  void registerRequiredShortcutKeys(@NotNull Editor editor) {
     EventFacade.getInstance().registerCustomShortcutSet(VimShortcutKeyAction.getInstance(),
-                                                        toShortcutSet(requiredKeys), editor.getComponent());
+                                                        toShortcutSet(requiredShortcutKeys), editor.getComponent());
   }
 
-  public void unregisterShortcutKeys(@NotNull Editor editor) {
+  void unregisterShortcutKeys(@NotNull Editor editor) {
     EventFacade.getInstance().unregisterCustomShortcutSet(VimShortcutKeyAction.getInstance(), editor.getComponent());
   }
 

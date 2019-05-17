@@ -307,6 +307,10 @@
  * |CTRL-W_<Up>|          {@link com.maddyhome.idea.vim.action.window.WindowUpAction}
  * |CTRL-W_<Left>|        {@link com.maddyhome.idea.vim.action.window.WindowLeftAction}
  * |CTRL-W_<Right>|       {@link com.maddyhome.idea.vim.action.window.WindowRightAction}
+ * |CTRL-W_CTRL-H|        {@link com.maddyhome.idea.vim.action.window.WindowLeftAction}
+ * |CTRL-W_CTRL-J|        {@link com.maddyhome.idea.vim.action.window.WindowDownAction}
+ * |CTRL-W_CTRL-K|        {@link com.maddyhome.idea.vim.action.window.WindowUpAction}
+ * |CTRL-W_CTRL-L|        {@link com.maddyhome.idea.vim.action.window.WindowRightAction}
  *
  *
  * 2.3. Square bracket commands
@@ -575,7 +579,72 @@
  *
  * 4. Command line editing
  *
- * There is no up-to-date list of supported command line editing commands.
+ * tag                    action
+ * -------------------------------------------------------------------------------------------------------------------
+ *
+ * |c_CTRL-A|             TODO
+ * |c_CTRL-B|             {@link javax.swing.text.DefaultEditorKit#beginLineAction}
+ * |c_CTRL-C|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.CancelEntryAction}
+ * |c_CTRL-D|             TODO
+ * |c_CTRL-E|             {@link javax.swing.text.DefaultEditorKit#endLineAction}
+ * |c_CTRL-G|             TODO
+ * |c_CTRL-H|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.DeletePreviousCharAction}
+ * |c_CTRL-I|             TODO
+ * |c_CTRL-J|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.CompleteEntryAction}
+ * |c_CTRL-K|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.StartDigraphAction}
+ * |c_CTRL-L|             TODO
+ * |c_CTRL-M|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.CompleteEntryAction}
+ * |c_CTRL-N|             TODO
+ * |c_CTRL-P|             TODO
+ * |c_CTRL-Q|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.StartDigraphAction}
+ * |c_CTRL-R|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.InsertRegisterAction}
+ * |c_CTRL-R_CTRL-A|      TODO
+ * |c_CTRL-R_CTRL-F|      TODO
+ * |c_CTRL-R_CTRL-L|      TODO
+ * |c_CTRL-R_CTRL-O|      TODO
+ * |c_CTRL-R_CTRL-P|      TODO
+ * |c_CTRL-R_CTRL-R|      TODO
+ * |c_CTRL-R_CTRL-W|      TODO
+ * |c_CTRL-T|             TODO
+ * |c_CTRL-U|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.DeleteToCursorAction}
+ * |c_CTRL-V|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.StartDigraphAction}
+ * |c_CTRL-W|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.DeletePreviousWordAction}
+ * |c_CTRL-Y|             TODO
+ * |c_CTRL-\_e|           TODO
+ * |c_CTRL-\_CTRL-G|      TODO
+ * |c_CTRL-\_CTRL-N|      TODO
+ * |c_CTRL-_|             not applicable
+ * |c_CTRL-^|             not applicable
+ * |c_CTRL-]|             TODO
+ * |c_CTRL-[|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.EscapeCharAction}
+ * |c_<BS>|               {@link com.maddyhome.idea.vim.ui.ExEditorKit.DeletePreviousCharAction}
+ * |c_<CR>|               {@link com.maddyhome.idea.vim.ui.ExEditorKit.CompleteEntryAction}
+ * |c_<C-Left>|           {@link javax.swing.text.DefaultEditorKit#previousWordAction}
+ * |c_<C-Right>|          {@link javax.swing.text.DefaultEditorKit#nextWordAction}
+ * |c_<Del>|              {@link javax.swing.text.DefaultEditorKit#deleteNextCharAction}
+ * |c_<Down>|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.HistoryDownFilterAction}
+ * |c_<End>|              {@link javax.swing.text.DefaultEditorKit#endLineAction}
+ * |c_<Esc>|              {@link com.maddyhome.idea.vim.ui.ExEditorKit.EscapeCharAction}
+ * |c_<Home>|             {@link javax.swing.text.DefaultEditorKit#beginLineAction}
+ * |c_<Insert>|           {@link com.maddyhome.idea.vim.ui.ExEditorKit.ToggleInsertReplaceAction}
+ * |c_<Left>|             {@link javax.swing.text.DefaultEditorKit#backwardAction}
+ * |c_<LeftMouse>|        not applicable
+ * |c_<MiddleMouse>|      TODO
+ * |c_<NL>|               {@link com.maddyhome.idea.vim.ui.ExEditorKit.CompleteEntryAction}
+ * |c_<PageUp>|           {@link com.maddyhome.idea.vim.ui.ExEditorKit.HistoryUpAction}
+ * |c_<PageDown>|         {@link com.maddyhome.idea.vim.ui.ExEditorKit.HistoryDownAction}
+ * |c_<Right>|            {@link javax.swing.text.DefaultEditorKit#forwardAction}
+ * |c_<S-Down>|           {@link com.maddyhome.idea.vim.ui.ExEditorKit.HistoryDownAction}
+ * |c_<S-Left>|           {@link javax.swing.text.DefaultEditorKit#previousWordAction}
+ * |c_<S-Right>|          {@link javax.swing.text.DefaultEditorKit#nextWordAction}
+ * |c_<S-Tab>|            TODO
+ * |c_<S-Up>|             {@link com.maddyhome.idea.vim.ui.ExEditorKit.HistoryUpAction}
+ * |c_<Tab>|              TODO
+ * |c_<Up>|               {@link com.maddyhome.idea.vim.ui.ExEditorKit.HistoryUpFilterAction}
+ * |c_digraph|            {char1} <BS> {char2} {@link com.maddyhome.idea.vim.ui.ExEditorKit.StartDigraphAction}
+ * |c_wildchar|           TODO
+ * |'cedit'|              TODO
+ *
  *
  * 5. Ex commands
  *
