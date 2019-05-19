@@ -22,10 +22,12 @@ import com.intellij.openapi.util.Ref
 import com.intellij.testFramework.UsefulTestCase
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.group.SearchGroup
 import com.maddyhome.idea.vim.helper.RunnableHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.Options
 import com.maddyhome.idea.vim.option.ToggleOption
+import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 import java.util.*
 
@@ -226,21 +228,18 @@ class SearchGroupTest : VimTestCase() {
     }
 
     fun `test search word matches case`() {
-        resetAllOptions()
         typeTextInFile(parseKeys("*"),
             "<caret>Editor editor Editor")
         assertOffset(14)
     }
 
     fun `test search next word matches case`() {
-        resetAllOptions()
         typeTextInFile(parseKeys("*", "n"),
             "<caret>Editor editor Editor editor Editor")
         assertOffset(28)
     }
 
     fun `test search word honours ignorecase`() {
-        resetAllOptions()
         setIgnoreCase()
         typeTextInFile(parseKeys("*"),
             "<caret>editor Editor editor")
@@ -248,7 +247,6 @@ class SearchGroupTest : VimTestCase() {
     }
 
     fun `test search next word honours ignorecase`() {
-        resetAllOptions()
         setIgnoreCase()
         typeTextInFile(parseKeys("*", "n"),
             "<caret>editor Editor editor")
@@ -256,7 +254,6 @@ class SearchGroupTest : VimTestCase() {
     }
 
     fun `test search word overrides smartcase`() {
-        resetAllOptions()
         setIgnoreCaseAndSmartCase()
         typeTextInFile(parseKeys("*"),
             "<caret>Editor editor Editor")
@@ -264,16 +261,20 @@ class SearchGroupTest : VimTestCase() {
     }
 
     fun `test search next word overrides smartcase`() {
-        resetAllOptions()
         setIgnoreCaseAndSmartCase()
         typeTextInFile(parseKeys("*", "n"),
             "<caret>Editor editor editor")
         assertOffset(14)
     }
 
-    private fun resetAllOptions() {
-        val options = Options.getInstance()
-        options.resetAllOptions()
+    // Ensure that the offsets for the last carriage return in the file are valid, even though it's for a line that
+    // doesn't exist
+    fun `test find last cr in file`() {
+        myFixture.configureByText("a.txt", "Something\n")
+        val textRange = SearchGroup.findNext(myFixture.editor, "\\n", 0, false, true)
+        assertNotNull(textRange)
+        TestCase.assertEquals(9, textRange?.startOffset)
+        TestCase.assertEquals(10, textRange?.endOffset)
     }
 
     private fun setIgnoreCase() {

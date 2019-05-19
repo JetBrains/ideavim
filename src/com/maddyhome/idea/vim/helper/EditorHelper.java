@@ -538,13 +538,12 @@ public class EditorHelper {
 
   @NotNull
   public static CharacterPosition offsetToCharacterPosition(@NotNull final Editor editor, final int offset) {
-    int line = editor.getDocument().getLineNumber(normalizeOffset(editor, offset));
-    int col = offset - editor.getDocument().getLineStartOffset(line);
-    return new CharacterPosition(line, col);
+    final LogicalPosition logicalPosition = editor.offsetToLogicalPosition(offset);
+    return new CharacterPosition(logicalPosition.line, logicalPosition.column);
   }
 
   public static int characterPositionToOffset(@NotNull final Editor editor, @NotNull final CharacterPosition pos) {
-    return editor.getDocument().getLineStartOffset(normalizeLine(editor, pos.line)) + pos.column;
+    return editor.logicalPositionToOffset(pos);
   }
 
   @NotNull
