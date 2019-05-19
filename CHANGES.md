@@ -50,6 +50,14 @@ To Be Released
 * Fix incorrect handling of subsequent key strokes after ex command line loses focus
 * [VIM-1240](https://youtrack.jetbrains.com/issue/VIM-1240) Improve UI of ex command line and output panel
 * [VIM-1485](https://youtrack.jetbrains.com/issue/VIM-1485) Remove incorrect gap between ex command line label and text
+* [VIM-1535](https://youtrack.jetbrains.com/issue/VIM-1535) Use same text attributes and highlight layer as IntelliJ's own Find command
+* [VIM-1413](https://youtrack.jetbrains.com/issue/VIM-1413) Fix `smartcase` option being ignored in incremental search
+* Fix incremental search not matching with trailing options, e.g. `/Foo/+1`
+* Move the current line as well as scrolling during incremental search
+* [VIM-128](https://youtrack.jetbrains.com/issue/VIM-128) Fix `:substitute` not respecting `ignorecase` and `smartcase` options
+* Fix next/previous search commands not respecting `smartcase` override
+* Search highlights are updated when `ignorecase`, `smartcase` and `hlsearch` options are updated
+* Fix exception when trying to highlight last CR in file
 
 0.51, 2019-02-12
 ----------------
