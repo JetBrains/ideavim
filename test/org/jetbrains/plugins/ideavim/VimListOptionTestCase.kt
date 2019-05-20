@@ -24,6 +24,17 @@ import junit.framework.TestCase
 
 /**
  * @author Alex Plate
+ *
+ * This test case helps you to test IdeaVim options
+ *
+ * While inheriting from this class you should specify (via constructor), which options you are going to test.
+ *   After that each test method in this class should contains [VimListOptionTestConfiguration] annotation with
+ *   description of wich values of option should be set before starting test.
+ *
+ * e.g.
+ * ```
+ * @VimListOptionTestConfiguration(VimListConfig("keymodel", ["startsel"]), VimListConfig("selectmode", ["key"]))
+ * ```
  */
 abstract class VimListOptionTestCase(option: String, vararg otherOptions: String) : VimTestCase() {
     val options: Set<String> = setOf(option, *otherOptions)
