@@ -50,7 +50,7 @@ class MotionShiftHomeActionTest : VimTestCase() {
     }
 
     fun `test default continueselect`() {
-        assertTrue(Options.getInstance().getListOption(KEYMODEL)!!.contains("continueselect"))
+        assertTrue(Options.getInstance().getListOption(KEYMODEL)!!.contains("acontinueselect"))
     }
 
     fun `test start visual`() {

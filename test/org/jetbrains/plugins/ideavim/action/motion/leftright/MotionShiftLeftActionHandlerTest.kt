@@ -23,6 +23,7 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.Options
+import com.maddyhome.idea.vim.option.Options.KEYMODEL
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionShiftLeftActionHandlerTest : VimTestCase() {
@@ -454,5 +455,68 @@ class MotionShiftLeftActionHandlerTest : VimTestCase() {
                 CommandState.Mode.SELECT,
                 CommandState.SubMode.VISUAL_BLOCK)
         assertCaretsColour()
+    }
+
+    fun `test acontinuevisual`() {
+        Options.getInstance().getListOption(KEYMODEL)!!.set("acontinuevisual")
+        doTest(parseKeys("v", "<S-Left>".repeat(3)),
+                """
+                A Discovery
+
+                I foun${c}d it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                """
+                A Discovery
+
+                I f${s}${c}ound${se} it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.VISUAL,
+                CommandState.SubMode.VISUAL_CHARACTER)
+    }
+
+    fun `test no acontinueselect`() {
+        Options.getInstance().getListOption(KEYMODEL)!!.set("")
+        doTest(parseKeys("gh", "<S-Left>".repeat(3)),
+                """
+                A Discovery
+
+                I found it in a ${c}legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                """
+                A Discovery
+
+                I found it ${s}${c}in a ${se}legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
+    }
+
+    fun `test no acontinuevisual`() {
+        Options.getInstance().getListOption(KEYMODEL)!!.set("")
+        doTest(parseKeys("v", "<S-Left>".repeat(3)),
+                """
+                A Discovery
+
+                I found it in a ${c}legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                """
+                A Discovery
+
+                I found ${s}${c}it in a l${se}egendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.VISUAL,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 }

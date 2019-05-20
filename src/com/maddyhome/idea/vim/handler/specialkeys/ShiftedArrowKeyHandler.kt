@@ -29,32 +29,43 @@ import com.maddyhome.idea.vim.option.Options
 /**
  * @author Alex Plate
  *
- * Handler for SHIFTED special keys except arrows, that are defined in `:h keymodel`
- * There are: <End>, <Home>, <PageUp> and <PageDown>
+ * Handler for SHIFTED arrow keys
  *
  * This handler is used to properly handle there keys according to current `keymodel` and `selectmode` options
  *
  * Handler is called once for all carets
  */
-abstract class ShiftedSpecialKeyHandler : EditorActionHandlerBase() {
+abstract class ShiftedArrowKeyHandler : EditorActionHandlerBase() {
     final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
         val keymodelOption = Options.getInstance().getListOption(Options.KEYMODEL)
         val startSel = keymodelOption?.contains("startsel") == true
-        if (startSel && !CommandState.inVisualMode(editor) && !CommandState.inSelectMode(editor)) {
-            if (Options.getInstance().getListOption(Options.SELECTMODE)?.contains("key") == true) {
-                VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
-            } else {
-                VimPlugin.getVisualMotion()
-                        .toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
+        val aContinueSelect = keymodelOption?.contains("acontinueselect") == true
+        val aContinueVisual = keymodelOption?.contains("acontinuevisual") == true
+        val inVisualMode = CommandState.inVisualMode(editor)
+        val inSelectMode = CommandState.inSelectMode(editor)
+        if (startSel || aContinueSelect && inSelectMode || aContinueVisual && inVisualMode) {
+            if (!inVisualMode && !inSelectMode) {
+                if (Options.getInstance().getListOption(Options.SELECTMODE)?.contains("key") == true) {
+                    VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
+                } else {
+                    VimPlugin.getVisualMotion()
+                            .toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
+                }
             }
+            motionWithKeyModel(editor, context, cmd)
+        } else {
+            motionWithoutKeyModel(editor, context, cmd)
         }
-        motion(editor, context, cmd)
         return true
     }
 
     /**
+     * This method is called when `keymodel` contains `startsel`, or one of `continue*` values in corresponding mode
+     */
+    abstract fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command)
+    /**
      * This method is called when `keymodel` doesn't contain `startsel`,
      * or contains one of `continue*` values but in different mode.
      */
-    abstract fun motion(editor: Editor, context: DataContext, cmd: Command)
+    abstract fun motionWithoutKeyModel(editor: Editor, context: DataContext, cmd: Command)
 }

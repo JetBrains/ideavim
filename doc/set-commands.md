@@ -12,25 +12,25 @@ The following `:set` commands can appear in `~/.ideavimrc` or set manually in th
     'iskeyword'      'isk'   defines keywords for commands like 'w', '*', etc.
     'incsearch'      'is'    show where search pattern typed so far matches
     
-    `keymodel`       `km`    String (default "continueselect,stopselect")   [To Be Released]
+    `keymodel`       `km`    String (default "acontinueselect,stopselect")   [To Be Released]
                              global
                  List of comma separated words, which enable special things that keys
                  can do. These values can be used:
-                   startsel           Using a shifted arrow key starts selection (either
+                   startsel           Using a shifted special[1] key starts selection (either
                                       Select mode or Visual mode, depending on "key" being
                                       present in 'selectmode').
-                   stopsel            Using a NOT-shifted arrow key stops selection.
+                   stopsel            Using a NOT-shifted special[1] key stops selection.
                                       Automatically enables `stopselect` and `stopvisual`
-                   stopselect         Using a NOT-shifted arrow key stops     - IdeaVim ONLY
+                   stopselect         Using a NOT-shifted special[1] key stops     - IdeaVim ONLY
                                       select mode and removes selection.
-                   stopvisual         Using a NOT-shifted arrow key stops     - IdeaVim ONLY
+                   stopvisual         Using a NOT-shifted special[1] key stops     - IdeaVim ONLY
                                       visual mode and removes selection.
-                   continueselect     Using a shifted arrow key doesn't       - IdeaVim ONLY
-                                      start selection, but also doesn't
-                                      exit select mode
-                   continuevisual     Using a shifted arrow key doesn't       - IdeaVim ONLY
-                                      start selection, but also doesn't
-                                      exit visual mode
+                   acontinueselect    Using a shifted arrow key doesn't       - IdeaVim ONLY
+                                      start selection, but in select mode
+                                      acts like startsel is enabled
+                   acontinuevisual    Using a shifted arrow key doesn't       - IdeaVim ONLY
+                                      start selection, but in visual mode
+                                      acts like startsel is enabled
     
     'matchpairs'     'mps'   pairs of characters that "%" can match
     'nrformats'      'nf'    number formats recognized for CTRL-A command
@@ -48,7 +48,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or set manually in th
                  Select mode instead of Visual mode, when a selection is started.
                  Possible values:
                    mouse           when using the mouse
-                   key             when using shifted arrow keys
+                   key             when using shifted special[1] keys
                    cmd             when using "v", "V" or <C-V>
                    template        when template starting        - IdeaVim ONLY
                    refactoring     when refactoring without      - IdeaVim ONLY
@@ -64,3 +64,6 @@ The following `:set` commands can appear in `~/.ideavimrc` or set manually in th
     'viminfo'        'vi'    information to remember after restart
     'visualbell'     'vb'    use visual bell instead of beeping
     'wrapscan'       'ws'    searches wrap around the end of the file
+
+    ----------
+    [1] - cursor keys, <End>, <Home>, <PageUp> and <PageDown>

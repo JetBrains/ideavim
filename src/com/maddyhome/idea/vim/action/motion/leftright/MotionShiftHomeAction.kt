@@ -35,15 +35,12 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 private object MotionShiftHomeActionHandler : ShiftedSpecialKeyHandler() {
-    override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {
+    override fun motion(editor: Editor, context: DataContext, cmd: Command) {
         editor.vimForAllOrPrimaryCaret { caret ->
             val newOffset = VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
             MotionGroup.moveCaret(editor, caret, newOffset)
         }
     }
-
-    override fun motionWithoutKeyModel(editor: Editor, context: DataContext, cmd: Command) =
-            motionWithKeyModel(editor, context, cmd)
 }
 
 class MotionShiftHomeAction : VimCommandAction(MotionShiftHomeActionHandler) {

@@ -16,11 +16,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@file:Suppress("RemoveCurlyBracesFromTemplate")
+
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.Options
+import com.maddyhome.idea.vim.option.Options.KEYMODEL
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionShiftRightActionHandlerTest : VimTestCase() {
@@ -438,5 +441,68 @@ class MotionShiftRightActionHandlerTest : VimTestCase() {
                 hard by the torrent of a mountain pass.""".trimIndent(),
                 CommandState.Mode.SELECT,
                 CommandState.SubMode.VISUAL_BLOCK)
+    }
+
+    fun `test acontinuevisual`() {
+        Options.getInstance().getListOption(KEYMODEL)!!.set("acontinuevisual")
+        doTest(parseKeys("v", "<S-Right>".repeat(3)),
+                """
+                A Discovery
+
+                I ${c}found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                """
+                A Discovery
+
+                I ${s}fou${c}n${se}d it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.VISUAL,
+                CommandState.SubMode.VISUAL_CHARACTER)
+    }
+
+    fun `test no acontinueselect`() {
+        Options.getInstance().getListOption(KEYMODEL)!!.set("")
+        doTest(parseKeys("gh", "<S-Right>".repeat(3)),
+                """
+                A Discovery
+
+                I ${c}found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                """
+                A Discovery
+
+                I ${s}found it in ${c}${se}a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.SELECT,
+                CommandState.SubMode.VISUAL_CHARACTER)
+    }
+
+    fun `test no acontinuevisual`() {
+        Options.getInstance().getListOption(KEYMODEL)!!.set("")
+        doTest(parseKeys("v", "<S-Right>".repeat(3)),
+                """
+                A Discovery
+
+                I ${c}found it in a legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                """
+                A Discovery
+
+                I ${s}found it in ${c}a${se} legendary land
+                all rocks and lavender and tufted grass,
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.""".trimIndent(),
+                CommandState.Mode.VISUAL,
+                CommandState.SubMode.VISUAL_CHARACTER)
     }
 }
