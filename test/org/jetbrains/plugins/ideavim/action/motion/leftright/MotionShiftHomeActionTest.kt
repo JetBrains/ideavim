@@ -25,9 +25,13 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.Options
 import com.maddyhome.idea.vim.option.Options.KEYMODEL
 import com.maddyhome.idea.vim.option.Options.SELECTMODE
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimListConfig
+import org.jetbrains.plugins.ideavim.VimListOptionDefault
+import org.jetbrains.plugins.ideavim.VimListOptionTestCase
+import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
 
-class MotionShiftHomeActionTest : VimTestCase() {
+class MotionShiftHomeActionTest : VimListOptionTestCase(KEYMODEL, SELECTMODE) {
+    @VimListOptionDefault
     fun `test simple home`() {
         val keys = parseKeys("<S-Home>")
         val before = """
@@ -49,12 +53,13 @@ class MotionShiftHomeActionTest : VimTestCase() {
         doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
+    @VimListOptionDefault
     fun `test default continueselect`() {
         assertTrue(Options.getInstance().getListOption(KEYMODEL)!!.contains("acontinueselect"))
     }
 
+    @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, ["startsel"]), VimListConfig(SELECTMODE, []))
     fun `test start visual`() {
-        Options.getInstance().getListOption(KEYMODEL)!!.set("startsel")
         val keys = parseKeys("<S-Home>")
         val before = """
             A Discovery
@@ -75,9 +80,8 @@ class MotionShiftHomeActionTest : VimTestCase() {
         doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
     }
 
+    @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, ["startsel"]), VimListConfig(SELECTMODE, ["key"]))
     fun `test start select`() {
-        Options.getInstance().getListOption(KEYMODEL)!!.set("startsel")
-        Options.getInstance().getListOption(SELECTMODE)!!.set("key")
         val keys = parseKeys("<S-Home>")
         val before = """
             A Discovery
@@ -98,6 +102,7 @@ class MotionShiftHomeActionTest : VimTestCase() {
         doTest(keys, before, after, CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
     }
 
+    @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, []), VimListConfig(SELECTMODE, []))
     fun `test continue visual`() {
         val before = """
             A Discovery
@@ -123,6 +128,7 @@ class MotionShiftHomeActionTest : VimTestCase() {
         assertState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
     }
 
+    @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, []), VimListConfig(SELECTMODE, []))
     fun `test continue select`() {
         val before = """
             A Discovery

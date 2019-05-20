@@ -23,9 +23,13 @@ package org.jetbrains.plugins.ideavim.action.motion.updown
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.Options
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimListConfig
+import org.jetbrains.plugins.ideavim.VimListOptionDefault
+import org.jetbrains.plugins.ideavim.VimListOptionTestCase
+import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
 
-class MotionArrowUpActionTest : VimTestCase() {
+class MotionArrowUpActionTest : VimListOptionTestCase(Options.KEYMODEL) {
+    @VimListOptionDefault
     fun `test visual default options`() {
         doTest(parseKeys("v", "<Up>"),
                 """
@@ -47,8 +51,8 @@ class MotionArrowUpActionTest : VimTestCase() {
                 CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
     }
 
+    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["stopsel"]))
     fun `test visual stopsel`() {
-        Options.getInstance().getListOption(Options.KEYMODEL)!!.set("stopsel")
         doTest(parseKeys("v", "<Up>"),
                 """
                 A Discovery
@@ -69,8 +73,8 @@ class MotionArrowUpActionTest : VimTestCase() {
                 CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
+    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["stopselect"]))
     fun `test visual stopselect`() {
-        Options.getInstance().getListOption(Options.KEYMODEL)!!.set("stopselect")
         doTest(parseKeys("v", "<Up>"),
                 """
                 A Discovery
@@ -91,8 +95,8 @@ class MotionArrowUpActionTest : VimTestCase() {
                 CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
     }
 
+    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["stopvisual"]))
     fun `test visual stopvisual`() {
-        Options.getInstance().getListOption(Options.KEYMODEL)!!.set("stopvisual")
         doTest(parseKeys("v", "<Up>"),
                 """
                 A Discovery
@@ -113,8 +117,8 @@ class MotionArrowUpActionTest : VimTestCase() {
                 CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
+    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["stopvisual"]))
     fun `test visual stopvisual multicaret`() {
-        Options.getInstance().getListOption(Options.KEYMODEL)!!.set("stopvisual")
         doTest(parseKeys("v", "<Up>"),
                 """
                 A Discovery
@@ -135,6 +139,7 @@ class MotionArrowUpActionTest : VimTestCase() {
                 CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
+    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["stopselect"]))
     fun `test char select simple move`() {
         doTest(parseKeys("gH", "<Up>"),
                 """
@@ -157,8 +162,8 @@ class MotionArrowUpActionTest : VimTestCase() {
                 CommandState.SubMode.NONE)
     }
 
+    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, []))
     fun `test char select stopsel`() {
-        Options.getInstance().getListOption(Options.KEYMODEL)!!.remove("stopselect")
         doTest(parseKeys("gh", "<Up>"),
                 """
                 A Discovery
@@ -180,6 +185,7 @@ class MotionArrowUpActionTest : VimTestCase() {
                 CommandState.SubMode.VISUAL_CHARACTER)
     }
 
+    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["stopselect"]))
     fun `test select multiple carets`() {
         doTest(parseKeys("gH", "<Up>"),
                 """

@@ -23,12 +23,15 @@ package org.jetbrains.plugins.ideavim.action.motion.updown
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.Options
-import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.VimListConfig
+import org.jetbrains.plugins.ideavim.VimListOptionTestCase
+import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
 
-class MotionShiftUpActionHandlerTest : VimTestCase() {
+class MotionShiftUpActionHandlerTest : VimListOptionTestCase(Options.SELECTMODE, Options.KEYMODEL) {
+    @VimListOptionTestConfiguration(
+            VimListConfig(Options.KEYMODEL, ["startsel"]),
+            VimListConfig(Options.SELECTMODE, []))
     fun `test visual up`() {
-        Options.getInstance().getListOption(Options.KEYMODEL)!!.set("startsel")
-
         doTest(parseKeys("<S-Up>"),
                 """
                 A Discovery
@@ -50,9 +53,10 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
         )
     }
 
+    @VimListOptionTestConfiguration(
+            VimListConfig(Options.KEYMODEL, ["startsel"]),
+            VimListConfig(Options.SELECTMODE, []))
     fun `test visual up twice`() {
-        Options.getInstance().getListOption(Options.KEYMODEL)!!.set("startsel")
-
         doTest(parseKeys("<S-Up><S-Up>"),
                 """
                 A Discovery
@@ -74,9 +78,10 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
         )
     }
 
+    @VimListOptionTestConfiguration(
+            VimListConfig(Options.KEYMODEL, ["startsel"]),
+            VimListConfig(Options.SELECTMODE, []))
     fun `test save column`() {
-        Options.getInstance().getListOption(Options.KEYMODEL)!!.set("startsel")
-
         doTest(parseKeys("<S-Up><S-Up><S-Up>"),
                 """
                 A Discovery
@@ -98,10 +103,10 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
         )
     }
 
+    @VimListOptionTestConfiguration(
+            VimListConfig(Options.KEYMODEL, ["startsel"]),
+            VimListConfig(Options.SELECTMODE, ["key"]))
     fun `test select up`() {
-        Options.getInstance().getListOption(Options.KEYMODEL)!!.set("startsel")
-        Options.getInstance().getListOption(Options.SELECTMODE)!!.set("key")
-
         doTest(parseKeys("<S-Up>"),
                 """
                 A Discovery
@@ -123,10 +128,10 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
         )
     }
 
+    @VimListOptionTestConfiguration(
+            VimListConfig(Options.KEYMODEL, ["startsel"]),
+            VimListConfig(Options.SELECTMODE, ["key"]))
     fun `test select up twice`() {
-        Options.getInstance().getListOption(Options.KEYMODEL)!!.set("startsel")
-        Options.getInstance().getListOption(Options.SELECTMODE)!!.set("key")
-
         doTest(parseKeys("<S-Up><S-Up>"),
                 """
                 A Discovery
@@ -148,6 +153,9 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
         )
     }
 
+    @VimListOptionTestConfiguration(
+            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.SELECTMODE, []))
     fun `test char mode simple motion`() {
         doTest(parseKeys("gh", "<S-Up>"),
                 """
@@ -170,6 +178,9 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 CommandState.SubMode.VISUAL_CHARACTER)
     }
 
+    @VimListOptionTestConfiguration(
+            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.SELECTMODE, []))
     fun `test char mode to empty line`() {
         doTest(parseKeys("gh", "<S-Up>"),
                 """
@@ -192,6 +203,9 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 CommandState.SubMode.VISUAL_CHARACTER)
     }
 
+    @VimListOptionTestConfiguration(
+            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.SELECTMODE, []))
     fun `test char mode from empty line`() {
         doTest(parseKeys("gh", "<S-Up>"),
                 """
@@ -214,6 +228,9 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 CommandState.SubMode.VISUAL_CHARACTER)
     }
 
+    @VimListOptionTestConfiguration(
+            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.SELECTMODE, []))
     fun `test char mode on file start`() {
         doTest(parseKeys("gh", "<S-Up>"),
                 """
@@ -236,6 +253,9 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 CommandState.SubMode.VISUAL_CHARACTER)
     }
 
+    @VimListOptionTestConfiguration(
+            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.SELECTMODE, []))
     fun `test char mode multicaret`() {
         doTest(parseKeys("gh", "<S-Up>"),
                 """
@@ -258,6 +278,9 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 CommandState.SubMode.VISUAL_CHARACTER)
     }
 
+    @VimListOptionTestConfiguration(
+            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.SELECTMODE, []))
     fun `test line mode simple motion`() {
         doTest(parseKeys("gH", "<S-Up>"),
                 """
@@ -280,6 +303,9 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 CommandState.SubMode.VISUAL_LINE)
     }
 
+    @VimListOptionTestConfiguration(
+            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.SELECTMODE, []))
     fun `test line mode to empty line`() {
         doTest(parseKeys("gH", "<S-Up>"),
                 """
@@ -302,6 +328,9 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 CommandState.SubMode.VISUAL_LINE)
     }
 
+    @VimListOptionTestConfiguration(
+            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.SELECTMODE, []))
     fun `test line mode from empty line`() {
         doTest(parseKeys("gH", "<S-Up>"),
                 """
@@ -324,6 +353,9 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 CommandState.SubMode.VISUAL_LINE)
     }
 
+    @VimListOptionTestConfiguration(
+            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.SELECTMODE, []))
     fun `test line mode to line start`() {
         doTest(parseKeys("gH", "<S-Up>"),
                 """
@@ -346,6 +378,9 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 CommandState.SubMode.VISUAL_LINE)
     }
 
+    @VimListOptionTestConfiguration(
+            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.SELECTMODE, []))
     fun `test line mode multicaret`() {
         doTest(parseKeys("gH", "<S-Up>"),
                 """
@@ -368,6 +403,9 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 CommandState.SubMode.VISUAL_LINE)
     }
 
+    @VimListOptionTestConfiguration(
+            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.SELECTMODE, []))
     fun `test block mode simple motion`() {
         doTest(parseKeys("g<C-H>", "<S-Up>"),
                 """
@@ -390,6 +428,9 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 CommandState.SubMode.VISUAL_BLOCK)
     }
 
+    @VimListOptionTestConfiguration(
+            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.SELECTMODE, []))
     fun `test block mode to empty line`() {
         doTest(parseKeys("g<C-H>", "<S-Up>"),
                 """
@@ -412,6 +453,9 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 CommandState.SubMode.VISUAL_BLOCK)
     }
 
+    @VimListOptionTestConfiguration(
+            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.SELECTMODE, []))
     fun `test block mode from empty line`() {
         doTest(parseKeys("g<C-H>", "<S-Up>"),
                 """
@@ -434,6 +478,9 @@ class MotionShiftUpActionHandlerTest : VimTestCase() {
                 CommandState.SubMode.VISUAL_BLOCK)
     }
 
+    @VimListOptionTestConfiguration(
+            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.SELECTMODE, []))
     fun `test block mode to line start`() {
         doTest(parseKeys("g<C-H>", "<S-Up>"),
                 """
