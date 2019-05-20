@@ -69,14 +69,14 @@ public class MotionLastColumnAction extends MotionEditorAction {
                             @NotNull Caret caret,
                             @NotNull DataContext context,
                             @NotNull Command cmd) {
-      CaretDataKt.setVimLastColumn(editor.getCaretModel().getPrimaryCaret(), MotionGroup.LAST_COLUMN);
+      CaretDataKt.setVimLastColumn(caret, MotionGroup.LAST_COLUMN);
     }
 
     protected void preMove(@NotNull Editor editor,
                            @NotNull Caret caret,
                            @NotNull DataContext context,
                            @NotNull Command cmd) {
-      CaretDataKt.setVimLastColumn(editor.getCaretModel().getPrimaryCaret(), MotionGroup.LAST_COLUMN);
+      CaretDataKt.setVimLastColumn(caret, MotionGroup.LAST_COLUMN);
     }
   }
 }

@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.option.Options
 import com.maddyhome.idea.vim.option.Options.KEYMODEL
 import org.jetbrains.plugins.ideavim.VimTestCase
 
-class MotionHomeActionHandlerTest : VimTestCase() {
+class MotionHomeActionTest : VimTestCase() {
     fun `test motion home`() {
         val keys = parseKeys("<Home>")
         val before = """

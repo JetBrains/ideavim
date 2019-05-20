@@ -118,6 +118,8 @@
     <action id="VimMotionRightTillMatchChar" class="com.maddyhome.idea.vim.action.motion.leftright.MotionRightTillMatchCharAction" text="Move Right till Character"/>
     <action id="VimMotionHome" class="com.maddyhome.idea.vim.action.motion.leftright.MotionHomeAction" text="Move Home Key"/>
     <action id="VimMotionShiftHome" class="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftHomeAction" text="Move Shift Home"/>
+    <action id="VimMotionEnd" class="com.maddyhome.idea.vim.action.motion.leftright.MotionEndAction" text="Move End Key"/>
+    <action id="VimMotionShiftEnd" class="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftEndAction" text="Move Shift End Key"/>
     <!-- Up/Down -->
     <action id="VimMotionDown" class="com.maddyhome.idea.vim.action.motion.updown.MotionDownAction" text="Down"/>
     <action id="VimMotionDownFirstNonSpace" class="com.maddyhome.idea.vim.action.motion.updown.MotionDownFirstNonSpaceAction" text="Down to First non-Space"/>

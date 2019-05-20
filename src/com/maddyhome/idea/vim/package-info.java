@@ -234,7 +234,7 @@
  * |<C-Right>|            {@link com.maddyhome.idea.vim.action.motion.text.MotionWordRightAction}
  * |<Del>|                {@link com.maddyhome.idea.vim.action.change.delete.DeleteCharacterAction}
  * |<Down>|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionArrowDownAction}
- * |<End>|                {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnAction}
+ * |<End>|                {@link com.maddyhome.idea.vim.action.motion.leftright.MotionEndAction}
  * |<F1>|                 IntelliJ help
  * |<Home>|               {@link com.maddyhome.idea.vim.action.motion.leftright.MotionHomeAction}
  * |<Insert>|             {@link com.maddyhome.idea.vim.action.change.insert.InsertBeforeCursorAction}
@@ -247,6 +247,7 @@
  * |<S-Right>|            {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftRightAction}
  * |<S-Up>|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionShiftUpAction}
  * |<S-Home>|             {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftHomeAction}
+ * |<S-End>|             {@link com.maddyhome.idea.vim.action.motion.leftright.MotionShiftEndAction}
  * |<Up>|                 {@link com.maddyhome.idea.vim.action.motion.updown.MotionArrowUpAction}
  *
  *
