@@ -29,12 +29,14 @@ import junit.framework.TestCase
  *
  * While inheriting from this class you should specify (via constructor), which options you are going to test.
  *   After that each test method in this class should contains [VimListOptionTestConfiguration] annotation with
- *   description of wich values of option should be set before starting test.
+ *   description of which values of option should be set before starting test.
  *
  * e.g.
  * ```
  * @VimListOptionTestConfiguration(VimListConfig("keymodel", ["startsel"]), VimListConfig("selectmode", ["key"]))
  * ```
+ *
+ * If you want to keep default configuration, you can put [VimListOptionDefault] annotation
  */
 abstract class VimListOptionTestCase(option: String, vararg otherOptions: String) : VimTestCase() {
     val options: Set<String> = setOf(option, *otherOptions)
