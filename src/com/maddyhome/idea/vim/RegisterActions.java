@@ -683,7 +683,7 @@ class RegisterActions {
     final KeyGroup parser = VimPlugin.getKey();
     // Other insert actions
     parser
-      .registerAction(MappingMode.I, "EditorBackSpace", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_IS_BACKSPACE),
+      .registerAction(MappingMode.I, "EditorBackSpace", Command.Type.INSERT,
                       new Shortcut[]{new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK)),
                         new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0))}
       );

@@ -235,7 +235,8 @@ public class KeyHandler {
           state = State.BAD_COMMAND;
         }
 
-        lastChar = key.getKeyChar();
+        lastChar = lastWasBS && lastChar != 0 ? 0 : key.getKeyChar();
+        lastWasBS = false;
         partialReset(editor);
       }
     }
@@ -512,7 +513,12 @@ public class KeyHandler {
     // Save off the command we are about to execute
     editorState.setCommand(cmd);
 
-    lastWasBS = cmd.getFlags().contains(CommandFlags.FLAG_IS_BACKSPACE);
+    if (lastChar != 0 && !lastWasBS) {
+      lastWasBS = key.equals(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0));
+    }
+    else {
+      lastChar = 0;
+    }
 
     Project project = editor.getProject();
     final Command.Type type = cmd.getType();
