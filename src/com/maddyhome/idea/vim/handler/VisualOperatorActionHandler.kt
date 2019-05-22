@@ -67,7 +67,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
     protected open fun afterExecution(editor: Editor, context: DataContext, cmd: Command, res: Boolean) {}
 
     final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-        logger.info("Execute visual command cmd=$cmd")
+        logger.info("Execute visual command cmd=${cmd.actionId}")
 
         EditorData.setChangeSwitchMode(editor, null)
 
