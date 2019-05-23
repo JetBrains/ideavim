@@ -40,11 +40,11 @@ import com.maddyhome.idea.vim.option.Options.KEYMODEL
  */
 abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() {
     final override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-        val keymodel = Options.getInstance().getListOption(KEYMODEL)
-        if (CommandState.inSelectMode(editor) && (keymodel?.contains("stopsel") == true || keymodel?.contains("stopselect") == true)) {
+        val keymodel = Options.getInstance().getListOption(KEYMODEL)!!
+        if (CommandState.inSelectMode(editor) && ("stopsel" in keymodel || "stopselect" in keymodel)) {
             VimPlugin.getVisualMotion().exitSelectMode(editor, false)
         }
-        if (CommandState.inVisualMode(editor) && (keymodel?.contains("stopsel") == true || keymodel?.contains("stopvisual") == true)) {
+        if (CommandState.inVisualMode(editor) && ("stopsel" in keymodel || "stopvisual" in keymodel)) {
             VimPlugin.getVisualMotion().exitVisual(editor)
         }
 
