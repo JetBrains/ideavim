@@ -218,6 +218,7 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
             editor.selectionModel.vimSetSystemBlockSelectionSilently(blockStart, blockEnd)
 
             for (aCaret in editor.caretModel.allCarets) {
+                if (!aCaret.isValid) continue
                 val line = aCaret.logicalPosition.line
                 val lineEndOffset = EditorHelper.getLineEndOffset(editor, line, true)
                 val lineStartOffset = EditorHelper.getLineStartOffset(editor, line)
