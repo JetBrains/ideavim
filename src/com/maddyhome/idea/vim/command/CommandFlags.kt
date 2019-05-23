@@ -66,8 +66,6 @@ enum class CommandFlags {
      * Command exits the visual mode, so caret movement shouldn't update visual selection
      */
     FLAG_EXIT_VISUAL,
-    FLAG_FORCE_VISUAL,
-    FLAG_FORCE_LINEWISE,
     /**
      * Special flag used for any mappings involving operators
      */

@@ -69,7 +69,7 @@ import java.io.Closeable
  *
  * java
  * ```
- * try (SelectionVimListenerSuppressor ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
+ * try (final VimListenerSuppressor ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
  *     ....
  * }
  * ```

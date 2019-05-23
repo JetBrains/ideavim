@@ -25,6 +25,7 @@ import com.intellij.codeInsight.template.TemplateManager;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.IdeActions;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.command.UndoConfirmationPolicy;
@@ -1419,17 +1420,18 @@ public class ChangeGroup {
   /**
    * Deletes the range of text and enters insert mode
    *
-   * @param editor The editor to change
-   * @param caret  The caret to be moved after range deletion
-   * @param range  The range to change
-   * @param type   The type of the range
+   * @param editor  The editor to change
+   * @param caret   The caret to be moved after range deletion
+   * @param range   The range to change
+   * @param type    The type of the range
    * @param context
    * @return true if able to delete the range, false if not
    */
   public boolean changeRange(@NotNull Editor editor,
                              @NotNull Caret caret,
                              @NotNull TextRange range,
-                             @NotNull SelectionType type, DataContext context) {
+                             @NotNull SelectionType type,
+                             DataContext context) {
     int col = 0;
     int lines = 0;
     if (type == SelectionType.BLOCK_WISE) {
@@ -1449,7 +1451,8 @@ public class ChangeGroup {
       if (type == SelectionType.LINE_WISE) {
         if (editor.getDocument().getText().isEmpty()) {
           insertBeforeCursor(editor, context);
-        } else if (after) {
+        }
+        else if (after) {
           insertNewLineBelow(editor, caret, lp.column);
         }
         else {
@@ -1498,7 +1501,7 @@ public class ChangeGroup {
   }
 
   public void reformatCode(@NotNull DataContext context) {
-    KeyHandler.executeAction("ReformatCode", context);
+    KeyHandler.executeAction(IdeActions.ACTION_EDITOR_REFORMAT, context);
   }
 
   public void autoIndentMotion(@NotNull Editor editor,
@@ -1522,7 +1525,7 @@ public class ChangeGroup {
 
     VisualUtilKt.vimSetSystemSelectionSilently(editor.getSelectionModel(), startOffset, endOffset);
 
-    KeyHandler.executeAction("AutoIndentLines", context);
+    KeyHandler.executeAction(IdeActions.ACTION_EDITOR_AUTO_INDENT_LINES, context);
 
     final int firstLine = editor.offsetToLogicalPosition(Math.min(startOffset, endOffset)).line;
     final int newOffset = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, firstLine);
@@ -1598,7 +1601,8 @@ public class ChangeGroup {
 
     final int sline = editor.offsetToLogicalPosition(range.getStartOffset()).line;
     final LogicalPosition endLogicalPosition = editor.offsetToLogicalPosition(range.getEndOffset());
-    final int eline = endLogicalPosition.column == 0 ? Math.max(endLogicalPosition.line - 1, 0) : endLogicalPosition.line;
+    final int eline =
+      endLogicalPosition.column == 0 ? Math.max(endLogicalPosition.line - 1, 0) : endLogicalPosition.line;
 
     if (range.isMultiple()) {
       final int from = editor.offsetToLogicalPosition(range.getStartOffset()).column;
@@ -1682,7 +1686,9 @@ public class ChangeGroup {
       return false;
     }
 
-    if (type == null || CommandState.inInsertMode(editor) || VimPlugin.getRegister().storeText(editor, range, type, true)) {
+    if (type == null ||
+        CommandState.inInsertMode(editor) ||
+        VimPlugin.getRegister().storeText(editor, range, type, true)) {
       final Document document = editor.getDocument();
       final int[] startOffsets = range.getStartOffsets();
       final int[] endOffsets = range.getEndOffsets();

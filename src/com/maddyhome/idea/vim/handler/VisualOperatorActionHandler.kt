@@ -149,55 +149,29 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
     }
 
     protected class VisualStartFinishWrapper(private val editor: Editor, private val cmd: Command) {
-        private lateinit var lastMode: CommandState.SubMode
         private val visualChanges = mutableMapOf<Caret, VisualChange?>()
-
-        private fun startForCaret(caret: Caret) {
-            val change = if (CommandState.inVisualMode(editor) && !CommandState.inRepeatMode(editor)) {
-                VisualOperation.getRange(editor, caret, cmd.flags)
-            } else null
-            logger.info("visual change = $change")
-            visualChanges[caret] = change
-        }
 
         fun start() {
             logger.debug("start")
             EditorData.setKeepingVisualOperatorAction(editor, CommandFlags.FLAG_EXIT_VISUAL !in cmd.flags)
 
-            editor.vimForAllOrPrimaryCaret(this@VisualStartFinishWrapper::startForCaret)
+            editor.vimForAllOrPrimaryCaret {
+                val change = if (CommandState.inVisualMode(this@VisualStartFinishWrapper.editor) && !CommandState.inRepeatMode(this@VisualStartFinishWrapper.editor)) {
+                    VisualOperation.getRange(this@VisualStartFinishWrapper.editor, it, this@VisualStartFinishWrapper.cmd.flags)
+                } else null
+                logger.info("visual change = $change")
+                this@VisualStartFinishWrapper.visualChanges[it] = change
+            }
 
             // If this is a mutli key change then exit visual now
-            if (CommandFlags.FLAG_MULTIKEY_UNDO in cmd.flags) {
-                logger.debug("multikey undo - exit visual")
+            if (CommandFlags.FLAG_MULTIKEY_UNDO in cmd.flags || CommandFlags.FLAG_EXIT_VISUAL in cmd.flags) {
+                logger.debug("Exit visual")
                 VimPlugin.getVisualMotion().exitVisual(editor)
-            } else if (CommandFlags.FLAG_FORCE_LINEWISE in cmd.flags) {
-                lastMode = CommandState.getInstance(editor).subMode
-                if (lastMode != CommandState.SubMode.VISUAL_LINE && CommandFlags.FLAG_FORCE_VISUAL in cmd.flags) {
-                    VimPlugin.getVisualMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE)
-                }
-            }
-
-            if (CommandFlags.FLAG_EXIT_VISUAL in cmd.flags) {
-                VimPlugin.getVisualMotion().exitVisual(editor)
-            }
-        }
-
-        private fun finishForCaret(caret: Caret, res: Boolean) {
-            if (res) {
-                visualChanges[caret]?.let {
-                    caret.vimLastVisualOperatorRange = it
-                }
             }
         }
 
         fun finish(res: Boolean) {
             logger.debug("finish")
-
-            if (CommandFlags.FLAG_FORCE_LINEWISE in cmd.flags) {
-                if (this::lastMode.isInitialized && lastMode != CommandState.SubMode.VISUAL_LINE && CommandFlags.FLAG_FORCE_VISUAL in cmd.flags) {
-                    VimPlugin.getVisualMotion().toggleVisual(editor, 1, 0, lastMode)
-                }
-            }
 
             if (CommandFlags.FLAG_MULTIKEY_UNDO !in cmd.flags && CommandFlags.FLAG_EXPECT_MORE !in cmd.flags) {
                 logger.debug("not multikey undo - exit visual")
@@ -206,10 +180,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
             if (res) {
                 CommandState.getInstance(editor).saveLastChangeCommand(cmd)
-            }
-
-            for (caret in editor.caretModel.allCarets) {
-                finishForCaret(caret, res)
+                editor.vimForAllOrPrimaryCaret { caret -> visualChanges[caret]?.let { caret.vimLastVisualOperatorRange = it } }
             }
 
             EditorData.setKeepingVisualOperatorAction(editor, false)
