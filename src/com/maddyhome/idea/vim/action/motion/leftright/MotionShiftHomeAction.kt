@@ -26,8 +26,8 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.group.visual.vimForAllOrPrimaryCaret
 import com.maddyhome.idea.vim.handler.specialkeys.ShiftedSpecialKeyHandler
+import com.maddyhome.idea.vim.helper.vimForEachCaret
 import java.util.*
 import javax.swing.KeyStroke
 
@@ -36,7 +36,7 @@ import javax.swing.KeyStroke
  */
 private object MotionShiftHomeActionHandler : ShiftedSpecialKeyHandler() {
     override fun motion(editor: Editor, context: DataContext, cmd: Command) {
-        editor.vimForAllOrPrimaryCaret { caret ->
+        editor.vimForEachCaret { caret ->
             val newOffset = VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
             MotionGroup.moveCaret(editor, caret, newOffset)
         }

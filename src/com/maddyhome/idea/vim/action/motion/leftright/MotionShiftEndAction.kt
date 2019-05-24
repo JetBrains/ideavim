@@ -27,8 +27,8 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.group.visual.vimForAllOrPrimaryCaret
 import com.maddyhome.idea.vim.handler.specialkeys.ShiftedSpecialKeyHandler
+import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.option.BoundStringOption
 import com.maddyhome.idea.vim.option.Options
@@ -37,7 +37,7 @@ import javax.swing.KeyStroke
 
 private object MotionShiftEndActionHandler : ShiftedSpecialKeyHandler() {
     override fun motion(editor: Editor, context: DataContext, cmd: Command) {
-        editor.vimForAllOrPrimaryCaret { caret ->
+        editor.vimForEachCaret { caret ->
             var allow = false
             if (CommandState.inInsertMode(editor)) {
                 allow = true

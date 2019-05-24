@@ -19,8 +19,10 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
+import com.maddyhome.idea.vim.command.CommandState
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -59,20 +61,6 @@ annotation class VimBehaviourDiffers(
         val description: String = "",
         val shouldBeFixed: Boolean = true
 )
-
-/**
- * Function for delegated properties.
- * The property will be delegated to UserData and has nullable type.
- */
-fun <T> userData(): ReadWriteProperty<UserDataHolder, T?> = object : UserDataReadWriteProperty<UserDataHolder, T?>() {
-    override fun getValue(thisRef: UserDataHolder, property: KProperty<*>): T? {
-        return thisRef.getUserData(getKey(property))
-    }
-
-    override fun setValue(thisRef: UserDataHolder, property: KProperty<*>, value: T?) {
-        thisRef.putUserData(getKey(property), value)
-    }
-}
 
 /**
  * Function for delegated properties.
@@ -118,6 +106,16 @@ fun <T> userDataOr(default: UserDataHolder.() -> T): ReadWriteProperty<UserDataH
     }
 }
 
+fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b
+
+inline fun Editor.vimForEachCaret(action: (caret: Caret) -> Unit) {
+    if (CommandState.inVisualBlockMode(this)) {
+        action(this.caretModel.primaryCaret)
+    } else {
+        this.caretModel.allCarets.forEach(action)
+    }
+}
+
 private abstract class UserDataReadWriteProperty<in R, T> : ReadWriteProperty<R, T> {
     private var key: Key<T>? = null
     protected fun getKey(property: KProperty<*>): Key<T> {
@@ -127,5 +125,3 @@ private abstract class UserDataReadWriteProperty<in R, T> : ReadWriteProperty<R,
         return key as Key<T>
     }
 }
-
-fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b

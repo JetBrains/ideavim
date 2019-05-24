@@ -30,10 +30,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.*
-import com.maddyhome.idea.vim.helper.EditorData
-import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
-import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.helper.*
 
 /**
  * @author Alex Plate
@@ -155,7 +152,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
             logger.debug("start")
             EditorData.setKeepingVisualOperatorAction(editor, CommandFlags.FLAG_EXIT_VISUAL !in cmd.flags)
 
-            editor.vimForAllOrPrimaryCaret {
+            editor.vimForEachCaret {
                 val change = if (CommandState.inVisualMode(this@VisualStartFinishWrapper.editor) && !CommandState.inRepeatMode(this@VisualStartFinishWrapper.editor)) {
                     VisualOperation.getRange(this@VisualStartFinishWrapper.editor, it, this@VisualStartFinishWrapper.cmd.flags)
                 } else null
@@ -180,7 +177,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
             if (res) {
                 CommandState.getInstance(editor).saveLastChangeCommand(cmd)
-                editor.vimForAllOrPrimaryCaret { caret -> visualChanges[caret]?.let { caret.vimLastVisualOperatorRange = it } }
+                editor.vimForEachCaret { caret -> visualChanges[caret]?.let { caret.vimLastVisualOperatorRange = it } }
             }
 
             EditorData.setKeepingVisualOperatorAction(editor, false)

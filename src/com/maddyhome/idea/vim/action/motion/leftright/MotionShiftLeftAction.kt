@@ -25,8 +25,8 @@ import com.maddyhome.idea.vim.action.VimCommandAction
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.group.visual.vimForAllOrPrimaryCaret
 import com.maddyhome.idea.vim.handler.specialkeys.ShiftedArrowKeyHandler
+import com.maddyhome.idea.vim.helper.vimForEachCaret
 import javax.swing.KeyStroke
 
 /**
@@ -35,14 +35,14 @@ import javax.swing.KeyStroke
 
 private object MotionShiftLeftActionHandler : ShiftedArrowKeyHandler() {
     override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {
-        editor.vimForAllOrPrimaryCaret { caret ->
+        editor.vimForEachCaret { caret ->
             val vertical = VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -cmd.count, true)
             MotionGroup.moveCaret(editor, caret, vertical)
         }
     }
 
     override fun motionWithoutKeyModel(editor: Editor, context: DataContext, cmd: Command) {
-        editor.vimForAllOrPrimaryCaret { caret ->
+        editor.vimForEachCaret { caret ->
             val newOffset = VimPlugin.getMotion().moveCaretToNextWord(editor, caret, -cmd.count, false)
             MotionGroup.moveCaret(editor, caret, newOffset)
         }

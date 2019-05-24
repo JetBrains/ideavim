@@ -19,10 +19,8 @@
 package com.maddyhome.idea.vim.group.visual
 
 import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.editor.SelectionModel
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 
 /**
@@ -46,11 +44,3 @@ fun SelectionModel.vimSetSystemBlockSelectionSilently(start: LogicalPosition, en
  */
 fun Caret.vimSetSystemSelectionSilently(start: Int, end: Int) =
         SelectionVimListenerSuppressor.lock().use { setSelection(start, end) }
-
-inline fun Editor.vimForAllOrPrimaryCaret(action: (caret: Caret) -> Unit) {
-    if (CommandState.inVisualBlockMode(this)) {
-       action(this.caretModel.primaryCaret)
-    } else {
-        this.caretModel.allCarets.forEach(action)
-    }
-}

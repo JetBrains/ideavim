@@ -155,7 +155,7 @@ class VisualMotionGroup {
                         ?: subMode
                 CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, primarySubMode, MappingMode.VISUAL)
 
-                editor.vimForAllOrPrimaryCaret {
+                editor.vimForEachCaret {
                     val range = it.vimLastVisualOperatorRange ?: VisualChange.default(subMode)
                     val end = VisualOperation.calculateRange(editor, range, count, it)
                     val lastColumn = if (range.columns == MotionGroup.LAST_COLUMN) MotionGroup.LAST_COLUMN else editor.offsetToLogicalPosition(end).column
@@ -164,7 +164,7 @@ class VisualMotionGroup {
                 }
             } else {
                 CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, subMode, MappingMode.VISUAL)
-                editor.vimForAllOrPrimaryCaret { it.vimSetSelection(it.offset) }
+                editor.vimForEachCaret { it.vimSetSelection(it.offset) }
             }
             return true
         }

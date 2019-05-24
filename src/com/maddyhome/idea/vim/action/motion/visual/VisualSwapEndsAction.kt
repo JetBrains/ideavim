@@ -24,8 +24,8 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimCommandAction
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.group.visual.vimForAllOrPrimaryCaret
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.helper.vimForEachCaret
 import java.util.*
 import javax.swing.KeyStroke
 
@@ -35,7 +35,7 @@ import javax.swing.KeyStroke
 private object VisualSwapEndsActionHandler : EditorActionHandlerBase() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
         var ret = true
-        editor.vimForAllOrPrimaryCaret { ret = ret and VimPlugin.getVisualMotion().swapVisualEnds(editor, it) }
+        editor.vimForEachCaret { ret = ret and VimPlugin.getVisualMotion().swapVisualEnds(editor, it) }
         return ret
     }
 }
