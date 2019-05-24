@@ -59,14 +59,14 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
      *
      * The method executes for each caret, but only once it there is block selection.
      */
-    protected open fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) = Unit
+    protected open fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {}
 
     /**
      * This method is called after [getOffset] and after caret visual.
      *
      * The method executes for each caret, but only once it there is block selection.
      */
-    protected open fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) = Unit
+    protected open fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {}
 
     abstract val alwaysBatchExecution: Boolean
 
@@ -77,11 +77,12 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
             val primaryCaret = editor.caretModel.primaryCaret
             doExecute(editor, primaryCaret, context, cmd)
         } else {
-            editor.caretModel.addCaretListener(CaretMergingWatcher)
-            editor.caretModel.runForEachCaret { caret ->
-                doExecute(editor, caret, context, cmd)
+            try {
+                editor.caretModel.addCaretListener(CaretMergingWatcher)
+                editor.caretModel.runForEachCaret { caret -> doExecute(editor, caret, context, cmd) }
+            } finally {
+                editor.caretModel.removeCaretListener(CaretMergingWatcher)
             }
-            editor.caretModel.removeCaretListener(CaretMergingWatcher)
         }
         return true
     }
