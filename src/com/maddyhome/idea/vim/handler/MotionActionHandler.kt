@@ -68,7 +68,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
      */
     protected open fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) = Unit
 
-    protected open val alwaysBatchExecution = false
+    abstract val alwaysBatchExecution: Boolean
 
     final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
         val visualBlockActive = CommandState.inVisualBlockMode(editor)
@@ -129,12 +129,14 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     }
 
     /**
-    * Base class for motion handlers.
-    * This handler executes an action for each caret. That means that if you have 5 carets, [getOffset] will be
-    *   called 5 times.
-    * @see [MotionActionHandler.SingleExecution] for only one execution
-    */
-    abstract class ForEachCaret : MotionActionHandler()
+     * Base class for motion handlers.
+     * This handler executes an action for each caret. That means that if you have 5 carets, [getOffset] will be
+     *   called 5 times.
+     * @see [MotionActionHandler.SingleExecution] for only one execution
+     */
+    abstract class ForEachCaret : MotionActionHandler() {
+        final override val alwaysBatchExecution: Boolean = false
+    }
 
     /**
      * Base class for motion handlers.
@@ -144,7 +146,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
      */
     abstract class SingleExecution : MotionActionHandler() {
 
-        override val alwaysBatchExecution = true
+        final override val alwaysBatchExecution = true
 
         /**
          * This method should return new offset for primary caret
