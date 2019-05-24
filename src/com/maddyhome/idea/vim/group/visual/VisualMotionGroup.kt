@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.helper.*
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.option.BoundStringOption
+import com.maddyhome.idea.vim.option.ListOption
 import com.maddyhome.idea.vim.option.Options
 
 /**
@@ -116,12 +117,12 @@ class VisualMotionGroup {
             }
             val autodetectedMode = autodetectVisualMode(editor)
             val project = editor.project
-            val selectMode = Options.getInstance().getListOption(Options.SELECTMODE)
+            val selectMode = Options.getInstance().getListOption(Options.SELECTMODE) ?: ListOption.empty
             when {
                 editor.isOneLineMode -> enterSelectMode(editor, autodetectedMode)
-                selectionSource == VimListenerManager.SelectionSource.MOUSE && selectMode?.contains("mouse") == true -> enterSelectMode(editor, autodetectedMode)
-                project != null && TemplateManager.getInstance(project).getActiveTemplate(editor) != null && selectMode?.contains("template") == true -> enterSelectMode(editor, autodetectedMode)
-                selectionSource == VimListenerManager.SelectionSource.OTHER && selectMode?.contains("refactoring") == true -> enterSelectMode(editor, autodetectedMode)
+                selectionSource == VimListenerManager.SelectionSource.MOUSE && "mouse" in selectMode -> enterSelectMode(editor, autodetectedMode)
+                project != null && TemplateManager.getInstance(project).getActiveTemplate(editor) != null && "template" in selectMode -> enterSelectMode(editor, autodetectedMode)
+                selectionSource == VimListenerManager.SelectionSource.OTHER && "refactoring" in selectMode -> enterSelectMode(editor, autodetectedMode)
                 else -> enterVisualMode(editor, autodetectedMode)
             }
             KeyHandler.getInstance().reset(editor)
