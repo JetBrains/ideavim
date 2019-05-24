@@ -69,11 +69,19 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         EditorData.setChangeSwitchMode(editor, null)
 
         val selections = editor.collectSelections() ?: return false
+        if (logger.isDebugEnabled) {
+            logger.debug("Count of selection segments: ${selections.size}")
+            selections.values.forEachIndexed { index, vimSelection -> logger.debug("Caret $index: $vimSelection") }
+        }
 
         val commandWrapper = VisualStartFinishWrapper(editor, cmd)
         commandWrapper.start()
 
-        if (!beforeExecution(editor, context, cmd, selections)) return false
+        logger.debug("Calling 'before execution'")
+        if (!beforeExecution(editor, context, cmd, selections)) {
+            logger.debug("Before execution block returned false. Stop further processing")
+            return false
+        }
 
         val res = Ref.create(true)
         when {
@@ -86,6 +94,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
             }, true)
         }
 
+        logger.debug("Calling 'after execution'")
         afterExecution(editor, context, cmd, res.get())
 
         commandWrapper.finish(res.get())
@@ -149,29 +158,31 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         private val visualChanges = mutableMapOf<Caret, VisualChange?>()
 
         fun start() {
-            logger.debug("start")
+            logger.debug("Preparing visual command")
             EditorData.setKeepingVisualOperatorAction(editor, CommandFlags.FLAG_EXIT_VISUAL !in cmd.flags)
 
             editor.vimForEachCaret {
                 val change = if (CommandState.inVisualMode(this@VisualStartFinishWrapper.editor) && !CommandState.inRepeatMode(this@VisualStartFinishWrapper.editor)) {
                     VisualOperation.getRange(this@VisualStartFinishWrapper.editor, it, this@VisualStartFinishWrapper.cmd.flags)
                 } else null
-                logger.info("visual change = $change")
                 this@VisualStartFinishWrapper.visualChanges[it] = change
+            }
+            if (logger.isDebugEnabled) {
+                visualChanges.values.forEachIndexed { index, visualChange -> logger.debug("Caret $index: $visualChange") }
             }
 
             // If this is a mutli key change then exit visual now
             if (CommandFlags.FLAG_MULTIKEY_UNDO in cmd.flags || CommandFlags.FLAG_EXIT_VISUAL in cmd.flags) {
-                logger.debug("Exit visual")
+                logger.debug("Exit visual before command executing")
                 VimPlugin.getVisualMotion().exitVisual(editor)
             }
         }
 
         fun finish(res: Boolean) {
-            logger.debug("finish")
+            logger.debug("Finish visual command. Result: $res")
 
             if (CommandFlags.FLAG_MULTIKEY_UNDO !in cmd.flags && CommandFlags.FLAG_EXPECT_MORE !in cmd.flags) {
-                logger.debug("not multikey undo - exit visual")
+                logger.debug("Not multikey undo - exit visual")
                 VimPlugin.getVisualMotion().exitVisual(editor)
             }
 
