@@ -41,6 +41,9 @@ import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.codeStyle.CodeStyleManager;
+import com.intellij.psi.util.PsiUtilBase;
 import com.intellij.util.ObjectUtils;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
@@ -50,12 +53,14 @@ import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.LineRange;
+import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.group.visual.VisualModeHelperKt;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.option.BoundListOption;
 import com.maddyhome.idea.vim.option.Options;
+import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -1500,8 +1505,20 @@ public class ChangeGroup {
     return range != null && changeCaseRange(editor, caret, range, type);
   }
 
-  public void reformatCode(@NotNull DataContext context) {
-    KeyHandler.executeAction(IdeActions.ACTION_EDITOR_REFORMAT, context);
+  public void reformatCode(@NotNull Editor editor, @NotNull VimSelection range) {
+    final Project project = editor.getProject();
+    if (project == null) return;
+    final PsiFile file = PsiUtilBase.getPsiFileInEditor(editor, project);
+    if (file == null) return;
+
+    final Pair<Integer, Integer> nativeStartAndEnd = range.getNativeStartAndEnd();
+    final Pair<Integer, Integer> sortedNativeStartAndEnd = HelperKt.sort(nativeStartAndEnd.getFirst(), nativeStartAndEnd.getSecond());
+    final int startOffset = EditorHelper.getLineStartForOffset(editor, sortedNativeStartAndEnd.getFirst());
+    final int endOffset = EditorHelper.getLineEndForOffset(editor, sortedNativeStartAndEnd.getSecond());
+
+    final com.intellij.openapi.util.TextRange textRange =
+      com.intellij.openapi.util.TextRange.create(startOffset, endOffset);
+    CodeStyleManager.getInstance(project).reformatText(file, Collections.singletonList(textRange));
   }
 
   public void autoIndentMotion(@NotNull Editor editor,

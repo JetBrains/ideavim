@@ -61,6 +61,8 @@ sealed class VimSelection {
      */
     abstract fun forEachLine(action: (start: Int, end: Int) -> Unit)
 
+    abstract fun getNativeStartAndEnd(): Pair<Int, Int>
+
     companion object {
         fun create(vimStart: Int, vimEnd: Int, type: SelectionType, editor: Editor) = when (type) {
             CHARACTER_WISE -> {
@@ -118,6 +120,8 @@ sealed class VimSimpleSelection : VimSelection() {
         }
     }
 
+    override fun getNativeStartAndEnd() = normNativeStart to normNativeEnd
+
     companion object {
         /**
          * Create character- and linewise selection if native selection is already known. Doesn't work for block selection
@@ -170,6 +174,8 @@ class VimBlockSelection(
         override val editor: Editor,
         val toLineEnd: Boolean
 ) : VimSelection() {
+    override fun getNativeStartAndEnd() = toNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL, type.toSubMode())
+
     override val type = BLOCK_WISE
 
     override fun toVimTextRange(skipNewLineForLineMode: Boolean): TextRange {

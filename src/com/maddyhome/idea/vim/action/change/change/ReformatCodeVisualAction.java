@@ -47,7 +47,7 @@ public class ReformatCodeVisualAction extends VimCommandAction {
                                       @NotNull DataContext context,
                                       @NotNull Command cmd,
                                       @NotNull VimSelection range) {
-        VimPlugin.getChange().reformatCode(context);
+        VimPlugin.getChange().reformatCode(editor, range);
         return true;
       }
     });
