@@ -145,7 +145,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         }
     }
 
-    protected class VisualStartFinishWrapper(private val editor: Editor, private val cmd: Command) {
+    private class VisualStartFinishWrapper(private val editor: Editor, private val cmd: Command) {
         private val visualChanges = mutableMapOf<Caret, VisualChange?>()
 
         fun start() {
