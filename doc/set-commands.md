@@ -12,8 +12,8 @@ The following `:set` commands can appear in `~/.ideavimrc` or set manually in th
     'iskeyword'      'isk'   defines keywords for commands like 'w', '*', etc.
     'incsearch'      'is'    show where search pattern typed so far matches
     
-    `keymodel`       `km`    String (default "acontinueselect,stopselect")   [To Be Released]
-                             global
+    `keymodel`       `km`    String (default "continueselect,stopselect")   [To Be Released]
+
                  List of comma separated words, which enable special things that keys
                  can do. These values can be used:
                    startsel           Using a shifted special[1] key starts selection (either
@@ -25,10 +25,10 @@ The following `:set` commands can appear in `~/.ideavimrc` or set manually in th
                                       select mode and removes selection.
                    stopvisual         Using a NOT-shifted special[1] key stops     - IdeaVim ONLY
                                       visual mode and removes selection.
-                   acontinueselect    Using a shifted arrow key doesn't       - IdeaVim ONLY
+                   continueselect     Using a shifted arrow key doesn't       - IdeaVim ONLY
                                       start selection, but in select mode
                                       acts like startsel is enabled
-                   acontinuevisual    Using a shifted arrow key doesn't       - IdeaVim ONLY
+                   continuevisual     Using a shifted arrow key doesn't       - IdeaVim ONLY
                                       start selection, but in visual mode
                                       acts like startsel is enabled
     
@@ -43,7 +43,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or set manually in th
     'selection'      'sel'   what type of selection to use
 
     `selectmode`     `slm`   String (default "template")     [To Be Released]
-                             global
+
                  This is a comma separated list of words, which specifies when to start
                  Select mode instead of Visual mode, when a selection is started.
                  Possible values:

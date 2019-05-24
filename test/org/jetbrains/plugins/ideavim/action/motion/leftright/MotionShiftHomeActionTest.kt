@@ -55,7 +55,7 @@ class MotionShiftHomeActionTest : VimListOptionTestCase(KEYMODEL, SELECTMODE) {
 
     @VimListOptionDefault
     fun `test default continueselect`() {
-        assertTrue(Options.getInstance().getListOption(KEYMODEL)!!.contains("acontinueselect"))
+        assertTrue(Options.getInstance().getListOption(KEYMODEL)!!.contains("continueselect"))
     }
 
     @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, ["startsel"]), VimListConfig(SELECTMODE, []))

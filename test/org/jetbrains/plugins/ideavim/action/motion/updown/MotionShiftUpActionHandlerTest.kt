@@ -154,7 +154,7 @@ class MotionShiftUpActionHandlerTest : VimListOptionTestCase(Options.SELECTMODE,
     }
 
     @VimListOptionTestConfiguration(
-            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.KEYMODEL, ["continueselect"]),
             VimListConfig(Options.SELECTMODE, []))
     fun `test char mode simple motion`() {
         doTest(parseKeys("gh", "<S-Up>"),
@@ -179,7 +179,7 @@ class MotionShiftUpActionHandlerTest : VimListOptionTestCase(Options.SELECTMODE,
     }
 
     @VimListOptionTestConfiguration(
-            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.KEYMODEL, ["continueselect"]),
             VimListConfig(Options.SELECTMODE, []))
     fun `test char mode to empty line`() {
         doTest(parseKeys("gh", "<S-Up>"),
@@ -204,7 +204,7 @@ class MotionShiftUpActionHandlerTest : VimListOptionTestCase(Options.SELECTMODE,
     }
 
     @VimListOptionTestConfiguration(
-            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.KEYMODEL, ["continueselect"]),
             VimListConfig(Options.SELECTMODE, []))
     fun `test char mode from empty line`() {
         doTest(parseKeys("gh", "<S-Up>"),
@@ -229,7 +229,7 @@ class MotionShiftUpActionHandlerTest : VimListOptionTestCase(Options.SELECTMODE,
     }
 
     @VimListOptionTestConfiguration(
-            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.KEYMODEL, ["continueselect"]),
             VimListConfig(Options.SELECTMODE, []))
     fun `test char mode on file start`() {
         doTest(parseKeys("gh", "<S-Up>"),
@@ -254,7 +254,7 @@ class MotionShiftUpActionHandlerTest : VimListOptionTestCase(Options.SELECTMODE,
     }
 
     @VimListOptionTestConfiguration(
-            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.KEYMODEL, ["continueselect"]),
             VimListConfig(Options.SELECTMODE, []))
     fun `test char mode multicaret`() {
         doTest(parseKeys("gh", "<S-Up>"),
@@ -279,7 +279,7 @@ class MotionShiftUpActionHandlerTest : VimListOptionTestCase(Options.SELECTMODE,
     }
 
     @VimListOptionTestConfiguration(
-            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.KEYMODEL, ["continueselect"]),
             VimListConfig(Options.SELECTMODE, []))
     fun `test line mode simple motion`() {
         doTest(parseKeys("gH", "<S-Up>"),
@@ -304,7 +304,7 @@ class MotionShiftUpActionHandlerTest : VimListOptionTestCase(Options.SELECTMODE,
     }
 
     @VimListOptionTestConfiguration(
-            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.KEYMODEL, ["continueselect"]),
             VimListConfig(Options.SELECTMODE, []))
     fun `test line mode to empty line`() {
         doTest(parseKeys("gH", "<S-Up>"),
@@ -329,7 +329,7 @@ class MotionShiftUpActionHandlerTest : VimListOptionTestCase(Options.SELECTMODE,
     }
 
     @VimListOptionTestConfiguration(
-            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.KEYMODEL, ["continueselect"]),
             VimListConfig(Options.SELECTMODE, []))
     fun `test line mode from empty line`() {
         doTest(parseKeys("gH", "<S-Up>"),
@@ -354,7 +354,7 @@ class MotionShiftUpActionHandlerTest : VimListOptionTestCase(Options.SELECTMODE,
     }
 
     @VimListOptionTestConfiguration(
-            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.KEYMODEL, ["continueselect"]),
             VimListConfig(Options.SELECTMODE, []))
     fun `test line mode to line start`() {
         doTest(parseKeys("gH", "<S-Up>"),
@@ -379,7 +379,7 @@ class MotionShiftUpActionHandlerTest : VimListOptionTestCase(Options.SELECTMODE,
     }
 
     @VimListOptionTestConfiguration(
-            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.KEYMODEL, ["continueselect"]),
             VimListConfig(Options.SELECTMODE, []))
     fun `test line mode multicaret`() {
         doTest(parseKeys("gH", "<S-Up>"),
@@ -404,7 +404,7 @@ class MotionShiftUpActionHandlerTest : VimListOptionTestCase(Options.SELECTMODE,
     }
 
     @VimListOptionTestConfiguration(
-            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.KEYMODEL, ["continueselect"]),
             VimListConfig(Options.SELECTMODE, []))
     fun `test block mode simple motion`() {
         doTest(parseKeys("g<C-H>", "<S-Up>"),
@@ -429,7 +429,7 @@ class MotionShiftUpActionHandlerTest : VimListOptionTestCase(Options.SELECTMODE,
     }
 
     @VimListOptionTestConfiguration(
-            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.KEYMODEL, ["continueselect"]),
             VimListConfig(Options.SELECTMODE, []))
     fun `test block mode to empty line`() {
         doTest(parseKeys("g<C-H>", "<S-Up>"),
@@ -454,7 +454,7 @@ class MotionShiftUpActionHandlerTest : VimListOptionTestCase(Options.SELECTMODE,
     }
 
     @VimListOptionTestConfiguration(
-            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.KEYMODEL, ["continueselect"]),
             VimListConfig(Options.SELECTMODE, []))
     fun `test block mode from empty line`() {
         doTest(parseKeys("g<C-H>", "<S-Up>"),
@@ -479,7 +479,7 @@ class MotionShiftUpActionHandlerTest : VimListOptionTestCase(Options.SELECTMODE,
     }
 
     @VimListOptionTestConfiguration(
-            VimListConfig(Options.KEYMODEL, ["acontinueselect"]),
+            VimListConfig(Options.KEYMODEL, ["continueselect"]),
             VimListConfig(Options.SELECTMODE, []))
     fun `test block mode to line start`() {
         doTest(parseKeys("g<C-H>", "<S-Up>"),
