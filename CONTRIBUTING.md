@@ -21,7 +21,8 @@ See also these docs on the IntelliJ API:
 * [IntelliJ architectural overview](http://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Architectural+Overview)
 * [IntelliJ plugin development resources](http://confluence.jetbrains.com/display/IDEADEV/PluginDevelopment)
 
-You can start by
+You can start by:
+
  - Picking relatively simple tasks that are tagged with
 [#patch_welcome](https://youtrack.jetbrains.com/issues/VIM?q=%23patch_welcome%20%23Unresolved%20sort%20by:%20votes%20)
 in the issue tracker.
@@ -40,23 +41,19 @@ in the issue tracker.
 
     * Select your Java 8+ JDK as the Gradle JVM, leave other parameters unchanged
 
-3. Set up [copyright](#copyright)
-
-4. Read [testing](#testing) section
-
-5. Run your IdeaVim plugin within IntelliJ via a Gradle task
+3. Run your IdeaVim plugin within IntelliJ via a Gradle task
 
     * Select "View | Tool Windows | Gradle" tool window
     
     * Launch "ideavim | intellij | runIde" from the tool window
 
-6. Run IdeaVim tests via a Gradle task
+4. Run IdeaVim tests via a Gradle task
 
     * Select "View | Tool Windows | Gradle" tool window
     
     * Launch "ideavim | verification | test" from the tool window
 
-7. Build the plugin distribution by running `./gradlew clean buildPlugin` in the
+5. Build the plugin distribution by running `./gradlew clean buildPlugin` in the
    terminal in your project root.
 
     * The resulting distribution file is build/distributions/IdeaVim-VERSION.zip
