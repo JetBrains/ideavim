@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.handler.specialkeys.ShiftedSpecialKeyHandler
+import com.maddyhome.idea.vim.handler.ShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.option.BoundStringOption

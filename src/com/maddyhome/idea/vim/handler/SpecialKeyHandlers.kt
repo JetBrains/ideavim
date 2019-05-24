@@ -16,14 +16,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.handler.specialkeys
+package com.maddyhome.idea.vim.handler
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.option.Options
 
 /**
@@ -60,8 +61,6 @@ abstract class ShiftedSpecialKeyHandler : EditorActionHandlerBase() {
 }
 
 /**
- * @author Alex Plate
- *
  * Handler for SHIFTED arrow keys
  *
  * This handler is used to properly handle there keys according to current `keymodel` and `selectmode` options
@@ -101,4 +100,31 @@ abstract class ShiftedArrowKeyHandler : EditorActionHandlerBase() {
      * or contains one of `continue*` values but in different mode.
      */
     abstract fun motionWithoutKeyModel(editor: Editor, context: DataContext, cmd: Command)
+}
+
+/**
+ * Handler for NON-SHIFTED special keys, that are defined in `:h keymodel`
+ * There are: cursor keys, <End>, <Home>, <PageUp> and <PageDown>
+ *
+ * This handler is used to properly handle there keys according to current `keymodel` and `selectmode` options
+ *
+ * Handler is called for each caret
+ */
+abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() {
+    final override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+        val keymodel = Options.getInstance().getListOption(Options.KEYMODEL)!!
+        if (CommandState.inSelectMode(editor) && ("stopsel" in keymodel || "stopselect" in keymodel)) {
+            VimPlugin.getVisualMotion().exitSelectMode(editor, false)
+        }
+        if (CommandState.inVisualMode(editor) && ("stopsel" in keymodel || "stopvisual" in keymodel)) {
+            VimPlugin.getVisualMotion().exitVisual(editor)
+        }
+
+        return offset(editor, caret, context, count, rawCount, argument)
+    }
+
+    /**
+     * Calculate new offset for current [caret]
+     */
+    abstract fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int
 }

@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.action.VimCommandAction
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.handler.specialkeys.ShiftedArrowKeyHandler
+import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import javax.swing.KeyStroke

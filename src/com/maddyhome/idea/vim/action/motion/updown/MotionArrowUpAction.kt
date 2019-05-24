@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.handler.specialkeys.NonShiftedSpecialKeyHandler
+import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import java.awt.event.KeyEvent
