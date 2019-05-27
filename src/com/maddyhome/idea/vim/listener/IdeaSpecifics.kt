@@ -46,13 +46,13 @@ object IdeaSpecifics {
         private val surrounderAction = "com.intellij.codeInsight.generation.surroundWith.SurroundWithHandler\$InvokeSurrounderAction"
         private var editor: Editor? = null
 
-        override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
+        override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent?) {
             if (!VimPlugin.isEnabled()) return
 
             editor = dataContext.getData(CommonDataKeys.EDITOR) ?: return
         }
 
-        override fun afterActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
+        override fun afterActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent?) {
             if (!VimPlugin.isEnabled()) return
 
             //region Extend Selection for Rider
