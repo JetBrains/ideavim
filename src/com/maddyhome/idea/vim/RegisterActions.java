@@ -774,5 +774,13 @@ class RegisterActions {
                           new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.CTRL_MASK)));
     parser.registerAction(MappingMode.I, "VimShiftRightLines", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_SAVE_STROKE),
                           new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.CTRL_MASK)));
+
+    // Digraph shortcuts are handled directly by KeyHandler#handleKey, so they don't have an action. But we still need to
+    // register the shortcuts or the editor will swallow them. Technically, the shortcuts will be registered as part of
+    // other commands, but it's best to be explicit
+    parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_K, KeyEvent.CTRL_MASK)));
+    parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK)));
+    parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_MASK)));
+    parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)));
   }
 }
