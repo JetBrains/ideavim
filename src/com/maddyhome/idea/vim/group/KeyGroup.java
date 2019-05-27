@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.group;
 
 import com.google.common.collect.ImmutableList;
+import com.intellij.codeInsight.lookup.impl.LookupImpl;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.actionSystem.ex.ActionUtil;
@@ -71,6 +72,12 @@ public class KeyGroup {
   void registerRequiredShortcutKeys(@NotNull Editor editor) {
     EventFacade.getInstance().registerCustomShortcutSet(VimShortcutKeyAction.getInstance(),
                                                         toShortcutSet(requiredShortcutKeys), editor.getComponent());
+  }
+
+  public void registerShortcutsForLookup(@NotNull LookupImpl lookup) {
+    EventFacade.getInstance()
+      .registerCustomShortcutSet(VimShortcutKeyAction.getInstance(), toShortcutSet(requiredShortcutKeys),
+                                 lookup.getComponent(), lookup);
   }
 
   void unregisterShortcutKeys(@NotNull Editor editor) {

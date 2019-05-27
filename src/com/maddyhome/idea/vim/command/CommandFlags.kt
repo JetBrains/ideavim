@@ -83,5 +83,18 @@ enum class CommandFlags {
      */
     FLAG_ALLOW_DIGRAPH,
     FLAG_COMPLETE_EX,
-    FLAG_TEXT_BLOCK
+    FLAG_TEXT_BLOCK,
+    /**
+     * Some IDE actions do enable `typeahead` option for proper popups handling.
+     *   There actions are GoToClass, GoToFile, SearchEverywhere and so on. With this options enabled if vim-action is
+     *   bound to the same shortcut as one of actions that are listed above, user will face significant UI freezes.
+     *   To avoid there freezes, `IdeEventQueue.getInstance().flushDelayedKeyEvents();` should be called. This
+     *   function is called automatically from [com.maddyhome.idea.vim.KeyHandler], but it will not be called if
+     *   vim-action has this flag. In that case this action should call function by itself.
+     *
+     * This flag is created for more convenience and used in [com.maddyhome.idea.vim.action.window.LookupUpAction]
+     *   and [com.maddyhome.idea.vim.action.window.LookupDownAction] because there actions have custom handler
+     *   only if lookup is active.
+     */
+    FLAG_TYPEAHEAD_SELF_MANAGE
 }

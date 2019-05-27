@@ -44,9 +44,9 @@
  * |i_CTRL-L|             TODO
  * |i_<CR>|               {@link com.maddyhome.idea.vim.action.change.insert.InsertEnterAction}
  * |i_CTRL-M|             {@link com.maddyhome.idea.vim.action.change.insert.InsertEnterAction}
- * |i_CTRL-N|             TODO
+ * |i_CTRL-N|             {@link com.maddyhome.idea.vim.action.window.LookupDownAction}
  * |i_CTRL-O|             {@link com.maddyhome.idea.vim.action.change.insert.InsertSingleCommandAction}
- * |i_CTRL-P|             TODO
+ * |i_CTRL-P|             {@link com.maddyhome.idea.vim.action.window.LookupUpAction}
  * |i_CTRL-Q|             TODO
  * |i_CTRL-R|             {@link com.maddyhome.idea.vim.action.change.insert.InsertRegisterAction}
  * |i_CTRL-R_CTRL-R|      TODO

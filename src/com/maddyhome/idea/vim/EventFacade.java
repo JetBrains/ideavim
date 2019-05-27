@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim;
 
+import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.codeInsight.template.TemplateManager;
 import com.intellij.codeInsight.template.TemplateManagerListener;
 import com.intellij.openapi.Disposable;
@@ -40,6 +41,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.beans.PropertyChangeListener;
 
 /**
  * @author vlan
@@ -76,6 +78,11 @@ public class EventFacade {
   public void registerCustomShortcutSet(@NotNull AnAction action, @NotNull ShortcutSet shortcutSet,
                                         @Nullable JComponent component) {
     action.registerCustomShortcutSet(shortcutSet, component);
+  }
+
+  public void registerCustomShortcutSet(@NotNull AnAction action, @NotNull ShortcutSet shortcutSet,
+                                        @Nullable JComponent component, @NotNull Disposable disposable) {
+    action.registerCustomShortcutSet(shortcutSet, component, disposable);
   }
 
   public void unregisterCustomShortcutSet(@NotNull AnAction action, @Nullable JComponent component) {
@@ -131,6 +138,10 @@ public class EventFacade {
 
   public void removeEditorSelectionListener(@NotNull Editor editor, @NotNull SelectionListener listener) {
     editor.getSelectionModel().removeSelectionListener(listener);
+  }
+
+  public void registerLookupListener(@NotNull Project project, @NotNull PropertyChangeListener propertyChangeListener) {
+    LookupManager.getInstance(project).addPropertyChangeListener(propertyChangeListener, project);
   }
 
   @NotNull

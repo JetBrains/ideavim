@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim;
 
+import com.intellij.ide.IdeEventQueue;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -531,6 +532,11 @@ public class KeyHandler {
       VimPlugin.indicateError();
       reset(editor);
     }
+
+    if (!cmd.getFlags().contains(CommandFlags.FLAG_TYPEAHEAD_SELF_MANAGE)) {
+      IdeEventQueue.getInstance().flushDelayedKeyEvents();
+    }
+
     if (ApplicationManager.getApplication().isDispatchThread()) {
       Runnable action = new ActionRunner(editor, context, cmd, key);
       String name = cmd.getAction().getTemplatePresentation().getText();
