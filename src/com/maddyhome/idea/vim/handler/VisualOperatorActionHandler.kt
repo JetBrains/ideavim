@@ -238,7 +238,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         final override val batchExecution = true
     }
 
-    companion object {
+    private companion object {
         val logger = Logger.getInstance(VisualOperatorActionHandler::class.java.name)
     }
 }
