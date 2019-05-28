@@ -28,16 +28,13 @@ import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
-import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
+import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
@@ -46,7 +43,31 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
  */
 public class PutVisualTextAction extends VimCommandAction {
   public PutVisualTextAction() {
-    super(new VisualOperatorActionHandler.ForEachCaret() {
+    super(new VisualOperatorActionHandler.SingleExecution() {
+
+      @Override
+      public boolean executeForAllCarets(@NotNull Editor editor,
+                                         @NotNull DataContext context,
+                                         @NotNull Command cmd,
+                                         @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
+        Register register = VimPlugin.getRegister().getLastRegister();
+        VimPlugin.getRegister().resetRegister();
+        if (register != null && register.getType() == SelectionType.LINE_WISE && editor.isOneLineMode()) return false;
+        if (caretsAndSelections.isEmpty()) return false;
+
+        final VimSelection range = new ArrayList(caretsAndSelections.values()).get(0);
+
+        if (range.getType() == SelectionType.BLOCK_WISE) {
+          boolean isBigP = cmd.getKeys().get(0).equals(parseKeys("P").get(0));
+
+          return VimPlugin.getPut()
+            .putVisualRangeBlockwise(editor, context, range, cmd.getCount(), true, false, register, isBigP);
+        }
+        else {
+          return VimPlugin.getPut()
+            .putVisualRangeCaL(editor, context, caretsAndSelections, cmd.getCount(), true, false, register);
+        }
+      }
 
       @Nullable private Register register;
 
