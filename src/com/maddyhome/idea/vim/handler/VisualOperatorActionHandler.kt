@@ -63,6 +63,8 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
      */
     protected open fun afterExecution(editor: Editor, context: DataContext, cmd: Command, res: Boolean) {}
 
+    abstract val batchExecution: Boolean
+
     final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
         logger.info("Execute visual command $cmd")
 
@@ -77,25 +79,29 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         val commandWrapper = VisualStartFinishWrapper(editor, cmd)
         commandWrapper.start()
 
-        logger.debug("Calling 'before execution'")
-        if (!beforeExecution(editor, context, cmd, selections)) {
-            logger.debug("Before execution block returned false. Stop further processing")
-            return false
-        }
-
         val res = Ref.create(true)
-        when {
-            selections.keys.isEmpty() -> return false
-            selections.keys.size == 1 -> res.set(executeAction(editor, selections.keys.first(), context, cmd, selections.values.first()))
-            else -> editor.caretModel.runForEachCaret({ caret ->
-                val range = selections.getValue(caret)
-                val loopRes = executeAction(editor, caret, context, cmd, range)
-                res.set(loopRes and res.get())
-            }, true)
-        }
+        if (batchExecution) {
+            res.set(beforeExecution(editor, context, cmd, selections))
+        } else {
+            logger.debug("Calling 'before execution'")
+            if (!beforeExecution(editor, context, cmd, selections)) {
+                logger.debug("Before execution block returned false. Stop further processing")
+                return false
+            }
 
-        logger.debug("Calling 'after execution'")
-        afterExecution(editor, context, cmd, res.get())
+            when {
+                selections.keys.isEmpty() -> return false
+                selections.keys.size == 1 -> res.set(executeAction(editor, selections.keys.first(), context, cmd, selections.values.first()))
+                else -> editor.caretModel.runForEachCaret({ caret ->
+                    val range = selections.getValue(caret)
+                    val loopRes = executeAction(editor, caret, context, cmd, range)
+                    res.set(loopRes and res.get())
+                }, true)
+            }
+
+            logger.debug("Calling 'after execution'")
+            afterExecution(editor, context, cmd, res.get())
+        }
 
         commandWrapper.finish(res.get())
 
@@ -201,7 +207,9 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
      *   [executeAction] will be called 5 times.
      * @see [VisualOperatorActionHandler.SingleExecution] for only one execution
      */
-    abstract class ForEachCaret : VisualOperatorActionHandler()
+    abstract class ForEachCaret : VisualOperatorActionHandler() {
+        final override val batchExecution = false
+    }
 
     /**
      * Base class for visual operation handlers.
@@ -226,6 +234,8 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
         }
 
         final override fun afterExecution(editor: Editor, context: DataContext, cmd: Command, res: Boolean) {}
+
+        final override val batchExecution = true
     }
 
     companion object {
