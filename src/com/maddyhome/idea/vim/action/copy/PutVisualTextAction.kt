@@ -16,112 +16,58 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action.copy;
+package com.maddyhome.idea.vim.action.copy
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.command.SelectionType;
-import com.maddyhome.idea.vim.common.Register;
-import com.maddyhome.idea.vim.group.visual.VimSelection;
-import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.group.visual.VimSelection
+import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import java.util.*
+import javax.swing.KeyStroke
 
-import javax.swing.*;
-import java.util.*;
+private object PutVisualTextActionHandler : VisualOperatorActionHandler.SingleExecution() {
 
-import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
+    override fun executeForAllCarets(editor: Editor,
+                                     context: DataContext,
+                                     cmd: Command,
+                                     caretsAndSelections: Map<Caret, VimSelection>): Boolean {
+        val register = VimPlugin.getRegister().lastRegister
+        VimPlugin.getRegister().resetRegister()
+        if (register != null && register.type == SelectionType.LINE_WISE && editor.isOneLineMode) return false
+        if (caretsAndSelections.isEmpty()) return false
+
+        val range = caretsAndSelections.values.first()
+
+        return if (range.type == SelectionType.BLOCK_WISE) {
+            val isBigP = cmd.keys[0] == parseKeys("P")[0]
+
+            VimPlugin.getPut()
+                    .putVisualRangeBlockwise(editor, context, range, cmd.count, true, false, register, isBigP)
+        } else {
+            VimPlugin.getPut()
+                    .putVisualRangeCaL(editor, context, caretsAndSelections, cmd.count, true, false, register)
+        }
+    }
+}
 
 /**
  * @author vlan
  */
-public class PutVisualTextAction extends VimCommandAction {
-  public PutVisualTextAction() {
-    super(new VisualOperatorActionHandler.SingleExecution() {
+class PutVisualTextAction : VimCommandAction(PutVisualTextActionHandler) {
 
-      @Override
-      public boolean executeForAllCarets(@NotNull Editor editor,
-                                         @NotNull DataContext context,
-                                         @NotNull Command cmd,
-                                         @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
-        Register register = VimPlugin.getRegister().getLastRegister();
-        VimPlugin.getRegister().resetRegister();
-        if (register != null && register.getType() == SelectionType.LINE_WISE && editor.isOneLineMode()) return false;
-        if (caretsAndSelections.isEmpty()) return false;
+    override fun getMappingModes(): Set<MappingMode> = MappingMode.V
 
-        final VimSelection range = new ArrayList(caretsAndSelections.values()).get(0);
+    override fun getKeyStrokesSet(): Set<List<KeyStroke>> = parseKeysSet("p", "P")
 
-        if (range.getType() == SelectionType.BLOCK_WISE) {
-          boolean isBigP = cmd.getKeys().get(0).equals(parseKeys("P").get(0));
+    override fun getType(): Command.Type = Command.Type.PASTE
 
-          return VimPlugin.getPut()
-            .putVisualRangeBlockwise(editor, context, range, cmd.getCount(), true, false, register, isBigP);
-        }
-        else {
-          return VimPlugin.getPut()
-            .putVisualRangeCaL(editor, context, caretsAndSelections, cmd.getCount(), true, false, register);
-        }
-      }
-
-      @Nullable private Register register;
-
-      @Override
-      protected boolean executeAction(@NotNull Editor editor,
-                                      @NotNull Caret caret,
-                                      @NotNull DataContext context,
-                                      @NotNull Command cmd,
-                                      @NotNull VimSelection range) {
-        if (range.getType() == SelectionType.BLOCK_WISE) {
-          boolean isBigP = cmd.getKeys().get(0).equals(parseKeys("P").get(0));
-
-          return VimPlugin.getPut()
-            .putVisualRangeBlockwise(editor, context, range, cmd.getCount(), true, false, register, isBigP);
-        }
-        else {
-          return VimPlugin.getPut()
-            .putVisualRangeCaL(editor, context, caret, range, cmd.getCount(), true, false, register);
-        }
-      }
-
-      @Override
-      protected boolean beforeExecution(@NotNull Editor editor,
-                                        @NotNull DataContext context,
-                                        @NotNull Command cmd, @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
-        Register register = VimPlugin.getRegister().getLastRegister();
-        VimPlugin.getRegister().resetRegister();
-        if (register != null && register.getType() == SelectionType.LINE_WISE && editor.isOneLineMode()) return false;
-        this.register = register;
-        return true;
-      }
-    });
-  }
-
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.V;
-  }
-
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("p", "P");
-  }
-
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.PASTE;
-  }
-
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_EXIT_VISUAL);
-  }
+    override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_EXIT_VISUAL)
 }

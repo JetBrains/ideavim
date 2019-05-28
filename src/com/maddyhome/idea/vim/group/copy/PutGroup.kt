@@ -31,14 +31,29 @@ import com.maddyhome.idea.vim.common.Register
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.CaretOrder.DECREASING_OFFSET
 import com.maddyhome.idea.vim.handler.CaretOrder.INCREASING_OFFSET
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.group.visual.VimSelection
 import java.util.*
 
 class PutGroup {
     fun putVisualRangeCaL(
+            editor: Editor,
+            context: DataContext,
+            caretsAndSelections: Map<Caret, VimSelection>,
+            count: Int,
+            indent: Boolean,
+            cursorAfter: Boolean,
+            register: Register?
+    ): Boolean {
+        caretsAndSelections.entries.sortedByDescending { it.key.logicalPosition }.forEach { (caret, selection) ->
+            putVisualRangeCaLEx(editor, context, caret, selection, count, indent, cursorAfter, register)
+        }
+        return true
+    }
+
+    private fun putVisualRangeCaLEx(
             editor: Editor,
             context: DataContext,
             caret: Caret,
