@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.listener
 
-import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.TemplateManagerListener
 import com.intellij.codeInsight.template.impl.TemplateState
 import com.intellij.openapi.actionSystem.*
@@ -27,6 +26,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.event.CaretEvent
 import com.intellij.openapi.editor.event.CaretListener
 import com.intellij.openapi.project.Project
+import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
@@ -37,9 +37,8 @@ import com.maddyhome.idea.vim.helper.EditorDataContext
  */
 object IdeaSpecifics {
     fun addIdeaSpecificsListener(project: Project) {
-        val connection = project.messageBus.connect()
-        connection.subscribe(AnActionListener.TOPIC, VimActionListener)
-        connection.subscribe(TemplateManager.TEMPLATE_STARTED_TOPIC, VimTemplateManagerListener)
+        EventFacade.getInstance().addAnActionListener(project, VimActionListener)
+        EventFacade.getInstance().addTemplateStartedListener(project, VimTemplateManagerListener)
     }
 
     object VimActionListener : AnActionListener {
