@@ -55,14 +55,14 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     protected open fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean = true
 
     /**
-     * This method is called after [getOffset], but before caret visual.
+     * This method is called after [getOffset], but before caret motion.
      *
      * The method executes for each caret, but only once it there is block selection.
      */
     protected open fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {}
 
     /**
-     * This method is called after [getOffset] and after caret visual.
+     * This method is called after [getOffset] and after caret motion.
      *
      * The method executes for each caret, but only once it there is block selection.
      */
@@ -163,14 +163,14 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
         protected open fun preOffsetComputation(editor: Editor, context: DataContext, cmd: Command): Boolean = true
 
         /**
-         * This method is called after [getOffset], but before caret visual.
+         * This method is called after [getOffset], but before caret motion.
          *
          * The method executes only once.
          */
         protected open fun preMove(editor: Editor, context: DataContext, cmd: Command) = Unit
 
         /**
-         * This method is called after [getOffset] and after caret visual.
+         * This method is called after [getOffset] and after caret motion.
          *
          * The method executes only once it there is block selection.
          */

@@ -27,9 +27,9 @@ import org.jetbrains.annotations.Nullable;
 public class Argument {
 
   /**
-   * Creates a visual command argument
+   * Creates a motion command argument
    *
-   * @param motionArg The visual command
+   * @param motionArg The motion command
    */
   public Argument(@Nullable Command motionArg) {
     this.motionArg = motionArg;
@@ -47,9 +47,9 @@ public class Argument {
   }
 
   /**
-   * Returns the visual command if this is a visual command argument
+   * Returns the motion command if this is a motion command argument
    *
-   * @return The visual command if this is a visual command argument, null if not
+   * @return The motion command if this is a motion command argument, null if not
    */
   @Nullable
   public Command getMotion() {

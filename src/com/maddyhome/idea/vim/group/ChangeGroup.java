@@ -1044,14 +1044,14 @@ public class ChangeGroup {
   }
 
   /**
-   * Delete all text moved over by the supplied visual command argument.
+   * Delete all text moved over by the supplied motion command argument.
    *
    * @param editor   The editor to delete the text from
-   * @param caret    The caret on which the visual appears to be performed
+   * @param caret    The caret on which the motion appears to be performed
    * @param context  The data context
    * @param count    The number of times to repeat the deletion
    * @param rawCount The actual count entered by the user
-   * @param argument The visual command
+   * @param argument The motion command
    * @param isChange if from a change
    * @return true if able to delete the text, false if not
    */
@@ -1067,7 +1067,7 @@ public class ChangeGroup {
       return (EditorHelper.getFileSize(editor) == 0);
     }
 
-    // Delete visual commands that are not linewise become linewise if all the following are true:
+    // Delete motion commands that are not linewise become linewise if all the following are true:
     // 1) The range is across multiple lines
     // 2) There is only whitespace before the start of the range
     // 3) There is only whitespace after the end of the range
@@ -1196,14 +1196,14 @@ public class ChangeGroup {
   }
 
   /**
-   * Delete the text covered by the visual command argument and enter insert mode
+   * Delete the text covered by the motion command argument and enter insert mode
    *
    * @param editor   The editor to change
-   * @param caret    The caret on which the visual is supposed to be performed
+   * @param caret    The caret on which the motion is supposed to be performed
    * @param context  The data context
    * @param count    The number of time to repeat the change
    * @param rawCount The actual count entered by the user
-   * @param argument The visual command
+   * @param argument The motion command
    * @return true if able to delete the text, false if not
    */
   public boolean changeMotion(@NotNull Editor editor,
@@ -1483,15 +1483,15 @@ public class ChangeGroup {
   }
 
   /**
-   * Changes the case of all the character moved over by the visual argument.
+   * Changes the case of all the character moved over by the motion argument.
    *
    * @param editor   The editor to change
-   * @param caret    The caret on which visual pretends to be performed
+   * @param caret    The caret on which motion pretends to be performed
    * @param context  The data context
    * @param count    The number of times to repeat the change
    * @param rawCount The actual count entered by the user
    * @param type     The case change type (TOGGLE, UPPER, LOWER)
-   * @param argument The visual command
+   * @param argument The motion command
    * @return true if able to delete the text, false if not
    */
   public boolean changeCaseMotion(@NotNull Editor editor,

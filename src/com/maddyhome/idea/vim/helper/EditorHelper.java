@@ -609,7 +609,7 @@ public class EditorHelper {
    * Due to block inlays, the caret location is maintained as a scroll offset, rather than the number of lines from the
    * top of the screen. This means the line offset can change if the number of inlays above the caret changes during
    * scrolling. It also means that after scrolling, the top screen line isn't guaranteed to be aligned to the top of
-   * the screen, unlike most other motions ('M' is the only other visual that doesn't align the top line).
+   * the screen, unlike most other motions ('M' is the only other motion that doesn't align the top line).
    *
    * This method will also move the caret location to ensure that any inlays attached above or below the target line are
    * fully visible.

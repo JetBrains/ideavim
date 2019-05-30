@@ -32,13 +32,13 @@ import java.util.*
 
 class YankGroup {
     /**
-     * This yanks the text moved over by the visual command argument.
+     * This yanks the text moved over by the motion command argument.
      *
      * @param editor   The editor to yank from
      * @param context  The data context
      * @param count    The number of times to yank
      * @param rawCount The actual count entered by the user
-     * @param argument The visual command argument
+     * @param argument The motion command argument
      * @return true if able to yank the text, false if not
      */
     fun yankMotion(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument): Boolean {
