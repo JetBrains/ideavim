@@ -48,9 +48,6 @@ sealed class VimSelection {
     abstract val vimEnd: Int
     protected abstract val editor: Editor
 
-    /**
-     * Converting to an old TextRange class
-     */
     abstract fun toVimTextRange(skipNewLineForLineMode: Boolean = false): TextRange
 
     /**

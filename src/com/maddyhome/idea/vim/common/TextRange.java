@@ -21,9 +21,8 @@ package com.maddyhome.idea.vim.common;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * @deprecated Please use com.maddyhome.idea.vim.group.visual.VimSelection
+ * Please prefer {@link com.maddyhome.idea.vim.group.visual.VimSelection} for visual selection
  */
-@Deprecated
 public class TextRange {
   public TextRange(int start, int end) {
     this(new int[]{start}, new int[]{end});
