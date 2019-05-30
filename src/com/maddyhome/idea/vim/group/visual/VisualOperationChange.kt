@@ -49,7 +49,7 @@ object VisualOperation {
      */
     fun getRange(editor: Editor, caret: Caret, cmdFlags: EnumSet<CommandFlags>): VisualChange {
         var (start, end) = caret.run {
-            if (CommandState.inVisualBlockMode(editor)) sort(vimSelectionStart, offset) else sort(selectionStart, selectionEnd)
+            if (CommandState.inBlockSubMode(editor)) sort(vimSelectionStart, offset) else sort(selectionStart, selectionEnd)
         }
         val type = SelectionType.fromSubMode(CommandState.getInstance(editor).subMode)
 

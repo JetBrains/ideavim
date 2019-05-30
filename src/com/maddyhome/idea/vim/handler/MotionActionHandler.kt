@@ -71,9 +71,9 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     abstract val alwaysBatchExecution: Boolean
 
     final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-        val visualBlockActive = CommandState.inVisualBlockMode(editor)
+        val blockSubmodeActive = CommandState.inBlockSubMode(editor)
 
-        if (visualBlockActive || editor.caretModel.caretCount == 1 || alwaysBatchExecution) {
+        if (blockSubmodeActive || editor.caretModel.caretCount == 1 || alwaysBatchExecution) {
             val primaryCaret = editor.caretModel.primaryCaret
             doExecute(editor, primaryCaret, context, cmd)
         } else {

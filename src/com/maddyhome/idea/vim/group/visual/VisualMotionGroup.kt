@@ -345,11 +345,11 @@ class VisualMotionGroup {
     }
 
     fun resetVisual(editor: Editor) {
-        val wasVisualBlock = CommandState.inVisualBlockMode(editor)
+        val wasBlockSubMode = CommandState.inBlockSubMode(editor)
         val selectionType = SelectionType.fromSubMode(CommandState.getInstance(editor).subMode)
 
         SelectionVimListenerSuppressor.lock().use {
-            if (wasVisualBlock) {
+            if (wasBlockSubMode) {
                 editor.caretModel.allCarets.forEach { it.visualAttributes = editor.caretModel.primaryCaret.visualAttributes }
                 editor.caretModel.removeSecondaryCarets()
             }

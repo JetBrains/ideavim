@@ -40,7 +40,7 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
 fun Caret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false) {
     vimSelectionStart = start
     setVisualSelection(start, end, this)
-    if (moveCaretToSelectionEnd && !CommandState.inVisualBlockMode(editor)) moveToOffset(end)
+    if (moveCaretToSelectionEnd && !CommandState.inBlockSubMode(editor)) moveToOffset(end)
 }
 
 /**
@@ -51,7 +51,7 @@ fun Caret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd:
 fun Caret.vimMoveSelectionToCaret() {
     if (CommandState.getInstance(editor).mode != CommandState.Mode.VISUAL && CommandState.getInstance(editor).mode != CommandState.Mode.SELECT)
         throw RuntimeException("Attempt to extent selection in non-visual mode")
-    if (CommandState.inVisualBlockMode(editor))
+    if (CommandState.inBlockSubMode(editor))
         throw RuntimeException("Move caret with [vimMoveBlockSelectionToOffset]")
 
     val startOffsetMark = vimSelectionStart

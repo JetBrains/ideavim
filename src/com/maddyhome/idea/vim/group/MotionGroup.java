@@ -325,7 +325,7 @@ public class MotionGroup {
   public static void moveCaret(@NotNull Editor editor, @NotNull Caret caret, int offset) {
     if (offset >= 0 && offset <= editor.getDocument().getTextLength()) {
 
-      if (CommandState.inVisualBlockMode(editor)) {
+      if (CommandState.inBlockSubMode(editor)) {
         VisualGroupKt.vimMoveBlockSelectionToOffset(editor, offset);
         Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
         CaretDataKt.setVimLastColumn(primaryCaret, primaryCaret.getVisualPosition().column);

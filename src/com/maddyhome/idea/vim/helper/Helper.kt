@@ -109,7 +109,7 @@ fun <T> userDataOr(default: UserDataHolder.() -> T): ReadWriteProperty<UserDataH
 fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b
 
 inline fun Editor.vimForEachCaret(action: (caret: Caret) -> Unit) {
-    if (CommandState.inVisualBlockMode(this)) {
+    if (CommandState.inBlockSubMode(this)) {
         action(this.caretModel.primaryCaret)
     } else {
         this.caretModel.allCarets.forEach(action)

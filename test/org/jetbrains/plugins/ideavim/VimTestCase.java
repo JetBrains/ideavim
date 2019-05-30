@@ -199,7 +199,7 @@ public abstract class VimTestCase extends UsefulTestCase {
   protected void assertCaretsColour() {
     Color selectionColour = myFixture.getEditor().getColorsScheme().getColor(EditorColors.SELECTION_BACKGROUND_COLOR);
     Color caretColour = myFixture.getEditor().getColorsScheme().getColor(EditorColors.CARET_COLOR);
-    if (CommandState.inVisualBlockMode(myFixture.getEditor())) {
+    if (CommandState.inBlockSubMode(myFixture.getEditor())) {
       CaretModel caretModel = myFixture.getEditor().getCaretModel();
       caretModel.getAllCarets().forEach(caret -> {
         if (caret != caretModel.getPrimaryCaret()) {
