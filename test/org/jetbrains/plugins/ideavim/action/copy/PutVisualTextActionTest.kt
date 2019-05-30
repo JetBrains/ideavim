@@ -991,15 +991,6 @@ class PutVisualTextActionTest : VimTestCase() {
         myFixture.checkResult(after)
     }
 
-
-    @VimBehaviourDiffers(originalVimAfter = """
-            A Discovery
-
-            I Discover${c}y it in a legendary land
-            alDiscoveryks and lavender and tufted grass,
-            whDiscoveryt was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-    """, description = "Different cursor position")
     @Test
     fun `test put visual text character to block`() {
         val before = """
@@ -1016,22 +1007,38 @@ class PutVisualTextActionTest : VimTestCase() {
         val after = """
             A Discovery
 
-            I Discovery it in a legendary land
+            I Discover${c}y it in a legendary land
             alDiscoveryks and lavender and tufted grass,
-            whDiscover${c}yt was settled on some sodden sand
+            whDiscoveryt was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
         myFixture.checkResult(after)
     }
 
-    @VimBehaviourDiffers(originalVimAfter = """
+    @Test
+    fun `test put visual text character to block motion up`() {
+        val before = """
             A Discovery
 
-            I DiscoveryDiscover${c}y it in a legendary land
-            alDiscoveryDiscoveryks and lavender and tufted grass,
-            whDiscoveryDiscoveryt was settled on some sodden sand
+            I |found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh$c|ere i|t was settled on some sodden sand
             hard by the torrent of a mountain pass.
-    """, description = "Different cursor position")
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "Discovery", SelectionType.CHARACTER_WISE, false)
+        typeText(parseKeys("<C-V>3e2k", "p"))
+        val after = """
+            A Discovery
+
+            I Discover${c}y it in a legendary land
+            alDiscoveryks and lavender and tufted grass,
+            whDiscoveryt was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
     @Test
     fun `test put visual text character to block twice`() {
         val before = """
@@ -1048,22 +1055,14 @@ class PutVisualTextActionTest : VimTestCase() {
         val after = """
             A Discovery
 
-            I DiscoveryDiscovery it in a legendary land
+            I DiscoveryDiscover${c}y it in a legendary land
             alDiscoveryDiscoveryks and lavender and tufted grass,
-            whDiscoveryDiscover${c}yt was settled on some sodden sand
+            whDiscoveryDiscoveryt was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
         myFixture.checkResult(after)
     }
 
-    @VimBehaviourDiffers(originalVimAfter = """
-            A Discovery
-
-            I Discover${c}y
-            alDiscovery
-            whDiscovery
-            haDiscovery
-    """, description = "Different cursor position")
     @Test
     fun `test put visual text character to block with dollar motion`() {
         val before = """
@@ -1080,10 +1079,10 @@ class PutVisualTextActionTest : VimTestCase() {
         val after = """
             A Discovery
 
-            I Discovery
+            I Discover${c}y
             alDiscovery
             whDiscovery
-            haDiscover${c}y
+            haDiscovery
             """.trimIndent()
         myFixture.checkResult(after)
     }
@@ -1117,9 +1116,34 @@ class PutVisualTextActionTest : VimTestCase() {
 
             I  it in a legendary land
             alks and lavender and tufted grass,
-            ${c}wht was settled on some sodden sand
+            wht was settled on some sodden sand
+            ${c}A Discovery
+
+            hard by the torrent of a mountain pass.
+            """.trimIndent()
+        myFixture.checkResult(after)
+    }
+
+    @Test
+    fun `test put visual text line to block before caret`() {
+        val before = """
             A Discovery
 
+            I $c|found| it in a legendary land
+            al|l roc|ks and lavender and tufted grass,
+            wh|ere i|t was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+        val editor = configureByText(before)
+        VimPlugin.getRegister().storeText(editor, before rangeOf "A Discovery\n", SelectionType.LINE_WISE, false)
+        typeText(parseKeys("<C-V>2e2j", "P"))
+        val after = """
+            A Discovery
+
+            ${c}A Discovery
+            I  it in a legendary land
+            alks and lavender and tufted grass,
+            wht was settled on some sodden sand
             hard by the torrent of a mountain pass.
             """.trimIndent()
         myFixture.checkResult(after)
@@ -1153,16 +1177,14 @@ class PutVisualTextActionTest : VimTestCase() {
 
             I  it in a legendary land
             alks and lavender and tufted grass,
-            ${c}wht was settled on some sodden sand
-            A Discovery
-
+            wht was settled on some sodden sand
+            ${c}A Discovery
             A Discovery
 
             hard by the torrent of a mountain pass.
             """.trimIndent()
         myFixture.checkResult(after)
     }
-
 
     @VimBehaviourDiffers(originalVimAfter = """
             A Discovery
@@ -1192,8 +1214,8 @@ class PutVisualTextActionTest : VimTestCase() {
             I  it in a legendary land
             alks and lavender and tufted grass,
             wht was settled on some sodden sand
-            ${c}ha the torrent of a mountain pass.
-            A Discovery
+            ha the torrent of a mountain pass.
+            ${c}A Discovery
 
             """.trimIndent()
         myFixture.checkResult(after)
@@ -1226,8 +1248,8 @@ class PutVisualTextActionTest : VimTestCase() {
 
             I
             a
-            ${c}w
-            A Discovery
+            w
+            ${c}A Discovery
 
             hard by the torrent of a mountain pass.
             """.trimIndent()

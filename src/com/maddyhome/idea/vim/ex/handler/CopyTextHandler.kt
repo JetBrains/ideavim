@@ -21,14 +21,10 @@ package com.maddyhome.idea.vim.ex.handler
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.ex.*
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
-import com.maddyhome.idea.vim.ex.CommandParser
-import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.commands
-import com.maddyhome.idea.vim.ex.flags
+import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.handler.CaretOrder
 import com.maddyhome.idea.vim.helper.EditorHelper
 
@@ -44,10 +40,10 @@ class CopyTextHandler : CommandHandler(
 
             val arg = CommandParser.getInstance().parse(cmd.argument)
             val line = arg.ranges.getFirstLine(editor, caret, context)
-            val offset = VimPlugin.getMotion().moveCaretToLineStart(editor, line + 1)
 
-            VimPlugin.getPut().putText(editor, caret, context, text, SelectionType.LINE_WISE, CommandState.SubMode.NONE,
-                    offset, 1, true, false)
+            val textData = PutData.TextData(text, SelectionType.LINE_WISE)
+            val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, _indent = true, caretAfterInsertedText = false, putToLine = line)
+            VimPlugin.getPut().putTextForCaret(editor, caret, context, putData)
         }
         return true
     }

@@ -26,31 +26,23 @@ import com.maddyhome.idea.vim.action.VimCommandAction
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import java.util.*
 import javax.swing.KeyStroke
 
 private object PutVisualTextMoveCursorActionHandler : VisualOperatorActionHandler.SingleExecution() {
     override fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>): Boolean {
-        val register = VimPlugin.getRegister().lastRegister
+        if (caretsAndSelections.isEmpty()) return false
+        val textData = VimPlugin.getRegister().lastRegister?.let { PutData.TextData(it.text, it.type) }
         VimPlugin.getRegister().resetRegister()
-        if (register == null) return false
-        if (register.type == SelectionType.LINE_WISE && editor.isOneLineMode) return false
-        if (register.text == null) return false
 
-        val range = caretsAndSelections.values.first()
-        return if (range.type == SelectionType.BLOCK_WISE) {
-            val isBigP = cmd.keys[1] == parseKeys("P")[0]
+        val insertTextBeforeCaret = cmd.keys[1].keyChar == 'P'
+        val selection = PutData.VisualSelection(caretsAndSelections, caretsAndSelections.values.first().type)
+        val putData = PutData(textData, selection, cmd.count, insertTextBeforeCaret, _indent = true, caretAfterInsertedText = true)
 
-            VimPlugin.getPut()
-                    .putVisualRangeBlockwise(editor, context, range, cmd.count, true, true, register, isBigP)
-        } else {
-            VimPlugin.getPut()
-                    .putVisualRangeCaL(editor, context, caretsAndSelections, cmd.count, true, true, register)
-        }
+        return VimPlugin.getPut().putText(editor, context, putData)
     }
 }
 

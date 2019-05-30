@@ -50,14 +50,6 @@ sealed class VimSelection {
 
     abstract fun toVimTextRange(skipNewLineForLineMode: Boolean = false): TextRange
 
-    /**
-     * Execute [action] for each line of selection.
-     * Action will be executed in bottom-up direction if [vimStart] > [vimEnd]
-     *
-     * [action#start] and [action#end] are offsets in current line
-     */
-    abstract fun forEachLine(action: (start: Int, end: Int) -> Unit)
-
     abstract fun getNativeStartAndEnd(): Pair<Int, Int>
 
     companion object {
@@ -105,17 +97,6 @@ sealed class VimSimpleSelection : VimSelection() {
     abstract val nativeEnd: Int
     abstract val normNativeStart: Int
     abstract val normNativeEnd: Int
-
-    override fun forEachLine(action: (start: Int, end: Int) -> Unit) {
-        val logicalStart = editor.offsetToLogicalPosition(nativeStart)
-        val logicalEnd = editor.offsetToLogicalPosition(nativeEnd)
-        val lineRange = if (logicalStart.line > logicalEnd.line) logicalStart.line downTo logicalEnd.line else logicalStart.line..logicalEnd.line
-        lineRange.map { line ->
-            val start = editor.logicalPositionToOffset(LogicalPosition(line, logicalStart.column))
-            val end = editor.logicalPositionToOffset(LogicalPosition(line, logicalEnd.column))
-            action(start, end)
-        }
-    }
 
     override fun getNativeStartAndEnd() = normNativeStart to normNativeEnd
 
@@ -185,7 +166,7 @@ class VimBlockSelection(
         return TextRange(starts.toIntArray(), ends.toIntArray()).also { it.normalize(editor.document.textLength) }
     }
 
-    override fun forEachLine(action: (start: Int, end: Int) -> Unit) {
+    private fun forEachLine(action: (start: Int, end: Int) -> Unit) {
         val offsets = toNativeSelection(editor, vimStart, vimEnd, CommandState.Mode.VISUAL, type.toSubMode())
         val logicalStart = editor.offsetToLogicalPosition(min(offsets.first, offsets.second))
         val logicalEnd = editor.offsetToLogicalPosition(max(offsets.first, offsets.second))

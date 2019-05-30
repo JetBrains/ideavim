@@ -21,21 +21,19 @@ package com.maddyhome.idea.vim.ex.handler
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.ex.*
+import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
-import com.maddyhome.idea.vim.group.MarkGroup
-import com.maddyhome.idea.vim.handler.CaretOrder
-import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.commands
+import com.maddyhome.idea.vim.ex.flags
+import com.maddyhome.idea.vim.group.copy.PutData
 
 class PutLinesHandler : CommandHandler(
         commands("pu[t]"),
         flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE)
 ) {
 
-  @Throws(ExException::class)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     if (editor.isOneLineMode) return false
 
@@ -47,33 +45,9 @@ class PutLinesHandler : CommandHandler(
       registerGroup.selectRegister(registerGroup.defaultRegister)
     }
 
-    val register = registerGroup.lastRegister ?: return false
-    val text = register.text
-
-    val lines = cmd.getOrderedLines(editor, context, CaretOrder.DECREASING_OFFSET)
-    val carets = EditorHelper.getOrderedCaretsList(editor, CaretOrder.DECREASING_OFFSET)
-    for (i in carets.indices) {
-      val caret = carets[i]
-      val line = lines[i]
-
-      var startOffset = minOf(editor.document.textLength,
-              VimPlugin.getMotion().moveCaretToLineEnd(editor, line, true) + 1)
-      if (startOffset > 0 && startOffset == editor.document.textLength &&
-              editor.document.charsSequence[startOffset - 1] != '\n') {
-        editor.document.insertString(startOffset, "\n")
-        startOffset++
-      }
-
-      if (text == null) {
-        VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_POS, startOffset)
-        VimPlugin.getMark().setChangeMarks(editor, TextRange(startOffset, startOffset))
-        continue
-      }
-
-      VimPlugin.getPut().putText(editor, caret, context, text, SelectionType.LINE_WISE, CommandState.SubMode.NONE,
-              startOffset, 1, false, false)
-    }
-
-    return true
+    val line = if (cmd.ranges.size() == 0) -1 else cmd.getLine(editor, context)
+    val textData = registerGroup.lastRegister?.let { PutData.TextData(it.text, SelectionType.LINE_WISE) }
+    val putData = PutData(textData, null, 1, false, false, false, line)
+    return VimPlugin.getPut().putText(editor, context, putData)
   }
 }
