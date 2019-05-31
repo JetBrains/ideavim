@@ -39,7 +39,7 @@ private object PutVisualTextActionHandler : VisualOperatorActionHandler.SingleEx
                                    cmd: Command,
                                    caretsAndSelections: Map<Caret, VimSelection>): Boolean {
     if (caretsAndSelections.isEmpty()) return false
-    val textData = VimPlugin.getRegister().lastRegister?.let { PutData.TextData(it.text, it.type) }
+    val textData = VimPlugin.getRegister().lastRegister?.let { PutData.TextData(it.text, it.type, it.transferableData) }
     VimPlugin.getRegister().resetRegister()
 
     val insertTextBeforeCaret = cmd.keys[0].keyChar == 'P'
