@@ -47,10 +47,6 @@ enum class CommandFlags {
      * This keystroke should be saved as part of the current insert
      */
     FLAG_SAVE_STROKE,
-    /**
-     * This is a backspace command
-     */
-    FLAG_IS_BACKSPACE,
     FLAG_IGNORE_SCROLL_JUMP,
     FLAG_IGNORE_SIDE_SCROLL_JUMP,
     /**
