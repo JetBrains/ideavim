@@ -24,6 +24,7 @@ import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.key.ParentNode;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.Options;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,6 +57,7 @@ public class CommandState {
     myLastChangeRegister = VimPlugin.getRegister().getDefaultRegister();
   }
 
+  @Contract("null -> new")
   @NotNull
   public static CommandState getInstance(@Nullable Editor editor) {
     if (editor == null) {
@@ -86,9 +88,27 @@ public class CommandState {
     return state.getMode() == Mode.VISUAL && state.getSubMode() == SubMode.VISUAL_CHARACTER;
   }
 
+  public static boolean inVisualMode(@Nullable Editor editor) {
+    return getInstance(editor).getMode() == Mode.VISUAL;
+  }
+
+  public static boolean inSelectMode(@Nullable Editor editor) {
+    return getInstance(editor).getMode() == Mode.SELECT;
+  }
+
+  public static boolean inVisualLineMode(@Nullable Editor editor) {
+    final CommandState state = getInstance(editor);
+    return state.getMode() == Mode.VISUAL && state.getSubMode() == SubMode.VISUAL_LINE;
+  }
+
   public static boolean inVisualBlockMode(@Nullable Editor editor) {
     final CommandState state = getInstance(editor);
     return state.getMode() == Mode.VISUAL && state.getSubMode() == SubMode.VISUAL_BLOCK;
+  }
+
+  public static boolean inBlockSubMode(@Nullable Editor editor) {
+    final CommandState state = getInstance(editor);
+    return state.getSubMode() == SubMode.VISUAL_BLOCK;
   }
 
   public static boolean inSingleCommandMode(@Nullable Editor editor) {
@@ -187,6 +207,7 @@ public class CommandState {
         msg.append("REPLACE");
         break;
       case VISUAL:
+      case SELECT:
         if (pos > 0) {
           State tmp = myStates.get(pos - 1);
           if (tmp.getMode() == Mode.COMMAND && tmp.getSubMode() == SubMode.SINGLE_COMMAND) {
@@ -196,13 +217,13 @@ public class CommandState {
         }
         switch (state.getSubMode()) {
           case VISUAL_LINE:
-            msg.append("VISUAL LINE");
+            msg.append(state.getMode()).append(" LINE");
             break;
           case VISUAL_BLOCK:
-            msg.append("VISUAL BLOCK");
+            msg.append(state.getMode()).append(" BLOCK");
             break;
           default:
-            msg.append("VISUAL");
+            msg.append(state.getMode());
         }
         break;
     }
@@ -327,7 +348,7 @@ public class CommandState {
     INSERT,
     REPLACE,
     REPEAT,
-    VISUAL,
+    VISUAL, SELECT,
     EX_ENTRY
   }
 

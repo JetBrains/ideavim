@@ -126,6 +126,10 @@ public class RegisterGroup {
     logger.debug("register reset");
   }
 
+  public void resetRegisters() {
+    registers.clear();
+  }
+
   /**
    * Store text into the last register.
    *
@@ -158,10 +162,6 @@ public class RegisterGroup {
       int t = start;
       start = end;
       end = t;
-    }
-
-    if (type == SelectionType.LINE_WISE && text.length() > 0 && text.charAt(text.length() - 1) != '\n') {
-      text = text + '\n';
     }
 
     // If this is an uppercase register, we need to append the text to the corresponding lowercase register

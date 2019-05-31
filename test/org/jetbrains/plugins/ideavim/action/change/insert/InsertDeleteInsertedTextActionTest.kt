@@ -18,6 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -27,12 +28,12 @@ class InsertDeleteInsertedTextActionTest : VimTestCase() {
         doTest(parseKeys("yiw", "ea", "Hello", "<C-U>", "<ESC>p"), """
             A Discovery
 
-            I found <caret>it in a legendary land
+            I found ${c}it in a legendary land
         """.trimIndent(), """
             A Discovery
 
-            I found iti<caret>t in a legendary land
-        """.trimIndent())
+            I found iti${c}t in a legendary land
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     // VIM-1655
@@ -41,11 +42,11 @@ class InsertDeleteInsertedTextActionTest : VimTestCase() {
         doTest(parseKeys("yiw", "eR", "Hello", "<C-U>", "<ESC>p"), """
             A Discovery
 
-            I found <caret>it in a legendary land
+            I found ${c}it in a legendary land
         """.trimIndent(), """
             A Discovery
 
-            I found ii<caret>ta legendary land
-        """.trimIndent())
+            I found ii${c}ta legendary land
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 }

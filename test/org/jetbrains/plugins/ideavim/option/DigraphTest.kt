@@ -18,6 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.option
 
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.Options
 import com.maddyhome.idea.vim.option.ToggleOption
@@ -44,7 +45,7 @@ class DigraphTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+        """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
     }
 
     fun `test digraph stops`() {
@@ -64,7 +65,7 @@ class DigraphTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+        """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
     }
 
     fun `test digraph double backspace`() {
@@ -84,7 +85,7 @@ class DigraphTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+        """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
     }
 
     fun `test digraph backspace digraph`() {
@@ -104,6 +105,6 @@ class DigraphTest : VimTestCase() {
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+        """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
     }
 }

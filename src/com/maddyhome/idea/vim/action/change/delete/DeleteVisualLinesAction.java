@@ -25,9 +25,9 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.group.visual.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -40,19 +40,22 @@ import java.util.Set;
  */
 public class DeleteVisualLinesAction extends VimCommandAction {
   public DeleteVisualLinesAction() {
-    super(new VisualOperatorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
+    super(new VisualOperatorActionHandler.ForEachCaret() {
       @Override
-      protected boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                                @NotNull Command cmd, @NotNull TextRange range) {
+      protected boolean executeAction(@NotNull Editor editor,
+                                      @NotNull Caret caret,
+                                      @NotNull DataContext context,
+                                      @NotNull Command cmd,
+                                      @NotNull VimSelection range) {
         final CommandState.SubMode mode = CommandState.getInstance(editor).getSubMode();
+        final TextRange textRange = range.toVimTextRange(false);
         if (mode == CommandState.SubMode.VISUAL_BLOCK) {
           return VimPlugin.getChange()
-            .deleteRange(editor, editor.getCaretModel().getPrimaryCaret(), range, SelectionType.fromSubMode(mode),
-                         false);
-        }
-        else {
-          final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
-                                                    EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
+            .deleteRange(editor, editor.getCaretModel().getPrimaryCaret(), textRange,
+                         SelectionType.fromSubMode(mode), false);
+        } else {
+          final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, textRange.getStartOffset()),
+                                                    EditorHelper.getLineEndForOffset(editor, textRange.getEndOffset()) + 1);
           return VimPlugin.getChange().deleteRange(editor, caret, lineRange, SelectionType.LINE_WISE, false);
         }
       }

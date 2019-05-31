@@ -71,7 +71,7 @@ class MoveTextHandler : CommandHandler(
       val text = texts[i]
 
       val offset = VimPlugin.getMotion().moveCaretToLineStart(editor, line + 1)
-      VimPlugin.getCopy().putText(editor, caret, context, text, SelectionType.LINE_WISE, CommandState.SubMode.NONE,
+        VimPlugin.getPut().putText(editor, caret, context, text, SelectionType.LINE_WISE, CommandState.SubMode.NONE,
               offset, 1, true, false)
     }
 

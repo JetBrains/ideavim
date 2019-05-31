@@ -43,7 +43,7 @@ public abstract class ChangeEditorActionHandler extends EditorActionHandlerBase 
   }
 
   public ChangeEditorActionHandler() {
-    this(false, CaretOrder.NATIVE);
+    this(false, CaretOrder.DECREASING_OFFSET);
   }
 
   @Override

@@ -21,9 +21,10 @@ package com.maddyhome.idea.vim.action;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
-import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.KeyHandler;
+import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -32,9 +33,11 @@ import org.jetbrains.annotations.NotNull;
 // TODO: Cannot find the corresponding Vim command. Remove it?
 public class ResetModeAction extends EditorAction {
   public ResetModeAction() {
-    super(new EditorActionHandler() {
-      public void execute(@NotNull Editor editor, @NotNull DataContext context) {
+    super(new EditorActionHandlerBase() {
+      @Override
+      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         KeyHandler.getInstance().fullReset(InjectedLanguageUtil.getTopLevelEditor(editor));
+        return true;
       }
     });
   }

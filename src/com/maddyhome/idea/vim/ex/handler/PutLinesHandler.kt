@@ -70,7 +70,7 @@ class PutLinesHandler : CommandHandler(
         continue
       }
 
-      VimPlugin.getCopy().putText(editor, caret, context, text, SelectionType.LINE_WISE, CommandState.SubMode.NONE,
+      VimPlugin.getPut().putText(editor, caret, context, text, SelectionType.LINE_WISE, CommandState.SubMode.NONE,
               startOffset, 1, false, false)
     }
 

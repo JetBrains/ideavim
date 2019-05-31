@@ -52,7 +52,7 @@ class YankLinesHandler : CommandHandler(
       ends.add(range.endOffset - 1)
     }
 
-    return VimPlugin.getCopy().yankRange(editor,
+    return VimPlugin.getYank().yankRange(editor,
             TextRange(starts.toIntArray(), ends.toIntArray()),
             SelectionType.LINE_WISE, false)
   }

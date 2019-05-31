@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
@@ -30,7 +29,6 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.handler.CaretOrder
-import com.maddyhome.idea.vim.helper.CaretData
 
 class JoinLinesHandler : CommandHandler(
         commands("j[oin]"),
@@ -41,12 +39,7 @@ class JoinLinesHandler : CommandHandler(
         val arg = cmd.argument
         val spaces = arg.isEmpty() || arg[0] != '!'
 
-        val textRange = if (CommandState.getInstance(editor).mode != CommandState.Mode.VISUAL)
-            cmd.getTextRange(editor, caret, context, true)
-        else
-            CaretData.getVisualTextRange(caret)
-
-        textRange ?: return false
+        val textRange = cmd.getTextRange(editor, caret, context, true) ?: return false
 
         return VimPlugin.getChange().deleteJoinRange(editor, caret, TextRange(textRange.startOffset,
                 textRange.endOffset - 1), spaces)

@@ -18,6 +18,7 @@
 
 package org.jetbrains.plugins.ideavim.action.change.insert
 
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -27,11 +28,11 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
         doTest(parseKeys("yiw", "3wea", "<C-W>", "<ESC>p"), """
             A Discovery
 
-            I found <caret>it in a legendary land
+            I found ${c}it in a legendary land
         """.trimIndent(), """
             A Discovery
 
-            I found it in a i<caret>t land
-        """.trimIndent())
+            I found it in a i${c}t land
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 }

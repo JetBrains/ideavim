@@ -38,7 +38,7 @@ public class PutTextBeforeCursorNoIndentAction extends EditorAction {
                              int count,
                              int rawCount,
                              @Nullable Argument argument) {
-        return VimPlugin.getCopy().putText(editor, context, count, false, false, true);
+        return VimPlugin.getPut().putText(editor, context, count, false, false, true);
       }
     });
   }

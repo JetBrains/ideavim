@@ -225,6 +225,11 @@ public class KeyHandler {
             shouldRecord = false;
           }
         }
+        else if (editorState.getMode() == CommandState.Mode.SELECT) {
+          if (!VimPlugin.getChange().processKeyInSelectMode(editor, context, key)) {
+            shouldRecord = false;
+          }
+        }
         else if (editorState.getMappingMode() == MappingMode.CMD_LINE) {
           if (!VimPlugin.getProcess().processExKey(editor, key)) {
             shouldRecord = false;
@@ -767,7 +772,11 @@ public class KeyHandler {
   }
 
   private enum State {
-    NEW_COMMAND, COMMAND, READY, ERROR, BAD_COMMAND
+    NEW_COMMAND,
+    COMMAND,
+    READY,
+    ERROR,
+    BAD_COMMAND
   }
 
   private int count;

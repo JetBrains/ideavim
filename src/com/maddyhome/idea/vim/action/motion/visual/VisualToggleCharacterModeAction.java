@@ -23,10 +23,12 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.CommandFlags;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.option.ListOption;
+import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -38,8 +40,13 @@ public class VisualToggleCharacterModeAction extends VimCommandAction {
   public VisualToggleCharacterModeAction() {
     super(new EditorActionHandlerBase() {
       protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-        return VimPlugin.getMotion().toggleVisual(editor, cmd.getCount(), cmd.getRawCount(),
-                                                  CommandState.SubMode.VISUAL_CHARACTER);
+        final ListOption listOption = Options.getInstance().getListOption(Options.SELECTMODE);
+        if (listOption != null && listOption.contains("cmd")) {
+          return VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER);
+        }
+
+        return VimPlugin.getVisualMotion()
+          .toggleVisual(editor, cmd.getCount(), cmd.getRawCount(), CommandState.SubMode.VISUAL_CHARACTER);
       }
     });
   }

@@ -16,37 +16,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.command;
+package org.jetbrains.plugins.ideavim.action.change.change
 
-import org.jetbrains.annotations.NotNull;
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.VimTestCase
 
-public class VisualChange {
-  public VisualChange(int lines, int columns, @NotNull SelectionType type) {
-    this.lines = lines;
-    this.columns = columns;
-    this.type = type;
-  }
-
-  public int getLines() {
-    return lines;
-  }
-
-  public int getColumns() {
-    return columns;
-  }
-
-  @NotNull
-  public SelectionType getType() {
-    return type;
-  }
-
-  @NotNull
-  public String toString() {
-
-    return "VisualChange[" + "lines=" + lines + ", columns=" + columns + ", type=" + type + "]";
-  }
-
-  final int lines;
-  final int columns;
-  @NotNull final SelectionType type;
+class ChangeLineActionTest : VimTestCase() {
+    fun `test on empty file`() {
+        doTest(parseKeys("cc"), "", "", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    }
 }
