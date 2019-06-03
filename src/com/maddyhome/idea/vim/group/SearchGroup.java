@@ -61,17 +61,21 @@ import java.util.List;
 
 public class SearchGroup {
   public SearchGroup() {
+    final Options options = Options.getInstance();
+    options.getOption(Options.HIGHLIGHT_SEARCH).addOptionChangeListener(event -> {
+      resetShowSearchHighlight();
+      forceUpdateSearchHighlights();
+    });
+
     final OptionChangeListener updateHighlightsIfVisible = event -> {
       if (showSearchHighlight) {
-        resetSearchHighlights();
+        forceUpdateSearchHighlights();
       }
     };
+    options.getOption(Options.IGNORE_CASE).addOptionChangeListener(updateHighlightsIfVisible);
 
     // It appears that when changing smartcase, Vim only redraws the highlights when the screen is redrawn. We can't
     // reliably copy that, so do the most intuitive thing
-    final Options options = Options.getInstance();
-    options.getOption(Options.HIGHLIGHT_SEARCH).addOptionChangeListener(event -> resetSearchHighlights());
-    options.getOption(Options.IGNORE_CASE).addOptionChangeListener(updateHighlightsIfVisible);
     options.getOption(Options.SMART_CASE).addOptionChangeListener(updateHighlightsIfVisible);
   }
 
@@ -319,7 +323,8 @@ public class SearchGroup {
 
     lastReplace = sub.toString();
 
-    resetSearchHighlights();
+    resetShowSearchHighlight();
+    forceUpdateSearchHighlights();
 
     if (logger.isDebugEnabled()) {
       logger.debug("search range=[" + start + "," + end + "]");
@@ -539,7 +544,8 @@ public class SearchGroup {
       logger.debug("lastDir=" + lastDir);
     }
 
-    resetSearchHighlights();
+    resetShowSearchHighlight();
+    forceUpdateSearchHighlights();
 
     return findItOffset(editor, startOffset, count, lastDir);
   }
@@ -567,7 +573,8 @@ public class SearchGroup {
     lastOffset = "";
     lastDir = dir;
 
-    resetSearchHighlights();
+    resetShowSearchHighlight();
+    forceUpdateSearchHighlights();
 
     return findItOffset(editor, caret.getOffset(), count, lastDir);
   }
@@ -581,39 +588,38 @@ public class SearchGroup {
   }
 
   public int searchNextFromOffset(@NotNull Editor editor, int offset, int count) {
+    resetShowSearchHighlight();
     updateSearchHighlights();
     return findItOffset(editor, offset, count, 1);
   }
 
   private int searchNextWithDirection(@NotNull Editor editor, @NotNull Caret caret, int count, int dir) {
+    resetShowSearchHighlight();
     updateSearchHighlights();
     return findItOffset(editor, caret.getOffset(), count, dir);
   }
 
-  /**
-   * Forces update of search highlights
-   */
-  private void resetSearchHighlights() {
+  private void resetShowSearchHighlight() {
     showSearchHighlight = Options.getInstance().isSet(Options.HIGHLIGHT_SEARCH);
-    highlightSearch(true);
   }
 
-  /**
-   * Update search highlights if they've changed
-   */
+  public void clearSearchHighlight() {
+    showSearchHighlight = false;
+    updateSearchHighlights();
+  }
+
+  private void forceUpdateSearchHighlights() {
+    updateSearchHighlights(lastSearch, lastIgnoreSmartCase, true);
+  }
+
   private void updateSearchHighlights() {
-    showSearchHighlight = Options.getInstance().isSet(Options.HIGHLIGHT_SEARCH);
-    highlightSearch(false);
+    updateSearchHighlights(lastSearch, lastIgnoreSmartCase, false);
   }
 
   /**
    * Refreshes current search highlights for all editors of currently active text editor/document
    */
-  private void refreshSearchHighlights() {
-    highlightSearch(false);
-  }
-
-  private void highlightSearch(boolean forceUpdate) {
+  private void updateSearchHighlights(@Nullable String pattern, boolean shouldIgnoreSmartCase, boolean forceUpdate) {
     Project[] projects = ProjectManager.getInstance().getOpenProjects();
     for (Project project : projects) {
       Editor current = FileEditorManager.getInstance(project).getSelectedTextEditor();
@@ -624,29 +630,33 @@ public class SearchGroup {
       }
 
       for (final Editor editor : editors) {
-        String els = EditorData.getLastSearch(editor);
-        if (!showSearchHighlight) {
-          removeSearchHighlight(editor);
-          continue;
-        }
-
         // Force update for the situations where the text is the same, but the ignore case values have changed.
         // E.g. Use `*` to search for a word (which ignores smartcase), then use `/<Up>` to search for the same pattern,
         // which will match smartcase. Or changing the smartcase/ignorecase settings
-        if (lastSearch != null && lastSearch.equals(els) && !forceUpdate) {
-          continue;
+        if (shouldRemoveSearchHighlight(editor, pattern, showSearchHighlight) || forceUpdate) {
+          removeSearchHighlight(editor);
         }
 
-        if (lastSearch == null) {
-          continue;
+        if (shouldAddSearchHighlight(editor, pattern, showSearchHighlight)) {
+          highlightSearchLines(editor, pattern, 0, -1, shouldIgnoreCase(pattern, shouldIgnoreSmartCase));
+          EditorData.setLastSearch(editor, pattern);
         }
-
-        removeSearchHighlight(editor);
-        highlightSearchLines(editor, lastSearch, 0, -1, shouldIgnoreCase(lastSearch, lastIgnoreSmartCase));
-
-        EditorData.setLastSearch(editor, lastSearch);
       }
     }
+  }
+
+  /**
+   * Remove current search highlights if hlSearch is false, or if the pattern is changed
+   */
+  private boolean shouldRemoveSearchHighlight(@NotNull Editor editor, String newPattern, boolean hlSearch) {
+    return !hlSearch || (newPattern != null && !newPattern.equals(EditorData.getLastSearch(editor)));
+  }
+
+  /**
+   * Add search highlights if hlSearch is true and the pattern is changed
+   */
+  private boolean shouldAddSearchHighlight(@NotNull Editor editor, @Nullable String newPattern, boolean hlSearch) {
+    return hlSearch && newPattern != null && !newPattern.equals(EditorData.getLastSearch(editor));
   }
 
   private void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine) {
@@ -762,8 +772,6 @@ public class SearchGroup {
     if (range == null) {
       return -1;
     }
-
-    //highlightMatch(editor, range.getStartOffset(), range.getEndOffset());
 
     ParsePosition pp = new ParsePosition(0);
     int res = range.getStartOffset();
@@ -1141,11 +1149,6 @@ public class SearchGroup {
     return highlighter;
   }
 
-  public void clearSearchHighlight() {
-    showSearchHighlight = false;
-    refreshSearchHighlights();
-  }
-
   private static void removeSearchHighlight(@NotNull Editor editor) {
     Collection<RangeHighlighter> ehl = EditorData.getLastHighlights(editor);
     if (ehl == null) {
@@ -1234,7 +1237,7 @@ public class SearchGroup {
      * Updates search highlights when the selected editor changes
      */
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
-      VimPlugin.getSearch().refreshSearchHighlights();
+      VimPlugin.getSearch().updateSearchHighlights();
     }
   }
 
