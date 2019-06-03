@@ -18,9 +18,12 @@
 
 package com.maddyhome.idea.vim;
 
+import com.intellij.codeInsight.template.TemplateManager;
+import com.intellij.codeInsight.template.TemplateManagerListener;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.ShortcutSet;
+import com.intellij.openapi.actionSystem.ex.AnActionListener;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
@@ -82,6 +85,16 @@ public class EventFacade {
   public void addFileEditorManagerListener(@NotNull Project project, @NotNull FileEditorManagerListener listener) {
     final MessageBusConnection connection = project.getMessageBus().connect();
     connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, listener);
+  }
+
+  public void addAnActionListener(@NotNull Project project, @NotNull AnActionListener listener) {
+    final MessageBusConnection connection = project.getMessageBus().connect();
+    connection.subscribe(AnActionListener.TOPIC, listener);
+  }
+
+  public void addTemplateStartedListener(@NotNull Project project, @NotNull TemplateManagerListener listener) {
+    final MessageBusConnection connection = project.getMessageBus().connect();
+    connection.subscribe(TemplateManager.TEMPLATE_STARTED_TOPIC, listener);
   }
 
   public void addDocumentListener(@NotNull Document document, @NotNull DocumentListener listener) {

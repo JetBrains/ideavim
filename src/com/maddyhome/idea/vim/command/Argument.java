@@ -26,13 +26,14 @@ import org.jetbrains.annotations.Nullable;
  */
 public class Argument {
 
-  public static enum Type {
-    NONE,
-    MOTION,
-    CHARACTER,
-    STRING,
-    DIGRAPH,
-    EX_STRING
+  /**
+   * Creates a motion command argument
+   *
+   * @param motionArg The motion command
+   */
+  public Argument(@Nullable Command motionArg) {
+    this.motionArg = motionArg;
+    type = Type.MOTION;
   }
 
   /**
@@ -46,13 +47,13 @@ public class Argument {
   }
 
   /**
-   * Creates a motion command argument
+   * Returns the motion command if this is a motion command argument
    *
-   * @param motionArg The motion command
+   * @return The motion command if this is a motion command argument, null if not
    */
-  public Argument(@Nullable Command motionArg) {
-    this.motionArg = motionArg;
-    type = Type.MOTION;
+  @Nullable
+  public Command getMotion() {
+    return motionArg;
   }
 
   /**
@@ -84,14 +85,8 @@ public class Argument {
     return charArg;
   }
 
-  /**
-   * Returns the motion command if this is a motion command argument
-   *
-   * @return The motion command if this is a motion command argument, null if not
-   */
-  @Nullable
-  public Command getMotion() {
-    return motionArg;
+  public enum Type {
+    NONE, MOTION, CHARACTER, STRING, DIGRAPH, EX_STRING
   }
 
   /**

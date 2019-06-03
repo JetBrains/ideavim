@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.action.change.change;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
@@ -26,8 +27,8 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
+import com.maddyhome.idea.vim.group.visual.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -40,11 +41,16 @@ import java.util.Set;
  */
 public class ChangeVisualCharacterAction extends VimCommandAction {
   public ChangeVisualCharacterAction() {
-    super(new VisualOperatorActionHandler() {
-      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
-                                @NotNull TextRange range) {
+    super(new VisualOperatorActionHandler.ForEachCaret() {
+      @Override
+      protected boolean executeAction(@NotNull Editor editor,
+                                      @NotNull Caret caret,
+                                      @NotNull DataContext context,
+                                      @NotNull Command cmd,
+                                      @NotNull VimSelection range) {
         final Argument argument = cmd.getArgument();
-        return argument != null && VimPlugin.getChange().changeCharacterRange(editor, range, argument.getCharacter());
+        return argument != null &&
+               VimPlugin.getChange().changeCharacterRange(editor, range.toVimTextRange(false), argument.getCharacter());
       }
     });
   }

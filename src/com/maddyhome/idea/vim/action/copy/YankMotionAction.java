@@ -41,7 +41,7 @@ public class YankMotionAction extends EditorAction {
         return false;
       }
 
-      return VimPlugin.getCopy().yankMotion(editor, context, cmd.getCount(), cmd.getRawCount(), argument);
+      return VimPlugin.getYank().yankMotion(editor, context, cmd.getCount(), cmd.getRawCount(), argument);
     }
   }
 }

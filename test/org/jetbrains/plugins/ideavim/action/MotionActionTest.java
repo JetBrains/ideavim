@@ -22,6 +22,7 @@ import com.intellij.json.JsonFileType;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.VisualPosition;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.CommandState;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.command.CommandState.Mode.COMMAND;
@@ -33,6 +34,12 @@ import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
  * @author vlan
  */
 public class MotionActionTest extends VimTestCase {
+  public void testDoubleToggleVisual() {
+    typeTextInFile(parseKeys("vv"),
+                   "one tw<caret>o\n");
+    assertMode(COMMAND);
+  }
+
   // VIM-198 |v_iw|
   public void testVisualMotionInnerWordNewLineAtEOF() {
     typeTextInFile(parseKeys("viw"),
@@ -612,8 +619,7 @@ public class MotionActionTest extends VimTestCase {
            "four  \n",
            "one   \n" +
            "two   \n" +
-           "thre<caret>e  \n" +
-           "four  \n");
+           "thre<caret>e  \n" + "four  \n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // |3g_|
@@ -625,8 +631,7 @@ public class MotionActionTest extends VimTestCase {
            "four  \n",
            "one   \n" +
            "two   \n" +
-           "thre<caret>e  \n" +
-           "four  \n");
+           "thre<caret>e  \n" + "four  \n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // VIM-646 |gv|
@@ -648,7 +653,7 @@ public class MotionActionTest extends VimTestCase {
                    "baz\n");
     assertSelection("foo\n" +
                     "bar\n" +
-                    "baz");
+                    "baz\n");
     typeText(parseKeys(">"));
     assertMode(COMMAND);
     myFixture.checkResult("    foo\n" +
@@ -657,7 +662,7 @@ public class MotionActionTest extends VimTestCase {
     typeText(parseKeys("gv"));
     assertSelection("    foo\n" +
                     "    bar\n" +
-                    "    baz");
+                    "    baz\n");
     typeText(parseKeys(">"));
     assertMode(COMMAND);
     myFixture.checkResult("        foo\n" +
@@ -666,7 +671,7 @@ public class MotionActionTest extends VimTestCase {
     typeText(parseKeys("gv"));
     assertSelection("        foo\n" +
                     "        bar\n" +
-                    "        baz");
+                    "        baz\n");
   }
 
   // VIM-862 |gv|
@@ -686,7 +691,7 @@ public class MotionActionTest extends VimTestCase {
                    "quux\n");
     assertMode(VISUAL);
     assertSelection("bar\n" +
-                    "baz");
+                    "baz\n");
     assertOffset(8);
   }
 
@@ -699,7 +704,7 @@ public class MotionActionTest extends VimTestCase {
                    "quux\n");
     assertMode(VISUAL);
     assertSelection("bar\n" +
-                    "baz");
+                    "baz\n");
     assertOffset(4);
   }
 }

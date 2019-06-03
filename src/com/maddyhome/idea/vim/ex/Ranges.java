@@ -242,7 +242,7 @@ public class Ranges {
       endLine = range.getLine(editor, context, lastZero);
       if (range.isMove()) {
         MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(),
-                              VimPlugin.getMotion().moveCaretToLine(editor, endLine));
+                              VimPlugin.getMotion().moveCaretToLine(editor, endLine, editor.getCaretModel().getPrimaryCaret()));
       }
       // Did that last range represent the start of the file?
       lastZero = (endLine < 0);
@@ -265,7 +265,7 @@ public class Ranges {
       startLine = endLine;
       endLine = range.getLine(editor, caret, context, lastZero);
 
-      if (range.isMove()) MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLine(editor, endLine));
+      if (range.isMove()) MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLine(editor, endLine, editor.getCaretModel().getPrimaryCaret()));
 
       lastZero = endLine < 0;
       ++count;

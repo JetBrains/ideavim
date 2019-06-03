@@ -52,8 +52,12 @@ import com.intellij.util.io.HttpRequests;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser;
 import com.maddyhome.idea.vim.group.*;
+import com.maddyhome.idea.vim.group.copy.PutGroup;
+import com.maddyhome.idea.vim.group.copy.YankGroup;
+import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.DocumentManager;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
+import com.maddyhome.idea.vim.listener.IdeaSpecifics;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import org.jdom.Element;
@@ -105,7 +109,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   @NotNull private final MotionGroup motion;
   @NotNull private final ChangeGroup change;
   @NotNull private final CommandGroup command;
-  @NotNull private final CopyGroup copy;
   @NotNull private final MarkGroup mark;
   @NotNull private final RegisterGroup register;
   @NotNull private final FileGroup file;
@@ -117,12 +120,14 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   @NotNull private final KeyGroup key;
   @NotNull private final WindowGroup window;
   @NotNull private final EditorGroup editor;
+  @NotNull private final VisualMotionGroup visualMotion;
+  @NotNull private final YankGroup yank;
+  @NotNull private final PutGroup put;
 
   public VimPlugin() {
     motion = new MotionGroup();
     change = new ChangeGroup();
     command = new CommandGroup();
-    copy = new CopyGroup();
     mark = new MarkGroup();
     register = new RegisterGroup();
     file = new FileGroup();
@@ -134,6 +139,9 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     key = new KeyGroup();
     window = new WindowGroup();
     editor = new EditorGroup();
+    visualMotion = new VisualMotionGroup();
+    yank = new YankGroup();
+    put = new PutGroup();
 
     LOG.debug("VimPlugin ctr");
   }
@@ -244,11 +252,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   public static CommandGroup getCommand() { return getInstance().command; }
 
   @NotNull
-  public static CopyGroup getCopy() {
-    return getInstance().copy;
-  }
-
-  @NotNull
   public static MarkGroup getMark() {
     return getInstance().mark;
   }
@@ -301,6 +304,21 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   @NotNull
   public static EditorGroup getEditor() {
     return getInstance().editor;
+  }
+
+  @NotNull
+  public static VisualMotionGroup getVisualMotion() {
+    return getInstance().visualMotion;
+  }
+
+  @NotNull
+  public static YankGroup getYank() {
+    return getInstance().yank;
+  }
+
+  @NotNull
+  public static PutGroup getPut() {
+    return getInstance().put;
   }
 
   @NotNull
@@ -479,6 +497,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         eventFacade.addFileEditorManagerListener(project, new MotionGroup.MotionEditorChange());
         eventFacade.addFileEditorManagerListener(project, new FileGroup.SelectionCheck());
         eventFacade.addFileEditorManagerListener(project, new SearchGroup.EditorSelectionCheck());
+        IdeaSpecifics.INSTANCE.addIdeaSpecificsListener(project);
       }
     });
   }

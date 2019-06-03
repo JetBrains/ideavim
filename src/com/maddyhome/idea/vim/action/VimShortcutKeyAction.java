@@ -159,7 +159,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
       if (editor != null && keyStroke != null) {
         final int keyCode = keyStroke.getKeyCode();
         if (LookupManager.getActiveLookup(editor) != null) {
-          return isExitInsertMode(keyStroke);
+          return isEnabledForLookup(keyStroke);
         }
         if (keyCode == VK_ESCAPE) {
           return isEnabledForEscape(editor);
@@ -213,12 +213,16 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
       .anyMatch(fileEditor -> editor.equals(EditorUtil.getEditorEx(fileEditor)));
   }
 
-  private boolean isExitInsertMode(@NotNull KeyStroke keyStroke) {
+  private boolean isEnabledForLookup(@NotNull KeyStroke keyStroke) {
     for (List<KeyStroke> keys : InsertExitModeAction.getInstance().getKeyStrokesSet()) {
       // XXX: Currently we cannot handle <C-\><C-N> because of the importance of <C-N> for the IDE on Linux
       if (keys.size() == 1 && keyStroke.equals(keys.get(0))) {
         return true;
       }
+    }
+    //noinspection RedundantIfStatement
+    if (keyStroke.equals(KeyStroke.getKeyStroke(VK_BACK_SPACE, 0))) {
+      return true;
     }
     return false;
   }

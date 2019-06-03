@@ -26,123 +26,123 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MultipleCaretsTest : VimTestCase() {
   fun testGotoToNthCharacter() {
-    val before = "qwe rty a<caret>sd\n fgh zx<caret>c <caret>vbn"
+      val before = "qwe rty a${c}sd\n fgh zx${c}c ${c}vbn"
     configureByText(before)
     typeText(commandToKeys("go 5"))
-    val after = "qwe <caret>rty asd\n fgh zxc vbn"
+      val after = "qwe ${c}rty asd\n fgh zxc vbn"
     myFixture.checkResult(after)
   }
 
   fun testGotoLine() {
-    val before = "qwe\n" + "rty\n" + "asd\n" + "f<caret>gh\n" + "zxc\n" + "v<caret>bn\n"
+      val before = "qwe\n" + "rty\n" + "asd\n" + "f${c}gh\n" + "zxc\n" + "v${c}bn\n"
     configureByText(before)
     typeText(commandToKeys("2"))
-    val after = "qwe\n" + "<caret>rty\n" + "asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+      val after = "qwe\n" + "${c}rty\n" + "asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
     myFixture.checkResult(after)
   }
 
   fun testGotoLineInc() {
-    val before = "qwe\n" + "rt<caret>y\n" + "asd\n" + "fgh\n" + "zxc\n" + "v<caret>bn\n"
+      val before = "qwe\n" + "rt${c}y\n" + "asd\n" + "fgh\n" + "zxc\n" + "v${c}bn\n"
     configureByText(before)
     typeText(commandToKeys("+2"))
-    val after = "qwe\n" + "rty\n" + "asd\n" + "<caret>fgh\n" + "zxc\n" + "<caret>vbn\n"
+      val after = "qwe\n" + "rty\n" + "asd\n" + "${c}fgh\n" + "zxc\n" + "${c}vbn\n"
     myFixture.checkResult(after)
   }
 
   fun testJoinLines() {
-    val before = "qwe\n" + "r<caret>ty\n" + "asd\n" + "fg<caret>h\n" + "zxc\n" + "vbn\n"
+      val before = "qwe\n" + "r${c}ty\n" + "asd\n" + "fg${c}h\n" + "zxc\n" + "vbn\n"
     configureByText(before)
     typeText(commandToKeys("j"))
-    val after = "qwe\n" + "rty<caret> asd\n" + "fgh<caret> zxc\n" + "vbn\n"
+      val after = "qwe\n" + "rty$c asd\n" + "fgh$c zxc\n" + "vbn\n"
     myFixture.checkResult(after)
   }
 
 //  fun testJoinVisualLines() {
-//    val before = "qwe\n" + "r<caret>ty\n" + "asd\n" + "fg<caret>h\n" + "zxc\n" + "vbn\n"
+//    val before = "qwe\n" + "r${c}ty\n" + "asd\n" + "fg${c}h\n" + "zxc\n" + "vbn\n"
 //    configureByText(before)
 //    typeText(parseKeys("vj"))
 //    typeText(commandToKeys("j"))
-//    val after = "qwe\n" + "rty<caret> asd\n" + "fgh<caret> zxc\n" + "vbn\n"
+//    val after = "qwe\n" + "rty${c} asd\n" + "fgh${c} zxc\n" + "vbn\n"
 //    myFixture.checkResult(after)
 //  }
 
   fun testCopyText() {
-    val before = "qwe\n" + "rty\n" + "a<caret>sd\n" + "fg<caret>h\n" + "zxc\n" + "vbn\n"
+      val before = "qwe\n" + "rty\n" + "a${c}sd\n" + "fg${c}h\n" + "zxc\n" + "vbn\n"
     configureByText(before)
     typeText(commandToKeys("co 2"))
-    val after = "qwe\n" + "rty\n" + "<caret>asd\n" + "<caret>fgh\n" + "asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+      val after = "qwe\n" + "rty\n" + "${c}asd\n" + "${c}fgh\n" + "asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
     myFixture.checkResult(after)
   }
 
 //  fun testCopyVisualText() {
-//    val before = "qwe\n" + "<caret>rty\n" + "asd\n" + "f<caret>gh\n" + "zxc\n" + "vbn\n"
+//    val before = "qwe\n" + "${c}rty\n" + "asd\n" + "f${c}gh\n" + "zxc\n" + "vbn\n"
 //    configureByText(before)
 //    typeText(parseKeys("vj"))
 //    typeText(commandToKeys(":co 2"))
-//    val after = "qwe\n" + "rty\n" + "<caret>rty\n" + "asd\n" + "<caret>fgh\n" + "zxc\n" + "asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+//    val after = "qwe\n" + "rty\n" + "${c}rty\n" + "asd\n" + "${c}fgh\n" + "zxc\n" + "asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
 //    myFixture.checkResult(after)
 //  }
 
   fun testPutText() {
-    val before = "<caret>qwe\n" + "rty\n" + "<caret>as<caret>d\n" + "fgh\n" + "zxc\n" + "vbn\n"
+      val before = "${c}qwe\n" + "rty\n" + "${c}as${c}d\n" + "fgh\n" + "zxc\n" + "vbn\n"
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
     typeText(commandToKeys("pu"))
-    val after = "qwe\n" + "<caret>zxc\n" + "rty\n" + "asd\n" + "<caret>zxc\n" + "<caret>zxc\n" + "fgh\n" + "zxc\n" + "vbn\n"
+      val after = "qwe\n" + "${c}zxc\n" + "rty\n" + "asd\n" + "${c}zxc\n" + "${c}zxc\n" + "fgh\n" + "zxc\n" + "vbn\n"
     myFixture.checkResult(after)
   }
 
   fun testPutTextCertainLine() {
-    val before = "<caret>qwe\n" + "rty\n" + "<caret>as<caret>d\n" + "fgh\n" + "zxc\n" + "vbn\n"
+      val before = "${c}qwe\n" + "rty\n" + "${c}as${c}d\n" + "fgh\n" + "zxc\n" + "vbn\n"
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
     typeText(commandToKeys("4pu"))
-    val after = "qwe\n" + "rty\n" + "asd\n" + "fgh\n" + "<caret>zxc\n" + "<caret>zxc\n" + "<caret>zxc\n" + "zxc\n" + "vbn\n"
+      val after = "qwe\n" + "rty\n" + "asd\n" + "fgh\n" + "${c}zxc\n" + "${c}zxc\n" + "${c}zxc\n" + "zxc\n" + "vbn\n"
     myFixture.checkResult(after)
   }
 
 //  fun testPutVisualLines() {
-//    val before = "<caret>qwe\n" + "rty\n" + "as<caret>d\n" + "fgh\n" + "zxc\n" + "vbn\n"
+//    val before = "${c}qwe\n" + "rty\n" + "as${c}d\n" + "fgh\n" + "zxc\n" + "vbn\n"
 //    val editor = configureByText(before)
 //    VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
 //
 //    typeText(parseKeys("vj"))
 //    typeText(commandToKeys("pu"))
 //
-//    val after = "qwe\n" + "rty\n" + "<caret>zxc\n" + "asd\n" + "fgh\n" + "<caret>zxc\n" + "zxc\n" + "vbn\n"
+//    val after = "qwe\n" + "rty\n" + "${c}zxc\n" + "asd\n" + "fgh\n" + "${c}zxc\n" + "zxc\n" + "vbn\n"
 //    myFixture.checkResult(after)
 //  }
 
   fun testMoveTextBeforeCarets() {
-    val before = "qwe\n" + "rty\n" + "<caret>asd\n" + "fgh\n" + "z<caret>xc\n" + "vbn\n"
+      val before = "qwe\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "z${c}xc\n" + "vbn\n"
     configureByText(before)
     typeText(commandToKeys("m 1"))
-    val after = "qwe\n" + "<caret>asd\n" + "<caret>zxc\n" + "rty\n" + "fgh\n" + "vbn\n"
+      val after = "qwe\n" + "${c}asd\n" + "${c}zxc\n" + "rty\n" + "fgh\n" + "vbn\n"
     myFixture.checkResult(after)
 
   }
 
   fun testMoveTextAfterCarets() {
-    val before = "q<caret>we\n" + "rty\n" + "<caret>asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+      val before = "q${c}we\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
     configureByText(before)
     typeText(commandToKeys("m 4"))
-    val after = "rty\n" + "fgh\n" + "zxc\n" + "<caret>qwe\n" + "<caret>asd\n" + "vbn\n"
+      val after = "rty\n" + "fgh\n" + "zxc\n" + "${c}qwe\n" + "${c}asd\n" + "vbn\n"
     myFixture.checkResult(after)
   }
 
   fun testMoveTextBetweenCarets() {
-    val before = "q<caret>we\n" + "rty\n" + "<caret>asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+      val before = "q${c}we\n" + "rty\n" + "${c}asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
     configureByText(before)
     typeText(commandToKeys("m 2"))
-    val after = "rty\n" + "<caret>qwe\n" + "<caret>asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
+      val after = "rty\n" + "${c}qwe\n" + "${c}asd\n" + "fgh\n" + "zxc\n" + "vbn\n"
     myFixture.checkResult(after)
   }
 
   fun testYankLines() {
     val before = """qwe
-      |rt<caret>y
+      |rt${c}y
       |asd
-      |<caret>fgh
+      |${c}fgh
       |zxc
       |vbn
     """.trimMargin()
@@ -157,11 +157,11 @@ class MultipleCaretsTest : VimTestCase() {
     typeText(parseKeys("p"))
     val after = """qwe
       |rty
-      |<caret>rty
+      |${c}rty
       |fgh
       |asd
       |fgh
-      |<caret>rty
+      |${c}rty
       |fgh
       |zxc
       |vbn
@@ -171,9 +171,9 @@ class MultipleCaretsTest : VimTestCase() {
 
   fun testDeleteLines() {
     val before = """qwe
-      |r<caret>ty
+      |r${c}ty
       |asd
-      |f<caret>gh
+      |f${c}gh
       |zxc
       |vbn
     """.trimMargin()
@@ -187,8 +187,8 @@ class MultipleCaretsTest : VimTestCase() {
     assertNotNull(text)
 
     val after = """qwe
-      |<caret>asd
-      |<caret>zxc
+      |${c}asd
+      |${c}zxc
       |vbn
     """.trimMargin()
     myFixture.checkResult(after)
@@ -196,9 +196,9 @@ class MultipleCaretsTest : VimTestCase() {
 
   fun testSortRangeWholeFile() {
     val before = """qwe
-      |as<caret>d
+      |as${c}d
       |zxc
-      |<caret>rty
+      |${c}rty
       |fgh
       |vbn
     """.trimMargin()
@@ -206,16 +206,16 @@ class MultipleCaretsTest : VimTestCase() {
 
     typeText(commandToKeys("sor"))
 
-    val after = "<caret>" + before.replace("<caret>", "").split('\n').sorted().joinToString(separator = "\n")
+      val after = "$c" + before.replace("$c", "").split('\n').sorted().joinToString(separator = "\n")
     myFixture.checkResult(after)
   }
 
   fun testSortRange() {
     val before = """qwe
-      |as<caret>d
+      |as${c}d
       | zxc
       |rty
-      |f<caret>gh
+      |f${c}gh
       |vbn
     """.trimMargin()
     configureByText(before)
@@ -223,7 +223,7 @@ class MultipleCaretsTest : VimTestCase() {
     typeText(commandToKeys("2,4 sor"))
 
     val after = """qwe
-      | <caret>zxc
+      | ${c}zxc
       |asd
       |rty
       |fgh
@@ -234,9 +234,9 @@ class MultipleCaretsTest : VimTestCase() {
 
   fun testSortRangeReverse() {
     val before = """qwe
-      |as<caret>d
+      |as${c}d
       |zxc
-      |<caret>rty
+      |${c}rty
       |fgh
       |vbn
     """.trimMargin()
@@ -244,9 +244,9 @@ class MultipleCaretsTest : VimTestCase() {
 
     typeText(commandToKeys("sor!"))
 
-    val after = "<caret>" +
+      val after = "$c" +
         before
-            .replace("<caret>", "")
+                .replace("$c", "")
             .split('\n')
             .sortedWith(reverseOrder())
             .joinToString(separator = "\n")
@@ -255,9 +255,9 @@ class MultipleCaretsTest : VimTestCase() {
 
   fun testSortRangeIgnoreCase() {
     val before = """qwe
-      |as<caret>d
+      |as${c}d
       |   zxc
-      |<caret>Rty
+      |${c}Rty
       |fgh
       |vbn
     """.trimMargin()
@@ -266,7 +266,7 @@ class MultipleCaretsTest : VimTestCase() {
     typeText(commandToKeys("2,4 sor i"))
 
     val after = """qwe
-      |   <caret>zxc
+      |   ${c}zxc
       |asd
       |Rty
       |fgh

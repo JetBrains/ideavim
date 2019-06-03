@@ -27,28 +27,29 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
-import com.maddyhome.idea.vim.helper.CaretData;
+import com.maddyhome.idea.vim.handler.MotionActionHandler;
+import com.maddyhome.idea.vim.helper.CaretDataKt;
 import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ *
  */
 public class MotionLastColumnAction extends MotionEditorAction {
   public MotionLastColumnAction() {
     super(new Handler());
   }
 
-  private static class Handler extends MotionEditorActionHandler {
-    public Handler() {
-      super(true);
-    }
-
+  private static class Handler extends MotionActionHandler.ForEachCaret {
     @Override
-    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                         int rawCount, @Nullable Argument argument) {
+    public int getOffset(@NotNull Editor editor,
+                         @NotNull Caret caret,
+                         @NotNull DataContext context,
+                         int count,
+                         int rawCount,
+                         @Nullable Argument argument) {
       boolean allow = false;
       if (CommandState.inInsertMode(editor)) {
         allow = true;
@@ -63,9 +64,19 @@ public class MotionLastColumnAction extends MotionEditorAction {
       return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow);
     }
 
-    protected void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+    @Override
+    protected void postMove(@NotNull Editor editor,
+                            @NotNull Caret caret,
+                            @NotNull DataContext context,
                             @NotNull Command cmd) {
-      CaretData.setLastColumn(editor, caret, MotionGroup.LAST_COLUMN);
+      CaretDataKt.setVimLastColumn(caret, MotionGroup.LAST_COLUMN);
+    }
+
+    protected void preMove(@NotNull Editor editor,
+                           @NotNull Caret caret,
+                           @NotNull DataContext context,
+                           @NotNull Command cmd) {
+      CaretDataKt.setVimLastColumn(caret, MotionGroup.LAST_COLUMN);
     }
   }
 }

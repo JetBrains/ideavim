@@ -29,7 +29,7 @@ class MarkHandlerTest : VimTestCase() {
     fun `test simple mark`() {
         configureByText("""I found it in a legendary land
                          |all rocks and lavender and tufted grass,
-                         |where it<caret> was settled on some sodden sand
+                         |where it$c was settled on some sodden sand
                          |hard by the torrent of a mountain pass.
                        """.trimMargin())
         typeText(commandToKeys("mark a"))
@@ -42,7 +42,7 @@ class MarkHandlerTest : VimTestCase() {
     fun `test global mark`() {
         configureByText("""I found it in a legendary land
                          |all rocks and lavender and tufted grass,
-                         |where it<caret> was settled on some sodden sand
+                         |where it$c was settled on some sodden sand
                          |hard by the torrent of a mountain pass.
                        """.trimMargin())
         typeText(commandToKeys("mark G"))
@@ -55,7 +55,7 @@ class MarkHandlerTest : VimTestCase() {
     fun `test k mark`() {
         configureByText("""I found it in a legendary land
                          |all rocks and lavender and tufted grass,
-                         |where it<caret> was settled on some sodden sand
+                         |where it$c was settled on some sodden sand
                          |hard by the torrent of a mountain pass.
                        """.trimMargin())
         typeText(commandToKeys("k a"))
@@ -68,7 +68,7 @@ class MarkHandlerTest : VimTestCase() {
     fun `test mark in range`() {
         configureByText("""I found it in a legendary land
                          |all rocks and lavender and tufted grass,
-                         |where it<caret> was settled on some sodden sand
+                         |where it$c was settled on some sodden sand
                          |hard by the torrent of a mountain pass.
                        """.trimMargin())
         typeText(commandToKeys("1,2 mark a"))

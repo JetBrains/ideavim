@@ -27,6 +27,8 @@ import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
+import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
+import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -71,8 +73,10 @@ public class VimTypedActionHandler implements TypedActionHandlerEx {
       }
     }
     else {
-      TypedActionHandler origHandler = handler.getOriginalHandler();
-      origHandler.execute(editor, charTyped, context);
+      try (final VimListenerSuppressor ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
+        TypedActionHandler origHandler = handler.getOriginalHandler();
+        origHandler.execute(editor, charTyped, context);
+      }
     }
   }
 

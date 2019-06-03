@@ -1,5 +1,26 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2019 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@file:Suppress("RemoveCurlyBracesFromTemplate")
+
 package org.jetbrains.plugins.ideavim.action.motion.leftright
 
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
@@ -8,125 +29,161 @@ class MotionRightActionTest : VimTestCase() {
         doTest(parseKeys("l"), """
             A Discovery
 
-            I found <caret>it in a legendary land
+            I found ${c}it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), """
             A Discovery
 
-            I found i<caret>t in a legendary land
+            I found i${c}t in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test simple motion with repeat`() {
         doTest(parseKeys("3l"), """
             A Discovery
 
-            I found <caret>it in a legendary land
+            I found ${c}it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), """
             A Discovery
 
-            I found it <caret>in a legendary land
+            I found it ${c}in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test simple motion to the end`() {
         doTest(parseKeys("3l"), """
             A Discovery
 
-            I found it in a legendary lan<caret>d
+            I found it in a legendary lan${c}d
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), """
             A Discovery
 
-            I found it in a legendary lan<caret>d
+            I found it in a legendary lan${c}d
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test simple motion non-ascii`() {
         doTest(parseKeys("l"), """
             A Discovery
 
-            I found it in a legendar<caret>𝛁 land
+            I found it in a legendar${c}𝛁 land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), """
             A Discovery
 
-            I found it in a legendar𝛁<caret> land
+            I found it in a legendar𝛁${c} land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test simple motion emoji`() {
         doTest(parseKeys("l"), """
             A Discovery
 
-            I found it in a legendar<caret>🐔 land
+            I found it in a legendar${c}🐔 land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), """
             A Discovery
 
-            I found it in a legendar🐔<caret> land
+            I found it in a legendar🐔${c} land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test simple motion czech`() {
         doTest(parseKeys("l"), """
             A Discovery
 
-            I found it in a legendar<caret>ž land
+            I found it in a legendar${c}ž land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), """
             A Discovery
 
-            I found it in a legendarž<caret> land
+            I found it in a legendarž${c} land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     }
 
     fun `test simple motion tab`() {
         doTest(parseKeys("l"), """
             A Discovery
 
-            I found it in a legendar<caret>	 land
+            I found it in a legendar${c}	 land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), """
             A Discovery
 
-            I found it in a legendar	<caret> land
+            I found it in a legendar	${c} land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
-        """.trimIndent())
+        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    }
+
+    fun `test char visual mode`() {
+        doTest(parseKeys("v", "ll"), """
+            A Discovery
+
+            I found it in a legendary lan${c}d
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent(), """
+            A Discovery
+
+            I found it in a legendary lan${s}d${c}${se}
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent(), CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    }
+
+    fun `test block visual mode`() {
+        doTest(parseKeys("<C-V>", "ll"), """
+            A Discovery
+
+            I found it in a legendary lan${c}d
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent(), """
+            A Discovery
+
+            I found it in a legendary lan${s}d${c}${se}
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent(), CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
     }
 }

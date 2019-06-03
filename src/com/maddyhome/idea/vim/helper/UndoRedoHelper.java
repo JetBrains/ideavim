@@ -20,8 +20,11 @@ package com.maddyhome.idea.vim.helper;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.command.undo.UndoManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.project.Project;
+import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
+import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -32,9 +35,12 @@ public class UndoRedoHelper {
   public static boolean undo(@NotNull final DataContext context) {
     final Project project = PlatformDataKeys.PROJECT.getData(context);
     final FileEditor fileEditor = PlatformDataKeys.FILE_EDITOR.getData(context);
-    final com.intellij.openapi.command.undo.UndoManager undoManager = com.intellij.openapi.command.undo.UndoManager.getInstance(project);
+    if (project == null) return false;
+    final UndoManager undoManager = UndoManager.getInstance(project);
     if (fileEditor != null && undoManager.isUndoAvailable(fileEditor)) {
-      undoManager.undo(fileEditor);
+      try (final VimListenerSuppressor ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
+        undoManager.undo(fileEditor);
+      }
       return true;
     }
     return false;
@@ -42,10 +48,13 @@ public class UndoRedoHelper {
 
   public static boolean redo(@NotNull final DataContext context) {
     final Project project = PlatformDataKeys.PROJECT.getData(context);
+    if (project == null) return false;
     final FileEditor fileEditor = PlatformDataKeys.FILE_EDITOR.getData(context);
-    final com.intellij.openapi.command.undo.UndoManager undoManager = com.intellij.openapi.command.undo.UndoManager.getInstance(project);
+    final UndoManager undoManager = UndoManager.getInstance(project);
     if (fileEditor != null && undoManager.isRedoAvailable(fileEditor)) {
-      undoManager.redo(fileEditor);
+      try (final VimListenerSuppressor ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
+        undoManager.redo(fileEditor);
+      }
       return true;
     }
     return false;

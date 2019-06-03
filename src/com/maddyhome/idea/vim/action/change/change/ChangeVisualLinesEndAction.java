@@ -28,10 +28,9 @@ import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.group.visual.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -44,24 +43,29 @@ import java.util.Set;
  */
 public class ChangeVisualLinesEndAction extends VimCommandAction {
   public ChangeVisualLinesEndAction() {
-    super(new VisualOperatorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
-      protected boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                                @NotNull Command cmd, @NotNull TextRange range) {
-        if (EditorData.wasVisualBlockMode(editor) && range.isMultiple()) {
-          final int[] starts = range.getStartOffsets();
-          final int[] ends = range.getEndOffsets();
+    super(new VisualOperatorActionHandler.ForEachCaret() {
+      @Override
+      protected boolean executeAction(@NotNull Editor editor,
+                                      @NotNull Caret caret,
+                                      @NotNull DataContext context,
+                                      @NotNull Command cmd,
+                                      @NotNull VimSelection range) {
+        TextRange vimTextRange = range.toVimTextRange(true);
+        if (range.getType() == SelectionType.BLOCK_WISE && vimTextRange.isMultiple()) {
+          final int[] starts = vimTextRange.getStartOffsets();
+          final int[] ends = vimTextRange.getEndOffsets();
           for (int i = 0; i < starts.length; i++) {
             if (ends[i] > starts[i]) {
               ends[i] = EditorHelper.getLineEndForOffset(editor, starts[i]);
             }
           }
           final TextRange blockRange = new TextRange(starts, ends);
-          return VimPlugin.getChange().changeRange(editor, caret, blockRange, SelectionType.BLOCK_WISE);
+          return VimPlugin.getChange().changeRange(editor, caret, blockRange, SelectionType.BLOCK_WISE, context);
         }
         else {
-          final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
-                                                    EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
-          return VimPlugin.getChange().changeRange(editor, caret, lineRange, SelectionType.LINE_WISE);
+          final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, vimTextRange.getStartOffset()),
+                                                    EditorHelper.getLineEndForOffset(editor, vimTextRange.getEndOffset()) + 1);
+          return VimPlugin.getChange().changeRange(editor, caret, lineRange, SelectionType.LINE_WISE, context);
         }
       }
     });

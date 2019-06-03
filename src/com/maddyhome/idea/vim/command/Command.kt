@@ -28,7 +28,7 @@ import javax.swing.KeyStroke
  * This represents a single Vim command to be executed. It may optionally include an argument if appropriate for
  * the command. The command has a count and a type.
  */
-class Command(
+data class Command(
         var rawCount: Int,
         val actionId: String?,
         var action: AnAction?,
