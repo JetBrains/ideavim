@@ -83,6 +83,8 @@ To Be Released
 * [VIM-1654](https://youtrack.jetbrains.com/issue/VIM-1654) Fix NPE while indent in visual block mode
 * [VIM-1657](https://youtrack.jetbrains.com/issue/VIM-1657) Fix vim repeat in visual block
 * [VIM-1659](https://youtrack.jetbrains.com/issue/VIM-1658) Fix selection on empty line
+* [VIM-1473](https://youtrack.jetbrains.com/issue/VIM-1473) Yanked lines are not handled as block
+  selection when clipboard is used
 
 0.51, 2019-02-12
 ----------------
