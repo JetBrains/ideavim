@@ -265,7 +265,12 @@ class PutGroup {
     val mutableTransferableData = transferableData.toMutableList()
     val s = TextBlockTransferable.convertLineSeparators(text, "\n", transferableData)
     if (mutableTransferableData.none { it is CaretStateTransferableData }) {
+      // Manually add CaretStateTransferableData to avoid adjustment of copied text to multicaret
       mutableTransferableData += CaretStateTransferableData(intArrayOf(0), intArrayOf(s.length))
+    }
+    if (logger.isDebugEnabled) {
+      val transferableClasses = transferableData.joinToString { it.javaClass.name }
+      logger.debug("Paste text with transferable data: $transferableClasses")
     }
     val content = TextBlockTransferable(s, mutableTransferableData, RawText(text))
     CopyPasteManager.getInstance().setContents(content)

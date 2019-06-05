@@ -65,6 +65,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This group works with command associated with copying and pasting text
@@ -176,6 +177,11 @@ public class RegisterGroup {
     // If this is an uppercase register, we need to append the text to the corresponding lowercase register
     final List<TextBlockTransferableData> transferableData = start != -1 ? getTransferableData(editor, range, text) : new ArrayList<>();
     final String processedText = start != -1 ? preprocessText(editor, range, text, transferableData) : text;
+    if (logger.isDebugEnabled()) {
+      final String transferableClasses =
+        transferableData.stream().map(it -> it.getClass().getName()).collect(Collectors.joining(","));
+      logger.debug("Copy to '" + lastRegister + "' with transferable data: " + transferableClasses);
+    }
     if (Character.isUpperCase(register)) {
       char lreg = Character.toLowerCase(register);
       Register r = registers.get(lreg);
