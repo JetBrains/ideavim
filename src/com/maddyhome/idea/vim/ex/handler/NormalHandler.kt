@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 
 class NormalHandler : CommandHandler(
         commands("norm[al]"),
-        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Flag.WRITABLE, Flag.SAVE_VISUAL_MODE),
+        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Flag.WRITABLE),
         false, CaretOrder.INCREASING_OFFSET
 ) {
 

@@ -92,10 +92,6 @@ abstract class CommandHandler {
      */
     READ_ONLY,
     DONT_SAVE_LAST,
-    /**
-     * Indicates that visual mode should NOT be exited after command execution
-     */
-    SAVE_VISUAL_MODE,
 
     /**
      * This command should not exit visual mode.

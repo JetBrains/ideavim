@@ -45,7 +45,6 @@ public class CommandParser {
   public static final int RES_ERROR = 1;
   public static final int RES_READONLY = 1;
   public static final int RES_DONT_REOPEN = 4;
-  public static final int RES_SAVE_VISUAL = 8;
   public static final Pattern TRIM_WHITESPACE = Pattern.compile("[ \\t]*(.*)[ \\t\\n\\r]+", Pattern.DOTALL);
 
   /**
@@ -240,9 +239,6 @@ public class CommandParser {
 
     if (handler.getArgFlags().getFlags().contains(CommandHandler.Flag.DONT_REOPEN)) {
       result |= RES_DONT_REOPEN;
-    }
-    if (handler.getArgFlags().getFlags().contains(CommandHandler.Flag.SAVE_VISUAL_MODE)) {
-      result |= RES_SAVE_VISUAL;
     }
 
     return result;
