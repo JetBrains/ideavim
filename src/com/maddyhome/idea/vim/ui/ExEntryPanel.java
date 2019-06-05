@@ -116,6 +116,14 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     entry.setText(initText);
     entry.setType(label);
     parent = editor.getContentComponent();
+
+    if (isIncSearchEnabled(label)) {
+      entry.getDocument().addDocumentListener(incSearchDocumentListener);
+      caretOffset = editor.getCaretModel().getOffset();
+      verticalOffset = editor.getScrollingModel().getVerticalScrollOffset();
+      horizontalOffset = editor.getScrollingModel().getHorizontalScrollOffset();
+    }
+
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
       JRootPane root = SwingUtilities.getRootPane(parent);
       oldGlass = (JComponent)root.getGlassPane();
@@ -127,12 +135,6 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       oldGlass.addComponentListener(adapter);
       positionPanel();
       oldGlass.setVisible(true);
-      if (isIncSearchEnabled(label)) {
-        entry.getDocument().addDocumentListener(incSearchDocumentListener);
-        caretOffset = editor.getCaretModel().getOffset();
-        verticalOffset = editor.getScrollingModel().getVerticalScrollOffset();
-        horizontalOffset = editor.getScrollingModel().getHorizontalScrollOffset();
-      }
       entry.requestFocusInWindow();
     }
     active = true;
@@ -233,6 +235,19 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     logger.info("deactivate");
     if (!active) return;
     active = false;
+
+    // incsearch won't change in the lifetime of this activation
+    if (isIncSearchEnabled(label.getText())) {
+      entry.getDocument().removeDocumentListener(incSearchDocumentListener);
+      final Editor editor = entry.getEditor();
+      if (!editor.isDisposed()) {
+        MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), caretOffset);
+        editor.getScrollingModel().scrollVertically(verticalOffset);
+        editor.getScrollingModel().scrollHorizontally(horizontalOffset);
+      }
+      removeIncrementalHighlight(editor);
+    }
+
     entry.deactivate();
 
     if (!ApplicationManager.getApplication().isUnitTestMode()) {
@@ -245,18 +260,6 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       oldGlass.remove(this);
       oldGlass.setOpaque(wasOpaque);
       oldGlass.setLayout(oldLayout);
-
-      // incsearch won't change in the lifetime of this activation
-      if (isIncSearchEnabled(label.getText())) {
-        entry.getDocument().removeDocumentListener(incSearchDocumentListener);
-        final Editor editor = entry.getEditor();
-        MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), caretOffset);
-        editor.getScrollingModel().scrollVertically(verticalOffset);
-        editor.getScrollingModel().scrollHorizontally(horizontalOffset);
-        if (incHighlighter != null) {
-          editor.getMarkupModel().removeHighlighter(incHighlighter);
-        }
-      }
     }
 
     parent = null;
@@ -264,6 +267,15 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
 
   private boolean isIncSearchEnabled(@NotNull String labelText) {
     return (labelText.equals("/") || labelText.equals("?")) && Options.getInstance().isSet(Options.INCREMENTAL_SEARCH);
+  }
+
+  private void removeIncrementalHighlight(@NotNull Editor editor) {
+    if (incHighlighter != null) {
+      if (!editor.isDisposed()) {
+        editor.getMarkupModel().removeHighlighter(incHighlighter);
+      }
+      incHighlighter = null;
+    }
   }
 
   /**
@@ -292,10 +304,9 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     @Override
     protected void textChanged(@NotNull DocumentEvent e) {
       final Editor editor = entry.getEditor();
+      removeIncrementalHighlight(editor);
+
       final boolean forwards = !label.getText().equals("?");
-      if (incHighlighter != null) {
-        editor.getMarkupModel().removeHighlighter(incHighlighter);
-      }
       final String searchText = entry.getActualText();
       final CharPointer p = new CharPointer(searchText);
       final CharPointer end = RegExp.skip_regexp(new CharPointer(searchText), forwards ? '/' : '?', true);

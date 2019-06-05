@@ -75,6 +75,8 @@ public class ExTextField extends JTextField {
 
   void deactivate() {
     clearCurrentAction();
+    editor = null;
+    context = null;
   }
 
   @Override

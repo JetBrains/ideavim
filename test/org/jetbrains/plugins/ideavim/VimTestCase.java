@@ -24,6 +24,7 @@ import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
@@ -44,6 +45,7 @@ import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.helper.TestInputModel;
+import com.maddyhome.idea.vim.option.Option;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.option.ToggleOption;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
@@ -136,18 +138,15 @@ public abstract class VimTestCase extends UsefulTestCase {
     final EditorDataContext dataContext = new EditorDataContext(editor);
     final Project project = myFixture.getProject();
     TestInputModel.getInstance(editor).setKeyStrokes(keys);
-    RunnableHelper.runWriteCommand(project, new Runnable() {
-      @Override
-      public void run() {
-        final TestInputModel inputModel = TestInputModel.getInstance(editor);
-        for (KeyStroke key = inputModel.nextKeyStroke(); key != null; key = inputModel.nextKeyStroke()) {
-          final ExEntryPanel exEntryPanel = ExEntryPanel.getInstance();
-          if (exEntryPanel.isActive()) {
-            exEntryPanel.handleKey(key);
-          }
-          else {
-            keyHandler.handleKey(editor, key, dataContext);
-          }
+    RunnableHelper.runWriteCommand(project, () -> {
+      final TestInputModel inputModel = TestInputModel.getInstance(editor);
+      for (KeyStroke key = inputModel.nextKeyStroke(); key != null; key = inputModel.nextKeyStroke()) {
+        final ExEntryPanel exEntryPanel = ExEntryPanel.getInstance();
+        if (exEntryPanel.isActive()) {
+          exEntryPanel.handleKey(key);
+        }
+        else {
+          keyHandler.handleKey(editor, key, dataContext);
         }
       }
     }, null, null);
@@ -156,11 +155,51 @@ public abstract class VimTestCase extends UsefulTestCase {
 
   @NotNull
   protected static List<KeyStroke> commandToKeys(@NotNull String command) {
-    List<KeyStroke> keys = new ArrayList<KeyStroke>();
+    List<KeyStroke> keys = new ArrayList<>();
     keys.addAll(StringHelper.parseKeys(":"));
     keys.addAll(StringHelper.stringToKeys(command));
     keys.addAll(StringHelper.parseKeys("<Enter>"));
     return keys;
+  }
+
+  @NotNull
+  protected Editor enterCommand(@NotNull String command) {
+    return typeText(commandToKeys(command));
+  }
+
+  protected static List<KeyStroke> searchToKeys(@NotNull String pattern, boolean forwards) {
+    List<KeyStroke> keys = new ArrayList<>();
+    keys.addAll(StringHelper.parseKeys(forwards ? "/" : "?"));
+    keys.addAll(StringHelper.stringToKeys(pattern));
+    keys.addAll(StringHelper.parseKeys("<Enter>"));
+    return keys;
+  }
+
+  protected Editor enterSearch(@NotNull String pattern) {
+    return enterSearch(pattern, true);
+  }
+
+  protected Editor enterSearch(@NotNull String pattern, boolean forwards) {
+    return typeText(searchToKeys(pattern, forwards));
+  }
+
+  protected void setOption(String name) {
+    final Option option = Options.getInstance().getOption(name);
+    assertInstanceOf(option, ToggleOption.class);
+    ((ToggleOption) option).set();
+  }
+
+  protected void resetOption(String name) {
+    final Option option = Options.getInstance().getOption(name);
+    assertInstanceOf(option, ToggleOption.class);
+    ((ToggleOption) option).reset();
+  }
+
+  public void assertPosition(int line, int column) {
+    final List<Caret> carets = myFixture.getEditor().getCaretModel().getAllCarets();
+    assertEquals("Wrong amount of carets", 1, carets.size());
+    final LogicalPosition position = carets.get(0).getLogicalPosition();
+    assertEquals(position, new LogicalPosition(line, column));
   }
 
   public void assertOffset(int... expectedOffsets) {

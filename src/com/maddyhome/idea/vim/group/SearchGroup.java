@@ -19,9 +19,7 @@ package com.maddyhome.idea.vim.group;
 
 import com.google.common.collect.Lists;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
@@ -1247,37 +1245,40 @@ public class SearchGroup {
         return;
       }
 
-      Project[] projs = ProjectManager.getInstance().getOpenProjects();
-      for (Project proj : projs) {
-        Editor[] editors = EditorFactory.getInstance().getEditors(event.getDocument(), proj);
-        for (Editor editor : editors) {
+      for (Project project : ProjectManager.getInstance().getOpenProjects()) {
+        final Document document = event.getDocument();
+
+        for (Editor editor : EditorFactory.getInstance().getEditors(document, project)) {
           Collection hls = EditorData.getLastHighlights(editor);
           if (hls == null) {
             continue;
           }
 
-          int soff = event.getOffset();
-          int eoff = soff + event.getNewLength();
-
           if (logger.isDebugEnabled()) {
             logger.debug("hls=" + hls);
             logger.debug("event=" + event);
           }
-          Iterator iter = hls.iterator();
+
+          // We can only re-highlight whole lines, so clear any highlights in the affected lines
+          final LogicalPosition startPosition = editor.offsetToLogicalPosition(event.getOffset());
+          final LogicalPosition endPosition = editor.offsetToLogicalPosition(event.getOffset() + event.getNewLength());
+          final int startLineOffset = document.getLineStartOffset(startPosition.line);
+          final int endLineOffset = document.getLineEndOffset(endPosition.line);
+
+          final Iterator iter = hls.iterator();
           while (iter.hasNext()) {
-            RangeHighlighter rh = (RangeHighlighter)iter.next();
-            if (!rh.isValid() || (eoff >= rh.getStartOffset() && soff <= rh.getEndOffset())) {
+            final RangeHighlighter highlighter = (RangeHighlighter) iter.next();
+            if (!highlighter.isValid() || (highlighter.getStartOffset() >= startLineOffset && highlighter.getEndOffset() <= endLineOffset)) {
               iter.remove();
-              editor.getMarkupModel().removeHighlighter(rh);
+              editor.getMarkupModel().removeHighlighter(highlighter);
             }
           }
 
-          int sl = editor.offsetToLogicalPosition(soff).line;
-          int el = editor.offsetToLogicalPosition(eoff).line;
-          VimPlugin.getSearch().highlightSearchLines(editor, sl, el);
+          VimPlugin.getSearch().highlightSearchLines(editor, startPosition.line, endPosition.line);
+
           if (logger.isDebugEnabled()) {
             hls = EditorData.getLastHighlights(editor);
-            logger.debug("sl=" + sl + ", el=" + el);
+            logger.debug("sl=" + startPosition.line + ", el=" + endPosition.line);
             logger.debug("hls=" + hls);
           }
         }
