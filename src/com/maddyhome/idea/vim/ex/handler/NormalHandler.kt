@@ -51,11 +51,6 @@ class NormalHandler : CommandHandler(
         val range = cmd.getLineRange(editor, editor.caretModel.primaryCaret, context)
 
         val commandState = CommandState.getInstance(editor)
-        if (commandState.mode == CommandState.Mode.VISUAL) {
-            // Disable visual mode before command execution
-            // Otherwise commands will be applied to selected text
-            VimPlugin.getVisualMotion().exitVisual(editor)
-        }
 
         for (line in range.startLine..range.endLine) {
             if (rangeUsed) {
