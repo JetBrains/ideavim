@@ -52,8 +52,12 @@ import com.intellij.util.io.HttpRequests;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser;
 import com.maddyhome.idea.vim.group.*;
+import com.maddyhome.idea.vim.group.copy.PutGroup;
+import com.maddyhome.idea.vim.group.copy.YankGroup;
+import com.maddyhome.idea.vim.group.visual.VisualMotionGroup;
 import com.maddyhome.idea.vim.helper.DocumentManager;
 import com.maddyhome.idea.vim.helper.MacKeyRepeat;
+import com.maddyhome.idea.vim.listener.IdeaSpecifics;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import org.jdom.Element;
@@ -80,7 +84,7 @@ import java.util.concurrent.TimeUnit;
  */
 @State(
   name = "VimSettings",
-  storages = {@Storage(file = "$APP_CONFIG$/vim_settings.xml")})
+  storages = {@Storage("$APP_CONFIG$/vim_settings.xml")})
 public class VimPlugin implements ApplicationComponent, PersistentStateComponent<Element> {
   private static final String IDEAVIM_COMPONENT_NAME = "VimPlugin";
   private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";
@@ -88,7 +92,9 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   public static final String IDEAVIM_NOTIFICATION_ID = "ideavim";
   public static final String IDEAVIM_STICKY_NOTIFICATION_ID = "ideavim-sticky";
   public static final String IDEAVIM_NOTIFICATION_TITLE = "IdeaVim";
-  public static final int STATE_VERSION = 4;
+  public static final int STATE_VERSION = 5;
+
+  private static long lastBeepTimeMillis;
 
   private boolean error = false;
 
@@ -102,7 +108,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
   @NotNull private final MotionGroup motion;
   @NotNull private final ChangeGroup change;
-  @NotNull private final CopyGroup copy;
+  @NotNull private final CommandGroup command;
   @NotNull private final MarkGroup mark;
   @NotNull private final RegisterGroup register;
   @NotNull private final FileGroup file;
@@ -114,11 +120,14 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   @NotNull private final KeyGroup key;
   @NotNull private final WindowGroup window;
   @NotNull private final EditorGroup editor;
+  @NotNull private final VisualMotionGroup visualMotion;
+  @NotNull private final YankGroup yank;
+  @NotNull private final PutGroup put;
 
   public VimPlugin() {
     motion = new MotionGroup();
     change = new ChangeGroup();
-    copy = new CopyGroup();
+    command = new CommandGroup();
     mark = new MarkGroup();
     register = new RegisterGroup();
     file = new FileGroup();
@@ -130,6 +139,9 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     key = new KeyGroup();
     window = new WindowGroup();
     editor = new EditorGroup();
+    visualMotion = new VisualMotionGroup();
+    yank = new YankGroup();
+    put = new PutGroup();
 
     LOG.debug("VimPlugin ctr");
   }
@@ -193,10 +205,6 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     state.setAttribute("enabled", Boolean.toString(enabled));
     element.addContent(state);
 
-    mark.saveData(element);
-    register.saveData(element);
-    search.saveData(element);
-    history.saveData(element);
     key.saveData(element);
     editor.saveData(element);
 
@@ -219,10 +227,13 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
       previousKeyMap = state.getAttributeValue("keymap");
     }
 
-    mark.readData(element);
-    register.readData(element);
-    search.readData(element);
-    history.readData(element);
+    if (previousStateVersion > 0 && previousStateVersion < 5) {
+      // Migrate settings from 4 to 5 version
+      mark.readData(element);
+      register.readData(element);
+      search.readData(element);
+      history.readData(element);
+    }
     key.readData(element);
     editor.readData(element);
   }
@@ -238,9 +249,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   }
 
   @NotNull
-  public static CopyGroup getCopy() {
-    return getInstance().copy;
-  }
+  public static CommandGroup getCommand() { return getInstance().command; }
 
   @NotNull
   public static MarkGroup getMark() {
@@ -298,6 +307,21 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   }
 
   @NotNull
+  public static VisualMotionGroup getVisualMotion() {
+    return getInstance().visualMotion;
+  }
+
+  @NotNull
+  public static YankGroup getYank() {
+    return getInstance().yank;
+  }
+
+  @NotNull
+  public static PutGroup getPut() {
+    return getInstance().put;
+  }
+
+  @NotNull
   public static PluginId getPluginId() {
     return PluginId.getId(IDEAVIM_PLUGIN_ID);
   }
@@ -341,7 +365,12 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
       getInstance().error = true;
     }
     else if (!Options.getInstance().isSet("visualbell")) {
-      Toolkit.getDefaultToolkit().beep();
+      // Vim only allows a beep once every half second - :help 'visualbell'
+      final long currentTimeMillis = System.currentTimeMillis();
+      if (currentTimeMillis - lastBeepTimeMillis > 500) {
+        Toolkit.getDefaultToolkit().beep();
+        lastBeepTimeMillis = currentTimeMillis;
+      }
     }
   }
 
@@ -468,6 +497,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
         eventFacade.addFileEditorManagerListener(project, new MotionGroup.MotionEditorChange());
         eventFacade.addFileEditorManagerListener(project, new FileGroup.SelectionCheck());
         eventFacade.addFileEditorManagerListener(project, new SearchGroup.EditorSelectionCheck());
+        IdeaSpecifics.INSTANCE.addIdeaSpecificsListener(project);
       }
     });
   }

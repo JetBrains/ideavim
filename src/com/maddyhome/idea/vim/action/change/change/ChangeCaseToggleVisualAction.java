@@ -26,10 +26,9 @@ import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
+import com.maddyhome.idea.vim.group.visual.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -42,11 +41,15 @@ import java.util.Set;
  */
 public class ChangeCaseToggleVisualAction extends VimCommandAction {
   public ChangeCaseToggleVisualAction() {
-    super(new VisualOperatorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
+    super(new VisualOperatorActionHandler.ForEachCaret() {
       @Override
-      protected boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                                @NotNull Command cmd, @NotNull TextRange range) {
-        return VimPlugin.getChange().changeCaseRange(editor, caret, range, CharacterHelper.CASE_TOGGLE);
+      protected boolean executeAction(@NotNull Editor editor,
+                                      @NotNull Caret caret,
+                                      @NotNull DataContext context,
+                                      @NotNull Command cmd,
+                                      @NotNull VimSelection range) {
+        return VimPlugin.getChange()
+          .changeCaseRange(editor, caret, range.toVimTextRange(false), CharacterHelper.CASE_TOGGLE);
       }
     });
   }

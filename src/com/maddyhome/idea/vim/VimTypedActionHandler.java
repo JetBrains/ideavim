@@ -22,14 +22,17 @@ import com.intellij.codeInsight.lookup.Lookup;
 import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandlerEx;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
+import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
+import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.awt.event.KeyEvent;
 
 /**
  * Accepts all regular keystrokes and passes them on to the Vim key handler.
@@ -39,11 +42,9 @@ import javax.swing.*;
 public class VimTypedActionHandler implements TypedActionHandlerEx {
   private static final Logger logger = Logger.getInstance(VimTypedActionHandler.class.getName());
 
-  private final TypedActionHandler origHandler;
   @NotNull private final KeyHandler handler;
 
-  public VimTypedActionHandler(TypedActionHandler origHandler) {
-    this.origHandler = origHandler;
+  VimTypedActionHandler(TypedActionHandler origHandler) {
     handler = KeyHandler.getInstance();
     handler.setOriginalHandler(origHandler);
   }
@@ -54,7 +55,7 @@ public class VimTypedActionHandler implements TypedActionHandlerEx {
       handler.beforeHandleKey(editor, KeyStroke.getKeyStroke(charTyped), context, plan);
     }
     else {
-      TypedActionHandler originalHandler = KeyHandler.getInstance().getOriginalHandler();
+      TypedActionHandler originalHandler = handler.getOriginalHandler();
       if (originalHandler instanceof TypedActionHandlerEx) {
         ((TypedActionHandlerEx)originalHandler).beforeExecute(editor, charTyped, context, plan);
       }
@@ -63,7 +64,7 @@ public class VimTypedActionHandler implements TypedActionHandlerEx {
 
   @Override
   public void execute(@NotNull final Editor editor, final char charTyped, @NotNull final DataContext context) {
-    if (isEnabled(editor)) {
+    if (isEnabled(editor) && charTyped != KeyEvent.CHAR_UNDEFINED) {
       try {
         handler.handleKey(editor, KeyStroke.getKeyStroke(charTyped), new EditorDataContext(editor));
       }
@@ -72,7 +73,10 @@ public class VimTypedActionHandler implements TypedActionHandlerEx {
       }
     }
     else {
-      origHandler.execute(editor, charTyped, context);
+      try (final VimListenerSuppressor ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
+        TypedActionHandler origHandler = handler.getOriginalHandler();
+        origHandler.execute(editor, charTyped, context);
+      }
     }
   }
 

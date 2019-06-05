@@ -23,17 +23,11 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_OPTIONAL
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_OPTIONAL
-import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.ex.commands
-import com.maddyhome.idea.vim.ex.flags
+import com.maddyhome.idea.vim.ex.*
 
 class YankLinesHandler : CommandHandler(
-        commands("y[ank]"),
-        flags(RANGE_OPTIONAL, ARGUMENT_OPTIONAL)
+  commands("y[ank]"),
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
 ) {
 
   @Throws(ExException::class)
@@ -58,8 +52,8 @@ class YankLinesHandler : CommandHandler(
       ends.add(range.endOffset - 1)
     }
 
-    return VimPlugin.getCopy().yankRange(editor,
-            TextRange(starts.toIntArray(), ends.toIntArray()),
-            SelectionType.LINE_WISE, false)
+    return VimPlugin.getYank().yankRange(editor,
+      TextRange(starts.toIntArray(), ends.toIntArray()),
+      SelectionType.LINE_WISE, false)
   }
 }

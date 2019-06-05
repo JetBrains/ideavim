@@ -22,9 +22,12 @@ import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
+import com.intellij.testFramework.EditorTestUtil;
 import com.intellij.testFramework.LightProjectDescriptor;
 import com.intellij.testFramework.UsefulTestCase;
 import com.intellij.testFramework.fixtures.CodeInsightTestFixture;
@@ -37,7 +40,10 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
-import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.helper.EditorDataContext;
+import com.maddyhome.idea.vim.helper.RunnableHelper;
+import com.maddyhome.idea.vim.helper.StringHelper;
+import com.maddyhome.idea.vim.helper.TestInputModel;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.option.ToggleOption;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
@@ -45,6 +51,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +60,10 @@ import java.util.List;
  */
 public abstract class VimTestCase extends UsefulTestCase {
   protected CodeInsightTestFixture myFixture;
+
+  protected static final String c = EditorTestUtil.CARET_TAG;
+  protected static final String s = EditorTestUtil.SELECTION_START_TAG;
+  protected static final String se = EditorTestUtil.SELECTION_END_TAG;
 
   @Override
   protected void setUp() throws Exception {
@@ -68,6 +79,9 @@ public abstract class VimTestCase extends UsefulTestCase {
     KeyHandler.getInstance().fullReset(myFixture.getEditor());
     Options.getInstance().resetAllOptions();
     VimPlugin.getKey().resetKeyMappings();
+
+    // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
+    ExEntryPanel.getInstance().getEntry().setBounds(0,0, 100, 25);
   }
 
   protected String getTestDataPath() {
@@ -80,6 +94,7 @@ public abstract class VimTestCase extends UsefulTestCase {
     myFixture = null;
     ExEntryPanel.getInstance().deactivate(false);
     VimScriptGlobalEnvironment.getInstance().getVariables().clear();
+    VimPlugin.getRegister().resetRegisters();
     super.tearDown();
   }
 
@@ -161,6 +176,11 @@ public abstract class VimTestCase extends UsefulTestCase {
     assertEquals(expectedMode, mode);
   }
 
+  public void assertSubMode(@NotNull CommandState.SubMode expectedSubMode) {
+    CommandState.SubMode subMode = CommandState.getInstance(myFixture.getEditor()).getSubMode();
+    assertEquals(expectedSubMode, subMode);
+  }
+
   public void assertSelection(@Nullable String expected) {
     final String selected = myFixture.getEditor().getSelectionModel().getSelectedText();
     assertEquals(expected, selected);
@@ -176,9 +196,42 @@ public abstract class VimTestCase extends UsefulTestCase {
     assertEquals(isError, VimPlugin.isError());
   }
 
-  public void doTest(final List<KeyStroke> keys, String before, String after) {
+  protected void assertCaretsColour() {
+    Color selectionColour = myFixture.getEditor().getColorsScheme().getColor(EditorColors.SELECTION_BACKGROUND_COLOR);
+    Color caretColour = myFixture.getEditor().getColorsScheme().getColor(EditorColors.CARET_COLOR);
+    if (CommandState.inBlockSubMode(myFixture.getEditor())) {
+      CaretModel caretModel = myFixture.getEditor().getCaretModel();
+      caretModel.getAllCarets().forEach(caret -> {
+        if (caret != caretModel.getPrimaryCaret()) {
+          assertEquals(selectionColour, caret.getVisualAttributes().getColor());
+        }
+        else {
+          Color color = caret.getVisualAttributes().getColor();
+          if (color != null) assertEquals(caretColour, color);
+        }
+      });
+    }
+    else {
+      myFixture.getEditor().getCaretModel().getAllCarets().forEach(caret -> {
+        Color color = caret.getVisualAttributes().getColor();
+        if (color != null) assertEquals(caretColour, color);
+      });
+    }
+  }
+
+  public void doTest(final List<KeyStroke> keys,
+                     String before,
+                     String after,
+                     CommandState.Mode modeAfter, CommandState.SubMode subModeAfter) {
     configureByText(before);
     typeText(keys);
     myFixture.checkResult(after);
+    assertState(modeAfter, subModeAfter);
+  }
+
+  protected void assertState(CommandState.Mode modeAfter, CommandState.SubMode subModeAfter) {
+    assertCaretsColour();
+    assertMode(modeAfter);
+    assertSubMode(subModeAfter);
   }
 }

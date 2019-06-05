@@ -22,20 +22,11 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_REQUIRED
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_OPTIONAL
+import com.maddyhome.idea.vim.ex.*
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
-import com.maddyhome.idea.vim.ex.CommandParser
-import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.ex.InvalidRangeException
-import com.maddyhome.idea.vim.ex.LineRange
-import com.maddyhome.idea.vim.ex.commands
-import com.maddyhome.idea.vim.ex.flags
+import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.handler.CaretOrder
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
@@ -43,8 +34,8 @@ import com.maddyhome.idea.vim.helper.Msg
 import java.util.*
 
 class MoveTextHandler : CommandHandler(
-        commands("m[ove]"),
-        flags(RANGE_OPTIONAL, ARGUMENT_REQUIRED, WRITABLE)
+  commands("m[ove]"),
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, WRITABLE)
 ) {
   @Throws(ExException::class)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
@@ -71,17 +62,15 @@ class MoveTextHandler : CommandHandler(
       }
     }
 
-    for (range in ranges) {
-      editor.document.deleteString(range.startOffset, range.endOffset)
-    }
+    ranges.forEach { editor.document.deleteString(it.startOffset, it.endOffset) }
 
     for (i in 0 until caretCount) {
       val caret = carets[i]
       val text = texts[i]
 
-      val offset = VimPlugin.getMotion().moveCaretToLineStart(editor, line + 1)
-      VimPlugin.getCopy().putText(editor, caret, context, text, SelectionType.LINE_WISE, CommandState.SubMode.NONE,
-              offset, 1, true, false)
+      val textData = PutData.TextData(text, SelectionType.LINE_WISE)
+      val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, _indent = true, caretAfterInsertedText = false, putToLine = line)
+      VimPlugin.getPut().putTextForCaret(editor, caret, context, putData)
     }
 
     return true

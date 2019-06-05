@@ -22,7 +22,6 @@ import com.intellij.ide.BrowserUtil
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_OPTIONAL
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
@@ -33,27 +32,27 @@ import java.net.URLEncoder
  * @author vlan
  */
 class HelpHandler : CommandHandler(
-        commands("h[elp]"),
-        flags(ARGUMENT_OPTIONAL)
+  commands("h[elp]"),
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        BrowserUtil.browse(helpTopicUrl(cmd.argument))
-        return true
-    }
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    BrowserUtil.browse(helpTopicUrl(cmd.argument))
+    return true
+  }
 
-    private fun helpTopicUrl(topic: String): String {
-        if (topic.isBlank()) return HELP_ROOT_URL
+  private fun helpTopicUrl(topic: String): String {
+    if (topic.isBlank()) return HELP_ROOT_URL
 
-        return try {
-            String.format("%s?docs=help&search=%s", HELP_QUERY_URL, URLEncoder.encode(topic, "UTF-8"))
-        } catch (e: UnsupportedEncodingException) {
-            HELP_ROOT_URL
-        }
+    return try {
+      String.format("%s?docs=help&search=%s", HELP_QUERY_URL, URLEncoder.encode(topic, "UTF-8"))
+    } catch (e: UnsupportedEncodingException) {
+      HELP_ROOT_URL
     }
+  }
 
-    companion object {
-        private const val HELP_BASE_URL = "http://vimdoc.sourceforge.net"
-        private const val HELP_ROOT_URL = "$HELP_BASE_URL/htmldoc/"
-        private const val HELP_QUERY_URL = "$HELP_BASE_URL/search.php"
-    }
+  companion object {
+    private const val HELP_BASE_URL = "http://vimdoc.sourceforge.net"
+    private const val HELP_ROOT_URL = "$HELP_BASE_URL/htmldoc/"
+    private const val HELP_QUERY_URL = "$HELP_BASE_URL/search.php"
+  }
 }

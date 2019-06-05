@@ -1,7 +1,24 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2019 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.maddyhome.idea.vim.ex.handler
 
 import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
@@ -10,22 +27,19 @@ import com.maddyhome.idea.vim.ex.*
 import com.maddyhome.idea.vim.handler.CaretOrder
 import com.maddyhome.idea.vim.handler.ExecuteMethodNotOverriddenException
 import com.maddyhome.idea.vim.helper.EditorHelper
-
-import javax.swing.*
-
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 
 class NormalHandler : CommandHandler(
         commands("norm[al]"),
-        flags(Flag.RANGE_OPTIONAL, Flag.ARGUMENT_REQUIRED, Flag.WRITABLE, Flag.SAVE_VISUAL_MODE),
-        true, CaretOrder.INCREASING_OFFSET
+        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Flag.WRITABLE, Flag.SAVE_VISUAL_MODE),
+        false, CaretOrder.INCREASING_OFFSET
 ) {
 
     @Throws(ExException::class, ExecuteMethodNotOverriddenException::class)
-    override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
+    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
         var argument = cmd.argument
         var useMapping = true
-        if (!argument.isEmpty() && argument[0] == '!') {
+        if (argument.isNotEmpty() && argument[0] == '!') {
             // Disable mapping by "!" option
             useMapping = false
             argument = argument.substring(1).trim()
@@ -34,13 +48,13 @@ class NormalHandler : CommandHandler(
         // True if line range was explicitly defined by user
         val rangeUsed = cmd.ranges.size() != 0
 
-        val range = cmd.getLineRange(editor, caret, context)
+        val range = cmd.getLineRange(editor, editor.caretModel.primaryCaret, context)
 
         val commandState = CommandState.getInstance(editor)
         if (commandState.mode == CommandState.Mode.VISUAL) {
             // Disable visual mode before command execution
             // Otherwise commands will be applied to selected text
-            VimPlugin.getMotion().exitVisual(editor)
+            VimPlugin.getVisualMotion().exitVisual(editor)
         }
 
         for (line in range.startLine..range.endLine) {

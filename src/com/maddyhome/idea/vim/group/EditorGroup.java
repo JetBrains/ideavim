@@ -39,7 +39,6 @@ import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
@@ -94,7 +93,8 @@ public class EditorGroup {
           // Turn on insert mode if editor doesn't have any file
           if (!EditorData.isFileEditor(editor) && editor.getDocument().isWritable() &&
               !CommandState.inInsertMode(editor)) {
-            KeyHandler.getInstance().handleKey(editor, KeyStroke.getKeyStroke('i'), new EditorDataContext(editor));
+            VimPlugin.getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
+            KeyHandler.getInstance().reset(editor);
           }
           editor.getSettings().setBlockCursor(!CommandState.inInsertMode(editor));
           editor.getSettings().setAnimatedScrolling(ANIMATED_SCROLLING_VIM_VALUE);

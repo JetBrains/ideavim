@@ -21,16 +21,15 @@ package com.maddyhome.idea.vim.ex
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.util.Ref
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.handler.CaretOrder
 import com.maddyhome.idea.vim.handler.ExecuteMethodNotOverriddenException
-import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
-
-import java.util.EnumSet
+import java.util.*
 
 /**
  * Base class for all Ex command handlers.
@@ -38,13 +37,15 @@ import java.util.EnumSet
 abstract class CommandHandler {
 
   val names: Array<CommandName>?
-  val argFlags: EnumSet<Flag>
+  val argFlags: CommandHandlerFlags
   private val optFlags: EnumSet<CommandFlags>
 
   private val runForEachCaret: Boolean
   private val caretOrder: CaretOrder
 
-  enum class Flag {
+  class CommandHandlerFlags(val rangeFlag: RangeFlag, val argumentFlag: ArgumentFlag, val flags: Set<Flag>)
+
+  enum class RangeFlag {
     /**
      * Indicates that a range must be specified with this command
      */
@@ -58,6 +59,14 @@ abstract class CommandHandler {
      */
     RANGE_FORBIDDEN,
     /**
+     * Indicates that the command takes a count, not a range - effects default
+     * Works like RANGE_OPTIONAL
+     */
+    RANGE_IS_COUNT
+  }
+
+  enum class ArgumentFlag {
+    /**
      * Indicates that an argument must be specified with this command
      */
     ARGUMENT_REQUIRED,
@@ -68,12 +77,10 @@ abstract class CommandHandler {
     /**
      * Indicates that an argument can't be specified for this command
      */
-    ARGUMENT_FORBIDDEN,
-    /**
-     * Indicates that the command takes a count, not a range - effects default
-     */
-    RANGE_IS_COUNT,
+    ARGUMENT_FORBIDDEN
+  }
 
+  enum class Flag {
     DONT_REOPEN,
 
     /**
@@ -88,7 +95,15 @@ abstract class CommandHandler {
     /**
      * Indicates that visual mode should NOT be exited after command execution
      */
-    SAVE_VISUAL_MODE
+    SAVE_VISUAL_MODE,
+
+    /**
+     * This command should not exit visual mode.
+     *
+     * Vim exits visual mode before command execution, but in this case :action will work incorrect.
+     *   With this flag visual mode will not be exited while command execution.
+     */
+    SAVE_VISUAL_BEFORE_EXECUTION
   }
 
   /**
@@ -98,11 +113,11 @@ abstract class CommandHandler {
    * [argFlags] - Range and Arguments commands
    */
   constructor(
-          names: Array<CommandName>?,
-          argFlags: EnumSet<Flag>,
-          runForEachCaret: Boolean = false,
-          caretOrder: CaretOrder = CaretOrder.NATIVE,
-          optFlags: EnumSet<CommandFlags> = EnumSet.noneOf<CommandFlags>(CommandFlags::class.java)
+    names: Array<CommandName>?,
+    argFlags: CommandHandlerFlags,
+    runForEachCaret: Boolean = false,
+    caretOrder: CaretOrder = CaretOrder.DECREASING_OFFSET,
+    optFlags: EnumSet<CommandFlags> = EnumSet.noneOf<CommandFlags>(CommandFlags::class.java)
   ) {
     this.names = names
     this.argFlags = argFlags
@@ -115,7 +130,7 @@ abstract class CommandHandler {
     CommandParser.getInstance().addHandler(this)
   }
 
-  constructor(argFlags: EnumSet<Flag>, optFlags: EnumSet<CommandFlags>, runForEachCaret: Boolean, caretOrder: CaretOrder) {
+  constructor(argFlags: CommandHandlerFlags, optFlags: EnumSet<CommandFlags>, runForEachCaret: Boolean, caretOrder: CaretOrder) {
     this.names = null
     this.argFlags = argFlags
     this.optFlags = optFlags
@@ -135,49 +150,58 @@ abstract class CommandHandler {
    */
   @Throws(ExException::class)
   fun process(editor: Editor, context: DataContext, cmd: ExCommand, count: Int): Boolean {
+
     // No range allowed
-    if (Flag.RANGE_FORBIDDEN in argFlags && cmd.ranges.size() != 0) {
+    if (RangeFlag.RANGE_FORBIDDEN == argFlags.rangeFlag && cmd.ranges.size() != 0) {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_norange))
       throw NoRangeAllowedException()
     }
 
-    if (Flag.RANGE_REQUIRED in argFlags && cmd.ranges.size() == 0) {
+    if (RangeFlag.RANGE_REQUIRED == argFlags.rangeFlag && cmd.ranges.size() == 0) {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_rangereq))
       throw MissingRangeException()
     }
 
+    if (RangeFlag.RANGE_IS_COUNT == argFlags.rangeFlag) {
+      cmd.ranges.setDefaultLine(1)
+    }
+
     // Argument required
-    if (Flag.ARGUMENT_REQUIRED in argFlags && cmd.argument.isEmpty()) {
+    if (ArgumentFlag.ARGUMENT_REQUIRED == argFlags.argumentFlag && cmd.argument.isEmpty()) {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_argreq))
       throw MissingArgumentException()
     }
 
-    if (Flag.RANGE_IS_COUNT in argFlags) {
-      cmd.ranges.setDefaultLine(1)
+    if (ArgumentFlag.ARGUMENT_FORBIDDEN == argFlags.argumentFlag && cmd.argument.isNotEmpty()) {
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_argforb))
+      throw NoArgumentAllowedException()
+    }
+    CommandState.getInstance(editor).flags = optFlags
+    if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL && Flag.SAVE_VISUAL_BEFORE_EXECUTION !in argFlags.flags) {
+      VimPlugin.getVisualMotion().exitVisual(editor)
     }
 
-    CommandState.getInstance(editor).flags = optFlags
-
-    var res = true
+    val res = Ref.create(true)
     try {
       if (runForEachCaret) {
-        EditorHelper.getOrderedCaretsList(editor, caretOrder).forEach { caret ->
+        editor.caretModel.runForEachCaret({ caret ->
           var i = 0
-          while (i < count && res) {
+          while (i < count && res.get()) {
             try {
-              res = execute(editor, caret, context, cmd)
+              res.set(execute(editor, caret, context, cmd))
             } catch (e: ExecuteMethodNotOverriddenException) {
-              return false
+              res.set(false)
+              return@runForEachCaret
             }
 
             i++
           }
-        }
+        }, caretOrder == CaretOrder.DECREASING_OFFSET)
       } else {
         var i = 0
-        while (i < count && res) {
+        while (i < count && res.get()) {
           try {
-            res = execute(editor, context, cmd)
+            res.set(execute(editor, context, cmd))
           } catch (e: ExecuteMethodNotOverriddenException) {
             return false
           }
@@ -186,10 +210,10 @@ abstract class CommandHandler {
         }
       }
 
-      if (!res) {
+      if (!res.get()) {
         VimPlugin.indicateError()
       }
-      return res
+      return res.get()
     } catch (e: ExException) {
       VimPlugin.showMessage(e.message)
       VimPlugin.indicateError()

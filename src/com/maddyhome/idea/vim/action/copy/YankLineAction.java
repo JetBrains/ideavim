@@ -35,7 +35,7 @@ public class YankLineAction extends EditorAction {
 
   private static class Handler extends EditorActionHandlerBase {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      return VimPlugin.getCopy().yankLine(editor, cmd.getCount());
+      return VimPlugin.getYank().yankLine(editor, cmd.getCount());
     }
   }
 }

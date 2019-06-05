@@ -22,25 +22,23 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_OPTIONAL
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_OPTIONAL
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class SubstituteHandler : CommandHandler(
-        commands("s[ubstitute]", "&", "~"),
-        flags(RANGE_OPTIONAL, ARGUMENT_OPTIONAL, WRITABLE)
+  commands("s[ubstitute]", "&", "~"),
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        var result = true
-        for (caret in editor.caretModel.allCarets) {
-            val lineRange = cmd.getLineRange(editor, caret, context)
-            if (!VimPlugin.getSearch().searchAndReplace(editor, caret, lineRange, cmd.command, cmd.argument)) {
-                result = false
-            }
-        }
-        return result
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    var result = true
+    for (caret in editor.caretModel.allCarets) {
+      val lineRange = cmd.getLineRange(editor, caret, context)
+      if (!VimPlugin.getSearch().searchAndReplace(editor, caret, lineRange, cmd.command, cmd.argument)) {
+        result = false
+      }
     }
+    return result
+  }
 }

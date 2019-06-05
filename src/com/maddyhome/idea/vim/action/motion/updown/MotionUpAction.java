@@ -25,8 +25,8 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
-import com.maddyhome.idea.vim.helper.CaretData;
+import com.maddyhome.idea.vim.handler.MotionActionHandler;
+import com.maddyhome.idea.vim.helper.CaretDataKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,11 +37,7 @@ public class MotionUpAction extends MotionEditorAction {
     super(new Handler());
   }
 
-  private static class Handler extends MotionEditorActionHandler {
-    public Handler() {
-      super(true);
-    }
-
+  private static class Handler extends MotionActionHandler.ForEachCaret {
     @Override
     public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                          int rawCount, @Nullable Argument argument) {
@@ -49,15 +45,18 @@ public class MotionUpAction extends MotionEditorAction {
     }
 
     @Override
-    protected void preMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                           @NotNull Command cmd) {
-      col = CaretData.getLastColumn(caret);
+    protected boolean preOffsetComputation(@NotNull Editor editor,
+                                           @NotNull Caret caret,
+                                           @NotNull DataContext context,
+                                           @NotNull Command cmd) {
+      col = CaretDataKt.getVimLastColumn(caret);
+      return true;
     }
 
     @Override
     protected void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                             @NotNull Command cmd) {
-      CaretData.setLastColumn(editor, caret, col);
+      CaretDataKt.setVimLastColumn(caret, col);
     }
 
     private int col;

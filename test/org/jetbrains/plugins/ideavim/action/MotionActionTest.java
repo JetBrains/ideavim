@@ -22,6 +22,7 @@ import com.intellij.json.JsonFileType;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.VisualPosition;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.CommandState;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.command.CommandState.Mode.COMMAND;
@@ -33,6 +34,12 @@ import static com.maddyhome.idea.vim.helper.StringHelper.stringToKeys;
  * @author vlan
  */
 public class MotionActionTest extends VimTestCase {
+  public void testDoubleToggleVisual() {
+    typeTextInFile(parseKeys("vv"),
+                   "one tw<caret>o\n");
+    assertMode(COMMAND);
+  }
+
   // VIM-198 |v_iw|
   public void testVisualMotionInnerWordNewLineAtEOF() {
     typeTextInFile(parseKeys("viw"),
@@ -151,41 +158,6 @@ public class MotionActionTest extends VimTestCase {
     myFixture.checkResult(" 0:<caret>_ 1:a 2:b 3:c \n");
   }
 
-  // VIM-326 |d| |v_ib|
-  public void testDeleteInnerBlock() {
-    typeTextInFile(parseKeys("di)"),
-                   "foo(\"b<caret>ar\")\n");
-    myFixture.checkResult("foo()\n");
-  }
-
-  // VIM-326 |d| |v_ib|
-  public void testDeleteInnerBlockCaretBeforeString() {
-    typeTextInFile(parseKeys("di)"),
-                   "foo(<caret>\"bar\")\n");
-    myFixture.checkResult("foo()\n");
-  }
-
-  // VIM-326 |c| |v_ib|
-  public void testChangeInnerBlockCaretBeforeString() {
-    typeTextInFile(parseKeys("ci)"),
-                   "foo(<caret>\"bar\")\n");
-    myFixture.checkResult("foo()\n");
-  }
-
-  // VIM-392 |c| |v_ib|
-  public void testChangeInnerBlockCaretBeforeBlock() {
-    typeTextInFile(parseKeys("ci)"),
-                   "foo<caret>(bar)\n");
-    myFixture.checkResult("foo()\n");
-    assertOffset(4);
-  }
-
-  // |v_ib|
-  public void testInnerBlockCrashWhenNoDelimiterFound() {
-    typeTextInFile(parseKeys("di)"), "(x\n");
-    myFixture.checkResult("(x\n");
-  }
-
   // VIM-314 |d| |v_iB|
   public void testDeleteInnerCurlyBraceBlock() {
     typeTextInFile(parseKeys("di{"),
@@ -218,30 +190,6 @@ public class MotionActionTest extends VimTestCase {
                           "}\n");
     assertOffset(6);
   }
-
-  // VIM-275 |d| |v_ib|
-  public void testDeleteInnerParensBlockBeforeOpen() {
-    typeTextInFile(parseKeys("di)"),
-                   "foo<caret>(bar)\n");
-    myFixture.checkResult("foo()\n");
-    assertOffset(4);
-  }
-
-  // |d| |v_ib|
-  public void testDeleteInnerParensBlockBeforeClose() {
-    typeTextInFile(parseKeys("di)"),
-                   "foo(bar<caret>)\n");
-    myFixture.checkResult("foo()\n");
-  }
-
-  // |d| |v_ab|
-  public void testDeleteOuterBlock() {
-    typeTextInFile(parseKeys("da)"),
-                   "foo(b<caret>ar, baz);\n");
-    myFixture.checkResult("foo;\n");
-  }
-
-
 
   // |d| |v_aw|
   public void testDeleteOuterWord() {
@@ -440,350 +388,6 @@ public class MotionActionTest extends VimTestCase {
     typeTextInFile(parseKeys("da`"),
                    "foo = `bar b<caret>az`;\n");
     myFixture.checkResult("foo = ;\n");
-  }
-
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockCaretInHtml() {
-    typeTextInFile(parseKeys("dit"), "<template <caret>name=\"hello\">\n" +
-                                     "  <button>Click Me</button>\n" +
-                                     "  <p>You've pressed the button {{counter}} times.</p>\n" +
-                                     "</template>\n");
-    myFixture.checkResult("<template name=\"hello\"></template>\n");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockCaretInHtmlUnclosedTag() {
-    typeTextInFile(parseKeys("dit"), "<template <caret>name=\"hello\">\n" +
-                                     "  <button>Click Me</button>\n" +
-                                     "  <br>\n" +
-                                     "  <p>You've pressed the button {{counter}} times.</p>\n" +
-                                     "</template>\n");
-    myFixture.checkResult("<template name=\"hello\"></template>\n");
-  }
-
-  public void testDeleteInnerTagBlockCaretEdgeTag() {
-    typeTextInFile(parseKeys("dit"), "<template name=\"hello\"<caret>>\n" +
-                                     "  <button>Click Me</button>\n" +
-                                     "  <br>\n" +
-                                     "  <p>You've pressed the button {{counter}} times.</p>\n" +
-                                     "</template>\n");
-    myFixture.checkResult("<template name=\"hello\"></template>\n");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockBefore() {
-    typeTextInFile(parseKeys("dit"), "abc<caret>de<tag>fg</tag>hi");
-    myFixture.checkResult("abcde<tag>fg</tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockInOpen() {
-    typeTextInFile(parseKeys("dit"), "abcde<ta<caret>g>fg</tag>hi");
-    myFixture.checkResult("abcde<tag></tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockInOpenEndOfLine() {
-    typeTextInFile(parseKeys("dit"), "abcde<ta<caret>g>fg</tag>");
-    myFixture.checkResult("abcde<tag></tag>");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockInOpenStartOfLine() {
-    typeTextInFile(parseKeys("dit"), "<ta<caret>g>fg</tag>hi");
-    myFixture.checkResult("<tag></tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockInOpenWithArgs() {
-    typeTextInFile(parseKeys("dit"), "abcde<ta<caret>g name = \"name\">fg</tag>hi");
-    myFixture.checkResult("abcde<tag name = \"name\"></tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockBetween() {
-    typeTextInFile(parseKeys("dit"), "abcde<tag>f<caret>g</tag>hi");
-    myFixture.checkResult("abcde<tag></tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockBetweenTagWithRegex() {
-    typeTextInFile(parseKeys("dit"), "abcde<[abc]*>af<caret>gbc</[abc]*>hi");
-    myFixture.checkResult("abcde<[abc]*></[abc]*>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockBetweenCamelCase() {
-    typeTextInFile(parseKeys("dit"), "abcde<tAg>f<caret>g</tag>hi");
-    myFixture.checkResult("abcde<tAg></tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockBetweenCaps() {
-    typeTextInFile(parseKeys("dit"), "abcde<tag>f<caret>g</TAG>hi");
-    myFixture.checkResult("abcde<tag></TAG>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockBetweenWithSpaceBeforeTag() {
-    typeTextInFile(parseKeys("dit"), "abcde< tag>f<caret>g</ tag>hi");
-    myFixture.checkResult("abcde< tag>fg</ tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockBetweenWithSpaceAfterTag() {
-    typeTextInFile(parseKeys("dit"), "abcde<tag >f<caret>g</tag>hi");
-    myFixture.checkResult("abcde<tag ></tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockBetweenWithArgs() {
-    typeTextInFile(parseKeys("dit"), "abcde<tag name = \"name\">f<caret>g</tag>hi");
-    myFixture.checkResult("abcde<tag name = \"name\"></tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockInClose() {
-    typeTextInFile(parseKeys("dit"), "abcde<tag>fg</ta<caret>g>hi");
-    myFixture.checkResult("abcde<tag></tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockAfter() {
-    typeTextInFile(parseKeys("dit"), "abcde<tag>fg</tag>h<caret>i");
-    myFixture.checkResult("abcde<tag>fg</tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockInAlone() {
-    typeTextInFile(parseKeys("dit"), "abcde<ta<caret>g>fghi");
-    myFixture.checkResult("abcde<tag>fghi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockWithoutTags() {
-    typeTextInFile(parseKeys("dit"), "abc<caret>de");
-    myFixture.checkResult("abcde");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockBeforeWithoutOpenTag() {
-    typeTextInFile(parseKeys("dit"), "abc<caret>defg</tag>hi");
-    myFixture.checkResult("abcdefg</tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockInCloseWithoutOpenTag() {
-    typeTextInFile(parseKeys("dit"), "abcdefg</ta<caret>g>hi");
-    myFixture.checkResult("abcdefg</tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockAfterWithoutOpenTag() {
-    typeTextInFile(parseKeys("dit"), "abcdefg</tag>h<caret>i");
-    myFixture.checkResult("abcdefg</tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockBeforeWithoutCloseTag() {
-    typeTextInFile(parseKeys("dit"), "abc<caret>defg<tag>hi");
-    myFixture.checkResult("abcdefg<tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockInOpenWithoutCloseTag() {
-    typeTextInFile(parseKeys("dit"), "abcdefg<ta<caret>g>hi");
-    myFixture.checkResult("abcdefg<tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockAfterWithoutCloseTag() {
-    typeTextInFile(parseKeys("dit"), "abcdefg<tag>h<caret>i");
-    myFixture.checkResult("abcdefg<tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockBeforeWrongOrder() {
-    typeTextInFile(parseKeys("dit"), "abc<caret>de</tag>fg<tag>hi");
-    myFixture.checkResult("abcde</tag>fg<tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockInOpenWrongOrder() {
-    typeTextInFile(parseKeys("dit"), "abcde</ta<caret>g>fg<tag>hi");
-    myFixture.checkResult("abcde</tag>fg<tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockBetweenWrongOrder() {
-    typeTextInFile(parseKeys("dit"), "abcde</tag>f<caret>g<tag>hi");
-    myFixture.checkResult("abcde</tag>fg<tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockInCloseWrongOrder() {
-    typeTextInFile(parseKeys("dit"), "abcde</tag>fg<ta<caret>g>hi");
-    myFixture.checkResult("abcde</tag>fg<tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockTwoTagsWrongOrder() {
-    typeTextInFile(parseKeys("dit"), "<foo><html>t<caret>ext</foo></html>");
-    myFixture.checkResult("<foo></foo></html>");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockTwoTagsWrongOrderInClosingTag() {
-    typeTextInFile(parseKeys("dit"), "<foo><html>text</foo></htm<caret>l>");
-    myFixture.checkResult("<foo><html></html>");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockAfterWrongOrder() {
-    typeTextInFile(parseKeys("dit"), "abcde</tag>fg<tag>h<caret>i");
-    myFixture.checkResult("abcde</tag>fg<tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockBracketInside() {
-    typeTextInFile(parseKeys("dit"), "abcde<tag>f<caret><>g</tag>hi");
-    myFixture.checkResult("abcde<tag></tag>hi");
-  }
-
-  //|d| |v_it|
-  public void testDeleteInnerTagBlockBracketInsideString() {
-    typeTextInFile(parseKeys("dit"), "abcde<tag>f<caret>\"<>\"g</tag>hi");
-    myFixture.checkResult("abcde<tag></tag>hi");
-  }
-
-  //|d| |v_at|
-  public void testDeleteOuterTagBlockBefore() {
-    typeTextInFile(parseKeys("dat"), "abc<caret>de<tag>fg</tag>hi");
-    myFixture.checkResult("abcde<tag>fg</tag>hi");
-  }
-
-  //|d| |v_at|
-  public void testDeleteOuterTagBlockInOpen() {
-    typeTextInFile(parseKeys("dat"), "abcde<ta<caret>g>fg</tag>hi");
-    myFixture.checkResult("abcdehi");
-  }
-
-  //|d| |v_at|
-  public void testDeleteOuterTagBlockInOpenWithArgs() {
-    typeTextInFile(parseKeys("dat"), "abcde<ta<caret>g name = \"name\">fg</tag>hi");
-    myFixture.checkResult("abcdehi");
-  }
-
-  //|d| |v_at|
-  public void testDeleteOuterTagBlockBetween() {
-    typeTextInFile(parseKeys("dat"), "abcde<tag>f<caret>g</tag>hi");
-    myFixture.checkResult("abcdehi");
-  }
-
-  //|d| |v_at|
-  public void testDeleteOuterTagBlockBetweenWithArgs() {
-    typeTextInFile(parseKeys("dat"), "abcde<tag name = \"name\">f<caret>g</tag>hi");
-    myFixture.checkResult("abcdehi");
-  }
-
-  //|d| |v_at|
-  public void testDeleteOuterTagBlockInClose() {
-    typeTextInFile(parseKeys("dat"), "abcde<tag>fg</ta<caret>g>hi");
-    myFixture.checkResult("abcdehi");
-  }
-
-  //|d| |v_at|
-  public void testDeleteOuterTagBlockAfter() {
-    typeTextInFile(parseKeys("dat"), "abcde<tag>fg</tag>h<caret>i");
-    myFixture.checkResult("abcde<tag>fg</tag>hi");
-  }
-
-  //|d| |v_at|
-  public void testDeleteOuterTagBlockInAlone() {
-    typeTextInFile(parseKeys("dat"), "abcde<ta<caret>g>fghi");
-    myFixture.checkResult("abcde<tag>fghi");
-  }
-
-  //|d| |v_at|
-  public void testDeleteOuterTagBlockWithoutTags() {
-    typeTextInFile(parseKeys("dat"), "abc<caret>de");
-    myFixture.checkResult("abcde");
-  }
-
-  //|d| |v_at|
-  public void testDeleteOuterTagBlockBeforeWithoutOpenTag() {
-    typeTextInFile(parseKeys("dat"), "abc<caret>defg</tag>hi");
-    myFixture.checkResult("abcdefg</tag>hi");
-  }
-
-  //|d| |v_at|
-  public void testDeleteOuterTagBlockInCloseWithoutOpenTag() {
-    typeTextInFile(parseKeys("dat"), "abcdefg</ta<caret>g>hi");
-    myFixture.checkResult("abcdefg</tag>hi");
-  }
-
-  //|d| |v_at|
-  public void testDeleteOuterTagBlockAfterWithoutOpenTag() {
-    typeTextInFile(parseKeys("dat"), "abcdefg</tag>h<caret>i");
-    myFixture.checkResult("abcdefg</tag>hi");
-  }
-
-  //|d| |v_at|
-  public void testDeleteOuterTagBlockBeforeWithoutCloseTag() {
-    typeTextInFile(parseKeys("dat"), "abc<caret>defg<tag>hi");
-    myFixture.checkResult("abcdefg<tag>hi");
-  }
-
-  //|d| |v_at|
-  public void testDeleteOuterTagBlockInOpenWithoutCloseTag() {
-    typeTextInFile(parseKeys("dat"), "abcdefg<ta<caret>g>hi");
-    myFixture.checkResult("abcdefg<tag>hi");
-  }
-
-  //|d| |v_at|
-  public void testDeleteOuterTagBlockAfterWithoutCloseTag() {
-    typeTextInFile(parseKeys("dat"), "abcdefg<tag>h<caret>i");
-    myFixture.checkResult("abcdefg<tag>hi");
-  }
-
-  //|d| |v_at|
-  public void testDeleteOuterTagBlockBeforeWrongOrder() {
-    typeTextInFile(parseKeys("dat"), "abc<caret>de</tag>fg<tag>hi");
-    myFixture.checkResult("abcde</tag>fg<tag>hi");
-  }
-
-  //|d| |v_at|
-  public void testDeleteOuterTagBlockInOpenWrongOrder() {
-    typeTextInFile(parseKeys("dat"), "abcde</ta<caret>g>fg<tag>hi");
-    myFixture.checkResult("abcde</tag>fg<tag>hi");
-  }
-
-  //|d| |v_at|
-  public void testDeleteOuterTagBlockBetweenWrongOrder() {
-    typeTextInFile(parseKeys("dat"), "abcde</tag>f<caret>g<tag>hi");
-    myFixture.checkResult("abcde</tag>fg<tag>hi");
-  }
-
-  //|d| |v_at|
-  public void testDeleteOuterTagBlockInCloseWrongOrder() {
-    typeTextInFile(parseKeys("dat"), "abcde</tag>fg<ta<caret>g>hi");
-    myFixture.checkResult("abcde</tag>fg<tag>hi");
-  }
-
-  //|d| |v_at|
-  public void testDeleteOuterTagBlockAfterWrongOrder() {
-    typeTextInFile(parseKeys("dat"), "abcde</tag>fg<tag>h<caret>i");
-    myFixture.checkResult("abcde</tag>fg<tag>hi");
-  }
-
-  // |v_it|
-  public void testFileStartsWithSlash() {
-    configureByText("/*hello\n" +
-                    "<caret>foo\n" +
-                    "bar>baz\n");
-    typeText(parseKeys("vit"));
-    assertPluginError(true);
   }
 
   // VIM-1427
@@ -1015,8 +619,7 @@ public class MotionActionTest extends VimTestCase {
            "four  \n",
            "one   \n" +
            "two   \n" +
-           "thre<caret>e  \n" +
-           "four  \n");
+           "thre<caret>e  \n" + "four  \n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // |3g_|
@@ -1028,8 +631,7 @@ public class MotionActionTest extends VimTestCase {
            "four  \n",
            "one   \n" +
            "two   \n" +
-           "thre<caret>e  \n" +
-           "four  \n");
+           "thre<caret>e  \n" + "four  \n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // VIM-646 |gv|
@@ -1051,7 +653,7 @@ public class MotionActionTest extends VimTestCase {
                    "baz\n");
     assertSelection("foo\n" +
                     "bar\n" +
-                    "baz");
+                    "baz\n");
     typeText(parseKeys(">"));
     assertMode(COMMAND);
     myFixture.checkResult("    foo\n" +
@@ -1060,7 +662,7 @@ public class MotionActionTest extends VimTestCase {
     typeText(parseKeys("gv"));
     assertSelection("    foo\n" +
                     "    bar\n" +
-                    "    baz");
+                    "    baz\n");
     typeText(parseKeys(">"));
     assertMode(COMMAND);
     myFixture.checkResult("        foo\n" +
@@ -1069,7 +671,7 @@ public class MotionActionTest extends VimTestCase {
     typeText(parseKeys("gv"));
     assertSelection("        foo\n" +
                     "        bar\n" +
-                    "        baz");
+                    "        baz\n");
   }
 
   // VIM-862 |gv|
@@ -1089,7 +691,7 @@ public class MotionActionTest extends VimTestCase {
                    "quux\n");
     assertMode(VISUAL);
     assertSelection("bar\n" +
-                    "baz");
+                    "baz\n");
     assertOffset(8);
   }
 
@@ -1102,7 +704,7 @@ public class MotionActionTest extends VimTestCase {
                    "quux\n");
     assertMode(VISUAL);
     assertSelection("bar\n" +
-                    "baz");
+                    "baz\n");
     assertOffset(4);
   }
 }

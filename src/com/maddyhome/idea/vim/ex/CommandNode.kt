@@ -18,16 +18,16 @@
 
 package com.maddyhome.idea.vim.ex
 
-import java.util.HashMap
+import java.util.*
 
 class CommandNode(command: CommandHandler? = null) {
 
-    var commandHandler: CommandHandler? = command
-    private val nodes = HashMap<Char, CommandNode>()
+  var commandHandler: CommandHandler? = command
+  private val nodes = HashMap<Char, CommandNode>()
 
-    fun addChild(ch: Char, command: CommandHandler?) = CommandNode(command).also {
-        nodes[ch] = it
-    }
+  fun addChild(ch: Char, command: CommandHandler?) = CommandNode(command).also {
+    nodes[ch] = it
+  }
 
-    fun getChild(ch: Char) = nodes[ch]
+  fun getChild(ch: Char) = nodes[ch]
 }

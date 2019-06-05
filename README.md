@@ -59,9 +59,8 @@ Get an Early Access
 Would you like to try new features and fixes? Join the Early Access Program and
 receive EAP builds as updates!  
 
-Add [https://plugins.jetbrains.com/plugins/eap/ideavim](https://plugins.jetbrains.com/plugins/eap/ideavim) to:  
-_IJ versions 2018.3 and newer:_ "Settings | Plugins | Cog icon | Manage Plugin Repositories"  
-_IJ versions 2018.2 and older:_ "Settings | Plugins | Browse Repositories | Manage Repositories"
+Add [https://plugins.jetbrains.com/plugins/eap/ideavim](https://plugins.jetbrains.com/plugins/eap/ideavim) to 
+"Settings | Plugins | Cog icon | Manage Plugin Repositories"  
 
 See [the changelog](CHANGES.md) for the list of hot unreleased features.
 
@@ -91,6 +90,7 @@ Supported:
 * Command line and search history
 * Window commands
 * Vim web help
+* Select mode [To Be Released]
 
 Emulated Vim plugins:
 
@@ -144,7 +144,7 @@ Available extensions:
 * multiple-cursors
     * Emulates [vim-multiple-cursors](https://github.com/terryma/vim-multiple-cursors)
     * Commands: `<A-n>`, `<A-x>`, `<A-p>`, `g<A-n>`
-* commentary
+* commentary [To Be Released]
     * Emulates [commentary.vim](https://github.com/tpope/vim-commentary)
     * Commands: `gcc`, `gc + motion`, `v_gc`
 

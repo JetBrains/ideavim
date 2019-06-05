@@ -39,6 +39,8 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
+import com.maddyhome.idea.vim.option.ListOption;
+import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import one.util.streamex.StreamEx;
 import org.jetbrains.annotations.NotNull;
@@ -57,7 +59,7 @@ import static java.awt.event.KeyEvent.*;
 
 /**
  * Handles Vim keys that are treated as action shortcuts by the IDE.
- *
+ * <p>
  * These keys are not passed to {@link com.maddyhome.idea.vim.VimTypedActionHandler} and should be handled by actions.
  */
 public class VimShortcutKeyAction extends AnAction implements DumbAware {
@@ -158,8 +160,8 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
       final KeyStroke keyStroke = getKeyStroke(e);
       if (editor != null && keyStroke != null) {
         final int keyCode = keyStroke.getKeyCode();
-        if (LookupManager.getActiveLookup(editor) != null) {
-          return isExitInsertMode(keyStroke);
+        if (LookupManager.getActiveLookup(editor) != null && !passCommandToVimWithLookup(keyStroke)) {
+          return isEnabledForLookup(keyStroke);
         }
         if (keyCode == VK_ESCAPE) {
           return isEnabledForEscape(editor);
@@ -167,6 +169,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
         if (CommandState.inInsertMode(editor)) {
           // XXX: <Tab> won't be recorded in macros
           if (keyCode == VK_TAB) {
+            VimPlugin.getChange().tabAction = true;
             return false;
           }
           // Debug watch, Python console, etc.
@@ -196,6 +199,20 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     return false;
   }
 
+  private boolean passCommandToVimWithLookup(@NotNull KeyStroke keyStroke) {
+    final ListOption popupActions = Options.getInstance().getListOption(Options.LOOKUPACTIONS);
+    if (popupActions == null) return false;
+    final List<String> values = popupActions.values();
+    if (values == null) return false;
+
+    return values.stream().anyMatch(actionId -> {
+      final AnAction action = ActionManager.getInstance().getAction(actionId);
+      if (!(action instanceof VimCommandAction)) return false;
+      return ((VimCommandAction)action).getKeyStrokesSet().stream()
+        .anyMatch(ks -> !ks.isEmpty() && ks.get(0).equals(keyStroke));
+    });
+  }
+
   private boolean isEnabledForEscape(@NotNull Editor editor) {
     final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
     return isPrimaryEditor(editor) || (EditorData.isFileEditor(editor) && mode != CommandState.Mode.COMMAND);
@@ -212,12 +229,16 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
       .anyMatch(fileEditor -> editor.equals(EditorUtil.getEditorEx(fileEditor)));
   }
 
-  private boolean isExitInsertMode(@NotNull KeyStroke keyStroke) {
+  private boolean isEnabledForLookup(@NotNull KeyStroke keyStroke) {
     for (List<KeyStroke> keys : InsertExitModeAction.getInstance().getKeyStrokesSet()) {
       // XXX: Currently we cannot handle <C-\><C-N> because of the importance of <C-N> for the IDE on Linux
       if (keys.size() == 1 && keyStroke.equals(keys.get(0))) {
         return true;
       }
+    }
+    //noinspection RedundantIfStatement
+    if (keyStroke.equals(KeyStroke.getKeyStroke(VK_BACK_SPACE, 0))) {
+      return true;
     }
     return false;
   }

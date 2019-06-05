@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.group;
 
 import com.google.common.collect.ImmutableList;
+import com.intellij.codeInsight.lookup.impl.LookupImpl;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.actionSystem.ex.ActionUtil;
@@ -68,13 +69,18 @@ public class KeyGroup {
   @NotNull private final Map<MappingMode, KeyMapping> keyMappings = new HashMap<>();
   @Nullable private OperatorFunction operatorFunction = null;
 
-  public void registerRequiredShortcutKeys(@NotNull Editor editor) {
-    final Set<KeyStroke> requiredKeys = VimPlugin.getKey().requiredShortcutKeys;
+  void registerRequiredShortcutKeys(@NotNull Editor editor) {
     EventFacade.getInstance().registerCustomShortcutSet(VimShortcutKeyAction.getInstance(),
-                                                        toShortcutSet(requiredKeys), editor.getComponent());
+                                                        toShortcutSet(requiredShortcutKeys), editor.getComponent());
   }
 
-  public void unregisterShortcutKeys(@NotNull Editor editor) {
+  public void registerShortcutsForLookup(@NotNull LookupImpl lookup) {
+    EventFacade.getInstance()
+      .registerCustomShortcutSet(VimShortcutKeyAction.getInstance(), toShortcutSet(requiredShortcutKeys),
+                                 lookup.getComponent(), lookup);
+  }
+
+  void unregisterShortcutKeys(@NotNull Editor editor) {
     EventFacade.getInstance().unregisterCustomShortcutSet(VimShortcutKeyAction.getInstance(), editor.getComponent());
   }
 
@@ -247,6 +253,19 @@ public class KeyGroup {
     return res;
   }
 
+  /**
+   * Registers a shortcut that is handled by KeyHandler#handleKey directly, rather than by an action
+   *
+   * <p>
+   * Digraphs are handled directly by KeyHandler#handleKey instead of via an action, but we need to still make sure the
+   * shortcuts are registered, or the key handler won't see them
+   * </p>
+   * @param shortcut The shortcut to register
+   */
+  public void registerShortcutWithoutAction(Shortcut shortcut) {
+    registerRequiredShortcut(shortcut);
+  }
+
   public void registerCommandAction(@NotNull VimCommandAction commandAction, @NotNull String actionId) {
     final List<Shortcut> shortcuts = new ArrayList<>();
     for (List<KeyStroke> keyStrokes : commandAction.getKeyStrokesSet()) {
@@ -330,15 +349,19 @@ public class KeyGroup {
   public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, EnumSet<CommandFlags> cmdFlags, @NotNull Shortcut[] shortcuts,
                              @NotNull Argument.Type argType) {
     for (Shortcut shortcut : shortcuts) {
-      final KeyStroke[] keys = shortcut.getKeys();
-      for (KeyStroke key : keys) {
-        if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
-          requiredShortcutKeys.add(key);
-        }
-      }
-      //noinspection deprecation
+      final KeyStroke[] keys = registerRequiredShortcut(shortcut);
       registerAction(mappingModes, actName, cmdType, cmdFlags, keys, argType);
     }
+  }
+
+  private KeyStroke[] registerRequiredShortcut(@NotNull Shortcut shortcut) {
+    final KeyStroke[] keys = shortcut.getKeys();
+    for (KeyStroke key : keys) {
+      if (key.getKeyChar() == KeyEvent.CHAR_UNDEFINED) {
+        requiredShortcutKeys.add(key);
+      }
+    }
+    return keys;
   }
 
   /**

@@ -22,39 +22,35 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_OPTIONAL
+import com.maddyhome.idea.vim.ex.*
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.DONT_REOPEN
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_FORBIDDEN
-import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.ExOutputModel
-import com.maddyhome.idea.vim.ex.commands
-import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.helper.StringHelper
 
 /**
  * @author smartbomb
  */
 class ActionListHandler : CommandHandler(
-        commands("actionlist"),
-        flags(RANGE_FORBIDDEN, DONT_REOPEN, ARGUMENT_OPTIONAL)
+  commands("actionlist"),
+  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        val lineSeparator = System.lineSeparator()
-        val searchPattern = cmd.argument.trim().toLowerCase().split("*")
-        val actionManager = ActionManager.getInstance()
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    val lineSeparator = "\n"
+    val searchPattern = cmd.argument.trim().toLowerCase().split("*")
+    val actionManager = ActionManager.getInstance()
 
-        val actions = actionManager.getActionIds("")
-                .filter { actionName -> searchPattern.all { it in actionName.toLowerCase() } }
-                .sortedWith(String.CASE_INSENSITIVE_ORDER).joinToString(lineSeparator) { actionName ->
-                    val shortcuts = actionManager.getAction(actionName).shortcutSet.shortcuts.joinToString(" ") {
-                        if (it is KeyboardShortcut) StringHelper.toKeyNotation(it.firstKeyStroke) else it.toString()
-                    }
-                    if (shortcuts.isBlank()) actionName else "${actionName.padEnd(50)} $shortcuts"
-                }
+    val actions = actionManager.getActionIds("")
+      .sortedWith(String.CASE_INSENSITIVE_ORDER)
+      .map { actionName ->
+        val shortcuts = actionManager.getAction(actionName).shortcutSet.shortcuts.joinToString(" ") {
+          if (it is KeyboardShortcut) StringHelper.toKeyNotation(it.firstKeyStroke) else it.toString()
+        }
+        if (shortcuts.isBlank()) actionName else "${actionName.padEnd(50)} $shortcuts"
+      }
+      .filter { line -> searchPattern.all { it in line.toLowerCase() } }
+      .joinToString(lineSeparator)
 
 
-        ExOutputModel.getInstance(editor).output("--- Actions ---$lineSeparator$actions")
-        return true
-    }
+    ExOutputModel.getInstance(editor).output("--- Actions ---$lineSeparator$actions")
+    return true
+  }
 }

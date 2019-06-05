@@ -20,13 +20,7 @@ package com.maddyhome.idea.vim.ex.handler
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_OPTIONAL
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_FORBIDDEN
-import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.ExOutputModel
-import com.maddyhome.idea.vim.ex.commands
-import com.maddyhome.idea.vim.ex.flags
+import com.maddyhome.idea.vim.ex.*
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 
@@ -34,17 +28,17 @@ import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
  * @author vlan
  */
 class EchoHandler : CommandHandler(
-        commands("ec[ho]"),
-        flags(RANGE_FORBIDDEN, ARGUMENT_OPTIONAL)
+  commands("ec[ho]"),
+  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
 ) {
 
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        val env = VimScriptGlobalEnvironment.getInstance()
-        val globals = env.variables
-        val value = VimScriptParser.evaluate(cmd.argument, globals)
-        val text = VimScriptParser.expressionToString(value) + "\n"
-        ExOutputModel.getInstance(editor).output(text)
-        return true
-    }
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    val env = VimScriptGlobalEnvironment.getInstance()
+    val globals = env.variables
+    val value = VimScriptParser.evaluate(cmd.argument, globals)
+    val text = VimScriptParser.expressionToString(value) + "\n"
+    ExOutputModel.getInstance(editor).output(text)
+    return true
+  }
 }
 

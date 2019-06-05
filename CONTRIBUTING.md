@@ -14,16 +14,19 @@
 
 ### Where to Start
 
-In order to contribute to IdeaVim you should have some understanding of Java or [Kotlin](https://kotlinlang.org/).
+In order to contribute to IdeaVim, you should have some understanding of Java or [Kotlin](https://kotlinlang.org/).
 
 See also these docs on the IntelliJ API:
 
 * [IntelliJ architectural overview](http://confluence.jetbrains.com/display/IDEADEV/IntelliJ+IDEA+Architectural+Overview)
 * [IntelliJ plugin development resources](http://confluence.jetbrains.com/display/IDEADEV/PluginDevelopment)
 
-You can start by picking relatively simple tasks that are tagged with
+You can start by:
+
+ - Picking relatively simple tasks that are tagged with
 [#patch_welcome](https://youtrack.jetbrains.com/issues/VIM?q=%23patch_welcome%20%23Unresolved%20sort%20by:%20votes%20)
 in the issue tracker.
+ - Read about `@VimBehaviourDiffers` annotation and fix corresponding functionality.
 
 
 ### Development Environment
@@ -38,20 +41,19 @@ in the issue tracker.
 
     * Select your Java 8+ JDK as the Gradle JVM, leave other parameters unchanged
 
-3. Set up [copyright](#copyright)
-4. Run your IdeaVim plugin within IntelliJ via a Gradle task
+3. Run your IdeaVim plugin within IntelliJ via a Gradle task
 
     * Select "View | Tool Windows | Gradle" tool window
     
     * Launch "ideavim | intellij | runIde" from the tool window
 
-5. Run IdeaVim tests via a Gradle task
+4. Run IdeaVim tests via a Gradle task
 
     * Select "View | Tool Windows | Gradle" tool window
     
     * Launch "ideavim | verification | test" from the tool window
 
-6. Build the plugin distribution by running `./gradlew clean buildPlugin` in the
+5. Build the plugin distribution by running `./gradlew clean buildPlugin` in the
    terminal in your project root.
 
     * The resulting distribution file is build/distributions/IdeaVim-VERSION.zip
@@ -61,7 +63,7 @@ in the issue tracker.
 
 ### Copyright
 
-1. Go to `Preferences | Appearance & Behavior | Scopes`, press "+" button, `local`.  
+1. Go to `Preferences | Appearance & Behavior | Scopes`, press "+" button, `Shared`.  
        Name: Copyright scope  
        Pattern: `file[IdeaVIM.main]:com//*||file[IdeaVIM.test]:*/`
 
@@ -88,3 +90,17 @@ in the issue tracker.
 3. Go to `Preferences | Editor | Copyright`, press "+" button.  
        Scope: Copyright scope  
        Copyright: IdeaVim
+       
+### Testing
+
+1. Read about `@VimBehaviourDiffers` annotation.
+
+2. Please avoid senseless text like "dhjkwaldjwa", "asdasdasd",
+"123 123 123 123", etc. Try to select a text that you can simply
+read and find out what is wrong if the test fails.
+For example, take a few lines from your favorite poem, or take
+"Vladimir Nabokov – A Discovery" if you don't have one.
+
+3. Test your functionality properly.
+Especially check whether your command works with:
+line start, line end, file start, file end, empty line, multiple carets, dollar motion.

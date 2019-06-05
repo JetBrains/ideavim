@@ -23,19 +23,27 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.common.Register;
+import com.maddyhome.idea.vim.group.copy.PutData;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- */
 public class PutTextAfterCursorAction extends EditorAction {
   public PutTextAfterCursorAction() {
     super(new ChangeEditorActionHandler() {
       @Override
-      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
+      public boolean execute(@NotNull Editor editor,
+                             @NotNull DataContext context,
+                             int count,
+                             int rawCount,
                              @Nullable Argument argument) {
-        return VimPlugin.getCopy().putText(editor, context, count, true, false, false);
+        final Register lastRegister = VimPlugin.getRegister().getLastRegister();
+
+        final PutData.TextData textData =
+          lastRegister != null ? new PutData.TextData(lastRegister.getText(), lastRegister.getType()) : null;
+        final PutData putData = new PutData(textData, null, count, false, true, false, -1);
+        return VimPlugin.getPut().putText(editor, context, putData);
       }
     });
   }

@@ -22,24 +22,22 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_OPTIONAL
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.DONT_REOPEN
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_FORBIDDEN
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class SplitHandler : CommandHandler(
-        commands("vs[plit]", "sp[lit]"),
-        flags(RANGE_FORBIDDEN, ARGUMENT_OPTIONAL, DONT_REOPEN)
+  commands("vs[plit]", "sp[lit]"),
+  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        if (cmd.command.startsWith("v")) {
-            VimPlugin.getWindow().splitWindowVertical(context, cmd.argument)
-        } else {
-            VimPlugin.getWindow().splitWindowHorizontal(context, cmd.argument)
-        }
-
-        return true
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    if (cmd.command.startsWith("v")) {
+      VimPlugin.getWindow().splitWindowVertical(context, cmd.argument)
+    } else {
+      VimPlugin.getWindow().splitWindowHorizontal(context, cmd.argument)
     }
+
+    return true
+  }
 }

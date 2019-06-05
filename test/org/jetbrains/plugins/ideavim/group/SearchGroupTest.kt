@@ -35,7 +35,7 @@ import java.util.*
 class SearchGroupTest : VimTestCase() {
     fun `test one letter`() {
         val pos = search("w",
-                """<caret>one
+                """${c}one
                   |two
                """.trimMargin())
         assertEquals(5, pos)
@@ -43,7 +43,7 @@ class SearchGroupTest : VimTestCase() {
 
     fun `test end of line`() {
         val pos = search("$",
-                """<caret>I found it in a legendary land
+                """${c}I found it in a legendary land
                   |all rocks and lavender and tufted grass,
                """.trimMargin())
         assertEquals(30, pos)
@@ -53,7 +53,7 @@ class SearchGroupTest : VimTestCase() {
     fun `test end of line with highlighting`() {
         setHighlightSearch()
         val pos = search("$",
-                """<caret>I found it in a legendary land
+                """${c}I found it in a legendary land
                   |all rocks and lavender and tufted grass,
                """.trimMargin())
         assertEquals(30, pos)
@@ -61,7 +61,7 @@ class SearchGroupTest : VimTestCase() {
 
     fun `test "and" without branches`() {
         val pos = search("\\&",
-                """<caret>I found it in a legendary land
+                """${c}I found it in a legendary land
                   |all rocks and lavender and tufted grass,
                """.trimMargin())
         assertEquals(1, pos)
@@ -71,7 +71,7 @@ class SearchGroupTest : VimTestCase() {
     fun `test "and" without branches with highlighting`() {
         setHighlightSearch()
         val pos = search("\\&",
-                """<caret>I found it in a legendary land
+                """${c}I found it in a legendary land
                   |all rocks and lavender and tufted grass,
                """.trimMargin())
         assertEquals(1, pos)
@@ -80,7 +80,7 @@ class SearchGroupTest : VimTestCase() {
     // VIM-528
     fun `test not found`() {
         val pos = search("(found)",
-                """<caret>I found it in a legendary land
+                """${c}I found it in a legendary land
                   |all rocks and lavender and tufted grass,
                """.trimMargin())
         assertEquals(-1, pos)
@@ -89,7 +89,7 @@ class SearchGroupTest : VimTestCase() {
     // VIM-528
     fun `test grouping`() {
         val pos = search("\\(found\\)",
-                """<caret>I found it in a legendary land
+                """${c}I found it in a legendary land
                   |all rocks and lavender and tufted grass,
                """.trimMargin())
         assertEquals(2, pos)
@@ -98,21 +98,21 @@ class SearchGroupTest : VimTestCase() {
     // VIM-855
     fun `test character class regression`() {
         val pos = search("[^c]b",
-                "<caret>bb\n")
+                "${c}bb\n")
         assertEquals(0, pos)
     }
 
     // VIM-855
     fun `test character class regression case insensitive`() {
         val pos = search("\\c[ABC]b",
-                "<caret>dd\n")
+                "${c}dd\n")
         assertEquals(-1, pos)
     }
 
     // VIM-856
     fun `test negative lookbehind regression`() {
         val pos = search("a\\@<!b",
-                "<caret>ab\n")
+                "${c}ab\n")
         assertEquals(-1, pos)
     }
 
@@ -133,77 +133,77 @@ class SearchGroupTest : VimTestCase() {
 
     fun `test search motion`() {
         typeTextInFile(parseKeys("/", "two", "<Enter>"),
-                "<caret>one two\n")
+                "${c}one two\n")
         assertOffset(4)
     }
 
     // |/pattern/e|
     fun `test search e motion offset`() {
         typeTextInFile(parseKeys("/", "two/e", "<Enter>"),
-                "<caret>one two three")
+                "${c}one two three")
         assertOffset(6)
     }
 
     // |/pattern/e|
     fun `test search e-1 motion offset`() {
         typeTextInFile(parseKeys("/", "two/e-1", "<Enter>"),
-                "<caret>one two three")
+                "${c}one two three")
         assertOffset(5)
     }
 
     // |/pattern/e|
     fun `test search e+2 motion offset`() {
         typeTextInFile(parseKeys("/", "two/e+2", "<Enter>"),
-                "<caret>one two three")
+                "${c}one two three")
         assertOffset(8)
     }
 
     // |/pattern/s|
     fun `test search s motion offset`() {
         typeTextInFile(parseKeys("/", "two/s", "<Enter>"),
-                "<caret>one two three")
+                "${c}one two three")
         assertOffset(4)
     }
 
     // |/pattern/s|
     fun `test search s-2 motion offset`() {
         typeTextInFile(parseKeys("/", "two/s-2", "<Enter>"),
-                "<caret>one two three")
+                "${c}one two three")
         assertOffset(2)
     }
 
     // |/pattern/s|
     fun `test search s+1 motion offset`() {
         typeTextInFile(parseKeys("/", "two/s+1", "<Enter>"),
-                "<caret>one two three")
+                "${c}one two three")
         assertOffset(5)
     }
 
     // |/pattern/b|
     fun `test search b motion offset`() {
         typeTextInFile(parseKeys("/", "two/b", "<Enter>"),
-                "<caret>one two three")
+                "${c}one two three")
         assertOffset(4)
     }
 
     // |/pattern/b|
     fun `test search b-2 motion offset`() {
         typeTextInFile(parseKeys("/", "two/b-2", "<Enter>"),
-                "<caret>one two three")
+                "${c}one two three")
         assertOffset(2)
     }
 
     // |/pattern/b|
     fun `test search b+1 motion offset`() {
         typeTextInFile(parseKeys("/", "two/b+1", "<Enter>"),
-                "<caret>one two three")
+                "${c}one two three")
         assertOffset(5)
     }
 
     fun `test search above line motion offset`() {
         typeTextInFile(parseKeys("/", "rocks/-1", "<Enter>"),
                 """I found it in a legendary land
-                 |<caret>all rocks and lavender and tufted grass,
+                 |${c}all rocks and lavender and tufted grass,
                  |where it was settled on some sodden sand
                  |hard by the torrent of a mountain pass.""".trimMargin())
         assertOffset(0)
@@ -212,7 +212,7 @@ class SearchGroupTest : VimTestCase() {
     fun `test search below line motion offset`() {
         typeTextInFile(parseKeys("/", "rocks/+2", "<Enter>"),
                 """I found it in a legendary land
-                 |<caret>all rocks and lavender and tufted grass,
+                 |${c}all rocks and lavender and tufted grass,
                  |where it was settled on some sodden sand
                  |hard by the torrent of a mountain pass.""".trimMargin())
         assertOffset(113)
@@ -221,7 +221,7 @@ class SearchGroupTest : VimTestCase() {
     // |i_CTRL-K|
     fun `test search digraph`() {
         typeTextInFile(parseKeys("/", "<C-K>O:", "<Enter>"),
-                "<caret>Hallo Österreich!\n")
+                "${c}Hallo Österreich!\n")
         assertOffset(6)
     }
 

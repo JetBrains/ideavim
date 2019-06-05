@@ -31,6 +31,7 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
@@ -302,7 +303,7 @@ public class FileGroup {
     else {
       msg.append("Selected ");
 
-      TextRange vr = VimPlugin.getMotion().getVisualRange(editor);
+      TextRange vr = new TextRange(editor.getSelectionModel().getBlockSelectionStarts(), editor.getSelectionModel().getBlockSelectionEnds());
       vr.normalize();
 
       int lines;
@@ -397,6 +398,11 @@ public class FileGroup {
     VimPlugin.showMessage(msg.toString());
   }
 
+  @NotNull private static final String disposableKey = "VimFileGroupDisposable";
+
+  @NotNull private static final HashMap<FileEditorManager, VirtualFile> lastSelections = new HashMap<>();
+  @NotNull private static final Logger logger = Logger.getInstance(FileGroup.class.getName());
+
   /**
    * This class listens for editor tab changes so any insert/replace modes that need to be reset can be.
    */
@@ -406,10 +412,13 @@ public class FileGroup {
       // appropriate repeat
       if (event.getOldFile() != null) {
         lastSelections.put(event.getManager(), event.getOldFile());
+        String disposableKey = FileGroup.disposableKey + event.getManager().hashCode();
+        if (Disposer.get(disposableKey) == null) {
+          Disposer.register(event.getManager().getProject(), () -> {
+            lastSelections.remove(event.getManager());
+          }, disposableKey);
+        }
       }
     }
   }
-
-  @NotNull private static final HashMap<FileEditorManager, VirtualFile> lastSelections = new HashMap<>();
-  @NotNull private static final Logger logger = Logger.getInstance(FileGroup.class.getName());
 }
