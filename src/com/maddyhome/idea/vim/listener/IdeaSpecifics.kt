@@ -39,78 +39,78 @@ import java.beans.PropertyChangeListener
  * @author Alex Plate
  */
 object IdeaSpecifics {
-    fun addIdeaSpecificsListener(project: Project) {
-        EventFacade.getInstance().addAnActionListener(project, VimActionListener)
-        EventFacade.getInstance().addTemplateStartedListener(project, VimTemplateManagerListener)
-        EventFacade.getInstance().registerLookupListener(project, LookupListener)
+  fun addIdeaSpecificsListener(project: Project) {
+    EventFacade.getInstance().addAnActionListener(project, VimActionListener)
+    EventFacade.getInstance().addTemplateStartedListener(project, VimTemplateManagerListener)
+    EventFacade.getInstance().registerLookupListener(project, LookupListener)
+  }
+
+  private object VimActionListener : AnActionListener {
+    private val surrounderItems = listOf("if", "if / else")
+    private val surrounderAction = "com.intellij.codeInsight.generation.surroundWith.SurroundWithHandler\$InvokeSurrounderAction"
+    private var editor: Editor? = null
+    override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
+      if (!VimPlugin.isEnabled()) return
+
+      editor = dataContext.getData(CommonDataKeys.EDITOR) ?: return
     }
 
-    private object VimActionListener : AnActionListener {
-        private val surrounderItems = listOf("if", "if / else")
-        private val surrounderAction = "com.intellij.codeInsight.generation.surroundWith.SurroundWithHandler\$InvokeSurrounderAction"
-        private var editor: Editor? = null
-        override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
-            if (!VimPlugin.isEnabled()) return
+    override fun afterActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
+      if (!VimPlugin.isEnabled()) return
 
-            editor = dataContext.getData(CommonDataKeys.EDITOR) ?: return
-        }
-
-        override fun afterActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
-            if (!VimPlugin.isEnabled()) return
-
-            //region Extend Selection for Rider
-            when (ActionManager.getInstance().getId(action)) {
-                IdeActions.ACTION_EDITOR_SELECT_WORD_AT_CARET, IdeActions.ACTION_EDITOR_UNSELECT_WORD_AT_CARET -> {
-                    // Rider moves caret to the end of selection
-                    editor?.caretModel?.addCaretListener(object : CaretListener {
-                        override fun caretPositionChanged(event: CaretEvent) {
-                            moveCaretOneCharLeftFromSelectionEnd(event.editor)
-                            event.editor.caretModel.removeCaretListener(this)
-                        }
-                    })
-                }
+      //region Extend Selection for Rider
+      when (ActionManager.getInstance().getId(action)) {
+        IdeActions.ACTION_EDITOR_SELECT_WORD_AT_CARET, IdeActions.ACTION_EDITOR_UNSELECT_WORD_AT_CARET -> {
+          // Rider moves caret to the end of selection
+          editor?.caretModel?.addCaretListener(object : CaretListener {
+            override fun caretPositionChanged(event: CaretEvent) {
+              moveCaretOneCharLeftFromSelectionEnd(event.editor)
+              event.editor.caretModel.removeCaretListener(this)
             }
-            //endregion
-
-            //region Enter insert mode after surround with if
-            if (surrounderAction == action.javaClass.name && surrounderItems.any { action.templatePresentation.text.endsWith(it) }) {
-                editor?.let {
-                    VimPlugin.getChange().insertBeforeCursor(it, dataContext)
-                    KeyHandler.getInstance().reset(it)
-                }
-            }
-            //endregion
-
-            editor = null
+          })
         }
+      }
+      //endregion
+
+      //region Enter insert mode after surround with if
+      if (surrounderAction == action.javaClass.name && surrounderItems.any { action.templatePresentation.text.endsWith(it) }) {
+        editor?.let {
+          VimPlugin.getChange().insertBeforeCursor(it, dataContext)
+          KeyHandler.getInstance().reset(it)
+        }
+      }
+      //endregion
+
+      editor = null
     }
+  }
 
-    //region Enter insert mode for surround templates without selection
-    private object VimTemplateManagerListener : TemplateManagerListener {
-        override fun templateStarted(state: TemplateState) {
-            if (!VimPlugin.isEnabled()) return
+  //region Enter insert mode for surround templates without selection
+  private object VimTemplateManagerListener : TemplateManagerListener {
+    override fun templateStarted(state: TemplateState) {
+      if (!VimPlugin.isEnabled()) return
 
-            val editor = state.editor ?: return
-            if (!editor.selectionModel.hasSelection()) {
-                // Enable insert mode if there is no selection in template
-                // Template with selection is handled by [com.maddyhome.idea.vim.group.visual.VisualMotionGroup.controlNonVimSelectionChange]
-                VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
-                KeyHandler.getInstance().reset(editor)
-            }
-        }
+      val editor = state.editor ?: return
+      if (!editor.selectionModel.hasSelection()) {
+        // Enable insert mode if there is no selection in template
+        // Template with selection is handled by [com.maddyhome.idea.vim.group.visual.VisualMotionGroup.controlNonVimSelectionChange]
+        VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
+        KeyHandler.getInstance().reset(editor)
+      }
     }
-    //endregion
+  }
+  //endregion
 
-    //region Register shortcuts for lookup
-    private object LookupListener : PropertyChangeListener {
-        override fun propertyChange(evt: PropertyChangeEvent?) {
-            if (evt != null && evt.propertyName == "activeLookup" && evt.oldValue == null && evt.newValue != null) {
-                val lookup = evt.newValue
-                if (lookup is LookupImpl) {
-                    VimPlugin.getKey().registerShortcutsForLookup(lookup)
-                }
-            }
+  //region Register shortcuts for lookup
+  private object LookupListener : PropertyChangeListener {
+    override fun propertyChange(evt: PropertyChangeEvent?) {
+      if (evt != null && evt.propertyName == "activeLookup" && evt.oldValue == null && evt.newValue != null) {
+        val lookup = evt.newValue
+        if (lookup is LookupImpl) {
+          VimPlugin.getKey().registerShortcutsForLookup(lookup)
         }
+      }
     }
-    //endregion
+  }
+  //endregion
 }

@@ -29,35 +29,35 @@ import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
 
 class MarksHandler : CommandHandler(commands("marks"), flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)) {
 
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
 
-        val res = VimPlugin.getMark().getMarks(editor).joinToString("\n") { mark ->
+    val res = VimPlugin.getMark().getMarks(editor).joinToString("\n") { mark ->
 
-            val text = StringBuilder()
-            text.append(" ")
-            text.append(mark.key)
+      val text = StringBuilder()
+      text.append(" ")
+      text.append(mark.key)
 
-            text.append("   ")
-            var num = (mark.logicalLine + 1).toString()
-            text.append(num.padStart(5))
+      text.append("   ")
+      var num = (mark.logicalLine + 1).toString()
+      text.append(num.padStart(5))
 
-            text.append("  ")
-            num = (mark.col + 1).toString()
-            text.append(num.padStart(3))
+      text.append("  ")
+      num = (mark.col + 1).toString()
+      text.append(num.padStart(3))
 
-            text.append(" ")
-            val vf = EditorData.getVirtualFile(editor)
-            if (vf != null && vf.path == mark.filename) {
-                text.append(toKeyNotation(stringToKeys(EditorHelper.getLineText(editor, mark.logicalLine).trim())))
-            } else {
-                text.append(mark.filename)
-            }
+      text.append(" ")
+      val vf = EditorData.getVirtualFile(editor)
+      if (vf != null && vf.path == mark.filename) {
+        text.append(toKeyNotation(stringToKeys(EditorHelper.getLineText(editor, mark.logicalLine).trim())))
+      } else {
+        text.append(mark.filename)
+      }
 
-            text.toString()
-        }
-
-        ExOutputModel.getInstance(editor).output("mark  line  col file/text\n$res")
-
-        return true
+      text.toString()
     }
+
+    ExOutputModel.getInstance(editor).output("mark  line  col file/text\n$res")
+
+    return true
+  }
 }

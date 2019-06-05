@@ -30,43 +30,43 @@ import java.util.regex.Pattern
  * @author vlan
  */
 class LetHandler : CommandHandler(
-        commands("let"),
-        flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
+  commands("let"),
+  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
 ), VimScriptCommandHandler {
 
-    @Throws(ExException::class)
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        execute(cmd)
-        return true
-    }
+  @Throws(ExException::class)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    execute(cmd)
+    return true
+  }
 
-    @Throws(ExException::class)
-    override fun execute(cmd: ExCommand) {
-        val argument = cmd.argument
-        if (argument.trim().isEmpty()) {
-            showVariables()
-        } else {
-            val matcher = SIMPLE_ASSIGNMENT.matcher(argument)
-            if (matcher.matches()) {
-                val name = matcher.group(1)
-                // TODO: Check that 'name' is global
-                val expression = matcher.group(2)
-                val env = VimScriptGlobalEnvironment.getInstance()
-                val globals = env.variables
-                val value = VimScriptParser.evaluate(expression, globals)
-                globals[name] = value
-            } else {
-                throw ExException("Only simple '=' assignments are supported in 'let' expressions")
-            }
-        }
+  @Throws(ExException::class)
+  override fun execute(cmd: ExCommand) {
+    val argument = cmd.argument
+    if (argument.trim().isEmpty()) {
+      showVariables()
+    } else {
+      val matcher = SIMPLE_ASSIGNMENT.matcher(argument)
+      if (matcher.matches()) {
+        val name = matcher.group(1)
+        // TODO: Check that 'name' is global
+        val expression = matcher.group(2)
+        val env = VimScriptGlobalEnvironment.getInstance()
+        val globals = env.variables
+        val value = VimScriptParser.evaluate(expression, globals)
+        globals[name] = value
+      } else {
+        throw ExException("Only simple '=' assignments are supported in 'let' expressions")
+      }
     }
+  }
 
-    @Throws(ExException::class)
-    private fun showVariables() {
-        throw ExException("'let' without arguments is not supported yet")
-    }
+  @Throws(ExException::class)
+  private fun showVariables() {
+    throw ExException("'let' without arguments is not supported yet")
+  }
 
-    companion object {
-        private val SIMPLE_ASSIGNMENT = Pattern.compile("([A-Za-z_][A-Za-z_0-9]*)[ \\t]*=[ \\t]*(.*)")
-    }
+  companion object {
+    private val SIMPLE_ASSIGNMENT = Pattern.compile("([A-Za-z_][A-Za-z_0-9]*)[ \\t]*=[ \\t]*(.*)")
+  }
 }

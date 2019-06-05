@@ -33,19 +33,19 @@ import javax.swing.KeyStroke
  * @author vlan
  */
 private object VisualSwapEndsActionHandler : EditorActionHandlerBase() {
-    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-        var ret = true
-        editor.vimForEachCaret { ret = ret and VimPlugin.getVisualMotion().swapVisualEnds(editor, it) }
-        return ret
-    }
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    var ret = true
+    editor.vimForEachCaret { ret = ret and VimPlugin.getVisualMotion().swapVisualEnds(editor, it) }
+    return ret
+  }
 }
 
 class VisualSwapEndsAction : VimCommandAction(VisualSwapEndsActionHandler) {
 
-    override fun getMappingModes(): EnumSet<MappingMode> = MappingMode.V
+  override fun getMappingModes(): EnumSet<MappingMode> = MappingMode.V
 
-    override fun getKeyStrokesSet(): Set<List<KeyStroke>> = parseKeysSet("o")
+  override fun getKeyStrokesSet(): Set<List<KeyStroke>> = parseKeysSet("o")
 
-    override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+  override fun getType(): Command.Type = Command.Type.OTHER_READONLY
 }
 

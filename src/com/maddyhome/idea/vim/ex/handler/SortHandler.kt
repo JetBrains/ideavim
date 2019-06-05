@@ -32,8 +32,8 @@ import java.util.*
  * @author Alex Selesse
  */
 class SortHandler : CommandHandler(
-        commands("sor[t]"),
-        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE)
+  commands("sor[t]"),
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE)
 ) {
 
   @Throws(ExException::class)

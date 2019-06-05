@@ -28,8 +28,8 @@ import com.maddyhome.idea.vim.ex.flags
 
 class OnlyHandler : CommandHandler(commands("on[ly]"), flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)) {
 
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        VimPlugin.getWindow().closeAllExceptCurrent(context)
-        return true
-    }
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    VimPlugin.getWindow().closeAllExceptCurrent(context)
+    return true
+  }
 }

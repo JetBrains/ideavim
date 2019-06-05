@@ -34,20 +34,20 @@ import javax.swing.KeyStroke
 
 private object PutVisualTextActionHandler : VisualOperatorActionHandler.SingleExecution() {
 
-    override fun executeForAllCarets(editor: Editor,
-                                     context: DataContext,
-                                     cmd: Command,
-                                     caretsAndSelections: Map<Caret, VimSelection>): Boolean {
-        if (caretsAndSelections.isEmpty()) return false
-        val textData = VimPlugin.getRegister().lastRegister?.let { PutData.TextData(it.text, it.type) }
-        VimPlugin.getRegister().resetRegister()
+  override fun executeForAllCarets(editor: Editor,
+                                   context: DataContext,
+                                   cmd: Command,
+                                   caretsAndSelections: Map<Caret, VimSelection>): Boolean {
+    if (caretsAndSelections.isEmpty()) return false
+    val textData = VimPlugin.getRegister().lastRegister?.let { PutData.TextData(it.text, it.type) }
+    VimPlugin.getRegister().resetRegister()
 
-        val insertTextBeforeCaret = cmd.keys[0].keyChar == 'P'
-        val selection = PutData.VisualSelection(caretsAndSelections, caretsAndSelections.values.first().type)
-        val putData = PutData(textData, selection, cmd.count, insertTextBeforeCaret, _indent = true, caretAfterInsertedText = false)
+    val insertTextBeforeCaret = cmd.keys[0].keyChar == 'P'
+    val selection = PutData.VisualSelection(caretsAndSelections, caretsAndSelections.values.first().type)
+    val putData = PutData(textData, selection, cmd.count, insertTextBeforeCaret, _indent = true, caretAfterInsertedText = false)
 
-        return VimPlugin.getPut().putText(editor, context, putData)
-    }
+    return VimPlugin.getPut().putText(editor, context, putData)
+  }
 }
 
 /**
@@ -55,11 +55,11 @@ private object PutVisualTextActionHandler : VisualOperatorActionHandler.SingleEx
  */
 class PutVisualTextAction : VimCommandAction(PutVisualTextActionHandler) {
 
-    override fun getMappingModes(): Set<MappingMode> = MappingMode.V
+  override fun getMappingModes(): Set<MappingMode> = MappingMode.V
 
-    override fun getKeyStrokesSet(): Set<List<KeyStroke>> = parseKeysSet("p", "P")
+  override fun getKeyStrokesSet(): Set<List<KeyStroke>> = parseKeysSet("p", "P")
 
-    override fun getType(): Command.Type = Command.Type.PASTE
+  override fun getType(): Command.Type = Command.Type.PASTE
 
-    override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_EXIT_VISUAL)
+  override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_EXIT_VISUAL)
 }

@@ -34,18 +34,18 @@ import java.util.*
 import javax.swing.KeyStroke
 
 private object MotionArrowRightActionHandler : NonShiftedSpecialKeyHandler() {
-    override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-        return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, count, false)
-    }
+  override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+    return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, count, false)
+  }
 }
 
 class MotionArrowRightAction : VimCommandAction(MotionArrowRightActionHandler) {
-    override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVO
+  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVO
 
-    override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = mutableSetOf(parseKeys("<Right>"), mutableListOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0)))
+  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = mutableSetOf(parseKeys("<Right>"), mutableListOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0)))
 
-    override fun getType(): Command.Type = Command.Type.MOTION
+  override fun getType(): Command.Type = Command.Type.MOTION
 
-    override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
+  override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
 }
 

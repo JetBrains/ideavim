@@ -32,18 +32,18 @@ import java.util.*
 import javax.swing.KeyStroke
 
 private object MotionHomeActionHandler : NonShiftedSpecialKeyHandler() {
-    override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int,
-                        rawCount: Int, argument: Argument?): Int {
-        return VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
-    }
+  override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int,
+                      rawCount: Int, argument: Argument?): Int {
+    return VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
+  }
 }
 
 class MotionHomeAction : VimCommandAction(MotionHomeActionHandler) {
-    override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVS
+  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVS
 
-    override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<Home>")
+  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<Home>")
 
-    override fun getType(): Command.Type = Command.Type.MOTION
+  override fun getType(): Command.Type = Command.Type.MOTION
 
-    override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
+  override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
 }

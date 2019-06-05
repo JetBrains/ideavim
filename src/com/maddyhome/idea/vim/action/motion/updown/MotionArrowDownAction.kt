@@ -35,28 +35,28 @@ import java.util.*
 import javax.swing.KeyStroke
 
 private object MotionArrowDownActionHandler : NonShiftedSpecialKeyHandler() {
-    private var col: Int = 0
+  private var col: Int = 0
 
-    override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-        return VimPlugin.getMotion().moveCaretVertical(editor, caret, count)
-    }
+  override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+    return VimPlugin.getMotion().moveCaretVertical(editor, caret, count)
+  }
 
-    override fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
-        col = caret.vimLastColumn
-        return true
-    }
+  override fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
+    col = caret.vimLastColumn
+    return true
+  }
 
-    override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
-        caret.vimLastColumn = col
-    }
+  override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
+    caret.vimLastColumn = col
+  }
 }
 
 class MotionArrowDownAction : VimCommandAction(MotionArrowDownActionHandler) {
-    override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVOS
+  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVOS
 
-    override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = mutableSetOf(parseKeys("<Down>"), mutableListOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0)))
+  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = mutableSetOf(parseKeys("<Down>"), mutableListOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0)))
 
-    override fun getType(): Command.Type = Command.Type.MOTION
+  override fun getType(): Command.Type = Command.Type.MOTION
 
-    override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
+  override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
 }

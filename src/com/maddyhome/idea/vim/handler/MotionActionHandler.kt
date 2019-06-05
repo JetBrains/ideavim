@@ -40,156 +40,156 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
  */
 sealed class MotionActionHandler : EditorActionHandlerBase(false) {
 
-    /**
-     * This method should return new offset for [caret]
-     * It executes once for each [caret]. That means that if you have 5 carets, [getOffset] will be
-     *   called 5 times.
-     * The method executes only once it there is block selection.
-     */
-    abstract fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int
+  /**
+   * This method should return new offset for [caret]
+   * It executes once for each [caret]. That means that if you have 5 carets, [getOffset] will be
+   *   called 5 times.
+   * The method executes only once it there is block selection.
+   */
+  abstract fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int
+
+  /**
+   * This method is called before [getOffset] once for each [caret].
+   * The method executes only once it there is block selection.
+   */
+  protected open fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean = true
+
+  /**
+   * This method is called after [getOffset], but before caret motion.
+   *
+   * The method executes for each caret, but only once it there is block selection.
+   */
+  protected open fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {}
+
+  /**
+   * This method is called after [getOffset] and after caret motion.
+   *
+   * The method executes for each caret, but only once it there is block selection.
+   */
+  protected open fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {}
+
+  abstract val alwaysBatchExecution: Boolean
+
+  final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    val blockSubmodeActive = CommandState.inBlockSubMode(editor)
+
+    if (blockSubmodeActive || editor.caretModel.caretCount == 1 || alwaysBatchExecution) {
+      val primaryCaret = editor.caretModel.primaryCaret
+      doExecute(editor, primaryCaret, context, cmd)
+    } else {
+      try {
+        editor.caretModel.addCaretListener(CaretMergingWatcher)
+        editor.caretModel.runForEachCaret { caret -> doExecute(editor, caret, context, cmd) }
+      } finally {
+        editor.caretModel.removeCaretListener(CaretMergingWatcher)
+      }
+    }
+    return true
+  }
+
+  private fun doExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
+    if (!preOffsetComputation(editor, caret, context, cmd)) return
+
+    var offset = getOffset(editor, caret, context, cmd.count, cmd.rawCount, cmd.argument)
+
+    if (offset >= 0) {
+      if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
+        VimPlugin.getMark().saveJumpLocation(editor)
+      }
+      if (!CommandState.inInsertMode(editor) &&
+        !CommandState.inRepeatMode(editor) &&
+        !CommandState.inVisualMode(editor) &&
+        !CommandState.inSelectMode(editor)) {
+        offset = EditorHelper.normalizeOffset(editor, offset, false)
+      }
+      preMove(editor, caret, context, cmd)
+      MotionGroup.moveCaret(editor, caret, offset)
+      postMove(editor, caret, context, cmd)
+    }
+  }
+
+  final override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command) = true
+
+  private object CaretMergingWatcher : CaretListener {
+    override fun caretRemoved(event: CaretEvent) {
+      val editor = event.editor
+      val caretToDelete = event.caret ?: return
+      if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
+        for (caret in editor.caretModel.allCarets) {
+          if (caretToDelete.selectionStart < caret.selectionEnd &&
+            caretToDelete.selectionStart >= caret.selectionStart ||
+            caretToDelete.selectionEnd <= caret.selectionEnd &&
+            caretToDelete.selectionEnd > caret.selectionStart) {
+            // Okay, caret is being removed because of merging
+            val vimSelectionStart = caretToDelete.vimSelectionStart
+            caret.vimSelectionStart = vimSelectionStart
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Base class for motion handlers.
+   * This handler executes an action for each caret. That means that if you have 5 carets, [getOffset] will be
+   *   called 5 times.
+   * @see [MotionActionHandler.SingleExecution] for only one execution
+   */
+  abstract class ForEachCaret : MotionActionHandler() {
+    final override val alwaysBatchExecution: Boolean = false
+  }
+
+  /**
+   * Base class for motion handlers.
+   * This handler executes an action only once for all carets. That means that if you have 5 carets,
+   *   [getOffset] will be called 1 time.
+   * @see [MotionActionHandler.ForEachCaret] for per-caret execution
+   */
+  abstract class SingleExecution : MotionActionHandler() {
+
+    final override val alwaysBatchExecution = true
 
     /**
-     * This method is called before [getOffset] once for each [caret].
-     * The method executes only once it there is block selection.
+     * This method should return new offset for primary caret
+     * It executes once for all carets. That means that if you have 5 carets, [getOffset] will be
+     *   called 1 time.
      */
-    protected open fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean = true
+    abstract fun getOffset(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int
+
+    /**
+     * This method is called before [getOffset].
+     * The method executes only once.
+     */
+    protected open fun preOffsetComputation(editor: Editor, context: DataContext, cmd: Command): Boolean = true
 
     /**
      * This method is called after [getOffset], but before caret motion.
      *
-     * The method executes for each caret, but only once it there is block selection.
+     * The method executes only once.
      */
-    protected open fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {}
+    protected open fun preMove(editor: Editor, context: DataContext, cmd: Command) = Unit
 
     /**
      * This method is called after [getOffset] and after caret motion.
      *
-     * The method executes for each caret, but only once it there is block selection.
+     * The method executes only once it there is block selection.
      */
-    protected open fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {}
+    protected open fun postMove(editor: Editor, context: DataContext, cmd: Command) = Unit
 
-    abstract val alwaysBatchExecution: Boolean
-
-    final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-        val blockSubmodeActive = CommandState.inBlockSubMode(editor)
-
-        if (blockSubmodeActive || editor.caretModel.caretCount == 1 || alwaysBatchExecution) {
-            val primaryCaret = editor.caretModel.primaryCaret
-            doExecute(editor, primaryCaret, context, cmd)
-        } else {
-            try {
-                editor.caretModel.addCaretListener(CaretMergingWatcher)
-                editor.caretModel.runForEachCaret { caret -> doExecute(editor, caret, context, cmd) }
-            } finally {
-                editor.caretModel.removeCaretListener(CaretMergingWatcher)
-            }
-        }
-        return true
+    final override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+      return getOffset(editor, context, count, rawCount, argument)
     }
 
-    private fun doExecute(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
-        if (!preOffsetComputation(editor, caret, context, cmd)) return
-
-        var offset = getOffset(editor, caret, context, cmd.count, cmd.rawCount, cmd.argument)
-
-        if (offset >= 0) {
-            if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
-                VimPlugin.getMark().saveJumpLocation(editor)
-            }
-            if (!CommandState.inInsertMode(editor) &&
-                    !CommandState.inRepeatMode(editor) &&
-                    !CommandState.inVisualMode(editor) &&
-                    !CommandState.inSelectMode(editor)) {
-                offset = EditorHelper.normalizeOffset(editor, offset, false)
-            }
-            preMove(editor, caret, context, cmd)
-            MotionGroup.moveCaret(editor, caret, offset)
-            postMove(editor, caret, context, cmd)
-        }
+    final override fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
+      return preOffsetComputation(editor, context, cmd)
     }
 
-    final override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command) = true
-
-    private object CaretMergingWatcher : CaretListener {
-        override fun caretRemoved(event: CaretEvent) {
-            val editor = event.editor
-            val caretToDelete = event.caret ?: return
-            if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
-                for (caret in editor.caretModel.allCarets) {
-                    if (caretToDelete.selectionStart < caret.selectionEnd &&
-                            caretToDelete.selectionStart >= caret.selectionStart ||
-                            caretToDelete.selectionEnd <= caret.selectionEnd &&
-                            caretToDelete.selectionEnd > caret.selectionStart) {
-                        // Okay, caret is being removed because of merging
-                        val vimSelectionStart = caretToDelete.vimSelectionStart
-                        caret.vimSelectionStart = vimSelectionStart
-                    }
-                }
-            }
-        }
+    final override fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
+      return preMove(editor, context, cmd)
     }
 
-    /**
-     * Base class for motion handlers.
-     * This handler executes an action for each caret. That means that if you have 5 carets, [getOffset] will be
-     *   called 5 times.
-     * @see [MotionActionHandler.SingleExecution] for only one execution
-     */
-    abstract class ForEachCaret : MotionActionHandler() {
-        final override val alwaysBatchExecution: Boolean = false
+    final override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
+      return postMove(editor, context, cmd)
     }
-
-    /**
-     * Base class for motion handlers.
-     * This handler executes an action only once for all carets. That means that if you have 5 carets,
-     *   [getOffset] will be called 1 time.
-     * @see [MotionActionHandler.ForEachCaret] for per-caret execution
-     */
-    abstract class SingleExecution : MotionActionHandler() {
-
-        final override val alwaysBatchExecution = true
-
-        /**
-         * This method should return new offset for primary caret
-         * It executes once for all carets. That means that if you have 5 carets, [getOffset] will be
-         *   called 1 time.
-         */
-        abstract fun getOffset(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int
-
-        /**
-         * This method is called before [getOffset].
-         * The method executes only once.
-         */
-        protected open fun preOffsetComputation(editor: Editor, context: DataContext, cmd: Command): Boolean = true
-
-        /**
-         * This method is called after [getOffset], but before caret motion.
-         *
-         * The method executes only once.
-         */
-        protected open fun preMove(editor: Editor, context: DataContext, cmd: Command) = Unit
-
-        /**
-         * This method is called after [getOffset] and after caret motion.
-         *
-         * The method executes only once it there is block selection.
-         */
-        protected open fun postMove(editor: Editor, context: DataContext, cmd: Command) = Unit
-
-        final override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-            return getOffset(editor, context, count, rawCount, argument)
-        }
-
-        final override fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
-            return preOffsetComputation(editor, context, cmd)
-        }
-
-        final override fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
-            return preMove(editor, context, cmd)
-        }
-
-        final override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
-            return postMove(editor, context, cmd)
-        }
-    }
+  }
 }

@@ -31,16 +31,16 @@ import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.handler.CaretOrder
 
 class ShiftLeftHandler : CommandHandler(
-        commands("<[${"<".repeat(31)}]"),
-        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE),
-        true, CaretOrder.DECREASING_OFFSET
+  commands("<[${"<".repeat(31)}]"),
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE),
+  true, CaretOrder.DECREASING_OFFSET
 ) {
-    override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
-        val range = cmd.getTextRange(editor, caret, context, true)
-        val endOffsets = range.endOffsets.map { it - 1 }.toIntArray()
-        VimPlugin.getChange().indentRange(editor, caret, context,
-                TextRange(range.startOffsets, endOffsets),
-                cmd.command.length, -1)
-        return true
-    }
+  override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
+    val range = cmd.getTextRange(editor, caret, context, true)
+    val endOffsets = range.endOffsets.map { it - 1 }.toIntArray()
+    VimPlugin.getChange().indentRange(editor, caret, context,
+      TextRange(range.startOffsets, endOffsets),
+      cmd.command.length, -1)
+    return true
+  }
 }

@@ -31,17 +31,17 @@ import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.handler.CaretOrder
 
 class JoinLinesHandler : CommandHandler(
-        commands("j[oin]"),
-        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE),
-        true, CaretOrder.DECREASING_OFFSET
+  commands("j[oin]"),
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE),
+  true, CaretOrder.DECREASING_OFFSET
 ) {
-    override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
-        val arg = cmd.argument
-        val spaces = arg.isEmpty() || arg[0] != '!'
+  override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
+    val arg = cmd.argument
+    val spaces = arg.isEmpty() || arg[0] != '!'
 
-        val textRange = cmd.getTextRange(editor, caret, context, true) ?: return false
+    val textRange = cmd.getTextRange(editor, caret, context, true) ?: return false
 
-        return VimPlugin.getChange().deleteJoinRange(editor, caret, TextRange(textRange.startOffset,
-                textRange.endOffset - 1), spaces)
-    }
+    return VimPlugin.getChange().deleteJoinRange(editor, caret, TextRange(textRange.startOffset,
+      textRange.endOffset - 1), spaces)
+  }
 }

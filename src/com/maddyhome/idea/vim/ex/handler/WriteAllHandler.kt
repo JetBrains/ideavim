@@ -27,11 +27,11 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class WriteAllHandler : CommandHandler(
-        commands("wa[ll]"),
-        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
+  commands("wa[ll]"),
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        VimPlugin.getFile().saveFiles()
-        return true
-    }
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    VimPlugin.getFile().saveFiles()
+    return true
+  }
 }

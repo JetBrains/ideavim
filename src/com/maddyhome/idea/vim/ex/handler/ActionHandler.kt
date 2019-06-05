@@ -40,43 +40,43 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
  * @author smartbomb
  */
 class ActionHandler : CommandHandler(
-        commands("action"),
-        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN, SAVE_VISUAL)
+  commands("action"),
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN, SAVE_VISUAL)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        val actionName = cmd.argument.trim()
-        val action = ActionManager.getInstance().getAction(actionName) ?: run {
-            VimPlugin.showMessage("Action not found: $actionName")
-            return false
-        }
-        val application = ApplicationManager.getApplication()
-        val selections = editor.caretModel.allCarets.map { if (it.hasSelection()) it.selectionStart to it.selectionEnd else null }
-        val oldMode = CommandState.getInstance(editor).subMode
-        if (application.isUnitTestMode) {
-            executeAction(editor, action, context, selections, oldMode)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    val actionName = cmd.argument.trim()
+    val action = ActionManager.getInstance().getAction(actionName) ?: run {
+      VimPlugin.showMessage("Action not found: $actionName")
+      return false
+    }
+    val application = ApplicationManager.getApplication()
+    val selections = editor.caretModel.allCarets.map { if (it.hasSelection()) it.selectionStart to it.selectionEnd else null }
+    val oldMode = CommandState.getInstance(editor).subMode
+    if (application.isUnitTestMode) {
+      executeAction(editor, action, context, selections, oldMode)
+    } else {
+      runAfterGotFocus(Runnable { executeAction(editor, action, context, selections, oldMode) })
+    }
+    return true
+  }
+
+  private fun executeAction(editor: Editor, action: AnAction, context: DataContext, selections: List<Pair<Int, Int>?>, oldSubMode: CommandState.SubMode) {
+    SelectionVimListenerSuppressor.lock().use {
+      selections.forEachIndexed { i, selection ->
+        val caret = editor.caretModel.allCarets[i]
+        if (caret.hasSelection()) caret.removeSelection() // Selection is removed in non-unittest mode
+        if (oldSubMode == CommandState.SubMode.VISUAL_LINE) {
+          // Skip new line character for Line mode
+          selection?.run { caret.setSelection(first, (second - 1).coerceAtLeast(0)) }
         } else {
-            runAfterGotFocus(Runnable { executeAction(editor, action, context, selections, oldMode) })
+          selection?.run { caret.setSelection(first, second) }
         }
-        return true
+      }
+      if (editor.caretModel.allCarets.any(Caret::hasSelection) && CommandState.getInstance(editor).subMode != oldSubMode) {
+        VimPlugin.getVisualMotion().enterVisualMode(editor, oldSubMode)
+      }
     }
 
-    private fun executeAction(editor: Editor, action: AnAction, context: DataContext, selections: List<Pair<Int, Int>?>, oldSubMode: CommandState.SubMode) {
-        SelectionVimListenerSuppressor.lock().use {
-            selections.forEachIndexed { i, selection ->
-                val caret = editor.caretModel.allCarets[i]
-                if (caret.hasSelection()) caret.removeSelection() // Selection is removed in non-unittest mode
-                if (oldSubMode == CommandState.SubMode.VISUAL_LINE) {
-                    // Skip new line character for Line mode
-                    selection?.run { caret.setSelection(first, (second - 1).coerceAtLeast(0)) }
-                } else {
-                    selection?.run { caret.setSelection(first, second) }
-                }
-            }
-            if (editor.caretModel.allCarets.any(Caret::hasSelection) && CommandState.getInstance(editor).subMode != oldSubMode) {
-                VimPlugin.getVisualMotion().enterVisualMode(editor, oldSubMode)
-            }
-        }
-
-        KeyHandler.executeAction(action, context)
-    }
+    KeyHandler.executeAction(action, context)
+  }
 }

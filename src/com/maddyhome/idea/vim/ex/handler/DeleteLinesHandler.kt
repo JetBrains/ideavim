@@ -31,22 +31,22 @@ import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.handler.CaretOrder
 
 class DeleteLinesHandler : CommandHandler(commands("d[elete]"),
-        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE),
-        true, CaretOrder.DECREASING_OFFSET
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE),
+  true, CaretOrder.DECREASING_OFFSET
 ) {
-    override fun execute(editor: Editor, caret: Caret, context: DataContext,
-                         cmd: ExCommand): Boolean {
-        val argument = cmd.argument
-        val register = if (argument.isNotEmpty() && !argument[0].isDigit()) {
-            cmd.argument = argument.substring(1)
-            argument[0]
-        } else {
-            VimPlugin.getRegister().defaultRegister
-        }
-
-        if (!VimPlugin.getRegister().selectRegister(register)) return false
-
-        val textRange = cmd.getTextRange(editor, caret, context, true)
-        return VimPlugin.getChange().deleteRange(editor, caret, textRange, SelectionType.LINE_WISE, false)
+  override fun execute(editor: Editor, caret: Caret, context: DataContext,
+                       cmd: ExCommand): Boolean {
+    val argument = cmd.argument
+    val register = if (argument.isNotEmpty() && !argument[0].isDigit()) {
+      cmd.argument = argument.substring(1)
+      argument[0]
+    } else {
+      VimPlugin.getRegister().defaultRegister
     }
+
+    if (!VimPlugin.getRegister().selectRegister(register)) return false
+
+    val textRange = cmd.getTextRange(editor, caret, context, true)
+    return VimPlugin.getChange().deleteRange(editor, caret, textRange, SelectionType.LINE_WISE, false)
+  }
 }

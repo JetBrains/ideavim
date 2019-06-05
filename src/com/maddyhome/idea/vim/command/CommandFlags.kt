@@ -19,82 +19,82 @@
 package com.maddyhome.idea.vim.command
 
 enum class CommandFlags {
-    /**
-     * Motion flags
-     */
-    FLAG_MOT_LINEWISE,
-    FLAG_MOT_CHARACTERWISE,
-    FLAG_MOT_BLOCKWISE,
-    FLAG_MOT_INCLUSIVE,
-    FLAG_MOT_EXCLUSIVE,
-    /**
-     * Indicates that the cursor position should be saved prior to this motion command
-     */
-    FLAG_SAVE_JUMP,
-    /**
-     * Special flag that says this is characterwise only for visual mode
-     */
-    FLAG_VISUAL_CHARACTERWISE,
-    /**
-     * Special command flag that indicates it is not to be repeated
-     */
-    FLAG_NO_REPEAT,
-    /**
-     * This insert command should clear all saved keystrokes from the current insert
-     */
-    FLAG_CLEAR_STROKES,
-    /**
-     * This keystroke should be saved as part of the current insert
-     */
-    FLAG_SAVE_STROKE,
-    FLAG_IGNORE_SCROLL_JUMP,
-    FLAG_IGNORE_SIDE_SCROLL_JUMP,
-    /**
-     * Indicates a command can accept a count in mid command
-     */
-    FLAG_ALLOW_MID_COUNT,
-    /**
-     * Search Flags
-     */
-    FLAG_SEARCH_FWD,
-    FLAG_SEARCH_REV,
-    /**
-     * Command exits the visual mode, so caret movement shouldn't update visual selection
-     */
-    FLAG_EXIT_VISUAL,
-    /**
-     * Special flag used for any mappings involving operators
-     */
-    FLAG_OP_PEND,
-    /**
-     * This command starts a multi-command undo transaction
-     */
-    FLAG_MULTIKEY_UNDO,
-    /**
-     * This command should be followed by another command
-     */
-    FLAG_EXPECT_MORE,
-    /**
-     * This flag indicates the command's argument isn't used while recording
-     */
-    FLAG_NO_ARG_RECORDING,
-    /**
-     * Indicate that the character argument may come from a digraph
-     */
-    FLAG_ALLOW_DIGRAPH,
-    FLAG_COMPLETE_EX,
-    FLAG_TEXT_BLOCK,
-    /**
-     * Some IDE actions do enable `typeahead` option for proper popups handling.
-     *   There actions are GoToClass, GoToFile, SearchEverywhere and so on. With this options enabled if vim-action is
-     *   bound to the same shortcut as one of actions that are listed above, user will face significant UI freezes.
-     *   To avoid there freezes, `IdeEventQueue.getInstance().flushDelayedKeyEvents();` should be called. This
-     *   function is called automatically from [com.maddyhome.idea.vim.KeyHandler], but it will not be called if
-     *   vim-action has this flag. In that case this action should call function by itself.
-     *
-     * This flag is created for more convenience and used in [com.maddyhome.idea.vim.action.window.LookupUpAction]
-     *   and [com.maddyhome.idea.vim.action.window.LookupDownAction] because there actions have custom handler
-     *   only if lookup is active.
-     */
-    FLAG_TYPEAHEAD_SELF_MANAGE
+  /**
+   * Motion flags
+   */
+  FLAG_MOT_LINEWISE,
+  FLAG_MOT_CHARACTERWISE,
+  FLAG_MOT_BLOCKWISE,
+  FLAG_MOT_INCLUSIVE,
+  FLAG_MOT_EXCLUSIVE,
+  /**
+   * Indicates that the cursor position should be saved prior to this motion command
+   */
+  FLAG_SAVE_JUMP,
+  /**
+   * Special flag that says this is characterwise only for visual mode
+   */
+  FLAG_VISUAL_CHARACTERWISE,
+  /**
+   * Special command flag that indicates it is not to be repeated
+   */
+  FLAG_NO_REPEAT,
+  /**
+   * This insert command should clear all saved keystrokes from the current insert
+   */
+  FLAG_CLEAR_STROKES,
+  /**
+   * This keystroke should be saved as part of the current insert
+   */
+  FLAG_SAVE_STROKE,
+  FLAG_IGNORE_SCROLL_JUMP,
+  FLAG_IGNORE_SIDE_SCROLL_JUMP,
+  /**
+   * Indicates a command can accept a count in mid command
+   */
+  FLAG_ALLOW_MID_COUNT,
+  /**
+   * Search Flags
+   */
+  FLAG_SEARCH_FWD,
+  FLAG_SEARCH_REV,
+  /**
+   * Command exits the visual mode, so caret movement shouldn't update visual selection
+   */
+  FLAG_EXIT_VISUAL,
+  /**
+   * Special flag used for any mappings involving operators
+   */
+  FLAG_OP_PEND,
+  /**
+   * This command starts a multi-command undo transaction
+   */
+  FLAG_MULTIKEY_UNDO,
+  /**
+   * This command should be followed by another command
+   */
+  FLAG_EXPECT_MORE,
+  /**
+   * This flag indicates the command's argument isn't used while recording
+   */
+  FLAG_NO_ARG_RECORDING,
+  /**
+   * Indicate that the character argument may come from a digraph
+   */
+  FLAG_ALLOW_DIGRAPH,
+  FLAG_COMPLETE_EX,
+  FLAG_TEXT_BLOCK,
+  /**
+   * Some IDE actions do enable `typeahead` option for proper popups handling.
+   *   There actions are GoToClass, GoToFile, SearchEverywhere and so on. With this options enabled if vim-action is
+   *   bound to the same shortcut as one of actions that are listed above, user will face significant UI freezes.
+   *   To avoid there freezes, `IdeEventQueue.getInstance().flushDelayedKeyEvents();` should be called. This
+   *   function is called automatically from [com.maddyhome.idea.vim.KeyHandler], but it will not be called if
+   *   vim-action has this flag. In that case this action should call function by itself.
+   *
+   * This flag is created for more convenience and used in [com.maddyhome.idea.vim.action.window.LookupUpAction]
+   *   and [com.maddyhome.idea.vim.action.window.LookupDownAction] because there actions have custom handler
+   *   only if lookup is active.
+   */
+  FLAG_TYPEAHEAD_SELF_MANAGE
 }

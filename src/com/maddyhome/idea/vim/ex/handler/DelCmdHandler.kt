@@ -27,16 +27,16 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class DelCmdHandler : CommandHandler(
-        commands("delc[ommand]"),
-        flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED)
+  commands("delc[ommand]"),
+  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        if (!VimPlugin.getCommand().hasAlias(cmd.argument)) {
-            VimPlugin.showMessage("E184: No such user-defined command: ${cmd.argument}")
-            return false
-        }
-
-        VimPlugin.getCommand().removeAlias(cmd.argument)
-        return true
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    if (!VimPlugin.getCommand().hasAlias(cmd.argument)) {
+      VimPlugin.showMessage("E184: No such user-defined command: ${cmd.argument}")
+      return false
     }
+
+    VimPlugin.getCommand().removeAlias(cmd.argument)
+    return true
+  }
 }

@@ -31,18 +31,18 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.CaretOrder
 
 class GotoCharacterHandler : CommandHandler(commands("go[to]"),
-        flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL),
-        true, CaretOrder.DECREASING_OFFSET, flags(CommandFlags.FLAG_MOT_EXCLUSIVE)
+  flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL),
+  true, CaretOrder.DECREASING_OFFSET, flags(CommandFlags.FLAG_MOT_EXCLUSIVE)
 ) {
-    override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
-        val count = cmd.getCount(editor, caret, context, 1, true)
-        if (count <= 0) return false
+  override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
+    val count = cmd.getCount(editor, caret, context, 1, true)
+    if (count <= 0) return false
 
-        val offset = VimPlugin.getMotion().moveCaretToNthCharacter(editor, count - 1)
-        if (offset == -1) return false
+    val offset = VimPlugin.getMotion().moveCaretToNthCharacter(editor, count - 1)
+    if (offset == -1) return false
 
-        MotionGroup.moveCaret(editor, caret, offset)
+    MotionGroup.moveCaret(editor, caret, offset)
 
-        return true
-    }
+    return true
+  }
 }

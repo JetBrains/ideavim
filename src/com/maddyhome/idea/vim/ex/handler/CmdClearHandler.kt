@@ -27,11 +27,11 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class CmdClearHandler : CommandHandler(
-        commands("comc[lear]"),
-        flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN)
+  commands("comc[lear]"),
+  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        VimPlugin.getCommand().resetAliases()
-        return true
-    }
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    VimPlugin.getCommand().resetAliases()
+    return true
+  }
 }

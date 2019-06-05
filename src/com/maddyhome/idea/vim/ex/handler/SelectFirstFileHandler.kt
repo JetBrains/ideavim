@@ -29,14 +29,14 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class SelectFirstFileHandler : CommandHandler(
-        commands("fir[st]", "rew[ind]"),
-        flags(RangeFlag.RANGE_OPTIONAL, ARGUMENT_OPTIONAL, DONT_REOPEN)
+  commands("fir[st]", "rew[ind]"),
+  flags(RangeFlag.RANGE_OPTIONAL, ARGUMENT_OPTIONAL, DONT_REOPEN)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        val res = VimPlugin.getFile().selectFile(0, context)
-        if (res) {
-            VimPlugin.getMark().saveJumpLocation(editor)
-        }
-        return res
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    val res = VimPlugin.getFile().selectFile(0, context)
+    if (res) {
+      VimPlugin.getMark().saveJumpLocation(editor)
     }
+    return res
+  }
 }

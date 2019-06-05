@@ -33,18 +33,18 @@ import javax.swing.KeyStroke
  */
 
 object SelectEscapeActionHandler : EditorActionHandlerBase() {
-    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-        val blockMode = CommandState.inBlockSubMode(editor)
-        VimPlugin.getVisualMotion().exitSelectMode(editor, true)
-        if (blockMode) editor.caretModel.removeSecondaryCarets()
-        return true
-    }
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    val blockMode = CommandState.inBlockSubMode(editor)
+    VimPlugin.getVisualMotion().exitSelectMode(editor, true)
+    if (blockMode) editor.caretModel.removeSecondaryCarets()
+    return true
+  }
 }
 
 class SelectEscapeAction : VimCommandAction(SelectEscapeActionHandler) {
-    override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.S
+  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.S
 
-    override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<esc>")
+  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<esc>")
 
-    override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+  override fun getType(): Command.Type = Command.Type.OTHER_READONLY
 }

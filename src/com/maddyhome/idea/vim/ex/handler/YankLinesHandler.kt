@@ -26,8 +26,8 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.*
 
 class YankLinesHandler : CommandHandler(
-        commands("y[ank]"),
-        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
+  commands("y[ank]"),
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
 ) {
 
   @Throws(ExException::class)
@@ -53,7 +53,7 @@ class YankLinesHandler : CommandHandler(
     }
 
     return VimPlugin.getYank().yankRange(editor,
-            TextRange(starts.toIntArray(), ends.toIntArray()),
-            SelectionType.LINE_WISE, false)
+      TextRange(starts.toIntArray(), ends.toIntArray()),
+      SelectionType.LINE_WISE, false)
   }
 }

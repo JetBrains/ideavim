@@ -28,8 +28,8 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class SelectFileHandler : CommandHandler(
-        commands("argu[ment]"),
-        flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
+  commands("argu[ment]"),
+  flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
 ) {
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {

@@ -32,25 +32,25 @@ import javax.swing.KeyStroke
  * @author vlan
  */
 private object VisualSwapEndsBlockActionHandler : EditorActionHandlerBase() {
-    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-        if (CommandState.inBlockSubMode(editor)) {
-            return VimPlugin.getVisualMotion().swapVisualEndsBigO(editor)
-        }
-
-        var ret = true
-        for (caret in editor.caretModel.allCarets) {
-            ret = ret && VimPlugin.getVisualMotion().swapVisualEnds(editor, caret)
-        }
-        return ret
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    if (CommandState.inBlockSubMode(editor)) {
+      return VimPlugin.getVisualMotion().swapVisualEndsBigO(editor)
     }
+
+    var ret = true
+    for (caret in editor.caretModel.allCarets) {
+      ret = ret && VimPlugin.getVisualMotion().swapVisualEnds(editor, caret)
+    }
+    return ret
+  }
 }
 
 class VisualSwapEndsBlockAction : VimCommandAction(VisualSwapEndsBlockActionHandler) {
 
-    override fun getMappingModes(): Set<MappingMode> = MappingMode.V
+  override fun getMappingModes(): Set<MappingMode> = MappingMode.V
 
-    override fun getKeyStrokesSet(): Set<List<KeyStroke>> = parseKeysSet("O")
+  override fun getKeyStrokesSet(): Set<List<KeyStroke>> = parseKeysSet("O")
 
-    override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+  override fun getType(): Command.Type = Command.Type.OTHER_READONLY
 }
 

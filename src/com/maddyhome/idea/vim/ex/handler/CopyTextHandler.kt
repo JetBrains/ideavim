@@ -29,22 +29,22 @@ import com.maddyhome.idea.vim.handler.CaretOrder
 import com.maddyhome.idea.vim.helper.EditorHelper
 
 class CopyTextHandler : CommandHandler(
-        commands("co[py]", "t"),
-        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, WRITABLE)
+  commands("co[py]", "t"),
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, WRITABLE)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        val carets = EditorHelper.getOrderedCaretsList(editor, CaretOrder.DECREASING_OFFSET)
-        for (caret in carets) {
-            val range = cmd.getTextRange(editor, caret, context, false)
-            val text = EditorHelper.getText(editor, range.startOffset, range.endOffset)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    val carets = EditorHelper.getOrderedCaretsList(editor, CaretOrder.DECREASING_OFFSET)
+    for (caret in carets) {
+      val range = cmd.getTextRange(editor, caret, context, false)
+      val text = EditorHelper.getText(editor, range.startOffset, range.endOffset)
 
-            val arg = CommandParser.getInstance().parse(cmd.argument)
-            val line = arg.ranges.getFirstLine(editor, caret, context)
+      val arg = CommandParser.getInstance().parse(cmd.argument)
+      val line = arg.ranges.getFirstLine(editor, caret, context)
 
-            val textData = PutData.TextData(text, SelectionType.LINE_WISE)
-            val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, _indent = true, caretAfterInsertedText = false, putToLine = line)
-            VimPlugin.getPut().putTextForCaret(editor, caret, context, putData)
-        }
-        return true
+      val textData = PutData.TextData(text, SelectionType.LINE_WISE)
+      val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, _indent = true, caretAfterInsertedText = false, putToLine = line)
+      VimPlugin.getPut().putTextForCaret(editor, caret, context, putData)
     }
+    return true
+  }
 }
