@@ -28,8 +28,8 @@ import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.CaretOrder
 
 class RepeatHandler : CommandHandler(commands("@"),
-        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, DONT_SAVE_LAST),
-        true, CaretOrder.DECREASING_OFFSET
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, DONT_SAVE_LAST),
+  true, CaretOrder.DECREASING_OFFSET
 ) {
 
   private var lastArg = ':'

@@ -28,17 +28,17 @@ import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
  * @author vlan
  */
 class EchoHandler : CommandHandler(
-        commands("ec[ho]"),
-        flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
+  commands("ec[ho]"),
+  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
 ) {
 
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        val env = VimScriptGlobalEnvironment.getInstance()
-        val globals = env.variables
-        val value = VimScriptParser.evaluate(cmd.argument, globals)
-        val text = VimScriptParser.expressionToString(value) + "\n"
-        ExOutputModel.getInstance(editor).output(text)
-        return true
-    }
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    val env = VimScriptGlobalEnvironment.getInstance()
+    val globals = env.variables
+    val value = VimScriptParser.evaluate(cmd.argument, globals)
+    val text = VimScriptParser.expressionToString(value) + "\n"
+    ExOutputModel.getInstance(editor).output(text)
+    return true
+  }
 }
 

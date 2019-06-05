@@ -28,8 +28,8 @@ import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.helper.UndoRedoHelper
 
 class UndoHandler : CommandHandler(
-        commands("u[ndo]"),
-        flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, WRITABLE)
+  commands("u[ndo]"),
+  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN, WRITABLE)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) = UndoRedoHelper.undo(context)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) = UndoRedoHelper.undo(context)
 }

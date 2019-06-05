@@ -29,41 +29,41 @@ import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
 import kotlin.math.absoluteValue
 
 class JumpsHandler : CommandHandler(
-        commands("ju[mps]"),
-        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_FORBIDDEN)
+  commands("ju[mps]"),
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_FORBIDDEN)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        val jumps = VimPlugin.getMark().jumps
-        val spot = VimPlugin.getMark().jumpSpot
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    val jumps = VimPlugin.getMark().jumps
+    val spot = VimPlugin.getMark().jumpSpot
 
-        val text = StringBuilder("  jump line  col file/text\n")
-        jumps.forEachIndexed { idx, jump ->
-            val jumpSizeMinusSpot = jumps.size - idx - spot - 1
-            text.append(if (jumpSizeMinusSpot == 0) "> " else "  ")
-            text.append(jumpSizeMinusSpot.absoluteValue.toString().padStart(3))
-            text.append(" ")
-            text.append((jump.logicalLine + 1).toString().padStart(5))
+    val text = StringBuilder("  jump line  col file/text\n")
+    jumps.forEachIndexed { idx, jump ->
+      val jumpSizeMinusSpot = jumps.size - idx - spot - 1
+      text.append(if (jumpSizeMinusSpot == 0) "> " else "  ")
+      text.append(jumpSizeMinusSpot.absoluteValue.toString().padStart(3))
+      text.append(" ")
+      text.append((jump.logicalLine + 1).toString().padStart(5))
 
-            text.append("  ")
-            text.append((jump.col + 1).toString().padStart(3))
+      text.append("  ")
+      text.append((jump.col + 1).toString().padStart(3))
 
-            text.append(" ")
-            val vf = EditorData.getVirtualFile(editor)
-            if (vf != null && vf.path == jump.filename) {
-                text.append(toKeyNotation(stringToKeys(EditorHelper.getLineText(editor, jump.logicalLine).trim())))
-            } else {
-                text.append(jump.filename)
-            }
+      text.append(" ")
+      val vf = EditorData.getVirtualFile(editor)
+      if (vf != null && vf.path == jump.filename) {
+        text.append(toKeyNotation(stringToKeys(EditorHelper.getLineText(editor, jump.logicalLine).trim())))
+      } else {
+        text.append(jump.filename)
+      }
 
-            text.append("\n")
-        }
-
-        if (spot == -1) {
-            text.append(">\n")
-        }
-
-        ExOutputModel.getInstance(editor).output(text.toString())
-
-        return true
+      text.append("\n")
     }
+
+    if (spot == -1) {
+      text.append(">\n")
+    }
+
+    ExOutputModel.getInstance(editor).output(text.toString())
+
+    return true
+  }
 }

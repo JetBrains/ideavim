@@ -28,20 +28,20 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class DigraphHandler : CommandHandler(
-        commands("dig[raphs]"),
-        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
+  commands("dig[raphs]"),
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
 ) {
 
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        val arg = cmd.argument
-        if (logger.isDebugEnabled) {
-            logger.debug("arg=$arg")
-        }
-
-        return VimPlugin.getDigraph().parseCommandLine(editor, arg)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    val arg = cmd.argument
+    if (logger.isDebugEnabled) {
+      logger.debug("arg=$arg")
     }
 
-    companion object {
-        private val logger = Logger.getInstance(DigraphHandler::class.java.name)
-    }
+    return VimPlugin.getDigraph().parseCommandLine(editor, arg)
+  }
+
+  companion object {
+    private val logger = Logger.getInstance(DigraphHandler::class.java.name)
+  }
 }

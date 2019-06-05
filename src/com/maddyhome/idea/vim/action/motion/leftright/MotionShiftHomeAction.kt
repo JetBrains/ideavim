@@ -35,20 +35,20 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 private object MotionShiftHomeActionHandler : ShiftedSpecialKeyHandler() {
-    override fun motion(editor: Editor, context: DataContext, cmd: Command) {
-        editor.vimForEachCaret { caret ->
-            val newOffset = VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
-            MotionGroup.moveCaret(editor, caret, newOffset)
-        }
+  override fun motion(editor: Editor, context: DataContext, cmd: Command) {
+    editor.vimForEachCaret { caret ->
+      val newOffset = VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
+      MotionGroup.moveCaret(editor, caret, newOffset)
     }
+  }
 }
 
 class MotionShiftHomeAction : VimCommandAction(MotionShiftHomeActionHandler) {
-    override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVS
+  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVS
 
-    override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<S-Home>")
+  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<S-Home>")
 
-    override fun getType(): Command.Type = Command.Type.MOTION
+  override fun getType(): Command.Type = Command.Type.MOTION
 
-    override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
+  override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
 }

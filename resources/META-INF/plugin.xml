@@ -137,6 +137,8 @@
     <action id="VimArrowMotionUp" class="com.maddyhome.idea.vim.action.motion.updown.MotionArrowUpAction" text="Arrow Up"/>
     <action id="VimArrowMotionLeft" class="com.maddyhome.idea.vim.action.motion.leftright.MotionArrowLeftAction" text="Arrow Left"/>
     <action id="VimArrowMotionRight" class="com.maddyhome.idea.vim.action.motion.leftright.MotionArrowRightAction" text="Arrow Right"/>
+    <action id="VimLookupDown" class="com.maddyhome.idea.vim.action.window.LookupDownAction" text="Down"/>
+    <action id="VimLookupUp" class="com.maddyhome.idea.vim.action.window.LookupUpAction" text="Up"/>
     <!-- Text -->
     <action id="VimMotionCamelEndLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionCamelEndLeftAction" text="Camel Word End Left"/>
     <action id="VimMotionCamelEndRight" class="com.maddyhome.idea.vim.action.motion.text.MotionCamelEndRightAction" text="Camel Word End Right"/>

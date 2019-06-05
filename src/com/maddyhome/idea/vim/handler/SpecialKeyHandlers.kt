@@ -38,26 +38,26 @@ import com.maddyhome.idea.vim.option.Options
  * Handler is called once for all carets
  */
 abstract class ShiftedSpecialKeyHandler : EditorActionHandlerBase() {
-    final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-        val keymodelOption = Options.getInstance().getListOption(Options.KEYMODEL)!!
-        val startSel = "startsel" in keymodelOption
-        if (startSel && !CommandState.inVisualMode(editor) && !CommandState.inSelectMode(editor)) {
-            if (Options.getInstance().getListOption(Options.SELECTMODE)?.contains("key") == true) {
-                VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
-            } else {
-                VimPlugin.getVisualMotion()
-                        .toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
-            }
-        }
-        motion(editor, context, cmd)
-        return true
+  final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    val keymodelOption = Options.getInstance().getListOption(Options.KEYMODEL)!!
+    val startSel = "startsel" in keymodelOption
+    if (startSel && !CommandState.inVisualMode(editor) && !CommandState.inSelectMode(editor)) {
+      if (Options.getInstance().getListOption(Options.SELECTMODE)?.contains("key") == true) {
+        VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
+      } else {
+        VimPlugin.getVisualMotion()
+          .toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
+      }
     }
+    motion(editor, context, cmd)
+    return true
+  }
 
-    /**
-     * This method is called when `keymodel` doesn't contain `startsel`,
-     * or contains one of `continue*` values but in different mode.
-     */
-    abstract fun motion(editor: Editor, context: DataContext, cmd: Command)
+  /**
+   * This method is called when `keymodel` doesn't contain `startsel`,
+   * or contains one of `continue*` values but in different mode.
+   */
+  abstract fun motion(editor: Editor, context: DataContext, cmd: Command)
 }
 
 /**
@@ -68,38 +68,39 @@ abstract class ShiftedSpecialKeyHandler : EditorActionHandlerBase() {
  * Handler is called once for all carets
  */
 abstract class ShiftedArrowKeyHandler : EditorActionHandlerBase() {
-    final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-        val keymodelOption = Options.getInstance().getListOption(Options.KEYMODEL)!!
-        val startSel = "startsel" in keymodelOption
-        val continueselect = "continueselect" in keymodelOption
-        val continuevisual = "continuevisual" in keymodelOption
-        val inVisualMode = CommandState.inVisualMode(editor)
-        val inSelectMode = CommandState.inSelectMode(editor)
-        if (startSel || continueselect && inSelectMode || continuevisual && inVisualMode) {
-            if (!inVisualMode && !inSelectMode) {
-                if ("key" in Options.getInstance().getListOption(Options.SELECTMODE)!!) {
-                    VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
-                } else {
-                    VimPlugin.getVisualMotion()
-                            .toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
-                }
-            }
-            motionWithKeyModel(editor, context, cmd)
+  final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    val keymodelOption = Options.getInstance().getListOption(Options.KEYMODEL)!!
+    val startSel = "startsel" in keymodelOption
+    val continueselect = "continueselect" in keymodelOption
+    val continuevisual = "continuevisual" in keymodelOption
+    val inVisualMode = CommandState.inVisualMode(editor)
+    val inSelectMode = CommandState.inSelectMode(editor)
+    if (startSel || continueselect && inSelectMode || continuevisual && inVisualMode) {
+      if (!inVisualMode && !inSelectMode) {
+        if ("key" in Options.getInstance().getListOption(Options.SELECTMODE)!!) {
+          VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
         } else {
-            motionWithoutKeyModel(editor, context, cmd)
+          VimPlugin.getVisualMotion()
+            .toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
         }
-        return true
+      }
+      motionWithKeyModel(editor, context, cmd)
+    } else {
+      motionWithoutKeyModel(editor, context, cmd)
     }
+    return true
+  }
 
-    /**
-     * This method is called when `keymodel` contains `startsel`, or one of `continue*` values in corresponding mode
-     */
-    abstract fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command)
-    /**
-     * This method is called when `keymodel` doesn't contain `startsel`,
-     * or contains one of `continue*` values but in different mode.
-     */
-    abstract fun motionWithoutKeyModel(editor: Editor, context: DataContext, cmd: Command)
+  /**
+   * This method is called when `keymodel` contains `startsel`, or one of `continue*` values in corresponding mode
+   */
+  abstract fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command)
+
+  /**
+   * This method is called when `keymodel` doesn't contain `startsel`,
+   * or contains one of `continue*` values but in different mode.
+   */
+  abstract fun motionWithoutKeyModel(editor: Editor, context: DataContext, cmd: Command)
 }
 
 /**
@@ -111,20 +112,20 @@ abstract class ShiftedArrowKeyHandler : EditorActionHandlerBase() {
  * Handler is called for each caret
  */
 abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() {
-    final override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-        val keymodel = Options.getInstance().getListOption(Options.KEYMODEL)!!
-        if (CommandState.inSelectMode(editor) && ("stopsel" in keymodel || "stopselect" in keymodel)) {
-            VimPlugin.getVisualMotion().exitSelectMode(editor, false)
-        }
-        if (CommandState.inVisualMode(editor) && ("stopsel" in keymodel || "stopvisual" in keymodel)) {
-            VimPlugin.getVisualMotion().exitVisual(editor)
-        }
-
-        return offset(editor, caret, context, count, rawCount, argument)
+  final override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+    val keymodel = Options.getInstance().getListOption(Options.KEYMODEL)!!
+    if (CommandState.inSelectMode(editor) && ("stopsel" in keymodel || "stopselect" in keymodel)) {
+      VimPlugin.getVisualMotion().exitSelectMode(editor, false)
+    }
+    if (CommandState.inVisualMode(editor) && ("stopsel" in keymodel || "stopvisual" in keymodel)) {
+      VimPlugin.getVisualMotion().exitVisual(editor)
     }
 
-    /**
-     * Calculate new offset for current [caret]
-     */
-    abstract fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int
+    return offset(editor, caret, context, count, rawCount, argument)
+  }
+
+  /**
+   * Calculate new offset for current [caret]
+   */
+  abstract fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int
 }

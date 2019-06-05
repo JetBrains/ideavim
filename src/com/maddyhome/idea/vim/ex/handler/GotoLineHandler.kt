@@ -35,28 +35,28 @@ import com.maddyhome.idea.vim.helper.EditorHelper
  * range.
  */
 class GotoLineHandler : CommandHandler(
-        flags(RangeFlag.RANGE_REQUIRED, ArgumentFlag.ARGUMENT_OPTIONAL),
-        flags(CommandFlags.FLAG_MOT_EXCLUSIVE),
-        true, CaretOrder.DECREASING_OFFSET
+  flags(RangeFlag.RANGE_REQUIRED, ArgumentFlag.ARGUMENT_OPTIONAL),
+  flags(CommandFlags.FLAG_MOT_EXCLUSIVE),
+  true, CaretOrder.DECREASING_OFFSET
 ) {
-    /**
-     * Moves the cursor to the line entered by the user
-     *
-     * @param editor  The editor to perform the action in
-     * @param caret   The caret to perform the action on
-     * @param context The data context
-     * @param cmd     The complete Ex command including range, command, and arguments
-     * @return True if able to perform the command, false if not
-     */
-    override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
-        val line = Math.min(cmd.getLine(editor, caret, context), EditorHelper.getLineCount(editor) - 1)
+  /**
+   * Moves the cursor to the line entered by the user
+   *
+   * @param editor  The editor to perform the action in
+   * @param caret   The caret to perform the action on
+   * @param context The data context
+   * @param cmd     The complete Ex command including range, command, and arguments
+   * @return True if able to perform the command, false if not
+   */
+  override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
+    val line = Math.min(cmd.getLine(editor, caret, context), EditorHelper.getLineCount(editor) - 1)
 
-        if (line >= 0) {
-            MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, line))
-            return true
-        }
-
-        MotionGroup.moveCaret(editor, caret, 0)
-        return false
+    if (line >= 0) {
+      MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, line))
+      return true
     }
+
+    MotionGroup.moveCaret(editor, caret, 0)
+    return false
+  }
 }

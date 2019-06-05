@@ -1,6 +1,26 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2019 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.maddyhome.idea.vim.ui
 
-import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.maddyhome.idea.vim.VimPlugin
 import java.awt.event.KeyEvent
 import javax.swing.KeyStroke
@@ -19,32 +39,32 @@ import javax.swing.KeyStroke
  */
 class ExShortcutKeyAction(private val exEntryPanel: ExEntryPanel) : AnAction() {
 
-    override fun actionPerformed(e: AnActionEvent) {
-        val keyStroke = getKeyStroke(e)
-        if (keyStroke != null) {
-            VimPlugin.getProcess().processExKey(exEntryPanel.entry.editor, keyStroke)
-        }
+  override fun actionPerformed(e: AnActionEvent) {
+    val keyStroke = getKeyStroke(e)
+    if (keyStroke != null) {
+      VimPlugin.getProcess().processExKey(exEntryPanel.entry.editor, keyStroke)
     }
+  }
 
-    override fun update(e: AnActionEvent) {
-        e.presentation.isEnabled = exEntryPanel.isActive
+  override fun update(e: AnActionEvent) {
+    e.presentation.isEnabled = exEntryPanel.isActive
+  }
+
+  private fun getKeyStroke(e: AnActionEvent): KeyStroke? {
+    val inputEvent = e.inputEvent
+    if (inputEvent is KeyEvent) {
+      return KeyStroke.getKeyStrokeForEvent(inputEvent)
     }
+    return null
+  }
 
-    private fun getKeyStroke(e: AnActionEvent): KeyStroke? {
-        val inputEvent = e.inputEvent
-        if (inputEvent is KeyEvent) {
-            return KeyStroke.getKeyStrokeForEvent(inputEvent)
-        }
-        return null
-    }
+  fun registerCustomShortcutSet() {
 
-    fun registerCustomShortcutSet() {
+    val shortcuts = ExKeyBindings.bindings.map {
+      KeyboardShortcut(it.key, null)
+    }.toTypedArray()
 
-        val shortcuts = ExKeyBindings.bindings.map {
-            KeyboardShortcut(it.key, null)
-        }.toTypedArray()
-
-        registerCustomShortcutSet({ shortcuts }, exEntryPanel)
-    }
+    registerCustomShortcutSet({ shortcuts }, exEntryPanel)
+  }
 }
 

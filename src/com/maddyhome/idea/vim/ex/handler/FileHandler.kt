@@ -28,12 +28,12 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class FileHandler : CommandHandler(
-        commands("f[ile]"),
-        flags(RangeFlag.RANGE_IS_COUNT, ARGUMENT_FORBIDDEN)
+  commands("f[ile]"),
+  flags(RangeFlag.RANGE_IS_COUNT, ARGUMENT_FORBIDDEN)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        val count = cmd.getCount(editor, context, 0, false)
-        VimPlugin.getFile().displayFileInfo(editor, count > 0)
-        return true
-    }
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    val count = cmd.getCount(editor, context, 0, false)
+    VimPlugin.getFile().displayFileInfo(editor, count > 0)
+    return true
+  }
 }

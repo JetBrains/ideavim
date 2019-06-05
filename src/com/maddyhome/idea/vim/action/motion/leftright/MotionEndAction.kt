@@ -33,36 +33,36 @@ import java.util.*
 import javax.swing.KeyStroke
 
 private object MotionEndActionHandler : NonShiftedSpecialKeyHandler() {
-    override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int,
-                        rawCount: Int, argument: Argument?): Int {
-        var allow = false
-        if (CommandState.inInsertMode(editor)) {
-            allow = true
-        } else if (CommandState.inVisualMode(editor) || CommandState.inSelectMode(editor)) {
-            val opt = Options.getInstance().getOption("selection") as BoundStringOption
-            if (opt.value != "old") {
-                allow = true
-            }
-        }
-
-        return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow)
+  override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int,
+                      rawCount: Int, argument: Argument?): Int {
+    var allow = false
+    if (CommandState.inInsertMode(editor)) {
+      allow = true
+    } else if (CommandState.inVisualMode(editor) || CommandState.inSelectMode(editor)) {
+      val opt = Options.getInstance().getOption("selection") as BoundStringOption
+      if (opt.value != "old") {
+        allow = true
+      }
     }
 
-    override fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
-        caret.vimLastColumn = MotionGroup.LAST_COLUMN
-    }
+    return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow)
+  }
 
-    override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
-        caret.vimLastColumn = MotionGroup.LAST_COLUMN
-    }
+  override fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
+    caret.vimLastColumn = MotionGroup.LAST_COLUMN
+  }
+
+  override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
+    caret.vimLastColumn = MotionGroup.LAST_COLUMN
+  }
 }
 
 class MotionEndAction : VimCommandAction(MotionEndActionHandler) {
-    override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVS
+  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVS
 
-    override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<End>")
+  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<End>")
 
-    override fun getType(): Command.Type = Command.Type.MOTION
+  override fun getType(): Command.Type = Command.Type.MOTION
 
-    override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
+  override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
 }

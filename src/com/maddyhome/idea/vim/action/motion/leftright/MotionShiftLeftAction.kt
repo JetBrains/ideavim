@@ -34,25 +34,25 @@ import javax.swing.KeyStroke
  */
 
 private object MotionShiftLeftActionHandler : ShiftedArrowKeyHandler() {
-    override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {
-        editor.vimForEachCaret { caret ->
-            val vertical = VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -cmd.count, true)
-            MotionGroup.moveCaret(editor, caret, vertical)
-        }
+  override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {
+    editor.vimForEachCaret { caret ->
+      val vertical = VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -cmd.count, true)
+      MotionGroup.moveCaret(editor, caret, vertical)
     }
+  }
 
-    override fun motionWithoutKeyModel(editor: Editor, context: DataContext, cmd: Command) {
-        editor.vimForEachCaret { caret ->
-            val newOffset = VimPlugin.getMotion().moveCaretToNextWord(editor, caret, -cmd.count, false)
-            MotionGroup.moveCaret(editor, caret, newOffset)
-        }
+  override fun motionWithoutKeyModel(editor: Editor, context: DataContext, cmd: Command) {
+    editor.vimForEachCaret { caret ->
+      val newOffset = VimPlugin.getMotion().moveCaretToNextWord(editor, caret, -cmd.count, false)
+      MotionGroup.moveCaret(editor, caret, newOffset)
     }
+  }
 }
 
 class MotionShiftLeftAction : VimCommandAction(MotionShiftLeftActionHandler) {
-    override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVS
+  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVS
 
-    override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<S-Left>")
+  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<S-Left>")
 
-    override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+  override fun getType(): Command.Type = Command.Type.OTHER_READONLY
 }

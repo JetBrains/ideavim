@@ -83,6 +83,8 @@ To Be Released
 * [VIM-1654](https://youtrack.jetbrains.com/issue/VIM-1654) Fix NPE while indent in visual block mode
 * [VIM-1657](https://youtrack.jetbrains.com/issue/VIM-1657) Fix vim repeat in visual block
 * [VIM-1659](https://youtrack.jetbrains.com/issue/VIM-1658) Fix selection on empty line
+* [VIM-1473](https://youtrack.jetbrains.com/issue/VIM-1473) Yanked lines are not handled as block
+  selection when clipboard is used
 * [VIM-1535](https://youtrack.jetbrains.com/issue/VIM-1535) Use same text attributes and highlight layer as IntelliJ's own Find command
 * [VIM-1413](https://youtrack.jetbrains.com/issue/VIM-1413) Fix `smartcase` option being ignored in incremental search
 * Fix incremental search not matching with trailing options, e.g. `/Foo/+1`

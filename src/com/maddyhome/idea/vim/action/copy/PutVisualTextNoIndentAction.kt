@@ -33,17 +33,17 @@ import java.util.*
 import javax.swing.KeyStroke
 
 private object PutVisualTextNoIndentActionHandler : VisualOperatorActionHandler.SingleExecution() {
-    override fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>): Boolean {
-        if (caretsAndSelections.isEmpty()) return false
-        val textData = VimPlugin.getRegister().lastRegister?.let { PutData.TextData(it.text, it.type) }
-        VimPlugin.getRegister().resetRegister()
+  override fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>): Boolean {
+    if (caretsAndSelections.isEmpty()) return false
+    val textData = VimPlugin.getRegister().lastRegister?.let { PutData.TextData(it.text, it.type) }
+    VimPlugin.getRegister().resetRegister()
 
-        val insertBeforeCaret = cmd.keys[1].keyChar == 'P'
-        val selection = PutData.VisualSelection(caretsAndSelections, caretsAndSelections.values.first().type)
-        val putData = PutData(textData, selection, cmd.count, insertBeforeCaret, _indent = false, caretAfterInsertedText = false)
+    val insertBeforeCaret = cmd.keys[1].keyChar == 'P'
+    val selection = PutData.VisualSelection(caretsAndSelections, caretsAndSelections.values.first().type)
+    val putData = PutData(textData, selection, cmd.count, insertBeforeCaret, _indent = false, caretAfterInsertedText = false)
 
-        return VimPlugin.getPut().putText(editor, context, putData)
-    }
+    return VimPlugin.getPut().putText(editor, context, putData)
+  }
 }
 
 /**
@@ -51,11 +51,11 @@ private object PutVisualTextNoIndentActionHandler : VisualOperatorActionHandler.
  */
 class PutVisualTextNoIndentAction : VimCommandAction(PutVisualTextNoIndentActionHandler) {
 
-    override fun getMappingModes(): Set<MappingMode> = MappingMode.V
+  override fun getMappingModes(): Set<MappingMode> = MappingMode.V
 
-    override fun getKeyStrokesSet(): Set<List<KeyStroke>> = parseKeysSet("[p", "]p", "[P", "]P")
+  override fun getKeyStrokesSet(): Set<List<KeyStroke>> = parseKeysSet("[p", "]p", "[P", "]P")
 
-    override fun getType(): Command.Type = Command.Type.PASTE
+  override fun getType(): Command.Type = Command.Type.PASTE
 
-    override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_EXIT_VISUAL)
+  override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_EXIT_VISUAL)
 }

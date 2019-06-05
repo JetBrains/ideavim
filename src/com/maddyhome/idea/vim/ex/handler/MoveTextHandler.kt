@@ -34,8 +34,8 @@ import com.maddyhome.idea.vim.helper.Msg
 import java.util.*
 
 class MoveTextHandler : CommandHandler(
-        commands("m[ove]"),
-        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, WRITABLE)
+  commands("m[ove]"),
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, WRITABLE)
 ) {
   @Throws(ExException::class)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {

@@ -35,24 +35,24 @@ import javax.swing.KeyStroke
  */
 
 private object MotionShiftDownActionHandler : ShiftedArrowKeyHandler() {
-    override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {
-        editor.vimForEachCaret { caret ->
-            val vertical = VimPlugin.getMotion().moveCaretVertical(editor, caret, cmd.count)
-            val col = caret.vimLastColumn
-            MotionGroup.moveCaret(editor, caret, vertical)
-            caret.vimLastColumn = col
-        }
+  override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {
+    editor.vimForEachCaret { caret ->
+      val vertical = VimPlugin.getMotion().moveCaretVertical(editor, caret, cmd.count)
+      val col = caret.vimLastColumn
+      MotionGroup.moveCaret(editor, caret, vertical)
+      caret.vimLastColumn = col
     }
+  }
 
-    override fun motionWithoutKeyModel(editor: Editor, context: DataContext, cmd: Command) {
-        VimPlugin.getMotion().scrollFullPage(editor, cmd.count)
-    }
+  override fun motionWithoutKeyModel(editor: Editor, context: DataContext, cmd: Command) {
+    VimPlugin.getMotion().scrollFullPage(editor, cmd.count)
+  }
 }
 
 class MotionShiftDownAction : VimCommandAction(MotionShiftDownActionHandler) {
-    override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVS
+  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVS
 
-    override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<S-Down>")
+  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<S-Down>")
 
-    override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+  override fun getType(): Command.Type = Command.Type.OTHER_READONLY
 }

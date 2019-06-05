@@ -30,20 +30,20 @@ import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 
 class MarkHandler : CommandHandler(
-        commands("ma[rk]", "k"),
-        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED)
+  commands("ma[rk]", "k"),
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED)
 ) {
 
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        val mark = cmd.argument[0]
-        val line = cmd.getLine(editor, context)
-        val offset = EditorHelper.getLineStartOffset(editor, line)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    val mark = cmd.argument[0]
+    val line = cmd.getLine(editor, context)
+    val offset = EditorHelper.getLineStartOffset(editor, line)
 
-        return if (mark.isLetter() || mark in "'`") {
-            VimPlugin.getMark().setMark(editor, mark, offset)
-        } else {
-            VimPlugin.showMessage(MessageHelper.message(Msg.E191))
-            false
-        }
+    return if (mark.isLetter() || mark in "'`") {
+      VimPlugin.getMark().setMark(editor, mark, offset)
+    } else {
+      VimPlugin.showMessage(MessageHelper.message(Msg.E191))
+      false
     }
+  }
 }

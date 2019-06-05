@@ -34,14 +34,14 @@ class DigraphTest : VimTestCase() {
         doTest(parseKeys("i B<BS>B"), """
             A Discovery
 
-            I found it<caret> in a legendary land
+            I found it${c} in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), """
             A Discovery
 
-            I found it ¦<caret> in a legendary land
+            I found it ¦${c} in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -54,14 +54,14 @@ class DigraphTest : VimTestCase() {
         doTest(parseKeys("i B<BS>BHello"), """
             A Discovery
 
-            I found it<caret> in a legendary land
+            I found it${c} in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), """
             A Discovery
 
-            I found it ¦Hello<caret> in a legendary land
+            I found it ¦Hello${c} in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -74,14 +74,14 @@ class DigraphTest : VimTestCase() {
         doTest(parseKeys("i B<BS><BS>B"), """
             A Discovery
 
-            I found it<caret> in a legendary land
+            I found it${c} in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), """
             A Discovery
 
-            I found itB<caret> in a legendary land
+            I found itB${c} in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
@@ -94,14 +94,14 @@ class DigraphTest : VimTestCase() {
         doTest(parseKeys("i B<BS>B<BS>B"), """
             A Discovery
 
-            I found it<caret> in a legendary land
+            I found it${c} in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), """
             A Discovery
 
-            I found it B<caret> in a legendary land
+            I found it B${c} in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.

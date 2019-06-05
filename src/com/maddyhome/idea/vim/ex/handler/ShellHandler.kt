@@ -29,9 +29,9 @@ import com.maddyhome.idea.vim.ex.flags
  * @author John Grib
  */
 class ShellHandler : CommandHandler(
-        commands("sh[ell]"),
-        flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN)
+  commands("sh[ell]"),
+  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) =
-            KeyHandler.executeAction("ActivateTerminalToolWindow", context)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) =
+    KeyHandler.executeAction("ActivateTerminalToolWindow", context)
 }

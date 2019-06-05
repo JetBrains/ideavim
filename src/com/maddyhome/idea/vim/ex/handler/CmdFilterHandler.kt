@@ -29,43 +29,43 @@ import com.maddyhome.idea.vim.helper.Msg
 import java.io.IOException
 
 class CmdFilterHandler : CommandHandler(
-        commands("!"),
-        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE)
+  commands("!"),
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        logger.info("execute")
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    logger.info("execute")
 
-        var command = cmd.argument
-        if (command.isEmpty()) {
-            return false
-        }
-
-        if ('!' in command) {
-            val last = VimPlugin.getProcess().lastCommand
-            if (last.isNullOrEmpty()) {
-                VimPlugin.showMessage(MessageHelper.message(Msg.e_noprev))
-                return false
-            }
-            command = command.replace("!".toRegex(), last)
-        }
-
-        return try {
-            if (cmd.ranges.size() == 0) {
-                // Show command output in a window
-                val commandOutput = VimPlugin.getProcess().executeCommand(command, null)
-                ExOutputModel.getInstance(editor).output(commandOutput)
-                true
-            } else {
-                // Filter
-                val range = cmd.getTextRange(editor, context, false)
-                VimPlugin.getProcess().executeFilter(editor, range, command)
-            }
-        } catch (e: IOException) {
-            throw ExException(e.message)
-        }
+    var command = cmd.argument
+    if (command.isEmpty()) {
+      return false
     }
 
-    companion object {
-        private val logger = Logger.getInstance(CmdFilterHandler::class.java.name)
+    if ('!' in command) {
+      val last = VimPlugin.getProcess().lastCommand
+      if (last.isNullOrEmpty()) {
+        VimPlugin.showMessage(MessageHelper.message(Msg.e_noprev))
+        return false
+      }
+      command = command.replace("!".toRegex(), last)
     }
+
+    return try {
+      if (cmd.ranges.size() == 0) {
+        // Show command output in a window
+        val commandOutput = VimPlugin.getProcess().executeCommand(command, null)
+        ExOutputModel.getInstance(editor).output(commandOutput)
+        true
+      } else {
+        // Filter
+        val range = cmd.getTextRange(editor, context, false)
+        VimPlugin.getProcess().executeFilter(editor, range, command)
+      }
+    } catch (e: IOException) {
+      throw ExException(e.message)
+    }
+  }
+
+  companion object {
+    private val logger = Logger.getInstance(CmdFilterHandler::class.java.name)
+  }
 }

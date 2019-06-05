@@ -28,17 +28,17 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class SubstituteHandler : CommandHandler(
-        commands("s[ubstitute]", "&", "~"),
-        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE)
+  commands("s[ubstitute]", "&", "~"),
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        var result = true
-        for (caret in editor.caretModel.allCarets) {
-            val lineRange = cmd.getLineRange(editor, caret, context)
-            if (!VimPlugin.getSearch().searchAndReplace(editor, caret, lineRange, cmd.command, cmd.argument)) {
-                result = false
-            }
-        }
-        return result
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    var result = true
+    for (caret in editor.caretModel.allCarets) {
+      val lineRange = cmd.getLineRange(editor, caret, context)
+      if (!VimPlugin.getSearch().searchAndReplace(editor, caret, lineRange, cmd.command, cmd.argument)) {
+        result = false
+      }
     }
+    return result
+  }
 }

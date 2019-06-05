@@ -31,125 +31,125 @@ import org.jetbrains.annotations.Contract
 import java.util.*
 
 class YankGroup {
-    /**
-     * This yanks the text moved over by the motion command argument.
-     *
-     * @param editor   The editor to yank from
-     * @param context  The data context
-     * @param count    The number of times to yank
-     * @param rawCount The actual count entered by the user
-     * @param argument The motion command argument
-     * @return true if able to yank the text, false if not
-     */
-    fun yankMotion(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument): Boolean {
-        val motion = argument.motion ?: return false
+  /**
+   * This yanks the text moved over by the motion command argument.
+   *
+   * @param editor   The editor to yank from
+   * @param context  The data context
+   * @param count    The number of times to yank
+   * @param rawCount The actual count entered by the user
+   * @param argument The motion command argument
+   * @return true if able to yank the text, false if not
+   */
+  fun yankMotion(editor: Editor, context: DataContext, count: Int, rawCount: Int, argument: Argument): Boolean {
+    val motion = argument.motion ?: return false
 
-        val caretModel = editor.caretModel
-        val ranges = ArrayList<Pair<Int, Int>>(caretModel.caretCount)
-        val startOffsets = HashMap<Caret, Int>(caretModel.caretCount)
-        for (caret in caretModel.allCarets) {
-            val motionRange = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument, true)
-                    ?: continue
+    val caretModel = editor.caretModel
+    val ranges = ArrayList<Pair<Int, Int>>(caretModel.caretCount)
+    val startOffsets = HashMap<Caret, Int>(caretModel.caretCount)
+    for (caret in caretModel.allCarets) {
+      val motionRange = MotionGroup.getMotionRange(editor, caret, context, count, rawCount, argument, true)
+        ?: continue
 
-            assert(motionRange.size() == 1)
-            ranges.add(motionRange.startOffset to motionRange.endOffset)
-            startOffsets[caret] = motionRange.normalize().startOffset
+      assert(motionRange.size() == 1)
+      ranges.add(motionRange.startOffset to motionRange.endOffset)
+      startOffsets[caret] = motionRange.normalize().startOffset
+    }
+
+    val type = SelectionType.fromCommandFlags(motion.flags)
+    val range = getTextRange(ranges, type)
+
+    val selectionType = if (type == SelectionType.CHARACTER_WISE && range.isMultiple) SelectionType.BLOCK_WISE else type
+    return yankRange(editor, range, selectionType, startOffsets)
+  }
+
+  /**
+   * This yanks count lines of text
+   *
+   * @param editor The editor to yank from
+   * @param count  The number of lines to yank
+   * @return true if able to yank the lines, false if not
+   */
+  fun yankLine(editor: Editor, count: Int): Boolean {
+    val caretModel = editor.caretModel
+    val ranges = ArrayList<Pair<Int, Int>>(caretModel.caretCount)
+    for (caret in caretModel.allCarets) {
+      val start = VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
+      val end = Math.min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, true) + 1,
+        EditorHelper.getFileSize(editor, true))
+
+      if (end == -1) continue
+
+      ranges.add(start to end)
+    }
+
+    val range = getTextRange(ranges, SelectionType.LINE_WISE)
+    return yankRange(editor, range, SelectionType.LINE_WISE, null)
+  }
+
+  /**
+   * This yanks a range of text
+   *
+   * @param editor The editor to yank from
+   * @param range  The range of text to yank
+   * @param type   The type of yank
+   * @return true if able to yank the range, false if not
+   */
+  fun yankRange(editor: Editor, range: TextRange?, type: SelectionType, moveCursor: Boolean): Boolean {
+    range ?: return false
+
+    val selectionType = if (type == SelectionType.CHARACTER_WISE && range.isMultiple) SelectionType.BLOCK_WISE else type
+
+    val caretModel = editor.caretModel
+    val rangeStartOffsets = range.startOffsets
+    val rangeEndOffsets = range.endOffsets
+
+    return if (moveCursor) {
+      val startOffsets = HashMap<Caret, Int>(caretModel.caretCount)
+      if (type == SelectionType.BLOCK_WISE) {
+        startOffsets[caretModel.primaryCaret] = range.normalize().startOffset
+      } else {
+        val carets = caretModel.allCarets
+        for (i in carets.indices) {
+          startOffsets[carets[i]] = TextRange(rangeStartOffsets[i], rangeEndOffsets[i]).normalize().startOffset
         }
+      }
 
-        val type = SelectionType.fromCommandFlags(motion.flags)
-        val range = getTextRange(ranges, type)
+      yankRange(editor, range, selectionType, startOffsets)
+    } else {
+      yankRange(editor, range, selectionType, null)
+    }
+  }
 
-        val selectionType = if (type == SelectionType.CHARACTER_WISE && range.isMultiple) SelectionType.BLOCK_WISE else type
-        return yankRange(editor, range, selectionType, startOffsets)
+  @Contract("_, _ -> new")
+  private fun getTextRange(ranges: List<Pair<Int, Int>>, type: SelectionType): TextRange {
+    val size = ranges.size
+    val starts = IntArray(size)
+    val ends = IntArray(size)
+
+    if (type == SelectionType.LINE_WISE) {
+      starts[size - 1] = ranges[size - 1].first
+      ends[size - 1] = ranges[size - 1].second
+      for (i in 0 until size - 1) {
+        val range = ranges[i]
+        starts[i] = range.first
+        ends[i] = range.second - 1
+      }
+    } else {
+      for (i in 0 until size) {
+        val range = ranges[i]
+        starts[i] = range.first
+        ends[i] = range.second
+      }
     }
 
-    /**
-     * This yanks count lines of text
-     *
-     * @param editor The editor to yank from
-     * @param count  The number of lines to yank
-     * @return true if able to yank the lines, false if not
-     */
-    fun yankLine(editor: Editor, count: Int): Boolean {
-        val caretModel = editor.caretModel
-        val ranges = ArrayList<Pair<Int, Int>>(caretModel.caretCount)
-        for (caret in caretModel.allCarets) {
-            val start = VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
-            val end = Math.min(VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, true) + 1,
-                    EditorHelper.getFileSize(editor, true))
+    return TextRange(starts, ends)
+  }
 
-            if (end == -1) continue
+  private fun yankRange(editor: Editor, range: TextRange, type: SelectionType,
+                        startOffsets: Map<Caret, Int>?): Boolean {
+    startOffsets?.forEach { caret, offset -> MotionGroup.moveCaret(editor, caret, offset) }
 
-            ranges.add(start to end)
-        }
-
-        val range = getTextRange(ranges, SelectionType.LINE_WISE)
-        return yankRange(editor, range, SelectionType.LINE_WISE, null)
-    }
-
-    /**
-     * This yanks a range of text
-     *
-     * @param editor The editor to yank from
-     * @param range  The range of text to yank
-     * @param type   The type of yank
-     * @return true if able to yank the range, false if not
-     */
-    fun yankRange(editor: Editor, range: TextRange?, type: SelectionType, moveCursor: Boolean): Boolean {
-        range ?: return false
-
-        val selectionType = if (type == SelectionType.CHARACTER_WISE && range.isMultiple) SelectionType.BLOCK_WISE else type
-
-        val caretModel = editor.caretModel
-        val rangeStartOffsets = range.startOffsets
-        val rangeEndOffsets = range.endOffsets
-
-        return if (moveCursor) {
-            val startOffsets = HashMap<Caret, Int>(caretModel.caretCount)
-            if (type == SelectionType.BLOCK_WISE) {
-                startOffsets[caretModel.primaryCaret] = range.normalize().startOffset
-            } else {
-                val carets = caretModel.allCarets
-                for (i in carets.indices) {
-                    startOffsets[carets[i]] = TextRange(rangeStartOffsets[i], rangeEndOffsets[i]).normalize().startOffset
-                }
-            }
-
-            yankRange(editor, range, selectionType, startOffsets)
-        } else {
-            yankRange(editor, range, selectionType, null)
-        }
-    }
-
-    @Contract("_, _ -> new")
-    private fun getTextRange(ranges: List<Pair<Int, Int>>, type: SelectionType): TextRange {
-        val size = ranges.size
-        val starts = IntArray(size)
-        val ends = IntArray(size)
-
-        if (type == SelectionType.LINE_WISE) {
-            starts[size - 1] = ranges[size - 1].first
-            ends[size - 1] = ranges[size - 1].second
-            for (i in 0 until size - 1) {
-                val range = ranges[i]
-                starts[i] = range.first
-                ends[i] = range.second - 1
-            }
-        } else {
-            for (i in 0 until size) {
-                val range = ranges[i]
-                starts[i] = range.first
-                ends[i] = range.second
-            }
-        }
-
-        return TextRange(starts, ends)
-    }
-
-    private fun yankRange(editor: Editor, range: TextRange, type: SelectionType,
-                          startOffsets: Map<Caret, Int>?): Boolean {
-        startOffsets?.forEach { caret, offset -> MotionGroup.moveCaret(editor, caret, offset) }
-
-        return VimPlugin.getRegister().storeText(editor, range, type, false)
-    }
+    return VimPlugin.getRegister().storeText(editor, range, type, false)
+  }
 }

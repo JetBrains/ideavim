@@ -36,32 +36,32 @@ import java.util.*
 import javax.swing.KeyStroke
 
 private object MotionShiftEndActionHandler : ShiftedSpecialKeyHandler() {
-    override fun motion(editor: Editor, context: DataContext, cmd: Command) {
-        editor.vimForEachCaret { caret ->
-            var allow = false
-            if (CommandState.inInsertMode(editor)) {
-                allow = true
-            } else if (CommandState.inVisualMode(editor) || CommandState.inSelectMode(editor)) {
-                val opt = Options.getInstance().getOption("selection") as BoundStringOption
-                if (opt.value != "old") {
-                    allow = true
-                }
-            }
-
-            val newOffset = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, cmd.count - 1, allow)
-            caret.vimLastColumn = MotionGroup.LAST_COLUMN
-            MotionGroup.moveCaret(editor, caret, newOffset)
-            caret.vimLastColumn = MotionGroup.LAST_COLUMN
+  override fun motion(editor: Editor, context: DataContext, cmd: Command) {
+    editor.vimForEachCaret { caret ->
+      var allow = false
+      if (CommandState.inInsertMode(editor)) {
+        allow = true
+      } else if (CommandState.inVisualMode(editor) || CommandState.inSelectMode(editor)) {
+        val opt = Options.getInstance().getOption("selection") as BoundStringOption
+        if (opt.value != "old") {
+          allow = true
         }
+      }
+
+      val newOffset = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, cmd.count - 1, allow)
+      caret.vimLastColumn = MotionGroup.LAST_COLUMN
+      MotionGroup.moveCaret(editor, caret, newOffset)
+      caret.vimLastColumn = MotionGroup.LAST_COLUMN
     }
+  }
 }
 
 class MotionShiftEndAction : VimCommandAction(MotionShiftEndActionHandler) {
-    override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVS
+  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVS
 
-    override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<S-End>")
+  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<S-End>")
 
-    override fun getType(): Command.Type = Command.Type.MOTION
+  override fun getType(): Command.Type = Command.Type.MOTION
 
-    override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
+  override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
 }

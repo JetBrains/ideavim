@@ -27,11 +27,11 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class PreviousTabHandler : CommandHandler(
-        commands("tabp[revious]", "tabN[ext]"),
-        flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
+  commands("tabp[revious]", "tabN[ext]"),
+  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        VimPlugin.getMotion().moveCaretGotoPreviousTab(editor, context, cmd.argument.toIntOrNull() ?: 0)
-        return true
-    }
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    VimPlugin.getMotion().moveCaretGotoPreviousTab(editor, context, cmd.argument.toIntOrNull() ?: 0)
+    return true
+  }
 }

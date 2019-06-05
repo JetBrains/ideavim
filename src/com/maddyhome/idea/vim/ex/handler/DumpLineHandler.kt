@@ -27,29 +27,29 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class DumpLineHandler : CommandHandler(
-        commands("dump[line]"),
-        flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
+  commands("dump[line]"),
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        if (!logger.isDebugEnabled) return false
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    if (!logger.isDebugEnabled) return false
 
-        val range = cmd.getLineRange(editor, context)
-        val chars = editor.document.charsSequence
-        for (l in range.startLine..range.endLine) {
-            val start = editor.document.getLineStartOffset(l)
-            val end = editor.document.getLineEndOffset(l)
+    val range = cmd.getLineRange(editor, context)
+    val chars = editor.document.charsSequence
+    for (l in range.startLine..range.endLine) {
+      val start = editor.document.getLineStartOffset(l)
+      val end = editor.document.getLineEndOffset(l)
 
-            logger.debug("Line $l, start offset=$start, end offset=$end")
+      logger.debug("Line $l, start offset=$start, end offset=$end")
 
-            for (i in start..end) {
-                logger.debug("Offset $i, char=${chars[i]}, lp=${editor.offsetToLogicalPosition(i)}, vp=${editor.offsetToVisualPosition(i)}")
-            }
-        }
-
-        return true
+      for (i in start..end) {
+        logger.debug("Offset $i, char=${chars[i]}, lp=${editor.offsetToLogicalPosition(i)}, vp=${editor.offsetToVisualPosition(i)}")
+      }
     }
 
-    companion object {
-        private val logger = Logger.getInstance(DumpLineHandler::class.java.name)
-    }
+    return true
+  }
+
+  companion object {
+    private val logger = Logger.getInstance(DumpLineHandler::class.java.name)
+  }
 }

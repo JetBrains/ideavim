@@ -27,9 +27,9 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class PromptReplaceHandler : CommandHandler(
-        commands("promptr[epl]"),
-        flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
+  commands("promptr[epl]"),
+  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) =
-            KeyHandler.executeAction("Replace", context)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) =
+    KeyHandler.executeAction("Replace", context)
 }

@@ -30,27 +30,27 @@ import com.maddyhome.idea.vim.helper.StringHelper
  * @author smartbomb
  */
 class ActionListHandler : CommandHandler(
-        commands("actionlist"),
-        flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
+  commands("actionlist"),
+  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        val lineSeparator = "\n"
-        val searchPattern = cmd.argument.trim().toLowerCase().split("*")
-        val actionManager = ActionManager.getInstance()
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    val lineSeparator = "\n"
+    val searchPattern = cmd.argument.trim().toLowerCase().split("*")
+    val actionManager = ActionManager.getInstance()
 
-        val actions = actionManager.getActionIds("")
-                .sortedWith(String.CASE_INSENSITIVE_ORDER)
-                .map { actionName ->
-                    val shortcuts = actionManager.getAction(actionName).shortcutSet.shortcuts.joinToString(" ") {
-                        if (it is KeyboardShortcut) StringHelper.toKeyNotation(it.firstKeyStroke) else it.toString()
-                    }
-                    if (shortcuts.isBlank()) actionName else "${actionName.padEnd(50)} $shortcuts"
-                }
-                .filter { line -> searchPattern.all { it in line.toLowerCase() } }
-                .joinToString(lineSeparator)
+    val actions = actionManager.getActionIds("")
+      .sortedWith(String.CASE_INSENSITIVE_ORDER)
+      .map { actionName ->
+        val shortcuts = actionManager.getAction(actionName).shortcutSet.shortcuts.joinToString(" ") {
+          if (it is KeyboardShortcut) StringHelper.toKeyNotation(it.firstKeyStroke) else it.toString()
+        }
+        if (shortcuts.isBlank()) actionName else "${actionName.padEnd(50)} $shortcuts"
+      }
+      .filter { line -> searchPattern.all { it in line.toLowerCase() } }
+      .joinToString(lineSeparator)
 
 
-        ExOutputModel.getInstance(editor).output("--- Actions ---$lineSeparator$actions")
-        return true
-    }
+    ExOutputModel.getInstance(editor).output("--- Actions ---$lineSeparator$actions")
+    return true
+  }
 }

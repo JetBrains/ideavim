@@ -67,7 +67,7 @@ class MapHandler : CommandHandler(COMMAND_NAMES, flags(RangeFlag.RANGE_FORBIDDEN
             }
           }
           VimPlugin.getKey().putKeyMapping(modes, arguments.fromKeys, arguments.toKeys, null,
-                  commandInfo.isRecursive)
+            commandInfo.isRecursive)
           return true
         }
       }
@@ -105,29 +105,29 @@ class MapHandler : CommandHandler(COMMAND_NAMES, flags(RangeFlag.RANGE_FORBIDDEN
 
   private class CommandInfo(val prefix: String, suffix: String, val mappingModes: Set<MappingMode>, val isRecursive: Boolean) {
     val command =
-            if (suffix.isBlank()) {
-              prefix
-            } else "$prefix[$suffix]"
+      if (suffix.isBlank()) {
+        prefix
+      } else "$prefix[$suffix]"
   }
 
   companion object {
     private const val CTRL_V = '\u0016'
     private val COMMAND_INFOS = arrayOf(
-            // TODO: Support xmap, smap, map!, lmap
-            CommandInfo("map", "", MappingMode.NVO, true),
-            CommandInfo("nm", "ap", MappingMode.N, true),
-            CommandInfo("vm", "ap", MappingMode.V, true),
-            CommandInfo("om", "ap", MappingMode.O, true),
-            CommandInfo("im", "ap", MappingMode.I, true),
-            CommandInfo("cm", "ap", MappingMode.C, true),
+      // TODO: Support xmap, smap, map!, lmap
+      CommandInfo("map", "", MappingMode.NVO, true),
+      CommandInfo("nm", "ap", MappingMode.N, true),
+      CommandInfo("vm", "ap", MappingMode.V, true),
+      CommandInfo("om", "ap", MappingMode.O, true),
+      CommandInfo("im", "ap", MappingMode.I, true),
+      CommandInfo("cm", "ap", MappingMode.C, true),
 
-            // TODO: Support xnoremap, snoremap, noremap!, lnoremap
-            CommandInfo("no", "remap", MappingMode.NVO, false),
-            CommandInfo("nn", "oremap", MappingMode.N, false),
-            CommandInfo("vn", "oremap", MappingMode.V, false),
-            CommandInfo("ono", "remap", MappingMode.O, false),
-            CommandInfo("ino", "remap", MappingMode.I, false),
-            CommandInfo("cno", "remap", MappingMode.C, false)
+      // TODO: Support xnoremap, snoremap, noremap!, lnoremap
+      CommandInfo("no", "remap", MappingMode.NVO, false),
+      CommandInfo("nn", "oremap", MappingMode.N, false),
+      CommandInfo("vn", "oremap", MappingMode.V, false),
+      CommandInfo("ono", "remap", MappingMode.O, false),
+      CommandInfo("ino", "remap", MappingMode.I, false),
+      CommandInfo("cno", "remap", MappingMode.C, false)
     )
     val COMMAND_NAMES = commands(*COMMAND_INFOS.map { it.command }.toTypedArray())
     private val UNSUPPORTED_SPECIAL_ARGUMENTS = EnumSet.of(EXPR, SCRIPT)

@@ -27,9 +27,9 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class PromptFindHandler : CommandHandler(
-        commands("pro[mptfind]"),
-        flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
+  commands("pro[mptfind]"),
+  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) =
-            KeyHandler.executeAction("Find", context)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) =
+    KeyHandler.executeAction("Find", context)
 }

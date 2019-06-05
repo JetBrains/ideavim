@@ -57,9 +57,9 @@ import kotlin.reflect.KProperty
 @Retention(AnnotationRetention.SOURCE)
 @Target(AnnotationTarget.FUNCTION)
 annotation class VimBehaviourDiffers(
-        val originalVimAfter: String = "",
-        val description: String = "",
-        val shouldBeFixed: Boolean = true
+  val originalVimAfter: String = "",
+  val description: String = "",
+  val shouldBeFixed: Boolean = true
 )
 
 /**
@@ -70,20 +70,20 @@ annotation class VimBehaviourDiffers(
  * Has nullable type.
  */
 fun <T> userDataCaretToEditor(): ReadWriteProperty<Caret, T?> = object : UserDataReadWriteProperty<Caret, T?>() {
-    override fun getValue(thisRef: Caret, property: KProperty<*>): T? {
-        return if (thisRef == thisRef.editor.caretModel.primaryCaret) {
-            thisRef.getUserData(getKey(property)) ?: thisRef.editor.getUserData(getKey(property))
-        } else {
-            thisRef.getUserData(getKey(property))
-        }
+  override fun getValue(thisRef: Caret, property: KProperty<*>): T? {
+    return if (thisRef == thisRef.editor.caretModel.primaryCaret) {
+      thisRef.getUserData(getKey(property)) ?: thisRef.editor.getUserData(getKey(property))
+    } else {
+      thisRef.getUserData(getKey(property))
     }
+  }
 
-    override fun setValue(thisRef: Caret, property: KProperty<*>, value: T?) {
-        if (thisRef == thisRef.editor.caretModel.primaryCaret) {
-            thisRef.editor.putUserData(getKey(property), value)
-        }
-        thisRef.putUserData(getKey(property), value)
+  override fun setValue(thisRef: Caret, property: KProperty<*>, value: T?) {
+    if (thisRef == thisRef.editor.caretModel.primaryCaret) {
+      thisRef.editor.putUserData(getKey(property), value)
     }
+    thisRef.putUserData(getKey(property), value)
+  }
 }
 
 /**
@@ -93,35 +93,35 @@ fun <T> userDataCaretToEditor(): ReadWriteProperty<Caret, T?> = object : UserDat
  *   The result of [default] will be put to user data and returned.
  */
 fun <T> userDataOr(default: UserDataHolder.() -> T): ReadWriteProperty<UserDataHolder, T> = object : UserDataReadWriteProperty<UserDataHolder, T>() {
-    override fun getValue(thisRef: UserDataHolder, property: KProperty<*>): T {
-        return thisRef.getUserData(getKey(property)) ?: run<ReadWriteProperty<UserDataHolder, T>, T> {
-            val defaultValue = thisRef.default()
-            thisRef.putUserData(getKey(property), defaultValue)
-            defaultValue
-        }
+  override fun getValue(thisRef: UserDataHolder, property: KProperty<*>): T {
+    return thisRef.getUserData(getKey(property)) ?: run<ReadWriteProperty<UserDataHolder, T>, T> {
+      val defaultValue = thisRef.default()
+      thisRef.putUserData(getKey(property), defaultValue)
+      defaultValue
     }
+  }
 
-    override fun setValue(thisRef: UserDataHolder, property: KProperty<*>, value: T) {
-        thisRef.putUserData(getKey(property), value)
-    }
+  override fun setValue(thisRef: UserDataHolder, property: KProperty<*>, value: T) {
+    thisRef.putUserData(getKey(property), value)
+  }
 }
 
 fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b
 
 inline fun Editor.vimForEachCaret(action: (caret: Caret) -> Unit) {
-    if (CommandState.inBlockSubMode(this)) {
-        action(this.caretModel.primaryCaret)
-    } else {
-        this.caretModel.allCarets.forEach(action)
-    }
+  if (CommandState.inBlockSubMode(this)) {
+    action(this.caretModel.primaryCaret)
+  } else {
+    this.caretModel.allCarets.forEach(action)
+  }
 }
 
 private abstract class UserDataReadWriteProperty<in R, T> : ReadWriteProperty<R, T> {
-    private var key: Key<T>? = null
-    protected fun getKey(property: KProperty<*>): Key<T> {
-        if (key == null) {
-            key = Key.create(property.name + " by userData()")
-        }
-        return key as Key<T>
+  private var key: Key<T>? = null
+  protected fun getKey(property: KProperty<*>): Key<T> {
+    if (key == null) {
+      key = Key.create(property.name + " by userData()")
     }
+    return key as Key<T>
+  }
 }

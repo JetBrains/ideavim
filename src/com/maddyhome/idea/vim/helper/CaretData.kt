@@ -34,13 +34,13 @@ import com.maddyhome.idea.vim.group.visual.VisualChange
  * Caret's offset when entering visual mode
  */
 var Caret.vimSelectionStart: Int
-    get() = _vimSelectionStart ?: throw AssertionError("Trying to access selection start, but it's not set")
-    set(value) {
-        _vimSelectionStart = value
-    }
+  get() = _vimSelectionStart ?: throw AssertionError("Trying to access selection start, but it's not set")
+  set(value) {
+    _vimSelectionStart = value
+  }
 
 fun Caret.vimSelectionStartClear() {
-    this._vimSelectionStart = null
+  this._vimSelectionStart = null
 }
 
 private var Caret._vimSelectionStart: Int? by userDataCaretToEditor()
@@ -49,12 +49,12 @@ private var Caret._vimSelectionStart: Int? by userDataCaretToEditor()
 //region Vim last column
 private val LAST_COLUMN: Key<Int> = Key.create("lastColumn")
 var Caret.vimLastColumn: Int
-    get() = getUserData(LAST_COLUMN) ?: visualPosition.column
-    set(value) = if (CommandState.inBlockSubMode(editor)) {
-        editor.caretModel.primaryCaret.putUserData(LAST_COLUMN, value)
-    } else {
-        putUserData(LAST_COLUMN, value)
-    }
+  get() = getUserData(LAST_COLUMN) ?: visualPosition.column
+  set(value) = if (CommandState.inBlockSubMode(editor)) {
+    editor.caretModel.primaryCaret.putUserData(LAST_COLUMN, value)
+  } else {
+    putUserData(LAST_COLUMN, value)
+  }
 //endregion
 
 var Caret.vimLastVisualOperatorRange: VisualChange? by userDataCaretToEditor()
