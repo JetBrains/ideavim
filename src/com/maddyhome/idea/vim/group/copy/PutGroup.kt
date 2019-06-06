@@ -135,7 +135,7 @@ class PutGroup {
 
   private fun putTextAndSetCaretPosition(editor: Editor, context: DataContext, text: ProcessedTextData, data: PutData, additionalData: Map<String, Any>) {
     val subMode = data.visualSelection?.typeInEditor?.toSubMode() ?: CommandState.SubMode.NONE
-    if (Options.getInstance().isSet(Options.IDEAPUT)) {
+    if (Options.getInstance().getListOption(Options.CLIPBOARD)!!.contains(Options.IDEAPUT)) {
       val idePasteProvider = getProviderForPasteViaIde(context, text.typeInRegister, data)
       if (idePasteProvider != null) {
         logger.debug("Perform put via idea paste")

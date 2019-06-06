@@ -4,12 +4,15 @@ List of Supported Set Commands
 The following `:set` commands can appear in `~/.ideavimrc` or set manually in the command mode:
 
     'clipboard'      'cb'       clipboard options
+                                Standard clipboard options plus 
+                                
+                                `ideaput`  (default on)   - IdeaVim ONLY         [To Be Released]
+                                enable native idea paste action for put operations
+    
     'digraph'        'dg'       enable the entering of digraphs in Insert mode
     'gdefault'       'gd'       the ":substitute" flag 'g' is default on
     'history'        'hi'       number of command-lines that are remembered
     'hlsearch'       'hls'      highlight matches with last search pattern
-    `ideaput`        `ideaput`  boolean (default on)   - IdeaVim ONLY         [To Be Released]
-                                enable native idea paste action for put operations
     'ignorecase'     'ic'       ignore case in search patterns
     'iskeyword'      'isk'      defines keywords for commands like 'w', '*', etc.
     'incsearch'      'is'       show where search pattern typed so far matches
