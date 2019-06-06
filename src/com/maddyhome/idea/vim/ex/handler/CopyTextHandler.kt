@@ -41,7 +41,8 @@ class CopyTextHandler : CommandHandler(
       val arg = CommandParser.getInstance().parse(cmd.argument)
       val line = arg.ranges.getFirstLine(editor, caret, context)
 
-      val textData = PutData.TextData(text, SelectionType.LINE_WISE)
+      val transferableData = VimPlugin.getRegister().getTransferableData(editor, range, text)
+      val textData = PutData.TextData(text, SelectionType.LINE_WISE, transferableData)
       val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, _indent = true, caretAfterInsertedText = false, putToLine = line)
       VimPlugin.getPut().putTextForCaret(editor, caret, context, putData)
     }

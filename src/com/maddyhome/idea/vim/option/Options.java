@@ -43,6 +43,7 @@ public class Options {
   public static final String VIMINFO = "viminfo";
   public static final String SELECTMODE = "selectmode";
   public static final String KEYMODEL = "keymodel";
+  public static final String IDEAPUT = "ideaput";
   public static final String LOOKUPACTIONS = "lookupactions";
 
   /**
@@ -477,6 +478,7 @@ public class Options {
     addOption(new KeywordOption("iskeyword", "isk", new String[]{"@", "48-57", "_"}));
     addOption(new BoundListOption(SELECTMODE, "slm", new String[]{"template"}, new String[]{"mouse", "key", "cmd", "template", "refactoring"}));
     addOption(new BoundListOption(KEYMODEL, "km", new String[]{"continueselect", "stopselect"}, new String[]{"startsel", "stopsel", "stopselect", "stopvisual", "continueselect", "continuevisual"}));
+    addOption(new ToggleOption(IDEAPUT, IDEAPUT, true));
     addOption(new ListOption(LOOKUPACTIONS, LOOKUPACTIONS, new String[]{"VimLookupUp", "VimLookupDown"}, null));
 
     registerExtensionOptions();

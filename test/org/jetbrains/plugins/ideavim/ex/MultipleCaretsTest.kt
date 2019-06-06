@@ -84,20 +84,57 @@ class MultipleCaretsTest : VimTestCase() {
 //  }
 
   fun testPutText() {
-      val before = "${c}qwe\n" + "rty\n" + "${c}as${c}d\n" + "fgh\n" + "zxc\n" + "vbn\n"
+      // This test produces double ${c}zxc on 3rd line if non-idea paste is used
+      val before = """
+          ${c}qwe
+          rty
+          ${c}as${c}d
+          fgh
+          zxc
+          vbn
+
+          """.trimIndent()
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
     typeText(commandToKeys("pu"))
-      val after = "qwe\n" + "${c}zxc\n" + "rty\n" + "asd\n" + "${c}zxc\n" + "${c}zxc\n" + "fgh\n" + "zxc\n" + "vbn\n"
+      val after = """
+          qwe
+          ${c}zxc
+          rty
+          asd
+          ${c}zxc
+          fgh
+          zxc
+          vbn
+
+          """.trimIndent()
     myFixture.checkResult(after)
   }
 
   fun testPutTextCertainLine() {
-      val before = "${c}qwe\n" + "rty\n" + "${c}as${c}d\n" + "fgh\n" + "zxc\n" + "vbn\n"
+      // This test produces triple ${c}zxc if non-idea paste is used
+      val before = """
+          ${c}qwe
+          rty
+          ${c}as${c}d
+          fgh
+          zxc
+          vbn
+
+          """.trimIndent()
     val editor = configureByText(before)
     VimPlugin.getRegister().storeText(editor, TextRange(16, 19), SelectionType.CHARACTER_WISE, false)
     typeText(commandToKeys("4pu"))
-      val after = "qwe\n" + "rty\n" + "asd\n" + "fgh\n" + "${c}zxc\n" + "${c}zxc\n" + "${c}zxc\n" + "zxc\n" + "vbn\n"
+      val after = """
+          qwe
+          rty
+          asd
+          fgh
+          ${c}zxc
+          zxc
+          vbn
+
+          """.trimIndent()
     myFixture.checkResult(after)
   }
 

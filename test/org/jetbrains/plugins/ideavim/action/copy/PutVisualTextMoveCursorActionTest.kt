@@ -23,6 +23,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.VimBehaviourDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.junit.Ignore
 
@@ -86,6 +87,15 @@ class PutVisualTextMoveCursorActionTest : VimTestCase() {
         myFixture.checkResult(newFile)
     }
 
+    @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
+
+            ound it in a legendary land
+             rocks and lavender and tufted grass,
+            re it was settled on some sodden sand
+            d by the torrent of a mountain pass.
+            ${c}A Discovery
+    """)
     fun `test put line in block selection`() {
         val file = """
             ${c}A Discovery

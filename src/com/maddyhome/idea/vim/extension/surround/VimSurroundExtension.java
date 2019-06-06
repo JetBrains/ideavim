@@ -35,6 +35,8 @@ import com.maddyhome.idea.vim.extension.VimNonDisposableExtension;
 import com.maddyhome.idea.vim.group.ChangeGroup;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.key.OperatorFunction;
+import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.ToggleOption;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,14 +48,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.executeNormal;
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.getRegister;
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.inputKeyStroke;
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.inputString;
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putExtensionHandlerMapping;
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.putKeyMapping;
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.setOperatorFunction;
-import static com.maddyhome.idea.vim.extension.VimExtensionFacade.setRegister;
+import static com.maddyhome.idea.vim.extension.VimExtensionFacade.*;
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
 
 /**
@@ -226,7 +221,11 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
     }
 
     private static void perform(@NotNull String sequence, @NotNull Editor editor) {
+      final ToggleOption ideaput = (ToggleOption)Options.getInstance().getOption(Options.IDEAPUT);
+      final boolean origValue = ideaput.getValue();
+      ideaput.reset();
       executeNormal(parseKeys("\"" + REGISTER + sequence), editor);
+      if (origValue) ideaput.set();
     }
 
     private static void pasteSurround(@NotNull List<KeyStroke> innerValue, @NotNull Editor editor) {

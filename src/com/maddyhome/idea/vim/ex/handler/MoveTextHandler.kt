@@ -68,7 +68,7 @@ class MoveTextHandler : CommandHandler(
       val caret = carets[i]
       val text = texts[i]
 
-      val textData = PutData.TextData(text, SelectionType.LINE_WISE)
+      val textData = PutData.TextData(text, SelectionType.LINE_WISE, emptyList())
       val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, _indent = true, caretAfterInsertedText = false, putToLine = line)
       VimPlugin.getPut().putTextForCaret(editor, caret, context, putData)
     }

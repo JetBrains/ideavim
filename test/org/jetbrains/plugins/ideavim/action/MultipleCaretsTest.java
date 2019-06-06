@@ -1652,26 +1652,28 @@ public class MultipleCaretsTest extends VimTestCase {
   }
 
   public void testPutTextBeforeCursorLinewiseOverlapRange() {
+    // Non-ide insert will produce double "<caret>zxcvbn\n"
     testPutOverlapLine("q<caret>we<caret>rty\n" + "asdfgh\n" + "<caret>zxcvbn\n",
-                       "<caret>zxcvbn\n" + "<caret>zxcvbn\n" + "qwerty\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n",
+                       "<caret>zxcvbn\n" + "qwerty\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n",
                        true);
     testPutOverlapLine("qwerty\n" + "a<caret>sd<caret>fgh\n" + "<caret>zxcvbn\n",
-                       "qwerty\n" + "<caret>zxcvbn\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n",
+                       "qwerty\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n",
                        true);
     testPutOverlapLine("qwerty\n" + "asd<caret>fgh\n" + "<caret>zxcvb<caret>n\n",
-                       "qwerty\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "<caret>zxcvbn\n" + "zxcvbn\n",
+                       "qwerty\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n",
                        true);
   }
 
   public void testPutTextAfterCursorLinewiseOverlapRange() {
+    // Non-ide insert will produce double "<caret>zxcvbn\n"
     testPutOverlapLine("q<caret>wert<caret>y\n" + "asdfgh\n" + "<caret>zxcvbn\n",
-                       "qwerty\n" + "<caret>zxcvbn\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "zxcvbn\n" + "<caret>zxcvbn\n",
+                       "qwerty\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "zxcvbn\n" + "<caret>zxcvbn\n",
                        false);
     testPutOverlapLine("qwerty\n" + "as<caret>dfg<caret>h\n" + "<caret>zxcvbn\n",
-                       "qwerty\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "<caret>zxcvbn\n" + "zxcvbn\n" + "<caret>zxcvbn\n",
+                       "qwerty\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n" + "<caret>zxcvbn\n",
                        false);
     testPutOverlapLine("qwerty\n" + "asdfg<caret>h\n" + "<caret>zxcv<caret>bn\n",
-                       "qwerty\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n" + "<caret>zxcvbn\n" + "<caret>zxcvbn\n",
+                       "qwerty\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n" + "<caret>zxcvbn\n",
                        false);
   }
 

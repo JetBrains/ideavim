@@ -35,7 +35,7 @@ import javax.swing.KeyStroke
 private object PutVisualTextNoIndentActionHandler : VisualOperatorActionHandler.SingleExecution() {
   override fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>): Boolean {
     if (caretsAndSelections.isEmpty()) return false
-    val textData = VimPlugin.getRegister().lastRegister?.let { PutData.TextData(it.text, it.type) }
+    val textData = VimPlugin.getRegister().lastRegister?.let { PutData.TextData(it.text, it.type, it.transferableData) }
     VimPlugin.getRegister().resetRegister()
 
     val insertBeforeCaret = cmd.keys[1].keyChar == 'P'
