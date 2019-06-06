@@ -32,7 +32,7 @@ class PutTextAfterCursorActionTest : VimTestCase() {
         |Same length text 2
   """)
   fun `test copy linear text using clipboard`() {
-    doTest(parseKeys("Vj\"+y", "G\"+p"),
+    doTest(parseKeys("Vj\"*y", "G\"*p"),
       """${c}Same length text 1
         |Same length text 2
         |Same length text 3
