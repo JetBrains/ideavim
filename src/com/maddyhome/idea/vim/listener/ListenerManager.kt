@@ -219,8 +219,6 @@ object VimListenerManager {
           } else if (CommandState.inSelectMode(editor)) {
             VimPlugin.getVisualMotion().exitSelectModeAndResetKeyHandler(editor, false)
           }
-        } else if (event.mouseEvent.clickCount == 2) {
-          moveCaretOneCharLeftFromSelectionEnd(editor)
         }
         // TODO: 2019-03-22 Multi?
         caretModel.primaryCaret.vimLastColumn = caretModel.visualPosition.column
@@ -240,14 +238,19 @@ object VimListenerManager {
   private object ComponentMouseListener: MouseAdapter() {
     override fun mousePressed(e: MouseEvent?) {
       val editor = (e?.component as? EditorComponentImpl)?.editor ?: return
-      if (!CommandState.inInsertMode(editor)) {
-        editor.caretModel.runForEachCaret { caret ->
-          val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
-          val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
-          if (caret.offset == lineEnd && lineEnd != lineStart) {
-            caret.moveToOffset(caret.offset - 1)
+      when (e.clickCount) {
+        1 -> {
+          if (!CommandState.inInsertMode(editor)) {
+            editor.caretModel.runForEachCaret { caret ->
+              val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
+              val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
+              if (caret.offset == lineEnd && lineEnd != lineStart) {
+                caret.moveToOffset(caret.offset - 1)
+              }
+            }
           }
         }
+        2 -> moveCaretOneCharLeftFromSelectionEnd(editor)
       }
     }
   }
