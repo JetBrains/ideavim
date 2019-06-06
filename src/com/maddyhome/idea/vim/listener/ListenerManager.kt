@@ -23,6 +23,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.event.*
 import com.intellij.openapi.editor.ex.DocumentEx
+import com.intellij.openapi.editor.impl.EditorComponentImpl
 import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
@@ -34,6 +35,7 @@ import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.ui.ExEntryPanel
+import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.Closeable
 
@@ -110,6 +112,7 @@ object VimListenerManager {
     eventFacade.addEditorMouseListener(editor, EditorMouseHandler)
     eventFacade.addEditorMouseMotionListener(editor, EditorMouseHandler)
     eventFacade.addEditorSelectionListener(editor, EditorSelectionHandler)
+    eventFacade.addComponentMouseListener(editor.contentComponent, ComponentMouseListener)
   }
 
   fun removeEditorListeners(editor: Editor) {
@@ -117,6 +120,7 @@ object VimListenerManager {
     eventFacade.removeEditorMouseListener(editor, EditorMouseHandler)
     eventFacade.removeEditorMouseMotionListener(editor, EditorMouseHandler)
     eventFacade.removeEditorSelectionListener(editor, EditorSelectionHandler)
+    eventFacade.removeComponentMouseListener(editor.contentComponent, ComponentMouseListener)
   }
 
   private object EditorSelectionHandler : SelectionListener {
@@ -172,10 +176,19 @@ object VimListenerManager {
       VisualMotionGroup.modeBeforeEnteringNonVimVisual = null
       if (mouseDragging) {
         logger.debug("Release mouse after dragging")
+        val editor = event.editor
+        val caret = editor.caretModel.primaryCaret
+        val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
+        val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
         SelectionVimListenerSuppressor.use {
-          VimPlugin.getVisualMotion().controlNonVimSelectionChange(event.editor, !isBlockCaret, VimListenerManager.SelectionSource.MOUSE)
-          moveCaretOneCharLeftFromSelectionEnd(event.editor)
-          event.editor.caretModel.primaryCaret.vimLastColumn = event.editor.caretModel.visualPosition.column
+          if (caret.offset == lineEnd && lineEnd != lineStart && caret.offset - 1 == caret.selectionStart && caret.offset == caret.selectionEnd) {
+            // UX protection for case when user performs a small dragging while putting caret on line end
+            caret.removeSelection()
+            caret.moveToOffset(caret.offset - 1)
+          }
+          VimPlugin.getVisualMotion().controlNonVimSelectionChange(editor, !isBlockCaret, VimListenerManager.SelectionSource.MOUSE)
+          moveCaretOneCharLeftFromSelectionEnd(editor)
+          caret.vimLastColumn = editor.caretModel.visualPosition.column
         }
 
         mouseDragging = false
@@ -211,16 +224,6 @@ object VimListenerManager {
         }
         // TODO: 2019-03-22 Multi?
         caretModel.primaryCaret.vimLastColumn = caretModel.visualPosition.column
-
-        if (!CommandState.inInsertMode(editor)) {
-          caretModel.runForEachCaret { caret ->
-            val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
-            val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
-            if (caret.offset == lineEnd && lineEnd != lineStart) {
-              caret.moveToOffset(caret.offset - 1)
-            }
-          }
-        }
       } else if (event.area != EditorMouseEventArea.ANNOTATIONS_AREA &&
         event.area != EditorMouseEventArea.FOLDING_OUTLINE_AREA &&
         event.mouseEvent.button != MouseEvent.BUTTON3) {
@@ -232,7 +235,21 @@ object VimListenerManager {
         ExOutputModel.getInstance(event.editor).clear()
       }
     }
+  }
 
+  private object ComponentMouseListener: MouseAdapter() {
+    override fun mousePressed(e: MouseEvent?) {
+      val editor = (e?.component as? EditorComponentImpl)?.editor ?: return
+      if (!CommandState.inInsertMode(editor)) {
+        editor.caretModel.runForEachCaret { caret ->
+          val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
+          val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
+          if (caret.offset == lineEnd && lineEnd != lineStart) {
+            caret.moveToOffset(caret.offset - 1)
+          }
+        }
+      }
+    }
   }
 
   enum class SelectionSource {
