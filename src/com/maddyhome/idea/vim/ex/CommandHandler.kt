@@ -99,7 +99,7 @@ abstract class CommandHandler {
      * Vim exits visual mode before command execution, but in this case :action will work incorrect.
      *   With this flag visual mode will not be exited while command execution.
      */
-    SAVE_VISUAL
+    SAVE_VISUAL_BEFORE_EXECUTION
   }
 
   /**
@@ -173,7 +173,7 @@ abstract class CommandHandler {
       throw NoArgumentAllowedException()
     }
     CommandState.getInstance(editor).flags = optFlags
-    if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL && Flag.SAVE_VISUAL !in argFlags.flags) {
+    if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL && Flag.SAVE_VISUAL_BEFORE_EXECUTION !in argFlags.flags) {
       VimPlugin.getVisualMotion().exitVisual(editor)
     }
 

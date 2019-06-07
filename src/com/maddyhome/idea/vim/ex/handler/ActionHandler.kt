@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.DONT_REOPEN
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.SAVE_VISUAL
+import com.maddyhome.idea.vim.ex.CommandHandler.Flag.SAVE_VISUAL_BEFORE_EXECUTION
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
@@ -41,7 +41,7 @@ import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
  */
 class ActionHandler : CommandHandler(
   commands("action"),
-  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN, SAVE_VISUAL)
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN, SAVE_VISUAL_BEFORE_EXECUTION)
 ) {
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val actionName = cmd.argument.trim()

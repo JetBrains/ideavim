@@ -131,6 +131,7 @@ public class CommandParser {
     new NextTabHandler();
     new PreviousTabHandler();
     new TabOnlyHandler();
+    new NormalHandler();
 
     registered = true;
     //logger.debug("root=" + root);

@@ -116,9 +116,6 @@ public class ProcessGroup {
       if (panel.getLabel().equals(":")) {
         flags = CommandParser.getInstance().processCommand(editor, context, text, 1);
         if (logger.isDebugEnabled()) logger.debug("flags=" + flags);
-        if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-          VimPlugin.getVisualMotion().exitVisual(editor);
-        }
       }
       else {
         int pos = VimPlugin.getSearch().search(editor, text, panel.getCount(),
