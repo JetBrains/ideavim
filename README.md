@@ -68,6 +68,10 @@ It is important to distinguish EAP from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
+You can always leave your feedback with:
+* [@IdeaVim](http://twitter.com/ideavim) in Twitter
+* [Bug tracker](http://youtrack.jetbrains.com/issues/VIM)
+
 
 Summary of Supported Vim Features
 ---------------------------------
