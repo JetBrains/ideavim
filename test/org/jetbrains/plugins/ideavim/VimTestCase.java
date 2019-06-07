@@ -40,10 +40,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
-import com.maddyhome.idea.vim.helper.EditorDataContext;
-import com.maddyhome.idea.vim.helper.RunnableHelper;
-import com.maddyhome.idea.vim.helper.StringHelper;
-import com.maddyhome.idea.vim.helper.TestInputModel;
+import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.option.ToggleOption;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
@@ -199,7 +196,7 @@ public abstract class VimTestCase extends UsefulTestCase {
   protected void assertCaretsColour() {
     Color selectionColour = myFixture.getEditor().getColorsScheme().getColor(EditorColors.SELECTION_BACKGROUND_COLOR);
     Color caretColour = myFixture.getEditor().getColorsScheme().getColor(EditorColors.CARET_COLOR);
-    if (CommandState.inBlockSubMode(myFixture.getEditor())) {
+    if (CommandStateHelper.inBlockSubMode(myFixture.getEditor())) {
       CaretModel caretModel = myFixture.getEditor().getCaretModel();
       caretModel.getAllCarets().forEach(caret -> {
         if (caret != caretModel.getPrimaryCaret()) {

@@ -34,6 +34,7 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
+import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 
 /**
@@ -51,7 +52,7 @@ class ActionHandler : CommandHandler(
     }
     val application = ApplicationManager.getApplication()
     val selections = editor.caretModel.allCarets.map { if (it.hasSelection()) it.selectionStart to it.selectionEnd else null }
-    val oldMode = CommandState.getInstance(editor).subMode
+    val oldMode = editor.subMode
     if (application.isUnitTestMode) {
       executeAction(editor, action, context, selections, oldMode)
     } else {
@@ -72,7 +73,7 @@ class ActionHandler : CommandHandler(
           selection?.run { caret.setSelection(first, second) }
         }
       }
-      if (editor.caretModel.allCarets.any(Caret::hasSelection) && CommandState.getInstance(editor).subMode != oldSubMode) {
+      if (editor.caretModel.allCarets.any(Caret::hasSelection) && editor.subMode != oldSubMode) {
         VimPlugin.getVisualMotion().enterVisualMode(editor, oldSubMode)
       }
     }

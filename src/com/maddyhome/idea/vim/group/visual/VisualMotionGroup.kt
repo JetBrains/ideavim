@@ -71,11 +71,11 @@ class VisualMotionGroup {
     editor.caretModel.removeSecondaryCarets()
     val vimSelectionStart = primaryCaret.vimSelectionStart
 
-    val selectionType = SelectionType.fromSubMode(CommandState.getInstance(editor).subMode)
+    val selectionType = SelectionType.fromSubMode(editor.subMode)
     EditorData.setLastSelectionType(editor, selectionType)
     VimPlugin.getMark().setVisualSelectionMarks(editor, TextRange(vimSelectionStart, primaryCaret.offset))
 
-    CommandState.getInstance(editor).subMode = lastSelectionType.toSubMode()
+    editor.subMode = lastSelectionType.toSubMode()
     primaryCaret.vimSetSelection(lastVisualRange.startOffset, lastVisualRange.endOffset, true)
 
     editor.scrollingModel.scrollToCaret(ScrollType.CENTER)
@@ -149,7 +149,7 @@ class VisualMotionGroup {
    * If visual mode is enabled with the same [subMode], disable it
    */
   fun toggleVisual(editor: Editor, count: Int, rawCount: Int, subMode: CommandState.SubMode): Boolean {
-    if (!CommandState.inVisualMode(editor)) {
+    if (!editor.inVisualMode) {
       // Enable visual subMode
       if (rawCount > 0) {
         val primarySubMode = editor.caretModel.primaryCaret.vimLastVisualOperatorRange?.type?.toSubMode()
@@ -170,14 +170,14 @@ class VisualMotionGroup {
       return true
     }
 
-    if (subMode == CommandState.getInstance(editor).subMode) {
+    if (subMode == editor.subMode) {
       // Disable visual subMode
       exitVisual(editor)
       return true
     }
 
     // Update visual subMode with new sub subMode
-    CommandState.getInstance(editor).subMode = subMode
+    editor.subMode = subMode
     for (caret in editor.caretModel.allCarets) {
       caret.vimUpdateEditorSelection()
     }
@@ -189,7 +189,7 @@ class VisualMotionGroup {
   fun setVisualMode(editor: Editor) {
     val autodetectedMode = autodetectVisualMode(editor)
 
-    if (CommandState.inVisualMode(editor)) {
+    if (editor.inVisualMode) {
       CommandState.getInstance(editor).popState()
     }
     CommandState.getInstance(editor).pushState(CommandState.Mode.VISUAL, autodetectedMode, MappingMode.VISUAL)
@@ -316,7 +316,7 @@ class VisualMotionGroup {
    *   editor's selection)
    */
   fun exitSelectModeAndResetKeyHandler(editor: Editor, adjustCaretPosition: Boolean) {
-    if (!CommandState.inSelectMode(editor)) return
+    if (!editor.inSelectMode) return
 
     exitSelectMode(editor, adjustCaretPosition)
 
@@ -324,7 +324,7 @@ class VisualMotionGroup {
   }
 
   fun exitSelectMode(editor: Editor, adjustCaretPosition: Boolean) {
-    if (!CommandState.inSelectMode(editor)) return
+    if (!editor.inSelectMode) return
 
     CommandState.getInstance(editor).popState()
     SelectionVimListenerSuppressor.lock().use {
@@ -345,8 +345,8 @@ class VisualMotionGroup {
   }
 
   fun resetVisual(editor: Editor) {
-    val wasBlockSubMode = CommandState.inBlockSubMode(editor)
-    val selectionType = SelectionType.fromSubMode(CommandState.getInstance(editor).subMode)
+    val wasBlockSubMode = editor.inBlockSobMode
+    val selectionType = SelectionType.fromSubMode(editor.subMode)
 
     SelectionVimListenerSuppressor.lock().use {
       if (wasBlockSubMode) {
@@ -358,7 +358,7 @@ class VisualMotionGroup {
       }
     }
 
-    if (CommandState.inVisualMode(editor)) {
+    if (editor.inVisualMode) {
       EditorData.setLastSelectionType(editor, selectionType)
       // FIXME: 2019-03-05 Make it multicaret
       val primaryCaret = editor.caretModel.primaryCaret
@@ -366,13 +366,13 @@ class VisualMotionGroup {
       VimPlugin.getMark().setVisualSelectionMarks(editor, TextRange(vimSelectionStart, primaryCaret.offset))
       editor.caretModel.allCarets.forEach { it.vimSelectionStartClear() }
 
-      CommandState.getInstance(editor).subMode = CommandState.SubMode.NONE
+      editor.subMode = CommandState.SubMode.NONE
     }
   }
 
   fun exitVisual(editor: Editor) {
     resetVisual(editor)
-    if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
+    if (editor.inVisualMode) {
       CommandState.getInstance(editor).popState()
     }
   }

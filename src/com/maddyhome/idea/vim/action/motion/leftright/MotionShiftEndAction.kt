@@ -28,6 +28,9 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.ShiftedSpecialKeyHandler
+import com.maddyhome.idea.vim.helper.inInsertMode
+import com.maddyhome.idea.vim.helper.inSelectMode
+import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.option.BoundStringOption
@@ -39,9 +42,9 @@ private object MotionShiftEndActionHandler : ShiftedSpecialKeyHandler() {
   override fun motion(editor: Editor, context: DataContext, cmd: Command) {
     editor.vimForEachCaret { caret ->
       var allow = false
-      if (CommandState.inInsertMode(editor)) {
+      if (editor.inInsertMode) {
         allow = true
-      } else if (CommandState.inVisualMode(editor) || CommandState.inSelectMode(editor)) {
+      } else if (editor.inVisualMode || editor.inSelectMode) {
         val opt = Options.getInstance().getOption("selection") as BoundStringOption
         if (opt.value != "old") {
           allow = true

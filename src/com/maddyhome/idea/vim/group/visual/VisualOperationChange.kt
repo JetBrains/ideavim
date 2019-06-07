@@ -27,7 +27,9 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.inBlockSobMode
 import com.maddyhome.idea.vim.helper.sort
+import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 import java.util.*
@@ -49,9 +51,9 @@ object VisualOperation {
    */
   fun getRange(editor: Editor, caret: Caret, cmdFlags: EnumSet<CommandFlags>): VisualChange {
     var (start, end) = caret.run {
-      if (CommandState.inBlockSubMode(editor)) sort(vimSelectionStart, offset) else sort(selectionStart, selectionEnd)
+      if (editor.inBlockSobMode) sort(vimSelectionStart, offset) else sort(selectionStart, selectionEnd)
     }
-    val type = SelectionType.fromSubMode(CommandState.getInstance(editor).subMode)
+    val type = SelectionType.fromSubMode(editor.subMode)
 
     start = EditorHelper.normalizeOffset(editor, start, false)
     end = EditorHelper.normalizeOffset(editor, end, false)

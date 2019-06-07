@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.helper.inBlockSobMode
 import javax.swing.KeyStroke
 
 /**
@@ -34,7 +35,7 @@ import javax.swing.KeyStroke
 
 object SelectEscapeActionHandler : EditorActionHandlerBase() {
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    val blockMode = CommandState.inBlockSubMode(editor)
+    val blockMode = editor.inBlockSobMode
     VimPlugin.getVisualMotion().exitSelectMode(editor, true)
     if (blockMode) editor.caretModel.removeSecondaryCarets()
     return true

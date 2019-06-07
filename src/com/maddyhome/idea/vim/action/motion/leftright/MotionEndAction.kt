@@ -26,6 +26,9 @@ import com.maddyhome.idea.vim.action.VimCommandAction
 import com.maddyhome.idea.vim.command.*
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
+import com.maddyhome.idea.vim.helper.inInsertMode
+import com.maddyhome.idea.vim.helper.inSelectMode
+import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.option.BoundStringOption
 import com.maddyhome.idea.vim.option.Options
@@ -36,9 +39,9 @@ private object MotionEndActionHandler : NonShiftedSpecialKeyHandler() {
   override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int,
                       rawCount: Int, argument: Argument?): Int {
     var allow = false
-    if (CommandState.inInsertMode(editor)) {
+    if (editor.inInsertMode) {
       allow = true
-    } else if (CommandState.inVisualMode(editor) || CommandState.inSelectMode(editor)) {
+    } else if (editor.inVisualMode || editor.inSelectMode) {
       val opt = Options.getInstance().getOption("selection") as BoundStringOption
       if (opt.value != "old") {
         allow = true

@@ -33,6 +33,10 @@ import com.maddyhome.idea.vim.group.visual.VisualMotionGroup
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.inInsertMode
+import com.maddyhome.idea.vim.helper.inSelectMode
+import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.ui.ExEntryPanel
 import java.awt.event.MouseAdapter
@@ -209,14 +213,14 @@ object VimListenerManager {
         ExOutputModel.getInstance(editor).clear()
 
         val caretModel = editor.caretModel
-        if (CommandState.getInstance(editor).subMode != CommandState.SubMode.NONE) {
+        if (editor.subMode != CommandState.SubMode.NONE) {
           caretModel.removeSecondaryCarets()
         }
 
         if (event.mouseEvent.clickCount == 1) {
-          if (CommandState.inVisualMode(editor)) {
+          if (editor.inVisualMode) {
             VimPlugin.getVisualMotion().exitVisual(editor)
-          } else if (CommandState.inSelectMode(editor)) {
+          } else if (editor.inSelectMode) {
             VimPlugin.getVisualMotion().exitSelectModeAndResetKeyHandler(editor, false)
           }
         }
@@ -240,7 +244,7 @@ object VimListenerManager {
       val editor = (e?.component as? EditorComponentImpl)?.editor ?: return
       when (e.clickCount) {
         1 -> {
-          if (!CommandState.inInsertMode(editor)) {
+          if (!editor.inInsertMode) {
             editor.caretModel.runForEachCaret { caret ->
               val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
               val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)

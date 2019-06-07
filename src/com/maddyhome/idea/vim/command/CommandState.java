@@ -73,49 +73,6 @@ public class CommandState {
     return res;
   }
 
-  public static boolean inInsertMode(@Nullable Editor editor) {
-    final Mode mode = getInstance(editor).getMode();
-    return mode == Mode.INSERT || mode == Mode.REPLACE;
-  }
-
-  public static boolean inRepeatMode(@Nullable Editor editor) {
-    final Mode mode = getInstance(editor).getMode();
-    return mode == Mode.REPEAT;
-  }
-
-  public static boolean inVisualCharacterMode(@Nullable Editor editor) {
-    final CommandState state = getInstance(editor);
-    return state.getMode() == Mode.VISUAL && state.getSubMode() == SubMode.VISUAL_CHARACTER;
-  }
-
-  public static boolean inVisualMode(@Nullable Editor editor) {
-    return getInstance(editor).getMode() == Mode.VISUAL;
-  }
-
-  public static boolean inSelectMode(@Nullable Editor editor) {
-    return getInstance(editor).getMode() == Mode.SELECT;
-  }
-
-  public static boolean inVisualLineMode(@Nullable Editor editor) {
-    final CommandState state = getInstance(editor);
-    return state.getMode() == Mode.VISUAL && state.getSubMode() == SubMode.VISUAL_LINE;
-  }
-
-  public static boolean inVisualBlockMode(@Nullable Editor editor) {
-    final CommandState state = getInstance(editor);
-    return state.getMode() == Mode.VISUAL && state.getSubMode() == SubMode.VISUAL_BLOCK;
-  }
-
-  public static boolean inBlockSubMode(@Nullable Editor editor) {
-    final CommandState state = getInstance(editor);
-    return state.getSubMode() == SubMode.VISUAL_BLOCK;
-  }
-
-  public static boolean inSingleCommandMode(@Nullable Editor editor) {
-    final CommandState state = getInstance(editor);
-    return state.getMode() == Mode.COMMAND && state.getSubMode() == SubMode.SINGLE_COMMAND;
-  }
-
   @Nullable
   public Command getCommand() {
     return myCommand;

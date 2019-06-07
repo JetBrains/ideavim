@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.handler.CaretOrder
 import com.maddyhome.idea.vim.handler.ExecuteMethodNotOverriddenException
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
+import com.maddyhome.idea.vim.helper.inVisualMode
 import java.util.*
 
 /**
@@ -173,7 +174,7 @@ abstract class CommandHandler {
       throw NoArgumentAllowedException()
     }
     CommandState.getInstance(editor).flags = optFlags
-    if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL && Flag.SAVE_VISUAL !in argFlags.flags) {
+    if (editor.inVisualMode && Flag.SAVE_VISUAL !in argFlags.flags) {
       VimPlugin.getVisualMotion().exitVisual(editor)
     }
 

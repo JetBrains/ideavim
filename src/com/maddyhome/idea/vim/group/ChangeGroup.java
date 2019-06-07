@@ -428,7 +428,7 @@ public class ChangeGroup {
             return;
           }
 
-          if (CommandState.inInsertMode(editor)) {
+          if (CommandStateHelper.inInsertMode(editor)) {
             clearStrokes(editor);
           }
         }
@@ -531,7 +531,7 @@ public class ChangeGroup {
     CommandState.getInstance(editor).popState();
     exitAllSingleCommandInsertModes(editor);
 
-    if (!CommandState.inInsertMode(editor)) {
+    if (!CommandStateHelper.inInsertMode(editor)) {
       resetCursor(editor, false);
     }
   }
@@ -1674,7 +1674,7 @@ public class ChangeGroup {
       }
     }
 
-    if (!CommandState.inInsertMode(editor)) {
+    if (!CommandStateHelper.inInsertMode(editor)) {
       if (!range.isMultiple()) {
         MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, sline));
       }
@@ -1704,7 +1704,7 @@ public class ChangeGroup {
     }
 
     if (type == null ||
-        CommandState.inInsertMode(editor) ||
+        CommandStateHelper.inInsertMode(editor) ||
         VimPlugin.getRegister().storeText(editor, range, type, true)) {
       final Document document = editor.getDocument();
       final int[] startOffsets = range.getStartOffsets();
@@ -1836,9 +1836,9 @@ public class ChangeGroup {
   }
 
   private void exitAllSingleCommandInsertModes(@NotNull Editor editor) {
-    while (CommandState.inSingleCommandMode(editor)) {
+    while (CommandStateHelper.inSingleCommandMode(editor)) {
       CommandState.getInstance(editor).popState();
-      if (CommandState.inInsertMode(editor)) {
+      if (CommandStateHelper.inInsertMode(editor)) {
         CommandState.getInstance(editor).popState();
       }
     }

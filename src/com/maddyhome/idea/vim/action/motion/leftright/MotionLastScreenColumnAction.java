@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import com.maddyhome.idea.vim.helper.CaretDataKt;
+import com.maddyhome.idea.vim.helper.CommandStateHelper;
 import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
@@ -45,7 +46,7 @@ public class MotionLastScreenColumnAction extends MotionEditorAction {
     public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                          int rawCount, Argument argument) {
       boolean allow = false;
-      if (CommandState.inInsertMode(editor)) {
+      if (CommandStateHelper.inInsertMode(editor)) {
         allow = true;
       }
       else if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {

@@ -30,6 +30,10 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.inBlockSobMode
+import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.isEndAllowed
+import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 
 /**
@@ -71,7 +75,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
   abstract val alwaysBatchExecution: Boolean
 
   final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    val blockSubmodeActive = CommandState.inBlockSubMode(editor)
+    val blockSubmodeActive = editor.inBlockSobMode
 
     if (blockSubmodeActive || editor.caretModel.caretCount == 1 || alwaysBatchExecution) {
       val primaryCaret = editor.caretModel.primaryCaret
@@ -96,10 +100,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       if (CommandFlags.FLAG_SAVE_JUMP in cmd.flags) {
         VimPlugin.getMark().saveJumpLocation(editor)
       }
-      if (!CommandState.inInsertMode(editor) &&
-        !CommandState.inRepeatMode(editor) &&
-        !CommandState.inVisualMode(editor) &&
-        !CommandState.inSelectMode(editor)) {
+      if (!editor.mode.isEndAllowed) {
         offset = EditorHelper.normalizeOffset(editor, offset, false)
       }
       preMove(editor, caret, context, cmd)
@@ -114,7 +115,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
     override fun caretRemoved(event: CaretEvent) {
       val editor = event.editor
       val caretToDelete = event.caret ?: return
-      if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
+      if (editor.inVisualMode) {
         for (caret in editor.caretModel.allCarets) {
           if (caretToDelete.selectionStart < caret.selectionEnd &&
             caretToDelete.selectionStart >= caret.selectionStart ||

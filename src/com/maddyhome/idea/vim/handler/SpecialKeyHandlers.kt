@@ -25,6 +25,8 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.inSelectMode
+import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.option.Options
 
 /**
@@ -41,7 +43,7 @@ abstract class ShiftedSpecialKeyHandler : EditorActionHandlerBase() {
   final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     val keymodelOption = Options.getInstance().getListOption(Options.KEYMODEL)!!
     val startSel = "startsel" in keymodelOption
-    if (startSel && !CommandState.inVisualMode(editor) && !CommandState.inSelectMode(editor)) {
+    if (startSel && !editor.inVisualMode && !editor.inSelectMode) {
       if (Options.getInstance().getListOption(Options.SELECTMODE)?.contains("key") == true) {
         VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER)
       } else {
@@ -73,8 +75,8 @@ abstract class ShiftedArrowKeyHandler : EditorActionHandlerBase() {
     val startSel = "startsel" in keymodelOption
     val continueselect = "continueselect" in keymodelOption
     val continuevisual = "continuevisual" in keymodelOption
-    val inVisualMode = CommandState.inVisualMode(editor)
-    val inSelectMode = CommandState.inSelectMode(editor)
+    val inVisualMode = editor.inVisualMode
+    val inSelectMode = editor.inSelectMode
     if (startSel || continueselect && inSelectMode || continuevisual && inVisualMode) {
       if (!inVisualMode && !inSelectMode) {
         if ("key" in Options.getInstance().getListOption(Options.SELECTMODE)!!) {
@@ -114,10 +116,10 @@ abstract class ShiftedArrowKeyHandler : EditorActionHandlerBase() {
 abstract class NonShiftedSpecialKeyHandler : MotionActionHandler.ForEachCaret() {
   final override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
     val keymodel = Options.getInstance().getListOption(Options.KEYMODEL)!!
-    if (CommandState.inSelectMode(editor) && ("stopsel" in keymodel || "stopselect" in keymodel)) {
+    if (editor.inSelectMode && ("stopsel" in keymodel || "stopselect" in keymodel)) {
       VimPlugin.getVisualMotion().exitSelectMode(editor, false)
     }
-    if (CommandState.inVisualMode(editor) && ("stopsel" in keymodel || "stopvisual" in keymodel)) {
+    if (editor.inVisualMode && ("stopsel" in keymodel || "stopvisual" in keymodel)) {
       VimPlugin.getVisualMotion().exitVisual(editor)
     }
 

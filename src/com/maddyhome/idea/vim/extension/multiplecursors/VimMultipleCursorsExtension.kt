@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.SearchHelper.findWordUnderCursor
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.option.Options
 import java.lang.Integer.min
 import java.util.*
@@ -151,7 +152,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
       if (caretModel.caretCount > 1) return
 
       val primaryCaret = caretModel.primaryCaret
-      var nextOffset = if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
+      var nextOffset = if (editor.inVisualMode) {
         val selectedText = primaryCaret.selectedText ?: return
         val nextOffset = VimPlugin.getSearch().search(editor, selectedText, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
         nextOffset

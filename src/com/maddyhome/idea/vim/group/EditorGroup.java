@@ -92,11 +92,11 @@ public class EditorGroup {
           initLineNumbers(editor);
           // Turn on insert mode if editor doesn't have any file
           if (!EditorData.isFileEditor(editor) && editor.getDocument().isWritable() &&
-              !CommandState.inInsertMode(editor)) {
+              !CommandStateHelper.inInsertMode(editor)) {
             VimPlugin.getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
             KeyHandler.getInstance().reset(editor);
           }
-          editor.getSettings().setBlockCursor(!CommandState.inInsertMode(editor));
+          editor.getSettings().setBlockCursor(!CommandStateHelper.inInsertMode(editor));
           editor.getSettings().setAnimatedScrolling(ANIMATED_SCROLLING_VIM_VALUE);
           editor.getSettings().setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
         }

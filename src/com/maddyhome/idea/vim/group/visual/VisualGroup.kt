@@ -24,7 +24,12 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.inBlockSobMode
+import com.maddyhome.idea.vim.helper.inSelectMode
+import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.sort
+import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import com.maddyhome.idea.vim.helper.vimSelectionStart
 
@@ -40,7 +45,7 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
 fun Caret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false) {
   vimSelectionStart = start
   setVisualSelection(start, end, this)
-  if (moveCaretToSelectionEnd && !CommandState.inBlockSubMode(editor)) moveToOffset(end)
+  if (moveCaretToSelectionEnd && !editor.inBlockSobMode) moveToOffset(end)
 }
 
 /**
@@ -49,9 +54,9 @@ fun Caret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd:
  * @see vimMoveBlockSelectionToOffset for blockwise selection
  */
 fun Caret.vimMoveSelectionToCaret() {
-  if (CommandState.getInstance(editor).mode != CommandState.Mode.VISUAL && CommandState.getInstance(editor).mode != CommandState.Mode.SELECT)
+  if (!editor.inVisualMode && !editor.inSelectMode)
     throw RuntimeException("Attempt to extent selection in non-visual mode")
-  if (CommandState.inBlockSubMode(editor))
+  if (editor.inBlockSobMode)
     throw RuntimeException("Move caret with [vimMoveBlockSelectionToOffset]")
 
   val startOffsetMark = vimSelectionStart
@@ -101,14 +106,14 @@ val Caret.vimLeadSelectionOffset: Int
         }
       }
 
-      return if (CommandState.getInstance(editor).subMode == CommandState.SubMode.VISUAL_LINE) {
+      return if (editor.subMode == CommandState.SubMode.VISUAL_LINE) {
         val selectionStartLine = editor.offsetToLogicalPosition(selectionStart).line
         val caretLine = editor.offsetToLogicalPosition(this.offset).line
         if (caretLine == selectionStartLine) {
           val column = editor.offsetToLogicalPosition(selectionEnd).column
           if (column == 0) (selectionEnd - 1).coerceAtLeast(0) else selectionEnd
         } else selectionStart
-      } else if (CommandState.getInstance(editor).subMode == CommandState.SubMode.VISUAL_BLOCK) {
+      } else if (editor.inBlockSobMode) {
         val selections = editor.caretModel.allCarets.map { it.selectionStart to it.selectionEnd }.sortedBy { it.first }
         val pCaret = editor.caretModel.primaryCaret
         when {
@@ -131,8 +136,7 @@ val Caret.vimLeadSelectionOffset: Int
  * Secondary carets became invisible colour in visual block mode
  */
 fun updateCaretColours(editor: Editor) {
-  val subMode = CommandState.getInstance(editor).subMode
-  if (subMode == CommandState.SubMode.VISUAL_BLOCK) {
+  if (editor.inBlockSobMode) {
     editor.caretModel.allCarets.forEach {
       if (it != editor.caretModel.primaryCaret) {
         // Set background color for non-primary carets as selection background color
@@ -184,7 +188,7 @@ fun toNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.M
   }
 
 fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor) {
-  if (!CommandState.inVisualMode(editor)) return
+  if (!editor.inVisualMode) return
   editor.caretModel.allCarets.forEach { caret ->
     if (caret.hasSelection() && caret.selectionEnd == caret.offset) {
       if (caret.selectionEnd <= 0) return@forEach
@@ -201,8 +205,8 @@ fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor) {
 private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Caret) {
   val (start, end) = if (selectionStart > selectionEnd) selectionEnd to selectionStart else selectionStart to selectionEnd
   val editor = caret.editor
-  val subMode = CommandState.getInstance(editor).subMode
-  val mode = CommandState.getInstance(editor).mode
+  val subMode = editor.subMode
+  val mode = editor.mode
   when (subMode) {
     CommandState.SubMode.VISUAL_LINE, CommandState.SubMode.VISUAL_CHARACTER -> {
       val (nativeStart, nativeEnd) = toNativeSelection(editor, start, end, mode, subMode)

@@ -119,7 +119,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
   private fun Editor.collectSelections(): Map<Caret, VimSelection>? {
 
     return when {
-      CommandState.inRepeatMode(this) -> {
+      this.inRepeatMode -> {
         if (EditorData.getLastSelectionType(this) == SelectionType.BLOCK_WISE) {
           val primaryCaret = caretModel.primaryCaret
           val range = primaryCaret.vimLastVisualOperatorRange ?: return null
@@ -138,7 +138,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
           carets.toMap()
         }
       }
-      CommandState.inBlockSubMode(this) -> {
+      this.inBlockSobMode -> {
         val primaryCaret = caretModel.primaryCaret
         mapOf(primaryCaret to VimBlockSelection(
           primaryCaret.vimSelectionStart,
@@ -168,7 +168,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
       EditorData.setKeepingVisualOperatorAction(editor, CommandFlags.FLAG_EXIT_VISUAL !in cmd.flags)
 
       editor.vimForEachCaret {
-        val change = if (CommandState.inVisualMode(this@VisualStartFinishWrapper.editor) && !CommandState.inRepeatMode(this@VisualStartFinishWrapper.editor)) {
+        val change = if (this@VisualStartFinishWrapper.editor.inVisualMode && !this@VisualStartFinishWrapper.editor.inRepeatMode) {
           VisualOperation.getRange(this@VisualStartFinishWrapper.editor, it, this@VisualStartFinishWrapper.cmd.flags)
         } else null
         this@VisualStartFinishWrapper.visualChanges[it] = change

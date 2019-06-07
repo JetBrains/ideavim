@@ -50,7 +50,7 @@ private var Caret._vimSelectionStart: Int? by userDataCaretToEditor()
 private val LAST_COLUMN: Key<Int> = Key.create("lastColumn")
 var Caret.vimLastColumn: Int
   get() = getUserData(LAST_COLUMN) ?: visualPosition.column
-  set(value) = if (CommandState.inBlockSubMode(editor)) {
+  set(value) = if (editor.inBlockSobMode) {
     editor.caretModel.primaryCaret.putUserData(LAST_COLUMN, value)
   } else {
     putUserData(LAST_COLUMN, value)

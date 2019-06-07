@@ -36,6 +36,7 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.helper.CommandStateHelper;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
@@ -166,7 +167,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
         if (keyCode == VK_ESCAPE) {
           return isEnabledForEscape(editor);
         }
-        if (CommandState.inInsertMode(editor)) {
+        if (CommandStateHelper.inInsertMode(editor)) {
           // XXX: <Tab> won't be recorded in macros
           if (keyCode == VK_TAB) {
             VimPlugin.getChange().tabAction = true;

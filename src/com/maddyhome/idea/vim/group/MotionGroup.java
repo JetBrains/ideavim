@@ -47,10 +47,7 @@ import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
-import com.maddyhome.idea.vim.helper.CaretDataKt;
-import com.maddyhome.idea.vim.helper.EditorData;
-import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.helper.SearchHelper;
+import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.Options;
@@ -249,8 +246,7 @@ public class MotionGroup {
       col = newColumn;
     }
 
-    newColumn = EditorHelper.normalizeVisualColumn(editor, newline, newColumn, CommandState.inInsertMode(editor) ||
-                                                                               CommandState.inSelectMode(editor));
+    newColumn = EditorHelper.normalizeVisualColumn(editor, newline, newColumn, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
 
     if (newline != caretVisualLine || newColumn != oldColumn) {
       int offset = EditorHelper.visualPositionToOffset(editor, new VisualPosition(newline, newColumn));
@@ -325,7 +321,7 @@ public class MotionGroup {
   public static void moveCaret(@NotNull Editor editor, @NotNull Caret caret, int offset) {
     if (offset >= 0 && offset <= editor.getDocument().getTextLength()) {
 
-      if (CommandState.inBlockSubMode(editor)) {
+      if (CommandStateHelper.inBlockSubMode(editor)) {
         VisualGroupKt.vimMoveBlockSelectionToOffset(editor, offset);
         Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
         CaretDataKt.setVimLastColumn(primaryCaret, primaryCaret.getVisualPosition().column);
@@ -341,7 +337,7 @@ public class MotionGroup {
         }
       }
 
-      if (CommandState.inVisualMode(editor) || CommandState.getInstance(editor).getMode() == CommandState.Mode.SELECT) {
+      if (CommandStateHelper.inVisualMode(editor) || CommandStateHelper.inSelectMode(editor)) {
         VisualGroupKt.vimMoveSelectionToCaret(caret);
       }
       else {
@@ -1291,10 +1287,7 @@ public class MotionGroup {
       int col = CaretDataKt.getVimLastColumn(caret);
       int line = EditorHelper.normalizeVisualLine(editor, pos.line + count);
       VisualPosition newPos = new VisualPosition(line, EditorHelper.normalizeVisualColumn(editor, line, col,
-                                                                                          CommandState
-                                                                                            .inInsertMode(editor) ||
-                                                                                          CommandState
-                                                                                            .inSelectMode(editor)));
+                                                                                          CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor))));
 
       return EditorHelper.visualPositionToOffset(editor, newPos);
     }
