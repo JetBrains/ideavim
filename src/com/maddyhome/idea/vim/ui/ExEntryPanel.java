@@ -24,12 +24,10 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.markup.RangeHighlighter;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
-import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.group.SearchGroup;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.regexp.CharPointer;
@@ -43,6 +41,7 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 
 /**
  * This is used to enter ex commands such as searches and "colon" commands
@@ -72,12 +71,6 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     gbc.fill = GridBagConstraints.HORIZONTAL;
     layout.setConstraints(entry, gbc);
     add(entry);
-
-    adapter = new ComponentAdapter() {
-      public void componentResized(ComponentEvent e) {
-        positionPanel();
-      }
-    };
 
     new ExShortcutKeyAction(this).registerCustomShortcutSet();
 
@@ -132,7 +125,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       oldGlass.setLayout(null);
       oldGlass.setOpaque(false);
       oldGlass.add(this);
-      oldGlass.addComponentListener(adapter);
+      oldGlass.addComponentListener(resizePanelListener);
       positionPanel();
       oldGlass.setVisible(true);
       entry.requestFocusInWindow();
@@ -245,7 +238,10 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
         editor.getScrollingModel().scrollVertically(verticalOffset);
         editor.getScrollingModel().scrollHorizontally(horizontalOffset);
       }
-      removeIncrementalHighlight(editor);
+      // This is somewhat inefficient. We've done the search, highlighted everything and now (if we hit <Enter>), we're
+      // removing all the highlights to invoke the search action, to search and highlight everything again. On the plus
+      // side, it clears up the current item highlight
+      VimPlugin.getSearch().resetIncsearchHighlights();
     }
 
     entry.deactivate();
@@ -255,7 +251,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
         UiHelper.requestFocus(parent);
       }
 
-      oldGlass.removeComponentListener(adapter);
+      oldGlass.removeComponentListener(resizePanelListener);
       oldGlass.setVisible(false);
       oldGlass.remove(this);
       oldGlass.setOpaque(wasOpaque);
@@ -269,15 +265,6 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     return (labelText.equals("/") || labelText.equals("?")) && Options.getInstance().isSet(Options.INCREMENTAL_SEARCH);
   }
 
-  private void removeIncrementalHighlight(@NotNull Editor editor) {
-    if (incHighlighter != null) {
-      if (!editor.isDisposed()) {
-        editor.getMarkupModel().removeHighlighter(incHighlighter);
-      }
-      incHighlighter = null;
-    }
-  }
-
   /**
    * Checks if the ex entry panel is currently active
    *
@@ -287,43 +274,43 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     return active;
   }
 
+  private boolean active;
+  private int count;
+
+  // UI stuff
   @Nullable private JComponent parent;
   @NotNull private final JLabel label;
   @NotNull private final ExTextField entry;
   private JComponent oldGlass;
   private LayoutManager oldLayout;
   private boolean wasOpaque;
-  @NotNull private final ComponentAdapter adapter;
-  private int count;
-  @Nullable private RangeHighlighter incHighlighter = null;
+
+  // incsearch stuff
   private int verticalOffset;
   private int horizontalOffset;
   private int caretOffset;
+
+  @NotNull private final ComponentListener resizePanelListener = new ComponentAdapter() {
+    @Override
+    public void componentResized(ComponentEvent e) {
+      positionPanel();
+    }
+  };
 
   @NotNull private final DocumentListener incSearchDocumentListener = new DocumentAdapter() {
     @Override
     protected void textChanged(@NotNull DocumentEvent e) {
       final Editor editor = entry.getEditor();
-      removeIncrementalHighlight(editor);
 
       final boolean forwards = !label.getText().equals("?");
       final String searchText = entry.getActualText();
       final CharPointer p = new CharPointer(searchText);
       final CharPointer end = RegExp.skip_regexp(new CharPointer(searchText), forwards ? '/' : '?', true);
       final String pattern = p.substring(end.pointer() - p.pointer());
-      final boolean ignoreCase = SearchGroup.shouldIgnoreCase(pattern, false);
-      final TextRange range = SearchGroup.findNext(editor, pattern, caretOffset, ignoreCase, forwards);
-      if (range != null) {
-        incHighlighter = SearchGroup.highlightMatch(editor, range.getStartOffset(), range.getEndOffset(), true, pattern);
-        MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), range.getStartOffset());
-      }
-      else {
-        MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), caretOffset);
-      }
+
+      VimPlugin.getSearch().updateIncsearchHighlights(editor, pattern, forwards, caretOffset);
     }
   };
-
-  private boolean active;
 
   private static ExEntryPanel instance;
   private static final Logger logger = Logger.getInstance(ExEntryPanel.class.getName());

@@ -87,6 +87,13 @@ public class SearchGroup {
     return lastPattern;
   }
 
+  public void resetState() {
+    lastSearch = lastPattern = lastSubstitute = lastReplace = lastOffset = null;
+    lastIgnoreSmartCase = false;
+    lastDir = 0;
+    resetShowSearchHighlight();
+  }
+
   private void setLastPattern(@NotNull Editor editor, @NotNull String lastPattern) {
     this.lastPattern = lastPattern;
     VimPlugin.getRegister().storeTextInternal(editor, new TextRange(-1, -1),
@@ -232,7 +239,7 @@ public class SearchGroup {
     /*
      * check for a trailing count
      */
-    cmd = CharHelper.skipwhite(cmd);
+    CharHelper.skipwhite(cmd);
     if (CharacterClasses.isDigit(cmd.charAt())) {
       int i = CharHelper.getdigits(cmd);
       if (i <= 0 && do_error) {
@@ -246,7 +253,7 @@ public class SearchGroup {
     /*
      * check for trailing command or garbage
      */
-    cmd = CharHelper.skipwhite(cmd);
+    CharHelper.skipwhite(cmd);
     if (!cmd.isNul() && cmd.charAt() != '"')        /* if not end-of-line or comment */ {
       VimPlugin.showMessage(MessageHelper.message(Msg.e_trailing));
       return false;
@@ -465,7 +472,7 @@ public class SearchGroup {
     return result.get();
   }
 
-  public static boolean shouldIgnoreCase(@NotNull String pattern, boolean ignoreSmartCase) {
+  private static boolean shouldIgnoreCase(@NotNull String pattern, boolean ignoreSmartCase) {
     boolean sc = !ignoreSmartCase && Options.getInstance().isSet(Options.SMART_CASE);
     boolean ic = Options.getInstance().isSet(Options.IGNORE_CASE);
 
@@ -607,22 +614,37 @@ public class SearchGroup {
   }
 
   private void forceUpdateSearchHighlights() {
-    updateSearchHighlights(lastSearch, lastIgnoreSmartCase, true);
+    updateSearchHighlights(lastSearch, lastIgnoreSmartCase, showSearchHighlight, true);
   }
 
   private void updateSearchHighlights() {
-    updateSearchHighlights(lastSearch, lastIgnoreSmartCase, false);
+    updateSearchHighlights(lastSearch, lastIgnoreSmartCase, showSearchHighlight, false);
+  }
+
+  public void resetIncsearchHighlights() {
+    updateSearchHighlights(lastSearch, lastIgnoreSmartCase, showSearchHighlight, true);
+  }
+
+  public void updateIncsearchHighlights(Editor editor, String pattern, boolean forwards, int caretOffset) {
+    int currentMatchOffset = updateSearchHighlights(pattern, false, true, caretOffset, forwards, false);
+    MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), currentMatchOffset == -1 ? caretOffset : currentMatchOffset);
+  }
+
+  private void updateSearchHighlights(@Nullable String pattern, boolean shouldIgnoreSmartCase, boolean showHighlights, boolean forceUpdate) {
+    updateSearchHighlights(pattern, shouldIgnoreSmartCase, showHighlights, -1, true, forceUpdate);
   }
 
   /**
    * Refreshes current search highlights for all editors of currently active text editor/document
    */
-  private void updateSearchHighlights(@Nullable String pattern, boolean shouldIgnoreSmartCase, boolean forceUpdate) {
+  private int updateSearchHighlights(@Nullable String pattern, boolean shouldIgnoreSmartCase, boolean showHighlights,
+                                     int initialOffset, boolean forwards, boolean forceUpdate) {
+    int currentMatchOffset = -1;
+
     Project[] projects = ProjectManager.getInstance().getOpenProjects();
     for (Project project : projects) {
       Editor current = FileEditorManager.getInstance(project).getSelectedTextEditor();
-      Editor[] editors =
-        current == null ? null : EditorFactory.getInstance().getEditors(current.getDocument(), project);
+      Editor[] editors = current == null ? null : EditorFactory.getInstance().getEditors(current.getDocument(), project);
       if (editors == null) {
         continue;
       }
@@ -631,16 +653,22 @@ public class SearchGroup {
         // Force update for the situations where the text is the same, but the ignore case values have changed.
         // E.g. Use `*` to search for a word (which ignores smartcase), then use `/<Up>` to search for the same pattern,
         // which will match smartcase. Or changing the smartcase/ignorecase settings
-        if (shouldRemoveSearchHighlight(editor, pattern, showSearchHighlight) || forceUpdate) {
+        if (shouldRemoveSearchHighlight(editor, pattern, showHighlights) || forceUpdate) {
           removeSearchHighlight(editor);
         }
 
-        if (shouldAddSearchHighlight(editor, pattern, showSearchHighlight)) {
-          highlightSearchLines(editor, pattern, 0, -1, shouldIgnoreCase(pattern, shouldIgnoreSmartCase));
+        if (shouldAddSearchHighlight(editor, pattern, showHighlights)) {
+          final List<TextRange> results = findAll(editor, pattern, 0, -1, shouldIgnoreCase(pattern, shouldIgnoreSmartCase));
+          if (!results.isEmpty()) {
+            currentMatchOffset = findClosestMatch(editor, results, initialOffset, forwards);
+            highlightSearchResults(editor, pattern, results, currentMatchOffset);
+          }
           EditorData.setLastSearch(editor, pattern);
         }
       }
     }
+
+    return currentMatchOffset;
   }
 
   /**
@@ -654,41 +682,42 @@ public class SearchGroup {
    * Add search highlights if hlSearch is true and the pattern is changed
    */
   private boolean shouldAddSearchHighlight(@NotNull Editor editor, @Nullable String newPattern, boolean hlSearch) {
-    return hlSearch && newPattern != null && !newPattern.equals(EditorData.getLastSearch(editor));
+    return hlSearch && newPattern != null && !newPattern.equals(EditorData.getLastSearch(editor)) && newPattern != "";
   }
 
   private void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine) {
     if (lastSearch != null) {
-      highlightSearchLines(editor, lastSearch, startLine, endLine, shouldIgnoreCase(lastSearch, lastIgnoreSmartCase));
+      final List<TextRange> results = findAll(editor, lastSearch, startLine, endLine, shouldIgnoreCase(lastSearch, lastIgnoreSmartCase));
+      highlightSearchResults(editor, lastSearch, results, -1);
     }
   }
 
-  @Nullable
-  public static TextRange findNext(@NotNull Editor editor, @NotNull String pattern, final int offset, boolean ignoreCase,
-                                   final boolean forwards) {
-    final List<TextRange> results = findAll(editor, pattern, 0, -1, ignoreCase);
-    if (results.isEmpty()) {
-      return null;
+  private int findClosestMatch(@NotNull Editor editor, List<TextRange> results, int initialOffset, boolean forwards) {
+    if (results.isEmpty() || initialOffset == -1) {
+      return -1;
     }
+
     final int size = EditorHelper.getFileSize(editor);
     final TextRange max = Collections.max(results, (r1, r2) -> {
-      final int d1 = distance(r1, offset, forwards, size);
-      final int d2 = distance(r2, offset, forwards, size);
+      final int d1 = distance(r1, initialOffset, forwards, size);
+      final int d2 = distance(r2, initialOffset, forwards, size);
       if (d1 < 0 && d2 >= 0) {
         return Integer.MAX_VALUE;
       }
       return d2 - d1;
     });
+
     if (!Options.getInstance().isSet("wrapscan")) {
       final int start = max.getStartOffset();
-      if (forwards && start < offset) {
-        return null;
+      if (forwards && start < initialOffset) {
+        return -1;
       }
-      else if (start >= offset) {
-        return null;
+      else if (start >= initialOffset) {
+        return -1;
       }
     }
-    return max;
+
+    return max.getStartOffset();
   }
 
   private static int distance(@NotNull TextRange range, int pos, boolean forwards, int size) {
@@ -750,16 +779,16 @@ public class SearchGroup {
     return results;
   }
 
-  private static void highlightSearchLines(@NotNull Editor editor, @NotNull String pattern, int startLine, int endLine,
-                                           boolean ignoreCase) {
+  private static void highlightSearchResults(@NotNull Editor editor, @NotNull String pattern, List<TextRange> results, int currentMatchOffset) {
     Collection<RangeHighlighter> highlighters = EditorData.getLastHighlights(editor);
     if (highlighters == null) {
       highlighters = new ArrayList<>();
       EditorData.setLastHighlights(editor, highlighters);
     }
 
-    for (TextRange range : findAll(editor, pattern, startLine, endLine, ignoreCase)) {
-      final RangeHighlighter highlighter = highlightMatch(editor, range.getStartOffset(), range.getEndOffset(), false, pattern);
+    for (TextRange range : results) {
+      final boolean current = range.getStartOffset() == currentMatchOffset;
+      final RangeHighlighter highlighter = highlightMatch(editor, range.getStartOffset(), range.getEndOffset(), current, pattern);
       highlighters.add(highlighter);
     }
   }
@@ -854,13 +883,12 @@ public class SearchGroup {
     }
   }
 
+  @SuppressWarnings("SameParameterValue")
   @Nullable
   private TextRange findIt(@NotNull Editor editor, int startOffset, int count, int dir,
                            boolean wrap, boolean showMessages, boolean wholeFile) {
-    TextRange res = null;
-
     if (lastSearch == null || lastSearch.length() == 0) {
-      return res;
+      return null;
     }
 
     //RE sp;
@@ -869,9 +897,9 @@ public class SearchGroup {
     regmatch.rmm_ic = shouldIgnoreCase(lastSearch, lastIgnoreSmartCase);
     sp = new RegExp();
     regmatch.regprog = sp.vim_regcomp(lastSearch, 1);
-    if (regmatch == null) {
+    if (regmatch.regprog == null) {
       if (logger.isDebugEnabled()) logger.debug("bad pattern: " + lastSearch);
-      return res;
+      return null;
     }
 
     /*
@@ -1133,7 +1161,7 @@ public class SearchGroup {
   }
 
   @NotNull
-  public static RangeHighlighter highlightMatch(@NotNull Editor editor, int start, int end, boolean current, String tooltip) {
+  private static RangeHighlighter highlightMatch(@NotNull Editor editor, int start, int end, boolean current, String tooltip) {
     TextAttributes attributes = editor.getColorsScheme().getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES);
     if (current) {
       // This mimics what IntelliJ does with the Find live preview
@@ -1217,7 +1245,7 @@ public class SearchGroup {
     Element show = search.getChild("show-last");
     final ListOption vimInfo = Options.getInstance().getListOption(Options.VIMINFO);
     final boolean disableHighlight = vimInfo != null && vimInfo.contains("h");
-    showSearchHighlight = !disableHighlight && Boolean.valueOf(show.getText());
+    showSearchHighlight = !disableHighlight && Boolean.parseBoolean(show.getText());
     if (logger.isDebugEnabled()) {
       logger.debug("show=" + show + "(" + show.getText() + ")");
       logger.debug("showSearchHighlight=" + showSearchHighlight);
