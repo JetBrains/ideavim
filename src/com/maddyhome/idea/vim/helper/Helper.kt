@@ -22,7 +22,6 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
-import com.maddyhome.idea.vim.command.CommandState
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -109,7 +108,7 @@ fun <T> userDataOr(default: UserDataHolder.() -> T): ReadWriteProperty<UserDataH
 fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b
 
 inline fun Editor.vimForEachCaret(action: (caret: Caret) -> Unit) {
-  if (this.inBlockSobMode) {
+  if (this.inBlockSubMode) {
     action(this.caretModel.primaryCaret)
   } else {
     this.caretModel.allCarets.forEach(action)

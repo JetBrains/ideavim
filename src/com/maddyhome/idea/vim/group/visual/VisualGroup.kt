@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.inBlockSobMode
+import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.mode
@@ -45,7 +45,7 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
 fun Caret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd: Boolean = false) {
   vimSelectionStart = start
   setVisualSelection(start, end, this)
-  if (moveCaretToSelectionEnd && !editor.inBlockSobMode) moveToOffset(end)
+  if (moveCaretToSelectionEnd && !editor.inBlockSubMode) moveToOffset(end)
 }
 
 /**
@@ -56,7 +56,7 @@ fun Caret.vimSetSelection(start: Int, end: Int = start, moveCaretToSelectionEnd:
 fun Caret.vimMoveSelectionToCaret() {
   if (!editor.inVisualMode && !editor.inSelectMode)
     throw RuntimeException("Attempt to extent selection in non-visual mode")
-  if (editor.inBlockSobMode)
+  if (editor.inBlockSubMode)
     throw RuntimeException("Move caret with [vimMoveBlockSelectionToOffset]")
 
   val startOffsetMark = vimSelectionStart
@@ -113,7 +113,7 @@ val Caret.vimLeadSelectionOffset: Int
           val column = editor.offsetToLogicalPosition(selectionEnd).column
           if (column == 0) (selectionEnd - 1).coerceAtLeast(0) else selectionEnd
         } else selectionStart
-      } else if (editor.inBlockSobMode) {
+      } else if (editor.inBlockSubMode) {
         val selections = editor.caretModel.allCarets.map { it.selectionStart to it.selectionEnd }.sortedBy { it.first }
         val pCaret = editor.caretModel.primaryCaret
         when {
@@ -136,7 +136,7 @@ val Caret.vimLeadSelectionOffset: Int
  * Secondary carets became invisible colour in visual block mode
  */
 fun updateCaretColours(editor: Editor) {
-  if (editor.inBlockSobMode) {
+  if (editor.inBlockSubMode) {
     editor.caretModel.allCarets.forEach {
       if (it != editor.caretModel.primaryCaret) {
         // Set background color for non-primary carets as selection background color

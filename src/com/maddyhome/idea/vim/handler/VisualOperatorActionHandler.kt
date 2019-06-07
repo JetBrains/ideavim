@@ -138,7 +138,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
           carets.toMap()
         }
       }
-      this.inBlockSobMode -> {
+      this.inBlockSubMode -> {
         val primaryCaret = caretModel.primaryCaret
         mapOf(primaryCaret to VimBlockSelection(
           primaryCaret.vimSelectionStart,

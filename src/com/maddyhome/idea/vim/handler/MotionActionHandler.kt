@@ -27,10 +27,9 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.inBlockSobMode
+import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.mode
@@ -75,7 +74,7 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
   abstract val alwaysBatchExecution: Boolean
 
   final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    val blockSubmodeActive = editor.inBlockSobMode
+    val blockSubmodeActive = editor.inBlockSubMode
 
     if (blockSubmodeActive || editor.caretModel.caretCount == 1 || alwaysBatchExecution) {
       val primaryCaret = editor.caretModel.primaryCaret

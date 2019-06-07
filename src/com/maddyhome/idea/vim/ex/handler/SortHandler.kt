@@ -23,10 +23,9 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.text.StringUtil
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.*
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
-import com.maddyhome.idea.vim.helper.inBlockSobMode
+import com.maddyhome.idea.vim.helper.inBlockSubMode
 import java.util.*
 
 /**
@@ -47,7 +46,7 @@ class SortHandler : CommandHandler(
     val number = nonEmptyArg && "n" in arg
 
     val lineComparator = LineComparator(ignoreCase, number, reverse)
-    if (editor.inBlockSobMode) {
+    if (editor.inBlockSubMode) {
       val primaryCaret = editor.caretModel.primaryCaret
       val range = getLineRange(editor, primaryCaret, context, cmd)
       val worked = VimPlugin.getChange().sortRange(editor, range, lineComparator)

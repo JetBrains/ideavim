@@ -39,7 +39,7 @@ val Editor.inSelectMode
   get() = this.mode == CommandState.Mode.SELECT
 
 @get:JvmName("inBlockSubMode")
-val Editor.inBlockSobMode
+val Editor.inBlockSubMode
   get() = this.subMode == CommandState.SubMode.VISUAL_BLOCK
 
 @get:JvmName("inSingleCommandMode")

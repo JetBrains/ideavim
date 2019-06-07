@@ -345,7 +345,7 @@ class VisualMotionGroup {
   }
 
   fun resetVisual(editor: Editor) {
-    val wasBlockSubMode = editor.inBlockSobMode
+    val wasBlockSubMode = editor.inBlockSubMode
     val selectionType = SelectionType.fromSubMode(editor.subMode)
 
     SelectionVimListenerSuppressor.lock().use {

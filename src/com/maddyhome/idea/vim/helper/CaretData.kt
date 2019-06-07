@@ -22,7 +22,6 @@ package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.util.Key
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.VisualChange
 
 /**
@@ -50,7 +49,7 @@ private var Caret._vimSelectionStart: Int? by userDataCaretToEditor()
 private val LAST_COLUMN: Key<Int> = Key.create("lastColumn")
 var Caret.vimLastColumn: Int
   get() = getUserData(LAST_COLUMN) ?: visualPosition.column
-  set(value) = if (editor.inBlockSobMode) {
+  set(value) = if (editor.inBlockSubMode) {
     editor.caretModel.primaryCaret.putUserData(LAST_COLUMN, value)
   } else {
     putUserData(LAST_COLUMN, value)
