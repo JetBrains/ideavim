@@ -255,6 +255,7 @@ public class RegisterGroup {
     if (project == null) return new ArrayList<>();
 
     final PsiFile file = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
+    if (file == null) return new ArrayList<>();
     DumbService.getInstance(project).withAlternativeResolveEnabled(() -> {
       for (CopyPastePostProcessor<? extends TextBlockTransferableData> processor : CopyPastePostProcessor.EP_NAME
         .getExtensionList()) {
