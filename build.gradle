@@ -9,7 +9,7 @@ buildscript {
 }
 
 plugins {
-  id 'org.jetbrains.intellij' version '0.3.12'
+  id 'org.jetbrains.intellij' version '0.4.9'
 }
 
 apply plugin: 'java'
