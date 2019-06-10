@@ -1351,7 +1351,7 @@ public class MotionGroup {
     return lastFTChar;
   }
 
-  public int selectNextSearch(Editor editor, int count, boolean forwards) {
+  public int selectNextSearch(@NotNull Editor editor, int count, boolean forwards) {
     TextRange nextRange = SearchGroup.findCurrentOrNextSearch(editor, count, forwards);
     if (nextRange == null) {
       return -1;
@@ -1376,7 +1376,7 @@ public class MotionGroup {
     return endOffset;
   }
 
-  private boolean atEdgeOfRange(TextRange nextRange, Editor editor, boolean forwards) {
+  private boolean atEdgeOfRange(@NotNull TextRange nextRange, @NotNull Editor editor, boolean forwards) {
     int currentPosition = editor.getCaretModel().getOffset();
     if (forwards) {
       return nextRange.getEndOffset() - 1 == currentPosition;

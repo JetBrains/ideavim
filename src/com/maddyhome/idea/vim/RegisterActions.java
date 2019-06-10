@@ -44,6 +44,7 @@ class RegisterActions {
     registerCommandLineActions();
     registerVariousModesActions();
   }
+
   private static void registerVimCommandActions() {
     final ActionManagerEx manager = ActionManagerEx.getInstanceEx();
     for (String actionId : manager.getPluginActions(VimPlugin.getPluginId())) {
