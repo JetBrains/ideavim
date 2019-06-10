@@ -64,7 +64,7 @@ class MotionDownActionTest : VimTestCase() {
 
             I |${s}found it in a legendary lan${c}d${se}
             al|${s}l rocks and lavender and tufted grass${c},${se}
-            wh|${s}ere it was settled on some sodden sand[additional Chars${c}]${se}
+            wh|${s}ere it was settled on some sodden sand[additional Chars]${c}${se}
             hard by the torrent of a mountain pass.
         """.trimIndent()
         doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)

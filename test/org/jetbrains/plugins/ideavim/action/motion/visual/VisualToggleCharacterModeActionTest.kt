@@ -395,7 +395,7 @@ class VisualToggleCharacterModeActionTest : VimTestCase() {
 
                     I
                     ${s}all rocks and lavender and tufted grass,
-                    where it was settled on some sodden sand[long line${c}]${se}
+                    where it was settled on some sodden sand[long line]${c}${se}
                     hard by the torrent of a mountain pass.
                 """.trimIndent(),
                 CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)

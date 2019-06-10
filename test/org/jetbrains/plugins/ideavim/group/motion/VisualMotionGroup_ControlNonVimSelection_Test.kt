@@ -521,7 +521,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
             I ${s}found it in a legendary lan${c}d$se
             al${s}l rocks and lavender and tufted gras${c}s${se},
             wh${s}ere it was settled on some sodden sa${c}n${se}d
-            ha${s}rd by the torrent of a mountain pass${c}.$se
+            ha${s}rd by the torrent of a mountain pass.${c}$se
         """.trimIndent())
         assertMode(CommandState.Mode.VISUAL)
         assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
