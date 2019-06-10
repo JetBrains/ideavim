@@ -37,8 +37,9 @@ import java.util.Set;
 public class VisualSwapSelectionsAction extends VimCommandAction {
   public VisualSwapSelectionsAction() {
     super(new EditorActionHandlerBase() {
+      // FIXME: 2019-03-05 Make it multicaret
       protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-        return VimPlugin.getMotion().swapVisualSelections(editor);
+        return VimPlugin.getVisualMotion().swapVisualSelections(editor);
       }
     });
   }

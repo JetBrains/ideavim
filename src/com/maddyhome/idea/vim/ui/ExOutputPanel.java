@@ -84,7 +84,10 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
     addKeyListener(moreKeyListener);
     myText.addKeyListener(moreKeyListener);
 
-    LafManager.getInstance().addLafManagerListener(this);
+    final Project project = editor.getProject();
+    if (project != null) {
+      LafManager.getInstance().addLafManagerListener(this, project);
+    }
 
     updateUI();
   }
@@ -110,7 +113,7 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
   public void updateUI() {
     super.updateUI();
 
-    setBorder(BorderFactory.createEtchedBorder());
+    setBorder(new ExPanelBorder());
 
     // Can be null when called from base constructor
     //noinspection ConstantConditions

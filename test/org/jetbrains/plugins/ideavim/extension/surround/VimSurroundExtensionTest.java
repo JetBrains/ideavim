@@ -43,11 +43,10 @@ public class VimSurroundExtensionTest extends VimTestCase {
       "if <caret>(condition) {\n" +
       "}\n";
 
-    doTest(parseKeys("yseb"), before, after);
-    doTest(parseKeys("yse)"), before, after);
+    doTest(parseKeys("yseb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("yse)"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
     doTest(parseKeys("yse("), before,
-           "if ( condition ) {\n" +
-            "}\n");
+           "if ( condition ) {\n" + "}\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testSurroundWORDBlock() {
@@ -56,10 +55,10 @@ public class VimSurroundExtensionTest extends VimTestCase {
     final String after =
       "if (condition) {return;}\n";
 
-    doTest(parseKeys("ysEB"), before, after);
-    doTest(parseKeys("ysE}"), before, after);
-    doTest(parseKeys("ysE{"), before,
-           "if (condition) { return; }\n");
+    doTest(parseKeys("ysEB"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("ysE}"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("ysE{"), before, "if (condition) { return; }\n", CommandState.Mode.COMMAND,
+           CommandState.SubMode.NONE);
   }
 
   public void testSurroundWordArray() {
@@ -68,10 +67,9 @@ public class VimSurroundExtensionTest extends VimTestCase {
     final String after =
       "int foo = bar[index];";
 
-    doTest(parseKeys("yser"), before, after);
-    doTest(parseKeys("yse]"), before, after);
-    doTest(parseKeys("yse["), before,
-           "int foo = bar[ index ];");
+    doTest(parseKeys("yser"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("yse]"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("yse["), before, "int foo = bar[ index ];", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testSurroundWordAngle() {
@@ -80,8 +78,8 @@ public class VimSurroundExtensionTest extends VimTestCase {
     final String after =
       "foo = new Bar<Baz>();";
 
-    doTest(parseKeys("ysea"), before, after);
-    doTest(parseKeys("yse>"), before, after);
+    doTest(parseKeys("ysea"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("yse>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testSurroundQuotes() {
@@ -90,8 +88,8 @@ public class VimSurroundExtensionTest extends VimTestCase {
     final String after =
       "foo = \"new Bar.Baz\";";
 
-    doTest(parseKeys("yst;\""), before, after);
-    doTest(parseKeys("ys4w\""), before, after);
+    doTest(parseKeys("yst;\""), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("ys4w\""), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testSurroundTag() {
@@ -124,13 +122,12 @@ public class VimSurroundExtensionTest extends VimTestCase {
       "if <caret>(condition) {\n" +
       "}\n";
 
-    doTest(parseKeys("veSb"), before, after);
+    doTest(parseKeys("veSb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
     assertMode(CommandState.Mode.COMMAND);
-    doTest(parseKeys("veS)"), before, after);
+    doTest(parseKeys("veS)"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
     assertMode(CommandState.Mode.COMMAND);
     doTest(parseKeys("veS("), before,
-           "if ( condition ) {\n" +
-           "}\n");
+           "if ( condition ) {\n" + "}\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
     assertMode(CommandState.Mode.COMMAND);
   }
 
@@ -144,9 +141,9 @@ public class VimSurroundExtensionTest extends VimTestCase {
       "if condition {\n" +
       "}\n";
 
-    doTest(parseKeys("dsb"), before, after);
-    doTest(parseKeys("ds("), before, after);
-    doTest(parseKeys("ds)"), before, after);
+    doTest(parseKeys("dsb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("ds("), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("ds)"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testDeleteSurroundingQuote() {
@@ -157,7 +154,7 @@ public class VimSurroundExtensionTest extends VimTestCase {
       "if (<caret>foo.equals(foo)) {\n" +
       "}\n";
 
-    doTest(parseKeys("ds\""), before, after);
+    doTest(parseKeys("ds\""), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testDeleteSurroundingBlock() {
@@ -166,9 +163,9 @@ public class VimSurroundExtensionTest extends VimTestCase {
     final String after =
       "if (condition) return;\n";
 
-    doTest(parseKeys("dsB"), before, after);
-    doTest(parseKeys("ds}"), before, after);
-    doTest(parseKeys("ds{"), before, after);
+    doTest(parseKeys("dsB"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("ds}"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("ds{"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testDeleteSurroundingArray() {
@@ -177,9 +174,9 @@ public class VimSurroundExtensionTest extends VimTestCase {
     final String after =
       "int foo = barindex;";
 
-    doTest(parseKeys("dsr"), before, after);
-    doTest(parseKeys("ds]"), before, after);
-    doTest(parseKeys("ds["), before, after);
+    doTest(parseKeys("dsr"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("ds]"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("ds["), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testDeleteSurroundingAngle() {
@@ -188,9 +185,9 @@ public class VimSurroundExtensionTest extends VimTestCase {
     final String after =
       "foo = new BarBaz();";
 
-    doTest(parseKeys("dsa"), before, after);
-    doTest(parseKeys("ds>"), before, after);
-    doTest(parseKeys("ds<"), before, after);
+    doTest(parseKeys("dsa"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("ds>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("ds<"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testDeleteSurroundingTag() {
@@ -199,7 +196,7 @@ public class VimSurroundExtensionTest extends VimTestCase {
     final String after =
       "<div><caret>Foo</div>";
 
-    doTest(parseKeys("dst"), before, after);
+    doTest(parseKeys("dst"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // VIM-1085
@@ -211,7 +208,7 @@ public class VimSurroundExtensionTest extends VimTestCase {
       "Foo\n" +
       "Seq\"-Yrangepos\"\n";
 
-    doTest(parseKeys("dsb"), before, after);
+    doTest(parseKeys("dsb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // VIM-1085
@@ -229,7 +226,7 @@ public class VimSurroundExtensionTest extends VimTestCase {
       "    other\n" +
       "Baz\n";
 
-    doTest(parseKeys("dsb"), before, after);
+    doTest(parseKeys("dsb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
 
@@ -255,7 +252,7 @@ public class VimSurroundExtensionTest extends VimTestCase {
       "if [condition] {\n" +
       "}\n";
 
-    doTest(parseKeys("csbr"), before, after);
+    doTest(parseKeys("csbr"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testChangeSurroundingBlock() {
@@ -264,7 +261,7 @@ public class VimSurroundExtensionTest extends VimTestCase {
     final String after =
       "if (condition) (return;)";
 
-    doTest(parseKeys("csBb"), before, after);
+    doTest(parseKeys("csBb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testChangeSurroundingTagSimple() {
@@ -273,7 +270,7 @@ public class VimSurroundExtensionTest extends VimTestCase {
     final String after =
       "<div><caret>(Foo)</div>";
 
-    doTest(parseKeys("cstb"), before, after);
+    doTest(parseKeys("cstb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   public void testChangeSurroundingTagAnotherTag() {
@@ -282,7 +279,7 @@ public class VimSurroundExtensionTest extends VimTestCase {
     final String after =
       "<div><caret><b>Foo</b></div>";
 
-    doTest(parseKeys("cst\\<b>"), before, after);
+    doTest(parseKeys("cst\\<b>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
   // TODO if/when we add proper repeat support

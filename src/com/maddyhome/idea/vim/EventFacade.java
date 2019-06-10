@@ -18,9 +18,13 @@
 
 package com.maddyhome.idea.vim;
 
+import com.intellij.codeInsight.lookup.LookupManager;
+import com.intellij.codeInsight.template.TemplateManager;
+import com.intellij.codeInsight.template.TemplateManagerListener;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.ShortcutSet;
+import com.intellij.openapi.actionSystem.ex.AnActionListener;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
@@ -37,6 +41,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseListener;
+import java.beans.PropertyChangeListener;
 
 /**
  * @author vlan
@@ -75,6 +82,11 @@ public class EventFacade {
     action.registerCustomShortcutSet(shortcutSet, component);
   }
 
+  public void registerCustomShortcutSet(@NotNull AnAction action, @NotNull ShortcutSet shortcutSet,
+                                        @Nullable JComponent component, @NotNull Disposable disposable) {
+    action.registerCustomShortcutSet(shortcutSet, component, disposable);
+  }
+
   public void unregisterCustomShortcutSet(@NotNull AnAction action, @Nullable JComponent component) {
     action.unregisterCustomShortcutSet(component);
   }
@@ -82,6 +94,16 @@ public class EventFacade {
   public void addFileEditorManagerListener(@NotNull Project project, @NotNull FileEditorManagerListener listener) {
     final MessageBusConnection connection = project.getMessageBus().connect();
     connection.subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, listener);
+  }
+
+  public void addAnActionListener(@NotNull Project project, @NotNull AnActionListener listener) {
+    final MessageBusConnection connection = project.getMessageBus().connect();
+    connection.subscribe(AnActionListener.TOPIC, listener);
+  }
+
+  public void addTemplateStartedListener(@NotNull Project project, @NotNull TemplateManagerListener listener) {
+    final MessageBusConnection connection = project.getMessageBus().connect();
+    connection.subscribe(TemplateManager.TEMPLATE_STARTED_TOPIC, listener);
   }
 
   public void addDocumentListener(@NotNull Document document, @NotNull DocumentListener listener) {
@@ -104,6 +126,14 @@ public class EventFacade {
     editor.removeEditorMouseListener(listener);
   }
 
+  public void addComponentMouseListener(@NotNull Component component, @NotNull MouseListener mouseListener) {
+    component.addMouseListener(mouseListener);
+  }
+
+  public void removeComponentMouseListener(@NotNull Component component, @NotNull MouseListener mouseListener) {
+    component.removeMouseListener(mouseListener);
+  }
+
   public void addEditorMouseMotionListener(@NotNull Editor editor, @NotNull EditorMouseMotionListener listener) {
     editor.addEditorMouseMotionListener(listener);
   }
@@ -118,6 +148,10 @@ public class EventFacade {
 
   public void removeEditorSelectionListener(@NotNull Editor editor, @NotNull SelectionListener listener) {
     editor.getSelectionModel().removeSelectionListener(listener);
+  }
+
+  public void registerLookupListener(@NotNull Project project, @NotNull PropertyChangeListener propertyChangeListener) {
+    LookupManager.getInstance(project).addPropertyChangeListener(propertyChangeListener, project);
   }
 
   @NotNull

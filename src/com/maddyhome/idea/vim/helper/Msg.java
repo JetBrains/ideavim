@@ -26,6 +26,7 @@ public interface Msg {
   String e_norange = "e_norange";
   String e_rangereq = "e_rangereq";
   String e_argreq = "e_argreq";
+  String e_argforb = "e_argforb";
   String e_noprev = "e_noprev";
   String e_nopresub = "e_nopresub";
   String E191 = "E191";

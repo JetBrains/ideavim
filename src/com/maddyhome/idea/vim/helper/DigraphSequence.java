@@ -49,7 +49,7 @@ public class DigraphSequence {
         if (key.getKeyCode() == KeyEvent.VK_K && (key.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
           logger.debug("found Ctrl-K");
           digraphState = DIG_STATE_DIG_ONE;
-          return DigraphResult.OK;
+          return DigraphResult.OK_DIGRAPH;
         }
         else if ((key.getKeyCode() == KeyEvent.VK_V || key.getKeyCode() == KeyEvent.VK_Q) &&
                  (key.getModifiers() & KeyEvent.CTRL_MASK) != 0) {
@@ -57,7 +57,7 @@ public class DigraphSequence {
           digraphState = DIG_STATE_CODE_START;
           codeChars = new char[8];
           codeCnt = 0;
-          return DigraphResult.OK;
+          return DigraphResult.OK_LITERAL;
         }
         else {
           return new DigraphResult(key);
@@ -68,7 +68,7 @@ public class DigraphSequence {
           digraphChar = key.getKeyChar();
           digraphState = DIG_STATE_DIG_TWO;
 
-          return DigraphResult.OK;
+          return new DigraphResult(DigraphResult.RES_OK, digraphChar);
         }
         else {
           digraphState = DIG_STATE_START;
@@ -93,26 +93,26 @@ public class DigraphSequence {
             digraphState = DIG_STATE_CODE_CHAR;
             codeType = 8;
             logger.debug("Octal");
-            return DigraphResult.OK;
+            return DigraphResult.OK_LITERAL;
           case 'x':
           case 'X':
             codeMax = 2;
             digraphState = DIG_STATE_CODE_CHAR;
             codeType = 16;
             logger.debug("hex2");
-            return DigraphResult.OK;
+            return DigraphResult.OK_LITERAL;
           case 'u':
             codeMax = 4;
             digraphState = DIG_STATE_CODE_CHAR;
             codeType = 16;
             logger.debug("hex4");
-            return DigraphResult.OK;
+            return DigraphResult.OK_LITERAL;
           case 'U':
             codeMax = 8;
             digraphState = DIG_STATE_CODE_CHAR;
             codeType = 16;
             logger.debug("hex8");
-            return DigraphResult.OK;
+            return DigraphResult.OK_LITERAL;
           case '0':
           case '1':
           case '2':
@@ -128,7 +128,7 @@ public class DigraphSequence {
             codeType = 10;
             codeChars[codeCnt++] = key.getKeyChar();
             logger.debug("decimal");
-            return DigraphResult.OK;
+            return DigraphResult.OK_LITERAL;
           default:
             switch (key.getKeyCode()) {
               case KeyEvent.VK_TAB:
@@ -177,7 +177,7 @@ public class DigraphSequence {
             return new DigraphResult(code);
           }
           else {
-            return DigraphResult.OK;
+            return DigraphResult.OK_LITERAL;
           }
         }
         else if (codeCnt > 0) {
@@ -204,11 +204,18 @@ public class DigraphSequence {
     public static final int RES_BAD = 1;
     public static final int RES_DONE = 2;
 
-    public static final DigraphResult OK = new DigraphResult(RES_OK);
-    public static final DigraphResult BAD = new DigraphResult(RES_BAD);
+    static final DigraphResult OK_DIGRAPH = new DigraphResult(RES_OK, '?');
+    static final DigraphResult OK_LITERAL = new DigraphResult(RES_OK, '^');
+    static final DigraphResult BAD = new DigraphResult(RES_BAD);
 
     DigraphResult(int result) {
       this.result = result;
+      stroke = null;
+    }
+
+    DigraphResult(int result, char promptCharacter) {
+      this.result = result;
+      this.promptCharacter = promptCharacter;
       stroke = null;
     }
 
@@ -226,8 +233,13 @@ public class DigraphSequence {
       return result;
     }
 
+    public char getPromptCharacter() {
+      return promptCharacter;
+    }
+
     private final int result;
     @Nullable private final KeyStroke stroke;
+    private char promptCharacter;
   }
 
   private int digraphState = DIG_STATE_START;

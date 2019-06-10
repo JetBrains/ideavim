@@ -42,7 +42,7 @@ public class FilterVisualLinesAction extends VimCommandAction {
       @Override
       protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         VimPlugin.getProcess().startFilterCommand(editor, context, cmd);
-        VimPlugin.getMotion().resetVisual(editor, true);
+        VimPlugin.getVisualMotion().resetVisual(editor);
         return true;
       }
     });

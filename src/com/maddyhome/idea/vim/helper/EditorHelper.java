@@ -18,20 +18,14 @@
 
 package com.maddyhome.idea.vim.helper;
 
-import com.intellij.application.options.CodeStyle;
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.fileTypes.FileTypeManager;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.maddyhome.idea.vim.common.CharacterPosition;
+import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.CaretOrder;
 import org.jetbrains.annotations.NotNull;
@@ -298,7 +292,9 @@ public class EditorHelper {
       return getFileSize(editor, allowEnd);
     }
     else {
-      return editor.getDocument().getLineEndOffset(line) - (allowEnd ? 0 : 1);
+      final int startOffset = editor.getDocument().getLineStartOffset(line);
+      final int endOffset = editor.getDocument().getLineEndOffset(line);
+      return endOffset - (startOffset == endOffset || allowEnd ? 0 : 1);
     }
   }
 
@@ -484,7 +480,7 @@ public class EditorHelper {
       int max = range.getMaxLength();
 
       for (int i = 0; i < len; i++) {
-        if (i > 0) {
+        if (i > 0 && res.length() > 0 && res.charAt(res.length() - 1) != '\n') {
           res.append('\n');
         }
         String line = getText(editor, range.getStartOffsets()[i], range.getEndOffsets()[i]);
@@ -584,22 +580,8 @@ public class EditorHelper {
     final int len = getLineLength(editor, line);
     if(len >= to) return "";
 
-    final VirtualFile virtualFile = EditorData.getVirtualFile(editor);
-    final Project project = PlatformDataKeys.PROJECT.getData(context);
     final int limit = to - len;
-    if (virtualFile != null) {
-      final FileType fileType = FileTypeManager.getInstance().getFileTypeByFile(virtualFile);
-      final CodeStyleSettings settings = project == null ? CodeStyle.getDefaultSettings() : CodeStyle.getSettings(project);
-      if (settings.useTabCharacter(fileType)) {
-        final int tabSize = settings.getTabSize(fileType);
-        final int tabsCnt = limit / tabSize;
-        final int spacesCnt = limit % tabSize;
-
-        return StringUtil.repeat("\t", tabsCnt) + StringUtil.repeat(" ", spacesCnt);
-      }
-    }
-
-    return StringUtil.repeat(" ", limit);
+    return IndentConfig.create(editor, context).createIndentBySize(limit);
   }
 
   /**
@@ -711,21 +693,7 @@ public class EditorHelper {
 
     Rectangle visibleArea = scrollingModel.getVisibleArea();
 
-    // For consistency, we always try to scroll to keep a whole line (with inlays) aligned at the top of the screen.
-    // This is inexact, and means we can bounce around, most visibly when the caret is on the last line and we're moving
-    // down (j) or the caret is on the last line and we're scrolling up (CTRL-Y)
-    // If we want it to be simpler: scrollingModel.scrollVertically(y - visibleArea.height + height);
-
-    int topVisualLine = editor.yToVisualLine(y - visibleArea.height + height);
-    int topLineInlayHeight = getHeightOfVisualLineInlays(editor, topVisualLine, true);
-    int topY = editor.visualLineToY(topVisualLine);
-    if (topY - topLineInlayHeight + visibleArea.height < y + height) {
-      // There's a pathological edge case here, if topVisualLine has a HUGE inlay, then topVisualLine+1 won't put our
-      // given line at the bottom of the screen
-      scrollVisualLineToTopOfScreen(editor, topVisualLine + 1);
-    } else {
-      scrollingModel.scrollVertically(topY - topLineInlayHeight);
-    }
+    scrollingModel.scrollVertically(y - visibleArea.height + height);
 
     return verticalPos != scrollingModel.getVerticalScrollOffset();
   }
@@ -745,6 +713,10 @@ public class EditorHelper {
       return scrollFullPageUp(editor, pages);
     }
     return -1;  // visual lines are 1-based
+  }
+
+  public static int lastColumnForLine(@NotNull final Editor editor, int line, boolean allowEnd) {
+    return editor.offsetToVisualPosition(EditorHelper.getLineEndOffset(editor, line, allowEnd)).column;
   }
 
   private static int scrollFullPageDown(@NotNull final Editor editor, int pages) {

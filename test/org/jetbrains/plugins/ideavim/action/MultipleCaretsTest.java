@@ -21,7 +21,6 @@ package org.jetbrains.plugins.ideavim.action;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -34,7 +33,7 @@ import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
  * @author Vasily Alferov
  */
 public class MultipleCaretsTest extends VimTestCase {
-  // com.maddyhome.idea.vim.action.motion.leftright
+  // com.maddyhome.idea.vim.action.visual.leftright
 
   public void testMotionLeftAction() {
     typeTextInFile(parseKeys("3h"),
@@ -181,7 +180,7 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult("one\nt<caret>wo three\nfo<caret>ur\n");
   }
 
-  // com.maddyhome.idea.vim.action.motion.updown
+  // com.maddyhome.idea.vim.action.visual.updown
 
   public void testMotionUpAction() {
     typeTextInFile(parseKeys("k"),
@@ -259,7 +258,7 @@ public class MultipleCaretsTest extends VimTestCase {
                           "  two\n");
   }
 
-  // com.maddyhome.idea.vim.action.motion.object
+  // com.maddyhome.idea.vim.action.visual.object
 
   public void testMotionInnerBigWordAction() {
     typeTextInFile(parseKeys("v", "iW"),
@@ -326,7 +325,7 @@ public class MultipleCaretsTest extends VimTestCase {
   public void testMotionInnerParagraphAction() {
     typeTextInFile(parseKeys("v", "3ip"),
                    "a<caret>bcd\na<caret>bcd\n\nabcd\nabcd\n\na<caret>bcd\nabcd\n\nabcd\nabcd\n");
-    myFixture.checkResult("<selection>abcd\nabcd\n\nabcd\nabcd</selection>\n\n<selection>abcd\nabcd\n\nabcd\nabcd</selection>\n");
+    myFixture.checkResult("<selection>abcd\nabcd\n\nabcd\nabcd\n</selection>\n<selection>abcd\nabcd\n\nabcd\nabcd\n</selection>");
   }
 
   public void testMotionInnerSentenceAction() {
@@ -399,7 +398,7 @@ public class MultipleCaretsTest extends VimTestCase {
   public void testMotionOuterParagraphAction() {
     typeTextInFile(parseKeys("v", "2ap"),
                    "a<caret>sdf\n\na<caret>sdf\n\nasdf\n\n");
-    myFixture.checkResult("<selection>asdf\n\nasdf\n\nasdf\n</selection>\n");
+    myFixture.checkResult("<selection>asdf\n\nasdf\n\nasdf\n\n</selection>");
   }
 
   public void testMotionOuterSentenceAction() {
@@ -408,7 +407,7 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult("<selection>asdf. asdf. asdf.</selection>");
   }
 
-  // com.maddyhime.idea.vim.action.motion.text
+  // com.maddyhime.idea.vim.action.visual.text
 
   public void testMotionBigWordEndLeftAction() {
     typeTextInFile(parseKeys("gE"), "a.asdf. a<caret>sdf<caret>.a a; as<caret>df\n a<caret>sdf");
@@ -710,7 +709,7 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult("<caret>( <caret>(() )<caret>()<caret>() ");
   }
 
-  // com.maddyhome.idea.vim.action.motion.visual
+  // com.maddyhome.idea.vim.action.visual.visual
 
   public void testVisualSwapEndsAction() {
     typeTextInFile(parseKeys("v", "iw", "o"), "o<caret>ne <caret>two th<caret>ree\n");
@@ -733,11 +732,11 @@ public class MultipleCaretsTest extends VimTestCase {
                    "th<caret>irteen fourteen\n");
     myFixture.checkResult("<selection>one two\n" +
                           "three four\n" +
-                          "five six</selection>\n" +
-                          "seven eight\n" +
+                          "five six\n" +
+                          "</selection>seven eight\n" +
                           "<selection>nine ten\n" +
                           "eleven twelve\n" +
-                          "thirteen fourteen</selection>\n");
+                          "thirteen fourteen\n</selection>");
   }
 
   public void testVisualModeMerging() {
@@ -747,7 +746,7 @@ public class MultipleCaretsTest extends VimTestCase {
                    "five six\n");
     myFixture.checkResult("<selection>one two\n" +
                           "three four\n" +
-                          "five six</selection>\n");
+                          "five six\n</selection>");
   }
 
   public void testVisualCharacterToVisualLineModeSwitch() {
@@ -758,10 +757,10 @@ public class MultipleCaretsTest extends VimTestCase {
                    "seven eight\n" +
                    "nine t<caret>en\n");
     myFixture.checkResult("<selection>one two\n" +
-                          "three four</selection>\n" +
-                          "five six\n" +
+                          "three four\n" +
+                          "</selection>five six\n" +
                           "<selection>seven eight\n" +
-                          "nine ten</selection>\n");
+                          "nine ten\n</selection>");
   }
 
   public void testVisualLineToVisualCharacterModeSwitch() {
@@ -783,31 +782,6 @@ public class MultipleCaretsTest extends VimTestCase {
                    "abc\ndef\n");
     myFixture.checkResult("<selection>abc</selection>\n" +
                           "<selection>def</selection>\n");
-  }
-
-  public void testVisualSwapEndsBlockActionInBlockMode() {
-    typeTextInFile(parseKeys("<C-V>", "2l", "j", "O"),
-                   "a<caret>abcc\n" +
-                   "ddeff\n");
-    myFixture.checkResult("a<selection><caret>abc</selection>c\n" +
-                          "d<selection>de<caret>f</selection>f\n");
-  }
-
-  public void testVisualBlockMovementAfterSwapEndsBlockAction() {
-    typeTextInFile(parseKeys("<C-V>", "2l", "j", "O", "k", "h", "j"),
-                   "aabcc\n" +
-                   "d<caret>deff\n" +
-                   "gghii\n" +
-                   "jjkll\n");
-    myFixture.checkResult("aabcc\n" +
-                          "<selection><caret>ddef</selection>f\n" +
-                          "<selection>ggh<caret>i</selection>i\n" +
-                          "jjkll\n");
-    typeText(parseKeys("j"));
-    myFixture.checkResult("aabcc\n" +
-                          "ddeff\n" +
-                          "<selection><caret>gghi</selection>i\n" +
-                          "jjkll\n");
   }
 
   public void testVisualBlockDownMovementAfterShorterLineAction() {
@@ -870,13 +844,13 @@ public class MultipleCaretsTest extends VimTestCase {
   public void testVisualLineMotionUp() {
     typeTextInFile(parseKeys("V", "2k", "k"),
                    "abcde\nabcde\n\nab<caret>cde\nabcde\n");
-    myFixture.checkResult("<selection>ab<caret>cde\nabcde\n\nabcde</selection>\nabcde\n");
+    myFixture.checkResult("<selection>ab<caret>cde\nabcde\n\nabcde\n</selection>abcde\n");
   }
 
   public void testVisualLineMotionDown() {
     typeTextInFile(parseKeys("V", "2j", "j"),
                    "ab<caret>cde\nabcde\n\nabcde\nabcde\n");
-    myFixture.checkResult("<selection>abcde\nabcde\n\nab<caret>cde</selection>\nabcde\n");
+    myFixture.checkResult("<selection>abcde\nabcde\n\nab<caret>cde\n</selection>abcde\n");
   }
 
   public void testVisualCharacterUpMerging() {
@@ -894,13 +868,13 @@ public class MultipleCaretsTest extends VimTestCase {
   public void testVisualLineUpMerging() {
     typeTextInFile(parseKeys("V", "2k", "k"),
                    "abcde\nabcde\n\nabc<caret>de\nab<caret>cde\n");
-    myFixture.checkResult("<selection>abc<caret>de\nabcde\n\nabcde\nabcde</selection>\n");
+    myFixture.checkResult("<selection>abc<caret>de\nabcde\n\nabcde\nabcde\n</selection>");
   }
 
   public void testVisualLineDownMerging() {
     typeTextInFile(parseKeys("V", "2j", "j"),
                    "abc<caret>de\nab<caret>cde\n\nabcde\nabcde\n");
-    myFixture.checkResult("<selection>abcde\nabcde\n\nabcde\nab<caret>cde</selection>\n");
+    myFixture.checkResult("<selection>abcde\nabcde\n\nabcde\nab<caret>cde\n</selection>");
   }
 
   // com.maddyhome.idea.vim.action.change.change
@@ -1073,13 +1047,6 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult(after);
   }
 
-  public void testChangeVisualAction() {
-    typeTextInFile(parseKeys("v2lc", "aaa", "<ESC>"),
-                   "abcd<caret>ffffff<caret>abcde<caret>aaaa\n");
-    assertMode(CommandState.Mode.COMMAND);
-    myFixture.checkResult("abcdaa<caret>afffaa<caret>adeaa<caret>aa\n");
-  }
-
   public void testChangeVisualCharacterAction() {
     typeTextInFile(parseKeys("v2lra"),
                    "abcd<caret>ffffff<caret>abcde<caret>aaaa\n");
@@ -1224,13 +1191,8 @@ public class MultipleCaretsTest extends VimTestCase {
   }
 
   public void testDeleteJoinVisualLinesAction() {
-    typeTextInFile(parseKeys("VkgJ"),
-                   "abcde\n" +
-                   "abcd<caret>e\n" +
-                   "abcde\n" +
-                   "ab<caret>cde\n");
-    myFixture.checkResult("abcde<caret>abcde\n" +
-                          "abcde<caret>abcde\n");
+    typeTextInFile(parseKeys("VkgJ"), "one\n" + "tw<caret>o\n" + "three\n" + "fo<caret>ur\n");
+    myFixture.checkResult("one<caret>two\n" + "three<caret>four\n");
   }
 
   public void testDeleteJoinVisualLinesSpacesAction() {
@@ -1314,33 +1276,7 @@ public class MultipleCaretsTest extends VimTestCase {
                    "abcde\n" +
                    "a<caret>bcde\n" +
                    "abcde\n");
-    myFixture.checkResult("<caret>abcde\n");
-  }
-
-  public void testDeleteVisualLinesEndAction() {
-    typeTextInFile(parseKeys("v", "2j", "D"),
-                   "a<caret>bcde\n" +
-                   "abcde\n" +
-                   "abcde\n" +
-                   "abcde\n" +
-                   "abcd<caret>e\n" +
-                   "abcde\n" +
-                   "abcde\n");
     myFixture.checkResult("<caret>abcd<caret>e\n");
-  }
-
-  public void testDeleteVisualBlockLineEndAction() {
-    typeTextInFile(parseKeys("<C-V>", "2j", "2l", "D"),
-                   "abcde\n" +
-                   "a<caret>bcde\n" +
-                   "abcde\n" +
-                   "abcde\n" +
-                   "abcde\n");
-    myFixture.checkResult("abcde\n" +
-                          "<caret>a\n" +
-                          "a\n" +
-                          "a\n" +
-                          "abcde\n");
   }
 
   // com.maddyhome.idea.vim.action.change.insert
@@ -1361,14 +1297,6 @@ public class MultipleCaretsTest extends VimTestCase {
     typeTextInFile(parseKeys("a", "abcd", "<ESC>"),
                    "on<caret>e two th<caret>re<caret>e");
     myFixture.checkResult("oneabc<caret>d two thrabc<caret>deeabc<caret>d");
-  }
-
-  public void testInsertAfterLineEndAction() {
-    typeTextInFile(parseKeys("A", "four", "<ESC>"),
-                   "one two <caret>three \n" +
-                   "sev<caret>en si<caret>x five \n");
-    myFixture.checkResult("one two three fou<caret>r\n" +
-                          "seven six five fou<caret>r\n");
   }
 
   public void testInsertBeforeCursorAction() {
@@ -1651,20 +1579,6 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult(after);
   }
 
-  public void testVisualBlockAppend() {
-    final String before = "<caret>int a;\n" + "int b;\n" + "int c;";
-    typeTextInFile(parseKeys("<C-V>", "2j", "e", "A", " const", "<Esc>"), before);
-    final String after = "int const a;\n" + "int const b;\n" + "int const c;";
-    myFixture.checkResult(after);
-  }
-
-  public void testVisualBlockInsert() {
-    final String before = "<caret>int a;\n" + "int b;\n" + "int c;";
-    typeTextInFile(parseKeys("<C-V>", "2j", "I", "const ", "<Esc>"), before);
-    final String after = "<caret>const int a;\n" + "const int b;\n" + "const int c;";
-    myFixture.checkResult(after);
-  }
-
   public void testAutoIndentRange() {
     final String before = "cl<caret>ass C {\n C(int i) {\nmy<caret>I = i;\n}\n private int myI;\n}";
     configureByJavaText(before);
@@ -1727,14 +1641,6 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult(after);
   }
 
-  public void testPutVisualText() {
-    final String before = "<caret>qwe asd <caret>zxc rty <caret>fgh vbn";
-    final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
-    typeText(parseKeys("v2e", "2p"));
-    final String after = "fghfg<caret>h fghfg<caret>h fghfg<caret>h";
-    myFixture.checkResult(after);
-  }
 
   public void testPutTextBeforeCursorLinewise() {
     final String before = "q<caret>werty\n" + "as<caret>dfgh\n" + "<caret>zxcvbn\n";
@@ -1746,26 +1652,28 @@ public class MultipleCaretsTest extends VimTestCase {
   }
 
   public void testPutTextBeforeCursorLinewiseOverlapRange() {
+    // Non-ide insert will produce double "<caret>zxcvbn\n"
     testPutOverlapLine("q<caret>we<caret>rty\n" + "asdfgh\n" + "<caret>zxcvbn\n",
-                       "<caret>zxcvbn\n" + "<caret>zxcvbn\n" + "qwerty\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n",
+                       "<caret>zxcvbn\n" + "qwerty\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n",
                        true);
     testPutOverlapLine("qwerty\n" + "a<caret>sd<caret>fgh\n" + "<caret>zxcvbn\n",
-                       "qwerty\n" + "<caret>zxcvbn\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n",
+                       "qwerty\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n",
                        true);
     testPutOverlapLine("qwerty\n" + "asd<caret>fgh\n" + "<caret>zxcvb<caret>n\n",
-                       "qwerty\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "<caret>zxcvbn\n" + "zxcvbn\n",
+                       "qwerty\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n",
                        true);
   }
 
   public void testPutTextAfterCursorLinewiseOverlapRange() {
+    // Non-ide insert will produce double "<caret>zxcvbn\n"
     testPutOverlapLine("q<caret>wert<caret>y\n" + "asdfgh\n" + "<caret>zxcvbn\n",
-                       "qwerty\n" + "<caret>zxcvbn\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "zxcvbn\n" + "<caret>zxcvbn\n",
+                       "qwerty\n" + "<caret>zxcvbn\n" + "asdfgh\n" + "zxcvbn\n" + "<caret>zxcvbn\n",
                        false);
     testPutOverlapLine("qwerty\n" + "as<caret>dfg<caret>h\n" + "<caret>zxcvbn\n",
-                       "qwerty\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "<caret>zxcvbn\n" + "zxcvbn\n" + "<caret>zxcvbn\n",
+                       "qwerty\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n" + "<caret>zxcvbn\n",
                        false);
     testPutOverlapLine("qwerty\n" + "asdfg<caret>h\n" + "<caret>zxcv<caret>bn\n",
-                       "qwerty\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n" + "<caret>zxcvbn\n" + "<caret>zxcvbn\n",
+                       "qwerty\n" + "asdfgh\n" + "<caret>zxcvbn\n" + "zxcvbn\n" + "<caret>zxcvbn\n",
                        false);
   }
 
@@ -1785,14 +1693,7 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult(after);
   }
 
-  public void testPutVisualTextLinewise() {
-    final String before = "q<caret>werty\n" + "as<caret>dfgh\n" + "<caret>zxcvbn\n";
-    final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(14, 21), SelectionType.LINE_WISE, false);
-    typeText(parseKeys("vl", "p"));
-    final String after = "q\n" + "<caret>zxcvbn\n" + "rty\n" + "as\n" + "<caret>zxcvbn\n" + "gh\n" + "\n" + "<caret>zxcvbn\n" + "cvbn\n";
-    myFixture.checkResult(after);
-  }
+
 
   public void testPutTextBeforeCursorMoveCursor() {
     final String before = "qw<caret>e asd z<caret>xc rty <caret>fgh vbn";
@@ -1809,15 +1710,6 @@ public class MultipleCaretsTest extends VimTestCase {
     VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
     typeText(parseKeys("l", "gp", "b", "gp"));
     final String after = "qwe ffgh<caret>ghasd zfgh<caret>xcfgh rty ffgh<caret>gfghh vbn";
-    myFixture.checkResult(after);
-  }
-
-  public void testPutVisualTextMoveCursor() {
-    final String before = "qw<caret>e asd z<caret>xc rty <caret>fgh vbn";
-    final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
-    typeText(parseKeys("vh", "gP"));
-    final String after = "qfgh<caret> asd fgh<caret>c rtyfgh<caret>gh vbn";
     myFixture.checkResult(after);
   }
 
@@ -1930,51 +1822,6 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult(after);
   }
 
-  public void testPutEmptyText() {
-    final String before = "qwe\n<caret>asd\nz<caret>xc\n";
-    final Editor editor = configureByText(before);
-
-    final String text = "\uFFFF";
-    final Register register = new Register('a', SelectionType.CHARACTER_WISE, parseKeys(text));
-    VimPlugin.getRegister().selectRegister('a');
-    assertNull(register.getText());
-    VimPlugin.getRegister().storeTextInternal(editor, new TextRange(0, 1), text, SelectionType.CHARACTER_WISE, 'a',
-                                              false);
-
-    typeText(parseKeys("p"));
-    myFixture.checkResult(before);
-
-    typeText(parseKeys("vlp"));
-    final String after = "qwe\nd\nz\n";
-    myFixture.checkResult(after);
-  }
-
-  public void testPutVisualTextVisualLineMode() {
-    final String before = "qw<caret>e\nasd\nzxc\nrty\nfgh\nvbn";
-    final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.CHARACTER_WISE, false);
-    typeText(parseKeys("<S-v>", "gP"));
-    final String after = "fgh\n<caret>asd\nzxc\nrty\nfgh\nvbn";
-    myFixture.checkResult(after);
-  }
-
-  public void testPutVisualBlockVisualLineMode() {
-    final String before = "qw<caret>e\nasd\nzxc\nrty\nfgh\nvbn";
-    final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.BLOCK_WISE, false);
-    typeText(parseKeys("<S-v>", "p"));
-    final String after = "<caret>fgh\nasd\nzxc\nrty\nfgh\nvbn";
-    myFixture.checkResult(after);
-  }
-
-  public void testPutVisualBlockLinewise() {
-   final String before = "qw<caret>e\nasd\nzxc\nrty\nfgh\nvbn";
-    final Editor editor = configureByText(before);
-    VimPlugin.getRegister().storeText(editor, new TextRange(16, 19), SelectionType.LINE_WISE, false);
-    typeText(parseKeys("<C-v>", "h", "p"));
-    final String after = "<caret>q\nfgh\nasd\nzxc\nrty\nfgh\nvbn";
-    myFixture.checkResult(after);
-  }
 
   public void testPutLinewiseWithoutLineSeparatorAtTheEndOfFile() {
     final String before = "qwe\nasd\nz<caret>xc\nrty\nfg<caret>h\nvb<caret>n";
@@ -2055,50 +1902,6 @@ public class MultipleCaretsTest extends VimTestCase {
                          "fgh\n" +
                          "vbn\n";
 
-    myFixture.checkResult(after);
-  }
-
-  public void testYankVisualRange() {
-    final String before = "q<caret>werty\n" + "asdf<caret>gh\n" + "<caret>zxcvbn\n";
-    configureByText(before);
-    typeText(parseKeys("vey"));
-
-    final Register lastRegister = VimPlugin.getRegister().getLastRegister();
-    assertNotNull(lastRegister);
-    final String text = lastRegister.getText();
-    assertNotNull(text);
-
-    typeText(parseKeys("G", "$", "p"));
-    final String after = "qwerty\n" + "asdfgh\n" + "zxcvbn<caret>werty\n" + "      gh\n" + "      zxcvbn\n";
-    myFixture.checkResult(after);
-  }
-
-  public void testYankVisualLines() {
-    final String before = "q<caret>we\n" + "asd\n" + "z<caret>xc\n" + "rt<caret>y\n" + "fgh\n" + "vbn\n";
-    configureByText(before);
-    typeText(parseKeys("<S-v>y"));
-
-    final Register lastRegister = VimPlugin.getRegister().getLastRegister();
-    assertNotNull(lastRegister);
-    final String text = lastRegister.getText();
-    assertNotNull(text);
-
-    typeText(parseKeys("p"));
-    final String after = "qwe\n" +
-                         "<caret>qwe\n" +
-                         "zxc\n" +
-                         "rty\n" +
-                         "asd\n" +
-                         "zxc\n" +
-                         "<caret>qwe\n" +
-                         "zxc\n" +
-                         "rty\n" +
-                         "rty\n" +
-                         "<caret>qwe\n" +
-                         "zxc\n" +
-                         "rty\n" +
-                         "fgh\n" +
-                         "vbn\n";
     myFixture.checkResult(after);
   }
 }

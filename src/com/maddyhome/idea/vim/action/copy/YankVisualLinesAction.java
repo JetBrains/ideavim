@@ -19,33 +19,51 @@
 package com.maddyhome.idea.vim.action.copy;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
-import com.maddyhome.idea.vim.command.*;
+import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandFlags;
+import com.maddyhome.idea.vim.command.MappingMode;
+import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
+import com.maddyhome.idea.vim.group.visual.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author vlan
  */
 public class YankVisualLinesAction extends VimCommandAction {
   public YankVisualLinesAction() {
-    super(new VisualOperatorActionHandler() {
-      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd,
-                                @NotNull TextRange range) {
-        final CommandState.SubMode mode = CommandState.getInstance(editor).getSubMode();
-        if (mode == CommandState.SubMode.VISUAL_BLOCK) {
-          return VimPlugin.getCopy().yankRange(editor, range, SelectionType.fromSubMode(mode), true);
+    super(new VisualOperatorActionHandler.SingleExecution() {
+      @Override
+      public boolean executeForAllCarets(@NotNull Editor editor,
+                                         @NotNull DataContext context,
+                                         @NotNull Command cmd, @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
+        Collection<? extends VimSelection> selections = caretsAndSelections.values();
+        List<Integer> starts = new ArrayList<>();
+        List<Integer> ends = new ArrayList<>();
+        selections.forEach(selection -> {
+          TextRange textRange = selection.toVimTextRange(false);
+          Arrays.stream(textRange.getStartOffsets()).boxed().forEach(starts::add);
+          Arrays.stream(textRange.getEndOffsets()).boxed().forEach(ends::add);
+        });
+        VimSelection vimSelection = selections.stream().findFirst().orElse(null);
+        if (vimSelection == null) return false;
+        int[] startsArray = starts.stream().mapToInt(i -> i).toArray();
+        int[] endsArray = ends.stream().mapToInt(i -> i).toArray();
+        if (vimSelection.getType() == SelectionType.BLOCK_WISE) {
+          return VimPlugin.getYank()
+            .yankRange(editor, new TextRange(startsArray, endsArray), SelectionType.BLOCK_WISE, true);
         }
         else {
-          return VimPlugin.getCopy().yankRange(editor, range, SelectionType.LINE_WISE, true);
+          return VimPlugin.getYank()
+            .yankRange(editor, new TextRange(startsArray, endsArray), SelectionType.LINE_WISE, true);
         }
       }
     });

@@ -20,12 +20,14 @@ package com.maddyhome.idea.vim.group;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.fileEditor.impl.EditorWindow;
 import com.intellij.openapi.fileEditor.impl.EditorWithProviderComposite;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.helper.EditorData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,6 +56,11 @@ public class WindowGroup {
         window.closeAllExcept(null);
       }
     }
+  }
+
+  public void closeAllExceptCurrentTab(@NotNull DataContext context) {
+    final EditorWindow currentWindow = getFileEditorManager(context).getCurrentWindow();
+    currentWindow.closeAllExcept(currentWindow.getSelectedFile());
   }
 
   public void closeAll(@NotNull DataContext context) {

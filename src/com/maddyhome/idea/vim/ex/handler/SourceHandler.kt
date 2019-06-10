@@ -21,8 +21,6 @@ package com.maddyhome.idea.vim.ex.handler
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_REQUIRED
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_FORBIDDEN
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
@@ -34,26 +32,26 @@ import java.io.File
  * @author vlan
  */
 class SourceHandler : CommandHandler(
-        commands("so[urce]"),
-        flags(RANGE_FORBIDDEN, ARGUMENT_REQUIRED)
+  commands("so[urce]"),
+  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED)
 ), VimScriptCommandHandler {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        execute(cmd)
-        return true
-    }
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    execute(cmd)
+    return true
+  }
 
-    override fun execute(cmd: ExCommand) {
-        val path = expandUser(cmd.argument.trim())
-        VimScriptParser.executeFile(File(path))
-    }
+  override fun execute(cmd: ExCommand) {
+    val path = expandUser(cmd.argument.trim())
+    VimScriptParser.executeFile(File(path))
+  }
 
-    private fun expandUser(path: String): String {
-        if (path.startsWith("~")) {
-            val home = System.getProperty("user.home")
-            if (home != null) {
-                return home + path.substring(1)
-            }
-        }
-        return path
+  private fun expandUser(path: String): String {
+    if (path.startsWith("~")) {
+      val home = System.getProperty("user.home")
+      if (home != null) {
+        return home + path.substring(1)
+      }
     }
+    return path
+  }
 }

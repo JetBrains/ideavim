@@ -26,11 +26,8 @@ import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.command.SelectionType;
-import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import com.maddyhome.idea.vim.helper.EditorData;
+import com.maddyhome.idea.vim.group.visual.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -43,14 +40,15 @@ import java.util.Set;
  */
 public class ChangeVisualAction extends VimCommandAction {
   public ChangeVisualAction() {
-    super(new VisualOperatorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
+    super(new VisualOperatorActionHandler.ForEachCaret() {
       @Override
-      protected boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                                @NotNull Command cmd, @NotNull TextRange range) {
-        final SelectionType type = EditorData.wasVisualBlockMode(editor) && range.isMultiple()
-                                   ? SelectionType.BLOCK_WISE
-                                   : SelectionType.CHARACTER_WISE;
-        return VimPlugin.getChange().changeRange(editor, caret, range, type);
+      protected boolean executeAction(@NotNull Editor editor,
+                                      @NotNull Caret caret,
+                                      @NotNull DataContext context,
+                                      @NotNull Command cmd,
+                                      @NotNull VimSelection range) {
+
+        return VimPlugin.getChange().changeRange(editor, caret, range.toVimTextRange(false), range.getType(), context);
       }
     });
   }

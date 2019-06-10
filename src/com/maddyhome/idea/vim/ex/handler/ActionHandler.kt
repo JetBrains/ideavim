@@ -22,55 +22,62 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.DONT_REOPEN
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_OPTIONAL
+import com.maddyhome.idea.vim.ex.CommandHandler.Flag.SAVE_VISUAL
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
+import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 
 /**
  * @author smartbomb
  */
 class ActionHandler : CommandHandler(
-        commands("action"),
-        flags(RANGE_OPTIONAL, DONT_REOPEN)
+  commands("action"),
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN, SAVE_VISUAL)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        val actionName = cmd.argument.trim()
-        val action = ActionManager.getInstance().getAction(actionName) ?: run {
-            VimPlugin.showMessage("Action not found: $actionName")
-            return false
-        }
-        val application = ApplicationManager.getApplication()
-        if (application.isUnitTestMode) {
-            executeAction(editor, cmd, action, context, actionName)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    val actionName = cmd.argument.trim()
+    val action = ActionManager.getInstance().getAction(actionName) ?: run {
+      VimPlugin.showMessage("Action not found: $actionName")
+      return false
+    }
+    val application = ApplicationManager.getApplication()
+    val selections = editor.caretModel.allCarets.map { if (it.hasSelection()) it.selectionStart to it.selectionEnd else null }
+    val oldMode = editor.subMode
+    if (application.isUnitTestMode) {
+      executeAction(editor, action, context, selections, oldMode)
+    } else {
+      runAfterGotFocus(Runnable { executeAction(editor, action, context, selections, oldMode) })
+    }
+    return true
+  }
+
+  private fun executeAction(editor: Editor, action: AnAction, context: DataContext, selections: List<Pair<Int, Int>?>, oldSubMode: CommandState.SubMode) {
+    SelectionVimListenerSuppressor.lock().use {
+      selections.forEachIndexed { i, selection ->
+        val caret = editor.caretModel.allCarets[i]
+        if (caret.hasSelection()) caret.removeSelection() // Selection is removed in non-unittest mode
+        if (oldSubMode == CommandState.SubMode.VISUAL_LINE) {
+          // Skip new line character for Line mode
+          selection?.run { caret.setSelection(first, (second - 1).coerceAtLeast(0)) }
         } else {
-            runAfterGotFocus(Runnable { executeAction(editor, cmd, action, context, actionName) })
+          selection?.run { caret.setSelection(first, second) }
         }
-        return true
+      }
+      if (editor.caretModel.allCarets.any(Caret::hasSelection) && editor.subMode != oldSubMode) {
+        VimPlugin.getVisualMotion().enterVisualMode(editor, oldSubMode)
+      }
     }
 
-    private fun executeAction(editor: Editor, cmd: ExCommand, action: AnAction,
-                              context: DataContext, actionName: String) {
-        val visualAction = cmd.ranges.size() > 0
-        if (visualAction) {
-            VimPlugin.getMotion().selectPreviousVisualMode(editor)
-        }
-        try {
-            KeyHandler.executeAction(action, context)
-        } catch (e: RuntimeException) {
-            assert(false) { "Error while executing :action $actionName ($action): $e" }
-        } finally {
-            if (visualAction) {
-                // Exit visual mode selected above, but do it without resetting the selected text
-                CommandState.getInstance(editor).popState()
-            }
-        }
-    }
+    KeyHandler.executeAction(action, context)
+  }
 }

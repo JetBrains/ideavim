@@ -41,6 +41,10 @@ public class Options {
   public static final String INCREMENTAL_SEARCH = "incsearch";
   public static final String TIMEOUT = "timeout";
   public static final String VIMINFO = "viminfo";
+  public static final String SELECTMODE = "selectmode";
+  public static final String KEYMODEL = "keymodel";
+  public static final String IDEAPUT = "ideaput";
+  public static final String LOOKUPACTIONS = "lookupactions";
 
   /**
    * Gets the singleton instance of the options
@@ -417,7 +421,7 @@ public class Options {
         Option opt = cols.get(pos);
         String val = opt.toString();
         res.append(val);
-        res.append(pad.substring(0, 20 - val.length()));
+        res.append(pad, 0, 20 - val.length());
       }
       res.append("\n");
     }
@@ -426,7 +430,7 @@ public class Options {
       String val = opt.toString();
       int seg = (val.length() - 1) / width;
       for (int j = 0; j <= seg; j++) {
-        res.append(val.substring(j * width, Math.min(j * width + width, val.length())));
+        res.append(val, j * width, Math.min(j * width + width, val.length()));
         res.append("\n");
       }
     }
@@ -467,11 +471,14 @@ public class Options {
     addOption(new ToggleOption("wrapscan", "ws", true));
     addOption(new ToggleOption(NUMBER, "nu", false));
     addOption(new ToggleOption(RELATIVE_NUMBER, "rnu", false));
-    addOption(new ListOption(CLIPBOARD, "cb", new String[]{"autoselect,exclude:cons\\|linux"}, null));
+    addOption(new ListOption(CLIPBOARD, "cb", new String[]{IDEAPUT, "autoselect,exclude:cons\\|linux"}, null));
     addOption(new ToggleOption(INCREMENTAL_SEARCH, "is", false));
     addOption(new ToggleOption(TIMEOUT, "to", true));
     addOption(new ListOption(VIMINFO, "vi", new String[]{"'100", "<50", "s10", "h"}, null));
     addOption(new KeywordOption("iskeyword", "isk", new String[]{"@", "48-57", "_"}));
+    addOption(new BoundListOption(SELECTMODE, "slm", new String[]{"template"}, new String[]{"mouse", "key", "cmd", "template", "refactoring"}));
+    addOption(new BoundListOption(KEYMODEL, "km", new String[]{"continueselect", "stopselect"}, new String[]{"startsel", "stopsel", "stopselect", "stopvisual", "continueselect", "continuevisual"}));
+    addOption(new ListOption(LOOKUPACTIONS, LOOKUPACTIONS, new String[]{"VimLookupUp", "VimLookupDown"}, null));
 
     registerExtensionOptions();
   }

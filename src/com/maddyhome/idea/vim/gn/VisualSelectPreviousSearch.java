@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
+import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,7 +39,7 @@ public class VisualSelectPreviousSearch extends VimCommandAction {
     super(new Handler());
   }
 
-  private static class Handler extends MotionEditorActionHandler {
+  private static class Handler extends MotionActionHandler.SingleExecution {
     @Override
     public int getOffset(@NotNull Editor editor,
                          @NotNull DataContext context,

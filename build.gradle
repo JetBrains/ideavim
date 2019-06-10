@@ -9,7 +9,7 @@ buildscript {
 }
 
 plugins {
-  id 'org.jetbrains.intellij' version '0.3.12'
+  id 'org.jetbrains.intellij' version '0.4.9'
 }
 
 apply plugin: 'java'
@@ -37,6 +37,11 @@ intellij {
   downloadSources Boolean.valueOf(downloadIdeaSources)
   instrumentCode Boolean.valueOf(instrumentPluginCode)
   intellijRepo = "https://www.jetbrains.com/intellij-repository"
+  if (!Boolean.valueOf(legacyNoJavaPlugin)) {
+    // Since 192 version of IJ java plugin should be defined separately
+    // Set `legacyNoJavaPlugin` to true if you are going to run tests under idea version < 192
+    plugins = ['java']
+  }
 
   publishPlugin {
     channels publishChannels.split(',')

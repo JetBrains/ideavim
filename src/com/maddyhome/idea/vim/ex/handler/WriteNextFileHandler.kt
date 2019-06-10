@@ -22,24 +22,21 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_OPTIONAL
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_IS_COUNT
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_OPTIONAL
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
 class WriteNextFileHandler : CommandHandler(
-        commands("wn[ext]"),
-        flags(RANGE_OPTIONAL, ARGUMENT_OPTIONAL, RANGE_IS_COUNT)
+  commands("wn[ext]"),
+  flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL)
 ) {
-    override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-        val count = cmd.getCount(editor, context, 1, true)
+  override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
+    val count = cmd.getCount(editor, context, 1, true)
 
-        VimPlugin.getFile().saveFile(editor)
-        VimPlugin.getMark().saveJumpLocation(editor)
-        VimPlugin.getFile().selectNextFile(count, context)
+    VimPlugin.getFile().saveFile(editor)
+    VimPlugin.getMark().saveJumpLocation(editor)
+    VimPlugin.getFile().selectNextFile(count, context)
 
-        return true
-    }
+    return true
+  }
 }

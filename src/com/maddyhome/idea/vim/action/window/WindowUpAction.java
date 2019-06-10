@@ -54,7 +54,7 @@ public class WindowUpAction extends VimCommandAction {
   @NotNull
   @Override
   public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("<C-W>k", "<C-W><Up>");
+    return parseKeysSet("<C-W>k", "<C-W><C-K>", "<C-W><Up>");
   }
 
   @NotNull

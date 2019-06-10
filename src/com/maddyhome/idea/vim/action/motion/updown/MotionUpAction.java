@@ -21,12 +21,15 @@ package com.maddyhome.idea.vim.action.motion.updown;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.VisualPosition;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
-import com.maddyhome.idea.vim.helper.CaretData;
+import com.maddyhome.idea.vim.handler.MotionActionHandler;
+import com.maddyhome.idea.vim.helper.CaretDataKt;
+import com.maddyhome.idea.vim.helper.CommandStateHelper;
+import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,11 +40,7 @@ public class MotionUpAction extends MotionEditorAction {
     super(new Handler());
   }
 
-  private static class Handler extends MotionEditorActionHandler {
-    public Handler() {
-      super(true);
-    }
-
+  private static class Handler extends MotionActionHandler.ForEachCaret {
     @Override
     public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                          int rawCount, @Nullable Argument argument) {
@@ -49,15 +48,21 @@ public class MotionUpAction extends MotionEditorAction {
     }
 
     @Override
-    protected void preMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                           @NotNull Command cmd) {
-      col = CaretData.getLastColumn(caret);
+    protected boolean preOffsetComputation(@NotNull Editor editor,
+                                           @NotNull Caret caret,
+                                           @NotNull DataContext context,
+                                           @NotNull Command cmd) {
+      col = CaretDataKt.getVimLastColumn(caret);
+      return true;
     }
 
     @Override
     protected void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                             @NotNull Command cmd) {
-      CaretData.setLastColumn(editor, caret, col);
+      VisualPosition pos = caret.getVisualPosition();
+      final int lastColumn = EditorHelper.lastColumnForLine(editor, pos.line, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
+      int targetColumn = pos.column != lastColumn ? pos.column : col;
+      CaretDataKt.setVimLastColumn(caret, targetColumn);
     }
 
     private int col;

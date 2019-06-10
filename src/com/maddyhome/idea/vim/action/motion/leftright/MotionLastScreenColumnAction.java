@@ -27,8 +27,9 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.handler.MotionEditorActionHandler;
-import com.maddyhome.idea.vim.helper.CaretData;
+import com.maddyhome.idea.vim.handler.MotionActionHandler;
+import com.maddyhome.idea.vim.helper.CaretDataKt;
+import com.maddyhome.idea.vim.helper.CommandStateHelper;
 import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
@@ -40,16 +41,12 @@ public class MotionLastScreenColumnAction extends MotionEditorAction {
     super(new Handler());
   }
 
-  private static class Handler extends MotionEditorActionHandler {
-    Handler() {
-      super(true);
-    }
-
+  private static class Handler extends MotionActionHandler.ForEachCaret {
     @Override
     public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                          int rawCount, Argument argument) {
       boolean allow = false;
-      if (CommandState.inInsertMode(editor)) {
+      if (CommandStateHelper.inInsertMode(editor)) {
         allow = true;
       }
       else if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
@@ -65,7 +62,7 @@ public class MotionLastScreenColumnAction extends MotionEditorAction {
     @Override
     protected void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                             @NotNull Command cmd) {
-      CaretData.setLastColumn(editor, caret, MotionGroup.LAST_COLUMN);
+      CaretDataKt.setVimLastColumn(caret, MotionGroup.LAST_COLUMN);
     }
   }
 }

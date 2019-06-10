@@ -28,9 +28,9 @@ import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.group.visual.VimSelection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -43,13 +43,18 @@ import java.util.Set;
  */
 public class ChangeVisualLinesAction extends VimCommandAction {
   public ChangeVisualLinesAction() {
-    super(new VisualOperatorActionHandler(true, CaretOrder.DECREASING_OFFSET) {
+    super(new VisualOperatorActionHandler.ForEachCaret() {
       @Override
-      protected boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                                @NotNull Command cmd, @NotNull TextRange range) {
-        final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, range.getStartOffset()),
-                                                  EditorHelper.getLineEndForOffset(editor, range.getEndOffset()) + 1);
-        return VimPlugin.getChange().changeRange(editor, caret, lineRange, SelectionType.LINE_WISE);
+      protected boolean executeAction(@NotNull Editor editor,
+                                      @NotNull Caret caret,
+                                      @NotNull DataContext context,
+                                      @NotNull Command cmd,
+                                      @NotNull VimSelection range) {
+        final TextRange textRange = range.toVimTextRange(true);
+
+        final TextRange lineRange = new TextRange(EditorHelper.getLineStartForOffset(editor, textRange.getStartOffset()),
+                                                  EditorHelper.getLineEndForOffset(editor, textRange.getEndOffset()) + 1);
+        return VimPlugin.getChange().changeRange(editor, caret, lineRange, SelectionType.LINE_WISE, context);
       }
     });
   }

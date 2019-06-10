@@ -22,35 +22,26 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.ARGUMENT_OPTIONAL
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.RANGE_OPTIONAL
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.handler.CaretOrder
-import com.maddyhome.idea.vim.helper.CaretData
 
 class JoinLinesHandler : CommandHandler(
-        commands("j[oin]"),
-        flags(RANGE_OPTIONAL, ARGUMENT_OPTIONAL, WRITABLE),
-        true, CaretOrder.DECREASING_OFFSET
+  commands("j[oin]"),
+  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE),
+  true, CaretOrder.DECREASING_OFFSET
 ) {
-    override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
-        val arg = cmd.argument
-        val spaces = arg.isEmpty() || arg[0] != '!'
+  override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
+    val arg = cmd.argument
+    val spaces = arg.isEmpty() || arg[0] != '!'
 
-        val textRange = if (CommandState.getInstance(editor).mode != CommandState.Mode.VISUAL)
-            cmd.getTextRange(editor, caret, context, true)
-        else
-            CaretData.getVisualTextRange(caret)
+    val textRange = cmd.getTextRange(editor, caret, context, true) ?: return false
 
-        textRange ?: return false
-
-        return VimPlugin.getChange().deleteJoinRange(editor, caret, TextRange(textRange.startOffset,
-                textRange.endOffset - 1), spaces)
-    }
+    return VimPlugin.getChange().deleteJoinRange(editor, caret, TextRange(textRange.startOffset,
+      textRange.endOffset - 1), spaces)
+  }
 }

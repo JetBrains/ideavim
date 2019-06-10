@@ -24,14 +24,17 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.CommandFlags;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
+import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
+import com.maddyhome.idea.vim.helper.CaretDataKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ *
  */
 public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
   public TextObjectActionHandler() {
@@ -53,26 +56,27 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
         return false;
       }
 
-      TextRange vr;
-      vr = VimPlugin.getMotion().getRawVisualRange(caret);
-
       boolean block = cmd.getFlags().contains(CommandFlags.FLAG_TEXT_BLOCK);
-      int newstart = block || vr.getEndOffset() >= vr.getStartOffset() ? range.getStartOffset() : range.getEndOffset();
-      int newend = block || vr.getEndOffset() >= vr.getStartOffset() ? range.getEndOffset() : range.getStartOffset();
+      int newstart = block || caret.getOffset() >= CaretDataKt.getVimSelectionStart(caret)
+                     ? range.getStartOffset()
+                     : range.getEndOffset();
+      int newend = block || caret.getOffset() >= CaretDataKt.getVimSelectionStart(caret)
+                   ? range.getEndOffset()
+                   : range.getStartOffset();
 
-      if (vr.getStartOffset() == vr.getEndOffset() || block) {
-        VimPlugin.getMotion().moveVisualStart(caret, newstart);
+      if (CaretDataKt.getVimSelectionStart(caret) == caret.getOffset() || block) {
+        VisualGroupKt.vimSetSelection(caret, newstart, newstart, false);
       }
 
       if ((cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE) &&
            !cmd.getFlags().contains(CommandFlags.FLAG_VISUAL_CHARACTERWISE)) &&
           CommandState.getInstance(editor).getSubMode() != CommandState.SubMode.VISUAL_LINE) {
-        VimPlugin.getMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE);
+        VimPlugin.getVisualMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE);
       }
       else if ((!cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE) ||
                 cmd.getFlags().contains(CommandFlags.FLAG_VISUAL_CHARACTERWISE)) &&
                CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_LINE) {
-        VimPlugin.getMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER);
+        VimPlugin.getVisualMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER);
       }
 
       MotionGroup.moveCaret(editor, caret, newend);
@@ -82,6 +86,10 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
   }
 
   @Nullable
-  public abstract TextRange getRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                                     int count, int rawCount, @Nullable Argument argument);
+  public abstract TextRange getRange(@NotNull Editor editor,
+                                     @NotNull Caret caret,
+                                     @NotNull DataContext context,
+                                     int count,
+                                     int rawCount,
+                                     @Nullable Argument argument);
 }

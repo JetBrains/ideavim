@@ -20,10 +20,7 @@ package com.maddyhome.idea.vim.ui;
 
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.PlainDocument;
+import javax.swing.text.*;
 
 /**
  * This document provides insert/overwrite mode
@@ -32,7 +29,7 @@ public class ExDocument extends PlainDocument {
   /**
    * Toggles the insert/overwrite state
    */
-  public void toggleInsertReplace() {
+  void toggleInsertReplace() {
     overwrite = !overwrite;
   }
 
@@ -72,5 +69,19 @@ public class ExDocument extends PlainDocument {
     }
   }
 
-  protected boolean overwrite = false;
+  public char getCharacter(int offset) {
+    // If we're a proportional font, 'o' is a good char to use. If we're fixed width, it's still a good char to use
+    if (offset >= getLength())
+      return 'o';
+
+    try {
+      final Segment segment = new Segment();
+      getContent().getChars(offset,1, segment);
+      return segment.charAt(0);
+    } catch (BadLocationException e) {
+      return 'o';
+    }
+  }
+
+  private boolean overwrite = false;
 }

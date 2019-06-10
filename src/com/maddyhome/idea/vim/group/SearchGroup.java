@@ -36,8 +36,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.CommandFlags;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -82,7 +82,7 @@ public class SearchGroup {
                                   @NotNull String excmd, String exarg) {
     // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-      VimPlugin.getMotion().exitVisual(editor);
+      VimPlugin.getVisualMotion().exitVisual(editor);
     }
 
     CharPointer cmd = new CharPointer(new StringBuffer(exarg));
