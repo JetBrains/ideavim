@@ -104,7 +104,8 @@ sealed class MotionActionHandler : EditorActionHandlerBase(false) {
       }
       preMove(editor, caret, context, cmd)
       MotionGroup.moveCaret(editor, caret, offset)
-      postMove(editor, caret, context, cmd)
+      val postMoveCaret = if (editor.inBlockSubMode) editor.caretModel.primaryCaret else caret
+      postMove(editor, postMoveCaret, context, cmd)
     }
   }
 
