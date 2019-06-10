@@ -7,6 +7,7 @@
         <li>Support select mode</li>
         <li>Enable select mode while refactorings</li>
         <li>Enable visual mode while structural selection</li>
+        <li>Support 'gn' commands</li>
         <li>Support :command command</li>
         <li>Support :shell command</li>
         <li>Support :tabnext and :tabprevious commands</li>

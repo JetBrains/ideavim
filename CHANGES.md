@@ -86,6 +86,7 @@ To Be Released
 * [VIM-1473](https://youtrack.jetbrains.com/issue/VIM-1473) Yanked lines are not handled as block
   selection when clipboard is used
 * [VIM-714](https://youtrack.jetbrains.com/issue/VIM-714) Fixed problems with caret position by vertical movement
+* [VIM-635](https://youtrack.jetbrains.com/issue/VIM-635) Supported `gn` commands
 
 0.51, 2019-02-12
 ----------------
