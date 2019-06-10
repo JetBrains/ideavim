@@ -101,6 +101,13 @@ public class TextRange {
     return true;
   }
 
+  public boolean contains(final int offset) {
+    if (isMultiple()) {
+      return false;
+    }
+    return this.getStartOffset() <= offset && offset < this.getEndOffset();
+  }
+
   @NotNull
   public String toString() {
     final StringBuilder sb = new StringBuilder();

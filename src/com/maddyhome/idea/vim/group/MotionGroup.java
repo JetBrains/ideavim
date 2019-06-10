@@ -654,11 +654,13 @@ public class MotionGroup {
   }
 
   public static void scrollCaretIntoView(@NotNull Editor editor) {
-    final boolean scrollJump = !CommandState.getInstance(editor).getFlags().contains(CommandFlags.FLAG_IGNORE_SCROLL_JUMP);
+    final boolean scrollJump =
+      !CommandState.getInstance(editor).getFlags().contains(CommandFlags.FLAG_IGNORE_SCROLL_JUMP);
     scrollPositionIntoView(editor, editor.getCaretModel().getVisualPosition(), scrollJump);
   }
 
-  public static void scrollPositionIntoView(@NotNull Editor editor, @NotNull VisualPosition position,
+  public static void scrollPositionIntoView(@NotNull Editor editor,
+                                            @NotNull VisualPosition position,
                                             boolean scrollJump) {
     final int topVisualLine = EditorHelper.getVisualLineAtTopOfScreen(editor);
     final int bottomVisualLine = EditorHelper.getVisualLineAtBottomOfScreen(editor);
@@ -666,11 +668,11 @@ public class MotionGroup {
     final int column = position.column;
 
     // We need the non-normalised value here, so we can handle cases such as so=999 to keep the current line centred
-    int scrollOffset = ((NumberOption) Options.getInstance().getOption("scrolloff")).value();
+    int scrollOffset = ((NumberOption)Options.getInstance().getOption("scrolloff")).value();
 
     int scrollJumpSize = 0;
     if (scrollJump) {
-      scrollJumpSize = Math.max(0, ((NumberOption) Options.getInstance().getOption("scrolljump")).value() - 1);
+      scrollJumpSize = Math.max(0, ((NumberOption)Options.getInstance().getOption("scrolljump")).value() - 1);
     }
 
     int visualTop = topVisualLine + scrollOffset;
@@ -683,7 +685,8 @@ public class MotionGroup {
     if (visualLine < visualTop) {
       diff = visualLine - visualTop;
       scrollJumpSize = -scrollJumpSize;
-    } else {
+    }
+    else {
       diff = Math.max(0, visualLine - visualBottom + 1);
     }
 
@@ -719,10 +722,10 @@ public class MotionGroup {
     int visualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
     int width = EditorHelper.getScreenWidth(editor);
     scrollJump = !CommandState.getInstance(editor).getFlags().contains(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP);
-    scrollOffset = ((NumberOption) Options.getInstance().getOption("sidescrolloff")).value();
+    scrollOffset = ((NumberOption)Options.getInstance().getOption("sidescrolloff")).value();
     scrollJumpSize = 0;
     if (scrollJump) {
-      scrollJumpSize = Math.max(0, ((NumberOption) Options.getInstance().getOption("sidescroll")).value() - 1);
+      scrollJumpSize = Math.max(0, ((NumberOption)Options.getInstance().getOption("sidescroll")).value() - 1);
       if (scrollJumpSize == 0) {
         scrollJumpSize = width / 2;
       }
@@ -1346,6 +1349,50 @@ public class MotionGroup {
 
   public char getLastFTChar() {
     return lastFTChar;
+  }
+
+  public int selectNextSearch(Editor editor, int count, boolean forwards) {
+    TextRange nextRange = SearchGroup.findCurrentOrNextSearch(editor, count, forwards);
+    if (nextRange == null) {
+      return -1;
+    }
+    final int startOffset = startOffset(nextRange, forwards);
+
+    CommandState.Mode currentMode = CommandState.getInstance(editor).getMode();
+    if (currentMode == CommandState.Mode.VISUAL) {
+      if (atEdgeOfRange(nextRange, editor, forwards)) {
+        nextRange = SearchGroup.findNextSearch(editor, count, forwards);
+      }
+    }
+    final int endOffset = endOffset(nextRange, forwards);
+
+    for (Caret caret : editor.getCaretModel().getAllCarets()) {
+      MotionGroup.moveCaret(editor, caret, startOffset);
+      if (currentMode != CommandState.Mode.VISUAL) {
+        VimPlugin.getVisualMotion().enterVisualMode(editor, CommandState.SubMode.VISUAL_CHARACTER);
+      }
+      MotionGroup.moveCaret(editor, caret, endOffset);
+    }
+    return endOffset;
+  }
+
+  private boolean atEdgeOfRange(TextRange nextRange, Editor editor, boolean forwards) {
+    int currentPosition = editor.getCaretModel().getOffset();
+    if (forwards) {
+      return nextRange.getEndOffset() - 1 == currentPosition;
+    }
+    else {
+      return nextRange.getStartOffset() == currentPosition;
+    }
+  }
+
+
+  private int startOffset(TextRange nextRange, boolean forwards) {
+    return forwards ? nextRange.getStartOffset() : Math.max(nextRange.getEndOffset() - 1, 0);
+  }
+
+  private int endOffset(TextRange nextRange, boolean forwards) {
+    return forwards ? Math.max(nextRange.getEndOffset() - 1, 0) : nextRange.getStartOffset();
   }
 
   private int lastFTCmd = 0;
