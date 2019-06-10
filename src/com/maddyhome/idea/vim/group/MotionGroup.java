@@ -1286,6 +1286,12 @@ public class MotionGroup {
     else {
       int col = CaretDataKt.getVimLastColumn(caret);
       int line = EditorHelper.normalizeVisualLine(editor, pos.line + count);
+      final CommandState.Mode mode = CommandStateHelper.getMode(editor);
+      final int lastColumnCurrentLine = EditorHelper.lastColumnForLine(editor, pos.line, CommandStateHelper.isEndAllowed(mode));
+
+      if (pos.column < col && lastColumnCurrentLine != pos.column) {
+        col = pos.column;
+      }
       VisualPosition newPos = new VisualPosition(line, EditorHelper.normalizeVisualColumn(editor, line, col,
                                                                                           CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor))));
 

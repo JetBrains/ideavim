@@ -85,6 +85,7 @@ To Be Released
 * [VIM-1659](https://youtrack.jetbrains.com/issue/VIM-1658) Fix selection on empty line
 * [VIM-1473](https://youtrack.jetbrains.com/issue/VIM-1473) Yanked lines are not handled as block
   selection when clipboard is used
+* [VIM-714](https://youtrack.jetbrains.com/issue/VIM-714) Fixed problems with caret position by vertical movement
 
 0.51, 2019-02-12
 ----------------
