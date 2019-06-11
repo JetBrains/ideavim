@@ -48,7 +48,9 @@ import static java.lang.Math.min;
 public class ExTextField extends JTextField {
 
   ExTextField() {
-    CommandLineCaret caret = new CommandLineCaret();
+    // We need to store this in a field, because we can't trust getCaret(), as it will return an instance of
+    // ComposedTextCaret when working with dead keys or input methods
+    caret = new CommandLineCaret();
     caret.setBlinkRate(getCaret().getBlinkRate());
     setCaret(caret);
     setNormalModeCaret();
@@ -359,17 +361,14 @@ public class ExTextField extends JTextField {
   // see :help 'guicursor'
   // Note that we can't easily support guicursor because we don't have arbitrary control over the IntelliJ editor caret
   private void setNormalModeCaret() {
-    CommandLineCaret caret = (CommandLineCaret) getCaret();
     caret.setBlockMode();
   }
 
   private void setInsertModeCaret() {
-    CommandLineCaret caret = (CommandLineCaret) getCaret();
     caret.setMode(CommandLineCaret.CaretMode.VER, 25);
   }
 
   private void setReplaceModeCaret() {
-    CommandLineCaret caret = (CommandLineCaret) getCaret();
     caret.setMode(CommandLineCaret.CaretMode.HOR, 20);
   }
 
@@ -517,6 +516,7 @@ public class ExTextField extends JTextField {
 
   private Editor editor;
   private DataContext context;
+  private CommandLineCaret caret;
   private String lastEntry;
   private List<HistoryGroup.HistoryEntry> history;
   private int histIndex = 0;
