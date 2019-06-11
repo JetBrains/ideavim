@@ -24,68 +24,44 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.CommandFlags.FLAG_MOT_LINEWISE
+import com.maddyhome.idea.vim.command.CommandFlags.FLAG_TEXT_BLOCK
+import com.maddyhome.idea.vim.command.CommandFlags.FLAG_VISUAL_CHARACTERWISE
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
-import org.jetbrains.annotations.NotNull
-import org.jetbrains.annotations.Nullable
+import com.maddyhome.idea.vim.group.visual.vimSetSelection
+import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.helper.vimSelectionStart
 
+/**
+ * @author Alex Plate
+ */
+abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
+  override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
+    if (!editor.inVisualMode) return true
 
-abstract class TextObjectActionHandler extends EditorActionHandlerBase {
-  public TextObjectActionHandler() {
-    this(false)
-  }
+    val range = getRange(editor, caret, context, cmd.count, cmd.rawCount, cmd.argument) ?: return false
 
-  public TextObjectActionHandler(boolean runForEachCaret) {
-    super(runForEachCaret)
-  }
+    val block = FLAG_TEXT_BLOCK in cmd.flags
+    val newstart = if (block || caret.offset >= caret.vimSelectionStart) range.startOffset else range.endOffset
+    val newend = if (block || caret.offset >= caret.vimSelectionStart) range.endOffset else range.startOffset
 
-  @Override
-  protected final boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                                  @NotNull Command cmd) {
-    if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
-      TextRange range
-      range = getRange(editor, caret, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument())
-
-      if (range == null) {
-        return false
-      }
-
-      boolean block = cmd.getFlags().contains(CommandFlags.FLAG_TEXT_BLOCK)
-      int newstart = block || caret.getOffset() >= CaretDataKt.getVimSelectionStart(caret)
-                     ? range.getStartOffset()
-                     : range.getEndOffset()
-      int newend = block || caret.getOffset() >= CaretDataKt.getVimSelectionStart(caret)
-                   ? range.getEndOffset()
-                   : range.getStartOffset()
-
-      if (CaretDataKt.getVimSelectionStart(caret) == caret.getOffset() || block) {
-        VisualGroupKt.vimSetSelection(caret, newstart, newstart, false)
-      }
-
-      if ((cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE) &&
-           !cmd.getFlags().contains(CommandFlags.FLAG_VISUAL_CHARACTERWISE)) &&
-          CommandState.getInstance(editor).subMode != CommandState.SubMode.VISUAL_LINE) {
-        VimPlugin.getVisualMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE)
-      }
-      else if ((!cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE) ||
-                cmd.getFlags().contains(CommandFlags.FLAG_VISUAL_CHARACTERWISE)) &&
-               CommandState.getInstance(editor).subMode == CommandState.SubMode.VISUAL_LINE) {
-        VimPlugin.getVisualMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
-      }
-
-      MotionGroup.moveCaret(editor, caret, newend)
+    if (caret.vimSelectionStart == caret.offset || block) {
+      caret.vimSetSelection(newstart, newstart, false)
     }
+
+    if (FLAG_MOT_LINEWISE in cmd.flags && FLAG_VISUAL_CHARACTERWISE !in cmd.flags && editor.subMode != CommandState.SubMode.VISUAL_LINE) {
+      VimPlugin.getVisualMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE)
+    } else if ((FLAG_MOT_LINEWISE !in cmd.flags || FLAG_VISUAL_CHARACTERWISE in cmd.flags) && editor.subMode == CommandState.SubMode.VISUAL_LINE) {
+      VimPlugin.getVisualMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
+    }
+
+    MotionGroup.moveCaret(editor, caret, newend)
 
     return true
   }
 
-  @Nullable
-  public abstract TextRange getRange(@NotNull Editor editor,
-                                     @NotNull Caret caret,
-                                     @NotNull DataContext context,
-                                     int count,
-                                     int rawCount,
-                                     @Nullable Argument argument)
+  abstract fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange?
 }

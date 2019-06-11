@@ -16,34 +16,36 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action.motion.object;
+package com.maddyhome.idea.vim.action.motion.`object`
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.motion.TextObjectAction;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.TextObjectAction
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.handler.TextObjectActionHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
+import java.util.*
+import javax.swing.KeyStroke
 
 
-public class MotionInnerSentenceAction extends TextObjectAction {
-  public MotionInnerSentenceAction() {
-    super(new MotionInnerSentenceAction.Handler());
-  }
-
-  private static class Handler extends TextObjectActionHandler {
-    public Handler() {
-      super(true);
-    }
-
-    @Override
-    public TextRange getRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                              int rawCount, @Nullable Argument argument) {
-      return VimPlugin.getMotion().getSentenceRange(editor, caret, count, false);
+class MotionInnerSentenceAction : TextObjectAction() {
+  override fun makeTextObjectHandler(): TextObjectActionHandler = object : TextObjectActionHandler() {
+    override fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange? {
+      return VimPlugin.getMotion().getSentenceRange(editor, caret, count, false)
     }
   }
+
+  override val mappingModes: Set<MappingMode> = MappingMode.VO
+
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("is")
+
+  override val type: Command.Type = Command.Type.MOTION
+
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_INCLUSIVE, CommandFlags.FLAG_TEXT_BLOCK)
 }

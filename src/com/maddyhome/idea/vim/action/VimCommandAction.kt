@@ -19,12 +19,17 @@
 package com.maddyhome.idea.vim.action
 
 import com.google.common.collect.ImmutableSet
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorAction
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import java.util.*
@@ -74,4 +79,14 @@ abstract class VimCommandAction : EditorAction(null) {
       return builder.build()
     }
   }
+}
+
+abstract class TextObjectAction : VimCommandAction() {
+  abstract fun makeTextObjectHandler(): TextObjectActionHandler
+
+  fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange? {
+    return (handler as TextObjectActionHandler).getRange(editor, caret, context, count, rawCount, argument)
+  }
+
+  final override fun makeActionHandler() = makeTextObjectHandler()
 }
