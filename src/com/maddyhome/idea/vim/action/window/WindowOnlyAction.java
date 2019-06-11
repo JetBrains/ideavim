@@ -19,11 +19,13 @@ package com.maddyhome.idea.vim.action.window;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -33,32 +35,37 @@ import java.util.Set;
 /**
  * @author rasendubi
  */
-public class WindowOnlyAction extends VimCommandAction {
-  public WindowOnlyAction() {
-    super(new EditorActionHandlerBase() {
+final public class WindowOnlyAction extends VimCommandAction {
+  @Contract(" -> new")
+  @NotNull
+  @Override
+  final protected EditorActionHandler makeActionHandler() {
+    return new EditorActionHandlerBase() {
       @Override
       protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         VimPlugin.getWindow().closeAllExceptCurrent(context);
         return true;
       }
-    });
+    };
   }
 
+  @Contract(pure = true)
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
+  final public Set<MappingMode> getMappingModes() {
     return MappingMode.N;
   }
 
   @NotNull
   @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
     return parseKeysSet("<C-W>o", "<C-W><C-O>");
   }
 
+  @Contract(pure = true)
   @NotNull
   @Override
-  public Command.Type getType() {
+  final public Command.Type getType() {
     return Command.Type.OTHER_READONLY;
   }
 }

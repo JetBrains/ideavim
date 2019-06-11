@@ -35,16 +35,16 @@ import javax.swing.KeyStroke
 /**
  * @author Alex Plate
  */
-private object MotionShiftHomeActionHandler : ShiftedSpecialKeyHandler() {
-  override fun motion(editor: Editor, context: DataContext, cmd: Command) {
-    editor.vimForEachCaret { caret ->
-      val newOffset = VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
-      MotionGroup.moveCaret(editor, caret, newOffset)
+class MotionShiftHomeAction : VimCommandAction() {
+  override fun makeActionHandler() = object : ShiftedSpecialKeyHandler() {
+    override fun motion(editor: Editor, context: DataContext, cmd: Command) {
+      editor.vimForEachCaret { caret ->
+        val newOffset = VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
+        MotionGroup.moveCaret(editor, caret, newOffset)
+      }
     }
   }
-}
 
-class MotionShiftHomeAction : VimCommandAction(MotionShiftHomeActionHandler) {
   override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Home>")

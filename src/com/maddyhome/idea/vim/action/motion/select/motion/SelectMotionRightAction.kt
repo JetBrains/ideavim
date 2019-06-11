@@ -36,20 +36,20 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 
-private object SelectMoveRightActionHandler : MotionActionHandler.ForEachCaret() {
-  override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-    val keymodel = Options.getInstance().getListOption(KEYMODEL)
-    if (keymodel?.contains("stopsel") == true || keymodel?.contains("stopselect") == true) {
-      VimPlugin.getVisualMotion().exitSelectMode(editor, false)
-      TemplateManager.getInstance(editor.project)
-        .getActiveTemplate(editor)?.run { VimPlugin.getChange().insertBeforeCursor(editor, context) }
-      return caret.offset
+class SelectMotionRightAction : VimCommandAction() {
+  override fun makeActionHandler() = object : MotionActionHandler.ForEachCaret() {
+    override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+      val keymodel = Options.getInstance().getListOption(KEYMODEL)
+      if (keymodel?.contains("stopsel") == true || keymodel?.contains("stopselect") == true) {
+        VimPlugin.getVisualMotion().exitSelectMode(editor, false)
+        TemplateManager.getInstance(editor.project)
+          .getActiveTemplate(editor)?.run { VimPlugin.getChange().insertBeforeCursor(editor, context) }
+        return caret.offset
+      }
+      return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, count, false)
     }
-    return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, count, false)
   }
-}
 
-class SelectMotionRightAction : VimCommandAction(SelectMoveRightActionHandler) {
   override val mappingModes: MutableSet<MappingMode> = MappingMode.S
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Right>")

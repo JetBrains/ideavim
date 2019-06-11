@@ -33,28 +33,26 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 import javax.swing.KeyStroke
 
-private object PutVisualTextActionHandler : VisualOperatorActionHandler.SingleExecution() {
-
-  override fun executeForAllCarets(editor: Editor,
-                                   context: DataContext,
-                                   cmd: Command,
-                                   caretsAndSelections: Map<Caret, VimSelection>): Boolean {
-    if (caretsAndSelections.isEmpty()) return false
-    val textData = VimPlugin.getRegister().lastRegister?.let { PutData.TextData(it.text, it.type, it.transferableData) }
-    VimPlugin.getRegister().resetRegister()
-
-    val insertTextBeforeCaret = cmd.keys[0].keyChar == 'P'
-    val selection = PutData.VisualSelection(caretsAndSelections, caretsAndSelections.values.first().type)
-    val putData = PutData(textData, selection, cmd.count, insertTextBeforeCaret, _indent = true, caretAfterInsertedText = false)
-
-    return VimPlugin.getPut().putText(editor, context, putData)
-  }
-}
-
 /**
  * @author vlan
  */
-class PutVisualTextAction : VimCommandAction(PutVisualTextActionHandler) {
+class PutVisualTextAction : VimCommandAction() {
+  override fun makeActionHandler() = object : VisualOperatorActionHandler.SingleExecution() {
+    override fun executeForAllCarets(editor: Editor,
+                                     context: DataContext,
+                                     cmd: Command,
+                                     caretsAndSelections: Map<Caret, VimSelection>): Boolean {
+      if (caretsAndSelections.isEmpty()) return false
+      val textData = VimPlugin.getRegister().lastRegister?.let { PutData.TextData(it.text, it.type, it.transferableData) }
+      VimPlugin.getRegister().resetRegister()
+
+      val insertTextBeforeCaret = cmd.keys[0].keyChar == 'P'
+      val selection = PutData.VisualSelection(caretsAndSelections, caretsAndSelections.values.first().type)
+      val putData = PutData(textData, selection, cmd.count, insertTextBeforeCaret, _indent = true, caretAfterInsertedText = false)
+
+      return VimPlugin.getPut().putText(editor, context, putData)
+    }
+  }
 
   override val mappingModes: Set<MappingMode> = MappingMode.V
 

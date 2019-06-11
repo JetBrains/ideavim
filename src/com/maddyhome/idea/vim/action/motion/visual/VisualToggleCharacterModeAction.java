@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.action.motion.visual;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
@@ -29,6 +30,7 @@ import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.Options;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -36,9 +38,12 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-public class VisualToggleCharacterModeAction extends VimCommandAction {
-  public VisualToggleCharacterModeAction() {
-    super(new EditorActionHandlerBase() {
+final public class VisualToggleCharacterModeAction extends VimCommandAction {
+  @Contract(" -> new")
+  @NotNull
+  @Override
+  final protected EditorActionHandler makeActionHandler() {
+    return new EditorActionHandlerBase() {
       protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         final ListOption listOption = Options.getInstance().getListOption(Options.SELECTMODE);
         if (listOption != null && listOption.contains("cmd")) {
@@ -48,29 +53,32 @@ public class VisualToggleCharacterModeAction extends VimCommandAction {
         return VimPlugin.getVisualMotion()
           .toggleVisual(editor, cmd.getCount(), cmd.getRawCount(), CommandState.SubMode.VISUAL_CHARACTER);
       }
-    });
+    };
   }
 
+  @Contract(pure = true)
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
+  final public Set<MappingMode> getMappingModes() {
     return MappingMode.NV;
   }
 
   @NotNull
   @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
     return parseKeysSet("v");
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Command.Type getType() {
+    return Command.Type.OTHER_READONLY;
   }
 
   @NotNull
   @Override
-  public Command.Type getType() {
-    return Command.Type.OTHER_READONLY;
-  }
-
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
+  final public EnumSet<CommandFlags> getFlags() {
     return EnumSet.of(CommandFlags.FLAG_MOT_CHARACTERWISE);
   }
 }

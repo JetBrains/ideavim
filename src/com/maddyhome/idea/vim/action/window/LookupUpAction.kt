@@ -38,25 +38,25 @@ import javax.swing.KeyStroke
 /**
  * @author Alex Plate
  */
-private object LookupUpActionHandler : EditorActionHandlerBase() {
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    val activeLookup = LookupManager.getActiveLookup(editor)
-    if (activeLookup != null) {
-      IdeEventQueue.getInstance().flushDelayedKeyEvents()
-      EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_UP)
-        .execute(editor, editor.caretModel.primaryCaret, context)
-    } else {
-      val keyStroke = LookupUpAction().keyStrokesSet.first().first()
-      val actions = VimPlugin.getKey().getKeymapConflicts(keyStroke)
-      for (action in actions) {
-        if (KeyHandler.executeAction(action, context)) break
+class LookupUpAction : VimCommandAction() {
+  override fun makeActionHandler() = object : EditorActionHandlerBase() {
+    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+      val activeLookup = LookupManager.getActiveLookup(editor)
+      if (activeLookup != null) {
+        IdeEventQueue.getInstance().flushDelayedKeyEvents()
+        EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_MOVE_CARET_UP)
+          .execute(editor, editor.caretModel.primaryCaret, context)
+      } else {
+        val keyStroke = LookupUpAction().keyStrokesSet.first().first()
+        val actions = VimPlugin.getKey().getKeymapConflicts(keyStroke)
+        for (action in actions) {
+          if (KeyHandler.executeAction(action, context)) break
+        }
       }
+      return true
     }
-    return true
   }
-}
 
-class LookupUpAction : VimCommandAction(LookupUpActionHandler) {
   override val mappingModes: MutableSet<MappingMode> = MappingMode.I
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-P>")

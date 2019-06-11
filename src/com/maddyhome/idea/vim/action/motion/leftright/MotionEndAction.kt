@@ -39,32 +39,32 @@ import com.maddyhome.idea.vim.option.Options
 import java.util.*
 import javax.swing.KeyStroke
 
-private object MotionEndActionHandler : NonShiftedSpecialKeyHandler() {
-  override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int,
-                      rawCount: Int, argument: Argument?): Int {
-    var allow = false
-    if (editor.inInsertMode) {
-      allow = true
-    } else if (editor.inVisualMode || editor.inSelectMode) {
-      val opt = Options.getInstance().getOption("selection") as BoundStringOption
-      if (opt.value != "old") {
+class MotionEndAction : VimCommandAction() {
+  override fun makeActionHandler() = object : NonShiftedSpecialKeyHandler() {
+    override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int,
+                        rawCount: Int, argument: Argument?): Int {
+      var allow = false
+      if (editor.inInsertMode) {
         allow = true
+      } else if (editor.inVisualMode || editor.inSelectMode) {
+        val opt = Options.getInstance().getOption("selection") as BoundStringOption
+        if (opt.value != "old") {
+          allow = true
+        }
       }
+
+      return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow)
     }
 
-    return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow)
+    override fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
+      caret.vimLastColumn = MotionGroup.LAST_COLUMN
+    }
+
+    override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
+      caret.vimLastColumn = MotionGroup.LAST_COLUMN
+    }
   }
 
-  override fun preMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
-    caret.vimLastColumn = MotionGroup.LAST_COLUMN
-  }
-
-  override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
-    caret.vimLastColumn = MotionGroup.LAST_COLUMN
-  }
-}
-
-class MotionEndAction : VimCommandAction(MotionEndActionHandler) {
   override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<End>")

@@ -31,21 +31,20 @@ import javax.swing.KeyStroke
 /**
  * @author vlan
  */
-private object VisualSwapEndsBlockActionHandler : EditorActionHandlerBase() {
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    if (editor.inBlockSubMode) {
-      return VimPlugin.getVisualMotion().swapVisualEndsBigO(editor)
-    }
+class VisualSwapEndsBlockAction : VimCommandAction() {
+  override fun makeActionHandler() = object : EditorActionHandlerBase() {
+    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+      if (editor.inBlockSubMode) {
+        return VimPlugin.getVisualMotion().swapVisualEndsBigO(editor)
+      }
 
-    var ret = true
-    for (caret in editor.caretModel.allCarets) {
-      ret = ret && VimPlugin.getVisualMotion().swapVisualEnds(editor, caret)
+      var ret = true
+      for (caret in editor.caretModel.allCarets) {
+        ret = ret && VimPlugin.getVisualMotion().swapVisualEnds(editor, caret)
+      }
+      return ret
     }
-    return ret
   }
-}
-
-class VisualSwapEndsBlockAction : VimCommandAction(VisualSwapEndsBlockActionHandler) {
 
   override val mappingModes: Set<MappingMode> = MappingMode.V
 

@@ -33,37 +33,37 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 
-private object SelectToggleVisualModeHandler : EditorActionHandlerBase() {
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    val commandState = CommandState.getInstance(editor)
-    val subMode = commandState.subMode
-    val mode = commandState.mode
-    commandState.popState()
-    if (mode == CommandState.Mode.VISUAL) {
-      commandState.pushState(CommandState.Mode.SELECT, subMode, MappingMode.SELECT)
-      if (subMode != CommandState.SubMode.VISUAL_LINE) {
-        editor.caretModel.runForEachCaret {
-          if (it.offset + VimPlugin.getVisualMotion().selectionAdj == it.selectionEnd) {
-            it.moveToOffset(it.offset + VimPlugin.getVisualMotion().selectionAdj)
+class SelectToggleVisualMode : VimCommandAction() {
+  override fun makeActionHandler() = object : EditorActionHandlerBase() {
+    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+      val commandState = CommandState.getInstance(editor)
+      val subMode = commandState.subMode
+      val mode = commandState.mode
+      commandState.popState()
+      if (mode == CommandState.Mode.VISUAL) {
+        commandState.pushState(CommandState.Mode.SELECT, subMode, MappingMode.SELECT)
+        if (subMode != CommandState.SubMode.VISUAL_LINE) {
+          editor.caretModel.runForEachCaret {
+            if (it.offset + VimPlugin.getVisualMotion().selectionAdj == it.selectionEnd) {
+              it.moveToOffset(it.offset + VimPlugin.getVisualMotion().selectionAdj)
+            }
+          }
+        }
+      } else {
+        commandState.pushState(CommandState.Mode.VISUAL, subMode, MappingMode.VISUAL)
+        if (subMode != CommandState.SubMode.VISUAL_LINE) {
+          editor.caretModel.runForEachCaret {
+            if (it.offset == it.selectionEnd && it.visualLineStart <= it.offset - VimPlugin.getVisualMotion().selectionAdj) {
+              it.moveToOffset(it.offset - VimPlugin.getVisualMotion().selectionAdj)
+            }
           }
         }
       }
-    } else {
-      commandState.pushState(CommandState.Mode.VISUAL, subMode, MappingMode.VISUAL)
-      if (subMode != CommandState.SubMode.VISUAL_LINE) {
-        editor.caretModel.runForEachCaret {
-          if (it.offset == it.selectionEnd && it.visualLineStart <= it.offset - VimPlugin.getVisualMotion().selectionAdj) {
-            it.moveToOffset(it.offset - VimPlugin.getVisualMotion().selectionAdj)
-          }
-        }
-      }
+      ChangeGroup.resetCursor(editor, mode == CommandState.Mode.VISUAL)
+      return true
     }
-    ChangeGroup.resetCursor(editor, mode == CommandState.Mode.VISUAL)
-    return true
   }
-}
 
-class SelectToggleVisualMode : VimCommandAction(SelectToggleVisualModeHandler) {
   override val mappingModes: MutableSet<MappingMode> = MappingMode.VS
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-G>")

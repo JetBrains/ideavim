@@ -37,26 +37,26 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 
-private object MotionShiftDownActionHandler : ShiftedArrowKeyHandler() {
-  override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {
-    editor.vimForEachCaret { caret ->
-      val vertical = VimPlugin.getMotion().moveCaretVertical(editor, caret, cmd.count)
-      val col = caret.vimLastColumn
-      MotionGroup.moveCaret(editor, caret, vertical)
+class MotionShiftDownAction : VimCommandAction() {
+  override fun makeActionHandler() = object : ShiftedArrowKeyHandler() {
+    override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {
+      editor.vimForEachCaret { caret ->
+        val vertical = VimPlugin.getMotion().moveCaretVertical(editor, caret, cmd.count)
+        val col = caret.vimLastColumn
+        MotionGroup.moveCaret(editor, caret, vertical)
 
-      val pos = caret.visualPosition
-      val lastColumn = EditorHelper.lastColumnForLine(editor, pos.line, editor.mode.isEndAllowed)
-      val targetColumn = if (pos.column != lastColumn) pos.column else col
-      caret.vimLastColumn = targetColumn
+        val pos = caret.visualPosition
+        val lastColumn = EditorHelper.lastColumnForLine(editor, pos.line, editor.mode.isEndAllowed)
+        val targetColumn = if (pos.column != lastColumn) pos.column else col
+        caret.vimLastColumn = targetColumn
+      }
+    }
+
+    override fun motionWithoutKeyModel(editor: Editor, context: DataContext, cmd: Command) {
+      VimPlugin.getMotion().scrollFullPage(editor, cmd.count)
     }
   }
 
-  override fun motionWithoutKeyModel(editor: Editor, context: DataContext, cmd: Command) {
-    VimPlugin.getMotion().scrollFullPage(editor, cmd.count)
-  }
-}
-
-class MotionShiftDownAction : VimCommandAction(MotionShiftDownActionHandler) {
   override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Down>")

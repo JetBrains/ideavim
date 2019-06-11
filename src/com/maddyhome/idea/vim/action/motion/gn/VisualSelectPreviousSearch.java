@@ -19,6 +19,7 @@ package com.maddyhome.idea.vim.action.motion.gn;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
@@ -26,6 +27,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,42 +36,46 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-public class VisualSelectPreviousSearch extends VimCommandAction {
-  public VisualSelectPreviousSearch() {
-    super(new Handler());
-  }
-
-  private static class Handler extends MotionActionHandler.SingleExecution {
-    @Override
-    public int getOffset(@NotNull Editor editor,
-                         @NotNull DataContext context,
-                         int count,
-                         int rawCount,
-                         @Nullable Argument argument) {
-      return VimPlugin.getMotion().selectNextSearch(editor, count, false);
-    }
-  }
-
+final public class VisualSelectPreviousSearch extends VimCommandAction {
+  @Contract(" -> new")
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
+  final protected EditorActionHandler makeActionHandler() {
+    return new MotionActionHandler.SingleExecution() {
+      @Override
+      final public int getOffset(@NotNull Editor editor,
+                           @NotNull DataContext context,
+                           int count,
+                           int rawCount,
+                           @Nullable Argument argument) {
+        return VimPlugin.getMotion().selectNextSearch(editor, count, false);
+      }
+    };
+ }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Set<MappingMode> getMappingModes() {
     return MappingMode.NV;
   }
 
   @NotNull
   @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
     return parseKeysSet("gN");
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Command.Type getType() {
+    return Command.Type.MOTION;
   }
 
   @NotNull
   @Override
-  public Command.Type getType() {
-    return Command.Type.MOTION;
-  }
-
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
+  final public EnumSet<CommandFlags> getFlags() {
     return EnumSet.noneOf(CommandFlags.class);
   }
 }

@@ -38,7 +38,14 @@ import javax.swing.KeyStroke
  *
  * @author vlan
  */
-abstract class VimCommandAction(defaultHandler: EditorActionHandler) : EditorAction(defaultHandler) {
+abstract class VimCommandAction : EditorAction(null) {
+
+  init {
+    @Suppress("LeakingThis")
+    setupHandler(makeActionHandler())
+  }
+
+  protected abstract fun makeActionHandler(): EditorActionHandler
 
   abstract val mappingModes: Set<MappingMode>
 

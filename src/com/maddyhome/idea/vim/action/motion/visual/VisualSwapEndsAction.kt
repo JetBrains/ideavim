@@ -32,15 +32,14 @@ import javax.swing.KeyStroke
 /**
  * @author vlan
  */
-private object VisualSwapEndsActionHandler : EditorActionHandlerBase() {
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    var ret = true
-    editor.vimForEachCaret { ret = ret and VimPlugin.getVisualMotion().swapVisualEnds(editor, it) }
-    return ret
+class VisualSwapEndsAction : VimCommandAction() {
+  override fun makeActionHandler() = object : EditorActionHandlerBase() {
+    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+      var ret = true
+      editor.vimForEachCaret { ret = ret and VimPlugin.getVisualMotion().swapVisualEnds(editor, it) }
+      return ret
+    }
   }
-}
-
-class VisualSwapEndsAction : VimCommandAction(VisualSwapEndsActionHandler) {
 
   override val mappingModes: EnumSet<MappingMode> = MappingMode.V
 

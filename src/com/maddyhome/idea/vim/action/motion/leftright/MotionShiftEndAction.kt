@@ -38,28 +38,28 @@ import com.maddyhome.idea.vim.option.Options
 import java.util.*
 import javax.swing.KeyStroke
 
-private object MotionShiftEndActionHandler : ShiftedSpecialKeyHandler() {
-  override fun motion(editor: Editor, context: DataContext, cmd: Command) {
-    editor.vimForEachCaret { caret ->
-      var allow = false
-      if (editor.inInsertMode) {
-        allow = true
-      } else if (editor.inVisualMode || editor.inSelectMode) {
-        val opt = Options.getInstance().getOption("selection") as BoundStringOption
-        if (opt.value != "old") {
+class MotionShiftEndAction : VimCommandAction() {
+  override fun makeActionHandler() = object : ShiftedSpecialKeyHandler() {
+    override fun motion(editor: Editor, context: DataContext, cmd: Command) {
+      editor.vimForEachCaret { caret ->
+        var allow = false
+        if (editor.inInsertMode) {
           allow = true
+        } else if (editor.inVisualMode || editor.inSelectMode) {
+          val opt = Options.getInstance().getOption("selection") as BoundStringOption
+          if (opt.value != "old") {
+            allow = true
+          }
         }
-      }
 
-      val newOffset = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, cmd.count - 1, allow)
-      caret.vimLastColumn = MotionGroup.LAST_COLUMN
-      MotionGroup.moveCaret(editor, caret, newOffset)
-      caret.vimLastColumn = MotionGroup.LAST_COLUMN
+        val newOffset = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, cmd.count - 1, allow)
+        caret.vimLastColumn = MotionGroup.LAST_COLUMN
+        MotionGroup.moveCaret(editor, caret, newOffset)
+        caret.vimLastColumn = MotionGroup.LAST_COLUMN
+      }
     }
   }
-}
 
-class MotionShiftEndAction : VimCommandAction(MotionShiftEndActionHandler) {
   override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-End>")

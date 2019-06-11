@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.action.change;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
@@ -29,6 +30,7 @@ import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.key.OperatorFunction;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -39,9 +41,12 @@ import java.util.Set;
 /**
  * @author vlan
  */
-public class OperatorAction extends VimCommandAction {
-  protected OperatorAction() {
-    super(new EditorActionHandlerBase() {
+final public class OperatorAction extends VimCommandAction {
+  @Contract(" -> new")
+  @NotNull
+  @Override
+  final protected EditorActionHandler makeActionHandler() {
+    return new EditorActionHandlerBase() {
       @Override
       protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         final OperatorFunction operatorFunction = VimPlugin.getKey().getOperatorFunction();
@@ -66,35 +71,39 @@ public class OperatorAction extends VimCommandAction {
         VimPlugin.showMessage(MessageHelper.message("E774"));
         return false;
       }
-    });
+    };
   }
 
+  @Contract(pure = true)
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
+  final public Set<MappingMode> getMappingModes() {
     return MappingMode.N;
   }
 
   @NotNull
   @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
     return parseKeysSet("g@");
   }
 
+  @Contract(pure = true)
   @NotNull
   @Override
-  public Command.Type getType() {
+  final public Command.Type getType() {
     return Command.Type.OTHER_SELF_SYNCHRONIZED;
   }
 
+  @Contract(pure = true)
   @NotNull
   @Override
-  public Argument.Type getArgumentType() {
+  final public Argument.Type getArgumentType() {
     return Argument.Type.MOTION;
   }
 
+  @NotNull
   @Override
-  public EnumSet<CommandFlags> getFlags() {
+  final public EnumSet<CommandFlags> getFlags() {
     return EnumSet.of(CommandFlags.FLAG_OP_PEND);
   }
 }

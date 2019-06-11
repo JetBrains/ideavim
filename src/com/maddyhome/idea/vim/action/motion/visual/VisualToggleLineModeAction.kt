@@ -35,20 +35,19 @@ import java.util.*
 import javax.swing.KeyStroke
 
 
-private object VisualToggleLineModeActionHandler : EditorActionHandlerBase() {
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    val listOption = Options.getInstance().getListOption(Options.SELECTMODE)
-    return if (listOption != null && "cmd" in listOption) {
-      VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_LINE).also {
-        editor.vimForEachCaret { it.vimSetSelection(it.offset) }
-      }
-    } else VimPlugin.getVisualMotion()
-      .toggleVisual(editor, cmd.count, cmd.rawCount, CommandState.SubMode.VISUAL_LINE)
-
+class VisualToggleLineModeAction : VimCommandAction() {
+  override fun makeActionHandler() = object : EditorActionHandlerBase() {
+    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+      val listOption = Options.getInstance().getListOption(Options.SELECTMODE)
+      return if (listOption != null && "cmd" in listOption) {
+        VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_LINE).also {
+          editor.vimForEachCaret { it.vimSetSelection(it.offset) }
+        }
+      } else VimPlugin.getVisualMotion()
+        .toggleVisual(editor, cmd.count, cmd.rawCount, CommandState.SubMode.VISUAL_LINE)
+    }
   }
-}
 
-class VisualToggleLineModeAction : VimCommandAction(VisualToggleLineModeActionHandler) {
   override val mappingModes: MutableSet<MappingMode> = MappingMode.NV
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("V")

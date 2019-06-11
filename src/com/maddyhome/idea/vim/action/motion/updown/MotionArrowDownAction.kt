@@ -38,26 +38,26 @@ import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
-private object MotionArrowDownActionHandler : NonShiftedSpecialKeyHandler() {
-  private var col: Int = 0
+class MotionArrowDownAction : VimCommandAction() {
+  override fun makeActionHandler() = object : NonShiftedSpecialKeyHandler() {
+    private var col: Int = 0
 
-  override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-    return VimPlugin.getMotion().moveCaretVertical(editor, caret, count)
+    override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+      return VimPlugin.getMotion().moveCaretVertical(editor, caret, count)
+    }
+
+    override fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
+      col = caret.vimLastColumn
+      return true
+    }
+
+    override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
+      val pos = caret.visualPosition
+      val lastColumn = EditorHelper.lastColumnForLine(editor, pos.line, editor.mode.isEndAllowed)
+      caret.vimLastColumn = if (pos.column != lastColumn) pos.column else col
+    }
   }
 
-  override fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
-    col = caret.vimLastColumn
-    return true
-  }
-
-  override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
-    val pos = caret.visualPosition
-    val lastColumn = EditorHelper.lastColumnForLine(editor, pos.line, editor.mode.isEndAllowed)
-    caret.vimLastColumn = if (pos.column != lastColumn) pos.column else col
-  }
-}
-
-class MotionArrowDownAction : VimCommandAction(MotionArrowDownActionHandler) {
   override val mappingModes: Set<MappingMode> = MappingMode.NVOS
 
   override val keyStrokesSet: Set<MutableList<KeyStroke>> = setOf(parseKeys("<Down>"), mutableListOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0)))

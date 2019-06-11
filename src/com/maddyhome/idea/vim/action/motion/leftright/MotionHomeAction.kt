@@ -32,14 +32,14 @@ import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 import javax.swing.KeyStroke
 
-private object MotionHomeActionHandler : NonShiftedSpecialKeyHandler() {
-  override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int,
-                      rawCount: Int, argument: Argument?): Int {
-    return VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
+class MotionHomeAction : VimCommandAction() {
+  override fun makeActionHandler() = object : NonShiftedSpecialKeyHandler() {
+    override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int,
+                        rawCount: Int, argument: Argument?): Int {
+      return VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
+    }
   }
-}
 
-class MotionHomeAction : VimCommandAction(MotionHomeActionHandler) {
   override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Home>")

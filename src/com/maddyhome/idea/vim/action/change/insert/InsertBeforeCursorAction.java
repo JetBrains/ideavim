@@ -20,6 +20,7 @@ package com.maddyhome.idea.vim.action.change.insert;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
@@ -27,6 +28,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,37 +37,43 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-public class InsertBeforeCursorAction extends VimCommandAction {
-  public InsertBeforeCursorAction() {
-    super(new ChangeEditorActionHandler() {
-      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
+final public class InsertBeforeCursorAction extends VimCommandAction {
+  @Contract(" -> new")
+  @NotNull
+  @Override
+  final protected EditorActionHandler makeActionHandler() {
+    return new ChangeEditorActionHandler() {
+      final public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
                              @Nullable Argument argument) {
         VimPlugin.getChange().insertBeforeCursor(editor, context);
         return true;
       }
-    });
+    };
   }
 
+  @Contract(pure = true)
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
+  final public Set<MappingMode> getMappingModes() {
     return MappingMode.N;
   }
 
   @NotNull
   @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
     return parseKeysSet("i", "<Insert>");
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Command.Type getType() {
+    return Command.Type.INSERT;
   }
 
   @NotNull
   @Override
-  public Command.Type getType() {
-    return Command.Type.INSERT;
-  }
-
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
+  final public EnumSet<CommandFlags> getFlags() {
     return EnumSet.of(CommandFlags.FLAG_MULTIKEY_UNDO);
   }
 }

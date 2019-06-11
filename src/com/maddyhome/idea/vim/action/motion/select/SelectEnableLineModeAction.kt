@@ -34,18 +34,18 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 
-private object SelectEnableLineModeActionHandler : EditorActionHandlerBase() {
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    editor.caretModel.runForEachCaret { caret ->
-      val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
-      val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
-      caret.vimSetSystemSelectionSilently(lineStart, lineEnd)
+class SelectEnableLineModeAction : VimCommandAction() {
+  override fun makeActionHandler() = object : EditorActionHandlerBase() {
+    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+      editor.caretModel.runForEachCaret { caret ->
+        val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
+        val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
+        caret.vimSetSystemSelectionSilently(lineStart, lineEnd)
+      }
+      return VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_LINE)
     }
-    return VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_LINE)
   }
-}
 
-class SelectEnableLineModeAction : VimCommandAction(SelectEnableLineModeActionHandler) {
   override val mappingModes: MutableSet<MappingMode> = MappingMode.N
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gH")

@@ -33,22 +33,22 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 
-private object SelectDeleteActionHandler : EditorActionHandlerBase() {
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    val enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
-    val actions = VimPlugin.getKey().getActions(editor.component, enterKeyStroke)
-    for (action in actions) {
-      if (KeyHandler.executeAction(action, context)) {
-        break
+class SelectDeleteAction : VimCommandAction() {
+  override fun makeActionHandler() = object : EditorActionHandlerBase() {
+    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+      val enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
+      val actions = VimPlugin.getKey().getActions(editor.component, enterKeyStroke)
+      for (action in actions) {
+        if (KeyHandler.executeAction(action, context)) {
+          break
+        }
       }
+      VimPlugin.getVisualMotion().exitSelectMode(editor, true)
+      VimPlugin.getChange().insertBeforeCursor(editor, context)
+      return true
     }
-    VimPlugin.getVisualMotion().exitSelectMode(editor, true)
-    VimPlugin.getChange().insertBeforeCursor(editor, context)
-    return true
   }
-}
 
-class SelectDeleteAction : VimCommandAction(SelectDeleteActionHandler) {
   override val mappingModes: MutableSet<MappingMode> = MappingMode.S
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<BS>", "<DEL>")

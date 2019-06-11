@@ -38,26 +38,26 @@ import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
-private object MotionArrowUpActionHandler : NonShiftedSpecialKeyHandler() {
-  private var col: Int = 0
+class MotionArrowUpAction : VimCommandAction() {
+  override fun makeActionHandler() = object : NonShiftedSpecialKeyHandler() {
+    private var col: Int = 0
 
-  override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-    return VimPlugin.getMotion().moveCaretVertical(editor, caret, -count)
+    override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+      return VimPlugin.getMotion().moveCaretVertical(editor, caret, -count)
+    }
+
+    override fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
+      col = caret.vimLastColumn
+      return true
+    }
+
+    override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
+      val pos = caret.visualPosition
+      val lastColumn = EditorHelper.lastColumnForLine(editor, pos.line, editor.mode.isEndAllowed)
+      caret.vimLastColumn = if (pos.column != lastColumn) pos.column else col
+    }
   }
 
-  override fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
-    col = caret.vimLastColumn
-    return true
-  }
-
-  override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
-    val pos = caret.visualPosition
-    val lastColumn = EditorHelper.lastColumnForLine(editor, pos.line, editor.mode.isEndAllowed)
-    caret.vimLastColumn = if (pos.column != lastColumn) pos.column else col
-  }
-}
-
-class MotionArrowUpAction : VimCommandAction(MotionArrowUpActionHandler) {
   override val mappingModes: MutableSet<MappingMode> = MappingMode.NVOS
 
   override val keyStrokesSet: Set<List<KeyStroke>> = setOf(parseKeys("<Up>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0)))

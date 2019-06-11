@@ -20,12 +20,14 @@ package com.maddyhome.idea.vim.action.change.change;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -36,38 +38,44 @@ import java.util.Set;
 /**
  * @author vlan
  */
-public class FilterVisualLinesAction extends VimCommandAction {
-  public FilterVisualLinesAction() {
-    super(new EditorActionHandlerBase() {
+final public class FilterVisualLinesAction extends VimCommandAction {
+  @Contract(" -> new")
+  @NotNull
+  @Override
+  final protected EditorActionHandler makeActionHandler() {
+    return new EditorActionHandlerBase() {
       @Override
       protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         VimPlugin.getProcess().startFilterCommand(editor, context, cmd);
         VimPlugin.getVisualMotion().resetVisual(editor);
         return true;
       }
-    });
+    };
   }
 
+  @Contract(pure = true)
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
+  final public Set<MappingMode> getMappingModes() {
     return MappingMode.V;
   }
 
   @NotNull
   @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
     return parseKeysSet("!");
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Command.Type getType() {
+    return Command.Type.CHANGE;
   }
 
   @NotNull
   @Override
-  public Command.Type getType() {
-    return Command.Type.CHANGE;
-  }
-
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
+  final public EnumSet<CommandFlags> getFlags() {
     return EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE);
   }
 }

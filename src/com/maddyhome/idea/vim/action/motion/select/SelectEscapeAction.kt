@@ -28,20 +28,15 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import javax.swing.KeyStroke
 
-/**
- * @author Alex Plate
- */
-
-object SelectEscapeActionHandler : EditorActionHandlerBase() {
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    val blockMode = editor.inBlockSubMode
-    VimPlugin.getVisualMotion().exitSelectMode(editor, true)
-    if (blockMode) editor.caretModel.removeSecondaryCarets()
-    return true
+class SelectEscapeAction : VimCommandAction() {
+  override fun makeActionHandler() = object : EditorActionHandlerBase() {
+    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+      val blockMode = editor.inBlockSubMode
+      VimPlugin.getVisualMotion().exitSelectMode(editor, true)
+      if (blockMode) editor.caretModel.removeSecondaryCarets()
+      return true
+    }
   }
-}
-
-class SelectEscapeAction : VimCommandAction(SelectEscapeActionHandler) {
   override val mappingModes: MutableSet<MappingMode> = MappingMode.S
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<esc>")
