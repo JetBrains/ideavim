@@ -16,71 +16,69 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.handler;
+package com.maddyhome.idea.vim.handler
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
-import com.maddyhome.idea.vim.helper.CaretDataKt;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.group.MotionGroup
+import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.Nullable
 
 
-public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
+abstract class TextObjectActionHandler extends EditorActionHandlerBase {
   public TextObjectActionHandler() {
-    this(false);
+    this(false)
   }
 
   public TextObjectActionHandler(boolean runForEachCaret) {
-    super(runForEachCaret);
+    super(runForEachCaret)
   }
 
   @Override
   protected final boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                                   @NotNull Command cmd) {
-    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-      TextRange range;
-      range = getRange(editor, caret, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument());
+    if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
+      TextRange range
+      range = getRange(editor, caret, context, cmd.getCount(), cmd.getRawCount(), cmd.getArgument())
 
       if (range == null) {
-        return false;
+        return false
       }
 
-      boolean block = cmd.getFlags().contains(CommandFlags.FLAG_TEXT_BLOCK);
+      boolean block = cmd.getFlags().contains(CommandFlags.FLAG_TEXT_BLOCK)
       int newstart = block || caret.getOffset() >= CaretDataKt.getVimSelectionStart(caret)
                      ? range.getStartOffset()
-                     : range.getEndOffset();
+                     : range.getEndOffset()
       int newend = block || caret.getOffset() >= CaretDataKt.getVimSelectionStart(caret)
                    ? range.getEndOffset()
-                   : range.getStartOffset();
+                   : range.getStartOffset()
 
       if (CaretDataKt.getVimSelectionStart(caret) == caret.getOffset() || block) {
-        VisualGroupKt.vimSetSelection(caret, newstart, newstart, false);
+        VisualGroupKt.vimSetSelection(caret, newstart, newstart, false)
       }
 
       if ((cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE) &&
            !cmd.getFlags().contains(CommandFlags.FLAG_VISUAL_CHARACTERWISE)) &&
-          CommandState.getInstance(editor).getSubMode() != CommandState.SubMode.VISUAL_LINE) {
-        VimPlugin.getVisualMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE);
+          CommandState.getInstance(editor).subMode != CommandState.SubMode.VISUAL_LINE) {
+        VimPlugin.getVisualMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE)
       }
       else if ((!cmd.getFlags().contains(CommandFlags.FLAG_MOT_LINEWISE) ||
                 cmd.getFlags().contains(CommandFlags.FLAG_VISUAL_CHARACTERWISE)) &&
-               CommandState.getInstance(editor).getSubMode() == CommandState.SubMode.VISUAL_LINE) {
-        VimPlugin.getVisualMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER);
+               CommandState.getInstance(editor).subMode == CommandState.SubMode.VISUAL_LINE) {
+        VimPlugin.getVisualMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
       }
 
-      MotionGroup.moveCaret(editor, caret, newend);
+      MotionGroup.moveCaret(editor, caret, newend)
     }
 
-    return true;
+    return true
   }
 
   @Nullable
@@ -89,5 +87,5 @@ public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
                                      @NotNull DataContext context,
                                      int count,
                                      int rawCount,
-                                     @Nullable Argument argument);
+                                     @Nullable Argument argument)
 }
