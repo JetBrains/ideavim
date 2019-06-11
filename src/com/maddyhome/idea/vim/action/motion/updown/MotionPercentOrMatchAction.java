@@ -32,8 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 
-/**
- */
+
 public class MotionPercentOrMatchAction extends MotionEditorAction {
   public MotionPercentOrMatchAction() {
     super(new Handler());

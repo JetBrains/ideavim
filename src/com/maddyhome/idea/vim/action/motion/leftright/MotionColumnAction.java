@@ -30,8 +30,7 @@ import com.maddyhome.idea.vim.helper.CaretDataKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- */
+
 public class MotionColumnAction extends MotionEditorAction {
   public MotionColumnAction() {
     super(new Handler());

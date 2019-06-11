@@ -20,9 +20,7 @@ package com.maddyhome.idea.vim.common;
 
 import com.intellij.openapi.editor.LogicalPosition;
 
-/**
- *
- */
+
 public class CharacterPosition extends LogicalPosition {
   public CharacterPosition(int line, int col) {
     super(line, col);

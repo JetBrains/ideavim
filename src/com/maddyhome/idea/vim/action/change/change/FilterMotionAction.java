@@ -33,8 +33,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
 
-/**
- */
+
 public class FilterMotionAction extends EditorAction {
   public FilterMotionAction() {
     super(new Handler());

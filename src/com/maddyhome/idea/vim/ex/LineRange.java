@@ -18,9 +18,7 @@
 
 package com.maddyhome.idea.vim.ex;
 
-/**
- *
- */
+
 public class LineRange {
   public LineRange(int startLine, int endLine) {
     if (endLine >= startLine) {

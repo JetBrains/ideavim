@@ -24,9 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- *
- */
+
 public class BoundListOption extends ListOption {
   BoundListOption(String name, String abbrev, String[] dflt, String[] values) {
     super(name, abbrev, dflt, null);

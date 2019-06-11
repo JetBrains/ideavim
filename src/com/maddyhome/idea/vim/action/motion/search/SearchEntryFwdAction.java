@@ -31,9 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 
-/**
- *
- */
+
 public class SearchEntryFwdAction extends MotionEditorAction {
   public SearchEntryFwdAction() {
     super(new Handler());

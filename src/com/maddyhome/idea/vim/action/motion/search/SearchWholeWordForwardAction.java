@@ -28,9 +28,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- *
- */
+
 public class SearchWholeWordForwardAction extends MotionEditorAction {
   public SearchWholeWordForwardAction() {
     super(new Handler());

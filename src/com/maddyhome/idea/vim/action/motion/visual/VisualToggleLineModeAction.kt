@@ -33,9 +33,7 @@ import com.maddyhome.idea.vim.option.Options
 import java.util.*
 import javax.swing.KeyStroke
 
-/**
- *
- */
+
 private object VisualToggleLineModeActionHandler : EditorActionHandlerBase() {
   override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     val listOption = Options.getInstance().getListOption(Options.SELECTMODE)

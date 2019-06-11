@@ -28,8 +28,7 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- */
+
 public abstract class TextObjectAction extends EditorAction {
   public TextObjectAction(TextObjectActionHandler handler) {
     super(handler);

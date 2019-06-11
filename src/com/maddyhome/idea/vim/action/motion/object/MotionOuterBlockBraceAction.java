@@ -29,8 +29,7 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- */
+
 public class MotionOuterBlockBraceAction extends TextObjectAction {
   public MotionOuterBlockBraceAction() {
     super(new Handler());

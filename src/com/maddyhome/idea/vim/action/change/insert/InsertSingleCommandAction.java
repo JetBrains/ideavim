@@ -26,8 +26,7 @@ import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.VimPlugin;
 import org.jetbrains.annotations.NotNull;
 
-/**
- */
+
 public class InsertSingleCommandAction extends EditorAction {
   public InsertSingleCommandAction() {
     super(new Handler());

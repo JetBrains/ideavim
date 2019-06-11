@@ -35,9 +35,7 @@ import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- *
- */
+
 public class MotionLastColumnAction extends MotionEditorAction {
   public MotionLastColumnAction() {
     super(new Handler());

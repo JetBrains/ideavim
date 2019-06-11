@@ -27,8 +27,7 @@ import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
-/**
- */
+
 public class RepeatChangeAction extends EditorAction {
   public RepeatChangeAction() {
     super(new Handler());

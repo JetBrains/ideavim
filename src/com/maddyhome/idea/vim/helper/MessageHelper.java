@@ -28,9 +28,7 @@ import org.jetbrains.annotations.PropertyKey;
 import java.lang.ref.Reference;
 import java.util.ResourceBundle;
 
-/**
- *
- */
+
 public class MessageHelper {
   @Nullable private static Reference<ResourceBundle> ourBundle;
 

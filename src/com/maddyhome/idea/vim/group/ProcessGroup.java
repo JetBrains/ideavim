@@ -40,9 +40,7 @@ import javax.swing.*;
 import java.io.*;
 import java.util.EnumSet;
 
-/**
- *
- */
+
 public class ProcessGroup {
   public ProcessGroup() {
   }

@@ -34,8 +34,7 @@ import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
 
-/**
- */
+
 public class MotionLastScreenColumnAction extends MotionEditorAction {
   public MotionLastScreenColumnAction() {
     super(new Handler());

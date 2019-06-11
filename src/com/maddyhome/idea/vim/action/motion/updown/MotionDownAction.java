@@ -33,9 +33,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- *
- */
+
 public class MotionDownAction extends MotionEditorAction {
   public MotionDownAction() {
     super(new Handler());

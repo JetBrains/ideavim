@@ -26,8 +26,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
-/**
- */
+
 // TODO: Unused action. Delete it?
 public class FileSaveAction extends EditorAction {
   public FileSaveAction() {

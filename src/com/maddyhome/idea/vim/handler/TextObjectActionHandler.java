@@ -33,9 +33,7 @@ import com.maddyhome.idea.vim.helper.CaretDataKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- *
- */
+
 public abstract class TextObjectActionHandler extends EditorActionHandlerBase {
   public TextObjectActionHandler() {
     this(false);

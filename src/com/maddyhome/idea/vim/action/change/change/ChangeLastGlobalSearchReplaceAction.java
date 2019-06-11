@@ -29,8 +29,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- */
+
 public class ChangeLastGlobalSearchReplaceAction extends EditorAction {
   public ChangeLastGlobalSearchReplaceAction() {
     super(new Handler());

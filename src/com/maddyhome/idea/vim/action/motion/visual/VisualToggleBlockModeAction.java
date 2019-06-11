@@ -29,9 +29,7 @@ import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
 
-/**
- *
- */
+
 public class VisualToggleBlockModeAction extends EditorAction {
   public VisualToggleBlockModeAction() {
     super(new Handler());

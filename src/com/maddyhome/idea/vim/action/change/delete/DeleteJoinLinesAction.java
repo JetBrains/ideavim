@@ -29,8 +29,7 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- */
+
 public class DeleteJoinLinesAction extends EditorAction {
   public DeleteJoinLinesAction() {
     super(new Handler());

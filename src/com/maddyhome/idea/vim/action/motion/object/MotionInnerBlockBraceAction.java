@@ -29,8 +29,7 @@ import com.maddyhome.idea.vim.handler.TextObjectActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- */
+
 public class MotionInnerBlockBraceAction extends TextObjectAction {
   public MotionInnerBlockBraceAction() {
     super(new MotionInnerBlockBraceAction.Handler());

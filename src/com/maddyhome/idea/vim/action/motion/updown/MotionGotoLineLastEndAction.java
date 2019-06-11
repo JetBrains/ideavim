@@ -32,8 +32,7 @@ import com.maddyhome.idea.vim.option.Options;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- */
+
 public class MotionGotoLineLastEndAction extends MotionEditorAction {
   public MotionGotoLineLastEndAction() {
     super(new Handler());

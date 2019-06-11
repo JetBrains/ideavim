@@ -20,9 +20,7 @@ package com.maddyhome.idea.vim.ex;
 
 import org.jetbrains.annotations.NotNull;
 
-/**
- *
- */
+
 public class ParseResult {
   @NotNull private final Ranges ranges;
   @NotNull private final String command;

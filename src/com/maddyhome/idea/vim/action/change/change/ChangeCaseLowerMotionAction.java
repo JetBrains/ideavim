@@ -30,8 +30,7 @@ import com.maddyhome.idea.vim.helper.CharacterHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- */
+
 public class ChangeCaseLowerMotionAction extends EditorAction {
   public ChangeCaseLowerMotionAction() {
     super(new Handler());

@@ -32,9 +32,7 @@ import javax.swing.text.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-/**
- *
- */
+
 public class ExEditorKit extends DefaultEditorKit {
   public static ExEditorKit getInstance() {
     if (instance == null) {

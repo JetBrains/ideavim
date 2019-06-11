@@ -28,8 +28,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- */
+
 public class MotionGotoMarkLineAction extends MotionEditorAction {
   public MotionGotoMarkLineAction() {
     super(new MotionActionHandler.ForEachCaret() {

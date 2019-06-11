@@ -23,9 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.nio.CharBuffer;
 
-/**
- *
- */
+
 public class CharPointer {
   public static final CharPointer INIT = new CharPointer();
 
