@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.handler.ExecuteMethodNotOverriddenException
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.noneOfEnum
 import java.util.*
 
 /**
@@ -114,7 +115,7 @@ abstract class CommandHandler {
     argFlags: CommandHandlerFlags,
     runForEachCaret: Boolean = false,
     caretOrder: CaretOrder = CaretOrder.DECREASING_OFFSET,
-    optFlags: EnumSet<CommandFlags> = EnumSet.noneOf<CommandFlags>(CommandFlags::class.java)
+    optFlags: EnumSet<CommandFlags> = noneOfEnum()
   ) {
     this.names = names
     this.argFlags = argFlags

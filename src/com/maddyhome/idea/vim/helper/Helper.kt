@@ -22,6 +22,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolder
+import java.util.*
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -106,6 +107,7 @@ fun <T> userDataOr(default: UserDataHolder.() -> T): ReadWriteProperty<UserDataH
 }
 
 fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b
+inline fun <reified T : Enum<T>> noneOfEnum(): EnumSet<T> = EnumSet.noneOf(T::class.java)
 
 inline fun Editor.vimForEachCaret(action: (caret: Caret) -> Unit) {
   if (this.inBlockSubMode) {

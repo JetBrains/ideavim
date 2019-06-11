@@ -21,11 +21,10 @@
 package org.jetbrains.plugins.ideavim.action.motion.gn
 
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.noneOfEnum
 import org.jetbrains.plugins.ideavim.VimTestCase
-import java.util.*
 import javax.swing.KeyStroke
 
 class GnPreviousTextObjectTest : VimTestCase() {
@@ -52,7 +51,7 @@ class GnPreviousTextObjectTest : VimTestCase() {
   private fun doTestWithSearch(keys: List<KeyStroke>, before: String,
                                after: String) {
     configureByText(before)
-    VimPlugin.getSearch().search(myFixture.editor, "test", 1, EnumSet.noneOf(CommandFlags::class.java), false)
+    VimPlugin.getSearch().search(myFixture.editor, "test", 1, noneOfEnum(), false)
     typeText(keys)
     myFixture.checkResult(after)
     assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
