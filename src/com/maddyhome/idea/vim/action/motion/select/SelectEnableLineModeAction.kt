@@ -46,9 +46,9 @@ private object SelectEnableLineModeActionHandler : EditorActionHandlerBase() {
 }
 
 class SelectEnableLineModeAction : VimCommandAction(SelectEnableLineModeActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.N
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.N
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("gH")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gH")
 
-  override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 }

@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 import javax.swing.KeyStroke
 
@@ -56,11 +57,11 @@ private object LookupUpActionHandler : EditorActionHandlerBase() {
 }
 
 class LookupUpAction : VimCommandAction(LookupUpActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.I
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.I
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<C-P>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-P>")
 
-  override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_TYPEAHEAD_SELF_MANAGE)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_TYPEAHEAD_SELF_MANAGE)
 }

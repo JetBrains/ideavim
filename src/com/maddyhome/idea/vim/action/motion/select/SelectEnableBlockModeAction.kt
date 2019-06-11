@@ -49,9 +49,9 @@ private object SelectEnableBlockModeActionHandler : EditorActionHandlerBase() {
 }
 
 class SelectEnableBlockModeAction : VimCommandAction(SelectEnableBlockModeActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.N
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.N
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("g<C-h>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("g<C-h>")
 
-  override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 }

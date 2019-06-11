@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 import javax.swing.KeyStroke
 
@@ -39,11 +40,11 @@ private object MotionHomeActionHandler : NonShiftedSpecialKeyHandler() {
 }
 
 class MotionHomeAction : VimCommandAction(MotionHomeActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVS
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<Home>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Home>")
 
-  override fun getType(): Command.Type = Command.Type.MOTION
+  override val type: Command.Type = Command.Type.MOTION
 
-  override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
 }

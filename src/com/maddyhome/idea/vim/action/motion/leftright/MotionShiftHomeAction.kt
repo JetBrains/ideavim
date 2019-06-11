@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.ShiftedSpecialKeyHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import java.util.*
 import javax.swing.KeyStroke
@@ -44,11 +45,11 @@ private object MotionShiftHomeActionHandler : ShiftedSpecialKeyHandler() {
 }
 
 class MotionShiftHomeAction : VimCommandAction(MotionShiftHomeActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVS
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<S-Home>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Home>")
 
-  override fun getType(): Command.Type = Command.Type.MOTION
+  override val type: Command.Type = Command.Type.MOTION
 
-  override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
 }

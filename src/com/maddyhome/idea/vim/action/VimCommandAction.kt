@@ -16,49 +16,37 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action;
+package com.maddyhome.idea.vim.action
 
-import com.google.common.collect.ImmutableSet;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
-import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.helper.StringHelper;
-import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet
+import com.intellij.openapi.editor.actionSystem.EditorAction
+import com.intellij.openapi.editor.actionSystem.EditorActionHandler
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.noneOfEnum
+import java.util.*
+import javax.swing.KeyStroke
 
 /**
  * Action that represents a Vim command.
  *
  * Actions should be registered in resources/META-INF/plugin.xml and in package-info.java
- * inside {@link com.maddyhome.idea.vim.action}.
+ * inside [com.maddyhome.idea.vim.action].
  *
  * @author vlan
  */
-public abstract class VimCommandAction extends EditorAction {
-  protected VimCommandAction(EditorActionHandler defaultHandler) {
-    super(defaultHandler);
-  }
+abstract class VimCommandAction(defaultHandler: EditorActionHandler) : EditorAction(defaultHandler) {
 
-  @NotNull
-  public abstract Set<MappingMode> getMappingModes();
+  abstract val mappingModes: Set<MappingMode>
 
-  @NotNull
-  public abstract Set<List<KeyStroke>> getKeyStrokesSet();
+  abstract val keyStrokesSet: Set<List<KeyStroke>>
 
-  @NotNull
-  public abstract Command.Type getType();
+  abstract val type: Command.Type
 
-  @NotNull
-  public Argument.Type getArgumentType() {
-    return Argument.Type.NONE;
-  }
+  open val argumentType: Argument.Type = Argument.Type.NONE
 
   /**
    * Returns various binary flags for the command.
@@ -67,16 +55,16 @@ public abstract class VimCommandAction extends EditorAction {
    *
    * @see com.maddyhome.idea.vim.command.Command
    */
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.noneOf(CommandFlags.class);
-  }
+  open val flags: EnumSet<CommandFlags> = noneOfEnum()
 
-  @NotNull
-  protected static Set<List<KeyStroke>> parseKeysSet(@NotNull String... keyStrings) {
-    final ImmutableSet.Builder<List<KeyStroke>> builder = ImmutableSet.builder();
-    for (String keyString : keyStrings) {
-      builder.add(StringHelper.parseKeys(keyString));
+  protected companion object {
+    @JvmStatic
+    fun parseKeysSet(vararg keyStrings: String): Set<List<KeyStroke>> {
+      val builder = ImmutableSet.builder<List<KeyStroke>>()
+      for (keyString in keyStrings) {
+        builder.add(StringHelper.parseKeys(keyString))
+      }
+      return builder.build()
     }
-    return builder.build();
   }
 }

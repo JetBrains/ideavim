@@ -57,9 +57,9 @@ private object MotionShiftDownActionHandler : ShiftedArrowKeyHandler() {
 }
 
 class MotionShiftDownAction : VimCommandAction(MotionShiftDownActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVS
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<S-Down>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Down>")
 
-  override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 }

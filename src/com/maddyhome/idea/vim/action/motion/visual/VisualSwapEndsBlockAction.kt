@@ -47,10 +47,10 @@ private object VisualSwapEndsBlockActionHandler : EditorActionHandlerBase() {
 
 class VisualSwapEndsBlockAction : VimCommandAction(VisualSwapEndsBlockActionHandler) {
 
-  override fun getMappingModes(): Set<MappingMode> = MappingMode.V
+  override val mappingModes: Set<MappingMode> = MappingMode.V
 
-  override fun getKeyStrokesSet(): Set<List<KeyStroke>> = parseKeysSet("O")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("O")
 
-  override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 }
 

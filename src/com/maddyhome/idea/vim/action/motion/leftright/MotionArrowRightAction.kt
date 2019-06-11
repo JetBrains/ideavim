@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.enumSetOf
 import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
@@ -40,12 +41,12 @@ private object MotionArrowRightActionHandler : NonShiftedSpecialKeyHandler() {
 }
 
 class MotionArrowRightAction : VimCommandAction(MotionArrowRightActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVO
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVO
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = mutableSetOf(parseKeys("<Right>"), mutableListOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0)))
+  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(parseKeys("<Right>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0)))
 
-  override fun getType(): Command.Type = Command.Type.MOTION
+  override val type: Command.Type = Command.Type.MOTION
 
-  override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
 }
 

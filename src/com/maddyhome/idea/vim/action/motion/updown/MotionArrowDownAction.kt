@@ -30,6 +30,7 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.vimLastColumn
@@ -57,11 +58,11 @@ private object MotionArrowDownActionHandler : NonShiftedSpecialKeyHandler() {
 }
 
 class MotionArrowDownAction : VimCommandAction(MotionArrowDownActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVOS
+  override val mappingModes: Set<MappingMode> = MappingMode.NVOS
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = mutableSetOf(parseKeys("<Down>"), mutableListOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0)))
+  override val keyStrokesSet: Set<MutableList<KeyStroke>> = setOf(parseKeys("<Down>"), mutableListOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0)))
 
-  override fun getType(): Command.Type = Command.Type.MOTION
+  override val type: Command.Type = Command.Type.MOTION
 
-  override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)
 }

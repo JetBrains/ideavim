@@ -42,10 +42,10 @@ private object VisualSwapEndsActionHandler : EditorActionHandlerBase() {
 
 class VisualSwapEndsAction : VimCommandAction(VisualSwapEndsActionHandler) {
 
-  override fun getMappingModes(): EnumSet<MappingMode> = MappingMode.V
+  override val mappingModes: EnumSet<MappingMode> = MappingMode.V
 
-  override fun getKeyStrokesSet(): Set<List<KeyStroke>> = parseKeysSet("o")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("o")
 
-  override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 }
 

@@ -50,9 +50,9 @@ private object MotionShiftLeftActionHandler : ShiftedArrowKeyHandler() {
 }
 
 class MotionShiftLeftAction : VimCommandAction(MotionShiftLeftActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVS
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<S-Left>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Left>")
 
-  override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 }

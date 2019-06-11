@@ -64,9 +64,9 @@ private object SelectToggleVisualModeHandler : EditorActionHandlerBase() {
 }
 
 class SelectToggleVisualMode : VimCommandAction(SelectToggleVisualModeHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.VS
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.VS
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<C-G>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-G>")
 
-  override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 }

@@ -50,9 +50,9 @@ private object SelectEnableCharacterModeActionHandler : EditorActionHandlerBase(
 }
 
 class SelectEnableCharacterModeAction : VimCommandAction(SelectEnableCharacterModeActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.N
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.N
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("gh")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gh")
 
-  override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 }

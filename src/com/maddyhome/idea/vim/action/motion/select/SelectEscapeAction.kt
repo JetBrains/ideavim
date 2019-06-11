@@ -42,9 +42,9 @@ object SelectEscapeActionHandler : EditorActionHandlerBase() {
 }
 
 class SelectEscapeAction : VimCommandAction(SelectEscapeActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.S
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.S
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<esc>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<esc>")
 
-  override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 }

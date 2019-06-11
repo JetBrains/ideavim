@@ -40,9 +40,9 @@ private object SelectEnterActionHandler : EditorActionHandlerBase() {
 }
 
 class SelectEnterAction : VimCommandAction(SelectEnterActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.S
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.S
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<enter>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<enter>")
 
-  override fun getType(): Command.Type = Command.Type.INSERT
+  override val type: Command.Type = Command.Type.INSERT
 }

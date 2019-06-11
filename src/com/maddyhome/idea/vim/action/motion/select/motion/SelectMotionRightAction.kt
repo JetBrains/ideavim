@@ -50,9 +50,9 @@ private object SelectMoveRightActionHandler : MotionActionHandler.ForEachCaret()
 }
 
 class SelectMotionRightAction : VimCommandAction(SelectMoveRightActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.S
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.S
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<Right>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Right>")
 
-  override fun getType(): Command.Type = Command.Type.MOTION
+  override val type: Command.Type = Command.Type.MOTION
 }

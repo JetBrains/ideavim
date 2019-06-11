@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 import javax.swing.KeyStroke
 
@@ -51,11 +52,11 @@ private object PutVisualTextMoveCursorActionHandler : VisualOperatorActionHandle
  */
 class PutVisualTextMoveCursorAction : VimCommandAction(PutVisualTextMoveCursorActionHandler) {
 
-  override fun getMappingModes(): Set<MappingMode> = MappingMode.V
+  override val mappingModes: Set<MappingMode> = MappingMode.V
 
-  override fun getKeyStrokesSet(): Set<List<KeyStroke>> = parseKeysSet("gp", "gP")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gp", "gP")
 
-  override fun getType(): Command.Type = Command.Type.PASTE
+  override val type: Command.Type = Command.Type.PASTE
 
-  override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_EXIT_VISUAL)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 }

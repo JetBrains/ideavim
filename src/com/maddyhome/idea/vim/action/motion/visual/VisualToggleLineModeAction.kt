@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.option.Options
 import java.util.*
@@ -48,12 +49,12 @@ private object VisualToggleLineModeActionHandler : EditorActionHandlerBase() {
 }
 
 class VisualToggleLineModeAction : VimCommandAction(VisualToggleLineModeActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NV
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NV
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("V")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("V")
 
-  override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)
 }
 
