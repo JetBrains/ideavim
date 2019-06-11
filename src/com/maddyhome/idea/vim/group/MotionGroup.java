@@ -1352,6 +1352,7 @@ public class MotionGroup {
   }
 
   public int selectNextSearch(@NotNull Editor editor, int count, boolean forwards) {
+    editor.getCaretModel().removeSecondaryCarets();
     TextRange current = VimPlugin.getSearch().findUnderCaret(editor);
     final Caret caret = editor.getCaretModel().getPrimaryCaret();
 

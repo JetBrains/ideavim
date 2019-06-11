@@ -37,6 +37,13 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
     assertMode(CommandState.Mode.VISUAL);
   }
 
+  public void testSearchMulticaret() {
+    typeTextInFile(parseKeys("*", "b", "gN"), "h<caret>ello world\nh<caret>ello world hello world");
+
+    assertEquals(1, myFixture.getEditor().getCaretModel().getCaretCount());
+    assertMode(CommandState.Mode.VISUAL);
+  }
+
   public void testSearchWhenOnMatch() {
     typeTextInFile(parseKeys("*","gN"),
                    "h<caret>ello world\nhello world hello world");
