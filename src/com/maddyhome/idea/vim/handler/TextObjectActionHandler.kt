@@ -37,9 +37,15 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
 
 /**
  * @author Alex Plate
+ *
+ * Handler for TextObjects.
+ *
+ * This handler gets executed for each caret.
  */
 abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
-  override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
+  abstract fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange?
+
+  final override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
     if (!editor.inVisualMode) return true
 
     val range = getRange(editor, caret, context, cmd.count, cmd.rawCount, cmd.argument) ?: return false
@@ -63,5 +69,5 @@ abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
     return true
   }
 
-  abstract fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange?
+  final override fun execute(editor: Editor, context: DataContext, cmd: Command) = false
 }
