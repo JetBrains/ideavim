@@ -1352,44 +1352,16 @@ public class MotionGroup {
   }
 
   public int selectNextSearch(@NotNull Editor editor, int count, boolean forwards) {
-    editor.getCaretModel().removeSecondaryCarets();
-    TextRange current = VimPlugin.getSearch().findUnderCaret(editor);
     final Caret caret = editor.getCaretModel().getPrimaryCaret();
-
-    if (current == null || CommandStateHelper.inVisualMode(editor) && atEdgeOfGnRange(current, editor, forwards)) {
-      current = VimPlugin.getSearch().findNextSearchForGn(editor, count, forwards);
-      if (current == null) return -1;
-    }
-    else {
-      if (count > 1) {
-        current = VimPlugin.getSearch().findNextSearchForGn(editor, count - 1, forwards);
-        if (current == null) return -1;
-      }
-    }
-
+    final TextRange range = VimPlugin.getSearch().getNextSearchRange(editor, count, forwards);
+    if (range == null) return -1;
+    final int adj = VimPlugin.getVisualMotion().getSelectionAdj();
     if (!CommandStateHelper.inVisualMode(editor)) {
-      MotionGroup.moveCaret(editor, caret, gnStartOffset(current, forwards));
+      final int startOffset = forwards ? range.getStartOffset() : Math.max(range.getEndOffset() - adj, 0);
+      MotionGroup.moveCaret(editor, caret, startOffset);
       VimPlugin.getVisualMotion().enterVisualMode(editor, CommandState.SubMode.VISUAL_CHARACTER);
     }
-    return gnEndOffset(current, forwards);
-  }
-
-  private boolean atEdgeOfGnRange(@NotNull TextRange nextRange, @NotNull Editor editor, boolean forwards) {
-    int currentPosition = editor.getCaretModel().getOffset();
-    if (forwards) {
-      return nextRange.getEndOffset() - 1 == currentPosition;
-    }
-    else {
-      return nextRange.getStartOffset() == currentPosition;
-    }
-  }
-
-  private int gnEndOffset(@NotNull TextRange nextRange, boolean forwards) {
-    return forwards ? Math.max(nextRange.getEndOffset() - 1, 0) : nextRange.getStartOffset();
-  }
-
-  private int gnStartOffset(@NotNull TextRange range, boolean forwards) {
-    return forwards ? range.getStartOffset() : Math.max(range.getEndOffset() - 1, 0);
+    return forwards ? Math.max(range.getEndOffset() - adj, 0) : range.getStartOffset();
   }
 
   private int lastFTCmd = 0;

@@ -179,6 +179,14 @@ class RegisterActions {
                           EnumSet.of(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE, CommandFlags.FLAG_TEXT_BLOCK),
                           new Shortcut[]{new Shortcut("at")}
     );
+    parser.registerAction(MappingMode.O, "VimGnNextTextObject", Command.Type.MOTION,
+                          EnumSet.of(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE),
+                          new Shortcut[]{new Shortcut("gn")}
+    );
+    parser.registerAction(MappingMode.O, "VimGnPreviousTextObject", Command.Type.MOTION,
+                          EnumSet.of(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE),
+                          new Shortcut[]{new Shortcut("gN")}
+    );
     parser.registerAction(MappingMode.NO, "VimResetMode", Command.Type.RESET, new Shortcut(new KeyStroke[]{
       KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SLASH, KeyEvent.CTRL_MASK),
       KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK)

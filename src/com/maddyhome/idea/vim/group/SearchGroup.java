@@ -648,7 +648,31 @@ public class SearchGroup {
   }
 
   @Nullable
-  public TextRange findNextSearchForGn(@NotNull Editor editor, int count, boolean forwards) {
+  public TextRange getNextSearchRange(@NotNull Editor editor, int count, boolean forwards) {
+    editor.getCaretModel().removeSecondaryCarets();
+    TextRange current = findUnderCaret(editor);
+
+    if (current == null || CommandStateHelper.inVisualMode(editor) && atEdgeOfGnRange(current, editor, forwards)) {
+      current = findNextSearchForGn(editor, count, forwards);
+    }
+    else if (count > 1) {
+      current = findNextSearchForGn(editor, count - 1, forwards);
+    }
+    return current;
+  }
+
+  private boolean atEdgeOfGnRange(@NotNull TextRange nextRange, @NotNull Editor editor, boolean forwards) {
+    int currentPosition = editor.getCaretModel().getOffset();
+    if (forwards) {
+      return nextRange.getEndOffset() - VimPlugin.getVisualMotion().getSelectionAdj() == currentPosition;
+    }
+    else {
+      return nextRange.getStartOffset() == currentPosition;
+    }
+  }
+
+  @Nullable
+  private TextRange findNextSearchForGn(@NotNull Editor editor, int count, boolean forwards) {
     if (forwards) {
       return findIt(editor, editor.getCaretModel().getOffset(), count, 1, false, true, false, true);
     } else {
@@ -656,7 +680,8 @@ public class SearchGroup {
     }
   }
 
-  public TextRange findUnderCaret(@NotNull Editor editor) {
+  @Nullable
+  private TextRange findUnderCaret(@NotNull Editor editor) {
     final TextRange backSearch = searchBackward(editor, editor.getCaretModel().getOffset() + 1, 1);
     if (backSearch == null) return null;
     return backSearch.contains(editor.getCaretModel().getOffset()) ? backSearch : null;
