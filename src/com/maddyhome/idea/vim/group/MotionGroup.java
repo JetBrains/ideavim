@@ -1352,31 +1352,28 @@ public class MotionGroup {
   }
 
   public int selectNextSearch(@NotNull Editor editor, int count, boolean forwards) {
-    TextRange nextRange = SearchGroup.findCurrentOrNextSearch(editor, count, forwards);
-    if (nextRange == null) {
-      return -1;
-    }
-    final int startOffset = startOffset(nextRange, forwards);
+    TextRange current = VimPlugin.getSearch().findUnderCaret(editor);
+    final Caret caret = editor.getCaretModel().getPrimaryCaret();
 
-    CommandState.Mode currentMode = CommandState.getInstance(editor).getMode();
-    if (currentMode == CommandState.Mode.VISUAL) {
-      if (atEdgeOfRange(nextRange, editor, forwards)) {
-        nextRange = SearchGroup.findNextSearch(editor, count, forwards);
+    if (current == null || CommandStateHelper.inVisualMode(editor) && atEdgeOfGnRange(current, editor, forwards)) {
+      current = VimPlugin.getSearch().findNextSearchForGn(editor, count, forwards);
+      if (current == null) return -1;
+    }
+    else {
+      if (count > 1) {
+        current = VimPlugin.getSearch().findNextSearchForGn(editor, count - 1, forwards);
+        if (current == null) return -1;
       }
     }
-    final int endOffset = endOffset(nextRange, forwards);
 
-    for (Caret caret : editor.getCaretModel().getAllCarets()) {
-      MotionGroup.moveCaret(editor, caret, startOffset);
-      if (currentMode != CommandState.Mode.VISUAL) {
-        VimPlugin.getVisualMotion().enterVisualMode(editor, CommandState.SubMode.VISUAL_CHARACTER);
-      }
-      MotionGroup.moveCaret(editor, caret, endOffset);
+    if (!CommandStateHelper.inVisualMode(editor)) {
+      MotionGroup.moveCaret(editor, caret, gnStartOffset(current, forwards));
+      VimPlugin.getVisualMotion().enterVisualMode(editor, CommandState.SubMode.VISUAL_CHARACTER);
     }
-    return endOffset;
+    return gnEndOffset(current, forwards);
   }
 
-  private boolean atEdgeOfRange(@NotNull TextRange nextRange, @NotNull Editor editor, boolean forwards) {
+  private boolean atEdgeOfGnRange(@NotNull TextRange nextRange, @NotNull Editor editor, boolean forwards) {
     int currentPosition = editor.getCaretModel().getOffset();
     if (forwards) {
       return nextRange.getEndOffset() - 1 == currentPosition;
@@ -1386,13 +1383,12 @@ public class MotionGroup {
     }
   }
 
-
-  private int startOffset(TextRange nextRange, boolean forwards) {
-    return forwards ? nextRange.getStartOffset() : Math.max(nextRange.getEndOffset() - 1, 0);
+  private int gnEndOffset(@NotNull TextRange nextRange, boolean forwards) {
+    return forwards ? Math.max(nextRange.getEndOffset() - 1, 0) : nextRange.getStartOffset();
   }
 
-  private int endOffset(TextRange nextRange, boolean forwards) {
-    return forwards ? Math.max(nextRange.getEndOffset() - 1, 0) : nextRange.getStartOffset();
+  private int gnStartOffset(@NotNull TextRange range, boolean forwards) {
+    return forwards ? range.getStartOffset() : Math.max(range.getEndOffset() - 1, 0);
   }
 
   private int lastFTCmd = 0;

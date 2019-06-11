@@ -619,49 +619,24 @@ public class SearchGroup {
     }
   }
 
-  private static Optional<TextRange> findCurrent(@NotNull Editor editor, @NotNull String pattern, final int offset) {
-    return findAll(editor, pattern, 0, -1, shouldIgnoreCase(pattern, false))
-      .stream()
-      .filter(range -> range.contains(offset))
-      .findFirst();
-  }
-
   @Nullable
-  public static TextRange findNext(@NotNull Editor editor,
-                                   @NotNull String pattern,
-                                   final int offset,
-                                   boolean ignoreCase,
+  public static TextRange findNext(@NotNull Editor editor, @NotNull String pattern, final int offset, boolean ignoreCase,
                                    final boolean forwards) {
-    return findNext(editor, pattern, offset, ignoreCase, forwards, 1);
-  }
-
-  @Nullable
-  public static TextRange findNext(@NotNull Editor editor,
-                                   @NotNull String pattern,
-                                   final int offset,
-                                   boolean ignoreCase,
-                                   final boolean forwards,
-                                   final int count) {
-    if (count <= 0) {
-      return null;
-    }
-    final List<TextRange> results =
-      new ArrayList<>(findAll(editor, pattern, 0, -1, shouldIgnoreCase(pattern, ignoreCase)));
+    final List<TextRange> results = findAll(editor, pattern, 0, -1, shouldIgnoreCase(pattern, ignoreCase));
     if (results.isEmpty()) {
       return null;
     }
     final int size = EditorHelper.getFileSize(editor);
-    results.sort((r1, r2) -> {
+    final TextRange max = Collections.max(results, (r1, r2) -> {
       final int d1 = distance(r1, offset, forwards, size);
       final int d2 = distance(r2, offset, forwards, size);
       if (d1 < 0 && d2 >= 0) {
-        return Integer.MIN_VALUE;
+        return Integer.MAX_VALUE;
       }
-      return d1 - d2;
+      return d2 - d1;
     });
-    TextRange nThClosest = results.get((count - 1) % results.size());
     if (!Options.getInstance().isSet("wrapscan")) {
-      final int start = nThClosest.getStartOffset();
+      final int start = max.getStartOffset();
       if (forwards && start < offset) {
         return null;
       }
@@ -669,51 +644,32 @@ public class SearchGroup {
         return null;
       }
     }
-    return nThClosest;
+    return max;
   }
 
   @Nullable
-  public static TextRange findNextSearch(@NotNull Editor editor, int count, boolean forwards) {
-    String lastSearch = VimPlugin.getSearch().getLastSearch();
-    if (lastSearch == null) return null;
-
-    int currentPos = editor.getCaretModel().getOffset();
-    TextRange nextRange = new TextRange(currentPos, currentPos);
-    int startOffset = nextRange.getStartOffset();
-    nextRange = findNext(editor, lastSearch, startOffset - 1, false, forwards);
-    if (nextRange == null) {
-      return null;
+  public TextRange findNextSearchForGn(@NotNull Editor editor, int count, boolean forwards) {
+    if (forwards) {
+      return findIt(editor, editor.getCaretModel().getOffset(), count, 1, false, true, false, true);
+    } else {
+      return searchBackward(editor, editor.getCaretModel().getOffset(), count);
     }
-    return findNext(editor, lastSearch, nextRange, forwards, count - 1);
+  }
+
+  public TextRange findUnderCaret(@NotNull Editor editor) {
+    final TextRange backSearch = searchBackward(editor, editor.getCaretModel().getOffset() + 1, 1);
+    if (backSearch == null) return null;
+    return backSearch.contains(editor.getCaretModel().getOffset()) ? backSearch : null;
   }
 
   @Nullable
-  public static TextRange findCurrentOrNextSearch(@NotNull Editor editor, int count, boolean forwards) {
-    String lastSearch = VimPlugin.getSearch().getLastSearch();
-    if (lastSearch == null) return null;
-
-    int currentPos = editor.getCaretModel().getOffset();
-    TextRange nextRange = new TextRange(currentPos, currentPos);
-    int startOffset = nextRange.getStartOffset();
-    nextRange =
-      findCurrent(editor, lastSearch, startOffset).orElse(findNext(editor, lastSearch, startOffset, false, forwards));
-    if (nextRange == null) {
-      return null;
-    }
-    return findNext(editor, lastSearch, nextRange, forwards, count - 1);
-  }
-
-  @Nullable
-  private static TextRange findNext(@NotNull Editor editor,
-                                    @NotNull String lastSearch,
-                                    @NotNull TextRange nextRange,
-                                    boolean forwards,
-                                    int count) {
-    if (count <= 0) {
-      return nextRange;
-    }
-    return findNext(editor, lastSearch, Math.max(nextRange.getStartOffset() - (forwards ? 0 : 1), 0), false, forwards,
-                    count);
+  private TextRange searchBackward(@NotNull Editor editor, int offset, int count) {
+    // Backward search returns wrongs end offset for some cases. That's why we should perform additional forward search
+    final TextRange foundBackward = findIt(editor, offset, count, -1, false, true, false, true);
+    if (foundBackward == null) return null;
+    int startOffset = foundBackward.getStartOffset() - 1;
+    if (startOffset < 0) startOffset = EditorHelper.getFileSize(editor);
+    return findIt(editor, startOffset, 1, 1, false, true, false, true);
   }
 
   private static int distance(@NotNull TextRange range, int pos, boolean forwards, int size) {
@@ -888,10 +844,8 @@ public class SearchGroup {
   @Nullable
   private TextRange findIt(@NotNull Editor editor, int startOffset, int count, int dir,
                            boolean noSmartCase, boolean wrap, boolean showMessages, boolean wholeFile) {
-    TextRange res = null;
-
     if (lastSearch == null || lastSearch.length() == 0) {
-      return res;
+      return null;
     }
 
     /*
@@ -907,10 +861,6 @@ public class SearchGroup {
     regmatch.rmm_ic = shouldIgnoreCase(lastSearch, noSmartCase);
     sp = new RegExp();
     regmatch.regprog = sp.vim_regcomp(lastSearch, 1);
-    if (regmatch == null) {
-      if (logger.isDebugEnabled()) logger.debug("bad pattern: " + lastSearch);
-      return res;
-    }
 
     /*
     int extra_col = 1;
