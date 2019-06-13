@@ -21,14 +21,12 @@ package com.maddyhome.idea.vim.action.motion.updown;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.VisualPosition;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import com.maddyhome.idea.vim.helper.CaretDataKt;
-import com.maddyhome.idea.vim.helper.CommandStateHelper;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,10 +56,7 @@ public class MotionUpAction extends MotionEditorAction {
     @Override
     protected void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                             @NotNull Command cmd) {
-      VisualPosition pos = caret.getVisualPosition();
-      final int lastColumn = EditorHelper.lastColumnForLine(editor, pos.line, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
-      int targetColumn = pos.column != lastColumn ? pos.column : col;
-      CaretDataKt.setVimLastColumn(caret, targetColumn);
+      EditorHelper.updateLastColumn(editor, caret, col);
     }
 
     private int col;

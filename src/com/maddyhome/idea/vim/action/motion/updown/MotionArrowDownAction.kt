@@ -31,8 +31,6 @@ import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.helper.isEndAllowed
-import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import java.awt.event.KeyEvent
 import java.util.*
@@ -52,9 +50,7 @@ class MotionArrowDownAction : VimCommandAction() {
     }
 
     override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
-      val pos = caret.visualPosition
-      val lastColumn = EditorHelper.lastColumnForLine(editor, pos.line, editor.mode.isEndAllowed)
-      caret.vimLastColumn = if (pos.column != lastColumn) pos.column else col
+      EditorHelper.updateLastColumn(editor, caret, col)
     }
   }
 

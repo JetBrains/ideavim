@@ -719,6 +719,14 @@ public class EditorHelper {
     return editor.offsetToVisualPosition(EditorHelper.getLineEndOffset(editor, line, allowEnd)).column;
   }
 
+  public static void updateLastColumn(@NotNull Editor editor, @NotNull Caret caret, int prevLastColumn) {
+    VisualPosition pos = caret.getVisualPosition();
+    final LogicalPosition logicalPosition = caret.getLogicalPosition();
+    final int lastColumn = EditorHelper.lastColumnForLine(editor, logicalPosition.line, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
+    int targetColumn = pos.column != lastColumn ? pos.column : prevLastColumn;
+    CaretDataKt.setVimLastColumn(caret, targetColumn);
+  }
+
   private static int scrollFullPageDown(@NotNull final Editor editor, int pages) {
     final Rectangle visibleArea = editor.getScrollingModel().getVisibleArea();
     final int lineCount = getVisualLineCount(editor);

@@ -1282,7 +1282,8 @@ public class MotionGroup {
   }
 
   public int moveCaretVertical(@NotNull Editor editor, @NotNull Caret caret, int count) {
-    VisualPosition pos = caret.getVisualPosition();
+   VisualPosition pos = caret.getVisualPosition();
+    final LogicalPosition logicalPosition = caret.getLogicalPosition();
     if ((pos.line == 0 && count < 0) || (pos.line >= EditorHelper.getVisualLineCount(editor) - 1 && count > 0)) {
       return -1;
     }
@@ -1290,14 +1291,19 @@ public class MotionGroup {
       int col = CaretDataKt.getVimLastColumn(caret);
       int line = EditorHelper.normalizeVisualLine(editor, pos.line + count);
       final CommandState.Mode mode = CommandStateHelper.getMode(editor);
-      final int lastColumnCurrentLine = EditorHelper.lastColumnForLine(editor, pos.line, CommandStateHelper.isEndAllowed(mode));
+      final int lastColumnCurrentLine = EditorHelper.lastColumnForLine(editor, logicalPosition.line, CommandStateHelper.isEndAllowed(mode));
 
       if (pos.column < col && lastColumnCurrentLine != pos.column) {
         col = pos.column;
       }
-      VisualPosition newPos = new VisualPosition(line, EditorHelper.normalizeVisualColumn(editor, line, col,
-                                                                                          CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor))));
+      final int normalizedCol = EditorHelper
+        .normalizeVisualColumn(editor, line, col, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
+      VisualPosition newPos = new VisualPosition(line, normalizedCol);
 
+      if (editor.visualToLogicalPosition(newPos).line == newPos.line && editor.visualToLogicalPosition(newPos).column != newPos.column) {
+        // There is some inconsistency with parameter hints (they are counted as one column)
+        return editor.logicalPositionToOffset(new LogicalPosition(line, normalizedCol));
+      }
       return EditorHelper.visualPositionToOffset(editor, newPos);
     }
   }

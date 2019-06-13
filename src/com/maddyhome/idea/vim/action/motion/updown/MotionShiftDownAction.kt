@@ -27,8 +27,6 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.isEndAllowed
-import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import javax.swing.KeyStroke
@@ -45,10 +43,7 @@ class MotionShiftDownAction : VimCommandAction() {
         val col = caret.vimLastColumn
         MotionGroup.moveCaret(editor, caret, vertical)
 
-        val pos = caret.visualPosition
-        val lastColumn = EditorHelper.lastColumnForLine(editor, pos.line, editor.mode.isEndAllowed)
-        val targetColumn = if (pos.column != lastColumn) pos.column else col
-        caret.vimLastColumn = targetColumn
+        EditorHelper.updateLastColumn(editor, caret, col)
       }
     }
 
