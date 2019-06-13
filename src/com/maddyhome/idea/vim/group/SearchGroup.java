@@ -77,6 +77,16 @@ public class SearchGroup {
     options.getOption(Options.SMART_CASE).addOptionChangeListener(updateHighlightsIfVisible);
   }
 
+  public void turnOn() {
+    updateSearchHighlights();
+  }
+
+  public void turnOff() {
+    final boolean show = showSearchHighlight;
+    clearSearchHighlight();
+    showSearchHighlight = show;
+  }
+
   @Nullable
   public String getLastSearch() {
     return lastSearch;

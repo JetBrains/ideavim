@@ -410,6 +410,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
     getEditor().turnOn();
     getMotion().turnOn();
+    getSearch().turnOn();
   }
 
   private void turnOffPlugin() {
@@ -417,6 +418,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
 
     getEditor().turnOff();
     getMotion().turnOff();
+    getSearch().turnOff();
   }
 
   private void updateState() {
