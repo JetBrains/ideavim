@@ -29,10 +29,11 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.CaretOrder
+import com.maddyhome.idea.vim.helper.enumSetOf
 
 class GotoCharacterHandler : CommandHandler(commands("go[to]"),
   flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL),
-  true, CaretOrder.DECREASING_OFFSET, flags(CommandFlags.FLAG_MOT_EXCLUSIVE)
+  true, CaretOrder.DECREASING_OFFSET, enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
 ) {
   override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
     val count = cmd.getCount(editor, caret, context, 1, true)

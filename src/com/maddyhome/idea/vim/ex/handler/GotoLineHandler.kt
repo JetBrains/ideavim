@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.CaretOrder
 import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.enumSetOf
 
 /**
  * This handles Ex commands that just specify a range which translates to moving the cursor to the line given by the
@@ -36,7 +37,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
  */
 class GotoLineHandler : CommandHandler(
   flags(RangeFlag.RANGE_REQUIRED, ArgumentFlag.ARGUMENT_OPTIONAL),
-  flags(CommandFlags.FLAG_MOT_EXCLUSIVE),
+  enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE),
   true, CaretOrder.DECREASING_OFFSET
 ) {
   /**

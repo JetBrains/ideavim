@@ -18,19 +18,14 @@
 
 package com.maddyhome.idea.vim.ex
 
-import java.util.*
-
 data class CommandName(val required: String, val optional: String = "")
 
-private val commandPattern: Regex = "^([^\\[]+)(?:\\[([^]]+)])?\$".toRegex()
 fun commands(vararg commands: String) = commands.map { command ->
   commandPattern.matchEntire(command)?.groupValues?.let { CommandName(it[1], it[2]) }
     ?: throw RuntimeException("$command is invalid!")
 }.toTypedArray()
 
-fun <T : Enum<T>> flags(first: T, vararg rest: T): EnumSet<T> {
-  return EnumSet.of(first, *rest)
-}
-
 fun flags(rangeFlag: CommandHandler.RangeFlag, argumentFlag: CommandHandler.ArgumentFlag, vararg flags: CommandHandler.Flag) =
   CommandHandler.CommandHandlerFlags(rangeFlag, argumentFlag, flags.toSet())
+
+private val commandPattern: Regex = "^([^\\[]+)(?:\\[([^]]+)])?\$".toRegex()
