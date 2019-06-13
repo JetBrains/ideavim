@@ -23,18 +23,22 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.text.StringUtil
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.ex.*
+import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.LineRange
+import com.maddyhome.idea.vim.ex.commands
+import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import java.util.*
 
 /**
  * @author Alex Selesse
  */
-class SortHandler : CommandHandler(
-  commands("sor[t]"),
-  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE)
-) {
+class SortHandler : CommandHandler.SingleExecution() {
+  override val names = commands("sor[t]")
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE)
 
   @Throws(ExException::class)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {

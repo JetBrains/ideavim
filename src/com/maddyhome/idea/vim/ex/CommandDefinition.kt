@@ -26,6 +26,6 @@ fun commands(vararg commands: String) = commands.map { command ->
 }.toTypedArray()
 
 fun flags(rangeFlag: CommandHandler.RangeFlag, argumentFlag: CommandHandler.ArgumentFlag, vararg flags: CommandHandler.Flag) =
-  CommandHandler.CommandHandlerFlags(rangeFlag, argumentFlag, flags.toSet())
+  CommandHandlerFlags(rangeFlag, argumentFlag, flags.toSet())
 
 private val commandPattern: Regex = "^([^\\[]+)(?:\\[([^]]+)])?\$".toRegex()

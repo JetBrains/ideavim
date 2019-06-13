@@ -25,10 +25,9 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
-class NoHLSearchHandler : CommandHandler(
-  commands("noh[lsearch]"),
-  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN)
-) {
+class NoHLSearchHandler : CommandHandler.SingleExecution() {
+  override val names = commands("noh[lsearch]")
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_FORBIDDEN)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     VimPlugin.getSearch().clearSearchHighlight()
     return true

@@ -31,10 +31,9 @@ import java.io.File
 /**
  * @author vlan
  */
-class SourceHandler : CommandHandler(
-  commands("so[urce]"),
-  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED)
-), VimScriptCommandHandler {
+class SourceHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
+  override val names = commands("so[urce]")
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     execute(cmd)
     return true

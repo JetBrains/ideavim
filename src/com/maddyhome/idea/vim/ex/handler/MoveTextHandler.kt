@@ -24,8 +24,15 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.ex.*
+import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
+import com.maddyhome.idea.vim.ex.CommandParser
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.InvalidRangeException
+import com.maddyhome.idea.vim.ex.LineRange
+import com.maddyhome.idea.vim.ex.commands
+import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.handler.CaretOrder
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -33,10 +40,9 @@ import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 import java.util.*
 
-class MoveTextHandler : CommandHandler(
-  commands("m[ove]"),
-  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, WRITABLE)
-) {
+class MoveTextHandler : CommandHandler.SingleExecution() {
+  override val names = commands("m[ove]")
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, WRITABLE)
   @Throws(ExException::class)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val carets = EditorHelper.getOrderedCaretsList(editor, CaretOrder.DECREASING_OFFSET)
@@ -76,7 +82,7 @@ class MoveTextHandler : CommandHandler(
     return true
   }
 
-  @Throws(InvalidRangeException::class)
+  @Throws
   private fun normalizeLine(editor: Editor, caret: Caret, context: DataContext,
                             command: ExCommand, lineRange: LineRange): Int {
     var line = command.ranges.getFirstLine(editor, caret, context)

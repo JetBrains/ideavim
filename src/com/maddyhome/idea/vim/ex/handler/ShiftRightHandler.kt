@@ -25,16 +25,16 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
+import com.maddyhome.idea.vim.ex.CommandHandlerFlags
+import com.maddyhome.idea.vim.ex.CommandName
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
-import com.maddyhome.idea.vim.handler.CaretOrder
 
-class ShiftRightHandler : CommandHandler(
-  commands(">[${">".repeat(31)}]"),
-  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE),
-  true, CaretOrder.DECREASING_OFFSET
-) {
+class ShiftRightHandler : CommandHandler.ForEachCaret() {
+  override val names: Array<CommandName> = commands(">[${">".repeat(31)}]")
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE)
+
   override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
     val range = cmd.getTextRange(editor, caret, context, true)
     val endOffsets = range.endOffsets.map { it - 1 }.toIntArray()

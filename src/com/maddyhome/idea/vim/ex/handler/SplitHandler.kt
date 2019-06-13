@@ -27,10 +27,9 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
-class SplitHandler : CommandHandler(
-  commands("vs[plit]", "sp[lit]"),
-  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
-) {
+class SplitHandler : CommandHandler.SingleExecution() {
+  override val names = commands("vs[plit]", "sp[lit]")
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     if (cmd.command.startsWith("v")) {
       VimPlugin.getWindow().splitWindowVertical(context, cmd.argument)

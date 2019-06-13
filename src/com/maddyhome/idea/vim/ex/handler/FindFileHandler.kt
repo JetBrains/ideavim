@@ -29,10 +29,9 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
-class FindFileHandler : CommandHandler(
-  commands("fin[d]"),
-  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
-) {
+class FindFileHandler : CommandHandler.SingleExecution() {
+  override val names = commands("fin[d]")
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val arg = cmd.argument
     if (arg.isNotEmpty()) {

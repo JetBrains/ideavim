@@ -26,10 +26,9 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
-class WriteAllHandler : CommandHandler(
-  commands("wa[ll]"),
-  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
-) {
+class WriteAllHandler : CommandHandler.SingleExecution() {
+  override val names = commands("wa[ll]")
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     VimPlugin.getFile().saveFiles()
     return true

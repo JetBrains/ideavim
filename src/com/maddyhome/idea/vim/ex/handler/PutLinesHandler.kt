@@ -29,10 +29,9 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.copy.PutData
 
-class PutLinesHandler : CommandHandler(
-  commands("pu[t]"),
-  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE)
-) {
+class PutLinesHandler : CommandHandler.SingleExecution() {
+  override val names = commands("pu[t]")
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     if (editor.isOneLineMode) return false

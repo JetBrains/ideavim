@@ -27,10 +27,9 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
-class NextFileHandler : CommandHandler(
-  commands("n[ext]"),
-  flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
-) {
+class NextFileHandler : CommandHandler.SingleExecution() {
+  override val names = commands("n[ext]")
+  override val argFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val count = cmd.getCount(editor, context, 1, true)

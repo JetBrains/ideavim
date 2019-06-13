@@ -26,10 +26,9 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
-class PromptFindHandler : CommandHandler(
-  commands("pro[mptfind]"),
-  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
-) {
+class PromptFindHandler : CommandHandler.SingleExecution() {
+  override val names = commands("pro[mptfind]")
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand) =
     KeyHandler.executeAction("Find", context)
 }
