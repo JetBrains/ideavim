@@ -31,10 +31,18 @@ import org.jetbrains.annotations.Nullable;
 public abstract class MotionEditorAction extends EditorAction {
   private final MotionActionHandler handler;
 
-  public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
+  public int getOffset(@NotNull Editor editor,
+                       @NotNull Caret caret,
+                       @NotNull DataContext context,
+                       int count,
                        int rawCount,
                        @Nullable Argument argument) {
-    return handler.getOffset(editor, caret, context, count, rawCount, argument);
+    if (handler instanceof MotionActionHandler.SingleExecution) {
+      return ((MotionActionHandler.SingleExecution)handler).getOffset(editor, context, count, rawCount, argument);
+    }
+    else {
+      return ((MotionActionHandler.ForEachCaret)handler).getOffset(editor, caret, context, count, rawCount, argument);
+    }
   }
 
   public MotionEditorAction(MotionActionHandler handler) {

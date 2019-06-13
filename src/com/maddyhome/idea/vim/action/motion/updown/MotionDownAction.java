@@ -53,7 +53,7 @@ public class MotionDownAction extends MotionEditorAction {
     }
 
     @Override
-    protected boolean preOffsetComputation(@NotNull Editor editor,
+    public boolean preOffsetComputation(@NotNull Editor editor,
                                            @NotNull Caret caret,
                                            @NotNull DataContext context,
                                            @NotNull Command cmd) {
@@ -62,7 +62,7 @@ public class MotionDownAction extends MotionEditorAction {
     }
 
     @Override
-    protected void postMove(@NotNull Editor editor,
+    public void postMove(@NotNull Editor editor,
                             @NotNull Caret caret,
                             @NotNull DataContext context,
                             @NotNull Command cmd) {

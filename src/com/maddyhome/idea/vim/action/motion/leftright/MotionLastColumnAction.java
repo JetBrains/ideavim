@@ -64,14 +64,14 @@ public class MotionLastColumnAction extends MotionEditorAction {
     }
 
     @Override
-    protected void postMove(@NotNull Editor editor,
+    public void postMove(@NotNull Editor editor,
                             @NotNull Caret caret,
                             @NotNull DataContext context,
                             @NotNull Command cmd) {
       CaretDataKt.setVimLastColumn(caret, MotionGroup.LAST_COLUMN);
     }
 
-    protected void preMove(@NotNull Editor editor,
+    public void preMove(@NotNull Editor editor,
                            @NotNull Caret caret,
                            @NotNull DataContext context,
                            @NotNull Command cmd) {

@@ -49,7 +49,7 @@ final public class ChangeCaseLowerVisualAction extends VimCommandAction {
   final protected EditorActionHandler makeActionHandler() {
     return new VisualOperatorActionHandler.ForEachCaret() {
       @Override
-      protected boolean executeAction(@NotNull Editor editor,
+      public boolean executeAction(@NotNull Editor editor,
                                       @NotNull Caret caret,
                                       @NotNull DataContext context,
                                       @NotNull Command cmd,

@@ -45,7 +45,7 @@ public class MotionUpAction extends MotionEditorAction {
     }
 
     @Override
-    protected boolean preOffsetComputation(@NotNull Editor editor,
+    public boolean preOffsetComputation(@NotNull Editor editor,
                                            @NotNull Caret caret,
                                            @NotNull DataContext context,
                                            @NotNull Command cmd) {
@@ -54,7 +54,7 @@ public class MotionUpAction extends MotionEditorAction {
     }
 
     @Override
-    protected void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+    public void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                             @NotNull Command cmd) {
       EditorHelper.updateLastColumn(editor, caret, col);
     }
