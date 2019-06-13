@@ -18,7 +18,11 @@
 
 package com.maddyhome.idea.vim.group.visual
 
-import com.intellij.openapi.editor.*
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.CaretVisualAttributes
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.LogicalPosition
+import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.colors.EditorColors
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
@@ -188,7 +192,14 @@ fun toNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.M
   }
 
 fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor) {
-  if (!editor.inVisualMode) return
+  if (!editor.inVisualMode) {
+    editor.caretModel.allCarets.forEach { caret ->
+      val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
+      val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
+      if (caret.offset == lineEnd && lineEnd != lineStart) caret.moveToOffset(caret.offset - 1)
+    }
+    return
+  }
   editor.caretModel.allCarets.forEach { caret ->
     if (caret.hasSelection() && caret.selectionEnd == caret.offset) {
       if (caret.selectionEnd <= 0) return@forEach

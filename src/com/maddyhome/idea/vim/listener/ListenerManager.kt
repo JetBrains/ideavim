@@ -21,7 +21,12 @@ package com.maddyhome.idea.vim.listener
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
-import com.intellij.openapi.editor.event.*
+import com.intellij.openapi.editor.event.EditorMouseEvent
+import com.intellij.openapi.editor.event.EditorMouseEventArea
+import com.intellij.openapi.editor.event.EditorMouseListener
+import com.intellij.openapi.editor.event.EditorMouseMotionListener
+import com.intellij.openapi.editor.event.SelectionEvent
+import com.intellij.openapi.editor.event.SelectionListener
 import com.intellij.openapi.editor.ex.DocumentEx
 import com.intellij.openapi.editor.impl.EditorComponentImpl
 import com.maddyhome.idea.vim.EventFacade
@@ -173,6 +178,13 @@ object VimListenerManager {
         mouseDragging = true
         isBlockCaret = e.editor.settings.isBlockCursor
         ChangeGroup.resetCursor(e.editor, true)
+        val caret = e.editor.caretModel.primaryCaret
+        val lineEnd = EditorHelper.getLineEndForOffset(e.editor, caret.offset)
+        val lineStart = EditorHelper.getLineStartForOffset(e.editor, caret.offset)
+        if (caret.offset == lineEnd && lineEnd != lineStart && caret.offset - 1 == caret.selectionStart && caret.offset == caret.selectionEnd) {
+          // UX protection for case when user performs a small dragging while putting caret on line end
+          caret.removeSelection()
+        }
       }
     }
 
@@ -182,14 +194,7 @@ object VimListenerManager {
         logger.debug("Release mouse after dragging")
         val editor = event.editor
         val caret = editor.caretModel.primaryCaret
-        val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
-        val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
         SelectionVimListenerSuppressor.use {
-          if (caret.offset == lineEnd && lineEnd != lineStart && caret.offset - 1 == caret.selectionStart && caret.offset == caret.selectionEnd) {
-            // UX protection for case when user performs a small dragging while putting caret on line end
-            caret.removeSelection()
-            caret.moveToOffset(caret.offset - 1)
-          }
           VimPlugin.getVisualMotion().controlNonVimSelectionChange(editor, !isBlockCaret, VimListenerManager.SelectionSource.MOUSE)
           moveCaretOneCharLeftFromSelectionEnd(editor)
           caret.vimLastColumn = editor.caretModel.visualPosition.column
