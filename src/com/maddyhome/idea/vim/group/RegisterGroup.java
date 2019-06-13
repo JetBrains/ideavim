@@ -275,8 +275,9 @@ public class RegisterGroup {
     if (project == null) return text;
 
     final PsiFile file = PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
+    if (file == null) return text;
     String rawText = TextBlockTransferable.convertLineSeparators(text, "\n", transferableDatas);
-    String escapedText = null;
+    String escapedText;
     for (CopyPastePreProcessor processor : CopyPastePreProcessor.EP_NAME.getExtensionList()) {
       escapedText = processor.preprocessOnCopy(file, textRange.getStartOffsets(), textRange.getEndOffsets(), rawText);
       if (escapedText != null) {
