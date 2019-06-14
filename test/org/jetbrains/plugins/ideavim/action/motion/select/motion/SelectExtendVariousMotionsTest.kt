@@ -29,8 +29,8 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  */
 class SelectExtendVariousMotionsTest : VimTestCase() {
 
-    fun `test with tabs`() {
-        val code = """
+  fun `test with tabs`() {
+    val code = """
             class Scratch {
             	public static void main(String[] args) {
             		try {
@@ -44,11 +44,11 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
             ${c}}
         """.trimIndent()
 
-        myFixture.configureByText(PlainTextFileType.INSTANCE, code)
+    myFixture.configureByText(PlainTextFileType.INSTANCE, code)
 
-        typeText(parseKeys("g<C-H>", "<S-UP>".repeat(2), "<S-Right>".repeat(2)))
+    typeText(parseKeys("g<C-H>", "<S-UP>".repeat(2), "<S-Right>".repeat(2)))
 
-        myFixture.checkResult("""
+    myFixture.checkResult("""
             class Scratch {
             	public static void main(String[] args) {
             		try {
@@ -61,11 +61,11 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
             ${s}${c}${se}	return anything
             ${s}}${c}${se}
         """.trimIndent()
-        )
+    )
 
-        typeText(parseKeys("<S-UP>".repeat(7), "<S-Right>".repeat(3)))
+    typeText(parseKeys("<S-UP>".repeat(7), "<S-Right>".repeat(3)))
 
-        myFixture.checkResult("""
+    myFixture.checkResult("""
             class Scratch {
             ${s}	pu${c}${se}blic static void main(String[] args) {
             ${s}	${c}${se}	try {
@@ -78,11 +78,11 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
             ${s}	re${c}${se}turn anything
             ${s}}${c}${se}
         """.trimIndent()
-        )
+    )
 
-        typeText(parseKeys("<S-Right>".repeat(2)))
+    typeText(parseKeys("<S-Right>".repeat(2)))
 
-        myFixture.checkResult("""
+    myFixture.checkResult("""
             class Scratch {
             ${s}	publ${c}${se}ic static void main(String[] args) {
             ${s}		${c}${se}try {
@@ -95,6 +95,6 @@ class SelectExtendVariousMotionsTest : VimTestCase() {
             ${s}	retu${c}${se}rn anything
             ${s}}${c}${se}
         """.trimIndent()
-        )
-    }
+    )
+  }
 }

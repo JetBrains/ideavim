@@ -24,93 +24,93 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  * @author Alex Plate
  */
 class ShiftLeftHandlerTest : VimTestCase() {
-    fun `test simple left shift`() {
-        val before = """        I found it in a legendary land
+  fun `test simple left shift`() {
+    val before = """        I found it in a legendary land
                       |        ${c}all rocks and lavender and tufted grass,
                       |        where it was settled on some sodden sand
                       |        hard by the torrent of a mountain pass.
                        """.trimMargin()
-        configureByJavaText(before)
+    configureByJavaText(before)
 
-        typeText(commandToKeys("<"))
+    typeText(commandToKeys("<"))
 
-        val after = """        I found it in a legendary land
+    val after = """        I found it in a legendary land
                       |    ${c}all rocks and lavender and tufted grass,
                       |        where it was settled on some sodden sand
                       |        hard by the torrent of a mountain pass.
                        """.trimMargin()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    fun `test double left shift`() {
-        val before = """        I found it in a legendary land
+  fun `test double left shift`() {
+    val before = """        I found it in a legendary land
                       |        ${c}all rocks and lavender and tufted grass,
                       |        where it was settled on some sodden sand
                       |        hard by the torrent of a mountain pass.
                        """.trimMargin()
-        configureByJavaText(before)
+    configureByJavaText(before)
 
-        typeText(commandToKeys("<<"))
+    typeText(commandToKeys("<<"))
 
-        val after = """        I found it in a legendary land
+    val after = """        I found it in a legendary land
                       |${c}all rocks and lavender and tufted grass,
                       |        where it was settled on some sodden sand
                       |        hard by the torrent of a mountain pass.
                        """.trimMargin()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    fun `test left shift no space`() {
-        val before = """I found it in a legendary land
+  fun `test left shift no space`() {
+    val before = """I found it in a legendary land
                       |${c}all rocks and lavender and tufted grass,
                       |where it was settled on some sodden sand
                       |hard by the torrent of a mountain pass.
                        """.trimMargin()
-        configureByJavaText(before)
+    configureByJavaText(before)
 
-        typeText(commandToKeys("<"))
+    typeText(commandToKeys("<"))
 
-        val after = """I found it in a legendary land
+    val after = """I found it in a legendary land
                       |${c}all rocks and lavender and tufted grass,
                       |where it was settled on some sodden sand
                       |hard by the torrent of a mountain pass.
                        """.trimMargin()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    fun `test range left shift`() {
-        val before = """        I found it in a legendary land
+  fun `test range left shift`() {
+    val before = """        I found it in a legendary land
                       |        ${c}all rocks and lavender and tufted grass,
                       |        where it was settled on some sodden sand
                       |        hard by the torrent of a mountain pass.
                        """.trimMargin()
-        configureByJavaText(before)
+    configureByJavaText(before)
 
-        typeText(commandToKeys("3,4<"))
+    typeText(commandToKeys("3,4<"))
 
-        val after = """        I found it in a legendary land
+    val after = """        I found it in a legendary land
                       |        all rocks and lavender and tufted grass,
                       |    ${c}where it was settled on some sodden sand
                       |    hard by the torrent of a mountain pass.
                        """.trimMargin()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
-    fun `test multiple carets`() {
-        val before = """    I found it in a legendary land
+  fun `test multiple carets`() {
+    val before = """    I found it in a legendary land
                       |${c}all rocks and lavender and tufted grass,
                       |    ${c}where it was settled on some sodden sand
                       |    hard by the$c torrent of a mountain pass.
                        """.trimMargin()
-        configureByJavaText(before)
+    configureByJavaText(before)
 
-        typeText(commandToKeys("<"))
+    typeText(commandToKeys("<"))
 
-        val after = """    I found it in a legendary land
+    val after = """    I found it in a legendary land
                       |${c}all rocks and lavender and tufted grass,
                       |${c}where it was settled on some sodden sand
                       |${c}hard by the torrent of a mountain pass.
                        """.trimMargin()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 }

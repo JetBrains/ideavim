@@ -23,9 +23,9 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class InsertDeleteInsertedTextActionTest : VimTestCase() {
-    // VIM-1655
-    fun `test deleted text is not yanked`() {
-        doTest(parseKeys("yiw", "ea", "Hello", "<C-U>", "<ESC>p"), """
+  // VIM-1655
+  fun `test deleted text is not yanked`() {
+    doTest(parseKeys("yiw", "ea", "Hello", "<C-U>", "<ESC>p"), """
             A Discovery
 
             I found ${c}it in a legendary land
@@ -34,12 +34,12 @@ class InsertDeleteInsertedTextActionTest : VimTestCase() {
 
             I found iti${c}t in a legendary land
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+  }
 
-    // VIM-1655
-    // VimBehaviourDiffers. Inserted text is not deleted after <C-U>
-    fun `test deleted text is not yanked after replace`() {
-        doTest(parseKeys("yiw", "eR", "Hello", "<C-U>", "<ESC>p"), """
+  // VIM-1655
+  // VimBehaviourDiffers. Inserted text is not deleted after <C-U>
+  fun `test deleted text is not yanked after replace`() {
+    doTest(parseKeys("yiw", "eR", "Hello", "<C-U>", "<ESC>p"), """
             A Discovery
 
             I found ${c}it in a legendary land
@@ -48,5 +48,5 @@ class InsertDeleteInsertedTextActionTest : VimTestCase() {
 
             I found ii${c}ta legendary land
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+  }
 }

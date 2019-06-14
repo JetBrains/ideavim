@@ -24,99 +24,99 @@ import org.jetbrains.plugins.ideavim.VimTestCase
 
 class VisualBlockInsertActionTest : VimTestCase() {
 
-    // VIM-1110 |CTRL-V| |v_b_i| |zc|
-    fun `test block insert after folds`() {
-        configureByJavaText("""$c/**
+  // VIM-1110 |CTRL-V| |v_b_i| |zc|
+  fun `test block insert after folds`() {
+    configureByJavaText("""$c/**
  * Something to fold.
  */
 foo
 bar
 """)
-        typeText(parseKeys("zc", "j", "<C-V>", "j", "I", "X", "<Esc>"))
-        myFixture.checkResult("""/**
+    typeText(parseKeys("zc", "j", "<C-V>", "j", "I", "X", "<Esc>"))
+    myFixture.checkResult("""/**
  * Something to fold.
  */
 ${c}Xfoo
 Xbar
 """)
-    }
+  }
 
-    // VIM-1379 |CTRL-V| |j| |v_b_I|
-    fun `test insert visual block with empty line in the middle`() {
-        doTest(parseKeys("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
-                """
+  // VIM-1379 |CTRL-V| |j| |v_b_I|
+  fun `test insert visual block with empty line in the middle`() {
+    doTest(parseKeys("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
+      """
                     foo
 
                     bar
 
                     """.trimIndent(),
-                """
+      """
                     fo_quux_o
 
                     ba_quux_r
 
                     """.trimIndent(),
-                CommandState.Mode.COMMAND,
-                CommandState.SubMode.NONE)
-    }
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+  }
 
-    // VIM-632 |CTRL-V| |v_b_I|
-    fun `test change visual block`() {
-        doTest(parseKeys("<C-V>", "j", "I", "quux ", "<Esc>"),
-                """
+  // VIM-632 |CTRL-V| |v_b_I|
+  fun `test change visual block`() {
+    doTest(parseKeys("<C-V>", "j", "I", "quux ", "<Esc>"),
+      """
                     foo bar
                     ${c}baz quux
                     spam eggs
 
                     """.trimIndent(),
-                ("""
+      ("""
                     foo bar
                     ${c}quux baz quux
                     quux spam eggs
 
                     """.trimIndent()),
-                CommandState.Mode.COMMAND,
-                CommandState.SubMode.NONE)
-    }
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+  }
 
-    fun `test visual block insert`() {
-        val before = """
+  fun `test visual block insert`() {
+    val before = """
             ${c}int a;
             int b;
             int c;
             """.trimIndent()
-        typeTextInFile(parseKeys("<C-V>", "2j", "I", "const ", "<Esc>"), before)
-        val after = """
+    typeTextInFile(parseKeys("<C-V>", "2j", "I", "const ", "<Esc>"), before)
+    val after = """
             ${c}const int a;
             const int b;
             const int c;
             """.trimIndent()
-        myFixture.checkResult(after)
-    }
+    myFixture.checkResult(after)
+  }
 
 
-    // VIM-1379 |CTRL-V| |j| |v_b_I|
-    fun `test insert visual block with shorter line in the middle`() {
-        doTest(parseKeys("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
-                """
+  // VIM-1379 |CTRL-V| |j| |v_b_I|
+  fun `test insert visual block with shorter line in the middle`() {
+    doTest(parseKeys("ll", "<C-V>", "jjI", "_quux_", "<Esc>"),
+      """
                     foo
                     x
                     bar
 
                     """.trimIndent(),
-                ("""
+      ("""
                     fo_quux_o
                     x
                     ba_quux_r
 
                     """.trimIndent()),
-                CommandState.Mode.COMMAND,
-                CommandState.SubMode.NONE)
-    }
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+  }
 
-    fun `test insert in non block mode`() {
-        doTest(parseKeys("vwIHello<esc>"),
-                """
+  fun `test insert in non block mode`() {
+    doTest(parseKeys("vwIHello<esc>"),
+      """
                 ${c}A Discovery
 
                 ${c}I found it in a legendary land
@@ -124,7 +124,7 @@ Xbar
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                """
+      """
                 Hell${c}oA Discovery
 
                 Hell${c}oI found it in a legendary land
@@ -132,8 +132,8 @@ Xbar
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                CommandState.Mode.COMMAND,
-                CommandState.SubMode.NONE)
-        assertMode(CommandState.Mode.COMMAND)
-    }
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+    assertMode(CommandState.Mode.COMMAND)
+  }
 }

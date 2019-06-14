@@ -39,152 +39,152 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  */
 class TemplateTest : VimTestCase() {
 
-    private lateinit var disposable: Disposable
+  private lateinit var disposable: Disposable
 
-    override fun setUp() {
-        super.setUp()
-        disposable = Disposer.newDisposable()
-    }
+  override fun setUp() {
+    super.setUp()
+    disposable = Disposer.newDisposable()
+  }
 
-    override fun tearDown() {
-        super.tearDown()
-        Disposer.dispose(disposable)
-    }
+  override fun tearDown() {
+    super.tearDown()
+    Disposer.dispose(disposable)
+  }
 
-    fun `test simple rename`() {
-        configureByJavaText("""
+  fun `test simple rename`() {
+    configureByJavaText("""
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
         """.trimIndent())
-        doInlineRename(VariableInplaceRenameHandler(), "myNewVar", myFixture)
-        myFixture.checkResult("""
+    doInlineRename(VariableInplaceRenameHandler(), "myNewVar", myFixture)
+    myFixture.checkResult("""
             class Hello {
                 public static void main() {
                     int my${c}NewVar = 5;
                 }
             }
         """.trimIndent())
-    }
+  }
 
-    fun `test type rename`() {
-        configureByJavaText("""
+  fun `test type rename`() {
+    configureByJavaText("""
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
         """.trimIndent())
-        startRenaming(VariableInplaceRenameHandler())
-        assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+    startRenaming(VariableInplaceRenameHandler())
+    assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
 
-        typeText(parseKeys("myNewVar", "<CR>"))
+    typeText(parseKeys("myNewVar", "<CR>"))
 
-        assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
-        myFixture.checkResult("""
+    assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    myFixture.checkResult("""
             class Hello {
                 public static void main() {
                     int myNewVar${c} = 5;
                 }
             }
         """.trimIndent())
-    }
+  }
 
-    fun `test selectmode without template`() {
-        Options.getInstance().getListOption(Options.SELECTMODE)!!.remove("template")
-        configureByJavaText("""
+  fun `test selectmode without template`() {
+    Options.getInstance().getListOption(Options.SELECTMODE)!!.remove("template")
+    configureByJavaText("""
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
         """.trimIndent())
-        startRenaming(VariableInplaceRenameHandler())
-        assertState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
-    }
+    startRenaming(VariableInplaceRenameHandler())
+    assertState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+  }
 
-    fun `test prepend`() {
-        configureByJavaText("""
+  fun `test prepend`() {
+    configureByJavaText("""
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
         """.trimIndent())
-        startRenaming(VariableInplaceRenameHandler())
-        assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+    startRenaming(VariableInplaceRenameHandler())
+    assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
 
-        typeText(parseKeys("<Left>"))
-        assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
-        typeText(parseKeys("pre", "<CR>"))
+    typeText(parseKeys("<Left>"))
+    assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    typeText(parseKeys("pre", "<CR>"))
 
-        assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
-        myFixture.checkResult("""
+    assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    myFixture.checkResult("""
             class Hello {
                 public static void main() {
                     int mpre${c}yVar = 5;
                 }
             }
         """.trimIndent())
-    }
+  }
 
-    fun `test escape`() {
-        configureByJavaText("""
+  fun `test escape`() {
+    configureByJavaText("""
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
         """.trimIndent())
-        startRenaming(VariableInplaceRenameHandler())
-        assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+    startRenaming(VariableInplaceRenameHandler())
+    assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
 
-        typeText(parseKeys("<ESC>"))
+    typeText(parseKeys("<ESC>"))
 
-        assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-        myFixture.checkResult("""
+    assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    myFixture.checkResult("""
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
         """.trimIndent())
-    }
+  }
 
-    fun `test escape after typing`() {
-        configureByJavaText("""
+  fun `test escape after typing`() {
+    configureByJavaText("""
             class Hello {
                 public static void main() {
                     int my${c}Var = 5;
                 }
             }
         """.trimIndent())
-        startRenaming(VariableInplaceRenameHandler())
-        assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+    startRenaming(VariableInplaceRenameHandler())
+    assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
 
-        typeText(parseKeys("Hello", "<ESC>"))
+    typeText(parseKeys("Hello", "<ESC>"))
 
-        assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-        myFixture.checkResult("""
+    assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    myFixture.checkResult("""
             class Hello {
                 public static void main() {
                     int Hell${c}o = 5;
                 }
             }
         """.trimIndent())
-    }
+  }
 
-    private fun startRenaming(handler: VariableInplaceRenameHandler): Editor {
-        val editor = if (myFixture.editor is EditorWindow) (myFixture.editor as EditorWindow).delegate else myFixture.editor
-        VimListenerManager.addEditorListeners(editor)
+  private fun startRenaming(handler: VariableInplaceRenameHandler): Editor {
+    val editor = if (myFixture.editor is EditorWindow) (myFixture.editor as EditorWindow).delegate else myFixture.editor
+    VimListenerManager.addEditorListeners(editor)
 
-        TemplateManagerImpl.setTemplateTesting(myFixture.project, disposable)
-        handler.doRename(myFixture.elementAtCaret, editor, dataContext)
-        return editor
-    }
+    TemplateManagerImpl.setTemplateTesting(myFixture.project, disposable)
+    handler.doRename(myFixture.elementAtCaret, editor, dataContext)
+    return editor
+  }
 
-    private val dataContext
-        get() = DataManager.getInstance().getDataContext(myFixture.editor.component)
+  private val dataContext
+    get() = DataManager.getInstance().getDataContext(myFixture.editor.component)
 }

@@ -17,6 +17,7 @@
  */
 
 package org.jetbrains.plugins.ideavim.ex.handler
+
 import com.maddyhome.idea.vim.VimPlugin
 import org.jetbrains.plugins.ideavim.VimFileEditorTestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -25,51 +26,51 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  * @author Elliot Courant
  */
 class DelCmdHandlerTest : VimFileEditorTestCase() {
-    fun `test remove alias`() {
-        VimPlugin.getCommand().resetAliases()
-        configureByText("\n")
-        typeText(VimTestCase.commandToKeys("command"))
-        assertPluginError(false)
-        assertExOutput("Name        Args       Definition\n") // There should not be any aliases.
+  fun `test remove alias`() {
+    VimPlugin.getCommand().resetAliases()
+    configureByText("\n")
+    typeText(VimTestCase.commandToKeys("command"))
+    assertPluginError(false)
+    assertExOutput("Name        Args       Definition\n") // There should not be any aliases.
 
-        typeText(VimTestCase.commandToKeys("command Vs vs"))
-        assertPluginError(false)
-        typeText(VimTestCase.commandToKeys("command Wq wq"))
-        assertPluginError(false)
-        typeText(VimTestCase.commandToKeys("command WQ wq"))
-        assertPluginError(false)
-        typeText(VimTestCase.commandToKeys("command"))
-        assertPluginError(false)
-        // The added alias should be listed
-        assertExOutput("""Name        Args       Definition
+    typeText(VimTestCase.commandToKeys("command Vs vs"))
+    assertPluginError(false)
+    typeText(VimTestCase.commandToKeys("command Wq wq"))
+    assertPluginError(false)
+    typeText(VimTestCase.commandToKeys("command WQ wq"))
+    assertPluginError(false)
+    typeText(VimTestCase.commandToKeys("command"))
+    assertPluginError(false)
+    // The added alias should be listed
+    assertExOutput("""Name        Args       Definition
             |Vs          0          vs
             |Wq          0          wq
             |WQ          0          wq
         """.trimMargin())
 
-        typeText(VimTestCase.commandToKeys("command W"))
-        assertPluginError(false)
-        // The filtered aliases should be listed
-        assertExOutput("""Name        Args       Definition
+    typeText(VimTestCase.commandToKeys("command W"))
+    assertPluginError(false)
+    // The filtered aliases should be listed
+    assertExOutput("""Name        Args       Definition
             |Wq          0          wq
             |WQ          0          wq
         """.trimMargin())
 
-        // Delete one of the aliases and then list all aliases again.
-        typeText(VimTestCase.commandToKeys("delcommand Wq"))
-        assertPluginError(false)
-        typeText(VimTestCase.commandToKeys("command"))
-        assertPluginError(false)
-        assertExOutput("""Name        Args       Definition
+    // Delete one of the aliases and then list all aliases again.
+    typeText(VimTestCase.commandToKeys("delcommand Wq"))
+    assertPluginError(false)
+    typeText(VimTestCase.commandToKeys("command"))
+    assertPluginError(false)
+    assertExOutput("""Name        Args       Definition
             |Vs          0          vs
             |WQ          0          wq
         """.trimMargin())
-    }
+  }
 
-    fun `test remove non-existant alias`() {
-        VimPlugin.getCommand().resetAliases()
-        configureByText("\n")
-        typeText(VimTestCase.commandToKeys("delcommand VS"))
-        assertPluginError(true)
-    }
+  fun `test remove non-existant alias`() {
+    VimPlugin.getCommand().resetAliases()
+    configureByText("\n")
+    typeText(VimTestCase.commandToKeys("delcommand VS"))
+    assertPluginError(true)
+  }
 }

@@ -29,10 +29,10 @@ import org.jetbrains.plugins.ideavim.VimListOptionTestCase
 import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
 
 class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
-    @VimListOptionDefault
-    fun `test visual default options`() {
-        doTest(parseKeys("v", "<Left>"),
-                """
+  @VimListOptionDefault
+  fun `test visual default options`() {
+    doTest(parseKeys("v", "<Left>"),
+      """
                 A Discovery
 
                 I ${c}found it in a legendary land
@@ -40,7 +40,7 @@ class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                """
+      """
                 A Discovery
 
                 I${s}${c} f${se}ound it in a legendary land
@@ -48,13 +48,13 @@ class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
-    }
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["stopsel"]))
-    fun `test visual stopsel`() {
-        doTest(parseKeys("v", "<Left>"),
-                """
+  @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["stopsel"]))
+  fun `test visual stopsel`() {
+    doTest(parseKeys("v", "<Left>"),
+      """
                 A Discovery
 
                 I ${c}found it in a legendary land
@@ -62,7 +62,7 @@ class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                """
+      """
                 A Discovery
 
                 I${c} found it in a legendary land
@@ -70,13 +70,13 @@ class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["stopselect"]))
-    fun `test visual stopselect`() {
-        doTest(parseKeys("v", "<Left>"),
-                """
+  @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["stopselect"]))
+  fun `test visual stopselect`() {
+    doTest(parseKeys("v", "<Left>"),
+      """
                 A Discovery
 
                 I ${c}found it in a legendary land
@@ -84,7 +84,7 @@ class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                """
+      """
                 A Discovery
 
                 I${s}${c} f${se}ound it in a legendary land
@@ -92,13 +92,13 @@ class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
-    }
+      CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["stopvisual"]))
-    fun `test visual stopvisual`() {
-        doTest(parseKeys("v", "<Left>"),
-                """
+  @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["stopvisual"]))
+  fun `test visual stopvisual`() {
+    doTest(parseKeys("v", "<Left>"),
+      """
                 A Discovery
 
                 I ${c}found it in a legendary land
@@ -106,7 +106,7 @@ class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                """
+      """
                 A Discovery
 
                 I${c} found it in a legendary land
@@ -114,13 +114,13 @@ class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["stopvisual"]))
-    fun `test visual stopvisual multicaret`() {
-        doTest(parseKeys("v", "<Left>"),
-                """
+  @VimListOptionTestConfiguration(VimListConfig(Options.KEYMODEL, ["stopvisual"]))
+  fun `test visual stopvisual multicaret`() {
+    doTest(parseKeys("v", "<Left>"),
+      """
                 A Discovery
 
                 I ${c}found it in a legendary land
@@ -128,7 +128,7 @@ class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                """
+      """
                 A Discovery
 
                 I${c} found it in a legendary land
@@ -136,6 +136,6 @@ class MotionArrowLeftActionTest : VimListOptionTestCase(Options.KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                 """.trimIndent(),
-                CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+      CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 }

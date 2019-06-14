@@ -20,32 +20,31 @@ package org.jetbrains.plugins.ideavim.ex.handler
 
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimFileEditorTestCase
-import javax.swing.SwingConstants
 
 /**
  * @author Daniele Megna
  */
 
 class TabOnlyHandlerTest : VimFileEditorTestCase() {
-    fun `test close not selected tabs`() {
-        val firstTabFile = myFixture.configureByText("A_Discovery", "I found it in a legendary land")
-        val secondTabFile = myFixture.configureByText("A_Legend", "I found it in a new land")
-        val thirdTabFile = myFixture.configureByText("A_Detection", "I found it in a that land")
-        fileManager.openFile(firstTabFile.virtualFile, false)
-        fileManager.openFile(secondTabFile.virtualFile, true)
-        fileManager.openFile(thirdTabFile.virtualFile, false)
-        fileManager.windows[0].tabbedPane!!.setSelectedIndex(1, true)
+  fun `test close not selected tabs`() {
+    val firstTabFile = myFixture.configureByText("A_Discovery", "I found it in a legendary land")
+    val secondTabFile = myFixture.configureByText("A_Legend", "I found it in a new land")
+    val thirdTabFile = myFixture.configureByText("A_Detection", "I found it in a that land")
+    fileManager.openFile(firstTabFile.virtualFile, false)
+    fileManager.openFile(secondTabFile.virtualFile, true)
+    fileManager.openFile(thirdTabFile.virtualFile, false)
+    fileManager.windows[0].tabbedPane!!.setSelectedIndex(1, true)
 
-        TestCase.assertEquals(1, fileManager.windows.size)
-        TestCase.assertEquals(3, fileManager.windows[0].files.size)
-        TestCase.assertEquals(3, fileManager.windows[0].tabCount)
-        TestCase.assertEquals(secondTabFile.virtualFile, fileManager.windows[0].selectedFile)
+    TestCase.assertEquals(1, fileManager.windows.size)
+    TestCase.assertEquals(3, fileManager.windows[0].files.size)
+    TestCase.assertEquals(3, fileManager.windows[0].tabCount)
+    TestCase.assertEquals(secondTabFile.virtualFile, fileManager.windows[0].selectedFile)
 
-        typeText(commandToKeys("tabonly"))
+    typeText(commandToKeys("tabonly"))
 
-        TestCase.assertEquals(1, fileManager.windows.size)
-        TestCase.assertEquals(1, fileManager.windows[0].files.size)
-        TestCase.assertEquals(1, fileManager.windows[0].tabCount)
-        TestCase.assertEquals(secondTabFile.virtualFile, fileManager.windows[0].selectedFile)
-    }
+    TestCase.assertEquals(1, fileManager.windows.size)
+    TestCase.assertEquals(1, fileManager.windows[0].files.size)
+    TestCase.assertEquals(1, fileManager.windows[0].tabCount)
+    TestCase.assertEquals(secondTabFile.virtualFile, fileManager.windows[0].selectedFile)
+  }
 }

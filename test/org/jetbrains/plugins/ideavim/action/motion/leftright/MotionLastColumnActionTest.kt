@@ -26,9 +26,9 @@ import com.maddyhome.idea.vim.helper.VimBehaviourDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionLastColumnActionTest : VimTestCase() {
-    fun `test dollar motion`() {
-        val keys = parseKeys("$")
-        val before = """
+  fun `test dollar motion`() {
+    val keys = parseKeys("$")
+    val before = """
             A Discovery
 
             I ${c}found it in a legendary land
@@ -36,7 +36,7 @@ class MotionLastColumnActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             I found it in a legendary lan${c}d
@@ -44,12 +44,12 @@ class MotionLastColumnActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    fun `test dollar motion with motion to longer line`() {
-        val keys = parseKeys("\$j")
-        val before = """
+  fun `test dollar motion with motion to longer line`() {
+    val keys = parseKeys("\$j")
+    val before = """
             A Discovery
 
             I ${c}found it in a legendary land
@@ -57,7 +57,7 @@ class MotionLastColumnActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             I found it in a legendary land
@@ -65,12 +65,12 @@ class MotionLastColumnActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    fun `test dollar motion in visual block mode`() {
-        val keys = parseKeys("<C-V>jj\$")
-        val before = """
+  fun `test dollar motion in visual block mode`() {
+    val keys = parseKeys("<C-V>jj\$")
+    val before = """
             A Discovery
 
             I ${c}found it in a legendary land
@@ -78,7 +78,7 @@ class MotionLastColumnActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             I ${s}found it in a legendary lan${c}d${se}
@@ -86,10 +86,10 @@ class MotionLastColumnActionTest : VimTestCase() {
             wh${s}ere it was settled on some sodden sand${c}${se}
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
-    }
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+  }
 
-    @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviourDiffers(originalVimAfter = """
             A Discovery
 
             I ${s}found it in a legendary lan${c}d${se}
@@ -97,9 +97,9 @@ class MotionLastColumnActionTest : VimTestCase() {
             wh${s}ere it was settled on some sodden san${c}d${se}
             hard by the torrent of a mountain pass.
     """)
-    fun `test dollar motion in visual block mode with left motion`() {
-        val keys = parseKeys("<C-V>jj\$h")
-        val before = """
+  fun `test dollar motion in visual block mode with left motion`() {
+    val keys = parseKeys("<C-V>jj\$h")
+    val before = """
             A Discovery
 
             I ${c}found it in a legendary land
@@ -107,7 +107,7 @@ class MotionLastColumnActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             I ${s}found it in a legendary lan${c}d${se}
@@ -115,6 +115,6 @@ class MotionLastColumnActionTest : VimTestCase() {
             wh${s}ere it was settled on some sodden san${c}d${se}
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
-    }
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+  }
 }

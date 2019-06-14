@@ -28,9 +28,9 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  * @author Alex Plate
  */
 class MotionDownActionTest : VimTestCase() {
-    fun `test motion down in visual block mode`() {
-        val keys = parseKeys("<C-V>2kjjj")
-        val before = """
+  fun `test motion down in visual block mode`() {
+    val keys = parseKeys("<C-V>2kjjj")
+    val before = """
             A Discovery
 
             I |found| it in a legendary land
@@ -38,7 +38,7 @@ class MotionDownActionTest : VimTestCase() {
             wh|${c}ere i|t was settled on some sodden sand
             ha|rd by| the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             I |found| it in a legendary land
@@ -46,12 +46,12 @@ class MotionDownActionTest : VimTestCase() {
             wh|${s}e${se}re i|t was settled on some sodden sand
             ha|${s}r${se}d by| the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
-    }
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+  }
 
-    fun `test motion down in visual block mode with dollar motion`() {
-        val keys = parseKeys("<C-V>\$jj")
-        val before = """
+  fun `test motion down in visual block mode with dollar motion`() {
+    val keys = parseKeys("<C-V>\$jj")
+    val before = """
             A Discovery
 
             I |${c}found it in a legendary land
@@ -59,7 +59,7 @@ class MotionDownActionTest : VimTestCase() {
             wh|ere it was settled on some sodden sand[additional Chars]
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             I |${s}found it in a legendary lan${c}d${se}
@@ -67,6 +67,6 @@ class MotionDownActionTest : VimTestCase() {
             wh|${s}ere it was settled on some sodden sand[additional Chars]${c}${se}
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
-    }
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
+  }
 }

@@ -23,9 +23,9 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class InsertDeletePreviousWordActionTest : VimTestCase() {
-    // VIM-1655
-    fun `test deleted word is not yanked`() {
-        doTest(parseKeys("yiw", "3wea", "<C-W>", "<ESC>p"), """
+  // VIM-1655
+  fun `test deleted word is not yanked`() {
+    doTest(parseKeys("yiw", "3wea", "<C-W>", "<ESC>p"), """
             A Discovery
 
             I found ${c}it in a legendary land
@@ -34,5 +34,5 @@ class InsertDeletePreviousWordActionTest : VimTestCase() {
 
             I found it in a i${c}t land
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+  }
 }

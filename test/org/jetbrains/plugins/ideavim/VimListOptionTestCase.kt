@@ -39,37 +39,37 @@ import junit.framework.TestCase
  * If you want to keep default configuration, you can put [VimListOptionDefault] annotation
  */
 abstract class VimListOptionTestCase(option: String, vararg otherOptions: String) : VimTestCase() {
-    val options: Set<String> = setOf(option, *otherOptions)
-    override fun runTest() {
-        val testMethod = this.javaClass.getMethod(this.name)
-        if (!testMethod.isAnnotationPresent(VimListOptionDefault::class.java)) {
-            if (!testMethod.isAnnotationPresent(VimListOptionTestConfiguration::class.java)) TestCase.fail("You should add VimOptionTestAnnotation with options for this method")
+  val options: Set<String> = setOf(option, *otherOptions)
+  override fun runTest() {
+    val testMethod = this.javaClass.getMethod(this.name)
+    if (!testMethod.isAnnotationPresent(VimListOptionDefault::class.java)) {
+      if (!testMethod.isAnnotationPresent(VimListOptionTestConfiguration::class.java)) TestCase.fail("You should add VimOptionTestAnnotation with options for this method")
 
-            val annotation = testMethod.getDeclaredAnnotation(VimListOptionTestConfiguration::class.java)
+      val annotation = testMethod.getDeclaredAnnotation(VimListOptionTestConfiguration::class.java)
 
-            val annotationsValuesList = annotation.value.map { it.option }
-            val annotationsValuesSet = annotationsValuesList.toSet()
-            if (annotationsValuesSet.size < annotationsValuesList.size) TestCase.fail("You have duplicated options")
-            if (annotationsValuesSet != options) TestCase.fail("You should present all options in annotations")
+      val annotationsValuesList = annotation.value.map { it.option }
+      val annotationsValuesSet = annotationsValuesList.toSet()
+      if (annotationsValuesSet.size < annotationsValuesList.size) TestCase.fail("You have duplicated options")
+      if (annotationsValuesSet != options) TestCase.fail("You should present all options in annotations")
 
-            annotation.value.forEach {
-                val option = Options.getInstance().getOption(it.option)
-                if (option !is ListOption) {
-                    TestCase.fail("Only list options are supported")
-                    return
-                }
-
-                option.set(it.values.joinToString(","))
-            }
+      annotation.value.forEach {
+        val option = Options.getInstance().getOption(it.option)
+        if (option !is ListOption) {
+          TestCase.fail("Only list options are supported")
+          return
         }
-        super.runTest()
+
+        option.set(it.values.joinToString(","))
+      }
     }
+    super.runTest()
+  }
 }
 
 @Target(AnnotationTarget.PROPERTY)
 annotation class VimListConfig(
-        val option: String,
-        val values: Array<String>
+  val option: String,
+  val values: Array<String>
 )
 
 @Target(AnnotationTarget.FUNCTION)
