@@ -24,10 +24,10 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.Options
 import org.jetbrains.plugins.ideavim.VimListConfig
-import org.jetbrains.plugins.ideavim.VimListOptionTestCase
 import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
 
-class MotionShiftUpActionHandlerTest : VimListOptionTestCase(Options.SELECTMODE, Options.KEYMODEL) {
+class MotionShiftUpActionHandlerTest : VimOptionTestCase(Options.SELECTMODE, Options.KEYMODEL) {
   @VimListOptionTestConfiguration(
     VimListConfig(Options.KEYMODEL, ["startsel"]),
     VimListConfig(Options.SELECTMODE, []))

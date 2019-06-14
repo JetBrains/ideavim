@@ -26,10 +26,10 @@ import com.maddyhome.idea.vim.option.Options
 import com.maddyhome.idea.vim.option.Options.KEYMODEL
 import org.jetbrains.plugins.ideavim.VimListConfig
 import org.jetbrains.plugins.ideavim.VimListOptionDefault
-import org.jetbrains.plugins.ideavim.VimListOptionTestCase
 import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
 
-class MotionHomeActionTest : VimListOptionTestCase(KEYMODEL) {
+class MotionHomeActionTest : VimOptionTestCase(KEYMODEL) {
   @VimListOptionDefault
   fun `test motion home`() {
     val keys = parseKeys("<Home>")

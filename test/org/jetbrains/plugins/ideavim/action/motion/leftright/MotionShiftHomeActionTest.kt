@@ -27,10 +27,10 @@ import com.maddyhome.idea.vim.option.Options.KEYMODEL
 import com.maddyhome.idea.vim.option.Options.SELECTMODE
 import org.jetbrains.plugins.ideavim.VimListConfig
 import org.jetbrains.plugins.ideavim.VimListOptionDefault
-import org.jetbrains.plugins.ideavim.VimListOptionTestCase
 import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
 
-class MotionShiftHomeActionTest : VimListOptionTestCase(KEYMODEL, SELECTMODE) {
+class MotionShiftHomeActionTest : VimOptionTestCase(KEYMODEL, SELECTMODE) {
   @VimListOptionDefault
   fun `test simple home`() {
     val keys = parseKeys("<S-Home>")

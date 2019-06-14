@@ -26,10 +26,10 @@ import com.maddyhome.idea.vim.option.Options.KEYMODEL
 import com.maddyhome.idea.vim.option.Options.SELECTMODE
 import com.maddyhome.idea.vim.option.Options.getInstance
 import org.jetbrains.plugins.ideavim.VimListConfig
-import org.jetbrains.plugins.ideavim.VimListOptionTestCase
 import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
 
-class MotionShiftLeftActionHandlerTest : VimListOptionTestCase(KEYMODEL, SELECTMODE) {
+class MotionShiftLeftActionHandlerTest : VimOptionTestCase(KEYMODEL, SELECTMODE) {
   @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, ["startsel"]), VimListConfig(SELECTMODE, []))
   fun `test visual left`() {
     doTest(parseKeys("<S-Left>"),

@@ -957,6 +957,34 @@ public class ChangeGroup {
     return true;
   }
 
+  public boolean joinViaIdeaByCount(@NotNull Editor editor, @NotNull DataContext context, int count) {
+    int executions = count > 1 ? count - 1 : 1;
+    final boolean allowedExecution = editor.getCaretModel().getAllCarets().stream().anyMatch(caret -> {
+      int lline = caret.getLogicalPosition().line;
+      int total = EditorHelper.getLineCount(editor);
+      return lline + count <= total;
+    });
+    if (!allowedExecution) return false;
+    for (int i = 0; i < executions; i++) KeyHandler.executeAction(IdeActions.ACTION_EDITOR_JOIN_LINES, context);
+    return true;
+  }
+
+  public void joinViaIdeaBySelections(@NotNull Editor editor, @NotNull DataContext context, @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
+    caretsAndSelections.forEach((caret, range) -> {
+      if (!caret.isValid()) return;
+      final Pair<Integer, Integer> nativeRange = range.getNativeStartAndEnd();
+      caret.setSelection(nativeRange.getFirst(), nativeRange.getSecond());
+    });
+    KeyHandler.executeAction(IdeActions.ACTION_EDITOR_JOIN_LINES, context);
+    editor.getCaretModel().getAllCarets().forEach(caret -> {
+      caret.removeSelection();
+      final VisualPosition currentVisualPosition = caret.getVisualPosition();
+      if (currentVisualPosition.line < 1) return;
+      final VisualPosition newVisualPosition = new VisualPosition(currentVisualPosition.line - 1, currentVisualPosition.column);
+      caret.moveToVisualPosition(newVisualPosition);
+    });
+  }
+
   /**
    * Begin Replace mode
    *

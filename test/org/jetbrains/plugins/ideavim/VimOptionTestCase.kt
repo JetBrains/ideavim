@@ -20,6 +20,7 @@ package org.jetbrains.plugins.ideavim
 
 import com.maddyhome.idea.vim.option.ListOption
 import com.maddyhome.idea.vim.option.Options
+import com.maddyhome.idea.vim.option.ToggleOption
 import junit.framework.TestCase
 
 /**
@@ -38,21 +39,23 @@ import junit.framework.TestCase
  *
  * If you want to keep default configuration, you can put [VimListOptionDefault] annotation
  */
-abstract class VimListOptionTestCase(option: String, vararg otherOptions: String) : VimTestCase() {
+abstract class VimOptionTestCase(option: String, vararg otherOptions: String) : VimTestCase() {
   val options: Set<String> = setOf(option, *otherOptions)
   override fun runTest() {
     val testMethod = this.javaClass.getMethod(this.name)
     if (!testMethod.isAnnotationPresent(VimListOptionDefault::class.java)) {
-      if (!testMethod.isAnnotationPresent(VimListOptionTestConfiguration::class.java)) TestCase.fail("You should add VimOptionTestAnnotation with options for this method")
+      if (!testMethod.isAnnotationPresent(VimListOptionTestConfiguration::class.java) &&
+        !testMethod.isAnnotationPresent(VimToggleOptionTestConfiguration::class.java)) TestCase.fail("You should add VimOptionTestAnnotation with options for this method")
 
-      val annotation = testMethod.getDeclaredAnnotation(VimListOptionTestConfiguration::class.java)
+      val listAnnotation: VimListOptionTestConfiguration? = testMethod.getDeclaredAnnotation(VimListOptionTestConfiguration::class.java)
+      val toggle: VimToggleOptionTestConfiguration? = testMethod.getDeclaredAnnotation(VimToggleOptionTestConfiguration::class.java)
 
-      val annotationsValuesList = annotation.value.map { it.option }
+      val annotationsValuesList = (listAnnotation?.value?.map { it.option } ?: emptyList()) + (toggle?.value?.map { it.option } ?: emptyList())
       val annotationsValuesSet = annotationsValuesList.toSet()
       if (annotationsValuesSet.size < annotationsValuesList.size) TestCase.fail("You have duplicated options")
       if (annotationsValuesSet != options) TestCase.fail("You should present all options in annotations")
 
-      annotation.value.forEach {
+      listAnnotation?.value?.forEach {
         val option = Options.getInstance().getOption(it.option)
         if (option !is ListOption) {
           TestCase.fail("Only list options are supported")
@@ -60,6 +63,14 @@ abstract class VimListOptionTestCase(option: String, vararg otherOptions: String
         }
 
         option.set(it.values.joinToString(","))
+      }
+      toggle?.value?.forEach {
+        val option = Options.getInstance().getOption(it.option)
+        if (option !is ToggleOption) {
+          TestCase.fail("Only list options are supported")
+          return
+        }
+        if (it.value) option.set() else option.reset()
       }
     }
     super.runTest()
@@ -77,3 +88,15 @@ annotation class VimListOptionTestConfiguration(vararg val value: VimListConfig)
 
 @Target(AnnotationTarget.FUNCTION)
 annotation class VimListOptionDefault
+
+@Target(AnnotationTarget.PROPERTY)
+annotation class VimToggleConfig(
+  val option: String,
+  val value: Boolean
+)
+
+@Target(AnnotationTarget.FUNCTION)
+annotation class VimToggleOptionTestConfiguration(vararg val value: VimToggleConfig)
+
+@Target(AnnotationTarget.FUNCTION)
+annotation class VimToggleOptionDefault

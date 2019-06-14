@@ -24,10 +24,10 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.Options.KEYMODEL
 import org.jetbrains.plugins.ideavim.VimListConfig
-import org.jetbrains.plugins.ideavim.VimListOptionTestCase
 import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
 
-class SelectMotionRightActionTest : VimListOptionTestCase(KEYMODEL) {
+class SelectMotionRightActionTest : VimOptionTestCase(KEYMODEL) {
   @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, ["stopselect"]))
   fun `test char select simple move`() {
     doTest(parseKeys("viw", "<C-G>", "<Right>"),

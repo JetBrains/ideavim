@@ -25,10 +25,10 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.Options
 import org.jetbrains.plugins.ideavim.VimListConfig
 import org.jetbrains.plugins.ideavim.VimListOptionDefault
-import org.jetbrains.plugins.ideavim.VimListOptionTestCase
 import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
 
-class MotionArrowUpActionTest : VimListOptionTestCase(Options.KEYMODEL) {
+class MotionArrowUpActionTest : VimOptionTestCase(Options.KEYMODEL) {
   @VimListOptionDefault
   fun `test visual default options`() {
     doTest(parseKeys("v", "<Up>"),

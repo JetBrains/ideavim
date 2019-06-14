@@ -25,10 +25,10 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.Options.KEYMODEL
 import org.jetbrains.plugins.ideavim.VimListConfig
 import org.jetbrains.plugins.ideavim.VimListOptionDefault
-import org.jetbrains.plugins.ideavim.VimListOptionTestCase
 import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
 
-class MotionEndActionTest : VimListOptionTestCase(KEYMODEL) {
+class MotionEndActionTest : VimOptionTestCase(KEYMODEL) {
   @VimListOptionDefault
   fun `test motion end`() {
     val keys = parseKeys("<End>")

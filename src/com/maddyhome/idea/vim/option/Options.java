@@ -45,6 +45,7 @@ public class Options {
   public static final String KEYMODEL = "keymodel";
   public static final String IDEAPUT = "ideaput";
   public static final String LOOKUPACTIONS = "lookupactions";
+  public static final String SMARTJOIN = "smartjoin";
 
   /**
    * Gets the singleton instance of the options
@@ -479,6 +480,7 @@ public class Options {
     addOption(new BoundListOption(SELECTMODE, "slm", new String[]{"template"}, new String[]{"mouse", "key", "cmd", "template", "refactoring"}));
     addOption(new BoundListOption(KEYMODEL, "km", new String[]{"continueselect", "stopselect"}, new String[]{"startsel", "stopsel", "stopselect", "stopvisual", "continueselect", "continuevisual"}));
     addOption(new ListOption(LOOKUPACTIONS, LOOKUPACTIONS, new String[]{"VimLookupUp", "VimLookupDown"}, null));
+    addOption(new ToggleOption(SMARTJOIN, SMARTJOIN, false));
 
     registerExtensionOptions();
   }

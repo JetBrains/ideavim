@@ -16,25 +16,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@file:Suppress("RemoveCurlyBracesFromTemplate")
-
-package org.jetbrains.plugins.ideavim.action.motion.select.motion
+package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.Options.KEYMODEL
-import org.jetbrains.plugins.ideavim.VimListConfig
-import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
+import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.option.Options
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
+import org.jetbrains.plugins.ideavim.VimToggleConfig
+import org.jetbrains.plugins.ideavim.VimToggleOptionTestConfiguration
 
-class SelectMotionLeftActionTest : VimOptionTestCase(KEYMODEL) {
-  @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, ["stopselect"]))
-  fun `test char select simple move`() {
-    doTest(parseKeys("viw", "<C-G>", "<Left>"),
+class DeleteJoinLinesSpacesActionTest : VimOptionTestCase(Options.SMARTJOIN) {
+  @VimToggleOptionTestConfiguration(VimToggleConfig(Options.SMARTJOIN, true))
+  fun `test join with idea`() {
+    doTest(StringHelper.parseKeys("J"),
       """
                 A Discovery
 
-                I ${c}found it in a legendary land
+                ${c}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
@@ -42,8 +40,7 @@ class SelectMotionLeftActionTest : VimOptionTestCase(KEYMODEL) {
       """
                 A Discovery
 
-                I foun${c}d it in a legendary land
-                all rocks and lavender and tufted grass,
+                I found it in a legendary land${c} all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
@@ -51,34 +48,34 @@ class SelectMotionLeftActionTest : VimOptionTestCase(KEYMODEL) {
       CommandState.SubMode.NONE)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, ["stopselect"]))
-  fun `test select multiple carets`() {
-    doTest(parseKeys("viwo", "<C-G>", "<Left>"),
+  @VimToggleOptionTestConfiguration(VimToggleConfig(Options.SMARTJOIN, true))
+  fun `test join with idea with count`() {
+    doTest(StringHelper.parseKeys("3J"),
       """
                 A Discovery
 
-                I ${c}found it in a legendary land
+                ${c}I found it in a legendary land
                 all rocks and lavender and tufted grass,
-                ${c}where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent(),
+                where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                    """.trimIndent(),
       """
                 A Discovery
 
-                I${c} found it in a legendary land
-                all rocks and lavender and tufted grass,
-                ${c}where it was settled on some sodden sand
-                hard by the torrent of a mountain pass.""".trimIndent(),
+                I found it in a legendary land all rocks and lavender and tufted grass,${c} where it was settled on some sodden sand
+                hard by the torrent of a mountain pass.
+                    """.trimIndent(),
       CommandState.Mode.COMMAND,
       CommandState.SubMode.NONE)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, []))
-  fun `test without stopsel`() {
-    doTest(parseKeys("viw", "<C-G>", "<Left>"),
+  @VimToggleOptionTestConfiguration(VimToggleConfig(Options.SMARTJOIN, true))
+  fun `test join with idea with large count`() {
+    doTest(StringHelper.parseKeys("10J"),
       """
                 A Discovery
 
-                I ${c}found it in a legendary land
+                ${c}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
@@ -86,12 +83,12 @@ class SelectMotionLeftActionTest : VimOptionTestCase(KEYMODEL) {
       """
                 A Discovery
 
-                I ${s}foun${c}${se}d it in a legendary land
+                ${c}I found it in a legendary land
                 all rocks and lavender and tufted grass,
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-      CommandState.Mode.SELECT,
-      CommandState.SubMode.VISUAL_CHARACTER)
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
   }
 }
