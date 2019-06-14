@@ -25,6 +25,7 @@ import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.colors.EditorColors;
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.testFramework.EditorTestUtil;
@@ -230,5 +231,9 @@ public abstract class VimTestCase extends UsefulTestCase {
     assertCaretsColour();
     assertMode(modeAfter);
     assertSubMode(subModeAfter);
+  }
+
+  protected FileEditorManagerEx getFileManager() {
+    return FileEditorManagerEx.getInstanceEx(myFixture.getProject());
   }
 }

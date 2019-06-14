@@ -19,12 +19,12 @@
 package org.jetbrains.plugins.ideavim.ex.handler
 
 import com.maddyhome.idea.vim.VimPlugin
-import org.jetbrains.plugins.ideavim.VimFileEditorTestCase
+import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
  * @author Elliot Courant
  */
-class CmdClearHandlerTest : VimFileEditorTestCase() {
+class CmdClearHandlerTest : VimTestCase() {
   fun `test clear aliases`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")

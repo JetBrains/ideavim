@@ -19,13 +19,12 @@
 package org.jetbrains.plugins.ideavim.ex.handler
 
 import com.maddyhome.idea.vim.VimPlugin
-import org.jetbrains.plugins.ideavim.VimFileEditorTestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
  * @author Elliot Courant
  */
-class DelCmdHandlerTest : VimFileEditorTestCase() {
+class DelCmdHandlerTest : VimTestCase() {
   fun `test remove alias`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")

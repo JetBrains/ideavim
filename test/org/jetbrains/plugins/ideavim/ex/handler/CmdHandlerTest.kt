@@ -19,13 +19,12 @@
 package org.jetbrains.plugins.ideavim.ex.handler
 
 import com.maddyhome.idea.vim.VimPlugin
-import org.jetbrains.plugins.ideavim.VimFileEditorTestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
  * @author Elliot Courant
  */
-class CmdHandlerTest : VimFileEditorTestCase() {
+class CmdHandlerTest : VimTestCase() {
   fun `test recursive`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
@@ -83,11 +82,11 @@ class CmdHandlerTest : VimFileEditorTestCase() {
   fun `test bad alias`() {
     VimPlugin.getCommand().resetAliases()
     configureByText("\n")
-    typeText(VimTestCase.commandToKeys("Vs"))
+    typeText(VimTestCase.commandToKeys("Xyz"))
     assertPluginError(true)
-    typeText(VimTestCase.commandToKeys("command Vs vs"))
+    typeText(VimTestCase.commandToKeys("command Xyz yank"))
     assertPluginError(false)
-    typeText(VimTestCase.commandToKeys("Vs"))
+    typeText(VimTestCase.commandToKeys("Xyz"))
     assertPluginError(false)
   }
 
