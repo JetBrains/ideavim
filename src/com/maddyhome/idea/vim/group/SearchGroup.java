@@ -506,12 +506,12 @@ public class SearchGroup {
   }
 
   public int search(@NotNull Editor editor, @NotNull String command, int startOffset, int count, EnumSet<CommandFlags> flags) {
-    int dir = 1;
+    int dir = DIR_FORWARDS;
     char type = '/';
     String pattern = lastSearch;
     String offset = lastOffset;
     if (flags.contains(CommandFlags.FLAG_SEARCH_REV)) {
-      dir = -1;
+      dir = DIR_BACKWARDS;
       type = '?';
     }
 
@@ -639,7 +639,8 @@ public class SearchGroup {
     // searchStartOffset is used to find the closest match. caretOffset is used to reset the caret if there is no match.
     // If searching based on e.g. :%s/... then these values are not going to be the same
     final int searchStartOffset = searchRange != null ? EditorHelper.getLineStartOffset(editor, searchRange.getStartLine()) : caretOffset;
-    int currentMatchOffset = updateSearchHighlights(pattern, false, true, searchStartOffset, searchRange, forwards, false);
+    final boolean showHighlights = Options.getInstance().isSet(Options.HIGHLIGHT_SEARCH);
+    int currentMatchOffset = updateSearchHighlights(pattern, false, showHighlights, searchStartOffset, searchRange, forwards, false);
     MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), currentMatchOffset == -1 ? caretOffset : currentMatchOffset);
   }
 
@@ -679,6 +680,17 @@ public class SearchGroup {
             highlightSearchResults(editor, pattern, results, currentMatchOffset);
           }
           EditorData.setLastSearch(editor, pattern);
+        }
+        else if (!showHighlights && initialOffset != -1) {
+          // Incremental search always highlights current match. We know it's incsearch if we have a valid initial offset
+          final boolean wrap = Options.getInstance().isSet(Options.WRAPSCAN);
+          final TextRange result = findIt(editor, pattern, initialOffset, 1,
+            forwards ? DIR_FORWARDS : DIR_BACKWARDS, shouldIgnoreSmartCase, wrap, false, true);
+          if (result != null) {
+            currentMatchOffset = result.getStartOffset();
+            final List<TextRange> results = Collections.singletonList(result);
+            highlightSearchResults(editor, pattern, results, currentMatchOffset);
+          }
         }
       }
     }
@@ -722,7 +734,7 @@ public class SearchGroup {
       return d2 - d1;
     });
 
-    if (!Options.getInstance().isSet("wrapscan")) {
+    if (!Options.getInstance().isSet(Options.WRAPSCAN)) {
       final int start = max.getStartOffset();
       if (forwards && start < initialOffset) {
         return -1;
@@ -810,8 +822,8 @@ public class SearchGroup {
   }
 
   private int findItOffset(@NotNull Editor editor, int startOffset, int count, int dir) {
-    boolean wrap = Options.getInstance().isSet("wrapscan");
-    TextRange range = findIt(editor, startOffset, count, dir, wrap, true, true);
+    boolean wrap = Options.getInstance().isSet(Options.WRAPSCAN);
+    TextRange range = findIt(editor, lastSearch, startOffset, count, dir, lastIgnoreSmartCase, wrap, true, true);
     if (range == null) {
       return -1;
     }
@@ -901,20 +913,20 @@ public class SearchGroup {
 
   @SuppressWarnings("SameParameterValue")
   @Nullable
-  private TextRange findIt(@NotNull Editor editor, int startOffset, int count, int dir,
-                           boolean wrap, boolean showMessages, boolean wholeFile) {
-    if (lastSearch == null || lastSearch.length() == 0) {
+  private static TextRange findIt(@NotNull Editor editor, @Nullable String pattern, int startOffset, int count, int dir,
+                                  boolean ignoreSmartCase, boolean wrap, boolean showMessages, boolean wholeFile) {
+    if (pattern == null || pattern.length() == 0) {
       return null;
     }
 
     //RE sp;
     RegExp sp;
     RegExp.regmmatch_T regmatch = new RegExp.regmmatch_T();
-    regmatch.rmm_ic = shouldIgnoreCase(lastSearch, lastIgnoreSmartCase);
+    regmatch.rmm_ic = shouldIgnoreCase(pattern, ignoreSmartCase);
     sp = new RegExp();
-    regmatch.regprog = sp.vim_regcomp(lastSearch, 1);
+    regmatch.regprog = sp.vim_regcomp(pattern, 1);
     if (regmatch.regprog == null) {
-      if (logger.isDebugEnabled()) logger.debug("bad pattern: " + lastSearch);
+      if (logger.isDebugEnabled()) logger.debug("bad pattern: " + pattern);
       return null;
     }
 
@@ -967,7 +979,7 @@ public class SearchGroup {
       * Start searching in current line, unless searching backwards and
       * we're in column 0.
       */
-      if (dir == -1 && start_pos.col == 0) {
+      if (dir == DIR_BACKWARDS && start_pos.col == 0) {
         lnum = pos.lnum - 1;
         at_first_line = false;
       }
@@ -992,14 +1004,14 @@ public class SearchGroup {
             lnum += regmatch.startpos[0].lnum;
             ptr = new CharPointer(EditorHelper.getLineBuffer(editor, lnum));
             startcol = regmatch.startpos[0].col;
-            endpos = regmatch.endpos[0];
+            endpos = new RegExp.lpos_T(regmatch.endpos[0]);
 
             /*
             * Forward search in the first line: match should be after
             * the start position. If not, continue at the end of the
             * match (this is vi compatible) or on the next char.
             */
-            if (dir == 1 && at_first_line) {
+            if (dir == DIR_FORWARDS && at_first_line) {
               match_ok = true;
               /*
               * When match lands on a NUL the cursor will be put
@@ -1024,7 +1036,7 @@ public class SearchGroup {
                   break;
                 }
                 startcol = regmatch.startpos[0].col;
-                endpos = regmatch.endpos[0];
+                endpos = new RegExp.lpos_T(regmatch.endpos[0]);
 
                 /* Need to get the line pointer again, a
         * multi-line search may have made it invalid. */
@@ -1034,7 +1046,7 @@ public class SearchGroup {
                 continue;
               }
             }
-            if (dir == -1) {
+            if (dir == DIR_BACKWARDS) {
               /*
               * Now, if there are multiple matches on this line,
               * we have to get the last one. Or the last one before
@@ -1049,7 +1061,7 @@ public class SearchGroup {
            * the last match in the line. */
                   match_ok = true;
                   startcol = regmatch.startpos[0].col;
-                  endpos = regmatch.endpos[0];
+                  endpos = new RegExp.lpos_T(regmatch.endpos[0]);
                 }
                 else {
                   break;
@@ -1124,7 +1136,7 @@ public class SearchGroup {
         * is redrawn. The keep_msg is cleared whenever another message is
         * written.
         */
-        if (dir == -1)    /* start second loop at the other end */ {
+        if (dir == DIR_BACKWARDS)    /* start second loop at the other end */ {
           lnum = lineCount - 1;
           //if (!shortmess(SHM_SEARCH) && (options & SEARCH_MSG))
           //    give_warning((char_u *)_(top_bot_msg), TRUE);
@@ -1144,13 +1156,13 @@ public class SearchGroup {
       //if ((options & SEARCH_MSG) == SEARCH_MSG)
       if (showMessages) {
         if (wrap) {
-          VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, lastSearch));
+          VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));
         }
         else if (lnum <= 0) {
-          VimPlugin.showMessage(MessageHelper.message(Msg.E384, lastSearch));
+          VimPlugin.showMessage(MessageHelper.message(Msg.E384, pattern));
         }
         else {
-          VimPlugin.showMessage(MessageHelper.message(Msg.E385, lastSearch));
+          VimPlugin.showMessage(MessageHelper.message(Msg.E385, pattern));
         }
       }
       return null;
@@ -1356,6 +1368,9 @@ public class SearchGroup {
   private static final int RE_LAST = 1;
   private static final int RE_SEARCH = 2;
   private static final int RE_SUBST = 3;
+
+  private static final int DIR_FORWARDS = 1;
+  private static final int DIR_BACKWARDS = -1;
 
   private static final Logger logger = Logger.getInstance(SearchGroup.class.getName());
 }

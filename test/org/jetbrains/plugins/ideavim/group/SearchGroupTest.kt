@@ -313,17 +313,36 @@ class SearchGroupTest : VimTestCase() {
       assertOffset(31)
     }
 
-    fun `test incsearch highlights current match by default`() {
+    fun `test incsearch highlights only current match with nohlsearch`() {
       setIncrementalSearch()
       configureByText(
         """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
-      typeText(parseKeys("/", "legend"))
-      assertSearchHighlights("legend",
-        """I found it in a ‷legend‴ary land
-           |all rocks and lavender and tufted grass,
+
+      typeText(parseKeys("/", "and"))
+
+      assertSearchHighlights("and",
+        """I found it in a legendary land
+           |all rocks ‷and‴ lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.""".trimMargin())
+    }
+
+    fun `test incsearch highlights only current match with nohlsearch (backwards)`() {
+      setIncrementalSearch()
+      configureByText(
+        """I found it in a legendary land
+           |all rocks and lave${c}nder and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.""".trimMargin())
+
+      typeText(parseKeys("?", "a"))
+
+      assertSearchHighlights("a",
+        """I found it in a legendary land
+           |all rocks and l‷a‴vender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
     }

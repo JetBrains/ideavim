@@ -35,18 +35,19 @@ import java.util.*;
  * Maintains the set of support options
  */
 public class Options {
-  public static final String RELATIVE_NUMBER = "relativenumber";
-  public static final String NUMBER = "number";
   public static final String CLIPBOARD = "clipboard";
   public static final String HIGHLIGHT_SEARCH = "hlsearch";
   public static final String IGNORE_CASE = "ignorecase";
   public static final String INCREMENTAL_SEARCH = "incsearch";
+  public static final String KEYMODEL = "keymodel";
+  public static final String LOOKUPACTIONS = "lookupactions";
+  public static final String NUMBER = "number";
+  public static final String RELATIVE_NUMBER = "relativenumber";
+  public static final String SELECTMODE = "selectmode";
   public static final String SMART_CASE = "smartcase";
   public static final String TIMEOUT = "timeout";
   public static final String VIMINFO = "viminfo";
-  public static final String SELECTMODE = "selectmode";
-  public static final String KEYMODEL = "keymodel";
-  public static final String LOOKUPACTIONS = "lookupactions";
+  public static final String WRAPSCAN = "wrapscan";
 
   /**
    * Gets the singleton instance of the options
@@ -470,7 +471,7 @@ public class Options {
     addOption(new NumberOption("timeoutlen", "tm", 1000, -1, Integer.MAX_VALUE));
     addOption(new NumberOption("undolevels", "ul", 1000, -1, Integer.MAX_VALUE));
     addOption(new ToggleOption("visualbell", "vb", false));
-    addOption(new ToggleOption("wrapscan", "ws", true));
+    addOption(new ToggleOption(WRAPSCAN, "ws", true));
     addOption(new ToggleOption(NUMBER, "nu", false));
     addOption(new ToggleOption(RELATIVE_NUMBER, "rnu", false));
     addOption(new ListOption(CLIPBOARD, "cb", new String[]{"autoselect,exclude:cons\\|linux"}, null));
