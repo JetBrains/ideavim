@@ -453,6 +453,97 @@ class SearchGroupTest : VimTestCase() {
            |hard by the torrent of a mountain pass.""".trimMargin())
     }
 
+    fun `test incsearch highlights for substitute command`() {
+      setIncrementalSearch()
+      setHighlightSearch()
+      configureByText(
+        """I found it in a legendary land
+           |${c}all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.""".trimMargin())
+
+      typeText(parseKeys(":", "%s/and"))
+
+      assertSearchHighlights("and",
+        """I found it in a legendary l«and»
+           |all rocks ‷and‴ lavender «and» tufted grass,
+           |where it was settled on some sodden s«and»
+           |hard by the torrent of a mountain pass.""".trimMargin())
+    }
+
+    fun `test incsearch highlights for substitute command only highlights in range`() {
+      setIncrementalSearch()
+      setHighlightSearch()
+      configureByText(
+        """I found it in a legendary land
+           |all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |${c}hard by the torrent and rush of a mountain pass.""".trimMargin())
+
+      typeText(parseKeys(":", "2,3s/and"))
+
+      assertSearchHighlights("and",
+        """I found it in a legendary land
+           |all rocks ‷and‴ lavender «and» tufted grass,
+           |where it was settled on some sodden s«and»
+           |hard by the torrent and rush of a mountain pass.""".trimMargin())
+    }
+
+    fun `test incsearch highlights for substitute command in current line with no range`() {
+      setIncrementalSearch()
+      setHighlightSearch()
+      configureByText(
+        """I found it in a legendary land
+           |${c}all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.""".trimMargin())
+
+      typeText(parseKeys(":", "s/and"))
+
+      assertSearchHighlights("and",
+        """I found it in a legendary land
+           |all rocks ‷and‴ lavender «and» tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.""".trimMargin())
+    }
+
+    fun `test incsearch highlights for substitute command clears highlights on backspace`() {
+      setIncrementalSearch()
+      setHighlightSearch()
+      configureByText(
+        """I found it in a legendary land
+           |${c}all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.""".trimMargin())
+
+      typeText(parseKeys(":", "%s/and", "<BS><BS><BS>"))
+
+      assertSearchHighlights("and",
+        """I found it in a legendary land
+           |all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.""".trimMargin())
+    }
+
+    fun `test cancelling incsearch highlights for substitute command shows previous highlights`() {
+      setIncrementalSearch()
+      setHighlightSearch()
+      configureByText(
+        """I found it in a legendary land
+           |${c}all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.""".trimMargin())
+
+      enterSearch("and")
+      typeText(parseKeys(":", "%s/ass", "<Esc>"))
+
+      assertSearchHighlights("and",
+        """I found it in a legendary l«and»
+           |all rocks «and» lavender «and» tufted grass,
+           |where it was settled on some sodden s«and»
+           |hard by the torrent of a mountain pass.""".trimMargin())
+    }
+
     fun `test highlight search results`() {
       setHighlightSearch()
       configureByText(
@@ -795,7 +886,7 @@ class SearchGroupTest : VimTestCase() {
     // doesn't exist
     fun `test find last cr in file`() {
       val res = search("\\n", "Something\n")
-      assertEquals(9, res);
+      assertEquals(9, res)
     }
 
     private fun setIgnoreCase() {

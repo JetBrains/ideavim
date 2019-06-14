@@ -27,7 +27,12 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.ex.CommandParser;
+import com.maddyhome.idea.vim.ex.ExCommand;
+import com.maddyhome.idea.vim.ex.LineRange;
+import com.maddyhome.idea.vim.ex.Ranges;
 import com.maddyhome.idea.vim.group.MotionGroup;
+import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.option.Options;
 import com.maddyhome.idea.vim.regexp.CharPointer;
@@ -110,7 +115,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     entry.setType(label);
     parent = editor.getContentComponent();
 
-    if (isIncSearchEnabled(label)) {
+    if (isIncSearchEnabled()) {
       entry.getDocument().addDocumentListener(incSearchDocumentListener);
       caretOffset = editor.getCaretModel().getOffset();
       verticalOffset = editor.getScrollingModel().getVerticalScrollOffset();
@@ -230,7 +235,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     active = false;
 
     // incsearch won't change in the lifetime of this activation
-    if (isIncSearchEnabled(label.getText())) {
+    if (isIncSearchEnabled()) {
       entry.getDocument().removeDocumentListener(incSearchDocumentListener);
       final Editor editor = entry.getEditor();
       if (!editor.isDisposed()) {
@@ -261,8 +266,8 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     parent = null;
   }
 
-  private boolean isIncSearchEnabled(@NotNull String labelText) {
-    return (labelText.equals("/") || labelText.equals("?")) && Options.getInstance().isSet(Options.INCREMENTAL_SEARCH);
+  private boolean isIncSearchEnabled() {
+    return Options.getInstance().isSet(Options.INCREMENTAL_SEARCH);
   }
 
   /**
@@ -302,13 +307,50 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     protected void textChanged(@NotNull DocumentEvent e) {
       final Editor editor = entry.getEditor();
 
-      final boolean forwards = !label.getText().equals("?");
-      final String searchText = entry.getActualText();
+      LineRange searchRange = null;
+      char separator = label.getText().charAt(0);
+      String searchText = entry.getActualText();
+      if (label.getText().equals(":")) {
+        final ExCommand command = getIncsearchCommand(searchText);
+        if (command == null) {
+          return;
+        }
+        searchText = "";
+        final String argument = command.getArgument();
+        if (argument.length() > 1) {  // E.g. skip '/' in `:%s/`. `%` is range, `s` is command, `/` is argument
+          separator = argument.charAt(0);
+          searchText = argument.substring(1);
+        }
+        final Ranges ranges = command.getRanges();
+        ranges.setDefaultLine(EditorHelper.offsetToCharacterPosition(editor, caretOffset).line);
+        searchRange = command.getLineRange(editor, entry.getContext());
+      }
+
+      final boolean forwards = !label.getText().equals("?");  // :s, :g, :v are treated as forwards
       final CharPointer p = new CharPointer(searchText);
-      final CharPointer end = RegExp.skip_regexp(new CharPointer(searchText), forwards ? '/' : '?', true);
+      final CharPointer end = RegExp.skip_regexp(new CharPointer(searchText), separator, true);
       final String pattern = p.substring(end.pointer() - p.pointer());
 
-      VimPlugin.getSearch().updateIncsearchHighlights(editor, pattern, forwards, caretOffset);
+      VimPlugin.getSearch().updateIncsearchHighlights(editor, pattern, forwards, caretOffset, searchRange);
+    }
+
+    @Nullable
+    private ExCommand getIncsearchCommand(String commandText) {
+      try {
+        final ExCommand exCommand = CommandParser.getInstance().parse(commandText);
+        final String command = exCommand.getCommand();
+        if (command.equals("s") || command.equals("substitute")
+          || command.equals("g") || command.equals("global")
+          || command.equals("v") || command.equals("vglobal")) {
+
+          return exCommand;
+        }
+      }
+      catch(Exception e) {
+        logger.warn("Cannot parse command for incsearch", e);
+      }
+
+      return null;
     }
   };
 

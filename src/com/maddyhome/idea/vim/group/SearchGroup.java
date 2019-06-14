@@ -635,20 +635,20 @@ public class SearchGroup {
     updateSearchHighlights(lastSearch, lastIgnoreSmartCase, showSearchHighlight, true);
   }
 
-  public void updateIncsearchHighlights(Editor editor, String pattern, boolean forwards, int caretOffset) {
-    int currentMatchOffset = updateSearchHighlights(pattern, false, true, caretOffset, forwards, false);
+  public void updateIncsearchHighlights(Editor editor, String pattern, boolean forwards, int caretOffset, @Nullable LineRange searchRange) {
+    int currentMatchOffset = updateSearchHighlights(pattern, false, true, caretOffset, searchRange, forwards, false);
     MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), currentMatchOffset == -1 ? caretOffset : currentMatchOffset);
   }
 
   private void updateSearchHighlights(@Nullable String pattern, boolean shouldIgnoreSmartCase, boolean showHighlights, boolean forceUpdate) {
-    updateSearchHighlights(pattern, shouldIgnoreSmartCase, showHighlights, -1, true, forceUpdate);
+    updateSearchHighlights(pattern, shouldIgnoreSmartCase, showHighlights, -1, null, true, forceUpdate);
   }
 
   /**
    * Refreshes current search highlights for all editors of currently active text editor/document
    */
   private int updateSearchHighlights(@Nullable String pattern, boolean shouldIgnoreSmartCase, boolean showHighlights,
-                                     int initialOffset, boolean forwards, boolean forceUpdate) {
+                                     int initialOffset, @Nullable LineRange searchRange, boolean forwards, boolean forceUpdate) {
     int currentMatchOffset = -1;
 
     Project[] projects = ProjectManager.getInstance().getOpenProjects();
@@ -668,7 +668,9 @@ public class SearchGroup {
         }
 
         if (shouldAddSearchHighlight(editor, pattern, showHighlights)) {
-          final List<TextRange> results = findAll(editor, pattern, 0, -1, shouldIgnoreCase(pattern, shouldIgnoreSmartCase));
+          final int startLine = searchRange == null ? 0 : searchRange.getStartLine();
+          final int endLine = searchRange == null ? -1 : searchRange.getEndLine();
+          List<TextRange> results = findAll(editor, pattern, startLine, endLine, shouldIgnoreCase(pattern, shouldIgnoreSmartCase));
           if (!results.isEmpty()) {
             currentMatchOffset = findClosestMatch(editor, results, initialOffset, forwards);
             highlightSearchResults(editor, pattern, results, currentMatchOffset);
@@ -692,7 +694,7 @@ public class SearchGroup {
    * Add search highlights if hlSearch is true and the pattern is changed
    */
   private boolean shouldAddSearchHighlight(@NotNull Editor editor, @Nullable String newPattern, boolean hlSearch) {
-    return hlSearch && newPattern != null && !newPattern.equals(EditorData.getLastSearch(editor)) && newPattern != "";
+    return hlSearch && newPattern != null && !newPattern.equals(EditorData.getLastSearch(editor)) && !Objects.equals(newPattern, "");
   }
 
   private void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine) {
@@ -789,7 +791,8 @@ public class SearchGroup {
     return results;
   }
 
-  private static void highlightSearchResults(@NotNull Editor editor, @NotNull String pattern, List<TextRange> results, int currentMatchOffset) {
+  private static void highlightSearchResults(@NotNull Editor editor, @NotNull String pattern, List<TextRange> results,
+                                             int currentMatchOffset) {
     Collection<RangeHighlighter> highlighters = EditorData.getLastHighlights(editor);
     if (highlighters == null) {
       highlighters = new ArrayList<>();
