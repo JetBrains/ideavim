@@ -636,7 +636,10 @@ public class SearchGroup {
   }
 
   public void updateIncsearchHighlights(Editor editor, String pattern, boolean forwards, int caretOffset, @Nullable LineRange searchRange) {
-    int currentMatchOffset = updateSearchHighlights(pattern, false, true, caretOffset, searchRange, forwards, false);
+    // searchStartOffset is used to find the closest match. caretOffset is used to reset the caret if there is no match.
+    // If searching based on e.g. :%s/... then these values are not going to be the same
+    final int searchStartOffset = searchRange != null ? EditorHelper.getLineStartOffset(editor, searchRange.getStartLine()) : caretOffset;
+    int currentMatchOffset = updateSearchHighlights(pattern, false, true, searchStartOffset, searchRange, forwards, false);
     MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), currentMatchOffset == -1 ? caretOffset : currentMatchOffset);
   }
 

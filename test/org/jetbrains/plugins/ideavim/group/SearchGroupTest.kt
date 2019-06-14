@@ -465,8 +465,8 @@ class SearchGroupTest : VimTestCase() {
       typeText(parseKeys(":", "%s/and"))
 
       assertSearchHighlights("and",
-        """I found it in a legendary l«and»
-           |all rocks ‷and‴ lavender «and» tufted grass,
+        """I found it in a legendary l‷and‴
+           |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
     }
@@ -503,6 +503,40 @@ class SearchGroupTest : VimTestCase() {
       assertSearchHighlights("and",
         """I found it in a legendary land
            |all rocks ‷and‴ lavender «and» tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.""".trimMargin())
+    }
+
+    fun `test incsearch for substitute command starts at beginning of range not caret position`() {
+      setIncrementalSearch()
+      setHighlightSearch()
+      configureByText(
+        """I found it in a legendary land
+           |all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.
+           |${c}I found it in a legendary land
+           |all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.
+           |I found it in a legendary land
+           |all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.""".trimMargin())
+
+      typeText(parseKeys(":", "2,8s/and"))
+
+      assertSearchHighlights("and",
+        """I found it in a legendary land
+           |all rocks ‷and‴ lavender «and» tufted grass,
+           |where it was settled on some sodden s«and»
+           |hard by the torrent of a mountain pass.
+           |I found it in a legendary l«and»
+           |all rocks «and» lavender «and» tufted grass,
+           |where it was settled on some sodden s«and»
+           |hard by the torrent of a mountain pass.
+           |I found it in a legendary land
+           |all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
     }
