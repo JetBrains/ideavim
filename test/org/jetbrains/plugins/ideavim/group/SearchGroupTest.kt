@@ -490,6 +490,26 @@ class SearchGroupTest : VimTestCase() {
            |hard by the torrent of a mountain pass.""".trimMargin())
     }
 
+    fun `test incsearch only highlights for substitute command after valid argument`() {
+      setIncrementalSearch()
+      setHighlightSearch()
+      configureByText(
+        """I found it in a legendary land
+           |${c}all rocks and lavender and tufted grass,
+           |where it was settled on some sodden sand
+           |hard by the torrent of a mountain pass.""".trimMargin())
+
+      // E.g. don't remove highlights when trying to type :set
+      enterSearch("and")
+      typeText(parseKeys(":s"))
+
+      assertSearchHighlights("and",
+        """I found it in a legendary l«and»
+           |all rocks «and» lavender «and» tufted grass,
+           |where it was settled on some sodden s«and»
+           |hard by the torrent of a mountain pass.""".trimMargin())
+    }
+
     fun `test incsearch highlights for substitute command only highlights in range`() {
       setIncrementalSearch()
       setHighlightSearch()
@@ -564,17 +584,36 @@ class SearchGroupTest : VimTestCase() {
       setIncrementalSearch()
       setHighlightSearch()
       configureByText(
+          """I found it in a legendary land
+             |${c}all rocks and lavender and tufted grass,
+             |where it was settled on some sodden sand
+             |hard by the torrent of a mountain pass.""".trimMargin())
+
+      typeText(parseKeys(":", "%s/and", "<BS><BS><BS>"))
+
+      assertSearchHighlights("and",
+          """I found it in a legendary land
+             |all rocks and lavender and tufted grass,
+             |where it was settled on some sodden sand
+             |hard by the torrent of a mountain pass.""".trimMargin())
+    }
+
+    fun `test incsearch highlights for substitute command resets highlights on backspace`() {
+      setIncrementalSearch()
+      setHighlightSearch()
+      configureByText(
         """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
 
-      typeText(parseKeys(":", "%s/and", "<BS><BS><BS>"))
+      enterSearch("and")
+      typeText(parseKeys(":", "%s/roc", "<BS><BS><BS>"))
 
       assertSearchHighlights("and",
-        """I found it in a legendary land
-           |all rocks and lavender and tufted grass,
-           |where it was settled on some sodden sand
+        """I found it in a legendary l«and»
+           |all rocks «and» lavender «and» tufted grass,
+           |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
     }
 

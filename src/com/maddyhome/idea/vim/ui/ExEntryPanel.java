@@ -321,6 +321,10 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
           separator = argument.charAt(0);
           searchText = argument.substring(1);
         }
+        if (searchText.length() == 0) {
+          VimPlugin.getSearch().resetIncsearchHighlights();
+          return;
+        }
         final Ranges ranges = command.getRanges();
         ranges.setDefaultLine(EditorHelper.offsetToCharacterPosition(editor, caretOffset).line);
         searchRange = command.getLineRange(editor, entry.getContext());
