@@ -84,18 +84,6 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     updateUI();
   }
 
-  @Override
-  public void lookAndFeelChanged(@NotNull LafManager source) {
-    // Calls updateUI on this and child components
-    IJSwingUtilities.updateComponentTreeUI(this);
-  }
-
-  private void setFontForElements() {
-    final Font font = UiHelper.getEditorFont();
-    label.setFont(font);
-    entry.setFont(font);
-  }
-
   /**
    * Turns on the ex entry field for the given editor
    *
@@ -138,94 +126,6 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     active = true;
   }
 
-  // Called automatically when the LAF is changed and the component is visible, and manually by the LAF listener handler
-  @Override
-  public void updateUI() {
-    super.updateUI();
-
-    setBorder(new ExPanelBorder());
-
-    // Can be null when called from base constructor
-    //noinspection ConstantConditions
-    if (entry != null && label != null) {
-
-      setFontForElements();
-
-      // Label background is automatically picked up
-      label.setForeground(entry.getForeground());
-    }
-  }
-
-  // Entry can be null if getForeground is called during base class initialisation
-  @SuppressWarnings("ConstantConditions")
-  @Override
-  public Color getForeground() {
-    return entry != null ? entry.getForeground() : super.getForeground();
-  }
-
-  @SuppressWarnings("ConstantConditions")
-  @Override
-  public Color getBackground() {
-    return entry != null ? entry.getBackground() : super.getBackground();
-  }
-
-  /**
-   * Gets the label for the ex entry. This should be one of ":", "/", or "?"
-   *
-   * @return The ex entry label
-   */
-  public String getLabel() {
-    return label.getText();
-  }
-
-  /**
-   * Gets the count given during activation
-   *
-   * @return The count
-   */
-  public int getCount() {
-    return count;
-  }
-
-  /**
-   * Pass the keystroke on to the text edit for handling
-   *
-   * @param stroke The keystroke
-   */
-  public void handleKey(@NotNull KeyStroke stroke) {
-    entry.handleKey(stroke);
-  }
-
-  private void positionPanel() {
-    if (parent == null) return;
-
-    Container scroll = SwingUtilities.getAncestorOfClass(JScrollPane.class, parent);
-    int height = (int)getPreferredSize().getHeight();
-    if (scroll != null) {
-      Rectangle bounds = scroll.getBounds();
-      bounds.translate(0, scroll.getHeight() - height);
-      bounds.height = height;
-      Point pos = SwingUtilities.convertPoint(scroll.getParent(), bounds.getLocation(), oldGlass);
-      bounds.setLocation(pos);
-      setBounds(bounds);
-      repaint();
-    }
-  }
-
-  /**
-   * Gets the text entered by the user. This includes any initial text but does not include the label
-   *
-   * @return The user entered text
-   */
-  public String getText() {
-    return entry.getActualText();
-  }
-
-  @NotNull
-  public ExTextField getEntry() {
-    return entry;
-  }
-
   /**
    * Turns off the ex entry field and optionally puts the focus back to the original component
    */
@@ -266,8 +166,22 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     parent = null;
   }
 
-  private boolean isIncSearchEnabled() {
-    return Options.getInstance().isSet(Options.INCREMENTAL_SEARCH);
+  /**
+   * Gets the label for the ex entry. This should be one of ":", "/", or "?"
+   *
+   * @return The ex entry label
+   */
+  public String getLabel() {
+    return label.getText();
+  }
+
+  /**
+   * Gets the count given during activation
+   *
+   * @return The count
+   */
+  public int getCount() {
+    return count;
   }
 
   /**
@@ -277,6 +191,92 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
    */
   public boolean isActive() {
     return active;
+  }
+
+  /**
+   * Gets the text entered by the user. This includes any initial text but does not include the label
+   *
+   * @return The user entered text
+   */
+  public String getText() {
+    return entry.getActualText();
+  }
+
+  @NotNull
+  public ExTextField getEntry() {
+    return entry;
+  }
+
+  /**
+   * Pass the keystroke on to the text edit for handling
+   *
+   * @param stroke The keystroke
+   */
+  public void handleKey(@NotNull KeyStroke stroke) {
+    entry.handleKey(stroke);
+  }
+
+  @Override
+  public void lookAndFeelChanged(@NotNull LafManager source) {
+    // Calls updateUI on this and child components
+    IJSwingUtilities.updateComponentTreeUI(this);
+  }
+
+  // Called automatically when the LAF is changed and the component is visible, and manually by the LAF listener handler
+  @Override
+  public void updateUI() {
+    super.updateUI();
+
+    setBorder(new ExPanelBorder());
+
+    // Can be null when called from base constructor
+    //noinspection ConstantConditions
+    if (entry != null && label != null) {
+
+      setFontForElements();
+
+      // Label background is automatically picked up
+      label.setForeground(entry.getForeground());
+    }
+  }
+
+  // Entry can be null if getForeground is called during base class initialisation
+  @SuppressWarnings("ConstantConditions")
+  @Override
+  public Color getForeground() {
+    return entry != null ? entry.getForeground() : super.getForeground();
+  }
+
+  @SuppressWarnings("ConstantConditions")
+  @Override
+  public Color getBackground() {
+    return entry != null ? entry.getBackground() : super.getBackground();
+  }
+
+  private void setFontForElements() {
+    final Font font = UiHelper.getEditorFont();
+    label.setFont(font);
+    entry.setFont(font);
+  }
+
+  private void positionPanel() {
+    if (parent == null) return;
+
+    Container scroll = SwingUtilities.getAncestorOfClass(JScrollPane.class, parent);
+    int height = (int)getPreferredSize().getHeight();
+    if (scroll != null) {
+      Rectangle bounds = scroll.getBounds();
+      bounds.translate(0, scroll.getHeight() - height);
+      bounds.height = height;
+      Point pos = SwingUtilities.convertPoint(scroll.getParent(), bounds.getLocation(), oldGlass);
+      bounds.setLocation(pos);
+      setBounds(bounds);
+      repaint();
+    }
+  }
+
+  private boolean isIncSearchEnabled() {
+    return Options.getInstance().isSet(Options.INCREMENTAL_SEARCH);
   }
 
   private boolean active;
