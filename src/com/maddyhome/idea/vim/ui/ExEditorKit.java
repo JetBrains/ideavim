@@ -105,7 +105,6 @@ public class ExEditorKit extends DefaultEditorKit {
   static final String DeletePreviousChar = "delete-prev-char";
   static final String DeletePreviousWord = "delete-prev-word";
   static final String DeleteToCursor = "delete-to-cursor";
-  static final String DeleteFromCursor = "delete-from-cursor";
   static final String ToggleInsertReplace = "toggle-insert";
   static final String InsertRegister = "insert-register";
   static final String HistoryUp = "history-up";
@@ -121,7 +120,6 @@ public class ExEditorKit extends DefaultEditorKit {
     new ExEditorKit.DeletePreviousCharAction(),
     new ExEditorKit.DeletePreviousWordAction(),
     new ExEditorKit.DeleteToCursorAction(),
-    new ExEditorKit.DeleteFromCursorAction(),
     new ExEditorKit.HistoryUpAction(),
     new ExEditorKit.HistoryDownAction(),
     new ExEditorKit.HistoryUpFilterAction(),
@@ -386,29 +384,6 @@ public class ExEditorKit extends DefaultEditorKit {
       Caret caret = target.getCaret();
       try {
         doc.remove(0, caret.getDot());
-      }
-      catch (BadLocationException ex) {
-        // ignore
-      }
-    }
-  }
-
-  public static class DeleteFromCursorAction extends TextAction {
-    DeleteFromCursorAction() {
-      super(DeleteFromCursor);
-    }
-
-    /**
-     * Invoked when an action occurs.
-     */
-    public void actionPerformed(ActionEvent e) {
-      ExTextField target = (ExTextField)getTextComponent(e);
-      target.saveLastEntry();
-
-      Document doc = target.getDocument();
-      Caret caret = target.getCaret();
-      try {
-        doc.remove(caret.getDot(), doc.getLength());
       }
       catch (BadLocationException ex) {
         // ignore
