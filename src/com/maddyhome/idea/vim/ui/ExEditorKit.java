@@ -331,7 +331,7 @@ public class ExEditorKit extends DefaultEditorKit {
 
           doc.remove(dot - delChars, delChars);
         }
-        else {
+        else if (dot == 0 && doc.getLength() == 0){
           target.cancel();
         }
       }

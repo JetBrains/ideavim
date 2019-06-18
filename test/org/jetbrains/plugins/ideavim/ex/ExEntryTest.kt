@@ -2,6 +2,7 @@ package org.jetbrains.plugins.ideavim.ex
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.VimBehaviourDiffers
 import com.maddyhome.idea.vim.option.Options
 import com.maddyhome.idea.vim.ui.ExDocument
 import com.maddyhome.idea.vim.ui.ExEntryPanel
@@ -119,7 +120,7 @@ class ExEntryTest: VimTestCase() {
         assertExText("set incsear")
     }
 
-    fun `test delete character in front of caret cancels entry`() {
+    fun `test delete at start of text cancels entry`() {
         typeExInput(":<BS>")
         assertIsDeactivated()
 
@@ -135,11 +136,11 @@ class ExEntryTest: VimTestCase() {
 
         deactivateExEntry()
 
-        // TODO: Vim behaviour is to NOT deactivate if there is still text
+        // Don't deactivate if there is still text to the right of the caret
         typeExInput(":set<C-B>")
         assertExOffset(0)
         typeText("<BS>")
-        assertIsDeactivated()
+        assertIsActive()
     }
 
     fun `test delete character under caret`() {
@@ -169,6 +170,7 @@ class ExEntryTest: VimTestCase() {
         assertExText("rch")
     }
 
+    @VimBehaviourDiffers(description = "Vim reorders history even when cancelling entry")
     fun `test command history`() {
         typeExInput(":set digraph<CR>")
         typeExInput(":digraph<CR>")
@@ -266,6 +268,7 @@ class ExEntryTest: VimTestCase() {
         assertExText("something cool")
     }
 
+    @VimBehaviourDiffers(description = "Vim reorders history even when cancelling entry")
     fun `test matching search history`() {
         typeExInput("/something cool<CR>")
         typeExInput("/not cool<CR>")
@@ -332,6 +335,7 @@ class ExEntryTest: VimTestCase() {
         assertExOffset(0)
     }
 
+    @VimBehaviourDiffers(description = "Moving one word right positions caret at end of previous word")
     fun `test move caret one WORD right`() {
         typeExInput(":set incsearch")
         caret.dot = 0
