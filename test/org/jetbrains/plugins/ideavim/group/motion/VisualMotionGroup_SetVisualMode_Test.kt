@@ -27,8 +27,8 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  */
 @Suppress("ClassName")
 class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
-    fun `test enable character selection`() {
-        configureByText("""
+  fun `test enable character selection`() {
+    configureByText("""
             A Discovery
 
             I ${s}found it$se in a legendary land
@@ -36,14 +36,14 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.COMMAND)
-        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
-        assertMode(CommandState.Mode.VISUAL)
-        assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    }
+    assertMode(CommandState.Mode.COMMAND)
+    VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+  }
 
-    fun `test enable character selection multicaret`() {
-        configureByText("""
+  fun `test enable character selection multicaret`() {
+    configureByText("""
             A Discovery
 
             I ${s}found it$c$se in a legendary land
@@ -51,15 +51,15 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.COMMAND)
-        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
-        assertMode(CommandState.Mode.VISUAL)
-        assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
-    }
+    assertMode(CommandState.Mode.COMMAND)
+    VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_CHARACTER)
+  }
 
 
-    fun `test enable line selection`() {
-        configureByText("""
+  fun `test enable line selection`() {
+    configureByText("""
             A Discovery
 
             ${s}I found it in a legendary land$se
@@ -67,14 +67,14 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.COMMAND)
-        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
-        assertMode(CommandState.Mode.VISUAL)
-        assertSubMode(CommandState.SubMode.VISUAL_LINE)
-    }
+    assertMode(CommandState.Mode.COMMAND)
+    VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+  }
 
-    fun `test enable line selection multicaret`() {
-        configureByText("""
+  fun `test enable line selection multicaret`() {
+    configureByText("""
             A Discovery
 
             ${s}I found it in a legendary land$c$se
@@ -82,14 +82,14 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
             ${s}where it was settled on some sodden sand$c$se
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.COMMAND)
-        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
-        assertMode(CommandState.Mode.VISUAL)
-        assertSubMode(CommandState.SubMode.VISUAL_LINE)
-    }
+    assertMode(CommandState.Mode.COMMAND)
+    VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+  }
 
-    fun `test enable line selection till next line`() {
-        configureByText("""
+  fun `test enable line selection till next line`() {
+    configureByText("""
             A Discovery
 
             ${s}I found it in a legendary land
@@ -97,14 +97,14 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.COMMAND)
-        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
-        assertMode(CommandState.Mode.VISUAL)
-        assertSubMode(CommandState.SubMode.VISUAL_LINE)
-    }
+    assertMode(CommandState.Mode.COMMAND)
+    VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+  }
 
-    fun `test enable line selection till next line multicaret`() {
-        configureByText("""
+  fun `test enable line selection till next line multicaret`() {
+    configureByText("""
             ${s}A Discovery
             $c$se
             ${s}I found it in a legendary land
@@ -112,15 +112,15 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.COMMAND)
-        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
-        assertMode(CommandState.Mode.VISUAL)
-        assertSubMode(CommandState.SubMode.VISUAL_LINE)
-    }
+    assertMode(CommandState.Mode.COMMAND)
+    VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_LINE)
+  }
 
 
-    fun `test enable block selection`() {
-        configureByText("""
+  fun `test enable block selection`() {
+    configureByText("""
             A Discovery
 
             I ${s}found$c$se it in a legendary land
@@ -128,14 +128,14 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
             wh${s}ere i$c${se}t was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.COMMAND)
-        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
-        assertMode(CommandState.Mode.VISUAL)
-        assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
-    }
+    assertMode(CommandState.Mode.COMMAND)
+    VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
+  }
 
-    fun `test enable block selection with different line size`() {
-        configureByText("""
+  fun `test enable block selection with different line size`() {
+    configureByText("""
             A Discovery
 
             I ${s}found it in a legendary land$c$se
@@ -143,14 +143,14 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
             wh${s}ere it was settled on some sodden sand$c$se
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.COMMAND)
-        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
-        assertMode(CommandState.Mode.VISUAL)
-        assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
-    }
+    assertMode(CommandState.Mode.COMMAND)
+    VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
+  }
 
-    fun `test enable block selection with long line`() {
-        configureByText("""
+  fun `test enable block selection with long line`() {
+    configureByText("""
             A Discovery
 
             I ${s}found it in a legendary land$c$se
@@ -158,9 +158,9 @@ class VisualMotionGroup_SetVisualMode_Test : VimTestCase() {
             wh${s}ere it was settled on some sodden sand12345$c${se}6789
             hard by the torrent of a mountain pass.
         """.trimIndent())
-        assertMode(CommandState.Mode.COMMAND)
-        VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
-        assertMode(CommandState.Mode.VISUAL)
-        assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
-    }
+    assertMode(CommandState.Mode.COMMAND)
+    VimPlugin.getVisualMotion().setVisualMode(myFixture.editor)
+    assertMode(CommandState.Mode.VISUAL)
+    assertSubMode(CommandState.SubMode.VISUAL_BLOCK)
+  }
 }

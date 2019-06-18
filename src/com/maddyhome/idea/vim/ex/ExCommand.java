@@ -24,9 +24,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.common.TextRange;
 import org.jetbrains.annotations.NotNull;
 
-/**
- *
- */
+
 public class ExCommand {
   public ExCommand(@NotNull Ranges ranges, @NotNull String command, @NotNull String argument) {
     this.ranges = ranges;

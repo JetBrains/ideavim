@@ -27,10 +27,9 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 
-class WriteQuitHandler : CommandHandler(
-  commands("wq", "exi[t]", "x[it]"),
-  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
-) {
+class WriteQuitHandler : CommandHandler.SingleExecution() {
+  override val names = commands("wq", "exi[t]", "x[it]")
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     VimPlugin.getFile().saveFile(editor)
     VimPlugin.getFile().closeFile(editor, context)

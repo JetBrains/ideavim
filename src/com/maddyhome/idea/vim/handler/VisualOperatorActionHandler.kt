@@ -29,8 +29,19 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.group.visual.*
-import com.maddyhome.idea.vim.helper.*
+import com.maddyhome.idea.vim.group.visual.VimBlockSelection
+import com.maddyhome.idea.vim.group.visual.VimSelection
+import com.maddyhome.idea.vim.group.visual.VimSimpleSelection
+import com.maddyhome.idea.vim.group.visual.VisualChange
+import com.maddyhome.idea.vim.group.visual.VisualOperation
+import com.maddyhome.idea.vim.helper.EditorData
+import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.helper.inRepeatMode
+import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.vimForEachCaret
+import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
+import com.maddyhome.idea.vim.helper.vimSelectionStart
 
 /**
  * @author Alex Plate
@@ -39,31 +50,54 @@ import com.maddyhome.idea.vim.helper.*
  * @see [VisualOperatorActionHandler.SingleExecution] and [VisualOperatorActionHandler.ForEachCaret]
  */
 sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
+  /**
+   * Base class for visual operation handlers.
+   * This handler executes an action for each caret. That means that if you have 5 carets,
+   *   [executeAction] will be called 5 times.
+   * @see [VisualOperatorActionHandler.SingleExecution] for only one execution
+   */
+  abstract class ForEachCaret : VisualOperatorActionHandler() {
+
+    /**
+     * Execute an action for current [caret].
+     * The selection offsets and type should be takes from [range] because this [caret] doesn't have this selection
+     *   anymore in time of action execution (and editor is in normal mode, not visual).
+     *
+     * This method is executed once for each caret except case with block selection. If there is block selection,
+     *   the method will be executed only once with [Caret#primaryCaret].
+     */
+    abstract fun executeAction(editor: Editor, caret: Caret, context: DataContext, cmd: Command, range: VimSelection): Boolean
+
+    /**
+     * This method executes before [executeAction] and only once for all carets.
+     * [caretsAndSelections] contains a map of all current carets and corresponding selections.
+     *   If there is block selection, only one caret is in [caretsAndSelections].
+     */
+    open fun beforeExecution(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>) = true
+
+    /**
+     * This method executes after [executeAction] and only once for all carets.
+     * [res] has true if ALL executions of [executeAction] returned true.
+     */
+    open fun afterExecution(editor: Editor, context: DataContext, cmd: Command, res: Boolean) {}
+  }
 
   /**
-   * Execute an action for current [caret].
-   * The selection offsets and type should be takes from [range] because this [caret] doesn't have this selection
-   *   anymore in time of action execution (and editor is in normal mode, not visual).
-   *
-   * This method is executed once for each caret except case with block selection. If there is block selection,
-   *   the method will be executed only once with [Caret#primaryCaret].
+   * Base class for visual operation handlers.
+   * This handler executes an action only once for all carets. That means that if you have 5 carets,
+   *   [executeAction] will be called 1 time.
+   * @see [VisualOperatorActionHandler.ForEachCaret] for per-caret execution
    */
-  protected abstract fun executeAction(editor: Editor, caret: Caret, context: DataContext, cmd: Command, range: VimSelection): Boolean
-
-  /**
-   * This method executes before [executeAction] and only once for all carets.
-   * [caretsAndSelections] contains a map of all current carets and corresponding selections.
-   *   If there is block selection, only one caret is in [caretsAndSelections].
-   */
-  protected open fun beforeExecution(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>) = true
-
-  /**
-   * This method executes after [executeAction] and only once for all carets.
-   * [res] has true if ALL executions of [executeAction] returned true.
-   */
-  protected open fun afterExecution(editor: Editor, context: DataContext, cmd: Command, res: Boolean) {}
-
-  abstract val batchExecution: Boolean
+  abstract class SingleExecution : VisualOperatorActionHandler() {
+    /**
+     * Execute an action
+     * [caretsAndSelections] contains a map of all current carets and corresponding selections.
+     *   If there is block selection, only one caret is in [caretsAndSelections].
+     *
+     * This method is executed once for all carets.
+     */
+    abstract fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>): Boolean
+  }
 
   final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     logger.info("Execute visual command $cmd")
@@ -80,27 +114,30 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
     commandWrapper.start()
 
     val res = Ref.create(true)
-    if (batchExecution) {
-      res.set(beforeExecution(editor, context, cmd, selections))
-    } else {
-      logger.debug("Calling 'before execution'")
-      if (!beforeExecution(editor, context, cmd, selections)) {
-        logger.debug("Before execution block returned false. Stop further processing")
-        return false
+    when (this) {
+      is SingleExecution -> {
+        res.set(executeForAllCarets(editor, context, cmd, selections))
       }
+      is ForEachCaret -> {
+        logger.debug("Calling 'before execution'")
+        if (!beforeExecution(editor, context, cmd, selections)) {
+          logger.debug("Before execution block returned false. Stop further processing")
+          return false
+        }
 
-      when {
-        selections.keys.isEmpty() -> return false
-        selections.keys.size == 1 -> res.set(executeAction(editor, selections.keys.first(), context, cmd, selections.values.first()))
-        else -> editor.caretModel.runForEachCaret({ caret ->
-          val range = selections.getValue(caret)
-          val loopRes = executeAction(editor, caret, context, cmd, range)
-          res.set(loopRes and res.get())
-        }, true)
+        when {
+          selections.keys.isEmpty() -> return false
+          selections.keys.size == 1 -> res.set(executeAction(editor, selections.keys.first(), context, cmd, selections.values.first()))
+          else -> editor.caretModel.runForEachCaret({ caret ->
+            val range = selections.getValue(caret)
+            val loopRes = executeAction(editor, caret, context, cmd, range)
+            res.set(loopRes and res.get())
+          }, true)
+        }
+
+        logger.debug("Calling 'after execution'")
+        afterExecution(editor, context, cmd, res.get())
       }
-
-      logger.debug("Calling 'after execution'")
-      afterExecution(editor, context, cmd, res.get())
     }
 
     commandWrapper.finish(res.get())
@@ -119,7 +156,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
   private fun Editor.collectSelections(): Map<Caret, VimSelection>? {
 
     return when {
-      CommandState.inRepeatMode(this) -> {
+      this.inRepeatMode -> {
         if (EditorData.getLastSelectionType(this) == SelectionType.BLOCK_WISE) {
           val primaryCaret = caretModel.primaryCaret
           val range = primaryCaret.vimLastVisualOperatorRange ?: return null
@@ -138,7 +175,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
           carets.toMap()
         }
       }
-      CommandState.inBlockSubMode(this) -> {
+      this.inBlockSubMode -> {
         val primaryCaret = caretModel.primaryCaret
         mapOf(primaryCaret to VimBlockSelection(
           primaryCaret.vimSelectionStart,
@@ -168,7 +205,7 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
       EditorData.setKeepingVisualOperatorAction(editor, CommandFlags.FLAG_EXIT_VISUAL !in cmd.flags)
 
       editor.vimForEachCaret {
-        val change = if (CommandState.inVisualMode(this@VisualStartFinishWrapper.editor) && !CommandState.inRepeatMode(this@VisualStartFinishWrapper.editor)) {
+        val change = if (this@VisualStartFinishWrapper.editor.inVisualMode && !this@VisualStartFinishWrapper.editor.inRepeatMode) {
           VisualOperation.getRange(this@VisualStartFinishWrapper.editor, it, this@VisualStartFinishWrapper.cmd.flags)
         } else null
         this@VisualStartFinishWrapper.visualChanges[it] = change
@@ -199,43 +236,6 @@ sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
 
       EditorData.setKeepingVisualOperatorAction(editor, false)
     }
-  }
-
-  /**
-   * Base class for visual operation handlers.
-   * This handler executes an action for each caret. That means that if you have 5 carets,
-   *   [executeAction] will be called 5 times.
-   * @see [VisualOperatorActionHandler.SingleExecution] for only one execution
-   */
-  abstract class ForEachCaret : VisualOperatorActionHandler() {
-    final override val batchExecution = false
-  }
-
-  /**
-   * Base class for visual operation handlers.
-   * This handler executes an action only once for all carets. That means that if you have 5 carets,
-   *   [executeAction] will be called 1 time.
-   * @see [VisualOperatorActionHandler.ForEachCaret] for per-caret execution
-   */
-  abstract class SingleExecution : VisualOperatorActionHandler() {
-    /**
-     * Execute an action
-     * [caretsAndSelections] contains a map of all current carets and corresponding selections.
-     *   If there is block selection, only one caret is in [caretsAndSelections].
-     *
-     * This method is executed once for all carets.
-     */
-    abstract fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>): Boolean
-
-    final override fun executeAction(editor: Editor, caret: Caret, context: DataContext, cmd: Command, range: VimSelection) = true
-
-    final override fun beforeExecution(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>): Boolean {
-      return executeForAllCarets(editor, context, cmd, caretsAndSelections)
-    }
-
-    final override fun afterExecution(editor: Editor, context: DataContext, cmd: Command, res: Boolean) {}
-
-    final override val batchExecution = true
   }
 
   private companion object {

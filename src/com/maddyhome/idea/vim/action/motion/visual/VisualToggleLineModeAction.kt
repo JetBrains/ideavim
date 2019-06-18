@@ -28,34 +28,32 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.vimForEachCaret
-import com.maddyhome.idea.vim.option.Options
+import com.maddyhome.idea.vim.option.OptionsManager
 import java.util.*
 import javax.swing.KeyStroke
 
-/**
- *
- */
-private object VisualToggleLineModeActionHandler : EditorActionHandlerBase() {
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    val listOption = Options.getInstance().getListOption(Options.SELECTMODE)
-    return if (listOption != null && "cmd" in listOption) {
-      VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_LINE).also {
-        editor.vimForEachCaret { it.vimSetSelection(it.offset) }
-      }
-    } else VimPlugin.getVisualMotion()
-      .toggleVisual(editor, cmd.count, cmd.rawCount, CommandState.SubMode.VISUAL_LINE)
 
+class VisualToggleLineModeAction : VimCommandAction() {
+  override fun makeActionHandler() = object : EditorActionHandlerBase() {
+    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+      val listOption = OptionsManager.selectmode
+      return if ("cmd" in listOption) {
+        VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_LINE).also {
+          editor.vimForEachCaret { it.vimSetSelection(it.offset) }
+        }
+      } else VimPlugin.getVisualMotion()
+        .toggleVisual(editor, cmd.count, cmd.rawCount, CommandState.SubMode.VISUAL_LINE)
+    }
   }
-}
 
-class VisualToggleLineModeAction : VimCommandAction(VisualToggleLineModeActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NV
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NV
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("V")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("V")
 
-  override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)
 }
 

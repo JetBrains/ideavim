@@ -30,8 +30,7 @@ import com.maddyhome.idea.vim.command.CommandState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- */
+
 public abstract class EditorActionHandlerBase extends EditorActionHandler {
   protected boolean myRunForEachCaret;
 

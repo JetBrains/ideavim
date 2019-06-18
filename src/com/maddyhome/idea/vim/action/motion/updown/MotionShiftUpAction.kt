@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
+import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import javax.swing.KeyStroke
@@ -34,25 +35,26 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 
-private object MotionShiftUpActionHandler : ShiftedArrowKeyHandler() {
-  override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {
-    editor.vimForEachCaret { caret ->
-      val vertical = VimPlugin.getMotion().moveCaretVertical(editor, caret, -cmd.count)
-      val col = caret.vimLastColumn
-      MotionGroup.moveCaret(editor, caret, vertical)
-      caret.vimLastColumn = col
+class MotionShiftUpAction : VimCommandAction() {
+  override fun makeActionHandler() = object : ShiftedArrowKeyHandler() {
+    override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {
+      editor.vimForEachCaret { caret ->
+        val vertical = VimPlugin.getMotion().moveCaretVertical(editor, caret, -cmd.count)
+        val col = caret.vimLastColumn
+        MotionGroup.moveCaret(editor, caret, vertical)
+
+        EditorHelper.updateLastColumn(editor, caret, col)
+      }
+    }
+
+    override fun motionWithoutKeyModel(editor: Editor, context: DataContext, cmd: Command) {
+      VimPlugin.getMotion().scrollFullPage(editor, -cmd.count)
     }
   }
 
-  override fun motionWithoutKeyModel(editor: Editor, context: DataContext, cmd: Command) {
-    VimPlugin.getMotion().scrollFullPage(editor, -cmd.count)
-  }
-}
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
 
-class MotionShiftUpAction : VimCommandAction(MotionShiftUpActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVS
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Up>")
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<S-Up>")
-
-  override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 }

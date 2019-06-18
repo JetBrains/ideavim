@@ -18,8 +18,7 @@
 
 package com.maddyhome.idea.vim.helper;
 
-import com.maddyhome.idea.vim.option.KeywordOption;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -66,7 +65,7 @@ public class CharacterHelper {
     else if (isHalfWidthKatakanaLetter(ch)) {
       return CharacterType.HALF_WIDTH_KATAKANA;
     }
-    else if (punctuationAsLetters || ((KeywordOption)Options.getInstance().getOption("iskeyword")).isKeyword(ch)) {
+    else if (punctuationAsLetters || OptionsManager.INSTANCE.getIskeyword().isKeyword(ch)) {
       return CharacterType.KEYWORD;
     }
     else {

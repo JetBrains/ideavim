@@ -29,10 +29,9 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 
-class MarkHandler : CommandHandler(
-  commands("ma[rk]", "k"),
-  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED)
-) {
+class MarkHandler : CommandHandler.SingleExecution() {
+  override val names = commands("ma[rk]", "k")
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val mark = cmd.argument[0]

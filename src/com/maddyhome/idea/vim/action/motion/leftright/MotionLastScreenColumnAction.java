@@ -29,12 +29,12 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import com.maddyhome.idea.vim.helper.CaretDataKt;
+import com.maddyhome.idea.vim.helper.CommandStateHelper;
 import com.maddyhome.idea.vim.option.BoundStringOption;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
 
-/**
- */
+
 public class MotionLastScreenColumnAction extends MotionEditorAction {
   public MotionLastScreenColumnAction() {
     super(new Handler());
@@ -45,11 +45,11 @@ public class MotionLastScreenColumnAction extends MotionEditorAction {
     public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                          int rawCount, Argument argument) {
       boolean allow = false;
-      if (CommandState.inInsertMode(editor)) {
+      if (CommandStateHelper.inInsertMode(editor)) {
         allow = true;
       }
       else if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-        BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
+        BoundStringOption opt = OptionsManager.INSTANCE.getSelection();
         if (!opt.getValue().equals("old")) {
           allow = true;
         }
@@ -59,7 +59,7 @@ public class MotionLastScreenColumnAction extends MotionEditorAction {
     }
 
     @Override
-    protected void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+    public void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                             @NotNull Command cmd) {
       CaretDataKt.setVimLastColumn(caret, MotionGroup.LAST_COLUMN);
     }

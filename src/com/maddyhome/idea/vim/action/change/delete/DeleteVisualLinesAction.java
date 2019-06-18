@@ -21,13 +21,15 @@ package com.maddyhome.idea.vim.action.change.delete;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.group.visual.VimSelection;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -38,11 +40,14 @@ import java.util.Set;
 /**
  * @author vlan
  */
-public class DeleteVisualLinesAction extends VimCommandAction {
-  public DeleteVisualLinesAction() {
-    super(new VisualOperatorActionHandler.ForEachCaret() {
+final public class DeleteVisualLinesAction extends VimCommandAction {
+  @Contract(" -> new")
+  @NotNull
+  @Override
+  final protected EditorActionHandler makeActionHandler() {
+    return new VisualOperatorActionHandler.ForEachCaret() {
       @Override
-      protected boolean executeAction(@NotNull Editor editor,
+      public boolean executeAction(@NotNull Editor editor,
                                       @NotNull Caret caret,
                                       @NotNull DataContext context,
                                       @NotNull Command cmd,
@@ -59,29 +64,32 @@ public class DeleteVisualLinesAction extends VimCommandAction {
           return VimPlugin.getChange().deleteRange(editor, caret, lineRange, SelectionType.LINE_WISE, false);
         }
       }
-    });
+    };
   }
 
+  @Contract(pure = true)
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
+  final public Set<MappingMode> getMappingModes() {
     return MappingMode.V;
   }
 
   @NotNull
   @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
     return parseKeysSet("X");
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Command.Type getType() {
+    return Command.Type.DELETE;
   }
 
   @NotNull
   @Override
-  public Command.Type getType() {
-    return Command.Type.DELETE;
-  }
-
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
+  final public EnumSet<CommandFlags> getFlags() {
     return EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_EXIT_VISUAL);
   }
 }

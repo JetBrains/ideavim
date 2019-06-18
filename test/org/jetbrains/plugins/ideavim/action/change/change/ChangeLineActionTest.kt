@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ChangeLineActionTest : VimTestCase() {
-    fun `test on empty file`() {
-        doTest(parseKeys("cc"), "", "", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
-    }
+  fun `test on empty file`() {
+    doTest(parseKeys("cc"), "", "", CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
 }

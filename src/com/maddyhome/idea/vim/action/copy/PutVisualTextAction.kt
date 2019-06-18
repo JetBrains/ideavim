@@ -29,37 +29,36 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.group.visual.VimSelection
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 import javax.swing.KeyStroke
-
-private object PutVisualTextActionHandler : VisualOperatorActionHandler.SingleExecution() {
-
-  override fun executeForAllCarets(editor: Editor,
-                                   context: DataContext,
-                                   cmd: Command,
-                                   caretsAndSelections: Map<Caret, VimSelection>): Boolean {
-    if (caretsAndSelections.isEmpty()) return false
-    val textData = VimPlugin.getRegister().lastRegister?.let { PutData.TextData(it.text, it.type) }
-    VimPlugin.getRegister().resetRegister()
-
-    val insertTextBeforeCaret = cmd.keys[0].keyChar == 'P'
-    val selection = PutData.VisualSelection(caretsAndSelections, caretsAndSelections.values.first().type)
-    val putData = PutData(textData, selection, cmd.count, insertTextBeforeCaret, _indent = true, caretAfterInsertedText = false)
-
-    return VimPlugin.getPut().putText(editor, context, putData)
-  }
-}
 
 /**
  * @author vlan
  */
-class PutVisualTextAction : VimCommandAction(PutVisualTextActionHandler) {
+class PutVisualTextAction : VimCommandAction() {
+  override fun makeActionHandler() = object : VisualOperatorActionHandler.SingleExecution() {
+    override fun executeForAllCarets(editor: Editor,
+                                     context: DataContext,
+                                     cmd: Command,
+                                     caretsAndSelections: Map<Caret, VimSelection>): Boolean {
+      if (caretsAndSelections.isEmpty()) return false
+      val textData = VimPlugin.getRegister().lastRegister?.let { PutData.TextData(it.text, it.type, it.transferableData) }
+      VimPlugin.getRegister().resetRegister()
 
-  override fun getMappingModes(): Set<MappingMode> = MappingMode.V
+      val insertTextBeforeCaret = cmd.keys[0].keyChar == 'P'
+      val selection = PutData.VisualSelection(caretsAndSelections, caretsAndSelections.values.first().type)
+      val putData = PutData(textData, selection, cmd.count, insertTextBeforeCaret, _indent = true, caretAfterInsertedText = false)
 
-  override fun getKeyStrokesSet(): Set<List<KeyStroke>> = parseKeysSet("p", "P")
+      return VimPlugin.getPut().putText(editor, context, putData)
+    }
+  }
 
-  override fun getType(): Command.Type = Command.Type.PASTE
+  override val mappingModes: Set<MappingMode> = MappingMode.V
 
-  override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_EXIT_VISUAL)
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("p", "P")
+
+  override val type: Command.Type = Command.Type.PASTE
+
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 }

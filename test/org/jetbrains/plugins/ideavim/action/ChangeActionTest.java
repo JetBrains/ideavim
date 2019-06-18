@@ -625,7 +625,7 @@ public class ChangeActionTest extends VimTestCase {
     assertMode(CommandState.Mode.COMMAND);
   }
 
-  public void ignoredDownMovementAfterDeletionToStart() {
+  public void testDownMovementAfterDeletionToStart() {
     doTest(parseKeys("ld^j"),
             "lorem <caret>ipsum dolor sit amet\n" +
                    "lorem ipsum dolor sit amet",
@@ -633,7 +633,7 @@ public class ChangeActionTest extends VimTestCase {
            CommandState.SubMode.NONE);
   }
 
-  public void ignoredDownMovementAfterDeletionToPrevWord() {
+  public void testDownMovementAfterDeletionToPrevWord() {
     doTest(parseKeys("ldbj"),
             "lorem<caret> ipsum dolor sit amet\n" +
                     "lorem ipsum dolor sit amet",
@@ -641,7 +641,7 @@ public class ChangeActionTest extends VimTestCase {
            CommandState.SubMode.NONE);
   }
 
-  public void ignoredDownMovementAfterChangeToPrevWord() {
+  public void testDownMovementAfterChangeToPrevWord() {
     doTest(parseKeys("lcb<Esc>j"),
             "lorem<caret> ipsum dolor sit amet\n" +
                     "lorem ipsum dolor sit amet",
@@ -649,7 +649,7 @@ public class ChangeActionTest extends VimTestCase {
            CommandState.SubMode.NONE);
   }
 
-  public void ignoredDownMovementAfterChangeToLineStart() {
+  public void testDownMovementAfterChangeToLineStart() {
     doTest(parseKeys("lc^<Esc>j"),
             "lorem<caret> ipsum dolor sit amet\n" +
                     "lorem ipsum dolor sit amet",
@@ -657,7 +657,7 @@ public class ChangeActionTest extends VimTestCase {
            CommandState.SubMode.NONE);
   }
 
-  public void ignoredUpMovementAfterDeletionToStart() {
+  public void testUpMovementAfterDeletionToStart() {
     doTest(parseKeys("ld^k"),
             "lorem ipsum dolor sit amet\n" +
                     "lorem <caret>ipsum dolor sit amet",
@@ -665,11 +665,30 @@ public class ChangeActionTest extends VimTestCase {
            CommandState.SubMode.NONE);
   }
 
-  public void ignoredUpMovementAfterChangeToPrevWord() {
+  public void testUpMovementAfterChangeToPrevWord() {
     doTest(parseKeys("lcb<Esc>k"),
             "lorem ipsum dolor sit amet\n" +
                     "lorem<caret> ipsum dolor sit amet",
            "<caret>lorem ipsum dolor sit amet\n" + "ipsum dolor sit amet", CommandState.Mode.COMMAND,
            CommandState.SubMode.NONE);
+  }
+
+  // VIM-714 |v|
+  public void testDeleteVisualColumnPositionOneLine() {
+    doTest(parseKeys("vwxj"),
+           "<caret>lorem ipsum dolor sit amet\n" +
+           "lorem ipsum dolor sit amet\n",
+           "psum dolor sit amet\n" +
+           "<caret>lorem ipsum dolor sit amet\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+  }
+
+  // VIM-714 |v|
+  public void testDeleteVisualColumnPositionMultiLine() {
+    doTest(parseKeys("v3wfixj"),
+           "gaganis <caret>gaganis gaganis\n" +
+           "gaganis gaganis gaganis\n" +
+           "gaganis gaganis gaganis\n",
+           "gaganis s gaganis\n" +
+           "gaganis <caret>gaganis gaganis\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 }

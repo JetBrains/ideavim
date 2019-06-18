@@ -27,9 +27,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
-/**
- *
- */
+
 // TODO: Cannot find the corresponding Vim command. Remove it?
 public class ResetModeAction extends EditorAction {
   public ResetModeAction() {

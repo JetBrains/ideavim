@@ -26,8 +26,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.helper.RunnableHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.Options
-import junit.framework.TestCase
+import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 import java.util.*
 
@@ -35,522 +34,522 @@ import java.util.*
  * @author Alex Plate
  */
 class SearchGroupTest : VimTestCase() {
-    fun `test one letter`() {
-        val pos = search("w",
-                """${c}one
+  fun `test one letter`() {
+    val pos = search("w",
+      """${c}one
                   |two
                """.trimMargin())
-        assertEquals(5, pos)
-    }
+    assertEquals(5, pos)
+  }
 
-    fun `test end of line`() {
-        val pos = search("$",
-                """${c}I found it in a legendary land
+  fun `test end of line`() {
+    val pos = search("$",
+      """${c}I found it in a legendary land
                   |all rocks and lavender and tufted grass,
                """.trimMargin())
-        assertEquals(30, pos)
-    }
+    assertEquals(30, pos)
+  }
 
-    // VIM-146
-    fun `test end of line with highlighting`() {
-        setHighlightSearch()
-        val pos = search("$",
-                """${c}I found it in a legendary land
+  // VIM-146
+  fun `test end of line with highlighting`() {
+    setHighlightSearch()
+    val pos = search("$",
+      """${c}I found it in a legendary land
                   |all rocks and lavender and tufted grass,
                """.trimMargin())
-        assertEquals(30, pos)
-    }
+    assertEquals(30, pos)
+  }
 
-    fun `test "and" without branches`() {
-        val pos = search("\\&",
-                """${c}I found it in a legendary land
+  fun `test "and" without branches`() {
+    val pos = search("\\&",
+      """${c}I found it in a legendary land
                   |all rocks and lavender and tufted grass,
                """.trimMargin())
-        assertEquals(1, pos)
-    }
+    assertEquals(1, pos)
+  }
 
-    // VIM-226
-    fun `test "and" without branches with highlighting`() {
-        setHighlightSearch()
-        val pos = search("\\&",
-                """${c}I found it in a legendary land
+  // VIM-226
+  fun `test "and" without branches with highlighting`() {
+    setHighlightSearch()
+    val pos = search("\\&",
+      """${c}I found it in a legendary land
                   |all rocks and lavender and tufted grass,
                """.trimMargin())
-        assertEquals(1, pos)
-    }
+    assertEquals(1, pos)
+  }
 
-    // VIM-528
-    fun `test not found`() {
-        val pos = search("(found)",
-                """${c}I found it in a legendary land
+  // VIM-528
+  fun `test not found`() {
+    val pos = search("(found)",
+      """${c}I found it in a legendary land
                   |all rocks and lavender and tufted grass,
                """.trimMargin())
-        assertEquals(-1, pos)
-    }
+    assertEquals(-1, pos)
+  }
 
-    // VIM-528
-    fun `test grouping`() {
-        val pos = search("\\(found\\)",
-                """${c}I found it in a legendary land
+  // VIM-528
+  fun `test grouping`() {
+    val pos = search("\\(found\\)",
+      """${c}I found it in a legendary land
                   |all rocks and lavender and tufted grass,
                """.trimMargin())
-        assertEquals(2, pos)
-    }
+    assertEquals(2, pos)
+  }
 
-    // VIM-855
-    fun `test character class regression`() {
-        val pos = search("[^c]b",
-                "${c}bb\n")
-        assertEquals(0, pos)
-    }
+  // VIM-855
+  fun `test character class regression`() {
+    val pos = search("[^c]b",
+      "${c}bb\n")
+    assertEquals(0, pos)
+  }
 
-    // VIM-855
-    fun `test character class regression case insensitive`() {
-        val pos = search("\\c[ABC]b",
-                "${c}dd\n")
-        assertEquals(-1, pos)
-    }
+  // VIM-855
+  fun `test character class regression case insensitive`() {
+    val pos = search("\\c[ABC]b",
+      "${c}dd\n")
+    assertEquals(-1, pos)
+  }
 
-    // VIM-856
-    fun `test negative lookbehind regression`() {
-        val pos = search("a\\@<!b",
-                "${c}ab\n")
-        assertEquals(-1, pos)
-    }
+  // VIM-856
+  fun `test negative lookbehind regression`() {
+    val pos = search("a\\@<!b",
+      "${c}ab\n")
+    assertEquals(-1, pos)
+  }
 
-    fun `test smart case search case insensitive`() {
-        setIgnoreCaseAndSmartCase()
-        val pos = search("tostring",
-                "obj.toString();\n")
-        assertEquals(4, pos)
-    }
+  fun `test smart case search case insensitive`() {
+    setIgnoreCaseAndSmartCase()
+    val pos = search("tostring",
+      "obj.toString();\n")
+    assertEquals(4, pos)
+  }
 
-    fun `test smart case search case sensitive`() {
-        setIgnoreCaseAndSmartCase()
-        val pos = search("toString",
-                """obj.tostring();
+  fun `test smart case search case sensitive`() {
+    setIgnoreCaseAndSmartCase()
+    val pos = search("toString",
+      """obj.tostring();
                  |obj.toString();""".trimMargin())
-        assertEquals(20, pos)
-    }
+    assertEquals(20, pos)
+  }
 
-    fun `test search motion`() {
-        typeTextInFile(parseKeys("/", "two", "<Enter>"),
-                "${c}one two\n")
-        assertOffset(4)
-    }
+  fun `test search motion`() {
+    typeTextInFile(parseKeys("/", "two", "<Enter>"),
+      "${c}one two\n")
+    assertOffset(4)
+  }
 
-    // |/pattern/e|
-    fun `test search e motion offset`() {
-        typeTextInFile(parseKeys("/", "two/e", "<Enter>"),
-                "${c}one two three")
-        assertOffset(6)
-    }
+  // |/pattern/e|
+  fun `test search e motion offset`() {
+    typeTextInFile(parseKeys("/", "two/e", "<Enter>"),
+      "${c}one two three")
+    assertOffset(6)
+  }
 
-    // |/pattern/e|
-    fun `test search e-1 motion offset`() {
-        typeTextInFile(parseKeys("/", "two/e-1", "<Enter>"),
-                "${c}one two three")
-        assertOffset(5)
-    }
+  // |/pattern/e|
+  fun `test search e-1 motion offset`() {
+    typeTextInFile(parseKeys("/", "two/e-1", "<Enter>"),
+      "${c}one two three")
+    assertOffset(5)
+  }
 
-    // |/pattern/e|
-    fun `test search e+2 motion offset`() {
-        typeTextInFile(parseKeys("/", "two/e+2", "<Enter>"),
-                "${c}one two three")
-        assertOffset(8)
-    }
+  // |/pattern/e|
+  fun `test search e+2 motion offset`() {
+    typeTextInFile(parseKeys("/", "two/e+2", "<Enter>"),
+      "${c}one two three")
+    assertOffset(8)
+  }
 
-    // |/pattern/s|
-    fun `test search s motion offset`() {
-        typeTextInFile(parseKeys("/", "two/s", "<Enter>"),
-                "${c}one two three")
-        assertOffset(4)
-    }
+  // |/pattern/s|
+  fun `test search s motion offset`() {
+    typeTextInFile(parseKeys("/", "two/s", "<Enter>"),
+      "${c}one two three")
+    assertOffset(4)
+  }
 
-    // |/pattern/s|
-    fun `test search s-2 motion offset`() {
-        typeTextInFile(parseKeys("/", "two/s-2", "<Enter>"),
-                "${c}one two three")
-        assertOffset(2)
-    }
+  // |/pattern/s|
+  fun `test search s-2 motion offset`() {
+    typeTextInFile(parseKeys("/", "two/s-2", "<Enter>"),
+      "${c}one two three")
+    assertOffset(2)
+  }
 
-    // |/pattern/s|
-    fun `test search s+1 motion offset`() {
-        typeTextInFile(parseKeys("/", "two/s+1", "<Enter>"),
-                "${c}one two three")
-        assertOffset(5)
-    }
+  // |/pattern/s|
+  fun `test search s+1 motion offset`() {
+    typeTextInFile(parseKeys("/", "two/s+1", "<Enter>"),
+      "${c}one two three")
+    assertOffset(5)
+  }
 
-    // |/pattern/b|
-    fun `test search b motion offset`() {
-        typeTextInFile(parseKeys("/", "two/b", "<Enter>"),
-                "${c}one two three")
-        assertOffset(4)
-    }
+  // |/pattern/b|
+  fun `test search b motion offset`() {
+    typeTextInFile(parseKeys("/", "two/b", "<Enter>"),
+      "${c}one two three")
+    assertOffset(4)
+  }
 
-    // |/pattern/b|
-    fun `test search b-2 motion offset`() {
-        typeTextInFile(parseKeys("/", "two/b-2", "<Enter>"),
-                "${c}one two three")
-        assertOffset(2)
-    }
+  // |/pattern/b|
+  fun `test search b-2 motion offset`() {
+    typeTextInFile(parseKeys("/", "two/b-2", "<Enter>"),
+      "${c}one two three")
+    assertOffset(2)
+  }
 
-    // |/pattern/b|
-    fun `test search b+1 motion offset`() {
-        typeTextInFile(parseKeys("/", "two/b+1", "<Enter>"),
-                "${c}one two three")
-        assertOffset(5)
-    }
+  // |/pattern/b|
+  fun `test search b+1 motion offset`() {
+    typeTextInFile(parseKeys("/", "two/b+1", "<Enter>"),
+      "${c}one two three")
+    assertOffset(5)
+  }
 
-    fun `test search above line motion offset`() {
-        typeTextInFile(parseKeys("/", "rocks/-1", "<Enter>"),
-                """I found it in a legendary land
+  fun `test search above line motion offset`() {
+    typeTextInFile(parseKeys("/", "rocks/-1", "<Enter>"),
+      """I found it in a legendary land
                  |${c}all rocks and lavender and tufted grass,
                  |where it was settled on some sodden sand
                  |hard by the torrent of a mountain pass.""".trimMargin())
-        assertOffset(0)
-    }
+    assertOffset(0)
+  }
 
-    fun `test search below line motion offset`() {
-        typeTextInFile(parseKeys("/", "rocks/+2", "<Enter>"),
-                """I found it in a legendary land
+  fun `test search below line motion offset`() {
+    typeTextInFile(parseKeys("/", "rocks/+2", "<Enter>"),
+      """I found it in a legendary land
                  |${c}all rocks and lavender and tufted grass,
                  |where it was settled on some sodden sand
                  |hard by the torrent of a mountain pass.""".trimMargin())
-        assertOffset(113)
-    }
+    assertOffset(113)
+  }
 
-    // |i_CTRL-K|
-    fun `test search digraph`() {
-        typeTextInFile(parseKeys("/", "<C-K>O:", "<Enter>"),
-                "${c}Hallo Österreich!\n")
-        assertOffset(6)
-    }
+  // |i_CTRL-K|
+  fun `test search digraph`() {
+    typeTextInFile(parseKeys("/", "<C-K>O:", "<Enter>"),
+      "${c}Hallo Österreich!\n")
+    assertOffset(6)
+  }
 
-    fun `test search word matches case`() {
-        typeTextInFile(parseKeys("*"),
-            "${c}Editor editor Editor")
-        assertOffset(14)
-    }
+  fun `test search word matches case`() {
+    typeTextInFile(parseKeys("*"),
+      "${c}Editor editor Editor")
+    assertOffset(14)
+  }
 
-    fun `test search next word matches case`() {
-        typeTextInFile(parseKeys("*", "n"),
-            "${c}Editor editor Editor editor Editor")
-        assertOffset(28)
-    }
+  fun `test search next word matches case`() {
+    typeTextInFile(parseKeys("*", "n"),
+      "${c}Editor editor Editor editor Editor")
+    assertOffset(28)
+  }
 
-    fun `test search word honours ignorecase`() {
-        setIgnoreCase()
-        typeTextInFile(parseKeys("*"),
-            "${c}editor Editor editor")
-        assertOffset(7)
-    }
+  fun `test search word honours ignorecase`() {
+    setIgnoreCase()
+    typeTextInFile(parseKeys("*"),
+      "${c}editor Editor editor")
+    assertOffset(7)
+  }
 
-    fun `test search next word honours ignorecase`() {
-        setIgnoreCase()
-        typeTextInFile(parseKeys("*", "n"),
-            "${c}editor Editor editor")
-        assertOffset(14)
-    }
+  fun `test search next word honours ignorecase`() {
+    setIgnoreCase()
+    typeTextInFile(parseKeys("*", "n"),
+      "${c}editor Editor editor")
+    assertOffset(14)
+  }
 
-    fun `test search word overrides smartcase`() {
-        setIgnoreCaseAndSmartCase()
-        typeTextInFile(parseKeys("*"),
-            "${c}Editor editor Editor")
-        assertOffset(7)
-    }
+  fun `test search word overrides smartcase`() {
+    setIgnoreCaseAndSmartCase()
+    typeTextInFile(parseKeys("*"),
+      "${c}Editor editor Editor")
+    assertOffset(7)
+  }
 
-    fun `test search next word overrides smartcase`() {
-        setIgnoreCaseAndSmartCase()
-        typeTextInFile(parseKeys("*", "n"),
-            "${c}Editor editor editor")
-        assertOffset(14)
-    }
+  fun `test search next word overrides smartcase`() {
+    setIgnoreCaseAndSmartCase()
+    typeTextInFile(parseKeys("*", "n"),
+      "${c}Editor editor editor")
+    assertOffset(14)
+  }
 
-    fun `test incsearch moves caret to start of first match`() {
-      setIncrementalSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test incsearch moves caret to start of first match`() {
+    setIncrementalSearch()
+    configureByText(
+      """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
          |hard by the torrent of a mountain pass.""".trimMargin())
-      typeText(parseKeys("/", "la"))
-      assertPosition(1, 14)
-    }
+    typeText(parseKeys("/", "la"))
+    assertPosition(1, 14)
+  }
 
-    fun `test incsearch moves caret to start of first match (backwards)`() {
-      setIncrementalSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test incsearch moves caret to start of first match (backwards)`() {
+    setIncrementalSearch()
+    configureByText(
+      """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
-      typeText(parseKeys("?", "la"))
-      assertPosition(0, 26)
-    }
+    typeText(parseKeys("?", "la"))
+    assertPosition(0, 26)
+  }
 
-    fun `test incsearch resets caret if no match found`() {
-      setIncrementalSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test incsearch resets caret if no match found`() {
+    setIncrementalSearch()
+    configureByText(
+      """I found it in a legendary land
              |${c}all rocks and lavender and tufted grass,
              |where it was settled on some sodden sand
              |hard by the torrent of a mountain pass.""".trimMargin())
-      typeText(parseKeys("/", "lazzz"))
-      assertPosition(1, 0)
-    }
+    typeText(parseKeys("/", "lazzz"))
+    assertPosition(1, 0)
+  }
 
-    fun `test incsearch resets caret if cancelled`() {
-      setIncrementalSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test incsearch resets caret if cancelled`() {
+    setIncrementalSearch()
+    configureByText(
+      """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
-      typeText(parseKeys("/", "la"))
-      assertOffset(45)
-      typeText(parseKeys("<Esc>"))
-      assertOffset(31)
-    }
+    typeText(parseKeys("/", "la"))
+    assertOffset(45)
+    typeText(parseKeys("<Esc>"))
+    assertOffset(31)
+  }
 
-    fun `test incsearch highlights only current match with nohlsearch`() {
-      setIncrementalSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test incsearch highlights only current match with nohlsearch`() {
+    setIncrementalSearch()
+    configureByText(
+      """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
 
-      typeText(parseKeys("/", "and"))
+    typeText(parseKeys("/", "and"))
 
-      assertSearchHighlights("and",
-        """I found it in a legendary land
+    assertSearchHighlights("and",
+      """I found it in a legendary land
            |all rocks ‷and‴ lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test incsearch highlights only current match with nohlsearch (backwards)`() {
-      setIncrementalSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test incsearch highlights only current match with nohlsearch (backwards)`() {
+    setIncrementalSearch()
+    configureByText(
+      """I found it in a legendary land
            |all rocks and lave${c}nder and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
 
-      typeText(parseKeys("?", "a"))
+    typeText(parseKeys("?", "a"))
 
-      assertSearchHighlights("a",
-        """I found it in a legendary land
+    assertSearchHighlights("a",
+      """I found it in a legendary land
            |all rocks and l‷a‴vender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test incsearch highlights all matches with hlsearch enabled`() {
-      setIncrementalSearch()
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test incsearch highlights all matches with hlsearch enabled`() {
+    setIncrementalSearch()
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
 
-      typeText(parseKeys("/", "and"))
+    typeText(parseKeys("/", "and"))
 
-      assertSearchHighlights("and",
-        """I found it in a legendary l«and»
+    assertSearchHighlights("and",
+      """I found it in a legendary l«and»
            |all rocks ‷and‴ lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test incsearch removes all highlights if no match`() {
-      setIncrementalSearch()
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test incsearch removes all highlights if no match`() {
+    setIncrementalSearch()
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
 
-      typeText(parseKeys("/", "and"))
-      assertSearchHighlights("and",
-        """I found it in a legendary l«and»
+    typeText(parseKeys("/", "and"))
+    assertSearchHighlights("and",
+      """I found it in a legendary l«and»
            |all rocks ‷and‴ lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
-      typeText(parseKeys("zz"))
+    typeText(parseKeys("zz"))
 
-      assertSearchHighlights("and",
-        """I found it in a legendary land
+    assertSearchHighlights("and",
+      """I found it in a legendary land
            |all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test incsearch does not hide previous search until first character is typed`() {
-      setIncrementalSearch()
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test incsearch does not hide previous search until first character is typed`() {
+    setIncrementalSearch()
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
 
-      enterSearch("and")
-      typeText(parseKeys("/"))
-      assertSearchHighlights("and",
-        """I found it in a legendary l«and»
+    enterSearch("and")
+    typeText(parseKeys("/"))
+    assertSearchHighlights("and",
+      """I found it in a legendary l«and»
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
-      typeText(parseKeys("v"))
+    typeText(parseKeys("v"))
 
-      assertSearchHighlights("v",
-        """I found it in a legendary land
+    assertSearchHighlights("v",
+      """I found it in a legendary land
            |all rocks and la‷v‴ender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test incsearch does not show previous search highlights when text field is deleted`() {
-      setIncrementalSearch()
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test incsearch does not show previous search highlights when text field is deleted`() {
+    setIncrementalSearch()
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
 
-      enterSearch("and")
-      typeText(parseKeys("/", "grass", "<BS><BS><BS><BS><BS>"))
+    enterSearch("and")
+    typeText(parseKeys("/", "grass", "<BS><BS><BS><BS><BS>"))
 
-      assertSearchHighlights("and",
-        """I found it in a legendary land
+    assertSearchHighlights("and",
+      """I found it in a legendary land
            |all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test cancelling incsearch shows previous search highlights`() {
-      setIncrementalSearch()
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test cancelling incsearch shows previous search highlights`() {
+    setIncrementalSearch()
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
 
-      enterSearch("and")
-      typeText(parseKeys("/", "grass", "<Esc>"))
+    enterSearch("and")
+    typeText(parseKeys("/", "grass", "<Esc>"))
 
-      assertSearchHighlights("and",
-        """I found it in a legendary l«and»
+    assertSearchHighlights("and",
+      """I found it in a legendary l«and»
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test cancelling incsearch does not show previous search highlights after nohls command`() {
-      setIncrementalSearch()
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test cancelling incsearch does not show previous search highlights after nohls command`() {
+    setIncrementalSearch()
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
 
-      enterSearch("and")
-      enterCommand("nohlsearch")
-      typeText(parseKeys("/", "grass", "<Esc>"))
+    enterSearch("and")
+    enterCommand("nohlsearch")
+    typeText(parseKeys("/", "grass", "<Esc>"))
 
-      assertSearchHighlights("and",
-        """I found it in a legendary land
+    assertSearchHighlights("and",
+      """I found it in a legendary land
            |all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test incsearch highlights for substitute command`() {
-      setIncrementalSearch()
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test incsearch highlights for substitute command`() {
+    setIncrementalSearch()
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
 
-      typeText(parseKeys(":", "%s/and"))
+    typeText(parseKeys(":", "%s/and"))
 
-      assertSearchHighlights("and",
-        """I found it in a legendary l‷and‴
+    assertSearchHighlights("and",
+      """I found it in a legendary l‷and‴
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test incsearch only highlights for substitute command after valid argument`() {
-      setIncrementalSearch()
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test incsearch only highlights for substitute command after valid argument`() {
+    setIncrementalSearch()
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
 
-      // E.g. don't remove highlights when trying to type :set
-      enterSearch("and")
-      typeText(parseKeys(":s"))
+    // E.g. don't remove highlights when trying to type :set
+    enterSearch("and")
+    typeText(parseKeys(":s"))
 
-      assertSearchHighlights("and",
-        """I found it in a legendary l«and»
+    assertSearchHighlights("and",
+      """I found it in a legendary l«and»
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test incsearch highlights for substitute command only highlights in range`() {
-      setIncrementalSearch()
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test incsearch highlights for substitute command only highlights in range`() {
+    setIncrementalSearch()
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
            |all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |${c}hard by the torrent and rush of a mountain pass.""".trimMargin())
 
-      typeText(parseKeys(":", "2,3s/and"))
+    typeText(parseKeys(":", "2,3s/and"))
 
-      assertSearchHighlights("and",
-        """I found it in a legendary land
+    assertSearchHighlights("and",
+      """I found it in a legendary land
            |all rocks ‷and‴ lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent and rush of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test incsearch highlights for substitute command in current line with no range`() {
-      setIncrementalSearch()
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test incsearch highlights for substitute command in current line with no range`() {
+    setIncrementalSearch()
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
 
-      typeText(parseKeys(":", "s/and"))
+    typeText(parseKeys(":", "s/and"))
 
-      assertSearchHighlights("and",
-        """I found it in a legendary land
+    assertSearchHighlights("and",
+      """I found it in a legendary land
            |all rocks ‷and‴ lavender «and» tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test incsearch for substitute command starts at beginning of range not caret position`() {
-      setIncrementalSearch()
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test incsearch for substitute command starts at beginning of range not caret position`() {
+    setIncrementalSearch()
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
            |all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.
@@ -563,10 +562,10 @@ class SearchGroupTest : VimTestCase() {
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
 
-      typeText(parseKeys(":", "2,8s/and"))
+    typeText(parseKeys(":", "2,8s/and"))
 
-      assertSearchHighlights("and",
-        """I found it in a legendary land
+    assertSearchHighlights("and",
+      """I found it in a legendary land
            |all rocks ‷and‴ lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.
@@ -578,489 +577,482 @@ class SearchGroupTest : VimTestCase() {
            |all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test incsearch highlights for substitute command clears highlights on backspace`() {
-      setIncrementalSearch()
-      setHighlightSearch()
-      configureByText(
-          """I found it in a legendary land
+  fun `test incsearch highlights for substitute command clears highlights on backspace`() {
+    setIncrementalSearch()
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
              |${c}all rocks and lavender and tufted grass,
              |where it was settled on some sodden sand
              |hard by the torrent of a mountain pass.""".trimMargin())
 
-      typeText(parseKeys(":", "%s/and", "<BS><BS><BS>"))
+    typeText(parseKeys(":", "%s/and", "<BS><BS><BS>"))
 
-      assertSearchHighlights("and",
-          """I found it in a legendary land
+    assertSearchHighlights("and",
+      """I found it in a legendary land
              |all rocks and lavender and tufted grass,
              |where it was settled on some sodden sand
              |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test incsearch highlights for substitute command resets highlights on backspace`() {
-      setIncrementalSearch()
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test incsearch highlights for substitute command resets highlights on backspace`() {
+    setIncrementalSearch()
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
 
-      enterSearch("and")
-      typeText(parseKeys(":", "%s/roc", "<BS><BS><BS>"))
+    enterSearch("and")
+    typeText(parseKeys(":", "%s/roc", "<BS><BS><BS>"))
 
-      assertSearchHighlights("and",
-        """I found it in a legendary l«and»
+    assertSearchHighlights("and",
+      """I found it in a legendary l«and»
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test cancelling incsearch highlights for substitute command shows previous highlights`() {
-      setIncrementalSearch()
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test cancelling incsearch highlights for substitute command shows previous highlights`() {
+    setIncrementalSearch()
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
 
-      enterSearch("and")
-      typeText(parseKeys(":", "%s/ass", "<Esc>"))
+    enterSearch("and")
+    typeText(parseKeys(":", "%s/ass", "<Esc>"))
 
-      assertSearchHighlights("and",
-        """I found it in a legendary l«and»
+    assertSearchHighlights("and",
+      """I found it in a legendary l«and»
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test highlight search results`() {
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test highlight search results`() {
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
 
-      val pattern = "and"
-      enterSearch(pattern)
+    val pattern = "and"
+    enterSearch(pattern)
 
-      assertSearchHighlights(pattern,
-        """I found it in a legendary l«and»
+    assertSearchHighlights(pattern,
+      """I found it in a legendary l«and»
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test search removes previous search highlights`() {
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test search removes previous search highlights`() {
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
          |hard by the torrent of a mountain pass.""".trimMargin())
 
-      val pattern = "and"
-      enterSearch("mountain")
-      enterSearch(pattern)
+    val pattern = "and"
+    enterSearch("mountain")
+    enterSearch(pattern)
 
-      assertSearchHighlights(pattern,
-        """I found it in a legendary l«and»
+    assertSearchHighlights(pattern,
+      """I found it in a legendary l«and»
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test no highlights for unmatched search`() {
-      setHighlightSearch()
-      typeTextInFile(parseKeys("/", "zzzz", "<Enter>"),
-        """I found it in a legendary land
+  fun `test no highlights for unmatched search`() {
+    setHighlightSearch()
+    typeTextInFile(parseKeys("/", "zzzz", "<Enter>"),
+      """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
          |hard by the torrent of a mountain pass.""".trimMargin())
-      assertNoSearchHighlights()
-    }
+    assertNoSearchHighlights()
+  }
 
-    fun `test nohlsearch command removes highlights`() {
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test nohlsearch command removes highlights`() {
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
          |hard by the torrent of a mountain pass.""".trimMargin())
-      enterSearch("and")
-      enterCommand("nohlsearch")
-      assertNoSearchHighlights()
-    }
+    enterSearch("and")
+    enterCommand("nohlsearch")
+    assertNoSearchHighlights()
+  }
 
-    fun `test find next after nohlsearch command shows highlights`() {
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test find next after nohlsearch command shows highlights`() {
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
          |hard by the torrent of a mountain pass.""".trimMargin())
 
-      val pattern = "and"
-      enterSearch(pattern)
-      enterCommand("nohlsearch")
-      typeText(parseKeys("n"))
+    val pattern = "and"
+    enterSearch(pattern)
+    enterCommand("nohlsearch")
+    typeText(parseKeys("n"))
 
-      assertSearchHighlights(pattern,
-        """I found it in a legendary l«and»
+    assertSearchHighlights(pattern,
+      """I found it in a legendary l«and»
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test nohlsearch option hides search highlights`() {
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test nohlsearch option hides search highlights`() {
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
          |hard by the torrent of a mountain pass.""".trimMargin())
-      enterSearch("and")
-      clearHighlightSearch()
-      assertNoSearchHighlights()
-    }
+    enterSearch("and")
+    clearHighlightSearch()
+    assertNoSearchHighlights()
+  }
 
-    fun `test setting hlsearch option shows search highlights for last search`() {
-      configureByText(
-        """I found it in a legendary land
+  fun `test setting hlsearch option shows search highlights for last search`() {
+    configureByText(
+      """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
          |hard by the torrent of a mountain pass.""".trimMargin())
 
-      val pattern = "and"
-      enterSearch(pattern)
-      setHighlightSearch()
+    val pattern = "and"
+    enterSearch(pattern)
+    setHighlightSearch()
 
-      assertSearchHighlights(pattern,
-        """I found it in a legendary l«and»
+    assertSearchHighlights(pattern,
+      """I found it in a legendary l«and»
            |all rocks «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test deleting text moves search highlights`() {
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test deleting text moves search highlights`() {
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
          |hard by the torrent of a mountain pass.""".trimMargin())
 
-      val pattern = "and"
-      enterSearch(pattern)
-      typeText(parseKeys("b", "dw"))  // deletes "rocks "
+    val pattern = "and"
+    enterSearch(pattern)
+    typeText(parseKeys("b", "dw"))  // deletes "rocks "
 
-      assertSearchHighlights(pattern,
-        """I found it in a legendary l«and»
+    assertSearchHighlights(pattern,
+      """I found it in a legendary l«and»
            |all «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test deleting match removes search highlight`() {
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test deleting match removes search highlight`() {
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
          |hard by the torrent of a mountain pass.""".trimMargin())
 
-      val pattern = "and"
-      enterSearch(pattern)
-      typeText(parseKeys("dw")) // deletes first "and " on line 2
+    val pattern = "and"
+    enterSearch(pattern)
+    typeText(parseKeys("dw")) // deletes first "and " on line 2
 
-      assertSearchHighlights(pattern,
-        """I found it in a legendary l«and»
+    assertSearchHighlights(pattern,
+      """I found it in a legendary l«and»
            |all rocks lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test deleting part of match removes search highlight`() {
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test deleting part of match removes search highlight`() {
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
          |hard by the torrent of a mountain pass.""".trimMargin())
 
-      val pattern = "and"
-      enterSearch(pattern)
-      typeText(parseKeys("xx")) // deletes "an" from first "and" on line 2
+    val pattern = "and"
+    enterSearch(pattern)
+    typeText(parseKeys("xx")) // deletes "an" from first "and" on line 2
 
-      assertSearchHighlights(pattern,
-        """I found it in a legendary l«and»
+    assertSearchHighlights(pattern,
+      """I found it in a legendary l«and»
            |all rocks d lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test deleting part of match keeps highlight if pattern still matches`() {
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test deleting part of match keeps highlight if pattern still matches`() {
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
              |${c}all rocks and lavender and tufted grass,
              |where it was settled on some sodden sand
              |hard by the torrent of a mountain pass.""".trimMargin())
 
-      val pattern = """\<s\w*d\>"""  // Should match "settled" and "sand"
-      enterSearch(pattern)
-      typeText(parseKeys("l", "xxx")) // Change "settled" to "sled"
+    val pattern = """\<s\w*d\>"""  // Should match "settled" and "sand"
+    enterSearch(pattern)
+    typeText(parseKeys("l", "xxx")) // Change "settled" to "sled"
 
-      assertSearchHighlights(pattern,
-        """I found it in a legendary land
+    assertSearchHighlights(pattern,
+      """I found it in a legendary land
            |all rocks and lavender and tufted grass,
            |where it was «sled» on some sodden «sand»
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test inserting text moves search highlights`() {
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test inserting text moves search highlights`() {
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
          |hard by the torrent of a mountain pass.""".trimMargin())
 
-      val pattern = "and"
-      enterSearch(pattern)
-      typeText(parseKeys("h", "i", ", trees"))  // inserts ", trees" before first "and" on line 2
+    val pattern = "and"
+    enterSearch(pattern)
+    typeText(parseKeys("h", "i", ", trees"))  // inserts ", trees" before first "and" on line 2
 
-      assertSearchHighlights(pattern,
-        """I found it in a legendary l«and»
+    assertSearchHighlights(pattern,
+      """I found it in a legendary l«and»
            |all rocks, trees «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test inserting text inside match removes search highlight`() {
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test inserting text inside match removes search highlight`() {
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
          |hard by the torrent of a mountain pass.""".trimMargin())
 
-      val pattern = "and"
-      enterSearch(pattern)
-      typeText(parseKeys("l", "i", "FOO"))  // inserts "FOO" inside first "and" - "aFOOnd"
+    val pattern = "and"
+    enterSearch(pattern)
+    typeText(parseKeys("l", "i", "FOO"))  // inserts "FOO" inside first "and" - "aFOOnd"
 
-      assertSearchHighlights(pattern,
-        """I found it in a legendary l«and»
+    assertSearchHighlights(pattern,
+      """I found it in a legendary l«and»
            |all rocks aFOOnd lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test inserting text inside match keeps highlight if pattern still matches`() {
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test inserting text inside match keeps highlight if pattern still matches`() {
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
          |hard by the torrent of a mountain pass.""".trimMargin())
 
-      val pattern = """\<s\w*d\>"""  // Should match "settled" and "sand"
-      enterSearch(pattern)
-      typeText(parseKeys("l", "i", "FOO", "<Esc>")) // Change "settled" to "sFOOettled"
+    val pattern = """\<s\w*d\>"""  // Should match "settled" and "sand"
+    enterSearch(pattern)
+    typeText(parseKeys("l", "i", "FOO", "<Esc>")) // Change "settled" to "sFOOettled"
 
-      assertSearchHighlights(pattern,
-        """I found it in a legendary land
+    assertSearchHighlights(pattern,
+      """I found it in a legendary land
            |all rocks and lavender and tufted grass,
            |where it was «sFOOettled» on some sodden «sand»
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test inserting text shows highlight if it contains matches`() {
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test inserting text shows highlight if it contains matches`() {
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
          |hard by the torrent of a mountain pass.""".trimMargin())
 
-      val pattern = "and"
-      enterSearch(pattern)
-      typeText(parseKeys("o", "and then I saw a cat and a dog", "<Esc>"))
+    val pattern = "and"
+    enterSearch(pattern)
+    typeText(parseKeys("o", "and then I saw a cat and a dog", "<Esc>"))
 
-      assertSearchHighlights(pattern,
-        """I found it in a legendary l«and»
+    assertSearchHighlights(pattern,
+      """I found it in a legendary l«and»
            |all rocks «and» lavender «and» tufted grass,
            |«and» then I saw a cat «and» a dog
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test replacing text moves search highlights`() {
-      val pattern = "and"
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test replacing text moves search highlights`() {
+    val pattern = "and"
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
 
-      enterSearch(pattern)
-      typeText(parseKeys("b", "cw", "boulders", "<Esc>"))  // Replaces "rocks" with "boulders" on line 2
+    enterSearch(pattern)
+    typeText(parseKeys("b", "cw", "boulders", "<Esc>"))  // Replaces "rocks" with "boulders" on line 2
 
-      assertSearchHighlights(pattern,
-        """I found it in a legendary l«and»
+    assertSearchHighlights(pattern,
+      """I found it in a legendary l«and»
            |all boulders «and» lavender «and» tufted grass,
            |where it was settled on some sodden s«and»
            |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test replacing text inside match removes search highlight`() {
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test replacing text inside match removes search highlight`() {
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
          |hard by the torrent of a mountain pass.""".trimMargin())
 
-      val pattern = "and"
-      enterSearch(pattern)
-      typeText(parseKeys("l", "cw", "lso", "<Esc>")) // replaces "nd" in first "and" with "lso" on line 2
+    val pattern = "and"
+    enterSearch(pattern)
+    typeText(parseKeys("l", "cw", "lso", "<Esc>")) // replaces "nd" in first "and" with "lso" on line 2
 
-      assertSearchHighlights(pattern,
-        """I found it in a legendary l«and»
+    assertSearchHighlights(pattern,
+      """I found it in a legendary l«and»
          |all rocks also lavender «and» tufted grass,
          |where it was settled on some sodden s«and»
          |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test replacing text shows highlight if it contains matches`() {
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test replacing text shows highlight if it contains matches`() {
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
           |${c}all rocks and lavender and tufted grass,
           |where it was settled on some sodden sand
           |hard by the torrent of a mountain pass.""".trimMargin())
 
-      val pattern = "and"
-      enterSearch(pattern)
-      typeText(parseKeys("w", "cw", "trees and boulders", "<Esc>"))
+    val pattern = "and"
+    enterSearch(pattern)
+    typeText(parseKeys("w", "cw", "trees and boulders", "<Esc>"))
 
-      assertSearchHighlights(pattern,
-        """I found it in a legendary l«and»
+    assertSearchHighlights(pattern,
+      """I found it in a legendary l«and»
           |all rocks «and» trees «and» boulders «and» tufted grass,
           |where it was settled on some sodden s«and»
           |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    fun `test replacing text inside match keeps highlight if pattern still matches`() {
-      setHighlightSearch()
-      configureByText(
-        """I found it in a legendary land
+  fun `test replacing text inside match keeps highlight if pattern still matches`() {
+    setHighlightSearch()
+    configureByText(
+      """I found it in a legendary land
             |${c}all rocks and lavender and tufted grass,
             |where it was settled on some sodden sand
             |hard by the torrent of a mountain pass.""".trimMargin())
 
-      val pattern = """\<s\w*d\>"""  // Should match "settled" and "sand"
-      enterSearch(pattern)
-      typeText(parseKeys("l", "ctl", "huff", "<Esc>")) // Change "settled" to "shuffled"
+    val pattern = """\<s\w*d\>"""  // Should match "settled" and "sand"
+    enterSearch(pattern)
+    typeText(parseKeys("l", "ctl", "huff", "<Esc>")) // Change "settled" to "shuffled"
 
-      assertSearchHighlights(pattern,
-        """I found it in a legendary land
+    assertSearchHighlights(pattern,
+      """I found it in a legendary land
             |all rocks and lavender and tufted grass,
             |where it was «shuffled» on some sodden «sand»
             |hard by the torrent of a mountain pass.""".trimMargin())
-    }
+  }
 
-    // Ensure that the offsets for the last carriage return in the file are valid, even though it's for a line that
-    // doesn't exist
-    fun `test find last cr in file`() {
-      val res = search("\\n", "Something\n")
-      assertEquals(9, res)
-    }
+  // Ensure that the offsets for the last carriage return in the file are valid, even though it's for a line that
+  // doesn't exist
+  fun `test find last cr in file`() {
+    val res = search("\\n", "Something\n")
+    assertEquals(9, res)
+  }
 
-    private fun setIgnoreCase() {
-      setOption(Options.IGNORE_CASE)
-    }
+  private fun setIgnoreCase() = OptionsManager.ignorecase.set()
 
-    private fun setIgnoreCaseAndSmartCase() {
-      setOption(Options.IGNORE_CASE)
-      setOption(Options.SMART_CASE)
-    }
+  private fun setIgnoreCaseAndSmartCase() {
+    OptionsManager.ignorecase.set()
+    OptionsManager.smartcase.set()
+  }
 
-    private fun setHighlightSearch() = setOption(Options.HIGHLIGHT_SEARCH)
-    private fun clearHighlightSearch() = resetOption(Options.HIGHLIGHT_SEARCH)
+  private fun setHighlightSearch() = OptionsManager.hlsearch.set()
+  private fun clearHighlightSearch() = OptionsManager.hlsearch.reset()
+  private fun setIncrementalSearch() = OptionsManager.incsearch.set()
 
-    private fun setIncrementalSearch() {
-      setOption(Options.INCREMENTAL_SEARCH)
-    }
+  private fun search(pattern: String, input: String): Int {
+    myFixture.configureByText("a.java", input)
+    val editor = myFixture.editor
+    val project = myFixture.project
+    val searchGroup = VimPlugin.getSearch()
+    val ref = Ref.create(-1)
+    RunnableHelper.runReadCommand(project, {
+      val n = searchGroup.search(editor, pattern, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
+      ref.set(n)
+    }, null, null)
+    return ref.get()
+  }
 
-    private fun search(pattern: String, input: String): Int {
-        myFixture.configureByText("a.java", input)
-        val editor = myFixture.editor
-        val project = myFixture.project
-        val searchGroup = VimPlugin.getSearch()
-        val ref = Ref.create(-1)
-        RunnableHelper.runReadCommand(project, {
-            val n = searchGroup.search(editor, pattern, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
-            ref.set(n)
-        }, null, null)
-        return ref.get()
-    }
+  private fun assertNoSearchHighlights() {
+    assertEquals(0, myFixture.editor.markupModel.allHighlighters.size)
+  }
 
-    private fun assertNoSearchHighlights() {
-      TestCase.assertEquals(0, myFixture.editor.markupModel.allHighlighters.size)
-    }
+  private fun assertSearchHighlights(tooltip: String, expected: String) {
+    val allHighlighters = myFixture.editor.markupModel.allHighlighters
 
-    private fun assertSearchHighlights(tooltip: String, expected: String) {
-      val allHighlighters = myFixture.editor.markupModel.allHighlighters
+    val actual = StringBuilder(myFixture.editor.document.text)
+    val inserts = mutableMapOf<Int, String>()
 
-      val actual = StringBuilder(myFixture.editor.document.text)
-      val inserts = mutableMapOf<Int, String>()
-
-      // Digraphs:
-      // <C-K>3" → ‷ + <C-K>3' → ‴ (current match)
-      // <C-K><< → « + <C-K>>> → » (normal match)
-      allHighlighters.forEach {
-        // TODO: This is not the nicest way to check for current match. Add something to the highlight's user data?
-        if (it.textAttributes?.effectType == EffectType.ROUNDED_BOX) {
-          inserts.compute(it.startOffset) { _, v -> if (v == null) "‷" else "$v‷" }
-          inserts.compute(it.endOffset) { _, v -> if (v == null) "‴" else "$v‴" }
-        }
-        else {
-          inserts.compute(it.startOffset) { _, v -> if (v == null) "«" else "$v«" }
-          inserts.compute(it.endOffset) { _, v -> if (v == null) "»" else "$v»" }
-        }
-      }
-
-      var offset = 0
-      inserts.toSortedMap().forEach { (k, v) ->
-        actual.insert(k + offset, v)
-        offset += v.length
-      }
-
-      assertEquals(expected, actual.toString())
-
-      // Assert all highlighters have the correct tooltip and text attributes
-      val editorColorsScheme = EditorColorsManager.getInstance().globalScheme
-      val attributes = editorColorsScheme.getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES)
-      val caretColour = editorColorsScheme.getColor(EditorColors.CARET_COLOR)
-      allHighlighters.forEach {
-        val offsets = "(${it.startOffset}, ${it.endOffset})"
-        assertEquals("Incorrect tooltip for highlighter at $offsets", tooltip, it.errorStripeTooltip)
-        assertEquals("Incorrect background colour for highlighter at $offsets", attributes.backgroundColor, it.textAttributes?.backgroundColor)
-        assertEquals("Incorrect foreground colour for highlighter at $offsets", attributes.foregroundColor, it.textAttributes?.foregroundColor)
-        // TODO: Find a better way to identify the current match
-        if (it.textAttributes?.effectType == EffectType.ROUNDED_BOX) {
-          assertEquals("Incorrect effect type for highlighter at $offsets", EffectType.ROUNDED_BOX, it.textAttributes?.effectType)
-          assertEquals("Incorrect effect colour for highlighter at $offsets", caretColour, it.textAttributes?.effectColor)
-        }
-        else {
-          assertEquals("Incorrect effect type for highlighter at $offsets", attributes.effectType, it.textAttributes?.effectType)
-          assertEquals("Incorrect effect colour for highlighter at $offsets", attributes.effectColor, it.textAttributes?.effectColor)
-        }
+    // Digraphs:
+    // <C-K>3" → ‷ + <C-K>3' → ‴ (current match)
+    // <C-K><< → « + <C-K>>> → » (normal match)
+    allHighlighters.forEach {
+      // TODO: This is not the nicest way to check for current match. Add something to the highlight's user data?
+      if (it.textAttributes?.effectType == EffectType.ROUNDED_BOX) {
+        inserts.compute(it.startOffset) { _, v -> if (v == null) "‷" else "$v‷" }
+        inserts.compute(it.endOffset) { _, v -> if (v == null) "‴" else "$v‴" }
+      } else {
+        inserts.compute(it.startOffset) { _, v -> if (v == null) "«" else "$v«" }
+        inserts.compute(it.endOffset) { _, v -> if (v == null) "»" else "$v»" }
       }
     }
+
+    var offset = 0
+    inserts.toSortedMap().forEach { (k, v) ->
+      actual.insert(k + offset, v)
+      offset += v.length
+    }
+
+    assertEquals(expected, actual.toString())
+
+    // Assert all highlighters have the correct tooltip and text attributes
+    val editorColorsScheme = EditorColorsManager.getInstance().globalScheme
+    val attributes = editorColorsScheme.getAttributes(EditorColors.TEXT_SEARCH_RESULT_ATTRIBUTES)
+    val caretColour = editorColorsScheme.getColor(EditorColors.CARET_COLOR)
+    allHighlighters.forEach {
+      val offsets = "(${it.startOffset}, ${it.endOffset})"
+      assertEquals("Incorrect tooltip for highlighter at $offsets", tooltip, it.errorStripeTooltip)
+      assertEquals("Incorrect background colour for highlighter at $offsets", attributes.backgroundColor, it.textAttributes?.backgroundColor)
+      assertEquals("Incorrect foreground colour for highlighter at $offsets", attributes.foregroundColor, it.textAttributes?.foregroundColor)
+      // TODO: Find a better way to identify the current match
+      if (it.textAttributes?.effectType == EffectType.ROUNDED_BOX) {
+        assertEquals("Incorrect effect type for highlighter at $offsets", EffectType.ROUNDED_BOX, it.textAttributes?.effectType)
+        assertEquals("Incorrect effect colour for highlighter at $offsets", caretColour, it.textAttributes?.effectColor)
+      } else {
+        assertEquals("Incorrect effect type for highlighter at $offsets", attributes.effectType, it.textAttributes?.effectType)
+        assertEquals("Incorrect effect colour for highlighter at $offsets", attributes.effectColor, it.textAttributes?.effectColor)
+      }
+    }
+  }
 }

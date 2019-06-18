@@ -40,7 +40,7 @@ import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.regexp.CharHelper;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.CharacterClasses;
@@ -59,8 +59,8 @@ import java.util.List;
 
 public class SearchGroup {
   public SearchGroup() {
-    final Options options = Options.getInstance();
-    options.getOption(Options.HIGHLIGHT_SEARCH).addOptionChangeListener(event -> {
+    final OptionsManager options = OptionsManager.INSTANCE;
+    options.getHlsearch().addOptionChangeListener(event -> {
       resetShowSearchHighlight();
       forceUpdateSearchHighlights();
     });
@@ -70,11 +70,11 @@ public class SearchGroup {
         forceUpdateSearchHighlights();
       }
     };
-    options.getOption(Options.IGNORE_CASE).addOptionChangeListener(updateHighlightsIfVisible);
+    options.getIgnorecase().addOptionChangeListener(updateHighlightsIfVisible);
 
     // It appears that when changing smartcase, Vim only redraws the highlights when the screen is redrawn. We can't
     // reliably copy that, so do the most intuitive thing
-    options.getOption(Options.SMART_CASE).addOptionChangeListener(updateHighlightsIfVisible);
+    options.getSmartcase().addOptionChangeListener(updateHighlightsIfVisible);
   }
 
   public void turnOn() {
@@ -204,7 +204,7 @@ public class SearchGroup {
       cmd.inc();
     }
     else {
-      do_all = Options.getInstance().isSet("gdefault");
+      do_all = OptionsManager.INSTANCE.getGdefault().isSet();
       do_ask = false;
       do_error = true;
       //do_print = false;
@@ -483,8 +483,8 @@ public class SearchGroup {
   }
 
   private static boolean shouldIgnoreCase(@NotNull String pattern, boolean ignoreSmartCase) {
-    boolean sc = !ignoreSmartCase && Options.getInstance().isSet(Options.SMART_CASE);
-    boolean ic = Options.getInstance().isSet(Options.IGNORE_CASE);
+    boolean sc = !ignoreSmartCase && OptionsManager.INSTANCE.getSmartcase().isSet();
+    boolean ic = OptionsManager.INSTANCE.getIgnorecase().isSet();
 
     return ic && !(sc && StringHelper.containsUpperCase(pattern));
   }
@@ -615,7 +615,7 @@ public class SearchGroup {
   }
 
   private void resetShowSearchHighlight() {
-    showSearchHighlight = Options.getInstance().isSet(Options.HIGHLIGHT_SEARCH);
+    showSearchHighlight = OptionsManager.INSTANCE.getHlsearch().isSet();
   }
 
   public void clearSearchHighlight() {
@@ -639,7 +639,7 @@ public class SearchGroup {
     // searchStartOffset is used to find the closest match. caretOffset is used to reset the caret if there is no match.
     // If searching based on e.g. :%s/... then these values are not going to be the same
     final int searchStartOffset = searchRange != null ? EditorHelper.getLineStartOffset(editor, searchRange.getStartLine()) : caretOffset;
-    final boolean showHighlights = Options.getInstance().isSet(Options.HIGHLIGHT_SEARCH);
+    final boolean showHighlights = OptionsManager.INSTANCE.getHlsearch().isSet();
     int currentMatchOffset = updateSearchHighlights(pattern, false, showHighlights, searchStartOffset, searchRange, forwards, false);
     MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), currentMatchOffset == -1 ? caretOffset : currentMatchOffset);
   }
@@ -683,7 +683,7 @@ public class SearchGroup {
         }
         else if (!showHighlights && initialOffset != -1) {
           // Incremental search always highlights current match. We know it's incsearch if we have a valid initial offset
-          final boolean wrap = Options.getInstance().isSet(Options.WRAPSCAN);
+          final boolean wrap = OptionsManager.INSTANCE.getWrapscan().isSet();
           final TextRange result = findIt(editor, pattern, initialOffset, 1,
             forwards ? DIR_FORWARDS : DIR_BACKWARDS, shouldIgnoreSmartCase, wrap, false, true);
           if (result != null) {
@@ -734,7 +734,7 @@ public class SearchGroup {
       return d2 - d1;
     });
 
-    if (!Options.getInstance().isSet(Options.WRAPSCAN)) {
+    if (!OptionsManager.INSTANCE.getWrapscan().isSet()) {
       final int start = max.getStartOffset();
       if (forwards && start < initialOffset) {
         return -1;
@@ -745,6 +745,56 @@ public class SearchGroup {
     }
 
     return max.getStartOffset();
+  }
+
+  @Nullable
+  public TextRange getNextSearchRange(@NotNull Editor editor, int count, boolean forwards) {
+    editor.getCaretModel().removeSecondaryCarets();
+    TextRange current = findUnderCaret(editor);
+
+    if (current == null || CommandStateHelper.inVisualMode(editor) && atEdgeOfGnRange(current, editor, forwards)) {
+      current = findNextSearchForGn(editor, count, forwards);
+    }
+    else if (count > 1) {
+      current = findNextSearchForGn(editor, count - 1, forwards);
+    }
+    return current;
+  }
+
+  private boolean atEdgeOfGnRange(@NotNull TextRange nextRange, @NotNull Editor editor, boolean forwards) {
+    int currentPosition = editor.getCaretModel().getOffset();
+    if (forwards) {
+      return nextRange.getEndOffset() - VimPlugin.getVisualMotion().getSelectionAdj() == currentPosition;
+    }
+    else {
+      return nextRange.getStartOffset() == currentPosition;
+    }
+  }
+
+  @Nullable
+  private TextRange findNextSearchForGn(@NotNull Editor editor, int count, boolean forwards) {
+    if (forwards) {
+      return findIt(editor, lastSearch, editor.getCaretModel().getOffset(), count, DIR_FORWARDS, false, true, false, true);
+    } else {
+      return searchBackward(editor, editor.getCaretModel().getOffset(), count);
+    }
+  }
+
+  @Nullable
+  private TextRange findUnderCaret(@NotNull Editor editor) {
+    final TextRange backSearch = searchBackward(editor, editor.getCaretModel().getOffset() + 1, 1);
+    if (backSearch == null) return null;
+    return backSearch.contains(editor.getCaretModel().getOffset()) ? backSearch : null;
+  }
+
+  @Nullable
+  private TextRange searchBackward(@NotNull Editor editor, int offset, int count) {
+    // Backward search returns wrongs end offset for some cases. That's why we should perform additional forward search
+    final TextRange foundBackward = findIt(editor, lastSearch, offset, count, DIR_BACKWARDS, false, true, false, true);
+    if (foundBackward == null) return null;
+    int startOffset = foundBackward.getStartOffset() - 1;
+    if (startOffset < 0) startOffset = EditorHelper.getFileSize(editor);
+    return findIt(editor, lastSearch, startOffset, 1, DIR_FORWARDS, false, true, false, true);
   }
 
   private static int distance(@NotNull TextRange range, int pos, boolean forwards, int size) {
@@ -822,7 +872,7 @@ public class SearchGroup {
   }
 
   private int findItOffset(@NotNull Editor editor, int startOffset, int count, int dir) {
-    boolean wrap = Options.getInstance().isSet(Options.WRAPSCAN);
+    boolean wrap = OptionsManager.INSTANCE.getWrapscan().isSet();
     TextRange range = findIt(editor, lastSearch, startOffset, count, dir, lastIgnoreSmartCase, wrap, true, true);
     if (range == null) {
       return -1;
@@ -914,7 +964,7 @@ public class SearchGroup {
   @SuppressWarnings("SameParameterValue")
   @Nullable
   private static TextRange findIt(@NotNull Editor editor, @Nullable String pattern, int startOffset, int count, int dir,
-                                  boolean ignoreSmartCase, boolean wrap, boolean showMessages, boolean wholeFile) {
+                                 boolean ignoreSmartCase, boolean wrap, boolean showMessages, boolean wholeFile) {
     if (pattern == null || pattern.length() == 0) {
       return null;
     }
@@ -1271,8 +1321,8 @@ public class SearchGroup {
     lastDir = Integer.parseInt(dir.getText());
 
     Element show = search.getChild("show-last");
-    final ListOption vimInfo = Options.getInstance().getListOption(Options.VIMINFO);
-    final boolean disableHighlight = vimInfo != null && vimInfo.contains("h");
+    final ListOption vimInfo = OptionsManager.INSTANCE.getViminfo();
+    final boolean disableHighlight = vimInfo.contains("h");
     showSearchHighlight = !disableHighlight && Boolean.parseBoolean(show.getText());
     if (logger.isDebugEnabled()) {
       logger.debug("show=" + show + "(" + show.getText() + ")");
@@ -1357,7 +1407,7 @@ public class SearchGroup {
   @Nullable private String lastOffset;
   private boolean lastIgnoreSmartCase;
   private int lastDir;
-  private boolean showSearchHighlight = Options.getInstance().isSet(Options.HIGHLIGHT_SEARCH);
+  private boolean showSearchHighlight = OptionsManager.INSTANCE.getHlsearch().isSet();
 
   private boolean do_all = false; /* do multiple substitutions per line */
   private boolean do_ask = false; /* ask for confirmation */

@@ -26,8 +26,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
-/**
- */
+
 public class MotionScrollFirstScreenLineAction extends EditorAction {
   public MotionScrollFirstScreenLineAction() {
     super(new Handler());

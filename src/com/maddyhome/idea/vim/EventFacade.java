@@ -41,6 +41,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseListener;
 import java.beans.PropertyChangeListener;
 
 /**
@@ -122,6 +124,14 @@ public class EventFacade {
 
   public void removeEditorMouseListener(@NotNull Editor editor, @NotNull EditorMouseListener listener) {
     editor.removeEditorMouseListener(listener);
+  }
+
+  public void addComponentMouseListener(@NotNull Component component, @NotNull MouseListener mouseListener) {
+    component.addMouseListener(mouseListener);
+  }
+
+  public void removeComponentMouseListener(@NotNull Component component, @NotNull MouseListener mouseListener) {
+    component.removeMouseListener(mouseListener);
   }
 
   public void addEditorMouseMotionListener(@NotNull Editor editor, @NotNull EditorMouseMotionListener listener) {

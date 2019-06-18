@@ -33,19 +33,19 @@ import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
-private object MotionArrowLeftActionHandler : NonShiftedSpecialKeyHandler() {
-  override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-    return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -count, false)
+class MotionArrowLeftAction : VimCommandAction() {
+  override fun makeActionHandler() = object : NonShiftedSpecialKeyHandler() {
+    override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+      return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -count, false)
+    }
   }
-}
 
-class MotionArrowLeftAction : VimCommandAction(MotionArrowLeftActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVO
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVO
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = mutableSetOf(parseKeys("<Left>"), mutableListOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0)))
+  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(parseKeys("<Left>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0)))
 
-  override fun getType(): Command.Type = Command.Type.MOTION
+  override val type: Command.Type = Command.Type.MOTION
 
-  override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
 }
 

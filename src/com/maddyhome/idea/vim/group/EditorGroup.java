@@ -30,11 +30,10 @@ import com.intellij.openapi.project.Project;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.OptionChangeEvent;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -65,7 +64,6 @@ public class EditorGroup {
   private final LineNumbersGutterProvider myLineNumbersGutterProvider = new LineNumbersGutterProvider();
 
   public EditorGroup() {
-    final Options options = Options.getInstance();
     final OptionChangeListener numbersChangeListener = new OptionChangeListener() {
       @Override
       public void valueChange(OptionChangeEvent event) {
@@ -74,8 +72,8 @@ public class EditorGroup {
         }
       }
     };
-    options.getOption(Options.NUMBER).addOptionChangeListener(numbersChangeListener);
-    options.getOption(Options.RELATIVE_NUMBER).addOptionChangeListener(numbersChangeListener);
+    OptionsManager.INSTANCE.getNumber().addOptionChangeListener(numbersChangeListener);
+    OptionsManager.INSTANCE.getRelativenumber().addOptionChangeListener(numbersChangeListener);
 
     EventFacade.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
       @Override
@@ -92,11 +90,11 @@ public class EditorGroup {
           initLineNumbers(editor);
           // Turn on insert mode if editor doesn't have any file
           if (!EditorData.isFileEditor(editor) && editor.getDocument().isWritable() &&
-              !CommandState.inInsertMode(editor)) {
+              !CommandStateHelper.inInsertMode(editor)) {
             VimPlugin.getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
             KeyHandler.getInstance().reset(editor);
           }
-          editor.getSettings().setBlockCursor(!CommandState.inInsertMode(editor));
+          editor.getSettings().setBlockCursor(!CommandStateHelper.inInsertMode(editor));
           editor.getSettings().setAnimatedScrolling(ANIMATED_SCROLLING_VIM_VALUE);
           editor.getSettings().setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
         }
@@ -163,9 +161,8 @@ public class EditorGroup {
       return;
     }
 
-    final Options options = Options.getInstance();
-    final boolean relativeLineNumber = options.isSet(Options.RELATIVE_NUMBER);
-    final boolean lineNumber = options.isSet(Options.NUMBER);
+    final boolean relativeLineNumber = OptionsManager.INSTANCE.getRelativenumber().isSet();
+    final boolean lineNumber = OptionsManager.INSTANCE.getNumber().isSet();
 
     final EditorSettings settings = editor.getSettings();
     final boolean showEditorLineNumbers = (EditorData.isLineNumbersShown(editor) || lineNumber) && !relativeLineNumber;
@@ -246,9 +243,8 @@ public class EditorGroup {
     @Override
     public String getLineText(int line, @NotNull Editor editor) {
       if (VimPlugin.isEnabled() && EditorData.isFileEditor(editor)) {
-        final Options options = Options.getInstance();
-        final boolean relativeLineNumber = options.isSet(Options.RELATIVE_NUMBER);
-        final boolean lineNumber = options.isSet(Options.NUMBER);
+        final boolean relativeLineNumber = OptionsManager.INSTANCE.getRelativenumber().isSet();
+        final boolean lineNumber = OptionsManager.INSTANCE.getNumber().isSet();
         if (relativeLineNumber && lineNumber && isCaretLine(line, editor)) {
           return lineNumberToString(getLineNumber(line), editor);
         }

@@ -401,7 +401,7 @@
  * |gH|                   {@link com.maddyhome.idea.vim.action.motion.select.SelectEnableLineModeAction} [To Be Released]
  * |gI|                   {@link com.maddyhome.idea.vim.action.change.insert.InsertLineStartAction}
  * |gJ|                   {@link com.maddyhome.idea.vim.action.change.delete.DeleteJoinLinesAction}
- * |gN|                   TODO
+ * |gN|                   {@link com.maddyhome.idea.vim.action.motion.gn.VisualSelectPreviousSearch}
  * |gP|                   {@link com.maddyhome.idea.vim.action.copy.PutTextBeforeCursorActionMoveCursor}
  * |gQ|                   TODO
  * |gR|                   TODO
@@ -420,7 +420,7 @@
  * |gi|                   {@link com.maddyhome.idea.vim.action.change.insert.InsertAtPreviousInsertAction}
  * |gj|                   TODO
  * |gk|                   TODO
- * |gn|                   TODO
+ * |gn|                   {@link com.maddyhome.idea.vim.action.motion.gn.VisualSelectNextSearch}
  * |gm|                   {@link com.maddyhome.idea.vim.action.motion.leftright.MotionMiddleColumnAction}
  * |go|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionNthCharacterAction}
  * |gp|                   {@link com.maddyhome.idea.vim.action.copy.PutVisualTextMoveCursorAction}

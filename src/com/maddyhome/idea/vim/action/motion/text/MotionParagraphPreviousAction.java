@@ -28,8 +28,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- */
+
 public class MotionParagraphPreviousAction extends MotionEditorAction {
   public MotionParagraphPreviousAction() {
     super(new MotionParagraphPreviousHandler());

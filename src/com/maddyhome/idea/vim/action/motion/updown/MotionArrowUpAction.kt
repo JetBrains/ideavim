@@ -28,35 +28,37 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
+import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
-private object MotionArrowUpActionHandler : NonShiftedSpecialKeyHandler() {
-  private var col: Int = 0
+class MotionArrowUpAction : VimCommandAction() {
+  override fun makeActionHandler() = object : NonShiftedSpecialKeyHandler() {
+    private var col: Int = 0
 
-  override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-    return VimPlugin.getMotion().moveCaretVertical(editor, caret, -count)
+    override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
+      return VimPlugin.getMotion().moveCaretVertical(editor, caret, -count)
+    }
+
+    override fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
+      col = caret.vimLastColumn
+      return true
+    }
+
+    override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
+      EditorHelper.updateLastColumn(editor, caret, col)
+    }
   }
 
-  override fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
-    col = caret.vimLastColumn
-    return true
-  }
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVOS
 
-  override fun postMove(editor: Editor, caret: Caret, context: DataContext, cmd: Command) {
-    caret.vimLastColumn = col
-  }
-}
+  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(parseKeys("<Up>"), listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0)))
 
-class MotionArrowUpAction : VimCommandAction(MotionArrowUpActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVOS
+  override val type: Command.Type = Command.Type.MOTION
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = mutableSetOf(parseKeys("<Up>"), mutableListOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0)))
-
-  override fun getType(): Command.Type = Command.Type.MOTION
-
-  override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)
 }

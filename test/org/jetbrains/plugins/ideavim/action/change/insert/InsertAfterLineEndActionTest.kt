@@ -23,23 +23,23 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class InsertAfterLineEndActionTest : VimTestCase() {
-    fun `test insert after line end action`() {
-        typeTextInFile(parseKeys("A", " four", "<ESC>"),
-                """
+  fun `test insert after line end action`() {
+    typeTextInFile(parseKeys("A", " four", "<ESC>"),
+      """
                     one two ${c}three
                     sev${c}en si${c}x five
 
                     """.trimIndent())
-        myFixture.checkResult("""
+    myFixture.checkResult("""
     one two three fou${c}r
     seven six five fou${c}r
 
     """.trimIndent())
-    }
+  }
 
-    fun `test multiple carets`() {
-        doTest(parseKeys("AHello<esc>"),
-                """
+  fun `test multiple carets`() {
+    doTest(parseKeys("AHello<esc>"),
+      """
                 ${c}A Discovery
 
                 ${c}I found it in a legendary land
@@ -47,7 +47,7 @@ class InsertAfterLineEndActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                """
+      """
                 A DiscoveryHell${c}o
 
                 I found it in a legendary landHell${c}o
@@ -55,8 +55,8 @@ class InsertAfterLineEndActionTest : VimTestCase() {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                CommandState.Mode.COMMAND,
-                CommandState.SubMode.NONE)
-        assertMode(CommandState.Mode.COMMAND)
-    }
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+    assertMode(CommandState.Mode.COMMAND)
+  }
 }

@@ -30,8 +30,7 @@ import com.maddyhome.idea.vim.helper.CaretDataKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- */
+
 public class MotionColumnAction extends MotionEditorAction {
   public MotionColumnAction() {
     super(new Handler());
@@ -49,7 +48,7 @@ public class MotionColumnAction extends MotionEditorAction {
     }
 
     @Override
-    protected void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+    public void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                             @NotNull Command cmd) {
       CaretDataKt.setVimLastColumn(caret, cmd.getCount() - 1);
     }

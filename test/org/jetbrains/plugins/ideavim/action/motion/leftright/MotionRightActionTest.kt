@@ -25,8 +25,8 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class MotionRightActionTest : VimTestCase() {
-    fun `test simple motion`() {
-        doTest(parseKeys("l"), """
+  fun `test simple motion`() {
+    doTest(parseKeys("l"), """
             A Discovery
 
             I found ${c}it in a legendary land
@@ -41,10 +41,10 @@ class MotionRightActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+  }
 
-    fun `test simple motion with repeat`() {
-        doTest(parseKeys("3l"), """
+  fun `test simple motion with repeat`() {
+    doTest(parseKeys("3l"), """
             A Discovery
 
             I found ${c}it in a legendary land
@@ -59,10 +59,10 @@ class MotionRightActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+  }
 
-    fun `test simple motion to the end`() {
-        doTest(parseKeys("3l"), """
+  fun `test simple motion to the end`() {
+    doTest(parseKeys("3l"), """
             A Discovery
 
             I found it in a legendary lan${c}d
@@ -77,10 +77,10 @@ class MotionRightActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+  }
 
-    fun `test simple motion non-ascii`() {
-        doTest(parseKeys("l"), """
+  fun `test simple motion non-ascii`() {
+    doTest(parseKeys("l"), """
             A Discovery
 
             I found it in a legendar${c}𝛁 land
@@ -95,10 +95,10 @@ class MotionRightActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+  }
 
-    fun `test simple motion emoji`() {
-        doTest(parseKeys("l"), """
+  fun `test simple motion emoji`() {
+    doTest(parseKeys("l"), """
             A Discovery
 
             I found it in a legendar${c}🐔 land
@@ -113,10 +113,10 @@ class MotionRightActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+  }
 
-    fun `test simple motion czech`() {
-        doTest(parseKeys("l"), """
+  fun `test simple motion czech`() {
+    doTest(parseKeys("l"), """
             A Discovery
 
             I found it in a legendar${c}ž land
@@ -131,10 +131,10 @@ class MotionRightActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+  }
 
-    fun `test simple motion tab`() {
-        doTest(parseKeys("l"), """
+  fun `test simple motion tab`() {
+    doTest(parseKeys("l"), """
             A Discovery
 
             I found it in a legendar${c}	 land
@@ -149,10 +149,10 @@ class MotionRightActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+  }
 
-    fun `test char visual mode`() {
-        doTest(parseKeys("v", "ll"), """
+  fun `test char visual mode`() {
+    doTest(parseKeys("v", "ll"), """
             A Discovery
 
             I found it in a legendary lan${c}d
@@ -167,10 +167,10 @@ class MotionRightActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
-    }
+  }
 
-    fun `test block visual mode`() {
-        doTest(parseKeys("<C-V>", "ll"), """
+  fun `test block visual mode`() {
+    doTest(parseKeys("<C-V>", "ll"), """
             A Discovery
 
             I found it in a legendary lan${c}d
@@ -185,5 +185,5 @@ class MotionRightActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
-    }
+  }
 }

@@ -29,9 +29,7 @@ import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- *
- */
+
 public class PutTextAfterCursorActionMoveCursor extends EditorAction {
   public PutTextAfterCursorActionMoveCursor() {
     super(new ChangeEditorActionHandler() {
@@ -44,7 +42,7 @@ public class PutTextAfterCursorActionMoveCursor extends EditorAction {
         final Register lastRegister = VimPlugin.getRegister().getLastRegister();
 
         final PutData.TextData textData =
-          lastRegister != null ? new PutData.TextData(lastRegister.getText(), lastRegister.getType()) : null;
+          lastRegister != null ? new PutData.TextData(lastRegister.getText(), lastRegister.getType(), lastRegister.getTransferableData()) : null;
         final PutData putData = new PutData(textData, null, count, false, true, true, -1);
         return VimPlugin.getPut().putText(editor, context, putData);
       }

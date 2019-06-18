@@ -30,19 +30,22 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.DONT_REOPEN
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.SAVE_VISUAL
+import com.maddyhome.idea.vim.ex.CommandHandlerFlags
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
+import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 
 /**
  * @author smartbomb
  */
-class ActionHandler : CommandHandler(
-  commands("action"),
-  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN, SAVE_VISUAL)
-) {
+class ActionHandler : CommandHandler.SingleExecution() {
+
+  override val names = commands("action")
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN, SAVE_VISUAL)
+
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val actionName = cmd.argument.trim()
     val action = ActionManager.getInstance().getAction(actionName) ?: run {
@@ -51,7 +54,7 @@ class ActionHandler : CommandHandler(
     }
     val application = ApplicationManager.getApplication()
     val selections = editor.caretModel.allCarets.map { if (it.hasSelection()) it.selectionStart to it.selectionEnd else null }
-    val oldMode = CommandState.getInstance(editor).subMode
+    val oldMode = editor.subMode
     if (application.isUnitTestMode) {
       executeAction(editor, action, context, selections, oldMode)
     } else {
@@ -72,7 +75,7 @@ class ActionHandler : CommandHandler(
           selection?.run { caret.setSelection(first, second) }
         }
       }
-      if (editor.caretModel.allCarets.any(Caret::hasSelection) && CommandState.getInstance(editor).subMode != oldSubMode) {
+      if (editor.caretModel.allCarets.any(Caret::hasSelection) && editor.subMode != oldSubMode) {
         VimPlugin.getVisualMotion().enterVisualMode(editor, oldSubMode)
       }
     }

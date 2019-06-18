@@ -27,11 +27,11 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import com.maddyhome.idea.vim.helper.CaretDataKt;
+import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- */
+
 public class MotionUpAction extends MotionEditorAction {
   public MotionUpAction() {
     super(new Handler());
@@ -45,7 +45,7 @@ public class MotionUpAction extends MotionEditorAction {
     }
 
     @Override
-    protected boolean preOffsetComputation(@NotNull Editor editor,
+    public boolean preOffsetComputation(@NotNull Editor editor,
                                            @NotNull Caret caret,
                                            @NotNull DataContext context,
                                            @NotNull Command cmd) {
@@ -54,9 +54,9 @@ public class MotionUpAction extends MotionEditorAction {
     }
 
     @Override
-    protected void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+    public void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                             @NotNull Command cmd) {
-      CaretDataKt.setVimLastColumn(caret, col);
+      EditorHelper.updateLastColumn(editor, caret, col);
     }
 
     private int col;

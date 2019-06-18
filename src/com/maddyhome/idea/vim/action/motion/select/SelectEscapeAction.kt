@@ -23,28 +23,23 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimCommandAction
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.helper.inBlockSubMode
 import javax.swing.KeyStroke
 
-/**
- * @author Alex Plate
- */
-
-object SelectEscapeActionHandler : EditorActionHandlerBase() {
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    val blockMode = CommandState.inBlockSubMode(editor)
-    VimPlugin.getVisualMotion().exitSelectMode(editor, true)
-    if (blockMode) editor.caretModel.removeSecondaryCarets()
-    return true
+class SelectEscapeAction : VimCommandAction() {
+  override fun makeActionHandler() = object : EditorActionHandlerBase() {
+    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+      val blockMode = editor.inBlockSubMode
+      VimPlugin.getVisualMotion().exitSelectMode(editor, true)
+      if (blockMode) editor.caretModel.removeSecondaryCarets()
+      return true
+    }
   }
-}
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.S
 
-class SelectEscapeAction : VimCommandAction(SelectEscapeActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.S
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<esc>")
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<esc>")
-
-  override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 }

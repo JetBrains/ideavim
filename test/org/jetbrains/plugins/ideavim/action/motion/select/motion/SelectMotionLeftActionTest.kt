@@ -22,16 +22,16 @@ package org.jetbrains.plugins.ideavim.action.motion.select.motion
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.Options.KEYMODEL
+import com.maddyhome.idea.vim.option.KeyModelOptionData
 import org.jetbrains.plugins.ideavim.VimListConfig
-import org.jetbrains.plugins.ideavim.VimListOptionTestCase
 import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
 
-class SelectMotionLeftActionTest : VimListOptionTestCase(KEYMODEL) {
-    @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, ["stopselect"]))
-    fun `test char select simple move`() {
-        doTest(parseKeys("viw", "<C-G>", "<Left>"),
-                """
+class SelectMotionLeftActionTest : VimOptionTestCase(KeyModelOptionData.name) {
+  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.stopselect]))
+  fun `test char select simple move`() {
+    doTest(parseKeys("viw", "<C-G>", "<Left>"),
+      """
                 A Discovery
 
                 I ${c}found it in a legendary land
@@ -39,7 +39,7 @@ class SelectMotionLeftActionTest : VimListOptionTestCase(KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                """
+      """
                 A Discovery
 
                 I foun${c}d it in a legendary land
@@ -47,35 +47,35 @@ class SelectMotionLeftActionTest : VimListOptionTestCase(KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                CommandState.Mode.COMMAND,
-                CommandState.SubMode.NONE)
-    }
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, ["stopselect"]))
-    fun `test select multiple carets`() {
-        doTest(parseKeys("viwo", "<C-G>", "<Left>"),
-                """
+  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.stopselect]))
+  fun `test select multiple carets`() {
+    doTest(parseKeys("viwo", "<C-G>", "<Left>"),
+      """
                 A Discovery
 
                 I ${c}found it in a legendary land
                 all rocks and lavender and tufted grass,
                 ${c}where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.""".trimIndent(),
-                """
+      """
                 A Discovery
 
                 I${c} found it in a legendary land
                 all rocks and lavender and tufted grass,
                 ${c}where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.""".trimIndent(),
-                CommandState.Mode.COMMAND,
-                CommandState.SubMode.NONE)
-    }
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, []))
-    fun `test without stopsel`() {
-        doTest(parseKeys("viw", "<C-G>", "<Left>"),
-                """
+  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, []))
+  fun `test without stopsel`() {
+    doTest(parseKeys("viw", "<C-G>", "<Left>"),
+      """
                 A Discovery
 
                 I ${c}found it in a legendary land
@@ -83,7 +83,7 @@ class SelectMotionLeftActionTest : VimListOptionTestCase(KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                """
+      """
                 A Discovery
 
                 I ${s}foun${c}${se}d it in a legendary land
@@ -91,7 +91,7 @@ class SelectMotionLeftActionTest : VimListOptionTestCase(KEYMODEL) {
                 where it was settled on some sodden sand
                 hard by the torrent of a mountain pass.
                     """.trimIndent(),
-                CommandState.Mode.SELECT,
-                CommandState.SubMode.VISUAL_CHARACTER)
-    }
+      CommandState.Mode.SELECT,
+      CommandState.SubMode.VISUAL_CHARACTER)
+  }
 }

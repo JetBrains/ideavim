@@ -46,6 +46,68 @@ public class CommandParser {
   public static final int RES_READONLY = 1;
   public static final int RES_DONT_REOPEN = 4;
   public static final Pattern TRIM_WHITESPACE = Pattern.compile("[ \\t]*(.*)[ \\t\\n\\r]+", Pattern.DOTALL);
+  private final CommandHandler[] myHandlers = new CommandHandler[] {
+    new ActionListHandler(),
+    new AsciiHandler(),
+    new CmdFilterHandler(),
+    new CmdHandler(),
+    new CmdClearHandler(),
+    new CopyTextHandler(),
+    new DelCmdHandler(),
+    new DeleteLinesHandler(),
+    new DigraphHandler(),
+    new DumpLineHandler(),
+    new EditFileHandler(),
+    new ActionHandler(),
+    new EchoHandler(),
+    new ExitHandler(),
+    new FindClassHandler(),
+    new FindFileHandler(),
+    new FindSymbolHandler(),
+    new GotoCharacterHandler(),
+    //new GotoLineHandler(); - not needed here
+    new HelpHandler(),
+    new HistoryHandler(),
+    new JoinLinesHandler(),
+    new JumpsHandler(),
+    new LetHandler(),
+    new MapHandler(),
+    new MarkHandler(),
+    new MarksHandler(),
+    new MoveTextHandler(),
+    new NextFileHandler(),
+    new NoHLSearchHandler(),
+    new OnlyHandler(),
+    new PreviousFileHandler(),
+    new PromptFindHandler(),
+    new PromptReplaceHandler(),
+    new PutLinesHandler(),
+    new QuitHandler(),
+    new RedoHandler(),
+    new RegistersHandler(),
+    new RepeatHandler(),
+    new SelectFileHandler(),
+    new SelectFirstFileHandler(),
+    new SelectLastFileHandler(),
+    new SetHandler(),
+    new ShiftLeftHandler(),
+    new ShiftRightHandler(),
+    new SourceHandler(),
+    new SortHandler(),
+    new SplitHandler(),
+    new SubstituteHandler(),
+    new UndoHandler(),
+    new WriteAllHandler(),
+    new WriteHandler(),
+    new WriteNextFileHandler(),
+    new WritePreviousFileHandler(),
+    new WriteQuitHandler(),
+    new YankLinesHandler(),
+    new ShellHandler(),
+    new NextTabHandler(),
+    new PreviousTabHandler(),
+    new TabOnlyHandler()
+};
 
   /**
    * There is only one parser.
@@ -71,66 +133,9 @@ public class CommandParser {
   public void registerHandlers() {
     if (registered) return;
 
-    new ActionListHandler();
-    new AsciiHandler();
-    new CmdFilterHandler();
-    new CmdHandler();
-    new CmdClearHandler();
-    new CopyTextHandler();
-    new DelCmdHandler();
-    new DeleteLinesHandler();
-    new DigraphHandler();
-    new DumpLineHandler();
-    new EditFileHandler();
-    new ActionHandler();
-    new EchoHandler();
-    new ExitHandler();
-    new FindClassHandler();
-    new FindFileHandler();
-    new FindSymbolHandler();
-    new GotoCharacterHandler();
-    //new GotoLineHandler(); - not needed here
-    new HelpHandler();
-    new HistoryHandler();
-    new JoinLinesHandler();
-    new JumpsHandler();
-    new LetHandler();
-    new MapHandler();
-    new MarkHandler();
-    new MarksHandler();
-    new MoveTextHandler();
-    new NextFileHandler();
-    new NoHLSearchHandler();
-    new OnlyHandler();
-    new PreviousFileHandler();
-    new PromptFindHandler();
-    new PromptReplaceHandler();
-    new PutLinesHandler();
-    new QuitHandler();
-    new RedoHandler();
-    new RegistersHandler();
-    new RepeatHandler();
-    new SelectFileHandler();
-    new SelectFirstFileHandler();
-    new SelectLastFileHandler();
-    new SetHandler();
-    new ShiftLeftHandler();
-    new ShiftRightHandler();
-    new SourceHandler();
-    new SortHandler();
-    new SplitHandler();
-    new SubstituteHandler();
-    new UndoHandler();
-    new WriteAllHandler();
-    new WriteHandler();
-    new WriteNextFileHandler();
-    new WritePreviousFileHandler();
-    new WriteQuitHandler();
-    new YankLinesHandler();
-    new ShellHandler();
-    new NextTabHandler();
-    new PreviousTabHandler();
-    new TabOnlyHandler();
+    for (CommandHandler handler : myHandlers) {
+      handler.register();
+    }
 
     registered = true;
     //logger.debug("root=" + root);
@@ -602,11 +607,7 @@ public class CommandParser {
    */
   public void addHandler(@NotNull CommandHandler handler) {
     // Iterator through each command name alias
-    CommandName[] names = handler.getNames();
-    if (names == null) {
-      return;
-    }
-    for (CommandName name : names) {
+    for (CommandName name : handler.getNames()) {
       CommandNode node = root;
       String text = name.getRequired();
       // Build a tree for each character in the required portion of the command name

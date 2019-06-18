@@ -1,3 +1,21 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2019 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 @file:Suppress("RemoveCurlyBracesFromTemplate")
 
 package org.jetbrains.plugins.ideavim.action.motion.updown
@@ -12,8 +30,8 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  */
 class VisualVariousMotionsTest : VimTestCase() {
 
-    fun `test with tabs`() {
-        val code = """
+  fun `test with tabs`() {
+    val code = """
             class Scratch {
             	public static void main(String[] args) {
             		try {
@@ -27,11 +45,11 @@ class VisualVariousMotionsTest : VimTestCase() {
             ${c}}
         """.trimIndent()
 
-        myFixture.configureByText(PlainTextFileType.INSTANCE, code)
+    myFixture.configureByText(PlainTextFileType.INSTANCE, code)
 
-        typeText(parseKeys("<C-V>", "k".repeat(2), "l".repeat(2)))
+    typeText(parseKeys("<C-V>", "k".repeat(2), "l".repeat(2)))
 
-        myFixture.checkResult("""
+    myFixture.checkResult("""
             class Scratch {
             	public static void main(String[] args) {
             		try {
@@ -44,12 +62,12 @@ class VisualVariousMotionsTest : VimTestCase() {
             ${s}${c}${se}	return anything
             ${s}${c}}${se}
         """.trimIndent()
-        )
+    )
 
-        typeText(parseKeys("k".repeat(7), "l".repeat(3)))
+    typeText(parseKeys("k".repeat(7), "l".repeat(3)))
 
-        // Carets 2-4 have 0 column as logical position, but ${se} - 1 column as visual position
-        myFixture.checkResult("""
+    // Carets 2-4 have 0 column as logical position, but ${se} - 1 column as visual position
+    myFixture.checkResult("""
             class Scratch {
             ${s}	pu${c}b${se}lic static void main(String[] args) {
             ${s}${c}	${se}	try {
@@ -62,15 +80,15 @@ class VisualVariousMotionsTest : VimTestCase() {
             ${s}	re${c}t${se}urn anything
             ${s}${c}}${se}
         """.trimIndent()
-        )
+    )
 
-        TestCase.assertEquals(3, myFixture.editor.caretModel.allCarets[1].visualPosition.column)
-        TestCase.assertEquals(3, myFixture.editor.caretModel.allCarets[2].visualPosition.column)
-        TestCase.assertEquals(3, myFixture.editor.caretModel.allCarets[3].visualPosition.column)
+    TestCase.assertEquals(3, myFixture.editor.caretModel.allCarets[1].visualPosition.column)
+    TestCase.assertEquals(3, myFixture.editor.caretModel.allCarets[2].visualPosition.column)
+    TestCase.assertEquals(3, myFixture.editor.caretModel.allCarets[3].visualPosition.column)
 
-        typeText(parseKeys("l".repeat(2)))
+    typeText(parseKeys("l".repeat(2)))
 
-        myFixture.checkResult("""
+    myFixture.checkResult("""
             class Scratch {
             ${s}	publ${c}i${se}c static void main(String[] args) {
             ${s}		${c}t${se}ry {
@@ -83,7 +101,7 @@ class VisualVariousMotionsTest : VimTestCase() {
             ${s}	retu${c}r${se}n anything
             ${s}${c}}${se}
         """.trimIndent()
-        )
-        TestCase.assertEquals(7, myFixture.editor.caretModel.allCarets[2].visualPosition.column)
-    }
+    )
+    TestCase.assertEquals(7, myFixture.editor.caretModel.allCarets[2].visualPosition.column)
+  }
 }

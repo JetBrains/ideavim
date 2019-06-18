@@ -24,44 +24,46 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimCommandAction
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.handler.ShiftedSpecialKeyHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
+import com.maddyhome.idea.vim.helper.inInsertMode
+import com.maddyhome.idea.vim.helper.inSelectMode
+import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.option.BoundStringOption
-import com.maddyhome.idea.vim.option.Options
+import com.maddyhome.idea.vim.option.OptionsManager
 import java.util.*
 import javax.swing.KeyStroke
 
-private object MotionShiftEndActionHandler : ShiftedSpecialKeyHandler() {
-  override fun motion(editor: Editor, context: DataContext, cmd: Command) {
-    editor.vimForEachCaret { caret ->
-      var allow = false
-      if (CommandState.inInsertMode(editor)) {
-        allow = true
-      } else if (CommandState.inVisualMode(editor) || CommandState.inSelectMode(editor)) {
-        val opt = Options.getInstance().getOption("selection") as BoundStringOption
-        if (opt.value != "old") {
+class MotionShiftEndAction : VimCommandAction() {
+  override fun makeActionHandler() = object : ShiftedSpecialKeyHandler() {
+    override fun motion(editor: Editor, context: DataContext, cmd: Command) {
+      editor.vimForEachCaret { caret ->
+        var allow = false
+        if (editor.inInsertMode) {
           allow = true
+        } else if (editor.inVisualMode || editor.inSelectMode) {
+          val opt = OptionsManager.selection
+          if (opt.value != "old") {
+            allow = true
+          }
         }
-      }
 
-      val newOffset = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, cmd.count - 1, allow)
-      caret.vimLastColumn = MotionGroup.LAST_COLUMN
-      MotionGroup.moveCaret(editor, caret, newOffset)
-      caret.vimLastColumn = MotionGroup.LAST_COLUMN
+        val newOffset = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, cmd.count - 1, allow)
+        caret.vimLastColumn = MotionGroup.LAST_COLUMN
+        MotionGroup.moveCaret(editor, caret, newOffset)
+        caret.vimLastColumn = MotionGroup.LAST_COLUMN
+      }
     }
   }
-}
 
-class MotionShiftEndAction : VimCommandAction(MotionShiftEndActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVS
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<S-End>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-End>")
 
-  override fun getType(): Command.Type = Command.Type.MOTION
+  override val type: Command.Type = Command.Type.MOTION
 
-  override fun getFlags(): EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
 }

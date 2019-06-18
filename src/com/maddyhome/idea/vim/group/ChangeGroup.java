@@ -59,7 +59,7 @@ import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.option.BoundListOption;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -428,7 +428,7 @@ public class ChangeGroup {
             return;
           }
 
-          if (CommandState.inInsertMode(editor)) {
+          if (CommandStateHelper.inInsertMode(editor)) {
             clearStrokes(editor);
           }
         }
@@ -531,7 +531,7 @@ public class ChangeGroup {
     CommandState.getInstance(editor).popState();
     exitAllSingleCommandInsertModes(editor);
 
-    if (!CommandState.inInsertMode(editor)) {
+    if (!CommandStateHelper.inInsertMode(editor)) {
       resetCursor(editor, false);
     }
   }
@@ -955,6 +955,34 @@ public class ChangeGroup {
     }
 
     return true;
+  }
+
+  public boolean joinViaIdeaByCount(@NotNull Editor editor, @NotNull DataContext context, int count) {
+    int executions = count > 1 ? count - 1 : 1;
+    final boolean allowedExecution = editor.getCaretModel().getAllCarets().stream().anyMatch(caret -> {
+      int lline = caret.getLogicalPosition().line;
+      int total = EditorHelper.getLineCount(editor);
+      return lline + count <= total;
+    });
+    if (!allowedExecution) return false;
+    for (int i = 0; i < executions; i++) KeyHandler.executeAction(IdeActions.ACTION_EDITOR_JOIN_LINES, context);
+    return true;
+  }
+
+  public void joinViaIdeaBySelections(@NotNull Editor editor, @NotNull DataContext context, @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
+    caretsAndSelections.forEach((caret, range) -> {
+      if (!caret.isValid()) return;
+      final Pair<Integer, Integer> nativeRange = range.getNativeStartAndEnd();
+      caret.setSelection(nativeRange.getFirst(), nativeRange.getSecond());
+    });
+    KeyHandler.executeAction(IdeActions.ACTION_EDITOR_JOIN_LINES, context);
+    editor.getCaretModel().getAllCarets().forEach(caret -> {
+      caret.removeSelection();
+      final VisualPosition currentVisualPosition = caret.getVisualPosition();
+      if (currentVisualPosition.line < 1) return;
+      final VisualPosition newVisualPosition = new VisualPosition(currentVisualPosition.line - 1, currentVisualPosition.column);
+      caret.moveToVisualPosition(newVisualPosition);
+    });
   }
 
   /**
@@ -1674,7 +1702,7 @@ public class ChangeGroup {
       }
     }
 
-    if (!CommandState.inInsertMode(editor)) {
+    if (!CommandStateHelper.inInsertMode(editor)) {
       if (!range.isMultiple()) {
         MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, sline));
       }
@@ -1704,7 +1732,7 @@ public class ChangeGroup {
     }
 
     if (type == null ||
-        CommandState.inInsertMode(editor) ||
+        CommandStateHelper.inInsertMode(editor) ||
         VimPlugin.getRegister().storeText(editor, range, type, true)) {
       final Document document = editor.getDocument();
       final int[] startOffsets = range.getStartOffsets();
@@ -1809,7 +1837,7 @@ public class ChangeGroup {
                                         @NotNull TextRange selectedRange,
                                         final int count,
                                         boolean avalanche) {
-    BoundListOption nf = (BoundListOption)Options.getInstance().getOption("nrformats");
+    BoundListOption nf = OptionsManager.INSTANCE.getNrformats();
     boolean alpha = nf.contains("alpha");
     boolean hex = nf.contains("hex");
     boolean octal = nf.contains("octal");
@@ -1836,9 +1864,9 @@ public class ChangeGroup {
   }
 
   private void exitAllSingleCommandInsertModes(@NotNull Editor editor) {
-    while (CommandState.inSingleCommandMode(editor)) {
+    while (CommandStateHelper.inSingleCommandMode(editor)) {
       CommandState.getInstance(editor).popState();
-      if (CommandState.inInsertMode(editor)) {
+      if (CommandStateHelper.inInsertMode(editor)) {
         CommandState.getInstance(editor).popState();
       }
     }
@@ -1849,7 +1877,7 @@ public class ChangeGroup {
   private List<Object> lastStrokes;
 
   public boolean changeNumber(@NotNull final Editor editor, @NotNull Caret caret, final int count) {
-    final BoundListOption nf = (BoundListOption)Options.getInstance().getOption("nrformats");
+    final BoundListOption nf = OptionsManager.INSTANCE.getNrformats();
     final boolean alpha = nf.contains("alpha");
     final boolean hex = nf.contains("hex");
     final boolean octal = nf.contains("octal");

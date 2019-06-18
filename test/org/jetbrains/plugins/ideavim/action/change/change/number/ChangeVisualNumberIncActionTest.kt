@@ -26,33 +26,33 @@ import org.jetbrains.plugins.ideavim.VimTestCase
  * @author Alex Plate
  */
 class ChangeVisualNumberIncActionTest : VimTestCase() {
-    fun `test inc visual full number`() {
-        doTest(parseKeys("V<C-A>"),
-                "${c}12345",
-                "${c}12346",
-                CommandState.Mode.COMMAND,
-                CommandState.SubMode.NONE)
-    }
+  fun `test inc visual full number`() {
+    doTest(parseKeys("V<C-A>"),
+      "${c}12345",
+      "${c}12346",
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+  }
 
-    fun `test inc visual multiple numbers`() {
-        doTest(parseKeys("v10w<C-A>"),
-                "11 <- should not be incremented |${c}11| should not be incremented -> 12",
-                "11 <- should not be incremented |${c}12| should not be incremented -> 12",
-                CommandState.Mode.COMMAND,
-                CommandState.SubMode.NONE)
-    }
+  fun `test inc visual multiple numbers`() {
+    doTest(parseKeys("v10w<C-A>"),
+      "11 <- should not be incremented |${c}11| should not be incremented -> 12",
+      "11 <- should not be incremented |${c}12| should not be incremented -> 12",
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+  }
 
-    fun `test inc visual part of number`() {
-        doTest(parseKeys("v4l<C-A>"),
-                "11111${c}22222111111",
-                "11111${c}22223111111",
-                CommandState.Mode.COMMAND,
-                CommandState.SubMode.NONE)
-    }
+  fun `test inc visual part of number`() {
+    doTest(parseKeys("v4l<C-A>"),
+      "11111${c}22222111111",
+      "11111${c}22223111111",
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+  }
 
-    fun `test inc visual multiple lines`() {
-        doTest(parseKeys("V2j<C-A>"),
-                """
+  fun `test inc visual multiple lines`() {
+    doTest(parseKeys("V2j<C-A>"),
+      """
                     no inc 1
                     no inc 1
                     ${c}inc    5
@@ -62,7 +62,7 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
                     no inc 1
 
                     """.trimIndent(),
-                """
+      """
                     no inc 1
                     no inc 1
                     ${c}inc    6
@@ -72,51 +72,51 @@ class ChangeVisualNumberIncActionTest : VimTestCase() {
                     no inc 1
 
                     """.trimIndent(),
-                CommandState.Mode.COMMAND,
-                CommandState.SubMode.NONE
-        )
-    }
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE
+    )
+  }
 
-    fun `test inc visual 999 multiple lines`() {
-        doTest(parseKeys("V2j<C-A>"),
-                """
+  fun `test inc visual 999 multiple lines`() {
+    doTest(parseKeys("V2j<C-A>"),
+      """
                     ${c}999
                     999
                     999
                     """.trimIndent(),
-                """
+      """
                     ${c}1000
                     1000
                     1000
                     """.trimIndent(),
-                CommandState.Mode.COMMAND,
-                CommandState.SubMode.NONE)
-    }
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+  }
 
-    fun `test inc visual multiple numbers on line`() {
-        doTest(parseKeys("V<C-A>"),
-                "1 should$c not be incremented -> 2",
-                "${c}2 should not be incremented -> 2",
-                CommandState.Mode.COMMAND,
-                CommandState.SubMode.NONE)
-    }
+  fun `test inc visual multiple numbers on line`() {
+    doTest(parseKeys("V<C-A>"),
+      "1 should$c not be incremented -> 2",
+      "${c}2 should not be incremented -> 2",
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+  }
 
-    fun `test change number inc visual multiple cursor`() {
-        typeTextInFile(parseKeys("Vj<C-A>"),
-                """
+  fun `test change number inc visual multiple cursor`() {
+    typeTextInFile(parseKeys("Vj<C-A>"),
+      """
                     ${c}1
                     2
                     3
                     ${c}4
                     5
                     """.trimIndent())
-        myFixture.checkResult(
-                """
+    myFixture.checkResult(
+      """
                     ${c}2
                     3
                     3
                     ${c}5
                     6
                     """.trimIndent())
-    }
+  }
 }

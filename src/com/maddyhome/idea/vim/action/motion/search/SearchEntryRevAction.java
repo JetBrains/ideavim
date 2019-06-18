@@ -31,9 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 
-/**
- *
- */
+
 public class SearchEntryRevAction extends MotionEditorAction {
   public SearchEntryRevAction() {
     super(new Handler());

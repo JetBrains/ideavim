@@ -28,8 +28,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- */
+
 public class MotionDownLess1FirstNonSpaceAction extends MotionEditorAction {
   public MotionDownLess1FirstNonSpaceAction() {
     super(new Handler());

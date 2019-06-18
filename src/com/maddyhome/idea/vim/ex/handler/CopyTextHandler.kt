@@ -22,16 +22,19 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
-import com.maddyhome.idea.vim.ex.*
+import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
+import com.maddyhome.idea.vim.ex.CommandParser
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.commands
+import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.handler.CaretOrder
 import com.maddyhome.idea.vim.helper.EditorHelper
 
-class CopyTextHandler : CommandHandler(
-  commands("co[py]", "t"),
-  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, WRITABLE)
-) {
+class CopyTextHandler : CommandHandler.SingleExecution() {
+  override val names = commands("co[py]", "t")
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, WRITABLE)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val carets = EditorHelper.getOrderedCaretsList(editor, CaretOrder.DECREASING_OFFSET)
     for (caret in carets) {
@@ -41,7 +44,8 @@ class CopyTextHandler : CommandHandler(
       val arg = CommandParser.getInstance().parse(cmd.argument)
       val line = arg.ranges.getFirstLine(editor, caret, context)
 
-      val textData = PutData.TextData(text, SelectionType.LINE_WISE)
+      val transferableData = VimPlugin.getRegister().getTransferableData(editor, range, text)
+      val textData = PutData.TextData(text, SelectionType.LINE_WISE, transferableData)
       val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, _indent = true, caretAfterInsertedText = false, putToLine = line)
       VimPlugin.getPut().putTextForCaret(editor, caret, context, putData)
     }

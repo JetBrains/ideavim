@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.UiHelper;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -269,8 +269,8 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
     int count = countLines(myText.getText());
     int visLines = getSize().height / myLineHeight - 1;
     int lines = Math.min(count, visLines);
-    setSize(getSize().width, lines * myLineHeight + myLabel.getPreferredSize().height +
-                             getBorder().getBorderInsets(this).top * 2);
+    setSize(getSize().width,
+            lines * myLineHeight + myLabel.getPreferredSize().height + getBorder().getBorderInsets(this).top * 2);
 
     int height = getSize().height;
     Rectangle bounds = scroll.getBounds();
@@ -282,7 +282,7 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
     setBounds(bounds);
 
     myScrollPane.getVerticalScrollBar().setValue(0);
-    if (!Options.getInstance().isSet("more")) {
+    if (!OptionsManager.INSTANCE.getMore().isSet()) {
       // FIX
       scrollOffset(100000);
     }

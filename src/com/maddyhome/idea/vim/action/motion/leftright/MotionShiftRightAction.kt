@@ -33,26 +33,26 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 
-private object MotionShiftRightActionHandler : ShiftedArrowKeyHandler() {
-  override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {
-    editor.vimForEachCaret { caret ->
-      val vertical = VimPlugin.getMotion().moveCaretHorizontal(editor, caret, cmd.count, true)
-      MotionGroup.moveCaret(editor, caret, vertical)
+class MotionShiftRightAction : VimCommandAction() {
+  override fun makeActionHandler() = object : ShiftedArrowKeyHandler() {
+    override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {
+      editor.vimForEachCaret { caret ->
+        val vertical = VimPlugin.getMotion().moveCaretHorizontal(editor, caret, cmd.count, true)
+        MotionGroup.moveCaret(editor, caret, vertical)
+      }
+    }
+
+    override fun motionWithoutKeyModel(editor: Editor, context: DataContext, cmd: Command) {
+      editor.vimForEachCaret { caret ->
+        val newOffset = VimPlugin.getMotion().moveCaretToNextWord(editor, caret, cmd.count, false)
+        MotionGroup.moveCaret(editor, caret, newOffset)
+      }
     }
   }
 
-  override fun motionWithoutKeyModel(editor: Editor, context: DataContext, cmd: Command) {
-    editor.vimForEachCaret { caret ->
-      val newOffset = VimPlugin.getMotion().moveCaretToNextWord(editor, caret, cmd.count, false)
-      MotionGroup.moveCaret(editor, caret, newOffset)
-    }
-  }
-}
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
 
-class MotionShiftRightAction : VimCommandAction(MotionShiftRightActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.NVS
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Right>")
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<S-Right>")
-
-  override fun getType(): Command.Type = Command.Type.OTHER_READONLY
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 }

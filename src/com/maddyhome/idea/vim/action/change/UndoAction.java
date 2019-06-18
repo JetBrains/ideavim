@@ -26,8 +26,7 @@ import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.helper.UndoRedoHelper;
 import org.jetbrains.annotations.NotNull;
 
-/**
- */
+
 public class UndoAction extends EditorAction {
   public UndoAction() {
     super(new Handler());

@@ -25,15 +25,16 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.ex.CommandHandler
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
+import com.maddyhome.idea.vim.ex.CommandHandlerFlags
+import com.maddyhome.idea.vim.ex.CommandName
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
-import com.maddyhome.idea.vim.handler.CaretOrder
 
-class DeleteLinesHandler : CommandHandler(commands("d[elete]"),
-  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE),
-  true, CaretOrder.DECREASING_OFFSET
-) {
+class DeleteLinesHandler : CommandHandler.ForEachCaret() {
+  override val names: Array<CommandName> = commands("d[elete]")
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE)
+
   override fun execute(editor: Editor, caret: Caret, context: DataContext,
                        cmd: ExCommand): Boolean {
     val argument = cmd.argument

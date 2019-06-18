@@ -27,8 +27,7 @@ import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 
-/**
- */
+
 public class MotionFirstScreenColumnAction extends MotionEditorAction {
   public MotionFirstScreenColumnAction() {
     super(new Handler());

@@ -36,11 +36,12 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.helper.CommandStateHelper;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
 import com.maddyhome.idea.vim.option.ListOption;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import one.util.streamex.StreamEx;
 import org.jetbrains.annotations.NotNull;
@@ -166,7 +167,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
         if (keyCode == VK_ESCAPE) {
           return isEnabledForEscape(editor);
         }
-        if (CommandState.inInsertMode(editor)) {
+        if (CommandStateHelper.inInsertMode(editor)) {
           // XXX: <Tab> won't be recorded in macros
           if (keyCode == VK_TAB) {
             VimPlugin.getChange().tabAction = true;
@@ -200,8 +201,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
   }
 
   private boolean passCommandToVimWithLookup(@NotNull KeyStroke keyStroke) {
-    final ListOption popupActions = Options.getInstance().getListOption(Options.LOOKUPACTIONS);
-    if (popupActions == null) return false;
+    final ListOption popupActions = OptionsManager.INSTANCE.getLookupActions();
     final List<String> values = popupActions.values();
     if (values == null) return false;
 

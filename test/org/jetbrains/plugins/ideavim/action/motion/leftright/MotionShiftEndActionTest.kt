@@ -22,18 +22,18 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.Options.KEYMODEL
-import com.maddyhome.idea.vim.option.Options.SELECTMODE
+import com.maddyhome.idea.vim.option.KeyModelOptionData
+import com.maddyhome.idea.vim.option.SelectModeOptionData
 import org.jetbrains.plugins.ideavim.VimListConfig
 import org.jetbrains.plugins.ideavim.VimListOptionDefault
-import org.jetbrains.plugins.ideavim.VimListOptionTestCase
 import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
 
-class MotionShiftEndActionTest : VimListOptionTestCase(KEYMODEL, SELECTMODE) {
-    @VimListOptionDefault
-    fun `test simple end`() {
-        val keys = parseKeys("<S-End>")
-        val before = """
+class MotionShiftEndActionTest : VimOptionTestCase(KeyModelOptionData.name, SelectModeOptionData.name) {
+  @VimListOptionDefault
+  fun `test simple end`() {
+    val keys = parseKeys("<S-End>")
+    val before = """
             A Discovery
 
             I found it in a ${c}legendary land
@@ -41,7 +41,7 @@ class MotionShiftEndActionTest : VimListOptionTestCase(KEYMODEL, SELECTMODE) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             I found it in a legendary lan${c}d
@@ -49,13 +49,13 @@ class MotionShiftEndActionTest : VimListOptionTestCase(KEYMODEL, SELECTMODE) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, ["startsel"]), VimListConfig(SELECTMODE, []))
-    fun `test start visual`() {
-        val keys = parseKeys("<S-End>")
-        val before = """
+  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.startsel]), VimListConfig(SelectModeOptionData.name, []))
+  fun `test start visual`() {
+    val keys = parseKeys("<S-End>")
+    val before = """
             A Discovery
 
             I found it in a ${c}legendary land
@@ -63,7 +63,7 @@ class MotionShiftEndActionTest : VimListOptionTestCase(KEYMODEL, SELECTMODE) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             I found it in a ${s}legendary land${c}${se}
@@ -71,13 +71,13 @@ class MotionShiftEndActionTest : VimListOptionTestCase(KEYMODEL, SELECTMODE) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
-    }
+    doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, ["startsel"]), VimListConfig(SELECTMODE, ["key"]))
-    fun `test start select`() {
-        val keys = parseKeys("<S-End>")
-        val before = """
+  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.startsel]), VimListConfig(SelectModeOptionData.name, [SelectModeOptionData.key]))
+  fun `test start select`() {
+    val keys = parseKeys("<S-End>")
+    val before = """
             A Discovery
 
             I found it in a ${c}legendary land
@@ -85,7 +85,7 @@ class MotionShiftEndActionTest : VimListOptionTestCase(KEYMODEL, SELECTMODE) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             I found it in a ${s}legendary land${c}${se}
@@ -93,12 +93,12 @@ class MotionShiftEndActionTest : VimListOptionTestCase(KEYMODEL, SELECTMODE) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
-    }
+    doTest(keys, before, after, CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, []), VimListConfig(SELECTMODE, []))
-    fun `test continue visual`() {
-        val before = """
+  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, []), VimListConfig(SelectModeOptionData.name, []))
+  fun `test continue visual`() {
+    val before = """
             A Discovery
 
             I found it in a ${c}legendary land
@@ -106,7 +106,7 @@ class MotionShiftEndActionTest : VimListOptionTestCase(KEYMODEL, SELECTMODE) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             ${s}I found it in a legendary land${c}${se}
@@ -114,17 +114,17 @@ class MotionShiftEndActionTest : VimListOptionTestCase(KEYMODEL, SELECTMODE) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        configureByText(before)
-        typeText(parseKeys("<S-End>"))
-        assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-        typeText(parseKeys("0v", "<S-End>"))
-        myFixture.checkResult(after)
-        assertState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
-    }
+    configureByText(before)
+    typeText(parseKeys("<S-End>"))
+    assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    typeText(parseKeys("0v", "<S-End>"))
+    myFixture.checkResult(after)
+    assertState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+  }
 
-    @VimListOptionTestConfiguration(VimListConfig(KEYMODEL, []), VimListConfig(SELECTMODE, []))
-    fun `test continue select`() {
-        val before = """
+  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, []), VimListConfig(SelectModeOptionData.name, []))
+  fun `test continue select`() {
+    val before = """
             A Discovery
 
             I found it in a ${c}legendary land
@@ -132,7 +132,7 @@ class MotionShiftEndActionTest : VimListOptionTestCase(KEYMODEL, SELECTMODE) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             ${s}I found it in a legendary land${c}${se}
@@ -140,11 +140,11 @@ class MotionShiftEndActionTest : VimListOptionTestCase(KEYMODEL, SELECTMODE) {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        configureByText(before)
-        typeText(parseKeys("<S-End>"))
-        assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-        typeText(parseKeys("0gh", "<S-End>"))
-        myFixture.checkResult(after)
-        assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
-    }
+    configureByText(before)
+    typeText(parseKeys("<S-End>"))
+    assertState(CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    typeText(parseKeys("0gh", "<S-End>"))
+    myFixture.checkResult(after)
+    assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+  }
 }

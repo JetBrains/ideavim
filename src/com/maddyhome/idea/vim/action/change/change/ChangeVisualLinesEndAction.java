@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.action.change.change;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
@@ -28,9 +29,10 @@ import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
+import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorHelper;
-import com.maddyhome.idea.vim.group.visual.VimSelection;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -41,11 +43,14 @@ import java.util.Set;
 /**
  * @author vlan
  */
-public class ChangeVisualLinesEndAction extends VimCommandAction {
-  public ChangeVisualLinesEndAction() {
-    super(new VisualOperatorActionHandler.ForEachCaret() {
+final public class ChangeVisualLinesEndAction extends VimCommandAction {
+  @Contract(" -> new")
+  @NotNull
+  @Override
+  final protected EditorActionHandler makeActionHandler() {
+    return new VisualOperatorActionHandler.ForEachCaret() {
       @Override
-      protected boolean executeAction(@NotNull Editor editor,
+      public boolean executeAction(@NotNull Editor editor,
                                       @NotNull Caret caret,
                                       @NotNull DataContext context,
                                       @NotNull Command cmd,
@@ -68,29 +73,32 @@ public class ChangeVisualLinesEndAction extends VimCommandAction {
           return VimPlugin.getChange().changeRange(editor, caret, lineRange, SelectionType.LINE_WISE, context);
         }
       }
-    });
+    };
   }
 
+  @Contract(pure = true)
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
+  final public Set<MappingMode> getMappingModes() {
     return MappingMode.V;
   }
 
   @NotNull
   @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
     return parseKeysSet("C");
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Command.Type getType() {
+    return Command.Type.CHANGE;
   }
 
   @NotNull
   @Override
-  public Command.Type getType() {
-    return Command.Type.CHANGE;
-  }
-
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
+  final public EnumSet<CommandFlags> getFlags() {
     return EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_MULTIKEY_UNDO, CommandFlags.FLAG_EXIT_VISUAL);
   }
 }

@@ -19,18 +19,17 @@
 package com.maddyhome.idea.vim.action.change.delete;
 
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
+import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- */
+
 public class DeleteJoinLinesAction extends EditorAction {
   public DeleteJoinLinesAction() {
     super(new Handler());
@@ -38,17 +37,26 @@ public class DeleteJoinLinesAction extends EditorAction {
 
   private static class Handler extends ChangeEditorActionHandler {
     public Handler() {
-      super(true, CaretOrder.DECREASING_OFFSET);
+      super();
     }
 
     @Override
-    public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                           int rawCount, @Nullable Argument argument) {
-      if (editor.isOneLineMode()) {
-        return false;
+    public boolean execute(@NotNull Editor editor,
+                           @NotNull DataContext context,
+                           int count,
+                           int rawCount,
+                           @Nullable Argument argument) {
+      if (editor.isOneLineMode()) return false;
+
+      if (OptionsManager.INSTANCE.getSmartjoin().isSet()) {
+        return VimPlugin.getChange().joinViaIdeaByCount(editor, context, count);
       }
 
-      return VimPlugin.getChange().deleteJoinLines(editor, caret, count, false);
+      Ref<Boolean> res = Ref.create(true);
+      editor.getCaretModel().runForEachCaret(caret -> {
+        if (!VimPlugin.getChange().deleteJoinLines(editor, caret, count, false)) res.set(false);
+      }, true);
+      return res.get();
     }
   }
 }

@@ -21,13 +21,15 @@ package com.maddyhome.idea.vim.action.change.change.number;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
+import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -35,11 +37,14 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-public class ChangeVisualNumberDecAction extends VimCommandAction {
-  protected ChangeVisualNumberDecAction() {
-    super(new VisualOperatorActionHandler.ForEachCaret() {
+final public class ChangeVisualNumberDecAction extends VimCommandAction {
+  @Contract(" -> new")
+  @NotNull
+  @Override
+  final protected EditorActionHandler makeActionHandler() {
+    return new VisualOperatorActionHandler.ForEachCaret() {
       @Override
-      protected boolean executeAction(@NotNull Editor editor,
+      public boolean executeAction(@NotNull Editor editor,
                                       @NotNull Caret caret,
                                       @NotNull DataContext context,
                                       @NotNull Command cmd,
@@ -47,29 +52,32 @@ public class ChangeVisualNumberDecAction extends VimCommandAction {
         return VimPlugin.getChange()
           .changeNumberVisualMode(editor, caret, range.toVimTextRange(false), -cmd.getCount(), false);
       }
-    });
+    };
   }
 
+  @Contract(pure = true)
   @NotNull
   @Override
-  public Set<MappingMode> getMappingModes() {
+  final public Set<MappingMode> getMappingModes() {
     return MappingMode.V;
   }
 
   @NotNull
   @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
+  final public Set<List<KeyStroke>> getKeyStrokesSet() {
     return parseKeysSet("<C-X>");
+  }
+
+  @Contract(pure = true)
+  @NotNull
+  @Override
+  final public Command.Type getType() {
+    return Command.Type.CHANGE;
   }
 
   @NotNull
   @Override
-  public Command.Type getType() {
-    return Command.Type.CHANGE;
-  }
-
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
+  final public EnumSet<CommandFlags> getFlags() {
     return EnumSet.of(CommandFlags.FLAG_EXIT_VISUAL);
   }
 }

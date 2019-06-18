@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.key.ParentNode;
 import com.maddyhome.idea.vim.option.NumberOption;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -71,49 +71,6 @@ public class CommandState {
     }
 
     return res;
-  }
-
-  public static boolean inInsertMode(@Nullable Editor editor) {
-    final Mode mode = getInstance(editor).getMode();
-    return mode == Mode.INSERT || mode == Mode.REPLACE;
-  }
-
-  public static boolean inRepeatMode(@Nullable Editor editor) {
-    final Mode mode = getInstance(editor).getMode();
-    return mode == Mode.REPEAT;
-  }
-
-  public static boolean inVisualCharacterMode(@Nullable Editor editor) {
-    final CommandState state = getInstance(editor);
-    return state.getMode() == Mode.VISUAL && state.getSubMode() == SubMode.VISUAL_CHARACTER;
-  }
-
-  public static boolean inVisualMode(@Nullable Editor editor) {
-    return getInstance(editor).getMode() == Mode.VISUAL;
-  }
-
-  public static boolean inSelectMode(@Nullable Editor editor) {
-    return getInstance(editor).getMode() == Mode.SELECT;
-  }
-
-  public static boolean inVisualLineMode(@Nullable Editor editor) {
-    final CommandState state = getInstance(editor);
-    return state.getMode() == Mode.VISUAL && state.getSubMode() == SubMode.VISUAL_LINE;
-  }
-
-  public static boolean inVisualBlockMode(@Nullable Editor editor) {
-    final CommandState state = getInstance(editor);
-    return state.getMode() == Mode.VISUAL && state.getSubMode() == SubMode.VISUAL_BLOCK;
-  }
-
-  public static boolean inBlockSubMode(@Nullable Editor editor) {
-    final CommandState state = getInstance(editor);
-    return state.getSubMode() == SubMode.VISUAL_BLOCK;
-  }
-
-  public static boolean inSingleCommandMode(@Nullable Editor editor) {
-    final CommandState state = getInstance(editor);
-    return state.getMode() == Mode.COMMAND && state.getSubMode() == SubMode.SINGLE_COMMAND;
   }
 
   @Nullable
@@ -165,10 +122,8 @@ public class CommandState {
   }
 
   public void startMappingTimer(@NotNull ActionListener actionListener) {
-    final NumberOption timeoutLength = Options.getInstance().getNumberOption("timeoutlen");
-    if (timeoutLength != null) {
-      myMappingTimer.setInitialDelay(timeoutLength.value());
-    }
+    final NumberOption timeoutLength = OptionsManager.INSTANCE.getTimeoutlen();
+    myMappingTimer.setInitialDelay(timeoutLength.value());
     for (ActionListener listener : myMappingTimer.getActionListeners()) {
       myMappingTimer.removeActionListener(listener);
     }
@@ -329,7 +284,7 @@ public class CommandState {
 
   private void updateStatus() {
     final StringBuilder msg = new StringBuilder();
-    if (Options.getInstance().isSet("showmode")) {
+    if (OptionsManager.INSTANCE.getShowmode().isSet()) {
       msg.append(getStatusString(myStates.size() - 1));
     }
 
@@ -344,20 +299,11 @@ public class CommandState {
   }
 
   public enum Mode {
-    COMMAND,
-    INSERT,
-    REPLACE,
-    REPEAT,
-    VISUAL, SELECT,
-    EX_ENTRY
+    COMMAND, INSERT, REPLACE, REPEAT, VISUAL, SELECT, EX_ENTRY
   }
 
   public enum SubMode {
-    NONE,
-    SINGLE_COMMAND,
-    VISUAL_CHARACTER,
-    VISUAL_LINE,
-    VISUAL_BLOCK
+    NONE, SINGLE_COMMAND, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
   }
 
   private class State {

@@ -26,6 +26,7 @@ import com.intellij.openapi.editor.CaretModel;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.colors.EditorColors;
+import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
 import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.testFramework.EditorTestUtil;
@@ -41,12 +42,9 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
-import com.maddyhome.idea.vim.helper.EditorDataContext;
-import com.maddyhome.idea.vim.helper.RunnableHelper;
-import com.maddyhome.idea.vim.helper.StringHelper;
-import com.maddyhome.idea.vim.helper.TestInputModel;
+import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.Option;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.option.ToggleOption;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import org.jetbrains.annotations.NotNull;
@@ -79,7 +77,7 @@ public abstract class VimTestCase extends UsefulTestCase {
     myFixture.setUp();
     myFixture.setTestDataPath(getTestDataPath());
     KeyHandler.getInstance().fullReset(myFixture.getEditor());
-    Options.getInstance().resetAllOptions();
+    OptionsManager.INSTANCE.resetAllOptions();
     VimPlugin.getKey().resetKeyMappings();
     VimPlugin.getSearch().resetState();
 
@@ -104,7 +102,7 @@ public abstract class VimTestCase extends UsefulTestCase {
 
   protected void enableExtensions(@NotNull String... extensionNames) {
     for (String name : extensionNames) {
-      ToggleOption option = (ToggleOption)Options.getInstance().getOption(name);
+      ToggleOption option = (ToggleOption) OptionsManager.INSTANCE.getOption(name);
       option.set();
     }
   }
@@ -185,18 +183,6 @@ public abstract class VimTestCase extends UsefulTestCase {
     return typeText(searchToKeys(pattern, forwards));
   }
 
-  protected void setOption(String name) {
-    final Option option = Options.getInstance().getOption(name);
-    assertInstanceOf(option, ToggleOption.class);
-    ((ToggleOption) option).set();
-  }
-
-  protected void resetOption(String name) {
-    final Option option = Options.getInstance().getOption(name);
-    assertInstanceOf(option, ToggleOption.class);
-    ((ToggleOption) option).reset();
-  }
-
   public void assertPosition(int line, int column) {
     final List<Caret> carets = myFixture.getEditor().getCaretModel().getAllCarets();
     assertEquals("Wrong amount of carets", 1, carets.size());
@@ -240,7 +226,7 @@ public abstract class VimTestCase extends UsefulTestCase {
   protected void assertCaretsColour() {
     Color selectionColour = myFixture.getEditor().getColorsScheme().getColor(EditorColors.SELECTION_BACKGROUND_COLOR);
     Color caretColour = myFixture.getEditor().getColorsScheme().getColor(EditorColors.CARET_COLOR);
-    if (CommandState.inBlockSubMode(myFixture.getEditor())) {
+    if (CommandStateHelper.inBlockSubMode(myFixture.getEditor())) {
       CaretModel caretModel = myFixture.getEditor().getCaretModel();
       caretModel.getAllCarets().forEach(caret -> {
         if (caret != caretModel.getPrimaryCaret()) {
@@ -274,5 +260,9 @@ public abstract class VimTestCase extends UsefulTestCase {
     assertCaretsColour();
     assertMode(modeAfter);
     assertSubMode(subModeAfter);
+  }
+
+  protected FileEditorManagerEx getFileManager() {
+    return FileEditorManagerEx.getInstanceEx(myFixture.getProject());
   }
 }

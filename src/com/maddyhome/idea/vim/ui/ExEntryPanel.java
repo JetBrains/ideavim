@@ -34,7 +34,7 @@ import com.maddyhome.idea.vim.ex.Ranges;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
 import org.jetbrains.annotations.NotNull;
@@ -276,7 +276,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
   }
 
   private boolean isIncSearchEnabled() {
-    return Options.getInstance().isSet(Options.INCREMENTAL_SEARCH);
+    return OptionsManager.INSTANCE.getIncsearch().isSet();
   }
 
   private boolean active;

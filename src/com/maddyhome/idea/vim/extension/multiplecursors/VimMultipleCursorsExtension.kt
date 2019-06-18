@@ -37,7 +37,8 @@ import com.maddyhome.idea.vim.group.visual.vimSetSelection
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.SearchHelper.findWordUnderCursor
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.Options
+import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.option.OptionsManager
 import java.lang.Integer.min
 import java.util.*
 
@@ -99,7 +100,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
         val patterns = sortedSetOf<String>()
         for (caret in caretModel.allCarets) {
           val selectedText = caret.selectedText ?: return
-          patterns += if (Options.getInstance().isSet("ignorecase")) selectedText.toLowerCase() else selectedText
+          patterns += if (OptionsManager.ignorecase.isSet) selectedText.toLowerCase() else selectedText
 
           val lines = selectedText.count { it == '\n' }
           if (lines > 0) {
@@ -151,7 +152,7 @@ class VimMultipleCursorsExtension : VimNonDisposableExtension() {
       if (caretModel.caretCount > 1) return
 
       val primaryCaret = caretModel.primaryCaret
-      var nextOffset = if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
+      var nextOffset = if (editor.inVisualMode) {
         val selectedText = primaryCaret.selectedText ?: return
         val nextOffset = VimPlugin.getSearch().search(editor, selectedText, 1, EnumSet.of(CommandFlags.FLAG_SEARCH_FWD), false)
         nextOffset

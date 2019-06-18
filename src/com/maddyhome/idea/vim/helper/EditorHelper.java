@@ -292,7 +292,9 @@ public class EditorHelper {
       return getFileSize(editor, allowEnd);
     }
     else {
-      return editor.getDocument().getLineEndOffset(line) - (allowEnd ? 0 : 1);
+      final int startOffset = editor.getDocument().getLineStartOffset(line);
+      final int endOffset = editor.getDocument().getLineEndOffset(line);
+      return endOffset - (startOffset == endOffset || allowEnd ? 0 : 1);
     }
   }
 
@@ -710,6 +712,18 @@ public class EditorHelper {
       return scrollFullPageUp(editor, pages);
     }
     return -1;  // visual lines are 1-based
+  }
+
+  public static int lastColumnForLine(@NotNull final Editor editor, int line, boolean allowEnd) {
+    return editor.offsetToVisualPosition(EditorHelper.getLineEndOffset(editor, line, allowEnd)).column;
+  }
+
+  public static void updateLastColumn(@NotNull Editor editor, @NotNull Caret caret, int prevLastColumn) {
+    VisualPosition pos = caret.getVisualPosition();
+    final LogicalPosition logicalPosition = caret.getLogicalPosition();
+    final int lastColumn = EditorHelper.lastColumnForLine(editor, logicalPosition.line, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
+    int targetColumn = pos.column != lastColumn ? pos.column : prevLastColumn;
+    CaretDataKt.setVimLastColumn(caret, targetColumn);
   }
 
   private static int scrollFullPageDown(@NotNull final Editor editor, int pages) {

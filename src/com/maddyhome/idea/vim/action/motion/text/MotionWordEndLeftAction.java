@@ -28,8 +28,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- */
+
 public class MotionWordEndLeftAction extends MotionEditorAction {
   public MotionWordEndLeftAction() {
     super(new Handler());

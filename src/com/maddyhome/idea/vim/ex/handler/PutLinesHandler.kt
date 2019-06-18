@@ -29,10 +29,9 @@ import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.copy.PutData
 
-class PutLinesHandler : CommandHandler(
-  commands("pu[t]"),
-  flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE)
-) {
+class PutLinesHandler : CommandHandler.SingleExecution() {
+  override val names = commands("pu[t]")
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, WRITABLE)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     if (editor.isOneLineMode) return false
@@ -46,7 +45,7 @@ class PutLinesHandler : CommandHandler(
     }
 
     val line = if (cmd.ranges.size() == 0) -1 else cmd.getLine(editor, context)
-    val textData = registerGroup.lastRegister?.let { PutData.TextData(it.text, SelectionType.LINE_WISE) }
+    val textData = registerGroup.lastRegister?.let { PutData.TextData(it.text, SelectionType.LINE_WISE, it.transferableData) }
     val putData = PutData(textData, null, 1, false, false, false, line)
     return VimPlugin.getPut().putText(editor, context, putData)
   }

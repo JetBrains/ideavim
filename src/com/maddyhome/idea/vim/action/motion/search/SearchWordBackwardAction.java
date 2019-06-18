@@ -28,9 +28,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- *
- */
+
 public class SearchWordBackwardAction extends MotionEditorAction {
   public SearchWordBackwardAction() {
     super(new Handler());

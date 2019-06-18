@@ -20,7 +20,11 @@ package com.maddyhome.idea.vim.ex.handler
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.ex.*
+import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.ExCommand
+import com.maddyhome.idea.vim.ex.ExException
+import com.maddyhome.idea.vim.ex.commands
+import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptCommandHandler
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
@@ -29,10 +33,9 @@ import java.util.regex.Pattern
 /**
  * @author vlan
  */
-class LetHandler : CommandHandler(
-  commands("let"),
-  flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
-), VimScriptCommandHandler {
+class LetHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
+  override val names = commands("let")
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
 
   @Throws(ExException::class)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
@@ -40,7 +43,7 @@ class LetHandler : CommandHandler(
     return true
   }
 
-  @Throws(ExException::class)
+  @Throws
   override fun execute(cmd: ExCommand) {
     val argument = cmd.argument
     if (argument.trim().isEmpty()) {

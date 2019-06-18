@@ -20,18 +20,18 @@ package org.jetbrains.plugins.ideavim.option
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.Options
-import com.maddyhome.idea.vim.option.ToggleOption
+import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
  * @author Alex Plate
  */
+// TODO: 2019-06-18 VimOptionsTestCase
 class DigraphTest : VimTestCase() {
-    fun `test digraph`() {
-        (Options.getInstance().getOption("digraph") as ToggleOption).set()
+  fun `test digraph`() {
+    OptionsManager.digraph.set()
 
-        doTest(parseKeys("i B<BS>B"), """
+    doTest(parseKeys("i B<BS>B"), """
             A Discovery
 
             I found it${c} in a legendary land
@@ -46,12 +46,12 @@ class DigraphTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
-    }
+  }
 
-    fun `test digraph stops`() {
-        (Options.getInstance().getOption("digraph") as ToggleOption).set()
+  fun `test digraph stops`() {
+    OptionsManager.digraph.set()
 
-        doTest(parseKeys("i B<BS>BHello"), """
+    doTest(parseKeys("i B<BS>BHello"), """
             A Discovery
 
             I found it${c} in a legendary land
@@ -66,12 +66,12 @@ class DigraphTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
-    }
+  }
 
-    fun `test digraph double backspace`() {
-        (Options.getInstance().getOption("digraph") as ToggleOption).set()
+  fun `test digraph double backspace`() {
+    OptionsManager.digraph.set()
 
-        doTest(parseKeys("i B<BS><BS>B"), """
+    doTest(parseKeys("i B<BS><BS>B"), """
             A Discovery
 
             I found it${c} in a legendary land
@@ -86,12 +86,12 @@ class DigraphTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
-    }
+  }
 
-    fun `test digraph backspace digraph`() {
-        (Options.getInstance().getOption("digraph") as ToggleOption).set()
+  fun `test digraph backspace digraph`() {
+    OptionsManager.digraph.set()
 
-        doTest(parseKeys("i B<BS>B<BS>B"), """
+    doTest(parseKeys("i B<BS>B<BS>B"), """
             A Discovery
 
             I found it${c} in a legendary land
@@ -106,5 +106,5 @@ class DigraphTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent(), CommandState.Mode.INSERT, CommandState.SubMode.NONE)
-    }
+  }
 }

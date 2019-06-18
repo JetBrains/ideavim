@@ -32,17 +32,17 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 
-private object SelectEnterActionHandler : EditorActionHandlerBase() {
-  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
-    VimPlugin.getChange().processEnter(InjectedLanguageUtil.getTopLevelEditor(editor), context)
-    return true
+class SelectEnterAction : VimCommandAction() {
+  override fun makeActionHandler() = object : EditorActionHandlerBase() {
+    override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+      VimPlugin.getChange().processEnter(InjectedLanguageUtil.getTopLevelEditor(editor), context)
+      return true
+    }
   }
-}
 
-class SelectEnterAction : VimCommandAction(SelectEnterActionHandler) {
-  override fun getMappingModes(): MutableSet<MappingMode> = MappingMode.S
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.S
 
-  override fun getKeyStrokesSet(): MutableSet<MutableList<KeyStroke>> = parseKeysSet("<enter>")
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<enter>")
 
-  override fun getType(): Command.Type = Command.Type.INSERT
+  override val type: Command.Type = Command.Type.INSERT
 }

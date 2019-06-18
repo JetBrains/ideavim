@@ -23,9 +23,9 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ChangeVisualActionTest : VimTestCase() {
-    fun `test multiple line change`() {
-        val keys = parseKeys("VjcHello<esc>")
-        val before = """
+  fun `test multiple line change`() {
+    val keys = parseKeys("VjcHello<esc>")
+    val before = """
             ${c}A Discovery
 
             I found it in a legendary land
@@ -33,19 +33,19 @@ class ChangeVisualActionTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             Hello
             I found it in a legendary land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    fun `test change with dollar motion`() {
-        val keys = parseKeys("<C-V>3j$", "c", "Hello<Esc>")
-        val before = """
+  fun `test change with dollar motion`() {
+    val keys = parseKeys("<C-V>3j$", "c", "Hello<Esc>")
+    val before = """
             A Discovery
 
             I |${c}found it in a legendary land
@@ -53,7 +53,7 @@ class ChangeVisualActionTest : VimTestCase() {
             wh|ere it was settled on some sodden sand
             ha|rd by the torrent of a mountain pass.
         """.trimIndent()
-        val after = """
+    val after = """
             A Discovery
 
             I |Hello
@@ -61,47 +61,47 @@ class ChangeVisualActionTest : VimTestCase() {
             wh|Hello
             ha|Hello
         """.trimIndent()
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    fun `test replace first line`() {
-        val keys = parseKeys("VcHello<esc>")
-        val before = "${c}A Discovery"
-        val after = "Hello"
-        doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
-    }
+  fun `test replace first line`() {
+    val keys = parseKeys("VcHello<esc>")
+    val before = "${c}A Discovery"
+    val after = "Hello"
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 
-    fun `test change visual action`() {
-        typeTextInFile(parseKeys("v2lc", "aaa", "<ESC>"),
-                "abcd${c}ffffff${c}abcde${c}aaaa\n")
-        assertMode(CommandState.Mode.COMMAND)
-        myFixture.checkResult("abcdaa${c}afffaa${c}adeaa${c}aa\n")
-    }
+  fun `test change visual action`() {
+    typeTextInFile(parseKeys("v2lc", "aaa", "<ESC>"),
+      "abcd${c}ffffff${c}abcde${c}aaaa\n")
+    assertMode(CommandState.Mode.COMMAND)
+    myFixture.checkResult("abcdaa${c}afffaa${c}adeaa${c}aa\n")
+  }
 
-    // VIM-1379 |CTRL-V| |j| |v_b_c|
-    fun `test change visual block with empty line in the middle`() {
-        doTest(parseKeys("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
-                "foo foo\n" +
-                        "\n" +
-                        "bar bar\n",
-                ("fo_quux_foo\n" +
-                        "\n" +
-                        "ba_quux_bar\n"),
-                CommandState.Mode.COMMAND,
-                CommandState.SubMode.NONE)
-    }
+  // VIM-1379 |CTRL-V| |j| |v_b_c|
+  fun `test change visual block with empty line in the middle`() {
+    doTest(parseKeys("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
+      "foo foo\n" +
+        "\n" +
+        "bar bar\n",
+      ("fo_quux_foo\n" +
+        "\n" +
+        "ba_quux_bar\n"),
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+  }
 
 
-    // VIM-1379 |CTRL-V| |j| |v_b_c|
-    fun `test change visual block with shorter line in the middle`() {
-        doTest(parseKeys("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
-                "foo foo\n" +
-                        "x\n" +
-                        "bar bar\n",
-                ("fo_quux_foo\n" +
-                        "x\n" +
-                        "ba_quux_bar\n"),
-                CommandState.Mode.COMMAND,
-                CommandState.SubMode.NONE)
-    }
+  // VIM-1379 |CTRL-V| |j| |v_b_c|
+  fun `test change visual block with shorter line in the middle`() {
+    doTest(parseKeys("ll", "<C-V>", "ljjc", "_quux_", "<Esc>"),
+      "foo foo\n" +
+        "x\n" +
+        "bar bar\n",
+      ("fo_quux_foo\n" +
+        "x\n" +
+        "ba_quux_bar\n"),
+      CommandState.Mode.COMMAND,
+      CommandState.SubMode.NONE)
+  }
 }

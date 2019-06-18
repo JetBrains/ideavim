@@ -30,8 +30,7 @@ import com.maddyhome.idea.vim.helper.EditorData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- */
+
 public abstract class ChangeEditorActionHandler extends EditorActionHandlerBase {
   private boolean myIsMulticaretChangeAction;
   private CaretOrder myCaretOrder;

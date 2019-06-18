@@ -29,8 +29,7 @@ import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- */
+
 public class MotionRightTillMatchCharAction extends MotionEditorAction {
   public MotionRightTillMatchCharAction() {
     super(new Handler());

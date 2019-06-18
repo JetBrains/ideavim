@@ -28,8 +28,7 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import org.jetbrains.annotations.NotNull;
 
-/**
- */
+
 public class ToggleRecordingAction extends EditorAction {
   public ToggleRecordingAction() {
     super(new Handler());
