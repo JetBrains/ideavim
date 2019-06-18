@@ -112,7 +112,7 @@ class ExEntryTest: VimTestCase() {
         assertExOffset(13)
     }
 
-    fun `test delete character in front of caret`() {
+    fun `test backspace deletes character in front of caret`() {
         typeExInput(":set incsearch<BS>")
         assertExText("set incsearc")
 
@@ -120,7 +120,7 @@ class ExEntryTest: VimTestCase() {
         assertExText("set incsear")
     }
 
-    fun `test delete at start of text cancels entry`() {
+    fun `test backspace at start of text cancels entry`() {
         typeExInput(":<BS>")
         assertIsDeactivated()
 
@@ -143,10 +143,22 @@ class ExEntryTest: VimTestCase() {
         assertIsActive()
     }
 
-    fun `test delete character under caret`() {
+    fun `test delete deletes character under caret`() {
         typeExInput(":set<Left>")
         typeText("<Del>")
         assertExText("se")
+    }
+
+    fun `test delete at end of string deletes character to left of caret`() {
+        typeExInput(":set")
+        typeText("<Del>")
+        assertExText("se")
+    }
+
+    fun `test delete with no text cancels entry`() {
+        typeExInput(":set")
+        typeText("<Del><Del><Del><Del>")
+        assertIsDeactivated()
     }
 
     fun `test delete word before caret`() {

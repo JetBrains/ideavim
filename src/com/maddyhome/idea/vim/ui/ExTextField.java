@@ -133,6 +133,11 @@ public class ExTextField extends JTextField {
     }
   }
 
+  /**
+   * Stores the current text for use in filtering history. Required for scrolling through multiple history entries
+   *
+   * Called whenever the text is changed, either by typing, or by special characters altering the text (e.g. Delete)
+   */
   void saveLastEntry() {
     lastEntry = super.getText();
   }
