@@ -30,7 +30,7 @@ import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -57,7 +57,7 @@ final public class DeleteJoinVisualLinesSpacesAction extends VimCommandAction {
                                          @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
         if (editor.isOneLineMode()) return false;
 
-        if (Options.getInstance().isSet(Options.SMARTJOIN)) {
+        if (OptionsManager.INSTANCE.getSmartjoin().isSet()) {
           VimPlugin.getChange().joinViaIdeaBySelections(editor, context, caretsAndSelections);
           return true;
         }

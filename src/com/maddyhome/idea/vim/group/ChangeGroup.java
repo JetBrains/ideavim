@@ -59,7 +59,7 @@ import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
 import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.option.BoundListOption;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import kotlin.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -1837,7 +1837,7 @@ public class ChangeGroup {
                                         @NotNull TextRange selectedRange,
                                         final int count,
                                         boolean avalanche) {
-    BoundListOption nf = (BoundListOption)Options.getInstance().getOption("nrformats");
+    BoundListOption nf = OptionsManager.INSTANCE.getNrformats();
     boolean alpha = nf.contains("alpha");
     boolean hex = nf.contains("hex");
     boolean octal = nf.contains("octal");
@@ -1877,7 +1877,7 @@ public class ChangeGroup {
   private List<Object> lastStrokes;
 
   public boolean changeNumber(@NotNull final Editor editor, @NotNull Caret caret, final int count) {
-    final BoundListOption nf = (BoundListOption)Options.getInstance().getOption("nrformats");
+    final BoundListOption nf = OptionsManager.INSTANCE.getNrformats();
     final boolean alpha = nf.contains("alpha");
     final boolean hex = nf.contains("hex");
     final boolean octal = nf.contains("octal");

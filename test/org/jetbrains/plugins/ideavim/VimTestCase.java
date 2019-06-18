@@ -42,7 +42,7 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
 import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.option.ToggleOption;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import org.jetbrains.annotations.NotNull;
@@ -75,7 +75,7 @@ public abstract class VimTestCase extends UsefulTestCase {
     myFixture.setUp();
     myFixture.setTestDataPath(getTestDataPath());
     KeyHandler.getInstance().fullReset(myFixture.getEditor());
-    Options.getInstance().resetAllOptions();
+    OptionsManager.INSTANCE.resetAllOptions();
     VimPlugin.getKey().resetKeyMappings();
 
     // Make sure the entry text field gets a bounds, or we won't be able to work out caret location
@@ -98,7 +98,7 @@ public abstract class VimTestCase extends UsefulTestCase {
 
   protected void enableExtensions(@NotNull String... extensionNames) {
     for (String name : extensionNames) {
-      ToggleOption option = (ToggleOption)Options.getInstance().getOption(name);
+      ToggleOption option = (ToggleOption) OptionsManager.INSTANCE.getOption(name);
       option.set();
     }
   }

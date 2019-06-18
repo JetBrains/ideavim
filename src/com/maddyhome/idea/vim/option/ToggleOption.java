@@ -68,6 +68,10 @@ public class ToggleOption extends Option {
     update(!value);
   }
 
+  public boolean isSet() {
+    return value;
+  }
+
   /**
    * Helper to set the value only it is changing and notify listeners
    *

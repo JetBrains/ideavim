@@ -50,7 +50,7 @@ import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.option.NumberOption;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import kotlin.ranges.IntProgression;
 import org.jetbrains.annotations.NotNull;
@@ -221,7 +221,7 @@ public class MotionGroup {
       newline = EditorHelper.normalizeVisualLine(editor, bottomVisualLine - scrollOffset);
     }
 
-    int sideScrollOffset = ((NumberOption)Options.getInstance().getOption("sidescrolloff")).value();
+    int sideScrollOffset = OptionsManager.INSTANCE.getSidescrolloff().value();
     int width = EditorHelper.getScreenWidth(editor);
     if (sideScrollOffset > width / 2) {
       sideScrollOffset = width / 2;
@@ -304,7 +304,7 @@ public class MotionGroup {
   }
 
   private static int getScrollOption(int rawCount) {
-    NumberOption scroll = (NumberOption)Options.getInstance().getOption("scroll");
+    NumberOption scroll = OptionsManager.INSTANCE.getScroll();
     if (rawCount == 0) {
       return scroll.value();
     }
@@ -314,7 +314,7 @@ public class MotionGroup {
   }
 
   private static int getNormalizedScrollOffset(@NotNull final Editor editor) {
-    int scrollOffset = ((NumberOption)Options.getInstance().getOption("scrolloff")).value();
+    int scrollOffset = OptionsManager.INSTANCE.getScrolloff().value();
     return EditorHelper.normalizeScrollOffset(editor, scrollOffset);
   }
 
@@ -668,11 +668,11 @@ public class MotionGroup {
     final int column = position.column;
 
     // We need the non-normalised value here, so we can handle cases such as so=999 to keep the current line centred
-    int scrollOffset = ((NumberOption)Options.getInstance().getOption("scrolloff")).value();
+    int scrollOffset = OptionsManager.INSTANCE.getScrolloff().value();
 
     int scrollJumpSize = 0;
     if (scrollJump) {
-      scrollJumpSize = Math.max(0, ((NumberOption)Options.getInstance().getOption("scrolljump")).value() - 1);
+      scrollJumpSize = Math.max(0, OptionsManager.INSTANCE.getScrolljump().value() - 1);
     }
 
     int visualTop = topVisualLine + scrollOffset;
@@ -722,10 +722,10 @@ public class MotionGroup {
     int visualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
     int width = EditorHelper.getScreenWidth(editor);
     scrollJump = !CommandState.getInstance(editor).getFlags().contains(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP);
-    scrollOffset = ((NumberOption)Options.getInstance().getOption("sidescrolloff")).value();
+    scrollOffset = OptionsManager.INSTANCE.getScrolloff().value();
     scrollJumpSize = 0;
     if (scrollJump) {
-      scrollJumpSize = Math.max(0, ((NumberOption)Options.getInstance().getOption("sidescroll")).value() - 1);
+      scrollJumpSize = Math.max(0, OptionsManager.INSTANCE.getSidescroll().value() - 1);
       if (scrollJumpSize == 0) {
         scrollJumpSize = width / 2;
       }
@@ -899,7 +899,7 @@ public class MotionGroup {
   }
 
   private void scrollColumnToScreenColumn(@NotNull Editor editor, int column) {
-    int scrollOffset = ((NumberOption)Options.getInstance().getOption("sidescrolloff")).value();
+    int scrollOffset = OptionsManager.INSTANCE.getSidescrolloff().value();
     int width = EditorHelper.getScreenWidth(editor);
     if (scrollOffset > width / 2) {
       scrollOffset = width / 2;

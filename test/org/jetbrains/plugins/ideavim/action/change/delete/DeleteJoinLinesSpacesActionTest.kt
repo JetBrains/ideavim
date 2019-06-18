@@ -20,13 +20,13 @@ package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.option.Options
+import com.maddyhome.idea.vim.option.SmartJoinOptionsData
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
 import org.jetbrains.plugins.ideavim.VimToggleConfig
 import org.jetbrains.plugins.ideavim.VimToggleOptionTestConfiguration
 
-class DeleteJoinLinesSpacesActionTest : VimOptionTestCase(Options.SMARTJOIN) {
-  @VimToggleOptionTestConfiguration(VimToggleConfig(Options.SMARTJOIN, true))
+class DeleteJoinLinesSpacesActionTest : VimOptionTestCase(SmartJoinOptionsData.name) {
+  @VimToggleOptionTestConfiguration(VimToggleConfig(SmartJoinOptionsData.name, true))
   fun `test join with idea`() {
     doTest(StringHelper.parseKeys("J"),
       """
@@ -48,7 +48,7 @@ class DeleteJoinLinesSpacesActionTest : VimOptionTestCase(Options.SMARTJOIN) {
       CommandState.SubMode.NONE)
   }
 
-  @VimToggleOptionTestConfiguration(VimToggleConfig(Options.SMARTJOIN, true))
+  @VimToggleOptionTestConfiguration(VimToggleConfig(SmartJoinOptionsData.name, true))
   fun `test join with idea with count`() {
     doTest(StringHelper.parseKeys("3J"),
       """
@@ -69,7 +69,7 @@ class DeleteJoinLinesSpacesActionTest : VimOptionTestCase(Options.SMARTJOIN) {
       CommandState.SubMode.NONE)
   }
 
-  @VimToggleOptionTestConfiguration(VimToggleConfig(Options.SMARTJOIN, true))
+  @VimToggleOptionTestConfiguration(VimToggleConfig(SmartJoinOptionsData.name, true))
   fun `test join with idea with large count`() {
     doTest(StringHelper.parseKeys("10J"),
       """

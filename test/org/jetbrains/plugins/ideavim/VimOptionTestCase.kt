@@ -19,7 +19,7 @@
 package org.jetbrains.plugins.ideavim
 
 import com.maddyhome.idea.vim.option.ListOption
-import com.maddyhome.idea.vim.option.Options
+import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.ToggleOption
 import junit.framework.TestCase
 
@@ -56,7 +56,7 @@ abstract class VimOptionTestCase(option: String, vararg otherOptions: String) : 
       if (annotationsValuesSet != options) TestCase.fail("You should present all options in annotations")
 
       listAnnotation?.value?.forEach {
-        val option = Options.getInstance().getOption(it.option)
+        val option = OptionsManager.getOption(it.option)
         if (option !is ListOption) {
           TestCase.fail("Only list options are supported")
           return
@@ -65,7 +65,7 @@ abstract class VimOptionTestCase(option: String, vararg otherOptions: String) : 
         option.set(it.values.joinToString(","))
       }
       toggle?.value?.forEach {
-        val option = Options.getInstance().getOption(it.option)
+        val option = OptionsManager.getOption(it.option)
         if (option !is ToggleOption) {
           TestCase.fail("Only list options are supported")
           return

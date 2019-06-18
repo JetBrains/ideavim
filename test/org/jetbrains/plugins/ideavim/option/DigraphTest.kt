@@ -20,16 +20,16 @@ package org.jetbrains.plugins.ideavim.option
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.Options
-import com.maddyhome.idea.vim.option.ToggleOption
+import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
  * @author Alex Plate
  */
+// TODO: 2019-06-18 VimOptionsTestCase
 class DigraphTest : VimTestCase() {
   fun `test digraph`() {
-    (Options.getInstance().getOption("digraph") as ToggleOption).set()
+    OptionsManager.digraph.set()
 
     doTest(parseKeys("i B<BS>B"), """
             A Discovery
@@ -49,7 +49,7 @@ class DigraphTest : VimTestCase() {
   }
 
   fun `test digraph stops`() {
-    (Options.getInstance().getOption("digraph") as ToggleOption).set()
+    OptionsManager.digraph.set()
 
     doTest(parseKeys("i B<BS>BHello"), """
             A Discovery
@@ -69,7 +69,7 @@ class DigraphTest : VimTestCase() {
   }
 
   fun `test digraph double backspace`() {
-    (Options.getInstance().getOption("digraph") as ToggleOption).set()
+    OptionsManager.digraph.set()
 
     doTest(parseKeys("i B<BS><BS>B"), """
             A Discovery
@@ -89,7 +89,7 @@ class DigraphTest : VimTestCase() {
   }
 
   fun `test digraph backspace digraph`() {
-    (Options.getInstance().getOption("digraph") as ToggleOption).set()
+    OptionsManager.digraph.set()
 
     doTest(parseKeys("i B<BS>B<BS>B"), """
             A Discovery

@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.helper.RunnableHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.option.Options
+import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.ToggleOption
 import org.jetbrains.plugins.ideavim.VimTestCase
 import java.util.*
@@ -226,20 +226,18 @@ class SearchGroupTest : VimTestCase() {
   }
 
   private fun setIgnoreCaseAndSmartCase() {
-    val options = Options.getInstance()
-    options.resetAllOptions()
-    val ignoreCaseOption = options.getOption("ignorecase")
-    val smartCaseOption = options.getOption("smartcase")
+    OptionsManager.resetAllOptions()
+    val ignoreCaseOption = OptionsManager.ignorecase
+    val smartCaseOption = OptionsManager.smartcase
     UsefulTestCase.assertInstanceOf(ignoreCaseOption, ToggleOption::class.java)
     UsefulTestCase.assertInstanceOf(smartCaseOption, ToggleOption::class.java)
-    (ignoreCaseOption as ToggleOption).set()
-    (smartCaseOption as ToggleOption).set()
+    ignoreCaseOption.set()
+    smartCaseOption.set()
   }
 
   private fun setHighlightSearch() {
-    val options = Options.getInstance()
-    options.resetAllOptions()
-    val option = options.getOption("hlsearch") as ToggleOption
+    OptionsManager.resetAllOptions()
+    val option = OptionsManager.hlsearch
     UsefulTestCase.assertInstanceOf(option, ToggleOption::class.java)
     option.set()
   }

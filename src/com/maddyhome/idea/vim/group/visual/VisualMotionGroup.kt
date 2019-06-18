@@ -31,12 +31,21 @@ import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.helper.*
+import com.maddyhome.idea.vim.helper.EditorData
+import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.inBlockSubMode
+import com.maddyhome.idea.vim.helper.inSelectMode
+import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.subMode
+import com.maddyhome.idea.vim.helper.vimForEachCaret
+import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
+import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.helper.vimSelectionStartClear
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.listener.VimListenerManager
-import com.maddyhome.idea.vim.option.BoundStringOption
-import com.maddyhome.idea.vim.option.ListOption
-import com.maddyhome.idea.vim.option.Options
+import com.maddyhome.idea.vim.option.OptionsManager
 
 /**
  * @author Alex Plate
@@ -117,7 +126,7 @@ class VisualMotionGroup {
       }
       val autodetectedMode = autodetectVisualMode(editor)
       val project = editor.project
-      val selectMode = Options.getInstance().getListOption(Options.SELECTMODE) ?: ListOption.empty
+      val selectMode = OptionsManager.selectmode
       when {
         editor.isOneLineMode -> enterSelectMode(editor, autodetectedMode)
         selectionSource == VimListenerManager.SelectionSource.MOUSE && "mouse" in selectMode -> enterSelectMode(editor, autodetectedMode)
@@ -378,7 +387,7 @@ class VisualMotionGroup {
   }
 
   val exclusiveSelection: Boolean
-    get() = (Options.getInstance().getOption("selection") as BoundStringOption).value == "exclusive"
+    get() = OptionsManager.selection.value == "exclusive"
   val selectionAdj: Int
     get() = if (exclusiveSelection) 0 else 1
 }

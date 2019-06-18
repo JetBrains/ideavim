@@ -19,11 +19,11 @@
 package org.jetbrains.plugins.ideavim.action;
 
 import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.option.ListOption;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.plugins.ideavim.VimTestCase;
 
 import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
@@ -148,7 +148,7 @@ public class CopyActionTest extends VimTestCase {
   // VIM-476 |yy| |'clipboard'|
   public void testClipboardUnnamed() {
     assertEquals('\"', VimPlugin.getRegister().getDefaultRegister());
-    final ListOption clipboardOption = Options.getInstance().getListOption(Options.CLIPBOARD);
+    final ListOption clipboardOption = OptionsManager.INSTANCE.getClipboard();
     assertNotNull(clipboardOption);
     clipboardOption.set("unnamed");
     assertEquals('*', VimPlugin.getRegister().getDefaultRegister());

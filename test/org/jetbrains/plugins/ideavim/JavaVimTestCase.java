@@ -1,3 +1,21 @@
+/*
+ * IdeaVim - Vim emulator for IDEs based on the IntelliJ platform
+ * Copyright (C) 2003-2019 The IdeaVim authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.jetbrains.plugins.ideavim;
 
 import com.intellij.ide.highlighter.JavaFileType;
@@ -11,7 +29,7 @@ import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.helper.TestInputModel;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.option.ToggleOption;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +49,7 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
     super.setUp();
 
     KeyHandler.getInstance().fullReset(myFixture.getEditor());
-    Options.getInstance().resetAllOptions();
+    OptionsManager.INSTANCE.resetAllOptions();
     VimPlugin.getKey().resetKeyMappings();
   }
 
@@ -44,7 +62,8 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
 
   protected void enableExtensions(@NotNull String... extensionNames) {
     for (String name : extensionNames) {
-      ToggleOption option = (ToggleOption)Options.getInstance().getOption(name);
+      ToggleOption option = (ToggleOption)OptionsManager.INSTANCE.getOption(name);
+      assert option != null;
       option.set();
     }
   }

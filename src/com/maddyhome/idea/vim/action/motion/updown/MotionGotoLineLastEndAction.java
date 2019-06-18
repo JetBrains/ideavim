@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import com.maddyhome.idea.vim.helper.CommandStateHelper;
 import com.maddyhome.idea.vim.option.BoundStringOption;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,7 +47,7 @@ public class MotionGotoLineLastEndAction extends MotionEditorAction {
         allow = true;
       }
       else if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-        BoundStringOption opt = (BoundStringOption)Options.getInstance().getOption("selection");
+        BoundStringOption opt = OptionsManager.INSTANCE.getSelection();
         if (!opt.getValue().equals("old")) {
           allow = true;
         }

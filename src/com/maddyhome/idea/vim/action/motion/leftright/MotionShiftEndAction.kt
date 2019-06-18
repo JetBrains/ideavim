@@ -33,8 +33,7 @@ import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.option.BoundStringOption
-import com.maddyhome.idea.vim.option.Options
+import com.maddyhome.idea.vim.option.OptionsManager
 import java.util.*
 import javax.swing.KeyStroke
 
@@ -46,7 +45,7 @@ class MotionShiftEndAction : VimCommandAction() {
         if (editor.inInsertMode) {
           allow = true
         } else if (editor.inVisualMode || editor.inSelectMode) {
-          val opt = Options.getInstance().getOption("selection") as BoundStringOption
+          val opt = OptionsManager.selection
           if (opt.value != "old") {
             allow = true
           }

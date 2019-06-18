@@ -41,7 +41,7 @@ import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
 import com.maddyhome.idea.vim.option.ListOption;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import one.util.streamex.StreamEx;
 import org.jetbrains.annotations.NotNull;
@@ -201,8 +201,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
   }
 
   private boolean passCommandToVimWithLookup(@NotNull KeyStroke keyStroke) {
-    final ListOption popupActions = Options.getInstance().getListOption(Options.LOOKUPACTIONS);
-    if (popupActions == null) return false;
+    final ListOption popupActions = OptionsManager.INSTANCE.getLookupActions();
     final List<String> values = popupActions.values();
     if (values == null) return false;
 

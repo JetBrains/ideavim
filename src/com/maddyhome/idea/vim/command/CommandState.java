@@ -23,7 +23,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.key.ParentNode;
 import com.maddyhome.idea.vim.option.NumberOption;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -122,10 +122,8 @@ public class CommandState {
   }
 
   public void startMappingTimer(@NotNull ActionListener actionListener) {
-    final NumberOption timeoutLength = Options.getInstance().getNumberOption("timeoutlen");
-    if (timeoutLength != null) {
-      myMappingTimer.setInitialDelay(timeoutLength.value());
-    }
+    final NumberOption timeoutLength = OptionsManager.INSTANCE.getTimeoutlen();
+    myMappingTimer.setInitialDelay(timeoutLength.value());
     for (ActionListener listener : myMappingTimer.getActionListeners()) {
       myMappingTimer.removeActionListener(listener);
     }
@@ -286,7 +284,7 @@ public class CommandState {
 
   private void updateStatus() {
     final StringBuilder msg = new StringBuilder();
-    if (Options.getInstance().isSet("showmode")) {
+    if (OptionsManager.INSTANCE.getShowmode().isSet()) {
       msg.append(getStatusString(myStates.size() - 1));
     }
 
@@ -301,20 +299,11 @@ public class CommandState {
   }
 
   public enum Mode {
-    COMMAND,
-    INSERT,
-    REPLACE,
-    REPEAT,
-    VISUAL, SELECT,
-    EX_ENTRY
+    COMMAND, INSERT, REPLACE, REPEAT, VISUAL, SELECT, EX_ENTRY
   }
 
   public enum SubMode {
-    NONE,
-    SINGLE_COMMAND,
-    VISUAL_CHARACTER,
-    VISUAL_LINE,
-    VISUAL_BLOCK
+    NONE, SINGLE_COMMAND, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
   }
 
   private class State {

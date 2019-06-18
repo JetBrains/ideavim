@@ -25,7 +25,7 @@ import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,7 +48,7 @@ public class DeleteJoinLinesAction extends EditorAction {
                            @Nullable Argument argument) {
       if (editor.isOneLineMode()) return false;
 
-      if (Options.getInstance().isSet(Options.SMARTJOIN)) {
+      if (OptionsManager.INSTANCE.getSmartjoin().isSet()) {
         return VimPlugin.getChange().joinViaIdeaByCount(editor, context, count);
       }
 

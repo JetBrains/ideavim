@@ -20,7 +20,7 @@ package org.jetbrains.plugins.ideavim.ex
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper
-import com.maddyhome.idea.vim.option.Options
+import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.ui.ExDocument
 import com.maddyhome.idea.vim.ui.ExEntryPanel
 import org.jetbrains.plugins.ideavim.VimTestCase
@@ -34,50 +34,46 @@ class ExEntryTest : VimTestCase() {
   }
 
   fun `test cancel entry`() {
-    val options = Options.getInstance()
-
-    assertFalse(options.isSet(Options.INCREMENTAL_SEARCH))
+    assertFalse(OptionsManager.incsearch.isSet)
     typeExInput(":set incsearch<Esc>")
-    assertFalse(options.isSet(Options.INCREMENTAL_SEARCH))
+    assertFalse(OptionsManager.incsearch.isSet)
     assertIsDeactivated()
 
     deactivateExEntry()
 
-    assertFalse(options.isSet(Options.INCREMENTAL_SEARCH))
+    assertFalse(OptionsManager.incsearch.isSet)
     typeExInput(":set incsearch<C-[>")
-    assertFalse(options.isSet(Options.INCREMENTAL_SEARCH))
+    assertFalse(OptionsManager.incsearch.isSet)
     assertIsDeactivated()
 
     deactivateExEntry()
 
-    assertFalse(options.isSet(Options.INCREMENTAL_SEARCH))
+    assertFalse(OptionsManager.incsearch.isSet)
     typeExInput(":set incsearch<C-C>")
-    assertFalse(options.isSet(Options.INCREMENTAL_SEARCH))
+    assertFalse(OptionsManager.incsearch.isSet)
     assertIsDeactivated()
   }
 
   fun `test complete entry`() {
-    val options = Options.getInstance()
-
-    assertFalse(options.isSet(Options.INCREMENTAL_SEARCH))
+    assertFalse(OptionsManager.incsearch.isSet)
     typeExInput(":set incsearch<Enter>")
-    assertTrue(options.isSet(Options.INCREMENTAL_SEARCH))
+    assertTrue(OptionsManager.incsearch.isSet)
     assertIsDeactivated()
 
     deactivateExEntry()
-    options.resetAllOptions()
+    OptionsManager.resetAllOptions()
 
-    assertFalse(options.isSet(Options.INCREMENTAL_SEARCH))
+    assertFalse(OptionsManager.incsearch.isSet)
     typeExInput(":set incsearch<C-J>")
-    assertTrue(options.isSet(Options.INCREMENTAL_SEARCH))
+    assertTrue(OptionsManager.incsearch.isSet)
     assertIsDeactivated()
 
     deactivateExEntry()
-    options.resetAllOptions()
+    OptionsManager.resetAllOptions()
 
-    assertFalse(Options.getInstance().isSet(Options.INCREMENTAL_SEARCH))
+    assertFalse(OptionsManager.incsearch.isSet)
     typeExInput(":set incsearch<C-M>")
-    assertTrue(Options.getInstance().isSet(Options.INCREMENTAL_SEARCH))
+    assertTrue(OptionsManager.incsearch.isSet)
     assertIsDeactivated()
   }
 

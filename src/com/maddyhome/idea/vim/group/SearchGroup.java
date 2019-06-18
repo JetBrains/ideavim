@@ -44,7 +44,7 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.ListOption;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.regexp.CharHelper;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.CharacterClasses;
@@ -170,7 +170,7 @@ public class SearchGroup {
       cmd.inc();
     }
     else {
-      do_all = Options.getInstance().isSet("gdefault");
+      do_all = OptionsManager.INSTANCE.getGdefault().isSet();
       do_ask = false;
       do_error = true;
       //do_print = false;
@@ -447,8 +447,8 @@ public class SearchGroup {
   }
 
   private static boolean shouldIgnoreCase(@NotNull String pattern, boolean noSmartCase) {
-    boolean sc = !noSmartCase && Options.getInstance().isSet("smartcase");
-    boolean ic = Options.getInstance().isSet("ignorecase");
+    boolean sc = !noSmartCase && OptionsManager.INSTANCE.getSmartcase().isSet();
+    boolean ic = OptionsManager.INSTANCE.getIgnorecase().isSet();
 
     return ic && !(sc && StringHelper.containsUpperCase(pattern));
   }
@@ -577,7 +577,7 @@ public class SearchGroup {
   }
 
   private void searchHighlight(boolean noSmartCase) {
-    showSearchHighlight = Options.getInstance().isSet("hlsearch");
+    showSearchHighlight = OptionsManager.INSTANCE.getHlsearch().isSet();
     highlightSearch(noSmartCase);
   }
 
@@ -635,7 +635,7 @@ public class SearchGroup {
       }
       return d2 - d1;
     });
-    if (!Options.getInstance().isSet("wrapscan")) {
+    if (!OptionsManager.INSTANCE.getWrapscan().isSet()) {
       final int start = max.getStartOffset();
       if (forwards && start < offset) {
         return null;
@@ -775,7 +775,7 @@ public class SearchGroup {
 
   private int findItOffset(@NotNull Editor editor, int startOffset, int count, int dir,
                            boolean noSmartCase) {
-    boolean wrap = Options.getInstance().isSet("wrapscan");
+    boolean wrap = OptionsManager.INSTANCE.getWrapscan().isSet();
     TextRange range = findIt(editor, startOffset, count, dir, noSmartCase, wrap, true, true);
     if (range == null) {
       return -1;
@@ -1224,9 +1224,9 @@ public class SearchGroup {
     lastDir = Integer.parseInt(dir.getText());
 
     Element show = search.getChild("show-last");
-    final ListOption vimInfo = Options.getInstance().getListOption(Options.VIMINFO);
-    final boolean disableHighlight = vimInfo != null && vimInfo.contains("h");
-    showSearchHighlight = !disableHighlight && Boolean.valueOf(show.getText());
+    final ListOption vimInfo = OptionsManager.INSTANCE.getViminfo();
+    final boolean disableHighlight = vimInfo.contains("h");
+    showSearchHighlight = !disableHighlight && Boolean.parseBoolean(show.getText());
     if (logger.isDebugEnabled()) {
       logger.debug("show=" + show + "(" + show.getText() + ")");
       logger.debug("showSearchHighlight=" + showSearchHighlight);
@@ -1315,7 +1315,7 @@ public class SearchGroup {
   @Nullable private String lastReplace;
   @Nullable private String lastOffset;
   private int lastDir;
-  private boolean showSearchHighlight = Options.getInstance().isSet("hlsearch");
+  private boolean showSearchHighlight = OptionsManager.INSTANCE.getHlsearch().isSet();
 
   private boolean do_all = false; /* do multiple substitutions per line */
   private boolean do_ask = false; /* ask for confirmation */

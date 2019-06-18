@@ -31,7 +31,8 @@ import com.intellij.testFramework.fixtures.CodeInsightTestUtil.doInlineRename
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.listener.VimListenerManager
-import com.maddyhome.idea.vim.option.Options
+import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.option.SelectModeOptionData
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -93,7 +94,7 @@ class TemplateTest : VimTestCase() {
   }
 
   fun `test selectmode without template`() {
-    Options.getInstance().getListOption(Options.SELECTMODE)!!.remove("template")
+    OptionsManager.selectmode.remove(SelectModeOptionData.template)
     configureByJavaText("""
             class Hello {
                 public static void main() {

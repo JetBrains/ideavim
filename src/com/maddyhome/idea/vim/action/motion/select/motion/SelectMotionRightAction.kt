@@ -28,8 +28,8 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.MotionActionHandler
-import com.maddyhome.idea.vim.option.Options
-import com.maddyhome.idea.vim.option.Options.KEYMODEL
+import com.maddyhome.idea.vim.option.KeyModelOptionData
+import com.maddyhome.idea.vim.option.OptionsManager
 import javax.swing.KeyStroke
 
 /**
@@ -39,8 +39,8 @@ import javax.swing.KeyStroke
 class SelectMotionRightAction : VimCommandAction() {
   override fun makeActionHandler() = object : MotionActionHandler.ForEachCaret() {
     override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
-      val keymodel = Options.getInstance().getListOption(KEYMODEL)
-      if (keymodel?.contains("stopsel") == true || keymodel?.contains("stopselect") == true) {
+      val keymodel = OptionsManager.keymodel
+      if (KeyModelOptionData.stopsel in keymodel || KeyModelOptionData.stopselect in keymodel) {
         VimPlugin.getVisualMotion().exitSelectMode(editor, false)
         TemplateManager.getInstance(editor.project)
           .getActiveTemplate(editor)?.run { VimPlugin.getChange().insertBeforeCursor(editor, context) }

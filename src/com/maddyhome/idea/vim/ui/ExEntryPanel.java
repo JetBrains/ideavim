@@ -33,7 +33,7 @@ import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.group.SearchGroup;
 import com.maddyhome.idea.vim.helper.UiHelper;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -258,7 +258,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
   }
 
   private boolean isIncSearchEnabled(@NotNull String labelText) {
-    return (labelText.equals("/") || labelText.equals("?")) && Options.getInstance().isSet(Options.INCREMENTAL_SEARCH);
+    return (labelText.equals("/") || labelText.equals("?")) && OptionsManager.INSTANCE.getIncsearch().isSet();
   }
 
   /**

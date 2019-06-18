@@ -40,7 +40,7 @@ import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.RunnableHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.key.*;
-import com.maddyhome.idea.vim.option.Options;
+import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -215,7 +215,7 @@ public class KeyHandler {
         shouldRecord = handleArgumentNode(editor, key, context, editorState, (ArgumentNode)node);
       }
       else {
-        if (lastWasBS && lastChar != 0 && Options.getInstance().isSet("digraph")) {
+        if (lastWasBS && lastChar != 0 && OptionsManager.INSTANCE.getDigraph().isSet()) {
           char dig = VimPlugin.getDigraph().getDigraph(lastChar, key.getKeyChar());
           key = KeyStroke.getKeyStroke(dig);
         }
@@ -324,7 +324,7 @@ public class KeyHandler {
 
     if (mapping.isPrefix(fromKeys)) {
       mappingKeys.add(key);
-      if (!application.isUnitTestMode() && Options.getInstance().isSet(Options.TIMEOUT)) {
+      if (!application.isUnitTestMode() && OptionsManager.INSTANCE.getTimeout().isSet()) {
         commandState.startMappingTimer(actionEvent -> application.invokeLater(() -> {
           mappingKeys.clear();
           if (editor.isDisposed()) {
@@ -778,11 +778,7 @@ public class KeyHandler {
   }
 
   private enum State {
-    NEW_COMMAND,
-    COMMAND,
-    READY,
-    ERROR,
-    BAD_COMMAND
+    NEW_COMMAND, COMMAND, READY, ERROR, BAD_COMMAND
   }
 
   private int count;
