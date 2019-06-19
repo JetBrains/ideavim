@@ -332,6 +332,11 @@ public class MarkGroup {
     }
   }
 
+  public void resetAllMarks() {
+    globalMarks.clear();
+    fileMarks.clear();
+  }
+
   private void removeMark(char ch, @NotNull Mark mark, @NotNull Editor editor) {
     if (FILE_MARKS.indexOf(ch) >= 0) {
       HashMap fmarks = getFileMarks(mark.getFilename());
@@ -748,9 +753,18 @@ public class MarkGroup {
 
       if (GLOBAL_MARKS.indexOf(b.getMnemonic()) != -1) {
         try {
+          OptionsManager.INSTANCE.getIdemarks().reset();
           final FileEditorManager fileEditorManager = FileEditorManager.getInstance(myProject);
           final Editor editor = EditorHelper.getEditor(fileEditorManager, b.getFile());
           if (editor == null) return;
+
+          final Mark existing = VimPlugin.getMark().getMark(editor, b.getMnemonic());
+          if (existing != null
+              && existing.getFilename() != null
+              && existing.getFilename().equals(b.getFile().getCanonicalPath())
+              && existing.getLogicalLine() == b.getLine()) {
+            return;
+          }
 
           VimPlugin.getMark().setMark(editor, b.getMnemonic(),
                                       VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, b.getLine()));
@@ -786,7 +800,6 @@ public class MarkGroup {
       if (!VimPlugin.isEnabled() || !OptionsManager.INSTANCE.getIdemarks().isSet()) return;
 
       if (GLOBAL_MARKS.indexOf(b.getMnemonic()) != -1) {
-        this.bookmarkRemoved(b);
         this.bookmarkAdded(b);
       }
     }

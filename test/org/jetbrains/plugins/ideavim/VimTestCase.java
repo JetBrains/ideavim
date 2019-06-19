@@ -93,6 +93,7 @@ public abstract class VimTestCase extends UsefulTestCase {
     ExEntryPanel.getInstance().deactivate(false);
     VimScriptGlobalEnvironment.getInstance().getVariables().clear();
     VimPlugin.getRegister().resetRegisters();
+    VimPlugin.getMark().resetAllMarks();
     super.tearDown();
   }
 

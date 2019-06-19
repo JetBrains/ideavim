@@ -77,6 +77,22 @@ class MotionMarkActionTest : VimOptionTestCase(IdeMarskOptionsData.name) {
   }
 
   @VimToggleOptionTestConfiguration(VimToggleConfig(IdeMarskOptionsData.name, true))
+  fun `test move to another line`() {
+    val keys = StringHelper.parseKeys("mAjj", "mA")
+    val text = """
+            A Discovery
+
+            I ${c}found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+    configureByText(text)
+    typeText(keys)
+    checkMarks('A' to 4)
+  }
+
+  @VimToggleOptionTestConfiguration(VimToggleConfig(IdeMarskOptionsData.name, true))
   fun `test simple system mark`() {
     val text = """
             A Discovery
@@ -97,6 +113,38 @@ class MotionMarkActionTest : VimOptionTestCase(IdeMarskOptionsData.name) {
     val vimMarks = VimPlugin.getMark().getMarks(myFixture.editor)
     TestCase.assertEquals(1, vimMarks.size)
     TestCase.assertEquals('A', vimMarks[0].key)
+  }
+
+  @VimToggleOptionTestConfiguration(VimToggleConfig(IdeMarskOptionsData.name, true))
+  fun `test system mark move to another line`() {
+    val text = """
+            A Discovery
+
+            I ${c}found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+    configureByText(text)
+    var bookmarkManager = BookmarkManager.getInstance(myFixture.project)
+    bookmarkManager.addEditorBookmark(myFixture.editor, 2)
+    var bookmark = bookmarkManager.findEditorBookmark(myFixture.editor.document, 2) ?: run {
+      TestCase.fail()
+      return
+    }
+    bookmarkManager.setMnemonic(bookmark, 'A')
+
+    bookmarkManager = BookmarkManager.getInstance(myFixture.project)
+    bookmarkManager.addEditorBookmark(myFixture.editor, 4)
+    bookmark = bookmarkManager.findEditorBookmark(myFixture.editor.document, 4) ?: run {
+      TestCase.fail()
+      return
+    }
+    bookmarkManager.setMnemonic(bookmark, 'A')
+    val vimMarks = VimPlugin.getMark().getMarks(myFixture.editor)
+    TestCase.assertEquals(1, vimMarks.size)
+    TestCase.assertEquals('A', vimMarks[0].key)
+    TestCase.assertEquals(4, vimMarks[0].logicalLine)
   }
 
   private fun checkMarks(vararg marks: Pair<Char, Int>) {
