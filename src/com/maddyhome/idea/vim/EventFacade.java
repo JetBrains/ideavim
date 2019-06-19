@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim;
 import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.codeInsight.template.TemplateManager;
 import com.intellij.codeInsight.template.TemplateManagerListener;
+import com.intellij.ide.bookmarks.BookmarksListener;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.ShortcutSet;
@@ -152,6 +153,11 @@ public class EventFacade {
 
   public void registerLookupListener(@NotNull Project project, @NotNull PropertyChangeListener propertyChangeListener) {
     LookupManager.getInstance(project).addPropertyChangeListener(propertyChangeListener, project);
+  }
+
+  public void registerBookmarkListener(@NotNull Project project, @NotNull BookmarksListener bookmarksListener) {
+    final MessageBusConnection connection = project.getMessageBus().connect();
+    connection.subscribe(BookmarksListener.TOPIC, bookmarksListener);
   }
 
   @NotNull

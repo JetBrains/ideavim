@@ -68,6 +68,7 @@ object OptionsManager {
   val keymodel = addOption(KeyModelOptionData.option)
   val lookupActions = addOption(ListOption("lookupactions", "lookupactions", arrayOf("VimLookupUp", "VimLookupDown"), null))
   val smartjoin = addOption(SmartJoinOptionsData.option)
+  val idemarks = addOption(IdeMarskOptionsData.option)
 
   init {
     registerExtensionOptions()
@@ -414,3 +415,9 @@ object SmartJoinOptionsData {
   val option = ToggleOption(name, name, defaultValue)
 }
 
+object IdeMarskOptionsData {
+  const val name = "idemarks"
+  const val defaultValue = true
+
+  val option = ToggleOption(name, name, defaultValue)
+}

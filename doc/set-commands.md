@@ -13,6 +13,12 @@ The following `:set` commands can appear in `~/.ideavimrc` or set manually in th
     'gdefault'       'gd'       the ":substitute" flag 'g' is default on
     'history'        'hi'       number of command-lines that are remembered
     'hlsearch'       'hls'      highlight matches with last search pattern
+    
+    `idemarks`       `idemarks` Boolean (default true)     - IdeaVim ONLY         [To Be Released]
+    
+                     If true, creation of global mark will trigger creation of IDE's bookmark
+                     and vice versa.
+    
     'ignorecase'     'ic'       ignore case in search patterns
     'iskeyword'      'isk'      defines keywords for commands like 'w', '*', etc.
     'incsearch'      'is'       show where search pattern typed so far matches
