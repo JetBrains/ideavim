@@ -87,6 +87,9 @@ To Be Released
   selection when clipboard is used
 * [VIM-714](https://youtrack.jetbrains.com/issue/VIM-714) Fixed problems with caret position by vertical movement
 * [VIM-635](https://youtrack.jetbrains.com/issue/VIM-635) Supported `gn` commands
+* [VIM-1626](https://youtrack.jetbrains.com/issue/VIM-1626) Add `smartjoin` option
+* [VIM-959](https://youtrack.jetbrains.com/issue/VIM-1626) Add `idemarks` option
+* [VIM-608](https://youtrack.jetbrains.com/issue/VIM-608) Automatic upload files on explicit save
 
 0.51, 2019-02-12
 ----------------
