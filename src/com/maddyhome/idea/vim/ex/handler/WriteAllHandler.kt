@@ -30,7 +30,7 @@ class WriteAllHandler : CommandHandler.SingleExecution() {
   override val names = commands("wa[ll]")
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-    VimPlugin.getFile().saveFiles()
+    VimPlugin.getFile().saveFiles(context)
     return true
   }
 }

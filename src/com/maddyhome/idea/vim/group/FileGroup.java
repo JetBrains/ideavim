@@ -37,6 +37,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtilCore;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileVisitor;
+import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -163,15 +164,15 @@ public class FileGroup {
   /**
    * Saves specific file in the project.
    */
-  public void saveFile(@NotNull Editor editor) {
-    FileDocumentManager.getInstance().saveDocument(editor.getDocument());
+  public void saveFile(DataContext context) {
+    KeyHandler.executeAction("SaveDocument", context);
   }
 
   /**
    * Saves all files in the project.
    */
-  public void saveFiles() {
-    FileDocumentManager.getInstance().saveAllDocuments();
+  public void saveFiles(DataContext context) {
+    KeyHandler.executeAction("SaveAll", context);
   }
 
   /**
