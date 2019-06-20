@@ -32,7 +32,7 @@ class WritePreviousFileHandler : CommandHandler.SingleExecution() {
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val count = cmd.getCount(editor, context, 1, true)
 
-    VimPlugin.getFile().saveFile(editor)
+    VimPlugin.getFile().saveFile(context)
     VimPlugin.getMark().saveJumpLocation(editor)
     VimPlugin.getFile().selectNextFile(-count, context)
 

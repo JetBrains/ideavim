@@ -97,6 +97,7 @@ public abstract class VimTestCase extends UsefulTestCase {
     VimScriptGlobalEnvironment.getInstance().getVariables().clear();
     VimPlugin.getRegister().resetRegisters();
     VimPlugin.getSearch().resetState();
+    VimPlugin.getMark().resetAllMarks();
     super.tearDown();
   }
 

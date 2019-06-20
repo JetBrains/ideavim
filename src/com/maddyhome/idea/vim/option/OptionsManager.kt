@@ -64,10 +64,11 @@ object OptionsManager {
   val timeout = addOption(ToggleOption("timeout", "to", true))
   val viminfo = addOption(ListOption("viminfo", "vi", arrayOf("'100", "<50", "s10", "h"), null))
   val iskeyword = addOption(KeywordOption("iskeyword", "isk", arrayOf("@", "48-57", "_")))
-  val selectmode = addOption(BoundListOption(SelectModeOptionData.name, SelectModeOptionData.abbr, SelectModeOptionData.default, SelectModeOptionData.options))
-  val keymodel = addOption(BoundListOption(KeyModelOptionData.name, KeyModelOptionData.abbr, KeyModelOptionData.default, KeyModelOptionData.options))
+  val selectmode = addOption(SelectModeOptionData.option)
+  val keymodel = addOption(KeyModelOptionData.option)
   val lookupActions = addOption(ListOption("lookupactions", "lookupactions", arrayOf("VimLookupUp", "VimLookupDown"), null))
-  val smartjoin = addOption(ToggleOption(SmartJoinOptionsData.name, SmartJoinOptionsData.name, false))
+  val smartjoin = addOption(SmartJoinOptionsData.option)
+  val idemarks = addOption(IdeMarskOptionsData.option)
 
   init {
     registerExtensionOptions()
@@ -369,51 +370,54 @@ object OptionsManager {
   }
 }
 
-class KeyModelOptionData private constructor(){
-  companion object {
-    const val name = "keymodel"
-    const val abbr = "km"
+object KeyModelOptionData {
+  const val name = "keymodel"
+  const val abbr = "km"
 
-    const val startsel = "startsel"
-    const val stopsel = "stopsel"
-    const val stopselect = "stopselect"
-    const val stopvisual = "stopvisual"
-    const val continueselect = "continueselect"
-    const val continuevisual = "continuevisual"
+  const val startsel = "startsel"
+  const val stopsel = "stopsel"
+  const val stopselect = "stopselect"
+  const val stopvisual = "stopvisual"
+  const val continueselect = "continueselect"
+  const val continuevisual = "continuevisual"
 
-    val options = arrayOf(startsel, stopsel, stopselect, stopvisual, continueselect, continuevisual)
-    val default = arrayOf(continueselect, stopselect)
-  }
+  val options = arrayOf(startsel, stopsel, stopselect, stopvisual, continueselect, continuevisual)
+  val default = arrayOf(continueselect, stopselect)
+  val option = BoundListOption(name, abbr, default, options)
 }
 
-class SelectModeOptionData private constructor() {
-  companion object {
-    const val name = "selectmode"
-    const val abbr = "slm"
+object SelectModeOptionData {
+  const val name = "selectmode"
+  const val abbr = "slm"
 
-    const val mouse = "mouse"
-    const val key = "key"
-    const val cmd = "cmd"
-    const val template = "template"
-    const val refactoring = "refactoring"
+  const val mouse = "mouse"
+  const val key = "key"
+  const val cmd = "cmd"
+  const val template = "template"
+  const val refactoring = "refactoring"
 
-    val options = arrayOf(mouse, key, cmd, template, refactoring)
-    val default = arrayOf(template)
-  }
+  val options = arrayOf(mouse, key, cmd, template, refactoring)
+  val default = arrayOf(template)
+  val option = BoundListOption(name, abbr, default, options)
 }
 
-class ClipboardOptionsData private constructor() {
-  companion object {
-    const val name = "clipboard"
-    const val abbr = "cb"
+object ClipboardOptionsData {
+  const val name = "clipboard"
+  const val abbr = "cb"
 
-    const val ideaput = "ideaput"
-  }
+  const val ideaput = "ideaput"
 }
 
-class SmartJoinOptionsData private constructor() {
-  companion object {
-    const val name = "smartjoin"
-  }
+object SmartJoinOptionsData {
+  const val name = "smartjoin"
+  const val defaultValue = false
+
+  val option = ToggleOption(name, name, defaultValue)
 }
 
+object IdeMarskOptionsData {
+  const val name = "idemarks"
+  const val defaultValue = true
+
+  val option = ToggleOption(name, name, defaultValue)
+}

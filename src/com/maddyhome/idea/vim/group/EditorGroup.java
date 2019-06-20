@@ -18,6 +18,8 @@
 
 package com.maddyhome.idea.vim.group;
 
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.*;
@@ -54,6 +56,8 @@ public class EditorGroup {
   private boolean isRefrainFromScrolling = false;
   private Boolean isKeyRepeat = null;
 
+  private boolean isSmartJoinNotified = false;
+
   private final CaretListener myLineNumbersCaretListener = new CaretAdapter() {
     @Override
     public void caretPositionChanged(CaretEvent e) {
@@ -89,7 +93,8 @@ public class EditorGroup {
         if (VimPlugin.isEnabled()) {
           initLineNumbers(editor);
           // Turn on insert mode if editor doesn't have any file
-          if (!EditorData.isFileEditor(editor) && editor.getDocument().isWritable() &&
+          if (!EditorData.isFileEditor(editor) &&
+              editor.getDocument().isWritable() &&
               !CommandStateHelper.inInsertMode(editor)) {
             VimPlugin.getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
             KeyHandler.getInstance().reset(editor);
@@ -207,9 +212,13 @@ public class EditorGroup {
   }
 
   public void saveData(@NotNull Element element) {
+    final Element editor = new Element("editor");
+    element.addContent(editor);
+
+    final Element smartJoin = new Element("smart-join");
+    smartJoin.setAttribute("enabled", Boolean.toString(isSmartJoinNotified));
+    editor.addContent(smartJoin);
     if (isKeyRepeat != null) {
-      final Element editor = new Element("editor");
-      element.addContent(editor);
       final Element keyRepeat = new Element("key-repeat");
       keyRepeat.setAttribute("enabled", Boolean.toString(isKeyRepeat));
       editor.addContent(keyRepeat);
@@ -226,6 +235,13 @@ public class EditorGroup {
           isKeyRepeat = Boolean.valueOf(enabled);
         }
       }
+      final Element smartJoin = editor.getChild("smart-join");
+      if (smartJoin != null) {
+        final String enabled = smartJoin.getAttributeValue("enabled");
+        if (enabled != null) {
+          isSmartJoinNotified = Boolean.parseBoolean(enabled);
+        }
+      }
     }
   }
 
@@ -236,6 +252,16 @@ public class EditorGroup {
 
   public void setKeyRepeat(@Nullable Boolean value) {
     this.isKeyRepeat = value;
+  }
+
+  public void notifyAboutSmartJoin() {
+    if (isSmartJoinNotified || OptionsManager.INSTANCE.getSmartjoin().isSet()) return;
+
+    isSmartJoinNotified = true;
+
+    new Notification(VimPlugin.IDEAVIM_STICKY_NOTIFICATION_ID, VimPlugin.IDEAVIM_NOTIFICATION_TITLE,
+                     "Put \"<code>set smartjoin</code>\" into your <code>.ideavimrc</code> to perform a join via the IDE",
+                     NotificationType.INFORMATION).notify(null);
   }
 
   private static class LineNumbersGutterProvider implements TextAnnotationGutterProvider {

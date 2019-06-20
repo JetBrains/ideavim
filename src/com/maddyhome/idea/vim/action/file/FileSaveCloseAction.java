@@ -34,7 +34,7 @@ public class FileSaveCloseAction extends EditorAction {
 
   private static class Handler extends EditorActionHandlerBase {
     protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      VimPlugin.getFile().saveFile(editor);
+      VimPlugin.getFile().saveFile(context);
       VimPlugin.getFile().closeFile(editor, context);
 
       return true;
