@@ -41,7 +41,6 @@ class RegisterActions {
     registerInsertModeActions();
     registerNormalModeActions();
     registerNVOModesActions();
-    registerCommandLineActions();
     registerSystemMappings();
     registerMultisettingMappings();
   }
@@ -79,16 +78,6 @@ class RegisterActions {
                           Argument.Type.CHARACTER);
     parser.registerAction(MappingMode.VO, "VimMotionGotoFileMarkLine", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE),
                           new Shortcut("g'"), Argument.Type.CHARACTER);
-  }
-
-  private static void registerCommandLineActions() {
-    final KeyGroup parser = VimPlugin.getKey();
-    parser
-      .registerAction(MappingMode.C, "VimProcessExEntry", Command.Type.OTHER_READ_WRITE, EnumSet.of(CommandFlags.FLAG_COMPLETE_EX),
-                      new Shortcut[]{new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)),
-                        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.CTRL_MASK)),
-                        new Shortcut(KeyStroke.getKeyStroke((char)0x0a)),
-                        new Shortcut(KeyStroke.getKeyStroke((char)0x0d))});
   }
 
   /**
