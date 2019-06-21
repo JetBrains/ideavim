@@ -156,8 +156,7 @@ class RegisterActions {
       .registerAction(MappingMode.NVO, "VimMotionGotoLineLastEnd", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP),
                       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, KeyEvent.CTRL_MASK)));
     parser.registerAction(MappingMode.NVO, "VimMotionLastColumn", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE), new Shortcut[]{
-      new Shortcut('$'),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, 0))
+      new Shortcut('$')
     });
     parser.registerAction(MappingMode.NVO, "VimMotionLastScreenColumn", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE), new Shortcut[]{
       new Shortcut("g$"),

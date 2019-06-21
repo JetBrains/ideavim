@@ -64,7 +64,7 @@ class MotionEndAction : VimCommandAction() {
     }
   }
 
-  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVS
+  override val mappingModes: MutableSet<MappingMode> = MappingMode.NVOS
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<End>")
 
