@@ -20,30 +20,62 @@ package com.maddyhome.idea.vim.action.motion.visual;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
+import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 
-public class VisualToggleBlockModeAction extends EditorAction {
-  public VisualToggleBlockModeAction() {
-    super(new Handler());
+
+public class VisualToggleBlockModeAction extends VimCommandAction {
+  @NotNull
+  @Override
+  protected EditorActionHandler makeActionHandler() {
+    return new EditorActionHandlerBase() {
+      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+        final ListOption listOption = OptionsManager.INSTANCE.getSelectmode();
+        if (listOption.contains("cmd")) {
+          return VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_BLOCK);
+        }
+
+        return VimPlugin.getVisualMotion()
+          .toggleVisual(editor, cmd.getCount(), cmd.getRawCount(), CommandState.SubMode.VISUAL_BLOCK);
+      }
+    };
   }
 
-  private static class Handler extends EditorActionHandlerBase {
-    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      final ListOption listOption = OptionsManager.INSTANCE.getSelectmode();
-      if (listOption.contains("cmd")) {
-        return VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_BLOCK);
-      }
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.NV;
+  }
 
-      return VimPlugin.getVisualMotion()
-        .toggleVisual(editor, cmd.getCount(), cmd.getRawCount(), CommandState.SubMode.VISUAL_BLOCK);
-    }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("<C-q>", "<C-v>");
+  }
+
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.OTHER_READONLY;
+  }
+
+  @NotNull
+  @Override
+  public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_MOT_BLOCKWISE);
   }
 }

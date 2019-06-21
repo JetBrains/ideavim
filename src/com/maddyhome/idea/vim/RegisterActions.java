@@ -42,7 +42,8 @@ class RegisterActions {
     registerNormalModeActions();
     registerNVOModesActions();
     registerCommandLineActions();
-    registerVariousModesActions();
+    registerSystemMappings();
+    registerMultisettingMappings();
   }
 
   private static void registerVimCommandActions() {
@@ -55,52 +56,29 @@ class RegisterActions {
     }
   }
 
-  private static void registerVariousModesActions() {
+  private static void registerSystemMappings() {
     final KeyGroup parser = VimPlugin.getKey();
-    parser.registerAction(MappingMode.NV, "VimVisualToggleBlockMode", Command.Type.OTHER_READONLY,
-                          EnumSet.of(CommandFlags.FLAG_MOT_BLOCKWISE),
-                          new Shortcut[]{new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK)),
-                            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_MASK))}
-    );
-    parser.registerAction(MappingMode.NV, "VimMotionMark", Command.Type.OTHER_READONLY, new Shortcut('m'),
-                          Argument.Type.CHARACTER);
-    parser.registerAction(MappingMode.NV, "VimGotoDeclaration", Command.Type.OTHER_READONLY, EnumSet.of(CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut[]{new Shortcut("gD"), new Shortcut("gd"),
-                            // TODO: <C-]> is a tag command similar to gD, the tag stack is not implemented
-                            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_CLOSE_BRACKET, KeyEvent.CTRL_MASK)),}
-    );
-    parser.registerAction(MappingMode.NV, "VimFileGetLocationInfo", Command.Type.OTHER_READONLY, new Shortcut(
-                            new KeyStroke[]{KeyStroke.getKeyStroke('g'),
-                              KeyStroke.getKeyStroke(KeyEvent.VK_G, KeyEvent.CTRL_MASK)})
-    );
     parser.registerAction(MappingMode.NV, "CollapseAllRegions", Command.Type.OTHER_READONLY, new Shortcut("zM"));
     parser.registerAction(MappingMode.NV, "CollapseRegion", Command.Type.OTHER_READONLY, new Shortcut("zc"));
     parser.registerAction(MappingMode.NV, "CollapseRegionRecursively", Command.Type.OTHER_READONLY, new Shortcut("zC"));
     parser.registerAction(MappingMode.NV, "ExpandAllRegions", Command.Type.OTHER_READONLY, new Shortcut("zR"));
     parser.registerAction(MappingMode.NV, "ExpandRegion", Command.Type.OTHER_READONLY, new Shortcut("zo"));
     parser.registerAction(MappingMode.NV, "ExpandRegionRecursively", Command.Type.OTHER_READONLY, new Shortcut("zO"));
-    parser.registerAction(MappingMode.NV, "VimToggleRecording",
-                          Command.Type.OTHER_READONLY,
-                          EnumSet.of(CommandFlags.FLAG_NO_ARG_RECORDING),
-                          new Shortcut('q'), Argument.Type.CHARACTER);
+  }
 
+  private static void registerMultisettingMappings() {
+    final KeyGroup parser = VimPlugin.getKey();
     // Text Object Actions for Visual and Operator Pending Modes
     parser.registerAction(MappingMode.VO, "VimMotionGotoFileMark", Command.Type.MOTION,
                           EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP), new Shortcut('`'),
                           Argument.Type.CHARACTER);
+    parser.registerAction(MappingMode.VO, "VimMotionGotoFileMark", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE),
+                          new Shortcut("g`"), Argument.Type.CHARACTER);
     parser.registerAction(MappingMode.VO, "VimMotionGotoFileMarkLine", Command.Type.MOTION,
                           EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP), new Shortcut('\''),
                           Argument.Type.CHARACTER);
-    parser.registerAction(MappingMode.VO, "VimMotionGotoFileMark", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE),
-                          new Shortcut("g`"), Argument.Type.CHARACTER);
     parser.registerAction(MappingMode.VO, "VimMotionGotoFileMarkLine", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE),
                           new Shortcut("g'"), Argument.Type.CHARACTER);
-    parser.registerAction(MappingMode.VO, "VimMotionInnerParagraph", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_TEXT_BLOCK), new Shortcut("ip"));
-    parser.registerAction(MappingMode.NO, "VimResetMode", Command.Type.RESET, new Shortcut(new KeyStroke[]{
-      KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SLASH, KeyEvent.CTRL_MASK),
-      KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK)
-    }));
   }
 
   private static void registerCommandLineActions() {
