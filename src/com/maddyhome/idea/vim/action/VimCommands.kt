@@ -89,4 +89,6 @@ abstract class TextObjectAction : VimCommandAction() {
   }
 
   final override fun makeActionHandler() = makeTextObjectHandler()
+
+  final override val type: Command.Type = Command.Type.MOTION
 }

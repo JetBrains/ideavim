@@ -24,7 +24,6 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.TextObjectAction
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
@@ -44,8 +43,6 @@ class MotionOuterBigWordAction : TextObjectAction() {
   override val mappingModes: Set<MappingMode> = MappingMode.VO
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("aW")
-
-  override val type: Command.Type = Command.Type.MOTION
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_CHARACTERWISE, CommandFlags.FLAG_MOT_INCLUSIVE)
 }
