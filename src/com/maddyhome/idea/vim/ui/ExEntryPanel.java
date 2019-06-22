@@ -344,10 +344,8 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       try {
         final ExCommand exCommand = CommandParser.getInstance().parse(commandText);
         final String command = exCommand.getCommand();
-        if (command.equals("s") || command.equals("substitute")
-          || command.equals("g") || command.equals("global")
-          || command.equals("v") || command.equals("vglobal")) {
-
+        // TODO: Add global, vglobal, smagic and snomagic here when the commands are supported
+        if ("substitute".startsWith(command)) {
           return exCommand;
         }
       }
