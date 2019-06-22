@@ -21,6 +21,8 @@ package com.maddyhome.idea.vim;
 import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.codeInsight.template.TemplateManager;
 import com.intellij.codeInsight.template.TemplateManagerListener;
+import com.intellij.find.FindManager;
+import com.intellij.find.FindModelListener;
 import com.intellij.ide.bookmarks.BookmarksListener;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -158,6 +160,11 @@ public class EventFacade {
   public void registerBookmarkListener(@NotNull Project project, @NotNull BookmarksListener bookmarksListener) {
     final MessageBusConnection connection = project.getMessageBus().connect();
     connection.subscribe(BookmarksListener.TOPIC, bookmarksListener);
+  }
+
+  public void registerFindModelListener(@NotNull Project project, @NotNull FindModelListener findModelListener) {
+    final MessageBusConnection connection = project.getMessageBus().connect();
+    connection.subscribe(FindManager.FIND_MODEL_TOPIC, findModelListener);
   }
 
   @NotNull

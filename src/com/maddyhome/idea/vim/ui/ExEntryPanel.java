@@ -335,6 +335,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       final CharPointer end = RegExp.skip_regexp(new CharPointer(searchText), separator, true);
       final String pattern = p.substring(end.pointer() - p.pointer());
 
+      VimPlugin.getEditor().closeEditorSearchSession(editor);
       VimPlugin.getSearch().updateIncsearchHighlights(editor, pattern, forwards, caretOffset, searchRange);
     }
 

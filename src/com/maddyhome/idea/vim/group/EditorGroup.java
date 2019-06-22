@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.group;
 
+import com.intellij.find.EditorSearchSession;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -262,6 +263,13 @@ public class EditorGroup {
     new Notification(VimPlugin.IDEAVIM_STICKY_NOTIFICATION_ID, VimPlugin.IDEAVIM_NOTIFICATION_TITLE,
                      "Put \"<code>set smartjoin</code>\" into your <code>.ideavimrc</code> to perform a join via the IDE",
                      NotificationType.INFORMATION).notify(null);
+  }
+
+  public void closeEditorSearchSession(@NotNull Editor editor) {
+    final EditorSearchSession editorSearchSession = EditorSearchSession.get(editor);
+    if (editorSearchSession != null) {
+      editorSearchSession.close();
+    }
   }
 
   private static class LineNumbersGutterProvider implements TextAnnotationGutterProvider {
