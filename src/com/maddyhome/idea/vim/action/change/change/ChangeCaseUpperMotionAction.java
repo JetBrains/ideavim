@@ -24,7 +24,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
 import org.jetbrains.annotations.NotNull;
@@ -38,7 +37,7 @@ public class ChangeCaseUpperMotionAction extends EditorAction {
 
   private static class Handler extends ChangeEditorActionHandler {
     public Handler() {
-      super(true, CaretOrder.DECREASING_OFFSET);
+      super(true);
     }
 
     public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,

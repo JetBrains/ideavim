@@ -33,16 +33,14 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class ChangeEditorActionHandler extends VimActionHandler {
   private boolean myIsMulticaretChangeAction;
-  private CaretOrder myCaretOrder;
 
-  public ChangeEditorActionHandler(boolean runForEachCaret, CaretOrder caretOrder) {
+  public ChangeEditorActionHandler(boolean runForEachCaret) {
     super(false);
     myIsMulticaretChangeAction = runForEachCaret;
-    myCaretOrder = caretOrder;
   }
 
   public ChangeEditorActionHandler() {
-    this(false, CaretOrder.DECREASING_OFFSET);
+    this(false);
   }
 
   @Override
@@ -65,7 +63,7 @@ public abstract class ChangeEditorActionHandler extends VimActionHandler {
         catch (ExecuteMethodNotOverriddenException e) {
             worked.set(false);
         }
-      });
+      }, true);
     }
     else {
       try {

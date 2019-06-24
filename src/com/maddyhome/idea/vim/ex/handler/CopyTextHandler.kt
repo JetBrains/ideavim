@@ -29,14 +29,13 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.copy.PutData
-import com.maddyhome.idea.vim.handler.CaretOrder
 import com.maddyhome.idea.vim.helper.EditorHelper
 
 class CopyTextHandler : CommandHandler.SingleExecution() {
   override val names = commands("co[py]", "t")
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, WRITABLE)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-    val carets = EditorHelper.getOrderedCaretsList(editor, CaretOrder.DECREASING_OFFSET)
+    val carets = EditorHelper.getOrderedCaretsList(editor)
     for (caret in carets) {
       val range = cmd.getTextRange(editor, caret, context, false)
       val text = EditorHelper.getText(editor, range.startOffset, range.endOffset)

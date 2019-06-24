@@ -24,7 +24,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.handler.CaretOrder;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,7 +36,7 @@ public class ChangeEndOfLineAction extends EditorAction {
 
   private static class Handler extends ChangeEditorActionHandler {
     public Handler() {
-      super(true, CaretOrder.DECREASING_OFFSET);
+      super(true);
     }
 
     @Override

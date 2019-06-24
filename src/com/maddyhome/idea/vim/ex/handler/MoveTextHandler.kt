@@ -34,7 +34,6 @@ import com.maddyhome.idea.vim.ex.LineRange
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.copy.PutData
-import com.maddyhome.idea.vim.handler.CaretOrder
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
@@ -45,7 +44,7 @@ class MoveTextHandler : CommandHandler.SingleExecution() {
   override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, WRITABLE)
   @Throws(ExException::class)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
-    val carets = EditorHelper.getOrderedCaretsList(editor, CaretOrder.DECREASING_OFFSET)
+    val carets = EditorHelper.getOrderedCaretsList(editor)
     val caretModel = editor.caretModel
     val caretCount = caretModel.caretCount
 

@@ -40,7 +40,6 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.visual.VimSelection
-import com.maddyhome.idea.vim.handler.CaretOrder.DECREASING_OFFSET
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -154,7 +153,7 @@ class PutGroup {
     val myCarets = if (data.visualSelection != null) {
       data.visualSelection.caretsAndSelections.keys.sortedByDescending { it.logicalPosition }
     } else {
-      EditorHelper.getOrderedCaretsList(editor, DECREASING_OFFSET)
+      EditorHelper.getOrderedCaretsList(editor)
     }
     myCarets.forEach { caret -> putForCaret(editor, caret, data, additionalData, context, text) }
   }
@@ -242,7 +241,7 @@ class PutGroup {
 
   private fun putTextViaIde(pasteProvider: PasteProvider, editor: Editor, context: DataContext, text: ProcessedTextData, subMode: CommandState.SubMode, data: PutData, additionalData: Map<String, Any>) {
     val carets: MutableMap<Caret, RangeMarker> = mutableMapOf()
-    EditorHelper.getOrderedCaretsList(editor, DECREASING_OFFSET).forEach { caret ->
+    EditorHelper.getOrderedCaretsList(editor).forEach { caret ->
       val startOffset = prepareDocumentAndGetStartOffsets(editor, caret, text.typeInRegister, data, additionalData).first()
       val pointMarker = editor.document.createRangeMarker(startOffset, startOffset)
       caret.moveToOffset(startOffset)

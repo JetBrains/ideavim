@@ -27,7 +27,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.handler.CaretOrder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -587,19 +586,13 @@ public class EditorHelper {
    * Get list of all carets from the editor.
    *
    * @param editor The editor from which the carets are taken
-   * @param order  Order in which the carets are given.
    */
   @NotNull
-  public static List<Caret> getOrderedCaretsList(@NotNull Editor editor, @NotNull CaretOrder order) {
+  public static List<Caret> getOrderedCaretsList(@NotNull Editor editor) {
     @NotNull List<Caret> carets = editor.getCaretModel().getAllCarets();
 
-    if (order == CaretOrder.INCREASING_OFFSET) {
-      carets.sort(Comparator.comparingInt(Caret::getOffset));
-    }
-    else if (order == CaretOrder.DECREASING_OFFSET) {
-      carets.sort(Comparator.comparingInt(Caret::getOffset));
-      Collections.reverse(carets);
-    }
+    carets.sort(Comparator.comparingInt(Caret::getOffset));
+    Collections.reverse(carets);
 
     return carets;
   }
