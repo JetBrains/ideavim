@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class AutoIndentLinesAction extends EditorAction {
   protected AutoIndentLinesAction() {
-    super(new ChangeEditorActionHandler(true) {
+    super(new ChangeEditorActionHandler.ForEachCaret() {
       @Override
       public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                              int rawCount, @Nullable Argument argument) {

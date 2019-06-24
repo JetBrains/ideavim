@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class PutTextAfterCursorAction extends EditorAction {
   public PutTextAfterCursorAction() {
-    super(new ChangeEditorActionHandler() {
+    super(new ChangeEditorActionHandler.SingleExecution() {
       @Override
       public boolean execute(@NotNull Editor editor,
                              @NotNull DataContext context,

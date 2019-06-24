@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class PutTextBeforeCursorAction extends EditorAction {
   public PutTextBeforeCursorAction() {
-    super(new ChangeEditorActionHandler() {
+    super(new ChangeEditorActionHandler.SingleExecution() {
       @Override
       public boolean execute(@NotNull Editor editor,
                              @NotNull DataContext context,

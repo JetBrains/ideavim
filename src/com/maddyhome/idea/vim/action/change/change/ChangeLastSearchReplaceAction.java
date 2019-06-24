@@ -35,7 +35,7 @@ public class ChangeLastSearchReplaceAction extends EditorAction {
     super(new Handler());
   }
 
-  private static class Handler extends ChangeEditorActionHandler {
+  private static class Handler extends ChangeEditorActionHandler.SingleExecution {
     public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
                            @Nullable Argument argument) {
       boolean result = true;

@@ -33,7 +33,8 @@ public class InsertNewLineAboveAction extends EditorAction {
     super(new Handler());
   }
 
-  private static class Handler extends ChangeEditorActionHandler {
+  private static class Handler extends ChangeEditorActionHandler.SingleExecution {
+    @Override
     public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
       if (editor.isOneLineMode()) {
         return false;

@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class AutoIndentMotionAction extends EditorAction {
   protected AutoIndentMotionAction() {
-    super(new ChangeEditorActionHandler(true) {
+    super(new ChangeEditorActionHandler.ForEachCaret() {
       @Override
       public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                              int rawCount, @Nullable Argument argument) {

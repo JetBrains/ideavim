@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class ChangeLineAction extends EditorAction {
   public ChangeLineAction() {
-    super(new ChangeEditorActionHandler(true) {
+    super(new ChangeEditorActionHandler.ForEachCaret() {
       @Override
       public boolean execute(@NotNull Editor editor,
                              @NotNull Caret caret,

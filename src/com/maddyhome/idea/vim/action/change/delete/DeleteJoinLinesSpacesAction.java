@@ -35,11 +35,7 @@ public class DeleteJoinLinesSpacesAction extends EditorAction {
     super(new Handler());
   }
 
-  private static class Handler extends ChangeEditorActionHandler {
-    public Handler() {
-      super();
-    }
-
+  private static class Handler extends ChangeEditorActionHandler.SingleExecution {
     @Override
     public boolean execute(@NotNull Editor editor,
                            @NotNull DataContext context,

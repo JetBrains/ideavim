@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class InsertPreviousInsertAction extends EditorAction {
   public InsertPreviousInsertAction() {
-    super(new ChangeEditorActionHandler() {
+    super(new ChangeEditorActionHandler.SingleExecution() {
       @Override
       public boolean execute(@NotNull Editor editor,
                              @NotNull DataContext context,
