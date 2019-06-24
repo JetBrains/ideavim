@@ -38,7 +38,7 @@ class MotionWordLeftAction : MotionEditorAction() {
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
 
-  override fun makeMotionHandler(): MotionActionHandler = MotionWordLeftActionHandler
+  override fun makeActionHandler(): MotionActionHandler = MotionWordLeftActionHandler
 }
 
 class MotionWordLeftInsertAction : MotionEditorAction() {
@@ -53,7 +53,7 @@ class MotionWordLeftInsertAction : MotionEditorAction() {
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_STROKE)
 
-  override fun makeMotionHandler(): MotionActionHandler = MotionWordLeftActionHandler
+  override fun makeActionHandler(): MotionActionHandler = MotionWordLeftActionHandler
 
 }
 

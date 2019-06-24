@@ -37,7 +37,7 @@ class MotionFirstColumnAction : MotionEditorAction() {
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
 
-  override fun makeMotionHandler(): MotionActionHandler = MotionFirstColumnActionHandler
+  override fun makeActionHandler(): MotionActionHandler = MotionFirstColumnActionHandler
 }
 
 class MotionFirstColumnInsertModeAction : MotionEditorAction() {
@@ -47,7 +47,7 @@ class MotionFirstColumnInsertModeAction : MotionEditorAction() {
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_STROKE)
 
-  override fun makeMotionHandler(): MotionActionHandler = MotionFirstColumnActionHandler
+  override fun makeActionHandler(): MotionActionHandler = MotionFirstColumnActionHandler
 }
 
 private object MotionFirstColumnActionHandler : MotionActionHandler.ForEachCaret() {

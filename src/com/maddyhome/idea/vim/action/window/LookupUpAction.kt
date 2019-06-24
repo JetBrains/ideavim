@@ -30,7 +30,7 @@ import com.maddyhome.idea.vim.action.VimCommandAction
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
 import javax.swing.KeyStroke
@@ -39,7 +39,7 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 class LookupUpAction : VimCommandAction() {
-  override fun makeActionHandler(): EditorActionHandlerBase = object : EditorActionHandlerBase() {
+  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
       val activeLookup = LookupManager.getActiveLookup(editor)
       if (activeLookup != null) {

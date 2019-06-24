@@ -33,7 +33,7 @@ import java.util.*
 import javax.swing.KeyStroke
 
 class MotionOuterBlockSingleQuoteAction : TextObjectAction() {
-  override fun makeTextObjectHandler(): TextObjectActionHandler = object : TextObjectActionHandler() {
+  override fun makeActionHandler(): TextObjectActionHandler = object : TextObjectActionHandler() {
     override fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange? {
       return VimPlugin.getMotion().getBlockQuoteRange(editor, caret, '\'', true)
     }

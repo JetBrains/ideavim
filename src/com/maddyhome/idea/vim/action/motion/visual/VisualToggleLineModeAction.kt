@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.visual.vimSetSelection
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -36,7 +36,7 @@ import javax.swing.KeyStroke
 
 
 class VisualToggleLineModeAction : VimCommandAction() {
-  override fun makeActionHandler(): EditorActionHandlerBase = object : EditorActionHandlerBase() {
+  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
       val listOption = OptionsManager.selectmode
       return if ("cmd" in listOption) {

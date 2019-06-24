@@ -38,7 +38,7 @@ final public class VisualSelectNextSearch extends MotionEditorAction {
   @Contract(" -> new")
   @NotNull
   @Override
-  public MotionActionHandler makeMotionHandler() {
+  public MotionActionHandler makeActionHandler() {
     return new MotionActionHandler.SingleExecution() {
       @Override
       final public int getOffset(@NotNull Editor editor,

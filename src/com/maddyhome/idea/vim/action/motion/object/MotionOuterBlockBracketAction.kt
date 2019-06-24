@@ -34,7 +34,7 @@ import javax.swing.KeyStroke
 
 
 class MotionOuterBlockBracketAction : TextObjectAction() {
-  override fun makeTextObjectHandler(): TextObjectActionHandler = object : TextObjectActionHandler() {
+  override fun makeActionHandler(): TextObjectActionHandler = object : TextObjectActionHandler() {
     override fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange? {
       return VimPlugin.getMotion().getBlockRange(editor, caret, count, true, '[')
     }

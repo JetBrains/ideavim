@@ -23,7 +23,7 @@ import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.*;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -35,8 +35,8 @@ import java.util.Set;
 public class ToggleRecordingAction extends VimCommandAction {
   @NotNull
   @Override
-  protected EditorActionHandlerBase makeActionHandler() {
-    return new EditorActionHandlerBase() {
+  protected VimActionHandler makeActionHandler() {
+    return new VimActionHandler() {
       protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         if (!CommandState.getInstance(editor).isRecording()) {
           final Argument argument = cmd.getArgument();

@@ -59,7 +59,7 @@ public class MotionColumnAction extends MotionEditorAction {
 
   @NotNull
   @Override
-  public MotionActionHandler makeMotionHandler() {
+  public MotionActionHandler makeActionHandler() {
     return new MotionActionHandler.ForEachCaret() {
       @Override
       public int getOffset(@NotNull Editor editor,

@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
 import com.maddyhome.idea.vim.helper.MessageHelper;
 import com.maddyhome.idea.vim.key.OperatorFunction;
 import org.jetbrains.annotations.Contract;
@@ -44,8 +44,8 @@ final public class OperatorAction extends VimCommandAction {
   @Contract(" -> new")
   @NotNull
   @Override
-  final protected EditorActionHandlerBase makeActionHandler() {
-    return new EditorActionHandlerBase() {
+  final protected VimActionHandler makeActionHandler() {
+    return new VimActionHandler() {
       @Override
       protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         final OperatorFunction operatorFunction = VimPlugin.getKey().getOperatorFunction();

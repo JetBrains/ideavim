@@ -37,7 +37,7 @@ import javax.swing.KeyStroke
  */
 
 class GnNextTextObject : TextObjectAction() {
-  override fun makeTextObjectHandler(): TextObjectActionHandler = object : TextObjectActionHandler() {
+  override fun makeActionHandler(): TextObjectActionHandler = object : TextObjectActionHandler() {
     override fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange? {
       if (caret != editor.caretModel.primaryCaret) return null
       val range = VimPlugin.getSearch().getNextSearchRange(editor, count, true)

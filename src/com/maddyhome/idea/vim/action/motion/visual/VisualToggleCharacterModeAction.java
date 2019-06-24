@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.Contract;
@@ -41,8 +41,8 @@ final public class VisualToggleCharacterModeAction extends VimCommandAction {
   @Contract(" -> new")
   @NotNull
   @Override
-  final protected EditorActionHandlerBase makeActionHandler() {
-    return new EditorActionHandlerBase() {
+  final protected VimActionHandler makeActionHandler() {
+    return new VimActionHandler() {
       protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         final ListOption listOption = OptionsManager.INSTANCE.getSelectmode();
         if (listOption.contains("cmd")) {

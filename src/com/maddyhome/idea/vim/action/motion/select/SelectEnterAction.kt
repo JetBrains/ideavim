@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimCommandAction
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.handler.VimActionHandler
 import javax.swing.KeyStroke
 
 /**
@@ -33,7 +33,7 @@ import javax.swing.KeyStroke
  */
 
 class SelectEnterAction : VimCommandAction() {
-  override fun makeActionHandler(): EditorActionHandlerBase = object : EditorActionHandlerBase() {
+  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
       VimPlugin.getChange().processEnter(InjectedLanguageUtil.getTopLevelEditor(editor), context)
       return true

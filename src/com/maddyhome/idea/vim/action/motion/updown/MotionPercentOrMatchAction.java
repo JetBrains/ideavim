@@ -57,7 +57,7 @@ public class MotionPercentOrMatchAction extends MotionEditorAction {
 
   @NotNull
   @Override
-  public MotionActionHandler makeMotionHandler() {
+  public MotionActionHandler makeActionHandler() {
     return new MotionActionHandler.ForEachCaret() {
       @Override
       public int getOffset(@NotNull Editor editor,
@@ -74,6 +74,7 @@ public class MotionPercentOrMatchAction extends MotionEditorAction {
         }
       }
 
+      @Override
       public void process(@NotNull Command cmd) {
         if (cmd.getRawCount() == 0) {
           cmd.setFlags(EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE));

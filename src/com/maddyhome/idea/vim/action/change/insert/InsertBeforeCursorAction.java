@@ -27,7 +27,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,7 +41,7 @@ final public class InsertBeforeCursorAction extends VimCommandAction {
   @Contract(" -> new")
   @NotNull
   @Override
-  final protected EditorActionHandlerBase makeActionHandler() {
+  final protected VimActionHandler makeActionHandler() {
     return new ChangeEditorActionHandler() {
       final public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
                              @Nullable Argument argument) {

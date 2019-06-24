@@ -57,7 +57,7 @@ public class MotionBigWordLeftAction extends MotionEditorAction {
 
   @NotNull
   @Override
-  public MotionActionHandler makeMotionHandler() {
+  public MotionActionHandler makeActionHandler() {
     return new MotionActionHandler.ForEachCaret() {
       @Override
       public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,

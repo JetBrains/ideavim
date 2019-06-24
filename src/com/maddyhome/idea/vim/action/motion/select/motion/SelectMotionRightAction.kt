@@ -36,7 +36,7 @@ import javax.swing.KeyStroke
  */
 
 class SelectMotionRightAction : MotionEditorAction() {
-  override fun makeMotionHandler() = object : MotionActionHandler.ForEachCaret() {
+  override fun makeActionHandler() = object : MotionActionHandler.ForEachCaret() {
     override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
       val keymodel = OptionsManager.keymodel
       if (KeyModelOptionData.stopsel in keymodel || KeyModelOptionData.stopselect in keymodel) {

@@ -43,7 +43,7 @@ class MotionLastColumnAction : MotionEditorAction() {
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE)
 
-  override fun makeMotionHandler(): MotionActionHandler = MotionLastColumnActionHandler
+  override fun makeActionHandler(): MotionActionHandler = MotionLastColumnActionHandler
 }
 
 class MotionLastColumnInsertAction : MotionEditorAction() {
@@ -53,7 +53,7 @@ class MotionLastColumnInsertAction : MotionEditorAction() {
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_STROKE)
 
-  override fun makeMotionHandler(): MotionActionHandler = MotionLastColumnActionHandler
+  override fun makeActionHandler(): MotionActionHandler = MotionLastColumnActionHandler
 }
 
 private object MotionLastColumnActionHandler : MotionActionHandler.ForEachCaret() {

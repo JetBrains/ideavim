@@ -24,7 +24,7 @@ import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -35,8 +35,8 @@ import java.util.Set;
 public class ResetModeAction extends VimCommandAction {
   @NotNull
   @Override
-  protected EditorActionHandlerBase makeActionHandler() {
-    return new EditorActionHandlerBase() {
+  protected VimActionHandler makeActionHandler() {
+    return new VimActionHandler() {
       @Override
       protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         KeyHandler.getInstance().fullReset(InjectedLanguageUtil.getTopLevelEditor(editor));

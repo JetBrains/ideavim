@@ -30,7 +30,7 @@ import com.intellij.openapi.keymap.KeymapManager;
 import com.intellij.openapi.keymap.ex.KeymapManagerEx;
 import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
+import com.maddyhome.idea.vim.action.VimCommandActionBase;
 import com.maddyhome.idea.vim.action.VimShortcutKeyAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
@@ -266,7 +266,7 @@ public class KeyGroup {
     registerRequiredShortcut(shortcut);
   }
 
-  public void registerCommandAction(@NotNull VimCommandAction commandAction, @NotNull String actionId) {
+  public void registerCommandAction(@NotNull VimCommandActionBase commandAction, @NotNull String actionId) {
     final List<Shortcut> shortcuts = new ArrayList<>();
     for (List<KeyStroke> keyStrokes : commandAction.getKeyStrokesSet()) {
       shortcuts.add(new Shortcut(keyStrokes.toArray(new KeyStroke[keyStrokes.size()])));

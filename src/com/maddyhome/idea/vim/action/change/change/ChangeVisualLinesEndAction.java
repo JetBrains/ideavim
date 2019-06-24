@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import org.jetbrains.annotations.Contract;
@@ -47,7 +47,7 @@ final public class ChangeVisualLinesEndAction extends VimCommandAction {
   @Contract(" -> new")
   @NotNull
   @Override
-  final protected EditorActionHandlerBase makeActionHandler() {
+  final protected VimActionHandler makeActionHandler() {
     return new VisualOperatorActionHandler.ForEachCaret() {
       @Override
       public boolean executeAction(@NotNull Editor editor,

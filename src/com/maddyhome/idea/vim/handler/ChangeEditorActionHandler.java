@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
-public abstract class ChangeEditorActionHandler extends EditorActionHandlerBase {
+public abstract class ChangeEditorActionHandler extends VimActionHandler {
   private boolean myIsMulticaretChangeAction;
   private CaretOrder myCaretOrder;
 

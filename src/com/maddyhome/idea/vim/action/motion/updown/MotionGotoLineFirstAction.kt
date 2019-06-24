@@ -37,7 +37,7 @@ class MotionGotoLineFirstAction : MotionEditorAction() {
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP)
 
-  override fun makeMotionHandler(): MotionActionHandler = MotionGotoLineFirstActionHandler
+  override fun makeActionHandler(): MotionActionHandler = MotionGotoLineFirstActionHandler
 }
 
 class MotionGotoLineFirstInsertAction : MotionEditorAction() {
@@ -47,7 +47,7 @@ class MotionGotoLineFirstInsertAction : MotionEditorAction() {
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES)
 
-  override fun makeMotionHandler(): MotionActionHandler = MotionGotoLineFirstActionHandler
+  override fun makeActionHandler(): MotionActionHandler = MotionGotoLineFirstActionHandler
 }
 
 private object MotionGotoLineFirstActionHandler : MotionActionHandler.ForEachCaret() {

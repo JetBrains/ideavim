@@ -37,7 +37,7 @@ import java.util.*
 import javax.swing.KeyStroke
 
 class MotionArrowDownAction : MotionEditorAction() {
-  override fun makeMotionHandler() = object : NonShiftedSpecialKeyHandler() {
+  override fun makeActionHandler() = object : NonShiftedSpecialKeyHandler() {
     private var col: Int = 0
 
     override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {

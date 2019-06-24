@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -36,8 +36,8 @@ import java.util.Set;
 public class MotionMarkAction extends VimCommandAction {
   @NotNull
   @Override
-  protected EditorActionHandlerBase makeActionHandler() {
-    return new EditorActionHandlerBase() {
+  protected VimActionHandler makeActionHandler() {
+    return new VimActionHandler() {
       protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         final Argument argument = cmd.getArgument();
         return argument != null && VimPlugin.getMark().setMark(editor, argument.getCharacter());

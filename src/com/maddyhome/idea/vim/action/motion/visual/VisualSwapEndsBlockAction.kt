@@ -24,7 +24,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.action.VimCommandAction
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import javax.swing.KeyStroke
 
@@ -32,7 +32,7 @@ import javax.swing.KeyStroke
  * @author vlan
  */
 class VisualSwapEndsBlockAction : VimCommandAction() {
-  override fun makeActionHandler(): EditorActionHandlerBase = object : EditorActionHandlerBase() {
+  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
       if (editor.inBlockSubMode) {
         return VimPlugin.getVisualMotion().swapVisualEndsBigO(editor)

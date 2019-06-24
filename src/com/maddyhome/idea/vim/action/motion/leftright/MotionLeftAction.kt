@@ -38,7 +38,7 @@ class MotionLeftAction : MotionEditorAction() {
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
 
-  override fun makeMotionHandler(): MotionActionHandler = MotionLeftActionHandler
+  override fun makeActionHandler(): MotionActionHandler = MotionLeftActionHandler
 }
 
 class MotionLeftInsertModeAction : MotionEditorAction() {
@@ -49,7 +49,7 @@ class MotionLeftInsertModeAction : MotionEditorAction() {
     listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0))
   )
 
-  override fun makeMotionHandler(): MotionActionHandler = MotionLeftActionHandler
+  override fun makeActionHandler(): MotionActionHandler = MotionLeftActionHandler
 }
 
 private object MotionLeftActionHandler : MotionActionHandler.ForEachCaret() {

@@ -177,8 +177,6 @@ sealed class MotionActionHandler : EditorActionHandlerBase() {
     }
   }
 
-  final override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command) = true
-
   private object CaretMergingWatcher : CaretListener {
     override fun caretRemoved(event: CaretEvent) {
       val editor = event.editor

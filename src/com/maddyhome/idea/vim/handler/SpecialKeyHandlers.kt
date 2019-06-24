@@ -41,7 +41,7 @@ import com.maddyhome.idea.vim.option.SelectModeOptionData
  *
  * Handler is called once for all carets
  */
-abstract class ShiftedSpecialKeyHandler : EditorActionHandlerBase() {
+abstract class ShiftedSpecialKeyHandler : VimActionHandler() {
   final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     val startSel = KeyModelOptionData.startsel in OptionsManager.keymodel
     if (startSel && !editor.inVisualMode && !editor.inSelectMode) {
@@ -70,7 +70,7 @@ abstract class ShiftedSpecialKeyHandler : EditorActionHandlerBase() {
  *
  * Handler is called once for all carets
  */
-abstract class ShiftedArrowKeyHandler : EditorActionHandlerBase() {
+abstract class ShiftedArrowKeyHandler : VimActionHandler() {
   final override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
     val keymodelOption = OptionsManager.keymodel
     val startSel = KeyModelOptionData.startsel in keymodelOption

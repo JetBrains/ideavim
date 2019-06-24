@@ -40,7 +40,7 @@ class MotionUpAction : MotionEditorAction() {
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
 
-  override fun makeMotionHandler(): MotionActionHandler = MotionUpActionHandler
+  override fun makeActionHandler(): MotionActionHandler = MotionUpActionHandler
 }
 
 class MotionUpNotLineWiseAction : MotionEditorAction() {
@@ -50,7 +50,7 @@ class MotionUpNotLineWiseAction : MotionEditorAction() {
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
 
-  override fun makeMotionHandler(): MotionActionHandler = MotionUpActionHandler
+  override fun makeActionHandler(): MotionActionHandler = MotionUpActionHandler
 }
 
 private object MotionUpActionHandler : MotionActionHandler.ForEachCaret() {

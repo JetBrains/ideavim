@@ -40,7 +40,7 @@ class MotionGotoLineLastEndAction : MotionEditorAction() {
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP)
 
-  override fun makeMotionHandler(): MotionActionHandler = MotionGotoLineLastEndActionHandler
+  override fun makeActionHandler(): MotionActionHandler = MotionGotoLineLastEndActionHandler
 }
 
 class MotionGotoLineLastEndInsertAction : MotionEditorAction() {
@@ -50,7 +50,7 @@ class MotionGotoLineLastEndInsertAction : MotionEditorAction() {
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES)
 
-  override fun makeMotionHandler(): MotionActionHandler = MotionGotoLineLastEndActionHandler
+  override fun makeActionHandler(): MotionActionHandler = MotionGotoLineLastEndActionHandler
 }
 
 private object MotionGotoLineLastEndActionHandler : MotionActionHandler.ForEachCaret() {

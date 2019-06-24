@@ -49,7 +49,7 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
  * Base class for visual operation handlers.
  * @see [VisualOperatorActionHandler.SingleExecution] and [VisualOperatorActionHandler.ForEachCaret]
  */
-sealed class VisualOperatorActionHandler : EditorActionHandlerBase(false) {
+sealed class VisualOperatorActionHandler : VimActionHandler(false) {
   /**
    * Base class for visual operation handlers.
    * This handler executes an action for each caret. That means that if you have 5 carets,

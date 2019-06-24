@@ -33,7 +33,7 @@ import java.util.*
 import javax.swing.KeyStroke
 
 class MotionInnerBlockBackQuoteAction : TextObjectAction() {
-  override fun makeTextObjectHandler(): TextObjectActionHandler = object : TextObjectActionHandler() {
+  override fun makeActionHandler(): TextObjectActionHandler = object : TextObjectActionHandler() {
     override fun getRange(editor: Editor,
                           caret: Caret,
                           context: DataContext,

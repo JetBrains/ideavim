@@ -19,7 +19,7 @@ package com.maddyhome.idea.vim;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
-import com.maddyhome.idea.vim.action.VimCommandAction;
+import com.maddyhome.idea.vim.action.VimCommandActionBase;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
@@ -48,8 +48,8 @@ class RegisterActions {
     final ActionManagerEx manager = ActionManagerEx.getInstanceEx();
     for (String actionId : manager.getPluginActions(VimPlugin.getPluginId())) {
       final AnAction action = manager.getAction(actionId);
-      if (action instanceof VimCommandAction) {
-        VimPlugin.getKey().registerCommandAction((VimCommandAction)action, actionId);
+      if (action instanceof VimCommandActionBase) {
+        VimPlugin.getKey().registerCommandAction((VimCommandActionBase)action, actionId);
       }
     }
   }

@@ -33,7 +33,7 @@ import java.util.*
 import javax.swing.KeyStroke
 
 class MotionArrowLeftAction : MotionEditorAction() {
-  override fun makeMotionHandler() = object : NonShiftedSpecialKeyHandler() {
+  override fun makeActionHandler() = object : NonShiftedSpecialKeyHandler() {
     override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
       return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -count, false)
     }

@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
+import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.noneOfEnum
 import java.util.*
@@ -44,7 +45,7 @@ import javax.swing.KeyStroke
  *
  * @author vlan
  */
-abstract class VimCommandAction : EditorAction(null) {
+sealed class VimCommandActionBase : EditorAction(null) {
 
   init {
     @Suppress("LeakingThis")
@@ -82,20 +83,25 @@ abstract class VimCommandAction : EditorAction(null) {
   }
 }
 
-abstract class TextObjectAction : VimCommandAction() {
-  abstract fun makeTextObjectHandler(): TextObjectActionHandler
+abstract class VimCommandAction : VimCommandActionBase() {
+  abstract override fun makeActionHandler(): VimActionHandler
+}
+
+abstract class TextObjectAction : VimCommandActionBase() {
+  abstract override fun makeActionHandler(): TextObjectActionHandler
 
   fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange? {
-    return (handler as TextObjectActionHandler).getRange(editor, caret, context, count, rawCount, argument)
-  }
+    val actionHandler = handler as? TextObjectActionHandler
+      ?: throw RuntimeException("TextObjectAction works only with TextObjectActionHandler")
 
-  final override fun makeActionHandler(): EditorActionHandlerBase = makeTextObjectHandler()
+    return actionHandler.getRange(editor, caret, context, count, rawCount, argument)
+  }
 
   final override val type: Command.Type = Command.Type.MOTION
 }
 
-abstract class MotionEditorAction : VimCommandAction() {
-  abstract fun makeMotionHandler(): MotionActionHandler
+abstract class MotionEditorAction : VimCommandActionBase() {
+  abstract override fun makeActionHandler(): MotionActionHandler
 
   fun getOffset(editor: Editor,
                 caret: Caret,
@@ -111,8 +117,6 @@ abstract class MotionEditorAction : VimCommandAction() {
       is MotionActionHandler.ForEachCaret -> actionHandler.getOffset(editor, caret, context, count, rawCount, argument)
     }
   }
-
-  final override fun makeActionHandler(): EditorActionHandlerBase = makeMotionHandler()
 
   final override val type: Command.Type = Command.Type.MOTION
 }

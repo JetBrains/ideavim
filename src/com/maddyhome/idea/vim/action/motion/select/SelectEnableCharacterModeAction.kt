@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
+import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimLastColumn
 import javax.swing.KeyStroke
@@ -36,7 +36,7 @@ import javax.swing.KeyStroke
  */
 
 class SelectEnableCharacterModeAction : VimCommandAction() {
-  override fun makeActionHandler(): EditorActionHandlerBase = object : EditorActionHandlerBase() {
+  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
       editor.caretModel.runForEachCaret { caret ->
         val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)

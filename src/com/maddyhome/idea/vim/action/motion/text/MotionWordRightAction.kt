@@ -38,7 +38,7 @@ class MotionWordRightAction : MotionEditorAction() {
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
 
-  override fun makeMotionHandler(): MotionActionHandler = MotionWordRightActionHandler
+  override fun makeActionHandler(): MotionActionHandler = MotionWordRightActionHandler
 }
 
 class MotionWordRightInsertAction : MotionEditorAction() {
@@ -53,7 +53,7 @@ class MotionWordRightInsertAction : MotionEditorAction() {
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_STROKE)
 
-  override fun makeMotionHandler(): MotionActionHandler = MotionWordRightActionHandler
+  override fun makeActionHandler(): MotionActionHandler = MotionWordRightActionHandler
 }
 
 private object MotionWordRightActionHandler : MotionActionHandler.ForEachCaret() {

@@ -39,7 +39,7 @@ class MotionGotoFileMarkLineAction : MotionEditorAction() {
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP)
 
-  override fun makeMotionHandler(): MotionActionHandler = MotionGotoFileMarkLineActionHandler
+  override fun makeActionHandler(): MotionActionHandler = MotionGotoFileMarkLineActionHandler
 }
 
 class MotionGotoFileMarkLineNoSaveJumpAction : MotionEditorAction() {
@@ -51,7 +51,7 @@ class MotionGotoFileMarkLineNoSaveJumpAction : MotionEditorAction() {
 
   override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
 
-  override fun makeMotionHandler(): MotionActionHandler = MotionGotoFileMarkLineActionHandler
+  override fun makeActionHandler(): MotionActionHandler = MotionGotoFileMarkLineActionHandler
 }
 
 private object MotionGotoFileMarkLineActionHandler : MotionActionHandler.ForEachCaret() {

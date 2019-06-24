@@ -57,7 +57,7 @@ public class MotionNextTabAction extends MotionEditorAction {
 
   @NotNull
   @Override
-  public MotionActionHandler makeMotionHandler() {
+  public MotionActionHandler makeActionHandler() {
     return new MotionActionHandler.SingleExecution() {
       public int getOffset(@NotNull final Editor editor,
                            @NotNull final DataContext context,

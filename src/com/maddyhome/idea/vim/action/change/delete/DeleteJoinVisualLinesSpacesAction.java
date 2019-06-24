@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.Contract;
@@ -47,7 +47,7 @@ final public class DeleteJoinVisualLinesSpacesAction extends VimCommandAction {
   @Contract(" -> new")
   @NotNull
   @Override
-  final protected EditorActionHandlerBase makeActionHandler() {
+  final protected VimActionHandler makeActionHandler() {
     return new VisualOperatorActionHandler.SingleExecution() {
 
       @Override

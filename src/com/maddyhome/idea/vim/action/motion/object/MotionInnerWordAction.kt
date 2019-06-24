@@ -33,7 +33,7 @@ import java.util.*
 import javax.swing.KeyStroke
 
 class MotionInnerWordAction : TextObjectAction() {
-  override fun makeTextObjectHandler(): TextObjectActionHandler = object : TextObjectActionHandler() {
+  override fun makeActionHandler(): TextObjectActionHandler = object : TextObjectActionHandler() {
     override fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange? {
       return VimPlugin.getMotion().getWordRange(editor, caret, count, false, false)
     }
