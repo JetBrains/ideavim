@@ -19,11 +19,9 @@ package com.maddyhome.idea.vim.action.motion.gn;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
+import com.maddyhome.idea.vim.action.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
@@ -36,22 +34,22 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-final public class VisualSelectPreviousSearch extends VimCommandAction {
+final public class VisualSelectPreviousSearch extends MotionEditorAction {
   @Contract(" -> new")
   @NotNull
   @Override
-  final protected EditorActionHandler makeActionHandler() {
+  public MotionActionHandler makeMotionHandler() {
     return new MotionActionHandler.SingleExecution() {
       @Override
       final public int getOffset(@NotNull Editor editor,
-                           @NotNull DataContext context,
-                           int count,
-                           int rawCount,
-                           @Nullable Argument argument) {
+                                 @NotNull DataContext context,
+                                 int count,
+                                 int rawCount,
+                                 @Nullable Argument argument) {
         return VimPlugin.getMotion().selectNextSearch(editor, count, false);
       }
     };
- }
+  }
 
   @Contract(pure = true)
   @NotNull
@@ -64,13 +62,6 @@ final public class VisualSelectPreviousSearch extends VimCommandAction {
   @Override
   final public Set<List<KeyStroke>> getKeyStrokesSet() {
     return parseKeysSet("gN");
-  }
-
-  @Contract(pure = true)
-  @NotNull
-  @Override
-  final public Command.Type getType() {
-    return Command.Type.MOTION;
   }
 
   @NotNull

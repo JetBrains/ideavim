@@ -16,72 +16,60 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action.motion.updown;
+package com.maddyhome.idea.vim.action.motion.updown
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.MotionEditorAction;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.handler.MotionActionHandler;
-import com.maddyhome.idea.vim.helper.CommandStateHelper;
-import com.maddyhome.idea.vim.option.BoundStringOption;
-import com.maddyhome.idea.vim.option.OptionsManager;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.MotionEditorAction
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.helper.inInsertMode
+import com.maddyhome.idea.vim.option.OptionsManager
+import java.util.*
+import javax.swing.KeyStroke
 
-import javax.swing.*;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+class MotionGotoLineLastEndAction : MotionEditorAction() {
+  override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
-public class MotionGotoLineLastEndAction extends MotionEditorAction {
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.NVO;
-  }
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-End>")
 
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("<C-End>");
-  }
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP)
 
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP);
-  }
+  override fun makeMotionHandler(): MotionActionHandler = MotionGotoLineLastEndActionHandler
+}
 
-  @NotNull
-  @Override
-  public MotionActionHandler makeMotionHandler() {
-    return new MotionActionHandler.ForEachCaret() {
-      @Override
-      public int getOffset(@NotNull Editor editor,
-                           @NotNull Caret caret,
-                           @NotNull DataContext context,
-                           int count,
-                           int rawCount,
-                           @Nullable Argument argument) {
-        boolean allow = false;
-        if (CommandStateHelper.inInsertMode(editor)) {
-          allow = true;
-        }
-        else if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-          BoundStringOption opt = OptionsManager.INSTANCE.getSelection();
-          if (!opt.getValue().equals("old")) {
-            allow = true;
-          }
-        }
+class MotionGotoLineLastEndInsertAction : MotionEditorAction() {
+  override val mappingModes: Set<MappingMode> = MappingMode.I
 
-        return VimPlugin.getMotion().moveCaretGotoLineLastEnd(editor, rawCount, count - 1, allow);
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-End>")
+
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES)
+
+  override fun makeMotionHandler(): MotionActionHandler = MotionGotoLineLastEndActionHandler
+}
+
+private object MotionGotoLineLastEndActionHandler : MotionActionHandler.ForEachCaret() {
+  override fun getOffset(editor: Editor,
+                         caret: Caret,
+                         context: DataContext,
+                         count: Int,
+                         rawCount: Int,
+                         argument: Argument?): Int {
+    var allow = false
+    if (editor.inInsertMode) {
+      allow = true
+    } else if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
+      val opt = OptionsManager.selection
+      if (opt.value != "old") {
+        allow = true
       }
-    };
+    }
+
+    return VimPlugin.getMotion().moveCaretGotoLineLastEnd(editor, rawCount, count - 1, allow)
   }
 }

@@ -16,67 +16,77 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action.motion.leftright;
+package com.maddyhome.idea.vim.action.motion.leftright
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
-import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.handler.MotionActionHandler;
-import com.maddyhome.idea.vim.helper.CaretDataKt;
-import com.maddyhome.idea.vim.helper.CommandStateHelper;
-import com.maddyhome.idea.vim.option.BoundStringOption;
-import com.maddyhome.idea.vim.option.OptionsManager;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.MotionEditorAction
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.helper.inInsertMode
+import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.option.OptionsManager
+import java.util.*
+import javax.swing.KeyStroke
 
+class MotionLastColumnAction : MotionEditorAction() {
+  override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
-public class MotionLastColumnAction extends MotionEditorAction {
-  public MotionLastColumnAction() {
-    super(new Handler());
-  }
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("$")
 
-  private static class Handler extends MotionActionHandler.ForEachCaret {
-    @Override
-    public int getOffset(@NotNull Editor editor,
-                         @NotNull Caret caret,
-                         @NotNull DataContext context,
-                         int count,
-                         int rawCount,
-                         @Nullable Argument argument) {
-      boolean allow = false;
-      if (CommandStateHelper.inInsertMode(editor)) {
-        allow = true;
-      }
-      else if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-        BoundStringOption opt = OptionsManager.INSTANCE.getSelection();
-        if (!opt.getValue().equals("old")) {
-          allow = true;
-        }
-      }
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE)
 
-      return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow);
-    }
-
-    @Override
-    public void postMove(@NotNull Editor editor,
-                            @NotNull Caret caret,
-                            @NotNull DataContext context,
-                            @NotNull Command cmd) {
-      CaretDataKt.setVimLastColumn(caret, MotionGroup.LAST_COLUMN);
-    }
-
-    public void preMove(@NotNull Editor editor,
-                           @NotNull Caret caret,
-                           @NotNull DataContext context,
-                           @NotNull Command cmd) {
-      CaretDataKt.setVimLastColumn(caret, MotionGroup.LAST_COLUMN);
-    }
-  }
+  override fun makeMotionHandler(): MotionActionHandler = MotionLastColumnActionHandler
 }
 
+class MotionLastColumnInsertAction : MotionEditorAction() {
+  override val mappingModes: Set<MappingMode> = MappingMode.I
+
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<End>")
+
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_STROKE)
+
+  override fun makeMotionHandler(): MotionActionHandler = MotionLastColumnActionHandler
+}
+
+private object MotionLastColumnActionHandler : MotionActionHandler.ForEachCaret() {
+  override fun getOffset(editor: Editor,
+                         caret: Caret,
+                         context: DataContext,
+                         count: Int,
+                         rawCount: Int,
+                         argument: Argument?): Int {
+    var allow = false
+    if (editor.inInsertMode) {
+      allow = true
+    } else if (CommandState.getInstance(editor).mode == CommandState.Mode.VISUAL) {
+      val opt = OptionsManager.selection
+      if (opt.value != "old") {
+        allow = true
+      }
+    }
+
+    return VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, allow)
+  }
+
+  override fun postMove(editor: Editor,
+                        caret: Caret,
+                        context: DataContext,
+                        cmd: Command) {
+    caret.vimLastColumn = MotionGroup.LAST_COLUMN
+  }
+
+  override fun preMove(editor: Editor,
+                       caret: Caret,
+                       context: DataContext,
+                       cmd: Command) {
+    caret.vimLastColumn = MotionGroup.LAST_COLUMN
+  }
+}

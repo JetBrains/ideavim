@@ -22,23 +22,44 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
+import com.maddyhome.idea.vim.action.MotionEditorAction;
 import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
+import java.util.List;
+import java.util.Set;
 
 public class MotionJumpPreviousAction extends MotionEditorAction {
-  public MotionJumpPreviousAction() {
-    super(new Handler());
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.N;
   }
 
-  private static class Handler extends MotionActionHandler.ForEachCaret {
-    @Override
-    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                         int rawCount, @Nullable Argument argument) {
-      return VimPlugin.getMotion().moveCaretToJump(editor, caret, -count);
-    }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    // TODO: <C-T> is a tag command similar to <C-O>, the tag stack is not implemented
+    return parseKeysSet("<C-O>", "<C-T>");
+  }
+
+  @NotNull
+  @Override
+  public MotionActionHandler makeMotionHandler() {
+    return new MotionActionHandler.ForEachCaret() {
+      @Override
+      public int getOffset(@NotNull Editor editor,
+                           @NotNull Caret caret,
+                           @NotNull DataContext context,
+                           int count,
+                           int rawCount,
+                           @Nullable Argument argument) {
+        return VimPlugin.getMotion().moveCaretToJump(editor, caret, -count);
+      }
+    };
   }
 }

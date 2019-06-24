@@ -103,20 +103,24 @@
     <!-- Left/Right -->
     <action id="VimMotionColumn" class="com.maddyhome.idea.vim.action.motion.leftright.MotionColumnAction" text="Move to Column"/>
     <action id="VimMotionFirstColumn" class="com.maddyhome.idea.vim.action.motion.leftright.MotionFirstColumnAction" text="Start of Line"/>
+    <action id="VimMotionFirstColumnInsertMode" class="com.maddyhome.idea.vim.action.motion.leftright.MotionFirstColumnInsertModeAction" text="Start of Line"/>
     <action id="VimMotionFirstScreenColumn" class="com.maddyhome.idea.vim.action.motion.leftright.MotionFirstScreenColumnAction" text="Start of Screen Line"/>
     <action id="VimMotionFirstNonSpace" class="com.maddyhome.idea.vim.action.motion.leftright.MotionFirstNonSpaceAction" text="First Character of Line"/>
     <action id="VimMotionFirstScreenNonSpace" class="com.maddyhome.idea.vim.action.motion.leftright.MotionFirstScreenNonSpaceAction" text="First Character of Screen Line"/>
     <action id="VimMotionLastColumn" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnAction" text="End of Line"/>
+    <action id="VimMotionLastColumnInsert" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnInsertAction" text="End of Line"/>
     <action id="VimMotionLastScreenColumn" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLastScreenColumnAction" text="End of Screen Line"/>
     <action id="VimMotionLastMatchChar" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLastMatchCharAction" text="Repeat Last Character Match"/>
     <action id="VimMotionLastMatchCharReverse" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLastMatchCharReverseAction" text="Repeat Last Character Match in Reverse"/>
     <action id="VimMotionLastNonSpace" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLastNonSpaceAction" text="Last Character of Line"/>
     <action id="VimMotionLeft" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftAction" text="Left"/>
+    <action id="VimMotionLeftInsert" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftInsertModeAction" text="Left"/>
     <action id="VimMotionLeftWrap" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftWrapAction" text="Left"/>
     <action id="VimMotionLeftMatchChar" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftMatchCharAction" text="Move Left to Character"/>
     <action id="VimMotionLeftTillMatchChar" class="com.maddyhome.idea.vim.action.motion.leftright.MotionLeftTillMatchCharAction" text="Move Left till Character"/>
     <action id="VimMotionMiddleColumn" class="com.maddyhome.idea.vim.action.motion.leftright.MotionMiddleColumnAction" text="Middle of Screen"/>
     <action id="VimMotionRight" class="com.maddyhome.idea.vim.action.motion.leftright.MotionRightAction" text="Right"/>
+    <action id="VimMotionRightInsert" class="com.maddyhome.idea.vim.action.motion.leftright.MotionRightInsertAction" text="Right"/>
     <action id="VimMotionRightWrap" class="com.maddyhome.idea.vim.action.motion.leftright.MotionRightWrapAction" text="Right"/>
     <action id="VimMotionRightMatchChar" class="com.maddyhome.idea.vim.action.motion.leftright.MotionRightMatchCharAction" text="Move Right to Character"/>
     <action id="VimMotionRightTillMatchChar" class="com.maddyhome.idea.vim.action.motion.leftright.MotionRightTillMatchCharAction" text="Move Right till Character"/>
@@ -126,13 +130,17 @@
     <action id="VimMotionShiftEnd" class="com.maddyhome.idea.vim.action.motion.leftright.MotionShiftEndAction" text="Move Shift End Key"/>
     <!-- Up/Down -->
     <action id="VimMotionDown" class="com.maddyhome.idea.vim.action.motion.updown.MotionDownAction" text="Down"/>
+    <action id="VimMotionNotLineWiseDown" class="com.maddyhome.idea.vim.action.motion.updown.MotionDownNotLineWiseAction" text="Down"/>
     <action id="VimMotionDownFirstNonSpace" class="com.maddyhome.idea.vim.action.motion.updown.MotionDownFirstNonSpaceAction" text="Down to First non-Space"/>
     <action id="VimMotionDownLess1FirstNonSpace" class="com.maddyhome.idea.vim.action.motion.updown.MotionDownLess1FirstNonSpaceAction" text="Down to First non-Space"/>
     <action id="VimMotionGotoLineFirst" class="com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineFirstAction" text="Goto Line"/>
+    <action id="VimMotionGotoLineFirstInsertMode" class="com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineFirstInsertAction" text="Goto Line"/>
     <action id="VimMotionGotoLineLast" class="com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastAction" text="Goto Line"/>
     <action id="VimMotionGotoLineLastEnd" class="com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastEndAction" text="Goto Line End"/>
+    <action id="VimMotionGotoLineLastEndInsert" class="com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastEndInsertAction" text="Goto Line End"/>
     <action id="VimMotionPercentOrMatch" class="com.maddyhome.idea.vim.action.motion.updown.MotionPercentOrMatchAction" text="Percent Down or Match"/>
     <action id="VimMotionUp" class="com.maddyhome.idea.vim.action.motion.updown.MotionUpAction" text="Up"/>
+    <action id="VimMotionUpNotLineWise" class="com.maddyhome.idea.vim.action.motion.updown.MotionUpNotLineWiseAction" text="Up"/>
     <action id="VimMotionUpFirstNonSpace" class="com.maddyhome.idea.vim.action.motion.updown.MotionUpFirstNonSpaceAction" text="Up to First non-Space"/>
     <action id="VimArrowMotionDown" class="com.maddyhome.idea.vim.action.motion.updown.MotionArrowDownAction" text="Arrow Down"/>
     <action id="VimArrowMotionUp" class="com.maddyhome.idea.vim.action.motion.updown.MotionArrowUpAction" text="Arrow Up"/>
@@ -151,8 +159,10 @@
     <action id="VimMotionWordEndRight" class="com.maddyhome.idea.vim.action.motion.text.MotionWordEndRightAction" text="Word End Right"/>
     <action id="VimMotionBigWordEndRight" class="com.maddyhome.idea.vim.action.motion.text.MotionBigWordEndRightAction" text="BigWord End Right"/>
     <action id="VimMotionWordLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionWordLeftAction" text="Word Left"/>
+    <action id="VimMotionWordLeftInsert" class="com.maddyhome.idea.vim.action.motion.text.MotionWordLeftInsertAction" text="Word Left"/>
     <action id="VimMotionBigWordLeft" class="com.maddyhome.idea.vim.action.motion.text.MotionBigWordLeftAction" text="BigWord Left"/>
     <action id="VimMotionWordRight" class="com.maddyhome.idea.vim.action.motion.text.MotionWordRightAction" text="Word Right"/>
+    <action id="VimMotionWordRightInsert" class="com.maddyhome.idea.vim.action.motion.text.MotionWordRightInsertAction" text="Word Right"/>
     <action id="VimMotionBigWordRight" class="com.maddyhome.idea.vim.action.motion.text.MotionBigWordRightAction" text="BigWord Right"/>
     <action id="VimMotionSentenceStartNext" class="com.maddyhome.idea.vim.action.motion.text.MotionSentenceNextStartAction" text="Next Sentence Start"/>
     <action id="VimMotionSentenceStartPrevious" class="com.maddyhome.idea.vim.action.motion.text.MotionSentencePreviousStartAction" text="Previous Sentence Start"/>
@@ -200,13 +210,15 @@
     <!-- Marks -->
     <action id="VimMotionMark" class="com.maddyhome.idea.vim.action.motion.mark.MotionMarkAction" text="Mark"/>
     <action id="VimMotionGotoFileMark" class="com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkAction" text="Goto Mark"/>
+    <action id="VimMotionGotoFileMarkNoSaveJump" class="com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkNoSaveJumpAction" text="Goto Mark"/>
     <action id="VimMotionGotoFileMarkLine" class="com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkLineAction" text="Goto Mark Line"/>
+    <action id="VimMotionGotoFileMarkLineNoSaveJumo" class="com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkLineNoSaveJumpAction" text="Goto Mark Line"/>
     <action id="VimMotionGotoMark" class="com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkAction" text="Goto Mark"/>
+    <action id="VimMotionGotoMarkNoSaveJump" class="com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkNoSaveJumpAction" text="Goto Mark"/>
     <action id="VimMotionGotoMarkLine" class="com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkLineAction" text="Goto Mark Line"/>
+    <action id="VimMotionGotoMarkLineNoSaveJump" class="com.maddyhome.idea.vim.action.motion.mark.MotionGotoMarkLineNoSaveJumpAction" text="Goto Mark Line"/>
     <action id="VimMotionJumpNext" class="com.maddyhome.idea.vim.action.motion.mark.MotionJumpNextAction" text="Goto Next Jump"/>
     <action id="VimMotionJumpPrevious" class="com.maddyhome.idea.vim.action.motion.mark.MotionJumpPreviousAction" text="Goto Previous Jump"/>
-    <action id="VimForward" class="com.maddyhome.idea.vim.action.motion.mark.MotionJumpNextAction" text="Forward"/>
-    <action id="VimBack" class="com.maddyhome.idea.vim.action.motion.mark.MotionJumpPreviousAction" text="Back"/>
     <!-- Screen -->
     <action id="VimMotionFirstScreenLine" class="com.maddyhome.idea.vim.action.motion.screen.MotionFirstScreenLineAction" text="First Screen Line"/>
     <action id="VimMotionLastScreenLine" class="com.maddyhome.idea.vim.action.motion.screen.MotionLastScreenLineAction" text="Last Screen Line"/>

@@ -22,10 +22,8 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
+import com.maddyhome.idea.vim.action.MotionEditorAction;
+import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
 import com.maddyhome.idea.vim.helper.CaretDataKt;
@@ -34,34 +32,62 @@ import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 
 public class MotionLastScreenColumnAction extends MotionEditorAction {
-  public MotionLastScreenColumnAction() {
-    super(new Handler());
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.NVO;
   }
 
-  private static class Handler extends MotionActionHandler.ForEachCaret {
-    @Override
-    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                         int rawCount, Argument argument) {
-      boolean allow = false;
-      if (CommandStateHelper.inInsertMode(editor)) {
-        allow = true;
-      }
-      else if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-        BoundStringOption opt = OptionsManager.INSTANCE.getSelection();
-        if (!opt.getValue().equals("old")) {
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("g$", "g<End>");
+  }
+
+  @NotNull
+  @Override
+  public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE);
+  }
+
+  @NotNull
+  @Override
+  public MotionActionHandler makeMotionHandler() {
+    return new MotionActionHandler.ForEachCaret() {
+      @Override
+      public int getOffset(@NotNull Editor editor,
+                           @NotNull Caret caret,
+                           @NotNull DataContext context,
+                           int count,
+                           int rawCount,
+                           Argument argument) {
+        boolean allow = false;
+        if (CommandStateHelper.inInsertMode(editor)) {
           allow = true;
         }
+        else if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
+          BoundStringOption opt = OptionsManager.INSTANCE.getSelection();
+          if (!opt.getValue().equals("old")) {
+            allow = true;
+          }
+        }
+
+        return VimPlugin.getMotion().moveCaretToLineScreenEnd(editor, caret, allow);
       }
 
-      return VimPlugin.getMotion().moveCaretToLineScreenEnd(editor, caret, allow);
-    }
-
-    @Override
-    public void postMove(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                            @NotNull Command cmd) {
-      CaretDataKt.setVimLastColumn(caret, MotionGroup.LAST_COLUMN);
-    }
+      @Override
+      public void postMove(@NotNull Editor editor,
+                           @NotNull Caret caret,
+                           @NotNull DataContext context,
+                           @NotNull Command cmd) {
+        CaretDataKt.setVimLastColumn(caret, MotionGroup.LAST_COLUMN);
+      }
+    };
   }
 }

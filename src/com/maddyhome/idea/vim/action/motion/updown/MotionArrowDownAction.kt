@@ -22,7 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.action.MotionEditorAction
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
@@ -36,8 +36,8 @@ import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
 
-class MotionArrowDownAction : VimCommandAction() {
-  override fun makeActionHandler() = object : NonShiftedSpecialKeyHandler() {
+class MotionArrowDownAction : MotionEditorAction() {
+  override fun makeMotionHandler() = object : NonShiftedSpecialKeyHandler() {
     private var col: Int = 0
 
     override fun offset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
@@ -57,8 +57,6 @@ class MotionArrowDownAction : VimCommandAction() {
   override val mappingModes: Set<MappingMode> = MappingMode.NVOS
 
   override val keyStrokesSet: Set<MutableList<KeyStroke>> = setOf(parseKeys("<Down>"), mutableListOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0)))
-
-  override val type: Command.Type = Command.Type.MOTION
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_LINEWISE)
 }

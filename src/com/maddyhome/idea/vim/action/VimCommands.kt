@@ -29,6 +29,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.StringHelper
 import com.maddyhome.idea.vim.helper.noneOfEnum
@@ -89,6 +90,29 @@ abstract class TextObjectAction : VimCommandAction() {
   }
 
   final override fun makeActionHandler() = makeTextObjectHandler()
+
+  final override val type: Command.Type = Command.Type.MOTION
+}
+
+abstract class MotionEditorAction : VimCommandAction() {
+  abstract fun makeMotionHandler(): MotionActionHandler
+
+  fun getOffset(editor: Editor,
+                caret: Caret,
+                context: DataContext,
+                count: Int,
+                rawCount: Int,
+                argument: Argument?): Int {
+    val actionHandler = handler as? MotionActionHandler
+      ?: throw RuntimeException("MotionAction works only with MotionHandler")
+
+    return when (actionHandler) {
+      is MotionActionHandler.SingleExecution -> actionHandler.getOffset(editor, context, count, rawCount, argument)
+      is MotionActionHandler.ForEachCaret -> actionHandler.getOffset(editor, caret, context, count, rawCount, argument)
+    }
+  }
+
+  final override fun makeActionHandler() = makeMotionHandler()
 
   final override val type: Command.Type = Command.Type.MOTION
 }

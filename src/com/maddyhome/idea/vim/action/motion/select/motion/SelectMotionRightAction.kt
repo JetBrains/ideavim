@@ -23,9 +23,8 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
-import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.action.MotionEditorAction
 import com.maddyhome.idea.vim.command.Argument
-import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.option.KeyModelOptionData
@@ -36,8 +35,8 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 
-class SelectMotionRightAction : VimCommandAction() {
-  override fun makeActionHandler() = object : MotionActionHandler.ForEachCaret() {
+class SelectMotionRightAction : MotionEditorAction() {
+  override fun makeMotionHandler() = object : MotionActionHandler.ForEachCaret() {
     override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
       val keymodel = OptionsManager.keymodel
       if (KeyModelOptionData.stopsel in keymodel || KeyModelOptionData.stopselect in keymodel) {
@@ -53,6 +52,4 @@ class SelectMotionRightAction : VimCommandAction() {
   override val mappingModes: MutableSet<MappingMode> = MappingMode.S
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Right>")
-
-  override val type: Command.Type = Command.Type.MOTION
 }

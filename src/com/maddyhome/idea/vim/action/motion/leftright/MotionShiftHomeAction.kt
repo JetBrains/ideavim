@@ -49,7 +49,7 @@ class MotionShiftHomeAction : VimCommandAction() {
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<S-Home>")
 
-  override val type: Command.Type = Command.Type.MOTION
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
 }

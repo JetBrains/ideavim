@@ -42,7 +42,6 @@ class RegisterActions {
     registerNormalModeActions();
     registerNVOModesActions();
     registerSystemMappings();
-    registerMultisettingMappings();
   }
 
   private static void registerVimCommandActions() {
@@ -65,21 +64,6 @@ class RegisterActions {
     parser.registerAction(MappingMode.NV, "ExpandRegionRecursively", Command.Type.OTHER_READONLY, new Shortcut("zO"));
   }
 
-  private static void registerMultisettingMappings() {
-    final KeyGroup parser = VimPlugin.getKey();
-    // Text Object Actions for Visual and Operator Pending Modes
-    parser.registerAction(MappingMode.VO, "VimMotionGotoFileMark", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP), new Shortcut('`'),
-                          Argument.Type.CHARACTER);
-    parser.registerAction(MappingMode.VO, "VimMotionGotoFileMark", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE),
-                          new Shortcut("g`"), Argument.Type.CHARACTER);
-    parser.registerAction(MappingMode.VO, "VimMotionGotoFileMarkLine", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP), new Shortcut('\''),
-                          Argument.Type.CHARACTER);
-    parser.registerAction(MappingMode.VO, "VimMotionGotoFileMarkLine", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE),
-                          new Shortcut("g'"), Argument.Type.CHARACTER);
-  }
-
   /**
    * Register normal, visual, operator pending modes actions.
    */
@@ -96,116 +80,7 @@ class RegisterActions {
     // TODO - add zj
     // TODO - add zk
 
-    parser.registerAction(MappingMode.NVO, "VimMotionNextTab", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE),
-                          new Shortcut("gt"));
-    parser.registerAction(MappingMode.NVO, "VimMotionPreviousTab", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE),
-                          new Shortcut("gT"));
-    parser.registerAction(MappingMode.NVO, "VimMotionCamelEndLeft", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE),
-                          new Shortcut("]b"));
-    parser.registerAction(MappingMode.NVO, "VimMotionCamelEndRight", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE),
-                          new Shortcut("]w"));
-    parser.registerAction(MappingMode.NVO, "VimMotionCamelLeft", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE),
-                          new Shortcut("[b"));
-    parser.registerAction(MappingMode.NVO, "VimMotionCamelRight", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE),
-                          new Shortcut("[w"));
-    parser.registerAction(MappingMode.NVO, "VimMotionColumn", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE),
-                          new Shortcut('|'));
-    parser.registerAction(MappingMode.NVO, "VimMotionDown", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE), new Shortcut[]{
-      new Shortcut('j'),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_MASK)),
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionDown", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE), new Shortcut[]{
-      new Shortcut("gj"),
-      new Shortcut(new KeyStroke[]{KeyStroke.getKeyStroke('g'), KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)})
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionDownFirstNonSpace", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE), new Shortcut[]{
-      new Shortcut('+'),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.CTRL_MASK))
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionDownLess1FirstNonSpace", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE),
-                          new Shortcut('_'));
-    parser.registerAction(MappingMode.NVO, "VimMotionFirstColumn", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE), new Shortcut[]{
-      new Shortcut('0')
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionFirstScreenColumn", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE), new Shortcut[]{
-      new Shortcut("g0"),
-      new Shortcut(new KeyStroke[]{KeyStroke.getKeyStroke('g'), KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0)})
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionFirstNonSpace", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE), new Shortcut[]{
-      new Shortcut('^')
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionFirstScreenNonSpace", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE), new Shortcut[]{
-      new Shortcut("g^")
-    });
-    parser
-      .registerAction(MappingMode.NVO, "VimMotionFirstScreenLine", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP),
-                      new Shortcut[]{
-                        new Shortcut('H')
-                      });
-    parser
-      .registerAction(MappingMode.NVO, "VimMotionGotoLineFirst", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP),
-                      new Shortcut[]{
-                        new Shortcut("gg"),
-                        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, KeyEvent.CTRL_MASK))
-                      });
-    parser
-      .registerAction(MappingMode.NVO, "VimMotionGotoLineLast", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP),
-                      new Shortcut('G'));
-    parser
-      .registerAction(MappingMode.NVO, "VimMotionGotoLineLastEnd", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP),
-                      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, KeyEvent.CTRL_MASK)));
-    parser.registerAction(MappingMode.NVO, "VimMotionLastColumn", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE), new Shortcut[]{
-      new Shortcut('$')
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionLastScreenColumn", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE), new Shortcut[]{
-      new Shortcut("g$"),
-      new Shortcut(new KeyStroke[]{KeyStroke.getKeyStroke('g'), KeyStroke.getKeyStroke(KeyEvent.VK_END, 0)})
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionLastMatchChar", Command.Type.MOTION,
-                          new Shortcut(';'));
-    parser.registerAction(MappingMode.NVO, "VimMotionLastMatchCharReverse", Command.Type.MOTION,
-                          new Shortcut(','));
-    parser.registerAction(MappingMode.NVO, "VimMotionLastNonSpace", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE),
-                          new Shortcut("g_"));
-    parser
-      .registerAction(MappingMode.NVO, "VimMotionLastScreenLine", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP),
-                      new Shortcut('L'));
-    parser.registerAction(MappingMode.NVO, "VimMotionLeft", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE), new Shortcut[]{
-      new Shortcut('h')
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionLeftMatchChar", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_ALLOW_DIGRAPH),
-                          new Shortcut('F'), Argument.Type.DIGRAPH);
-    parser.registerAction(MappingMode.NVO, "VimMotionLeftTillMatchChar", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_ALLOW_DIGRAPH),
-                          new Shortcut('T'), Argument.Type.DIGRAPH);
-    parser.registerAction(MappingMode.NVO, "VimMotionLeftWrap", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE), new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK))
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionMiddleColumn", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE),
-                          new Shortcut("gm"));
-    parser.registerAction(MappingMode.NVO, "VimMotionMiddleScreenLine", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut('M'));
-    parser
-      .registerAction(MappingMode.NVO, "VimMotionNthCharacter", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                      new Shortcut("go"));
     // This represents two commands and one is linewise and the other is inclusive - the handler will fix it
-    parser.registerAction(MappingMode.NVO, "VimMotionPercentOrMatch", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut('%'));
-    parser.registerAction(MappingMode.NVO, "VimMotionRight", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE), new Shortcut[]{
-      new Shortcut('l')
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionRightMatchChar", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE, CommandFlags.FLAG_ALLOW_DIGRAPH),
-                          new Shortcut('f'), Argument.Type.DIGRAPH);
-    parser.registerAction(MappingMode.NVO, "VimMotionRightTillMatchChar", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE, CommandFlags.FLAG_ALLOW_DIGRAPH),
-                          new Shortcut('t'), Argument.Type.DIGRAPH);
-    parser.registerAction(MappingMode.NVO, "VimMotionRightWrap", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE),
-                          new Shortcut(' '));
     parser.registerAction(MappingMode.NVO, "VimMotionScrollFirstScreenLine", Command.Type.OTHER_READONLY, new Shortcut[]{
       new Shortcut("zt")
     });
@@ -262,119 +137,9 @@ class RegisterActions {
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0))
     });
-    parser.registerAction(MappingMode.NVO, "VimMotionUp", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE), new Shortcut[]{
-      new Shortcut('k'),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_P, KeyEvent.CTRL_MASK)),
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionUp", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE), new Shortcut[]{
-      new Shortcut("gk"),
-      new Shortcut(new KeyStroke[]{KeyStroke.getKeyStroke('g'), KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)})
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionUpFirstNonSpace", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE),
-                          new Shortcut('-'));
-    parser.registerAction(MappingMode.NVO, "VimMotionWordEndLeft", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE),
-                          new Shortcut("ge"));
-    parser.registerAction(MappingMode.NVO, "VimMotionWordEndRight", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE),
-                          new Shortcut('e'));
-    parser.registerAction(MappingMode.NVO, "VimMotionWordLeft", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE), new Shortcut[]{
-      new Shortcut('b')
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionWordRight", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE), new Shortcut[]{
-      new Shortcut('w')
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionBigWordEndLeft", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE),
-                          new Shortcut("gE"));
-    parser.registerAction(MappingMode.NVO, "VimMotionBigWordEndRight", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_INCLUSIVE),
-                          new Shortcut('E'));
-    parser.registerAction(MappingMode.NVO, "VimMotionBigWordLeft", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE), new Shortcut[]{
-      new Shortcut('B'),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_MASK))
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionBigWordRight", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE), new Shortcut[]{
-      new Shortcut('W'),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_MASK))
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionSentenceStartPrevious", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut('('));
-    parser.registerAction(MappingMode.NVO, "VimMotionSentenceStartNext", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut(')'));
-    parser.registerAction(MappingMode.NVO, "VimMotionSentenceEndPrevious", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut("g("));
-    parser.registerAction(MappingMode.NVO, "VimMotionSentenceEndNext", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut("g)"));
-    parser.registerAction(MappingMode.NVO, "VimMotionParagraphPrevious", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut('{'));
-    parser
-      .registerAction(MappingMode.NVO, "VimMotionParagraphNext", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                      new Shortcut('}'));
-    parser.registerAction(MappingMode.NVO, "VimMotionUnmatchedBraceOpen", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut("[{"));
-    parser.registerAction(MappingMode.NVO, "VimMotionUnmatchedBraceClose", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut("]}"));
-    parser.registerAction(MappingMode.NVO, "VimMotionUnmatchedParenOpen", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut("[("));
-    parser.registerAction(MappingMode.NVO, "VimMotionUnmatchedParenClose", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut("])"));
-    parser.registerAction(MappingMode.NVO, "VimMotionSectionBackwardEnd", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut("[]"));
-    parser.registerAction(MappingMode.NVO, "VimMotionSectionBackwardStart", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut("[["));
-    parser.registerAction(MappingMode.NVO, "VimMotionSectionForwardEnd", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut("]]"));
-    parser.registerAction(MappingMode.NVO, "VimMotionSectionForwardStart", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut("]["));
-    parser.registerAction(MappingMode.NVO, "VimMotionMethodBackwardEnd", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut("[M"));
-    parser.registerAction(MappingMode.NVO, "VimMotionMethodBackwardStart", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut("[m"));
-    parser.registerAction(MappingMode.NVO, "VimMotionMethodForwardEnd", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut("]M"));
-    parser.registerAction(MappingMode.NVO, "VimMotionMethodForwardStart", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut("]m"));
-
     // Misc Actions
-    parser.registerAction(MappingMode.NVO, "VimSearchFwdEntry", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SEARCH_FWD, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut('/'), Argument.Type.EX_STRING);
-    parser.registerAction(MappingMode.NVO, "VimSearchRevEntry", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SEARCH_REV, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut('?'), Argument.Type.EX_STRING);
-    parser.registerAction(MappingMode.NVO, "VimSearchAgainNext", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut('n'));
-    parser
-      .registerAction(MappingMode.NVO, "VimSearchAgainPrevious", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                      new Shortcut('N'));
     parser.registerAction(MappingMode.NVO, "VimExEntry", Command.Type.OTHER_READ_WRITE,
                           new Shortcut(':'));
-    parser.registerAction(MappingMode.NVO, "VimSearchWholeWordForward", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut('*'));
-    parser.registerAction(MappingMode.NVO, "VimSearchWholeWordBackward", Command.Type.MOTION,
-                          EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                          new Shortcut('#'));
-    parser
-      .registerAction(MappingMode.NVO, "VimSearchWordForward", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                      new Shortcut("g*"));
-    parser
-      .registerAction(MappingMode.NVO, "VimSearchWordBackward", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                      new Shortcut("g#"));
   }
 
   private static void registerNormalModeActions() {
@@ -467,17 +232,6 @@ class RegisterActions {
                           new Shortcut('O'));
     parser.registerAction(MappingMode.N, "VimInsertNewLineBelow", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_MULTIKEY_UNDO),
                           new Shortcut('o'));
-    // Motion Actions
-    parser
-      .registerAction(MappingMode.N, "VimMotionGotoMark", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP),
-                      new Shortcut('`'), Argument.Type.CHARACTER);
-    parser
-      .registerAction(MappingMode.N, "VimMotionGotoMarkLine", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE, CommandFlags.FLAG_SAVE_JUMP),
-                      new Shortcut('\''), Argument.Type.CHARACTER);
-    parser.registerAction(MappingMode.N, "VimMotionGotoMark", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE),
-                          new Shortcut("g`"), Argument.Type.CHARACTER);
-    parser.registerAction(MappingMode.N, "VimMotionGotoMarkLine", Command.Type.MOTION, EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE),
-                          new Shortcut("g'"), Argument.Type.CHARACTER);
     // Misc Actions
     parser.registerAction(MappingMode.N, "VimLastSearchReplace", Command.Type.OTHER_WRITABLE,
                           new Shortcut('&'));
@@ -522,16 +276,6 @@ class RegisterActions {
 
     // Jump Actions
 
-    parser.registerAction(MappingMode.N, "VimMotionJumpNext", Command.Type.OTHER_READONLY, new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0))
-    });
-    parser.registerAction(MappingMode.N, "VimMotionJumpPrevious", Command.Type.OTHER_READONLY,
-                          new Shortcut[] {
-                            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK)),
-                            // TODO: <C-T> is a tag command similar to <C-O>, the tag stack is not implemented
-                            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.CTRL_MASK))
-                          });
 
     parser.registerAction(MappingMode.N, "VimFileGetAscii", Command.Type.OTHER_READONLY,
                           new Shortcut("ga"));
@@ -597,22 +341,6 @@ class RegisterActions {
     parser.registerAction(MappingMode.I, "VimInsertSingleCommand", Command.Type.INSERT,
                           EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES, CommandFlags.FLAG_EXPECT_MORE),
                           new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK)));
-    parser.registerAction(MappingMode.I, "VimMotionFirstColumn", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_SAVE_STROKE),
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, 0)));
-    parser.registerAction(MappingMode.I, "VimMotionGotoLineFirst", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES),
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_HOME, KeyEvent.CTRL_MASK)));
-    parser.registerAction(MappingMode.I, "VimMotionGotoLineLastEnd", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES),
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, KeyEvent.CTRL_MASK)));
-    parser.registerAction(MappingMode.I, "VimMotionLastColumn", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_SAVE_STROKE),
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_END, 0)));
-    parser.registerAction(MappingMode.I, "VimMotionLeft", Command.Type.INSERT, new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0))
-    });
-    parser.registerAction(MappingMode.I, "VimMotionRight", Command.Type.INSERT, new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, 0))
-    });
     parser.registerAction(MappingMode.I, "VimMotionScrollPageUp", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES), new Shortcut[]{
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.CTRL_MASK)),
@@ -626,18 +354,6 @@ class RegisterActions {
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, KeyEvent.CTRL_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.SHIFT_MASK)),
       new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, KeyEvent.SHIFT_MASK))
-    });
-    parser.registerAction(MappingMode.I, "VimMotionWordLeft", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_SAVE_STROKE), new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, KeyEvent.CTRL_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.SHIFT_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, KeyEvent.SHIFT_MASK))
-    });
-    parser.registerAction(MappingMode.I, "VimMotionWordRight", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_SAVE_STROKE), new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, KeyEvent.CTRL_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.SHIFT_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_RIGHT, KeyEvent.SHIFT_MASK))
     });
     parser.registerAction(MappingMode.I, "VimShiftLeftLines", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_SAVE_STROKE),
                           new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.CTRL_MASK)));

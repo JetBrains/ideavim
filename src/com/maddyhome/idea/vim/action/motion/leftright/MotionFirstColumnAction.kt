@@ -16,33 +16,47 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action.motion.leftright;
+package com.maddyhome.idea.vim.action.motion.leftright
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.handler.MotionActionHandler;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.MotionEditorAction
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.handler.MotionActionHandler
+import java.util.*
+import javax.swing.KeyStroke
 
+class MotionFirstColumnAction : MotionEditorAction() {
+  override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
-public class MotionFirstColumnAction extends MotionEditorAction {
-  public MotionFirstColumnAction() {
-    super(new Handler());
-  }
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("0")
 
-  private static class Handler extends MotionActionHandler.ForEachCaret {
-    public Handler() {
-      super();
-    }
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
 
-    @Override
-    public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                         int rawCount, @Nullable Argument argument) {
-      return VimPlugin.getMotion().moveCaretToLineStart(editor, caret);
-    }
+  override fun makeMotionHandler(): MotionActionHandler = MotionFirstColumnActionHandler
+}
+
+class MotionFirstColumnInsertModeAction : MotionEditorAction() {
+  override val mappingModes: Set<MappingMode> = MappingMode.I
+
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Home>")
+
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_STROKE)
+
+  override fun makeMotionHandler(): MotionActionHandler = MotionFirstColumnActionHandler
+}
+
+private object MotionFirstColumnActionHandler : MotionActionHandler.ForEachCaret() {
+  override fun getOffset(editor: Editor,
+                         caret: Caret,
+                         context: DataContext,
+                         count: Int,
+                         rawCount: Int,
+                         argument: Argument?): Int {
+    return VimPlugin.getMotion().moveCaretToLineStart(editor, caret)
   }
 }

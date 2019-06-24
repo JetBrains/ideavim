@@ -32,6 +32,8 @@ import com.intellij.openapi.editor.actionSystem.ActionPlan;
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
+import com.maddyhome.idea.vim.action.MotionEditorAction;
+import com.maddyhome.idea.vim.action.TextObjectAction;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.group.RegisterGroup;
@@ -560,6 +562,10 @@ public class KeyHandler {
     if (currentArg == Argument.Type.MOTION) {
       // We have been expecting a motion argument - is this one?
       if (node.getCmdType() == Command.Type.MOTION) {
+        if (!(node.getAction() instanceof MotionEditorAction) && !(node.getAction() instanceof TextObjectAction)) {
+          throw new RuntimeException("MOTION cmd type can be used only with MotionEditorAction or TextObjectAction - " +
+                                     node.getAction().getClass().getName());
+        }
         // Create the motion command and add it to the stack
         Command cmd = new Command(count, node.getActionId(), node.getAction(), node.getCmdType(), node.getFlags());
         cmd.setKeys(keys);

@@ -16,58 +16,49 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action.motion.leftright;
+package com.maddyhome.idea.vim.action.motion.leftright
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.MotionEditorAction;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.handler.MotionActionHandler;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.MotionEditorAction
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.handler.MotionActionHandler
+import java.awt.event.KeyEvent
+import java.util.*
+import javax.swing.KeyStroke
 
-import javax.swing.*;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+class MotionLeftAction : MotionEditorAction() {
+  override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
-public class MotionLeftAction extends MotionEditorAction {
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.NVO;
-  }
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("h")
 
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("h");
-  }
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
 
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE);
-  }
-
-  @NotNull
-  @Override
-  public MotionActionHandler makeMotionHandler() {
-    return new MotionActionHandler.ForEachCaret() {
-      @Override
-      public int getOffset(@NotNull Editor editor,
-                           @NotNull Caret caret,
-                           @NotNull DataContext context,
-                           int count,
-                           int rawCount,
-                           @Nullable Argument argument) {
-        return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -count, false);
-      }
-    };
-  }
+  override fun makeMotionHandler(): MotionActionHandler = MotionLeftActionHandler
 }
 
+class MotionLeftInsertModeAction : MotionEditorAction() {
+  override val mappingModes: Set<MappingMode> = MappingMode.I
+
+  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)),
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_LEFT, 0))
+  )
+
+  override fun makeMotionHandler(): MotionActionHandler = MotionLeftActionHandler
+}
+
+private object MotionLeftActionHandler : MotionActionHandler.ForEachCaret() {
+  override fun getOffset(editor: Editor,
+                         caret: Caret,
+                         context: DataContext,
+                         count: Int,
+                         rawCount: Int,
+                         argument: Argument?): Int {
+    return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -count, false)
+  }
+}

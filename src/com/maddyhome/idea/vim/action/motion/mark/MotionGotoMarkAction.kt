@@ -16,62 +16,50 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action.motion.mark;
+package com.maddyhome.idea.vim.action.motion.mark
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.MotionEditorAction;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.handler.MotionActionHandler;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.MotionEditorAction
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.handler.MotionActionHandler
+import java.util.*
+import javax.swing.KeyStroke
 
-import javax.swing.*;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+class MotionGotoMarkAction : MotionEditorAction() {
+  override val mappingModes: Set<MappingMode> = MappingMode.N
 
-public class MotionGotoMarkAction extends MotionEditorAction {
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.N;
-  }
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("`")
 
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("`");
-  }
+  override val argumentType: Argument.Type = Argument.Type.CHARACTER
 
-  @NotNull
-  @Override
-  public Argument.Type getArgumentType() {
-    return Argument.Type.CHARACTER;
-  }
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP)
 
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE, CommandFlags.FLAG_SAVE_JUMP);
-  }
+  override fun makeMotionHandler(): MotionActionHandler = MotionGotoMarkActionHandler
+}
 
-  @NotNull
-  @Override
-  public MotionActionHandler makeMotionHandler() {
-    return new MotionActionHandler.ForEachCaret() {
-      @Override
-      public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                           int rawCount, @Nullable Argument argument) {
-        if (argument == null) return -1;
+class MotionGotoMarkNoSaveJumpAction : MotionEditorAction() {
+  override val mappingModes: Set<MappingMode> = MappingMode.N
 
-        final char mark = argument.getCharacter();
-        return VimPlugin.getMotion().moveCaretToMark(editor, mark, false);
-      }
-    };
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("g`")
+
+  override val argumentType: Argument.Type = Argument.Type.CHARACTER
+
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
+
+  override fun makeMotionHandler(): MotionActionHandler = MotionGotoMarkActionHandler
+}
+
+private object MotionGotoMarkActionHandler : MotionActionHandler.ForEachCaret() {
+  override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int,
+                         rawCount: Int, argument: Argument?): Int {
+    if (argument == null) return -1
+
+    val mark = argument.character
+    return VimPlugin.getMotion().moveCaretToMark(editor, mark, false)
   }
 }

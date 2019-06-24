@@ -16,59 +16,66 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action.motion.updown;
+package com.maddyhome.idea.vim.action.motion.updown
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.motion.MotionEditorAction;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.handler.MotionActionHandler;
-import com.maddyhome.idea.vim.helper.CaretDataKt;
-import com.maddyhome.idea.vim.helper.EditorHelper;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.MotionEditorAction
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.helper.EditorHelper
+import com.maddyhome.idea.vim.helper.vimLastColumn
+import java.util.*
+import javax.swing.KeyStroke
 
+class MotionDownAction : MotionEditorAction() {
+  override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
-public class MotionDownAction extends MotionEditorAction {
-  public MotionDownAction() {
-    super(new Handler());
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("j", "<C-N>")
+
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_LINEWISE)
+
+  override fun makeMotionHandler(): MotionActionHandler = MotionDownActionHandler
+}
+
+class MotionDownNotLineWiseAction : MotionEditorAction() {
+  override val mappingModes: Set<MappingMode> = MappingMode.NVO
+
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gj", "g<Down>")
+
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_MOT_EXCLUSIVE)
+
+  override fun makeMotionHandler(): MotionActionHandler = MotionDownActionHandler
+}
+
+private object MotionDownActionHandler : MotionActionHandler.ForEachCaret() {
+  private var col: Int = 0
+  override fun getOffset(editor: Editor,
+                         caret: Caret,
+                         context: DataContext,
+                         count: Int,
+                         rawCount: Int,
+                         argument: Argument?): Int {
+    return VimPlugin.getMotion().moveCaretVertical(editor, caret, count)
   }
 
-  private static class Handler extends MotionActionHandler.ForEachCaret {
-    public Handler() {
-      super();
-    }
+  override fun preOffsetComputation(editor: Editor,
+                                    caret: Caret,
+                                    context: DataContext,
+                                    cmd: Command): Boolean {
+    col = caret.vimLastColumn
+    return true
+  }
 
-    @Override
-    public int getOffset(@NotNull Editor editor,
-                         @NotNull Caret caret,
-                         @NotNull DataContext context,
-                         int count,
-                         int rawCount,
-                         @Nullable Argument argument) {
-      return VimPlugin.getMotion().moveCaretVertical(editor, caret, count);
-    }
-
-    @Override
-    public boolean preOffsetComputation(@NotNull Editor editor,
-                                           @NotNull Caret caret,
-                                           @NotNull DataContext context,
-                                           @NotNull Command cmd) {
-      col = CaretDataKt.getVimLastColumn(caret);
-      return true;
-    }
-
-    @Override
-    public void postMove(@NotNull Editor editor,
-                            @NotNull Caret caret,
-                            @NotNull DataContext context,
-                            @NotNull Command cmd) {
-      EditorHelper.updateLastColumn(editor, caret, col);
-    }
-
-    private int col;
+  override fun postMove(editor: Editor,
+                        caret: Caret,
+                        context: DataContext,
+                        cmd: Command) {
+    EditorHelper.updateLastColumn(editor, caret, col)
   }
 }
