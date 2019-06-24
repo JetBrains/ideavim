@@ -50,6 +50,7 @@ sealed class ChangeEditorActionHandler : VimActionHandler(false) {
     when (this) {
       is ForEachCaret -> {
         editor.caretModel.runForEachCaret({ caret ->
+          if (!caret.isValid) return@runForEachCaret
           if (!execute(editor, caret, context, cmd.count, cmd.rawCount, cmd.argument)) {
             worked.set(false)
           }

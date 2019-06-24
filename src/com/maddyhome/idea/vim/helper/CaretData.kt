@@ -21,6 +21,7 @@
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.RangeMarker
 import com.intellij.openapi.util.Key
 import com.maddyhome.idea.vim.group.visual.VisualChange
 
@@ -57,4 +58,4 @@ var Caret.vimLastColumn: Int
 //endregion
 
 var Caret.vimLastVisualOperatorRange: VisualChange? by userDataCaretToEditor()
-var Caret.vimInsertStart: Int by userDataOr { (this as Caret).offset }
+var Caret.vimInsertStart: RangeMarker by userDataOr { (this as Caret).editor.document.createRangeMarker(this.offset, this.offset) }

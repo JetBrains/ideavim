@@ -315,7 +315,7 @@ public class ChangeGroup {
    * @return true if able to delete the text, false if not
    */
   public boolean insertDeleteInsertedText(@NotNull Editor editor, @NotNull Caret caret) {
-    int deleteTo = CaretDataKt.getVimInsertStart(caret);
+    int deleteTo = CaretDataKt.getVimInsertStart(caret).getStartOffset();
     int offset = caret.getOffset();
     if (offset == deleteTo) {
       deleteTo = VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, caret);
@@ -358,7 +358,7 @@ public class ChangeGroup {
 
     final CaretModel caretModel = editor.getCaretModel();
     for (Caret caret : caretModel.getAllCarets()) {
-      CaretDataKt.setVimInsertStart(caret, caret.getOffset());
+      CaretDataKt.setVimInsertStart(caret, editor.getDocument().createRangeMarker(caret.getOffset(), caret.getOffset()));
       if (caret == caretModel.getPrimaryCaret()) {
         VimPlugin.getMark().setMark(editor, MarkGroup.MARK_CHANGE_START, caret.getOffset());
       }
@@ -699,7 +699,7 @@ public class ChangeGroup {
     strokes.clear();
     repeatCharsCount = 0;
     for (Caret caret : editor.getCaretModel().getAllCarets()) {
-      CaretDataKt.setVimInsertStart(caret, caret.getOffset());
+      CaretDataKt.setVimInsertStart(caret, editor.getDocument().createRangeMarker(caret.getOffset(), caret.getOffset()));
     }
   }
 
@@ -772,7 +772,10 @@ public class ChangeGroup {
   public boolean deleteEndOfLine(@NotNull Editor editor, @NotNull Caret caret, int count) {
     int offset = VimPlugin.getMotion().moveCaretToLineEndOffset(editor, caret, count - 1, true);
     if (offset != -1) {
-      boolean res = deleteText(editor, new TextRange(caret.getOffset(), offset), SelectionType.CHARACTER_WISE);
+      final TextRange rangeToDelete = new TextRange(caret.getOffset(), offset);
+      editor.getCaretModel().getAllCarets().stream().filter(c -> c != caret && rangeToDelete.contains(c.getOffset()))
+        .forEach(c -> editor.getCaretModel().removeCaret(c));
+      boolean res = deleteText(editor, rangeToDelete, SelectionType.CHARACTER_WISE);
       int pos = VimPlugin.getMotion().moveCaretHorizontal(editor, caret, -1, false);
       if (pos != -1) {
         MotionGroup.moveCaret(editor, caret, pos);
