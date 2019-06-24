@@ -35,7 +35,7 @@ import javax.swing.KeyStroke
  */
 
 class SelectEnableLineModeAction : VimCommandAction() {
-  override fun makeActionHandler() = object : EditorActionHandlerBase() {
+  override fun makeActionHandler(): EditorActionHandlerBase = object : EditorActionHandlerBase() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
       editor.caretModel.runForEachCaret { caret ->
         val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)

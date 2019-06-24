@@ -39,7 +39,7 @@ import javax.swing.KeyStroke
  * @author Alex Plate
  */
 class LookupDownAction : VimCommandAction() {
-  override fun makeActionHandler() = object : EditorActionHandlerBase() {
+  override fun makeActionHandler(): EditorActionHandlerBase = object : EditorActionHandlerBase() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
       val activeLookup = LookupManager.getActiveLookup(editor)
       if (activeLookup != null) {

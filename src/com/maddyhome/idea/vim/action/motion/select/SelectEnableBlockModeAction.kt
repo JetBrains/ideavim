@@ -36,7 +36,7 @@ import javax.swing.KeyStroke
  */
 
 class SelectEnableBlockModeAction : VimCommandAction() {
-  override fun makeActionHandler() = object : EditorActionHandlerBase() {
+  override fun makeActionHandler(): EditorActionHandlerBase = object : EditorActionHandlerBase() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
       editor.caretModel.removeSecondaryCarets()
       val lineEnd = EditorHelper.getLineEndForOffset(editor, editor.caretModel.primaryCaret.offset)

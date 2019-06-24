@@ -36,7 +36,7 @@ import javax.swing.KeyStroke
 
 
 class VisualToggleLineModeAction : VimCommandAction() {
-  override fun makeActionHandler() = object : EditorActionHandlerBase() {
+  override fun makeActionHandler(): EditorActionHandlerBase = object : EditorActionHandlerBase() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
       val listOption = OptionsManager.selectmode
       return if ("cmd" in listOption) {

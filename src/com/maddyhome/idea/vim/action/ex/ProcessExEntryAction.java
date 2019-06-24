@@ -20,7 +20,6 @@ package com.maddyhome.idea.vim.action.ex;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
@@ -42,7 +41,7 @@ import java.util.Set;
 public class ProcessExEntryAction extends VimCommandAction {
   @NotNull
   @Override
-  protected EditorActionHandler makeActionHandler() {
+  protected EditorActionHandlerBase makeActionHandler() {
     return new EditorActionHandlerBase() {
       protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         return VimPlugin.getProcess().processExEntry(editor, context);

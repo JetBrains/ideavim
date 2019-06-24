@@ -23,12 +23,12 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorAction
-import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.handler.TextObjectActionHandler
 import com.maddyhome.idea.vim.helper.StringHelper
@@ -51,7 +51,7 @@ abstract class VimCommandAction : EditorAction(null) {
     setupHandler(makeActionHandler())
   }
 
-  protected abstract fun makeActionHandler(): EditorActionHandler
+  protected abstract fun makeActionHandler(): EditorActionHandlerBase
 
   abstract val mappingModes: Set<MappingMode>
 
@@ -89,7 +89,7 @@ abstract class TextObjectAction : VimCommandAction() {
     return (handler as TextObjectActionHandler).getRange(editor, caret, context, count, rawCount, argument)
   }
 
-  final override fun makeActionHandler() = makeTextObjectHandler()
+  final override fun makeActionHandler(): EditorActionHandlerBase = makeTextObjectHandler()
 
   final override val type: Command.Type = Command.Type.MOTION
 }
@@ -112,7 +112,7 @@ abstract class MotionEditorAction : VimCommandAction() {
     }
   }
 
-  final override fun makeActionHandler() = makeMotionHandler()
+  final override fun makeActionHandler(): EditorActionHandlerBase = makeMotionHandler()
 
   final override val type: Command.Type = Command.Type.MOTION
 }

@@ -20,7 +20,6 @@ package com.maddyhome.idea.vim.action.motion.search;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.VimCommandAction;
@@ -39,7 +38,7 @@ import java.util.Set;
 public class GotoDeclarationAction extends VimCommandAction {
   @NotNull
   @Override
-  protected EditorActionHandler makeActionHandler() {
+  protected EditorActionHandlerBase makeActionHandler() {
     return new EditorActionHandlerBase() {
       protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         VimPlugin.getMark().saveJumpLocation(editor);

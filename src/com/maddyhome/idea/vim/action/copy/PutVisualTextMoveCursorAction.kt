@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.group.visual.VimSelection
+import com.maddyhome.idea.vim.handler.EditorActionHandlerBase
 import com.maddyhome.idea.vim.handler.VisualOperatorActionHandler
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
@@ -37,7 +38,7 @@ import javax.swing.KeyStroke
  * @author vlan
  */
 class PutVisualTextMoveCursorAction : VimCommandAction() {
-  override fun makeActionHandler() = object : VisualOperatorActionHandler.SingleExecution() {
+  override fun makeActionHandler(): EditorActionHandlerBase = object : VisualOperatorActionHandler.SingleExecution() {
     override fun executeForAllCarets(editor: Editor, context: DataContext, cmd: Command, caretsAndSelections: Map<Caret, VimSelection>): Boolean {
       if (caretsAndSelections.isEmpty()) return false
       val textData = VimPlugin.getRegister().lastRegister?.let { PutData.TextData(it.text, it.type, it.transferableData) }
