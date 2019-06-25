@@ -33,7 +33,7 @@ import javax.swing.KeyStroke
  * @author vlan
  */
 class VisualSwapEndsAction : VimCommandAction() {
-  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler() {
+  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
       var ret = true
       editor.vimForEachCaret { ret = ret and VimPlugin.getVisualMotion().swapVisualEnds(editor, it) }

@@ -34,7 +34,7 @@ import javax.swing.KeyStroke
  */
 
 class SelectDeleteAction : VimCommandAction() {
-  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler() {
+  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
       val enterKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)
       val actions = VimPlugin.getKey().getActions(editor.component, enterKeyStroke)

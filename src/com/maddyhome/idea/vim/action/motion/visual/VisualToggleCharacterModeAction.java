@@ -42,8 +42,8 @@ final public class VisualToggleCharacterModeAction extends VimCommandAction {
   @NotNull
   @Override
   final protected VimActionHandler makeActionHandler() {
-    return new VimActionHandler() {
-      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+    return new VimActionHandler.SingleExecution() {
+      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         final ListOption listOption = OptionsManager.INSTANCE.getSelectmode();
         if (listOption.contains("cmd")) {
           return VimPlugin.getVisualMotion().enterSelectMode(editor, CommandState.SubMode.VISUAL_CHARACTER);

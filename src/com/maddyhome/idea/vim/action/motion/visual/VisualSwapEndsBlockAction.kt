@@ -32,7 +32,7 @@ import javax.swing.KeyStroke
  * @author vlan
  */
 class VisualSwapEndsBlockAction : VimCommandAction() {
-  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler() {
+  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
       if (editor.inBlockSubMode) {
         return VimPlugin.getVisualMotion().swapVisualEndsBigO(editor)

@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
@@ -39,8 +39,8 @@ public class FilterMotionAction extends EditorAction {
     super(new Handler());
   }
 
-  private static class Handler extends EditorActionHandlerBase {
-    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+  private static class Handler extends VimActionHandler.SingleExecution {
+    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       final Argument argument = cmd.getArgument();
       if (argument == null) {
         return false;

@@ -39,9 +39,9 @@ final public class WindowNextAction extends VimCommandAction {
   @NotNull
   @Override
   final protected VimActionHandler makeActionHandler() {
-    return new VimActionHandler() {
+    return new VimActionHandler.SingleExecution() {
       @Override
-      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         if (cmd.getRawCount() == 0) {
           VimPlugin.getWindow().selectNextWindow(context);
         } else {

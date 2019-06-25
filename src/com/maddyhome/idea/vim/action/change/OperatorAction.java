@@ -45,9 +45,9 @@ final public class OperatorAction extends VimCommandAction {
   @NotNull
   @Override
   final protected VimActionHandler makeActionHandler() {
-    return new VimActionHandler() {
+    return new VimActionHandler.SingleExecution() {
       @Override
-      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         final OperatorFunction operatorFunction = VimPlugin.getKey().getOperatorFunction();
         if (operatorFunction != null) {
           final Argument argument = cmd.getArgument();

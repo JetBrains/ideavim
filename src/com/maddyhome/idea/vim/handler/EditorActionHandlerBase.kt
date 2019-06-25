@@ -16,81 +16,80 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.handler;
+package com.maddyhome.idea.vim.handler
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorActionHandler;
-import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandState;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.actionSystem.EditorActionHandler
+import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandState
 
 
-public abstract class EditorActionHandlerBase extends EditorActionHandler {
-  protected boolean myRunForEachCaret;
-
-  public EditorActionHandlerBase() {
-    this(false);
+/**
+ * Handler for common usage
+ */
+sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerBase(myRunForEachCaret) {
+  abstract class ForEachCaret : VimActionHandler(true) {
+    abstract fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean
   }
 
-  public EditorActionHandlerBase(boolean runForEachCaret) {
-    super(runForEachCaret);
-    myRunForEachCaret = runForEachCaret;
+  abstract class SingleExecution : VimActionHandler(false) {
+    abstract fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean
   }
 
-  @Override
-  public final void doExecute(@NotNull Editor editor, @Nullable Caret caret, @NotNull DataContext context) {
-    editor = InjectedLanguageUtil.getTopLevelEditor(editor);
-    logger.debug("doExecute");
-
-    if (!VimPlugin.isEnabled()) {
-      return;
+  override fun baseExecute(editor: Editor, caret: Caret?, context: DataContext, cmd: Command): Boolean {
+    return when (this) {
+      is ForEachCaret -> caret == null || execute(editor, caret, context, cmd)
+      is SingleExecution -> execute(editor, context, cmd)
     }
+  }
+}
 
-    final CommandState state = CommandState.getInstance(editor);
-    final Command cmd = state.getCommand();
+abstract class EditorActionHandlerBase(myRunForEachCaret: Boolean) : EditorActionHandler(myRunForEachCaret) {
 
-    try {
-      if (myRunForEachCaret) {
-        if (cmd == null || caret == null || !execute(editor, caret, context, cmd)) {
-          VimPlugin.indicateError();
-        }
-      }
-      else {
-        if (cmd == null || !execute(editor, context, cmd)) {
-          VimPlugin.indicateError();
-        }
-      }
-    }
-    catch (ExecuteMethodNotOverriddenException e) {
-      VimPlugin.indicateError();
+  abstract class ForEachCaret : EditorActionHandlerBase(true) {
+    abstract fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean
+
+    final override fun baseExecute(editor: Editor, caret: Caret?, context: DataContext, cmd: Command): Boolean {
+      if (caret == null) return false
+      return execute(editor, caret, context, cmd)
     }
   }
 
-  public void process(Command cmd) {
+  abstract class SingleExecution : EditorActionHandlerBase(false) {
+    abstract fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean
+
+    final override fun baseExecute(editor: Editor, caret: Caret?, context: DataContext, cmd: Command): Boolean {
+      return execute(editor, context, cmd)
+    }
+  }
+
+  abstract fun baseExecute(editor: Editor, caret: Caret?, context: DataContext, cmd: Command): Boolean
+
+  public final override fun doExecute(_editor: Editor, caret: Caret?, context: DataContext) {
+    val editor = InjectedLanguageUtil.getTopLevelEditor(_editor)
+    logger.debug("doExecute")
+
+    if (!VimPlugin.isEnabled()) return
+
+    val state = CommandState.getInstance(editor)
+    val cmd = state.command ?: run {
+      VimPlugin.indicateError()
+      return
+    }
+
+    if (!baseExecute(editor, caret, context, cmd)) VimPlugin.indicateError()
+  }
+
+  open fun process(cmd: Command) {
     // No-op
   }
 
-  protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd)
-    throws ExecuteMethodNotOverriddenException {
-    if (!myRunForEachCaret) {
-      throw new ExecuteMethodNotOverriddenException(this.getClass());
-    }
-    return execute(editor, editor.getCaretModel().getPrimaryCaret(), context, cmd);
+  private companion object {
+    private val logger = Logger.getInstance(EditorActionHandlerBase::class.java.name)
   }
-
-  protected boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
-                            @NotNull Command cmd) throws ExecuteMethodNotOverriddenException {
-    if (myRunForEachCaret) {
-      throw new ExecuteMethodNotOverriddenException(this.getClass());
-    }
-    return execute(editor, context, cmd);
-  }
-
-  private static final Logger logger = Logger.getInstance(EditorActionHandlerBase.class.getName());
 }

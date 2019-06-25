@@ -37,8 +37,8 @@ public class MotionMarkAction extends VimCommandAction {
   @NotNull
   @Override
   protected VimActionHandler makeActionHandler() {
-    return new VimActionHandler() {
-      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+    return new VimActionHandler.SingleExecution() {
+      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         final Argument argument = cmd.getArgument();
         return argument != null && VimPlugin.getMark().setMark(editor, argument.getCharacter());
       }

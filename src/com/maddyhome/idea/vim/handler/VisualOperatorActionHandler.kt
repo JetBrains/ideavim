@@ -49,7 +49,7 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
  * Base class for visual operation handlers.
  * @see [VisualOperatorActionHandler.SingleExecution] and [VisualOperatorActionHandler.ForEachCaret]
  */
-sealed class VisualOperatorActionHandler : VimActionHandler(false) {
+sealed class VisualOperatorActionHandler : VimActionHandler.SingleExecution() {
   /**
    * Base class for visual operation handlers.
    * This handler executes an action for each caret. That means that if you have 5 carets,
@@ -147,10 +147,6 @@ sealed class VisualOperatorActionHandler : VimActionHandler(false) {
     }
 
     return res.get()
-  }
-
-  final override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
-    return super.execute(editor, caret, context, cmd)
   }
 
   private fun Editor.collectSelections(): Map<Caret, VimSelection>? {

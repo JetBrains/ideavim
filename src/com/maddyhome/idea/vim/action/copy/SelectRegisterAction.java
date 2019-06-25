@@ -24,7 +24,7 @@ import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -33,9 +33,9 @@ public class SelectRegisterAction extends EditorAction {
     super(new Handler());
   }
 
-  private static class Handler extends EditorActionHandlerBase {
+  private static class Handler extends VimActionHandler.SingleExecution {
     @Override
-    protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       final Argument argument = cmd.getArgument();
       return argument != null && VimPlugin.getRegister().selectRegister(argument.getCharacter());
     }

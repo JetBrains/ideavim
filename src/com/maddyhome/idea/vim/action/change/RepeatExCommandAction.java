@@ -24,7 +24,7 @@ import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExException;
-import com.maddyhome.idea.vim.handler.EditorActionHandlerBase;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -33,7 +33,7 @@ public class RepeatExCommandAction extends EditorAction {
     super(new Handler());
   }
 
-  private static class Handler extends EditorActionHandlerBase {
+  private static class Handler extends VimActionHandler.SingleExecution {
     public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command command) {
       int count = command.getCount();
       try {

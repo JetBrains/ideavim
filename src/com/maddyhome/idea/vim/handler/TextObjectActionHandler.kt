@@ -24,9 +24,7 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
-import com.maddyhome.idea.vim.command.CommandFlags.FLAG_MOT_LINEWISE
-import com.maddyhome.idea.vim.command.CommandFlags.FLAG_TEXT_BLOCK
-import com.maddyhome.idea.vim.command.CommandFlags.FLAG_VISUAL_CHARACTERWISE
+import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
@@ -42,15 +40,14 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
  *
  * This handler gets executed for each caret.
  */
-abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
+abstract class TextObjectActionHandler : VimActionHandler.ForEachCaret() {
   abstract fun getRange(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): TextRange?
-
-  final override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
+  override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
     if (!editor.inVisualMode) return true
 
     val range = getRange(editor, caret, context, cmd.count, cmd.rawCount, cmd.argument) ?: return false
 
-    val block = FLAG_TEXT_BLOCK in cmd.flags
+    val block = CommandFlags.FLAG_TEXT_BLOCK in cmd.flags
     val newstart = if (block || caret.offset >= caret.vimSelectionStart) range.startOffset else range.endOffset
     val newend = if (block || caret.offset >= caret.vimSelectionStart) range.endOffset else range.startOffset
 
@@ -58,9 +55,9 @@ abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
       caret.vimSetSelection(newstart, newstart, false)
     }
 
-    if (FLAG_MOT_LINEWISE in cmd.flags && FLAG_VISUAL_CHARACTERWISE !in cmd.flags && editor.subMode != CommandState.SubMode.VISUAL_LINE) {
+    if (CommandFlags.FLAG_MOT_LINEWISE in cmd.flags && CommandFlags.FLAG_VISUAL_CHARACTERWISE !in cmd.flags && editor.subMode != CommandState.SubMode.VISUAL_LINE) {
       VimPlugin.getVisualMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_LINE)
-    } else if ((FLAG_MOT_LINEWISE !in cmd.flags || FLAG_VISUAL_CHARACTERWISE in cmd.flags) && editor.subMode == CommandState.SubMode.VISUAL_LINE) {
+    } else if ((CommandFlags.FLAG_MOT_LINEWISE !in cmd.flags || CommandFlags.FLAG_VISUAL_CHARACTERWISE in cmd.flags) && editor.subMode == CommandState.SubMode.VISUAL_LINE) {
       VimPlugin.getVisualMotion().toggleVisual(editor, 1, 0, CommandState.SubMode.VISUAL_CHARACTER)
     }
 
@@ -68,6 +65,4 @@ abstract class TextObjectActionHandler : EditorActionHandlerBase(true) {
 
     return true
   }
-
-  final override fun execute(editor: Editor, context: DataContext, cmd: Command) = false
 }

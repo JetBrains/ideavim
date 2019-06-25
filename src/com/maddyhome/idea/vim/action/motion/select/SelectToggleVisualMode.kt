@@ -34,7 +34,7 @@ import javax.swing.KeyStroke
  */
 
 class SelectToggleVisualMode : VimCommandAction() {
-  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler() {
+  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
       val commandState = CommandState.getInstance(editor)
       val subMode = commandState.subMode

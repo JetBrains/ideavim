@@ -39,9 +39,9 @@ final public class VerticalSplitAction extends VimCommandAction {
   @NotNull
   @Override
   final protected VimActionHandler makeActionHandler() {
-    return new VimActionHandler() {
+    return new VimActionHandler.SingleExecution() {
       @Override
-      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         VimPlugin.getWindow().splitWindowVertical(context, "");
         return true;
       }

@@ -42,8 +42,8 @@ public class ProcessExEntryAction extends VimCommandAction {
   @NotNull
   @Override
   protected VimActionHandler makeActionHandler() {
-    return new VimActionHandler() {
-      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+    return new VimActionHandler.SingleExecution() {
+      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         return VimPlugin.getProcess().processExEntry(editor, context);
       }
     };

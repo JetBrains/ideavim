@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.EditorData
 
-sealed class ChangeEditorActionHandler : VimActionHandler(false) {
+sealed class ChangeEditorActionHandler : VimActionHandler.SingleExecution() {
 
   abstract class ForEachCaret : ChangeEditorActionHandler() {
     abstract fun execute(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Boolean

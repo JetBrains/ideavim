@@ -60,8 +60,12 @@ public class MotionBigWordEndRightAction extends MotionEditorAction {
   public MotionActionHandler makeActionHandler() {
     return new MotionActionHandler.ForEachCaret() {
       @Override
-      public int getOffset(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-      int rawCount, @Nullable Argument argument) {
+      public int getOffset(@NotNull Editor editor,
+                           @NotNull Caret caret,
+                           @NotNull DataContext context,
+                           int count,
+                           int rawCount,
+                           @Nullable Argument argument) {
         return VimPlugin.getMotion().moveCaretToNextWordEnd(editor, caret, count, true);
       }
     };

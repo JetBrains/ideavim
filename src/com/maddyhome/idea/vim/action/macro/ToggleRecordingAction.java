@@ -36,8 +36,9 @@ public class ToggleRecordingAction extends VimCommandAction {
   @NotNull
   @Override
   protected VimActionHandler makeActionHandler() {
-    return new VimActionHandler() {
-      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+    return new VimActionHandler.SingleExecution() {
+      @Override
+      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         if (!CommandState.getInstance(editor).isRecording()) {
           final Argument argument = cmd.getArgument();
           if (argument == null) {

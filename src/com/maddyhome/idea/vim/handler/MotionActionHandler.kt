@@ -41,7 +41,7 @@ import com.maddyhome.idea.vim.helper.vimSelectionStart
  * Base class for motion handlers.
  * @see [MotionActionHandler.SingleExecution] and [MotionActionHandler.ForEachCaret]
  */
-sealed class MotionActionHandler : EditorActionHandlerBase() {
+sealed class MotionActionHandler : VimActionHandler.SingleExecution() {
 
   /**
    * Base class for motion handlers.

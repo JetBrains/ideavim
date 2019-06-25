@@ -36,9 +36,9 @@ public class ResetModeAction extends VimCommandAction {
   @NotNull
   @Override
   protected VimActionHandler makeActionHandler() {
-    return new VimActionHandler() {
+    return new VimActionHandler.SingleExecution() {
       @Override
-      protected boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         KeyHandler.getInstance().fullReset(InjectedLanguageUtil.getTopLevelEditor(editor));
         return true;
       }

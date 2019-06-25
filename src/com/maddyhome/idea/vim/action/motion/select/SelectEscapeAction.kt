@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.helper.inBlockSubMode
 import javax.swing.KeyStroke
 
 class SelectEscapeAction : VimCommandAction() {
-  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler() {
+  override fun makeActionHandler(): VimActionHandler = object : VimActionHandler.SingleExecution() {
     override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
       val blockMode = editor.inBlockSubMode
       VimPlugin.getVisualMotion().exitSelectMode(editor, true)
