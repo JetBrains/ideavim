@@ -190,6 +190,7 @@ public class ExTextField extends JTextField {
     super.setText(string);
   }
 
+  @Override
   public void setText(String string) {
     super.setText(string);
 
@@ -267,6 +268,7 @@ public class ExTextField extends JTextField {
     }
   }
 
+  @Override
   protected void processKeyEvent(KeyEvent e) {
     if (logger.isDebugEnabled()) logger.debug("key=" + e);
     super.processKeyEvent(e);
@@ -279,6 +281,7 @@ public class ExTextField extends JTextField {
    *
    * @return the default model implementation
    */
+  @Override
   @NotNull
   protected Document createDefaultModel() {
     return new ExDocument();
@@ -495,6 +498,7 @@ public class ExTextField extends JTextField {
       }
     }
 
+    @Override
     protected synchronized void damage(Rectangle r) {
       if (r != null) {
         JTextComponent component = getComponent();

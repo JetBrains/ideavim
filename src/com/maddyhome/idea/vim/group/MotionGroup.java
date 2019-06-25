@@ -75,6 +75,7 @@ public class MotionGroup {
    */
   public MotionGroup() {
     EventFacade.getInstance().addEditorFactoryListener(new EditorFactoryListener() {
+      @Override
       public void editorCreated(@NotNull EditorFactoryEvent event) {
         if (!VimPlugin.isEnabled()) return;
         final Editor editor = event.getEditor();
@@ -90,6 +91,7 @@ public class MotionGroup {
           })));
       }
 
+      @Override
       public void editorReleased(@NotNull EditorFactoryEvent event) {
         if (!VimPlugin.isEnabled()) return;
         Editor editor = event.getEditor();
@@ -1333,6 +1335,7 @@ public class MotionGroup {
   }
 
   public static class MotionEditorChange implements FileEditorManagerListener {
+    @Override
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
       if (ExEntryPanel.getInstance().isActive()) {
         ExEntryPanel.getInstance().deactivate(false);

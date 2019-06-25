@@ -55,6 +55,7 @@ public class RunnableHelper {
       this.cmd = cmd;
     }
 
+    @Override
     public void run() {
       ApplicationManager.getApplication().runReadAction(cmd);
     }
@@ -67,6 +68,7 @@ public class RunnableHelper {
       this.cmd = cmd;
     }
 
+    @Override
     public void run() {
       ApplicationManager.getApplication().runWriteAction(cmd);
     }

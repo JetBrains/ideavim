@@ -33,6 +33,7 @@ public class MotionScrollColumnLeftAction extends EditorAction {
   }
 
   private static class Handler extends VimActionHandler.SingleExecution {
+    @Override
     public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       return VimPlugin.getMotion().scrollColumn(editor, cmd.getCount());
     }

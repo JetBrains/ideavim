@@ -2157,6 +2157,7 @@ public class SearchHelper {
       pairsChars = parseOption(lo);
 
       lo.addOptionChangeListener(new OptionChangeListener() {
+        @Override
         public void valueChange(@NotNull OptionChangeEvent event) {
           pairsChars = parseOption((ListOption)event.getOption());
         }

@@ -74,6 +74,7 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
     myText.setEditable(false);
 
     myAdapter = new ComponentAdapter() {
+      @Override
       public void componentResized(ComponentEvent e) {
         positionPanel();
       }
@@ -297,6 +298,7 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
 
   private void close(@Nullable final KeyEvent e) {
     ApplicationManager.getApplication().invokeLater(new Runnable() {
+      @Override
       public void run() {
         deactivate(true);
 
@@ -322,6 +324,7 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
     /**
      * Invoked when a key has been pressed.
      */
+    @Override
     public void keyTyped(@NotNull KeyEvent e) {
       if (myExOutputPanel.myAtEnd) {
         myExOutputPanel.close(e);

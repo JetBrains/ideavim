@@ -33,6 +33,7 @@ public class FilePreviousAction extends EditorAction {
   }
 
   private static class FilePreviousHandler extends VimActionHandler.SingleExecution {
+    @Override
     public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       VimPlugin.getFile().selectPreviousTab(context);
 

@@ -33,6 +33,7 @@ public class FileSaveCloseAction extends EditorAction {
   }
 
   private static class Handler extends VimActionHandler.SingleExecution {
+    @Override
     public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       VimPlugin.getFile().saveFile(context);
       VimPlugin.getFile().closeFile(editor, context);

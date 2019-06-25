@@ -33,6 +33,7 @@ public class FileGetFileInfoAction extends EditorAction {
   }
 
   private static class Handler extends VimActionHandler.SingleExecution {
+    @Override
     public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       VimPlugin.getFile().displayFileInfo(editor, cmd.getRawCount() > 0);
 

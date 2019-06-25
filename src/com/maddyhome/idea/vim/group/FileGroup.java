@@ -408,6 +408,7 @@ public class FileGroup {
    * This class listens for editor tab changes so any insert/replace modes that need to be reset can be.
    */
   public static class SelectionCheck implements FileEditorManagerListener {
+    @Override
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
       // The user has changed the editor they are working with - exit insert/replace mode, and complete any
       // appropriate repeat

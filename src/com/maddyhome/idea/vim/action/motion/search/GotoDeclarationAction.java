@@ -40,6 +40,7 @@ public class GotoDeclarationAction extends VimCommandAction {
   @Override
   protected VimActionHandler makeActionHandler() {
     return new VimActionHandler.SingleExecution() {
+      @Override
       public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         VimPlugin.getMark().saveJumpLocation(editor);
         KeyHandler.executeAction("GotoDeclaration", context);

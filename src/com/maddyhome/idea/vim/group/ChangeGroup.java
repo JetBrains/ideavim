@@ -407,12 +407,14 @@ public class ChangeGroup {
     final EventFacade eventFacade = EventFacade.getInstance();
 
     eventFacade.addEditorFactoryListener(new EditorFactoryAdapter() {
+      @Override
       public void editorCreated(@NotNull EditorFactoryEvent event) {
         final Editor editor = event.getEditor();
         eventFacade.addEditorMouseListener(editor, listener);
         EditorData.setChangeGroup(editor, true);
       }
 
+      @Override
       public void editorReleased(@NotNull EditorFactoryEvent event) {
         final Editor editor = event.getEditor();
         if (EditorData.getChangeGroup(editor)) {
@@ -422,6 +424,7 @@ public class ChangeGroup {
       }
 
       @NotNull private final EditorMouseAdapter listener = new EditorMouseAdapter() {
+        @Override
         public void mouseClicked(@NotNull EditorMouseEvent event) {
           Editor editor = event.getEditor();
           if (!VimPlugin.isEnabled()) {

@@ -35,6 +35,7 @@ public class VimPluginToggleAction extends ToggleAction implements DumbAware {
    * @param event The event that triggered the action
    * @return true if the toggle is on, false if off
    */
+  @Override
   public boolean isSelected(@NotNull AnActionEvent event) {
     return VimPlugin.isEnabled();
   }
@@ -45,6 +46,7 @@ public class VimPluginToggleAction extends ToggleAction implements DumbAware {
    * @param event The event that triggered the action
    * @param b     The new state - true is on, false is off
    */
+  @Override
   public void setSelected(@NotNull AnActionEvent event, boolean b) {
     VimPlugin.setEnabled(b);
   }

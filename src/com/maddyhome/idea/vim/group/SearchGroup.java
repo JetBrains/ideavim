@@ -1340,12 +1340,14 @@ public class SearchGroup {
     /**
      * Updates search highlights when the selected editor changes
      */
+    @Override
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
       VimPlugin.getSearch().updateSearchHighlights();
     }
   }
 
   public static class DocumentSearchListener implements DocumentListener {
+    @Override
     public void documentChanged(@NotNull DocumentEvent event) {
       if (!VimPlugin.isEnabled()) {
         return;

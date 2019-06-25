@@ -99,6 +99,7 @@ public class SearchRange extends AbstractRange {
    * @param lastZero True if last line was set to start of file
    * @return The zero based line number, -1 if the text was not found
    */
+  @Override
   protected int getRangeLine(@NotNull Editor editor, DataContext context, boolean lastZero) {
     // Each subsequent pattern is searched for starting in the line after the previous search match
     int line = editor.getCaretModel().getLogicalPosition().line;

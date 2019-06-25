@@ -36,6 +36,7 @@ public class ChangeCaseUpperMotionAction extends EditorAction {
   }
 
   private static class Handler extends ChangeEditorActionHandler.ForEachCaret {
+    @Override
     public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
                            int rawCount, @Nullable Argument argument) {
       return argument != null &&

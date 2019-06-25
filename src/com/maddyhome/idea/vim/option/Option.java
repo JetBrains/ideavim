@@ -104,6 +104,7 @@ public abstract class Option {
    * Helper method used to sort lists of options by their name
    */
   static class NameSorter<V> implements Comparator<V> {
+    @Override
     public int compare(@NotNull V o1, @NotNull V o2) {
       return ((Option)o1).name.compareTo(((Option)o2).name);
     }

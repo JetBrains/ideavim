@@ -48,6 +48,7 @@ public class ExEditorKit extends DefaultEditorKit {
    *
    * @return the type
    */
+  @Override
   @NotNull
   public String getContentType() {
     return "text/ideavim";
@@ -60,6 +61,7 @@ public class ExEditorKit extends DefaultEditorKit {
    *
    * @return the set of actions
    */
+  @Override
   public Action[] getActions() {
     Action[] res = TextAction.augmentList(super.getActions(), this.exActions);
     if (logger.isDebugEnabled()) logger.debug("res.length=" + res.length);
@@ -73,6 +75,7 @@ public class ExEditorKit extends DefaultEditorKit {
    *
    * @return the model
    */
+  @Override
   @NotNull
   public Document createDefaultDocument() {
     return new ExDocument();
@@ -127,6 +130,7 @@ public class ExEditorKit extends DefaultEditorKit {
   };
 
   public static class DefaultExKeyHandler extends DefaultKeyTypedAction {
+    @Override
     public void actionPerformed(@NotNull ActionEvent e) {
       ExTextField target = (ExTextField)getTextComponent(e);
       final Action currentAction = target.getCurrentAction();
@@ -161,6 +165,7 @@ public class ExEditorKit extends DefaultEditorKit {
       super(HistoryUp);
     }
 
+    @Override
     public void actionPerformed(ActionEvent actionEvent) {
       ExTextField target = (ExTextField)getTextComponent(actionEvent);
       target.selectHistory(true, false);
@@ -172,6 +177,7 @@ public class ExEditorKit extends DefaultEditorKit {
       super(HistoryDown);
     }
 
+    @Override
     public void actionPerformed(ActionEvent actionEvent) {
       ExTextField target = (ExTextField)getTextComponent(actionEvent);
       target.selectHistory(false, false);
@@ -183,6 +189,7 @@ public class ExEditorKit extends DefaultEditorKit {
       super(HistoryUpFilter);
     }
 
+    @Override
     public void actionPerformed(ActionEvent actionEvent) {
       ExTextField target = (ExTextField)getTextComponent(actionEvent);
       target.selectHistory(true, true);
@@ -194,6 +201,7 @@ public class ExEditorKit extends DefaultEditorKit {
       super(HistoryDownFilter);
     }
 
+    @Override
     public void actionPerformed(ActionEvent actionEvent) {
       ExTextField target = (ExTextField)getTextComponent(actionEvent);
       target.selectHistory(false, true);
@@ -212,6 +220,7 @@ public class ExEditorKit extends DefaultEditorKit {
       super(InsertRegister);
     }
 
+    @Override
     public void actionPerformed(@NotNull ActionEvent e) {
       final ExTextField target = (ExTextField)getTextComponent(e);
       final KeyStroke key = convert(e);
@@ -256,6 +265,7 @@ public class ExEditorKit extends DefaultEditorKit {
       super(CompleteEntry);
     }
 
+    @Override
     public void actionPerformed(ActionEvent actionEvent) {
       logger.debug("complete entry");
       KeyStroke stroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
@@ -275,6 +285,7 @@ public class ExEditorKit extends DefaultEditorKit {
       super(CancelEntry);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
       ExTextField target = (ExTextField)getTextComponent(e);
       target.cancel();
@@ -286,6 +297,7 @@ public class ExEditorKit extends DefaultEditorKit {
       super(EscapeChar);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
       ExTextField target = (ExTextField)getTextComponent(e);
       target.escape();
@@ -381,6 +393,7 @@ public class ExEditorKit extends DefaultEditorKit {
       super(deletePrevCharAction);
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
       ExTextField target = (ExTextField)getTextComponent(e);
       target.saveLastEntry();
@@ -410,6 +423,7 @@ public class ExEditorKit extends DefaultEditorKit {
     /**
      * Invoked when an action occurs.
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
       ExTextField target = (ExTextField)getTextComponent(e);
       target.saveLastEntry();
@@ -437,6 +451,7 @@ public class ExEditorKit extends DefaultEditorKit {
     /**
      * Invoked when an action occurs.
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
       ExTextField target = (ExTextField)getTextComponent(e);
       target.saveLastEntry();
@@ -462,6 +477,7 @@ public class ExEditorKit extends DefaultEditorKit {
     /**
      * Invoked when an action occurs.
      */
+    @Override
     public void actionPerformed(ActionEvent e) {
       logger.debug("actionPerformed");
       ExTextField target = (ExTextField)getTextComponent(e);
@@ -476,6 +492,7 @@ public class ExEditorKit extends DefaultEditorKit {
       super(StartDigraph);
     }
 
+    @Override
     public void actionPerformed(@NotNull ActionEvent e) {
       final ExTextField target = (ExTextField)getTextComponent(e);
       final KeyStroke key = convert(e);

@@ -32,6 +32,7 @@ public class BoundListOption extends ListOption {
     this.values = new ArrayList<String>(Arrays.asList(values));
   }
 
+  @Override
   public boolean set(String val) {
     List<String> vals = parseVals(val);
     if (vals != null && values.containsAll(vals)) {
@@ -41,6 +42,7 @@ public class BoundListOption extends ListOption {
     return true;
   }
 
+  @Override
   public boolean append(String val) {
     List<String> vals = parseVals(val);
     if (vals != null && values.containsAll(vals)) {
@@ -50,6 +52,7 @@ public class BoundListOption extends ListOption {
     return true;
   }
 
+  @Override
   public boolean prepend(String val) {
     List<String> vals = parseVals(val);
     if (vals != null && values.containsAll(vals)) {
@@ -59,6 +62,7 @@ public class BoundListOption extends ListOption {
     return true;
   }
 
+  @Override
   public boolean remove(String val) {
     List<String> vals = parseVals(val);
     if (vals != null && values.containsAll(vals)) {

@@ -33,6 +33,7 @@ public class InsertInsertAction extends EditorAction {
   }
 
   private static class Handler extends EditorActionHandler {
+    @Override
     public void execute(@NotNull Editor editor, @NotNull DataContext context) {
       VimPlugin.getChange().processInsert(InjectedLanguageUtil.getTopLevelEditor(editor));
     }

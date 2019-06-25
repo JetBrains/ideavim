@@ -33,6 +33,7 @@ public class MotionScrollPageUpAction extends EditorAction {
   }
 
   private static class Handler extends VimActionHandler.SingleExecution {
+    @Override
     public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       return VimPlugin.getMotion().scrollFullPage(editor, -cmd.getCount());
     }

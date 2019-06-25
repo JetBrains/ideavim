@@ -33,6 +33,7 @@ public class MotionScrollMiddleScreenLineAction extends EditorAction {
   }
 
   private static class Handler extends VimActionHandler.SingleExecution {
+    @Override
     public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       return VimPlugin.getMotion().scrollLineToMiddleScreenLine(editor, cmd.getRawCount(), false);
     }

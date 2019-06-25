@@ -31,6 +31,7 @@ public class KeywordOptionTest extends VimTestCase {
 
   private KeywordOption option;
 
+  @Override
   public void setUp() throws Exception {
     super.setUp();
     option = OptionsManager.INSTANCE.getIskeyword();

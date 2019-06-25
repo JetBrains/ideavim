@@ -69,6 +69,7 @@ public class MarkGroup {
    */
   public MarkGroup() {
     EventFacade.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
+      @Override
       public void editorReleased(@NotNull EditorFactoryEvent event) {
         // Save off the last caret position of the file before it is closed
         Editor editor = event.getEditor();
@@ -672,6 +673,7 @@ public class MarkGroup {
       this.timestamp = timestamp;
     }
 
+    @Override
     public V put(K key, V value) {
       timestamp = new Date();
       return super.put(key, value);
@@ -696,6 +698,7 @@ public class MarkGroup {
      *
      * @param event The change event
      */
+    @Override
     public void beforeDocumentChange(@NotNull DocumentEvent event) {
       if (!VimPlugin.isEnabled()) return;
 
@@ -714,6 +717,7 @@ public class MarkGroup {
      *
      * @param event The change event
      */
+    @Override
     public void documentChanged(@NotNull DocumentEvent event) {
       if (!VimPlugin.isEnabled()) return;
 

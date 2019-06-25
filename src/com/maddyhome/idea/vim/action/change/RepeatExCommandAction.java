@@ -34,6 +34,7 @@ public class RepeatExCommandAction extends EditorAction {
   }
 
   private static class Handler extends VimActionHandler.SingleExecution {
+    @Override
     public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command command) {
       int count = command.getCount();
       try {

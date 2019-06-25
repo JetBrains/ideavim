@@ -50,6 +50,7 @@ public class MarkRange extends AbstractRange {
    * @param lastZero True if last line was set to start of file
    * @return The zero based line number, -1 if there is no such mark set in the file
    */
+  @Override
   public int getRangeLine(@NotNull Editor editor, DataContext context, boolean lastZero) {
     Mark mark = VimPlugin.getMark().getFileMark(editor, this.mark);
 

@@ -744,6 +744,7 @@ public class KeyHandler {
       this.key = key;
     }
 
+    @Override
     public void run() {
       CommandState editorState = CommandState.getInstance(editor);
       boolean wasRecording = editorState.isRecording();

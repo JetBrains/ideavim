@@ -36,6 +36,7 @@ public class ChangeLastGlobalSearchReplaceAction extends EditorAction {
   }
 
   private static class Handler extends ChangeEditorActionHandler.SingleExecution {
+    @Override
     public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount, @Nullable Argument argument) {
       final LineRange range = new LineRange(0, EditorHelper.getLineCount(editor) - 1);
       return VimPlugin.getSearch().searchAndReplace(editor, editor.getCaretModel().getPrimaryCaret(), range, "s", "//~/&");

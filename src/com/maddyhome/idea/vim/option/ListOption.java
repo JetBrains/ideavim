@@ -37,6 +37,7 @@ public class ListOption extends TextOption {
    *
    * @return The option's value
    */
+  @Override
   @NotNull
   public String getValue() {
     StringBuffer res = new StringBuffer();
@@ -84,6 +85,7 @@ public class ListOption extends TextOption {
    * @param val A comma separated list of values
    * @return True if all the supplied values were correct, false if not
    */
+  @Override
   public boolean set(String val) {
     return set(parseVals(val));
   }
@@ -95,6 +97,7 @@ public class ListOption extends TextOption {
    * @param val A comma separated list of values
    * @return True if all the supplied values were correct, false if not
    */
+  @Override
   public boolean append(String val) {
     return append(parseVals(val));
   }
@@ -106,6 +109,7 @@ public class ListOption extends TextOption {
    * @param val A comma separated list of values
    * @return True if all the supplied values were correct, false if not
    */
+  @Override
   public boolean prepend(String val) {
     return prepend(parseVals(val));
   }
@@ -117,6 +121,7 @@ public class ListOption extends TextOption {
    * @param val A comma separated list of values
    * @return True if all the supplied values were correct, false if not
    */
+  @Override
   public boolean remove(String val) {
     return remove(parseVals(val));
   }
@@ -186,6 +191,7 @@ public class ListOption extends TextOption {
    *
    * @return True if equal to default, false if not
    */
+  @Override
   public boolean isDefault() {
     return dflt.equals(value);
   }
@@ -224,6 +230,7 @@ public class ListOption extends TextOption {
   /**
    * Resets the option to its default value
    */
+  @Override
   public void resetDefault() {
     if (!dflt.equals(value)) {
       value = new ArrayList<>(dflt);

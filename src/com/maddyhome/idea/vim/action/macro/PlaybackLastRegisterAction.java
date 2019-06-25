@@ -35,6 +35,7 @@ public class PlaybackLastRegisterAction extends EditorAction {
   }
 
   private static class Handler extends VimActionHandler.SingleExecution {
+    @Override
     public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       final Project project = PlatformDataKeys.PROJECT.getData(context);
       return VimPlugin.getMacro().playbackLastRegister(editor, context, project, cmd.getCount());

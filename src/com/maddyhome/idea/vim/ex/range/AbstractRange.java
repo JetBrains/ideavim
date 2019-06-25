@@ -107,6 +107,7 @@ public abstract class AbstractRange implements Range {
    *
    * @return True if cursor should move, false if not
    */
+  @Override
   public boolean isMove() {
     return move;
   }
@@ -119,12 +120,14 @@ public abstract class AbstractRange implements Range {
    * @param lastZero True if last line was set to start of file
    * @return The zero based line number, -1 if unable to get the line number
    */
+  @Override
   public int getLine(Editor editor, DataContext context, boolean lastZero) {
     int line = getRangeLine(editor, context, lastZero);
 
     return line + offset;
   }
 
+  @Override
   public int getLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, boolean lastZero) {
     if (offset == 0) return getRangeLine(editor, context, lastZero);
 

@@ -59,6 +59,7 @@ public class MotionCamelEndRightAction extends MotionEditorAction {
   @Override
   public MotionActionHandler makeActionHandler() {
     return new MotionActionHandler.ForEachCaret() {
+      @Override
       public int getOffset(@NotNull Editor editor,
                            @NotNull Caret caret,
                            @NotNull DataContext context,

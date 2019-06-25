@@ -63,6 +63,7 @@ public class LineNumberRange extends AbstractRange {
    * @param lastZero True if last line was set to start of file
    * @return The zero based line number, -1 for start of file
    */
+  @Override
   protected int getRangeLine(@NotNull Editor editor, DataContext context, boolean lastZero) {
     if (line == CURRENT_LINE) {
       line = editor.getCaretModel().getLogicalPosition().line;
@@ -74,6 +75,7 @@ public class LineNumberRange extends AbstractRange {
     return line;
   }
 
+  @Override
   protected int getRangeLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
                              boolean lastZero) {
     if (line == LAST_LINE) line = EditorHelper.getLineCount(editor) - 1;

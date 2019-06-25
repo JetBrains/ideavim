@@ -43,6 +43,7 @@ final public class VisualToggleCharacterModeAction extends VimCommandAction {
   @Override
   final protected VimActionHandler makeActionHandler() {
     return new VimActionHandler.SingleExecution() {
+      @Override
       public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         final ListOption listOption = OptionsManager.INSTANCE.getSelectmode();
         if (listOption.contains("cmd")) {

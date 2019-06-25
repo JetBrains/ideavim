@@ -33,6 +33,7 @@ public class UndoAction extends EditorAction {
   }
 
   private static class Handler extends VimActionHandler.SingleExecution {
+    @Override
     public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
       return UndoRedoHelper.undo(context);
     }

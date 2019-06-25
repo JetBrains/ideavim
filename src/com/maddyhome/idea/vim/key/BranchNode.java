@@ -55,6 +55,7 @@ public class BranchNode extends ParentNode {
    * @param key The key used to find the child
    * @return The child mapped to key or an argument node or null if no such mapping found
    */
+  @Override
   @Nullable
   public Node getChild(@NotNull Object key) {
     Node res = super.getChild(key);

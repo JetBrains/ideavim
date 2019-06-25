@@ -42,6 +42,7 @@ final public class VisualSwapSelectionsAction extends VimCommandAction {
   final protected VimActionHandler makeActionHandler() {
     return new VimActionHandler.SingleExecution() {
       // FIXME: 2019-03-05 Make it multicaret
+      @Override
       public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
         return VimPlugin.getVisualMotion().swapVisualSelections(editor);
       }

@@ -157,6 +157,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
     Notifications.Bus.register(IDEAVIM_STICKY_NOTIFICATION_ID, NotificationDisplayType.STICKY_BALLOON);
 
     ApplicationManager.getApplication().invokeLater(new Runnable() {
+      @Override
       public void run() {
         updateState();
       }

@@ -60,6 +60,7 @@ public class ExDocument extends PlainDocument {
    *                              position within the document
    * @see Document#insertString
    */
+  @Override
   public void insertString(int offs, @NotNull String str, AttributeSet a) throws BadLocationException {
     super.insertString(offs, str, a);
     int newOffs = offs + str.length();

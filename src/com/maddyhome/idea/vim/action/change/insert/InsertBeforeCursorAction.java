@@ -43,8 +43,9 @@ final public class InsertBeforeCursorAction extends VimCommandAction {
   @Override
   final protected VimActionHandler makeActionHandler() {
     return new ChangeEditorActionHandler.SingleExecution() {
+      @Override
       final public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
-                             @Nullable Argument argument) {
+                                   @Nullable Argument argument) {
         VimPlugin.getChange().insertBeforeCursor(editor, context);
         return true;
       }
