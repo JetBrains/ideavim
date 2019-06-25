@@ -54,8 +54,8 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class SearchGroup {
   public SearchGroup() {
@@ -679,7 +679,7 @@ public class SearchGroup {
             currentMatchOffset = findClosestMatch(editor, results, initialOffset, forwards);
             highlightSearchResults(editor, pattern, results, currentMatchOffset);
           }
-          EditorData.setLastSearch(editor, pattern);
+          UserDataManager.setVimLastSearch(editor, pattern);
         }
         else if (!showHighlights && initialOffset != -1) {
           // Incremental search always highlights current match. We know it's incsearch if we have a valid initial offset
@@ -702,14 +702,14 @@ public class SearchGroup {
    * Remove current search highlights if hlSearch is false, or if the pattern is changed
    */
   private boolean shouldRemoveSearchHighlight(@NotNull Editor editor, String newPattern, boolean hlSearch) {
-    return !hlSearch || (newPattern != null && !newPattern.equals(EditorData.getLastSearch(editor)));
+    return !hlSearch || (newPattern != null && !newPattern.equals(UserDataManager.getVimLastSearch(editor)));
   }
 
   /**
    * Add search highlights if hlSearch is true and the pattern is changed
    */
   private boolean shouldAddSearchHighlight(@NotNull Editor editor, @Nullable String newPattern, boolean hlSearch) {
-    return hlSearch && newPattern != null && !newPattern.equals(EditorData.getLastSearch(editor)) && !Objects.equals(newPattern, "");
+    return hlSearch && newPattern != null && !newPattern.equals(UserDataManager.getVimLastSearch(editor)) && !Objects.equals(newPattern, "");
   }
 
   private void highlightSearchLines(@NotNull Editor editor, int startLine, int endLine) {
@@ -858,10 +858,10 @@ public class SearchGroup {
 
   private static void highlightSearchResults(@NotNull Editor editor, @NotNull String pattern, List<TextRange> results,
                                              int currentMatchOffset) {
-    Collection<RangeHighlighter> highlighters = EditorData.getLastHighlights(editor);
+    Collection<RangeHighlighter> highlighters = UserDataManager.getVimLastHighlighters(editor);
     if (highlighters == null) {
       highlighters = new ArrayList<>();
-      EditorData.setLastHighlights(editor, highlighters);
+      UserDataManager.setVimLastHighlighters(editor, highlighters);
     }
 
     for (TextRange range : results) {
@@ -1254,7 +1254,7 @@ public class SearchGroup {
   }
 
   private static void removeSearchHighlight(@NotNull Editor editor) {
-    Collection<RangeHighlighter> ehl = EditorData.getLastHighlights(editor);
+    Collection<RangeHighlighter> ehl = UserDataManager.getVimLastHighlighters(editor);
     if (ehl == null) {
       return;
     }
@@ -1265,8 +1265,8 @@ public class SearchGroup {
 
     ehl.clear();
 
-    EditorData.setLastHighlights(editor, null);
-    EditorData.setLastSearch(editor, null);
+    UserDataManager.setVimLastHighlighters(editor, null);
+    UserDataManager.setVimLastSearch(editor, null);
   }
 
   public void saveData(@NotNull Element element) {
@@ -1357,7 +1357,7 @@ public class SearchGroup {
         final Document document = event.getDocument();
 
         for (Editor editor : EditorFactory.getInstance().getEditors(document, project)) {
-          Collection hls = EditorData.getLastHighlights(editor);
+          Collection hls = UserDataManager.getVimLastHighlighters(editor);
           if (hls == null) {
             continue;
           }
@@ -1385,7 +1385,7 @@ public class SearchGroup {
           VimPlugin.getSearch().highlightSearchLines(editor, startPosition.line, endPosition.line);
 
           if (logger.isDebugEnabled()) {
-            hls = EditorData.getLastHighlights(editor);
+            hls = UserDataManager.getVimLastHighlighters(editor);
             logger.debug("sl=" + startPosition.line + ", el=" + endPosition.line);
             logger.debug("hls=" + hls);
           }

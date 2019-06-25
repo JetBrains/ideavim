@@ -41,7 +41,6 @@ import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.helper.StringHelper;
@@ -153,7 +152,7 @@ public class FileGroup {
     if (project != null) {
       final FileEditorManagerEx fileEditorManager = FileEditorManagerEx.getInstanceEx(project);
       final EditorWindow window = fileEditorManager.getCurrentWindow();
-      final VirtualFile virtualFile = EditorData.getVirtualFile(editor);
+      final VirtualFile virtualFile = EditorHelper.getVirtualFile(editor);
 
       if (virtualFile != null) {
         window.closeFile(virtualFile);
@@ -349,7 +348,7 @@ public class FileGroup {
 
   public void displayFileInfo(@NotNull Editor editor, boolean fullPath) {
     StringBuilder msg = new StringBuilder();
-    VirtualFile vf = EditorData.getVirtualFile(editor);
+    VirtualFile vf = EditorHelper.getVirtualFile(editor);
     if (vf != null) {
       msg.append('"');
       if (fullPath) {

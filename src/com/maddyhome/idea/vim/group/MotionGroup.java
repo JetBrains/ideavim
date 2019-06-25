@@ -47,7 +47,10 @@ import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
-import com.maddyhome.idea.vim.helper.*;
+import com.maddyhome.idea.vim.helper.CommandStateHelper;
+import com.maddyhome.idea.vim.helper.EditorHelper;
+import com.maddyhome.idea.vim.helper.SearchHelper;
+import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.listener.VimListenerManager;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
@@ -87,7 +90,7 @@ public class MotionGroup {
         ApplicationManager.getApplication().invokeLater(() -> ApplicationManager.getApplication()
           .invokeLater(() -> ApplicationManager.getApplication().invokeLater(() -> {
             VimListenerManager.INSTANCE.addEditorListeners(editor);
-            EditorData.setMotionGroup(editor, true);
+            UserDataManager.setVimMotionGroup(editor, true);
           })));
       }
 
@@ -95,9 +98,9 @@ public class MotionGroup {
       public void editorReleased(@NotNull EditorFactoryEvent event) {
         if (!VimPlugin.isEnabled()) return;
         Editor editor = event.getEditor();
-        if (EditorData.getMotionGroup(editor)) {
+        if (UserDataManager.getVimMotionGroup(editor)) {
           VimListenerManager.INSTANCE.removeEditorListeners(editor);
-          EditorData.setMotionGroup(editor, false);
+          UserDataManager.setVimMotionGroup(editor, false);
         }
       }
     }, ApplicationManager.getApplication());
@@ -106,9 +109,9 @@ public class MotionGroup {
   public void turnOn() {
     Editor[] editors = EditorFactory.getInstance().getAllEditors();
     for (Editor editor : editors) {
-      if (!EditorData.getMotionGroup(editor)) {
+      if (!UserDataManager.getVimMotionGroup(editor)) {
         VimListenerManager.INSTANCE.addEditorListeners(editor);
-        EditorData.setMotionGroup(editor, true);
+        UserDataManager.setVimMotionGroup(editor, true);
       }
     }
   }
@@ -116,9 +119,9 @@ public class MotionGroup {
   public void turnOff() {
     Editor[] editors = EditorFactory.getInstance().getAllEditors();
     for (Editor editor : editors) {
-      if (EditorData.getMotionGroup(editor)) {
+      if (UserDataManager.getVimMotionGroup(editor)) {
         VimListenerManager.INSTANCE.removeEditorListeners(editor);
-        EditorData.setMotionGroup(editor, false);
+        UserDataManager.setVimMotionGroup(editor, false);
       }
     }
   }
@@ -232,7 +235,7 @@ public class MotionGroup {
     int col = editor.getCaretModel().getVisualPosition().column;
     int oldColumn = col;
     if (col >= EditorHelper.getLineLength(editor) - 1) {
-      col = CaretDataKt.getVimLastColumn(editor.getCaretModel().getPrimaryCaret());
+      col = UserDataManager.getVimLastColumn(editor.getCaretModel().getPrimaryCaret());
     }
     int visualColumn = EditorHelper.getVisualColumnAtLeftOfScreen(editor);
     int caretColumn = col;
@@ -254,7 +257,7 @@ public class MotionGroup {
       int offset = EditorHelper.visualPositionToOffset(editor, new VisualPosition(newline, newColumn));
       moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), offset);
 
-      CaretDataKt.setVimLastColumn(editor.getCaretModel().getPrimaryCaret(), col);
+      UserDataManager.setVimLastColumn(editor.getCaretModel().getPrimaryCaret(), col);
     }
   }
 
@@ -326,14 +329,14 @@ public class MotionGroup {
       if (CommandStateHelper.inBlockSubMode(editor)) {
         VisualGroupKt.vimMoveBlockSelectionToOffset(editor, offset);
         Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-        CaretDataKt.setVimLastColumn(primaryCaret, primaryCaret.getVisualPosition().column);
+        UserDataManager.setVimLastColumn(primaryCaret, primaryCaret.getVisualPosition().column);
         scrollCaretIntoView(editor);
         return;
       }
 
       if (caret.getOffset() != offset) {
         caret.moveToOffset(offset);
-        CaretDataKt.setVimLastColumn(caret, caret.getVisualPosition().column);
+        UserDataManager.setVimLastColumn(caret, caret.getVisualPosition().column);
         if (caret == editor.getCaretModel().getPrimaryCaret()) {
           scrollCaretIntoView(editor);
         }
@@ -811,10 +814,10 @@ public class MotionGroup {
     int dir = 1;
     boolean selection = false;
     if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-      if (CaretDataKt.getVimSelectionStart(caret) > caret.getOffset()) {
+      if (UserDataManager.getVimSelectionStart(caret) > caret.getOffset()) {
         dir = -1;
       }
-      if (CaretDataKt.getVimSelectionStart(caret) != caret.getOffset()) {
+      if (UserDataManager.getVimSelectionStart(caret) != caret.getOffset()) {
         selection = true;
       }
     }
@@ -836,7 +839,7 @@ public class MotionGroup {
     final Mark mark = VimPlugin.getMark().getMark(editor, ch);
     if (mark == null) return -1;
 
-    final VirtualFile vf = EditorData.getVirtualFile(editor);
+    final VirtualFile vf = EditorHelper.getVirtualFile(editor);
     if (vf == null) return -1;
 
     final int line = mark.getLogicalLine();
@@ -866,7 +869,7 @@ public class MotionGroup {
       return -1;
     }
 
-    final VirtualFile vf = EditorData.getVirtualFile(editor);
+    final VirtualFile vf = EditorHelper.getVirtualFile(editor);
     if (vf == null) {
       return -1;
     }
@@ -1116,7 +1119,7 @@ public class MotionGroup {
   }
 
   public int moveCaretToLine(@NotNull Editor editor, int logicalLine, @NotNull Caret caret) {
-    int col = CaretDataKt.getVimLastColumn(caret);
+    int col = UserDataManager.getVimLastColumn(caret);
     int line = logicalLine;
     if (logicalLine < 0) {
       line = 0;
@@ -1290,7 +1293,7 @@ public class MotionGroup {
       return -1;
     }
     else {
-      int col = CaretDataKt.getVimLastColumn(caret);
+      int col = UserDataManager.getVimLastColumn(caret);
       int line = EditorHelper.normalizeVisualLine(editor, pos.line + count);
       final CommandState.Mode mode = CommandStateHelper.getMode(editor);
       final int lastColumnCurrentLine = EditorHelper.lastColumnForLine(editor, logicalPosition.line, CommandStateHelper.isEndAllowed(mode));

@@ -26,8 +26,8 @@ import com.maddyhome.idea.vim.action.MotionEditorAction;
 import com.maddyhome.idea.vim.command.*;
 import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.handler.MotionActionHandler;
-import com.maddyhome.idea.vim.helper.CaretDataKt;
 import com.maddyhome.idea.vim.helper.CommandStateHelper;
+import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.option.BoundStringOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
@@ -86,7 +86,7 @@ public class MotionLastScreenColumnAction extends MotionEditorAction {
                            @NotNull Caret caret,
                            @NotNull DataContext context,
                            @NotNull Command cmd) {
-        CaretDataKt.setVimLastColumn(caret, MotionGroup.LAST_COLUMN);
+        UserDataManager.setVimLastColumn(caret, MotionGroup.LAST_COLUMN);
       }
     };
   }

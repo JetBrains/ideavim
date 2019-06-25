@@ -37,8 +37,8 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.helper.CommandStateHelper;
-import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
+import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
@@ -174,7 +174,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
             return false;
           }
           // Debug watch, Python console, etc.
-          if (NON_FILE_EDITOR_KEYS.contains(keyStroke) && !EditorData.isFileEditor(editor)) {
+          if (NON_FILE_EDITOR_KEYS.contains(keyStroke) && !EditorHelper.isFileEditor(editor)) {
             return false;
           }
         }
@@ -215,7 +215,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
 
   private boolean isEnabledForEscape(@NotNull Editor editor) {
     final CommandState.Mode mode = CommandState.getInstance(editor).getMode();
-    return isPrimaryEditor(editor) || (EditorData.isFileEditor(editor) && mode != CommandState.Mode.COMMAND);
+    return isPrimaryEditor(editor) || (EditorHelper.isFileEditor(editor) && mode != CommandState.Mode.COMMAND);
   }
 
   /**

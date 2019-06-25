@@ -28,7 +28,6 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
-import com.maddyhome.idea.vim.helper.EditorData
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
 import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
@@ -54,7 +53,7 @@ class MarksHandler : CommandHandler.SingleExecution() {
       text.append(num.padStart(3))
 
       text.append(" ")
-      val vf = EditorData.getVirtualFile(editor)
+      val vf = EditorHelper.getVirtualFile(editor)
       if (vf != null && vf.path == mark.filename) {
         text.append(toKeyNotation(stringToKeys(EditorHelper.getLineText(editor, mark.logicalLine).trim())))
       } else {

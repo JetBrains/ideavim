@@ -44,7 +44,6 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.common.Jump;
 import com.maddyhome.idea.vim.common.Mark;
 import com.maddyhome.idea.vim.common.TextRange;
-import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.SearchHelper;
 import com.maddyhome.idea.vim.option.OptionsManager;
@@ -103,7 +102,7 @@ public class MarkGroup {
     // Make sure this is a valid mark
     if (VALID_GET_MARKS.indexOf(ch) < 0) return null;
 
-    VirtualFile vf = EditorData.getVirtualFile(editor);
+    VirtualFile vf = EditorHelper.getVirtualFile(editor);
     if ("{}".indexOf(ch) >= 0 && vf != null) {
       int offset = SearchHelper.findNextParagraph(editor, editor.getCaretModel().getPrimaryCaret(), ch == '{' ? -1 : 1,
                                                   false);
@@ -205,7 +204,7 @@ public class MarkGroup {
     if (ch == '`') ch = '\'';
     LogicalPosition lp = editor.offsetToLogicalPosition(offset);
 
-    final VirtualFile vf = EditorData.getVirtualFile(editor);
+    final VirtualFile vf = EditorHelper.getVirtualFile(editor);
     if (vf == null) {
       return false;
     }
@@ -245,7 +244,7 @@ public class MarkGroup {
     Bookmark bookmark = bookmarkManager.findEditorBookmark(editor.getDocument(), line);
     if (bookmark != null && bookmark.getMnemonic() == ch) return;
 
-    final VirtualFile virtualFile = EditorData.getVirtualFile(editor);
+    final VirtualFile virtualFile = EditorHelper.getVirtualFile(editor);
     if (virtualFile == null) return;
     bookmark = bookmarkManager.addTextBookmark(virtualFile, line, "");
     bookmarkManager.setMnemonic(bookmark, ch);
@@ -302,7 +301,7 @@ public class MarkGroup {
   }
 
   private void addJump(@NotNull Editor editor, int offset, boolean reset) {
-    final VirtualFile vf = EditorData.getVirtualFile(editor);
+    final VirtualFile vf = EditorHelper.getVirtualFile(editor);
     if (vf == null) {
       return;
     }

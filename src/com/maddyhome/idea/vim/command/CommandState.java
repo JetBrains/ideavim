@@ -20,7 +20,7 @@ package com.maddyhome.idea.vim.command;
 
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.helper.EditorData;
+import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.key.ParentNode;
 import com.maddyhome.idea.vim.option.NumberOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
@@ -64,10 +64,10 @@ public class CommandState {
       return new CommandState();
     }
 
-    CommandState res = EditorData.getCommandState(editor);
+    CommandState res = UserDataManager.getVimCommandState(editor);
     if (res == null) {
       res = new CommandState();
-      EditorData.setCommandState(editor, res);
+      UserDataManager.setVimCommandState(editor, res);
     }
 
     return res;

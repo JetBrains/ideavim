@@ -26,7 +26,6 @@ import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
-import com.maddyhome.idea.vim.helper.EditorData
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.stringToKeys
 import com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation
@@ -51,7 +50,7 @@ class JumpsHandler : CommandHandler.SingleExecution() {
       text.append((jump.col + 1).toString().padStart(3))
 
       text.append(" ")
-      val vf = EditorData.getVirtualFile(editor)
+      val vf = EditorHelper.getVirtualFile(editor)
       if (vf != null && vf.path == jump.filename) {
         text.append(toKeyNotation(stringToKeys(EditorHelper.getLineText(editor, jump.logicalLine).trim())))
       } else {

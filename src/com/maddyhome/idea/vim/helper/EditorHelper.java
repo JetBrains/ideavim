@@ -24,6 +24,7 @@ import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.testFramework.LightVirtualFile;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -716,7 +717,7 @@ public class EditorHelper {
     final LogicalPosition logicalPosition = caret.getLogicalPosition();
     final int lastColumn = EditorHelper.lastColumnForLine(editor, logicalPosition.line, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
     int targetColumn = pos.column != lastColumn ? pos.column : prevLastColumn;
-    CaretDataKt.setVimLastColumn(caret, targetColumn);
+    UserDataManager.setVimLastColumn(caret, targetColumn);
   }
 
   private static int scrollFullPageDown(@NotNull final Editor editor, int pages) {
@@ -811,5 +812,24 @@ public class EditorHelper {
       inlayHeight += inlay.getHeightInPixels();
     }
     return inlayHeight;
+  }
+
+  /**
+   * Gets the virtual file associated with this editor
+   *
+   * @param editor The editor
+   * @return The virtual file for the editor
+   */
+  @Nullable
+  public static VirtualFile getVirtualFile(@NotNull Editor editor) {
+    return FileDocumentManager.getInstance().getFile(editor.getDocument());
+  }
+
+  /**
+   * Checks if editor is file editor, also it takes into account that editor can be placed in editors hierarchy
+   */
+  public static boolean isFileEditor(@NotNull Editor editor) {
+    final VirtualFile virtualFile = getVirtualFile(editor);
+    return virtualFile != null && !(virtualFile instanceof LightVirtualFile);
   }
 }

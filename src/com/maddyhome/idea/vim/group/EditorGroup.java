@@ -87,14 +87,13 @@ public class EditorGroup {
         isBlockCursor = editor.getSettings().isBlockCursor();
         isAnimatedScrolling = editor.getSettings().isAnimatedScrolling();
         isRefrainFromScrolling = editor.getSettings().isRefrainFromScrolling();
-        EditorData.initializeEditor(editor);
         DocumentManager.getInstance().addListeners(editor.getDocument());
         VimPlugin.getKey().registerRequiredShortcutKeys(editor);
 
         if (VimPlugin.isEnabled()) {
           initLineNumbers(editor);
           // Turn on insert mode if editor doesn't have any file
-          if (!EditorData.isFileEditor(editor) &&
+          if (!EditorHelper.isFileEditor(editor) &&
               editor.getDocument().isWritable() &&
               !CommandStateHelper.inInsertMode(editor)) {
             VimPlugin.getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
@@ -110,7 +109,7 @@ public class EditorGroup {
       public void editorReleased(@NotNull EditorFactoryEvent event) {
         final Editor editor = event.getEditor();
         deinitLineNumbers(editor);
-        EditorData.unInitializeEditor(editor);
+        UserDataManager.unInitializeEditor(editor);
         VimPlugin.getKey().unregisterShortcutKeys(editor);
         editor.getSettings().setAnimatedScrolling(isAnimatedScrolling);
         editor.getSettings().setRefrainFromScrolling(isRefrainFromScrolling);
@@ -125,7 +124,7 @@ public class EditorGroup {
     setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
 
     for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
-      if (!EditorData.getEditorGroup(editor)) {
+      if (!UserDataManager.getVimEditorGroup(editor)) {
         initLineNumbers(editor);
       }
     }
@@ -143,27 +142,27 @@ public class EditorGroup {
 
   private void initLineNumbers(@NotNull final Editor editor) {
     editor.getCaretModel().addCaretListener(myLineNumbersCaretListener);
-    EditorData.setEditorGroup(editor, true);
+    UserDataManager.setVimEditorGroup(editor, true);
 
     final EditorSettings settings = editor.getSettings();
-    EditorData.setLineNumbersShown(editor, settings.isLineNumbersShown());
+    UserDataManager.setVimLineNumbersShown(editor, settings.isLineNumbersShown());
     updateLineNumbers(editor);
   }
 
   private void deinitLineNumbers(@NotNull Editor editor) {
     editor.getCaretModel().removeCaretListener(myLineNumbersCaretListener);
-    EditorData.setEditorGroup(editor, false);
+    UserDataManager.setVimEditorGroup(editor, false);
 
     editor.getGutter().closeAllAnnotations();
 
     final Project project = editor.getProject();
     if (project == null || project.isDisposed()) return;
 
-    editor.getSettings().setLineNumbersShown(EditorData.isLineNumbersShown(editor));
+    editor.getSettings().setLineNumbersShown(UserDataManager.getVimLineNumbersShown(editor));
   }
 
   private void updateLineNumbers(@NotNull Editor editor) {
-    if (!EditorData.isFileEditor(editor)) {
+    if (!EditorHelper.isFileEditor(editor)) {
       return;
     }
 
@@ -171,7 +170,7 @@ public class EditorGroup {
     final boolean lineNumber = OptionsManager.INSTANCE.getNumber().isSet();
 
     final EditorSettings settings = editor.getSettings();
-    final boolean showEditorLineNumbers = (EditorData.isLineNumbersShown(editor) || lineNumber) && !relativeLineNumber;
+    final boolean showEditorLineNumbers = (UserDataManager.getVimLineNumbersShown(editor) || lineNumber) && !relativeLineNumber;
 
     if (settings.isLineNumbersShown() ^ showEditorLineNumbers) {
       // Update line numbers later since it may be called from a caret listener
@@ -276,7 +275,7 @@ public class EditorGroup {
     @Nullable
     @Override
     public String getLineText(int line, @NotNull Editor editor) {
-      if (VimPlugin.isEnabled() && EditorData.isFileEditor(editor)) {
+      if (VimPlugin.isEnabled() && EditorHelper.isFileEditor(editor)) {
         final boolean relativeLineNumber = OptionsManager.INSTANCE.getRelativenumber().isSet();
         final boolean lineNumber = OptionsManager.INSTANCE.getNumber().isSet();
         if (relativeLineNumber && lineNumber && isCaretLine(line, editor)) {

@@ -26,7 +26,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
-import com.maddyhome.idea.vim.helper.EditorData
+import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
 
 sealed class ChangeEditorActionHandler : VimActionHandler.SingleExecution() {
 
@@ -44,7 +44,7 @@ sealed class ChangeEditorActionHandler : VimActionHandler.SingleExecution() {
     // to be worked after each task. So here we override the deprecated execute function which
     // is called for each task and call the handlers for each caret, if implemented.
 
-    EditorData.setChangeSwitchMode(editor, null)
+    editor.vimChangeActionSwitchMode = null
 
     val worked = Ref.create(true)
     when (this) {
@@ -65,7 +65,7 @@ sealed class ChangeEditorActionHandler : VimActionHandler.SingleExecution() {
       CommandState.getInstance(editor).saveLastChangeCommand(cmd)
     }
 
-    val toSwitch = EditorData.getChangeSwitchMode(editor)
+    val toSwitch = editor.vimChangeActionSwitchMode
     if (toSwitch != null) {
       VimPlugin.getChange().processPostChangeModeSwitch(editor, context, toSwitch)
     }

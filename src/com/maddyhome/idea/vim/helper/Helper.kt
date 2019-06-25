@@ -64,6 +64,20 @@ annotation class VimBehaviourDiffers(
 
 /**
  * Function for delegated properties.
+ * The property will be delegated to UserData and has nullable type.
+ */
+fun <T> userData(): ReadWriteProperty<UserDataHolder, T?> = object : UserDataReadWriteProperty<UserDataHolder, T?>() {
+  override fun getValue(thisRef: UserDataHolder, property: KProperty<*>): T? {
+    return thisRef.getUserData(getKey(property))
+  }
+
+  override fun setValue(thisRef: UserDataHolder, property: KProperty<*>, value: T?) {
+    thisRef.putUserData(getKey(property), value)
+  }
+}
+
+/**
+ * Function for delegated properties.
  * The property will be saved to caret if this caret is not primary
  *   and to caret and editor otherwise.
  * In case of primary caret getter uses value stored in caret. If it's null, then the value from editor

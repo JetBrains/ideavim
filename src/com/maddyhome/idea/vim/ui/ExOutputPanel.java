@@ -26,9 +26,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.helper.EditorData;
 import com.maddyhome.idea.vim.helper.EditorDataContext;
 import com.maddyhome.idea.vim.helper.UiHelper;
+import com.maddyhome.idea.vim.helper.UserDataManager;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -95,10 +95,10 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
 
   @NotNull
   public static ExOutputPanel getInstance(@NotNull Editor editor) {
-    ExOutputPanel panel = EditorData.getMorePanel(editor);
+    ExOutputPanel panel = UserDataManager.getVimMorePanel(editor);
     if (panel == null) {
       panel = new ExOutputPanel(editor);
-      EditorData.setMorePanel(editor, panel);
+      UserDataManager.setVimMorePanel(editor, panel);
     }
     return panel;
   }

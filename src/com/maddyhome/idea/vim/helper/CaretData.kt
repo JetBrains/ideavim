@@ -16,14 +16,21 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@file:JvmName("UserDataManager")
 @file:Suppress("ObjectPropertyName")
 
 package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.RangeMarker
+import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.util.Key
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.command.SelectionType
+import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.visual.VisualChange
+import com.maddyhome.idea.vim.ui.ExOutputPanel
 
 /**
  * @author Alex Plate
@@ -59,3 +66,33 @@ var Caret.vimLastColumn: Int
 
 var Caret.vimLastVisualOperatorRange: VisualChange? by userDataCaretToEditor()
 var Caret.vimInsertStart: RangeMarker by userDataOr { (this as Caret).editor.document.createRangeMarker(this.offset, this.offset) }
+
+
+//------------------ Editor
+fun unInitializeEditor(editor: Editor) {
+  editor.vimLastSelectionType = null
+  editor.vimCommandState = null
+  editor.vimMorePanel = null
+  editor.vimExOutput = null
+  editor.vimLastHighlighters = null
+}
+
+var Editor.vimLastSearch: String? by userData()
+var Editor.vimLastHighlighters: Collection<RangeHighlighter>? by userData()
+/***
+ * @see :help visualmode()
+ */
+var Editor.vimLastSelectionType: SelectionType? by userData()
+var Editor.vimCommandState: CommandState? by userData()
+var Editor.vimChangeGroup: Boolean by userDataOr { false }
+var Editor.vimMotionGroup: Boolean by userDataOr { false }
+var Editor.vimEditorGroup: Boolean by userDataOr { false }
+var Editor.vimLineNumbersShown: Boolean by userDataOr { false }
+var Editor.vimMorePanel: ExOutputPanel? by userData()
+var Editor.vimExOutput: ExOutputModel? by userData()
+var Editor.vimTestInputModel: TestInputModel? by userData()
+/**
+ * Checks whether a keeping visual mode visual operator action is performed on editor.
+ */
+var Editor.vimKeepingVisualOperatorAction: Boolean by userDataOr { false }
+var Editor.vimChangeActionSwitchMode: CommandState.Mode? by userData()
