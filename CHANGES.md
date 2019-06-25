@@ -19,7 +19,7 @@ usual beta standards.
 To Be Released
 --------------
 
-* Introduce [Select Mode](https://vimhelp.org/visual.txt.html#Select-mode).  
+* Introduce [Select Mode](https://vimhelp.org/visual.txt.html#Select-mode).
 
 
 * Fixed `:only` command
@@ -87,6 +87,17 @@ To Be Released
   selection when clipboard is used
 * [VIM-714](https://youtrack.jetbrains.com/issue/VIM-714) Fixed problems with caret position by vertical movement
 * [VIM-635](https://youtrack.jetbrains.com/issue/VIM-635) Supported `gn` commands
+* [VIM-1535](https://youtrack.jetbrains.com/issue/VIM-1535) Use same text attributes and highlight layer as IntelliJ's own Find command
+* [VIM-1413](https://youtrack.jetbrains.com/issue/VIM-1413) Fix `smartcase` option being ignored in incremental search
+* Fix incremental search not matching with trailing options, e.g. `/Foo/+1`
+* Move the current line as well as scrolling during incremental search
+* [VIM-128](https://youtrack.jetbrains.com/issue/VIM-128) Fix `:substitute` not respecting `ignorecase` and `smartcase` options
+* Fix next/previous search commands not respecting `smartcase` override
+* Search highlights are updated when `ignorecase`, `smartcase` and `hlsearch` options are updated, and when plugin is disabled
+* Incremental search highlights all matches in file, not just first
+* Added incremental search highlights for `:substitute` command
+* Fix exception when trying to highlight last CR in file
+* Improve behaviour of `<BS>` in command line entry
 * [VIM-1626](https://youtrack.jetbrains.com/issue/VIM-1626) Add `smartjoin` option
 * [VIM-959](https://youtrack.jetbrains.com/issue/VIM-1626) Add `idemarks` option
 * [VIM-608](https://youtrack.jetbrains.com/issue/VIM-608) Automatic upload files on explicit save

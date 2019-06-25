@@ -21,6 +21,7 @@ package com.maddyhome.idea.vim.listener
 import com.intellij.codeInsight.lookup.impl.LookupImpl
 import com.intellij.codeInsight.template.TemplateManagerListener
 import com.intellij.codeInsight.template.impl.TemplateState
+import com.intellij.find.FindModelListener
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.actionSystem.ex.AnActionListener
 import com.intellij.openapi.editor.Editor
@@ -43,6 +44,7 @@ object IdeaSpecifics {
     EventFacade.getInstance().addAnActionListener(project, VimActionListener)
     EventFacade.getInstance().addTemplateStartedListener(project, VimTemplateManagerListener)
     EventFacade.getInstance().registerLookupListener(project, LookupListener)
+    EventFacade.getInstance().registerFindModelListener(project, VimFindModelListener)
   }
 
   private object VimActionListener : AnActionListener {
@@ -110,6 +112,14 @@ object IdeaSpecifics {
           VimPlugin.getKey().registerShortcutsForLookup(lookup)
         }
       }
+    }
+  }
+  //endregion
+
+  //region Hide Vim search highlights when showing IntelliJ search results
+  private object VimFindModelListener : FindModelListener {
+    override fun findNextModelChanged() {
+      VimPlugin.getSearch().clearSearchHighlight()
     }
   }
   //endregion

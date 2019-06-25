@@ -100,10 +100,7 @@ public class ExEditorKit extends DefaultEditorKit {
   static final String CancelEntry = "cancel-entry";
   static final String CompleteEntry = "complete-entry";
   static final String EscapeChar = "escape";
-  static final String DeletePreviousChar = "delete-prev-char";
-  static final String DeletePreviousWord = "delete-prev-word";
   static final String DeleteToCursor = "delete-to-cursor";
-  static final String DeleteFromCursor = "delete-from-cursor";
   static final String ToggleInsertReplace = "toggle-insert";
   static final String InsertRegister = "insert-register";
   static final String HistoryUp = "history-up";
@@ -113,19 +110,19 @@ public class ExEditorKit extends DefaultEditorKit {
   static final String StartDigraph = "start-digraph";
 
   @NotNull private final Action[] exActions = new Action[]{
-    new ExEditorKit.CancelEntryAction(),
-    new ExEditorKit.CompleteEntryAction(),
-    new ExEditorKit.EscapeCharAction(),
-    new ExEditorKit.DeletePreviousCharAction(),
-    new ExEditorKit.DeletePreviousWordAction(),
-    new ExEditorKit.DeleteToCursorAction(),
-    new ExEditorKit.DeleteFromCursorAction(),
-    new ExEditorKit.HistoryUpAction(),
-    new ExEditorKit.HistoryDownAction(),
-    new ExEditorKit.HistoryUpFilterAction(),
-    new ExEditorKit.HistoryDownFilterAction(),
-    new ExEditorKit.ToggleInsertReplaceAction(),
-    new ExEditorKit.StartDigraphAction(),
+    new CancelEntryAction(),
+    new CompleteEntryAction(),
+    new EscapeCharAction(),
+    new DeleteNextCharAction(),
+    new DeletePreviousCharAction(),
+    new DeletePreviousWordAction(),
+    new DeleteToCursorAction(),
+    new HistoryUpAction(),
+    new HistoryDownAction(),
+    new HistoryUpFilterAction(),
+    new HistoryDownFilterAction(),
+    new ToggleInsertReplaceAction(),
+    new StartDigraphAction(),
     new InsertRegisterAction(),
   };
 
@@ -232,7 +229,7 @@ public class ExEditorKit extends DefaultEditorKit {
             if (c != KeyEvent.CHAR_UNDEFINED) {
               final Register register = VimPlugin.getRegister().getRegister(c);
               if (register != null) {
-                final String oldText = target.getText();
+                final String oldText = target.getActualText();
                 final String text = register.getText();
                 if (oldText != null && text != null) {
                   final int offset = target.getCaretPosition();
@@ -295,14 +292,95 @@ public class ExEditorKit extends DefaultEditorKit {
     }
   }
 
-  public static class DeletePreviousCharAction extends TextAction {
-    DeletePreviousCharAction() {
-      super(DeletePreviousChar);
+  @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+  private static abstract class DeleteCharAction extends TextAction {
+
+    DeleteCharAction(String name) {
+      super(name);
     }
 
-    /**
-     * Invoked when an action occurs.
-     */
+    boolean deleteSelection(Document doc, int dot, int mark) throws BadLocationException {
+      if (dot != mark) {
+        doc.remove(Math.min(dot, mark), Math.abs(dot - mark));
+        return true;
+      }
+      return false;
+    }
+
+    boolean deleteNextChar(Document doc, int dot) throws BadLocationException {
+      if (dot < doc.getLength()) {
+        int delChars = 1;
+
+        if (dot < doc.getLength() - 1) {
+          final String dotChars = doc.getText(dot, 2);
+          final char c0 = dotChars.charAt(0);
+          final char c1 = dotChars.charAt(1);
+
+          if (c0 >= '\uD800' && c0 <= '\uDBFF' &&
+              c1 >= '\uDC00' && c1 <= '\uDFFF') {
+            delChars = 2;
+          }
+        }
+
+        doc.remove(dot, delChars);
+        return true;
+      }
+
+      return false;
+    }
+
+    boolean deletePrevChar(Document doc, int dot) throws BadLocationException {
+      if (dot > 0) {
+        int delChars = 1;
+
+        if (dot > 1) {
+          final String dotChars = doc.getText(dot - 2, 2);
+          final char c0 = dotChars.charAt(0);
+          final char c1 = dotChars.charAt(1);
+
+          if (c0 >= '\uD800' && c0 <= '\uDBFF' &&
+              c1 >= '\uDC00' && c1 <= '\uDFFF') {
+            delChars = 2;
+          }
+        }
+
+        doc.remove(dot - delChars, delChars);
+        return true;
+      }
+
+      return false;
+    }
+  }
+
+  public static class DeleteNextCharAction extends DeleteCharAction {
+    DeleteNextCharAction() {
+      super(deleteNextCharAction);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      final ExTextField target = (ExTextField)getTextComponent(e);
+      target.saveLastEntry();
+
+      try {
+        final Document doc = target.getDocument();
+        final Caret caret = target.getCaret();
+        final int dot = caret.getDot();
+        final int mark = caret.getMark();
+        if (!deleteSelection(doc, dot, mark) && !deleteNextChar(doc, dot) && !deletePrevChar(doc, dot)) {
+         target.cancel();
+        }
+      } catch (BadLocationException ex) {
+        // ignore
+      }
+    }
+  }
+
+  public static class DeletePreviousCharAction extends DeleteCharAction {
+    DeletePreviousCharAction() {
+      super(deletePrevCharAction);
+    }
+
     public void actionPerformed(ActionEvent e) {
       ExTextField target = (ExTextField)getTextComponent(e);
       target.saveLastEntry();
@@ -312,27 +390,10 @@ public class ExEditorKit extends DefaultEditorKit {
         Caret caret = target.getCaret();
         int dot = caret.getDot();
         int mark = caret.getMark();
-        if (dot != mark) {
-          doc.remove(Math.min(dot, mark), Math.abs(dot - mark));
-        }
-        else if (dot > 0) {
-          int delChars = 1;
-
-          if (dot > 1) {
-            String dotChars = doc.getText(dot - 2, 2);
-            char c0 = dotChars.charAt(0);
-            char c1 = dotChars.charAt(1);
-
-            if (c0 >= '\uD800' && c0 <= '\uDBFF' &&
-                c1 >= '\uDC00' && c1 <= '\uDFFF') {
-              delChars = 2;
-            }
+        if (!deleteSelection(doc, dot, mark) && !deletePrevChar(doc, dot)) {
+          if (dot == 0 && doc.getLength() == 0) {
+            target.cancel();
           }
-
-          doc.remove(dot - delChars, delChars);
-        }
-        else {
-          target.cancel();
         }
       }
       catch (BadLocationException bl) {
@@ -343,7 +404,7 @@ public class ExEditorKit extends DefaultEditorKit {
 
   public static class DeletePreviousWordAction extends TextAction {
     DeletePreviousWordAction() {
-      super(DeletePreviousWord);
+      super(deletePrevWordAction);
     }
 
     /**
@@ -355,7 +416,7 @@ public class ExEditorKit extends DefaultEditorKit {
 
       Document doc = target.getDocument();
       Caret caret = target.getCaret();
-      int offset = SearchHelper.findNextWord(target.getText(), caret.getDot(), target.getText().length(),
+      int offset = SearchHelper.findNextWord(target.getActualText(), caret.getDot(), target.getActualText().length(),
                                              -1, false, false);
       if (logger.isDebugEnabled()) logger.debug("offset=" + offset);
       try {
@@ -384,29 +445,6 @@ public class ExEditorKit extends DefaultEditorKit {
       Caret caret = target.getCaret();
       try {
         doc.remove(0, caret.getDot());
-      }
-      catch (BadLocationException ex) {
-        // ignore
-      }
-    }
-  }
-
-  public static class DeleteFromCursorAction extends TextAction {
-    DeleteFromCursorAction() {
-      super(DeleteFromCursor);
-    }
-
-    /**
-     * Invoked when an action occurs.
-     */
-    public void actionPerformed(ActionEvent e) {
-      ExTextField target = (ExTextField)getTextComponent(e);
-      target.saveLastEntry();
-
-      Document doc = target.getDocument();
-      Caret caret = target.getCaret();
-      try {
-        doc.remove(caret.getDot(), doc.getLength());
       }
       catch (BadLocationException ex) {
         // ignore

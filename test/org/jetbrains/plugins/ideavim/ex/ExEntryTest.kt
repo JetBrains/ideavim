@@ -20,6 +20,7 @@ package org.jetbrains.plugins.ideavim.ex
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.helper.StringHelper
+import com.maddyhome.idea.vim.helper.VimBehaviourDiffers
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.ui.ExDocument
 import com.maddyhome.idea.vim.ui.ExEntryPanel
@@ -125,7 +126,7 @@ class ExEntryTest : VimTestCase() {
     assertExOffset(13)
   }
 
-  fun `test delete character in front of caret`() {
+  fun `test backspace deletes character in front of caret`() {
     typeExInput(":set incsearch<BS>")
     assertExText("set incsearc")
 
@@ -133,7 +134,7 @@ class ExEntryTest : VimTestCase() {
     assertExText("set incsear")
   }
 
-  fun `test delete character in front of caret cancels entry`() {
+  fun `test backspace character in front of caret cancels entry`() {
     typeExInput(":<BS>")
     assertIsDeactivated()
 
@@ -149,17 +150,29 @@ class ExEntryTest : VimTestCase() {
 
     deactivateExEntry()
 
-    // TODO: Vim behaviour is to NOT deactivate if there is still text
+    // Don't deactivate if there is still text to the right of the caret
     typeExInput(":set<C-B>")
     assertExOffset(0)
     typeText("<BS>")
-    assertIsDeactivated()
+    assertIsActive()
   }
 
-  fun `test delete character under caret`() {
+  fun `test delete deletes character under caret`() {
     typeExInput(":set<Left>")
     typeText("<Del>")
     assertExText("se")
+  }
+
+  fun `test delete at end of string deletes character to left of caret`() {
+    typeExInput(":set")
+    typeText("<Del>")
+    assertExText("se")
+  }
+
+  fun `test delete with no text cancels entry`() {
+    typeExInput(":set")
+    typeText("<Del><Del><Del><Del>")
+    assertIsDeactivated()
   }
 
   fun `test delete word before caret`() {
@@ -183,6 +196,7 @@ class ExEntryTest : VimTestCase() {
     assertExText("rch")
   }
 
+  @VimBehaviourDiffers(description = "Vim reorders history even when cancelling entry")
   fun `test command history`() {
     typeExInput(":set digraph<CR>")
     typeExInput(":digraph<CR>")
@@ -280,6 +294,7 @@ class ExEntryTest : VimTestCase() {
     assertExText("something cool")
   }
 
+  @VimBehaviourDiffers(description = "Vim reorders history even when cancelling entry")
   fun `test matching search history`() {
     typeExInput("/something cool<CR>")
     typeExInput("/not cool<CR>")
@@ -346,6 +361,7 @@ class ExEntryTest : VimTestCase() {
     assertExOffset(0)
   }
 
+  @VimBehaviourDiffers(description = "Moving one word right positions caret at end of previous word")
   fun `test move caret one WORD right`() {
     typeExInput(":set incsearch")
     caret.dot = 0
@@ -567,8 +583,10 @@ class ExEntryTest : VimTestCase() {
       typeText("<C-C>")
   }
 
+  @Suppress("DEPRECATION")
   private fun assertExText(expected: String) {
-    assertEquals(expected, exEntryPanel.text)
+    // Get the text directly from the text field. This will include any "prompt" chars for e.g. digraphs
+    assertEquals(expected, exEntryPanel.entry.text)
   }
 
   private fun assertIsActive() {

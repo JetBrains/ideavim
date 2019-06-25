@@ -52,13 +52,13 @@ public class ExKeyBindings {
     new KeyBinding(KeyStroke.getKeyStroke((char)0x05, KeyEvent.CTRL_MASK), ExEditorKit.endLineAction),
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_END, 0), ExEditorKit.endLineAction),
 
-    new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), ExEditorKit.DeletePreviousChar),
-    new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK), ExEditorKit.DeletePreviousChar),
-    new KeyBinding(KeyStroke.getKeyStroke((char)0x08, KeyEvent.CTRL_MASK), ExEditorKit.DeletePreviousChar),
+    new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), ExEditorKit.deletePrevCharAction),
+    new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK), ExEditorKit.deletePrevCharAction),
+    new KeyBinding(KeyStroke.getKeyStroke((char)0x08, KeyEvent.CTRL_MASK), ExEditorKit.deletePrevCharAction),
 
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), ExEditorKit.deleteNextCharAction),
 
-    new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK), ExEditorKit.DeletePreviousWord),
+    new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK), ExEditorKit.deletePrevWordAction),
 
     new KeyBinding(KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.CTRL_MASK), ExEditorKit.DeleteToCursor),
 
