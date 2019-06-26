@@ -156,45 +156,45 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
   }
 
   private boolean isEnabled(@NotNull AnActionEvent e) {
-    if (VimPlugin.isEnabled()) {
-      final Editor editor = getEditor(e);
-      final KeyStroke keyStroke = getKeyStroke(e);
-      if (editor != null && keyStroke != null) {
-        final int keyCode = keyStroke.getKeyCode();
-        if (LookupManager.getActiveLookup(editor) != null && !passCommandToVimWithLookup(keyStroke)) {
-          return isEnabledForLookup(keyStroke);
+    if (!VimPlugin.isEnabled()) return false;
+
+    final Editor editor = getEditor(e);
+    final KeyStroke keyStroke = getKeyStroke(e);
+    if (editor != null && keyStroke != null) {
+      final int keyCode = keyStroke.getKeyCode();
+      if (LookupManager.getActiveLookup(editor) != null && !passCommandToVimWithLookup(keyStroke)) {
+        return isEnabledForLookup(keyStroke);
+      }
+      if (keyCode == VK_ESCAPE) {
+        return isEnabledForEscape(editor);
+      }
+      if (CommandStateHelper.inInsertMode(editor)) {
+        // XXX: <Tab> won't be recorded in macros
+        if (keyCode == VK_TAB) {
+          VimPlugin.getChange().tabAction = true;
+          return false;
         }
-        if (keyCode == VK_ESCAPE) {
-          return isEnabledForEscape(editor);
+        // Debug watch, Python console, etc.
+        if (NON_FILE_EDITOR_KEYS.contains(keyStroke) && !EditorHelper.isFileEditor(editor)) {
+          return false;
         }
-        if (CommandStateHelper.inInsertMode(editor)) {
-          // XXX: <Tab> won't be recorded in macros
-          if (keyCode == VK_TAB) {
-            VimPlugin.getChange().tabAction = true;
-            return false;
-          }
-          // Debug watch, Python console, etc.
-          if (NON_FILE_EDITOR_KEYS.contains(keyStroke) && !EditorHelper.isFileEditor(editor)) {
-            return false;
-          }
+      }
+      if (VIM_ONLY_EDITOR_KEYS.contains(keyStroke)) {
+        return true;
+      }
+      final Map<KeyStroke, ShortcutOwner> savedShortcutConflicts = VimPlugin.getKey().getSavedShortcutConflicts();
+      final ShortcutOwner owner = savedShortcutConflicts.get(keyStroke);
+      if (owner == ShortcutOwner.VIM) {
+        return true;
+      }
+      else if (owner == ShortcutOwner.IDE) {
+        return !isShortcutConflict(keyStroke);
+      }
+      else {
+        if (isShortcutConflict(keyStroke)) {
+          savedShortcutConflicts.put(keyStroke, ShortcutOwner.UNDEFINED);
         }
-        if (VIM_ONLY_EDITOR_KEYS.contains(keyStroke)) {
-          return true;
-        }
-        final Map<KeyStroke, ShortcutOwner> savedShortcutConflicts = VimPlugin.getKey().getSavedShortcutConflicts();
-        final ShortcutOwner owner = savedShortcutConflicts.get(keyStroke);
-        if (owner == ShortcutOwner.VIM) {
-          return true;
-        }
-        else if (owner == ShortcutOwner.IDE) {
-          return !isShortcutConflict(keyStroke);
-        }
-        else {
-          if (isShortcutConflict(keyStroke)) {
-            savedShortcutConflicts.put(keyStroke, ShortcutOwner.UNDEFINED);
-          }
-          return true;
-        }
+        return true;
       }
     }
     return false;

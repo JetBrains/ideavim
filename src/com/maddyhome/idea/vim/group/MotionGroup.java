@@ -21,11 +21,9 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
-import com.intellij.openapi.editor.event.EditorFactoryListener;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
-import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.fileEditor.impl.EditorTabbedContainer;
 import com.intellij.openapi.fileEditor.impl.EditorWindow;
@@ -33,7 +31,6 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.vfs.VirtualFileSystem;
-import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.MotionEditorAction;
@@ -73,56 +70,25 @@ public class MotionGroup {
   public static final int LAST_t = 4;
   public static final int LAST_COLUMN = 9999;
 
-  /**
-   * Create the group
-   */
-  public MotionGroup() {
-    EventFacade.getInstance().addEditorFactoryListener(new EditorFactoryListener() {
-      @Override
-      public void editorCreated(@NotNull EditorFactoryEvent event) {
-        if (!VimPlugin.isEnabled()) return;
-        final Editor editor = event.getEditor();
-        // This ridiculous code ensures that a lot of events are processed BEFORE we finally start listening
-        // to visible area changes. The primary reason for this change is to fix the cursor position bug
-        // using the gd and gD commands (Goto Declaration). This bug has been around since Idea 6.0.4?
-        // Prior to this change the visible area code was moving the cursor around during file load and messing
-        // with the cursor position of the Goto Declaration processing.
-        ApplicationManager.getApplication().invokeLater(() -> ApplicationManager.getApplication()
-          .invokeLater(() -> ApplicationManager.getApplication().invokeLater(() -> {
-            VimListenerManager.INSTANCE.addEditorListeners(editor);
-            UserDataManager.setVimMotionGroup(editor, true);
-          })));
-      }
-
-      @Override
-      public void editorReleased(@NotNull EditorFactoryEvent event) {
-        if (!VimPlugin.isEnabled()) return;
-        Editor editor = event.getEditor();
-        if (UserDataManager.getVimMotionGroup(editor)) {
-          VimListenerManager.INSTANCE.removeEditorListeners(editor);
-          UserDataManager.setVimMotionGroup(editor, false);
-        }
-      }
-    }, ApplicationManager.getApplication());
-  }
-
-  public void turnOn() {
-    Editor[] editors = EditorFactory.getInstance().getAllEditors();
-    for (Editor editor : editors) {
-      if (!UserDataManager.getVimMotionGroup(editor)) {
-        VimListenerManager.INSTANCE.addEditorListeners(editor);
+  public void editorCreated(@NotNull EditorFactoryEvent event) {
+    final Editor editor = event.getEditor();
+    // This ridiculous code ensures that a lot of events are processed BEFORE we finally start listening
+    // to visible area changes. The primary reason for this change is to fix the cursor position bug
+    // using the gd and gD commands (Goto Declaration). This bug has been around since Idea 6.0.4?
+    // Prior to this change the visible area code was moving the cursor around during file load and messing
+    // with the cursor position of the Goto Declaration processing.
+    ApplicationManager.getApplication().invokeLater(() -> ApplicationManager.getApplication()
+      .invokeLater(() -> ApplicationManager.getApplication().invokeLater(() -> {
+        VimListenerManager.EditorListeners.add(editor);
         UserDataManager.setVimMotionGroup(editor, true);
-      }
-    }
+      })));
   }
 
-  public void turnOff() {
-    Editor[] editors = EditorFactory.getInstance().getAllEditors();
-    for (Editor editor : editors) {
-      if (UserDataManager.getVimMotionGroup(editor)) {
-        VimListenerManager.INSTANCE.removeEditorListeners(editor);
-        UserDataManager.setVimMotionGroup(editor, false);
-      }
+  public void editorReleased(@NotNull EditorFactoryEvent event) {
+    Editor editor = event.getEditor();
+    if (UserDataManager.getVimMotionGroup(editor)) {
+      VimListenerManager.EditorListeners.remove(editor);
+      UserDataManager.setVimMotionGroup(editor, false);
     }
   }
 
@@ -1337,20 +1303,17 @@ public class MotionGroup {
     TOP, MIDDLE, BOTTOM
   }
 
-  public static class MotionEditorChange implements FileEditorManagerListener {
-    @Override
-    public void selectionChanged(@NotNull FileEditorManagerEvent event) {
-      if (ExEntryPanel.getInstance().isActive()) {
-        ExEntryPanel.getInstance().deactivate(false);
-      }
-      final FileEditor fileEditor = event.getOldEditor();
-      if (fileEditor instanceof TextEditor) {
-        final Editor editor = ((TextEditor)fileEditor).getEditor();
-        ExOutputModel.getInstance(editor).clear();
-        if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-          VimPlugin.getVisualMotion().exitVisual(editor);
-          KeyHandler.getInstance().reset(editor);
-        }
+  public static void fileEditorManagerSelectionChangedCallback(@NotNull FileEditorManagerEvent event) {
+    if (ExEntryPanel.getInstance().isActive()) {
+      ExEntryPanel.getInstance().deactivate(false);
+    }
+    final FileEditor fileEditor = event.getOldEditor();
+    if (fileEditor instanceof TextEditor) {
+      final Editor editor = ((TextEditor)fileEditor).getEditor();
+      ExOutputModel.getInstance(editor).clear();
+      if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
+        VimPlugin.getVisualMotion().exitVisual(editor);
+        KeyHandler.getInstance().reset(editor);
       }
     }
   }

@@ -42,7 +42,7 @@ class NonVimVisualChangeTest : VimTestCase() {
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass.
         """.trimIndent())
-    VimListenerManager.addEditorListeners(myFixture.editor)
+    VimListenerManager.EditorListeners.add(myFixture.editor)
     typeText(parseKeys("i"))
     assertMode(CommandState.Mode.INSERT)
     ApplicationManager.getApplication().runWriteAction {

@@ -404,21 +404,18 @@ public class FileGroup {
   @NotNull private static final Logger logger = Logger.getInstance(FileGroup.class.getName());
 
   /**
-   * This class listens for editor tab changes so any insert/replace modes that need to be reset can be.
+   * This method listens for editor tab changes so any insert/replace modes that need to be reset can be.
    */
-  public static class SelectionCheck implements FileEditorManagerListener {
-    @Override
-    public void selectionChanged(@NotNull FileEditorManagerEvent event) {
-      // The user has changed the editor they are working with - exit insert/replace mode, and complete any
-      // appropriate repeat
-      if (event.getOldFile() != null) {
-        lastSelections.put(event.getManager(), event.getOldFile());
-        String disposableKey = FileGroup.disposableKey + event.getManager().hashCode();
-        if (Disposer.get(disposableKey) == null) {
-          Disposer.register(event.getManager().getProject(), () -> {
-            lastSelections.remove(event.getManager());
-          }, disposableKey);
-        }
+  public static void fileEditorManagerSelectionChangedCallback(@NotNull FileEditorManagerEvent event) {
+    // The user has changed the editor they are working with - exit insert/replace mode, and complete any
+    // appropriate repeat
+    if (event.getOldFile() != null) {
+      lastSelections.put(event.getManager(), event.getOldFile());
+      String disposableKey = FileGroup.disposableKey + event.getManager().hashCode();
+      if (Disposer.get(disposableKey) == null) {
+        Disposer.register(event.getManager().getProject(), () -> {
+          lastSelections.remove(event.getManager());
+        }, disposableKey);
       }
     }
   }

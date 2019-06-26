@@ -21,7 +21,6 @@ package com.maddyhome.idea.vim.group;
 import com.intellij.ide.bookmarks.Bookmark;
 import com.intellij.ide.bookmarks.BookmarkManager;
 import com.intellij.ide.bookmarks.BookmarksListener;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -29,15 +28,12 @@ import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
-import com.intellij.openapi.editor.event.EditorFactoryAdapter;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
-import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -63,18 +59,10 @@ public class MarkGroup {
   public static final char MARK_CHANGE_END = ']';
   public static final char MARK_CHANGE_POS = '.';
 
-  /**
-   * Creates the class
-   */
-  public MarkGroup() {
-    EventFacade.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
-      @Override
-      public void editorReleased(@NotNull EditorFactoryEvent event) {
-        // Save off the last caret position of the file before it is closed
-        Editor editor = event.getEditor();
-        setMark(editor, '"', editor.getCaretModel().getOffset());
-      }
-    }, ApplicationManager.getApplication());
+  public void editorReleased(@NotNull EditorFactoryEvent event) {
+    // Save off the last caret position of the file before it is closed
+    Editor editor = event.getEditor();
+    setMark(editor, '"', editor.getCaretModel().getOffset());
   }
 
   /**
@@ -685,10 +673,12 @@ public class MarkGroup {
    * This class is used to listen to editor document changes
    */
   public static class MarkUpdater implements DocumentListener {
+
+    public static MarkUpdater INSTANCE = new MarkUpdater();
     /**
      * Creates the listener for the supplied editor
      */
-    public MarkUpdater() {
+    private MarkUpdater() {
     }
 
     /**
@@ -743,22 +733,14 @@ public class MarkGroup {
   }
 
   public static class MarkListener implements BookmarksListener {
-
-    private Project myProject;
-
-    public MarkListener(Project project) {
-      myProject = project;
-    }
-
     @Override
     public void bookmarkAdded(@NotNull Bookmark b) {
-      if (!VimPlugin.isEnabled() || !OptionsManager.INSTANCE.getIdemarks().isSet()) return;
+      if (!OptionsManager.INSTANCE.getIdemarks().isSet()) return;
 
       if (GLOBAL_MARKS.indexOf(b.getMnemonic()) != -1) {
         try {
           OptionsManager.INSTANCE.getIdemarks().reset();
-          final FileEditorManager fileEditorManager = FileEditorManager.getInstance(myProject);
-          final Editor editor = EditorHelper.getEditor(fileEditorManager, b.getFile());
+          final Editor editor = EditorHelper.getEditor(b.getFile());
           if (editor == null) return;
 
           final Mark existing = VimPlugin.getMark().getMark(editor, b.getMnemonic());
@@ -780,13 +762,12 @@ public class MarkGroup {
 
     @Override
     public void bookmarkRemoved(@NotNull Bookmark b) {
-      if (!VimPlugin.isEnabled() || !OptionsManager.INSTANCE.getIdemarks().isSet()) return;
+      if (!OptionsManager.INSTANCE.getIdemarks().isSet()) return;
 
       if (GLOBAL_MARKS.indexOf(b.getMnemonic()) != -1) {
         try {
           OptionsManager.INSTANCE.getIdemarks().reset();
-          final FileEditorManager fileEditorManager = FileEditorManager.getInstance(myProject);
-          final Editor editor = EditorHelper.getEditor(fileEditorManager, b.getFile());
+          final Editor editor = EditorHelper.getEditor(b.getFile());
           if (editor == null) return;
 
           final Mark mark = VimPlugin.getMark().getMark(editor, b.getMnemonic());
@@ -800,7 +781,7 @@ public class MarkGroup {
 
     @Override
     public void bookmarkChanged(@NotNull Bookmark b) {
-      if (!VimPlugin.isEnabled() || !OptionsManager.INSTANCE.getIdemarks().isSet()) return;
+      if (!OptionsManager.INSTANCE.getIdemarks().isSet()) return;
 
       if (GLOBAL_MARKS.indexOf(b.getMnemonic()) != -1) {
         this.bookmarkAdded(b);

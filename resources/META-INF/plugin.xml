@@ -76,6 +76,11 @@
       <implementation-class>com.maddyhome.idea.vim.VimLocalConfig</implementation-class>
     </component>
   </application-components>
+  <project-components>
+    <component>
+      <implementation-class>com.maddyhome.idea.vim.VimProjectComponent</implementation-class>
+    </component>
+  </project-components>
 
   <extensionPoints>
     <extensionPoint qualifiedName="IdeaVIM.vimExtension" interface="com.maddyhome.idea.vim.extension.VimExtension"/>

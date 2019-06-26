@@ -18,10 +18,14 @@
 
 package com.maddyhome.idea.vim.listener
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
+import com.intellij.openapi.editor.actionSystem.EditorActionManager
+import com.intellij.openapi.editor.event.EditorFactoryEvent
+import com.intellij.openapi.editor.event.EditorFactoryListener
 import com.intellij.openapi.editor.event.EditorMouseEvent
 import com.intellij.openapi.editor.event.EditorMouseEventArea
 import com.intellij.openapi.editor.event.EditorMouseListener
@@ -30,11 +34,21 @@ import com.intellij.openapi.editor.event.SelectionEvent
 import com.intellij.openapi.editor.event.SelectionListener
 import com.intellij.openapi.editor.ex.DocumentEx
 import com.intellij.openapi.editor.impl.EditorComponentImpl
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent
+import com.intellij.openapi.fileEditor.FileEditorManagerListener
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
 import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.VimTypedActionHandler
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.ChangeGroup
+import com.maddyhome.idea.vim.group.EditorGroup
+import com.maddyhome.idea.vim.group.FileGroup
+import com.maddyhome.idea.vim.group.MarkGroup
+import com.maddyhome.idea.vim.group.MotionGroup
+import com.maddyhome.idea.vim.group.SearchGroup
 import com.maddyhome.idea.vim.group.visual.VisualMotionGroup
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
@@ -44,6 +58,8 @@ import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimLastColumn
+import com.maddyhome.idea.vim.helper.vimMotionGroup
+import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.ui.ExEntryPanel
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -117,20 +133,121 @@ object VimListenerManager {
 
   val logger = Logger.getInstance(VimListenerManager::class.java)
 
-  fun addEditorListeners(editor: Editor) {
-    val eventFacade = EventFacade.getInstance()
-    eventFacade.addEditorMouseListener(editor, EditorMouseHandler)
-    eventFacade.addEditorMouseMotionListener(editor, EditorMouseHandler)
-    eventFacade.addEditorSelectionListener(editor, EditorSelectionHandler)
-    eventFacade.addComponentMouseListener(editor.contentComponent, ComponentMouseListener)
+  fun turnOn() {
+    GlobalListeners.enable()
+    ProjectListeners.addAll()
+    EditorListeners.addAll()
   }
 
-  fun removeEditorListeners(editor: Editor) {
-    val eventFacade = EventFacade.getInstance()
-    eventFacade.removeEditorMouseListener(editor, EditorMouseHandler)
-    eventFacade.removeEditorMouseMotionListener(editor, EditorMouseHandler)
-    eventFacade.removeEditorSelectionListener(editor, EditorSelectionHandler)
-    eventFacade.removeComponentMouseListener(editor.contentComponent, ComponentMouseListener)
+  fun turnOff() {
+    GlobalListeners.disable()
+    ProjectListeners.removeAll()
+    EditorListeners.removeAll()
+  }
+
+  object GlobalListeners {
+    @JvmStatic
+    fun enable() {
+      val typedAction = EditorActionManager.getInstance().typedAction
+      EventFacade.getInstance().setupTypedActionHandler(VimTypedActionHandler(typedAction.rawHandler))
+
+      OptionsManager.number.addOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
+      OptionsManager.relativenumber.addOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
+
+      EventFacade.getInstance().addEditorFactoryListener(VimEditorFactoryListener, ApplicationManager.getApplication())
+    }
+
+    fun disable() {
+      EventFacade.getInstance().restoreTypedActionHandler()
+
+      OptionsManager.number.removeOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
+      OptionsManager.relativenumber.removeOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
+
+      EventFacade.getInstance().removeEditorFactoryListener(VimEditorFactoryListener)
+    }
+  }
+
+  object ProjectListeners {
+    fun add(project: Project) {
+      val eventFacade = EventFacade.getInstance()
+      eventFacade.connectBookmarkListener(project, MarkGroup.MarkListener())
+      eventFacade.connectFileEditorManagerListener(project, VimFileEditorManagerListener)
+      IdeaSpecifics.addIdeaSpecificsListeners(project)
+    }
+
+    fun removeAll() {
+      // Project listeners are self-disposable, so there is no need to unregister them on project close
+      EventFacade.getInstance().disableBusConnection()
+      ProjectManager.getInstance().openProjects.filterNot { it.isDisposed }.forEach { IdeaSpecifics.removeIdeaSpecificsListeners(it) }
+    }
+
+    fun addAll() {
+      ProjectManager.getInstance().openProjects.filterNot { it.isDisposed }.forEach { add(it) }
+    }
+  }
+
+  object EditorListeners {
+    fun addAll() {
+      val editors = EditorFactory.getInstance().allEditors
+      for (editor in editors) {
+        if (!editor.vimMotionGroup) {
+          add(editor)
+          editor.vimMotionGroup = true
+        }
+      }
+    }
+
+    fun removeAll() {
+      val editors = EditorFactory.getInstance().allEditors
+      for (editor in editors) {
+        if (editor.vimMotionGroup) {
+          remove(editor)
+          editor.vimMotionGroup = false
+        }
+      }
+    }
+
+    @JvmStatic
+    fun add(editor: Editor) {
+      val eventFacade = EventFacade.getInstance()
+      eventFacade.addEditorMouseListener(editor, EditorMouseHandler)
+      eventFacade.addEditorMouseMotionListener(editor, EditorMouseHandler)
+      eventFacade.addEditorSelectionListener(editor, EditorSelectionHandler)
+      eventFacade.addComponentMouseListener(editor.contentComponent, ComponentMouseListener)
+    }
+
+    @JvmStatic
+    fun remove(editor: Editor) {
+      val eventFacade = EventFacade.getInstance()
+      eventFacade.removeEditorMouseListener(editor, EditorMouseHandler)
+      eventFacade.removeEditorMouseMotionListener(editor, EditorMouseHandler)
+      eventFacade.removeEditorSelectionListener(editor, EditorSelectionHandler)
+      eventFacade.removeComponentMouseListener(editor.contentComponent, ComponentMouseListener)
+    }
+  }
+
+  private object VimFileEditorManagerListener : FileEditorManagerListener {
+    override fun selectionChanged(event: FileEditorManagerEvent) {
+      MotionGroup.fileEditorManagerSelectionChangedCallback(event)
+      FileGroup.fileEditorManagerSelectionChangedCallback(event)
+      SearchGroup.fileEditorManagerSelectionChangedCallback(event)
+    }
+  }
+
+  private object VimEditorFactoryListener : EditorFactoryListener {
+    override fun editorCreated(event: EditorFactoryEvent) {
+      VimPlugin.getEditor().editorCreated(event)
+      VimPlugin.getMotion().editorCreated(event)
+      VimPlugin.getChange().editorCreated(event)
+      VimPlugin.statisticReport()
+    }
+
+    override fun editorReleased(event: EditorFactoryEvent) {
+      VimPlugin.getEditor().editorReleased(event)
+      VimPlugin.getMotion().editorReleased(event)
+      VimPlugin.getChange().editorReleased(event)
+      VimPlugin.getMark().editorReleased(event)
+    }
   }
 
   private object EditorSelectionHandler : SelectionListener {
@@ -212,7 +329,6 @@ object VimListenerManager {
     }
 
     override fun mouseClicked(event: EditorMouseEvent) {
-      if (!VimPlugin.isEnabled()) return
       logger.debug("Mouse clicked")
 
       if (event.area == EditorMouseEventArea.EDITING_AREA) {

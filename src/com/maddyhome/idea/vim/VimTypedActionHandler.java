@@ -44,7 +44,7 @@ public class VimTypedActionHandler implements TypedActionHandlerEx {
 
   @NotNull private final KeyHandler handler;
 
-  VimTypedActionHandler(TypedActionHandler origHandler) {
+  public VimTypedActionHandler(TypedActionHandler origHandler) {
     handler = KeyHandler.getInstance();
     handler.setOriginalHandler(origHandler);
   }

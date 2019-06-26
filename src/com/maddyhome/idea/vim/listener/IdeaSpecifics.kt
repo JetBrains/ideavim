@@ -22,7 +22,12 @@ import com.intellij.codeInsight.lookup.impl.LookupImpl
 import com.intellij.codeInsight.template.TemplateManagerListener
 import com.intellij.codeInsight.template.impl.TemplateState
 import com.intellij.find.FindModelListener
-import com.intellij.openapi.actionSystem.*
+import com.intellij.openapi.actionSystem.ActionManager
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.actionSystem.ex.AnActionListener
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.event.CaretEvent
@@ -40,11 +45,15 @@ import java.beans.PropertyChangeListener
  * @author Alex Plate
  */
 object IdeaSpecifics {
-  fun addIdeaSpecificsListener(project: Project) {
-    EventFacade.getInstance().addAnActionListener(project, VimActionListener)
-    EventFacade.getInstance().addTemplateStartedListener(project, VimTemplateManagerListener)
+  fun addIdeaSpecificsListeners(project: Project) {
+    EventFacade.getInstance().connectAnActionListener(project, VimActionListener)
+    EventFacade.getInstance().connectTemplateStartedListener(project, VimTemplateManagerListener)
+    EventFacade.getInstance().connectFindModelListener(project, VimFindModelListener)
     EventFacade.getInstance().registerLookupListener(project, LookupListener)
-    EventFacade.getInstance().registerFindModelListener(project, VimFindModelListener)
+  }
+
+  fun removeIdeaSpecificsListeners(project: Project) {
+    EventFacade.getInstance().removeLookupListener(project, LookupListener)
   }
 
   private object VimActionListener : AnActionListener {
@@ -52,14 +61,10 @@ object IdeaSpecifics {
     private val surrounderAction = "com.intellij.codeInsight.generation.surroundWith.SurroundWithHandler\$InvokeSurrounderAction"
     private var editor: Editor? = null
     override fun beforeActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
-      if (!VimPlugin.isEnabled()) return
-
       editor = dataContext.getData(CommonDataKeys.EDITOR) ?: return
     }
 
     override fun afterActionPerformed(action: AnAction, dataContext: DataContext, event: AnActionEvent) {
-      if (!VimPlugin.isEnabled()) return
-
       //region Extend Selection for Rider
       when (ActionManager.getInstance().getId(action)) {
         IdeActions.ACTION_EDITOR_SELECT_WORD_AT_CARET, IdeActions.ACTION_EDITOR_UNSELECT_WORD_AT_CARET -> {
@@ -90,8 +95,6 @@ object IdeaSpecifics {
   //region Enter insert mode for surround templates without selection
   private object VimTemplateManagerListener : TemplateManagerListener {
     override fun templateStarted(state: TemplateState) {
-      if (!VimPlugin.isEnabled()) return
-
       val editor = state.editor ?: return
       if (!editor.selectionModel.hasSelection()) {
         // Enable insert mode if there is no selection in template

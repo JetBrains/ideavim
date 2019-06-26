@@ -71,10 +71,10 @@ abstract class EditorActionHandlerBase(myRunForEachCaret: Boolean) : EditorActio
   abstract fun baseExecute(editor: Editor, caret: Caret?, context: DataContext, cmd: Command): Boolean
 
   public final override fun doExecute(_editor: Editor, caret: Caret?, context: DataContext) {
+    if (!VimPlugin.isEnabled()) return
+
     val editor = InjectedLanguageUtil.getTopLevelEditor(_editor)
     logger.debug("doExecute")
-
-    if (!VimPlugin.isEnabled()) return
 
     val state = CommandState.getInstance(editor)
     val cmd = state.command ?: run {

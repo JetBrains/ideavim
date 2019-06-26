@@ -27,10 +27,12 @@ import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.colors.ColorKey;
 import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.editor.colors.EditorFontType;
-import com.intellij.openapi.editor.event.*;
+import com.intellij.openapi.editor.event.CaretAdapter;
+import com.intellij.openapi.editor.event.CaretEvent;
+import com.intellij.openapi.editor.event.CaretListener;
+import com.intellij.openapi.editor.event.EditorFactoryEvent;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.Project;
-import com.maddyhome.idea.vim.EventFacade;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.*;
@@ -65,58 +67,6 @@ public class EditorGroup {
       updateLineNumbers(e.getEditor());
     }
   };
-
-  private final LineNumbersGutterProvider myLineNumbersGutterProvider = new LineNumbersGutterProvider();
-
-  public EditorGroup() {
-    final OptionChangeListener numbersChangeListener = new OptionChangeListener() {
-      @Override
-      public void valueChange(OptionChangeEvent event) {
-        for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
-          updateLineNumbers(editor);
-        }
-      }
-    };
-    OptionsManager.INSTANCE.getNumber().addOptionChangeListener(numbersChangeListener);
-    OptionsManager.INSTANCE.getRelativenumber().addOptionChangeListener(numbersChangeListener);
-
-    EventFacade.getInstance().addEditorFactoryListener(new EditorFactoryAdapter() {
-      @Override
-      public void editorCreated(@NotNull EditorFactoryEvent event) {
-        final Editor editor = event.getEditor();
-        isBlockCursor = editor.getSettings().isBlockCursor();
-        isAnimatedScrolling = editor.getSettings().isAnimatedScrolling();
-        isRefrainFromScrolling = editor.getSettings().isRefrainFromScrolling();
-        DocumentManager.getInstance().addListeners(editor.getDocument());
-        VimPlugin.getKey().registerRequiredShortcutKeys(editor);
-
-        if (VimPlugin.isEnabled()) {
-          initLineNumbers(editor);
-          // Turn on insert mode if editor doesn't have any file
-          if (!EditorHelper.isFileEditor(editor) &&
-              editor.getDocument().isWritable() &&
-              !CommandStateHelper.inInsertMode(editor)) {
-            VimPlugin.getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
-            KeyHandler.getInstance().reset(editor);
-          }
-          editor.getSettings().setBlockCursor(!CommandStateHelper.inInsertMode(editor));
-          editor.getSettings().setAnimatedScrolling(ANIMATED_SCROLLING_VIM_VALUE);
-          editor.getSettings().setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
-        }
-      }
-
-      @Override
-      public void editorReleased(@NotNull EditorFactoryEvent event) {
-        final Editor editor = event.getEditor();
-        deinitLineNumbers(editor);
-        UserDataManager.unInitializeEditor(editor);
-        VimPlugin.getKey().unregisterShortcutKeys(editor);
-        editor.getSettings().setAnimatedScrolling(isAnimatedScrolling);
-        editor.getSettings().setRefrainFromScrolling(isRefrainFromScrolling);
-        DocumentManager.getInstance().removeListeners(editor.getDocument());
-      }
-    }, ApplicationManager.getApplication());
-  }
 
   public void turnOn() {
     setCursors(BLOCK_CURSOR_VIM_VALUE);
@@ -161,7 +111,7 @@ public class EditorGroup {
     editor.getSettings().setLineNumbersShown(UserDataManager.getVimLineNumbersShown(editor));
   }
 
-  private void updateLineNumbers(@NotNull Editor editor) {
+  private static void updateLineNumbers(@NotNull Editor editor) {
     if (!EditorHelper.isFileEditor(editor)) {
       return;
     }
@@ -184,7 +134,7 @@ public class EditorGroup {
     if (relativeLineNumber) {
       final EditorGutter gutter = editor.getGutter();
       gutter.closeAllAnnotations();
-      gutter.registerTextAnnotation(myLineNumbersGutterProvider);
+      gutter.registerTextAnnotation(LineNumbersGutterProvider.INSTANCE);
     }
   }
 
@@ -271,7 +221,56 @@ public class EditorGroup {
     }
   }
 
+  public void editorCreated(@NotNull EditorFactoryEvent event) {
+    final Editor editor = event.getEditor();
+    isBlockCursor = editor.getSettings().isBlockCursor();
+    isAnimatedScrolling = editor.getSettings().isAnimatedScrolling();
+    isRefrainFromScrolling = editor.getSettings().isRefrainFromScrolling();
+    DocumentManager.getInstance().addListeners(editor.getDocument());
+    VimPlugin.getKey().registerRequiredShortcutKeys(editor);
+
+    initLineNumbers(editor);
+    // Turn on insert mode if editor doesn't have any file
+    if (!EditorHelper.isFileEditor(editor) &&
+        editor.getDocument().isWritable() &&
+        !CommandStateHelper.inInsertMode(editor)) {
+      VimPlugin.getChange().insertBeforeCursor(editor, new EditorDataContext(editor));
+      KeyHandler.getInstance().reset(editor);
+    }
+    editor.getSettings().setBlockCursor(!CommandStateHelper.inInsertMode(editor));
+    editor.getSettings().setAnimatedScrolling(ANIMATED_SCROLLING_VIM_VALUE);
+    editor.getSettings().setRefrainFromScrolling(REFRAIN_FROM_SCROLLING_VIM_VALUE);
+  }
+
+  public void editorReleased(@NotNull EditorFactoryEvent event) {
+    final Editor editor = event.getEditor();
+    deinitLineNumbers(editor);
+    UserDataManager.unInitializeEditor(editor);
+    VimPlugin.getKey().unregisterShortcutKeys(editor);
+    editor.getSettings().setAnimatedScrolling(isAnimatedScrolling);
+    editor.getSettings().setRefrainFromScrolling(isRefrainFromScrolling);
+    DocumentManager.getInstance().removeListeners(editor.getDocument());
+  }
+
+  public static class NumberChangeListener implements OptionChangeListener {
+    public static NumberChangeListener INSTANCE = new NumberChangeListener();
+    private NumberChangeListener() {
+    }
+    @Override
+    public void valueChange(OptionChangeEvent event) {
+      for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
+        updateLineNumbers(editor);
+      }
+    }
+  }
+
   private static class LineNumbersGutterProvider implements TextAnnotationGutterProvider {
+
+    public static LineNumbersGutterProvider INSTANCE = new LineNumbersGutterProvider();
+
+    private LineNumbersGutterProvider() {
+    }
+
     @Nullable
     @Override
     public String getLineText(int line, @NotNull Editor editor) {

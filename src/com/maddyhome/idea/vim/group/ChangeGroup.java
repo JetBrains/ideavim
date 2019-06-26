@@ -399,49 +399,32 @@ public class ChangeGroup {
     }
   }
 
-  /**
-   * Creates the group
-   */
-  public ChangeGroup() {
-    // We want to know when a user clicks the mouse somewhere in the editor so we can clear any
-    // saved text for the current insert mode.
-    final EventFacade eventFacade = EventFacade.getInstance();
-
-    eventFacade.addEditorFactoryListener(new EditorFactoryAdapter() {
-      @Override
-      public void editorCreated(@NotNull EditorFactoryEvent event) {
-        final Editor editor = event.getEditor();
-        eventFacade.addEditorMouseListener(editor, listener);
-        UserDataManager.setVimChangeGroup(editor, true);
-      }
-
-      @Override
-      public void editorReleased(@NotNull EditorFactoryEvent event) {
-        final Editor editor = event.getEditor();
-        if (UserDataManager.getVimChangeGroup(editor)) {
-          eventFacade.removeEditorMouseListener(editor, listener);
-          UserDataManager.setVimChangeGroup(editor, false);
-        }
-      }
-
-      @NotNull private final EditorMouseAdapter listener = new EditorMouseAdapter() {
-        @Override
-        public void mouseClicked(@NotNull EditorMouseEvent event) {
-          Editor editor = event.getEditor();
-          if (!VimPlugin.isEnabled()) {
-            return;
-          }
-
-          if (CommandStateHelper.inInsertMode(editor)) {
-            clearStrokes(editor);
-          }
-        }
-      };
-    }, ApplicationManager.getApplication());
-  }
-
   // Workaround for VIM-1546. Another solution is highly appreciated.
   public boolean tabAction = false;
+
+  @NotNull private final EditorMouseListener listener = new EditorMouseListener() {
+    @Override
+    public void mouseClicked(@NotNull EditorMouseEvent event) {
+      Editor editor = event.getEditor();
+      if (CommandStateHelper.inInsertMode(editor)) {
+        clearStrokes(editor);
+      }
+    }
+  };
+
+  public void editorCreated(@NotNull EditorFactoryEvent event) {
+    final Editor editor = event.getEditor();
+    EventFacade.getInstance().addEditorMouseListener(editor, listener);
+    UserDataManager.setVimChangeGroup(editor, true);
+  }
+
+  public void editorReleased(@NotNull EditorFactoryEvent event) {
+    final Editor editor = event.getEditor();
+    if (UserDataManager.getVimChangeGroup(editor)) {
+      EventFacade.getInstance().removeEditorMouseListener(editor, listener);
+      UserDataManager.setVimChangeGroup(editor, false);
+    }
+  }
 
   @Nullable
   private static TextRange getDeleteMotionRange(@NotNull Editor editor,

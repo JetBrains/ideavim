@@ -26,7 +26,6 @@ import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.markup.*;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
-import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
@@ -1336,23 +1335,22 @@ public class SearchGroup {
     return child != null ? StringHelper.getSafeXmlText(child) : null;
   }
 
-  public static class EditorSelectionCheck implements FileEditorManagerListener {
-    /**
-     * Updates search highlights when the selected editor changes
-     */
-    @Override
-    public void selectionChanged(@NotNull FileEditorManagerEvent event) {
-      VimPlugin.getSearch().updateSearchHighlights();
-    }
+  /**
+   * Updates search highlights when the selected editor changes
+   */
+  public static void fileEditorManagerSelectionChangedCallback(@NotNull FileEditorManagerEvent event) {
+    VimPlugin.getSearch().updateSearchHighlights();
   }
 
   public static class DocumentSearchListener implements DocumentListener {
+
+    public static DocumentSearchListener INSTANCE = new DocumentSearchListener();
+
+    private DocumentSearchListener () {
+    }
+
     @Override
     public void documentChanged(@NotNull DocumentEvent event) {
-      if (!VimPlugin.isEnabled()) {
-        return;
-      }
-
       for (Project project : ProjectManager.getInstance().getOpenProjects()) {
         final Document document = event.getDocument();
 

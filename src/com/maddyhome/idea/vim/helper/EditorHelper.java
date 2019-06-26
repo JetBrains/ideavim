@@ -22,7 +22,6 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.LightVirtualFile;
 import com.maddyhome.idea.vim.common.CharacterPosition;
@@ -421,12 +420,11 @@ public class EditorHelper {
   /**
    * Gets the editor for the virtual file within the editor manager.
    *
-   * @param manager The file editor manager
    * @param file    The virtual file get the editor for
    * @return The matching editor or null if no match was found
    */
   @Nullable
-  public static Editor getEditor(@NotNull final FileEditorManager manager, @Nullable final VirtualFile file) {
+  public static Editor getEditor(@Nullable final VirtualFile file) {
     if (file == null) {
       return null;
     }
@@ -435,7 +433,7 @@ public class EditorHelper {
     if (doc == null) {
       return null;
     }
-    final Editor[] editors = EditorFactory.getInstance().getEditors(doc, manager.getProject());
+    final Editor[] editors = EditorFactory.getInstance().getEditors(doc);
     if (editors.length > 0) {
       return editors[0];
     }

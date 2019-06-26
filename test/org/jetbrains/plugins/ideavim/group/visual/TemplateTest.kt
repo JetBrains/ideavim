@@ -179,7 +179,7 @@ class TemplateTest : VimTestCase() {
 
   private fun startRenaming(handler: VariableInplaceRenameHandler): Editor {
     val editor = if (myFixture.editor is EditorWindow) (myFixture.editor as EditorWindow).delegate else myFixture.editor
-    VimListenerManager.addEditorListeners(editor)
+    VimListenerManager.EditorListeners.add(editor)
 
     TemplateManagerImpl.setTemplateTesting(myFixture.project, disposable)
     handler.doRename(myFixture.elementAtCaret, editor, dataContext)
