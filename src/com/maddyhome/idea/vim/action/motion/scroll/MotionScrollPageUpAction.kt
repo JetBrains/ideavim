@@ -16,54 +16,52 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action.motion.scroll;
+package com.maddyhome.idea.vim.action.motion.scroll
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
+import java.awt.event.KeyEvent
+import java.util.*
+import javax.swing.KeyStroke
 
-import javax.swing.*;
-import java.util.List;
-import java.util.Set;
 
+class MotionScrollPageUpAction : VimCommandAction() {
+  override val mappingModes: Set<MappingMode> = MappingMode.NVO
 
-public class MotionScrollPageUpAction extends VimCommandAction {
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.NVO;
-  }
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-B>", "<PageUp>")
 
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("<C-B>", "<PageUp>");
-  }
+  override val type: Command.Type = Command.Type.OTHER_READONLY
 
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.OTHER_READONLY;
-  }
+  override fun makeActionHandler(): VimActionHandler = MotionScrollPageUpActionHandler
+}
 
-  @NotNull
-  @Override
-  protected VimActionHandler makeActionHandler() {
-    return new VimActionHandler.SingleExecution() {
-      @Override
-      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-        return VimPlugin.getMotion().scrollFullPage(editor, -cmd.getCount());
-      }
-    };
+class MotionScrollPageUpInsertModeAction : VimCommandAction() {
+  override val mappingModes: Set<MappingMode> = MappingMode.I
+
+  override val keyStrokesSet: Set<List<KeyStroke>> = setOf(
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0)),
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.CTRL_MASK)),
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, KeyEvent.CTRL_MASK)),
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_MASK)),
+    listOf(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, KeyEvent.SHIFT_MASK))
+  )
+
+  override val type: Command.Type = Command.Type.OTHER_READONLY
+
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_CLEAR_STROKES)
+
+  override fun makeActionHandler(): VimActionHandler = MotionScrollPageUpActionHandler
+}
+
+private object MotionScrollPageUpActionHandler : VimActionHandler.SingleExecution() {
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    return VimPlugin.getMotion().scrollFullPage(editor, -cmd.count)
   }
 }
-    parser.registerAction(MappingMode.NVO, "VimMotionScrollPageUp", Command.Type.OTHER_READONLY, new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0))
-      });

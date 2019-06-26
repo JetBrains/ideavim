@@ -40,7 +40,6 @@ class RegisterActions {
 
     registerInsertModeActions();
     registerNormalModeActions();
-    registerNVOModesActions();
     registerSystemMappings();
   }
 
@@ -62,84 +61,6 @@ class RegisterActions {
     parser.registerAction(MappingMode.NV, "ExpandAllRegions", Command.Type.OTHER_READONLY, new Shortcut("zR"));
     parser.registerAction(MappingMode.NV, "ExpandRegion", Command.Type.OTHER_READONLY, new Shortcut("zo"));
     parser.registerAction(MappingMode.NV, "ExpandRegionRecursively", Command.Type.OTHER_READONLY, new Shortcut("zO"));
-  }
-
-  /**
-   * Register normal, visual, operator pending modes actions.
-   */
-  private static void registerNVOModesActions() {
-    final KeyGroup parser = VimPlugin.getKey();
-    parser.registerAction(MappingMode.NVO, "VimCopySelectRegister", Command.Type.SELECT_REGISTER, EnumSet.of(CommandFlags.FLAG_EXPECT_MORE),
-                          new Shortcut('"'), Argument.Type.CHARACTER);
-
-    // Motion Actions
-    // TODO - add ['
-    // TODO - add [`
-    // TODO - add ]'
-    // TODO - add ]`
-    // TODO - add zj
-    // TODO - add zk
-
-    // This represents two commands and one is linewise and the other is inclusive - the handler will fix it
-    parser.registerAction(MappingMode.NVO, "VimMotionScrollFirstScreenLine", Command.Type.OTHER_READONLY, new Shortcut[]{
-      new Shortcut("zt")
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionScrollFirstScreenColumn", Command.Type.OTHER_READONLY, new Shortcut[]{
-      new Shortcut("zs")
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionScrollFirstScreenLineStart", Command.Type.OTHER_READONLY, new Shortcut[]{
-      new Shortcut(new KeyStroke[]{KeyStroke.getKeyStroke('z'), KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)})
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionScrollFirstScreenLinePageStart", Command.Type.OTHER_READONLY, new Shortcut[]{
-      new Shortcut("z+")
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionScrollHalfPageDown", Command.Type.OTHER_READONLY, EnumSet.of(CommandFlags.FLAG_IGNORE_SCROLL_JUMP),
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.CTRL_MASK)));
-    parser.registerAction(MappingMode.NVO, "VimMotionScrollHalfPageUp", Command.Type.OTHER_READONLY, EnumSet.of(CommandFlags.FLAG_IGNORE_SCROLL_JUMP),
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.CTRL_MASK)));
-    parser.registerAction(MappingMode.NVO, "VimMotionScrollLastScreenLine", Command.Type.OTHER_READONLY, new Shortcut[]{
-      new Shortcut("zb")
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionScrollLastScreenColumn", Command.Type.OTHER_READONLY, new Shortcut[]{
-      new Shortcut("ze")
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionScrollLastScreenLineStart", Command.Type.OTHER_READONLY, new Shortcut[]{
-      new Shortcut("z-")
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionScrollLastScreenLinePageStart", Command.Type.OTHER_READONLY, new Shortcut[]{
-      new Shortcut("z^")
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionScrollLineDown", Command.Type.OTHER_READONLY,
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_MASK)));
-    parser.registerAction(MappingMode.NVO, "VimMotionScrollLineUp", Command.Type.OTHER_READONLY,
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_MASK)));
-    parser.registerAction(MappingMode.NVO, "VimMotionScrollMiddleScreenLine", Command.Type.OTHER_READONLY, new Shortcut[]{
-      new Shortcut("zz")
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionScrollMiddleScreenLineStart", Command.Type.OTHER_READONLY, new Shortcut[]{
-      new Shortcut("z.")
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionScrollColumnLeft", Command.Type.OTHER_READONLY, EnumSet.of(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP),
-                          new Shortcut[]{
-                            new Shortcut("zl"),
-                            new Shortcut(new KeyStroke[]{KeyStroke.getKeyStroke('z'), KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0)})
-                          });
-    parser.registerAction(MappingMode.NVO, "VimMotionScrollColumnRight", Command.Type.OTHER_READONLY, EnumSet.of(CommandFlags.FLAG_IGNORE_SIDE_SCROLL_JUMP),
-                          new Shortcut[]{
-                            new Shortcut("zh"),
-                            new Shortcut(new KeyStroke[]{KeyStroke.getKeyStroke('z'), KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0)})
-                          });
-    parser.registerAction(MappingMode.NVO, "VimMotionScrollPageDown", Command.Type.OTHER_READONLY, new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_F, KeyEvent.CTRL_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0))
-    });
-    parser.registerAction(MappingMode.NVO, "VimMotionScrollPageUp", Command.Type.OTHER_READONLY, new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_B, KeyEvent.CTRL_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0))
-    });
-    // Misc Actions
-    parser.registerAction(MappingMode.NVO, "VimExEntry", Command.Type.OTHER_READ_WRITE,
-                          new Shortcut(':'));
   }
 
   private static void registerNormalModeActions() {
@@ -341,20 +262,6 @@ class RegisterActions {
     parser.registerAction(MappingMode.I, "VimInsertSingleCommand", Command.Type.INSERT,
                           EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES, CommandFlags.FLAG_EXPECT_MORE),
                           new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK)));
-    parser.registerAction(MappingMode.I, "VimMotionScrollPageUp", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES), new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_UP, 0)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.CTRL_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, KeyEvent.CTRL_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.SHIFT_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, KeyEvent.SHIFT_MASK))
-    });
-    parser.registerAction(MappingMode.I, "VimMotionScrollPageDown", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES), new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_PAGE_DOWN, 0)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.CTRL_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, KeyEvent.CTRL_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.SHIFT_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, KeyEvent.SHIFT_MASK))
-    });
     parser.registerAction(MappingMode.I, "VimShiftLeftLines", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_SAVE_STROKE),
                           new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.CTRL_MASK)));
     parser.registerAction(MappingMode.I, "VimShiftRightLines", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_SAVE_STROKE),

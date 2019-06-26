@@ -77,16 +77,16 @@
  * |i_<S-Right>|          {@link com.maddyhome.idea.vim.action.motion.text.MotionWordRightInsertAction}
  * |i_<C-Right>|          {@link com.maddyhome.idea.vim.action.motion.text.MotionWordRightInsertAction}
  * |i_<Up>|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionUpAction}
- * |i_<S-Up>|             {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpAction}
+ * |i_<S-Up>|             {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpInsertModeAction}
  * |i_<Down>|             {@link com.maddyhome.idea.vim.action.motion.updown.MotionDownNotLineWiseAction}
- * |i_<S-Down>|           {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownAction}
+ * |i_<S-Down>|           {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownInsertModeAction}
  * |i_<Home>|             {@link com.maddyhome.idea.vim.action.motion.leftright.MotionFirstColumnInsertModeAction}
  * |i_<C-Home>|           {@link com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineFirstInsertAction}
  * |i_<End>|              {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastColumnInsertAction}
  * |i_<C-End>|            {@link com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineLastEndInsertAction}
  * |i_<Insert>|           {@link com.maddyhome.idea.vim.action.change.insert.InsertInsertAction}
- * |i_<PageUp>|           {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpAction}
- * |i_<PageDown>|         {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownAction}
+ * |i_<PageUp>|           {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpInsertModeAction}
+ * |i_<PageDown>|         {@link com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownInsertModeAction}
  * |i_<F1>|               IntelliJ help
  * |i_<Insert>|           IntelliJ editor toggle insert/replace
  * |i_CTRL-X_index|       TODO

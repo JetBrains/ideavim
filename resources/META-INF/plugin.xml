@@ -237,7 +237,9 @@
     <action id="VimMotionScrollMiddleScreenLine" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollMiddleScreenLineAction" text="Scroll Line to Middle"/>
     <action id="VimMotionScrollMiddleScreenLineStart" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollMiddleScreenLineStartAction" text="Scroll Line to Middle"/>
     <action id="VimMotionScrollPageDown" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownAction" text="Scroll Page Down"/>
+    <action id="VimMotionScrollPageDownInsertMode" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageDownInsertModeAction" text="Scroll Page Down"/>
     <action id="VimMotionScrollPageUp" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpAction" text="Scroll Page Up"/>
+    <action id="VimMotionScrollPageUpInsertMode" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollPageUpInsertModeAction" text="Scroll Page Up"/>
     <action id="VimMotionScrollFirstScreenColumn" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollFirstScreenColumnAction" text="Scroll Column to first column"/>
     <action id="VimMotionScrollLastScreenColumn" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollLastScreenColumnAction" text="Scroll Column to last column"/>
     <action id="VimMotionScrollColumnLeft" class="com.maddyhome.idea.vim.action.motion.scroll.MotionScrollColumnLeftAction" text="Scroll Column Left"/>
