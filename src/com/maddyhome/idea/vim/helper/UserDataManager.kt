@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.visual.VisualChange
+import com.maddyhome.idea.vim.group.visual.vimLeadSelectionOffset
 import com.maddyhome.idea.vim.ui.ExOutputPanel
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -44,7 +45,14 @@ import kotlin.reflect.KProperty
  * Caret's offset when entering visual mode
  */
 var Caret.vimSelectionStart: Int
-  get() = _vimSelectionStart ?: throw AssertionError("Trying to access selection start, but it's not set")
+  get() {
+    val selectionStart = _vimSelectionStart
+    if (selectionStart == null) {
+      vimSelectionStart = vimLeadSelectionOffset
+      return vimLeadSelectionOffset
+    }
+    return selectionStart
+  }
   set(value) {
     _vimSelectionStart = value
   }

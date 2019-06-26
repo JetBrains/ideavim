@@ -255,11 +255,7 @@ class VisualMotionGroup {
 
   fun enterSelectMode(editor: Editor, subMode: CommandState.SubMode): Boolean {
     CommandState.getInstance(editor).pushState(CommandState.Mode.SELECT, subMode, MappingMode.SELECT)
-    if (subMode == CommandState.SubMode.VISUAL_BLOCK) {
-      editor.caretModel.primaryCaret.run { vimSelectionStart = vimLeadSelectionOffset }
-    } else {
-      editor.caretModel.allCarets.forEach { it.vimSelectionStart = it.vimLeadSelectionOffset }
-    }
+    editor.vimForEachCaret { it.vimSelectionStart = it.vimLeadSelectionOffset }
     updateCaretColours(editor)
     ChangeGroup.resetCursor(editor, true)
     return true
