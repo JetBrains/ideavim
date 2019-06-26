@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.listener
 
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.event.EditorMouseEvent
@@ -175,15 +176,23 @@ object VimListenerManager {
         logger.debug("Mouse dragging")
         SelectionVimListenerSuppressor.lock()
         mouseDragging = true
-        ChangeGroup.resetCaret(e.editor, true)
         val caret = e.editor.caretModel.primaryCaret
-        val lineEnd = EditorHelper.getLineEndForOffset(e.editor, caret.offset)
-        val lineStart = EditorHelper.getLineStartForOffset(e.editor, caret.offset)
-        if (caret.offset == lineEnd && lineEnd != lineStart && caret.offset - 1 == caret.selectionStart && caret.offset == caret.selectionEnd) {
+        if (onLineEnd(caret)) {
           // UX protection for case when user performs a small dragging while putting caret on line end
           caret.removeSelection()
+          ChangeGroup.resetCaret(e.editor, true)
         }
       }
+      if (mouseDragging && e.editor.caretModel.primaryCaret.hasSelection()) {
+        ChangeGroup.resetCaret(e.editor, true)
+      }
+    }
+
+    private fun onLineEnd(caret: Caret): Boolean {
+      val editor = caret.editor
+      val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
+      val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
+      return caret.offset == lineEnd && lineEnd != lineStart && caret.offset - 1 == caret.selectionStart && caret.offset == caret.selectionEnd
     }
 
     override fun mouseReleased(event: EditorMouseEvent) {
@@ -242,7 +251,7 @@ object VimListenerManager {
     }
   }
 
-  private object ComponentMouseListener: MouseAdapter() {
+  private object ComponentMouseListener : MouseAdapter() {
     override fun mousePressed(e: MouseEvent?) {
       val editor = (e?.component as? EditorComponentImpl)?.editor ?: return
       when (e.clickCount) {
