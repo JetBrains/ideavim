@@ -22,14 +22,44 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+import java.util.List;
+import java.util.Set;
 
-public class YankLineAction extends EditorAction {
+
+public class YankLineAction extends VimCommandAction {
   public YankLineAction() {
     super(new Handler());
+  }
+
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return null;
+  }
+
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return null;
+  }
+
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return null;
+  }
+
+  @NotNull
+  @Override
+  protected VimActionHandler makeActionHandler() {
+    return null;
   }
 
   private static class Handler extends VimActionHandler.SingleExecution {
