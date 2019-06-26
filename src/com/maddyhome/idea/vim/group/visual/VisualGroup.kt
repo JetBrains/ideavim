@@ -26,6 +26,7 @@ import com.intellij.openapi.editor.VisualPosition
 import com.intellij.openapi.editor.colors.EditorColors
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inBlockSubMode
@@ -139,7 +140,8 @@ val Caret.vimLeadSelectionOffset: Int
  *
  * Secondary carets became invisible colour in visual block mode
  */
-fun updateCaretColours(editor: Editor) {
+fun updateCaretState(editor: Editor) {
+  // Update colour
   if (editor.inBlockSubMode) {
     editor.caretModel.allCarets.forEach {
       if (it != editor.caretModel.primaryCaret) {
@@ -152,6 +154,13 @@ fun updateCaretColours(editor: Editor) {
     }
   } else {
     editor.caretModel.allCarets.forEach { it.visualAttributes = CaretVisualAttributes.DEFAULT }
+  }
+
+  // Update shape
+  when (editor.mode) {
+    CommandState.Mode.COMMAND, CommandState.Mode.VISUAL, CommandState.Mode.REPLACE -> ChangeGroup.resetCaret(editor, false)
+    CommandState.Mode.SELECT, CommandState.Mode.INSERT -> ChangeGroup.resetCaret(editor, true)
+    CommandState.Mode.REPEAT, CommandState.Mode.EX_ENTRY -> Unit
   }
 }
 
@@ -263,5 +272,5 @@ private fun setVisualSelection(selectionStart: Int, selectionEnd: Int, caret: Ca
     }
     else -> Unit
   }
-  updateCaretColours(editor)
+  updateCaretState(editor)
 }

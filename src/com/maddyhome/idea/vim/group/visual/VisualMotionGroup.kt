@@ -29,7 +29,6 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -117,7 +116,7 @@ class VisualMotionGroup {
     return true
   }
 
-  fun controlNonVimSelectionChange(editor: Editor, resetCaretToInsert: Boolean = false, selectionSource: VimListenerManager.SelectionSource = VimListenerManager.SelectionSource.OTHER) {
+  fun controlNonVimSelectionChange(editor: Editor, selectionSource: VimListenerManager.SelectionSource = VimListenerManager.SelectionSource.OTHER) {
     if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
       val commandState = CommandState.getInstance(editor)
       modeBeforeEnteringNonVimVisual = commandState.mode
@@ -136,7 +135,7 @@ class VisualMotionGroup {
       }
       KeyHandler.getInstance().reset(editor)
     } else {
-      ChangeGroup.resetCursor(editor, resetCaretToInsert)
+      updateCaretState(editor)
       exitVisual(editor)
       exitSelectModeAndResetKeyHandler(editor, true)
 
@@ -248,16 +247,14 @@ class VisualMotionGroup {
     } else {
       editor.caretModel.allCarets.forEach { it.vimSelectionStart = it.vimLeadSelectionOffset }
     }
-    updateCaretColours(editor)
-    ChangeGroup.resetCursor(editor, false)
+    updateCaretState(editor)
     return true
   }
 
   fun enterSelectMode(editor: Editor, subMode: CommandState.SubMode): Boolean {
     CommandState.getInstance(editor).pushState(CommandState.Mode.SELECT, subMode, MappingMode.SELECT)
     editor.vimForEachCaret { it.vimSelectionStart = it.vimLeadSelectionOffset }
-    updateCaretColours(editor)
-    ChangeGroup.resetCursor(editor, true)
+    updateCaretState(editor)
     return true
   }
 
@@ -345,8 +342,7 @@ class VisualMotionGroup {
         }
       }
     }
-    updateCaretColours(editor)
-    ChangeGroup.resetCursor(editor, false)
+    updateCaretState(editor)
   }
 
   fun resetVisual(editor: Editor) {

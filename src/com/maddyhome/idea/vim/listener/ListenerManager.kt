@@ -144,7 +144,7 @@ object VimListenerManager {
 
       if (SelectionVimListenerSuppressor.isNotLocked) {
         logger.debug("Adjust non vim selection change")
-        VimPlugin.getVisualMotion().controlNonVimSelectionChange(editor, !editor.settings.isBlockCursor)
+        VimPlugin.getVisualMotion().controlNonVimSelectionChange(editor)
       }
 
       if (myMakingChanges || document is DocumentEx && document.isInEventsHandling) {
@@ -169,15 +169,13 @@ object VimListenerManager {
 
   private object EditorMouseHandler : EditorMouseListener, EditorMouseMotionListener {
     private var mouseDragging = false
-    private var isBlockCaret = true
 
     override fun mouseDragged(e: EditorMouseEvent) {
       if (!mouseDragging) {
         logger.debug("Mouse dragging")
         SelectionVimListenerSuppressor.lock()
         mouseDragging = true
-        isBlockCaret = e.editor.settings.isBlockCursor
-        ChangeGroup.resetCursor(e.editor, true)
+        ChangeGroup.resetCaret(e.editor, true)
         val caret = e.editor.caretModel.primaryCaret
         val lineEnd = EditorHelper.getLineEndForOffset(e.editor, caret.offset)
         val lineStart = EditorHelper.getLineStartForOffset(e.editor, caret.offset)
@@ -195,7 +193,7 @@ object VimListenerManager {
         val editor = event.editor
         val caret = editor.caretModel.primaryCaret
         SelectionVimListenerSuppressor.use {
-          VimPlugin.getVisualMotion().controlNonVimSelectionChange(editor, !isBlockCaret, VimListenerManager.SelectionSource.MOUSE)
+          VimPlugin.getVisualMotion().controlNonVimSelectionChange(editor, VimListenerManager.SelectionSource.MOUSE)
           moveCaretOneCharLeftFromSelectionEnd(editor)
           caret.vimLastColumn = editor.caretModel.visualPosition.column
         }

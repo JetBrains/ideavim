@@ -54,6 +54,7 @@ import com.maddyhome.idea.vim.common.Register;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.group.visual.VimSelection;
+import com.maddyhome.idea.vim.group.visual.VisualGroupKt;
 import com.maddyhome.idea.vim.group.visual.VisualModeHelperKt;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
@@ -394,7 +395,7 @@ public class ChangeGroup {
       setInsertEditorState(editor, mode == CommandState.Mode.INSERT);
       state.pushState(mode, CommandState.SubMode.NONE, MappingMode.INSERT);
 
-      resetCursor(editor, true);
+      VisualGroupKt.updateCaretState(editor);
     }
   }
 
@@ -534,9 +535,7 @@ public class ChangeGroup {
     CommandState.getInstance(editor).popState();
     exitAllSingleCommandInsertModes(editor);
 
-    if (!CommandStateHelper.inInsertMode(editor)) {
-      resetCursor(editor, false);
-    }
+    VisualGroupKt.updateCaretState(editor);
   }
 
   /**
@@ -1759,19 +1758,19 @@ public class ChangeGroup {
     return false;
   }
 
-  public static void resetCursor(@NotNull Editor editor, boolean insert) {
+  public static void resetCaret(@NotNull Editor editor, boolean insert) {
     Document doc = editor.getDocument();
     VirtualFile vf = FileDocumentManager.getInstance().getFile(doc);
     if (vf != null) {
-      resetCursor(vf, editor.getProject(), insert);
+      resetCaret(vf, editor.getProject(), insert);
     }
     else {
       editor.getSettings().setBlockCursor(!insert);
     }
   }
 
-  private static void resetCursor(@NotNull VirtualFile virtualFile, Project proj, boolean insert) {
-    logger.debug("resetCursor");
+  private static void resetCaret(@NotNull VirtualFile virtualFile, Project proj, boolean insert) {
+    logger.debug("resetCaret");
     Document doc = FileDocumentManager.getInstance().getDocument(virtualFile);
     if (doc == null) return; // Must be no text editor (such as image)
     Editor[] editors = EditorFactory.getInstance().getEditors(doc, proj);

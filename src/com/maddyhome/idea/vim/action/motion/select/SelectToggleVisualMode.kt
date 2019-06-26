@@ -25,7 +25,7 @@ import com.maddyhome.idea.vim.action.VimCommandAction
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.group.ChangeGroup
+import com.maddyhome.idea.vim.group.visual.updateCaretState
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import javax.swing.KeyStroke
 
@@ -59,7 +59,7 @@ class SelectToggleVisualMode : VimCommandAction() {
           }
         }
       }
-      ChangeGroup.resetCursor(editor, mode == CommandState.Mode.VISUAL)
+      updateCaretState(editor)
       return true
     }
   }
