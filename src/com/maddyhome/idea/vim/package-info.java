@@ -147,11 +147,11 @@
  * |:|                    {@link com.maddyhome.idea.vim.action.ExEntryAction}
  * |;|                    {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastMatchCharAction}
  * |<|                    {@link com.maddyhome.idea.vim.action.change.shift.ShiftLeftMotionAction}
- * |<<|                   {@link com.maddyhome.idea.vim.action.change.shift.ShiftLeftLinesAction}
+ * |<<|                   {@link com.maddyhome.idea.vim.action.change.shift.ShiftLeftLinesNormalModeAction}
  * |=|                    {@link com.maddyhome.idea.vim.action.change.shift.AutoIndentMotionAction}
  * |==|                   {@link com.maddyhome.idea.vim.action.change.shift.AutoIndentLinesAction}
  * |>|                    {@link com.maddyhome.idea.vim.action.change.shift.ShiftRightMotionAction}
- * |>>|                   {@link com.maddyhome.idea.vim.action.change.shift.ShiftRightLinesAction}
+ * |>>|                   {@link com.maddyhome.idea.vim.action.change.shift.ShiftRightLinesNormalModeAction}
  * |?|                    {@link com.maddyhome.idea.vim.action.motion.search.SearchEntryRevAction}
  * |@|                    {@link com.maddyhome.idea.vim.action.macro.PlaybackRegisterAction}
  * |@:|                   {@link com.maddyhome.idea.vim.action.change.RepeatExCommandAction}

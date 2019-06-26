@@ -20,24 +20,53 @@ package com.maddyhome.idea.vim.action.change.insert;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+import java.util.List;
+import java.util.Set;
 
-public class InsertRegisterAction extends EditorAction {
-  public InsertRegisterAction() {
-    super(new Handler());
+
+public class InsertRegisterAction extends VimCommandAction {
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.I;
   }
 
-  private static class Handler extends VimActionHandler.SingleExecution {
-    @Override
-    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      final Argument argument = cmd.getArgument();
-      return argument != null && VimPlugin.getChange().insertRegister(editor, context, argument.getCharacter());
-    }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("<C-R>");
+  }
+
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.INSERT;
+  }
+
+  @NotNull
+  @Override
+  public Argument.Type getArgumentType() {
+    return Argument.Type.CHARACTER;
+  }
+
+  @NotNull
+  @Override
+  protected VimActionHandler makeActionHandler() {
+    return new VimActionHandler.SingleExecution() {
+      @Override
+      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
+        final Argument argument = cmd.getArgument();
+        return argument != null && VimPlugin.getChange().insertRegister(editor, context, argument.getCharacter());
+      }
+    };
   }
 }

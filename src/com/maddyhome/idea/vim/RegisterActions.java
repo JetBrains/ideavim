@@ -38,7 +38,6 @@ class RegisterActions {
   static void registerActions() {
     registerVimCommandActions();
 
-    registerInsertModeActions();
     registerNormalModeActions();
     registerSystemMappings();
   }
@@ -61,6 +60,29 @@ class RegisterActions {
     parser.registerAction(MappingMode.NV, "ExpandAllRegions", Command.Type.OTHER_READONLY, new Shortcut("zR"));
     parser.registerAction(MappingMode.NV, "ExpandRegion", Command.Type.OTHER_READONLY, new Shortcut("zo"));
     parser.registerAction(MappingMode.NV, "ExpandRegionRecursively", Command.Type.OTHER_READONLY, new Shortcut("zO"));
+
+    parser.registerAction(MappingMode.I, "EditorBackSpace", Command.Type.INSERT,
+                          new Shortcut[]{new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK)),
+                            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0))});
+    parser.registerAction(MappingMode.I, "EditorDelete", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_SAVE_STROKE),
+                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)));
+    parser.registerAction(MappingMode.I, "EditorDown", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES),
+                          new Shortcut[]{new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)),
+                            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0))});
+    parser.registerAction(MappingMode.I, "EditorTab", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_SAVE_STROKE),
+                          new Shortcut[]{new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_MASK)),
+                            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0))});
+    parser.registerAction(MappingMode.I, "EditorUp", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES),
+                          new Shortcut[]{new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)),
+                            new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0))});
+
+    // Digraph shortcuts are handled directly by KeyHandler#handleKey, so they don't have an action. But we still need to
+    // register the shortcuts or the editor will swallow them. Technically, the shortcuts will be registered as part of
+    // other commands, but it's best to be explicit
+    parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_K, KeyEvent.CTRL_MASK)));
+    parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK)));
+    parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_MASK)));
+    parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)));
   }
 
   private static void registerNormalModeActions() {
@@ -162,12 +184,8 @@ class RegisterActions {
                           new Shortcut("=="));
     parser.registerAction(MappingMode.N, "VimAutoIndentMotion", Command.Type.CHANGE, EnumSet.of(CommandFlags.FLAG_OP_PEND),
                           new Shortcut('='), Argument.Type.MOTION);
-    parser.registerAction(MappingMode.N, "VimShiftLeftLines", Command.Type.CHANGE,
-                          new Shortcut("<<"));
     parser.registerAction(MappingMode.N, "VimShiftLeftMotion", Command.Type.CHANGE, EnumSet.of(CommandFlags.FLAG_OP_PEND),
                           new Shortcut('<'), Argument.Type.MOTION);
-    parser.registerAction(MappingMode.N, "VimShiftRightLines", Command.Type.CHANGE,
-                          new Shortcut(">>"));
     parser.registerAction(MappingMode.N, "VimShiftRightMotion", Command.Type.CHANGE, EnumSet.of(CommandFlags.FLAG_OP_PEND),
                           new Shortcut('>'), Argument.Type.MOTION);
 
@@ -187,68 +205,5 @@ class RegisterActions {
     parser.registerAction(MappingMode.N, "VimPlaybackRegister", Command.Type.OTHER_WRITABLE,
                           new Shortcut('@'), Argument.Type.CHARACTER);
     // TODO - support for :map macros
-  }
-
-  private static void registerInsertModeActions() {
-    final KeyGroup parser = VimPlugin.getKey();
-    // Other insert actions
-    parser
-      .registerAction(MappingMode.I, "EditorBackSpace", Command.Type.INSERT,
-                      new Shortcut[]{new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK)),
-                        new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0))}
-      );
-    parser.registerAction(MappingMode.I, "EditorDelete", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_SAVE_STROKE),
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)));
-    parser.registerAction(MappingMode.I, "EditorDown", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES), new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0))
-    });
-    parser.registerAction(MappingMode.I, "EditorTab", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_SAVE_STROKE), new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0))
-    });
-    parser.registerAction(MappingMode.I, "EditorUp", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES), new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0))
-    });
-    parser.registerAction(MappingMode.I, "VimInsertCharacterAboveCursor", Command.Type.INSERT,
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_Y, KeyEvent.CTRL_MASK)));
-    parser.registerAction(MappingMode.I, "VimInsertCharacterBelowCursor", Command.Type.INSERT,
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_MASK)));
-    parser.registerAction(MappingMode.I, "VimInsertDeleteInsertedText", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES),
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_U, KeyEvent.CTRL_MASK)));
-    parser.registerAction(MappingMode.I, "VimInsertDeletePreviousWord", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES),
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_W, KeyEvent.CTRL_MASK)));
-    parser.registerAction(MappingMode.I, "VimInsertEnter", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_SAVE_STROKE), new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_M, KeyEvent.CTRL_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0))
-    });
-    parser.registerAction(MappingMode.I, "VimInsertPreviousInsert", Command.Type.INSERT,
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_MASK)));
-    parser.registerAction(MappingMode.I, "VimInsertPreviousInsertExit", Command.Type.INSERT, new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_2, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_2, KeyEvent.CTRL_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_AT, KeyEvent.CTRL_MASK))
-    });
-    parser.registerAction(MappingMode.I, "VimInsertRegister", Command.Type.INSERT,
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_MASK)),
-                          Argument.Type.CHARACTER);
-    parser.registerAction(MappingMode.I, "VimInsertReplaceToggle", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_SAVE_STROKE),
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0)));
-    parser.registerAction(MappingMode.I, "VimInsertSingleCommand", Command.Type.INSERT,
-                          EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES, CommandFlags.FLAG_EXPECT_MORE),
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_MASK)));
-    parser.registerAction(MappingMode.I, "VimShiftLeftLines", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_SAVE_STROKE),
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_D, KeyEvent.CTRL_MASK)));
-    parser.registerAction(MappingMode.I, "VimShiftRightLines", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_SAVE_STROKE),
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.CTRL_MASK)));
-
-    // Digraph shortcuts are handled directly by KeyHandler#handleKey, so they don't have an action. But we still need to
-    // register the shortcuts or the editor will swallow them. Technically, the shortcuts will be registered as part of
-    // other commands, but it's best to be explicit
-    parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_K, KeyEvent.CTRL_MASK)));
-    parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK)));
-    parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_MASK)));
-    parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)));
   }
 }

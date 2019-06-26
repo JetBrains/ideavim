@@ -16,67 +16,49 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action.change.shift;
+package com.maddyhome.idea.vim.action.change.shift
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
-import com.maddyhome.idea.vim.command.Argument;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import javax.swing.*;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Caret
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.command.Argument
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler
+import com.maddyhome.idea.vim.handler.VimActionHandler
+import java.util.*
+import javax.swing.KeyStroke
 
 
-public class ShiftRightLinesAction extends VimCommandAction {
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return MappingMode.I;
-  }
+class ShiftRightLinesAction : VimCommandAction() {
+  override val mappingModes: Set<MappingMode> = MappingMode.I
 
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return parseKeysSet("<C-T>");
-  }
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<C-T>")
 
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return Command.Type.INSERT;
-  }
+  override val type: Command.Type = Command.Type.INSERT
 
-  @NotNull
-  @Override
-  public EnumSet<CommandFlags> getFlags() {
-    return super.getFlags();
-  }
+  override val flags: EnumSet<CommandFlags> = EnumSet.of(CommandFlags.FLAG_SAVE_STROKE)
 
-  @NotNull
-  @Override
-  protected VimActionHandler makeActionHandler() {
-    return new ChangeEditorActionHandler.ForEachCaret() {
-      @Override
-      public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-      int rawCount, @Nullable Argument argument) {
-        VimPlugin.getChange().indentLines(editor, caret, context, count, 1);
+  override fun makeActionHandler(): VimActionHandler = ShiftRightLinesActionHandler
+}
 
-        return true;
-      }
-    };
+class ShiftRightLinesNormalModeAction : VimCommandAction() {
+  override val mappingModes: Set<MappingMode> = MappingMode.N
+
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet(">>")
+
+  override val type: Command.Type = Command.Type.CHANGE
+
+  override fun makeActionHandler(): VimActionHandler = ShiftRightLinesActionHandler
+}
+
+private object ShiftRightLinesActionHandler : ChangeEditorActionHandler.ForEachCaret() {
+  override fun execute(editor: Editor, caret: Caret, context: DataContext, count: Int,
+                       rawCount: Int, argument: Argument?): Boolean {
+    VimPlugin.getChange().indentLines(editor, caret, context, count, 1)
+    return true
   }
 }
-    parser.registerAction(MappingMode.I, "VimShiftRightLines", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_SAVE_STROKE),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.CTRL_MASK)));

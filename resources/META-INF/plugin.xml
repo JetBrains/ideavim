@@ -352,9 +352,11 @@
     <action id="VimAutoIndentLines" class="com.maddyhome.idea.vim.action.change.shift.AutoIndentLinesAction" text="Auto Indent Lines"/>
     <action id="VimAutoIndentMotion" class="com.maddyhome.idea.vim.action.change.shift.AutoIndentMotionAction" text="Auto Indent Lines"/>
     <action id="VimShiftLeftLines" class="com.maddyhome.idea.vim.action.change.shift.ShiftLeftLinesAction" text="Shift Lines Left"/>
+    <action id="VimShiftLeftLinesNormalMode" class="com.maddyhome.idea.vim.action.change.shift.ShiftLeftLinesNormalModeAction" text="Shift Lines Left"/>
     <action id="VimShiftLeftMotion" class="com.maddyhome.idea.vim.action.change.shift.ShiftLeftMotionAction" text="Shift Motion Left"/>
     <action id="VimShiftLeftVisual" class="com.maddyhome.idea.vim.action.change.shift.ShiftLeftVisualAction" text="Shift Visual Left"/>
     <action id="VimShiftRightLines" class="com.maddyhome.idea.vim.action.change.shift.ShiftRightLinesAction" text="Shift Lines Right"/>
+    <action id="VimShiftRightLinesNormalMode" class="com.maddyhome.idea.vim.action.change.shift.ShiftRightLinesNormalModeAction" text="Shift Lines Right"/>
     <action id="VimShiftRightMotion" class="com.maddyhome.idea.vim.action.change.shift.ShiftRightMotionAction" text="Shift Motion Right"/>
     <action id="VimShiftRightVisual" class="com.maddyhome.idea.vim.action.change.shift.ShiftRightVisualAction" text="Shift Visual Right"/>
 
