@@ -269,85 +269,26 @@ public class KeyGroup {
   public void registerCommandAction(@NotNull VimCommandActionBase commandAction, @NotNull String actionId) {
     final List<Shortcut> shortcuts = new ArrayList<>();
     for (List<KeyStroke> keyStrokes : commandAction.getKeyStrokesSet()) {
-      shortcuts.add(new Shortcut(keyStrokes.toArray(new KeyStroke[keyStrokes.size()])));
+      shortcuts.add(new Shortcut(keyStrokes.toArray(new KeyStroke[0])));
     }
-    //noinspection deprecation
     registerAction(commandAction.getMappingModes(), actionId, commandAction.getType(), commandAction.getFlags(),
-                   shortcuts.toArray(new Shortcut[shortcuts.size()]), commandAction.getArgumentType());
+                   shortcuts.toArray(new Shortcut[0]), commandAction.getArgumentType());
   }
 
-  /**
-   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
-   */
-  @Deprecated
   public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, Shortcut shortcut) {
-    //noinspection deprecation
-    registerAction(mappingModes, actName, cmdType, new Shortcut[]{shortcut});
+    registerAction(mappingModes, actName, cmdType, EnumSet.noneOf(CommandFlags.class), new Shortcut[]{shortcut});
   }
 
-  /**
-   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
-   */
-  @Deprecated
-  public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, EnumSet<CommandFlags> cmdFlags, Shortcut shortcut) {
-    //noinspection deprecation
-    registerAction(mappingModes, actName, cmdType, cmdFlags, new Shortcut[]{shortcut});
-  }
-
-  /**
-   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
-   */
-  @Deprecated
-  public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, Shortcut shortcut,
-                             @NotNull Argument.Type argType) {
-    //noinspection deprecation
-    registerAction(mappingModes, actName, cmdType, new Shortcut[]{shortcut}, argType);
-  }
-
-  /**
-   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
-   */
-  @Deprecated
-  public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, EnumSet<CommandFlags> cmdFlags, Shortcut shortcut,
-                             @NotNull Argument.Type argType) {
-    //noinspection deprecation
-    registerAction(mappingModes, actName, cmdType, cmdFlags, new Shortcut[]{shortcut}, argType);
-  }
-
-  /**
-   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
-   */
-  @Deprecated
-  public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, @NotNull Shortcut[] shortcuts) {
-    //noinspection deprecation
-    registerAction(mappingModes, actName, cmdType, EnumSet.noneOf(CommandFlags.class), shortcuts);
-  }
-
-  /**
-   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
-   */
-  @Deprecated
-  public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, @NotNull Shortcut[] shortcuts,
-                             @NotNull Argument.Type argType) {
-    //noinspection deprecation
-    registerAction(mappingModes, actName, cmdType, EnumSet.noneOf(CommandFlags.class), shortcuts, argType);
-  }
-
-  /**
-   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
-   */
-  @Deprecated
   public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, EnumSet<CommandFlags> cmdFlags, @NotNull Shortcut[] shortcuts) {
-    //noinspection deprecation
     registerAction(mappingModes, actName, cmdType, cmdFlags, shortcuts, Argument.Type.NONE);
   }
 
-  /**
-   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
-   */
-  @Deprecated
-  public void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, EnumSet<CommandFlags> cmdFlags, @NotNull Shortcut[] shortcuts,
-                             @NotNull Argument.Type argType) {
+  private void registerAction(@NotNull Set<MappingMode> mappingModes,
+                              @NotNull String actName,
+                              @NotNull Command.Type cmdType,
+                              EnumSet<CommandFlags> cmdFlags,
+                              @NotNull Shortcut[] shortcuts,
+                              @NotNull Argument.Type argType) {
     for (Shortcut shortcut : shortcuts) {
       final KeyStroke[] keys = registerRequiredShortcut(shortcut);
       registerAction(mappingModes, actName, cmdType, cmdFlags, keys, argType);
@@ -364,10 +305,6 @@ public class KeyGroup {
     return keys;
   }
 
-  /**
-   * @deprecated Inherit your action from {@link com.maddyhome.idea.vim.action.VimCommandAction} instead.
-   */
-  @Deprecated
   private void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, EnumSet<CommandFlags> cmdFlags, @NotNull KeyStroke[] keys,
                               @NotNull Argument.Type argType) {
     for (MappingMode mappingMode : mappingModes) {

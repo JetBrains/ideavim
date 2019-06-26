@@ -20,9 +20,9 @@ package com.maddyhome.idea.vim.action.change;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandState;
@@ -30,56 +30,78 @@ import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
+import java.util.List;
+import java.util.Set;
 
-public class RepeatChangeAction extends EditorAction {
-  public RepeatChangeAction() {
-    super(new Handler());
+
+public class RepeatChangeAction extends VimCommandAction {
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.N;
   }
 
-  private static class Handler extends VimActionHandler.SingleExecution {
-    @Override
-    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command command) {
-      CommandState state = CommandState.getInstance(editor);
-      Command cmd = state.getLastChangeCommand();
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet(".");
+  }
 
-      if (cmd != null) {
-        if (command.getRawCount() > 0) {
-          cmd.setCount(command.getCount());
-          Argument arg = cmd.getArgument();
-          if (arg != null) {
-            Command mot = arg.getMotion();
-            if (mot != null) {
-              mot.setCount(0);
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.OTHER_WRITABLE;
+  }
+
+  @NotNull
+  @Override
+  protected VimActionHandler makeActionHandler() {
+    return new VimActionHandler.SingleExecution() {
+      @Override
+      public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command command) {
+        CommandState state = CommandState.getInstance(editor);
+        Command cmd = state.getLastChangeCommand();
+
+        if (cmd != null) {
+          if (command.getRawCount() > 0) {
+            cmd.setCount(command.getCount());
+            Argument arg = cmd.getArgument();
+            if (arg != null) {
+              Command mot = arg.getMotion();
+              if (mot != null) {
+                mot.setCount(0);
+              }
             }
           }
-        }
-        Command save = state.getCommand();
-        int lastFTCmd = VimPlugin.getMotion().getLastFTCmd();
-        char lastFTChar = VimPlugin.getMotion().getLastFTChar();
+          Command save = state.getCommand();
+          int lastFTCmd = VimPlugin.getMotion().getLastFTCmd();
+          char lastFTChar = VimPlugin.getMotion().getLastFTChar();
 
-        state.setCommand(cmd);
-        state.pushState(CommandState.Mode.REPEAT, CommandState.SubMode.NONE, MappingMode.NORMAL);
-        char reg = VimPlugin.getRegister().getCurrentRegister();
-        VimPlugin.getRegister().selectRegister(state.getLastChangeRegister());
-        try {
-          KeyHandler.executeAction(cmd.getAction(), context);
-        }
-        catch (Exception e) {
-          // oops
-        }
-        state.popState();
-        if (save != null) {
-          state.setCommand(save);
-        }
-        VimPlugin.getMotion().setLastFTCmd(lastFTCmd, lastFTChar);
-        state.saveLastChangeCommand(cmd);
-        VimPlugin.getRegister().selectRegister(reg);
+          state.setCommand(cmd);
+          state.pushState(CommandState.Mode.REPEAT, CommandState.SubMode.NONE, MappingMode.NORMAL);
+          char reg = VimPlugin.getRegister().getCurrentRegister();
+          VimPlugin.getRegister().selectRegister(state.getLastChangeRegister());
+          try {
+            KeyHandler.executeAction(cmd.getAction(), context);
+          }
+          catch (Exception e) {
+            // oops
+          }
+          state.popState();
+          if (save != null) {
+            state.setCommand(save);
+          }
+          VimPlugin.getMotion().setLastFTCmd(lastFTCmd, lastFTChar);
+          state.saveLastChangeCommand(cmd);
+          VimPlugin.getRegister().selectRegister(reg);
 
-        return true;
+          return true;
+        }
+        else {
+          return false;
+        }
       }
-      else {
-        return false;
-      }
-    }
+    };
   }
 }

@@ -21,27 +21,70 @@ package com.maddyhome.idea.vim.action.change.change;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.CommandFlags;
+import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
 import com.maddyhome.idea.vim.helper.CharacterHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 
-public class ChangeCaseUpperMotionAction extends EditorAction {
-  public ChangeCaseUpperMotionAction() {
-    super(new Handler());
+
+public class ChangeCaseUpperMotionAction extends VimCommandAction {
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.N;
   }
 
-  private static class Handler extends ChangeEditorActionHandler.ForEachCaret {
-    @Override
-    public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                           int rawCount, @Nullable Argument argument) {
-      return argument != null &&
-             VimPlugin.getChange()
-               .changeCaseMotion(editor, caret, context, count, rawCount, CharacterHelper.CASE_UPPER, argument);
-    }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("gU");
+  }
+
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.CHANGE;
+  }
+
+  @NotNull
+  @Override
+  public Argument.Type getArgumentType() {
+    return Argument.Type.MOTION;
+  }
+
+  @NotNull
+  @Override
+  public EnumSet<CommandFlags> getFlags() {
+    return EnumSet.of(CommandFlags.FLAG_OP_PEND);
+  }
+
+  @NotNull
+  @Override
+  protected VimActionHandler makeActionHandler() {
+    return new ChangeEditorActionHandler.ForEachCaret() {
+      @Override
+      public boolean execute(@NotNull Editor editor,
+                             @NotNull Caret caret,
+                             @NotNull DataContext context,
+                             int count,
+                             int rawCount,
+                             @Nullable Argument argument) {
+        return argument != null &&
+               VimPlugin.getChange()
+                 .changeCaseMotion(editor, caret, context, count, rawCount, CharacterHelper.CASE_UPPER, argument);
+      }
+    };
   }
 }

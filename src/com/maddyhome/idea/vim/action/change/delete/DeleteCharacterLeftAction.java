@@ -21,24 +21,53 @@ package com.maddyhome.idea.vim.action.change.delete;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
+import java.util.List;
+import java.util.Set;
 
-public class DeleteCharacterLeftAction extends EditorAction {
-  public DeleteCharacterLeftAction() {
-    super(new Handler());
+
+public class DeleteCharacterLeftAction extends VimCommandAction {
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.N;
   }
 
-  private static class Handler extends ChangeEditorActionHandler.ForEachCaret {
-    @Override
-    public boolean execute(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context, int count,
-                           int rawCount, @Nullable Argument argument) {
-      return VimPlugin.getChange().deleteCharacter(editor, caret, -count, false);
-    }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("X");
+  }
+
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.DELETE;
+  }
+
+  @NotNull
+  @Override
+  protected VimActionHandler makeActionHandler() {
+    return new ChangeEditorActionHandler.ForEachCaret() {
+      @Override
+      public boolean execute(@NotNull Editor editor,
+                             @NotNull Caret caret,
+                             @NotNull DataContext context,
+                             int count,
+                             int rawCount,
+                             @Nullable Argument argument) {
+        return VimPlugin.getChange().deleteCharacter(editor, caret, -count, false);
+      }
+    };
   }
 }

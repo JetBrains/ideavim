@@ -21,33 +21,61 @@ package com.maddyhome.idea.vim.action.change.change;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.action.VimCommandAction;
 import com.maddyhome.idea.vim.command.Argument;
+import com.maddyhome.idea.vim.command.Command;
+import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.handler.ChangeEditorActionHandler;
+import com.maddyhome.idea.vim.handler.VimActionHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
+import java.util.List;
+import java.util.Set;
 
-public class ChangeLastSearchReplaceAction extends EditorAction {
-  public ChangeLastSearchReplaceAction() {
-    super(new Handler());
+
+public class ChangeLastSearchReplaceAction extends VimCommandAction {
+  @NotNull
+  @Override
+  public Set<MappingMode> getMappingModes() {
+    return MappingMode.N;
   }
 
-  private static class Handler extends ChangeEditorActionHandler.SingleExecution {
-    @Override
-    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, int count, int rawCount,
-                           @Nullable Argument argument) {
-      boolean result = true;
-      for (Caret caret : editor.getCaretModel().getAllCarets()) {
-        final int line = caret.getLogicalPosition().line;
-        if (!VimPlugin.getSearch().searchAndReplace(editor, caret, new LineRange(line, line), "s", "//~/")) {
-          result = false;
-        }
+  @NotNull
+  @Override
+  public Set<List<KeyStroke>> getKeyStrokesSet() {
+    return parseKeysSet("&");
+  }
 
+  @NotNull
+  @Override
+  public Command.Type getType() {
+    return Command.Type.OTHER_WRITABLE;
+  }
+
+  @NotNull
+  @Override
+  protected VimActionHandler makeActionHandler() {
+    return new ChangeEditorActionHandler.SingleExecution() {
+      @Override
+      public boolean execute(@NotNull Editor editor,
+                             @NotNull DataContext context,
+                             int count,
+                             int rawCount,
+                             @Nullable Argument argument) {
+        boolean result = true;
+        for (Caret caret : editor.getCaretModel().getAllCarets()) {
+          final int line = caret.getLogicalPosition().line;
+          if (!VimPlugin.getSearch().searchAndReplace(editor, caret, new LineRange(line, line), "s", "//~/")) {
+            result = false;
+          }
+
+        }
+        return result;
       }
-      return result;
-    }
+    };
   }
 }

@@ -20,7 +20,6 @@ package com.maddyhome.idea.vim;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.maddyhome.idea.vim.action.VimCommandActionBase;
-import com.maddyhome.idea.vim.command.Argument;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.CommandFlags;
 import com.maddyhome.idea.vim.command.MappingMode;
@@ -37,8 +36,6 @@ class RegisterActions {
    */
   static void registerActions() {
     registerVimCommandActions();
-
-    registerNormalModeActions();
     registerSystemMappings();
   }
 
@@ -61,11 +58,11 @@ class RegisterActions {
     parser.registerAction(MappingMode.NV, "ExpandRegion", Command.Type.OTHER_READONLY, new Shortcut("zo"));
     parser.registerAction(MappingMode.NV, "ExpandRegionRecursively", Command.Type.OTHER_READONLY, new Shortcut("zO"));
 
-    parser.registerAction(MappingMode.I, "EditorBackSpace", Command.Type.INSERT,
+    parser.registerAction(MappingMode.I, "EditorBackSpace", Command.Type.INSERT, EnumSet.noneOf(CommandFlags.class),
                           new Shortcut[]{new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_H, KeyEvent.CTRL_MASK)),
                             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0))});
     parser.registerAction(MappingMode.I, "EditorDelete", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_SAVE_STROKE),
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)));
+                          new Shortcut[]{new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0))});
     parser.registerAction(MappingMode.I, "EditorDown", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_CLEAR_STROKES),
                           new Shortcut[]{new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)),
                             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_DOWN, 0))});
@@ -76,6 +73,8 @@ class RegisterActions {
                           new Shortcut[]{new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)),
                             new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_KP_UP, 0))});
 
+    parser.registerAction(MappingMode.N, "QuickJavaDoc", Command.Type.OTHER_READONLY, new Shortcut('K'));
+
     // Digraph shortcuts are handled directly by KeyHandler#handleKey, so they don't have an action. But we still need to
     // register the shortcuts or the editor will swallow them. Technically, the shortcuts will be registered as part of
     // other commands, but it's best to be explicit
@@ -83,127 +82,5 @@ class RegisterActions {
     parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_MASK)));
     parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_MASK)));
     parser.registerShortcutWithoutAction(new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0)));
-  }
-
-  private static void registerNormalModeActions() {
-    final KeyGroup parser = VimPlugin.getKey();
-    // Insert/Replace/Change Actions
-    parser.registerAction(MappingMode.N, "VimChangeCaseLowerMotion", Command.Type.CHANGE, EnumSet.of(CommandFlags.FLAG_OP_PEND),
-                          new Shortcut("gu"), Argument.Type.MOTION);
-    parser.registerAction(MappingMode.N, "VimChangeCaseToggleCharacter", Command.Type.CHANGE,
-                          new Shortcut('~'));
-    parser.registerAction(MappingMode.N, "VimChangeCaseToggleMotion", Command.Type.CHANGE, EnumSet.of(CommandFlags.FLAG_OP_PEND),
-                          new Shortcut("g~"), Argument.Type.MOTION);
-    parser.registerAction(MappingMode.N, "VimChangeCaseUpperMotion", Command.Type.CHANGE, EnumSet.of(CommandFlags.FLAG_OP_PEND),
-                          new Shortcut("gU"), Argument.Type.MOTION);
-    parser.registerAction(MappingMode.N, "VimChangeCharacter", Command.Type.CHANGE, EnumSet.of(CommandFlags.FLAG_ALLOW_DIGRAPH),
-                          new Shortcut('r'), Argument.Type.DIGRAPH);
-    parser
-      .registerAction(MappingMode.N, "VimChangeCharacters", Command.Type.CHANGE, EnumSet.of(CommandFlags.FLAG_NO_REPEAT, CommandFlags.FLAG_MULTIKEY_UNDO),
-                      new Shortcut('s'));
-    parser
-      .registerAction(MappingMode.N, "VimChangeEndOfLine", Command.Type.CHANGE, EnumSet.of(CommandFlags.FLAG_NO_REPEAT, CommandFlags.FLAG_MULTIKEY_UNDO),
-                      new Shortcut('C'));
-    parser.registerAction(MappingMode.N, "VimChangeLine", Command.Type.CHANGE,
-                          EnumSet.of(CommandFlags.FLAG_NO_REPEAT, CommandFlags.FLAG_ALLOW_MID_COUNT, CommandFlags.FLAG_MULTIKEY_UNDO), new Shortcut[]{
-        new Shortcut("cc"),
-        new Shortcut('S')
-      });
-    parser.registerAction(MappingMode.N, "VimChangeNumberInc", Command.Type.CHANGE,
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.CTRL_MASK)));
-    parser.registerAction(MappingMode.N, "VimChangeNumberDec", Command.Type.CHANGE,
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.CTRL_MASK)));
-    parser.registerAction(MappingMode.N, "VimChangeMotion", Command.Type.CHANGE, EnumSet.of(CommandFlags.FLAG_OP_PEND, CommandFlags.FLAG_MULTIKEY_UNDO),
-                          new Shortcut('c'), Argument.Type.MOTION);
-    parser.registerAction(MappingMode.N, "VimChangeReplace", Command.Type.CHANGE, EnumSet.of(CommandFlags.FLAG_MULTIKEY_UNDO),
-                          new Shortcut('R'));
-    parser.registerAction(MappingMode.N, "VimDeleteCharacter", Command.Type.DELETE,
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)));
-    parser.registerAction(MappingMode.N, "VimDeleteCharacterLeft", Command.Type.DELETE,
-                          new Shortcut('X'));
-    parser.registerAction(MappingMode.N, "VimDeleteCharacterRight", Command.Type.DELETE,
-                          new Shortcut('x'));
-    parser.registerAction(MappingMode.N, "VimDeleteEndOfLine", Command.Type.DELETE,
-                          new Shortcut('D'));
-    parser.registerAction(MappingMode.N, "VimDeleteJoinLines", Command.Type.DELETE,
-                          new Shortcut("gJ"));
-    parser.registerAction(MappingMode.N, "VimDeleteJoinLinesSpaces", Command.Type.DELETE,
-                          new Shortcut('J'));
-    parser.registerAction(MappingMode.N, "VimDeleteLine", Command.Type.DELETE, EnumSet.of(CommandFlags.FLAG_ALLOW_MID_COUNT),
-                          new Shortcut("dd"));
-    parser.registerAction(MappingMode.N, "VimDeleteMotion", Command.Type.DELETE, EnumSet.of(CommandFlags.FLAG_OP_PEND),
-                          new Shortcut('d'), Argument.Type.MOTION);
-    parser.registerAction(MappingMode.N, "VimFilterCountLines", Command.Type.CHANGE,
-                          new Shortcut("!!"));
-    parser.registerAction(MappingMode.N, "VimFilterMotion", Command.Type.CHANGE, EnumSet.of(CommandFlags.FLAG_OP_PEND),
-                          new Shortcut('!'), Argument.Type.MOTION);
-    parser.registerAction(MappingMode.N, "VimInsertAfterCursor", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_MULTIKEY_UNDO),
-                          new Shortcut('a'));
-    parser.registerAction(MappingMode.N, "VimInsertAfterLineEnd", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_MULTIKEY_UNDO),
-                          new Shortcut('A'));
-    parser.registerAction(MappingMode.N, "VimInsertAtPreviousInsert", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_MULTIKEY_UNDO),
-                          new Shortcut("gi"));
-    parser.registerAction(MappingMode.N, "VimInsertBeforeFirstNonBlank", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_MULTIKEY_UNDO),
-                          new Shortcut('I'));
-    parser.registerAction(MappingMode.N, "VimInsertLineStart", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_MULTIKEY_UNDO),
-                          new Shortcut("gI"));
-    parser.registerAction(MappingMode.N, "VimInsertNewLineAbove", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_MULTIKEY_UNDO),
-                          new Shortcut('O'));
-    parser.registerAction(MappingMode.N, "VimInsertNewLineBelow", Command.Type.INSERT, EnumSet.of(CommandFlags.FLAG_MULTIKEY_UNDO),
-                          new Shortcut('o'));
-    // Misc Actions
-    parser.registerAction(MappingMode.N, "VimLastSearchReplace", Command.Type.OTHER_WRITABLE,
-                          new Shortcut('&'));
-    parser.registerAction(MappingMode.N, "VimLastGlobalSearchReplace", Command.Type.OTHER_WRITABLE,
-                          new Shortcut("g&"));
-    parser.registerAction(MappingMode.N, "VimRepeatChange", Command.Type.OTHER_WRITABLE,
-                          new Shortcut('.'));
-    parser.registerAction(MappingMode.N, "VimRepeatExCommand", Command.Type.OTHER_WRITABLE,
-                          new Shortcut("@:"));
-    parser.registerAction(MappingMode.N, "QuickJavaDoc", Command.Type.OTHER_READONLY,
-                          new Shortcut('K'));
-    parser.registerAction(MappingMode.N, "VimRedo", Command.Type.OTHER_SELF_SYNCHRONIZED,
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_MASK)));
-    parser.registerAction(MappingMode.N, "VimUndo", Command.Type.OTHER_SELF_SYNCHRONIZED, new Shortcut[]{
-      new Shortcut('u'),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_UNDO, 0))
-    });
-
-    // File Actions
-    parser.registerAction(MappingMode.N, "VimFileSaveClose", Command.Type.OTHER_WRITABLE, new Shortcut[]{
-      new Shortcut("ZQ"),
-      new Shortcut("ZZ")
-    });
-    parser.registerAction(MappingMode.N, "VimFilePrevious", Command.Type.OTHER_READONLY, new Shortcut[]{
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_6, KeyEvent.CTRL_MASK | KeyEvent.SHIFT_MASK)),
-      new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_CIRCUMFLEX, KeyEvent.CTRL_MASK))
-    });
-
-    // Shift Actions
-    parser.registerAction(MappingMode.N, "VimAutoIndentLines", Command.Type.CHANGE,
-                          new Shortcut("=="));
-    parser.registerAction(MappingMode.N, "VimAutoIndentMotion", Command.Type.CHANGE, EnumSet.of(CommandFlags.FLAG_OP_PEND),
-                          new Shortcut('='), Argument.Type.MOTION);
-    parser.registerAction(MappingMode.N, "VimShiftLeftMotion", Command.Type.CHANGE, EnumSet.of(CommandFlags.FLAG_OP_PEND),
-                          new Shortcut('<'), Argument.Type.MOTION);
-    parser.registerAction(MappingMode.N, "VimShiftRightMotion", Command.Type.CHANGE, EnumSet.of(CommandFlags.FLAG_OP_PEND),
-                          new Shortcut('>'), Argument.Type.MOTION);
-
-    // Jump Actions
-
-
-    parser.registerAction(MappingMode.N, "VimFileGetAscii", Command.Type.OTHER_READONLY,
-                          new Shortcut("ga"));
-    parser.registerAction(MappingMode.N, "VimFileGetHex", Command.Type.OTHER_READONLY,
-                          new Shortcut("g8"));
-    parser.registerAction(MappingMode.N, "VimFileGetFileInfo", Command.Type.OTHER_READONLY,
-                          new Shortcut(KeyStroke.getKeyStroke(KeyEvent.VK_G, KeyEvent.CTRL_MASK)));
-
-    // Macro Actions
-    parser.registerAction(MappingMode.N, "VimPlaybackLastRegister", Command.Type.OTHER_WRITABLE,
-                          new Shortcut("@@"));
-    parser.registerAction(MappingMode.N, "VimPlaybackRegister", Command.Type.OTHER_WRITABLE,
-                          new Shortcut('@'), Argument.Type.CHARACTER);
-    // TODO - support for :map macros
   }
 }
