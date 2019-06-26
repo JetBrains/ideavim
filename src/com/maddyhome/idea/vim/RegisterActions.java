@@ -65,30 +65,6 @@ class RegisterActions {
 
   private static void registerNormalModeActions() {
     final KeyGroup parser = VimPlugin.getKey();
-    // Copy/Paste Actions
-    parser.registerAction(MappingMode.N, "VimCopyPutTextBeforeCursor", Command.Type.PASTE,
-                          new Shortcut('P'));
-    parser.registerAction(MappingMode.N, "VimCopyPutTextAfterCursor", Command.Type.PASTE,
-                          new Shortcut('p'));
-    parser.registerAction(MappingMode.N, "VimCopyPutTextBeforeCursorMoveCursor", Command.Type.PASTE,
-                          new Shortcut("gP"));
-    parser.registerAction(MappingMode.N, "VimCopyPutTextAfterCursorMoveCursor", Command.Type.PASTE,
-                          new Shortcut("gp"));
-    parser.registerAction(MappingMode.N, "VimCopyPutTextBeforeCursorNoIndent", Command.Type.PASTE, new Shortcut[]{
-      new Shortcut("[P"),
-      new Shortcut("]P"),
-      new Shortcut("[p")
-    });
-    parser.registerAction(MappingMode.N, "VimCopyPutTextAfterCursorNoIndent", Command.Type.PASTE, new Shortcut[]{
-      new Shortcut("]p")
-    });
-    parser.registerAction(MappingMode.N, "VimCopyYankLine", Command.Type.COPY,
-                          new Shortcut('Y'));
-    parser.registerAction(MappingMode.N, "VimCopyYankLine", Command.Type.COPY, EnumSet.of(CommandFlags.FLAG_ALLOW_MID_COUNT),
-                          new Shortcut("yy"));
-    parser.registerAction(MappingMode.N, "VimCopyYankMotion", Command.Type.COPY, EnumSet.of(CommandFlags.FLAG_OP_PEND),
-                          new Shortcut('y'), Argument.Type.MOTION);
-
     // Insert/Replace/Change Actions
     parser.registerAction(MappingMode.N, "VimChangeCaseLowerMotion", Command.Type.CHANGE, EnumSet.of(CommandFlags.FLAG_OP_PEND),
                           new Shortcut("gu"), Argument.Type.MOTION);

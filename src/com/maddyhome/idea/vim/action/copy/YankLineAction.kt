@@ -16,56 +16,45 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.action.copy;
+package com.maddyhome.idea.vim.action.copy
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.actionSystem.EditorAction;
-import com.maddyhome.idea.vim.VimPlugin;
-import com.maddyhome.idea.vim.action.VimCommandAction;
-import com.maddyhome.idea.vim.command.Command;
-import com.maddyhome.idea.vim.command.MappingMode;
-import com.maddyhome.idea.vim.handler.VimActionHandler;
-import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-import java.util.List;
-import java.util.Set;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.editor.Editor
+import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.action.VimCommandAction
+import com.maddyhome.idea.vim.command.Command
+import com.maddyhome.idea.vim.command.CommandFlags
+import com.maddyhome.idea.vim.command.MappingMode
+import com.maddyhome.idea.vim.handler.VimActionHandler
+import com.maddyhome.idea.vim.helper.enumSetOf
+import java.util.*
+import javax.swing.KeyStroke
 
 
-public class YankLineAction extends VimCommandAction {
-  public YankLineAction() {
-    super(new Handler());
-  }
+class YankLineAction : VimCommandAction() {
+  override val mappingModes: Set<MappingMode> = MappingMode.N
 
-  @NotNull
-  @Override
-  public Set<MappingMode> getMappingModes() {
-    return null;
-  }
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("Y")
 
-  @NotNull
-  @Override
-  public Set<List<KeyStroke>> getKeyStrokesSet() {
-    return null;
-  }
+  override val type: Command.Type = Command.Type.COPY
 
-  @NotNull
-  @Override
-  public Command.Type getType() {
-    return null;
-  }
+  override fun makeActionHandler(): VimActionHandler = YankLineActionHandler
+}
 
-  @NotNull
-  @Override
-  protected VimActionHandler makeActionHandler() {
-    return null;
-  }
+class YankLineMidCountAction : VimCommandAction() {
+  override val mappingModes: Set<MappingMode> = MappingMode.N
 
-  private static class Handler extends VimActionHandler.SingleExecution {
-    @Override
-    public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-      return VimPlugin.getYank().yankLine(editor, cmd.getCount());
-    }
+  override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("yy")
+
+  override val type: Command.Type = Command.Type.COPY
+
+  override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_ALLOW_MID_COUNT)
+
+  override fun makeActionHandler(): VimActionHandler = YankLineActionHandler
+}
+
+private object YankLineActionHandler : VimActionHandler.SingleExecution() {
+  override fun execute(editor: Editor, context: DataContext, cmd: Command): Boolean {
+    return VimPlugin.getYank().yankLine(editor, cmd.count)
   }
 }

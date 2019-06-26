@@ -220,7 +220,7 @@
  * |w|                    {@link com.maddyhome.idea.vim.action.motion.text.MotionWordRightAction}
  * |x|                    {@link com.maddyhome.idea.vim.action.change.delete.DeleteCharacterRightAction}
  * |y|                    {@link com.maddyhome.idea.vim.action.copy.YankMotionAction}
- * |yy|                   {@link com.maddyhome.idea.vim.action.copy.YankLineAction}
+ * |yy|                   {@link com.maddyhome.idea.vim.action.copy.YankLineMidCountAction}
  * |z|                    see commands starting with 'z'
  * |{|                    {@link com.maddyhome.idea.vim.action.motion.text.MotionParagraphPreviousAction}
  * |bar|                  {@link com.maddyhome.idea.vim.action.motion.leftright.MotionColumnAction}
