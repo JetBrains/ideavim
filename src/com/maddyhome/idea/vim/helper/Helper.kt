@@ -20,11 +20,7 @@ package com.maddyhome.idea.vim.helper
 
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.util.Key
-import com.intellij.openapi.util.UserDataHolder
 import java.util.*
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
 
 /**
  * This annotation is created for test functions (methods).
@@ -62,64 +58,6 @@ annotation class VimBehaviourDiffers(
   val shouldBeFixed: Boolean = true
 )
 
-/**
- * Function for delegated properties.
- * The property will be delegated to UserData and has nullable type.
- */
-fun <T> userData(): ReadWriteProperty<UserDataHolder, T?> = object : UserDataReadWriteProperty<UserDataHolder, T?>() {
-  override fun getValue(thisRef: UserDataHolder, property: KProperty<*>): T? {
-    return thisRef.getUserData(getKey(property))
-  }
-
-  override fun setValue(thisRef: UserDataHolder, property: KProperty<*>, value: T?) {
-    thisRef.putUserData(getKey(property), value)
-  }
-}
-
-/**
- * Function for delegated properties.
- * The property will be saved to caret if this caret is not primary
- *   and to caret and editor otherwise.
- * In case of primary caret getter uses value stored in caret. If it's null, then the value from editor
- * Has nullable type.
- */
-fun <T> userDataCaretToEditor(): ReadWriteProperty<Caret, T?> = object : UserDataReadWriteProperty<Caret, T?>() {
-  override fun getValue(thisRef: Caret, property: KProperty<*>): T? {
-    return if (thisRef == thisRef.editor.caretModel.primaryCaret) {
-      thisRef.getUserData(getKey(property)) ?: thisRef.editor.getUserData(getKey(property))
-    } else {
-      thisRef.getUserData(getKey(property))
-    }
-  }
-
-  override fun setValue(thisRef: Caret, property: KProperty<*>, value: T?) {
-    if (thisRef == thisRef.editor.caretModel.primaryCaret) {
-      thisRef.editor.putUserData(getKey(property), value)
-    }
-    thisRef.putUserData(getKey(property), value)
-  }
-}
-
-/**
- * Function for delegated properties.
- * The property will be delegated to UserData and has non-nullable type.
- * [default] action will be executed if UserData doesn't have this property now.
- *   The result of [default] will be put to user data and returned.
- */
-fun <T> userDataOr(default: UserDataHolder.() -> T): ReadWriteProperty<UserDataHolder, T> = object : UserDataReadWriteProperty<UserDataHolder, T>() {
-  override fun getValue(thisRef: UserDataHolder, property: KProperty<*>): T {
-    return thisRef.getUserData(getKey(property)) ?: run<ReadWriteProperty<UserDataHolder, T>, T> {
-      val defaultValue = thisRef.default()
-      thisRef.putUserData(getKey(property), defaultValue)
-      defaultValue
-    }
-  }
-
-  override fun setValue(thisRef: UserDataHolder, property: KProperty<*>, value: T) {
-    thisRef.putUserData(getKey(property), value)
-  }
-}
-
 fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b
 inline fun <reified T : Enum<T>> noneOfEnum(): EnumSet<T> = EnumSet.noneOf(T::class.java)
 inline fun <reified T : Enum<T>> enumSetOf(vararg value: T): EnumSet<T> = when (value.size) {
@@ -136,12 +74,3 @@ inline fun Editor.vimForEachCaret(action: (caret: Caret) -> Unit) {
   }
 }
 
-private abstract class UserDataReadWriteProperty<in R, T> : ReadWriteProperty<R, T> {
-  private var key: Key<T>? = null
-  protected fun getKey(property: KProperty<*>): Key<T> {
-    if (key == null) {
-      key = Key.create(property.name + " by userData()")
-    }
-    return key as Key<T>
-  }
-}
