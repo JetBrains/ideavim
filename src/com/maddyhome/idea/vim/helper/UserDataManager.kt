@@ -64,17 +64,7 @@ fun Caret.vimSelectionStartClear() {
 private var Caret._vimSelectionStart: Int? by userDataCaretToEditor()
 //endregion ----------------------------------------------------
 
-//region Vim last column
-private val LAST_COLUMN: Key<Int> = Key.create("lastColumn")
-var Caret.vimLastColumn: Int
-  get() = getUserData(LAST_COLUMN) ?: visualPosition.column
-  set(value) = if (editor.inBlockSubMode) {
-    editor.caretModel.primaryCaret.putUserData(LAST_COLUMN, value)
-  } else {
-    putUserData(LAST_COLUMN, value)
-  }
-//endregion
-
+var Caret.vimLastColumn: Int by userDataCaretToEditorOr { (this as Caret).visualPosition.column }
 var Caret.vimLastVisualOperatorRange: VisualChange? by userDataCaretToEditor()
 var Caret.vimInsertStart: RangeMarker by userDataOr { (this as Caret).editor.document.createRangeMarker(this.offset, this.offset) }
 
@@ -140,6 +130,37 @@ private fun <T> userDataCaretToEditor(): ReadWriteProperty<Caret, T?> = object :
   }
 
   override fun setValue(thisRef: Caret, property: KProperty<*>, value: T?) {
+    if (thisRef == thisRef.editor.caretModel.primaryCaret) {
+      thisRef.editor.putUserData(getKey(property), value)
+    }
+    thisRef.putUserData(getKey(property), value)
+  }
+}
+
+/**
+ * Function for delegated properties.
+ * The property will be saved to caret if this caret is not primary
+ *   and to caret and editor otherwise.
+ * In case of primary caret getter uses value stored in caret. If it's null, then the value from editor
+ * Has not nullable type.
+ */
+private fun <T> userDataCaretToEditorOr(default: UserDataHolder.() -> T): ReadWriteProperty<Caret, T> = object : UserDataReadWriteProperty<Caret, T>() {
+  override fun getValue(thisRef: Caret, property: KProperty<*>): T {
+    val res = if (thisRef == thisRef.editor.caretModel.primaryCaret) {
+      thisRef.getUserData(getKey(property)) ?: thisRef.editor.getUserData(getKey(property))
+    } else {
+      thisRef.getUserData(getKey(property))
+    }
+
+    if (res == null) {
+      val defaultValue = thisRef.default()
+      setValue(thisRef, property, defaultValue)
+      return defaultValue
+    }
+    return res
+  }
+
+  override fun setValue(thisRef: Caret, property: KProperty<*>, value: T) {
     if (thisRef == thisRef.editor.caretModel.primaryCaret) {
       thisRef.editor.putUserData(getKey(property), value)
     }

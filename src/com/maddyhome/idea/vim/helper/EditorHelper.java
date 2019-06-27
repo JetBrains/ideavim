@@ -710,6 +710,17 @@ public class EditorHelper {
     return editor.offsetToVisualPosition(EditorHelper.getLineEndOffset(editor, line, allowEnd)).column;
   }
 
+  public static int prepareLastColumn(@NotNull Editor editor, @NotNull Caret caret) {
+    VisualPosition pos = caret.getVisualPosition();
+    final LogicalPosition logicalPosition = caret.getLogicalPosition();
+    final int lastColumn = EditorHelper.lastColumnForLine(editor, logicalPosition.line, CommandStateHelper.isEndAllowed(CommandStateHelper.getMode(editor)));
+    if (pos.column != lastColumn) {
+      return pos.column;
+    } else {
+      return UserDataManager.getVimLastColumn(caret);
+    }
+  }
+
   public static void updateLastColumn(@NotNull Editor editor, @NotNull Caret caret, int prevLastColumn) {
     VisualPosition pos = caret.getVisualPosition();
     final LogicalPosition logicalPosition = caret.getLogicalPosition();

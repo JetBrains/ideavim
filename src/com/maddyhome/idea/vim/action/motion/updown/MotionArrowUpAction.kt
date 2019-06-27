@@ -31,7 +31,6 @@ import com.maddyhome.idea.vim.handler.NonShiftedSpecialKeyHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.helper.enumSetOf
-import com.maddyhome.idea.vim.helper.vimLastColumn
 import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.KeyStroke
@@ -45,7 +44,7 @@ class MotionArrowUpAction : MotionEditorAction() {
     }
 
     override fun preOffsetComputation(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean {
-      col = caret.vimLastColumn
+      col = EditorHelper.prepareLastColumn(editor, caret)
       return true
     }
 

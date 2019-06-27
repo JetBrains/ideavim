@@ -29,7 +29,6 @@ import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.MotionActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.vimLastColumn
 import java.util.*
 import javax.swing.KeyStroke
 
@@ -69,7 +68,7 @@ private object MotionUpActionHandler : MotionActionHandler.ForEachCaret() {
                                     caret: Caret,
                                     context: DataContext,
                                     cmd: Command): Boolean {
-    col = caret.vimLastColumn
+    col = EditorHelper.prepareLastColumn(editor, caret)
     return true
   }
 

@@ -43,7 +43,6 @@ import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
 import com.maddyhome.idea.vim.helper.*;
-import com.maddyhome.idea.vim.option.Option;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.option.ToggleOption;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
@@ -54,6 +53,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * @author vlan
@@ -252,6 +252,18 @@ public abstract class VimTestCase extends UsefulTestCase {
                      String after,
                      CommandState.Mode modeAfter, CommandState.SubMode subModeAfter) {
     configureByText(before);
+    typeText(keys);
+    myFixture.checkResult(after);
+    assertState(modeAfter, subModeAfter);
+  }
+
+  public void doTest(final List<KeyStroke> keys,
+                     String before,
+                     String after,
+                     CommandState.Mode modeAfter, CommandState.SubMode subModeAfter,
+                     @NotNull Consumer<Editor> afterEditorInitialized) {
+    configureByText(before);
+    afterEditorInitialized.accept(myFixture.getEditor());
     typeText(keys);
     myFixture.checkResult(after);
     assertState(modeAfter, subModeAfter);

@@ -230,6 +230,7 @@ sealed class VisualOperatorActionHandler : VimActionHandler.SingleExecution() {
       if (res) {
         CommandState.getInstance(editor).saveLastChangeCommand(cmd)
         editor.vimForEachCaret { caret -> visualChanges[caret]?.let { caret.vimLastVisualOperatorRange = it } }
+        editor.caretModel.allCarets.forEach { it.vimLastColumn = it.visualPosition.column }
       }
 
       editor.vimKeepingVisualOperatorAction = false

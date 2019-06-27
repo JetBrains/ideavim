@@ -29,7 +29,6 @@ import com.maddyhome.idea.vim.handler.ShiftedArrowKeyHandler
 import com.maddyhome.idea.vim.handler.VimActionHandler
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.vimForEachCaret
-import com.maddyhome.idea.vim.helper.vimLastColumn
 import javax.swing.KeyStroke
 
 /**
@@ -41,7 +40,7 @@ class MotionShiftUpAction : VimCommandAction() {
     override fun motionWithKeyModel(editor: Editor, context: DataContext, cmd: Command) {
       editor.vimForEachCaret { caret ->
         val vertical = VimPlugin.getMotion().moveCaretVertical(editor, caret, -cmd.count)
-        val col = caret.vimLastColumn
+        val col = EditorHelper.prepareLastColumn(editor, caret)
         MotionGroup.moveCaret(editor, caret, vertical)
 
         EditorHelper.updateLastColumn(editor, caret, col)

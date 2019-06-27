@@ -69,4 +69,18 @@ class MotionDownActionTest : VimTestCase() {
         """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_BLOCK)
   }
+
+  fun `test last column after line deletion`() {
+    val keys = parseKeys("Vd", "j")
+    val before = """
+            I found it in a ${c}legendary land
+            
+            all rocks and lavender and tufted grass,
+        """.trimIndent()
+    val after = """
+            
+            ${c}all rocks and lavender and tufted grass,
+        """.trimIndent()
+    doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 }

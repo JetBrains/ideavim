@@ -1253,7 +1253,7 @@ public class MotionGroup {
   }
 
   public int moveCaretVertical(@NotNull Editor editor, @NotNull Caret caret, int count) {
-   VisualPosition pos = caret.getVisualPosition();
+    VisualPosition pos = caret.getVisualPosition();
     final LogicalPosition logicalPosition = caret.getLogicalPosition();
     if ((pos.line == 0 && count < 0) || (pos.line >= EditorHelper.getVisualLineCount(editor) - 1 && count > 0)) {
       return -1;
@@ -1264,7 +1264,7 @@ public class MotionGroup {
       final CommandState.Mode mode = CommandStateHelper.getMode(editor);
       final int lastColumnCurrentLine = EditorHelper.lastColumnForLine(editor, logicalPosition.line, CommandStateHelper.isEndAllowed(mode));
 
-      if (pos.column < col && lastColumnCurrentLine != pos.column) {
+      if (lastColumnCurrentLine != pos.column) {
         col = pos.column;
       }
       final int normalizedCol = EditorHelper

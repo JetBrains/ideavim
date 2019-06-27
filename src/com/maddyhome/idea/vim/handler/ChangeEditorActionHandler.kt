@@ -27,6 +27,7 @@ import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.vimChangeActionSwitchMode
+import com.maddyhome.idea.vim.helper.vimLastColumn
 
 sealed class ChangeEditorActionHandler : VimActionHandler.SingleExecution() {
 
@@ -63,6 +64,7 @@ sealed class ChangeEditorActionHandler : VimActionHandler.SingleExecution() {
 
     if (worked.get()) {
       CommandState.getInstance(editor).saveLastChangeCommand(cmd)
+      editor.caretModel.allCarets.forEach { it.vimLastColumn = it.visualPosition.column }
     }
 
     val toSwitch = editor.vimChangeActionSwitchMode
