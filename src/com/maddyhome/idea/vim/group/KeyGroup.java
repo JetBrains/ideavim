@@ -362,6 +362,12 @@ public class KeyGroup {
       ((BranchNode)node).addChild(arg, BranchNode.ARGUMENT);
     }
 
+    if (base instanceof BranchNode) {
+      // All flags of a child should be added to parent
+      // Otherwise set of this flags will differ for different initialization orders
+      ((BranchNode)base).getFlags().addAll(cmdFlags);
+    }
+
     return node;
   }
 

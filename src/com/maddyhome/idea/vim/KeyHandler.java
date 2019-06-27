@@ -197,7 +197,7 @@ public class KeyHandler {
 
       // Ask the key/action tree if this is an appropriate key at this point in the command and if so,
       // return the node matching this keystroke
-      final Node node = editorState.getCurrentNode().getChild(key);
+      final Node node = editorState.getCurrentNode().getChildOrArgument(key);
 
       if (handleDigraph(editor, key, context, node)) {
         return;
