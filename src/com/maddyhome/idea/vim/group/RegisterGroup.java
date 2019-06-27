@@ -133,7 +133,7 @@ public class RegisterGroup {
    */
   public void resetRegister() {
     lastRegister = defaultRegister;
-    logger.debug("register reset");
+    logger.debug("Last register reset to default register");
   }
 
   public void resetRegisters() {
