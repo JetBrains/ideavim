@@ -74,7 +74,7 @@ abstract class EditorActionHandlerBase(myRunForEachCaret: Boolean) : EditorActio
     if (!VimPlugin.isEnabled()) return
 
     val editor = InjectedLanguageUtil.getTopLevelEditor(_editor)
-    logger.debug("Execute command with handler: " + this.javaClass.canonicalName)
+    logger.debug("Execute command with handler: " + this.javaClass.name)
 
     val state = CommandState.getInstance(editor)
     val cmd = state.command ?: run {
