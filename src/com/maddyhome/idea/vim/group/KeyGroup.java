@@ -23,6 +23,7 @@ import com.intellij.codeInsight.lookup.impl.LookupImpl;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.ActionManagerEx;
 import com.intellij.openapi.actionSystem.ex.ActionUtil;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.keymap.Keymap;
@@ -308,8 +309,10 @@ public class KeyGroup {
   private void registerAction(@NotNull Set<MappingMode> mappingModes, @NotNull String actName, @NotNull Command.Type cmdType, EnumSet<CommandFlags> cmdFlags, @NotNull KeyStroke[] keys,
                               @NotNull Argument.Type argType) {
     for (MappingMode mappingMode : mappingModes) {
-      // TODO: 2019-06-21 Do not delete next commented line. See description of method
-      //checkIdentity(mappingMode, actName, keys);
+      if (ApplicationManager.getApplication().isUnitTestMode()) {
+        identityChecker = new HashMap<>();
+        checkIdentity(mappingMode, actName, keys);
+      }
       Node node = getKeyRoot(mappingMode);
       final int len = keys.length;
       // Add a child for each keystroke in the shortcut for this action
@@ -322,16 +325,13 @@ public class KeyGroup {
     }
   }
 
-  @SuppressWarnings("unused")
-  // TODO: 2019-06-21 This is not a dead code! Uncomment call for this method to check identity of keymaps
-  //   This should be rewritten to either call this method only in dev mode, or check identity by key tree
   private void checkIdentity(MappingMode mappingMode, String actName, KeyStroke[] keys) {
     Set<List<KeyStroke>> keySets = identityChecker.computeIfAbsent(mappingMode, k -> new HashSet<>());
     if (keySets.contains(Arrays.asList(keys))) throw new RuntimeException("This keymap already exists: " + mappingMode + " keys: " + Arrays.asList(keys) + " action:" + actName);
     keySets.add(Arrays.asList(keys));
   }
 
-  private Map<MappingMode, Set<List<KeyStroke>>> identityChecker = new HashMap<>();
+  private Map<MappingMode, Set<List<KeyStroke>>> identityChecker;
 
   @NotNull
   private Node addNode(@NotNull ParentNode base, @NotNull String actName, @NotNull Command.Type cmdType, EnumSet<CommandFlags> cmdFlags, @NotNull KeyStroke key,
