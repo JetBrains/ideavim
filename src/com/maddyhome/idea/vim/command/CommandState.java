@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.command;
 
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.helper.UserDataManager;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 public class CommandState {
   public static final int DEFAULT_TIMEOUT_LENGTH = 1000;
@@ -49,6 +51,7 @@ public class CommandState {
   @NotNull private final Timer myMappingTimer;
   private EnumSet<CommandFlags> myFlags = EnumSet.noneOf(CommandFlags.class);
   private boolean myIsRecording = false;
+  private static Logger logger = Logger.getInstance(CommandState.class.getName());
 
   private CommandState() {
     myMappingTimer = new Timer(DEFAULT_TIMEOUT_LENGTH, null);
@@ -92,13 +95,25 @@ public class CommandState {
   }
 
   public void pushState(@NotNull Mode mode, @NotNull SubMode submode, @NotNull MappingMode mappingMode) {
+    logger.info("Push new state: " + mode + ":" + submode);
+    if (logger.isDebugEnabled()) {
+      logger.debug("Stack state before push: " +
+                   myStates.stream().map(state -> state.getMode() + ":" + state.getSubMode())
+                     .collect(Collectors.joining(", ")));
+    }
     myStates.push(new State(mode, submode, mappingMode));
     updateStatus();
   }
 
   public void popState() {
-    myStates.pop();
+    final State popped = myStates.pop();
     updateStatus();
+    logger.info("Pop state: " + popped.getMode() + ":" + popped.getSubMode());
+    if (logger.isDebugEnabled()) {
+      logger.debug("Stack state after pop: " +
+                   myStates.stream().map(state -> state.getMode() + ":" + state.getSubMode())
+                     .collect(Collectors.joining(", ")));
+    }
   }
 
   @NotNull
