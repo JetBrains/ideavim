@@ -137,6 +137,7 @@
     <action id="VimMotionDown" class="com.maddyhome.idea.vim.action.motion.updown.MotionDownAction" text="Down"/>
     <action id="VimMotionNotLineWiseDown" class="com.maddyhome.idea.vim.action.motion.updown.MotionDownNotLineWiseAction" text="Down"/>
     <action id="VimMotionDownFirstNonSpace" class="com.maddyhome.idea.vim.action.motion.updown.MotionDownFirstNonSpaceAction" text="Down to First non-Space"/>
+    <action id="VimEnterNormalAction" class="com.maddyhome.idea.vim.action.motion.updown.EnterNormalAction" text="Down to First non-Space"/>
     <action id="VimMotionDownLess1FirstNonSpace" class="com.maddyhome.idea.vim.action.motion.updown.MotionDownLess1FirstNonSpaceAction" text="Down to First non-Space"/>
     <action id="VimMotionGotoLineFirst" class="com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineFirstAction" text="Goto Line"/>
     <action id="VimMotionGotoLineFirstInsertMode" class="com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineFirstInsertAction" text="Goto Line"/>

@@ -111,7 +111,7 @@
  * |<NL>|                 {@link com.maddyhome.idea.vim.action.motion.updown.MotionDownNotLineWiseAction}
  * |CTRL-J|               TODO
  * |CTRL-L|               not applicable
- * |<CR>|                 {@link com.maddyhome.idea.vim.action.motion.updown.MotionDownFirstNonSpaceAction}
+ * |<CR>|                 {@link com.maddyhome.idea.vim.action.motion.updown.EnterNormalAction}
  * |CTRL-M|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionDownFirstNonSpaceAction}
  * |CTRL-N|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionDownAction}
  * |CTRL-O|               {@link com.maddyhome.idea.vim.action.motion.mark.MotionJumpPreviousAction}
