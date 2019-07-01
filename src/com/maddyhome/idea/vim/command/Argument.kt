@@ -16,126 +16,22 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.command;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+package com.maddyhome.idea.vim.command
 
 /**
  * This represents a command argument.
  */
-public class Argument {
+data class Argument internal constructor(
+  val character: Char = 0.toChar(),
+  val motion: Command? = null,
+  val string: String? = null,
+  val type: Type
+) {
+  constructor(motionArg: Command?) : this(motion = motionArg, type = Type.MOTION)
+  constructor(charArg: Char) : this(character = charArg, type = Type.CHARACTER)
+  constructor(strArg: String?) : this(string = strArg, type = Type.STRING)
 
-  /**
-   * Creates a motion command argument
-   *
-   * @param motionArg The motion command
-   */
-  public Argument(@Nullable Command motionArg) {
-    this.motionArg = motionArg;
-    type = Type.MOTION;
-  }
-
-  /**
-   * Creates a character argument
-   *
-   * @param charArg The character
-   */
-  public Argument(char charArg) {
-    this.charArg = charArg;
-    type = Type.CHARACTER;
-  }
-
-  /**
-   * Returns the motion command if this is a motion command argument
-   *
-   * @return The motion command if this is a motion command argument, null if not
-   */
-  @Nullable
-  public Command getMotion() {
-    return motionArg;
-  }
-
-  /**
-   * Creates a string argument
-   *
-   * @param strArg The string
-   */
-  public Argument(@Nullable String strArg) {
-    this.strArg = strArg;
-    type = Type.STRING;
-  }
-
-  /**
-   * Returns the argument type
-   *
-   * @return The argument type
-   */
-  @NotNull
-  public Type getType() {
-    return type;
-  }
-
-  /**
-   * Returns the character if this is a character argument
-   *
-   * @return The character if this is a character argument, null character if not
-   */
-  public char getCharacter() {
-    return charArg;
-  }
-
-  public enum Type {
+  enum class Type {
     NONE, MOTION, CHARACTER, STRING, DIGRAPH, EX_STRING
   }
-
-  /**
-   * Returns the string if this is a string argument
-   *
-   * @return The string if this is a string argument, null if not
-   */
-  @Nullable
-  public String getString() {
-    return strArg;
-  }
-
-  /**
-   * Returns the argument as an object
-   *
-   * @return The argument (MOTION = Command, CHARACTER = Character, STRING = String)
-   */
-  @Nullable
-  public Object getArgument() {
-    switch (type) {
-      case MOTION:
-        return motionArg;
-      case CHARACTER:
-      case DIGRAPH:
-        return charArg;
-      case STRING:
-        return strArg;
-    }
-
-    throw new IllegalStateException("Unexpected argType of " + type);
-  }
-
-  @NotNull
-  public String toString() {
-
-    return "Argument [" +
-           "charArg=" +
-           charArg +
-           ", motionArg=" +
-           motionArg +
-           ", strArg=" +
-           strArg +
-           ", type=" +
-           type +
-           "]";
-  }
-
-  private char charArg = 0;
-  @Nullable private Command motionArg = null;
-  @Nullable private String strArg = null;
-  @NotNull private final Type type;
 }
