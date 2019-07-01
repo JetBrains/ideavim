@@ -19,6 +19,9 @@
 package com.maddyhome.idea.vim.group.visual
 
 import com.intellij.codeInsight.template.TemplateManager
+import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.diagnostic.debug
+import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
@@ -55,6 +58,7 @@ import com.maddyhome.idea.vim.option.SelectModeOptionData
 class VisualMotionGroup {
   companion object {
     var modeBeforeEnteringNonVimVisual: CommandState.Mode? = null
+    val logger = Logger.getInstance(VisualMotionGroup.javaClass)
   }
 
   fun selectPreviousVisualMode(editor: Editor): Boolean {
@@ -120,6 +124,7 @@ class VisualMotionGroup {
 
   fun controlNonVimSelectionChange(editor: Editor, selectionSource: VimListenerManager.SelectionSource = VimListenerManager.SelectionSource.OTHER) {
     if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
+      logger.debug("Some of carets have selection")
       val commandState = CommandState.getInstance(editor)
       modeBeforeEnteringNonVimVisual = commandState.mode
       while (commandState.mode != CommandState.Mode.COMMAND) {
@@ -137,7 +142,7 @@ class VisualMotionGroup {
       }
       KeyHandler.getInstance().reset(editor)
     } else {
-      updateCaretState(editor)
+      logger.debug("None of carets has selection")
       exitVisual(editor)
       exitSelectModeAndResetKeyHandler(editor, true)
 
@@ -145,8 +150,10 @@ class VisualMotionGroup {
       if ((project != null && TemplateManager.getInstance(project).getActiveTemplate(editor) != null || modeBeforeEnteringNonVimVisual == CommandState.Mode.INSERT) && editor.mode == CommandState.Mode.COMMAND) {
         VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
       }
+      updateCaretState(editor)
       KeyHandler.getInstance().reset(editor)
     }
+    logger.debug("${editor.mode} is enabled")
   }
 
   //=============================== ENTER VISUAL and SELECT MODE ==============================================
