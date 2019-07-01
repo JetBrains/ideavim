@@ -35,6 +35,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.subMode
 import com.maddyhome.idea.vim.helper.vimForEachCaret
 import com.maddyhome.idea.vim.helper.vimKeepingVisualOperatorAction
@@ -46,6 +47,7 @@ import com.maddyhome.idea.vim.helper.vimSelectionStartClear
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.option.SelectModeOptionData
 
 /**
  * @author Alex Plate
@@ -128,9 +130,9 @@ class VisualMotionGroup {
       val selectMode = OptionsManager.selectmode
       when {
         editor.isOneLineMode -> enterSelectMode(editor, autodetectedMode)
-        selectionSource == VimListenerManager.SelectionSource.MOUSE && "mouse" in selectMode -> enterSelectMode(editor, autodetectedMode)
-        project != null && TemplateManager.getInstance(project).getActiveTemplate(editor) != null && "template" in selectMode -> enterSelectMode(editor, autodetectedMode)
-        selectionSource == VimListenerManager.SelectionSource.OTHER && "refactoring" in selectMode -> enterSelectMode(editor, autodetectedMode)
+        selectionSource == VimListenerManager.SelectionSource.MOUSE && SelectModeOptionData.mouse in selectMode -> enterSelectMode(editor, autodetectedMode)
+        project != null && TemplateManager.getInstance(project).getActiveTemplate(editor) != null && SelectModeOptionData.template in selectMode -> enterSelectMode(editor, autodetectedMode)
+        selectionSource == VimListenerManager.SelectionSource.OTHER && SelectModeOptionData.refactoring in selectMode -> enterSelectMode(editor, autodetectedMode)
         else -> enterVisualMode(editor, autodetectedMode)
       }
       KeyHandler.getInstance().reset(editor)
@@ -140,7 +142,7 @@ class VisualMotionGroup {
       exitSelectModeAndResetKeyHandler(editor, true)
 
       val project = editor.project
-      if (project != null && TemplateManager.getInstance(project).getActiveTemplate(editor) != null || modeBeforeEnteringNonVimVisual == CommandState.Mode.INSERT) {
+      if ((project != null && TemplateManager.getInstance(project).getActiveTemplate(editor) != null || modeBeforeEnteringNonVimVisual == CommandState.Mode.INSERT) && editor.mode == CommandState.Mode.COMMAND) {
         VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
       }
       KeyHandler.getInstance().reset(editor)

@@ -36,8 +36,10 @@ import com.intellij.openapi.project.Project
 import com.maddyhome.idea.vim.EventFacade
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.helper.EditorDataContext
+import com.maddyhome.idea.vim.helper.mode
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
 
@@ -99,8 +101,10 @@ object IdeaSpecifics {
       if (!editor.selectionModel.hasSelection()) {
         // Enable insert mode if there is no selection in template
         // Template with selection is handled by [com.maddyhome.idea.vim.group.visual.VisualMotionGroup.controlNonVimSelectionChange]
-        VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
-        KeyHandler.getInstance().reset(editor)
+        if (editor.mode == CommandState.Mode.COMMAND) {
+          VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
+          KeyHandler.getInstance().reset(editor)
+        }
       }
     }
   }
