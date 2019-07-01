@@ -290,30 +290,29 @@ public class MotionGroup {
   }
 
   public static void moveCaret(@NotNull Editor editor, @NotNull Caret caret, int offset) {
-    if (offset >= 0 && offset <= editor.getDocument().getTextLength()) {
+    if (offset < 0 || offset > editor.getDocument().getTextLength() || !caret.isValid()) return;
 
-      if (CommandStateHelper.inBlockSubMode(editor)) {
-        VisualGroupKt.vimMoveBlockSelectionToOffset(editor, offset);
-        Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-        UserDataManager.setVimLastColumn(primaryCaret, primaryCaret.getVisualPosition().column);
+    if (CommandStateHelper.inBlockSubMode(editor)) {
+      VisualGroupKt.vimMoveBlockSelectionToOffset(editor, offset);
+      Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+      UserDataManager.setVimLastColumn(primaryCaret, primaryCaret.getVisualPosition().column);
+      scrollCaretIntoView(editor);
+      return;
+    }
+
+    if (caret.getOffset() != offset) {
+      caret.moveToOffset(offset);
+      UserDataManager.setVimLastColumn(caret, caret.getVisualPosition().column);
+      if (caret == editor.getCaretModel().getPrimaryCaret()) {
         scrollCaretIntoView(editor);
-        return;
       }
+    }
 
-      if (caret.getOffset() != offset) {
-        caret.moveToOffset(offset);
-        UserDataManager.setVimLastColumn(caret, caret.getVisualPosition().column);
-        if (caret == editor.getCaretModel().getPrimaryCaret()) {
-          scrollCaretIntoView(editor);
-        }
-      }
-
-      if (CommandStateHelper.inVisualMode(editor) || CommandStateHelper.inSelectMode(editor)) {
-        VisualGroupKt.vimMoveSelectionToCaret(caret);
-      }
-      else {
-        VimPlugin.getVisualMotion().exitVisual(editor);
-      }
+    if (CommandStateHelper.inVisualMode(editor) || CommandStateHelper.inSelectMode(editor)) {
+      VisualGroupKt.vimMoveSelectionToCaret(caret);
+    }
+    else {
+      VimPlugin.getVisualMotion().exitVisual(editor);
     }
   }
 
