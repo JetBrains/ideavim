@@ -101,6 +101,10 @@ To Be Released
 * [VIM-1626](https://youtrack.jetbrains.com/issue/VIM-1626) Add `smartjoin` option
 * [VIM-959](https://youtrack.jetbrains.com/issue/VIM-1626) Add `idemarks` option
 * [VIM-608](https://youtrack.jetbrains.com/issue/VIM-608) Automatic upload files on explicit save
+* [VIM-1548](https://youtrack.jetbrains.com/issue/VIM-1548) Respect editor settings about tabs and spaces
+* [VIM-1682](https://youtrack.jetbrains.com/issue/VIM-1682) Fix backward search with OR
+* [VIM-752](https://youtrack.jetbrains.com/issue/VIM-752) Enter finishes template in normal mode
+* [VIM-1668](https://youtrack.jetbrains.com/issue/VIM-1668) Fix smart step into
 
 0.51, 2019-02-12
 ----------------
