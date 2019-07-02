@@ -32,6 +32,7 @@ import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Key;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.action.change.insert.InsertExitModeAction;
@@ -161,6 +162,10 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     final Editor editor = getEditor(e);
     final KeyStroke keyStroke = getKeyStroke(e);
     if (editor != null && keyStroke != null) {
+      // Workaround for smart step into
+      final Key<?> SMART_STEP_INPLACE_DATA = Key.findKeyByName("SMART_STEP_INPLACE_DATA");
+      if (SMART_STEP_INPLACE_DATA != null && editor.getUserData(SMART_STEP_INPLACE_DATA) != null) return false;
+
       final int keyCode = keyStroke.getKeyCode();
       if (LookupManager.getActiveLookup(editor) != null && !passCommandToVimWithLookup(keyStroke)) {
         return isEnabledForLookup(keyStroke);
