@@ -46,7 +46,7 @@ intellij {
   publishPlugin {
     channels publishChannels.split(',')
     username publishUsername
-    password publishPassword
+    token publishToken
   }
 }
 
