@@ -57,3 +57,20 @@ repositories {
 dependencies {
   compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 }
+
+tasks.register("slackEapNotification") {
+  doLast {
+    if (!slackUrl) return
+    def post = new URL(slackUrl).openConnection();
+    def message = "{\"text\":\"New EAP released: $version\"}"
+    post.setRequestMethod("POST")
+    post.setDoOutput(true)
+    post.setRequestProperty("Content-Type", "application/json")
+    post.getOutputStream().write(message.getBytes("UTF-8"));
+    def postRC = post.getResponseCode();
+    println(postRC);
+    if(postRC.equals(200)) {
+      println(post.getInputStream().getText());
+    }
+  }
+}
