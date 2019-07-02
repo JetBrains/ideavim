@@ -56,7 +56,7 @@ class PutVisualTextMoveCursorAction : VimCommandAction() {
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("gp", "gP")
 
-  override val type: Command.Type = Command.Type.PASTE
+  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 }

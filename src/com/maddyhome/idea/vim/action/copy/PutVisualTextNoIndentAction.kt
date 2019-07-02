@@ -56,7 +56,7 @@ class PutVisualTextNoIndentAction : VimCommandAction() {
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("[p", "]p", "[P", "]P")
 
-  override val type: Command.Type = Command.Type.PASTE
+  override val type: Command.Type = Command.Type.OTHER_SELF_SYNCHRONIZED
 
   override val flags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_EXIT_VISUAL)
 }

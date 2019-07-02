@@ -53,7 +53,7 @@ public class PutTextAfterCursorActionMoveCursor extends VimCommandAction {
   @NotNull
   @Override
   public Command.Type getType() {
-    return Command.Type.PASTE;
+    return Command.Type.OTHER_SELF_SYNCHRONIZED;
   }
 
   @NotNull

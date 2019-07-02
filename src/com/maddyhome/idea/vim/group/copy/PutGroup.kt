@@ -24,6 +24,7 @@ import com.intellij.ide.CopyPasteManagerEx
 import com.intellij.ide.PasteProvider
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.CaretStateTransferableData
@@ -116,7 +117,9 @@ class PutGroup {
       if (!caret.isValid) return@forEach
       val range = selection.toVimTextRange(false).normalize()
 
-      VimPlugin.getChange().deleteRange(editor, caret, range, selection.type, false)
+      ApplicationManager.getApplication().runWriteAction {
+        VimPlugin.getChange().deleteRange(editor, caret, range, selection.type, false)
+      }
       caret.moveToOffset(range.startOffset)
     }
   }
@@ -155,7 +158,9 @@ class PutGroup {
     } else {
       EditorHelper.getOrderedCaretsList(editor)
     }
-    myCarets.forEach { caret -> putForCaret(editor, caret, data, additionalData, context, text) }
+    ApplicationManager.getApplication().runWriteAction {
+      myCarets.forEach { caret -> putForCaret(editor, caret, data, additionalData, context, text) }
+    }
   }
 
   private fun putForCaret(editor: Editor, caret: Caret, data: PutData, additionalData: Map<String, Any>, context: DataContext, text: ProcessedTextData) {
@@ -172,10 +177,11 @@ class PutGroup {
   }
 
   private fun prepareDocumentAndGetStartOffsets(editor: Editor, caret: Caret, typeInRegister: SelectionType, data: PutData, additionalData: Map<String, Any>): List<Int> {
+    val application = ApplicationManager.getApplication()
     if (data.visualSelection != null) {
       return when {
         data.visualSelection.typeInEditor == SelectionType.CHARACTER_WISE && typeInRegister == SelectionType.LINE_WISE -> {
-          editor.document.insertString(caret.offset, "\n")
+          application.runWriteAction { editor.document.insertString(caret.offset, "\n") }
           listOf(caret.offset + 1)
         }
         data.visualSelection.typeInEditor == SelectionType.BLOCK_WISE -> {
@@ -188,7 +194,7 @@ class PutGroup {
               data.insertTextBeforeCaret -> listOf(EditorHelper.getLineStartOffset(editor, line))
               else -> {
                 val pos = EditorHelper.getLineEndOffset(editor, line, true)
-                editor.document.insertString(pos, "\n")
+                application.runWriteAction { editor.document.insertString(pos, "\n") }
                 listOf(pos + 1)
               }
             }
@@ -212,9 +218,8 @@ class PutGroup {
       when (typeInRegister) {
         SelectionType.LINE_WISE -> {
           startOffset = min(editor.document.textLength, VimPlugin.getMotion().moveCaretToLineEnd(editor, line, true) + 1)
-          if (startOffset > 0 && startOffset == editor.document.textLength &&
-            editor.document.charsSequence[startOffset - 1] != '\n') {
-            editor.document.insertString(startOffset, "\n")
+          if (startOffset > 0 && startOffset == editor.document.textLength && editor.document.charsSequence[startOffset - 1] != '\n') {
+            application.runWriteAction { editor.document.insertString(startOffset, "\n") }
             startOffset++
           }
         }
