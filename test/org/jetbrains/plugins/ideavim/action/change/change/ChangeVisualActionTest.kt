@@ -16,10 +16,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@file:Suppress("RemoveCurlyBracesFromTemplate")
+
 package org.jetbrains.plugins.ideavim.action.change.change
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.VimBehaviourDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class ChangeVisualActionTest : VimTestCase() {
@@ -41,6 +44,94 @@ class ChangeVisualActionTest : VimTestCase() {
             hard by the torrent of a mountain pass.
         """.trimIndent()
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  fun `test multiple line change in text middle`() {
+    val keys = parseKeys("Vjc")
+    val before = """
+            A Discovery
+
+            ${c}I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+    val after = """
+            A Discovery
+
+            ${c}
+            where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+  @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            
+            ${c}
+  """)
+  fun `test multiple line change till the end`() {
+    val keys = parseKeys("Vjc")
+    val before = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            
+            ${c}where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+        """.trimIndent()
+    val after = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            ${c}
+            
+            
+        """.trimIndent()
+    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+  }
+
+
+  @VimBehaviourDiffers(originalVimAfter = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+           
+            ${c}
+            
+            
+  """)
+  fun `test multiple line change till the end with two new lines`() {
+    val keys = parseKeys("Vjc")
+    val before = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+            
+            ${c}where it was settled on some sodden sand
+            hard by the torrent of a mountain pass.
+            
+            
+        """.trimIndent()
+    val after = """
+            A Discovery
+
+            I found it in a legendary land
+            all rocks and lavender and tufted grass,
+           
+           
+            ${c}
+            
+        """.trimIndent()
+    doTest(keys, before, after, CommandState.Mode.INSERT, CommandState.SubMode.NONE)
   }
 
   fun `test change with dollar motion`() {
