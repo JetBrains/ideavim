@@ -23,6 +23,7 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.notification.*;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.PermanentInstallationID;
 import com.intellij.openapi.components.ApplicationComponent;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
@@ -36,7 +37,6 @@ import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.updateSettings.impl.UpdateChecker;
 import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.vfs.CharsetToolkit;
@@ -486,7 +486,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
             final String version = URLEncoder.encode(getVersion(), CharsetToolkit.UTF8);
             final String os =
               URLEncoder.encode(SystemInfo.OS_NAME + " " + SystemInfo.OS_VERSION, CharsetToolkit.UTF8);
-            final String uid = UpdateChecker.getInstallationUID(PropertiesComponent.getInstance());
+            final String uid = PermanentInstallationID.get();
             final String url = "https://plugins.jetbrains.com/plugins/list" +
                                "?pluginId=" +
                                pluginId +

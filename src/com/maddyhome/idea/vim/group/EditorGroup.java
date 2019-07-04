@@ -27,7 +27,6 @@ import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.colors.ColorKey;
 import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.editor.colors.EditorFontType;
-import com.intellij.openapi.editor.event.CaretAdapter;
 import com.intellij.openapi.editor.event.CaretEvent;
 import com.intellij.openapi.editor.event.CaretListener;
 import com.intellij.openapi.editor.event.EditorFactoryEvent;
@@ -62,7 +61,7 @@ public class EditorGroup {
 
   private boolean isSmartJoinNotified = false;
 
-  private final CaretListener myLineNumbersCaretListener = new CaretAdapter() {
+  private final CaretListener myLineNumbersCaretListener = new CaretListener() {
     @Override
     public void caretPositionChanged(CaretEvent e) {
       updateLineNumbers(e.getEditor());

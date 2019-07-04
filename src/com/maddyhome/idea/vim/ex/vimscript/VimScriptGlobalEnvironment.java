@@ -18,9 +18,9 @@
 
 package com.maddyhome.idea.vim.ex.vimscript;
 
-import com.intellij.util.containers.hash.HashMap;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**

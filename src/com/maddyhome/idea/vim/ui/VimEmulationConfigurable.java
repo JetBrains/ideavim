@@ -26,6 +26,7 @@ import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.openapi.ui.StripeTable;
 import com.intellij.ui.IdeBorderFactory;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.UIUtil;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -39,8 +40,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 /**
  * @author vlan
@@ -94,7 +95,7 @@ public class VimEmulationConfigurable implements Configurable {
       myShortcutConflictsTable = new VimShortcutConflictsTable(model);
       setLayout(new BorderLayout());
       final JScrollPane scrollPane = new JBScrollPane(myShortcutConflictsTable);
-      scrollPane.setBorder(new LineBorder(UIUtil.getBorderColor()));
+      scrollPane.setBorder(new LineBorder(JBColor.border()));
       final JPanel conflictsPanel = new JPanel(new BorderLayout());
       final String title = String.format("Shortcut Conflicts for Active Keymap");
       conflictsPanel.setBorder(IdeBorderFactory.createTitledBorder(title, false));
@@ -285,7 +286,7 @@ public class VimEmulationConfigurable implements Configurable {
       }
     }
 
-    private static enum Column {
+    private enum Column {
       KEYSTROKE(0, "Shortcut"),
       IDE_ACTION(1, "IDE Action"),
       OWNER(2, "Handler");
