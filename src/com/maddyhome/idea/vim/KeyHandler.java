@@ -19,10 +19,7 @@
 package com.maddyhome.idea.vim;
 
 import com.intellij.ide.IdeEventQueue;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ModalityState;
@@ -108,7 +105,7 @@ public class KeyHandler {
     // Is the template presentation sufficient?
     // What are the modifiers? Is zero OK?
     final AnActionEvent event =
-      new AnActionEvent(null, context, "", action.getTemplatePresentation(), ActionManager.getInstance(), 0);
+      new AnActionEvent(null, context, ActionPlaces.ACTION_SEARCH, action.getTemplatePresentation(), ActionManager.getInstance(), 0);
     action.update(event);
     if (event.getPresentation().isEnabled()) {
       action.actionPerformed(event);
