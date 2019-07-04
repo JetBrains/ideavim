@@ -62,6 +62,7 @@ import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
 import com.maddyhome.idea.vim.option.BoundListOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import kotlin.Pair;
+import kotlin.text.StringsKt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -1923,7 +1924,7 @@ public class ChangeGroup {
       int num = (int)Long.parseLong(text.substring(2), 16);
       num += count;
       number = Integer.toHexString(num);
-      number = StringHelper.rightJustify(number, text.length() - 2, '0');
+      number = StringsKt.padStart(number, text.length() - 2, '0');
 
       if (!lastLower) {
         number = number.toUpperCase();
@@ -1935,7 +1936,7 @@ public class ChangeGroup {
       int num = (int)Long.parseLong(text, 8);
       num += count;
       number = Integer.toOctalString(num);
-      number = "0" + StringHelper.rightJustify(number, text.length() - 1, '0');
+      number = "0" + StringsKt.padStart(number, text.length() - 1, '0');
     }
     else if (alpha && Character.isLetter(ch)) {
       ch += count;
@@ -1961,7 +1962,7 @@ public class ChangeGroup {
           neg = true;
           number = number.substring(1);
         }
-        number = StringHelper.rightJustify(number, len, '0');
+        number = StringsKt.padStart(number, len, '0');
         if (neg) {
           number = "-" + number;
         }

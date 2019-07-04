@@ -39,6 +39,7 @@ import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.OptionChangeEvent;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.OptionsManager;
+import kotlin.text.StringsKt;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -305,7 +306,7 @@ public class EditorGroup {
     private String lineNumberToString(int lineNumber, @NotNull Editor editor) {
       final int lineCount = editor.getDocument().getLineCount();
       final int digitsCount = (int)Math.ceil(Math.log10(lineCount));
-      return StringHelper.leftJustify("" + lineNumber, digitsCount, ' ');
+      return StringsKt.padEnd("" + lineNumber, digitsCount, ' ');
     }
 
     @Nullable

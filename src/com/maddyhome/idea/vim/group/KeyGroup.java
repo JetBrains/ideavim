@@ -42,6 +42,7 @@ import com.maddyhome.idea.vim.extension.VimExtensionHandler;
 import com.maddyhome.idea.vim.helper.StringHelper;
 import com.maddyhome.idea.vim.key.Shortcut;
 import com.maddyhome.idea.vim.key.*;
+import kotlin.text.StringsKt;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,7 +53,6 @@ import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.*;
 
-import static com.maddyhome.idea.vim.helper.StringHelper.leftJustify;
 import static com.maddyhome.idea.vim.helper.StringHelper.toKeyNotation;
 
 /**
@@ -89,9 +89,9 @@ public class KeyGroup {
     final List<MappingInfo> rows = getKeyMappingRows(modes);
     final StringBuilder builder = new StringBuilder();
     for (MappingInfo row : rows) {
-      builder.append(leftJustify(getModesStringCode(row.getMappingModes()), 2, ' '));
+      builder.append(StringsKt.padEnd(getModesStringCode(row.getMappingModes()), 2, ' '));
       builder.append(" ");
-      builder.append(leftJustify(toKeyNotation(row.getFromKeys()), 11, ' '));
+      builder.append(StringsKt.padEnd(toKeyNotation(row.getFromKeys()), 11, ' '));
       builder.append(" ");
       builder.append(row.isRecursive() ? " " : "*");
       builder.append(" ");

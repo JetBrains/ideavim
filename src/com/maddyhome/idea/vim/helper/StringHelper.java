@@ -95,40 +95,14 @@ public class StringHelper {
 
   private StringHelper() {}
 
-  /**
-   * @deprecated please use String.padEnd function of kotlin
-   */
-  @Deprecated
-  @NotNull
-  public static String leftJustify(@NotNull String text, int width, char fillChar) {
-    final StringBuilder builder = new StringBuilder(text);
-    for (int i = text.length(); i < width; i++) {
-      builder.append(fillChar);
-    }
-    return builder.toString();
-  }
-
-  /**
-   * @deprecated please use String.padStart function of kotlin
-   */
-  @Deprecated
-  @NotNull
-  public static String rightJustify(@NotNull String text, int width, char fillChar) {
-    final StringBuilder builder = new StringBuilder(text);
-    for (int i = text.length(); i < width; i++) {
-      builder.insert(0, fillChar);
-    }
-    return builder.toString();
-  }
-
   @Nullable
   private static String toEscapeNotation(@NotNull KeyStroke key) {
     final char c = key.getKeyChar();
     if (isControlCharacter(c)) {
-      return "^" + String.valueOf((char)(c + 'A' - 1));
+      return "^" + (char)(c + 'A' - 1);
     }
     else if (isControlKeyCode(key)) {
-      return "^" + String.valueOf((char)(key.getKeyCode() + 'A' - 1));
+      return "^" + (char)(key.getKeyCode() + 'A' - 1);
     }
     return null;
   }
