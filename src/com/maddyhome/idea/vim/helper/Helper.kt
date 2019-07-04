@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.intellij.injected.editor.EditorWindow
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import java.util.*
@@ -59,6 +60,7 @@ annotation class VimBehaviourDiffers(
 )
 
 fun <T : Comparable<T>> sort(a: T, b: T) = if (a > b) b to a else a to b
+
 inline fun <reified T : Enum<T>> noneOfEnum(): EnumSet<T> = EnumSet.noneOf(T::class.java)
 inline fun <reified T : Enum<T>> enumSetOf(vararg value: T): EnumSet<T> = when (value.size) {
   0 -> noneOfEnum()
@@ -74,3 +76,4 @@ inline fun Editor.vimForEachCaret(action: (caret: Caret) -> Unit) {
   }
 }
 
+fun Editor.getTopLevelEditor() = if (this is EditorWindow) this.delegate else this

@@ -23,10 +23,10 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
-import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.Command
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.getTopLevelEditor
 
 
 /**
@@ -73,7 +73,7 @@ abstract class EditorActionHandlerBase(myRunForEachCaret: Boolean) : EditorActio
   public final override fun doExecute(_editor: Editor, caret: Caret?, context: DataContext) {
     if (!VimPlugin.isEnabled()) return
 
-    val editor = InjectedLanguageUtil.getTopLevelEditor(_editor)
+    val editor = _editor.getTopLevelEditor()
     logger.debug("Execute command with handler: " + this.javaClass.name)
 
     val state = CommandState.getInstance(editor)

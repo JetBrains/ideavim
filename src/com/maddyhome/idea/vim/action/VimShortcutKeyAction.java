@@ -104,7 +104,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
       if (owner == ShortcutOwner.UNDEFINED) {
         notifyAboutShortcutConflict(keyStroke);
       }
-      // Should we use InjectedLanguageUtil.getTopLevelEditor(editor) here, as we did in former EditorKeyHandler?
+      // Should we use HelperKt.getTopLevelEditor(editor) here, as we did in former EditorKeyHandler?
       try {
         KeyHandler.getInstance().handleKey(editor, keyStroke, new EditorDataContext(editor));
       }

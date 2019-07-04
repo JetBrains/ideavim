@@ -20,11 +20,11 @@ package com.maddyhome.idea.vim.action;
 
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.psi.impl.source.tree.injected.InjectedLanguageUtil;
 import com.maddyhome.idea.vim.KeyHandler;
 import com.maddyhome.idea.vim.command.Command;
 import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.handler.VimActionHandler;
+import com.maddyhome.idea.vim.helper.HelperKt;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -39,7 +39,7 @@ public class ResetModeAction extends VimCommandAction {
     return new VimActionHandler.SingleExecution() {
       @Override
       public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-        KeyHandler.getInstance().fullReset(InjectedLanguageUtil.getTopLevelEditor(editor));
+        KeyHandler.getInstance().fullReset(HelperKt.getTopLevelEditor(editor));
         return true;
       }
     };
