@@ -162,8 +162,82 @@ public class VimEmulationConfigurable implements Configurable {
       }
     }
 
+    private enum Column {
+      KEYSTROKE(0, "Shortcut"),
+      IDE_ACTION(1, "IDE Action"),
+      OWNER(2, "Handler");
+
+      @NotNull private static final Map<Integer, Column> ourMembers = new HashMap<>();
+
+      static {
+        for (Column column : values()) {
+          ourMembers.put(column.myIndex, column);
+        }
+      }
+
+      private final int myIndex;
+      @NotNull private final String myTitle;
+
+      Column(int index, @NotNull String title) {
+        myIndex = index;
+        myTitle = title;
+      }
+
+      @Nullable
+      public static Column fromIndex(int index) {
+        return ourMembers.get(index);
+      }
+
+      public int getIndex() {
+        return myIndex;
+      }
+
+      @NotNull
+      public String getTitle() {
+        return myTitle;
+      }
+    }
+
+    private static final class Row implements Comparable<Row> {
+      @NotNull private final KeyStroke myKeyStroke;
+      @NotNull private final AnAction myAction;
+      @NotNull private ShortcutOwner myOwner;
+
+      private Row(@NotNull KeyStroke keyStroke, @NotNull AnAction action, @NotNull ShortcutOwner owner) {
+        myKeyStroke = keyStroke;
+        myAction = action;
+        myOwner = owner;
+      }
+
+      @NotNull
+      public KeyStroke getKeyStroke() {
+        return myKeyStroke;
+      }
+
+      @NotNull
+      public AnAction getAction() {
+        return myAction;
+      }
+
+      @NotNull
+      public ShortcutOwner getOwner() {
+        return myOwner;
+      }
+
+      @Override
+      public int compareTo(@NotNull Row row) {
+        final KeyStroke otherKeyStroke = row.getKeyStroke();
+        final int keyCodeDiff = myKeyStroke.getKeyCode() - otherKeyStroke.getKeyCode();
+        return keyCodeDiff != 0 ? keyCodeDiff : myKeyStroke.getModifiers() - otherKeyStroke.getModifiers();
+      }
+
+      public void setOwner(@NotNull ShortcutOwner owner) {
+        myOwner = owner;
+      }
+    }
+
     private static final class Model extends AbstractTableModel {
-      @NotNull private final List<Row> myRows = new ArrayList<Row>();
+      @NotNull private final List<Row> myRows = new ArrayList<>();
 
       public Model() {
         reset();
@@ -240,85 +314,11 @@ public class VimEmulationConfigurable implements Configurable {
 
       @NotNull
       private Map<KeyStroke, ShortcutOwner> getCurrentData() {
-        final Map<KeyStroke, ShortcutOwner> result = new HashMap<KeyStroke, ShortcutOwner>();
+        final Map<KeyStroke, ShortcutOwner> result = new HashMap<>();
         for (Row row : myRows) {
           result.put(row.getKeyStroke(), row.getOwner());
         }
         return result;
-      }
-    }
-
-    private static final class Row implements Comparable<Row> {
-      @NotNull private final KeyStroke myKeyStroke;
-      @NotNull private final AnAction myAction;
-      @NotNull private ShortcutOwner myOwner;
-
-      private Row(@NotNull KeyStroke keyStroke, @NotNull AnAction action, @NotNull ShortcutOwner owner) {
-        myKeyStroke = keyStroke;
-        myAction = action;
-        myOwner = owner;
-      }
-
-      @NotNull
-      public KeyStroke getKeyStroke() {
-        return myKeyStroke;
-      }
-
-      @NotNull
-      public AnAction getAction() {
-        return myAction;
-      }
-
-      @NotNull
-      public ShortcutOwner getOwner() {
-        return myOwner;
-      }
-
-      @Override
-      public int compareTo(@NotNull Row row) {
-        final KeyStroke otherKeyStroke = row.getKeyStroke();
-        final int keyCodeDiff = myKeyStroke.getKeyCode() - otherKeyStroke.getKeyCode();
-        return keyCodeDiff != 0 ? keyCodeDiff : myKeyStroke.getModifiers() - otherKeyStroke.getModifiers();
-      }
-
-      public void setOwner(@NotNull ShortcutOwner owner) {
-        myOwner = owner;
-      }
-    }
-
-    private enum Column {
-      KEYSTROKE(0, "Shortcut"),
-      IDE_ACTION(1, "IDE Action"),
-      OWNER(2, "Handler");
-
-      @NotNull private static final Map<Integer, Column> ourMembers = new HashMap<Integer, Column>();
-
-      static {
-        for (Column column : values()) {
-          ourMembers.put(column.myIndex, column);
-        }
-      }
-
-      private final int myIndex;
-      @NotNull private final String myTitle;
-
-      Column(int index, @NotNull String title) {
-        myIndex = index;
-        myTitle = title;
-      }
-
-      @Nullable
-      public static Column fromIndex(int index) {
-        return ourMembers.get(index);
-      }
-
-      public int getIndex() {
-        return myIndex;
-      }
-
-      @NotNull
-      public String getTitle() {
-        return myTitle;
       }
     }
   }

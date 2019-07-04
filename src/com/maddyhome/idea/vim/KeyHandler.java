@@ -307,7 +307,7 @@ public class KeyHandler {
     }
 
     final List<KeyStroke> mappingKeys = commandState.getMappingKeys();
-    final List<KeyStroke> fromKeys = new ArrayList<KeyStroke>(mappingKeys);
+    final List<KeyStroke> fromKeys = new ArrayList<>(mappingKeys);
     fromKeys.add(key);
 
     final KeyMapping mapping = VimPlugin.getKey().getKeyMapping(mappingMode);
@@ -386,7 +386,7 @@ public class KeyHandler {
       return true;
     }
     else {
-      final List<KeyStroke> unhandledKeys = new ArrayList<KeyStroke>(mappingKeys);
+      final List<KeyStroke> unhandledKeys = new ArrayList<>(mappingKeys);
       mappingKeys.clear();
       for (KeyStroke keyStroke : unhandledKeys) {
         handleKey(editor, keyStroke, context, false);
@@ -691,7 +691,7 @@ public class KeyHandler {
    */
   private void partialReset(@Nullable Editor editor) {
     count = 0;
-    keys = new ArrayList<KeyStroke>();
+    keys = new ArrayList<>();
     CommandState editorState = CommandState.getInstance(editor);
     editorState.stopMappingTimer();
     editorState.getMappingKeys().clear();

@@ -61,5 +61,5 @@ public abstract class ParentNode implements Node {
   }
 
 
-  @NotNull protected final HashMap<Object, Node> children = new HashMap<Object, Node>();
+  @NotNull protected final HashMap<Object, Node> children = new HashMap<>();
 }

@@ -29,7 +29,7 @@ public class BoundListOption extends ListOption {
   BoundListOption(String name, String abbrev, String[] dflt, String[] values) {
     super(name, abbrev, dflt, null);
 
-    this.values = new ArrayList<String>(Arrays.asList(values));
+    this.values = new ArrayList<>(Arrays.asList(values));
   }
 
   @Override

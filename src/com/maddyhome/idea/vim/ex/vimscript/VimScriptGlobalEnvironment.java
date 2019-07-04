@@ -29,7 +29,7 @@ import java.util.Map;
 public class VimScriptGlobalEnvironment {
   private static final VimScriptGlobalEnvironment ourInstance = new VimScriptGlobalEnvironment();
 
-  private final Map<String, Object> myVariables = new HashMap<String, Object>();
+  private final Map<String, Object> myVariables = new HashMap<>();
 
   private VimScriptGlobalEnvironment() {}
 

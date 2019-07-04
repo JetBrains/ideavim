@@ -109,7 +109,7 @@ public class StringHelper {
 
   @NotNull
   public static List<KeyStroke> stringToKeys(@NotNull String s) {
-    final List<KeyStroke> res = new ArrayList<KeyStroke>();
+    final List<KeyStroke> res = new ArrayList<>();
     for (int i = 0; i < s.length(); i++) {
       res.add(getKeyStroke(s.charAt(i)));
     }
@@ -130,7 +130,7 @@ public class StringHelper {
    */
   @NotNull
   public static List<KeyStroke> parseKeys(@NotNull String... strings) {
-    final List<KeyStroke> result = new ArrayList<KeyStroke>();
+    final List<KeyStroke> result = new ArrayList<>();
     for (String s : strings) {
       KeyParserState state = KeyParserState.INIT;
       StringBuilder specialKeyBuilder = new StringBuilder();
@@ -362,7 +362,7 @@ public class StringHelper {
 
   @NotNull
   private static <K, V> Map<V, K> invertMap(@NotNull Map<K, V> map) {
-    final Map<V, K> inverted = new HashMap<V, K>();
+    final Map<V, K> inverted = new HashMap<>();
     for (Map.Entry<K, V> entry : map.entrySet()) {
       final V value = entry.getValue();
       if (!inverted.containsKey(value)) {

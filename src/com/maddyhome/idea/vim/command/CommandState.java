@@ -43,11 +43,11 @@ public class CommandState {
   @Nullable private static Command ourLastChange = null;
   private char myLastChangeRegister;
 
-  @NotNull private final Stack<State> myStates = new Stack<State>();
+  @NotNull private final Stack<State> myStates = new Stack<>();
   @NotNull private final State myDefaultState = new State(Mode.COMMAND, SubMode.NONE, MappingMode.NORMAL);
   @Nullable private Command myCommand;
   @NotNull private ParentNode myCurrentNode = VimPlugin.getKey().getKeyRoot(getMappingMode());
-  @NotNull private final List<KeyStroke> myMappingKeys = new ArrayList<KeyStroke>();
+  @NotNull private final List<KeyStroke> myMappingKeys = new ArrayList<>();
   @NotNull private final Timer myMappingTimer;
   private EnumSet<CommandFlags> myFlags = EnumSet.noneOf(CommandFlags.class);
   private boolean myIsRecording = false;

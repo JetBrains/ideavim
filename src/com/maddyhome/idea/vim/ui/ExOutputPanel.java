@@ -306,7 +306,7 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
 
         if (project != null && e != null && e.getKeyChar() != '\n') {
           final KeyStroke key = KeyStroke.getKeyStrokeForEvent(e);
-          final List<KeyStroke> keys = new ArrayList<KeyStroke>(1);
+          final List<KeyStroke> keys = new ArrayList<>(1);
           keys.add(key);
           VimPlugin.getMacro().playbackKeys(myEditor, new EditorDataContext(myEditor), project, keys, 0, 0, 1);
         }
