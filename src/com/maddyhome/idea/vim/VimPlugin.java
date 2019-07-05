@@ -201,31 +201,52 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     return element;
   }
 
-  @Override
-  public void loadState(@NotNull final Element element) {
-    LOG.debug("Loading state");
-
-    // Restore whether the plugin is enabled or not
-    Element state = element.getChild("state");
-    if (state != null) {
-      try {
-        previousStateVersion = Integer.valueOf(state.getAttributeValue("version"));
-      }
-      catch (NumberFormatException ignored) {
-      }
-      enabled = Boolean.valueOf(state.getAttributeValue("enabled"));
-      previousKeyMap = state.getAttributeValue("keymap");
+  /**
+   * Reports statistics about installed IdeaVim and enabled Vim emulation.
+   * <p>
+   * See https://github.com/go-lang-plugin-org/go-lang-idea-plugin/commit/5182ab4a1d01ad37f6786268a2fe5e908575a217
+   */
+  public static void statisticReport() {
+    final PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
+    final long lastUpdate = propertiesComponent.getOrInitLong(IDEAVIM_STATISTICS_TIMESTAMP_KEY, 0);
+    final boolean outOfDate =
+      lastUpdate == 0 || System.currentTimeMillis() - lastUpdate > TimeUnit.DAYS.toMillis(1);
+    if (outOfDate && isEnabled()) {
+      ApplicationManager.getApplication().executeOnPooledThread(() -> {
+        try {
+          final String buildNumber = ApplicationInfo.getInstance().getBuild().asString();
+          final String version = URLEncoder.encode(getVersion(), CharsetToolkit.UTF8);
+          final String os =
+            URLEncoder.encode(SystemInfo.OS_NAME + " " + SystemInfo.OS_VERSION, CharsetToolkit.UTF8);
+          final String uid = PermanentInstallationID.get();
+          final String url = "https://plugins.jetbrains.com/plugins/list" +
+                             "?pluginId=" + IDEAVIM_PLUGIN_ID +
+                             "&build=" +
+                             buildNumber +
+                             "&pluginVersion=" +
+                             version +
+                             "&os=" +
+                             os +
+                             "&uuid=" +
+                             uid;
+          PropertiesComponent.getInstance()
+            .setValue(IDEAVIM_STATISTICS_TIMESTAMP_KEY, String.valueOf(System.currentTimeMillis()));
+          HttpRequests.request(url).connect(request -> {
+            LOG.info("Sending statistics: " + url);
+            try {
+              JDOMUtil.load(request.getInputStream());
+            }
+            catch (JDOMException e) {
+              LOG.warn(e);
+            }
+            return null;
+          });
+        }
+        catch (IOException e) {
+          LOG.warn(e);
+        }
+      });
     }
-
-    if (previousStateVersion > 0 && previousStateVersion < 5) {
-      // Migrate settings from 4 to 5 version
-      mark.readData(element);
-      register.readData(element);
-      search.readData(element);
-      history.readData(element);
-    }
-    key.readData(element);
-    editor.readData(element);
   }
 
   @NotNull
@@ -467,59 +488,30 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     }
   }
 
-  /**
-   * Reports statistics about installed IdeaVim and enabled Vim emulation.
-   * <p>
-   * See https://github.com/go-lang-plugin-org/go-lang-idea-plugin/commit/5182ab4a1d01ad37f6786268a2fe5e908575a217
-   */
-  public static void statisticReport() {
-    final PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
-    final long lastUpdate = propertiesComponent.getOrInitLong(IDEAVIM_STATISTICS_TIMESTAMP_KEY, 0);
-    final boolean outOfDate =
-      lastUpdate == 0 || System.currentTimeMillis() - lastUpdate > TimeUnit.DAYS.toMillis(1);
-    if (outOfDate && isEnabled()) {
-      ApplicationManager.getApplication().executeOnPooledThread(new Runnable() {
-        @Override
-        public void run() {
-          try {
-            final String buildNumber = ApplicationInfo.getInstance().getBuild().asString();
-            final String pluginId = IDEAVIM_PLUGIN_ID;
-            final String version = URLEncoder.encode(getVersion(), CharsetToolkit.UTF8);
-            final String os =
-              URLEncoder.encode(SystemInfo.OS_NAME + " " + SystemInfo.OS_VERSION, CharsetToolkit.UTF8);
-            final String uid = PermanentInstallationID.get();
-            final String url = "https://plugins.jetbrains.com/plugins/list" +
-                               "?pluginId=" +
-                               pluginId +
-                               "&build=" +
-                               buildNumber +
-                               "&pluginVersion=" +
-                               version +
-                               "&os=" +
-                               os +
-                               "&uuid=" +
-                               uid;
-            PropertiesComponent.getInstance()
-              .setValue(IDEAVIM_STATISTICS_TIMESTAMP_KEY, String.valueOf(System.currentTimeMillis()));
-            HttpRequests.request(url).connect(new HttpRequests.RequestProcessor<Object>() {
-              @Override
-              public Object process(@NotNull HttpRequests.Request request) throws IOException {
-                LOG.info("Sending statistics: " + url);
-                try {
-                  JDOMUtil.load(request.getInputStream());
-                }
-                catch (JDOMException e) {
-                  LOG.warn(e);
-                }
-                return null;
-              }
-            });
-          }
-          catch (IOException e) {
-            LOG.warn(e);
-          }
-        }
-      });
+  @Override
+  public void loadState(@NotNull final Element element) {
+    LOG.debug("Loading state");
+
+    // Restore whether the plugin is enabled or not
+    Element state = element.getChild("state");
+    if (state != null) {
+      try {
+        previousStateVersion = Integer.parseInt(state.getAttributeValue("version"));
+      }
+      catch (NumberFormatException ignored) {
+      }
+      enabled = Boolean.parseBoolean(state.getAttributeValue("enabled"));
+      previousKeyMap = state.getAttributeValue("keymap");
     }
+
+    if (previousStateVersion > 0 && previousStateVersion < 5) {
+      // Migrate settings from 4 to 5 version
+      mark.readData(element);
+      register.readData(element);
+      search.readData(element);
+      history.readData(element);
+    }
+    key.readData(element);
+    editor.readData(element);
   }
 }

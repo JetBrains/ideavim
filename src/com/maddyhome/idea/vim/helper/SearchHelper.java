@@ -32,8 +32,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.option.ListOption;
-import com.maddyhome.idea.vim.option.OptionChangeEvent;
-import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -2156,12 +2154,7 @@ public class SearchHelper {
       ListOption lo = OptionsManager.INSTANCE.getMatchpairs();
       pairsChars = parseOption(lo);
 
-      lo.addOptionChangeListener(new OptionChangeListener() {
-        @Override
-        public void valueChange(@NotNull OptionChangeEvent event) {
-          pairsChars = parseOption((ListOption)event.getOption());
-        }
-      });
+      lo.addOptionChangeListener(event -> pairsChars = parseOption((ListOption)event.getOption()));
     }
 
     return pairsChars;

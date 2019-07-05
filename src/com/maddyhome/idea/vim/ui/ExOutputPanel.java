@@ -297,19 +297,16 @@ public class ExOutputPanel extends JPanel implements LafManagerListener {
   }
 
   private void close(@Nullable final KeyEvent e) {
-    ApplicationManager.getApplication().invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        deactivate(true);
+    ApplicationManager.getApplication().invokeLater(() -> {
+      deactivate(true);
 
-        final Project project = myEditor.getProject();
+      final Project project = myEditor.getProject();
 
-        if (project != null && e != null && e.getKeyChar() != '\n') {
-          final KeyStroke key = KeyStroke.getKeyStrokeForEvent(e);
-          final List<KeyStroke> keys = new ArrayList<>(1);
-          keys.add(key);
-          VimPlugin.getMacro().playbackKeys(myEditor, new EditorDataContext(myEditor), project, keys, 0, 0, 1);
-        }
+      if (project != null && e != null && e.getKeyChar() != '\n') {
+        final KeyStroke key = KeyStroke.getKeyStrokeForEvent(e);
+        final List<KeyStroke> keys = new ArrayList<>(1);
+        keys.add(key);
+        VimPlugin.getMacro().playbackKeys(myEditor, new EditorDataContext(myEditor), project, keys, 0, 0, 1);
       }
     });
   }

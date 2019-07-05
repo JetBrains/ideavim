@@ -282,12 +282,8 @@ public class KeyHandler {
       RegisterGroup register = VimPlugin.getRegister();
       if (register.getCurrentRegister() == register.getDefaultRegister()) {
         if (key.getKeyCode() == KeyEvent.VK_ESCAPE) {
-          CommandProcessor.getInstance().executeCommand(editor.getProject(), new Runnable() {
-            @Override
-            public void run() {
-              KeyHandler.executeAction("EditorEscape", context);
-            }
-          }, "", null);
+          CommandProcessor.getInstance().executeCommand(editor.getProject(),
+                                                        () -> KeyHandler.executeAction("EditorEscape", context), "", null);
         }
         VimPlugin.indicateError();
       }
@@ -334,46 +330,43 @@ public class KeyHandler {
     }
     else if (mappingInfo != null) {
       mappingKeys.clear();
-      final Runnable handleMappedKeys = new Runnable() {
-        @Override
-        public void run() {
-          if (editor.isDisposed()) {
-            return;
+      final Runnable handleMappedKeys = () -> {
+        if (editor.isDisposed()) {
+          return;
+        }
+        final List<KeyStroke> toKeys = mappingInfo.getToKeys();
+        final VimExtensionHandler extensionHandler = mappingInfo.getExtensionHandler();
+        final EditorDataContext currentContext = new EditorDataContext(editor);
+        if (toKeys != null) {
+          final boolean fromIsPrefix = isPrefix(mappingInfo.getFromKeys(), toKeys);
+          boolean first = true;
+          for (KeyStroke keyStroke : toKeys) {
+            final boolean recursive = mappingInfo.isRecursive() && !(first && fromIsPrefix);
+            handleKey(editor, keyStroke, currentContext, recursive);
+            first = false;
           }
-          final List<KeyStroke> toKeys = mappingInfo.getToKeys();
-          final VimExtensionHandler extensionHandler = mappingInfo.getExtensionHandler();
-          final EditorDataContext currentContext = new EditorDataContext(editor);
-          if (toKeys != null) {
-            final boolean fromIsPrefix = isPrefix(mappingInfo.getFromKeys(), toKeys);
-            boolean first = true;
-            for (KeyStroke keyStroke : toKeys) {
-              final boolean recursive = mappingInfo.isRecursive() && !(first && fromIsPrefix);
-              handleKey(editor, keyStroke, currentContext, recursive);
-              first = false;
-            }
-          }
-          else if (extensionHandler != null) {
-            final CommandProcessor processor = CommandProcessor.getInstance();
-            processor.executeCommand(editor.getProject(), () -> extensionHandler.execute(editor, context),
-                                     "Vim " + extensionHandler.getClass().getSimpleName(), null);
-          }
+        }
+        else if (extensionHandler != null) {
+          final CommandProcessor processor = CommandProcessor.getInstance();
+          processor.executeCommand(editor.getProject(), () -> extensionHandler.execute(editor, context),
+                                   "Vim " + extensionHandler.getClass().getSimpleName(), null);
+        }
 
-          // NB: mappingInfo MUST be non-null here, so if equal
-          //  then prevMappingInfo is also non-null; this also
-          //  means that the prev mapping was a prefix, but the
-          //  next key typed (`key`) was not part of that
-          if (prevMappingInfo == mappingInfo) {
-            // post to end of queue so it's handled AFTER
-            //  an <Plug> mapping is invoked (since that
-            //  will also get posted)
-            Runnable handleRemainingKey = () -> handleKey(editor, key, currentContext);
+        // NB: mappingInfo MUST be non-null here, so if equal
+        //  then prevMappingInfo is also non-null; this also
+        //  means that the prev mapping was a prefix, but the
+        //  next key typed (`key`) was not part of that
+        if (prevMappingInfo == mappingInfo) {
+          // post to end of queue so it's handled AFTER
+          //  an <Plug> mapping is invoked (since that
+          //  will also get posted)
+          Runnable handleRemainingKey = () -> handleKey(editor, key, currentContext);
 
-            if (application.isUnitTestMode()) {
-              handleRemainingKey.run();
-            }
-            else {
-              application.invokeLater(handleRemainingKey);
-            }
+          if (application.isUnitTestMode()) {
+            handleRemainingKey.run();
+          }
+          else {
+            application.invokeLater(handleRemainingKey);
           }
         }
       };

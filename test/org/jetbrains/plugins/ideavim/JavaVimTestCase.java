@@ -87,18 +87,15 @@ public abstract class JavaVimTestCase extends JavaCodeInsightFixtureTestCase {
     final EditorDataContext dataContext = new EditorDataContext(editor);
     final Project project = myFixture.getProject();
     TestInputModel.getInstance(editor).setKeyStrokes(keys);
-    RunnableHelper.runWriteCommand(project, new Runnable() {
-      @Override
-      public void run() {
-        final TestInputModel inputModel = TestInputModel.getInstance(editor);
-        for (KeyStroke key = inputModel.nextKeyStroke(); key != null; key = inputModel.nextKeyStroke()) {
-          final ExEntryPanel exEntryPanel = ExEntryPanel.getInstance();
-          if (exEntryPanel.isActive()) {
-            exEntryPanel.handleKey(key);
-          }
-          else {
-            keyHandler.handleKey(editor, key, dataContext);
-          }
+    RunnableHelper.runWriteCommand(project, () -> {
+      final TestInputModel inputModel = TestInputModel.getInstance(editor);
+      for (KeyStroke key = inputModel.nextKeyStroke(); key != null; key = inputModel.nextKeyStroke()) {
+        final ExEntryPanel exEntryPanel = ExEntryPanel.getInstance();
+        if (exEntryPanel.isActive()) {
+          exEntryPanel.handleKey(key);
+        }
+        else {
+          keyHandler.handleKey(editor, key, dataContext);
         }
       }
     }, null, null);
