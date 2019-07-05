@@ -96,6 +96,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
 
   // It is enabled by default to avoid any special configuration after plugin installation
   private boolean enabled = true;
+  private boolean initialized = false;
 
   private static final Logger LOG = Logger.getInstance(VimPlugin.class);
 
@@ -149,13 +150,27 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   public void initComponent() {
     LOG.debug("initComponent");
 
+    if (isEnabled()) initializePlugin();
+
+    LOG.debug("done");
+  }
+
+  @Override
+  public void dispose() {
+    LOG.debug("disposeComponent");
+    turnOffPlugin();
+    LOG.debug("done");
+  }
+
+  private void initializePlugin() {
+    if (initialized) return;
+    initialized = true;
+
     Notifications.Bus.register(IDEAVIM_STICKY_NOTIFICATION_ID, NotificationDisplayType.STICKY_BALLOON);
 
     ApplicationManager.getApplication().invokeLater(this::updateState);
 
-    if (isEnabled()) {
-      VimListenerManager.GlobalListeners.enable();
-    }
+    VimListenerManager.GlobalListeners.enable();
 
     // Register vim actions in command mode
     RegisterActions.registerActions();
@@ -173,15 +188,6 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
         VimScriptParser.executeFile(ideaVimRc);
       }
     }
-
-    LOG.debug("done");
-  }
-
-  @Override
-  public void dispose() {
-    LOG.debug("disposeComponent");
-    turnOffPlugin();
-    LOG.debug("done");
   }
 
   @Override
@@ -419,6 +425,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   }
 
   private void turnOnPlugin() {
+    initializePlugin();
     KeyHandler.getInstance().fullReset(null);
 
     getEditor().turnOn();
