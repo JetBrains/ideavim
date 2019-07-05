@@ -21,10 +21,11 @@ import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.notification.*;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.PermanentInstallationID;
-import com.intellij.openapi.components.ApplicationComponent;
+import com.intellij.openapi.components.BaseComponent;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
@@ -77,7 +78,7 @@ import java.util.concurrent.TimeUnit;
  * @version 0.1
  */
 @State(name = "VimSettings", storages = {@Storage("$APP_CONFIG$/vim_settings.xml")})
-public class VimPlugin implements ApplicationComponent, PersistentStateComponent<Element> {
+public class VimPlugin implements BaseComponent, PersistentStateComponent<Element>, Disposable {
   private static final String IDEAVIM_COMPONENT_NAME = "VimPlugin";
   private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";
   private static final String IDEAVIM_STATISTICS_TIMESTAMP_KEY = "ideavim.statistics.timestamp";
@@ -177,7 +178,7 @@ public class VimPlugin implements ApplicationComponent, PersistentStateComponent
   }
 
   @Override
-  public void disposeComponent() {
+  public void dispose() {
     LOG.debug("disposeComponent");
     turnOffPlugin();
     LOG.debug("done");
