@@ -74,8 +74,6 @@ import java.util.concurrent.TimeUnit;
  * <p/>
  * This is an application level plugin meaning that all open projects will share a common instance of the plugin.
  * Registers and marks are shared across open projects so you can copy and paste between files of different projects.
- *
- * @version 0.1
  */
 @State(name = "VimSettings", storages = {@Storage("$APP_CONFIG$/vim_settings.xml")})
 public class VimPlugin implements BaseComponent, PersistentStateComponent<Element>, Disposable {
