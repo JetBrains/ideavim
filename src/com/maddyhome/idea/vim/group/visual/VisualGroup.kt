@@ -32,6 +32,7 @@ import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inSelectMode
 import com.maddyhome.idea.vim.helper.inVisualMode
+import com.maddyhome.idea.vim.helper.isEndAllowed
 import com.maddyhome.idea.vim.helper.mode
 import com.maddyhome.idea.vim.helper.sort
 import com.maddyhome.idea.vim.helper.subMode
@@ -202,10 +203,12 @@ fun toNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.M
 
 fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor) {
   if (!editor.inVisualMode) {
-    editor.caretModel.allCarets.forEach { caret ->
-      val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
-      val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
-      if (caret.offset == lineEnd && lineEnd != lineStart) caret.moveToOffset(caret.offset - 1)
+    if (!editor.mode.isEndAllowed) {
+      editor.caretModel.allCarets.forEach { caret ->
+        val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
+        val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
+        if (caret.offset == lineEnd && lineEnd != lineStart) caret.moveToOffset(caret.offset - 1)
+      }
     }
     return
   }
