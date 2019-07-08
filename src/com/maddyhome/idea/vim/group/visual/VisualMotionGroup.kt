@@ -20,8 +20,6 @@ package com.maddyhome.idea.vim.group.visual
 
 import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.diagnostic.debug
-import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
@@ -33,7 +31,6 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.inBlockSubMode
 import com.maddyhome.idea.vim.helper.inSelectMode
@@ -57,8 +54,7 @@ import com.maddyhome.idea.vim.option.SelectModeOptionData
  */
 class VisualMotionGroup {
   companion object {
-    var modeBeforeEnteringNonVimVisual: CommandState.Mode? = null
-    val logger = Logger.getInstance(VisualMotionGroup.javaClass)
+    val logger = Logger.getInstance(VisualMotionGroup::class.java)
   }
 
   fun selectPreviousVisualMode(editor: Editor): Boolean {
@@ -126,7 +122,6 @@ class VisualMotionGroup {
     if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
       logger.debug("Some of carets have selection")
       val commandState = CommandState.getInstance(editor)
-      modeBeforeEnteringNonVimVisual = commandState.mode
       while (commandState.mode != CommandState.Mode.COMMAND) {
         commandState.popState()
       }
@@ -146,10 +141,6 @@ class VisualMotionGroup {
       exitVisual(editor)
       exitSelectModeAndResetKeyHandler(editor, true)
 
-      val project = editor.project
-      if ((project != null && TemplateManager.getInstance(project).getActiveTemplate(editor) != null || modeBeforeEnteringNonVimVisual == CommandState.Mode.INSERT) && editor.mode == CommandState.Mode.COMMAND) {
-        VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
-      }
       updateCaretState(editor)
       KeyHandler.getInstance().reset(editor)
     }
