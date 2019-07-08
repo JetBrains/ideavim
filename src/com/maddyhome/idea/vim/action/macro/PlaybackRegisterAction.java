@@ -55,6 +55,12 @@ public class PlaybackRegisterAction extends VimCommandAction {
 
   @NotNull
   @Override
+  public Argument.Type getArgumentType() {
+    return Argument.Type.CHARACTER;
+  }
+
+  @NotNull
+  @Override
   protected VimActionHandler makeActionHandler() {
     return new VimActionHandler.SingleExecution() {
       @Override
