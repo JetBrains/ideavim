@@ -57,7 +57,7 @@ public class UndoAction extends VimCommandAction {
     return new VimActionHandler.SingleExecution() {
       @Override
       public boolean execute(@NotNull Editor editor, @NotNull DataContext context, @NotNull Command cmd) {
-        return UndoRedoHelper.undo(context);
+        return UndoRedoHelper.INSTANCE.undo(context);
       }
     };
   }

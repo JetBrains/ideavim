@@ -16,47 +16,36 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.helper;
+package com.maddyhome.idea.vim.helper
 
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.command.undo.UndoManager;
-import com.intellij.openapi.fileEditor.FileEditor;
-import com.intellij.openapi.project.Project;
-import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor;
-import com.maddyhome.idea.vim.listener.VimListenerSuppressor;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.command.undo.UndoManager
+import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 
 /**
  * @author oleg
  */
-public class UndoRedoHelper {
-
-  public static boolean undo(@NotNull final DataContext context) {
-    final Project project = PlatformDataKeys.PROJECT.getData(context);
-    final FileEditor fileEditor = PlatformDataKeys.FILE_EDITOR.getData(context);
-    if (project == null) return false;
-    final UndoManager undoManager = UndoManager.getInstance(project);
+object UndoRedoHelper {
+  fun undo(context: DataContext): Boolean {
+    val project = PlatformDataKeys.PROJECT.getData(context) ?: return false
+    val fileEditor = PlatformDataKeys.FILE_EDITOR.getData(context)
+    val undoManager = UndoManager.getInstance(project)
     if (fileEditor != null && undoManager.isUndoAvailable(fileEditor)) {
-      try (final VimListenerSuppressor ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
-        undoManager.undo(fileEditor);
-      }
-      return true;
+      SelectionVimListenerSuppressor.lock().use { undoManager.undo(fileEditor) }
+      return true
     }
-    return false;
+    return false
   }
 
-  public static boolean redo(@NotNull final DataContext context) {
-    final Project project = PlatformDataKeys.PROJECT.getData(context);
-    if (project == null) return false;
-    final FileEditor fileEditor = PlatformDataKeys.FILE_EDITOR.getData(context);
-    final UndoManager undoManager = UndoManager.getInstance(project);
+  fun redo(context: DataContext): Boolean {
+    val project = PlatformDataKeys.PROJECT.getData(context) ?: return false
+    val fileEditor = PlatformDataKeys.FILE_EDITOR.getData(context)
+    val undoManager = UndoManager.getInstance(project)
     if (fileEditor != null && undoManager.isRedoAvailable(fileEditor)) {
-      try (final VimListenerSuppressor ignored = SelectionVimListenerSuppressor.INSTANCE.lock()) {
-        undoManager.redo(fileEditor);
-      }
-      return true;
+      SelectionVimListenerSuppressor.lock().use { undoManager.redo(fileEditor) }
+      return true
     }
-    return false;
+    return false
   }
 }
