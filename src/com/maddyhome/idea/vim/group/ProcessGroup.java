@@ -42,9 +42,6 @@ import java.util.EnumSet;
 
 
 public class ProcessGroup {
-  public ProcessGroup() {
-  }
-
   public String getLastCommand() {
     return lastCommand;
   }

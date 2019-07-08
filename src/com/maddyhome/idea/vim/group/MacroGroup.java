@@ -39,9 +39,6 @@ import java.util.List;
  * Used to handle playback of macros
  */
 public class MacroGroup {
-  public MacroGroup() {
-  }
-
   /**
    * This method is used to play the macro of keystrokes stored in the specified registers.
    *

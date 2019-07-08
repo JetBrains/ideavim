@@ -38,9 +38,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class WindowGroup {
-  public WindowGroup() {
-  }
-
   public void closeCurrentWindow(@NotNull DataContext context) {
     final FileEditorManagerEx fileEditorManager = getFileEditorManager(context);
     final EditorWindow window = fileEditorManager.getSplitters().getCurrentWindow();

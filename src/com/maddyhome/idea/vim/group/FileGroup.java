@@ -52,9 +52,6 @@ import java.io.File;
 import java.util.HashMap;
 
 public class FileGroup {
-  public FileGroup() {
-  }
-
   public boolean openFile(@NotNull String filename, @NotNull DataContext context) {
     if (logger.isDebugEnabled()) {
       logger.debug("openFile(" + filename + ")");
