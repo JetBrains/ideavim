@@ -232,6 +232,8 @@
  * |<C-Home>|             {@link com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineFirstAction}
  * |<C-Left>|             {@link com.maddyhome.idea.vim.action.motion.text.MotionWordLeftAction}
  * |<C-Right>|            {@link com.maddyhome.idea.vim.action.motion.text.MotionWordRightAction}
+ * |<C-Down>|             {@link com.maddyhome.idea.vim.action.motion.scroll.CtrlDownAction}
+ * |<C-Up>|               {@link com.maddyhome.idea.vim.action.motion.scroll.CtrlUpAction}
  * |<Del>|                {@link com.maddyhome.idea.vim.action.change.delete.DeleteCharacterAction}
  * |<Down>|               {@link com.maddyhome.idea.vim.action.motion.updown.MotionArrowDownAction}
  * |<End>|                {@link com.maddyhome.idea.vim.action.motion.leftright.MotionEndAction}
