@@ -49,6 +49,7 @@ import com.maddyhome.idea.vim.group.FileGroup
 import com.maddyhome.idea.vim.group.MarkGroup
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.group.SearchGroup
+import com.maddyhome.idea.vim.group.visual.VisualMotionGroup
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.helper.EditorHelper
@@ -312,6 +313,7 @@ object VimListenerManager {
     }
 
     override fun mouseReleased(event: EditorMouseEvent) {
+      VisualMotionGroup.modeBeforeEnteringNonVimVisual = null
       if (mouseDragging) {
         logger.debug("Release mouse after dragging")
         val editor = event.editor
