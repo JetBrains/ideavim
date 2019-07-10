@@ -973,6 +973,14 @@ class SearchGroupTest : VimTestCase() {
             |hard by the torrent of a mountain pass.""".trimMargin())
   }
 
+  fun `test search highlight with tabs`() {
+    setHighlightSearch()
+    configureByText("\tfoo")
+    val pattern = "foo"
+    enterSearch(pattern)
+    assertSearchHighlights(pattern, "\t«foo»")
+  }
+
   // Ensure that the offsets for the last carriage return in the file are valid, even though it's for a line that
   // doesn't exist
   fun `test find last cr in file`() {

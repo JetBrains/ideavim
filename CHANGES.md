@@ -105,6 +105,7 @@ To Be Released
 * [VIM-1682](https://youtrack.jetbrains.com/issue/VIM-1682) Fix backward search with OR
 * [VIM-752](https://youtrack.jetbrains.com/issue/VIM-752) Enter finishes template in normal mode
 * [VIM-1668](https://youtrack.jetbrains.com/issue/VIM-1668) Fix smart step into
+* [VIM-1697](https://youtrack.jetbrains.com/issue/VIM-1697) Fix wrong search with tab characters
 
 0.51, 2019-02-12
 ----------------

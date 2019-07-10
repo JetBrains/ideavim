@@ -264,6 +264,11 @@ class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, Ignor
     myFixture.checkResult(after)
   }
 
+  @VimOptionDefaultAll
+  fun `test with tabs`() {
+    doTest("s/foo/bar", "\tfoo", "\tbar")
+  }
+
   private fun doTest(command: String, before: String, after: String) {
     myFixture.configureByText("a.java", before)
     typeText(commandToKeys(command))

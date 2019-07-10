@@ -543,7 +543,7 @@ public class EditorHelper {
   }
 
   public static int characterPositionToOffset(@NotNull final Editor editor, @NotNull final CharacterPosition pos) {
-    return editor.logicalPositionToOffset(pos);
+    return getLineStartOffset(editor, pos.line) + pos.column;
   }
 
   @NotNull

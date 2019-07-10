@@ -145,4 +145,9 @@ public class VisualSelectNextSearchTest extends VimTestCase {
     assertSelection("hello world hello");
     assertMode(CommandState.Mode.VISUAL);
   }
+
+  public void testSearchWithTabs() {
+    typeTextInFile(parseKeys("*", "gn"), "\tf<caret>oo");
+    assertSelection("foo");
+  }
 }
