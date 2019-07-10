@@ -137,18 +137,18 @@ class MotionRightActionTest : VimTestCase() {
     doTest(parseKeys("l"), """
             A Discovery
 
-            I found it in a legendar${c}	 land
+            I found it in a legendar${c}. land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-        """.trimIndent(), """
+            hard by the torrent of a mountain pass
+        """.replace('.', '\t').trimIndent(), """
             A Discovery
 
-            I found it in a legendar	${c} land
+            I found it in a legendar.${c} land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
-            hard by the torrent of a mountain pass.
-        """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+            hard by the torrent of a mountain pass
+        """.replace('.', '\t').trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test char visual mode`() {

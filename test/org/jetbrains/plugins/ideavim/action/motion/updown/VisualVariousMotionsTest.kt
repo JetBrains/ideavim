@@ -33,17 +33,17 @@ class VisualVariousMotionsTest : VimTestCase() {
   fun `test with tabs`() {
     val code = """
             class Scratch {
-            	public static void main(String[] args) {
-            		try {
-            			if ()
-            		}
-            	}
+            .public static void main(String[] args) {
+            ..try {
+            ...if ()
+            ..}
+            .}
             }
 
             func myFunc() {
-            	return anything
+            .return anything
             ${c}}
-        """.trimIndent()
+        """.dotToTab().trimIndent()
 
     myFixture.configureByText(PlainTextFileType.INSTANCE, code)
 
@@ -51,17 +51,17 @@ class VisualVariousMotionsTest : VimTestCase() {
 
     myFixture.checkResult("""
             class Scratch {
-            	public static void main(String[] args) {
-            		try {
-            			if ()
-            		}
-            	}
+            .public static void main(String[] args) {
+            ..try {
+            ...if ()
+            ..}
+            .}
             }
 
             ${s}fu${c}n${se}c myFunc() {
-            ${s}${c}${se}	return anything
+            ${s}${c}${se}.return anything
             ${s}${c}}${se}
-        """.trimIndent()
+        """.dotToTab().trimIndent()
     )
 
     typeText(parseKeys("k".repeat(7), "l".repeat(3)))
@@ -69,17 +69,17 @@ class VisualVariousMotionsTest : VimTestCase() {
     // Carets 2-4 have 0 column as logical position, but ${se} - 1 column as visual position
     myFixture.checkResult("""
             class Scratch {
-            ${s}	pu${c}b${se}lic static void main(String[] args) {
-            ${s}${c}	${se}	try {
-            ${s}${c}	${se}		if ()
-            ${s}${c}	${se}	}
-            ${s}	${c}}${se}
+            ${s}.pu${c}b${se}lic static void main(String[] args) {
+            ${s}${c}.${se}.try {
+            ${s}${c}.${se}..if ()
+            ${s}${c}.${se}.}
+            ${s}.${c}}${se}
             ${s}${c}}${se}
 
             ${s}func m${c}y${se}Func() {
-            ${s}	re${c}t${se}urn anything
+            ${s}.re${c}t${se}urn anything
             ${s}${c}}${se}
-        """.trimIndent()
+        """.dotToTab().trimIndent()
     )
 
     TestCase.assertEquals(3, myFixture.editor.caretModel.allCarets[1].visualPosition.column)
@@ -90,18 +90,20 @@ class VisualVariousMotionsTest : VimTestCase() {
 
     myFixture.checkResult("""
             class Scratch {
-            ${s}	publ${c}i${se}c static void main(String[] args) {
-            ${s}		${c}t${se}ry {
-            ${s}	${c}	${se}	if ()
-            ${s}		${c}}${se}
-            ${s}	${c}}${se}
+            ${s}.publ${c}i${se}c static void main(String[] args) {
+            ${s}..${c}t${se}ry {
+            ${s}.${c}.${se}.if ()
+            ${s}..${c}}${se}
+            ${s}.${c}}${se}
             ${s}${c}}${se}
 
             ${s}func myF${c}u${se}nc() {
-            ${s}	retu${c}r${se}n anything
+            ${s}.retu${c}r${se}n anything
             ${s}${c}}${se}
-        """.trimIndent()
+        """.dotToTab().trimIndent()
     )
     TestCase.assertEquals(7, myFixture.editor.caretModel.allCarets[2].visualPosition.column)
   }
+
+  private fun String.dotToTab(): String = this.replace('.', '\t')
 }
