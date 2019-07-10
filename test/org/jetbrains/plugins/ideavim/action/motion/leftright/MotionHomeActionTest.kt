@@ -24,13 +24,14 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.KeyModelOptionData
 import com.maddyhome.idea.vim.option.OptionsManager
-import org.jetbrains.plugins.ideavim.VimListConfig
-import org.jetbrains.plugins.ideavim.VimListOptionDefault
-import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
+import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class MotionHomeActionTest : VimOptionTestCase(KeyModelOptionData.name) {
-  @VimListOptionDefault
+  @VimOptionDefaultAll
   fun `test motion home`() {
     val keys = parseKeys("<Home>")
     val before = """
@@ -52,12 +53,12 @@ class MotionHomeActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  @VimListOptionDefault
+  @VimOptionDefaultAll
   fun `test default stop select`() {
     assertTrue(KeyModelOptionData.stopselect in OptionsManager.keymodel)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, []))
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []))
   fun `test continue visual`() {
     val keys = parseKeys("v", "<Home>")
     val before = """
@@ -79,7 +80,7 @@ class MotionHomeActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     doTest(keys, before, after, CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, []))
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []))
   fun `test continue select`() {
     val keys = parseKeys("gh", "<Home>")
     val before = """
@@ -101,7 +102,7 @@ class MotionHomeActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     doTest(keys, before, after, CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.stopvisual]))
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
   fun `test exit visual`() {
     val keys = parseKeys("v", "<Home>")
     val before = """
@@ -123,7 +124,7 @@ class MotionHomeActionTest : VimOptionTestCase(KeyModelOptionData.name) {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.stopselect]))
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
   fun `test exit select`() {
     val keys = parseKeys("gh", "<Home>")
     val before = """

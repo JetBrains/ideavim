@@ -22,11 +22,12 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.SmartJoinOptionsData
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
-import org.jetbrains.plugins.ideavim.VimToggleConfig
-import org.jetbrains.plugins.ideavim.VimToggleOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class DeleteJoinVisualLinesSpacesActionTest : VimOptionTestCase(SmartJoinOptionsData.name) {
-  @VimToggleOptionTestConfiguration(VimToggleConfig(SmartJoinOptionsData.name, true))
+  @VimOptionTestConfiguration(VimTestOption(SmartJoinOptionsData.name, VimTestOptionType.TOGGLE, ["true"]))
   fun `test join via idea`() {
     doTest(parseKeys("VjJ"),
       """

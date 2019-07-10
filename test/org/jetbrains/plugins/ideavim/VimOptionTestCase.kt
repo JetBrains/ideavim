@@ -29,74 +29,82 @@ import junit.framework.TestCase
  * This test case helps you to test IdeaVim options
  *
  * While inheriting from this class you should specify (via constructor), which options you are going to test.
- *   After that each test method in this class should contains [VimListOptionTestConfiguration] annotation with
+ *   After that each test method in this class should contains [VimOptionTestConfiguration] annotation with
  *   description of which values of option should be set before starting test.
  *
  * e.g.
  * ```
- * @VimListOptionTestConfiguration(VimListConfig("keymodel", ["startsel"]), VimListConfig("selectmode", ["key"]))
+ * @VimOptionTestConfiguration(VimTestOption("keymodel", LIST, ["startsel"]), VimTestOption("selectmode", LIST, ["key"]))
  * ```
  *
- * If you want to keep default configuration, you can put [VimListOptionDefault] annotation
+ * If you want to keep default configuration, you can put [VimOptionDefaultAll] annotation
  */
 abstract class VimOptionTestCase(option: String, vararg otherOptions: String) : VimTestCase() {
-  val options: Set<String> = setOf(option, *otherOptions)
+  private val options: Set<String> = setOf(option, *otherOptions)
+
   override fun runTest() {
     val testMethod = this.javaClass.getMethod(this.name)
-    if (!testMethod.isAnnotationPresent(VimListOptionDefault::class.java)) {
-      if (!testMethod.isAnnotationPresent(VimListOptionTestConfiguration::class.java) &&
-        !testMethod.isAnnotationPresent(VimToggleOptionTestConfiguration::class.java)) TestCase.fail("You should add VimOptionTestAnnotation with options for this method")
+    if (!testMethod.isAnnotationPresent(VimOptionDefaultAll::class.java)) {
+      if (!testMethod.isAnnotationPresent(VimOptionTestConfiguration::class.java)) TestCase.fail("You should add VimOptionTestConfiguration with options for this method")
 
-      val listAnnotation: VimListOptionTestConfiguration? = testMethod.getDeclaredAnnotation(VimListOptionTestConfiguration::class.java)
-      val toggle: VimToggleOptionTestConfiguration? = testMethod.getDeclaredAnnotation(VimToggleOptionTestConfiguration::class.java)
-
-      val annotationsValuesList = (listAnnotation?.value?.map { it.option } ?: emptyList()) + (toggle?.value?.map { it.option } ?: emptyList())
-      val annotationsValuesSet = annotationsValuesList.toSet()
-      if (annotationsValuesSet.size < annotationsValuesList.size) TestCase.fail("You have duplicated options")
-      if (annotationsValuesSet != options) TestCase.fail("You should present all options in annotations")
-
-      listAnnotation?.value?.forEach {
-        val option = OptionsManager.getOption(it.option)
-        if (option !is ListOption) {
-          TestCase.fail("Only list options are supported")
-          return
-        }
-
-        option.set(it.values.joinToString(","))
+      val annotationValues = testMethod.getDeclaredAnnotation(VimOptionTestConfiguration::class.java) ?: run {
+        TestCase.fail("You should have at least one VimOptionTestConfiguration annotation. Or you can use VimOptionDefaultAll")
+        return
       }
-      toggle?.value?.forEach {
+      val defaultOptions = testMethod.getDeclaredAnnotation(VimOptionDefault::class.java)?.values ?: emptyArray()
+
+      val annotationsValueList = annotationValues.value.map { it.option } + defaultOptions
+      val annotationsValueSet = annotationsValueList.toSet()
+      if (annotationsValueSet.size < annotationsValueList.size) TestCase.fail("You have duplicated options")
+      if (annotationsValueSet != options) TestCase.fail("You should present all options in annotations")
+
+      annotationValues.value.forEach {
         val option = OptionsManager.getOption(it.option)
-        if (option !is ToggleOption) {
-          TestCase.fail("Only list options are supported")
-          return
+        when (it.type) {
+          VimTestOptionType.TOGGLE -> {
+            if (option !is ToggleOption) {
+              TestCase.fail("${it.option} is not a toggle option. Change it for method `${testMethod.name}`")
+              return
+            }
+            if (it.values.size != 1) {
+              TestCase.fail("You should provide only one value for Toggle option. Change it for method `${testMethod.name}`")
+              return
+            }
+
+            if (it.values.first().toBoolean()) option.set() else option.reset()
+          }
+          VimTestOptionType.LIST -> {
+            if (option !is ListOption) {
+              TestCase.fail("${it.option} is not a list option. Change it for method `${testMethod.name}`")
+              return
+            }
+
+            option.set(it.values.joinToString(","))
+          }
         }
-        if (it.value) option.set() else option.reset()
       }
     }
     super.runTest()
   }
 }
 
+@Target(AnnotationTarget.FUNCTION)
+annotation class VimOptionDefaultAll
+
+@Target(AnnotationTarget.FUNCTION)
+annotation class VimOptionDefault(vararg val values: String)
+
+@Target(AnnotationTarget.FUNCTION)
+annotation class VimOptionTestConfiguration(vararg val value: VimTestOption)
+
 @Target(AnnotationTarget.PROPERTY)
-annotation class VimListConfig(
+annotation class VimTestOption(
   val option: String,
+  val type: VimTestOptionType,
   val values: Array<String>
 )
 
-@Target(AnnotationTarget.FUNCTION)
-annotation class VimListOptionTestConfiguration(vararg val value: VimListConfig)
-
-@Target(AnnotationTarget.FUNCTION)
-annotation class VimListOptionDefault
-
-@Target(AnnotationTarget.PROPERTY)
-annotation class VimToggleConfig(
-  val option: String,
-  val value: Boolean
-)
-
-@Target(AnnotationTarget.FUNCTION)
-annotation class VimToggleOptionTestConfiguration(vararg val value: VimToggleConfig)
-
-@Target(AnnotationTarget.FUNCTION)
-annotation class VimToggleOptionDefault
+enum class VimTestOptionType {
+  LIST,
+  TOGGLE
+}

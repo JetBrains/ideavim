@@ -23,12 +23,13 @@ package org.jetbrains.plugins.ideavim.action.motion.select.motion
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.KeyModelOptionData
-import org.jetbrains.plugins.ideavim.VimListConfig
-import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
+import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class SelectMotionRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.stopselect]))
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
   fun `test char select simple move`() {
     doTest(parseKeys("viw", "<C-G>", "<Right>"),
       """
@@ -51,7 +52,7 @@ class SelectMotionRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
       CommandState.SubMode.NONE)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.stopselect]))
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
   fun `test select multiple carets`() {
     doTest(parseKeys("viw", "<C-G>", "<Right>"),
       """
@@ -72,7 +73,7 @@ class SelectMotionRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
       CommandState.SubMode.NONE)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, []))
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []))
   fun `test without stopsel`() {
     doTest(parseKeys("viw", "<C-G>", "<Right>"),
       """

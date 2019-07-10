@@ -24,12 +24,16 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.KeyModelOptionData
 import com.maddyhome.idea.vim.option.SelectModeOptionData
-import org.jetbrains.plugins.ideavim.VimListConfig
-import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
+import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.name, SelectModeOptionData.name) {
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.startsel]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test visual right`() {
     doTest(parseKeys("<S-Right>"),
       """
@@ -52,7 +56,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     )
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.startsel]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test visual right twice`() {
     doTest(parseKeys("<S-Right><S-Right>"),
       """
@@ -75,7 +82,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     )
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.startsel]), VimListConfig(SelectModeOptionData.name, [SelectModeOptionData.key]))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.key])
+  )
   fun `test select right`() {
     doTest(parseKeys("<S-Right>"),
       """
@@ -98,7 +108,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     )
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.startsel]), VimListConfig(SelectModeOptionData.name, [SelectModeOptionData.key]))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.key])
+  )
   fun `test select right twice`() {
     doTest(parseKeys("<S-Right><S-Right>"),
       """
@@ -121,7 +134,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
     )
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test simple motion char mode`() {
     doTest(parseKeys("gh", "<S-Right>"),
       """
@@ -144,7 +160,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test at the lineend char mode`() {
     doTest(parseKeys("gh", "<S-Right>"),
       """
@@ -167,7 +186,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test out of line char mode`() {
     doTest(parseKeys("gh", "<S-Right>".repeat(2)),
       """
@@ -190,7 +212,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test file end char mode`() {
     doTest(parseKeys("gh", "<S-Right>".repeat(2)),
       """
@@ -211,7 +236,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test file char mode multicaret`() {
     doTest(parseKeys("gh", "<S-Right>".repeat(2)),
       """
@@ -232,7 +260,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test simple motion line mode`() {
     doTest(parseKeys("gH", "<S-Right>"),
       """
@@ -255,7 +286,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_LINE)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test lineend line mode`() {
     doTest(parseKeys("gH", "<S-Right>"),
       """
@@ -278,7 +312,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_LINE)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test out of line line mode`() {
     doTest(parseKeys("gH", "<S-Right>".repeat(2)),
       """
@@ -301,7 +338,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_LINE)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test fileend line mode`() {
     doTest(parseKeys("gH", "<S-Right>"),
       """
@@ -322,7 +362,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_LINE)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test line mode multicaret`() {
     doTest(parseKeys("gH", "<S-Right>"),
       """
@@ -343,7 +386,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_LINE)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test simple motion block mode`() {
     doTest(parseKeys("g<C-H>", "<S-Right>"),
       """
@@ -366,7 +412,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_BLOCK)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test at the lineend block mode`() {
     doTest(parseKeys("g<C-H>", "<S-Right>"),
       """
@@ -389,7 +438,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_BLOCK)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test out of line block mode`() {
     doTest(parseKeys("g<C-H>", "<S-Right>".repeat(2)),
       """
@@ -412,7 +464,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_BLOCK)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test file end block mode`() {
     doTest(parseKeys("g<C-H>", "<S-Right>".repeat(2)),
       """
@@ -433,7 +488,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_BLOCK)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test to longer line block mode`() {
     doTest(parseKeys("g<C-H>", "<S-Down>", "<S-Right>".repeat(3)),
       """
@@ -454,7 +512,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_BLOCK)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continuevisual]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continuevisual]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test continuevisual`() {
     doTest(parseKeys("v", "<S-Right>".repeat(3)),
       """
@@ -475,7 +536,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, []), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test no continueselect`() {
     doTest(parseKeys("gh", "<S-Right>".repeat(3)),
       """
@@ -496,7 +560,10 @@ class MotionShiftRightActionHandlerTest : VimOptionTestCase(KeyModelOptionData.n
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, []), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, []),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test no continuevisual`() {
     doTest(parseKeys("v", "<S-Right>".repeat(3)),
       """

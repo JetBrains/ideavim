@@ -23,13 +23,14 @@ package org.jetbrains.plugins.ideavim.action.motion.leftright
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.KeyModelOptionData
-import org.jetbrains.plugins.ideavim.VimListConfig
-import org.jetbrains.plugins.ideavim.VimListOptionDefault
-import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
+import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class MotionArrowRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
-  @VimListOptionDefault
+  @VimOptionDefaultAll
   fun `test visual default options`() {
     doTest(parseKeys("v", "<Right>"),
       """
@@ -51,7 +52,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.stopsel]))
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopsel]))
   fun `test visual stopsel`() {
     doTest(parseKeys("v", "<Right>"),
       """
@@ -73,7 +74,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.stopselect]))
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopselect]))
   fun `test visual stopselect`() {
     doTest(parseKeys("v", "<Right>"),
       """
@@ -95,7 +96,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
       CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.stopvisual]))
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
   fun `test visual stopvisual`() {
     doTest(parseKeys("v", "<Right>"),
       """
@@ -117,7 +118,7 @@ class MotionArrowRightActionTest : VimOptionTestCase(KeyModelOptionData.name) {
       CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.stopvisual]))
+  @VimOptionTestConfiguration(VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.stopvisual]))
   fun `test visual stopvisual multicaret`() {
     doTest(parseKeys("v", "<Right>"),
       """

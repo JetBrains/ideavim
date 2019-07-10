@@ -24,14 +24,16 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.option.KeyModelOptionData
 import com.maddyhome.idea.vim.option.SelectModeOptionData
-import org.jetbrains.plugins.ideavim.VimListConfig
-import org.jetbrains.plugins.ideavim.VimListOptionTestConfiguration
 import org.jetbrains.plugins.ideavim.VimOptionTestCase
+import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.name, SelectModeOptionData.name) {
-  @VimListOptionTestConfiguration(
-    VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.startsel]),
-    VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test visual down`() {
     doTest(parseKeys("<S-Down>"),
       """
@@ -54,9 +56,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     )
   }
 
-  @VimListOptionTestConfiguration(
-    VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.startsel]),
-    VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test visual down twice`() {
     doTest(parseKeys("<S-Down><S-Down>"),
       """
@@ -79,9 +82,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     )
   }
 
-  @VimListOptionTestConfiguration(
-    VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.startsel]),
-    VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test save column`() {
     doTest(parseKeys("<S-Down><S-Down><S-Down>"),
       """
@@ -104,9 +108,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     )
   }
 
-  @VimListOptionTestConfiguration(
-    VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.startsel]),
-    VimListConfig(SelectModeOptionData.name, [SelectModeOptionData.key]))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.key])
+  )
   fun `test select down`() {
     doTest(parseKeys("<S-Down>"),
       """
@@ -129,9 +134,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     )
   }
 
-  @VimListOptionTestConfiguration(
-    VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.startsel]),
-    VimListConfig(SelectModeOptionData.name, [SelectModeOptionData.key]))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.startsel]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [SelectModeOptionData.key])
+  )
   fun `test select down twice`() {
     doTest(parseKeys("<S-Down><S-Down>"),
       """
@@ -154,7 +160,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
     )
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test char select simple move`() {
     doTest(parseKeys("gh", "<S-Down>"),
       """
@@ -177,7 +186,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test char select move to empty line`() {
     doTest(parseKeys("gh", "<S-Down>"),
       """
@@ -200,7 +212,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test char select move from empty line`() {
     doTest(parseKeys("gh", "<S-Down>"),
       """
@@ -223,7 +238,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test char select move to file end`() {
     doTest(parseKeys("gh", "<S-Down>"),
       """
@@ -244,7 +262,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test char select move multicaret`() {
     doTest(parseKeys("gh", "<S-Down>"),
       """
@@ -265,7 +286,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test line select simple move`() {
     doTest(parseKeys("gH", "<S-Down>"),
       """
@@ -288,7 +312,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
       CommandState.SubMode.VISUAL_LINE)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test line select to empty line`() {
     doTest(parseKeys("gH", "<S-Down>"),
       """
@@ -311,7 +338,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
       CommandState.SubMode.VISUAL_LINE)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test line select from empty line`() {
     doTest(parseKeys("gH", "<S-Down>"),
       """
@@ -334,7 +364,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
       CommandState.SubMode.VISUAL_LINE)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test line select to file end`() {
     doTest(parseKeys("gH", "<S-Down>"),
       """
@@ -355,7 +388,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
       CommandState.SubMode.VISUAL_LINE)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test line select multicaret`() {
     doTest(parseKeys("gH", "<S-Down>"),
       """
@@ -376,7 +412,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
       CommandState.SubMode.VISUAL_LINE)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test block select simple move`() {
     doTest(parseKeys("g<C-H>", "<S-Down>"),
       """
@@ -397,7 +436,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
       CommandState.SubMode.VISUAL_BLOCK)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test block select to empty line`() {
     doTest(parseKeys("g<C-H>", "<S-Down>"),
       """
@@ -418,7 +460,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
       CommandState.SubMode.VISUAL_BLOCK)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test block select from empty line`() {
     doTest(parseKeys("g<C-H>", "<S-Down>"),
       """
@@ -439,7 +484,10 @@ class MotionShiftDownActionHandlerTest : VimOptionTestCase(KeyModelOptionData.na
       CommandState.SubMode.VISUAL_BLOCK)
   }
 
-  @VimListOptionTestConfiguration(VimListConfig(KeyModelOptionData.name, [KeyModelOptionData.continueselect]), VimListConfig(SelectModeOptionData.name, []))
+  @VimOptionTestConfiguration(
+    VimTestOption(KeyModelOptionData.name, VimTestOptionType.LIST, [KeyModelOptionData.continueselect]),
+    VimTestOption(SelectModeOptionData.name, VimTestOptionType.LIST, [])
+  )
   fun `test block select to file end`() {
     doTest(parseKeys("g<C-H>", "<S-Down>"),
       """
