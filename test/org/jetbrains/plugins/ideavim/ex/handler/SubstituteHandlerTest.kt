@@ -19,13 +19,21 @@
 package org.jetbrains.plugins.ideavim.ex.handler
 
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.option.IgnoreCaseOptionsData
 import com.maddyhome.idea.vim.option.OptionsManager
-import org.jetbrains.plugins.ideavim.VimTestCase
+import com.maddyhome.idea.vim.option.SmartCaseOptionsData
+import org.jetbrains.plugins.ideavim.VimOptionDefault
+import org.jetbrains.plugins.ideavim.VimOptionDefaultAll
+import org.jetbrains.plugins.ideavim.VimOptionTestCase
+import org.jetbrains.plugins.ideavim.VimOptionTestConfiguration
+import org.jetbrains.plugins.ideavim.VimTestOption
+import org.jetbrains.plugins.ideavim.VimTestOptionType
 
 /**
  * @author Alex Plate
  */
-class SubstituteHandlerTest : VimTestCase() {
+class SubstituteHandlerTest : VimOptionTestCase(SmartCaseOptionsData.name, IgnoreCaseOptionsData.name) {
+  @VimOptionDefaultAll
   fun `test one letter`() {
     doTest("s/a/b/",
       """a${c}baba
@@ -37,6 +45,7 @@ class SubstituteHandlerTest : VimTestCase() {
     )
   }
 
+  @VimOptionDefaultAll
   fun `test one letter multi per line`() {
     doTest("s/a/b/g",
       """a${c}baba
@@ -48,6 +57,7 @@ class SubstituteHandlerTest : VimTestCase() {
     )
   }
 
+  @VimOptionDefaultAll
   fun `test one letter multi per line whole file`() {
     doTest("%s/a/b/g",
       """a${c}baba
@@ -60,6 +70,7 @@ class SubstituteHandlerTest : VimTestCase() {
   }
 
   // VIM-146
+  @VimOptionDefaultAll
   fun `test eoLto quote`() {
     doTest("s/$/'/g",
       """${c}one
@@ -71,6 +82,7 @@ class SubstituteHandlerTest : VimTestCase() {
     )
   }
 
+  @VimOptionDefaultAll
   fun `test soLto quote`() {
     doTest("s/^/'/g",
       """${c}one
@@ -81,6 +93,8 @@ class SubstituteHandlerTest : VimTestCase() {
                """.trimMargin()
     )
   }
+
+  @VimOptionDefaultAll
   fun `test dot to nul`() {
     doTest("s/\\./\\n/g",
       "${c}one.two.three\n",
@@ -88,12 +102,14 @@ class SubstituteHandlerTest : VimTestCase() {
   }
 
   // VIM-528
+  @VimOptionDefaultAll
   fun `test groups`() {
     doTest("s/\\(a\\|b\\)/z\\1/g",
       "${c}abcdefg",
       "zazbcdefg")
   }
 
+  @VimOptionDefaultAll
   fun `test to nl`() {
     doTest("s/\\./\\r/g",
       "${c}one.two.three\n",
@@ -101,6 +117,7 @@ class SubstituteHandlerTest : VimTestCase() {
   }
 
   // VIM-289
+  @VimOptionDefaultAll
   fun `test dot to nlDot`() {
     doTest("s/\\./\\r\\./g",
       "${c}one.two.three\n",
@@ -108,6 +125,7 @@ class SubstituteHandlerTest : VimTestCase() {
   }
 
   // VIM-702
+  @VimOptionDefaultAll
   fun `test end of line to nl`() {
     doTest("%s/$/\\r/g",
       "${c}one\ntwo\nthree\n",
@@ -115,21 +133,24 @@ class SubstituteHandlerTest : VimTestCase() {
   }
 
   // VIM-702
+  @VimOptionDefaultAll
   fun `test start of line to nl`() {
     doTest("%s/^/\\r/g",
       "${c}one\ntwo\nthree\n",
       "\none\n\ntwo\n\nthree\n")
   }
 
+  @VimOptionTestConfiguration(VimTestOption(IgnoreCaseOptionsData.name, VimTestOptionType.TOGGLE, ["true"]))
+  @VimOptionDefault(SmartCaseOptionsData.name)
   fun `test ignorecase option`() {
-    setIgnoreCase()
     doTest("%s/foo/bar/g",
       "foo Foo foo\nFoo FOO foo",
       "bar bar bar\nbar bar bar")
   }
 
+  @VimOptionDefaultAll
   fun `test smartcase option`() {
-    setSmartCase()
+    OptionsManager.smartcase.set()
 
     // smartcase does nothing if ignorecase is not set
     doTest("%s/foo/bar/g",
@@ -139,7 +160,7 @@ class SubstituteHandlerTest : VimTestCase() {
       "foo Foo foo\nFoo FOO foo",
       "foo bar foo\nbar FOO foo")
 
-    setIgnoreCase()
+    OptionsManager.ignorecase.set()
     doTest("%s/foo/bar/g",
       "foo Foo foo\nFoo FOO foo",
       "bar bar bar\nbar bar bar")
@@ -148,51 +169,56 @@ class SubstituteHandlerTest : VimTestCase() {
       "foo bar foo\nbar FOO foo")
   }
 
+  @VimOptionDefaultAll
   fun `test force ignore case flag`() {
     doTest("%s/foo/bar/gi",
       "foo Foo foo\nFoo FOO foo",
       "bar bar bar\nbar bar bar")
 
-    setIgnoreCase()
+    OptionsManager.ignorecase.set()
     doTest("%s/foo/bar/gi",
       "foo Foo foo\nFoo FOO foo",
       "bar bar bar\nbar bar bar")
 
-    setSmartCase()
+    OptionsManager.smartcase.set()
     doTest("%s/foo/bar/gi",
       "foo Foo foo\nFoo FOO foo",
       "bar bar bar\nbar bar bar")
   }
 
+  @VimOptionDefaultAll
   fun `test force match case flag`() {
     doTest("%s/foo/bar/gI",
       "foo Foo foo\nFoo FOO foo",
       "bar Foo bar\nFoo FOO bar")
 
-    setIgnoreCase()
+    OptionsManager.ignorecase.set()
     doTest("%s/foo/bar/gI",
       "foo Foo foo\nFoo FOO foo",
       "bar Foo bar\nFoo FOO bar")
 
-    setSmartCase()
+    OptionsManager.smartcase.set()
     doTest("%s/Foo/bar/gI",
       "foo Foo foo\nFoo FOO foo",
       "foo bar foo\nbar FOO foo")
   }
 
   // VIM-864
+  @VimOptionDefaultAll
   fun `test visual substitute doesnt change visual marks`() {
     myFixture.configureByText("a.java", "foo\nbar\nbaz\n")
     typeText(parseKeys("V", "j", ":'<,'>s/foo/fuu/<Enter>", "gv", "~"))
     myFixture.checkResult("FUU\nBAR\nbaz\n")
   }
 
+  @VimOptionDefaultAll
   fun `test offset range`() {
     doTest(".,+2s/a/b/g",
       "aaa\naa${c}a\naaa\naaa\naaa\n",
       "aaa\nbbb\nbbb\nbbb\naaa\n")
   }
 
+  @VimOptionDefaultAll
   fun `test multiple carets`() {
     val before = """public class C {
       |  Stri${c}ng a;
@@ -215,6 +241,7 @@ class SubstituteHandlerTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
+  @VimOptionDefaultAll
   fun `test multiple carets substitute all occurrences`() {
     val before = """public class C {
       |  Stri${c}ng a; String e;
@@ -241,13 +268,5 @@ class SubstituteHandlerTest : VimTestCase() {
     myFixture.configureByText("a.java", before)
     typeText(commandToKeys(command))
     myFixture.checkResult(after)
-  }
-
-  private fun setIgnoreCase() {
-    OptionsManager.ignorecase.set()
-  }
-
-  private fun setSmartCase() {
-    OptionsManager.smartcase.set()
   }
 }
