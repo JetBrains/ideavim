@@ -16,13 +16,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.maddyhome.idea.vim.common;
+package com.maddyhome.idea.vim.common
 
-import com.intellij.openapi.editor.LogicalPosition;
+import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.LogicalPosition
+import com.maddyhome.idea.vim.helper.EditorHelper.getLineStartOffset
 
 
-public class CharacterPosition extends LogicalPosition {
-  public CharacterPosition(int line, int col) {
-    super(line, col);
+class CharacterPosition(line: Int, col: Int) : LogicalPosition(line, col) {
+  fun toOffset(editor: Editor) = getLineStartOffset(editor, line) + column
+
+  companion object {
+    fun fromOffset(editor: Editor, offset: Int): CharacterPosition =
+      editor.offsetToLogicalPosition(offset).let { CharacterPosition(it.line, it.column) }
   }
 }

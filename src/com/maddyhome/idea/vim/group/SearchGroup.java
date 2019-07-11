@@ -111,340 +111,53 @@ public class SearchGroup {
     VimPlugin.getHistory().addEntry(HistoryGroup.SEARCH, lastPattern);
   }
 
-  public boolean searchAndReplace(@NotNull Editor editor, @NotNull Caret caret, @NotNull LineRange range,
-                                  @NotNull String excmd, String exarg) {
-    // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
-    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
-      VimPlugin.getVisualMotion().exitVisual(editor);
+  @NotNull
+  private static List<TextRange> findAll(@NotNull Editor editor,
+                                         @NotNull String pattern,
+                                         int startLine,
+                                         int endLine,
+                                         boolean ignoreCase) {
+    final List<TextRange> results = Lists.newArrayList();
+    final int lineCount = EditorHelper.getLineCount(editor);
+    final int actualEndLine = endLine == -1 ? lineCount : endLine;
+
+    final RegExp.regmmatch_T regMatch = new RegExp.regmmatch_T();
+    final RegExp regExp = new RegExp();
+    regMatch.regprog = regExp.vim_regcomp(pattern, 1);
+    if (regMatch.regprog == null) {
+      return results;
     }
 
-    CharPointer cmd = new CharPointer(new StringBuffer(exarg));
-    //sub_nsubs = 0;
-    //sub_nlines = 0;
+    regMatch.rmm_ic = ignoreCase;
 
-    int which_pat;
-    if (excmd.equals("~")) {
-      which_pat = RE_LAST;    /* use last used regexp */
-    }
-    else {
-      which_pat = RE_SUBST;   /* use last substitute regexp */
-    }
+    int col = 0;
+    for (int line = startLine; line <= actualEndLine; ) {
+      int matchedLines = regExp.vim_regexec_multi(regMatch, editor, lineCount, line, col);
+      if (matchedLines > 0) {
+        final CharacterPosition startPos = new CharacterPosition(line + regMatch.startpos[0].lnum,
+                                                                 regMatch.startpos[0].col);
+        final CharacterPosition endPos = new CharacterPosition(line + regMatch.endpos[0].lnum,
+                                                               regMatch.endpos[0].col);
+        int start = startPos.toOffset(editor);
+        int end = endPos.toOffset(editor);
+        results.add(new TextRange(start, end));
 
-    CharPointer pat;
-    CharPointer sub;
-    char delimiter;
-    /* new pattern and substitution */
-    if (excmd.charAt(0) == 's' && !cmd.isNul() && !Character.isWhitespace(
-        cmd.charAt()) && "0123456789cegriIp|\"".indexOf(cmd.charAt()) == -1) {
-      /* don't accept alphanumeric for separator */
-      if (CharacterClasses.isAlpha(cmd.charAt())) {
-        VimPlugin.showMessage(MessageHelper.message(Msg.E146));
-        return false;
-      }
-      /*
-       * undocumented vi feature:
-       *  "\/sub/" and "\?sub?" use last used search pattern (almost like
-       *  //sub/r).  "\&sub&" use last substitute pattern (like //sub/).
-       */
-      if (cmd.charAt() == '\\') {
-        cmd.inc();
-        if ("/?&".indexOf(cmd.charAt()) == -1) {
-          VimPlugin.showMessage(MessageHelper.message(Msg.e_backslash));
-          return false;
-        }
-        if (cmd.charAt() != '&') {
-          which_pat = RE_SEARCH;      /* use last '/' pattern */
-        }
-        pat = new CharPointer("");             /* empty search pattern */
-        delimiter = cmd.charAt();             /* remember delimiter character */
-        cmd.inc();
-      }
-      else            /* find the end of the regexp */ {
-        which_pat = RE_LAST;            /* use last used regexp */
-        delimiter = cmd.charAt();             /* remember delimiter character */
-        cmd.inc();
-        pat = cmd.ref(0);                      /* remember start of search pat */
-        cmd = RegExp.skip_regexp(cmd, delimiter, true);
-        if (cmd.charAt() == delimiter)        /* end delimiter found */ {
-          cmd.set('\u0000').inc(); /* replace it with a NUL */
-        }
-      }
-
-      /*
-       * Small incompatibility: vi sees '\n' as end of the command, but in
-       * Vim we want to use '\n' to find/substitute a NUL.
-       */
-      sub = cmd.ref(0);          /* remember the start of the substitution */
-
-      while (!cmd.isNul()) {
-        if (cmd.charAt() == delimiter)            /* end delimiter found */ {
-          cmd.set('\u0000').inc(); /* replace it with a NUL */
-          break;
-        }
-        if (cmd.charAt(0) == '\\' && cmd.charAt(1) != 0)  /* skip escaped characters */ {
-          cmd.inc();
-        }
-        cmd.inc();
-      }
-    }
-    else        /* use previous pattern and substitution */ {
-      if (lastReplace == null)    /* there is no previous command */ {
-        VimPlugin.showMessage(MessageHelper.message(Msg.e_nopresub));
-        return false;
-      }
-      pat = null;             /* search_regcomp() will use previous pattern */
-      sub = new CharPointer(lastReplace);
-    }
-
-    /*
-     * Find trailing options.  When '&' is used, keep old options.
-     */
-    if (cmd.charAt() == '&') {
-      cmd.inc();
-    }
-    else {
-      do_all = OptionsManager.INSTANCE.getGdefault().isSet();
-      do_ask = false;
-      do_error = true;
-      //do_print = false;
-      do_ic = 0;
-    }
-    while (!cmd.isNul()) {
-      /*
-       * Note that 'g' and 'c' are always inverted, also when p_ed is off.
-       * 'r' is never inverted.
-       */
-      if (cmd.charAt() == 'g') {
-        do_all = !do_all;
-      }
-      else if (cmd.charAt() == 'c') {
-        do_ask = !do_ask;
-      }
-      else if (cmd.charAt() == 'e') {
-        do_error = !do_error;
-      }
-      else if (cmd.charAt() == 'r')       /* use last used regexp */ {
-        which_pat = RE_LAST;
-      }
-      else if (cmd.charAt() == 'i')       /* ignore case */ {
-        do_ic = 'i';
-      }
-      else if (cmd.charAt() == 'I')       /* don't ignore case */ {
-        do_ic = 'I';
-      }
-      else if (cmd.charAt() != 'p') {
-        break;
-      }
-      cmd.inc();
-    }
-
-    int line1 = range.getStartLine();
-    int line2 = range.getEndLine();
-
-    if (line1 < 0 || line2 < 0) {
-      return false;
-    }
-
-    /*
-     * check for a trailing count
-     */
-    CharHelper.skipwhite(cmd);
-    if (CharacterClasses.isDigit(cmd.charAt())) {
-      int i = CharHelper.getdigits(cmd);
-      if (i <= 0 && do_error) {
-        VimPlugin.showMessage(MessageHelper.message(Msg.e_zerocount));
-        return false;
-      }
-      line1 = line2;
-      line2 = EditorHelper.normalizeLine(editor, line1 + i - 1);
-    }
-
-    /*
-     * check for trailing command or garbage
-     */
-    CharHelper.skipwhite(cmd);
-    if (!cmd.isNul() && cmd.charAt() != '"')        /* if not end-of-line or comment */ {
-      VimPlugin.showMessage(MessageHelper.message(Msg.e_trailing));
-      return false;
-    }
-
-    String pattern = "";
-    if (pat == null || pat.isNul()) {
-      switch (which_pat) {
-        case RE_LAST:
-          pattern = lastPattern;
-          break;
-        case RE_SEARCH:
-          pattern = lastSearch;
-          break;
-        case RE_SUBST:
-          pattern = lastSubstitute;
-          break;
-      }
-    }
-    else {
-      pattern = pat.toString();
-    }
-
-    lastSubstitute = pattern;
-    lastSearch = pattern;
-    if (pattern != null) {
-      setLastPattern(editor, pattern);
-    }
-
-    //int start = editor.logicalPositionToOffset(new LogicalPosition(line1, 0));
-    //int end = editor.logicalPositionToOffset(new LogicalPosition(line2, EditorHelper.getLineLength(editor, line2)));
-    int start = editor.getDocument().getLineStartOffset(line1);
-    int end = editor.getDocument().getLineEndOffset(line2);
-
-    RegExp sp;
-    RegExp.regmmatch_T regmatch = new RegExp.regmmatch_T();
-    sp = new RegExp();
-    regmatch.regprog = sp.vim_regcomp(pattern, 1);
-    if (regmatch.regprog == null) {
-      if (do_error) {
-        VimPlugin.showMessage(MessageHelper.message(Msg.e_invcmd));
-      }
-      return false;
-    }
-
-    /* the 'i' or 'I' flag overrules 'ignorecase' and 'smartcase' */
-    regmatch.rmm_ic = shouldIgnoreCase(pattern != null ? pattern : "", false);
-    if (do_ic == 'i') {
-      regmatch.rmm_ic = true;
-    }
-    else if (do_ic == 'I') {
-      regmatch.rmm_ic = false;
-    }
-
-    /*
-     * ~ in the substitute pattern is replaced with the old pattern.
-     * We do it here once to avoid it to be replaced over and over again.
-     * But don't do it when it starts with "\=", then it's an expression.
-     */
-    if (!(sub.charAt(0) == '\\' && sub.charAt(1) == '=') && lastReplace != null) {
-      StringBuffer tmp = new StringBuffer(sub.toString());
-      int pos = 0;
-      while ((pos = tmp.indexOf("~", pos)) != -1) {
-        if (pos == 0 || tmp.charAt(pos - 1) != '\\') {
-          tmp.replace(pos, pos + 1, lastReplace);
-          pos += lastReplace.length();
-        }
-        pos++;
-      }
-      sub = new CharPointer(tmp);
-    }
-
-    lastReplace = sub.toString();
-
-    resetShowSearchHighlight();
-    forceUpdateSearchHighlights();
-
-    if (logger.isDebugEnabled()) {
-      logger.debug("search range=[" + start + "," + end + "]");
-      logger.debug("pattern=" + pattern + ", replace=" + sub);
-    }
-    int lastMatch = -1;
-    int lastLine = -1;
-    int searchcol = 0;
-    boolean firstMatch = true;
-    boolean got_quit = false;
-    int lcount = EditorHelper.getLineCount(editor);
-    for (int lnum = line1; lnum <= line2 && !got_quit; ) {
-      CharacterPosition newpos = null;
-      int nmatch = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol);
-      if (nmatch > 0) {
-        if (firstMatch) {
-          VimPlugin.getMark().saveJumpLocation(editor);
-          firstMatch = false;
-        }
-
-        String match = sp.vim_regsub_multi(regmatch, lnum, sub, 1, false);
-        if (match == null) {
-          return false;
-        }
-        //logger.debug("found match[" + spos + "," + epos + "] - replace " + match);
-
-        int line = lnum + regmatch.startpos[0].lnum;
-        CharacterPosition startpos = new CharacterPosition(lnum + regmatch.startpos[0].lnum, regmatch.startpos[0].col);
-        CharacterPosition endpos = new CharacterPosition(lnum + regmatch.endpos[0].lnum, regmatch.endpos[0].col);
-        int startoff = EditorHelper.characterPositionToOffset(editor, startpos);
-        int endoff = EditorHelper.characterPositionToOffset(editor, endpos);
-        int newend = startoff + match.length();
-
-        if (do_all || line != lastLine) {
-          boolean doReplace = true;
-          if (do_ask) {
-            RangeHighlighter hl = highlightConfirm(editor, startoff, endoff);
-            MotionGroup.scrollPositionIntoView(editor, editor.offsetToVisualPosition(startoff), true);
-            MotionGroup.moveCaret(editor, caret, start);
-            final ReplaceConfirmationChoice choice = confirmChoice(editor, match);
-            editor.getMarkupModel().removeHighlighter(hl);
-            switch (choice) {
-              case SUBSTITUTE_THIS:
-                doReplace = true;
-                break;
-              case SKIP:
-                doReplace = false;
-                break;
-              case SUBSTITUTE_ALL:
-                do_ask = false;
-                break;
-              case QUIT:
-                doReplace = false;
-                got_quit = true;
-                break;
-              case SUBSTITUTE_LAST:
-                do_all = false;
-                line2 = lnum;
-                doReplace = true;
-                break;
-            }
-          }
-
-          if (doReplace) {
-            editor.getDocument().replaceString(startoff, endoff, match);
-            lastMatch = startoff;
-            newpos = EditorHelper.offsetToCharacterPosition(editor, newend);
-
-            lnum += newpos.line - endpos.line;
-            line2 += newpos.line - endpos.line;
-          }
-        }
-
-        lastLine = line;
-
-        lnum += nmatch - 1;
-        if (do_all && startoff != endoff) {
-          if (newpos != null) {
-            lnum = newpos.line;
-            searchcol = newpos.column;
-          }
-          else {
-            searchcol = endpos.column;
-          }
+        if (start != end) {
+          line += matchedLines - 1;
+          col = endPos.column;
         }
         else {
-          searchcol = 0;
-          lnum++;
+          line += matchedLines;
+          col = 0;
         }
       }
       else {
-        lnum++;
-        searchcol = 0;
+        line++;
+        col = 0;
       }
     }
 
-    if (lastMatch != -1) {
-      MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor,
-                                                                                                 editor.offsetToLogicalPosition(
-                                                                                                     lastMatch).line));
-    }
-    else {
-      VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));
-    }
-
-    return true;
+    return results;
   }
 
   @NotNull
@@ -806,160 +519,6 @@ public class SearchGroup {
     }
   }
 
-  @NotNull
-  private static List<TextRange> findAll(@NotNull Editor editor,
-                                         @NotNull String pattern,
-                                         int startLine,
-                                         int endLine,
-                                         boolean ignoreCase) {
-    final List<TextRange> results = Lists.newArrayList();
-    final int lineCount = EditorHelper.getLineCount(editor);
-    final int actualEndLine = endLine == -1 ? lineCount : endLine;
-
-    final RegExp.regmmatch_T regMatch = new RegExp.regmmatch_T();
-    final RegExp regExp = new RegExp();
-    regMatch.regprog = regExp.vim_regcomp(pattern, 1);
-    if (regMatch.regprog == null) {
-      return results;
-    }
-
-    regMatch.rmm_ic = ignoreCase;
-
-    int col = 0;
-    for (int line = startLine; line <= actualEndLine; ) {
-      int matchedLines = regExp.vim_regexec_multi(regMatch, editor, lineCount, line, col);
-      if (matchedLines > 0) {
-        final CharacterPosition startPos = new CharacterPosition(line + regMatch.startpos[0].lnum,
-                                                                 regMatch.startpos[0].col);
-        final CharacterPosition endPos = new CharacterPosition(line + regMatch.endpos[0].lnum,
-                                                               regMatch.endpos[0].col);
-        int start = EditorHelper.characterPositionToOffset(editor, startPos);
-        int end = EditorHelper.characterPositionToOffset(editor, endPos);
-        results.add(new TextRange(start, end));
-
-        if (start != end) {
-          line += matchedLines - 1;
-          col = endPos.column;
-        }
-        else {
-          line += matchedLines;
-          col = 0;
-        }
-      }
-      else {
-        line++;
-        col = 0;
-      }
-    }
-
-    return results;
-  }
-
-  private static void highlightSearchResults(@NotNull Editor editor, @NotNull String pattern, List<TextRange> results,
-                                             int currentMatchOffset) {
-    Collection<RangeHighlighter> highlighters = UserDataManager.getVimLastHighlighters(editor);
-    if (highlighters == null) {
-      highlighters = new ArrayList<>();
-      UserDataManager.setVimLastHighlighters(editor, highlighters);
-    }
-
-    for (TextRange range : results) {
-      final boolean current = range.getStartOffset() == currentMatchOffset;
-      final RangeHighlighter highlighter = highlightMatch(editor, range.getStartOffset(), range.getEndOffset(), current, pattern);
-      highlighters.add(highlighter);
-    }
-  }
-
-  private int findItOffset(@NotNull Editor editor, int startOffset, int count, int dir) {
-    boolean wrap = OptionsManager.INSTANCE.getWrapscan().isSet();
-    TextRange range = findIt(editor, lastSearch, startOffset, count, dir, lastIgnoreSmartCase, wrap, true, true);
-    if (range == null) {
-      return -1;
-    }
-
-    ParsePosition pp = new ParsePosition(0);
-    int res = range.getStartOffset();
-
-    if (lastOffset == null) {
-      return -1;
-    }
-
-    if (lastOffset.length() == 0) {
-      return range.getStartOffset();
-    }
-    else if (Character.isDigit(lastOffset.charAt(0)) || lastOffset.charAt(0) == '+' || lastOffset.charAt(0) == '-') {
-      int lineOffset = 0;
-      if (lastOffset.equals("+")) {
-        lineOffset = 1;
-      }
-      else if (lastOffset.equals("-")) {
-        lineOffset = -1;
-      }
-      else {
-        if (lastOffset.charAt(0) == '+') {
-          lastOffset = lastOffset.substring(1);
-        }
-        NumberFormat nf = NumberFormat.getIntegerInstance();
-        pp = new ParsePosition(0);
-        Number num = nf.parse(lastOffset, pp);
-        if (num != null) {
-          lineOffset = num.intValue();
-        }
-      }
-
-      int line = editor.offsetToLogicalPosition(range.getStartOffset()).line;
-      int newLine = EditorHelper.normalizeLine(editor, line + lineOffset);
-
-      res = VimPlugin.getMotion().moveCaretToLineStart(editor, newLine);
-    }
-    else if ("ebs".indexOf(lastOffset.charAt(0)) != -1) {
-      int charOffset = 0;
-      if (lastOffset.length() >= 2) {
-        if ("+-".indexOf(lastOffset.charAt(1)) != -1) {
-          charOffset = 1;
-        }
-        NumberFormat nf = NumberFormat.getIntegerInstance();
-        pp = new ParsePosition(lastOffset.charAt(1) == '+' ? 2 : 1);
-        Number num = nf.parse(lastOffset, pp);
-        if (num != null) {
-          charOffset = num.intValue();
-        }
-      }
-
-      int base = range.getStartOffset();
-      if (lastOffset.charAt(0) == 'e') {
-        base = range.getEndOffset() - 1;
-      }
-
-      res = Math.max(0, Math.min(base + charOffset, EditorHelper.getFileSize(editor) - 1));
-    }
-
-    int ppos = pp.getIndex();
-    if (ppos < lastOffset.length() - 1 && lastOffset.charAt(ppos) == ';') {
-      EnumSet<CommandFlags> flags = EnumSet.noneOf(CommandFlags.class);
-      if (lastOffset.charAt(ppos + 1) == '/') {
-        flags.add(CommandFlags.FLAG_SEARCH_FWD);
-      }
-      else if (lastOffset.charAt(ppos + 1) == '?') {
-        flags.add(CommandFlags.FLAG_SEARCH_REV);
-      }
-      else {
-        return res;
-      }
-
-      if (lastOffset.length() - ppos > 2) {
-        ppos++;
-      }
-
-      res = search(editor, lastOffset.substring(ppos + 1), res, 1, flags);
-
-      return res;
-    }
-    else {
-      return res;
-    }
-  }
-
   @SuppressWarnings("SameParameterValue")
   @Nullable
   private static TextRange findIt(@NotNull Editor editor, @Nullable String pattern, int startOffset, int count, int dir,
@@ -989,7 +548,7 @@ public class SearchGroup {
     //REMatch match = null;
     */
 
-    CharacterPosition lpos = EditorHelper.offsetToCharacterPosition(editor, startOffset);
+    CharacterPosition lpos = CharacterPosition.Companion.fromOffset(editor, startOffset);
     RegExp.lpos_T pos = new RegExp.lpos_T();
     pos.lnum = lpos.line;
     pos.col = lpos.column;
@@ -1221,8 +780,449 @@ public class SearchGroup {
     //    editor.logicalPositionToOffset(new LogicalPosition(endpos.lnum, endpos.col)));
     //return new TextRange(editor.logicalPositionToOffset(new LogicalPosition(pos.lnum, 0)) + pos.col,
     //    editor.logicalPositionToOffset(new LogicalPosition(endpos.lnum, 0)) + endpos.col);
-    return new TextRange(EditorHelper.characterPositionToOffset(editor, new CharacterPosition(pos.lnum, pos.col)),
-                         EditorHelper.characterPositionToOffset(editor, new CharacterPosition(endpos.lnum, endpos.col)));
+    return new TextRange(new CharacterPosition(pos.lnum, pos.col).toOffset(editor),
+                         new CharacterPosition(endpos.lnum, endpos.col).toOffset(editor));
+  }
+
+  private static void highlightSearchResults(@NotNull Editor editor, @NotNull String pattern, List<TextRange> results,
+                                             int currentMatchOffset) {
+    Collection<RangeHighlighter> highlighters = UserDataManager.getVimLastHighlighters(editor);
+    if (highlighters == null) {
+      highlighters = new ArrayList<>();
+      UserDataManager.setVimLastHighlighters(editor, highlighters);
+    }
+
+    for (TextRange range : results) {
+      final boolean current = range.getStartOffset() == currentMatchOffset;
+      final RangeHighlighter highlighter = highlightMatch(editor, range.getStartOffset(), range.getEndOffset(), current, pattern);
+      highlighters.add(highlighter);
+    }
+  }
+
+  private int findItOffset(@NotNull Editor editor, int startOffset, int count, int dir) {
+    boolean wrap = OptionsManager.INSTANCE.getWrapscan().isSet();
+    TextRange range = findIt(editor, lastSearch, startOffset, count, dir, lastIgnoreSmartCase, wrap, true, true);
+    if (range == null) {
+      return -1;
+    }
+
+    ParsePosition pp = new ParsePosition(0);
+    int res = range.getStartOffset();
+
+    if (lastOffset == null) {
+      return -1;
+    }
+
+    if (lastOffset.length() == 0) {
+      return range.getStartOffset();
+    }
+    else if (Character.isDigit(lastOffset.charAt(0)) || lastOffset.charAt(0) == '+' || lastOffset.charAt(0) == '-') {
+      int lineOffset = 0;
+      if (lastOffset.equals("+")) {
+        lineOffset = 1;
+      }
+      else if (lastOffset.equals("-")) {
+        lineOffset = -1;
+      }
+      else {
+        if (lastOffset.charAt(0) == '+') {
+          lastOffset = lastOffset.substring(1);
+        }
+        NumberFormat nf = NumberFormat.getIntegerInstance();
+        pp = new ParsePosition(0);
+        Number num = nf.parse(lastOffset, pp);
+        if (num != null) {
+          lineOffset = num.intValue();
+        }
+      }
+
+      int line = editor.offsetToLogicalPosition(range.getStartOffset()).line;
+      int newLine = EditorHelper.normalizeLine(editor, line + lineOffset);
+
+      res = VimPlugin.getMotion().moveCaretToLineStart(editor, newLine);
+    }
+    else if ("ebs".indexOf(lastOffset.charAt(0)) != -1) {
+      int charOffset = 0;
+      if (lastOffset.length() >= 2) {
+        if ("+-".indexOf(lastOffset.charAt(1)) != -1) {
+          charOffset = 1;
+        }
+        NumberFormat nf = NumberFormat.getIntegerInstance();
+        pp = new ParsePosition(lastOffset.charAt(1) == '+' ? 2 : 1);
+        Number num = nf.parse(lastOffset, pp);
+        if (num != null) {
+          charOffset = num.intValue();
+        }
+      }
+
+      int base = range.getStartOffset();
+      if (lastOffset.charAt(0) == 'e') {
+        base = range.getEndOffset() - 1;
+      }
+
+      res = Math.max(0, Math.min(base + charOffset, EditorHelper.getFileSize(editor) - 1));
+    }
+
+    int ppos = pp.getIndex();
+    if (ppos < lastOffset.length() - 1 && lastOffset.charAt(ppos) == ';') {
+      EnumSet<CommandFlags> flags = EnumSet.noneOf(CommandFlags.class);
+      if (lastOffset.charAt(ppos + 1) == '/') {
+        flags.add(CommandFlags.FLAG_SEARCH_FWD);
+      }
+      else if (lastOffset.charAt(ppos + 1) == '?') {
+        flags.add(CommandFlags.FLAG_SEARCH_REV);
+      }
+      else {
+        return res;
+      }
+
+      if (lastOffset.length() - ppos > 2) {
+        ppos++;
+      }
+
+      res = search(editor, lastOffset.substring(ppos + 1), res, 1, flags);
+
+      return res;
+    }
+    else {
+      return res;
+    }
+  }
+
+  public boolean searchAndReplace(@NotNull Editor editor, @NotNull Caret caret, @NotNull LineRange range,
+                                  @NotNull String excmd, String exarg) {
+    // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
+    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
+      VimPlugin.getVisualMotion().exitVisual(editor);
+    }
+
+    CharPointer cmd = new CharPointer(new StringBuffer(exarg));
+    //sub_nsubs = 0;
+    //sub_nlines = 0;
+
+    int which_pat;
+    if (excmd.equals("~")) {
+      which_pat = RE_LAST;    /* use last used regexp */
+    }
+    else {
+      which_pat = RE_SUBST;   /* use last substitute regexp */
+    }
+
+    CharPointer pat;
+    CharPointer sub;
+    char delimiter;
+    /* new pattern and substitution */
+    if (excmd.charAt(0) == 's' && !cmd.isNul() && !Character.isWhitespace(
+        cmd.charAt()) && "0123456789cegriIp|\"".indexOf(cmd.charAt()) == -1) {
+      /* don't accept alphanumeric for separator */
+      if (CharacterClasses.isAlpha(cmd.charAt())) {
+        VimPlugin.showMessage(MessageHelper.message(Msg.E146));
+        return false;
+      }
+      /*
+       * undocumented vi feature:
+       *  "\/sub/" and "\?sub?" use last used search pattern (almost like
+       *  //sub/r).  "\&sub&" use last substitute pattern (like //sub/).
+       */
+      if (cmd.charAt() == '\\') {
+        cmd.inc();
+        if ("/?&".indexOf(cmd.charAt()) == -1) {
+          VimPlugin.showMessage(MessageHelper.message(Msg.e_backslash));
+          return false;
+        }
+        if (cmd.charAt() != '&') {
+          which_pat = RE_SEARCH;      /* use last '/' pattern */
+        }
+        pat = new CharPointer("");             /* empty search pattern */
+        delimiter = cmd.charAt();             /* remember delimiter character */
+        cmd.inc();
+      }
+      else            /* find the end of the regexp */ {
+        which_pat = RE_LAST;            /* use last used regexp */
+        delimiter = cmd.charAt();             /* remember delimiter character */
+        cmd.inc();
+        pat = cmd.ref(0);                      /* remember start of search pat */
+        cmd = RegExp.skip_regexp(cmd, delimiter, true);
+        if (cmd.charAt() == delimiter)        /* end delimiter found */ {
+          cmd.set('\u0000').inc(); /* replace it with a NUL */
+        }
+      }
+
+      /*
+       * Small incompatibility: vi sees '\n' as end of the command, but in
+       * Vim we want to use '\n' to find/substitute a NUL.
+       */
+      sub = cmd.ref(0);          /* remember the start of the substitution */
+
+      while (!cmd.isNul()) {
+        if (cmd.charAt() == delimiter)            /* end delimiter found */ {
+          cmd.set('\u0000').inc(); /* replace it with a NUL */
+          break;
+        }
+        if (cmd.charAt(0) == '\\' && cmd.charAt(1) != 0)  /* skip escaped characters */ {
+          cmd.inc();
+        }
+        cmd.inc();
+      }
+    }
+    else        /* use previous pattern and substitution */ {
+      if (lastReplace == null)    /* there is no previous command */ {
+        VimPlugin.showMessage(MessageHelper.message(Msg.e_nopresub));
+        return false;
+      }
+      pat = null;             /* search_regcomp() will use previous pattern */
+      sub = new CharPointer(lastReplace);
+    }
+
+    /*
+     * Find trailing options.  When '&' is used, keep old options.
+     */
+    if (cmd.charAt() == '&') {
+      cmd.inc();
+    }
+    else {
+      do_all = OptionsManager.INSTANCE.getGdefault().isSet();
+      do_ask = false;
+      do_error = true;
+      //do_print = false;
+      do_ic = 0;
+    }
+    while (!cmd.isNul()) {
+      /*
+       * Note that 'g' and 'c' are always inverted, also when p_ed is off.
+       * 'r' is never inverted.
+       */
+      if (cmd.charAt() == 'g') {
+        do_all = !do_all;
+      }
+      else if (cmd.charAt() == 'c') {
+        do_ask = !do_ask;
+      }
+      else if (cmd.charAt() == 'e') {
+        do_error = !do_error;
+      }
+      else if (cmd.charAt() == 'r')       /* use last used regexp */ {
+        which_pat = RE_LAST;
+      }
+      else if (cmd.charAt() == 'i')       /* ignore case */ {
+        do_ic = 'i';
+      }
+      else if (cmd.charAt() == 'I')       /* don't ignore case */ {
+        do_ic = 'I';
+      }
+      else if (cmd.charAt() != 'p') {
+        break;
+      }
+      cmd.inc();
+    }
+
+    int line1 = range.getStartLine();
+    int line2 = range.getEndLine();
+
+    if (line1 < 0 || line2 < 0) {
+      return false;
+    }
+
+    /*
+     * check for a trailing count
+     */
+    CharHelper.skipwhite(cmd);
+    if (CharacterClasses.isDigit(cmd.charAt())) {
+      int i = CharHelper.getdigits(cmd);
+      if (i <= 0 && do_error) {
+        VimPlugin.showMessage(MessageHelper.message(Msg.e_zerocount));
+        return false;
+      }
+      line1 = line2;
+      line2 = EditorHelper.normalizeLine(editor, line1 + i - 1);
+    }
+
+    /*
+     * check for trailing command or garbage
+     */
+    CharHelper.skipwhite(cmd);
+    if (!cmd.isNul() && cmd.charAt() != '"')        /* if not end-of-line or comment */ {
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_trailing));
+      return false;
+    }
+
+    String pattern = "";
+    if (pat == null || pat.isNul()) {
+      switch (which_pat) {
+        case RE_LAST:
+          pattern = lastPattern;
+          break;
+        case RE_SEARCH:
+          pattern = lastSearch;
+          break;
+        case RE_SUBST:
+          pattern = lastSubstitute;
+          break;
+      }
+    }
+    else {
+      pattern = pat.toString();
+    }
+
+    lastSubstitute = pattern;
+    lastSearch = pattern;
+    if (pattern != null) {
+      setLastPattern(editor, pattern);
+    }
+
+    //int start = editor.logicalPositionToOffset(new LogicalPosition(line1, 0));
+    //int end = editor.logicalPositionToOffset(new LogicalPosition(line2, EditorHelper.getLineLength(editor, line2)));
+    int start = editor.getDocument().getLineStartOffset(line1);
+    int end = editor.getDocument().getLineEndOffset(line2);
+
+    RegExp sp;
+    RegExp.regmmatch_T regmatch = new RegExp.regmmatch_T();
+    sp = new RegExp();
+    regmatch.regprog = sp.vim_regcomp(pattern, 1);
+    if (regmatch.regprog == null) {
+      if (do_error) {
+        VimPlugin.showMessage(MessageHelper.message(Msg.e_invcmd));
+      }
+      return false;
+    }
+
+    /* the 'i' or 'I' flag overrules 'ignorecase' and 'smartcase' */
+    regmatch.rmm_ic = shouldIgnoreCase(pattern != null ? pattern : "", false);
+    if (do_ic == 'i') {
+      regmatch.rmm_ic = true;
+    }
+    else if (do_ic == 'I') {
+      regmatch.rmm_ic = false;
+    }
+
+    /*
+     * ~ in the substitute pattern is replaced with the old pattern.
+     * We do it here once to avoid it to be replaced over and over again.
+     * But don't do it when it starts with "\=", then it's an expression.
+     */
+    if (!(sub.charAt(0) == '\\' && sub.charAt(1) == '=') && lastReplace != null) {
+      StringBuffer tmp = new StringBuffer(sub.toString());
+      int pos = 0;
+      while ((pos = tmp.indexOf("~", pos)) != -1) {
+        if (pos == 0 || tmp.charAt(pos - 1) != '\\') {
+          tmp.replace(pos, pos + 1, lastReplace);
+          pos += lastReplace.length();
+        }
+        pos++;
+      }
+      sub = new CharPointer(tmp);
+    }
+
+    lastReplace = sub.toString();
+
+    resetShowSearchHighlight();
+    forceUpdateSearchHighlights();
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("search range=[" + start + "," + end + "]");
+      logger.debug("pattern=" + pattern + ", replace=" + sub);
+    }
+    int lastMatch = -1;
+    int lastLine = -1;
+    int searchcol = 0;
+    boolean firstMatch = true;
+    boolean got_quit = false;
+    int lcount = EditorHelper.getLineCount(editor);
+    for (int lnum = line1; lnum <= line2 && !got_quit; ) {
+      CharacterPosition newpos = null;
+      int nmatch = sp.vim_regexec_multi(regmatch, editor, lcount, lnum, searchcol);
+      if (nmatch > 0) {
+        if (firstMatch) {
+          VimPlugin.getMark().saveJumpLocation(editor);
+          firstMatch = false;
+        }
+
+        String match = sp.vim_regsub_multi(regmatch, lnum, sub, 1, false);
+        if (match == null) {
+          return false;
+        }
+        //logger.debug("found match[" + spos + "," + epos + "] - replace " + match);
+
+        int line = lnum + regmatch.startpos[0].lnum;
+        CharacterPosition startpos = new CharacterPosition(lnum + regmatch.startpos[0].lnum, regmatch.startpos[0].col);
+        CharacterPosition endpos = new CharacterPosition(lnum + regmatch.endpos[0].lnum, regmatch.endpos[0].col);
+        int startoff = startpos.toOffset(editor);
+        int endoff = endpos.toOffset(editor);
+        int newend = startoff + match.length();
+
+        if (do_all || line != lastLine) {
+          boolean doReplace = true;
+          if (do_ask) {
+            RangeHighlighter hl = highlightConfirm(editor, startoff, endoff);
+            MotionGroup.scrollPositionIntoView(editor, editor.offsetToVisualPosition(startoff), true);
+            MotionGroup.moveCaret(editor, caret, start);
+            final ReplaceConfirmationChoice choice = confirmChoice(editor, match);
+            editor.getMarkupModel().removeHighlighter(hl);
+            switch (choice) {
+              case SUBSTITUTE_THIS:
+                doReplace = true;
+                break;
+              case SKIP:
+                doReplace = false;
+                break;
+              case SUBSTITUTE_ALL:
+                do_ask = false;
+                break;
+              case QUIT:
+                doReplace = false;
+                got_quit = true;
+                break;
+              case SUBSTITUTE_LAST:
+                do_all = false;
+                line2 = lnum;
+                doReplace = true;
+                break;
+            }
+          }
+
+          if (doReplace) {
+            editor.getDocument().replaceString(startoff, endoff, match);
+            lastMatch = startoff;
+            newpos = CharacterPosition.Companion.fromOffset(editor, newend);
+
+            lnum += newpos.line - endpos.line;
+            line2 += newpos.line - endpos.line;
+          }
+        }
+
+        lastLine = line;
+
+        lnum += nmatch - 1;
+        if (do_all && startoff != endoff) {
+          if (newpos != null) {
+            lnum = newpos.line;
+            searchcol = newpos.column;
+          }
+          else {
+            searchcol = endpos.column;
+          }
+        }
+        else {
+          searchcol = 0;
+          lnum++;
+        }
+      }
+      else {
+        lnum++;
+        searchcol = 0;
+      }
+    }
+
+    if (lastMatch != -1) {
+      MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor,
+                                                                                                 editor.offsetToLogicalPosition(
+                                                                                                     lastMatch).line));
+    }
+    else {
+      VimPlugin.showMessage(MessageHelper.message(Msg.e_patnotf2, pattern));
+    }
+
+    return true;
   }
 
   @NotNull

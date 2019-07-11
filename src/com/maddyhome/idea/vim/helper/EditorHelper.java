@@ -24,7 +24,6 @@ import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.LightVirtualFile;
-import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.IndentConfig;
 import com.maddyhome.idea.vim.common.TextRange;
 import org.jetbrains.annotations.NotNull;
@@ -534,16 +533,6 @@ public class EditorHelper {
   @NotNull
   public static String getLineText(@NotNull final Editor editor, final int line) {
     return getText(editor, getLineStartOffset(editor, line), getLineEndOffset(editor, line, true));
-  }
-
-  @NotNull
-  public static CharacterPosition offsetToCharacterPosition(@NotNull final Editor editor, final int offset) {
-    final LogicalPosition logicalPosition = editor.offsetToLogicalPosition(offset);
-    return new CharacterPosition(logicalPosition.line, logicalPosition.column);
-  }
-
-  public static int characterPositionToOffset(@NotNull final Editor editor, @NotNull final CharacterPosition pos) {
-    return getLineStartOffset(editor, pos.line) + pos.column;
   }
 
   @NotNull

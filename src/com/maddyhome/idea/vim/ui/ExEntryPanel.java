@@ -27,12 +27,12 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.util.IJSwingUtilities;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.ex.Ranges;
 import com.maddyhome.idea.vim.group.MotionGroup;
-import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.regexp.CharPointer;
@@ -326,7 +326,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
           return;
         }
         final Ranges ranges = command.getRanges();
-        ranges.setDefaultLine(EditorHelper.offsetToCharacterPosition(editor, caretOffset).line);
+        ranges.setDefaultLine(CharacterPosition.Companion.fromOffset(editor, caretOffset).line);
         searchRange = command.getLineRange(editor, entry.getContext());
       }
 
