@@ -97,9 +97,7 @@ public class CommandState {
   public void pushState(@NotNull Mode mode, @NotNull SubMode submode, @NotNull MappingMode mappingMode) {
     logger.info("Push new state: " + mode + ":" + submode);
     if (logger.isDebugEnabled()) {
-      logger.debug("Stack state before push: " +
-                   myStates.stream().map(state -> state.getMode() + ":" + state.getSubMode())
-                     .collect(Collectors.joining(", ")));
+      logger.debug("Stack state before push: " + toSimpleString());
     }
     myStates.push(new State(mode, submode, mappingMode));
     updateStatus();
@@ -110,9 +108,7 @@ public class CommandState {
     updateStatus();
     logger.info("Pop state: " + popped.getMode() + ":" + popped.getSubMode());
     if (logger.isDebugEnabled()) {
-      logger.debug("Stack state after pop: " +
-                   myStates.stream().map(state -> state.getMode() + ":" + state.getSubMode())
-                     .collect(Collectors.joining(", ")));
+      logger.debug("Stack state after pop: " + toSimpleString());
     }
   }
 
@@ -286,6 +282,11 @@ public class CommandState {
 
   public void setCurrentNode(@NotNull ParentNode currentNode) {
     this.myCurrentNode = currentNode;
+  }
+
+  public String toSimpleString() {
+    return myStates.stream().map(state -> state.getMode() + ":" + state.getSubMode())
+      .collect(Collectors.joining(", "));
   }
 
   private State currentState() {

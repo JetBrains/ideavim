@@ -121,9 +121,10 @@ class VisualMotionGroup {
   }
 
   fun controlNonVimSelectionChange(editor: Editor, selectionSource: VimListenerManager.SelectionSource = VimListenerManager.SelectionSource.OTHER) {
+    logger.info("Adjust non-vim selection. Source: $selectionSource")
     if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
-      logger.debug("Some of carets have selection")
       val commandState = CommandState.getInstance(editor)
+      logger.info("Some carets have selection. State before adjustment: ${commandState.toSimpleString()}")
       modeBeforeEnteringNonVimVisual = commandState.mode
       while (commandState.mode != CommandState.Mode.COMMAND) {
         commandState.popState()
@@ -140,18 +141,20 @@ class VisualMotionGroup {
       }
       KeyHandler.getInstance().reset(editor)
     } else {
-      logger.debug("None of carets has selection")
+      val commandState = CommandState.getInstance(editor)
+      logger.info("None of carets have selection. State before adjustment: ${commandState.toSimpleString()}")
       exitVisual(editor)
       exitSelectModeAndResetKeyHandler(editor, true)
 
       val project = editor.project
       if ((project != null && TemplateManager.getInstance(project).getActiveTemplate(editor) != null || modeBeforeEnteringNonVimVisual == CommandState.Mode.INSERT) && editor.mode == CommandState.Mode.COMMAND) {
+        logger.info("Enter insert mode")
         VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
       }
       updateCaretState(editor)
       KeyHandler.getInstance().reset(editor)
     }
-    logger.debug("${editor.mode} is enabled")
+    logger.info("${editor.mode} is enabled")
   }
 
   //=============================== ENTER VISUAL and SELECT MODE ==============================================

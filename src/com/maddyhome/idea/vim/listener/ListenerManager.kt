@@ -261,7 +261,7 @@ object VimListenerManager {
       val document = editor.document
 
       if (SelectionVimListenerSuppressor.isNotLocked) {
-        logger.debug("Adjust non vim selection change")
+        logger.info("Adjust non vim selection change")
         VimPlugin.getVisualMotion().controlNonVimSelectionChange(editor)
       }
 
