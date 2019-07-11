@@ -26,6 +26,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
 import com.maddyhome.idea.vim.helper.RunnableHelper
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.VimTestFunction
 import com.maddyhome.idea.vim.option.OptionsManager
 import org.jetbrains.plugins.ideavim.VimTestCase
 import java.util.*
@@ -226,18 +227,21 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(6)
   }
 
+  @VimTestFunction("com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction")
   fun `test search word matches case`() {
     typeTextInFile(parseKeys("*"),
       "${c}Editor editor Editor")
     assertOffset(14)
   }
 
+  @VimTestFunction("com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction")
   fun `test search next word matches case`() {
     typeTextInFile(parseKeys("*", "n"),
       "${c}Editor editor Editor editor Editor")
     assertOffset(28)
   }
 
+  @VimTestFunction("com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction")
   fun `test search word honours ignorecase`() {
     setIgnoreCase()
     typeTextInFile(parseKeys("*"),
@@ -245,6 +249,7 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(7)
   }
 
+  @VimTestFunction("com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction")
   fun `test search next word honours ignorecase`() {
     setIgnoreCase()
     typeTextInFile(parseKeys("*", "n"),
@@ -252,6 +257,7 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(14)
   }
 
+  @VimTestFunction("com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction")
   fun `test search word overrides smartcase`() {
     setIgnoreCaseAndSmartCase()
     typeTextInFile(parseKeys("*"),
@@ -259,6 +265,7 @@ class SearchGroupTest : VimTestCase() {
     assertOffset(7)
   }
 
+  @VimTestFunction("com.maddyhome.idea.vim.action.motion.search.SearchWholeWordForwardAction")
   fun `test search next word overrides smartcase`() {
     setIgnoreCaseAndSmartCase()
     typeTextInFile(parseKeys("*", "n"),
