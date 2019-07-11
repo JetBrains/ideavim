@@ -280,6 +280,7 @@ public class SearchGroup {
   public int searchWord(@NotNull Editor editor, @NotNull Caret caret, int count, boolean whole, int dir) {
     TextRange range = SearchHelper.findWordUnderCursor(editor, caret);
     if (range == null) {
+      logger.warn("No range was found");
       return -1;
     }
 
@@ -524,6 +525,7 @@ public class SearchGroup {
   private static TextRange findIt(@NotNull Editor editor, @Nullable String pattern, int startOffset, int count, int dir,
                                  boolean ignoreSmartCase, boolean wrap, boolean showMessages, boolean wholeFile) {
     if (pattern == null || pattern.length() == 0) {
+      logger.warn("Pattern is null or empty. Cannot perform search");
       return null;
     }
 
@@ -801,8 +803,10 @@ public class SearchGroup {
 
   private int findItOffset(@NotNull Editor editor, int startOffset, int count, int dir) {
     boolean wrap = OptionsManager.INSTANCE.getWrapscan().isSet();
+    logger.info("Perform search. Direction: " + dir + " wrap: " + wrap);
     TextRange range = findIt(editor, lastSearch, startOffset, count, dir, lastIgnoreSmartCase, wrap, true, true);
     if (range == null) {
+      logger.warn("No range is found");
       return -1;
     }
 
@@ -810,6 +814,7 @@ public class SearchGroup {
     int res = range.getStartOffset();
 
     if (lastOffset == null) {
+      logger.warn("Last offset is null. Cannot perform search");
       return -1;
     }
 
