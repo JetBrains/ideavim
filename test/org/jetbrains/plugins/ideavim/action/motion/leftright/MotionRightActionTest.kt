@@ -134,21 +134,21 @@ class MotionRightActionTest : VimTestCase() {
   }
 
   fun `test simple motion tab`() {
-    doTest(parseKeys("l"), """
+    doTest(parseKeys("l"), dotToTab("""
             A Discovery
 
             I found it in a legendar${c}. land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass
-        """.replace('.', '\t').trimIndent(), """
+        """.trimIndent()), dotToTab("""
             A Discovery
 
             I found it in a legendar.${c} land
             all rocks and lavender and tufted grass,
             where it was settled on some sodden sand
             hard by the torrent of a mountain pass
-        """.replace('.', '\t').trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+        """.trimIndent()), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   fun `test char visual mode`() {

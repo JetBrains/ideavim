@@ -46,6 +46,7 @@ import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.option.ToggleOption;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -277,5 +278,17 @@ public abstract class VimTestCase extends UsefulTestCase {
 
   protected FileEditorManagerEx getFileManager() {
     return FileEditorManagerEx.getInstanceEx(myFixture.getProject());
+  }
+
+  @NotNull
+  @Contract(pure = true)
+  protected static String toTab(@NotNull String str, char ch) {
+    return str.replace(ch, '\t');
+  }
+
+  @NotNull
+  @Contract(pure = true)
+  protected static String dotToTab(@NotNull String str) {
+    return str.replace('.', '\t');
   }
 }
