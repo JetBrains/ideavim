@@ -107,6 +107,7 @@ To Be Released
 * [VIM-1668](https://youtrack.jetbrains.com/issue/VIM-1668) Fix smart step into
 * [VIM-1697](https://youtrack.jetbrains.com/issue/VIM-1697) Fix wrong search with tab characters
 * [VIM-1700](https://youtrack.jetbrains.com/issue/VIM-1700) Fix wrong search with tab characters
+* [VIM-1698](https://youtrack.jetbrains.com/issue/VIM-1698) Paste doesn't clear clipboard
 
 0.51, 2019-02-12
 ----------------

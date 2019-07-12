@@ -26,12 +26,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.CaretStateTransferableData
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.LogicalPosition
-import com.intellij.openapi.editor.RangeMarker
-import com.intellij.openapi.editor.RawText
+import com.intellij.openapi.editor.*
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.util.text.StringUtil
 import com.maddyhome.idea.vim.VimPlugin
@@ -253,11 +248,16 @@ class PutGroup {
       carets[caret] = pointMarker
     }
 
+    val sizeBeforeInsert = CopyPasteManager.getInstance().allContents.size
     val origContent: TextBlockTransferable = setClipboardText(text.text, text.transferableData)
+    val sizeAfterInsert = CopyPasteManager.getInstance().allContents.size
     try {
       pasteProvider.performPaste(context)
     } finally {
-      (CopyPasteManager.getInstance() as? CopyPasteManagerEx)?.run { removeContent(origContent) }
+      if (sizeBeforeInsert != sizeAfterInsert) {
+        // Sometimes inserted text replaces existing one. E.g. on insert with + or * register
+        (CopyPasteManager.getInstance() as? CopyPasteManagerEx)?.run { removeContent(origContent) }
+      }
     }
 
     carets.forEach { (caret, point) ->
