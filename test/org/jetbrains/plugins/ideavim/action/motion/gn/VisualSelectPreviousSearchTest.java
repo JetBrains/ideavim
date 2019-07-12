@@ -101,4 +101,12 @@ public class VisualSelectPreviousSearchTest extends VimTestCase {
     assertSelection("hel");
     assertMode(CommandState.Mode.VISUAL);
   }
+
+  public void testWithTabs() {
+    typeTextInFile(parseKeys("*", "gN", "gN"), "hello 1\n\thello 2\n\the<caret>llo 3\n\thello 4");
+
+    assertOffset(18);
+    assertSelection("hello 3\n\thello");
+    assertMode(CommandState.Mode.VISUAL);
+  }
 }

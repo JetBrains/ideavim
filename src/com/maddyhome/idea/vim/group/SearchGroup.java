@@ -666,7 +666,7 @@ public class SearchGroup {
               */
               match_ok = false;
               for (; ; ) {
-                if (!at_first_line || (regmatch.startpos[0].col + extra_col <= start_pos.col)) {
+                if (!at_first_line || (CharacterPosition.charOffsetOnLineToColumn(editor, lnum, regmatch.startpos[0].col + extra_col) <= start_pos.col)) {
                   /* Remember this position, we use it if it's
            * the last match in the line. */
                   match_ok = true;
