@@ -175,7 +175,7 @@ public class RegExp {
      */
 
   /* META[] is used often enough to justify turning it into a table. */
-  private static final int META_flags[] = {
+  private static final int[] META_flags = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     /*                 %  &     (  )  *  +        .    */
@@ -469,7 +469,6 @@ public class RegExp {
     }
 
     r = new regprog_T();
-    r.program = new StringBuffer();
 
     /*
          * Second pass: emit code.
@@ -552,7 +551,7 @@ public class RegExp {
   /*
      * Setup to parse the regexp.  Used once to get the length and once to do it.
      */
-  private void regcomp_start(String expr, int magic) {
+  private void regcomp_start(@NotNull String expr, int magic) {
     initchr(expr);
     if (magic != 0) {
       reg_magic = MAGIC_ON;
@@ -1000,7 +999,7 @@ public class RegExp {
     boolean cpo_lit = false;        /* 'cpoptions' contains 'l' flag */
     int c;
     String classchars = ".iIkKfFpPsSdDxXoOwWhHaAlLuU";
-    int classcodes[] = {ANY, IDENT, SIDENT, KWORD, SKWORD,
+    int[] classcodes = {ANY, IDENT, SIDENT, KWORD, SKWORD,
       FNAME, SFNAME, PRINT, SPRINT,
       WHITE, NWHITE, DIGIT, NDIGIT,
       HEX, NHEX, OCTAL, NOCTAL,
@@ -1745,7 +1744,7 @@ public class RegExp {
     regtail(p.OPERAND(), val);
   }
 
-  private void initchr(String str) {
+  private void initchr(@NotNull String str) {
     regparse = new CharPointer(str);
     prevchr_len = 0;
     curchr = prevprevchr = prevchr = nextchr = -1;
@@ -2871,9 +2870,10 @@ public class RegExp {
 
             cleanup_zsubexpr();
             no = op - ZREF;
-            if (re_extmatch_in != null && re_extmatch_in.matches[no] != null) {
-              len = re_extmatch_in.matches[no].length();
-              if (cstrncmp(new CharPointer(re_extmatch_in.matches[no]), reginput, len) != 0) {
+            final String match = re_extmatch_in.matches[no];
+            if (re_extmatch_in != null && match != null) {
+              len = match.length();
+              if (cstrncmp(new CharPointer(match), reginput, len) != 0) {
                 return false;
               }
               reginput.inc(len);
@@ -3733,10 +3733,7 @@ public class RegExp {
      * Return 0 if strings match, non-zero otherwise.
      */
   private int cstrncmp(@NotNull CharPointer s1, @NotNull CharPointer s2, int n) {
-    if (!ireg_ic) {
-      return s1.strncmp(s2, n);
-    }
-    return s1.strnicmp(s2, n);
+    return s1.strncmp(s2, n, ireg_ic);
   }
 
   /*
@@ -4666,7 +4663,7 @@ public class RegExp {
     int regmlen;
     int regflags;
     char reghasz;
-    StringBuffer program;
+    @NotNull StringBuffer program = new StringBuffer();
   }
 
   private static class MinMax {

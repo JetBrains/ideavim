@@ -207,6 +207,7 @@ public class ExTextField extends JTextField {
     return super.getText();
   }
 
+  @Nullable
   String getActualText() {
     if (actualText != null) {
       return actualText;

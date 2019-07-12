@@ -37,6 +37,7 @@ import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.RegExp;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -331,16 +332,23 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
       }
 
       final boolean forwards = !label.getText().equals("?");  // :s, :g, :v are treated as forwards
-      final CharPointer p = new CharPointer(searchText);
-      final CharPointer end = RegExp.skip_regexp(new CharPointer(searchText), separator, true);
-      final String pattern = p.substring(end.pointer() - p.pointer());
+      final String pattern;
+      if (searchText == null) {
+        pattern = "";
+      } else {
+        final CharPointer p = new CharPointer(searchText);
+        final CharPointer end = RegExp.skip_regexp(new CharPointer(searchText), separator, true);
+        pattern = p.substring(end.pointer() - p.pointer());
+      }
 
       VimPlugin.getEditor().closeEditorSearchSession(editor);
       VimPlugin.getSearch().updateIncsearchHighlights(editor, pattern, forwards, caretOffset, searchRange);
     }
 
+    @Contract("null -> null")
     @Nullable
-    private ExCommand getIncsearchCommand(String commandText) {
+    private ExCommand getIncsearchCommand(@Nullable String commandText) {
+      if (commandText == null) return null;
       try {
         final ExCommand exCommand = CommandParser.getInstance().parse(commandText);
         final String command = exCommand.getCommand();
