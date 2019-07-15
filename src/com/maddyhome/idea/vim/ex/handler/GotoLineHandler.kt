@@ -23,15 +23,12 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
-import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandlerFlags
-import com.maddyhome.idea.vim.ex.CommandName
-import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.flags
+import com.maddyhome.idea.vim.ex.*
 import com.maddyhome.idea.vim.group.MotionGroup
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.enumSetOf
 import java.util.*
+import kotlin.math.min
 
 /**
  * This handles Ex commands that just specify a range which translates to moving the cursor to the line given by the
@@ -52,7 +49,7 @@ class GotoLineHandler : CommandHandler.ForEachCaret() {
    * @return True if able to perform the command, false if not
    */
   override fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: ExCommand): Boolean {
-    val line = Math.min(cmd.getLine(editor, caret, context), EditorHelper.getLineCount(editor) - 1)
+    val line = min(cmd.getLine(editor, caret, context), EditorHelper.getLineCount(editor) - 1)
 
     if (line >= 0) {
       MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, line))

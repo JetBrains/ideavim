@@ -24,20 +24,14 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
-import com.maddyhome.idea.vim.ex.CommandHandler
+import com.maddyhome.idea.vim.ex.*
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
-import com.maddyhome.idea.vim.ex.CommandParser
-import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.ex.InvalidRangeException
-import com.maddyhome.idea.vim.ex.LineRange
-import com.maddyhome.idea.vim.ex.commands
-import com.maddyhome.idea.vim.ex.flags
 import com.maddyhome.idea.vim.group.copy.PutData
 import com.maddyhome.idea.vim.helper.EditorHelper
 import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 import java.util.*
+import kotlin.math.min
 
 class MoveTextHandler : CommandHandler.SingleExecution() {
   override val names = commands("m[ove]")
@@ -58,7 +52,7 @@ class MoveTextHandler : CommandHandler.SingleExecution() {
       val range = cmd.getTextRange(editor, caret, context, false)
       val lineRange = cmd.getLineRange(editor, caret, context)
 
-      line = Math.min(line, normalizeLine(editor, caret, context, command, lineRange))
+      line = min(line, normalizeLine(editor, caret, context, command, lineRange))
       texts.add(EditorHelper.getText(editor, range.startOffset, range.endOffset))
 
       if (lastRange == null || lastRange.startOffset != range.startOffset && lastRange.endOffset != range.endOffset) {

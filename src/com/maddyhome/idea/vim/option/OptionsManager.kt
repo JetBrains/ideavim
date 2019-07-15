@@ -28,6 +28,7 @@ import com.maddyhome.idea.vim.helper.MessageHelper
 import com.maddyhome.idea.vim.helper.Msg
 import org.jetbrains.annotations.Contract
 import java.util.*
+import kotlin.math.ceil
 import kotlin.math.min
 
 @Suppress("unused")
@@ -318,7 +319,7 @@ object OptionsManager {
       width = 80
     }
     val colCount = width / 20
-    val height = Math.ceil(cols.size.toDouble() / colCount.toDouble()).toInt()
+    val height = ceil(cols.size.toDouble() / colCount.toDouble()).toInt()
     var empty = cols.size % colCount
     empty = if (empty == 0) colCount else empty
 

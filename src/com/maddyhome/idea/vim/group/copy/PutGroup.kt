@@ -41,6 +41,7 @@ import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.option.OptionsManager
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.max
 import kotlin.math.min
 
 /**
@@ -427,7 +428,7 @@ class PutGroup {
       }
       "postEndOffset" -> MotionGroup.moveCaret(editor, caret, endOffset + 1)
       "preLineEndOfEndOffset" -> {
-        val pos = Math.min(endOffset, EditorHelper.getLineEndForOffset(editor, endOffset - 1) - 1)
+        val pos = min(endOffset, EditorHelper.getLineEndForOffset(editor, endOffset - 1) - 1)
         MotionGroup.moveCaret(editor, caret, pos)
       }
     }
@@ -448,7 +449,7 @@ class PutGroup {
     var maxLen = 0
     while (tokenizer.hasMoreTokens()) {
       val s = tokenizer.nextToken()
-      maxLen = Math.max(s.length, maxLen)
+      maxLen = max(s.length, maxLen)
     }
     return maxLen
   }
