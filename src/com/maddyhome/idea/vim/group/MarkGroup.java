@@ -224,7 +224,7 @@ public class MarkGroup {
   }
 
   private void setSystemMark(char ch, int line, @NotNull Editor editor) {
-    if (!OptionsManager.INSTANCE.getIdemarks().isSet()) return;
+    if (!OptionsManager.INSTANCE.getIdeamarks().isSet()) return;
     final Project project = editor.getProject();
     if (project == null) return;
     final BookmarkManager bookmarkManager = BookmarkManager.getInstance(project);
@@ -239,7 +239,7 @@ public class MarkGroup {
   }
 
   private void removeSystemMark(char ch, @NotNull Editor editor) {
-    if (!OptionsManager.INSTANCE.getIdemarks().isSet()) return;
+    if (!OptionsManager.INSTANCE.getIdeamarks().isSet()) return;
     final Project project = editor.getProject();
     if (project == null) return;
     final BookmarkManager bookmarkManager = BookmarkManager.getInstance(project);
@@ -735,11 +735,11 @@ public class MarkGroup {
   public static class MarkListener implements BookmarksListener {
     @Override
     public void bookmarkAdded(@NotNull Bookmark b) {
-      if (!OptionsManager.INSTANCE.getIdemarks().isSet()) return;
+      if (!OptionsManager.INSTANCE.getIdeamarks().isSet()) return;
 
       if (GLOBAL_MARKS.indexOf(b.getMnemonic()) != -1) {
         try {
-          OptionsManager.INSTANCE.getIdemarks().reset();
+          OptionsManager.INSTANCE.getIdeamarks().reset();
           final Editor editor = EditorHelper.getEditor(b.getFile());
           if (editor == null) return;
 
@@ -755,18 +755,18 @@ public class MarkGroup {
                                       VimPlugin.getMotion().moveCaretToLineStartSkipLeading(editor, b.getLine()));
         }
         finally {
-          OptionsManager.INSTANCE.getIdemarks().set();
+          OptionsManager.INSTANCE.getIdeamarks().set();
         }
       }
     }
 
     @Override
     public void bookmarkRemoved(@NotNull Bookmark b) {
-      if (!OptionsManager.INSTANCE.getIdemarks().isSet()) return;
+      if (!OptionsManager.INSTANCE.getIdeamarks().isSet()) return;
 
       if (GLOBAL_MARKS.indexOf(b.getMnemonic()) != -1) {
         try {
-          OptionsManager.INSTANCE.getIdemarks().reset();
+          OptionsManager.INSTANCE.getIdeamarks().reset();
           final Editor editor = EditorHelper.getEditor(b.getFile());
           if (editor == null) return;
 
@@ -774,14 +774,14 @@ public class MarkGroup {
           if (mark != null) VimPlugin.getMark().removeMark(b.getMnemonic(), mark, editor);
         }
         finally {
-          OptionsManager.INSTANCE.getIdemarks().set();
+          OptionsManager.INSTANCE.getIdeamarks().set();
         }
       }
     }
 
     @Override
     public void bookmarkChanged(@NotNull Bookmark b) {
-      if (!OptionsManager.INSTANCE.getIdemarks().isSet()) return;
+      if (!OptionsManager.INSTANCE.getIdeamarks().isSet()) return;
 
       if (GLOBAL_MARKS.indexOf(b.getMnemonic()) != -1) {
         this.bookmarkAdded(b);

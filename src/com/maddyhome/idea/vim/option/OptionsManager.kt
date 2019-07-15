@@ -42,7 +42,7 @@ object OptionsManager {
   val gdefault = addOption(ToggleOption("gdefault", "gd", false))
   val history = addOption(NumberOption("history", "hi", 20, 1, Int.MAX_VALUE))
   val hlsearch = addOption(ToggleOption("hlsearch", "hls", false))
-  val idemarks = addOption(IdeMarskOptionsData.option)
+  val ideamarks = addOption(IdeaMarkskOptionsData.option)
   val ignorecase = addOption(ToggleOption(IgnoreCaseOptionsData.name, IgnoreCaseOptionsData.abbr, false))
   val incsearch = addOption(ToggleOption("incsearch", "is", false))
   val iskeyword = addOption(KeywordOption("iskeyword", "isk", arrayOf("@", "48-57", "_")))
@@ -415,8 +415,8 @@ object SmartJoinOptionsData {
   val option = ToggleOption(name, name, defaultValue)
 }
 
-object IdeMarskOptionsData {
-  const val name = "idemarks"
+object IdeaMarkskOptionsData {
+  const val name = "ideamarks"
   const val defaultValue = true
 
   val option = ToggleOption(name, name, defaultValue)
