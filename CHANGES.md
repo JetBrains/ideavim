@@ -99,7 +99,7 @@ To Be Released
 * Fix exception when trying to highlight last CR in file
 * Improve behaviour of `<BS>` in command line entry
 * [VIM-1626](https://youtrack.jetbrains.com/issue/VIM-1626) Add `smartjoin` option
-* [VIM-959](https://youtrack.jetbrains.com/issue/VIM-1626) Add `idemarks` option
+* [VIM-959](https://youtrack.jetbrains.com/issue/VIM-959) Add `idemarks` option
 * [VIM-608](https://youtrack.jetbrains.com/issue/VIM-608) Automatic upload files on explicit save
 * [VIM-1548](https://youtrack.jetbrains.com/issue/VIM-1548) Respect editor settings about tabs and spaces
 * [VIM-1682](https://youtrack.jetbrains.com/issue/VIM-1682) Fix backward search with OR
