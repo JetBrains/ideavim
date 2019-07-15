@@ -20,16 +20,11 @@ package com.maddyhome.idea.vim.action;
 
 import com.google.common.collect.ImmutableSet;
 import com.intellij.codeInsight.lookup.LookupManager;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationListener;
-import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx;
-import com.intellij.openapi.keymap.KeymapUtil;
-import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
@@ -43,13 +38,11 @@ import com.maddyhome.idea.vim.helper.EditorHelper;
 import com.maddyhome.idea.vim.key.ShortcutOwner;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionsManager;
-import com.maddyhome.idea.vim.ui.VimEmulationConfigurable;
 import one.util.streamex.StreamEx;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -102,7 +95,7 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
     if (editor != null && keyStroke != null) {
       final ShortcutOwner owner = VimPlugin.getKey().getSavedShortcutConflicts().get(keyStroke);
       if (owner == ShortcutOwner.UNDEFINED) {
-        notifyAboutShortcutConflict(keyStroke);
+        VimPlugin.getNotifications(editor.getProject()).notifyAboutShortcutConflict(keyStroke);
       }
       // Should we use HelperKt.getTopLevelEditor(editor) here, as we did in former EditorKeyHandler?
       try {
@@ -126,34 +119,6 @@ public class VimShortcutKeyAction extends AnAction implements DumbAware {
       ourInstance = EmptyAction.wrap(originalAction);
     }
     return ourInstance;
-  }
-
-  private void notifyAboutShortcutConflict(@NotNull final KeyStroke keyStroke) {
-    VimPlugin.getKey().getSavedShortcutConflicts().put(keyStroke, ShortcutOwner.VIM);
-    final String message = String.format(
-      "Using the <b>%s</b> shortcut for Vim emulation.<br/>" +
-      "You can redefine it as an <a href='#ide'>IDE shortcut</a> or " +
-      "configure its handler in <a href='#settings'>Vim Emulation</a> settings.",
-      KeymapUtil.getShortcutText(new KeyboardShortcut(keyStroke, null)));
-    final NotificationListener listener = new NotificationListener.Adapter() {
-      @Override
-      protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent e) {
-        final String description = e.getDescription();
-        if ("#ide".equals(description)) {
-          VimPlugin.getKey().getSavedShortcutConflicts().put(keyStroke, ShortcutOwner.IDE);
-          notification.expire();
-        }
-        else if ("#settings".equals(description)) {
-          ShowSettingsUtil.getInstance().editConfigurable((Project)null, new VimEmulationConfigurable());
-        }
-      }
-    };
-    final Notification notification = new Notification(VimPlugin.IDEAVIM_NOTIFICATION_ID,
-                                                       VimPlugin.IDEAVIM_NOTIFICATION_TITLE,
-                                                       message,
-                                                       NotificationType.INFORMATION,
-                                                       listener);
-    notification.notify(null);
   }
 
   private boolean isEnabled(@NotNull AnActionEvent e) {

@@ -88,6 +88,9 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <applicationConfigurable groupId="editor" instance="com.maddyhome.idea.vim.ui.VimEmulationConfigurable"/>
+
+    <projectService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"/>
+    <applicationService serviceImplementation="com.maddyhome.idea.vim.group.NotificationService"/>
   </extensions>
 
   <extensions defaultExtensionNs="IdeaVIM">

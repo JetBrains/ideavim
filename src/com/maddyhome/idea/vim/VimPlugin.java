@@ -20,15 +20,15 @@ package com.maddyhome.idea.vim;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.notification.*;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationDisplayType;
+import com.intellij.notification.NotificationListener;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.PermanentInstallationID;
-import com.intellij.openapi.components.BaseComponent;
-import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.State;
-import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.components.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.keymap.Keymap;
@@ -80,9 +80,6 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   private static final String IDEAVIM_COMPONENT_NAME = "VimPlugin";
   private static final String IDEAVIM_PLUGIN_ID = "IdeaVIM";
   private static final String IDEAVIM_STATISTICS_TIMESTAMP_KEY = "ideavim.statistics.timestamp";
-  public static final String IDEAVIM_NOTIFICATION_ID = "ideavim";
-  public static final String IDEAVIM_STICKY_NOTIFICATION_ID = "ideavim-sticky";
-  public static final String IDEAVIM_NOTIFICATION_TITLE = "IdeaVim";
   public static final int STATE_VERSION = 5;
 
   private static long lastBeepTimeMillis;
@@ -160,31 +157,15 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     LOG.debug("done");
   }
 
-  private void initializePlugin() {
-    if (initialized) return;
-    initialized = true;
-
-    Notifications.Bus.register(IDEAVIM_STICKY_NOTIFICATION_ID, NotificationDisplayType.STICKY_BALLOON);
-
-    ApplicationManager.getApplication().invokeLater(this::updateState);
-
-    VimListenerManager.GlobalListeners.enable();
-
-    // Register vim actions in command mode
-    RegisterActions.registerActions();
-
-    // Add some listeners so we can handle special events
-    DocumentManager.getInstance().addDocumentListener(MarkGroup.MarkUpdater.INSTANCE);
-    DocumentManager.getInstance().addDocumentListener(SearchGroup.DocumentSearchListener.INSTANCE);
-
-    // Register ex handlers
-    CommandParser.getInstance().registerHandlers();
-
-    if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      final File ideaVimRc = VimScriptParser.findIdeaVimRc();
-      if (ideaVimRc != null) {
-        VimScriptParser.executeFile(ideaVimRc);
-      }
+  /**
+   * @return NotificationService as applicationService if project is null and projectService otherwise
+   */
+  @NotNull
+  public static NotificationService getNotifications(@Nullable Project project) {
+    if (project == null) {
+      return ServiceManager.getService(NotificationService.class);
+    } else {
+      return ServiceManager.getService(project, NotificationService.class);
     }
   }
 
@@ -339,6 +320,39 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   }
 
   @NotNull
+  private static NotificationService getNotifications() {
+    return getNotifications(null);
+  }
+
+  private void initializePlugin() {
+    if (initialized) return;
+    initialized = true;
+
+    Notifications.Bus.register(NotificationService.IDEAVIM_STICKY_NOTIFICATION_ID, NotificationDisplayType.STICKY_BALLOON);
+
+    ApplicationManager.getApplication().invokeLater(this::updateState);
+
+    VimListenerManager.GlobalListeners.enable();
+
+    // Register vim actions in command mode
+    RegisterActions.registerActions();
+
+    // Add some listeners so we can handle special events
+    DocumentManager.getInstance().addDocumentListener(MarkGroup.MarkUpdater.INSTANCE);
+    DocumentManager.getInstance().addDocumentListener(SearchGroup.DocumentSearchListener.INSTANCE);
+
+    // Register ex handlers
+    CommandParser.getInstance().registerHandlers();
+
+    if (!ApplicationManager.getApplication().isUnitTestMode()) {
+      final File ideaVimRc = VimScriptParser.findIdeaVimRc();
+      if (ideaVimRc != null) {
+        VimScriptParser.executeFile(ideaVimRc);
+      }
+    }
+  }
+
+  @NotNull
   public static PluginId getPluginId() {
     return PluginId.getId(IDEAVIM_PLUGIN_ID);
   }
@@ -446,10 +460,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
         final Boolean enabled = keyRepeat.isEnabled();
         final Boolean isKeyRepeat = editor.isKeyRepeat();
         if ((enabled == null || !enabled) && (isKeyRepeat == null || isKeyRepeat)) {
-          if (Messages.showYesNoDialog("Do you want to enable repeating keys in Mac OS X on press and hold?\n\n" +
-                                       "(You can do it manually by running 'defaults write -g " +
-                                       "ApplePressAndHoldEnabled 0' in the console).", IDEAVIM_NOTIFICATION_TITLE,
-                                       Messages.getQuestionIcon()) == Messages.YES) {
+          if (VimPlugin.getNotifications().enableRepeatingMode() == Messages.YES) {
             editor.setKeyRepeat(true);
             keyRepeat.setEnabled(true);
           }
@@ -468,27 +479,16 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
           keymap = manager.getKeymap(DefaultKeymap.getInstance().getDefaultKeymapName());
         }
         assert keymap != null : "Default keymap not found";
-        new Notification(VimPlugin.IDEAVIM_STICKY_NOTIFICATION_ID, VimPlugin.IDEAVIM_NOTIFICATION_TITLE, String.format(
-          "IdeaVim plugin doesn't use the special \"Vim\" keymap any longer. " +
-          "Switching to \"%s\" keymap.<br/><br/>" +
-          "Now it is possible to set up:<br/>" +
-          "<ul>" +
-          "<li>Vim keys in your ~/.ideavimrc file using key mapping commands</li>" +
-          "<li>IDE action shortcuts in \"File | Settings | Keymap\"</li>" +
-          "<li>Vim or IDE handlers for conflicting shortcuts in <a href='#settings'>Vim Emulation</a> settings</li>" +
-          "</ul>", keymap.getPresentableName()), NotificationType.INFORMATION, new NotificationListener.Adapter() {
+        VimPlugin.getNotifications().specialKeymap(keymap, new NotificationListener.Adapter() {
           @Override
           protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent e) {
             ShowSettingsUtil.getInstance().editConfigurable((Project)null, new VimEmulationConfigurable());
           }
-        }).notify(null);
+        });
         manager.setActiveKeymap(keymap);
       }
       if (previousStateVersion > 0 && previousStateVersion < 4) {
-        new Notification(VimPlugin.IDEAVIM_STICKY_NOTIFICATION_ID, VimPlugin.IDEAVIM_NOTIFICATION_TITLE,
-                         "The ~/.vimrc file is no longer read by default, use ~/.ideavimrc instead. You can read it from your " +
-                         "~/.ideavimrc using this command:<br/><br/>" +
-                         "<code>source ~/.vimrc</code>", NotificationType.INFORMATION).notify(null);
+        VimPlugin.getNotifications().noVimrcAsDefault();
       }
     }
   }

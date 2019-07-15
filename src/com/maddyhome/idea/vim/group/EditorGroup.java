@@ -19,8 +19,6 @@
 package com.maddyhome.idea.vim.group;
 
 import com.intellij.find.EditorSearchSession;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.*;
@@ -204,16 +202,6 @@ public class EditorGroup {
     this.isKeyRepeat = value;
   }
 
-  public void notifyAboutIdeaJoin() {
-    if (isIdeaJoinNotified || OptionsManager.INSTANCE.getIdeajoin().isSet()) return;
-
-    isIdeaJoinNotified = true;
-
-    new Notification(VimPlugin.IDEAVIM_STICKY_NOTIFICATION_ID, VimPlugin.IDEAVIM_NOTIFICATION_TITLE,
-                     "Put \"<code>set ideajoin</code>\" into your <code>.ideavimrc</code> to perform a join via the IDE",
-                     NotificationType.INFORMATION).notify(null);
-  }
-
   public void closeEditorSearchSession(@NotNull Editor editor) {
     final EditorSearchSession editorSearchSession = EditorSearchSession.get(editor);
     if (editorSearchSession != null) {
@@ -264,12 +252,17 @@ public class EditorGroup {
     }
   }
 
+  public void notifyIdeaJoin(@Nullable Project project) {
+    if (isIdeaJoinNotified || OptionsManager.INSTANCE.getIdeajoin().isSet()) return;
+
+    isIdeaJoinNotified = true;
+
+    VimPlugin.getNotifications(project).notifyAboutIdeaJoin();
+  }
+
   private static class LineNumbersGutterProvider implements TextAnnotationGutterProvider {
 
     public static LineNumbersGutterProvider INSTANCE = new LineNumbersGutterProvider();
-
-    private LineNumbersGutterProvider() {
-    }
 
     @Nullable
     @Override

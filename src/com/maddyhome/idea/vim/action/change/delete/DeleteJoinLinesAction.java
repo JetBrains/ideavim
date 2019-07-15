@@ -71,7 +71,7 @@ public class DeleteJoinLinesAction extends VimCommandAction {
         if (OptionsManager.INSTANCE.getIdeajoin().isSet()) {
           return VimPlugin.getChange().joinViaIdeaByCount(editor, context, count);
         }
-        VimPlugin.getEditor().notifyAboutIdeaJoin();
+        VimPlugin.getEditor().notifyIdeaJoin(editor.getProject());
 
         Ref<Boolean> res = Ref.create(true);
         editor.getCaretModel().runForEachCaret(caret -> {
