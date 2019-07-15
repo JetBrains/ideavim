@@ -68,10 +68,10 @@ public class DeleteJoinLinesAction extends VimCommandAction {
                              @Nullable Argument argument) {
         if (editor.isOneLineMode()) return false;
 
-        if (OptionsManager.INSTANCE.getSmartjoin().isSet()) {
+        if (OptionsManager.INSTANCE.getIdeajoin().isSet()) {
           return VimPlugin.getChange().joinViaIdeaByCount(editor, context, count);
         }
-        VimPlugin.getEditor().notifyAboutSmartJoin();
+        VimPlugin.getEditor().notifyAboutIdeaJoin();
 
         Ref<Boolean> res = Ref.create(true);
         editor.getCaretModel().runForEachCaret(caret -> {

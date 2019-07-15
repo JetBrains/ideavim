@@ -62,7 +62,7 @@ object OptionsManager {
   val sidescroll = addOption(NumberOption("sidescroll", "ss", 0))
   val sidescrolloff = addOption(NumberOption("sidescrolloff", "siso", 0))
   val smartcase = addOption(ToggleOption(SmartCaseOptionsData.name, SmartCaseOptionsData.abbr, false))
-  val smartjoin = addOption(SmartJoinOptionsData.option)
+  val ideajoin = addOption(IdeaJoinOptionsData.option)
   val timeout = addOption(ToggleOption("timeout", "to", true))
   val timeoutlen = addOption(NumberOption("timeoutlen", "tm", 1000, -1, Int.MAX_VALUE))
   val undolevels = addOption(NumberOption("undolevels", "ul", 1000, -1, Int.MAX_VALUE))
@@ -408,8 +408,8 @@ object ClipboardOptionsData {
   const val ideaput = "ideaput"
 }
 
-object SmartJoinOptionsData {
-  const val name = "smartjoin"
+object IdeaJoinOptionsData {
+  const val name = "ideajoin"
   const val defaultValue = false
 
   val option = ToggleOption(name, name, defaultValue)

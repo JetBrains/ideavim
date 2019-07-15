@@ -73,7 +73,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or set manually in th
 
     'showmode'       'smd'       message on status line to show current mode
     
-    `smartjoin`      `smartjoin` Boolean (default false)     - IdeaVim ONLY [To Be Released] 
+    `ideajoin`      `ideajoin` Boolean (default false)     - IdeaVim ONLY [To Be Released] 
     
                   If true, join command will be performed via IDE
     

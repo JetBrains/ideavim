@@ -98,7 +98,7 @@ To Be Released
 * Added incremental search highlights for `:substitute` command
 * Fix exception when trying to highlight last CR in file
 * Improve behaviour of `<BS>` in command line entry
-* [VIM-1626](https://youtrack.jetbrains.com/issue/VIM-1626) Add `smartjoin` option
+* [VIM-1626](https://youtrack.jetbrains.com/issue/VIM-1626) Add `ideajoin` option
 * [VIM-959](https://youtrack.jetbrains.com/issue/VIM-959) Add `ideamarks` option
 * [VIM-608](https://youtrack.jetbrains.com/issue/VIM-608) Automatic upload files on explicit save
 * [VIM-1548](https://youtrack.jetbrains.com/issue/VIM-1548) Respect editor settings about tabs and spaces

@@ -59,7 +59,7 @@ public class EditorGroup {
   private boolean isRefrainFromScrolling = false;
   private Boolean isKeyRepeat = null;
 
-  private boolean isSmartJoinNotified = false;
+  private boolean isIdeaJoinNotified = false;
 
   private final CaretListener myLineNumbersCaretListener = new CaretListener() {
     @Override
@@ -165,9 +165,9 @@ public class EditorGroup {
     final Element editor = new Element("editor");
     element.addContent(editor);
 
-    final Element smartJoin = new Element("smart-join");
-    smartJoin.setAttribute("enabled", Boolean.toString(isSmartJoinNotified));
-    editor.addContent(smartJoin);
+    final Element ideaJoin = new Element("idea-join");
+    ideaJoin.setAttribute("enabled", Boolean.toString(isIdeaJoinNotified));
+    editor.addContent(ideaJoin);
     if (isKeyRepeat != null) {
       final Element keyRepeat = new Element("key-repeat");
       keyRepeat.setAttribute("enabled", Boolean.toString(isKeyRepeat));
@@ -185,11 +185,11 @@ public class EditorGroup {
           isKeyRepeat = Boolean.valueOf(enabled);
         }
       }
-      final Element smartJoin = editor.getChild("smart-join");
-      if (smartJoin != null) {
-        final String enabled = smartJoin.getAttributeValue("enabled");
+      final Element ideaJoin = editor.getChild("idea-join");
+      if (ideaJoin != null) {
+        final String enabled = ideaJoin.getAttributeValue("enabled");
         if (enabled != null) {
-          isSmartJoinNotified = Boolean.parseBoolean(enabled);
+          isIdeaJoinNotified = Boolean.parseBoolean(enabled);
         }
       }
     }
@@ -204,13 +204,13 @@ public class EditorGroup {
     this.isKeyRepeat = value;
   }
 
-  public void notifyAboutSmartJoin() {
-    if (isSmartJoinNotified || OptionsManager.INSTANCE.getSmartjoin().isSet()) return;
+  public void notifyAboutIdeaJoin() {
+    if (isIdeaJoinNotified || OptionsManager.INSTANCE.getIdeajoin().isSet()) return;
 
-    isSmartJoinNotified = true;
+    isIdeaJoinNotified = true;
 
     new Notification(VimPlugin.IDEAVIM_STICKY_NOTIFICATION_ID, VimPlugin.IDEAVIM_NOTIFICATION_TITLE,
-                     "Put \"<code>set smartjoin</code>\" into your <code>.ideavimrc</code> to perform a join via the IDE",
+                     "Put \"<code>set ideajoin</code>\" into your <code>.ideavimrc</code> to perform a join via the IDE",
                      NotificationType.INFORMATION).notify(null);
   }
 

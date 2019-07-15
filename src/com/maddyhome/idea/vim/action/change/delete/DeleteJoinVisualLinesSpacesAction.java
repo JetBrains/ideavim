@@ -57,7 +57,7 @@ final public class DeleteJoinVisualLinesSpacesAction extends VimCommandAction {
                                          @NotNull Map<Caret, ? extends VimSelection> caretsAndSelections) {
         if (editor.isOneLineMode()) return false;
 
-        if (OptionsManager.INSTANCE.getSmartjoin().isSet()) {
+        if (OptionsManager.INSTANCE.getIdeajoin().isSet()) {
           VimPlugin.getChange().joinViaIdeaBySelections(editor, context, caretsAndSelections);
           return true;
         }
