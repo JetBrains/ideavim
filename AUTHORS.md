@@ -72,6 +72,7 @@ Contributors:
 * [Michael Ziwisky](mailto:mziwisky@instructure.com)
 * [Pierce Corcoran](mailto:pierce@plasticcow.com)
 * [Jonatan Tierno](mailto:jonatantierno@gmail.com)
+* [Brendan Annable](mailto:brendan@annable.me)
 
 If you are a contributor and your name is not listed here, feel free to
 contact the maintainer.
