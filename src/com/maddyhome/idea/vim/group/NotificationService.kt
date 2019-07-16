@@ -20,6 +20,7 @@ import com.intellij.openapi.util.text.TextWithMnemonic
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.key.ShortcutOwner
+import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
 import java.io.File
@@ -34,52 +35,26 @@ class NotificationService(private val project: Project?) {
   @Suppress("unused")
   constructor() : this(null)
 
+  fun notifyAboutIdeaPut() {
+    val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+      """Add <code>ideaput</code> to <code>clipboard</code> option to perform a put via the IDE<br/><b><code>set clipboard+=ideaput</code></b>""",
+      NotificationType.INFORMATION)
+
+    notification.addAction(OpenIdeaVimRcAction(notification))
+
+    notification.addAction(AppendToIdeaVimRcAction(notification, "set clipboard+=ideaput", "ideaput") { OptionsManager.clipboard.append(ClipboardOptionsData.ideaput) })
+
+    notification.notify(project)
+  }
+
   fun notifyAboutIdeaJoin() {
     val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
       """Put <b><code>set ideajoin</code></b> into your <code>~/.ideavimrc</code> to perform a join via the IDE""",
       NotificationType.INFORMATION)
 
-    notification.addAction(object : AnAction() {
-      init {
-        this.templatePresentation.setTextWithMnemonic(TextWithMnemonic.parse("_Open ~/.ideavimrc"))
-      }
+    notification.addAction(OpenIdeaVimRcAction(notification))
 
-      override fun actionPerformed(e: AnActionEvent) {
-        val eventProject = e.project
-        if (eventProject != null) {
-          val ideaVimRc = VimScriptParser.findOrCreateIdeaVimRc()
-          if (ideaVimRc != null) {
-            OpenFileAction.openFile(ideaVimRc.path, eventProject)
-            // Do not expire a notification. The user should see what they are entering
-            return
-          }
-        }
-        notification.expire()
-        createIdeaVimRcManually("Cannot create configuration file.<br/>Please create <code>~/.ideavimrc</code> manually")
-      }
-    })
-
-    notification.addAction(object : AnAction() {
-      init {
-        this.templatePresentation.setTextWithMnemonic(TextWithMnemonic.parse("_Append to ~/.ideavimrc"))
-      }
-
-      override fun actionPerformed(e: AnActionEvent) {
-        val eventProject = e.project
-        OptionsManager.ideajoin.set()
-        if (eventProject != null) {
-          val ideaVimRc = VimScriptParser.findOrCreateIdeaVimRc()
-          if (ideaVimRc != null && ideaVimRc.canWrite()) {
-            ideaVimRc.appendText("set ideajoin")
-            notification.expire()
-            Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, "Success.<br/><code>ideajoin</code> is enabled", NotificationType.INFORMATION).notify(project)
-            return
-          }
-        }
-        notification.expire()
-        createIdeaVimRcManually("Option is enabled, but the file is not modified<br/>Please modify <code>~/.ideavimrc</code> manually")
-      }
-    })
+    notification.addAction(AppendToIdeaVimRcAction(notification, "set ideajoin", "ideajoin") { OptionsManager.ideajoin.set() })
 
     notification.addAction(object : AnAction("", "", AllIcons.General.TodoQuestion) {
       override fun actionPerformed(e: AnActionEvent) {
@@ -151,6 +126,51 @@ class NotificationService(private val project: Project?) {
       NotificationType.INFORMATION,
       listener).notify(project)
   }
+
+  private inner class OpenIdeaVimRcAction(val notification: Notification) : AnAction() {
+    init {
+      this.templatePresentation.setTextWithMnemonic(TextWithMnemonic.parse("_Open ~/.ideavimrc"))
+    }
+
+    override fun actionPerformed(e: AnActionEvent) {
+      val eventProject = e.project
+      if (eventProject != null) {
+        val ideaVimRc = VimScriptParser.findOrCreateIdeaVimRc()
+        if (ideaVimRc != null) {
+          OpenFileAction.openFile(ideaVimRc.path, eventProject)
+          // Do not expire a notification. The user should see what they are entering
+          return
+        }
+      }
+      notification.expire()
+      createIdeaVimRcManually("Cannot create configuration file.<br/>Please create <code>~/.ideavimrc</code> manually")
+    }
+  }
+
+  private inner class AppendToIdeaVimRcAction(val notification: Notification, val appendableText: String, val optionName: String, val enableOption: () -> Unit) : AnAction() {
+    init {
+      this.templatePresentation.setTextWithMnemonic(TextWithMnemonic.parse("_Append to ~/.ideavimrc"))
+    }
+
+    override fun actionPerformed(e: AnActionEvent) {
+      val eventProject = e.project
+      enableOption()
+      if (eventProject != null) {
+        val ideaVimRc = VimScriptParser.findOrCreateIdeaVimRc()
+        if (ideaVimRc != null && ideaVimRc.canWrite()) {
+          ideaVimRc.appendText(appendableText)
+          notification.expire()
+          val successNotification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE, "<code>$optionName</code> is enabled", NotificationType.INFORMATION)
+          successNotification.addAction(OpenIdeaVimRcAction(successNotification))
+          successNotification.notify(project)
+          return
+        }
+      }
+      notification.expire()
+      createIdeaVimRcManually("Option is enabled, but the file is not modified<br/>Please modify <code>~/.ideavimrc</code> manually")
+    }
+  }
+
 
   companion object {
     const val IDEAVIM_STICKY_NOTIFICATION_ID = "ideavim-sticky"

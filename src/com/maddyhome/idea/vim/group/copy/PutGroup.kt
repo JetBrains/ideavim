@@ -28,6 +28,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.*
 import com.intellij.openapi.ide.CopyPasteManager
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.text.StringUtil
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
@@ -148,6 +149,7 @@ class PutGroup {
       }
     }
 
+    notifyAboutIdeaPut(editor.project)
     logger.debug("Perform put via plugin")
     val myCarets = if (data.visualSelection != null) {
       data.visualSelection.caretsAndSelections.keys.sortedByDescending { it.logicalPosition }
@@ -452,6 +454,14 @@ class PutGroup {
       maxLen = max(s.length, maxLen)
     }
     return maxLen
+  }
+
+  private fun notifyAboutIdeaPut(project: Project?) {
+    if (VimPlugin.getVimState().isIdeaPutNotified || ClipboardOptionsData.ideaput in OptionsManager.clipboard) return
+
+    VimPlugin.getVimState().isIdeaPutNotified = true
+
+    VimPlugin.getNotifications(project).notifyAboutIdeaPut()
   }
 
   companion object {
