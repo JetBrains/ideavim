@@ -16,7 +16,6 @@ import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.SystemInfo
-import com.intellij.openapi.util.text.TextWithMnemonic
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.key.ShortcutOwner
@@ -127,11 +126,7 @@ class NotificationService(private val project: Project?) {
       listener).notify(project)
   }
 
-  private inner class OpenIdeaVimRcAction(val notification: Notification) : AnAction() {
-    init {
-      this.templatePresentation.setTextWithMnemonic(TextWithMnemonic.parse("_Open ~/.ideavimrc"))
-    }
-
+  private inner class OpenIdeaVimRcAction(val notification: Notification) : AnAction("Open ~/.ideavimrc") {
     override fun actionPerformed(e: AnActionEvent) {
       val eventProject = e.project
       if (eventProject != null) {
@@ -147,11 +142,7 @@ class NotificationService(private val project: Project?) {
     }
   }
 
-  private inner class AppendToIdeaVimRcAction(val notification: Notification, val appendableText: String, val optionName: String, val enableOption: () -> Unit) : AnAction() {
-    init {
-      this.templatePresentation.setTextWithMnemonic(TextWithMnemonic.parse("_Append to ~/.ideavimrc"))
-    }
-
+  private inner class AppendToIdeaVimRcAction(val notification: Notification, val appendableText: String, val optionName: String, val enableOption: () -> Unit) : AnAction("Append to ~/.ideavimrc") {
     override fun actionPerformed(e: AnActionEvent) {
       val eventProject = e.project
       enableOption()
