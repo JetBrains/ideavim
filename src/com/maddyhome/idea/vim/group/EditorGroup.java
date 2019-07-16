@@ -163,9 +163,6 @@ public class EditorGroup {
     final Element editor = new Element("editor");
     element.addContent(editor);
 
-    final Element ideaJoin = new Element("idea-join");
-    ideaJoin.setAttribute("enabled", Boolean.toString(isIdeaJoinNotified));
-    editor.addContent(ideaJoin);
     if (isKeyRepeat != null) {
       final Element keyRepeat = new Element("key-repeat");
       keyRepeat.setAttribute("enabled", Boolean.toString(isKeyRepeat));
@@ -181,13 +178,6 @@ public class EditorGroup {
         final String enabled = keyRepeat.getAttributeValue("enabled");
         if (enabled != null) {
           isKeyRepeat = Boolean.valueOf(enabled);
-        }
-      }
-      final Element ideaJoin = editor.getChild("idea-join");
-      if (ideaJoin != null) {
-        final String enabled = ideaJoin.getAttributeValue("enabled");
-        if (enabled != null) {
-          isIdeaJoinNotified = Boolean.parseBoolean(enabled);
         }
       }
     }
@@ -253,9 +243,9 @@ public class EditorGroup {
   }
 
   public void notifyIdeaJoin(@Nullable Project project) {
-    if (isIdeaJoinNotified || OptionsManager.INSTANCE.getIdeajoin().isSet()) return;
+    if (VimPlugin.getVimState().isIdeaJoinNotified() || OptionsManager.INSTANCE.getIdeajoin().isSet()) return;
 
-    isIdeaJoinNotified = true;
+    VimPlugin.getVimState().setIdeaJoinNotified(true);
 
     VimPlugin.getNotifications(project).notifyAboutIdeaJoin();
   }

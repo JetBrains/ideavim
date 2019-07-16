@@ -113,6 +113,8 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   @NotNull private final YankGroup yank;
   @NotNull private final PutGroup put;
 
+  @NotNull private final VimState state;
+
   public VimPlugin() {
     motion = new MotionGroup();
     change = new ChangeGroup();
@@ -131,6 +133,8 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     visualMotion = new VisualMotionGroup();
     yank = new YankGroup();
     put = new PutGroup();
+
+    state = new VimState();
 
     LOG.debug("VimPlugin ctr");
   }
@@ -169,21 +173,9 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     }
   }
 
-  @Override
-  public Element getState() {
-    LOG.debug("Saving state");
-
-    final Element element = new Element("ideavim");
-    // Save whether the plugin is enabled or not
-    final Element state = new Element("state");
-    state.setAttribute("version", Integer.toString(STATE_VERSION));
-    state.setAttribute("enabled", Boolean.toString(enabled));
-    element.addContent(state);
-
-    key.saveData(element);
-    editor.saveData(element);
-
-    return element;
+  @NotNull
+  public static VimState getVimState() {
+    return getInstance().state;
   }
 
   /**
@@ -322,6 +314,24 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   @NotNull
   private static NotificationService getNotifications() {
     return getNotifications(null);
+  }
+
+  @Override
+  public Element getState() {
+    LOG.debug("Saving state");
+
+    final Element element = new Element("ideavim");
+    // Save whether the plugin is enabled or not
+    final Element state = new Element("state");
+    state.setAttribute("version", Integer.toString(STATE_VERSION));
+    state.setAttribute("enabled", Boolean.toString(enabled));
+    element.addContent(state);
+
+    key.saveData(element);
+    editor.saveData(element);
+    this.state.saveData(element);
+
+    return element;
   }
 
   private void initializePlugin() {
@@ -518,5 +528,6 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
     }
     key.readData(element);
     editor.readData(element);
+    this.state.readData(element);
   }
 }
