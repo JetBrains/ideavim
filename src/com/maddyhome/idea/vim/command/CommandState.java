@@ -38,7 +38,7 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 
 public class CommandState {
-  public static final int DEFAULT_TIMEOUT_LENGTH = 1000;
+  private static final int DEFAULT_TIMEOUT_LENGTH = 1000;
 
   @Nullable private static Command ourLastChange = null;
   private char myLastChangeRegister;
@@ -95,18 +95,19 @@ public class CommandState {
   }
 
   public void pushState(@NotNull Mode mode, @NotNull SubMode submode, @NotNull MappingMode mappingMode) {
-    logger.info("Push new state: " + mode + ":" + submode);
+    final State newState = new State(mode, submode, mappingMode);
+    logger.info("Push new state: " + newState.toSimpleString());
     if (logger.isDebugEnabled()) {
       logger.debug("Stack state before push: " + toSimpleString());
     }
-    myStates.push(new State(mode, submode, mappingMode));
+    myStates.push(newState);
     updateStatus();
   }
 
   public void popState() {
     final State popped = myStates.pop();
     updateStatus();
-    logger.info("Pop state: " + popped.getMode() + ":" + popped.getSubMode());
+    logger.info("Pop state: " + popped.toSimpleString());
     if (logger.isDebugEnabled()) {
       logger.debug("Stack state after pop: " + toSimpleString());
     }
@@ -285,7 +286,7 @@ public class CommandState {
   }
 
   public String toSimpleString() {
-    return myStates.stream().map(state -> state.getMode() + ":" + state.getSubMode())
+    return myStates.stream().map(State::toSimpleString)
       .collect(Collectors.joining(", "));
   }
 
@@ -322,11 +323,12 @@ public class CommandState {
     NONE, SINGLE_COMMAND, VISUAL_CHARACTER, VISUAL_LINE, VISUAL_BLOCK
   }
 
-  private class State {
+  private static class State {
     @NotNull private final Mode myMode;
     @NotNull private SubMode mySubMode;
     @NotNull private final MappingMode myMappingMode;
 
+    @Contract(pure = true)
     public State(@NotNull Mode mode, @NotNull SubMode subMode, @NotNull MappingMode mappingMode) {
       this.myMode = mode;
       this.mySubMode = subMode;
@@ -350,6 +352,10 @@ public class CommandState {
     @NotNull
     public MappingMode getMappingMode() {
       return myMappingMode;
+    }
+
+    public String toSimpleString() {
+      return myMode + ":" + mySubMode;
     }
   }
 }
