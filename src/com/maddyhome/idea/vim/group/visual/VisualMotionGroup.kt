@@ -31,20 +31,7 @@ import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.common.TextRange
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.helper.EditorDataContext
-import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.inBlockSubMode
-import com.maddyhome.idea.vim.helper.inSelectMode
-import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.helper.mode
-import com.maddyhome.idea.vim.helper.subMode
-import com.maddyhome.idea.vim.helper.vimForEachCaret
-import com.maddyhome.idea.vim.helper.vimKeepingVisualOperatorAction
-import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.helper.vimLastSelectionType
-import com.maddyhome.idea.vim.helper.vimLastVisualOperatorRange
-import com.maddyhome.idea.vim.helper.vimSelectionStart
-import com.maddyhome.idea.vim.helper.vimSelectionStartClear
+import com.maddyhome.idea.vim.helper.*
 import com.maddyhome.idea.vim.listener.SelectionVimListenerSuppressor
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.option.OptionsManager
@@ -133,11 +120,26 @@ class VisualMotionGroup {
       val project = editor.project
       val selectMode = OptionsManager.selectmode
       when {
-        editor.isOneLineMode -> enterSelectMode(editor, autodetectedMode)
-        selectionSource == VimListenerManager.SelectionSource.MOUSE && SelectModeOptionData.mouse in selectMode -> enterSelectMode(editor, autodetectedMode)
-        project != null && TemplateManager.getInstance(project).getActiveTemplate(editor) != null && SelectModeOptionData.template in selectMode -> enterSelectMode(editor, autodetectedMode)
-        selectionSource == VimListenerManager.SelectionSource.OTHER && SelectModeOptionData.refactoring in selectMode -> enterSelectMode(editor, autodetectedMode)
-        else -> enterVisualMode(editor, autodetectedMode)
+        editor.isOneLineMode -> {
+          logger.info("Enter select mode. Reason: one line mode")
+          enterSelectMode(editor, autodetectedMode)
+        }
+        selectionSource == VimListenerManager.SelectionSource.MOUSE && SelectModeOptionData.mouse in selectMode -> {
+          logger.info("Enter select mode. Selection source is mouse and selectMode option has mouse")
+          enterSelectMode(editor, autodetectedMode)
+        }
+        project != null && TemplateManager.getInstance(project).getActiveTemplate(editor) != null && SelectModeOptionData.template in selectMode -> {
+          logger.info("Enter select mode. Template is active and selectMode has template")
+          enterSelectMode(editor, autodetectedMode)
+        }
+        selectionSource == VimListenerManager.SelectionSource.OTHER && SelectModeOptionData.refactoring in selectMode -> {
+          logger.info("Enter select mode. Selection source is OTHER and selectMode has refactoring")
+          enterSelectMode(editor, autodetectedMode)
+        }
+        else -> {
+          logger.info("Enter visual mode")
+          enterVisualMode(editor, autodetectedMode)
+        }
       }
       KeyHandler.getInstance().reset(editor)
     } else {
