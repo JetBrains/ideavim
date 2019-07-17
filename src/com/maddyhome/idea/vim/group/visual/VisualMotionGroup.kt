@@ -112,6 +112,7 @@ class VisualMotionGroup {
       val commandState = CommandState.getInstance(editor)
       logger.info("Some carets have selection. State before adjustment: ${commandState.toSimpleString()}")
       modeBeforeEnteringNonVimVisual = commandState.mode
+      logger.info("Mode before entering non-vim visual: $modeBeforeEnteringNonVimVisual")
       while (commandState.mode != CommandState.Mode.COMMAND) {
         commandState.popState()
       }
@@ -147,8 +148,9 @@ class VisualMotionGroup {
       exitVisual(editor)
       exitSelectModeAndResetKeyHandler(editor, true)
 
-      if ((editor.isTemplateActive() || modeBeforeEnteringNonVimVisual == CommandState.Mode.INSERT) && editor.mode == CommandState.Mode.COMMAND) {
-        logger.info("Enter insert mode")
+      val templateActive = editor.isTemplateActive()
+      if ((templateActive || modeBeforeEnteringNonVimVisual == CommandState.Mode.INSERT) && editor.mode == CommandState.Mode.COMMAND) {
+        logger.info("Enter insert mode because ${if (templateActive) "template is active" else "mode before entering non vim visual: $modeBeforeEnteringNonVimVisual"}")
         VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
       }
       updateCaretState(editor)

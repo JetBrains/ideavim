@@ -125,7 +125,73 @@ class TemplateTest : VimTestCase() {
     myFixture.checkResult("""
             class Hello {
                 public static void main() {
-                    int mpre${c}yVar = 5;
+                    int pre${c}myVar = 5;
+                }
+            }
+        """.trimIndent())
+  }
+
+  fun `test motion right`() {
+    configureByJavaText("""
+            class Hello {
+                public static void main() {
+                    int my${c}Var = 5;
+                }
+            }
+        """.trimIndent())
+    startRenaming(VariableInplaceRenameHandler())
+    assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+
+    typeText(parseKeys("<Right>"))
+    assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    myFixture.checkResult("""
+            class Hello {
+                public static void main() {
+                    int myVar${c} = 5;
+                }
+            }
+        """.trimIndent())
+  }
+
+  fun `test motion left on age`() {
+    configureByJavaText("""
+            class Hello {
+                public static void main() {
+                    int ${c}myVar = 5;
+                }
+            }
+        """.trimIndent())
+    startRenaming(VariableInplaceRenameHandler())
+    assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+
+    typeText(parseKeys("<Left>"))
+    assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    myFixture.checkResult("""
+            class Hello {
+                public static void main() {
+                    int ${c}myVar = 5;
+                }
+            }
+        """.trimIndent())
+  }
+
+  fun `test motion right on age`() {
+    configureByJavaText("""
+            class Hello {
+                public static void main() {
+                    int myVa${c}r = 5;
+                }
+            }
+        """.trimIndent())
+    startRenaming(VariableInplaceRenameHandler())
+    assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
+
+    typeText(parseKeys("<Right>"))
+    assertState(CommandState.Mode.INSERT, CommandState.SubMode.NONE)
+    myFixture.checkResult("""
+            class Hello {
+                public static void main() {
+                    int myVar${c} = 5;
                 }
             }
         """.trimIndent())

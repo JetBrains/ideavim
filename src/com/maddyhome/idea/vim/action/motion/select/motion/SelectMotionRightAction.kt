@@ -19,6 +19,7 @@
 package com.maddyhome.idea.vim.action.motion.select.motion
 
 import com.intellij.openapi.actionSystem.DataContext
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
@@ -40,9 +41,16 @@ class SelectMotionRightAction : MotionEditorAction() {
     override fun getOffset(editor: Editor, caret: Caret, context: DataContext, count: Int, rawCount: Int, argument: Argument?): Int {
       val keymodel = OptionsManager.keymodel
       if (KeyModelOptionData.stopsel in keymodel || KeyModelOptionData.stopselect in keymodel) {
+        logger.info("Keymodel option has stopselect. Exiting select mode")
+        val startSelection = caret.selectionStart
+        val endSelection = caret.selectionEnd
         VimPlugin.getVisualMotion().exitSelectMode(editor, false)
         if (editor.isTemplateActive()) {
+          logger.info("Template is active. Activate insert mode")
           VimPlugin.getChange().insertBeforeCursor(editor, context)
+          if (caret.offset in startSelection..endSelection) {
+            return endSelection
+          }
         }
         return caret.offset
       }
@@ -53,4 +61,8 @@ class SelectMotionRightAction : MotionEditorAction() {
   override val mappingModes: MutableSet<MappingMode> = MappingMode.S
 
   override val keyStrokesSet: Set<List<KeyStroke>> = parseKeysSet("<Right>")
+
+  companion object {
+    private val logger = Logger.getInstance(SelectMotionRightAction::class.java)
+  }
 }
