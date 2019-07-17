@@ -354,7 +354,8 @@ public class SearchGroup {
     final int searchStartOffset = searchRange != null ? EditorHelper.getLineStartOffset(editor, searchRange.getStartLine()) : caretOffset;
     final boolean showHighlights = OptionsManager.INSTANCE.getHlsearch().isSet();
     int currentMatchOffset = updateSearchHighlights(pattern, false, showHighlights, searchStartOffset, searchRange, forwards, false);
-    MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), currentMatchOffset == -1 ? caretOffset : currentMatchOffset);
+    LogicalPosition scrollTo = editor.offsetToLogicalPosition(currentMatchOffset == -1 ? caretOffset : currentMatchOffset);
+    editor.getScrollingModel().scrollTo(scrollTo, ScrollType.MAKE_VISIBLE);
   }
 
   private void updateSearchHighlights(@Nullable String pattern, boolean shouldIgnoreSmartCase, boolean showHighlights, boolean forceUpdate) {

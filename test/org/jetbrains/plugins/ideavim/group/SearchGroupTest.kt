@@ -280,7 +280,7 @@ class SearchGroupTest : VimTestCase() {
          |${c}all rocks and lavender and tufted grass,
          |where it was settled on some sodden sand
          |hard by the torrent of a mountain pass.""".trimMargin())
-    typeText(parseKeys("/", "la"))
+    typeText(parseKeys("/", "la<CR>"))
     assertPosition(1, 14)
   }
 
@@ -291,7 +291,7 @@ class SearchGroupTest : VimTestCase() {
            |${c}all rocks and lavender and tufted grass,
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
-    typeText(parseKeys("?", "la"))
+    typeText(parseKeys("?", "la<CR>"))
     assertPosition(0, 26)
   }
 
@@ -314,7 +314,6 @@ class SearchGroupTest : VimTestCase() {
            |where it was settled on some sodden sand
            |hard by the torrent of a mountain pass.""".trimMargin())
     typeText(parseKeys("/", "la"))
-    assertOffset(45)
     typeText(parseKeys("<Esc>"))
     assertOffset(31)
   }

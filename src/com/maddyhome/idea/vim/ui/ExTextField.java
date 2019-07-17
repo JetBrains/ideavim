@@ -305,7 +305,7 @@ public class ExTextField extends JTextField {
    */
   void cancel() {
     clearCurrentAction();
-    VimPlugin.getProcess().cancelExEntry(editor);
+    VimPlugin.getProcess().cancelExEntry(editor, true);
   }
 
   void setCurrentAction(@NotNull ExEditorKit.MultiStepAction action, char pendingIndicator) {

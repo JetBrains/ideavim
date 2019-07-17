@@ -25,7 +25,7 @@ class ActionHandlerTest : VimTestCase() {
       "-----")
     typeText(parseKeys("vjl"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(CommandState.Mode.VISUAL)
     myFixture.checkResult("-----\n" +
       "1/*2345\n" +
       "abc*/de\n" +
@@ -37,7 +37,7 @@ class ActionHandlerTest : VimTestCase() {
     configureByJavaText("1<caret>2345\n" + "abcde\n")
     typeText(parseKeys("vl"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(CommandState.Mode.VISUAL)
     myFixture.checkResult("1/*23*/45\n" + "abcde\n")
   }
 
@@ -49,10 +49,12 @@ class ActionHandlerTest : VimTestCase() {
       "-----")
     typeText(parseKeys("Vj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(CommandState.Mode.VISUAL)
     myFixture.checkResult("-----\n" +
-      "/*12345\n" +
-      "abcde*/\n" +
+      "/*\n" +
+      "12345\n" +
+      "abcde\n" +
+      "*/\n" +
       "-----")
   }
 
@@ -64,7 +66,7 @@ class ActionHandlerTest : VimTestCase() {
       "-----")
     typeText(parseKeys("<C-V>lj"))
     typeText(commandToKeys("'<,'>action CommentByBlockComment"))
-    assertMode(CommandState.Mode.COMMAND)
+    assertMode(CommandState.Mode.VISUAL)
     myFixture.checkResult("-----\n" +
       "1/*23*/45\n" +
       "a/*bc*/de\n" +

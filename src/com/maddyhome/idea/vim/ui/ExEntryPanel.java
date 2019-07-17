@@ -32,7 +32,6 @@ import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExCommand;
 import com.maddyhome.idea.vim.ex.LineRange;
 import com.maddyhome.idea.vim.ex.Ranges;
-import com.maddyhome.idea.vim.group.MotionGroup;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.regexp.CharPointer;
@@ -325,10 +324,13 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     }
   };
 
+  public void deactivate(boolean refocusOwningEditor) {
+    deactivate(refocusOwningEditor, false);
+  }
   /**
    * Turns off the ex entry field and optionally puts the focus back to the original component
    */
-  public void deactivate(boolean refocusOwningEditor) {
+  public void deactivate(boolean refocusOwningEditor, boolean scrollToOldPosition) {
     logger.info("Deactivate ex entry panel");
     if (!active) return;
     active = false;
@@ -337,8 +339,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     if (isIncSearchEnabled()) {
       entry.getDocument().removeDocumentListener(incSearchDocumentListener);
       final Editor editor = entry.getEditor();
-      if (!editor.isDisposed()) {
-        MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), caretOffset);
+      if (!editor.isDisposed() && scrollToOldPosition) {
         editor.getScrollingModel().scrollVertically(verticalOffset);
         editor.getScrollingModel().scrollHorizontally(horizontalOffset);
       }
