@@ -22,7 +22,7 @@ IdeaVim
 </div>
 
 
-IdeaVim is a Vim emulation plugin for IDEs based on the IntelliJ platform.
+IdeaVim is a Vim emulation plugin for IDEs based on the IntelliJ Platform.
 IdeaVim can be used with IntelliJ IDEA, PyCharm, CLion, PhpStorm, WebStorm,
 RubyMine, AppCode, DataGrip, GoLand, Rider, Cursive, and Android Studio.
 
@@ -48,12 +48,12 @@ shortcuts.
 
 Keyboard shortcut conflicts between the Vim emulation and the IDE can be
 resolved via "File | Settings | Editor | Vim Emulation", "File | Settings |
-Keymap" on Linux & Windows, and by "Preferences | Editor | Vim Emulation",
-"Preferences | Keymap" on macOS. They can also be resolved by key mapping
+Keymap" on Linux & Windows, and via "Preferences | Editor | Vim Emulation",
+"Preferences | Keymap" on macOS. They can also be resolved by key-mapping
 commands in your ~/.ideavimrc file.
 
 
-Get an Early Access
+Get Early Access
 -------------------
 
 Would you like to try new features and fixes? Join the Early Access Program and
@@ -64,7 +64,7 @@ Add [https://plugins.jetbrains.com/plugins/eap/ideavim](https://plugins.jetbrain
 
 See [the changelog](CHANGES.md) for the list of hot unreleased features.
 
-It is important to distinguish EAP from traditional pre-release software.
+It is important to distinguish EAP builds from traditional pre-release software.
 Please note that the quality of EAP versions may at times be way below even
 usual beta standards.
 
@@ -104,7 +104,7 @@ Emulated Vim plugins:
 Not supported (yet):
 
 * Jump lists
-* Various less used commands
+* Various less-used commands
 
 See also:
 
@@ -118,16 +118,16 @@ Files
 * ~/.ideavimrc
     * Your IdeaVim-specific Vim initialization commands
 
-You can read your ~/.vimrc file from ~/.ideavimrc using this command:
+You can read your ~/.vimrc file from ~/.ideavimrc with this command:
 
     source ~/.vimrc
 
-Note, that IdeaVim currently parses ~/.ideavimrc file via simple pattern matching,
-see [VIM-669](http://youtrack.jetbrains.com/issue/VIM-669) for proper parsing
+Note, that IdeaVim currently parses ~/.ideavimrc file via simple pattern matching.
+See [VIM-669](http://youtrack.jetbrains.com/issue/VIM-669) for proper parsing
 of VimL files.
 
 Also note that if you have overridden the `user.home` JVM option, this
-will affect where IdeaVim looks for your .ideavimrc file.  For example, if you
+will affect where IdeaVim looks for your .ideavimrc file. For example, if you
 have `-Duser.home=/my/alternate/home` then IdeaVim will source
 `/my/alternate/home/.ideavimrc` instead of `~/.ideavimrc`.
 
@@ -158,7 +158,7 @@ Changes to the IDE
 
 ### Undo/Redo
 
-The IdeaVim plugin uses the undo/redo functionality of the IntelliJ platform,
+The IdeaVim plugin uses the undo/redo functionality of the IntelliJ Platform,
 so the behavior of the `u` and `<C-R>` commands may differ from the original
 Vim. Vim compatibility of undo/redo may be improved in future releases.
 
@@ -166,11 +166,11 @@ See also [unresolved undo issues](http://youtrack.jetbrains.com/issues/VIM?q=%23
 
 ### Escape
 
-Using `<Esc>` in dialog windows remains problematic. For most dialog windows
-the Vim emulator is put into the insert mode with `<Esc>` not working. You
-should use `<C-c>` or `<C-[>` instead. In some dialog windows the normal mode is
-on by default. The usage of the Vim emulator in dialog windows is an area for
-improvements.
+Using `<Esc>` in dialog windows remains problematic. For most dialog windows,
+the Vim emulator is put into insert mode with `<Esc>` not working. You
+should use `<C-c>` or `<C-[>` instead. In some dialog windows, the normal mode is
+switched by default. The usage of the Vim emulator in dialog windows is an area for
+improvement.
 
 See also [unresolved escape issues](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+i_Esc).
 
@@ -204,4 +204,4 @@ for a list of authors and contributors.
 License
 -------
 
-IdeaVim is licensed under the terms of the GNU Public license version 2.
+IdeaVim is licensed under the terms of the GNU Public License version 2.
