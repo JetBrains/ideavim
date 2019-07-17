@@ -20,8 +20,6 @@ package com.maddyhome.idea.vim.group;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.intellij.codeInsight.template.Template;
-import com.intellij.codeInsight.template.TemplateManager;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -848,10 +846,8 @@ public class ChangeGroup {
   }
 
   private boolean activeTemplateWithLeftRightMotion(Editor editor, KeyStroke keyStroke) {
-    Template template =
-      TemplateManager.getInstance(Objects.requireNonNull(editor.getProject())).getActiveTemplate(editor);
-    return template != null &&
-           (keyStroke.getKeyCode() == KeyEvent.VK_LEFT || keyStroke.getKeyCode() == KeyEvent.VK_RIGHT);
+    return HelperKt.isTemplateActive(editor)
+      && (keyStroke.getKeyCode() == KeyEvent.VK_LEFT || keyStroke.getKeyCode() == KeyEvent.VK_RIGHT);
   }
 
   /**

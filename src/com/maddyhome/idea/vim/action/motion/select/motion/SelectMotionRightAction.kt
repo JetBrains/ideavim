@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.action.motion.select.motion
 
-import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
@@ -27,6 +26,7 @@ import com.maddyhome.idea.vim.action.MotionEditorAction
 import com.maddyhome.idea.vim.command.Argument
 import com.maddyhome.idea.vim.command.MappingMode
 import com.maddyhome.idea.vim.handler.MotionActionHandler
+import com.maddyhome.idea.vim.helper.isTemplateActive
 import com.maddyhome.idea.vim.option.KeyModelOptionData
 import com.maddyhome.idea.vim.option.OptionsManager
 import javax.swing.KeyStroke
@@ -41,8 +41,9 @@ class SelectMotionRightAction : MotionEditorAction() {
       val keymodel = OptionsManager.keymodel
       if (KeyModelOptionData.stopsel in keymodel || KeyModelOptionData.stopselect in keymodel) {
         VimPlugin.getVisualMotion().exitSelectMode(editor, false)
-        TemplateManager.getInstance(editor.project)
-          .getActiveTemplate(editor)?.run { VimPlugin.getChange().insertBeforeCursor(editor, context) }
+        if (editor.isTemplateActive()) {
+          VimPlugin.getChange().insertBeforeCursor(editor, context)
+        }
         return caret.offset
       }
       return VimPlugin.getMotion().moveCaretHorizontal(editor, caret, count, false)

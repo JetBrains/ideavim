@@ -18,6 +18,7 @@
 
 package com.maddyhome.idea.vim.helper
 
+import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.injected.editor.EditorWindow
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
@@ -100,3 +101,8 @@ inline fun Editor.vimForEachCaret(action: (caret: Caret) -> Unit) {
 }
 
 fun Editor.getTopLevelEditor() = if (this is EditorWindow) this.delegate else this
+
+fun Editor.isTemplateActive(): Boolean {
+  val project = this.project ?: return false
+  return TemplateManager.getInstance(project).getActiveTemplate(this) != null
+}

@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.group.visual
 
-import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
@@ -128,7 +127,7 @@ class VisualMotionGroup {
           logger.info("Enter select mode. Selection source is mouse and selectMode option has mouse")
           enterSelectMode(editor, autodetectedMode)
         }
-        project != null && TemplateManager.getInstance(project).getActiveTemplate(editor) != null && SelectModeOptionData.template in selectMode -> {
+        editor.isTemplateActive() && SelectModeOptionData.template in selectMode -> {
           logger.info("Enter select mode. Template is active and selectMode has template")
           enterSelectMode(editor, autodetectedMode)
         }
@@ -148,8 +147,7 @@ class VisualMotionGroup {
       exitVisual(editor)
       exitSelectModeAndResetKeyHandler(editor, true)
 
-      val project = editor.project
-      if ((project != null && TemplateManager.getInstance(project).getActiveTemplate(editor) != null || modeBeforeEnteringNonVimVisual == CommandState.Mode.INSERT) && editor.mode == CommandState.Mode.COMMAND) {
+      if ((editor.isTemplateActive() || modeBeforeEnteringNonVimVisual == CommandState.Mode.INSERT) && editor.mode == CommandState.Mode.COMMAND) {
         logger.info("Enter insert mode")
         VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
       }
