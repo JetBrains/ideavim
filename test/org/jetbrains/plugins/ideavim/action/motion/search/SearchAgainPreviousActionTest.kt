@@ -1,4 +1,4 @@
-package com.maddyhome.idea.vim.action.motion.search
+package org.jetbrains.plugins.ideavim.action.motion.search
 
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandFlags
