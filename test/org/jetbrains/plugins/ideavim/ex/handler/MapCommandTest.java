@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex;
+package org.jetbrains.plugins.ideavim.ex.handler;
 
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser;

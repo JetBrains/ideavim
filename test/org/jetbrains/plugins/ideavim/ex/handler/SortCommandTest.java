@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.ex;
+package org.jetbrains.plugins.ideavim.ex.handler;
 
 import com.google.common.collect.Lists;
 import org.jetbrains.plugins.ideavim.VimTestCase;
