@@ -24,14 +24,7 @@ import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.editor.actionSystem.EditorActionManager
-import com.intellij.openapi.editor.event.EditorFactoryEvent
-import com.intellij.openapi.editor.event.EditorFactoryListener
-import com.intellij.openapi.editor.event.EditorMouseEvent
-import com.intellij.openapi.editor.event.EditorMouseEventArea
-import com.intellij.openapi.editor.event.EditorMouseListener
-import com.intellij.openapi.editor.event.EditorMouseMotionListener
-import com.intellij.openapi.editor.event.SelectionEvent
-import com.intellij.openapi.editor.event.SelectionListener
+import com.intellij.openapi.editor.event.*
 import com.intellij.openapi.editor.ex.DocumentEx
 import com.intellij.openapi.editor.impl.EditorComponentImpl
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
@@ -43,22 +36,11 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.VimTypedActionHandler
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.ExOutputModel
-import com.maddyhome.idea.vim.group.ChangeGroup
-import com.maddyhome.idea.vim.group.EditorGroup
-import com.maddyhome.idea.vim.group.FileGroup
-import com.maddyhome.idea.vim.group.MarkGroup
-import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.group.SearchGroup
+import com.maddyhome.idea.vim.group.*
 import com.maddyhome.idea.vim.group.visual.VisualMotionGroup
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
-import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.inInsertMode
-import com.maddyhome.idea.vim.helper.inSelectMode
-import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.helper.subMode
-import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.helper.vimMotionGroup
+import com.maddyhome.idea.vim.helper.*
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.ui.ExEntryPanel
 import java.awt.event.MouseAdapter
@@ -335,7 +317,7 @@ object VimListenerManager {
         VimPlugin.getMotion()
         val editor = event.editor
         if (ExEntryPanel.getInstance().isActive) {
-          VimPlugin.getProcess().cancelExEntry(editor, ExEntryPanel.getInstance().entry.context)
+          VimPlugin.getProcess().cancelExEntry(editor)
         }
 
         ExOutputModel.getInstance(editor).clear()
@@ -359,7 +341,7 @@ object VimListenerManager {
         event.mouseEvent.button != MouseEvent.BUTTON3) {
         VimPlugin.getMotion()
         if (ExEntryPanel.getInstance().isActive) {
-          VimPlugin.getProcess().cancelExEntry(event.editor, ExEntryPanel.getInstance().entry.context)
+          VimPlugin.getProcess().cancelExEntry(event.editor)
         }
 
         ExOutputModel.getInstance(event.editor).clear()

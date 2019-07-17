@@ -18,7 +18,6 @@
 
 package com.maddyhome.idea.vim.ex.range;
 
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
 import com.maddyhome.idea.vim.VimPlugin;
@@ -46,12 +45,11 @@ public class MarkRange extends AbstractRange {
    * Gets the line number specified by this range without regard to any offset.
    *
    * @param editor   The editor to get the line for
-   * @param context  The data context
    * @param lastZero True if last line was set to start of file
    * @return The zero based line number, -1 if there is no such mark set in the file
    */
   @Override
-  public int getRangeLine(@NotNull Editor editor, DataContext context, boolean lastZero) {
+  public int getRangeLine(@NotNull Editor editor, boolean lastZero) {
     Mark mark = VimPlugin.getMark().getFileMark(editor, this.mark);
 
     if (mark != null) {
@@ -63,9 +61,9 @@ public class MarkRange extends AbstractRange {
   }
 
   @Override
-  protected int getRangeLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context,
+  protected int getRangeLine(@NotNull Editor editor, @NotNull Caret caret,
                              boolean lastZero) {
-    return getRangeLine(editor, context, lastZero);
+    return getRangeLine(editor, lastZero);
   }
 
   @NotNull

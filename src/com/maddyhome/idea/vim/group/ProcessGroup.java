@@ -31,6 +31,7 @@ import com.maddyhome.idea.vim.command.MappingMode;
 import com.maddyhome.idea.vim.common.TextRange;
 import com.maddyhome.idea.vim.ex.CommandParser;
 import com.maddyhome.idea.vim.ex.ExException;
+import com.maddyhome.idea.vim.helper.CommandStateHelper;
 import com.maddyhome.idea.vim.helper.UiHelper;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import org.jetbrains.annotations.NotNull;
@@ -62,7 +63,7 @@ public class ProcessGroup {
     panel.activate(editor, context, label, initText, count);
   }
 
-  public String endSearchCommand(@NotNull final Editor editor, @NotNull DataContext context) {
+  public String endSearchCommand(@NotNull final Editor editor) {
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true);
 
@@ -114,7 +115,7 @@ public class ProcessGroup {
       if (panel.getLabel().equals(":")) {
         flags = CommandParser.getInstance().processCommand(editor, context, text, 1);
         if (logger.isDebugEnabled()) logger.debug("flags=" + flags);
-        if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
+        if (CommandStateHelper.inVisualMode(editor)) {
           VimPlugin.getVisualMotion().exitVisual(editor);
         }
       }
@@ -142,7 +143,7 @@ public class ProcessGroup {
     return res;
   }
 
-  public void cancelExEntry(@NotNull final Editor editor, @NotNull final DataContext context) {
+  public void cancelExEntry(@NotNull final Editor editor) {
     CommandState.getInstance(editor).popState();
     KeyHandler.getInstance().reset(editor);
     ExEntryPanel panel = ExEntryPanel.getInstance();

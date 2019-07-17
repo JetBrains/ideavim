@@ -202,7 +202,7 @@ public class KeyHandler {
       }
       // If this is a command node the user has entered a valid key sequence of a known command
       else if (node instanceof CommandNode) {
-        handleCommandNode(editor, context, (CommandNode)node);
+        handleCommandNode(editor, (CommandNode)node);
       }
       // If this is an argument node then the last keystroke was not part of the current command but should
       // be the first keystroke of the argument of the current command
@@ -541,7 +541,7 @@ public class KeyHandler {
     }
   }
 
-  private void handleCommandNode(@NotNull Editor editor, @NotNull DataContext context, @NotNull CommandNode node) {
+  private void handleCommandNode(@NotNull Editor editor, @NotNull CommandNode node) {
     // If all does well we are ready to process this command
     state = State.READY;
     // Did we just get the completed sequence for a motion command argument?
@@ -569,7 +569,7 @@ public class KeyHandler {
       }
     }
     else if (currentArg == Argument.Type.EX_STRING && node.getFlags().contains(CommandFlags.FLAG_COMPLETE_EX)) {
-      String text = VimPlugin.getProcess().endSearchCommand(editor, context);
+      String text = VimPlugin.getProcess().endSearchCommand(editor);
       Argument arg = new Argument(text);
       Command cmd = currentCmd.peek();
       cmd.setArgument(arg);

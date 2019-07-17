@@ -32,7 +32,7 @@ class DumpLineHandler : CommandHandler.SingleExecution() {
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     if (!logger.isDebugEnabled) return false
 
-    val range = cmd.getLineRange(editor, context)
+    val range = cmd.getLineRange(editor)
     val chars = editor.document.charsSequence
     for (l in range.startLine..range.endLine) {
       val start = editor.document.getLineStartOffset(l)

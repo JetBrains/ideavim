@@ -215,7 +215,7 @@ public class ExTextField extends JTextField {
     return super.getText();
   }
 
-  void setEditor(Editor editor, DataContext context) {
+  void setEditor(@NotNull Editor editor, DataContext context) {
     this.editor = editor;
     this.context = context;
     String disposeKey = vimExTextFieldDisposeKey + editor.hashCode();
@@ -305,7 +305,7 @@ public class ExTextField extends JTextField {
    */
   void cancel() {
     clearCurrentAction();
-    VimPlugin.getProcess().cancelExEntry(editor, context);
+    VimPlugin.getProcess().cancelExEntry(editor);
   }
 
   void setCurrentAction(@NotNull ExEditorKit.MultiStepAction action, char pendingIndicator) {

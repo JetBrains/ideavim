@@ -35,7 +35,7 @@ class MarkHandler : CommandHandler.SingleExecution() {
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val mark = cmd.argument[0]
-    val line = cmd.getLine(editor, context)
+    val line = cmd.getLine(editor)
     val offset = EditorHelper.getLineStartOffset(editor, line)
 
     return if (mark.isLetter() || mark in "'`") {

@@ -32,8 +32,8 @@ public class ExCommand {
     this.command = command;
   }
 
-  public int getLine(@NotNull Editor editor, DataContext context) {
-    return ranges.getLine(editor, context);
+  public int getLine(@NotNull Editor editor) {
+    return ranges.getLine(editor);
   }
 
   public int getLine(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {
@@ -62,8 +62,8 @@ public class ExCommand {
   }
 
   @NotNull
-  public LineRange getLineRange(@NotNull Editor editor, DataContext context) {
-    return ranges.getLineRange(editor, context, -1);
+  public LineRange getLineRange(@NotNull Editor editor) {
+    return ranges.getLineRange(editor, -1);
   }
 
   public LineRange getLineRange(@NotNull Editor editor, @NotNull Caret caret, @NotNull DataContext context) {

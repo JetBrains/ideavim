@@ -127,45 +127,67 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     active = true;
   }
 
-  /**
-   * Turns off the ex entry field and optionally puts the focus back to the original component
-   */
-  public void deactivate(boolean refocusOwningEditor) {
-    logger.info("deactivate");
-    if (!active) return;
-    active = false;
-
-    // incsearch won't change in the lifetime of this activation
-    if (isIncSearchEnabled()) {
-      entry.getDocument().removeDocumentListener(incSearchDocumentListener);
+  @NotNull private final DocumentListener incSearchDocumentListener = new DocumentAdapter() {
+    @Override
+    protected void textChanged(@NotNull DocumentEvent e) {
       final Editor editor = entry.getEditor();
-      if (!editor.isDisposed()) {
-        MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), caretOffset);
-        editor.getScrollingModel().scrollVertically(verticalOffset);
-        editor.getScrollingModel().scrollHorizontally(horizontalOffset);
+
+      LineRange searchRange = null;
+      char separator = label.getText().charAt(0);
+      String searchText = entry.getActualText();
+      if (label.getText().equals(":")) {
+        final ExCommand command = getIncsearchCommand(searchText);
+        if (command == null) {
+          return;
+        }
+        searchText = "";
+        final String argument = command.getArgument();
+        if (argument.length() > 1) {  // E.g. skip '/' in `:%s/`. `%` is range, `s` is command, `/` is argument
+          separator = argument.charAt(0);
+          searchText = argument.substring(1);
+        }
+        if (searchText.length() == 0) {
+          VimPlugin.getSearch().resetIncsearchHighlights();
+          return;
+        }
+        final Ranges ranges = command.getRanges();
+        ranges.setDefaultLine(CharacterPosition.Companion.fromOffset(editor, caretOffset).line);
+        searchRange = command.getLineRange(editor);
       }
-      // This is somewhat inefficient. We've done the search, highlighted everything and now (if we hit <Enter>), we're
-      // removing all the highlights to invoke the search action, to search and highlight everything again. On the plus
-      // side, it clears up the current item highlight
-      VimPlugin.getSearch().resetIncsearchHighlights();
+
+      final boolean forwards = !label.getText().equals("?");  // :s, :g, :v are treated as forwards
+      final String pattern;
+      if (searchText == null) {
+        pattern = "";
+      } else {
+        final CharPointer p = new CharPointer(searchText);
+        final CharPointer end = RegExp.skip_regexp(new CharPointer(searchText), separator, true);
+        pattern = p.substring(end.pointer() - p.pointer());
+      }
+
+      VimPlugin.getEditor().closeEditorSearchSession(editor);
+      VimPlugin.getSearch().updateIncsearchHighlights(editor, pattern, forwards, caretOffset, searchRange);
     }
 
-    entry.deactivate();
-
-    if (!ApplicationManager.getApplication().isUnitTestMode()) {
-      if (refocusOwningEditor && parent != null) {
-        UiHelper.requestFocus(parent);
+    @Contract("null -> null")
+    @Nullable
+    private ExCommand getIncsearchCommand(@Nullable String commandText) {
+      if (commandText == null) return null;
+      try {
+        final ExCommand exCommand = CommandParser.getInstance().parse(commandText);
+        final String command = exCommand.getCommand();
+        // TODO: Add global, vglobal, smagic and snomagic here when the commands are supported
+        if ("substitute".startsWith(command)) {
+          return exCommand;
+        }
+      }
+      catch(Exception e) {
+        logger.warn("Cannot parse command for incsearch", e);
       }
 
-      oldGlass.removeComponentListener(resizePanelListener);
-      oldGlass.setVisible(false);
-      oldGlass.remove(this);
-      oldGlass.setOpaque(wasOpaque);
-      oldGlass.setLayout(oldLayout);
+      return null;
     }
-
-    parent = null;
-  }
+  };
 
   /**
    * Gets the label for the ex entry. This should be one of ":", "/", or "?"
@@ -303,67 +325,45 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     }
   };
 
-  @NotNull private final DocumentListener incSearchDocumentListener = new DocumentAdapter() {
-    @Override
-    protected void textChanged(@NotNull DocumentEvent e) {
+  /**
+   * Turns off the ex entry field and optionally puts the focus back to the original component
+   */
+  public void deactivate(boolean refocusOwningEditor) {
+    logger.info("Deactivate ex entry panel");
+    if (!active) return;
+    active = false;
+
+    // incsearch won't change in the lifetime of this activation
+    if (isIncSearchEnabled()) {
+      entry.getDocument().removeDocumentListener(incSearchDocumentListener);
       final Editor editor = entry.getEditor();
-
-      LineRange searchRange = null;
-      char separator = label.getText().charAt(0);
-      String searchText = entry.getActualText();
-      if (label.getText().equals(":")) {
-        final ExCommand command = getIncsearchCommand(searchText);
-        if (command == null) {
-          return;
-        }
-        searchText = "";
-        final String argument = command.getArgument();
-        if (argument.length() > 1) {  // E.g. skip '/' in `:%s/`. `%` is range, `s` is command, `/` is argument
-          separator = argument.charAt(0);
-          searchText = argument.substring(1);
-        }
-        if (searchText.length() == 0) {
-          VimPlugin.getSearch().resetIncsearchHighlights();
-          return;
-        }
-        final Ranges ranges = command.getRanges();
-        ranges.setDefaultLine(CharacterPosition.Companion.fromOffset(editor, caretOffset).line);
-        searchRange = command.getLineRange(editor, entry.getContext());
+      if (!editor.isDisposed()) {
+        MotionGroup.moveCaret(editor, editor.getCaretModel().getPrimaryCaret(), caretOffset);
+        editor.getScrollingModel().scrollVertically(verticalOffset);
+        editor.getScrollingModel().scrollHorizontally(horizontalOffset);
       }
-
-      final boolean forwards = !label.getText().equals("?");  // :s, :g, :v are treated as forwards
-      final String pattern;
-      if (searchText == null) {
-        pattern = "";
-      } else {
-        final CharPointer p = new CharPointer(searchText);
-        final CharPointer end = RegExp.skip_regexp(new CharPointer(searchText), separator, true);
-        pattern = p.substring(end.pointer() - p.pointer());
-      }
-
-      VimPlugin.getEditor().closeEditorSearchSession(editor);
-      VimPlugin.getSearch().updateIncsearchHighlights(editor, pattern, forwards, caretOffset, searchRange);
+      // This is somewhat inefficient. We've done the search, highlighted everything and now (if we hit <Enter>), we're
+      // removing all the highlights to invoke the search action, to search and highlight everything again. On the plus
+      // side, it clears up the current item highlight
+      VimPlugin.getSearch().resetIncsearchHighlights();
     }
 
-    @Contract("null -> null")
-    @Nullable
-    private ExCommand getIncsearchCommand(@Nullable String commandText) {
-      if (commandText == null) return null;
-      try {
-        final ExCommand exCommand = CommandParser.getInstance().parse(commandText);
-        final String command = exCommand.getCommand();
-        // TODO: Add global, vglobal, smagic and snomagic here when the commands are supported
-        if ("substitute".startsWith(command)) {
-          return exCommand;
-        }
-      }
-      catch(Exception e) {
-        logger.warn("Cannot parse command for incsearch", e);
+    entry.deactivate();
+
+    if (!ApplicationManager.getApplication().isUnitTestMode()) {
+      if (refocusOwningEditor && parent != null) {
+        UiHelper.requestFocus(parent);
       }
 
-      return null;
+      oldGlass.removeComponentListener(resizePanelListener);
+      oldGlass.setVisible(false);
+      oldGlass.remove(this);
+      oldGlass.setOpaque(wasOpaque);
+      oldGlass.setLayout(oldLayout);
     }
-  };
+
+    parent = null;
+  }
 
   private static ExEntryPanel instance;
   private static final Logger logger = Logger.getInstance(ExEntryPanel.class.getName());

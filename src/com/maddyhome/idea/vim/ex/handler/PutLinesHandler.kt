@@ -23,7 +23,6 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.WRITABLE
 import com.maddyhome.idea.vim.ex.ExCommand
 import com.maddyhome.idea.vim.ex.commands
 import com.maddyhome.idea.vim.ex.flags
@@ -44,9 +43,9 @@ class PutLinesHandler : CommandHandler.SingleExecution() {
       registerGroup.selectRegister(registerGroup.defaultRegister)
     }
 
-    val line = if (cmd.ranges.size() == 0) -1 else cmd.getLine(editor, context)
+    val line = if (cmd.ranges.size() == 0) -1 else cmd.getLine(editor)
     val textData = registerGroup.lastRegister?.let { PutData.TextData(it.text, SelectionType.LINE_WISE, it.transferableData) }
-    val putData = PutData(textData, null, 1, false, false, false, line)
+    val putData = PutData(textData, null, 1, insertTextBeforeCaret = false, _indent = false, caretAfterInsertedText = false, putToLine = line)
     return VimPlugin.getPut().putText(editor, context, putData)
   }
 }
