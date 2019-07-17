@@ -24,7 +24,7 @@ package org.jetbrains.plugins.ideavim.action.copy
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.VimBehaviourDiffers
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 import org.jetbrains.plugins.ideavim.rangeOf
 import org.junit.Test
@@ -514,7 +514,7 @@ class PutVisualTextActionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
-  @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             I found it in a legendary land
@@ -547,7 +547,7 @@ class PutVisualTextActionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
-  @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             ${c}Discovery
@@ -580,7 +580,7 @@ class PutVisualTextActionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
-  @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             ${c}Discovery
@@ -664,7 +664,7 @@ class PutVisualTextActionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
-  @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             I found it in a legendary land
@@ -697,7 +697,7 @@ class PutVisualTextActionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
-  @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             ${c}A Discovery
@@ -730,7 +730,7 @@ class PutVisualTextActionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
-  @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             ${c}A Discovery
@@ -802,7 +802,7 @@ class PutVisualTextActionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
-  @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             I |found| it in a legendary land
@@ -857,7 +857,7 @@ class PutVisualTextActionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
-  @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             I |found| it in a legendary land
@@ -915,7 +915,7 @@ class PutVisualTextActionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
-  @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             $c|found|
@@ -1089,7 +1089,7 @@ class PutVisualTextActionTest : VimTestCase() {
 
   // ----- Case 8: Copied | Linewise | --- pasted | Blockwise | ---| small p |--------------------
 
-  @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             I  it in a legendary land
@@ -1149,7 +1149,7 @@ class PutVisualTextActionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
-  @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             I  it in a legendary land
@@ -1186,7 +1186,7 @@ class PutVisualTextActionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
-  @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             I  it in a legendary land
@@ -1221,7 +1221,7 @@ class PutVisualTextActionTest : VimTestCase() {
     myFixture.checkResult(after)
   }
 
-  @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             I

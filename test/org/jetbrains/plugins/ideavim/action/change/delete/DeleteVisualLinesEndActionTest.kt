@@ -22,7 +22,7 @@ package org.jetbrains.plugins.ideavim.action.change.delete
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.VimBehaviourDiffers
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class DeleteVisualLinesEndActionTest : VimTestCase() {
@@ -46,7 +46,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
                 ${c}all rocks and lavender and tufted grass,
@@ -93,7 +93,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  @VimBehaviourDiffers("""
+  @VimBehaviorDiffers("""
             A Discovery
 
             I found it in a legendary land
@@ -165,7 +165,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  @VimBehaviourDiffers("""
+  @VimBehaviorDiffers("""
             A Discovery
 
             I found it in a legendary land
@@ -265,7 +265,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
                 ${c}all rocks and lavender and tufted grass,
@@ -312,7 +312,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  @VimBehaviourDiffers("""
+  @VimBehaviorDiffers("""
             A Discovery
 
             I found it in a legendary land
@@ -342,7 +342,7 @@ class DeleteVisualLinesEndActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  @VimBehaviourDiffers("""
+  @VimBehaviorDiffers("""
             A Discovery
 
             I found it in a legendary land

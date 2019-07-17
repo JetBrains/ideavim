@@ -22,7 +22,7 @@ package org.jetbrains.plugins.ideavim.action.motion.select
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.VimBehaviourDiffers
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class SelectToggleVisualModeHandlerTest : VimTestCase() {
@@ -246,7 +246,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
-  @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
                 A Discovery
 
                 ${s}${c}I${se} found it in a legendary land
@@ -274,7 +274,7 @@ class SelectToggleVisualModeHandlerTest : VimTestCase() {
       CommandState.SubMode.VISUAL_CHARACTER)
   }
 
-  @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
                 A Discovery
 
                 ${s}I found it in a legendary land

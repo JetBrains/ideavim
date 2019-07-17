@@ -159,7 +159,7 @@ Changes to the IDE
 ### Undo/Redo
 
 The IdeaVim plugin uses the undo/redo functionality of the IntelliJ platform,
-so the behaviour of the `u` and `<C-R>` commands may differ from the original
+so the behavior of the `u` and `<C-R>` commands may differ from the original
 Vim. Vim compatibility of undo/redo may be improved in future releases.
 
 See also [unresolved undo issues](http://youtrack.jetbrains.com/issues/VIM?q=%23Unresolved+Help+topic%3A+u).

@@ -20,7 +20,7 @@ package org.jetbrains.plugins.ideavim.action.motion.select
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.VimBehaviourDiffers
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -232,7 +232,7 @@ class SelectKeyHandlerTest : VimTestCase() {
       CommandState.SubMode.NONE)
   }
 
-  @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
                 A Discovery
                 Hello
                 Hellofound it in a legendary land

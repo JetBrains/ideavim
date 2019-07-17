@@ -20,7 +20,7 @@ package org.jetbrains.plugins.ideavim.action.change
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.VimBehaviourDiffers
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 class RepeatChangeActionTest : VimTestCase() {
@@ -232,7 +232,7 @@ class RepeatChangeActionTest : VimTestCase() {
     doTest(keys, before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  @VimBehaviourDiffers("""
+  @VimBehaviorDiffers("""
                 A Discovery
 
                 XXXXXnd it in a legendary land

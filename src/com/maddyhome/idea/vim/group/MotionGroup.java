@@ -663,7 +663,7 @@ public class MotionGroup {
     if (diff != 0) {
 
       // If we need to scroll the current line more than half a screen worth of lines then we just centre the new
-      // current line. This mimics vim behaviour of e.g. 100G in a 300 line file with a screen size of 25 centering line
+      // current line. This mimics vim behavior of e.g. 100G in a 300 line file with a screen size of 25 centering line
       // 100. It also handles so=999 keeping the current line centred.
       // It doesn't handle keeping the line centred when scroll offset is less than a full page height, as the new line
       // might be within e.g. top + scroll offset, so we test for that separately.

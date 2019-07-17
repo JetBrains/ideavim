@@ -23,7 +23,7 @@ package org.jetbrains.plugins.ideavim.group.motion
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.VimBehaviourDiffers
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -76,7 +76,7 @@ class VisualMotionGroup_ControlNonVimSelection_Test : VimTestCase() {
     assertCaretsColour()
   }
 
-  @VimBehaviourDiffers(originalVimAfter = """
+  @VimBehaviorDiffers(originalVimAfter = """
             A Discovery
 
             I ${s}found i${c}t$se in a legendary land

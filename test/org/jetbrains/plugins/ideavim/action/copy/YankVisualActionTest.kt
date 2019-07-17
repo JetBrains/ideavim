@@ -23,7 +23,7 @@ package org.jetbrains.plugins.ideavim.action.copy
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.SelectionType
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
-import com.maddyhome.idea.vim.helper.VimBehaviourDiffers
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 import javax.swing.KeyStroke
@@ -42,7 +42,7 @@ class YankVisualActionTest : VimTestCase() {
       "found", SelectionType.CHARACTER_WISE)
   }
 
-  @VimBehaviourDiffers("\n")
+  @VimBehaviorDiffers("\n")
   fun `test yank empty line`() {
     doTest(parseKeys("v", "y"),
       """
@@ -56,7 +56,7 @@ class YankVisualActionTest : VimTestCase() {
       "", SelectionType.CHARACTER_WISE)
   }
 
-  @VimBehaviourDiffers("land\n")
+  @VimBehaviorDiffers("land\n")
   fun `test yank to the end`() {
     doTest(parseKeys("viwl", "y"),
       """
