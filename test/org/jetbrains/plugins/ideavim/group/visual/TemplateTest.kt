@@ -247,7 +247,7 @@ class TemplateTest : VimTestCase() {
     val editor = if (myFixture.editor is EditorWindow) (myFixture.editor as EditorWindow).delegate else myFixture.editor
     VimListenerManager.EditorListeners.add(editor)
 
-    TemplateManagerImpl.setTemplateTesting(disposable)
+    TemplateManagerImpl.setTemplateTesting(myFixture.project, disposable)
     handler.doRename(myFixture.elementAtCaret, editor, dataContext)
     return editor
   }
