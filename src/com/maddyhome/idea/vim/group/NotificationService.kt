@@ -21,6 +21,7 @@ import com.maddyhome.idea.vim.ex.vimscript.VimScriptParser
 import com.maddyhome.idea.vim.key.ShortcutOwner
 import com.maddyhome.idea.vim.option.ClipboardOptionsData
 import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.option.SelectModeOptionData
 import com.maddyhome.idea.vim.ui.VimEmulationConfigurable
 import java.io.File
 import javax.swing.KeyStroke
@@ -33,6 +34,25 @@ class NotificationService(private val project: Project?) {
   // This constructor is used to create an applicationService
   @Suppress("unused")
   constructor() : this(null)
+
+  fun notifyAboutTemplateInSelectMode() {
+    val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
+      "We recommend to add <b><code>template</code></b> to the <b><code>selectmode</code></b> option to enable <a href='#select'>select mode</a> during template editing" +
+        "<br/><code>set selectmode+=template</code></b>",
+      NotificationType.INFORMATION, NotificationListener { _, event ->
+      if (event.description == "#select") {
+        BrowserLauncher.instance.open(selectModeUrl)
+      }
+    })
+
+    notification.addAction(OpenIdeaVimRcAction(notification))
+
+    notification.addAction(AppendToIdeaVimRcAction(notification, "set selectmode+=template", "template") { OptionsManager.selectmode.append(SelectModeOptionData.template) })
+
+    notification.addAction(HelpLink(notification, selectModeUrl))
+
+    notification.notify(project)
+  }
 
   fun notifyAboutIdeaPut() {
     val notification = Notification(IDEAVIM_NOTIFICATION_ID, IDEAVIM_NOTIFICATION_TITLE,
@@ -55,12 +75,7 @@ class NotificationService(private val project: Project?) {
 
     notification.addAction(AppendToIdeaVimRcAction(notification, "set ideajoin", "ideajoin") { OptionsManager.ideajoin.set() })
 
-    notification.addAction(object : AnAction("", "", AllIcons.General.TodoQuestion) {
-      override fun actionPerformed(e: AnActionEvent) {
-        BrowserLauncher.instance.open(ideajoinExamplesUrl)
-        notification.expire()
-      }
-    })
+    notification.addAction(HelpLink(notification, ideajoinExamplesUrl))
     notification.notify(project)
   }
 
@@ -162,11 +177,18 @@ class NotificationService(private val project: Project?) {
     }
   }
 
+  private inner class HelpLink(val notification: Notification, val link: String) : AnAction("", "", AllIcons.General.TodoQuestion) {
+    override fun actionPerformed(e: AnActionEvent) {
+      BrowserLauncher.instance.open(link)
+      notification.expire()
+    }
+  }
 
   companion object {
     const val IDEAVIM_STICKY_NOTIFICATION_ID = "ideavim-sticky"
     const val IDEAVIM_NOTIFICATION_ID = "ideavim"
     const val IDEAVIM_NOTIFICATION_TITLE = "IdeaVim"
     const val ideajoinExamplesUrl = "https://github.com/JetBrains/ideavim/blob/master/doc/ideajoin-examples.md"
+    const val selectModeUrl = "https://vimhelp.org/visual.txt.html#Select-mode"
   }
 }

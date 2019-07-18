@@ -67,7 +67,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
                    mouse           when using the mouse
                    key             when using shifted special[1] keys
                    cmd             when using "v", "V", or <C-V>
-                   template        when starting atemplate       - IdeaVim ONLY
+                   template        when starting a template       - IdeaVim ONLY
                    refactoring     when refactoring without      - IdeaVim ONLY
                                     a template is performed
 

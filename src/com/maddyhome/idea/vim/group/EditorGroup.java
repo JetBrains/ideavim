@@ -57,8 +57,6 @@ public class EditorGroup {
   private boolean isRefrainFromScrolling = false;
   private Boolean isKeyRepeat = null;
 
-  private boolean isIdeaJoinNotified = false;
-
   private final CaretListener myLineNumbersCaretListener = new CaretListener() {
     @Override
     public void caretPositionChanged(CaretEvent e) {

@@ -8,6 +8,7 @@ import org.jdom.Element
 class VimState {
   var isIdeaJoinNotified = false
   var isIdeaPutNotified = false
+  var isTemplateInSelectModeNotified = false
 
   fun readData(element: Element) {
     val notifications: Element? = element.getChild("notifications")
@@ -16,6 +17,9 @@ class VimState {
       isIdeaJoinNotified = it.toBoolean()
     }
     notifications?.getChild("idea-put")?.getAttributeValue("enabled")?.let {
+      isIdeaPutNotified = it.toBoolean()
+    }
+    notifications?.getChild("template-selectmode")?.getAttributeValue("enabled")?.let {
       isIdeaPutNotified = it.toBoolean()
     }
   }
@@ -31,5 +35,9 @@ class VimState {
     val ideaPut = Element("idea-put")
     ideaPut.setAttribute("enabled", isIdeaPutNotified.toString())
     notifications.addContent(ideaPut)
+
+    val templateKeyModel = Element("template-selectmode")
+    templateKeyModel.setAttribute("enabled", isTemplateInSelectModeNotified.toString())
+    notifications.addContent(templateKeyModel)
   }
 }

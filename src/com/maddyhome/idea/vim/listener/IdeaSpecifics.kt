@@ -19,15 +19,12 @@
 package com.maddyhome.idea.vim.listener
 
 import com.intellij.codeInsight.lookup.impl.LookupImpl
+import com.intellij.codeInsight.template.Template
+import com.intellij.codeInsight.template.TemplateEditingAdapter
 import com.intellij.codeInsight.template.TemplateManagerListener
 import com.intellij.codeInsight.template.impl.TemplateState
 import com.intellij.find.FindModelListener
-import com.intellij.openapi.actionSystem.ActionManager
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.actionSystem.DataContext
-import com.intellij.openapi.actionSystem.IdeActions
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.actionSystem.ex.AnActionListener
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.event.CaretEvent
@@ -40,6 +37,8 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.helper.EditorDataContext
 import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.option.OptionsManager
+import com.maddyhome.idea.vim.option.SelectModeOptionData
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
 
@@ -98,6 +97,7 @@ object IdeaSpecifics {
   private object VimTemplateManagerListener : TemplateManagerListener {
     override fun templateStarted(state: TemplateState) {
       val editor = state.editor ?: return
+      notifySelectmode(state, editor.project)
       if (!editor.selectionModel.hasSelection()) {
         // Enable insert mode if there is no selection in template
         // Template with selection is handled by [com.maddyhome.idea.vim.group.visual.VisualMotionGroup.controlNonVimSelectionChange]
@@ -106,6 +106,22 @@ object IdeaSpecifics {
           KeyHandler.getInstance().reset(editor)
         }
       }
+    }
+
+    private fun notifySelectmode(state: TemplateState, project: Project?) {
+      if (VimPlugin.getVimState().isTemplateInSelectModeNotified || SelectModeOptionData.template in OptionsManager.selectmode) return
+
+      VimPlugin.getVimState().isTemplateInSelectModeNotified = true
+
+      state.addTemplateStateListener(object : TemplateEditingAdapter() {
+        override fun templateFinished(template: Template, brokenOff: Boolean) {
+          VimPlugin.getNotifications(project).notifyAboutTemplateInSelectMode()
+        }
+
+        override fun templateCancelled(template: Template?) {
+          VimPlugin.getNotifications(project).notifyAboutTemplateInSelectMode()
+        }
+      })
     }
   }
   //endregion
