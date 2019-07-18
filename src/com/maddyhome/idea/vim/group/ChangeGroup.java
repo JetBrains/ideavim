@@ -333,12 +333,26 @@ public class ChangeGroup {
   /**
    * Deletes the text from the cursor to the start of the previous word
    *
+   * TODO This behavior should be configured via the `backspace` option
+   *
    * @param editor The editor to delete the text from
    * @return true if able to delete text, false if not
    */
   public boolean insertDeletePreviousWord(@NotNull Editor editor, @NotNull Caret caret) {
-    final int deleteTo = VimPlugin.getMotion().moveCaretToNextWord(editor, caret, -1, false);
-    if (deleteTo == -1) {
+    final int deleteTo;
+    if (caret.getLogicalPosition().column == 0) {
+      deleteTo = caret.getOffset() - 1;
+    } else {
+      int pointer = caret.getOffset() - 1;
+      final CharSequence chars = editor.getDocument().getCharsSequence();
+      while (pointer >= 0 && chars.charAt(pointer) == ' ' && chars.charAt(pointer) != '\n') pointer--;
+      if (chars.charAt(pointer) == '\n') {
+        deleteTo = pointer + 1;
+      } else {
+        deleteTo = VimPlugin.getMotion().findOffsetOfNextWord(editor, pointer + 1, -1, false);
+      }
+    }
+    if (deleteTo < 0) {
       return false;
     }
     final TextRange range = new TextRange(deleteTo, caret.getOffset());

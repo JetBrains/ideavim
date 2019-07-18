@@ -108,6 +108,7 @@ To Be Released
 * [VIM-1697](https://youtrack.jetbrains.com/issue/VIM-1697) Fix wrong search with tab characters
 * [VIM-1700](https://youtrack.jetbrains.com/issue/VIM-1700) Fix wrong search with tab characters
 * [VIM-1698](https://youtrack.jetbrains.com/issue/VIM-1698) Paste doesn't clear clipboard
+* [VIM-1359](https://youtrack.jetbrains.com/issue/VIM-1359) Fix behavior of i_CTRL-W action
 
 0.51, 2019-02-12
 ----------------

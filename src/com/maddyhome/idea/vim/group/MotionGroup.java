@@ -392,18 +392,16 @@ public class MotionGroup {
    * This moves the caret to the start of the next/previous word/WORD.
    *
    * @param editor  The editor to move in
-   * @param caret   The caret to be moved
    * @param count   The number of words to skip
    * @param bigWord If true then find WORD, if false then find word
    * @return position
    */
-  public int moveCaretToNextWord(@NotNull Editor editor, @NotNull Caret caret, int count, boolean bigWord) {
-    final int offset = caret.getOffset();
+  public int findOffsetOfNextWord(@NotNull Editor editor, int searchFrom, int count, boolean bigWord) {
     final int size = EditorHelper.getFileSize(editor);
-    if ((offset == 0 && count < 0) || (offset >= size - 1 && count > 0)) {
+    if ((searchFrom == 0 && count < 0) || (searchFrom >= size - 1 && count > 0)) {
       return -1;
     }
-    return SearchHelper.findNextWord(editor, caret, count, bigWord);
+    return SearchHelper.findNextWord(editor, searchFrom, count, bigWord);
   }
 
   /**

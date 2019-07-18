@@ -1346,12 +1346,6 @@ public class MultipleCaretsTest extends VimTestCase {
     myFixture.checkResult("on<caret>e two th<caret>ree");
   }
 
-  public void testInsertDeletePreviousWordAction() {
-    typeTextInFile(parseKeys("i", "<C-W>", "<ESC>"),
-                   "one tw<caret>o three<caret> four   <caret>\n");
-    myFixture.checkResult("one<caret> o<caret> <caret> \n");
-  }
-
   public void testInsertEnterAction() {
     typeTextInFile(parseKeys("i", "<C-M>", "<ESC>"),
                    "one<caret>two<caret>three<caret>four\n");

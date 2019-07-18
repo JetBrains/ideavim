@@ -64,6 +64,6 @@ private object MotionWordLeftActionHandler : MotionActionHandler.ForEachCaret() 
                          count: Int,
                          rawCount: Int,
                          argument: Argument?): Int {
-    return VimPlugin.getMotion().moveCaretToNextWord(editor, caret, -count, false)
+    return VimPlugin.getMotion().findOffsetOfNextWord(editor, caret.offset, -count, false)
   }
 }

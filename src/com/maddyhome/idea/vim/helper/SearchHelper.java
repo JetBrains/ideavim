@@ -811,7 +811,7 @@ public class SearchHelper {
         position = count;
       }
       else if (last < offset && res >= offset) {
-        if (count == 2 && res > offset) {
+        if (count == 2) {
           position = 1;
         }
         else {
@@ -829,12 +829,11 @@ public class SearchHelper {
     return new CountPosition(count, position);
   }
 
-  public static int findNextWord(@NotNull Editor editor, @NotNull Caret caret, int count, boolean bigWord) {
+  public static int findNextWord(@NotNull Editor editor, int searchFrom, int count, boolean bigWord) {
     CharSequence chars = editor.getDocument().getCharsSequence();
-    final int pos = caret.getOffset();
     final int size = EditorHelper.getFileSize(editor);
 
-    return findNextWord(chars, pos, size, count, bigWord, false);
+    return findNextWord(chars, searchFrom, size, count, bigWord, false);
   }
 
   public static int findNextWord(@NotNull CharSequence chars, int pos, int size, int count, boolean bigWord,

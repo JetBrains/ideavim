@@ -72,14 +72,6 @@ public class ChangeActionTest extends VimTestCase {
     doTest(parseKeys("d0"), "<caret>hello\n", "hello\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
   }
 
-  // VIM-112 |i| |i_CTRL-W|
-  public void testInsertDeletePreviousWord() {
-    typeTextInFile(parseKeys("i", "one two three", "<C-W>"),
-                   "hello\n" +
-                   "<caret>\n");
-    myFixture.checkResult("hello\n" + "one two \n");
-  }
-
   // VIM-157 |~|
   public void testToggleCharCase() {
     doTest(parseKeys("~~"), "<caret>hello world\n", "HEllo world\n", CommandState.Mode.COMMAND,
@@ -274,25 +266,6 @@ public class ChangeActionTest extends VimTestCase {
   public void testVisualSelectionRightMargin() {
     doTest(parseKeys("v", "k$d"),
            "foo\n<caret>bar\n", "fooar\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-  }
-
-  // VIM-569 |a| |i_CTRL-W|
-  public void testDeletePreviousWordDotEOL() {
-    doTest(parseKeys("a", "<C-W>"),
-           "this is a sentence<caret>.\n", "this is a sentence<caret>\n", CommandState.Mode.INSERT,
-           CommandState.SubMode.NONE);
-  }
-
-  // VIM-569 |a| |i_CTRL-W|
-  public void testDeletePreviousWordLastAfterWhitespace() {
-    doTest(parseKeys("A", "<C-W>"),
-           "<caret>this is a sentence\n", "this is a <caret>\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
-  }
-
-  // VIM-513 |A| |i_CTRL-W|
-  public void testDeletePreviousWordEOL() {
-    doTest(parseKeys("A", "<C-W>"),
-           "<caret>$variable\n", "$<caret>\n", CommandState.Mode.INSERT, CommandState.SubMode.NONE);
   }
 
   // VIM-632 |CTRL-V| |v_d|
