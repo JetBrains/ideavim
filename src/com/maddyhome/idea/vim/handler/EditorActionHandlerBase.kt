@@ -29,6 +29,33 @@ import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.visual.VisualMotionGroup
 import com.maddyhome.idea.vim.helper.getTopLevelEditor
 
+/**
+ * Structure of handlers
+ * `~` - this symbol means that this handler cannot be used directly (only its children)
+ * Almost each handler isn't usable by itself and has two children - "SingleExecution" and "ForEachCaret"
+ *      which should be used
+ *
+ *                                         ~ EditorActionHandlerBase ~
+ *                                                     |
+ *               ----------------------------------------------------------------------------
+ *                 |                                   |                                    |
+ *          ~ ForEachCaret ~                   ~ SingleExecution ~                  ~ VimActionHandler ~
+ *                 |                                   |                                /         \
+ *       TextObjectActionHandler               MotionActionHandler                    /            \
+ *                                                                             SingleExecution   ForEachCaret
+ *                                                                                  |
+ *                      -------------------------------------------------------------
+ *                      |                                   |
+ *        ~ ChangeEditorActionHandler ~         ~ VisualOperatorActionHandler ~
+ *              /           \                         /         \
+ *    SingleExecution    ForEachCaret         SingleExecution    ForEachCaret
+ *
+ *
+ *  SpecialKeyHandlers are not presented here because these handlers are created to a limited set of commands and they
+ *    are already implemented
+ *
+ * See also VimCommands.kt for commands structure
+ */
 
 /**
  * Handler for common usage
@@ -50,7 +77,7 @@ sealed class VimActionHandler(myRunForEachCaret: Boolean) : EditorActionHandlerB
   }
 }
 
-abstract class EditorActionHandlerBase(myRunForEachCaret: Boolean) : EditorActionHandler(myRunForEachCaret) {
+sealed class EditorActionHandlerBase(myRunForEachCaret: Boolean) : EditorActionHandler(myRunForEachCaret) {
 
   abstract class ForEachCaret : EditorActionHandlerBase(true) {
     abstract fun execute(editor: Editor, caret: Caret, context: DataContext, cmd: Command): Boolean

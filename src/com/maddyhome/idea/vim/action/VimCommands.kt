@@ -38,6 +38,20 @@ import java.util.*
 import javax.swing.KeyStroke
 
 /**
+ * Structure of commands
+ *
+ *                                          VimCommandActionBase
+ *                                        (Can't be used directly)
+ *                                                  |
+ *         -------------------------------------------------------------------------------------
+ *         |                                        |                                          |
+ *     MotionEditorAction                    TextObjectAction                          VimCommandAction
+ * (accepts MotionActionHandler)        (accepts TextObjectActionHandler)        (accepts VimActionHandler)
+ *
+ * See also EditorActionHandlerBase.kt for handlers structure
+ */
+
+/**
  * Action that represents a Vim command.
  *
  * Actions should be registered in resources/META-INF/plugin.xml and in package-info.java
