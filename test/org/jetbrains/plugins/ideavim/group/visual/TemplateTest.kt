@@ -23,16 +23,20 @@ package org.jetbrains.plugins.ideavim.group.visual
 import com.intellij.codeInsight.template.impl.TemplateManagerImpl
 import com.intellij.ide.DataManager
 import com.intellij.injected.editor.EditorWindow
+import com.intellij.notification.EventLog
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Disposer
 import com.intellij.refactoring.rename.inplace.VariableInplaceRenameHandler
 import com.intellij.testFramework.fixtures.CodeInsightTestUtil.doInlineRename
+import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.group.NotificationService
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.SelectModeOptionData
+import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -241,6 +245,41 @@ class TemplateTest : VimTestCase() {
                 }
             }
         """.trimIndent())
+  }
+
+  fun `test notification on first time`() {
+    EventLog.markAllAsRead(myFixture.project)
+    VimPlugin.getVimState().isTemplateInSelectModeNotified = false
+    OptionsManager.selectmode.set("")
+
+    configureByJavaText("""
+            class Hello {
+                public static void main() {
+                    int my${c}Var = 5;
+                }
+            }
+        """.trimIndent())
+    startRenaming(VariableInplaceRenameHandler())
+    typeText(parseKeys("<CR>"))
+
+    waitFor {
+      val notifications = EventLog.getLogModel(myFixture.project).notifications
+      notifications.isNotEmpty() && notifications.last().title == NotificationService.IDEAVIM_NOTIFICATION_TITLE
+    }
+    val notification = EventLog.getLogModel(myFixture.project).notifications.last()
+
+    assertEquals(NotificationService.IDEAVIM_NOTIFICATION_TITLE, notification.title)
+    assertTrue(SelectModeOptionData.name in notification.content)
+    assertEquals(3, notification.actions.size)
+  }
+
+  private fun waitFor(action: () -> Boolean) {
+    val start = System.currentTimeMillis()
+    var res: Boolean
+    do {
+      res = action()
+    } while (!res && System.currentTimeMillis() - start < 5000L)
+    if (!res) TestCase.fail()
   }
 
   private fun startRenaming(handler: VariableInplaceRenameHandler): Editor {
