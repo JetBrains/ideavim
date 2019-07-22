@@ -59,7 +59,7 @@ Get Early Access
 Would you like to try new features and fixes? Join the Early Access Program and
 receive EAP builds as updates!  
 
-1. Open `Settings | Plugins` ([open settings](jetbrains://idea/settings?name=Plugins))
+1. Open `Settings | Plugins`
 2. Click the gear icon :gear:, select `Manage Plugin Repositories`, and add the following url:
  `https://plugins.jetbrains.com/plugins/eap/ideavim`
 
