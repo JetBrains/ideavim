@@ -380,7 +380,7 @@
  *
  * |g_CTRL-A|             not applicable
  * |g_CTRL-G|             {@link com.maddyhome.idea.vim.action.file.FileGetLocationInfoAction}
- * |g_CTRL-H|             {@link com.maddyhome.idea.vim.action.motion.select.SelectEnableBlockModeAction} [To Be Released]
+ * |g_CTRL-H|             {@link com.maddyhome.idea.vim.action.motion.select.SelectEnableBlockModeAction}
  * |g_CTRL-]|             TODO
  * |g#|                   {@link com.maddyhome.idea.vim.action.motion.search.SearchWordBackwardAction}
  * |g$|                   {@link com.maddyhome.idea.vim.action.motion.leftright.MotionLastScreenColumnAction}
@@ -401,7 +401,7 @@
  * |gD|                   {@link com.maddyhome.idea.vim.action.motion.search.GotoDeclarationAction}
  * |gE|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionBigWordEndLeftAction}
  * |gF|                   TODO
- * |gH|                   {@link com.maddyhome.idea.vim.action.motion.select.SelectEnableLineModeAction} [To Be Released]
+ * |gH|                   {@link com.maddyhome.idea.vim.action.motion.select.SelectEnableLineModeAction}
  * |gI|                   {@link com.maddyhome.idea.vim.action.change.insert.InsertLineStartAction}
  * |gJ|                   {@link com.maddyhome.idea.vim.action.change.delete.DeleteJoinLinesAction}
  * |gN|                   {@link com.maddyhome.idea.vim.action.motion.gn.VisualSelectPreviousSearch}
@@ -420,7 +420,7 @@
  * |ge|                   {@link com.maddyhome.idea.vim.action.motion.text.MotionWordEndLeftAction}
  * |gf|                   TODO
  * |gg|                   {@link com.maddyhome.idea.vim.action.motion.updown.MotionGotoLineFirstAction}
- * |gh|                   {@link com.maddyhome.idea.vim.action.motion.select.SelectEnableCharacterModeAction} [To Be Released]
+ * |gh|                   {@link com.maddyhome.idea.vim.action.motion.select.SelectEnableCharacterModeAction}
  * |gi|                   {@link com.maddyhome.idea.vim.action.change.insert.InsertAtPreviousInsertAction}
  * |gj|                   TODO
  * |gk|                   {@link com.maddyhome.idea.vim.action.motion.updown.MotionUpNotLineWiseAction}
@@ -504,7 +504,7 @@
  * |v_CTRL-\_CTRL-G|      TODO
  * |v_CTRL-A|             {@link com.maddyhome.idea.vim.action.change.change.number.ChangeVisualNumberIncAction}
  * |v_CTRL-C|             {@link com.maddyhome.idea.vim.action.motion.visual.VisualExitModeAction}
- * |v_CTRL-G|             {@link com.maddyhome.idea.vim.action.motion.select.SelectToggleVisualMode} [To Be Released]
+ * |v_CTRL-G|             {@link com.maddyhome.idea.vim.action.motion.select.SelectToggleVisualMode}
  * |v_<BS>|               NVO mapping
  * |v_CTRL-H|             NVO mapping
  * |v_CTRL-O|             TODO
@@ -588,7 +588,7 @@
  * |v_'|                  {@link com.maddyhome.idea.vim.action.motion.mark.MotionGotoFileMarkLineAction}
  *
  *
- * 4. Select mode [To Be Released]
+ * 4. Select mode
  *
  * tag                    action
  * -------------------------------------------------------------------------------------------------------------------
@@ -700,9 +700,9 @@
  * |:quitall|             {@link com.maddyhome.idea.vim.ex.handler.ExitHandler}
  * |:wqall|               {@link com.maddyhome.idea.vim.ex.handler.ExitHandler}
  * |:xall|                {@link com.maddyhome.idea.vim.ex.handler.ExitHandler}
- * |:command|             {@link com.maddyhome.idea.vim.ex.handler.CmdHandler} [To Be Released]
- * |:delcommand|          {@link com.maddyhome.idea.vim.ex.handler.DelCmdHandler} [To Be Released]
- * |:comclear|            {@link com.maddyhome.idea.vim.ex.handler.CmdClearHandler} [To Be Released]
+ * |:command|             {@link com.maddyhome.idea.vim.ex.handler.CmdHandler}
+ * |:delcommand|          {@link com.maddyhome.idea.vim.ex.handler.DelCmdHandler}
+ * |:comclear|            {@link com.maddyhome.idea.vim.ex.handler.CmdClearHandler}
  * ...
  *
  * The list of supported Ex commands is incomplete.

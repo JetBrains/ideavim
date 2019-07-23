@@ -6,7 +6,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
     'clipboard'      'cb'       clipboard options
                                 Standard clipboard options plus 
                                 
-                                `ideaput`  (default on)   - IdeaVim ONLY         [To Be Released]
+                                `ideaput`  (default on)   - IdeaVim ONLY
                                 enable native idea paste action for put operations
     
     'digraph'        'dg'       enable the entering of digraphs in Insert mode
@@ -14,7 +14,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
     'history'        'hi'       number of command-lines that are remembered
     'hlsearch'       'hls'      highlight matches with the last search pattern
     
-    `ideamarks`      `ideamarks` Boolean (default true)     - IdeaVim ONLY         [To Be Released]
+    `ideamarks`      `ideamarks` Boolean (default true)     - IdeaVim ONLY
     
                      If true, creation of global mark will trigger creation of IDE's bookmark
                      and vice versa.
@@ -23,7 +23,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
     'iskeyword'      'isk'      defines keywords for commands like 'w', '*', etc.
     'incsearch'      'is'       show where search pattern typed so far matches
     
-    `keymodel`       `km`       String (default "continueselect,stopselect")   [To Be Released]
+    `keymodel`       `km`       String (default "continueselect,stopselect")
 
                  List of comma separated words, which enable special things that keys
                  can do. These values can be used:
@@ -47,7 +47,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
     'nrformats'      'nf'    number formats recognized for CTRL-A command
     'number'         'nu'    print the line number in front of each line
     
-    `lookupactions`  `lookupactions`  String (default "VimLookupUp,VimLookupDown")  - IdeaVim Only [To Be Released]
+    `lookupactions`  `lookupactions`  String (default "VimLookupUp,VimLookupDown")  - IdeaVim Only
              
                   By default all actions are handled by the IDE if lookup is active.
                   This list of comma-separated words enables defined vim actions for active lookup.
@@ -59,7 +59,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
     'scrolloff'      'so'    minimum number of lines above and below the cursor
     'selection'      'sel'   what type of selection to use
 
-    `selectmode`     `slm`   String (default "template")     [To Be Released]
+    `selectmode`     `slm`   String (default "template")
 
                  This is a comma-separated list of words, which specify when to start
                  Select mode instead of Visual mode, when a selection is started.
@@ -73,7 +73,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
 
     'showmode'       'smd'       message on the status line to show current mode
     
-    `ideajoin`      `ideajoin` Boolean (default false)     - IdeaVim ONLY [To Be Released] 
+    `ideajoin`      `ideajoin` Boolean (default false)     - IdeaVim ONLY
     
                   If true, join command will be performed via IDE
                   See ideajoin-examples.md

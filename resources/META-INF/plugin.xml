@@ -2,50 +2,16 @@
   <name>IdeaVim</name>
   <id>IdeaVIM</id>
   <change-notes><![CDATA[
-      <p>To be released:</p>
       <ul>
         <li>Support select mode</li>
-        <li>Enable select mode while refactorings</li>
-        <li>Enable visual mode while structural selection</li>
+        <li>Integration with templates & in-line refactorings using Select mode</li>
+        <li>Support "Extend selection" action in visual mode</li>
+        <li>Commentary extension</li>
+        <li>Add options to integrate paste/join/marks with the IDE</li>
         <li>Support 'gn' commands</li>
         <li>Support :command command</li>
         <li>Support :shell command</li>
         <li>Support :tabnext and :tabprevious commands</li>
-        <li>Commentary extension</li>
-        <li>Various bug fixes</li>
-      </ul>
-      <p>0.51:</p>
-      <ul>
-        <li>Various bug fixes</li>
-      </ul>
-      <p>0.50:</p>
-      <ul>
-        <li>Moved "Vim Emulation" settings into "File | Settings | Editor"</li>
-        <li>Support for vim-multiple-cursors commands <code>&lt;A-n&gt;</code>, <code>&lt;A-x&gt;</code>, <code>&lt;A-p&gt;</code>, <code>g&lt;A-n&gt;</code> (put <code>set multiple-cursors</code> into your ~/.ideavimrc to enable it)</li>
-        <li>Support for running Vim commands for multiple cursors</li>
-        <li>The <a href="https://github.com/JetBrains/ideavim/blob/master/src/com/maddyhome/idea/vim/package-info.java">index of supported commands</a> on the GitHub page</li>
-        <li>Various bug fixes</li>
-      </ul>
-      <p>0.49:</p>
-      <ul>
-        <li>Enabled zero-latency typing for Vim emulation</li>
-        <li>Support for <code>iskeyword</code> option</li>
-        <li>Various bug fixes</li>
-      </ul>
-      <p>0.48:</p>
-      <ul>
-        <li>Various bug fixes</li>
-      </ul>
-      <p>0.47:</p>
-      <ul>
-        <li>Various bug fixes</li>
-      </ul>
-      <p>0.46:</p>
-      <ul>
-        <li>Support for <code>incsearch</code> option for showing search results while typing</li>
-        <li>Support for <code>it</code> and <code>at</code> tag block selection</li>
-        <li>Support for vim-surround commands <code>ys</code>, <code>cs</code>, <code>ds</code>, <code>S</code>, enable it with <code>set surround</code> in your ~/.ideavimrc</li>
-        <li>Support for <code>={motion}</code> formatting command</li>
         <li>Various bug fixes</li>
       </ul>
       <p>See also the complete <a href="https://github.com/JetBrains/ideavim/blob/master/CHANGES.md">changelog</a>.</p>
