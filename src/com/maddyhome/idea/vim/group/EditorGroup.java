@@ -258,7 +258,10 @@ public class EditorGroup {
       if (VimPlugin.isEnabled() && EditorHelper.isFileEditor(editor)) {
         final boolean relativeLineNumber = OptionsManager.INSTANCE.getRelativenumber().isSet();
         final boolean lineNumber = OptionsManager.INSTANCE.getNumber().isSet();
-        if (relativeLineNumber && lineNumber && isCaretLine(line, editor)) {
+        if (editor.getDocument().getLineCount() == 0) {
+          return null;
+        }
+        else if (relativeLineNumber && lineNumber && isCaretLine(line, editor)) {
           return lineNumberToString(getLineNumber(line), editor);
         }
         else if (relativeLineNumber) {
