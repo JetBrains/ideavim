@@ -131,6 +131,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     protected void textChanged(@NotNull DocumentEvent e) {
       final Editor editor = entry.getEditor();
 
+      boolean searchCommand = false;
       LineRange searchRange = null;
       char separator = label.getText().charAt(0);
       String searchText = entry.getActualText();
@@ -139,6 +140,7 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
         if (command == null) {
           return;
         }
+        searchCommand = true;
         searchText = "";
         final String argument = command.getArgument();
         if (argument.length() > 1) {  // E.g. skip '/' in `:%s/`. `%` is range, `s` is command, `/` is argument
@@ -154,18 +156,21 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
         searchRange = command.getLineRange(editor);
       }
 
-      final boolean forwards = !label.getText().equals("?");  // :s, :g, :v are treated as forwards
-      final String pattern;
-      if (searchText == null) {
-        pattern = "";
-      } else {
-        final CharPointer p = new CharPointer(searchText);
-        final CharPointer end = RegExp.skip_regexp(new CharPointer(searchText), separator, true);
-        pattern = p.substring(end.pointer() - p.pointer());
-      }
+      final String labelText = label.getText();
+      if (labelText.equals("/") || labelText.equals("?") || searchCommand) {
+        final boolean forwards = !labelText.equals("?");  // :s, :g, :v are treated as forwards
+        final String pattern;
+        if (searchText == null) {
+          pattern = "";
+        } else {
+          final CharPointer p = new CharPointer(searchText);
+          final CharPointer end = RegExp.skip_regexp(new CharPointer(searchText), separator, true);
+          pattern = p.substring(end.pointer() - p.pointer());
+        }
 
-      VimPlugin.getEditor().closeEditorSearchSession(editor);
-      VimPlugin.getSearch().updateIncsearchHighlights(editor, pattern, forwards, caretOffset, searchRange);
+        VimPlugin.getEditor().closeEditorSearchSession(editor);
+        VimPlugin.getSearch().updateIncsearchHighlights(editor, pattern, forwards, caretOffset, searchRange);
+      }
     }
 
     @Contract("null -> null")
