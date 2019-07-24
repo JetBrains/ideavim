@@ -61,13 +61,6 @@ public class InputQueue {
     instance.queue.addAll(strokes);
   }
 
-  public static void insert(List<KeyStroke> keys) {
-    final int size = keys.size();
-    for (int i = size-1; i >= 0; i--) {
-      instance.queue.addFirst(keys.get(i));
-    }
-  }
-
   static class DrainTask implements Runnable {
 
     private final Editor myEditor;
