@@ -100,6 +100,17 @@ class YankGroup {
 
     val selectionType = if (type == SelectionType.CHARACTER_WISE && range.isMultiple) SelectionType.BLOCK_WISE else type
 
+    if (type == SelectionType.LINE_WISE) {
+      for (i in 0 until range.size()) {
+        if (editor.offsetToLogicalPosition(range.startOffsets[i]).column != 0) {
+          range.startOffsets[i] = EditorHelper.getLineStartForOffset(editor, range.startOffsets[i])
+        }
+        if (editor.offsetToLogicalPosition(range.endOffsets[i]).column != 0) {
+          range.endOffsets[i] = (EditorHelper.getLineEndForOffset(editor, range.endOffsets[i]) + 1).coerceAtMost(EditorHelper.getFileSize(editor))
+        }
+      }
+    }
+
     val caretModel = editor.caretModel
     val rangeStartOffsets = range.startOffsets
     val rangeEndOffsets = range.endOffsets
