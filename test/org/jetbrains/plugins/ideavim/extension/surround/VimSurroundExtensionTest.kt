@@ -16,224 +16,187 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.jetbrains.plugins.ideavim.extension.surround;
+@file:Suppress("RemoveCurlyBracesFromTemplate")
 
-import com.maddyhome.idea.vim.command.CommandState;
-import org.jetbrains.plugins.ideavim.VimTestCase;
+package org.jetbrains.plugins.ideavim.extension.surround
 
-import static com.maddyhome.idea.vim.helper.StringHelper.parseKeys;
+import com.maddyhome.idea.vim.command.CommandState
+import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
  * @author dhleong
  */
-public class VimSurroundExtensionTest extends VimTestCase {
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
-    enableExtensions("surround");
+class VimSurroundExtensionTest : VimTestCase() {
+  @Throws(Exception::class)
+  override fun setUp() {
+    super.setUp()
+    enableExtensions("surround")
   }
 
   /* surround */
 
-  public void testSurroundWordParens() {
-    final String before =
-      "if <caret>condition {\n" +
-      "}\n";
-    final String after =
-      "if <caret>(condition) {\n" +
-      "}\n";
+  fun testSurroundWordParens() {
+    val before = "if ${c}condition {\n" + "}\n"
+    val after = "if ${c}(condition) {\n" + "}\n"
 
-    doTest(parseKeys("yseb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    doTest(parseKeys("yse)"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("yseb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(parseKeys("yse)"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     doTest(parseKeys("yse("), before,
-           "if ( condition ) {\n" + "}\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+      "if ( condition ) {\n" + "}\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  public void testSurroundWORDBlock() {
-    final String before =
-      "if (condition) <caret>return;\n";
-    final String after =
-      "if (condition) {return;}\n";
+  fun testSurroundWORDBlock() {
+    val before = "if (condition) ${c}return;\n"
+    val after = "if (condition) {return;}\n"
 
-    doTest(parseKeys("ysEB"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    doTest(parseKeys("ysE}"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("ysEB"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(parseKeys("ysE}"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
     doTest(parseKeys("ysE{"), before, "if (condition) { return; }\n", CommandState.Mode.COMMAND,
-           CommandState.SubMode.NONE);
+      CommandState.SubMode.NONE)
   }
 
-  public void testSurroundWordArray() {
-    final String before =
-      "int foo = bar<caret>index;";
-    final String after =
-      "int foo = bar[index];";
+  fun testSurroundWordArray() {
+    val before = "int foo = bar${c}index;"
+    val after = "int foo = bar[index];"
 
-    doTest(parseKeys("yser"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    doTest(parseKeys("yse]"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    doTest(parseKeys("yse["), before, "int foo = bar[ index ];", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("yser"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(parseKeys("yse]"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(parseKeys("yse["), before, "int foo = bar[ index ];", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  public void testSurroundWordAngle() {
-    final String before =
-      "foo = new Bar<caret>Baz();";
-    final String after =
-      "foo = new Bar<Baz>();";
+  fun testSurroundWordAngle() {
+    val before = "foo = new Bar${c}Baz();"
+    val after = "foo = new Bar<Baz>();"
 
-    doTest(parseKeys("ysea"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    doTest(parseKeys("yse>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("ysea"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(parseKeys("yse>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  public void testSurroundQuotes() {
-    final String before =
-      "foo = <caret>new Bar.Baz;";
-    final String after =
-      "foo = \"new Bar.Baz\";";
+  fun testSurroundQuotes() {
+    val before = "foo = ${c}new Bar.Baz;"
+    val after = "foo = \"new Bar.Baz\";"
 
-    doTest(parseKeys("yst;\""), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    doTest(parseKeys("ys4w\""), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("yst;\""), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(parseKeys("ys4w\""), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  public void testSurroundTag() {
-    configureByText("Hello <caret>World!\n");
-    typeText(parseKeys("ysiw\\<em>"));
-    myFixture.checkResult("Hello <em>World</em>!\n");
+  fun testSurroundTag() {
+    configureByText("Hello ${c}World!\n")
+    typeText(parseKeys("ysiw\\<em>"))
+    myFixture.checkResult("Hello <em>World</em>!\n")
   }
 
   // VIM-1569
-  public void testSurroundTagWithAttributes() {
-    configureByText("Hello <caret>World!");
-    typeText(parseKeys("ysiw\\<span class=\"important\" data-foo=\"bar\">"));
-    myFixture.checkResult("Hello <span class=\"important\" data-foo=\"bar\">World</span>!");
+  fun testSurroundTagWithAttributes() {
+    configureByText("Hello ${c}World!")
+    typeText(parseKeys("ysiw\\<span class=\"important\" data-foo=\"bar\">"))
+    myFixture.checkResult("Hello <span class=\"important\" data-foo=\"bar\">World</span>!")
   }
 
   // VIM-1569
-  public void testSurraungTagAsInIssue(){
-    configureByText("<p><caret>Hello</p>");
-    typeText(parseKeys("VS<div class = \"container\">"));
-    myFixture.checkResult("<div class = \"container\"><p>Hello</p></div>");
+  fun testSurraungTagAsInIssue() {
+    configureByText("<p>${c}Hello</p>")
+    typeText(parseKeys("VS<div class = \"container\">"))
+    myFixture.checkResult("<div class = \"container\"><p>Hello</p></div>")
   }
 
   /* visual surround */
 
-  public void testVisualSurroundWordParens() {
-    final String before =
-      "if <caret>condition {\n" +
-      "}\n";
-    final String after =
-      "if <caret>(condition) {\n" +
-      "}\n";
+  fun testVisualSurroundWordParens() {
+    val before = "if ${c}condition {\n" + "}\n"
+    val after = "if ${c}(condition) {\n" + "}\n"
 
-    doTest(parseKeys("veSb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    assertMode(CommandState.Mode.COMMAND);
-    doTest(parseKeys("veS)"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    assertMode(CommandState.Mode.COMMAND);
+    doTest(parseKeys("veSb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    assertMode(CommandState.Mode.COMMAND)
+    doTest(parseKeys("veS)"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    assertMode(CommandState.Mode.COMMAND)
     doTest(parseKeys("veS("), before,
-           "if ( condition ) {\n" + "}\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    assertMode(CommandState.Mode.COMMAND);
+      "if ( condition ) {\n" + "}\n", CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    assertMode(CommandState.Mode.COMMAND)
   }
 
   /* Delete surroundings */
 
-  public void testDeleteSurroundingParens() {
-    final String before =
-      "if (<caret>condition) {\n" +
-      "}\n";
-    final String after =
-      "if condition {\n" +
-      "}\n";
+  fun testDeleteSurroundingParens() {
+    val before = "if (${c}condition) {\n" + "}\n"
+    val after = "if condition {\n" + "}\n"
 
-    doTest(parseKeys("dsb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    doTest(parseKeys("ds("), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    doTest(parseKeys("ds)"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("dsb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(parseKeys("ds("), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(parseKeys("ds)"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  public void testDeleteSurroundingQuote() {
-    final String before =
-      "if (\"<caret>foo\".equals(foo)) {\n" +
-      "}\n";
-    final String after =
-      "if (<caret>foo.equals(foo)) {\n" +
-      "}\n";
+  fun testDeleteSurroundingQuote() {
+    val before = "if (\"${c}foo\".equals(foo)) {\n" + "}\n"
+    val after = "if (${c}foo.equals(foo)) {\n" + "}\n"
 
-    doTest(parseKeys("ds\""), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("ds\""), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  public void testDeleteSurroundingBlock() {
-    final String before =
-      "if (condition) {<caret>return;}\n";
-    final String after =
-      "if (condition) return;\n";
+  fun testDeleteSurroundingBlock() {
+    val before = "if (condition) {${c}return;}\n"
+    val after = "if (condition) return;\n"
 
-    doTest(parseKeys("dsB"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    doTest(parseKeys("ds}"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    doTest(parseKeys("ds{"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("dsB"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(parseKeys("ds}"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(parseKeys("ds{"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  public void testDeleteSurroundingArray() {
-    final String before =
-      "int foo = bar[<caret>index];";
-    final String after =
-      "int foo = barindex;";
+  fun testDeleteSurroundingArray() {
+    val before = "int foo = bar[${c}index];"
+    val after = "int foo = barindex;"
 
-    doTest(parseKeys("dsr"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    doTest(parseKeys("ds]"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    doTest(parseKeys("ds["), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("dsr"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(parseKeys("ds]"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(parseKeys("ds["), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  public void testDeleteSurroundingAngle() {
-    final String before =
-      "foo = new Bar<<caret>Baz>();";
-    final String after =
-      "foo = new BarBaz();";
+  fun testDeleteSurroundingAngle() {
+    val before = "foo = new Bar<${c}Baz>();"
+    val after = "foo = new BarBaz();"
 
-    doTest(parseKeys("dsa"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    doTest(parseKeys("ds>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
-    doTest(parseKeys("ds<"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("dsa"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(parseKeys("ds>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+    doTest(parseKeys("ds<"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  public void testDeleteSurroundingTag() {
-     final String before =
-      "<div><p><caret>Foo</p></div>";
-    final String after =
-      "<div><caret>Foo</div>";
+  fun testDeleteSurroundingTag() {
+    val before = "<div><p>${c}Foo</p></div>"
+    val after = "<div>${c}Foo</div>"
 
-    doTest(parseKeys("dst"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("dst"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-1085
-  public void testDeleteSurroundingParamsAtLineEnd() {
-    final String before =
-      "Foo\n" +
-      "Seq(\"-<caret>Yrangepos\")\n";
-    final String after =
-      "Foo\n" +
-      "Seq\"-Yrangepos\"\n";
+  fun testDeleteSurroundingParamsAtLineEnd() {
+    val before = "Foo\n" + "Seq(\"-${c}Yrangepos\")\n"
+    val after = "Foo\n" + "Seq\"-Yrangepos\"\n"
 
-    doTest(parseKeys("dsb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("dsb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // VIM-1085
-  public void testDeleteMultiLineSurroundingParamsAtLineEnd() {
-    final String before =
-      "Foo\n" +
+  fun testDeleteMultiLineSurroundingParamsAtLineEnd() {
+    val before = "Foo\n" +
       "Bar\n" +
-      "Seq(\"-<caret>Yrangepos\",\n" +
+      "Seq(\"-${c}Yrangepos\",\n" +
       "    other)\n" +
-      "Baz\n";
-    final String after =
-      "Foo\n" +
+      "Baz\n"
+    val after = "Foo\n" +
       "Bar\n" +
       "Seq\"-Yrangepos\",\n" +
       "    other\n" +
-      "Baz\n";
+      "Baz\n"
 
-    doTest(parseKeys("dsb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("dsb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
 
   // TODO if/when we add proper repeat support
   //public void testRepeatDeleteSurroundParens() {
   //  final String before =
-  //    "if ((<caret>condition)) {\n" +
+  //    "if ((${c}condition)) {\n" +
   //    "}\n";
   //  final String after =
   //    "if condition {\n" +
@@ -244,48 +207,38 @@ public class VimSurroundExtensionTest extends VimTestCase {
 
   /* Change surroundings */
 
-  public void testChangeSurroundingParens() {
-    final String before =
-      "if (<caret>condition) {\n" +
-      "}\n";
-    final String after =
-      "if [condition] {\n" +
-      "}\n";
+  fun testChangeSurroundingParens() {
+    val before = "if (${c}condition) {\n" + "}\n"
+    val after = "if [condition] {\n" + "}\n"
 
-    doTest(parseKeys("csbr"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("csbr"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  public void testChangeSurroundingBlock() {
-    final String before =
-      "if (condition) {<caret>return;}";
-    final String after =
-      "if (condition) (return;)";
+  fun testChangeSurroundingBlock() {
+    val before = "if (condition) {${c}return;}"
+    val after = "if (condition) (return;)"
 
-    doTest(parseKeys("csBb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("csBb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  public void testChangeSurroundingTagSimple() {
-    final String before =
-      "<div><p><caret>Foo</p></div>";
-    final String after =
-      "<div><caret>(Foo)</div>";
+  fun testChangeSurroundingTagSimple() {
+    val before = "<div><p>${c}Foo</p></div>"
+    val after = "<div>${c}(Foo)</div>"
 
-    doTest(parseKeys("cstb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("cstb"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
-  public void testChangeSurroundingTagAnotherTag() {
-    final String before =
-      "<div><p><caret>Foo</p></div>";
-    final String after =
-      "<div><caret><b>Foo</b></div>";
+  fun testChangeSurroundingTagAnotherTag() {
+    val before = "<div><p>${c}Foo</p></div>"
+    val after = "<div>${c}<b>Foo</b></div>"
 
-    doTest(parseKeys("cst\\<b>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE);
+    doTest(parseKeys("cst\\<b>"), before, after, CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
   }
 
   // TODO if/when we add proper repeat support
   //public void testRepeatChangeSurroundingParens() {
   //  final String before =
-  //    "foo(<caret>index)(index2) = bar;";
+  //    "foo(${c}index)(index2) = bar;";
   //  final String after =
   //    "foo[index][index2] = bar;";
   //
