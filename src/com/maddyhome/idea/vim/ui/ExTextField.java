@@ -110,7 +110,7 @@ public class ExTextField extends JTextField {
 
     setInputMap(WHEN_FOCUSED, new InputMap());
     Keymap map = addKeymap("ex", getKeymap());
-    loadKeymap(map, ExKeyBindings.getBindings(), actions);
+    loadKeymap(map, ExKeyBindings.INSTANCE.getBindings(), actions);
     map.setDefaultAction(new ExEditorKit.DefaultExKeyHandler());
     setKeymap(map);
   }
