@@ -42,7 +42,7 @@ import com.maddyhome.idea.vim.option.SelectModeOptionData
 class VisualMotionGroup {
   companion object {
     var modeBeforeEnteringNonVimVisual: CommandState.Mode? = null
-    val logger = Logger.getInstance(VisualMotionGroup.javaClass)
+    val logger = Logger.getInstance(VisualMotionGroup::class.java)
   }
 
   fun selectPreviousVisualMode(editor: Editor): Boolean {
@@ -117,7 +117,6 @@ class VisualMotionGroup {
         commandState.popState()
       }
       val autodetectedMode = autodetectVisualMode(editor)
-      val project = editor.project
       val selectMode = OptionsManager.selectmode
       when {
         editor.isOneLineMode -> {
