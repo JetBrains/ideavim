@@ -76,7 +76,7 @@ The following `:set` commands can appear in `~/.ideavimrc` or be set manually in
     `ideajoin`      `ideajoin` Boolean (default false)     - IdeaVim ONLY
     
                   If true, join command will be performed via IDE
-                  See ideajoin-examples.md
+                  See wiki/`ideajoin` examples
     
     'sidescroll'     'ss'        minimum number of columns to scroll horizontally
     'sidescrolloff'  'siso'      min. number of columns to left and right of cursor
