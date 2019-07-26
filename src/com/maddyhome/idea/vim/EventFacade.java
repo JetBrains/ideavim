@@ -68,12 +68,9 @@ public class EventFacade {
 
   public void setupTypedActionHandler(@NotNull VimTypedActionHandler handler) {
     final TypedAction typedAction = getTypedAction();
-    final TypedActionHandler rawHandler = typedAction.getRawHandler();
-    if (!(rawHandler instanceof VimTypedActionHandler)) {
-      // Actually this if should always be true, but just as protection
-      myOriginalTypedActionHandler = rawHandler;
-      typedAction.setupRawHandler(handler);
-    }
+    myOriginalTypedActionHandler = typedAction.getRawHandler();
+
+    typedAction.setupRawHandler(handler);
   }
 
   public void restoreTypedActionHandler() {

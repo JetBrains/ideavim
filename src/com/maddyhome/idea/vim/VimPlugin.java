@@ -342,7 +342,7 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
 
     ApplicationManager.getApplication().invokeLater(this::updateState);
 
-    VimListenerManager.GlobalListeners.enable();
+    VimListenerManager.INSTANCE.turnOn();
 
     // Register vim actions in command mode
     RegisterActions.registerActions();
@@ -447,12 +447,15 @@ public class VimPlugin implements BaseComponent, PersistentStateComponent<Elemen
   }
 
   private void turnOnPlugin() {
-    initializePlugin();
-    KeyHandler.getInstance().fullReset(null);
+    if (initialized) {
+      KeyHandler.getInstance().fullReset(null);
 
-    getEditor().turnOn();
-    getSearch().turnOn();
-    VimListenerManager.INSTANCE.turnOn();
+      getEditor().turnOn();
+      getSearch().turnOn();
+      VimListenerManager.INSTANCE.turnOn();
+    } else {
+      initializePlugin();
+    }
   }
 
   private void turnOffPlugin() {

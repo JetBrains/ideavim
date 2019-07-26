@@ -131,7 +131,10 @@ object VimListenerManager {
     @JvmStatic
     fun enable() {
       val typedAction = EditorActionManager.getInstance().typedAction
-      EventFacade.getInstance().setupTypedActionHandler(VimTypedActionHandler(typedAction.rawHandler))
+      if (typedAction.rawHandler !is VimTypedActionHandler) {
+        // Actually this if should always be true, but just as protection
+        EventFacade.getInstance().setupTypedActionHandler(VimTypedActionHandler(typedAction.rawHandler))
+      }
 
       OptionsManager.number.addOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
       OptionsManager.relativenumber.addOptionChangeListener(EditorGroup.NumberChangeListener.INSTANCE)
