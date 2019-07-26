@@ -348,7 +348,7 @@ public class SearchGroup {
     updateSearchHighlights(lastSearch, lastIgnoreSmartCase, showSearchHighlight, true);
   }
 
-  public void updateIncsearchHighlights(Editor editor, String pattern, boolean forwards, int caretOffset, @Nullable LineRange searchRange) {
+  public void updateIncsearchHighlights(@NotNull Editor editor, @NotNull String pattern, boolean forwards, int caretOffset, @Nullable LineRange searchRange) {
     // searchStartOffset is used to find the closest match. caretOffset is used to reset the caret if there is no match.
     // If searching based on e.g. :%s/... then these values are not going to be the same
     final int searchStartOffset = searchRange != null ? EditorHelper.getLineStartOffset(editor, searchRange.getStartLine()) : caretOffset;
@@ -400,7 +400,7 @@ public class SearchGroup {
           final boolean wrap = OptionsManager.INSTANCE.getWrapscan().isSet();
           final TextRange result = findIt(editor, pattern, initialOffset, 1,
             forwards ? DIR_FORWARDS : DIR_BACKWARDS, shouldIgnoreSmartCase, wrap, false, true);
-          if (result != null) {
+          if (result != null && pattern != null) {
             currentMatchOffset = result.getStartOffset();
             final List<TextRange> results = Collections.singletonList(result);
             highlightSearchResults(editor, pattern, results, currentMatchOffset);
