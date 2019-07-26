@@ -47,6 +47,7 @@ import com.maddyhome.idea.vim.regexp.RegExp;
 import com.maddyhome.idea.vim.ui.ExEntryPanel;
 import com.maddyhome.idea.vim.ui.ModalEntry;
 import org.jdom.Element;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -217,7 +218,7 @@ public class SearchGroup {
     return res;
   }
 
-  public int search(@NotNull Editor editor, @NotNull String command, int startOffset, int count, EnumSet<CommandFlags> flags) {
+  public int search(@NotNull Editor editor, @NotNull String command, int startOffset, int count, @NotNull EnumSet<CommandFlags> flags) {
     int dir = DIR_FORWARDS;
     char type = '/';
     String pattern = lastSearch;
@@ -415,6 +416,7 @@ public class SearchGroup {
   /**
    * Remove current search highlights if hlSearch is false, or if the pattern is changed
    */
+  @Contract("_, _, false -> true; _, null, true -> false")
   private boolean shouldRemoveSearchHighlight(@NotNull Editor editor, String newPattern, boolean hlSearch) {
     return !hlSearch || (newPattern != null && !newPattern.equals(UserDataManager.getVimLastSearch(editor)));
   }
@@ -422,6 +424,7 @@ public class SearchGroup {
   /**
    * Add search highlights if hlSearch is true and the pattern is changed
    */
+  @Contract("_, _, false -> false; _, null, true -> false")
   private boolean shouldAddSearchHighlight(@NotNull Editor editor, @Nullable String newPattern, boolean hlSearch) {
     return hlSearch && newPattern != null && !newPattern.equals(UserDataManager.getVimLastSearch(editor)) && !Objects.equals(newPattern, "");
   }
@@ -433,7 +436,7 @@ public class SearchGroup {
     }
   }
 
-  private int findClosestMatch(@NotNull Editor editor, List<TextRange> results, int initialOffset, boolean forwards) {
+  private int findClosestMatch(@NotNull Editor editor, @NotNull List<TextRange> results, int initialOffset, boolean forwards) {
     if (results.isEmpty() || initialOffset == -1) {
       return -1;
     }
@@ -1352,6 +1355,7 @@ public class SearchGroup {
 
     public static DocumentSearchListener INSTANCE = new DocumentSearchListener();
 
+    @Contract(pure = true)
     private DocumentSearchListener () {
     }
 
