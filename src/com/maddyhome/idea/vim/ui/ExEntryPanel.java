@@ -52,15 +52,9 @@ import java.awt.event.ComponentListener;
  * This is used to enter ex commands such as searches and "colon" commands
  */
 public class ExEntryPanel extends JPanel implements LafManagerListener {
-  public static ExEntryPanel getInstance() {
-    if (instance == null) {
-      instance = new ExEntryPanel();
-    }
+  private static ExEntryPanel instanceWithoutShortcuts;
 
-    return instance;
-  }
-
-  private ExEntryPanel() {
+  private ExEntryPanel(boolean enableShortcuts) {
     label = new JLabel(" ");
     entry = new ExTextField();
 
@@ -77,11 +71,21 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
     layout.setConstraints(entry, gbc);
     add(entry);
 
-    new ExShortcutKeyAction(this).registerCustomShortcutSet();
+    if (enableShortcuts) {
+      new ExShortcutKeyAction(this).registerCustomShortcutSet();
+    }
 
     LafManager.getInstance().addLafManagerListener(this);
 
     updateUI();
+  }
+
+  public static ExEntryPanel getInstance() {
+    if (instance == null) {
+      instance = new ExEntryPanel(true);
+    }
+
+    return instance;
   }
 
   /**
@@ -372,5 +376,13 @@ public class ExEntryPanel extends JPanel implements LafManagerListener {
   }
 
   private static ExEntryPanel instance;
+
+  public static ExEntryPanel getInstanceWithoutShortcuts() {
+    if (instanceWithoutShortcuts == null) {
+      instanceWithoutShortcuts = new ExEntryPanel(false);
+    }
+
+    return instanceWithoutShortcuts;
+  }
   private static final Logger logger = Logger.getInstance(ExEntryPanel.class.getName());
 }

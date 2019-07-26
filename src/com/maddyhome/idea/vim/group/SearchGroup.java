@@ -164,7 +164,7 @@ public class SearchGroup {
   private static ReplaceConfirmationChoice confirmChoice(@NotNull Editor editor, @NotNull String match) {
     final Ref<ReplaceConfirmationChoice> result = Ref.create(ReplaceConfirmationChoice.QUIT);
     // XXX: The Ex entry panel is used only for UI here, its logic might be inappropriate for this method
-    final ExEntryPanel exEntryPanel = ExEntryPanel.getInstance();
+    final ExEntryPanel exEntryPanel = ExEntryPanel.getInstanceWithoutShortcuts();
     exEntryPanel.activate(editor, new EditorDataContext(editor), "Replace with " + match + " (y/n/a/q/l)?", "", 1);
     ModalEntry.activate(key -> {
       final ReplaceConfirmationChoice choice;

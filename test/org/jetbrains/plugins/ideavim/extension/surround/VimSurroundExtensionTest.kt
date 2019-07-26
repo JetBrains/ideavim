@@ -22,6 +22,7 @@ package org.jetbrains.plugins.ideavim.extension.surround
 
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
+import com.maddyhome.idea.vim.helper.VimBehaviorDiffers
 import org.jetbrains.plugins.ideavim.VimTestCase
 
 /**
@@ -244,4 +245,70 @@ class VimSurroundExtensionTest : VimTestCase() {
   //
   //  doTest(parseKeys("csbrE."), before, after);
   //}
+
+  @VimBehaviorDiffers("""
+      <h1>Title</h1>
+      
+      <p>
+      SurroundThis
+      </p>
+      
+      <p>Some text</p>
+  """)
+  fun `test wrap with tag full line`() {
+    doTest(parseKeys("VS\\<p>"), """
+      <h1>Title</h1>
+      
+      Sur${c}roundThis
+      
+      <p>Some text</p>
+    """.trimIndent(), """
+      <h1>Title</h1>
+      
+      <p>SurroundThis
+      </p>
+      <p>Some text</p>
+    """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  @VimBehaviorDiffers("""
+      <div>
+          <p>Some paragraph</p>
+          <p>
+          Surround This
+          </p>
+          <p>Some other paragraph</p>
+      </div>
+  """)
+  fun `test wrap with tag full line in middle`() {
+    doTest(parseKeys("VS\\<p>"), """
+      <div>
+          <p>Some paragraph</p>
+          Sur${c}round This
+          <p>Some other paragraph</p>
+      </div>
+      """.trimIndent(), """
+      <div>
+          <p>Some paragraph</p>
+      <p>    Surround This
+      </p>    <p>Some other paragraph</p>
+      </div>
+    """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
+
+  fun `test wrap line with char selection`() {
+    doTest(parseKeys("vawES\\<p>"), """
+      <div>
+          <p>Some paragraph</p>
+          Sur${c}round This
+          <p>Some other paragraph</p>
+      </div>
+      """.trimIndent(), """
+      <div>
+          <p>Some paragraph</p>
+          <p>Surround This</p>
+          <p>Some other paragraph</p>
+      </div>
+    """.trimIndent(), CommandState.Mode.COMMAND, CommandState.SubMode.NONE)
+  }
 }
