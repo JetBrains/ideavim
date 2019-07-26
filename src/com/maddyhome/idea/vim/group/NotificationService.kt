@@ -188,7 +188,7 @@ class NotificationService(private val project: Project?) {
     const val IDEAVIM_STICKY_NOTIFICATION_ID = "ideavim-sticky"
     const val IDEAVIM_NOTIFICATION_ID = "ideavim"
     const val IDEAVIM_NOTIFICATION_TITLE = "IdeaVim"
-    const val ideajoinExamplesUrl = "https://github.com/JetBrains/ideavim/blob/master/doc/ideajoin-examples.md"
+    const val ideajoinExamplesUrl = "https://github.com/JetBrains/ideavim/wiki/%60ideajoin%60-examples"
     const val selectModeUrl = "https://vimhelp.org/visual.txt.html#Select-mode"
   }
 }
