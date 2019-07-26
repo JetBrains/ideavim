@@ -102,6 +102,24 @@ class VimSurroundExtensionTest : VimTestCase() {
     myFixture.checkResult("<div class = \"container\"><p>Hello</p></div>")
   }
 
+  fun testSurroundFunctionName() {
+    configureByText("foo = ${c}bar")
+    typeText(parseKeys("ysiwfbaz"))
+    myFixture.checkResult("foo = baz(bar)")
+  }
+
+  fun testSurroundFunctionNameDoesNothingIfInputIsEmpty() {
+    configureByText("foo = ${c}bar")
+    typeText(parseKeys("ysiwf"))
+    myFixture.checkResult("foo = bar")
+  }
+
+  fun testSurroundFunctionNameWithInnerSpacing() {
+    configureByText("foo = ${c}bar")
+    typeText(parseKeys("ysiwFbaz"))
+    myFixture.checkResult("foo = baz( bar )")
+  }
+
   /* visual surround */
 
   fun testVisualSurroundWordParens() {
