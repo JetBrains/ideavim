@@ -103,9 +103,9 @@ class VimSurroundExtensionTest : VimTestCase() {
   }
 
   fun testSurroundFunctionName() {
-    configureByText("foo = ${c}bar")
+    configureByText("foo = b${c}ar")
     typeText(parseKeys("ysiwfbaz"))
-    myFixture.checkResult("foo = baz(bar)")
+    myFixture.checkResult("foo = ${c}baz(bar)")
   }
 
   fun testSurroundFunctionNameDoesNothingIfInputIsEmpty() {
@@ -117,7 +117,13 @@ class VimSurroundExtensionTest : VimTestCase() {
   fun testSurroundFunctionNameWithInnerSpacing() {
     configureByText("foo = ${c}bar")
     typeText(parseKeys("ysiwFbaz"))
-    myFixture.checkResult("foo = baz( bar )")
+    myFixture.checkResult("foo = ${c}baz( bar )")
+  }
+
+  fun testSurroundSpace() {
+    configureByText("foo(${c}bar)")
+    typeText(parseKeys("csbs"))
+    myFixture.checkResult("foo${c} bar")
   }
 
   /* visual surround */

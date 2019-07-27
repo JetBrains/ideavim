@@ -77,6 +77,7 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
     .put(']', Pair.create("[", "]"))
     .put('a', Pair.create("<", ">"))
     .put('>', Pair.create("<", ">"))
+    .put('s', Pair.create(" ", ""))
     .build();
 
   @NotNull
