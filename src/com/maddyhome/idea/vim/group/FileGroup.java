@@ -234,7 +234,10 @@ public class FileGroup {
     FileEditor[] feditors = fMgr.openFile(file, true);
     if (feditors.length > 0) {
       if (feditors[0] instanceof TextEditor) {
-        return ((TextEditor)feditors[0]).getEditor();
+        Editor editor = ((TextEditor) feditors[0]).getEditor();
+        if (!editor.isDisposed()) {
+          return editor;
+        }
       }
     }
 
