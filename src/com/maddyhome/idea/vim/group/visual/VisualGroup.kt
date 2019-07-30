@@ -18,26 +18,13 @@
 
 package com.maddyhome.idea.vim.group.visual
 
-import com.intellij.openapi.editor.Caret
-import com.intellij.openapi.editor.CaretVisualAttributes
-import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.LogicalPosition
-import com.intellij.openapi.editor.VisualPosition
+import com.intellij.openapi.editor.*
 import com.intellij.openapi.editor.colors.EditorColors
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.group.ChangeGroup
 import com.maddyhome.idea.vim.group.MotionGroup
-import com.maddyhome.idea.vim.helper.EditorHelper
-import com.maddyhome.idea.vim.helper.inBlockSubMode
-import com.maddyhome.idea.vim.helper.inSelectMode
-import com.maddyhome.idea.vim.helper.inVisualMode
-import com.maddyhome.idea.vim.helper.isEndAllowed
-import com.maddyhome.idea.vim.helper.mode
-import com.maddyhome.idea.vim.helper.sort
-import com.maddyhome.idea.vim.helper.subMode
-import com.maddyhome.idea.vim.helper.vimLastColumn
-import com.maddyhome.idea.vim.helper.vimSelectionStart
+import com.maddyhome.idea.vim.helper.*
 
 /**
  * @author Alex Plate
@@ -201,9 +188,9 @@ fun toNativeSelection(editor: Editor, start: Int, end: Int, mode: CommandState.M
     else -> sort(start, end)
   }
 
-fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor) {
-  if (!editor.inVisualMode) {
-    if (!editor.mode.isEndAllowed) {
+fun moveCaretOneCharLeftFromSelectionEnd(editor: Editor, predictedMode: CommandState.Mode) {
+  if (predictedMode != CommandState.Mode.VISUAL) {
+    if (!predictedMode.isEndAllowed) {
       editor.caretModel.allCarets.forEach { caret ->
         val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
         val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)

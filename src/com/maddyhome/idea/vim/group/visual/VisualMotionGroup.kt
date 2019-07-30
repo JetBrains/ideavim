@@ -156,6 +156,36 @@ class VisualMotionGroup {
     }
   }
 
+  // TODO: 2019-07-30 This method should be used for [controlNonVimSelectionChange]
+  fun predictMode(editor: Editor, selectionSource: VimListenerManager.SelectionSource): CommandState.Mode {
+    if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
+      val selectMode = OptionsManager.selectmode
+      return when {
+        editor.isOneLineMode -> {
+          CommandState.Mode.SELECT
+        }
+        selectionSource == VimListenerManager.SelectionSource.MOUSE && SelectModeOptionData.mouse in selectMode -> {
+          CommandState.Mode.SELECT
+        }
+        editor.isTemplateActive() && SelectModeOptionData.template in selectMode -> {
+          CommandState.Mode.SELECT
+        }
+        selectionSource == VimListenerManager.SelectionSource.OTHER && SelectModeOptionData.refactoring in selectMode -> {
+          CommandState.Mode.SELECT
+        }
+        else -> {
+          CommandState.Mode.VISUAL
+        }
+      }
+    } else {
+      val templateActive = editor.isTemplateActive()
+      if (templateActive && editor.mode == CommandState.Mode.COMMAND) {
+        return CommandState.Mode.INSERT
+      }
+      return CommandState.Mode.COMMAND
+    }
+  }
+
   //=============================== ENTER VISUAL and SELECT MODE ==============================================
 
   /**

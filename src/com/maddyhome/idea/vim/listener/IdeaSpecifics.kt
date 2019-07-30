@@ -72,7 +72,8 @@ object IdeaSpecifics {
           // Rider moves caret to the end of selection
           editor?.caretModel?.addCaretListener(object : CaretListener {
             override fun caretPositionChanged(event: CaretEvent) {
-              moveCaretOneCharLeftFromSelectionEnd(event.editor)
+              val predictedMode = VimPlugin.getVisualMotion().predictMode(event.editor, VimListenerManager.SelectionSource.OTHER)
+              moveCaretOneCharLeftFromSelectionEnd(event.editor, predictedMode)
               event.editor.caretModel.removeCaretListener(this)
             }
           })
