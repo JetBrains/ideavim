@@ -36,8 +36,9 @@ import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import com.maddyhome.idea.vim.listener.VimListenerManager
 import com.maddyhome.idea.vim.option.OptionsManager
 import com.maddyhome.idea.vim.option.SelectModeOptionData
-import junit.framework.TestCase
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.waitAndAssert
+import org.jetbrains.plugins.ideavim.waitAndAssertMode
 
 /**
  * @author Alex Plate
@@ -83,6 +84,7 @@ class TemplateTest : VimTestCase() {
             }
         """.trimIndent())
     startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
 
     typeText(parseKeys("myNewVar", "<CR>"))
@@ -107,7 +109,10 @@ class TemplateTest : VimTestCase() {
             }
         """.trimIndent())
     startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     assertState(CommandState.Mode.VISUAL, CommandState.SubMode.VISUAL_CHARACTER)
+    // Disable template
+    typeText(parseKeys("<CR>"))
   }
 
   fun `test prepend`() {
@@ -119,6 +124,7 @@ class TemplateTest : VimTestCase() {
             }
         """.trimIndent())
     startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
 
     typeText(parseKeys("<Left>"))
@@ -144,6 +150,7 @@ class TemplateTest : VimTestCase() {
             }
         """.trimIndent())
     startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
 
     typeText(parseKeys("<Right>"))
@@ -166,6 +173,7 @@ class TemplateTest : VimTestCase() {
             }
         """.trimIndent())
     startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
 
     typeText(parseKeys("<Left>"))
@@ -188,6 +196,7 @@ class TemplateTest : VimTestCase() {
             }
         """.trimIndent())
     startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
 
     typeText(parseKeys("<Right>"))
@@ -210,6 +219,7 @@ class TemplateTest : VimTestCase() {
             }
         """.trimIndent())
     startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
 
     typeText(parseKeys("<ESC>"))
@@ -233,6 +243,7 @@ class TemplateTest : VimTestCase() {
             }
         """.trimIndent())
     startRenaming(VariableInplaceRenameHandler())
+    waitAndAssertMode(myFixture, CommandState.Mode.SELECT)
     assertState(CommandState.Mode.SELECT, CommandState.SubMode.VISUAL_CHARACTER)
 
     typeText(parseKeys("Hello", "<ESC>"))
@@ -262,7 +273,7 @@ class TemplateTest : VimTestCase() {
     startRenaming(VariableInplaceRenameHandler())
     typeText(parseKeys("<CR>"))
 
-    waitFor {
+    waitAndAssert(5000) {
       val notifications = EventLog.getLogModel(myFixture.project).notifications
       notifications.isNotEmpty() && notifications.last().title == NotificationService.IDEAVIM_NOTIFICATION_TITLE
     }
@@ -271,15 +282,6 @@ class TemplateTest : VimTestCase() {
     assertEquals(NotificationService.IDEAVIM_NOTIFICATION_TITLE, notification.title)
     assertTrue(SelectModeOptionData.name in notification.content)
     assertEquals(3, notification.actions.size)
-  }
-
-  private fun waitFor(action: () -> Boolean) {
-    val start = System.currentTimeMillis()
-    var res: Boolean
-    do {
-      res = action()
-    } while (!res && System.currentTimeMillis() - start < 5000L)
-    if (!res) TestCase.fail()
   }
 
   private fun startRenaming(handler: VariableInplaceRenameHandler): Editor {

@@ -42,6 +42,7 @@ import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.ex.ExOutputModel;
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptGlobalEnvironment;
+import com.maddyhome.idea.vim.group.visual.VimVisualTimer;
 import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.OptionsManager;
 import com.maddyhome.idea.vim.option.ToggleOption;
@@ -92,6 +93,10 @@ public abstract class VimTestCase extends UsefulTestCase {
 
   @Override
   protected void tearDown() throws Exception {
+    Timer swingTimer = VimVisualTimer.INSTANCE.getSwingTimer();
+    if (swingTimer != null) {
+      swingTimer.stop();
+    }
     myFixture.tearDown();
     myFixture = null;
     ExEntryPanel.getInstance().deactivate(false);

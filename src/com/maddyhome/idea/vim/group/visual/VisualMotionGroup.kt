@@ -41,7 +41,6 @@ import com.maddyhome.idea.vim.option.SelectModeOptionData
  */
 class VisualMotionGroup {
   companion object {
-    var modeBeforeEnteringNonVimVisual: CommandState.Mode? = null
     val logger = Logger.getInstance(VisualMotionGroup::class.java)
   }
 
@@ -107,55 +106,54 @@ class VisualMotionGroup {
   }
 
   fun controlNonVimSelectionChange(editor: Editor, selectionSource: VimListenerManager.SelectionSource = VimListenerManager.SelectionSource.OTHER) {
-    logger.info("Adjust non-vim selection. Source: $selectionSource")
-    if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
-      val commandState = CommandState.getInstance(editor)
-      logger.info("Some carets have selection. State before adjustment: ${commandState.toSimpleString()}")
-      modeBeforeEnteringNonVimVisual = commandState.mode
-      logger.info("Mode before entering non-vim visual: $modeBeforeEnteringNonVimVisual")
-      while (commandState.mode != CommandState.Mode.COMMAND) {
-        commandState.popState()
-      }
-      val autodetectedMode = autodetectVisualMode(editor)
-      val selectMode = OptionsManager.selectmode
-      when {
-        editor.isOneLineMode -> {
-          logger.info("Enter select mode. Reason: one line mode")
-          enterSelectMode(editor, autodetectedMode)
+    VimVisualTimer.singleTask(editor.caretModel.allCarets.any(Caret::hasSelection), editor.mode) {
+      logger.info("Adjust non-vim selection. Source: $selectionSource")
+      if (editor.caretModel.allCarets.any(Caret::hasSelection)) {
+        val commandState = CommandState.getInstance(editor)
+        logger.info("Some carets have selection. State before adjustment: ${commandState.toSimpleString()}")
+        while (commandState.mode != CommandState.Mode.COMMAND) {
+          commandState.popState()
         }
-        selectionSource == VimListenerManager.SelectionSource.MOUSE && SelectModeOptionData.mouse in selectMode -> {
-          logger.info("Enter select mode. Selection source is mouse and selectMode option has mouse")
-          enterSelectMode(editor, autodetectedMode)
+        val autodetectedMode = autodetectVisualMode(editor)
+        val selectMode = OptionsManager.selectmode
+        when {
+          editor.isOneLineMode -> {
+            logger.info("Enter select mode. Reason: one line mode")
+            enterSelectMode(editor, autodetectedMode)
+          }
+          selectionSource == VimListenerManager.SelectionSource.MOUSE && SelectModeOptionData.mouse in selectMode -> {
+            logger.info("Enter select mode. Selection source is mouse and selectMode option has mouse")
+            enterSelectMode(editor, autodetectedMode)
+          }
+          editor.isTemplateActive() && SelectModeOptionData.template in selectMode -> {
+            logger.info("Enter select mode. Template is active and selectMode has template")
+            enterSelectMode(editor, autodetectedMode)
+          }
+          selectionSource == VimListenerManager.SelectionSource.OTHER && SelectModeOptionData.refactoring in selectMode -> {
+            logger.info("Enter select mode. Selection source is OTHER and selectMode has refactoring")
+            enterSelectMode(editor, autodetectedMode)
+          }
+          else -> {
+            logger.info("Enter visual mode")
+            enterVisualMode(editor, autodetectedMode)
+          }
         }
-        editor.isTemplateActive() && SelectModeOptionData.template in selectMode -> {
-          logger.info("Enter select mode. Template is active and selectMode has template")
-          enterSelectMode(editor, autodetectedMode)
-        }
-        selectionSource == VimListenerManager.SelectionSource.OTHER && SelectModeOptionData.refactoring in selectMode -> {
-          logger.info("Enter select mode. Selection source is OTHER and selectMode has refactoring")
-          enterSelectMode(editor, autodetectedMode)
-        }
-        else -> {
-          logger.info("Enter visual mode")
-          enterVisualMode(editor, autodetectedMode)
-        }
-      }
-      KeyHandler.getInstance().reset(editor)
-    } else {
-      val commandState = CommandState.getInstance(editor)
-      logger.info("None of carets have selection. State before adjustment: ${commandState.toSimpleString()}")
-      exitVisual(editor)
-      exitSelectModeAndResetKeyHandler(editor, true)
+        KeyHandler.getInstance().reset(editor)
+      } else {
+        val commandState = CommandState.getInstance(editor)
+        logger.info("None of carets have selection. State before adjustment: ${commandState.toSimpleString()}")
+        exitVisual(editor)
+        exitSelectModeAndResetKeyHandler(editor, true)
 
-      val templateActive = editor.isTemplateActive()
-      if ((templateActive || modeBeforeEnteringNonVimVisual == CommandState.Mode.INSERT) && editor.mode == CommandState.Mode.COMMAND) {
-        logger.info("Enter insert mode because ${if (templateActive) "template is active" else "mode before entering non vim visual: $modeBeforeEnteringNonVimVisual"}")
-        VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
+        val templateActive = editor.isTemplateActive()
+        if (templateActive && editor.mode == CommandState.Mode.COMMAND) {
+          VimPlugin.getChange().insertBeforeCursor(editor, EditorDataContext(editor))
+        }
+        updateCaretState(editor)
+        KeyHandler.getInstance().reset(editor)
       }
-      updateCaretState(editor)
-      KeyHandler.getInstance().reset(editor)
+      logger.info("${editor.mode} is enabled")
     }
-    logger.info("${editor.mode} is enabled")
   }
 
   //=============================== ENTER VISUAL and SELECT MODE ==============================================

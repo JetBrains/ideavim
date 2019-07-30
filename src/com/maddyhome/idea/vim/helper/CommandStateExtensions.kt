@@ -11,6 +11,12 @@ val CommandState.Mode.isEndAllowed
     CommandState.Mode.COMMAND, CommandState.Mode.EX_ENTRY, CommandState.Mode.REPLACE -> false
   }
 
+val CommandState.Mode.hasVisualSelection
+  get() = when (this) {
+    CommandState.Mode.VISUAL, CommandState.Mode.SELECT -> true
+    CommandState.Mode.REPLACE, CommandState.Mode.EX_ENTRY, CommandState.Mode.COMMAND, CommandState.Mode.INSERT, CommandState.Mode.REPEAT -> false
+  }
+
 val Editor.mode
   get() = CommandState.getInstance(this).mode
 

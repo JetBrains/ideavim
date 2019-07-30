@@ -22,6 +22,7 @@ import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.helper.StringHelper.parseKeys
 import org.jetbrains.plugins.ideavim.VimTestCase
+import org.jetbrains.plugins.ideavim.waitAndAssertMode
 
 /**
  * @author Alex Plate
@@ -123,6 +124,7 @@ class DeleteVisualActionTest : VimTestCase() {
             ${se}hard by the torrent of a mountain pass.
         """.trimIndent())
     VimPlugin.getVisualMotion().controlNonVimSelectionChange(myFixture.editor)
+    waitAndAssertMode(myFixture, CommandState.Mode.VISUAL)
     typeText(parseKeys("d"))
     myFixture.checkResult("""
             A Discovery

@@ -18,10 +18,16 @@
 
 package org.jetbrains.plugins.ideavim
 
+import com.intellij.ide.IdeEventQueue
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.testFramework.EditorTestUtil
+import com.intellij.testFramework.fixtures.CodeInsightTestFixture
+import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.common.TextRange
+import com.maddyhome.idea.vim.helper.mode
+import com.maddyhome.idea.vim.option.OptionsManager
+import junit.framework.TestCase
 
 /**
  * @author Alex Plate
@@ -54,4 +60,30 @@ fun Editor.rangeOf(first: String, nLinesDown: Int): TextRange {
     ends += nextOffset + first.length
   }
   return TextRange(starts.toIntArray(), ends.toIntArray())
+}
+
+inline fun waitAndAssert(timeInMillis: Int = 1000, condition: () -> Boolean) {
+  val end = System.currentTimeMillis() + timeInMillis
+  while (end > System.currentTimeMillis()) {
+    Thread.sleep(10)
+    IdeEventQueue.getInstance().flushQueue()
+    if (condition()) return
+  }
+  TestCase.fail()
+}
+
+fun waitAndAssertMode(fixture: CodeInsightTestFixture, mode: CommandState.Mode, timeInMillis: Int = OptionsManager.visualEnterDelay.value() + 1000) {
+  waitAndAssert(timeInMillis) { fixture.editor.mode == mode }
+}
+
+fun assertDoesntChange(timeInMillis: Int = 1000, condition: () -> Boolean) {
+  val end = System.currentTimeMillis() + timeInMillis
+  while (end > System.currentTimeMillis()) {
+    if (!condition()) {
+      TestCase.fail()
+      return
+    }
+    Thread.sleep(10)
+    IdeEventQueue.getInstance().flushQueue()
+  }
 }

@@ -37,7 +37,6 @@ import com.maddyhome.idea.vim.VimTypedActionHandler
 import com.maddyhome.idea.vim.command.CommandState
 import com.maddyhome.idea.vim.ex.ExOutputModel
 import com.maddyhome.idea.vim.group.*
-import com.maddyhome.idea.vim.group.visual.VisualMotionGroup
 import com.maddyhome.idea.vim.group.visual.moveCaretOneCharLeftFromSelectionEnd
 import com.maddyhome.idea.vim.group.visual.vimSetSystemSelectionSilently
 import com.maddyhome.idea.vim.helper.*
@@ -298,7 +297,6 @@ object VimListenerManager {
     }
 
     override fun mouseReleased(event: EditorMouseEvent) {
-      VisualMotionGroup.modeBeforeEnteringNonVimVisual = null
       if (mouseDragging) {
         logger.debug("Release mouse after dragging")
         val editor = event.editor

@@ -70,6 +70,7 @@ object OptionsManager {
   val viminfo = addOption(ListOption("viminfo", "vi", arrayOf("'100", "<50", "s10", "h"), null))
   val visualbell = addOption(ToggleOption("visualbell", "vb", false))
   val wrapscan = addOption(ToggleOption("wrapscan", "ws", true))
+  val visualEnterDelay = addOption(NumberOption("visualdelay", "visualdelay", 100, 0, Int.MAX_VALUE))
 
   init {
     registerExtensionOptions()
