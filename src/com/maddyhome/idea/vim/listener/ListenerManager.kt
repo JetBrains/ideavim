@@ -355,7 +355,7 @@ object VimListenerManager {
       val editor = (e?.component as? EditorComponentImpl)?.editor ?: return
       when (e.clickCount) {
         1 -> {
-          if (!editor.inInsertMode) {
+          if (!editor.mode.isEndAllowed) {
             editor.caretModel.runForEachCaret { caret ->
               val lineEnd = EditorHelper.getLineEndForOffset(editor, caret.offset)
               val lineStart = EditorHelper.getLineStartForOffset(editor, caret.offset)
