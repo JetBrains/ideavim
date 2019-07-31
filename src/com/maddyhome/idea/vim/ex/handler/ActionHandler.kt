@@ -26,7 +26,6 @@ import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.KeyHandler
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.ex.*
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.DONT_REOPEN
 import com.maddyhome.idea.vim.ex.CommandHandler.Flag.SAVE_VISUAL
 import com.maddyhome.idea.vim.helper.runAfterGotFocus
 
@@ -36,7 +35,7 @@ import com.maddyhome.idea.vim.helper.runAfterGotFocus
 class ActionHandler : CommandHandler.SingleExecution() {
 
   override val names = commands("action")
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN, SAVE_VISUAL)
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, SAVE_VISUAL)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val actionName = cmd.argument.trim()

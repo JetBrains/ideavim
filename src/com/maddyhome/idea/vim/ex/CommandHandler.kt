@@ -88,8 +88,6 @@ sealed class CommandHandler {
   }
 
   enum class Flag {
-    DONT_REOPEN,
-
     /**
      * Indicates that this is a command that modifies the editor
      */

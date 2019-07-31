@@ -22,14 +22,7 @@ import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.KeyboardShortcut
 import com.intellij.openapi.editor.Editor
-import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandler.Flag.DONT_REOPEN
-import com.maddyhome.idea.vim.ex.CommandHandlerFlags
-import com.maddyhome.idea.vim.ex.CommandName
-import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.ExOutputModel
-import com.maddyhome.idea.vim.ex.commands
-import com.maddyhome.idea.vim.ex.flags
+import com.maddyhome.idea.vim.ex.*
 import com.maddyhome.idea.vim.helper.StringHelper
 
 /**
@@ -37,7 +30,7 @@ import com.maddyhome.idea.vim.helper.StringHelper
  */
 class ActionListHandler : CommandHandler.SingleExecution() {
   override val names: Array<CommandName> = commands("actionlist")
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, DONT_REOPEN)
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val lineSeparator = "\n"

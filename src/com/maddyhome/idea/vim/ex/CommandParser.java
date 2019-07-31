@@ -44,7 +44,6 @@ public class CommandParser {
   public static final int RES_EMPTY = 1;
   public static final int RES_ERROR = 1;
   public static final int RES_READONLY = 1;
-  public static final int RES_DONT_REOPEN = 4;
   public static final Pattern TRIM_WHITESPACE = Pattern.compile("[ \\t]*(.*)[ \\t\\n\\r]+", Pattern.DOTALL);
   private final CommandHandler[] myHandlers = new CommandHandler[] {
     new ActionListHandler(),
@@ -239,10 +238,6 @@ public class CommandParser {
     if (ok && !handler.getArgFlags().getFlags().contains(CommandHandler.Flag.DONT_SAVE_LAST)) {
       VimPlugin.getRegister().storeTextInternal(editor, new TextRange(-1, -1), cmd,
               SelectionType.CHARACTER_WISE, ':', false);
-    }
-
-    if (handler.getArgFlags().getFlags().contains(CommandHandler.Flag.DONT_REOPEN)) {
-      result |= RES_DONT_REOPEN;
     }
 
     return result;
