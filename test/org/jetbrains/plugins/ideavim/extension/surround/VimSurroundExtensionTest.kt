@@ -109,19 +109,21 @@ class VimSurroundExtensionTest : VimTestCase() {
   }
 
   fun testSurroundFunctionNameDoesNothingIfInputIsEmpty() {
-    configureByText("foo = ${c}bar")
+    // The cursor does not move. This is different from Vim
+    // where the cursor moves to the beginning of the text object.
+    configureByText("foo = b${c}ar")
     typeText(parseKeys("ysiwf"))
-    myFixture.checkResult("foo = bar")
+    myFixture.checkResult("foo = b${c}ar")
   }
 
   fun testSurroundFunctionNameWithInnerSpacing() {
-    configureByText("foo = ${c}bar")
+    configureByText("foo = b${c}ar")
     typeText(parseKeys("ysiwFbaz"))
     myFixture.checkResult("foo = ${c}baz( bar )")
   }
 
   fun testSurroundSpace() {
-    configureByText("foo(${c}bar)")
+    configureByText("foo(b${c}ar)")
     typeText(parseKeys("csbs"))
     myFixture.checkResult("foo${c} bar")
   }
