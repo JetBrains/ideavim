@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.ex.flags
 
 class DelCmdHandler : CommandHandler.SingleExecution() {
   override val names = commands("delc[ommand]")
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED)
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     if (!VimPlugin.getCommand().hasAlias(cmd.argument)) {
       VimPlugin.showMessage("E184: No such user-defined command: ${cmd.argument}")

@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.helper.Msg
 
 class MarkHandler : CommandHandler.SingleExecution() {
   override val names = commands("ma[rk]", "k")
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED)
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val mark = cmd.argument[0]

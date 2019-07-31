@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.ex.flags
 
 class WritePreviousFileHandler : CommandHandler.SingleExecution() {
   override val names = commands("wN[ext]", "wp[revious]")
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val count = cmd.getCount(editor, context, 1, true)
 

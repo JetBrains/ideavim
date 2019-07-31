@@ -33,7 +33,7 @@ import java.net.URLEncoder
  */
 class HelpHandler : CommandHandler.SingleExecution() {
   override val names = commands("h[elp]")
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     BrowserUtil.browse(helpTopicUrl(cmd.argument))
     return true

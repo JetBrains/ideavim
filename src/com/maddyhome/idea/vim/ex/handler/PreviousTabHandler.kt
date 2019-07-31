@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.ex.flags
 
 class PreviousTabHandler : CommandHandler.SingleExecution() {
   override val names = commands("tabp[revious]", "tabN[ext]")
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     VimPlugin.getMotion().moveCaretGotoPreviousTab(editor, context, cmd.argument.toIntOrNull() ?: 0)
     return true

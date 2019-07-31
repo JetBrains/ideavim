@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.ex.flags
 
 class SelectLastFileHandler : CommandHandler.SingleExecution() {
   override val names = commands("la[st]")
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val res = VimPlugin.getFile().selectFile(999, context)
     if (res) {

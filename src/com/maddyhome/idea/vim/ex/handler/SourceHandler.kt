@@ -33,7 +33,7 @@ import java.io.File
  */
 class SourceHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
   override val names = commands("so[urce]")
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED)
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_REQUIRED, Access.READ_ONLY)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     execute(cmd)
     return true

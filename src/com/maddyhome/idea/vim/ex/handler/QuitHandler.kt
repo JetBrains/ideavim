@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.ex.flags
 
 class QuitHandler : CommandHandler.SingleExecution() {
   override val names = commands("q[uit]", "clo[se]", "hid[e]")
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL)
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     VimPlugin.getFile().closeFile(editor, context)
     return true

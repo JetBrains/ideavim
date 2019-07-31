@@ -30,7 +30,7 @@ import com.maddyhome.idea.vim.helper.StringHelper
  */
 class ActionListHandler : CommandHandler.SingleExecution() {
   override val names: Array<CommandName> = commands("actionlist")
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val lineSeparator = "\n"

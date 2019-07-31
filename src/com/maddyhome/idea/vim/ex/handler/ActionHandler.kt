@@ -35,7 +35,7 @@ import com.maddyhome.idea.vim.helper.runAfterGotFocus
 class ActionHandler : CommandHandler.SingleExecution() {
 
   override val names = commands("action")
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, SAVE_VISUAL)
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY, SAVE_VISUAL)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val actionName = cmd.argument.trim()

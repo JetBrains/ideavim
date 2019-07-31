@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.ex.flags
 
 class SelectFileHandler : CommandHandler.SingleExecution() {
   override val names = commands("argu[ment]")
-  override val argFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL)
+  override val argFlags = flags(RangeFlag.RANGE_IS_COUNT, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val count = cmd.getCount(editor, context, 0, true)

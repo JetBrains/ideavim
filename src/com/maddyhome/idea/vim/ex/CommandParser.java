@@ -18,8 +18,10 @@
 package com.maddyhome.idea.vim.ex;
 
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.util.ThrowableComputable;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.Register;
@@ -216,17 +218,32 @@ public class CommandParser {
       throw new InvalidCommandException(message, cmd);
     }
 
-    if (handler.getArgFlags().getFlags().contains(CommandHandler.Flag.WRITABLE) && !editor.getDocument().isWritable()) {
+    if (handler.getArgFlags().getAccess() == CommandHandler.Access.WRITABLE && !editor.getDocument().isWritable()) {
       VimPlugin.indicateError();
       logger.info("Trying to modify readonly document");
       return;
     }
 
     // Run the command
-    boolean ok = handler.process(editor, context, command, count);
-    if (ok && !handler.getArgFlags().getFlags().contains(CommandHandler.Flag.DONT_SAVE_LAST)) {
-      VimPlugin.getRegister().storeTextInternal(editor, new TextRange(-1, -1), cmd,
-              SelectionType.CHARACTER_WISE, ':', false);
+
+    ThrowableComputable<Object, ExException> runCommand = () -> {
+      boolean ok = handler.process(editor, context, command, count);
+      if (ok && !handler.getArgFlags().getFlags().contains(CommandHandler.Flag.DONT_SAVE_LAST)) {
+        VimPlugin.getRegister().storeTextInternal(editor, new TextRange(-1, -1), cmd,
+                                                  SelectionType.CHARACTER_WISE, ':', false);
+      }
+      return null;
+    };
+
+    switch (handler.getArgFlags().getAccess()) {
+      case WRITABLE:
+        ApplicationManager.getApplication().runWriteAction(runCommand);
+        break;
+      case READ_ONLY:
+        ApplicationManager.getApplication().runReadAction(runCommand);
+        break;
+      case SELF_SYNCHRONIZED:
+        runCommand.compute();
     }
   }
 

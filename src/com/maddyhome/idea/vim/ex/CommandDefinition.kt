@@ -25,7 +25,11 @@ fun commands(vararg commands: String) = commands.map { command ->
     ?: throw RuntimeException("$command is invalid!")
 }.toTypedArray()
 
-fun flags(rangeFlag: CommandHandler.RangeFlag, argumentFlag: CommandHandler.ArgumentFlag, vararg flags: CommandHandler.Flag) =
-  CommandHandlerFlags(rangeFlag, argumentFlag, flags.toSet())
+fun flags(
+  rangeFlag: CommandHandler.RangeFlag,
+  argumentFlag: CommandHandler.ArgumentFlag,
+  access: CommandHandler.Access,
+  vararg flags: CommandHandler.Flag
+) = CommandHandlerFlags(rangeFlag, argumentFlag, access, flags.toSet())
 
 private val commandPattern: Regex = "^([^\\[]+)(?:\\[([^]]+)])?\$".toRegex()

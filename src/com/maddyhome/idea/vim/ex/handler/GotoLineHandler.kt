@@ -36,7 +36,7 @@ import kotlin.math.min
  */
 class GotoLineHandler : CommandHandler.ForEachCaret() {
   override val names: Array<CommandName> = arrayOf()
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_REQUIRED, ArgumentFlag.ARGUMENT_OPTIONAL)
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_REQUIRED, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override val optFlags: EnumSet<CommandFlags> = enumSetOf(CommandFlags.FLAG_MOT_EXCLUSIVE)
 
   /**

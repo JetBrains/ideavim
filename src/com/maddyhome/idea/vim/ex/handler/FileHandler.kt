@@ -29,7 +29,7 @@ import com.maddyhome.idea.vim.ex.flags
 
 class FileHandler : CommandHandler.SingleExecution() {
   override val names = commands("f[ile]")
-  override val argFlags = flags(RangeFlag.RANGE_IS_COUNT, ARGUMENT_FORBIDDEN)
+  override val argFlags = flags(RangeFlag.RANGE_IS_COUNT, ARGUMENT_FORBIDDEN, Access.READ_ONLY)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val count = cmd.getCount(editor, context, 0, false)
     VimPlugin.getFile().displayFileInfo(editor, count > 0)

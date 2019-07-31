@@ -31,7 +31,7 @@ import com.maddyhome.idea.vim.helper.EditorDataContext
 
 class EditFileHandler : CommandHandler.SingleExecution() {
   override val names = commands("bro[wse]", "e[dit]")
-  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
+  override val argFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     val arg = cmd.argument
     if (arg == "#") {

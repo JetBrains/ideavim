@@ -22,13 +22,7 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
 import com.maddyhome.idea.vim.VimPlugin
 import com.maddyhome.idea.vim.command.MappingMode
-import com.maddyhome.idea.vim.ex.CommandHandler
-import com.maddyhome.idea.vim.ex.CommandHandlerFlags
-import com.maddyhome.idea.vim.ex.CommandName
-import com.maddyhome.idea.vim.ex.ExCommand
-import com.maddyhome.idea.vim.ex.ExException
-import com.maddyhome.idea.vim.ex.commands
-import com.maddyhome.idea.vim.ex.flags
+import com.maddyhome.idea.vim.ex.*
 import com.maddyhome.idea.vim.ex.handler.MapHandler.SpecialArgument.EXPR
 import com.maddyhome.idea.vim.ex.handler.MapHandler.SpecialArgument.SCRIPT
 import com.maddyhome.idea.vim.ex.vimscript.VimScriptCommandHandler
@@ -41,7 +35,7 @@ import javax.swing.KeyStroke
  */
 class MapHandler : CommandHandler.SingleExecution(), VimScriptCommandHandler {
   override val names: Array<CommandName> = COMMAND_NAMES
-  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL)
+  override val argFlags: CommandHandlerFlags = flags(RangeFlag.RANGE_FORBIDDEN, ArgumentFlag.ARGUMENT_OPTIONAL, Access.READ_ONLY)
 
   @Throws(ExException::class)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
