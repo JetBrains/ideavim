@@ -71,10 +71,8 @@ public class ProcessGroup {
   }
 
   public void startExCommand(@NotNull Editor editor, DataContext context, @NotNull Command cmd) {
-    if (editor.isOneLineMode()) // Don't allow ex commands in one line editors
-    {
-      return;
-    }
+    // Don't allow ex commands in one line editors
+    if (editor.isOneLineMode()) return;
 
     String initText = getRange(editor, cmd);
     CommandState.getInstance(editor).pushState(CommandState.Mode.EX_ENTRY, CommandState.SubMode.NONE, MappingMode.CMD_LINE);

@@ -47,7 +47,7 @@ public class ExEntryAction extends VimCommandAction {
   @NotNull
   @Override
   public Command.Type getType() {
-    return Command.Type.OTHER_READ_WRITE;
+    return Command.Type.OTHER_READONLY;
   }
 
   @NotNull

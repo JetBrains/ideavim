@@ -87,7 +87,6 @@ data class Command(
     SELECT_REGISTER,
     OTHER_READONLY,
     OTHER_WRITABLE,
-    OTHER_READ_WRITE,
     /**
      * Represent commands that don't require an outer read or write action for synchronization.
      */
@@ -96,13 +95,13 @@ data class Command(
 
     val isRead: Boolean
       get() = when (this) {
-        MOTION, COPY, SELECT_REGISTER, OTHER_READONLY, OTHER_READ_WRITE, COMPLETION -> true
+        MOTION, COPY, SELECT_REGISTER, OTHER_READONLY, COMPLETION -> true
         else -> false
       }
 
     val isWrite: Boolean
       get() = when (this) {
-        INSERT, DELETE, CHANGE, PASTE, RESET, OTHER_WRITABLE, OTHER_READ_WRITE -> true
+        INSERT, DELETE, CHANGE, PASTE, RESET, OTHER_WRITABLE -> true
         else -> false
       }
   }
