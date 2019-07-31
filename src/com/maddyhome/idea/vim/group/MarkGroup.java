@@ -325,7 +325,7 @@ public class MarkGroup {
     fileMarks.clear();
   }
 
-  private void removeMark(char ch, @NotNull Mark mark, @NotNull Editor editor) {
+  public void removeMark(char ch, @NotNull Mark mark, @NotNull Editor editor) {
     if (FILE_MARKS.indexOf(ch) >= 0) {
       HashMap fmarks = getFileMarks(mark.getFilename());
       fmarks.remove(ch);
