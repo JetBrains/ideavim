@@ -31,7 +31,6 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.util.Ref;
 import com.maddyhome.idea.vim.VimPlugin;
 import com.maddyhome.idea.vim.command.CommandFlags;
-import com.maddyhome.idea.vim.command.CommandState;
 import com.maddyhome.idea.vim.command.SelectionType;
 import com.maddyhome.idea.vim.common.CharacterPosition;
 import com.maddyhome.idea.vim.common.TextRange;
@@ -40,7 +39,6 @@ import com.maddyhome.idea.vim.helper.*;
 import com.maddyhome.idea.vim.option.ListOption;
 import com.maddyhome.idea.vim.option.OptionChangeListener;
 import com.maddyhome.idea.vim.option.OptionsManager;
-import com.maddyhome.idea.vim.regexp.CharHelper;
 import com.maddyhome.idea.vim.regexp.CharPointer;
 import com.maddyhome.idea.vim.regexp.CharacterClasses;
 import com.maddyhome.idea.vim.regexp.RegExp;
@@ -901,16 +899,14 @@ public class SearchGroup {
   public boolean searchAndReplace(@NotNull Editor editor, @NotNull Caret caret, @NotNull LineRange range,
                                   @NotNull String excmd, String exarg) {
     // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
-    if (CommandState.getInstance(editor).getMode() == CommandState.Mode.VISUAL) {
+    if (CommandStateHelper.inVisualMode(editor)) {
       VimPlugin.getVisualMotion().exitVisual(editor);
     }
 
     CharPointer cmd = new CharPointer(new StringBuffer(exarg));
-    //sub_nsubs = 0;
-    //sub_nlines = 0;
 
     int which_pat;
-    if (excmd.equals("~")) {
+    if ("~".equals(excmd)) {
       which_pat = RE_LAST;    /* use last used regexp */
     }
     else {
@@ -946,7 +942,8 @@ public class SearchGroup {
         delimiter = cmd.charAt();             /* remember delimiter character */
         cmd.inc();
       }
-      else            /* find the end of the regexp */ {
+      else {
+        /* find the end of the regexp */
         which_pat = RE_LAST;            /* use last used regexp */
         delimiter = cmd.charAt();             /* remember delimiter character */
         cmd.inc();
@@ -974,8 +971,10 @@ public class SearchGroup {
         cmd.inc();
       }
     }
-    else        /* use previous pattern and substitution */ {
-      if (lastReplace == null)    /* there is no previous command */ {
+    else {
+      /* use previous pattern and substitution */
+      if (lastReplace == null) {
+        /* there is no previous command */
         VimPlugin.showMessage(MessageHelper.message(Msg.e_nopresub));
         return false;
       }
@@ -1010,13 +1009,16 @@ public class SearchGroup {
       else if (cmd.charAt() == 'e') {
         do_error = !do_error;
       }
-      else if (cmd.charAt() == 'r')       /* use last used regexp */ {
+      else if (cmd.charAt() == 'r') {
+        /* use last used regexp */
         which_pat = RE_LAST;
       }
-      else if (cmd.charAt() == 'i')       /* ignore case */ {
+      else if (cmd.charAt() == 'i') {
+        /* ignore case */
         do_ic = 'i';
       }
-      else if (cmd.charAt() == 'I')       /* don't ignore case */ {
+      else if (cmd.charAt() == 'I') {
+        /* don't ignore case */
         do_ic = 'I';
       }
       else if (cmd.charAt() != 'p') {
@@ -1035,9 +1037,9 @@ public class SearchGroup {
     /*
      * check for a trailing count
      */
-    CharHelper.skipwhite(cmd);
-    if (CharacterClasses.isDigit(cmd.charAt())) {
-      int i = CharHelper.getdigits(cmd);
+    cmd.skipWhitespaces();
+    if (Character.isDigit(cmd.charAt())) {
+      int i = cmd.getDigits();
       if (i <= 0 && do_error) {
         VimPlugin.showMessage(MessageHelper.message(Msg.e_zerocount));
         return false;
@@ -1049,8 +1051,9 @@ public class SearchGroup {
     /*
      * check for trailing command or garbage
      */
-    CharHelper.skipwhite(cmd);
-    if (!cmd.isNul() && cmd.charAt() != '"')        /* if not end-of-line or comment */ {
+    cmd.skipWhitespaces();
+    if (!cmd.isNul() && cmd.charAt() != '"') {
+      /* if not end-of-line or comment */
       VimPlugin.showMessage(MessageHelper.message(Msg.e_trailing));
       return false;
     }
@@ -1079,8 +1082,6 @@ public class SearchGroup {
       setLastPattern(editor, pattern);
     }
 
-    //int start = editor.logicalPositionToOffset(new LogicalPosition(line1, 0));
-    //int end = editor.logicalPositionToOffset(new LogicalPosition(line2, EditorHelper.getLineLength(editor, line2)));
     int start = editor.getDocument().getLineStartOffset(line1);
     int end = editor.getDocument().getLineEndOffset(line2);
 
@@ -1150,7 +1151,6 @@ public class SearchGroup {
         if (match == null) {
           return false;
         }
-        //logger.debug("found match[" + spos + "," + epos + "] - replace " + match);
 
         int line = lnum + regmatch.startpos[0].lnum;
         CharacterPosition startpos = new CharacterPosition(lnum + regmatch.startpos[0].lnum, regmatch.startpos[0].col);

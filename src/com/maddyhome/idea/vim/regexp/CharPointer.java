@@ -288,6 +288,20 @@ public class CharPointer {
     return Objects.hash(seq, pointer);
   }
 
+  public void skipWhitespaces() {
+    while (CharacterClasses.isWhite(charAt())) inc();
+  }
+
+  public int getDigits() {
+    int res = 0;
+    while (Character.isDigit(charAt())) {
+      res = res * 10 + (charAt() - '0');
+      inc();
+    }
+
+    return res;
+  }
+
   private int normalize(int pos) {
     return Math.min(seq.length(), pos);
   }

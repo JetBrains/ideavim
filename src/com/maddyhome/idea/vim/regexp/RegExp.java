@@ -1955,14 +1955,14 @@ public class RegExp {
     first_char = regparse.ref(0);
     minval = getdigits(regparse);
     if (regparse.charAt() == ',')           /* There is a comma */ {
-      if (CharacterClasses.isDigit(regparse.inc().charAt())) {
+      if (Character.isDigit(regparse.inc().charAt())) {
         maxval = getdigits(regparse);
       }
       else {
         maxval = MAX_LIMIT;
       }
     }
-    else if (CharacterClasses.isDigit(first_char.charAt())) {
+    else if (Character.isDigit(first_char.charAt())) {
       maxval = minval;          /* It was \{n} or \{-n} */
     }
     else {
@@ -2004,7 +2004,7 @@ public class RegExp {
       neg = true;
       p.inc();
     }
-    while (CharacterClasses.isDigit(p.charAt())) {
+    while (Character.isDigit(p.charAt())) {
       res = res * 10 + Character.digit(p.charAt(), 10);
       p.inc();
     }
@@ -2435,7 +2435,7 @@ public class RegExp {
             break;
 
           case SIDENT:
-            if (CharacterClasses.isDigit(reginput.charAt()) || !Character.isJavaIdentifierPart(c)) {
+            if (Character.isDigit(reginput.charAt()) || !Character.isJavaIdentifierPart(c)) {
               return false;
             }
             reginput.inc();
@@ -2449,7 +2449,7 @@ public class RegExp {
             break;
 
           case SKWORD:
-            if (CharacterClasses.isDigit(reginput.charAt()) || !CharacterClasses.isWord(reginput.charAt())) {
+            if (Character.isDigit(reginput.charAt()) || !CharacterClasses.isWord(reginput.charAt())) {
               return false;
             }
             reginput.inc();
@@ -2463,7 +2463,7 @@ public class RegExp {
             break;
 
           case SFNAME:
-            if (CharacterClasses.isDigit(reginput.charAt()) || !CharacterClasses.isFile(c)) {
+            if (Character.isDigit(reginput.charAt()) || !CharacterClasses.isFile(c)) {
               return false;
             }
             reginput.inc();
@@ -2477,7 +2477,7 @@ public class RegExp {
             break;
 
           case SPRINT:
-            if (CharacterClasses.isDigit(reginput.charAt()) || !CharacterClasses.isPrint(reginput.charAt())) {
+            if (Character.isDigit(reginput.charAt()) || !CharacterClasses.isPrint(reginput.charAt())) {
               return false;
             }
             reginput.inc();
@@ -2498,14 +2498,14 @@ public class RegExp {
             break;
 
           case DIGIT:
-            if (!CharacterClasses.isDigit(c)) {
+            if (!Character.isDigit(c)) {
               return false;
             }
             reginput.inc();
             break;
 
           case NDIGIT:
-            if (c == '\u0000' || CharacterClasses.isDigit(c)) {
+            if (c == '\u0000' || Character.isDigit(c)) {
               return false;
             }
             reginput.inc();
