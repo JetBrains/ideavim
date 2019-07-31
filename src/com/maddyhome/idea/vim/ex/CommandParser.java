@@ -41,10 +41,7 @@ import java.util.regex.Pattern;
  */
 public class CommandParser {
   private static final int MAX_RECURSION = 100;
-  public static final int RES_EMPTY = 1;
-  public static final int RES_ERROR = 1;
-  public static final int RES_READONLY = 1;
-  public static final Pattern TRIM_WHITESPACE = Pattern.compile("[ \\t]*(.*)[ \\t\\n\\r]+", Pattern.DOTALL);
+  private static final Pattern TRIM_WHITESPACE = Pattern.compile("[ \\t]*(.*)[ \\t\\n\\r]+", Pattern.DOTALL);
   private final CommandHandler[] myHandlers = new CommandHandler[] {
     new ActionListHandler(),
     new AsciiHandler(),
@@ -168,31 +165,20 @@ public class CommandParser {
    * @param context The data context
    * @param cmd     The text entered by the user
    * @param count   The count entered before the colon
-   * @return A bitwise collection of flags, if any, from the result of running the command.
    * @throws ExException if any part of the command is invalid or unknown
    */
-  public int processCommand(@NotNull Editor editor, @NotNull DataContext context, @NotNull String cmd,
+  public void processCommand(@NotNull Editor editor, @NotNull DataContext context, @NotNull String cmd,
                             int count) throws ExException {
-    return processCommand(editor, context, cmd, count, MAX_RECURSION);
+    processCommand(editor, context, cmd, count, MAX_RECURSION);
   }
 
-  /**
-   * Parse and execute an Ex command entered by the user
-   *
-   * @param editor  The editor to run the command in
-   * @param context The data context
-   * @param cmd     The text entered by the user
-   * @param count   The count entered before the colon
-   * @param aliasCountdown A countdown for the depth of alias recursion that is allowed
-   * @return A bitwise collection of flags, if any, from the result of running the command.
-   * @throws ExException if any part of the command is invalid or unknown
-   */
-  private int processCommand(@NotNull Editor editor, @NotNull DataContext context, @NotNull String cmd,
+  private void processCommand(@NotNull Editor editor, @NotNull DataContext context, @NotNull String cmd,
                              int count, int aliasCountdown) throws ExException {
     // Nothing entered
     int result = 0;
     if (cmd.length() == 0) {
-      return result | RES_EMPTY;
+      logger.warn("CMD is empty");
+      return;
     }
 
     // Only save the command to the history if it is at the top of the stack.
@@ -209,14 +195,16 @@ public class CommandParser {
       if (aliasCountdown > 0) {
         String commandAlias = VimPlugin.getCommand().getAliasCommand(cmd, count);
         if (commandAlias.isEmpty()) {
-          return result |= RES_ERROR;
+          logger.warn("Command alias is empty");
+          return;
         }
-        return processCommand(editor, context, commandAlias, count, aliasCountdown - 1);
+        processCommand(editor, context, commandAlias, count, aliasCountdown - 1);
       } else {
         VimPlugin.showMessage("Recursion detected, maximum alias depth reached.");
         VimPlugin.indicateError();
-        return result |= RES_ERROR;
+        logger.warn("Recursion detected, maximum alias depth reached. ");
       }
+      return;
     }
 
     // Parse the command
@@ -230,7 +218,8 @@ public class CommandParser {
 
     if (handler.getArgFlags().getFlags().contains(CommandHandler.Flag.WRITABLE) && !editor.getDocument().isWritable()) {
       VimPlugin.indicateError();
-      return result | RES_READONLY;
+      logger.info("Trying to modify readonly document");
+      return;
     }
 
     // Run the command
@@ -239,8 +228,6 @@ public class CommandParser {
       VimPlugin.getRegister().storeTextInternal(editor, new TextRange(-1, -1), cmd,
               SelectionType.CHARACTER_WISE, ':', false);
     }
-
-    return result;
   }
 
   @Nullable

@@ -104,7 +104,6 @@ public class ProcessGroup {
     ExEntryPanel panel = ExEntryPanel.getInstance();
     panel.deactivate(true);
     boolean res = true;
-    int flags;
     try {
       CommandState.getInstance(editor).popState();
       logger.debug("processing command");
@@ -112,8 +111,7 @@ public class ProcessGroup {
       record(editor, text);
       if (logger.isDebugEnabled()) logger.debug("swing=" + SwingUtilities.isEventDispatchThread());
       if (panel.getLabel().equals(":")) {
-        flags = CommandParser.getInstance().processCommand(editor, context, text, 1);
-        if (logger.isDebugEnabled()) logger.debug("flags=" + flags);
+        CommandParser.getInstance().processCommand(editor, context, text, 1);
       }
       else {
         int pos = VimPlugin.getSearch().search(editor, text, panel.getCount(),
