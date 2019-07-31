@@ -410,6 +410,7 @@ class VisualMotionGroup {
     }
   }
 
+  @RWLockLabel.NoLockRequired
   fun exitVisual(editor: Editor) {
     resetVisual(editor)
     if (editor.inVisualMode) {
