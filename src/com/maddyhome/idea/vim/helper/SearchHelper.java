@@ -1110,6 +1110,8 @@ public class SearchHelper {
     int stop = EditorHelper.getLineEndOffset(editor, caret.getLogicalPosition().line, true);
 
     int pos = caret.getOffset();
+    if (chars.length() <= pos) return null;
+
     int start = pos;
     CharacterHelper.CharacterType[] types = new CharacterHelper.CharacterType[]{CharacterHelper.CharacterType.KEYWORD,
       CharacterHelper.CharacterType.PUNCTUATION};
@@ -1174,6 +1176,8 @@ public class SearchHelper {
     }
 
     int pos = caret.getOffset();
+    if (chars.length() <= pos) return new TextRange(chars.length() - 1, chars.length() - 1);
+
     boolean startSpace = CharacterHelper.charType(chars.charAt(pos), isBig) == CharacterHelper.CharacterType.WHITESPACE;
     // Find word start
     boolean onWordStart = pos == min ||
