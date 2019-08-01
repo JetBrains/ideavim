@@ -1869,7 +1869,7 @@ public class SearchHelper {
     }
 
     if (res < 0 || count > 0) {
-      res = dir > 0 ? max - 1 : 0;
+      res = dir > 0 ? (max > 0 ? max - 1 : 0) : 0;
     }
     else if (isOuter && ((dir < 0 && findend) || (dir > 0 && !findend))) {
       if (res != 0 && res != max - 1) {
