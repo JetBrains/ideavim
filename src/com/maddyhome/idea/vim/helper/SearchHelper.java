@@ -1328,16 +1328,6 @@ public class SearchHelper {
     boolean found = false;
     // For forward searches, skip any current whitespace so we start at the start of a word
     if (step > 0 && pos < size - 1) {
-      /*
-      if (CharacterHelper.charType(chars[pos + step], false) == CharacterHelper.WHITESPACE)
-      {
-          if (!stayEnd)
-          {
-              pos += step;
-          }
-          pos = skipSpace(chars, pos, step, size);
-      }
-      */
       if (CharacterHelper.charType(chars.charAt(pos + 1), bigWord) == CharacterHelper.CharacterType.WHITESPACE &&
           !spaceWords) {
         pos = skipSpace(chars, pos + 1, step, size) - 1;
@@ -1379,11 +1369,11 @@ public class SearchHelper {
     }
 
     if (found) {
-      if (res < 0) //(pos <= 0)
+      if (res < 0)
       {
         res = 0;
       }
-      else if (res >= size) //(pos >= size)
+      else if (res >= size)
       {
         res = size - 1;
       }
