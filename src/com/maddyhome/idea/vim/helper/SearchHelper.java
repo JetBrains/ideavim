@@ -662,6 +662,7 @@ public class SearchHelper {
   }
 
   private static boolean checkInString(@NotNull CharSequence chars, int pos, boolean str) {
+    if (chars.length() == 0) return false;
     int offset = pos;
     while (offset > 0 && chars.charAt(offset) != '\n') {
       offset--;
