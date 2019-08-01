@@ -543,6 +543,7 @@ public class EditorHelper {
 
   public static boolean isLineEmpty(@NotNull final Editor editor, final int line, final boolean allowBlanks) {
     CharSequence chars = editor.getDocument().getCharsSequence();
+    if (chars.length() == 0) return true;
     int offset = getLineStartOffset(editor, line);
     if (offset >= chars.length() || chars.charAt(offset) == '\n') {
       return true;
