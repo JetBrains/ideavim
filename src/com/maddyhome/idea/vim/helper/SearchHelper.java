@@ -623,7 +623,7 @@ public class SearchHelper {
                                                     boolean isOuter) {
     final CharSequence chars = editor.getDocument().getCharsSequence();
     final int pos = caret.getOffset();
-    if (chars.charAt(pos) == '\n') {
+    if (pos >= chars.length() || chars.charAt(pos) == '\n') {
       return null;
     }
 
