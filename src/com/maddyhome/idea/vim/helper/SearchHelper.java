@@ -1883,6 +1883,7 @@ public class SearchHelper {
   @NotNull
   public static TextRange findSentenceRange(@NotNull Editor editor, @NotNull Caret caret, int count, boolean isOuter) {
     CharSequence chars = editor.getDocument().getCharsSequence();
+    if (chars.length() == 0) return new TextRange(0, 0);
     int max = EditorHelper.getFileSize(editor);
     int offset = caret.getOffset();
     int ssel = caret.getSelectionStart();
