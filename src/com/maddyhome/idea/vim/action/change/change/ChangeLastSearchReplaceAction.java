@@ -53,7 +53,7 @@ public class ChangeLastSearchReplaceAction extends VimCommandAction {
   @NotNull
   @Override
   public Command.Type getType() {
-    return Command.Type.OTHER_WRITABLE;
+    return Command.Type.OTHER_SELF_SYNCHRONIZED;
   }
 
   @NotNull

@@ -28,7 +28,7 @@ import com.maddyhome.idea.vim.ex.flags
 
 class SubstituteHandler : CommandHandler.SingleExecution() {
   override val names = commands("s[ubstitute]", "&", "~")
-  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.WRITABLE)
+  override val argFlags = flags(RangeFlag.RANGE_OPTIONAL, ArgumentFlag.ARGUMENT_OPTIONAL, Access.SELF_SYNCHRONIZED)
   override fun execute(editor: Editor, context: DataContext, cmd: ExCommand): Boolean {
     var result = true
     for (caret in editor.caretModel.allCarets) {

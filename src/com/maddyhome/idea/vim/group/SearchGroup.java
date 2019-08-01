@@ -18,6 +18,7 @@
 package com.maddyhome.idea.vim.group;
 
 import com.google.common.collect.Lists;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.colors.EditorColors;
@@ -896,6 +897,7 @@ public class SearchGroup {
     }
   }
 
+  @RWLockLabel.SelfSynchronized
   public boolean searchAndReplace(@NotNull Editor editor, @NotNull Caret caret, @NotNull LineRange range,
                                   @NotNull String excmd, String exarg) {
     // Explicitly exit visual mode here, so that visual mode marks don't change when we move the cursor to a match.
@@ -992,7 +994,6 @@ public class SearchGroup {
       do_all = OptionsManager.INSTANCE.getGdefault().isSet();
       do_ask = false;
       do_error = true;
-      //do_print = false;
       do_ic = 0;
     }
     while (!cmd.isNul()) {
@@ -1190,7 +1191,7 @@ public class SearchGroup {
           }
 
           if (doReplace) {
-            editor.getDocument().replaceString(startoff, endoff, match);
+            ApplicationManager.getApplication().runWriteAction(() -> editor.getDocument().replaceString(startoff, endoff, match));
             lastMatch = startoff;
             newpos = CharacterPosition.Companion.fromOffset(editor, newend);
 
