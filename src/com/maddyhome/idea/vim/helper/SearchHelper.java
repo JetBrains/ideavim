@@ -1406,7 +1406,7 @@ public class SearchHelper {
    * @param size   The size of the document
    * @return The new position. This will be the first non-whitespace character found or an empty line
    */
-  public static int skipSpace(@NotNull CharSequence chars, int offset, int step, int size) {
+  private static int skipSpace(@NotNull CharSequence chars, int offset, int step, int size) {
     char prev = 0;
     while (offset >= 0 && offset < size) {
       final char c = chars.charAt(offset);
@@ -1420,7 +1420,7 @@ public class SearchHelper {
       offset += step;
     }
 
-    return offset;
+    return offset < size ? offset : size - 1;
   }
 
   /**
