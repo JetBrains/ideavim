@@ -1,26 +1,23 @@
 package com.maddyhome.idea.vim
 
 import org.jdom.Element
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 /**
  * @author Alex Plate
  */
 class VimState {
-  var isIdeaJoinNotified = false
-  var isIdeaPutNotified = false
-  var isTemplateInSelectModeNotified = false
+  var isIdeaJoinNotified by StateProperty("idea-join")
+  var isIdeaPutNotified by StateProperty("idea-put")
+  var isTemplateInSelectModeNotified by StateProperty("template-selectmode")
 
   fun readData(element: Element) {
-    val notifications: Element? = element.getChild("notifications")
-
-    notifications?.getChild("idea-join")?.getAttributeValue("enabled")?.let {
-      isIdeaJoinNotified = it.toBoolean()
-    }
-    notifications?.getChild("idea-put")?.getAttributeValue("enabled")?.let {
-      isIdeaPutNotified = it.toBoolean()
-    }
-    notifications?.getChild("template-selectmode")?.getAttributeValue("enabled")?.let {
-      isIdeaPutNotified = it.toBoolean()
+    val notifications = element.getChild("notifications")
+    map.keys.forEach { name ->
+      notifications?.getChild(name)?.getAttributeValue("enabled")?.let {
+        map[name] = it.toBoolean()
+      }
     }
   }
 
@@ -28,16 +25,25 @@ class VimState {
     val notifications = Element("notifications")
     element.addContent(notifications)
 
-    val ideaJoin = Element("idea-join")
-    ideaJoin.setAttribute("enabled", isIdeaJoinNotified.toString())
-    notifications.addContent(ideaJoin)
+    map.forEach { (name, value) ->
+      val child = Element(name)
+      child.setAttribute("enabled", value.toString())
+      notifications.addContent(child)
+    }
+  }
+}
 
-    val ideaPut = Element("idea-put")
-    ideaPut.setAttribute("enabled", isIdeaPutNotified.toString())
-    notifications.addContent(ideaPut)
+val map by lazy { mutableMapOf<String, Boolean>() }
 
-    val templateKeyModel = Element("template-selectmode")
-    templateKeyModel.setAttribute("enabled", isTemplateInSelectModeNotified.toString())
-    notifications.addContent(templateKeyModel)
+private class StateProperty(val xmlName: String) : ReadWriteProperty<VimState, Boolean> {
+
+  init {
+    map[xmlName] = false
+  }
+
+  override fun getValue(thisRef: VimState, property: KProperty<*>): Boolean = map.getOrPut(xmlName) { false }
+
+  override fun setValue(thisRef: VimState, property: KProperty<*>, value: Boolean) {
+    map[xmlName] = value
   }
 }

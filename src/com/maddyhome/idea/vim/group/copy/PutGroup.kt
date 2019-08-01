@@ -457,7 +457,9 @@ class PutGroup {
   }
 
   private fun notifyAboutIdeaPut(project: Project?) {
-    if (VimPlugin.getVimState().isIdeaPutNotified || ClipboardOptionsData.ideaput in OptionsManager.clipboard) return
+    if (VimPlugin.getVimState().isIdeaPutNotified
+      || ClipboardOptionsData.ideaput in OptionsManager.clipboard
+      || ClipboardOptionsData.ideaputDisabled) return
 
     VimPlugin.getVimState().isIdeaPutNotified = true
 

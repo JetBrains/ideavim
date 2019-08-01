@@ -408,6 +408,27 @@ object ClipboardOptionsData {
   const val abbr = "cb"
 
   const val ideaput = "ideaput"
+  var ideaputDisabled = false
+    private set
+
+  /**
+   * This autocloseable class allows temporary disable ideaput option
+   * [ClipboardOptionsData.ideaputDisabled] property indicates if ideaput was disabled
+   */
+  class IdeaputDisabler : AutoCloseable {
+    private val containedBefore: Boolean
+    override fun close() {
+      if (containedBefore) OptionsManager.clipboard.append(ideaput)
+      ideaputDisabled = false
+    }
+
+    init {
+      val options = OptionsManager.clipboard
+      containedBefore = options.contains(ideaput)
+      options.remove(ideaput)
+      ideaputDisabled = true
+    }
+  }
 }
 
 object IdeaJoinOptionsData {
