@@ -575,10 +575,13 @@ public class ChangeGroup {
     int len = EditorHelper.getLineLength(editor, EditorHelper.visualLineToLogicalLine(editor, vp.line));
     if (vp.column < len) {
       int offset = EditorHelper.visualPositionToOffset(editor, vp);
-      char ch = editor.getDocument().getCharsSequence().charAt(offset);
-      editor.getDocument().insertString(caret.getOffset(), Character.toString(ch));
-      MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretHorizontal(editor, caret, 1, true));
-      res = true;
+      CharSequence charsSequence = editor.getDocument().getCharsSequence();
+      if (offset < charsSequence.length()) {
+        char ch = charsSequence.charAt(offset);
+        editor.getDocument().insertString(caret.getOffset(), Character.toString(ch));
+        MotionGroup.moveCaret(editor, caret, VimPlugin.getMotion().moveCaretHorizontal(editor, caret, 1, true));
+        res = true;
+      }
     }
 
     return res;
