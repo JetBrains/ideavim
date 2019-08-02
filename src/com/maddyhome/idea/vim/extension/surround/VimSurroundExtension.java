@@ -195,6 +195,8 @@ public class VimSurroundExtension extends VimNonDisposableExtension {
       List<KeyStroke> innerValue = getRegister(REGISTER);
       if (innerValue == null) {
         innerValue = new ArrayList<>();
+      } else {
+        innerValue = new ArrayList<>(innerValue);
       }
 
       // Delete the surrounding
