@@ -30,8 +30,9 @@ import java.util.Map;
 
 /**
  * This document provides insert/overwrite mode
+ * Note that PlainDocument will remove CRs from text for single line text fields
  */
-public class ExDocument extends DefaultStyledDocument {
+public class ExDocument extends PlainDocument {
   /**
    * Toggles the insert/overwrite state
    */
