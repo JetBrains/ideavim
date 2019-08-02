@@ -26,6 +26,7 @@ import com.intellij.openapi.fileEditor.impl.EditorWithProviderComposite;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.maddyhome.idea.vim.VimPlugin;
+import com.maddyhome.idea.vim.helper.RWLockLabel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -99,6 +100,7 @@ public class WindowGroup {
     splitWindow(SwingConstants.VERTICAL, context, filename);
   }
 
+  @RWLockLabel.Readonly
   public void selectWindowInRow(@NotNull DataContext context, int relativePosition, boolean vertical) {
     final FileEditorManagerEx fileEditorManager = getFileEditorManager(context);
     final EditorWindow currentWindow = fileEditorManager.getCurrentWindow();
