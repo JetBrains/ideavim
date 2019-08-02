@@ -62,6 +62,8 @@ class YankGroup {
     val type = SelectionType.fromCommandFlags(motion.flags)
     val range = getTextRange(ranges, type)
 
+    if (range.size() == 0) return false;
+
     val selectionType = if (type == SelectionType.CHARACTER_WISE && range.isMultiple) SelectionType.BLOCK_WISE else type
     return yankRange(editor, range, selectionType, startOffsets)
   }
